@@ -30,10 +30,10 @@ def clean():
 
 @rule(None, html, winhelp)
 def package():
-    "Create Zip files for upload to Launchpad; for end-user downloads"
+    "Create Zip files for upload to BitBucket; for end-user downloads"
     os.chdir("_build")
-    os.system("zip -r Python3PatternsAndIdioms-html.zip html")
-    os.system("zip -r Python3PatternsAndIdioms-htmlhelp.zip htmlhelp/Python3PatternsIdiomsdoc.*")
+    os.system("zip -r ../../Python3PatternsAndIdioms-html.zip html")
+    os.system("zip -r ../../Python3PatternsAndIdioms-htmlhelp.zip htmlhelp/Python3PatternsIdiomsdoc.*")
     os.chdir("..")
 
 @rule(None, html, winhelp)
