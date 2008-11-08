@@ -1,0 +1,1641 @@
+=== added file '.bzrignore'
+--- .bzrignore	1970-01-01 00:00:00 +0000
++++ .bzrignore	2008-11-07 04:55:02 +0000
+@@ -0,0 +1,9 @@
++*.pyc
++*.pyo
++*~
++*-
++#*
++.db
++.svn
++.swp
++_build
+
+=== modified file 'Comprehensions.rst'
+--- Comprehensions.rst	2008-11-05 20:42:20 +0000
++++ Comprehensions.rst	2008-11-07 04:55:02 +0000
+@@ -19,5 +19,5 @@
+     restFiles = [os.path.join(d[0], f) for d in os.walk(".")
+                  for f in d[2] if f.endswith(".rst")]
+     for r in restFiles:
+-        print r
++        print(r)
+ 
+
+=== modified file 'DeveloperGuide.rst'
+--- DeveloperGuide.rst	2008-11-07 00:21:35 +0000
++++ DeveloperGuide.rst	2008-11-07 04:55:02 +0000
+@@ -46,6 +46,14 @@
+ 
+     ``$ hg pull``
+ 
++    Once you update, run
++
++    ``$ python setup.py install``
++
++    We may talk about minimum version numbers to process the book. Check your version with:
++
++    ``$ hg identify -n``
++
+ The full anouncement from Georg (Sphinx creator) is here:
+ 
+     http://groups.google.com/group/sphinx-dev/browse_thread/thread/6dd415847e5cbf7c
+@@ -107,6 +115,7 @@
+ Working with Launchpad and Bazaar
+ ===============================================================================
+ 
++<<<<<<< TREE
+ (Adapted from a posting by Yarko T)
+ 
+ This assumes that you have created a local branch on your private machine where
+@@ -163,4 +172,22 @@
+     it will be merged into the trunk.
+ 
+ 
++=======
++Register a branch on http://code.launchpad.net/python3patterns/.  Since your login
++will identify your branch, ``devel`` is a good choice for a general development branch.
++If you're unsure, select ``Hosted`` branching.
++
++You must submit a public key - this will get you there: 
++
++    https://launchpad.net/people/+me/+editsshkeys
++
++When you create your branch, Launchpad will show you the command to push to your branch.
++It will look something like this.
++
++.. image:: _images/pushPath.*
++
++
++A good local setup is to keep an updated copy of the current trunk
++and a separate local development branch.
++>>>>>>> MERGE-SOURCE
+ 
+
+=== modified file 'PythonDecorators.rst'
+--- PythonDecorators.rst	2008-11-05 20:42:20 +0000
++++ PythonDecorators.rst	2008-11-07 04:55:02 +0000
+@@ -84,11 +84,11 @@
+ 
+     @entryExit
+     def func1():
+-        print "inside func1()"
++        print("inside func1()")
+ 
+     @entryExit
+     def func2():
+-        print "inside func2()"
++        print("inside func2()")
+ 
+ The ``@`` indicates the application of the decorator.
+ 
+@@ -100,7 +100,7 @@
+ 
+     @myDecorator
+     def aFunction():
+-        print "inside aFunction"
++        print("inside aFunction")
+ 
+ When the compiler passes over this code, ``aFunction()`` is compiled and the
+ resulting function object is passed to the ``myDecorator`` code, which does
+@@ -123,17 +123,17 @@
+     class myDecorator(object):
+ 
+         def __init__(self, f):
+-            print "inside myDecorator.__init__()"
++            print("inside myDecorator.__init__()")
+             f() # Prove that function definition has completed
+ 
+         def __call__(self):
+-            print "inside myDecorator.__call__()"
++            print("inside myDecorator.__call__()")
+ 
+     @myDecorator
+     def aFunction():
+-        print "inside aFunction()"
++        print("inside aFunction()")
+ 
+-    print "Finished decorating aFunction()"
++    print("Finished decorating aFunction()")
+ 
+     aFunction()
+ 
+@@ -191,17 +191,17 @@
+             self.f = f
+ 
+         def __call__(self):
+-            print "Entering", self.f.__name__
++            print("Entering", self.f.__name__)
+             self.f()
+-            print "Exited", self.f.__name__
++            print("Exited", self.f.__name__)
+ 
+     @entryExit
+     def func1():
+-        print "inside func1()"
++        print("inside func1()")
+ 
+     @entryExit
+     def func2():
+-        print "inside func2()"
++        print("inside func2()")
+ 
+     func1()
+     func2()
+@@ -233,22 +233,22 @@
+ 
+     def entryExit(f):
+         def new_f():
+-            print "Entering", f.__name__
++            print("Entering", f.__name__)
+             f()
+-            print "Exited", f.__name__
++            print("Exited", f.__name__)
+         return new_f
+ 
+     @entryExit
+     def func1():
+-        print "inside func1()"
++        print("inside func1()")
+ 
+     @entryExit
+     def func2():
+-        print "inside func2()"
++        print("inside func2()")
+ 
+     func1()
+     func2()
+-    print func1.__name__
++    print(func1.__name__)
+ 
+ ``new_f()`` is defined within the body of ``entryExit()``, so it is created and
+ returned when ``entryExit()`` is called. Note that ``new_f()`` is a *closure*,
+@@ -257,16 +257,16 @@
+ Once ``new_f()`` has been defined, it is returned from ``entryExit()`` so that
+ the decorator mechanism can assign the result as the decorated function.
+ 
+-The output of the line ``print func1.__name__`` is ``new_f``, because the
++The output of the line ``print(func1.__name__)`` is ``new_f``, because the
+ ``new_f`` function has been substituted for the original function during
+ decoration. If this is a problem you can change the name of the decorator
+ function before you return it::
+ 
+     def entryExit(f):
+         def new_f():
+-            print "Entering", f.__name__
++            print("Entering", f.__name__)
+             f()
+-            print "Exited", f.__name__
++            print("Exited", f.__name__)
+         new_f.__name__ = f.__name__
+         return new_f
+ 
+@@ -287,7 +287,7 @@
+             If there are no decorator arguments, the function
+             to be decorated is passed to the constructor.
+             """
+-            print "Inside __init__()"
++            print("Inside __init__()")
+             self.f = f
+ 
+         def __call__(self, *args):
+@@ -295,21 +295,21 @@
+             The __call__ method is not called until the
+             decorated function is called.
+             """
+-            print "Inside __call__()"
++            print("Inside __call__()")
+             self.f(*args)
+-            print "After self.f(*args)"
++            print("After self.f(*args)")
+ 
+     @decoratorWithoutArguments
+     def sayHello(a1, a2, a3, a4):
+-        print 'sayHello arguments:', a1, a2, a3, a4
+-
+-    print "After decoration"
+-
+-    print "Preparing to call sayHello()"
++        print('sayHello arguments:', a1, a2, a3, a4)
++
++    print("After decoration")
++
++    print("Preparing to call sayHello()")
+     sayHello("say", "hello", "argument", "list")
+-    print "After first sayHello() call"
++    print("After first sayHello() call")
+     sayHello("a", "different", "set of", "arguments")
+-    print "After second sayHello() call"
++    print("After second sayHello() call")
+ 
+ Any arguments for the decorated function are just passed to ``__call__()``. The
+ output is::
+@@ -346,7 +346,7 @@
+             If there are decorator arguments, the function
+             to be decorated is not passed to the constructor!
+             """
+-            print "Inside __init__()"
++            print("Inside __init__()")
+             self.arg1 = arg1
+             self.arg2 = arg2
+             self.arg3 = arg3
+@@ -357,25 +357,25 @@
+             once, as part of the decoration process! You can only give
+             it a single argument, which is the function object.
+             """
+-            print "Inside __call__()"
++            print("Inside __call__()")
+             def wrapped_f(*args):
+-                print "Inside wrapped_f()"
+-                print "Decorator arguments:", self.arg1, self.arg2, self.arg3
++                print("Inside wrapped_f()")
++                print("Decorator arguments:", self.arg1, self.arg2, self.arg3)
+                 f(*args)
+-                print "After f(*args)"
++                print("After f(*args)")
+             return wrapped_f
+ 
+     @decoratorWithArguments("hello", "world", 42)
+     def sayHello(a1, a2, a3, a4):
+-        print 'sayHello arguments:', a1, a2, a3, a4
+-
+-    print "After decoration"
+-
+-    print "Preparing to call sayHello()"
++        print('sayHello arguments:', a1, a2, a3, a4)
++
++    print("After decoration")
++
++    print("Preparing to call sayHello()")
+     sayHello("say", "hello", "argument", "list")
+-    print "after first sayHello() call"
++    print("after first sayHello() call")
+     sayHello("a", "different", "set of", "arguments")
+-    print "after second sayHello() call"
++    print("after second sayHello() call")
+ 
+ From the output, we can see that the behavior changes quite significantly::
+ 
+@@ -416,26 +416,26 @@
+ 
+     def decoratorFunctionWithArguments(arg1, arg2, arg3):
+         def wrap(f):
+-            print "Inside wrap()"
++            print("Inside wrap()")
+             def wrapped_f(*args):
+-                print "Inside wrapped_f()"
+-                print "Decorator arguments:", arg1, arg2, arg3
++                print("Inside wrapped_f()")
++                print("Decorator arguments:", arg1, arg2, arg3)
+                 f(*args)
+-                print "After f(*args)"
++                print("After f(*args)")
+             return wrapped_f
+         return wrap
+ 
+     @decoratorFunctionWithArguments("hello", "world", 42)
+     def sayHello(a1, a2, a3, a4):
+-        print 'sayHello arguments:', a1, a2, a3, a4
+-
+-    print "After decoration"
+-
+-    print "Preparing to call sayHello()"
++        print('sayHello arguments:', a1, a2, a3, a4)
++
++    print("After decoration")
++
++    print("Preparing to call sayHello()")
+     sayHello("say", "hello", "argument", "list")
+-    print "after first sayHello() call"
++    print("after first sayHello() call")
+     sayHello("a", "different", "set of", "arguments")
+-    print "after second sayHello() call"
++    print("after second sayHello() call")
+ 
+ Here's the output::
+ 
+
+=== modified file 'Rules.rst'
+--- Rules.rst	2008-11-06 16:31:06 +0000
++++ Rules.rst	2008-11-07 04:55:02 +0000
+@@ -126,4 +126,5 @@
+ modified using the free Windows program Paint.NET (note, however, that we should
+ not use color because it won't translate well to the print book):
+ 
+-.. image:: _images/DistributedSystem.png
+\ No newline at end of file
++.. image:: _images/DistributedSystem.*
++
+
+=== added file '_images/DistributedSystem.pdf'
+Binary files _images/DistributedSystem.pdf	1970-01-01 00:00:00 +0000 and _images/DistributedSystem.pdf	2008-11-07 04:55:02 +0000 differ
+=== added file '_images/coffeeExplosion.pdf'
+Binary files _images/coffeeExplosion.pdf	1970-01-01 00:00:00 +0000 and _images/coffeeExplosion.pdf	2008-11-07 04:55:02 +0000 differ
+=== added file '_images/compromiseDecoration.pdf'
+Binary files _images/compromiseDecoration.pdf	1970-01-01 00:00:00 +0000 and _images/compromiseDecoration.pdf	2008-11-07 04:55:02 +0000 differ
+=== added file '_images/decoratedCoffee.pdf'
+Binary files _images/decoratedCoffee.pdf	1970-01-01 00:00:00 +0000 and _images/decoratedCoffee.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/decorator.pdf'
+Binary files _images/decorator.pdf	1970-01-01 00:00:00 +0000 and _images/decorator.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/pushPath.pdf'
+Binary files _images/pushPath.pdf	1970-01-01 00:00:00 +0000 and _images/pushPath.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/pushPath.png'
+Binary files _images/pushPath.png	1970-01-01 00:00:00 +0000 and _images/pushPath.png	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/stateMachine.pdf'
+Binary files _images/stateMachine.pdf	1970-01-01 00:00:00 +0000 and _images/stateMachine.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/surrogate.pdf'
+Binary files _images/surrogate.pdf	1970-01-01 00:00:00 +0000 and _images/surrogate.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/trashSorter1.pdf'
+Binary files _images/trashSorter1.pdf	1970-01-01 00:00:00 +0000 and _images/trashSorter1.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/trashSorter2.pdf'
+Binary files _images/trashSorter2.pdf	1970-01-01 00:00:00 +0000 and _images/trashSorter2.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/trashSorter3.pdf'
+Binary files _images/trashSorter3.pdf	1970-01-01 00:00:00 +0000 and _images/trashSorter3.pdf	2008-11-07 04:55:03 +0000 differ
+=== added file '_images/trashVisitor.pdf'
+Binary files _images/trashVisitor.pdf	1970-01-01 00:00:00 +0000 and _images/trashVisitor.pdf	2008-11-07 04:55:03 +0000 differ
+=== modified file 'appFrameworks.rst'
+--- appFrameworks.rst	2008-11-05 20:42:20 +0000
++++ appFrameworks.rst	2008-11-07 04:55:02 +0000
+@@ -40,9 +40,9 @@
+     # Create an "application":
+     class MyApp(ApplicationFramework):
+         def customize1(self):
+-            print "Nudge, nudge, wink, wink! ",
++            print("Nudge, nudge, wink, wink! ",)
+         def customize2(self):
+-            print "Say no more, Say no more!"
++            print("Say no more, Say no more!")
+ 
+     MyApp()
+ 
+
+=== modified file 'decorator.rst'
+--- decorator.rst	2008-11-05 20:42:20 +0000
++++ decorator.rst	2008-11-07 04:55:02 +0000
+@@ -22,7 +22,7 @@
+ Basic Decorator Structure
+ =======================================================================
+ 
+-.. image:: _images/decorator.gif
++.. image:: _images/decorator.*
+ 
+ 
+ A Coffee Example
+@@ -49,7 +49,7 @@
+ describes the drink and is responsible for the cost etc. The resulting menu is
+ huge, and a part of the class diagram would look something like this:
+ 
+-.. image:: _images/coffeeExplosion.gif
++.. image:: _images/coffeeExplosion.*
+ 
+ The key to using this method is to find the particular combination you want.
+ So, once you've found the drink you would like, here is how you would use it, as
+@@ -107,12 +107,12 @@
+     class CafeLatteWhipped: pass
+ 
+     cappuccino = Cappuccino()
+-    print (cappuccino.getDescription() + ": $" +
+-      `cappuccino.getCost()`)
++    print((cappuccino.getDescription() + ": $" +
++      `cappuccino.getCost()`))
+ 
+     cafeMocha = CafeMochaDecafWhipped()
+-    print (cafeMocha.getDescription()
+-      + ": $" + `cafeMocha.getCost()`)
++    print((cafeMocha.getDescription()
++      + ": $" + `cafeMocha.getCost()`))
+ 
+ 
+ 
+@@ -140,7 +140,7 @@
+ the interface of the component it encloses, so the wrapping is transparent.
+ Decorators can also be nested without the loss of this transparency.
+ 
+-.. image:: _images/decoratedCoffee.gif
++.. image:: _images/decoratedCoffee.*
+ 
+ 
+ Methods invoked on the Decorator can in turn invoke methods in the component,
+@@ -221,13 +221,13 @@
+             Decorator.__init__(self, drinkComponent)
+ 
+     cappuccino = Espresso(FoamedMilk(Mug()))
+-    print cappuccino.getDescription().strip() + \
++    print(cappuccino.getDescription().strip() + \)
+       ": $" + `cappuccino.getTotalCost()`
+ 
+     cafeMocha = Espresso(SteamedMilk(Chocolate(
+       Whipped(Decaf(Mug())))))
+ 
+-    print cafeMocha.getDescription().strip() + \
++    print(cafeMocha.getDescription().strip() + \)
+       ": $" + `cafeMocha.getTotalCost()`
+ 
+ 
+@@ -257,7 +257,7 @@
+ you would use decorators to make the modifications. This is the type of menu you
+ are presented with in most coffee shops.
+ 
+-.. image:: _images/compromiseDecoration.gif
++.. image:: _images/compromiseDecoration.*
+ 
+ Here is how to create a basic selection, as well as a decorated selection::
+ 
+@@ -322,11 +322,11 @@
+             Decorator.__init__(self, drinkComponent)
+ 
+     cappuccino = Cappuccino()
+-    print cappuccino.getDescription() + ": $" + \
++    print(cappuccino.getDescription() + ": $" + \)
+       `cappuccino.getTotalCost()`
+ 
+     cafeMocha = Whipped(Decaf(CafeMocha()))
+-    print cafeMocha.getDescription() + ": $" + \
++    print(cafeMocha.getDescription() + ": $" + \)
+       `cafeMocha.getTotalCost()`
+ 
+ 
+
+=== modified file 'factory.rst'
+--- factory.rst	2008-11-05 20:42:20 +0000
++++ factory.rst	2008-11-07 04:55:02 +0000
+@@ -51,12 +51,12 @@
+         factory = staticmethod(factory)
+ 
+     class Circle(Shape):
+-        def draw(self): print "Circle.draw"
+-        def erase(self): print "Circle.erase"
++        def draw(self): print("Circle.draw")
++        def erase(self): print("Circle.erase")
+ 
+     class Square(Shape):
+-        def draw(self): print "Square.draw"
+-        def erase(self): print "Square.erase"
++        def draw(self): print("Square.draw")
++        def erase(self): print("Square.erase")
+ 
+     # Generate shape name strings:
+     def shapeNameGen(n):
+@@ -107,7 +107,7 @@
+ explicitly if you want, for example::
+ 
+     gen = shapeNameGen(7)
+-    print gen.next()
++    print(gen.next())
+ 
+ So **next( )** is the iterator method that's actually called to generate the
+ next object, and it takes no arguments. **shapeNameGen( )** is the factory, and
+@@ -144,12 +144,12 @@
+ 
+     def factory(type):
+         class Circle(Shape):
+-            def draw(self): print "Circle.draw"
+-            def erase(self): print "Circle.erase"
++            def draw(self): print("Circle.draw")
++            def erase(self): print("Circle.erase")
+ 
+         class Square(Shape):
+-            def draw(self): print "Square.draw"
+-            def erase(self): print "Square.erase"
++            def draw(self): print("Square.draw")
++            def erase(self): print("Square.erase")
+ 
+         if type == "Circle": return Circle()
+         if type == "Square": return Square()
+@@ -204,16 +204,16 @@
+     class Shape(object): pass
+ 
+     class Circle(Shape):
+-        def draw(self): print "Circle.draw"
+-        def erase(self): print "Circle.erase"
++        def draw(self): print("Circle.draw")
++        def erase(self): print("Circle.erase")
+         class Factory:
+             def create(self): return Circle()
+ 
+     class Square(Shape):
+         def draw(self):
+-            print "Square.draw"
++            print("Square.draw")
+         def erase(self):
+-            print "Square.erase"
++            print("Square.erase")
+         class Factory:
+             def create(self): return Square()
+ 
+@@ -277,21 +277,21 @@
+ 
+     class Kitty(Character):
+         def interactWith(self, obstacle):
+-            print "Kitty has encountered a",
+-            obstacle.action()
++            print("Kitty has encountered a",
++            obstacle.action())
+ 
+     class KungFuGuy(Character):
+         def interactWith(self, obstacle):
+-            print "KungFuGuy now battles a",
+-            obstacle.action()
++            print("KungFuGuy now battles a",
++            obstacle.action())
+ 
+     class Puzzle(Obstacle):
+         def action(self):
+-            print "Puzzle"
++            print("Puzzle")
+ 
+     class NastyWeapon(Obstacle):
+         def action(self):
+-            print "NastyWeapon"
++            print("NastyWeapon")
+ 
+     # The Abstract Factory:
+     class GameElementFactory:
+@@ -345,19 +345,19 @@
+ 
+     class Kitty:
+         def interactWith(self, obstacle):
+-            print "Kitty has encountered a",
+-            obstacle.action()
++            print("Kitty has encountered a",
++            obstacle.action())
+ 
+     class KungFuGuy:
+         def interactWith(self, obstacle):
+-            print "KungFuGuy now battles a",
+-            obstacle.action()
++            print("KungFuGuy now battles a",
++            obstacle.action())
+ 
+     class Puzzle:
+-        def action(self): print "Puzzle"
++        def action(self): print("Puzzle")
+ 
+     class NastyWeapon:
+-        def action(self): print "NastyWeapon"
++        def action(self): print("NastyWeapon")
+ 
+     # Concrete factories:
+     class KittiesAndPuzzles:
+
+=== modified file 'fronting.rst'
+--- fronting.rst	2008-11-05 20:42:20 +0000
++++ fronting.rst	2008-11-07 04:55:02 +0000
+@@ -15,7 +15,7 @@
+ The basic idea is simple: from a base class, the surrogate is derived along with
+ the class or classes that provide the actual implementation:
+ 
+-..  image:: _images/surrogate.gif
++..  image:: _images/surrogate.*
+ 
+ 
+ When a surrogate object is created, it is given an implementation to which to
+@@ -38,11 +38,11 @@
+ 
+     class Implementation:
+         def f(self):
+-            print "Implementation.f()"
++            print("Implementation.f()")
+         def g(self):
+-            print "Implementation.g()"
++            print("Implementation.g()")
+         def h(self):
+-            print "Implementation.h()"
++            print("Implementation.h()")
+ 
+     class Proxy:
+         def __init__(self):
+@@ -70,11 +70,11 @@
+ 
+     class Implementation2:
+         def f(self):
+-            print "Implementation.f()"
++            print("Implementation.f()")
+         def g(self):
+-            print "Implementation.g()"
++            print("Implementation.g()")
+         def h(self):
+-            print "Implementation.h()"
++            print("Implementation.h()")
+ 
+     class Proxy2:
+         def __init__(self):
+@@ -110,19 +110,19 @@
+ 
+     class Implementation1:
+         def f(self):
+-            print "Fiddle de dum, Fiddle de dee,"
++            print("Fiddle de dum, Fiddle de dee,")
+         def g(self):
+-            print "Eric the half a bee."
++            print("Eric the half a bee.")
+         def h(self):
+-            print "Ho ho ho, tee hee hee,"
++            print("Ho ho ho, tee hee hee,")
+ 
+     class Implementation2:
+         def f(self):
+-            print "We're Knights of the Round Table."
++            print("We're Knights of the Round Table.")
+         def g(self):
+-            print "We dance whene'er we're able."
++            print("We dance whene'er we're able.")
+         def h(self):
+-            print "We do routines and chorus scenes"
++            print("We do routines and chorus scenes")
+ 
+     def run(b):
+         b.f()
+
+=== modified file 'functionObjects.rst'
+--- functionObjects.rst	2008-11-05 20:42:20 +0000
++++ functionObjects.rst	2008-11-07 04:55:02 +0000
+@@ -28,15 +28,15 @@
+ 
+     class Loony(Command):
+         def execute(self):
+-            print "You're a loony."
++            print("You're a loony.")
+ 
+     class NewBrain(Command):
+         def execute(self):
+-            print "You might even need a new brain."
++            print("You might even need a new brain.")
+ 
+     class Afford(Command):
+         def execute(self):
+-            print "I couldn't afford a whole new brain."
++            print("I couldn't afford a whole new brain.")
+ 
+     # An object that holds commands:
+     class Macro:
+@@ -125,9 +125,9 @@
+ 
+     solver = MinimaSolver(LeastSquares())
+     line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
+-    print solver.minima(line)
++    print(solver.minima(line))
+     solver.changeAlgorithm(Bisection())
+-    print solver.minima(line)
++    print(solver.minima(line))
+ 
+ 
+ Note similarity with template method - TM claims distinction that it has more
+@@ -232,7 +232,7 @@
+ 
+     class LeastSquares(Strategy):
+         def __call__(self, messenger):
+-            print self
++            print(self)
+             linedata = messenger
+             # [ Actual test/calculation here ]
+             result = LineData([1.1, 2.2]) # Dummy data
+@@ -241,7 +241,7 @@
+ 
+     class NewtonsMethod(Strategy):
+         def __call__(self, messenger):
+-            print self
++            print(self)
+             linedata = messenger
+             # [ Actual test/calculation here ]
+             result = LineData([3.3, 4.4]) # Dummy data
+@@ -250,7 +250,7 @@
+ 
+     class Bisection(Strategy):
+         def __call__(self, messenger):
+-            print self
++            print(self)
+             linedata = messenger
+             # [ Actual test/calculation here ]
+             result = LineData([5.5, 6.6]) # Dummy data
+@@ -259,7 +259,7 @@
+ 
+     class ConjugateGradient(Strategy):
+         def __call__(self, messenger):
+-            print self
++            print(self)
+             linedata = messenger
+             # [ Actual test/calculation here ]
+             result = LineData([7.7, 8.8]) # Dummy data
+@@ -277,7 +277,7 @@
+       3.0, 4.0, 5.0, 4.0
+     ])
+ 
+-    print solutions[0](line)
++    print(solutions[0](line))
+ 
+ 
+ Exercises
+
+=== modified file 'jython.rst'
+--- jython.rst	2008-11-05 20:42:20 +0000
++++ jython.rst	2008-11-07 04:55:02 +0000
+@@ -99,7 +99,7 @@
+             if self.time > other.time: return 1
+             return 0
+         def run(self):
+-            print "%.2f: %s" % (self.time, self.action)
++            print("%.2f: %s" % (self.time, self.action))
+ 
+     class LightOn(Event):
+         def __init__(self, time):
+@@ -256,29 +256,29 @@
+         // It automatically converts Strings
+         // into native Python strings:
+         interp.set("a", "This is a test");
+-        interp.exec("print a");
+-        interp.exec("print a[5:]"); // A slice
++        interp.exec("print(a)");
++        interp.exec("print(a[5:])"); // A slice
+         // It also knows what to do with arrays:
+         String[] s = { "How", "Do", "You", "Do?" };
+         interp.set("b", s);
+-        interp.exec("for x in b: print x[0], x");
++        interp.exec("for x in b: print(x[0], x)");
+         // set() only takes Objects, so it can't
+         // figure out primitives. Instead,
+         // you have to use wrappers:
+         interp.set("c", new PyInteger(1));
+         interp.set("d", new PyFloat(2.2));
+-        interp.exec("print c + d");
++        interp.exec("print(c + d)");
+         // You can also use Java's object wrappers:
+         interp.set("c", new Integer(9));
+         interp.set("d", new Float(3.14));
+-        interp.exec("print c + d");
++        interp.exec("print(c + d)");
+         // Define a Python function to print arrays:
+         interp.exec(
+           "def prt(x): \n" +
+-          "  print x \n" +
++          "  print(x)\n" +
+           "  for i in x: \n" +
+-          "    print i, \n" +
+-          "  print x.__class__\n");
++          "    print(i,)\n" +
++          "  print(x.__class__)\n");
+         // Arrays are Objects, so it has no trouble
+         // figuring out the types contained in arrays:
+         Object[] types = {
+@@ -296,25 +296,24 @@
+         }
+         // It uses toString() to print Java objects:
+         interp.set("f", new Date());
+-        interp.exec("print f");
++        interp.exec("print(f)");
+         // You can pass it a List
+         // and index into it...
+         List x = new ArrayList();
+         for(int i = 0; i < 10; i++)
+             x.add(new Integer(i * 10));
+         interp.set("g", x);
+-        interp.exec("print g");
+-        interp.exec("print g[1]");
++        interp.exec("print(g)");
++        interp.exec("print(g[1])");
+         // ... But it's not quite smart enough
+         // to treat it as a Python array:
+-        interp.exec("print g.__class__");
+-        // interp.exec("print g[5:]); // Fails
+-        // If you want it to be a python array, you
++        interp.exec("print(g.__class__)");
++        // interp.exec("print(g[5:])"); // Fails
+         // must extract the Java array:
+         System.out.println("ArrayList to array:");
+         interp.set("h", x.toArray());
+-        interp.exec("print h.__class__");
+-        interp.exec("print h[5:]");
++        interp.exec("print(h.__class__)");
++        interp.exec("print(h[5:])");
+         // Passing in a Map:
+         Map m = new HashMap();
+         m.put(new Integer(1), new Character('a'));
+@@ -324,17 +323,17 @@
+         m.put(new Integer(11), new Character('e'));
+         System.out.println("m: " + m);
+         interp.set("m", m);
+-        interp.exec("print m, m.__class__, " +
+-          "m[1], m[1].__class__");
++        interp.exec("print(m, m.__class__," +
++          "m[1], m[1].__class__)");
+         // Not a Python dictionary, so this fails:
+         //! interp.exec("for x in m.keys():" +
+-        //!   "print x, m[x]");
++        //!   "print(x, m[x])");
+         // To convert a Map to a Python dictionary,
+         // use net.mindview.python.PyUtil:
+         interp.set("m", PyUtil.toPyDictionary(m));
+-        interp.exec("print m, m.__class__, " +
+-          "m[1], m[1].__class__");
+-        interp.exec("for x in m.keys():print x,m[x]");
++        interp.exec("print(m, m.__class__, " +
++          "m[1], m[1].__class__)");
++        interp.exec("for x in m.keys():print(x,m[x])");
+       }
+       public static void
+       main(String[] args) throws PyException  {
+@@ -354,7 +353,7 @@
+ 
+ Early in the program you'll see an **exec( )** containing the Python statement::
+ 
+-    print a[5:]
++    print(a[5:])
+ 
+ The colon inside the indexing statement indicates a Python *slice*, which
+ produces a range of elements from the original array. In this case, it produces
+@@ -490,8 +489,8 @@
+         m.put("toves", new Integer(55));
+         System.out.println(m);
+         pi.set("m", PyUtil.toPyDictionary(m));
+-        pi.exec("print m");
+-        pi.exec("print m['slithy']");
++        pi.exec("print(m)");
++        pi.exec("print(m['slithy'])");
+       }
+       public static void main(String args[]) {
+         junit.textui.TestRunner.run(Test.class);
+@@ -671,8 +670,8 @@
+       public void test() throws PyException {
+         interp1.set("a", new PyInteger(42));
+         interp2.set("a", new PyInteger(47));
+-        interp1.exec("print a");
+-        interp2.exec("print a");
++        interp1.exec("print(a)");
++        interp2.exec("print(a)");
+         PyObject x1 = interp1.get("a");
+         PyObject x2 = interp2.get("a");
+         System.out.println("a from interp1: " + x1);
+@@ -707,7 +706,7 @@
+     from math import sin
+ 
+     d = Date() # Creating a Java Date object
+-    print d # Calls toString()
++    print(d) # Calls toString()
+ 
+     # A "generator" to easily create data:
+     class ValGen:
+@@ -727,27 +726,27 @@
+         set.add(y)
+         set.add(y)
+ 
+-    print map
+-    print set
++    print(map)
++    print(set)
+ 
+     # Iterating through a set:
+     for z in set:
+-        print z, z.__class__
++        print(z, z.__class__)
+ 
+-    print map[3] # Uses Python dictionary indexing
++    print(map[3]) # Uses Python dictionary indexing
+     for x in map.keySet(): # keySet() is a Map method
+-        print x, map[x]
++        print(x, map[x])
+ 
+     # Using a Java class that you create yourself is
+     # just as easy:
+     jc = JavaClass()
+     jc2 = JavaClass("Created within Jython")
+-    print jc2.getVal()
++    print(jc2.getVal())
+     jc.setVal("Using a Java class is trivial")
+-    print jc.getVal()
+-    print jc.getChars()
++    print(jc.getVal())
++    print(jc.getChars())
+     jc.val = "Using bean properties"
+-    print jc.val
++    print(jc.val)
+ 
+ 
+ The "**=M**" comment is recognized by the makefile generator tool (that I
+@@ -1049,11 +1048,11 @@
+         # Java code:
+         def __init__(self):
+             "@sig public PythonToJavaClass()"
+-            print "Constructor for PythonToJavaClass"
++            print("Constructor for PythonToJavaClass")
+ 
+         def simple(self):
+             "@sig public void simple()"
+-            print "simple()"
++            print("simple()")
+ 
+         # Returning values to Java:
+         def returnString(self):
+@@ -1080,38 +1079,38 @@
+         # Passing arguments in from Java:
+         def argIn1(self, a):
+             "@sig public void argIn1(java.lang.String a)"
+-            print "a: %s" % a
+-            print "a.__class__", a.__class__
++            print("a: %s" % a)
++            print("a.__class__", a.__class__)
+ 
+         def argIn2(self, a):
+             "@sig public void argIn1(java.lang.Integer a)"
+-            print "a + 100: %d" % (a + 100)
+-            print "a.__class__", a.__class__
++            print("a + 100: %d" % (a + 100))
++            print("a.__class__", a.__class__)
+ 
+         def argIn3(self, a):
+             "@sig public void argIn3(java.util.List a)"
+-            print "received List:", a, a.__class__
+-            print "element type:", a[0].__class__
+-            print "a[3] + a[5]:", a[5] + a[7]
+-            #! print "a[2:5]:", a[2:5] # Doesn't work
++            print("received List:", a, a.__class__)
++            print("element type:", a[0].__class__)
++            print("a[3] + a[5]:", a[5] + a[7])
++            #! print("a[2:5]:", a[2:5]) # Doesn't work
+ 
+         def argIn4(self, a):
+             "@sig public void \
+                argIn4(org.python.core.PyArray a)"
+-            print "received type:", a.__class__
+-            print "a: ", a
+-            print "element type:", a[0].__class__
+-            print "a[3] + a[5]:", a[5] + a[7]
+-            print "a[2:5]:", a[2:5] # A real Python array
++            print("received type:", a.__class__)
++            print("a: ", a)
++            print("element type:", a[0].__class__)
++            print("a[3] + a[5]:", a[5] + a[7])
++            print("a[2:5]:", a[2:5] # A real Python array)
+ 
+         # A map must be passed in as a PyDictionary:
+         def argIn5(self, m):
+             "@sig public void \
+                argIn5(org.python.core.PyDictionary m)"
+-            print "received Map: ", m, m.__class__
+-            print "m['3']:", m['3']
++            print("received Map: ", m, m.__class__)
++            print("m['3']:", m['3'])
+             for x in m.keys():
+-                print x, m[x]
++                print(x, m[x])
+ 
+ 
+ First note that **PythonToJavaClass** is inherited from **java.lang.Object**; if
+
+=== modified file 'multipleDispatching.rst'
+--- multipleDispatching.rst	2008-11-05 20:42:20 +0000
++++ multipleDispatching.rst	2008-11-07 04:55:02 +0000
+@@ -99,8 +99,8 @@
+             return Outcome.DRAW
+ 
+     def match(item1, item2):
+-        print "%s <--> %s : %s" % (
+-          item1, item2, item1.compete(item2))
++        print("%s <--> %s : %s" % (
++          item1, item2, item1.compete(item2)))
+ 
+     # Generate the items:
+     def itemPairGen(n):
+@@ -163,8 +163,8 @@
+     }
+ 
+     def match(item1, item2):
+-        print "%s <--> %s : %s" % (
+-          item1, item2, item1.compete(item2))
++        print("%s <--> %s : %s" % (
++          item1, item2, item1.compete(item2)))
+ 
+     # Generate the items:
+     def itemPairGen(n):
+
+=== modified file 'observer.rst'
+--- observer.rst	2008-11-05 20:42:20 +0000
++++ observer.rst	2008-11-07 04:55:02 +0000
+@@ -112,12 +112,12 @@
+         def f(*args):
+             self = args[0]
+             self.mutex.acquire();
+-            # print method.__name__, 'acquired'
++            # print(method.__name__, 'acquired')
+             try:
+                 return apply(method, args)
+             finally:
+                 self.mutex.release();
+-                # print method.__name__, 'released'
++                # print(method.__name__, 'released')
+         return f
+ 
+     def synchronize(klass, names=None):
+@@ -128,7 +128,7 @@
+         for (name, val) in klass.__dict__.items():
+             if callable(val) and name != '__init__' and \
+               (names == None or name in names):
+-                # print "synchronizing", name
++                # print("synchronizing", name)
+                 klass.__dict__[name] = synchronized(val)
+ 
+     # You can create your own self.mutex, or inherit
+@@ -339,14 +339,14 @@
+             def __init__(self, outer):
+                 self.outer = outer
+             def update(self, observable, arg):
+-                print "Bee " + self.outer.name + \
++                print("Bee " + self.outer.name + \)
+                   "'s breakfast time!"
+         # Another inner class for closings:
+         class CloseObserver(Observer):
+             def __init__(self, outer):
+                 self.outer = outer
+             def update(self, observable, arg):
+-                print "Bee " + self.outer.name + \
++                print("Bee " + self.outer.name + \)
+                   "'s bed time!"
+ 
+     class Hummingbird:
+@@ -360,14 +360,14 @@
+             def __init__(self, outer):
+                 self.outer = outer
+             def update(self, observable, arg):
+-                print "Hummingbird " + self.outer.name + \
+-                  "'s breakfast time!"
++                print("Hummingbird " + self.outer.name + \
++                  "'s breakfast time!")
+         class CloseObserver(Observer):
+             def __init__(self, outer):
+                 self.outer = outer
+             def update(self, observable, arg):
+-                print "Hummingbird " + self.outer.name + \
+-                  "'s bed time!"
++                print("Hummingbird " + self.outer.name + \
++                  "'s bed time!")
+ 
+     f = Flower()
+     ba = Bee("Eric")
+
+=== modified file 'patternRefactoring.rst'
+--- patternRefactoring.rst	2008-11-05 20:42:20 +0000
++++ patternRefactoring.rst	2008-11-07 04:55:02 +0000
+@@ -60,7 +60,7 @@
+                   t.getClass().getName() +
+                   " = " + t.getWeight())
+ 
+-            print "Total value = " + val
++            print("Total value = " + val)
+ 
+     class Aluminum(Trash):
+         val  = 1.67f
+@@ -392,7 +392,7 @@
+                   t.getClass().getName() +
+                   " = " + t.getWeight())
+ 
+-            print "Total value = " + val
++            print("Total value = " + val)
+ 
+         # Remainder of class provides
+         # support for prototyping:
+@@ -417,7 +417,7 @@
+             # Class was not in the list. Try to load it,
+             # but it must be in your class path!
+             try:
+-                print "Loading " + info.id
++                print("Loading " + info.id)
+                 trashTypes.add(Class.forName(info.id))
+             except e:
+                 e.printStackTrace(System.err)
+@@ -747,7 +747,7 @@
+ class? This is the principle of "If you must do something ugly, at least
+ localize the ugliness inside a class." It looks like this:
+ 
+-.. image:: _images/trashSorter1.gif
++.. image:: _images/trashSorter1.*
+ 
+ 
+ The **TrashSorter** object initialization must now be changed whenever a new type of **Trash** is added to the model. You could imagine that the **TrashSorter** class might look something like this::
+@@ -769,7 +769,7 @@
+ **ArrayList**. Since the job of this method is to grab the pieces of trash it is
+ interested in, it's called **grab(Trash)**. The structure now looks like:
+ 
+-.. image:: _images/trashSorter2.gif
++.. image:: _images/trashSorter2.*
+ 
+ 
+ 
+@@ -912,7 +912,7 @@
+ It uses this array to step through and try to add itself to the appropriate bin,
+ and this is where you'll see the double dispatch.
+ 
+-.. image:: _images/trashSorter3.gif
++.. image:: _images/trashSorter3.*
+ 
+ 
+ 
+@@ -1195,7 +1195,7 @@
+ simply "accept" the visitor, then call the visitor's dynamically-bound method.
+ It looks like this:
+ 
+-.. image:: _images/trashVisitor.gif
++.. image:: _images/trashVisitor.*
+ 
+ 
+ Now, if **v** is a **Visitable** reference to an **Aluminum** object, the code::
+@@ -1355,22 +1355,22 @@
+         cSum = 0.0  # Cardboard
+         def visit(self, al):
+             v = al.getWeight() * al.getValue()
+-            print "value of Aluminum= " + v
++            print("value of Aluminum= " + v)
+             alSum += v
+ 
+         def visit(self, p):
+             v = p.getWeight() * p.getValue()
+-            print "value of Paper= " + v
++            print("value of Paper= " + v)
+             pSum += v
+ 
+         def visit(self, g):
+             v = g.getWeight() * g.getValue()
+-            print "value of Glass= " + v
++            print("value of Glass= " + v)
+             gSum += v
+ 
+         def visit(self, c):
+             v = c.getWeight() * c.getValue()
+-            print "value of Cardboard = " + v
++            print("value of Cardboard = " + v)
+             cSum += v
+ 
+         def total(self):
+
+=== modified file 'projects.rst'
+--- projects.rst	2008-11-05 20:42:20 +0000
++++ projects.rst	2008-11-07 04:55:02 +0000
+@@ -48,7 +48,7 @@
+         height = -1
+         main(self):
+             if (args.length < 1):
+-                print "Enter filename"
++                print("Enter filename")
+                 System.exit(0)
+ 
+             Maze m = Maze()
+
+=== modified file 'quickPython.rst'
+--- quickPython.rst	2008-11-05 20:42:20 +0000
++++ quickPython.rst	2008-11-07 04:55:02 +0000
+@@ -52,9 +52,9 @@
+     # quickPython/if.py
+     response = "yes"
+     if response == "yes":
+-        print "affirmative"
++        print("affirmative")
+         val = 1
+-    print "continuing..."
++    print("continuing...")
+ 
+ 
+ The '**#**' denotes a comment that goes until the end of the line, just like C++
+@@ -97,10 +97,10 @@
+ 
+     # quickPython/list.py
+     list = [ 1, 3, 5, 7, 9, 11 ]
+-    print list
++    print(list)
+     list.append(13)
+     for x in list:
+-        print x
++        print(x)
+ 
+ 
+ The first line creates a list. You can print the list and it will look exactly
+@@ -132,13 +132,13 @@
+     def myFunction(response):
+         val = 0
+         if response == "yes":
+-            print "affirmative"
++            print("affirmative")
+             val = 1
+-        print "continuing..."
++        print("continuing...")
+         return val
+ 
+-    print myFunction("no")
+-    print myFunction("yes")
++    print(myFunction("no"))
++    print(myFunction("yes"))
+ 
+ Notice there is no type information in the function signature - all it specifies
+ is the name of the function and the argument identifiers, but no argument types
+@@ -153,8 +153,8 @@
+         if arg == "one":
+             return True
+ 
+-    print differentReturns(1)
+-    print differentReturns("one")
++    print(differentReturns(1))
++    print(differentReturns("one"))
+ 
+ 
+ The only constraints on an object that is passed into the function are that the
+@@ -166,8 +166,8 @@
+     def sum(arg1, arg2):
+         return arg1 + arg2
+ 
+-    print sum(42, 47)
+-    print sum('spam ', "eggs")
++    print(sum(42, 47))
++    print(sum('spam ', "eggs"))
+ 
+ 
+ When the operator '**+**' is used with strings, it means concatenation (yes,
+@@ -182,13 +182,13 @@
+ double quotes, you can embed single quotes and vice versa::
+ 
+     # quickPython/strings.py
+-    print "That isn't a horse"
+-    print 'You are not a "Viking"'
+-    print """You're just pounding two
+-    coconut halves together."""
+-    print '''"Oh no!" He exclaimed.
+-    "It's the blemange!"'''
+-    print r'c:\python\lib\utils'
++    print("That isn't a horse")
++    print('You are not a "Viking"')
++    print("""You're just pounding two
++    coconut halves together.""")
++    print('''"Oh no!" He exclaimed.
++    "It's the blemange!"''')
++    print(r'c:\python\lib\utils')
+ 
+ 
+ Note that Python was not named after the snake, but rather the Monty Python
+@@ -210,10 +210,10 @@
+ 
+     # quickPython/stringFormatting.py
+     val = 47
+-    print "The number is %d" % val
++    print("The number is %d" % val)
+     val2 = 63.4
+     s = "val: %d, val2: %f" % (val, val2)
+-    print s
++    print(s)
+ 
+ 
+ As you can see in the second case, if you have more than one argument you
+@@ -235,14 +235,14 @@
+     # quickPython/SimpleClass.py
+     class Simple:
+         def __init__(self, str):
+-            print "Inside the Simple constructor"
++            print("Inside the Simple constructor")
+             self.s = str
+         # Two methods:
+         def show(self):
+-            print self.s
++            print(self.s)
+         def showMsg(self, msg):
+-            print msg + ':',
+-            self.show() # Calling another method
++            print(msg + ':',
++            self.show()) # Calling another method
+ 
+     if __name__ == "__main__":
+         # Create an object:
+@@ -332,7 +332,7 @@
+ 
+     class Simple2(Simple):
+         def __init__(self, str):
+-            print "Inside Simple2 constructor"
++            print("Inside Simple2 constructor")
+             # You must explicitly call
+             # the base-class constructor:
+             Simple.__init__(self, str)
+@@ -340,14 +340,14 @@
+             self.showMsg("Called from display()")
+         # Overriding a base-class method
+         def show(self):
+-            print "Overridden show() method"
++            print("Overridden show() method")
+             # Calling a base-class method from inside
+             # the overridden method:
+             Simple.show(self)
+ 
+     class Different:
+         def show(self):
+-            print "Not derived from Simple"
++            print("Not derived from Simple")
+ 
+     if __name__ == "__main__":
+         x = Simple2("Simple2 constructor argument")
+
+=== modified file 'singleton.rst'
+--- singleton.rst	2008-11-05 20:42:20 +0000
++++ singleton.rst	2008-11-07 04:55:02 +0000
+@@ -27,16 +27,16 @@
+             return getattr(self.instance, name)
+ 
+     x = OnlyOne('sausage')
+-    print x
++    print(x)
+     y = OnlyOne('eggs')
+-    print y
++    print(y)
+     z = OnlyOne('spam')
+-    print z
+-    print x
+-    print y
+-    print `x`
+-    print `y`
+-    print `z`
++    print(z)
++    print(x)
++    print(y)
++    print(`x`)
++    print(`y`)
++    print(`z`)
+     output = '''
+     <__main__.__OnlyOne instance at 0076B7AC>sausage
+     <__main__.__OnlyOne instance at 0076B7AC>eggs
+@@ -91,15 +91,15 @@
+ 
+     x = OnlyOne()
+     x.val = 'sausage'
+-    print x
++    print(x)
+     y = OnlyOne()
+     y.val = 'eggs'
+-    print y
++    print(y)
+     z = OnlyOne()
+     z.val = 'spam'
+-    print z
+-    print x
+-    print y
++    print(z)
++    print(x)
++    print(y)
+     #<hr>
+     output = '''
+     <__main__.__OnlyOne instance at 0x00798900>sausage
+@@ -132,16 +132,16 @@
+         def __str__(self): return self.val
+ 
+     x = Singleton('sausage')
+-    print x
++    print(x)
+     y = Singleton('eggs')
+-    print y
++    print(y)
+     z = Singleton('spam')
+-    print z
+-    print x
+-    print y
+-    print `x`
+-    print `y`
+-    print `z`
++    print(z)
++    print(x)
++    print(y)
++    print(`x`)
++    print(`y`)
++    print(`z`)
+     output = '''
+     sausage
+     eggs
+@@ -194,10 +194,10 @@
+     x.val = 'sausage'
+     y.val = 'eggs'
+     z.val = 'spam'
+-    print x.val
+-    print y.val
+-    print z.val
+-    print x is y is z
++    print(x.val)
++    print(y.val)
++    print(z.val)
++    print(x is y is z)
+ 
+ 
+ [[ Description ]]
+@@ -230,10 +230,10 @@
+     x=bar('sausage')
+     y=bar('eggs')
+     z=bar('spam')
+-    print x
+-    print y
+-    print z
+-    print x is y is z
++    print(x)
++    print(y)
++    print(z)
++    print(x is y is z)
+ 
+ 
+ [[ Long, detailed, informative description of what metaclasses are and how they
+
+=== modified file 'stateMachine.rst'
+--- stateMachine.rst	2008-11-05 20:42:20 +0000
++++ stateMachine.rst	2008-11-07 04:55:02 +0000
+@@ -61,7 +61,7 @@
+         # Template method:
+         def runAll(self, inputs):
+             for i in inputs:
+-                print i
++                print(i)
+                 self.currentState = self.currentState.next(i)
+                 self.currentState.run()
+ 
+@@ -142,7 +142,7 @@
+ 
+     class Waiting(State):
+         def run(self):
+-            print "Waiting: Broadcasting cheese smell"
++            print("Waiting: Broadcasting cheese smell")
+ 
+         def next(self, input):
+             if input == MouseAction.appears:
+@@ -151,7 +151,7 @@
+ 
+     class Luring(State):
+         def run(self):
+-            print "Luring: Presenting Cheese, door open"
++            print("Luring: Presenting Cheese, door open")
+ 
+         def next(self, input):
+             if input == MouseAction.runsAway:
+@@ -162,7 +162,7 @@
+ 
+     class Trapping(State):
+         def run(self):
+-            print "Trapping: Closing door"
++            print("Trapping: Closing door")
+ 
+         def next(self, input):
+             if input == MouseAction.escapes:
+@@ -173,7 +173,7 @@
+ 
+     class Holding(State):
+         def run(self):
+-            print "Holding: Mouse caught"
++            print("Holding: Mouse caught")
+ 
+         def next(self, input):
+             if input == MouseAction.removed:
+@@ -239,7 +239,7 @@
+ 
+     class Waiting(StateT):
+         def run(self):
+-            print "Waiting: Broadcasting cheese smell"
++            print("Waiting: Broadcasting cheese smell")
+         def next(self, input):
+             # Lazy initialization:
+             if not self.transitions:
+@@ -250,7 +250,7 @@
+ 
+     class Luring(StateT):
+         def run(self):
+-            print "Luring: Presenting Cheese, door open"
++            print("Luring: Presenting Cheese, door open")
+         def next(self, input):
+             # Lazy initialization:
+             if not self.transitions:
+@@ -262,7 +262,7 @@
+ 
+     class Trapping(StateT):
+         def run(self):
+-            print "Trapping: Closing door"
++            print("Trapping: Closing door")
+         def next(self, input):
+             # Lazy initialization:
+             if not self.transitions:
+@@ -274,7 +274,7 @@
+ 
+     class Holding(StateT):
+         def run(self):
+-            print "Holding: Mouse caught"
++            print("Holding: Mouse caught")
+         def next(self, input):
+             # Lazy initialization:
+             if not self.transitions:
+@@ -355,7 +355,7 @@
+ * Tests and transitions are encapsulated in function objects (objects that hold functions)
+ * Java constraint: methods are not first-class objects
+ 
+-.. image:: _images/stateMachine.gif
++.. image:: _images/stateMachine.*
+ 
+ 
+ The State Class
+@@ -589,9 +589,9 @@
+             i1 = first.getValue()
+             i2 = input.getValue()
+             ItemSlot is = items[i1][i2]
+-            print ("Dispensing item " +
++            print(("Dispensing item " +
+               is + " costs " + is.getPrice() +
+-              " and has quantity " + is.getQuantity())
++              " and has quantity " + is.getQuantity()))
+             items[i1][i2].decrQuantity()
+             print ("Quantity " +
+               is.getQuantity())
+@@ -601,15 +601,15 @@
+ 
+         def showTotal(self, input):
+             amount += ((Money)input).getValue()
+-            print "Total amount = " + amount
++            print("Total amount = " + amount)
+ 
+         def returnChange(self, input):
+-            print "Returning " + amount
++            print("Returning " + amount)
+             amount = 0
+ 
+         def showDigit(self, input):
+             first = (FirstDigit)input
+-            print "First Digit= "+ first
++            print("First Digit= "+ first)
+ 
+         def __init__(self):
+             StateMachine.__init__(self, State.quiescent)
+
+=== modified file 'unitTesting.rst'
+--- unitTesting.rst	2008-11-05 20:42:20 +0000
++++ unitTesting.rst	2008-11-07 04:55:02 +0000
+@@ -125,9 +125,9 @@
+             pyprogs = [p for p in glob.glob('*.py')
+                        if p not in exclude ]
+             if not pyprogs: return
+-            print '[' + os.getcwd() + ']'
++            print('[' + os.getcwd() + ']')
+             for program in pyprogs:
+-                print '\t', program
++                print('\t', program)
+                 os.system("python %s > tmp" % program)
+                 file = open(program).read()
+                 output = open('tmp').read()
+@@ -222,10 +222,10 @@
+         objCounter = 0
+         id = ++objCounter
+         def TestDemo(String s):
+-            print (s + ": count = " + id)
++            print(s + ": count = " + id)
+ 
+         def close(self):
+-            print ("Cleaning up: " + id)
++            print("Cleaning up: " + id)
+ 
+         def someCondition(self): return True
+         class Test(UnitTest):
+@@ -236,11 +236,11 @@
+                 test1.close()
+ 
+             def testA(self):
+-                print "TestDemo.testA"
++                print("TestDemo.testA")
+                 affirm(test1.someCondition())
+ 
+             def testB(self):
+-                print "TestDemo.testB"
++                print("TestDemo.testB")
+                 affirm(test2.someCondition())
+                 affirm(TestDemo.objCounter != 0)
+ 
+@@ -316,11 +316,11 @@
+         # as the test class in the base class:
+         class Test(UnitTest):
+             def testA(self):
+-                print "TestDemo2.testA"
++                print("TestDemo2.testA")
+                 affirm(1 + 1 == 2)
+ 
+             def testB(self):
+-                print "TestDemo2.testB"
++                print("TestDemo2.testB")
+                 affirm(2 * 2 == 4)
+ 
+ 
+@@ -435,7 +435,7 @@
+     class RunUnitTests:
+         def require(requirement, errmsg):
+             if(!requirement):
+-                print errmsg
++                print(errmsg)
+                 sys.exit()
+ 
+         def main(self, args):
+
+=== modified file 'visitor.rst'
+--- visitor.rst	2008-11-05 20:42:20 +0000
++++ visitor.rst	2008-11-07 04:55:02 +0000
+@@ -33,9 +33,9 @@
+         def accept(self, visitor):
+             visitor.visit(self)
+         def pollinate(self, pollinator):
+-            print self, "pollinated by", pollinator
++            print(self, "pollinated by", pollinator)
+         def eat(self, eater):
+-            print self, "eaten by", eater
++            print(self, "eaten by", eater)
+         def __str__(self):
+             return self.__class__.__name__
+ 
+

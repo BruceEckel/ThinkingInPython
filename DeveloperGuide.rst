@@ -1,0 +1,208 @@
+*******************************************************************************
+Developer Guide
+*******************************************************************************
+
+Details for people participating in the book development process.
+
+For Windows Users
+===============================================================================
+
+You need to install Cygwin; go to:
+
+    http://www.cygwin.com
+
+You need to install at least the ``make`` utility, but I find that ``chere``
+(command prompt here) is also very useful.
+
+Also install ``openssh`` (under **Net**), so you can create your RSA key
+for Bazaar.
+
+I've discovered that it's best if you *don't* install Python as part of
+Cygwin; instead use a single Python installation under windows. Cygwin will
+find the installation if it is on your Windows PATH.
+
+Because of this, you shouldn't select "mercurial" or "bazaar" when you're
+installing Cygwin because that will cause Python to be installed. Instead,
+install them as Windows applications (see below).
+
+Installing Sphinx
+===============================================================================
+
+Because we are sometimes pushing the boundaries of Sphinx, you'll need to get
+the very latest development version (a.k.a. the "tip").
+
+#. Get mercurial:
+
+    http://www.selenic.com/mercurial
+
+    Avoid installing the tortoiseHG part - it has caused trouble w/ Python
+    debuggers.
+
+#. To get the Sphinx trunk, start with:
+
+    ``$ hg clone http://www.bitbucket.org/birkenfeld/sphinx/``
+
+    and to update, use:
+
+    ``$ hg pull``
+
+    Once you update, run
+
+    ``$ python setup.py install``
+
+    We may talk about minimum version numbers to process the book. Check your
+    version with:
+
+    ``$ hg identify -n``
+
+The full anouncement from Georg (Sphinx creator) is here:
+
+    http://groups.google.com/group/sphinx-dev/browse_thread/thread/6dd415847e5cbf7c
+
+Mercurial Cheat sheets & quick starts should be enough to answer your questions:
+
+    - http://edong.net/2008v1/docs/dongwoo-Hg-120dpi.png
+    - http://www.ivy.fr/mercurial/ref/v1.0/
+
+Getting the Development Branch of the Book
+===============================================================================
+
+This book uses Launchpad.net tools, and additional tools if necessary.
+
+#.  Sign up for an account at http://Launchpad.net.
+
+#.  Install the Bazaar distributed version control system (DVCS):
+
+    https://launchpad.net/bzr
+
+    It's helpful to follow this Bazaar mini-tutorial:
+
+    http://doc.bazaar-vcs.org/latest/en/mini-tutorial/index.html
+
+    And here's the complete Bazaar user guide:
+
+    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html
+
+#.  You must create an rsa key. Under OSX and Linux, and if you installed
+    ``openssh with`` Cygwin under windows, you run ``ssh-keygen`` to generate
+    the key, and then add it to your Launchpad account.
+
+#.  Go to https://code.launchpad.net/python3patterns, and you'll see
+    instructions for getting a branch for development.
+
+#.  Work on your branch and make local commits.
+
+Building the Book
+===============================================================================
+
+To ensure you have Cygwin installed correctly (if you're using windows) and
+to see what the options are, type:
+
+    ``make``
+
+at a shell prompt. Then you can use ``make html`` to build the HTML version of
+the book, or ``make htmlhelp`` to make the windows help version, etc.
+
+You can also use the ``build`` system I've created (as a book example; it is
+part of the distribution). This will call ``make`` and it simplifies many of the
+tasks involved. Type:
+
+    ``build help``
+
+to see the options.
+
+Working with Launchpad and Bazaar
+===============================================================================
+
+(Adapted from a posting by Yarko T)
+
+This assumes that you have created a local branch on your private machine where
+you do work, and keep it merged with the trunk.
+
+That is, you've done:
+
+   - ``bzr branch lp:python3patterns``
+   - ``bzr commit -m 'initial checkout'``
+   - (hack, hack, hack....)
+   - ``bzr merge``   (pull new updates)
+   - ``bzr commit -m 'checkin after merge...'``
+   - ... and so on...
+
+When you have a new function idea, or think you've found a bug, ask Bruce
+on the group.
+
+   -  If you have a new feature, register a blueprint on Launchpad and
+      describe what you're going to do.
+   -  If you have found a bug, make a bug report on Launchpad (later assign
+      it to yourself, and link your branch to it);
+   -  If you want to work on a project, look for an unassigned bug and try to
+      work it out - then proceed as below...
+
+When you are ready to share your work have others review, register a branch.
+
+.. note:: Once you create a branch, there is no easy way to remove it.
+
+.. note:: You can re-use one branch for multiple bug fixes.
+
+1.  Sign up for an account on launchpad.net
+
+2.  Go to the project and select "register branch"
+    (``https://code.launchpad.net/python3patterns/+addbranch``). Suggest you
+    create a hosted branch, then you can work locally, and pull/push as you make
+    progress (see
+    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html#organizing).
+
+3.  Once you have registered your branch, launchpad will provide you with
+    instructions on how to pull and push to your personal development copy.
+
+4.  Link your bug report or blueprint to your branch.
+
+5.  Merge from your "parent" (the trunk, or others you are working with) as needed.
+
+6.  Push your working copy to launchpad as your work is ready for others to
+    review or  test.
+
+7.  Once you are done making your changes, have completed testing, and are
+    ready for the project team to inspect & test, please select "propose for
+    merging"
+
+8.  Somebody on the core team will make a test merge (it may include
+    merging with other patches). Once tests pass, and your branch is accepted,
+    it will be merged into the trunk.
+
+
+Branch Registration Details
+===============================================================================
+Register a branch on http://code.launchpad.net/python3patterns/.  Since your login
+will identify your branch, ``devel`` is a good choice for a general development branch.
+If you're unsure, select ``Hosted`` branching.
+
+You must submit a public key - this will get you there:
+
+    https://launchpad.net/people/+me/+editsshkeys
+
+When you create your branch, Launchpad will show you the command to push to your branch.
+It will look something like this.
+
+.. image:: _images/pushPath.*
+
+A good local setup is to keep an updated copy of the current trunk
+and a separate local development branch.
+
+Tips for Merging
+===============================================================================
+
+..  note:: I want to eventually move to the mode where submissions are
+    reviewed by another member of the team, rather than me reviewing everything.
+
+-   Make a merge using a local test branch
+
+-   Consider using kdiff3: http://kdiff3.sourceforge.net/
+
+-   You can use ``bzr diff --using=kdiff3`` to browse differences, and use a bazaar
+    plugin to merge conflicts:
+
+       ``bzr extmerge --all``
+
+-    More here:  http://dev.mysql.com/tech-resources/articles/advanced-bazaar.html
+
