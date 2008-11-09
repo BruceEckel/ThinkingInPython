@@ -25,8 +25,8 @@ def clean():
         shutil.rmtree("_code")
 
 # Bug: This needs to work:
-#@rule(["_build/Python3PatternsAndIdioms-html.zip",
-#       "_build/Python3PatternsAndIdioms-htmlhelp.zip"], html, winhelp)
+#@rule(["../Python3PatternsAndIdioms-html.zip",
+#       "../Python3PatternsAndIdioms-htmlhelp.zip"], html, winhelp)
 
 @rule(None, html, winhelp)
 def package():
