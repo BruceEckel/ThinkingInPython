@@ -465,7 +465,8 @@ the class version. However, this is a case where I find "explicit is better than
 implicit," so even though the function version is more succinct I find the class
 version easier to understand and thus to modify and maintain.
 
-.. seealso::
+Further Reading
+==================================================
 
     http://wiki.python.org/moin/PythonDecoratorLibrary
         More examples of decorators. Note the number of these examples that
@@ -475,7 +476,7 @@ version easier to understand and thus to modify and maintain.
         Matt Wilson's *Decorators Are Fun*.
 
     http://loveandtheft.org/2008/09/22/python-decorators-explained
-        Another introduction to decorators
+        Another introduction to decorators.
 
     http://www.phyast.pitt.edu/~micheles/python/documentation.html
         Michele Simionato's decorator module wraps functions for you. The page
