@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Book Development Rules &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Developer Guide" href="DeveloperGuide.html" />
+    <link rel="prev" title="Teaching Support" href="TeachingSupport.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DeveloperGuide.html" title="Developer Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TeachingSupport.html" title="Teaching Support"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="book-development-rules">
+<h1>Book Development Rules<a class="headerlink" href="#book-development-rules" title="Permalink to this headline">¶</a></h1>
+<p>Guidelines for the creation process.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is just a start. This document will evolve as more issues appear.</p>
+</div>
+<div class="section" id="contribute-what-you-can">
+<h2>Contribute What You Can<a class="headerlink" href="#contribute-what-you-can" title="Permalink to this headline">¶</a></h2>
+<p>One of the things I&#8217;ve learned by holding open-spaces conferences is that
+everyone has something useful to contribute, although they often don&#8217;t know it.</p>
+<p>Maybe you&#8217;re don&#8217;t feel expert enough at Python to contribute anything yet.
+But you&#8217;re in this field, so you&#8217;ve got some useful abilities.</p>
+<ul class="simple">
+<li>Maybe you&#8217;re good at admin stuff, figuring out how things work and configuring
+things.</li>
+<li>If you have a flair for design and can figure out Sphinx templating,
+that will be useful.</li>
+<li>Perhaps you are good at Latex. We need to figure out how to format the
+PDF version of the book from the Sphinx sources, so that we can produce
+the print version of the book without going through hand work in a layout
+program.</li>
+<li>You probably have ideas about things you&#8217;d like to understand, that haven&#8217;t
+been covered elsewhere.</li>
+<li>And sometimes people are particularly good at spotting typos.</li>
+</ul>
+</div>
+<div class="section" id="don-t-get-attached">
+<h2>Don&#8217;t Get Attached<a class="headerlink" href="#don-t-get-attached" title="Permalink to this headline">¶</a></h2>
+<p>Writing is rewriting. Your stuff will get rewritten, probably multiple times.
+This makes it better for the reader. It doesn&#8217;t mean it was bad. Everything can
+be made better.</p>
+<p>By the same measure, don&#8217;t worry if your examples or prose aren&#8217;t perfect. Don&#8217;t
+let that keep you from contributing them early. They&#8217;ll get rewritten anyway, so
+don&#8217;t worry too much &#8211; do the best you can, but don&#8217;t get blocked.</p>
+<p>There&#8217;s also an editor who will be rewriting for clarity and active voice. He
+doesn&#8217;t necessarily understand the technology but he will still be able to
+improve the flow. If you discover he has introduced technical errors in the
+prose, then feel free to fix it but try to maintain any clarity that he has
+added.</p>
+<p>If something is moved to Volume 2 or the electronic-only appendices, it&#8217;s just
+a decision about the material, not about you.</p>
+</div>
+<div class="section" id="credit">
+<h2>Credit<a class="headerlink" href="#credit" title="Permalink to this headline">¶</a></h2>
+<p>As much as possible, I want to give credit to contributions. Much of this will
+be taken care of automatically by the Launchpad.net &#8220;Karma&#8221; system. However, if
+you contribute something significant, for example the bulk of a new chapter,
+then you should put &#8220;contributed by&#8221; at the beginning of that chapter, and if
+you make significant improvements and changes to a chapter you should say
+&#8220;further contributions by&#8221; or &#8220;further changes by&#8221;, accordingly.</p>
+</div>
+<div class="section" id="mechanics">
+<h2>Mechanics<a class="headerlink" href="#mechanics" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Automate everything. Everything should be in the build script; nothing should
+be done by hand.</li>
+<li>All documents will be in Sphinx restructured text format. Here&#8217;s the
+<a class="reference external" href="http://sphinx.pocoo.org/contents.html">link to the Sphinx documentation</a>.</li>
+<li>Everything goes through Launchpad.net and uses Launchpad&#8217;s Bazzar distributed
+version control system.</li>
+<li>Follow PEP8 for style. That way we don&#8217;t have to argue about it.</li>
+<li>Camelcasing for naming. PEP8 suggests underscores as a preference rather than
+a hard-and fast rule, and camelcasing <em>feels</em> more like OO to me, as if we are
+emphasizing the design here (which I want to do) and putting less focus on the
+C-ish nature that <em>can</em> be expressed in Python.</li>
+</ul>
+<pre>The above point is still being debated.</pre>
+<ul class="simple">
+<li>Four space indents.</li>
+<li>We&#8217;re not using chapter numbers because we&#8217;ll be moving chapters around.
+If you need to cross-reference a chapter, use the chapter name and a
+link.</li>
+<li>Index as you go. Indexing will happen throughout the project. Although
+finalizing the index is a task in itself, it will be very helpful if everyone
+adds index entries anytime they occur to you. You can find example index
+entries by going to the index, clicking on one of the entries, then selecting
+&#8220;view source&#8221; in the left-side bar (Sphinx cleverly shows you the Sphinx
+source so you can use it as an example).</li>
+<li>Don&#8217;t worry about chapter length. Some chapters may be very small, others may
+be quite significant. It&#8217;s just the nature of this book. Trying to make the
+chapters the same length will end up fluffing some up which will not benefit
+the reader. Make the chapters however long they need to be, but no longer.</li>
+</ul>
+</div>
+<div class="section" id="diagrams">
+<h2>Diagrams<a class="headerlink" href="#diagrams" title="Permalink to this headline">¶</a></h2>
+<p>Create diagrams using whatever tool is convenient for you, as long as it produces
+formats that Sphinx can use.</p>
+<p>It doesn&#8217;t matter if your diagram is imperfect. Even if you just sketch something
+by hand and scan it in, it will help readers visualize what&#8217;s going on.</p>
+<p>At some point, diagrams will be redone for consistency using a single tool,
+with print publication in mind. This tool may be a commercial product. However,
+if you need to change the diagram you can replace it with your new version using
+your tool of choice. The important thing is to get the diagram right; at some
+point it will be redone to look good.</p>
+<p>Note that all image tags should use a <tt class="docutils literal"><span class="pre">*</span></tt> at the end, not the file extension
+name. For example <tt class="docutils literal"><span class="pre">..image::</span> <span class="pre">_images/foo.*</span></tt>. This way the tag will work for
+both the HTML output and the Latex output. Also, all images should be placed
+in the <tt class="docutils literal"><span class="pre">_images</span></tt> directory.</p>
+<p>Here&#8217;s an example which was done with the free online service Gliffy.com, then
+modified using the free Windows program Paint.NET (note, however, that we should
+not use color because it won&#8217;t translate well to the print book):</p>
+<img alt="_images/DistributedSystem.png" src="_images/DistributedSystem.png" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Book Development Rules</a><ul>
+<li><a class="reference external" href="#contribute-what-you-can">Contribute What You Can</a></li>
+<li><a class="reference external" href="#don-t-get-attached">Don&#8217;t Get Attached</a></li>
+<li><a class="reference external" href="#credit">Credit</a></li>
+<li><a class="reference external" href="#mechanics">Mechanics</a></li>
+<li><a class="reference external" href="#diagrams">Diagrams</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="TeachingSupport.html" title="previous chapter">Teaching Support</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="DeveloperGuide.html" title="next chapter">Developer Guide</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Rules.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DeveloperGuide.html" title="Developer Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TeachingSupport.html" title="Teaching Support"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

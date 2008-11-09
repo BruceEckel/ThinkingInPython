@@ -1,0 +1,603 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit Testing &amp; Test-Driven Development &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Python 3 Language Changes" href="LanguageChanges.html" />
+    <link rel="prev" title="Quick Python for Programmers" href="quickPython.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LanguageChanges.html" title="Python 3 Language Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickPython.html" title="Quick Python for Programmers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="unit-testing-test-driven-development">
+<h1>Unit Testing &amp; Test-Driven Development<a class="headerlink" href="#unit-testing-test-driven-development" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This chapter has not had any significant translation yet. Should introduce and compare the various common test systems.</p>
+</div>
+<p>One of the important recent realizations is the dramatic value of unit testing.</p>
+<p>This is the process of building integrated tests into all the code that you
+create, and running those tests every time you do a build. It&#8217;s as if you are
+extending the compiler, telling it more about what your program is supposed to
+do. That way, the build process can check for more than just syntax errors,
+since you teach it how to check for semantic errors as well.</p>
+<p>C-style programming languages, and C++ in particular, have typically valued
+performance over programming safety. The reason that developing programs in Java
+is so much faster than in C++ (roughly twice as fast, by most accounts) is
+because of Java&#8217;s safety net: features like better type checking, enforced
+exceptions and garbage collection. By integrating unit testing into your build
+process, you are extending this safety net, and the result is that you can
+develop faster. You can also be bolder in the changes that you make, and more
+easily refactor your code when you discover design or implementation flaws, and
+in general produce a better product, faster.</p>
+<p>Unit testing is not generally considered a design pattern; in fact, it might be
+considered a &#8220;development pattern,&#8221; but perhaps there are enough &#8220;pattern&#8221;
+phrases in the world already. Its effect on development is so significant that
+it will be used throughout this book, and thus will be introduced here.</p>
+<p>My own experience with unit testing began when I realized that every program in
+a book must be automatically extracted and organized into a source tree, along
+with appropriate makefiles (or some equivalent technology) so that you could
+just type <strong>make</strong> to build the whole tree. The effect of this process on the
+code quality of the book was so immediate and dramatic that it soon became (in
+my mind) a requisite for any programming book-how can you trust code that you
+didn&#8217;t compile? I also discovered that if I wanted to make sweeping changes, I
+could do so using search-and-replace throughout the book, and also bashing the
+code around at will. I knew that if I introduced a flaw, the code extractor and
+the makefiles would flush it out.</p>
+<p>As programs became more complex, however, I also found that there was a serious
+hole in my system. Being able to successfully compile programs is clearly an
+important first step, and for a published book it seemed a fairly revolutionary
+one-usually due to the pressures of publishing, it&#8217;s quite typical to randomly
+open a programming book and discover a coding flaw. However, I kept getting
+messages from readers reporting semantic problems in my code (in <em>Thinking in
+Java</em>). These problems could only be discovered by running the code. Naturally,
+I understood this and had taken some early faltering steps towards implementing
+a system that would perform automatic execution tests, but I had succumbed to
+the pressures of publishing, all the while knowing that there was definitely
+something wrong with my process and that it would come back to bite me in the
+form of embarrassing bug reports (in the open source world, embarrassment is one
+of the prime motivating factors towards increasing the quality of one&#8217;s code!).</p>
+<p>The other problem was that I was lacking a structure for the testing system.
+Eventually, I started hearing about unit testing and Junit <a class="footnote-reference" href="#id3" id="id1">[1]</a>, which provided
+a basis for a testing structure. However, even though JUnit is intended to make
+the creation of test code easy, I wanted to see if I could make it even easier,
+applying the Extreme Programming principle of &#8220;do the simplest thing that could
+possibly work&#8221; as a starting point, and then evolving the system as usage
+demands (In addition, I wanted to try to reduce the amount of test code, in an
+attempt to fit more functionality in less code for screen presentations). This
+chapter is the result.</p>
+<div class="section" id="write-tests-first">
+<h2>Write Tests First<a class="headerlink" href="#write-tests-first" title="Permalink to this headline">¶</a></h2>
+<p>As I mentioned, one of the problems that I encountered-that most people
+encounter, it turns out-was submitting to the pressures of publishing and as a
+result letting tests fall by the wayside. This is easy to do if you forge ahead
+and write your program code because there&#8217;s a little voice that tells you that,
+after all, you&#8217;ve got it working now, and wouldn&#8217;t it be more
+interesting/useful/expedient to just go on and write that other part (we can
+always go back and write the tests later). As a result, the tests take on less
+importance, as they often do in a development project.</p>
+<p>The answer to this problem, which I first found described in <em>Extreme
+Programming Explained</em>, is to write the tests <em>before</em> you write the code. This
+may seem to artificially force testing to the forefront of the development
+process, but what it actually does is to give testing enough additional value to
+make it essential. If you write the tests first, you:</p>
+<ol class="arabic simple">
+<li>Describe what the code is supposed to do, not with some external graphical
+tool but with code that actually lays the specification down in concrete,
+verifiable terms.</li>
+<li>Provide an example of how the code should be used; again, this is a working,
+tested example, normally showing all the important method calls, rather than
+just an academic description of a library.</li>
+<li>Provide a way to verify when the code is finished (when all the tests run
+correctly).</li>
+</ol>
+<p>Thus, if you write the tests first then testing becomes a development tool, not
+just a verification step that can be skipped if you happen to feel comfortable
+about the code that you just wrote (a comfort, I have found, that is usually
+wrong).</p>
+<p>You can find convincing arguments in <em>Extreme Programming Explained</em>, as &#8220;write
+tests first&#8221; is a fundamental principle of XP. If you aren&#8217;t convinced you need
+to adopt any of the changes suggested by XP, note that according to Software
+Engineering Institute (SEI) studies, nearly 70% of software organizations are
+stuck in the first two levels of SEI&#8217;s scale of sophistication: chaos, and
+slightly better than chaos. If you change nothing else, add automated testing.</p>
+</div>
+<div class="section" id="simple-python-testing">
+<h2>Simple Python Testing<a class="headerlink" href="#simple-python-testing" title="Permalink to this headline">¶</a></h2>
+<p>Sanity check for a quick test of the programs in this book, and to append the
+output of each program (as a string) to its listing:</p>
+<div class="highlight"><pre><span class="c"># SanityCheck.py</span>
+<span class="c">#! /usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
+<span class="c"># Do not include the following in the automatic</span>
+<span class="c"># tests:</span>
+<span class="n">exclude</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;SanityCheck.py&quot;</span><span class="p">,</span> <span class="s">&quot;BoxObserver.py&quot;</span><span class="p">,)</span>
+
+<span class="k">def</span> <span class="nf">visitor</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pyprogs</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*.py&#39;</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pyprogs</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;]&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">program</span> <span class="ow">in</span> <span class="n">pyprogs</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">program</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&quot;python </span><span class="si">%s</span><span class="s"> &gt; tmp&quot;</span> <span class="o">%</span> <span class="n">program</span><span class="p">)</span>
+            <span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">program</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="c"># Append output if it&#39;s not already there:</span>
+            <span class="k">if</span> <span class="nb">file</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;output = &#39;&#39;&#39;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mf">1</span> <span class="ow">and</span> \
+              <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0</span><span class="p">:</span>
+                <span class="n">divider</span> <span class="o">=</span> <span class="s">&#39;#&#39;</span> <span class="o">*</span> <span class="mf">50</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="nb">file</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;#&#39;</span> <span class="o">+</span> <span class="s">&#39;:~&#39;</span><span class="p">,</span> <span class="s">&#39;#&lt;hr&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="nb">file</span> <span class="o">+=</span> <span class="s">&quot;output = &#39;&#39;&#39;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> \
+                  <span class="nb">open</span><span class="p">(</span><span class="s">&#39;tmp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;&#39;&#39;&#39;</span><span class="se">\n</span><span class="s">&quot;</span>
+                <span class="nb">open</span><span class="p">(</span><span class="n">program</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">visitor</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+<p>Just run this from the root directory of the code listings for the book; it will
+descend into each subdirectory and run the program there. An easy way to check
+things is to redirect standard output to a file, then if there are any errors
+they will be the only thing that appears at the console during program
+execution.</p>
+</div>
+<div class="section" id="a-very-simple-framework">
+<h2>A Very Simple Framework<a class="headerlink" href="#a-very-simple-framework" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned, a primary goal of this code is to make the writing of unit testing
+code very simple, even simpler than with JUnit. As further needs are discovered
+<em>during the use</em> of this system, then that functionality can be added, but to
+start with the framework will just provide a way to easily create and run tests,
+and report failure if something breaks (success will produce no results other
+than normal output that may occur during the running of the test). My intended
+use of this framework is in makefiles, and <strong>make</strong> aborts if there is a non-
+zero return value from the execution of a command. The build process will
+consist of compilation of the programs and execution of unit tests, and if
+<strong>make</strong> gets all the way through successfully then the system will be
+validated, otherwise it will abort at the place of failure. The error messages
+will report the test that failed but not much else, so that you can provide
+whatever granularity that you need by writing as many tests as you want, each
+one covering as much or as little as you find necessary.</p>
+<p>In some sense, this framework provides an alternative place for all those
+&#8220;print&#8221; statements I&#8217;ve written and later erased over the years.</p>
+<p>To create a set of tests, you start by making a <strong>static</strong> inner class inside
+the class you wish to test (your test code may also test other classes; it&#8217;s up
+to you). This test code is distinguished by inheriting from <strong>UnitTest</strong>:</p>
+<pre># unitTesting/UnitTest.py
+# The basic unit testing class
+
+class UnitTest:
+    testID = ""
+    static List errors = ArrayList()
+    # Override cleanup() if test object
+    # creation allocates non-memory
+    # resources that must be cleaned up:
+    def cleanup(self):
+    # Verify the truth of a condition:
+    def affirm(boolean condition):
+        if(!condition)
+            errors.add("failed: " + testID)</pre>
+<p>The only testing method [[ So far ]] is <strong>affirm( )</strong> <a class="footnote-reference" href="#id4" id="id2">[2]</a>, which is
+<strong>protected</strong> so that it can be used from the inheriting class. All this method
+does is verify that something is <strong>true</strong>. If not, it adds an error to the list,
+reporting that the current test (established by the <strong>static testID</strong>, which is
+set by the test-running program that you shall see shortly) has failed. Although
+this is not a lot of information-you might also wish to have the line number,
+which could be extracted from an exception-it may be enough for most situations.</p>
+<p>Unlike JUnit (which uses <strong>setUp( )</strong> and <strong>tearDown( )</strong> methods), test objects
+will be built using ordinary Python construction. You define the test objects by
+creating them as ordinary class members of the test class, and a new test class
+object will be created for each test method (thus preventing any problems that
+might occur from side effects between tests). Occasionally, the creation of a
+test object will allocate non-memory resources, in which case you must override
+<strong>cleanup( )</strong> to release those resources.</p>
+</div>
+<div class="section" id="writing-tests">
+<h2>Writing Tests<a class="headerlink" href="#writing-tests" title="Permalink to this headline">¶</a></h2>
+<p>Writing tests becomes very simple. Here&#8217;s an example that creates the necessary
+<strong>static</strong> inner class and performs trivial tests:</p>
+<pre># unitTesting/TestDemo.py
+# Creating a test
+
+class TestDemo:
+    objCounter = 0
+    id = ++objCounter
+    def TestDemo(String s):
+        print(s + ": count = " + id)
+
+    def close(self):
+        print("Cleaning up: " + id)
+
+    def someCondition(self): return True
+    class Test(UnitTest):
+        TestDemo test1 = TestDemo("test1")
+        TestDemo test2 = TestDemo("test2")
+        def cleanup(self):
+            test2.close()
+            test1.close()
+
+        def testA(self):
+            print("TestDemo.testA")
+            affirm(test1.someCondition())
+
+        def testB(self):
+            print("TestDemo.testB")
+            affirm(test2.someCondition())
+            affirm(TestDemo.objCounter != 0)
+
+        # Causes the build to halt:
+        #! def test3(): affirm(0)</pre>
+<p>The <strong>test3( )</strong>  method is commented out because, as you&#8217;ll see, it causes the
+automatic build of this book&#8217;s source-code tree to stop.</p>
+<p>You can name your inner class anything you&#8217;d like; the only important factor is
+that it <strong>extends UnitTest</strong>. You can also include any necessary support code in
+other methods. Only <strong>public</strong> methods that take no arguments and return
+<strong>void</strong> will be treated as tests (the names of these methods are also not
+constrained).</p>
+<p>The above test class creates two instances of <strong>TestDemo</strong>. The <strong>TestDemo</strong>
+constructor prints something, so that we can see it being called. You could also
+define a default constructor (the only kind that is used by the test framework),
+although none is necessary here. The <strong>TestDemo</strong> class has a <strong>close( )</strong>
+method which suggests it is used as part of object cleanup, so this is called in
+the overridden <strong>cleanup( )</strong> method in <strong>Test</strong>.</p>
+<p>The testing methods use the <strong>affirm( )</strong> method to validate expressions, and if
+there is a failure the information is stored and printed after all the tests are
+run.  Of course, the <strong>affirm( )</strong> arguments are usually more complicated than
+this; you&#8217;ll see more examples throughout the rest of this book.</p>
+<p>Notice that in <strong>testB( )</strong>, the <strong>private</strong> field <strong>objCounter</strong> is accessible
+to the testing code-this is because <strong>Test</strong> has the permissions of an inner
+class.</p>
+<p>You can see that writing test code requires very little extra effort, and no
+knowledge other than that used for writing ordinary classes.</p>
+<p>To run the tests, you use <strong>RunUnitTests.py</strong> (which will be introduced
+shortly). The command for the above code looks like this:</p>
+<p><strong>java com.bruceeckel.test.RunUnitTests TestDemo</strong></p>
+<p>It produces the following output:</p>
+<pre>test1: count = 1
+test2: count = 2
+TestDemo.testA
+Cleaning up: 2
+Cleaning up: 1
+test1: count = 3
+test2: count = 4
+TestDemo.testB
+Cleaning up: 4
+Cleaning up: 3</pre>
+<p>All the output is noise as far as the success or failure of the unit testing is
+concerned. Only if one or more of the unit tests fail does the program returns a
+non-zero value to terminate the <strong>make</strong> process after the error messages are
+produced. Thus, you can choose to produce output or not, as it suits your needs,
+and the test class becomes a good place to put any printing code you might need-
+if you do this, you tend to keep such code around rather than putting it in and
+stripping it out as is typically done with tracing code.</p>
+<p>If you need to add a test to a class derived from one that already has a test
+class, it&#8217;s no problem, as you can see here:</p>
+<div class="highlight"><pre><span class="c"># unitTesting/TestDemo2.py</span>
+<span class="c"># Inheriting from a class that</span>
+<span class="c"># already has a test is no problem.</span>
+
+<span class="k">class</span> <span class="nc">TestDemo2</span><span class="p">(</span><span class="n">TestDemo</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span> <span class="n">TestDemo</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="c"># You can even use the same name</span>
+    <span class="c"># as the test class in the base class:</span>
+    <span class="k">class</span> <span class="nc">Test</span><span class="p">(</span><span class="n">UnitTest</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">testA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;TestDemo2.testA&quot;</span><span class="p">)</span>
+            <span class="n">affirm</span><span class="p">(</span><span class="mf">1</span> <span class="o">+</span> <span class="mf">1</span> <span class="o">==</span> <span class="mf">2</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">testB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;TestDemo2.testB&quot;</span><span class="p">)</span>
+            <span class="n">affirm</span><span class="p">(</span><span class="mf">2</span> <span class="o">*</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">4</span><span class="p">)</span>
+</pre></div>
+<p>Even the name of the inner class can be the same. In the above code, all the
+assertions are always true so the tests will never fail.</p>
+</div>
+<div class="section" id="white-box-black-box-tests">
+<h2>White-Box &amp; Black-Box Tests<a class="headerlink" href="#white-box-black-box-tests" title="Permalink to this headline">¶</a></h2>
+<p>The unit test examples so far are what are traditionally called <em>white-box
+tests</em>. This means that the test code has complete access to the internals of
+the class that&#8217;s being tested (so it might be more appropriately called
+&#8220;transparent box&#8221; testing). White-box testing happens automatically when you
+make the unit test class as an inner class of the class being tested, since
+inner classes automatically have access to all their outer class elements, even
+those that are <strong>private</strong>.</p>
+<p>A possibly more common form of testing is <em>black-box testing</em>, which refers to
+treating the class under test as an impenetrable box. You can&#8217;t see the
+internals; you can only access the <strong>public</strong> portions of the class. Thus,
+black-box testing corresponds more closely to functional testing, to verify the
+methods that the client programmer is going to use. In addition, black-box
+testing provides a minimal instruction sheet to the client programmer - in the
+absence of all other documentation, the black-box tests at least demonstrate how
+to make basic calls to the <strong>public</strong> class methods.</p>
+<p>To perform black-box tests using the unit-testing framework presented in this
+book, all you need to do is create your test class as a global class instead of
+an inner class. All the other rules are the same (for example, the unit test
+class must be <strong>public</strong>, and derived from <strong>UnitTest</strong>).</p>
+<p>There&#8217;s one other caveat, which will also provide a little review of Java
+packages. If you want to be completely rigorous, you must put your black-box
+test class in a separate directory than the class it tests, otherwise it will
+have package access to the elements of the class being tested. That is, you&#8217;ll
+be able to access <strong>protected</strong> and <strong>friendly</strong> elements of the class being
+tested. Here&#8217;s an example:</p>
+<div class="highlight"><pre><span class="c"># unitTesting/Testable.py</span>
+
+<span class="k">class</span> <span class="nc">Testable</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f1</span><span class="p">():</span> <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span> <span class="c"># &quot;Friendly&quot;: package access</span>
+    <span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span> <span class="c"># Also package access</span>
+    <span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+</pre></div>
+<p>Normally, the only method that should be directly accessible to the client
+programmer is <strong>f4( )</strong>. However, if you put your black-box test in the same
+directory, it automatically becomes part of the same package (in this case, the
+default package since none is specified) and then has inappropriate access:</p>
+<pre># unitTesting/TooMuchAccess.py
+
+class TooMuchAccess(UnitTest):
+    Testable tst = Testable()
+    def test1(self):
+        tst.f2() # Oops!
+        tst.f3() # Oops!
+        tst.f4() # OK</pre>
+<p>You can solve the problem by moving <strong>TooMuchAccess.py</strong> into its own
+subdirectory, thereby putting it in its own default package (thus a different
+package from <strong>Testable.py</strong>). Of course, when you do this, then <strong>Testable</strong>
+must be in its own package, so that it can be imported (note that it is also
+possible to import a &#8220;package-less&#8221; class by giving the class name in the
+<strong>import</strong> statement and ensuring that the class is in your CLASSPATH):</p>
+<pre># unitTesting/testable/Testable.py
+package c02.testable
+
+class Testable:
+    def f1(): pass
+    def f2(self): # "Friendly": package access
+    def f3(self): # Also package access
+    def f4(self):</pre>
+<p>Here&#8217;s the black-box test in its own package, showing how only public methods
+may be called:</p>
+<pre># unitTesting/BlackBoxTest.py
+
+class BlackBoxTest(UnitTest):
+    Testable tst = Testable()
+    def test1(self):
+        #! tst.f2() # Nope!
+        #! tst.f3() # Nope!
+        tst.f4() # Only public methods available</pre>
+<p>Note that the above program is indeed very similar to the one that the client
+programmer would write to use your class, including the imports and available
+methods. So it does make a good programming example. Of course, it&#8217;s easier from
+a coding standpoint to just make an inner class, and unless you&#8217;re ardent about
+the need for specific black-box testing you may just want to go ahead and use
+the inner classes (with the knowledge that if you need to you can later extract
+the inner classes into separate black-box test classes, without too much
+effort).</p>
+</div>
+<div class="section" id="running-tests">
+<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h2>
+<p>The program that runs the tests makes significant use of reflection so that
+writing the tests can be simple for the client programmer:</p>
+<pre># unitTesting/RunUnitTests.py
+# Discovering the unit test
+# class and running each test.
+
+class RunUnitTests:
+    def require(requirement, errmsg):
+        if(!requirement):
+            print(errmsg)
+            sys.exit()
+
+    def main(self, args):
+        require(args.length == 1,
+          "Usage: RunUnitTests qualified-class")
+        try:
+            Class c = Class.forName(args[0])
+            # Only finds the inner classes
+            # declared in the current class:
+            Class[] classes = c.getDeclaredClasses()
+            Class ut = null
+            for(int j = 0 j &lt; classes.length j++):
+                # Skip inner classes that are
+                # not derived from UnitTest:
+                if(!UnitTest.class.
+                    isAssignableFrom(classes[j]))
+                    continue
+                ut = classes[j]
+                break # Finds the first test class only
+
+            # If it found an inner class,
+            # that class must be static:
+            if(ut != null)
+                require(
+                  Modifier.isStatic(ut.getModifiers()),
+                  "inner UnitTest class must be static")
+            # If it couldn't find the inner class,
+            # maybe it's a regular class (for black-
+            # box testing:
+            if(ut == null)
+                if(UnitTest.class.isAssignableFrom(c))
+                    ut = c
+            require(ut != null,
+              "No UnitTest class found")
+            require(
+              Modifier.isPublic(ut.getModifiers()),
+              "UnitTest class must be public")
+            Method[] methods = ut.getDeclaredMethods()
+            for(int k = 0 k &lt; methods.length k++):
+                Method m = methods[k]
+                # Ignore overridden UnitTest methods:
+                if(m.getName().equals("cleanup"))
+                    continue
+                # Only public methods with no
+                # arguments and void return
+                # types will be used as test code:
+                if(m.getParameterTypes().length == 0 &amp;&amp;
+                   m.getReturnType() == void.class &amp;&amp;
+                   Modifier.isPublic(m.getModifiers())):
+                    # The name of the test is
+                    # used in error messages:
+                    UnitTest.testID = m.getName()
+                    # A instance of the
+                    # test object is created and
+                    # cleaned up for each test:
+                    Object test = ut.newInstance()
+                    m.invoke(test, Object[0])
+                    ((UnitTest)test).cleanup()
+
+        except e:
+            e.printStackTrace(System.err)
+            # Any exception will return a nonzero
+            # value to the console, so that
+            # 'make' will abort:
+            System.err.println("Aborting make")
+            System.exit(1)
+
+        # After all tests in this class are run,
+        # display any results. If there were errors,
+        # abort 'make' by returning a nonzero value.
+        if(UnitTest.errors.size() != 0):
+            it = UnitTest.errors.iterator()
+            while(it.hasNext()):
+                print(it.next())
+            sys.exit(1)</pre>
+</div>
+<div class="section" id="automatically-executing-tests">
+<h2>Automatically Executing Tests<a class="headerlink" href="#automatically-executing-tests" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Install this book&#8217;s source code tree and ensure that you have a <strong>make</strong>
+utility installed on your system (Gnu <strong>make</strong> is freely available on the
+internet at various locations). In <strong>TestDemo.py</strong>, un-comment <strong>test3( )</strong>,
+then type <strong>make</strong> and observe the results.</li>
+<li>Modify TestDemo.py by adding a new test that throws an exception. Type
+<strong>make</strong> and observe the results.</li>
+<li>Modify your solutions to the exercises in Chapter 1 by adding unit tests.
+Write makefiles that incorporate the unit tests.</li>
+</ol>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><em>http://www.junit.org</em></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>I had originally called this <strong>assert()</strong>, but that word became reserved
+in JDK 1.4 when assertions were added to the language.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Unit Testing &amp; Test-Driven Development</a><ul>
+<li><a class="reference external" href="#write-tests-first">Write Tests First</a></li>
+<li><a class="reference external" href="#simple-python-testing">Simple Python Testing</a></li>
+<li><a class="reference external" href="#a-very-simple-framework">A Very Simple Framework</a></li>
+<li><a class="reference external" href="#writing-tests">Writing Tests</a></li>
+<li><a class="reference external" href="#white-box-black-box-tests">White-Box &amp; Black-Box Tests</a></li>
+<li><a class="reference external" href="#running-tests">Running tests</a></li>
+<li><a class="reference external" href="#automatically-executing-tests">Automatically Executing Tests</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="quickPython.html" title="previous chapter">Quick Python for Programmers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="LanguageChanges.html" title="next chapter">Python 3 Language Changes</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/unitTesting.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LanguageChanges.html" title="Python 3 Language Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickPython.html" title="Quick Python for Programmers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

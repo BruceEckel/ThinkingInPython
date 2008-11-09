@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Discovering the Details About Your Platform &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="A Canonical Form for Command-Line Programs" href="CanonicalScript.html" />
+    <link rel="prev" title="Part II: Idioms" href="Part2.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="CanonicalScript.html" title="A Canonical Form for Command-Line Programs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Part2.html" title="Part II: Idioms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="discovering-the-details-about-your-platform">
+<h1>Discovering the Details About Your Platform<a class="headerlink" href="#discovering-the-details-about-your-platform" title="Permalink to this headline">¶</a></h1>
+<p>The Python library XXX will give you some information about your machine,
+but it falls short. Here&#8217;s a rather messy, but useful way to figure out
+everything else.</p>
+<p>Just a starting point:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">detectCPUs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detects the number of CPUs on a system. Cribbed from pp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Linux, Unix and MacOS:</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s">&quot;sysconf&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">sysconf_names</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;SC_NPROCESSORS_ONLN&quot;</span><span class="p">):</span>
+            <span class="c"># Linux &amp; Unix:</span>
+            <span class="n">ncpus</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sysconf</span><span class="p">(</span><span class="s">&quot;SC_NPROCESSORS_ONLN&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ncpus</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ncpus</span> <span class="o">&gt;</span> <span class="mf">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ncpus</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># OSX:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">popen2</span><span class="p">(</span><span class="s">&quot;sysctl -n hw.ncpu&quot;</span><span class="p">)[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="c"># Windows:</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;NUMBER_OF_PROCESSORS&quot;</span><span class="p">):</span>
+            <span class="n">ncpus</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&quot;NUMBER_OF_PROCESSORS&quot;</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="n">ncpus</span> <span class="o">&gt;</span> <span class="mf">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ncpus</span>
+    <span class="k">return</span> <span class="mf">1</span> <span class="c"># Default</span>
+</pre></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Part2.html" title="previous chapter">Part II: Idioms</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="CanonicalScript.html" title="next chapter">A Canonical Form for Command-Line Programs</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/MachineDiscovery.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="CanonicalScript.html" title="A Canonical Form for Command-Line Programs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Part2.html" title="Part II: Idioms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

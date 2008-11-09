@@ -1,0 +1,486 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Factory: Encapsulating Object Creation &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Function Objects" href="functionObjects.html" />
+    <link rel="prev" title="Iterators: Decoupling Algorithms from Containers" href="iterators.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="functionObjects.html" title="Function Objects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="iterators.html" title="Iterators: Decoupling Algorithms from Containers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="factory-encapsulating-object-creation">
+<h1>Factory: Encapsulating Object Creation<a class="headerlink" href="#factory-encapsulating-object-creation" title="Permalink to this headline">¶</a></h1>
+<p>When you discover that you need to add new types to a system, the most sensible
+first step is to use polymorphism to create a common interface to those new
+types. This separates the rest of the code in your system from the knowledge of
+the specific types that you are adding. New types may be added without
+disturbing existing code ... or so it seems. At first it would appear that the
+only place you need to change the code in such a design is the place where you
+inherit a new type, but this is not quite true. You must still create an object
+of your new type, and at the point of creation you must specify the exact
+constructor to use. Thus, if the code that creates objects is distributed
+throughout your application, you have the same problem when adding new types-you
+must still chase down all the points of your code where type matters. It happens
+to be the <em>creation</em> of the type that matters in this case rather than the <em>use</em>
+of the type (which is taken care of by polymorphism), but the effect is the
+same: adding a new type can cause problems.</p>
+<p>The solution is to force the creation of objects to occur through a common
+<em>factory</em> rather than to allow the creational code to be spread throughout your
+system. If all the code in your program must go through this factory whenever it
+needs to create one of your objects, then all you must do when you add a new
+object is to modify the factory.</p>
+<p>Since every object-oriented program creates objects, and since it&#8217;s very likely
+you will extend your program by adding new types, I suspect that factories may
+be the most universally useful kinds of design patterns.</p>
+<div class="section" id="simple-factory-method">
+<h2>Simple Factory Method<a class="headerlink" href="#simple-factory-method" title="Permalink to this headline">¶</a></h2>
+<p>As an example, let&#8217;s revisit the <strong>Shape</strong> system.</p>
+<p>One approach is to make the factory a <strong>static</strong> method of the base class:</p>
+<div class="highlight"><pre><span class="c"># factory/shapefact1/ShapeFactory1.py</span>
+<span class="c"># A simple static factory method.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">generators</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c"># Create based on class name:</span>
+    <span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+        <span class="c">#return eval(type + &quot;()&quot;)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s">&quot;Circle&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="n">Circle</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s">&quot;Square&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="n">Square</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;Bad shape creation: &quot;</span> <span class="o">+</span> <span class="nb">type</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">factory</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.draw&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.erase&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Square</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.draw&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.erase&quot;</span><span class="p">)</span>
+
+<span class="c"># Generate shape name strings:</span>
+<span class="k">def</span> <span class="nf">shapeNameGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="n">Shape</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="n">shapes</span> <span class="o">=</span> \
+  <span class="p">[</span> <span class="n">Shape</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">shapeNameGen</span><span class="p">(</span><span class="mf">7</span><span class="p">)]</span>
+
+<span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">erase</span><span class="p">()</span>
+</pre></div>
+<p>The <strong>factory( )</strong> takes an argument that allows it to determine what type of
+<strong>Shape</strong> to create; it happens to be a <strong>String</strong> in this case but it could be
+any set of data. The <strong>factory( )</strong> is now the only other code in the system
+that needs to be changed when a new type of <strong>Shape</strong> is added (the
+initialization data for the objects will presumably come from somewhere outside
+the system, and not be a hard-coded array as in the above example).</p>
+<p>Note that this example also shows the new Python 2.2 <strong>staticmethod( )</strong>
+technique for creating static methods in a class.</p>
+<p>I have also used a tool which is new in Python 2.2 called a <em>generator</em>. A
+generator is a special case of a factory: it&#8217;s a factory that takes no arguments
+in order to create a new object. Normally you hand some information to a factory
+in order to tell it what kind of object to create and how to create it, but a
+generator has some kind of internal algorithm that tells it what and how to
+build. It &#8220;generates out of thin air&#8221; rather than being told what to create.</p>
+<p>Now, this may not look consistent with the code you see above:</p>
+<pre>for i in shapeNameGen(7)</pre>
+<p>looks like there&#8217;s an initialization taking place. This is where a generator is
+a bit strange - when you call a function that contains a <strong>yield</strong> statement
+(<strong>yield</strong> is a new keyword that determines that a function is a generator),
+that function actually returns a generator object that has an iterator. This
+iterator is implicitly used in the <strong>for</strong> statement above, so it appears that
+you are iterating through the generator function, not what it returns. This was
+done for convenience of use.</p>
+<p>Thus, the code that you write is actually a kind of factory, that creates the
+generator objects that do the actual generation. You can use the generator
+explicitly if you want, for example:</p>
+<div class="highlight"><pre><span class="n">gen</span> <span class="o">=</span> <span class="n">shapeNameGen</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gen</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+</pre></div>
+<p>So <strong>next( )</strong> is the iterator method that&#8217;s actually called to generate the
+next object, and it takes no arguments. <strong>shapeNameGen( )</strong> is the factory, and
+<strong>gen</strong> is the generator.</p>
+<p>Inside the generator-factory, you can see the call to <strong>__subclasses__( )</strong>,
+which produces a list of references to each of the subclasses of <strong>Shape</strong>
+(which must be inherited from <strong>object</strong> for this to work). You should be aware,
+however, that this only works for the first level of inheritance from <strong>Item</strong>,
+so if you were to inherit a new class from <strong>Circle</strong>, it wouldn&#8217;t show up in
+the list generated by <strong>__subclasses__( )</strong>. If you need to create a deeper
+hierarchy this way, you must recurse the <strong>__subclasses__( )</strong> list.</p>
+<p>Also note that in <strong>shapeNameGen( )</strong> the statement:</p>
+<div class="highlight"><pre><span class="n">types</span> <span class="o">=</span> <span class="n">Shape</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+</pre></div>
+<p>Is only executed when the generator object is produced; each time the <strong>next(
+)</strong> method of this generator object is called (which, as noted above, may happen
+implicitly), only the code in the <strong>for</strong> loop will be executed, so you don&#8217;t
+have wasteful execution (as you would if this were an ordinary function).</p>
+<div class="section" id="preventing-direct-creation">
+<h3>Preventing direct creation<a class="headerlink" href="#preventing-direct-creation" title="Permalink to this headline">¶</a></h3>
+<p>To disallow direct access to the classes, you can nest the classes within the
+factory method, like this:</p>
+<div class="highlight"><pre><span class="c"># factory/shapefact1/NestedShapeFactory.py</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.draw&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.erase&quot;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Square</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.draw&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.erase&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s">&quot;Circle&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="n">Circle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s">&quot;Square&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="n">Square</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;Bad shape creation: &quot;</span> <span class="o">+</span> <span class="nb">type</span>
+
+<span class="k">def</span> <span class="nf">shapeNameGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">factory</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s">&quot;Circle&quot;</span><span class="p">,</span> <span class="s">&quot;Square&quot;</span><span class="p">]))</span>
+
+<span class="c"># Circle() # Not defined</span>
+
+<span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapeNameGen</span><span class="p">(</span><span class="mf">7</span><span class="p">):</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">erase</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="polymorphic-factories">
+<h2>Polymorphic Factories<a class="headerlink" href="#polymorphic-factories" title="Permalink to this headline">¶</a></h2>
+<p>The static <strong>factory( )</strong> method in the previous example forces all the creation
+operations to be focused in one spot, so that&#8217;s the only place you need to
+change the code. This is certainly a reasonable solution, as it throws a box
+around the process of creating objects. However, the <em>Design Patterns</em> book
+emphasizes that the reason for the <em>Factory Method</em> pattern is so that different
+types of factories can be subclassed from the basic factory (the above design is
+mentioned as a special case). However, the book does not provide an example, but
+instead just repeats the example used for the <em>Abstract Factory</em> (you&#8217;ll see an
+example of this in the next section). Here is <strong>ShapeFactory1.py</strong> modified so
+the factory methods are in a separate class as virtual functions. Notice also
+that the specific <strong>Shape</strong> classes are dynamically loaded on demand:</p>
+<div class="highlight"><pre><span class="c"># factory/shapefact2/ShapeFactory2.py</span>
+<span class="c"># Polymorphic factory methods.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">generators</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">:</span>
+    <span class="n">factories</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">addFactory</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">shapeFactory</span><span class="p">):</span>
+        <span class="n">ShapeFactory</span><span class="o">.</span><span class="n">factories</span><span class="o">.</span><span class="n">put</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">shapeFactory</span>
+    <span class="n">addFactory</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">addFactory</span><span class="p">)</span>
+    <span class="c"># A Template Method:</span>
+    <span class="k">def</span> <span class="nf">createShape</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ShapeFactory</span><span class="o">.</span><span class="n">factories</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+            <span class="n">ShapeFactory</span><span class="o">.</span><span class="n">factories</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> \
+              <span class="nb">eval</span><span class="p">(</span><span class="nb">id</span> <span class="o">+</span> <span class="s">&#39;.Factory()&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ShapeFactory</span><span class="o">.</span><span class="n">factories</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+    <span class="n">createShape</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">createShape</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.draw&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Circle.erase&quot;</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Circle</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Square</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.draw&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Square.erase&quot;</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Square</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">shapeNameGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="n">Shape</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span> <span class="n">ShapeFactory</span><span class="o">.</span><span class="n">createShape</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">shapeNameGen</span><span class="p">(</span><span class="mf">7</span><span class="p">)]</span>
+
+<span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">erase</span><span class="p">()</span>
+</pre></div>
+<p>Now the factory method appears in its own class, <strong>ShapeFactory</strong>, as the
+<strong>create( )</strong> method. The different types of shapes must each create their own
+factory with a <strong>create( )</strong> method to create an object of their own type. The
+actual creation of shapes is performed by calling <strong>ShapeFactory.createShape(
+)</strong>, which is a static method that uses the dictionary in <strong>ShapeFactory</strong> to
+find the appropriate factory object based on an identifier that you pass it. The
+factory is immediately used to create the shape object, but you could imagine a
+more complex problem where the appropriate factory object is returned and then
+used by the caller to create an object in a more sophisticated way. However, it
+seems that much of the time you don&#8217;t need the intricacies of the polymorphic
+factory method, and a single static method in the base class (as shown in
+<strong>ShapeFactory1.py</strong>) will work fine.</p>
+<p>Notice that the <strong>ShapeFactory</strong> must be initialized by loading its dictionary
+with factory objects, which takes place in the static initialization clause of
+each of the shape implementations.</p>
+</div>
+<div class="section" id="abstract-factories">
+<h2>Abstract Factories<a class="headerlink" href="#abstract-factories" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Abstract Factory</em> pattern looks like the factory objects we&#8217;ve seen
+previously, with not one but several factory methods. Each of the factory
+methods creates a different kind of object. The idea is that at the point of
+creation of the factory object, you decide how all the objects created by that
+factory will be used. The example given in <em>Design Patterns</em> implements
+portability across various graphical user interfaces (GUIs): you create a
+factory object appropriate to the GUI that you&#8217;re working with, and from then on
+when you ask it for a menu, button, slider, etc. it will automatically create
+the appropriate version of that item for the GUI. Thus you&#8217;re able to isolate,
+in one place, the effect of changing from one GUI to another.</p>
+<p>As another example suppose you are creating a general-purpose gaming environment
+and you want to be able to support different types of games. Here&#8217;s how it might
+look using an abstract factory:</p>
+<div class="highlight"><pre><span class="c"># factory/Games.py</span>
+<span class="c"># An example of the Abstract Factory pattern.</span>
+
+<span class="k">class</span> <span class="nc">Obstacle</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Character</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obstacle</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Kitty</span><span class="p">(</span><span class="n">Character</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obstacle</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Kitty has encountered a&quot;</span><span class="p">,</span>
+        <span class="n">obstacle</span><span class="o">.</span><span class="n">action</span><span class="p">())</span>
+
+<span class="k">class</span> <span class="nc">KungFuGuy</span><span class="p">(</span><span class="n">Character</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obstacle</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;KungFuGuy now battles a&quot;</span><span class="p">,</span>
+        <span class="n">obstacle</span><span class="o">.</span><span class="n">action</span><span class="p">())</span>
+
+<span class="k">class</span> <span class="nc">Puzzle</span><span class="p">(</span><span class="n">Obstacle</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Puzzle&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">NastyWeapon</span><span class="p">(</span><span class="n">Obstacle</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;NastyWeapon&quot;</span><span class="p">)</span>
+
+<span class="c"># The Abstract Factory:</span>
+<span class="k">class</span> <span class="nc">GameElementFactory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">makeCharacter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">makeObstacle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="c"># Concrete factories:</span>
+<span class="k">class</span> <span class="nc">KittiesAndPuzzles</span><span class="p">(</span><span class="n">GameElementFactory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">makeCharacter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Kitty</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">makeObstacle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Puzzle</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">KillAndDismember</span><span class="p">(</span><span class="n">GameElementFactory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">makeCharacter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">KungFuGuy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">makeObstacle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">NastyWeapon</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">GameEnvironment</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">makeCharacter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ob</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">makeObstacle</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ob</span><span class="p">)</span>
+
+<span class="n">g1</span> <span class="o">=</span> <span class="n">GameEnvironment</span><span class="p">(</span><span class="n">KittiesAndPuzzles</span><span class="p">())</span>
+<span class="n">g2</span> <span class="o">=</span> <span class="n">GameEnvironment</span><span class="p">(</span><span class="n">KillAndDismember</span><span class="p">())</span>
+<span class="n">g1</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+<span class="n">g2</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+</pre></div>
+<p>In this environment, <strong>Character</strong> objects interact with <strong>Obstacle</strong> objects,
+but there are different types of Characters and obstacles depending on what kind
+of game you&#8217;re playing. You determine the kind of game by choosing a particular
+<strong>GameElementFactory</strong>, and then the <strong>GameEnvironment</strong> controls the setup and
+play of the game. In this example, the setup and play is very simple, but those
+activities (the <em>initial conditions</em> and the <em>state change</em>) can determine much
+of the game&#8217;s outcome. Here, <strong>GameEnvironment</strong> is not designed to be
+inherited, although it could very possibly make sense to do that.</p>
+<p>This also contains examples of <em>Double Dispatching</em> and the <em>Factory Method</em>,
+both of which will be explained later.</p>
+<p>Of course, the above scaffolding of <strong>Obstacle</strong>, <strong>Character</strong> and
+<strong>GameElementFactory</strong> (which was translated from the Java version of this
+example) is unnecessary - it&#8217;s only required for languages that have static type
+checking. As long as the concrete Python classes follow the form of the required
+classes, we don&#8217;t need any base classes:</p>
+<div class="highlight"><pre><span class="c"># factory/Games2.py</span>
+<span class="c"># Simplified Abstract Factory.</span>
+
+<span class="k">class</span> <span class="nc">Kitty</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obstacle</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Kitty has encountered a&quot;</span><span class="p">,</span>
+        <span class="n">obstacle</span><span class="o">.</span><span class="n">action</span><span class="p">())</span>
+
+<span class="k">class</span> <span class="nc">KungFuGuy</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obstacle</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;KungFuGuy now battles a&quot;</span><span class="p">,</span>
+        <span class="n">obstacle</span><span class="o">.</span><span class="n">action</span><span class="p">())</span>
+
+<span class="k">class</span> <span class="nc">Puzzle</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Puzzle&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">NastyWeapon</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;NastyWeapon&quot;</span><span class="p">)</span>
+
+<span class="c"># Concrete factories:</span>
+<span class="k">class</span> <span class="nc">KittiesAndPuzzles</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">makeCharacter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Kitty</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">makeObstacle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">Puzzle</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">KillAndDismember</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">makeCharacter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">KungFuGuy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">makeObstacle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="n">NastyWeapon</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">GameEnvironment</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">makeCharacter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ob</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">makeObstacle</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">interactWith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ob</span><span class="p">)</span>
+
+<span class="n">g1</span> <span class="o">=</span> <span class="n">GameEnvironment</span><span class="p">(</span><span class="n">KittiesAndPuzzles</span><span class="p">())</span>
+<span class="n">g2</span> <span class="o">=</span> <span class="n">GameEnvironment</span><span class="p">(</span><span class="n">KillAndDismember</span><span class="p">())</span>
+<span class="n">g1</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+<span class="n">g2</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+</pre></div>
+<p>Another way to put this is that all inheritance in Python is implementation
+inheritance; since Python does its type-checking at runtime, there&#8217;s no need to
+use interface inheritance so that you can upcast to the base type.</p>
+<p>You might want to study the two examples for comparison, however. Does the first
+one add enough useful information about the pattern that it&#8217;s worth keeping some
+aspect of it? Perhaps all you need is &#8220;tagging classes&#8221; like this:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Obstacle</span><span class="p">:</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Character</span><span class="p">:</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">GameElementFactory</span><span class="p">:</span> <span class="k">pass</span>
+</pre></div>
+<p>Then the inheritance serves only to indicate the type of the derived classes.</p>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Add a class <strong>Triangle</strong> to <strong>ShapeFactory1.py</strong></li>
+<li>Add a class <strong>Triangle</strong> to <strong>ShapeFactory2.py</strong></li>
+<li>Add a new type of <strong>GameEnvironment</strong> called <strong>GnomesAndFairies</strong> to
+<strong>GameEnvironment.py</strong></li>
+<li>Modify <strong>ShapeFactory2.py</strong> so that it uses an <em>Abstract Factory</em> to create
+different sets of shapes (for example, one particular type of factory object
+creates &#8220;thick shapes,&#8221; another creates &#8220;thin shapes,&#8221; but each factory
+object can create all the shapes: circles, squares, triangles etc.).</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Factory: Encapsulating Object Creation</a><ul>
+<li><a class="reference external" href="#simple-factory-method">Simple Factory Method</a><ul>
+<li><a class="reference external" href="#preventing-direct-creation">Preventing direct creation</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#polymorphic-factories">Polymorphic Factories</a></li>
+<li><a class="reference external" href="#abstract-factories">Abstract Factories</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="iterators.html" title="previous chapter">Iterators: Decoupling Algorithms from Containers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="functionObjects.html" title="next chapter">Function Objects</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/factory.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="functionObjects.html" title="Function Objects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="iterators.html" title="Iterators: Decoupling Algorithms from Containers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

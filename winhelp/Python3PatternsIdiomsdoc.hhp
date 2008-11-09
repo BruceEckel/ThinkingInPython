@@ -1,0 +1,71 @@
+[OPTIONS]
+Binary TOC=Yes
+Compiled file=Python3PatternsIdiomsdoc.chm
+Contents file=Python3PatternsIdiomsdoc.hhc
+Default Window=Python3PatternsIdiomsdoc
+Default topic=index.html
+Display compile progress=No
+Full text search stop list file=Python3PatternsIdiomsdoc.stp
+Full-text search=Yes
+Index file=Python3PatternsIdiomsdoc.hhk
+Language=0x409
+Title=Python 3 Patterns & Idioms
+
+[WINDOWS]
+Python3PatternsIdiomsdoc="Python 3 Patterns & Idioms","Python3PatternsIdiomsdoc.hhc","Python3PatternsIdiomsdoc.hhk","index.html","index.html",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
+
+[FILES]
+appFrameworks.html
+CanonicalScript.html
+changeInterface.html
+Comprehensions.html
+Contributors.html
+CoroutinesAndConcurrency.html
+decorator.html
+DeveloperGuide.html
+factory.html
+fronting.html
+functionObjects.html
+GeneratorsIterators.html
+genindex.html
+index.html
+Introduction.html
+iterators.html
+jython.html
+LanguageChanges.html
+MachineDiscovery.html
+multipleDispatching.html
+NoteToReaders.html
+observer.html
+Part1.html
+Part2.html
+Part3.html
+patternConcept.html
+patternRefactoring.html
+projects.html
+PythonDecorators.html
+quickPython.html
+Rules.html
+singleton.html
+stateMachine.html
+tableDriven.html
+TeachingSupport.html
+unitTesting.html
+visitor.html
+_static\contents.png
+_static\default.css
+_static\favicon.ico
+_static\file.png
+_static\LaunchpadBrand.png
+_static\LaunchpadIcon.png
+_static\LaunchpadLogo.png
+_static\Logo.png
+_static\minus.png
+_static\navigation.png
+_static\plus.png
+_static\pygments.css
+_static\rightsidebar.css
+_static\sphinxdoc.css
+_static\stickysidebar.css
+_static\Thumbs.db
+_static\traditional.css

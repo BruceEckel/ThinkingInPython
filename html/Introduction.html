@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Teaching Support" href="TeachingSupport.html" />
+    <link rel="prev" title="A Note To Readers" href="NoteToReaders.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="TeachingSupport.html" title="Teaching Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="NoteToReaders.html" title="A Note To Readers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<font size="+1">The vision for this book.</font><div class="section" id="a-team-effort">
+<h2>A Team Effort<a class="headerlink" href="#a-team-effort" title="Permalink to this headline">¶</a></h2>
+<p>This book is an experiment to see if we can combine everyone&#8217;s best efforts to
+create something great.</p>
+<p>You can find the contributors right before this introduction. They are listed
+in order of <em>Karma Points</em>, a system Launchpad.net uses to keep track of
+contributions from everyone working on an open-source project.</p>
+<p>In my case, I will write new material, as well as rewriting other contributions
+to clarify and give voice, setting up the architecture and being the <em>Benevolent
+Dictator</em> for the book. But I definitely won&#8217;t be doing everything; my goal is
+that this is a team project and that everyone who wants to will have something
+useful to contribute.</p>
+<p>We&#8217;ll be using Launchpad.net&#8217;s &#8220;Blueprints&#8221; facility to add &#8220;features&#8221; to the
+book, so that&#8217;s where you&#8217;ll find the main repository of things to do.</p>
+<p>What can you contribute? Anything as small as spelling and grammatical
+correctons, and as large as a whole chapter. Research into new topics and
+creating examples is what takes me the most time, so if you know something
+already or are willing to figure it out, don&#8217;t worry if your writing or
+programming isn&#8217;t perfect &#8211; contribute it and I and the rest of the group will
+improve it.</p>
+<p>You may also have talents in figuring things out. Sphinx formatting, for
+example, or how to produce camera-ready formatting. These are all very useful
+things which will not only benefit this book but also any future book built on
+this template (every bit of the build system for the book will be out in the
+open, so if you want to take what we&#8217;ve done here and start your own book, you
+can).</p>
+<p>Of course, not everything can make it into the final print book, but things that
+don&#8217;t fit into the main book can be moved into an &#8220;appendix book&#8221; or a &#8220;volume
+2&#8221; book or something like that.</p>
+</div>
+<div class="section" id="not-an-introductory-book">
+<h2>Not an Introductory Book<a class="headerlink" href="#not-an-introductory-book" title="Permalink to this headline">¶</a></h2>
+<p>Although there is an introduction for programmers, this book is not intended to
+be introductory. There are already lots of good introductory books out there.</p>
+<p>You can think of it as an &#8220;intermediate&#8221; or &#8220;somewhat advanced&#8221; book, but the
+&#8220;somewhat&#8221; modifier is very important here. Because it is not introductory, two
+difficult constraints are removed.</p>
+<ol class="arabic simple">
+<li>In an introductory book you are forced to describe everything in lock step,
+never mentioning anything before it has been thoroughly introduced. That&#8217;s
+still a good goal, but we don&#8217;t have to agonize over it when it doesn&#8217;t
+happen (just cross-reference the material).</li>
+<li>In addition, the topics are not restricted; in this book topics are chosen
+based on whether they are interesting and/or useful, not on whether they are
+introductory or not.</li>
+</ol>
+<p>That said, people will still be coming to a topic without knowing about it and
+it will need to be introduced, as much as possible, as if they have never seen
+it before.</p>
+</div>
+<div class="section" id="the-license">
+<h2>The License<a class="headerlink" href="#the-license" title="Permalink to this headline">¶</a></h2>
+<p>Unless otherwise specified, the material in this book is published under a
+<a class="reference external" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-Share Alike 3.0 license</a>.</p>
+<p>If you make contributions, you must own the rights to your material and be able
+to place them under this license. Please don&#8217;t contribute something unless you
+are sure this is the case (read your company&#8217;s employment contract &#8211; these
+often specify that anything you think of or create at any time of day or night
+belongs to the company).</p>
+</div>
+<div class="section" id="the-printed-book">
+<h2>The Printed Book<a class="headerlink" href="#the-printed-book" title="Permalink to this headline">¶</a></h2>
+<p>Because of the creative commons license, the electronic version of the book as
+well as all the sources are available, can be reproduced on other web sites,
+etc. (again, as long as you attribute it).</p>
+<p>You can print your own version of the book. I will be creating a printed version
+of the book for sale, with a nice cover and binding. Many people do like to have
+a print version of the book, and part of the motivation for doing a print
+version is to make some income off the effort I put into the book.</p>
+<p>But buying my particular print version of the book is optional. All of the tools
+will be downloadable so that you can print it yourself, or send it to a copy
+shop and have it bound, etc. The only thing you won&#8217;t get is my cover and
+binding.</p>
+</div>
+<div class="section" id="translations">
+<h2>Translations<a class="headerlink" href="#translations" title="Permalink to this headline">¶</a></h2>
+<p>Launchpad.net, where this project is hosted, has support for doing translations
+and this gave me an idea. I had just come back from speaking at the Python
+conference in Brazil, and was thinking about the user group there and how I
+might support them. (We had done a seminar while I was there in order to help
+pay for my trip and support the organization).</p>
+<p>If the book can be kept in a Sphinx restructured text format that can be turned
+directly into camera-ready PDF (the basic form is there but it will take
+somebody messing about with it to get it into camera-ready layout), then the job
+of translation can be kept to something that could be done by user groups during
+sprints. The user group could then use a print-on-demand service to print the
+book, and get the group members to take them to local bookstores and do other
+kinds of promotions. The profits from the book could go to the user group (who
+knows, just like the Brazillian group, your group may end up using some of those
+profits to bring me to speak at your conference!).</p>
+<p>If possible, I would like a royalty from these translations. To me, 5% of the
+cover price sounds reasonable. If the user group would like to use my cover,
+then they could pay this royalty. If they wanted to go their own way, it&#8217;s
+creative commons so as long as the book is attributed that&#8217;s their choice.</p>
+</div>
+<div class="section" id="my-motives">
+<h2>My Motives<a class="headerlink" href="#my-motives" title="Permalink to this headline">¶</a></h2>
+<p>Just so it&#8217;s clear, I have the following motives for creating this book:</p>
+<ol class="arabic simple">
+<li>Learn more about Python and contribute to the Python community, to help
+create more and better Python programmers.</li>
+<li>Develop more Python consulting and training clients through the publicity
+generated by the book (see
+<a class="reference external" href="http://www.mindviewinc.com/Consulting/Index.php">here</a>).</li>
+<li>Experiment with group creation of teaching materials for the book, which
+will benefit me in my own training (see the previous point) but will also
+benefit anyone choosing to use the book as a text in a course or training
+seminar. (See <a class="reference external" href="TeachingSupport.html#teachingsupport"><em>Teaching Support</em></a>).</li>
+<li>Generate profits by selling printed books. (But see above about the ability
+to print the book yourself).</li>
+<li>Help raise money for non-U.S. Python user groups via translations, from
+which I might gain a small percentage.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Introduction</a><ul>
+<li><a class="reference external" href="#a-team-effort">A Team Effort</a></li>
+<li><a class="reference external" href="#not-an-introductory-book">Not an Introductory Book</a></li>
+<li><a class="reference external" href="#the-license">The License</a></li>
+<li><a class="reference external" href="#the-printed-book">The Printed Book</a></li>
+<li><a class="reference external" href="#translations">Translations</a></li>
+<li><a class="reference external" href="#my-motives">My Motives</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="NoteToReaders.html" title="previous chapter">A Note To Readers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="TeachingSupport.html" title="next chapter">Teaching Support</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Introduction.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="TeachingSupport.html" title="Teaching Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="NoteToReaders.html" title="A Note To Readers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

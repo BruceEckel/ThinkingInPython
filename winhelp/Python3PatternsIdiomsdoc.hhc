@@ -1,0 +1,712 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+        <param name="Window Styles" value="0x801227">
+        <param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Python 3 Patterns & Idioms">
+    <param name="Local" value="index.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Global Module Index">
+    <param name="Local" value="modindex.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Contributors">
+    <param name="Local" value="Contributors.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Thanks To">
+    <param name="Local" value="Contributors.html#thanks-to">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Note To Readers">
+    <param name="Local" value="NoteToReaders.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Introduction">
+    <param name="Local" value="Introduction.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Team Effort">
+    <param name="Local" value="Introduction.html#a-team-effort">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Not an Introductory Book">
+    <param name="Local" value="Introduction.html#not-an-introductory-book">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The License">
+    <param name="Local" value="Introduction.html#the-license">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Printed Book">
+    <param name="Local" value="Introduction.html#the-printed-book">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Translations">
+    <param name="Local" value="Introduction.html#translations">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="My Motives">
+    <param name="Local" value="Introduction.html#my-motives">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Teaching Support">
+    <param name="Local" value="TeachingSupport.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Book Development Rules">
+    <param name="Local" value="Rules.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Contribute What You Can">
+    <param name="Local" value="Rules.html#contribute-what-you-can">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Don't Get Attached">
+    <param name="Local" value="Rules.html#don-t-get-attached">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Credit">
+    <param name="Local" value="Rules.html#credit">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Mechanics">
+    <param name="Local" value="Rules.html#mechanics">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Diagrams">
+    <param name="Local" value="Rules.html#diagrams">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Developer Guide">
+    <param name="Local" value="DeveloperGuide.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="For Windows Users">
+    <param name="Local" value="DeveloperGuide.html#for-windows-users">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Installing Sphinx">
+    <param name="Local" value="DeveloperGuide.html#installing-sphinx">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Getting the Development Branch of the Book">
+    <param name="Local" value="DeveloperGuide.html#getting-the-development-branch-of-the-book">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Building the Book">
+    <param name="Local" value="DeveloperGuide.html#building-the-book">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Working with Launchpad and Bazaar">
+    <param name="Local" value="DeveloperGuide.html#working-with-launchpad-and-bazaar">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Branch Registration Details">
+    <param name="Local" value="DeveloperGuide.html#branch-registration-details">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Tips for Merging">
+    <param name="Local" value="DeveloperGuide.html#tips-for-merging">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Part I: Foundations">
+    <param name="Local" value="Part1.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Quick Python for Programmers">
+    <param name="Local" value="quickPython.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Scripting vs. Programming">
+    <param name="Local" value="quickPython.html#scripting-vs-programming">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Built-In Containers">
+    <param name="Local" value="quickPython.html#built-in-containers">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Functions">
+    <param name="Local" value="quickPython.html#functions">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Strings">
+    <param name="Local" value="quickPython.html#strings">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Classes">
+    <param name="Local" value="quickPython.html#classes">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Inheritance">
+    <param name="Local" value="quickPython.html#inheritance">
+</OBJECT>
+</UL>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Unit Testing &amp; Test-Driven Development">
+    <param name="Local" value="unitTesting.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Write Tests First">
+    <param name="Local" value="unitTesting.html#write-tests-first">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Simple Python Testing">
+    <param name="Local" value="unitTesting.html#simple-python-testing">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Very Simple Framework">
+    <param name="Local" value="unitTesting.html#a-very-simple-framework">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Writing Tests">
+    <param name="Local" value="unitTesting.html#writing-tests">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="White-Box &amp; Black-Box Tests">
+    <param name="Local" value="unitTesting.html#white-box-black-box-tests">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Running tests">
+    <param name="Local" value="unitTesting.html#running-tests">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Automatically Executing Tests">
+    <param name="Local" value="unitTesting.html#automatically-executing-tests">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="unitTesting.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Python 3 Language Changes">
+    <param name="Local" value="LanguageChanges.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Decorators">
+    <param name="Local" value="PythonDecorators.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Decorators vs. the Decorator Pattern">
+    <param name="Local" value="PythonDecorators.html#decorators-vs-the-decorator-pattern">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="History of Macros">
+    <param name="Local" value="PythonDecorators.html#history-of-macros">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Goal of Macros">
+    <param name="Local" value="PythonDecorators.html#the-goal-of-macros">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="What Can You Do With Decorators?">
+    <param name="Local" value="PythonDecorators.html#what-can-you-do-with-decorators">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Function Decorators">
+    <param name="Local" value="PythonDecorators.html#function-decorators">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Slightly More Useful">
+    <param name="Local" value="PythonDecorators.html#slightly-more-useful">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Using Functions as Decorators">
+    <param name="Local" value="PythonDecorators.html#using-functions-as-decorators">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Review: Decorators without Arguments">
+    <param name="Local" value="PythonDecorators.html#review-decorators-without-arguments">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Decorators with Arguments">
+    <param name="Local" value="PythonDecorators.html#decorators-with-arguments">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Decorator Functions with Decorator Arguments">
+    <param name="Local" value="PythonDecorators.html#decorator-functions-with-decorator-arguments">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Generators, Iterators, and Itertools">
+    <param name="Local" value="GeneratorsIterators.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Comprehensions">
+    <param name="Local" value="Comprehensions.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Coroutines &amp; Concurrency">
+    <param name="Local" value="CoroutinesAndConcurrency.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Jython">
+    <param name="Local" value="jython.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Interpreter Motivation">
+    <param name="Local" value="jython.html#interpreter-motivation">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Creating a Language">
+    <param name="Local" value="jython.html#creating-a-language">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Controlling the Interpreter">
+    <param name="Local" value="jython.html#controlling-the-interpreter">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Putting Data In">
+    <param name="Local" value="jython.html#putting-data-in">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Getting Data Out">
+    <param name="Local" value="jython.html#getting-data-out">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Multiple Interpreters">
+    <param name="Local" value="jython.html#multiple-interpreters">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Controlling Java from Jython">
+    <param name="Local" value="jython.html#controlling-java-from-jython">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Inner Classes">
+    <param name="Local" value="jython.html#inner-classes">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Using Java libraries">
+    <param name="Local" value="jython.html#using-java-libraries">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Inheriting from Java library Classes">
+    <param name="Local" value="jython.html#inheriting-from-java-library-classes">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Creating Java classes with Jython">
+    <param name="Local" value="jython.html#creating-java-classes-with-jython">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Building Java Classes from Python">
+    <param name="Local" value="jython.html#building-java-classes-from-python">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Summary">
+    <param name="Local" value="jython.html#summary">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="jython.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Part II: Idioms">
+    <param name="Local" value="Part2.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Discovering the Details About Your Platform">
+    <param name="Local" value="MachineDiscovery.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Canonical Form for Command-Line Programs">
+    <param name="Local" value="CanonicalScript.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Part III: Patterns">
+    <param name="Local" value="Part3.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Pattern Concept">
+    <param name="Local" value="patternConcept.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="What is a Pattern?">
+    <param name="Local" value="patternConcept.html#what-is-a-pattern">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Classifying Patterns">
+    <param name="Local" value="patternConcept.html#classifying-patterns">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Pattern Taxonomy">
+    <param name="Local" value="patternConcept.html#pattern-taxonomy">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Design Structures">
+    <param name="Local" value="patternConcept.html#design-structures">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Design Principles">
+    <param name="Local" value="patternConcept.html#design-principles">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Singleton">
+    <param name="Local" value="singleton.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="singleton.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Building Application Frameworks">
+    <param name="Local" value="appFrameworks.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Template Method">
+    <param name="Local" value="appFrameworks.html#template-method">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="appFrameworks.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Fronting for an Implementation">
+    <param name="Local" value="fronting.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Proxy">
+    <param name="Local" value="fronting.html#proxy">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="State">
+    <param name="Local" value="fronting.html#state">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="StateMachine">
+    <param name="Local" value="stateMachine.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Table-Driven State Machine">
+    <param name="Local" value="stateMachine.html#table-driven-state-machine">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The State Class">
+    <param name="Local" value="stateMachine.html#the-state-class">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Conditions for Transition">
+    <param name="Local" value="stateMachine.html#conditions-for-transition">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Transition Actions">
+    <param name="Local" value="stateMachine.html#transition-actions">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Table">
+    <param name="Local" value="stateMachine.html#the-table">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Basic Machine">
+    <param name="Local" value="stateMachine.html#the-basic-machine">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Simple Vending Machine">
+    <param name="Local" value="stateMachine.html#simple-vending-machine">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Testing the Machine">
+    <param name="Local" value="stateMachine.html#testing-the-machine">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Tools">
+    <param name="Local" value="stateMachine.html#tools">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="stateMachine.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Decorator: Dynamic Type Selection">
+    <param name="Local" value="decorator.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Basic Decorator Structure">
+    <param name="Local" value="decorator.html#basic-decorator-structure">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Coffee Example">
+    <param name="Local" value="decorator.html#a-coffee-example">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Class for Each Combination">
+    <param name="Local" value="decorator.html#class-for-each-combination">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Decorator Approach">
+    <param name="Local" value="decorator.html#the-decorator-approach">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Compromise">
+    <param name="Local" value="decorator.html#compromise">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Other Considerations">
+    <param name="Local" value="decorator.html#other-considerations">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="decorator.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Iterators: Decoupling Algorithms from Containers">
+    <param name="Local" value="iterators.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Type-Safe Iterators">
+    <param name="Local" value="iterators.html#type-safe-iterators">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Factory: Encapsulating Object Creation">
+    <param name="Local" value="factory.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Simple Factory Method">
+    <param name="Local" value="factory.html#simple-factory-method">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Preventing direct creation">
+    <param name="Local" value="factory.html#preventing-direct-creation">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Polymorphic Factories">
+    <param name="Local" value="factory.html#polymorphic-factories">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Abstract Factories">
+    <param name="Local" value="factory.html#abstract-factories">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="factory.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Function Objects">
+    <param name="Local" value="functionObjects.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Command: Choosing the Operation at Runtime">
+    <param name="Local" value="functionObjects.html#command-choosing-the-operation-at-runtime">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Strategy: Choosing the Algorithm at Runtime">
+    <param name="Local" value="functionObjects.html#strategy-choosing-the-algorithm-at-runtime">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Chain of Responsibility">
+    <param name="Local" value="functionObjects.html#chain-of-responsibility">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="functionObjects.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Changing the Interface">
+    <param name="Local" value="changeInterface.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Adapter">
+    <param name="Local" value="changeInterface.html#adapter">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Fa&#231;ade">
+    <param name="Local" value="changeInterface.html#fa-ade">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="changeInterface.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Table-Driven Code: Configuration Flexibility">
+    <param name="Local" value="tableDriven.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Table-Driven Code Using Anonymous Inner Classes">
+    <param name="Local" value="tableDriven.html#table-driven-code-using-anonymous-inner-classes">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Observer">
+    <param name="Local" value="observer.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Observing Flowers">
+    <param name="Local" value="observer.html#observing-flowers">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Visual Example of Observers">
+    <param name="Local" value="observer.html#a-visual-example-of-observers">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="observer.html#exercises">
+</OBJECT>
+</UL>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Multiple Dispatching">
+    <param name="Local" value="multipleDispatching.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Visitor">
+    <param name="Local" value="visitor.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="visitor.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Pattern Refactoring">
+    <param name="Local" value="patternRefactoring.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Simulating the Trash Recycler">
+    <param name="Local" value="patternRefactoring.html#simulating-the-trash-recycler">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Improving the Design">
+    <param name="Local" value="patternRefactoring.html#improving-the-design">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="&quot;Make More Objects&quot;">
+    <param name="Local" value="patternRefactoring.html#make-more-objects">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Pattern for Prototyping Creation">
+    <param name="Local" value="patternRefactoring.html#a-pattern-for-prototyping-creation">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Trash Subclasses">
+    <param name="Local" value="patternRefactoring.html#trash-subclasses">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Parsing Trash from an External File">
+    <param name="Local" value="patternRefactoring.html#parsing-trash-from-an-external-file">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Recycling with Prototyping">
+    <param name="Local" value="patternRefactoring.html#recycling-with-prototyping">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Abstracting Usage">
+    <param name="Local" value="patternRefactoring.html#abstracting-usage">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Multiple Dispatching">
+    <param name="Local" value="patternRefactoring.html#multiple-dispatching">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Implementing the Double Dispatch">
+    <param name="Local" value="patternRefactoring.html#implementing-the-double-dispatch">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The Visitor Pattern">
+    <param name="Local" value="patternRefactoring.html#the-visitor-pattern">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Reflective Decorator">
+    <param name="Local" value="patternRefactoring.html#a-reflective-decorator">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="More Coupling?">
+    <param name="Local" value="patternRefactoring.html#more-coupling">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="RTTI Considered Harmful?">
+    <param name="Local" value="patternRefactoring.html#rtti-considered-harmful">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Summary">
+    <param name="Local" value="patternRefactoring.html#summary">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Exercises">
+    <param name="Local" value="patternRefactoring.html#exercises">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Projects">
+    <param name="Local" value="projects.html">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Rats &amp; Mazes">
+    <param name="Local" value="projects.html#rats-mazes">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Other Maze Resources">
+    <param name="Local" value="projects.html#other-maze-resources">
+</OBJECT>
+</UL>
+</UL>
+</UL></BODY></HTML>

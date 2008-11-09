@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Changing the Interface &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Table-Driven Code: Configuration Flexibility" href="tableDriven.html" />
+    <link rel="prev" title="Function Objects" href="functionObjects.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tableDriven.html" title="Table-Driven Code: Configuration Flexibility"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="functionObjects.html" title="Function Objects"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="changing-the-interface">
+<h1>Changing the Interface<a class="headerlink" href="#changing-the-interface" title="Permalink to this headline">¶</a></h1>
+<p>Sometimes the problem that you&#8217;re solving is as simple as &#8220;I don&#8217;t have the
+interface that I want.&#8221; Two of the patterns in <em>Design Patterns</em> solve this
+problem: <em>Adapter</em> takes one type and produces an interface to some other type.
+<em>Façade</em> creates an interface to a set of classes, simply to provide a more
+comfortable way to deal with a library or bundle of resources.</p>
+<div class="section" id="adapter">
+<h2>Adapter<a class="headerlink" href="#adapter" title="Permalink to this headline">¶</a></h2>
+<p>When you&#8217;ve got <em>this</em>, and you need <em>that</em>, <em>Adapter</em> solves the problem. The
+only requirement is to produce a <em>that</em>, and there are a number of ways you can
+accomplish this adaptation:</p>
+<div class="highlight"><pre><span class="c"># changeInterface/Adapter.py</span>
+<span class="c"># Variations on the Adapter pattern.</span>
+
+<span class="k">class</span> <span class="nc">WhatIHave</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">WhatIWant</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">ProxyAdapter</span><span class="p">(</span><span class="n">WhatIWant</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whatIHave</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">whatIHave</span> <span class="o">=</span> <span class="n">whatIHave</span>
+
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Implement behavior using</span>
+        <span class="c"># methods in WhatIHave:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">whatIHave</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">whatIHave</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">WhatIUse</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whatIWant</span><span class="p">):</span>
+        <span class="n">whatIWant</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+
+<span class="c"># Approach 2: build adapter use into op():</span>
+<span class="k">class</span> <span class="nc">WhatIUse2</span><span class="p">(</span><span class="n">WhatIUse</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whatIHave</span><span class="p">):</span>
+        <span class="n">ProxyAdapter</span><span class="p">(</span><span class="n">whatIHave</span><span class="p">)</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+
+<span class="c"># Approach 3: build adapter into WhatIHave:</span>
+<span class="k">class</span> <span class="nc">WhatIHave2</span><span class="p">(</span><span class="n">WhatIHave</span><span class="p">,</span> <span class="n">WhatIWant</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+
+<span class="c"># Approach 4: use an inner class:</span>
+<span class="k">class</span> <span class="nc">WhatIHave3</span><span class="p">(</span><span class="n">WhatIHave</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">InnerAdapter</span><span class="p">(</span><span class="n">WhatIWant</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outer</span> <span class="o">=</span> <span class="n">outer</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outer</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">whatIWant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">WhatIHave3</span><span class="o">.</span><span class="n">InnerAdapter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="n">whatIUse</span> <span class="o">=</span> <span class="n">WhatIUse</span><span class="p">()</span>
+<span class="n">whatIHave</span> <span class="o">=</span> <span class="n">WhatIHave</span><span class="p">()</span>
+<span class="n">adapt</span><span class="o">=</span> <span class="n">ProxyAdapter</span><span class="p">(</span><span class="n">whatIHave</span><span class="p">)</span>
+<span class="n">whatIUse2</span> <span class="o">=</span> <span class="n">WhatIUse2</span><span class="p">()</span>
+<span class="n">whatIHave2</span> <span class="o">=</span> <span class="n">WhatIHave2</span><span class="p">()</span>
+<span class="n">whatIHave3</span> <span class="o">=</span> <span class="n">WhatIHave3</span><span class="p">()</span>
+<span class="n">whatIUse</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">adapt</span><span class="p">)</span>
+<span class="c"># Approach 2:</span>
+<span class="n">whatIUse2</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">whatIHave</span><span class="p">)</span>
+<span class="c"># Approach 3:</span>
+<span class="n">whatIUse</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">whatIHave2</span><span class="p">)</span>
+<span class="c"># Approach 4:</span>
+<span class="n">whatIUse</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">whatIHave3</span><span class="o">.</span><span class="n">whatIWant</span><span class="p">())</span>
+</pre></div>
+<p>I&#8217;m taking liberties with the term &#8220;proxy&#8221; here, because in <em>Design Patterns</em>
+they assert that a proxy must have an identical interface with the object that
+it is a surrogate for. However, if you have the two words together: &#8220;proxy
+adapter,&#8221; it is perhaps more reasonable.</p>
+</div>
+<div class="section" id="fa-ade">
+<h2>Façade<a class="headerlink" href="#fa-ade" title="Permalink to this headline">¶</a></h2>
+<p>A general principle that I apply when I&#8217;m casting about trying to mold
+requirements into a first-cut object is &#8220;If something is ugly, hide it inside an
+object.&#8221; This is basically what <em>Façade</em> accomplishes. If you have a rather
+confusing collection of classes and interactions that the client programmer
+doesn&#8217;t really need to see, then you can create an interface that is useful for
+the client programmer and that only presents what&#8217;s necessary.</p>
+<p>Façade is often implemented as singleton abstract factory. Of course, you can
+easily get this effect by creating a class containing <strong>static</strong> factory
+methods:</p>
+<div class="highlight"><pre><span class="c"># changeInterface/Facade.py</span>
+<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="c"># Other classes that aren&#39;t exposed by the</span>
+<span class="c"># facade go here ...</span>
+
+<span class="k">class</span> <span class="nc">Facade</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">makeA</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">A</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">makeA</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">makeA</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">makeB</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">B</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">makeB</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">makeB</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">makeC</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">C</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">makeC</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">makeC</span><span class="p">)</span>
+
+<span class="c"># The client programmer gets the objects</span>
+<span class="c"># by calling the static methods:</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">Facade</span><span class="o">.</span><span class="n">makeA</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Facade</span><span class="o">.</span><span class="n">makeB</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Facade</span><span class="o">.</span><span class="n">makeC</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span>
+</pre></div>
+<p>[rewrite this section using research from Larman&#8217;s book]</p>
+<p>Example for Facade (?): my &#8220;nicer&#8221; version of the XML library.</p>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Create an adapter class that automatically loads a two-dimensional array of
+objects into a dictionary as key-value pairs.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Changing the Interface</a><ul>
+<li><a class="reference external" href="#adapter">Adapter</a></li>
+<li><a class="reference external" href="#fa-ade">Façade</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="functionObjects.html" title="previous chapter">Function Objects</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="tableDriven.html" title="next chapter">Table-Driven Code: Configuration Flexibility</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/changeInterface.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tableDriven.html" title="Table-Driven Code: Configuration Flexibility"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="functionObjects.html" title="Function Objects"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

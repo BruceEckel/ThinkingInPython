@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Building Application Frameworks &mdash; Python 3 Patterns & Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns & Idioms" href="index.html" />
+    <link rel="next" title="Fronting for an Implementation" href="fronting.html" />
+    <link rel="prev" title="The Singleton" href="singleton.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fronting.html" title="Fronting for an Implementation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="singleton.html" title="The Singleton"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="building-application-frameworks">
+<h1>Building Application Frameworks<a class="headerlink" href="#building-application-frameworks" title="Permalink to this headline">¶</a></h1>
+<p>An application framework allows you to inherit from a class or set of classes
+and create a new application, reusing most of the code in the existing classes
+and overriding one or more methods in order to customize the application to your
+needs. A fundamental concept in the application framework is the <em>Template
+Method</em> which is typically hidden beneath the covers and drives the application
+by calling the various methods in the base class (some of which you have
+overridden in order to create the application).</p>
+<p>For example, whenever you create an applet you&#8217;re using an application
+framework: you inherit from <strong>JApplet</strong> and then override <strong>init( )</strong>. The
+applet mechanism (which is a <em>Template Method</em>) does the rest by drawing the
+screen, handling the event loop, resizing, etc.</p>
+<div class="section" id="template-method">
+<h2>Template Method<a class="headerlink" href="#template-method" title="Permalink to this headline">¶</a></h2>
+<p>An important characteristic of the <em>Template Method</em> is that it is defined in
+the base class and cannot be changed. It&#8217;s sometimes a <strong>private</strong> method but
+it&#8217;s virtually always <strong>final</strong>. It calls other base-class methods (the ones you
+override) in order to do its job, but it is usually called only as part of an
+initialization process (and thus the client programmer isn&#8217;t necessarily able to
+call it directly):</p>
+<div class="highlight"><pre><span class="c"># appFrameworks/TemplateMethod.py</span>
+<span class="c"># Simple demonstration of Template Method.</span>
+
+<span class="k">class</span> <span class="nc">ApplicationFramework</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__templateMethod</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__templateMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">customize1</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">customize2</span><span class="p">()</span>
+
+<span class="c"># Create an &quot;application&quot;:</span>
+<span class="k">class</span> <span class="nc">MyApp</span><span class="p">(</span><span class="n">ApplicationFramework</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">customize1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Nudge, nudge, wink, wink! &quot;</span><span class="p">,)</span>
+    <span class="k">def</span> <span class="nf">customize2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Say no more, Say no more!&quot;</span><span class="p">)</span>
+
+<span class="n">MyApp</span><span class="p">()</span>
+</pre></div>
+<p>The base-class constructor is responsible for performing the necessary
+initialization and then starting the &#8220;engine&#8221; (the template method) that runs
+the application (in a GUI application, this &#8220;engine&#8221; would be the main event
+loop). The client programmer simply provides definitions for <strong>customize1( )</strong>
+and <strong>customize2( )</strong> and the &#8220;application&#8221; is ready to run.</p>
+<p>We&#8217;ll see <em>Template Method</em> numerous other times throughout the book.</p>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Create a framework that takes a list of file names on the command line. It
+opens each file except the last for reading, and the last for writing. The
+framework will process each input file using an undetermined policy and
+write the output to the last file. Inherit to customize this framework to
+create two separate applications:</p>
+<blockquote>
+<ol class="arabic simple">
+<li>Converts all the letters in each file to uppercase.</li>
+<li>Searches the files for words given in the first file.</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Building Application Frameworks</a><ul>
+<li><a class="reference external" href="#template-method">Template Method</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="singleton.html" title="previous chapter">The Singleton</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="fronting.html" title="next chapter">Fronting for an Implementation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/appFrameworks.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fronting.html" title="Fronting for an Implementation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="singleton.html" title="The Singleton"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns & Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Nov 09, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>
