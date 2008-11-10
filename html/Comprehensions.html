@@ -58,6 +58,146 @@
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 </pre></div>
+<div class="section" id="a-more-complex-example">
+<h2>A More Complex Example<a class="headerlink" href="#a-more-complex-example" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is still under development. After finishing, it will get a full
+description of all parts.</p>
+</div>
+<div class="highlight"><pre><span class="c"># comprehensions/CodeManager.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO: update() is still only in test mode; doesn&#39;t actually work yet.</span>
+<span class="sd">TODO: check() should generate deltas</span>
+
+<span class="sd">Extracts, checks and updates code examples in ReST files.</span>
+
+<span class="sd">You can just put in the codeMarker and the (indented) first line (containing the</span>
+<span class="sd">file path) into your ReST file, then run the update program to automatically</span>
+<span class="sd">insert the rest of the file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
+
+<span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="s">&quot;_test&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
+
+<span class="k">class</span> <span class="nc">Languages</span><span class="p">:</span>
+    <span class="s">&quot;Strategy design pattern&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Python</span><span class="p">:</span>
+        <span class="n">codeMarker</span> <span class="o">=</span> <span class="s">&quot;::</span><span class="se">\n\n</span><span class="s">&quot;</span>
+        <span class="n">commentTag</span> <span class="o">=</span> <span class="s">&quot;#&quot;</span>
+        <span class="n">listings</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;::</span><span class="se">\n\n</span><span class="s">( {4}#.*(?:</span><span class="se">\n</span><span class="s">+ {4}.*)*)&quot;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Java</span><span class="p">:</span>
+        <span class="n">codeMarker</span> <span class="o">=</span> <span class="s">&quot;..  code-block:: java</span><span class="se">\n\n</span><span class="s">&quot;</span>
+        <span class="n">commentTag</span> <span class="o">=</span> <span class="s">&quot;//&quot;</span>
+        <span class="n">listings</span> <span class="o">=</span> \
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;.. *code-block:: *java</span><span class="se">\n\n</span><span class="s">( {4}//.*(?:</span><span class="se">\n</span><span class="s">+ {4}.*)*)&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="n">listing</span><span class="p">):</span>
+    <span class="s">&quot;Shift the listing left by 4 spaces&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mf">4</span><span class="p">:]</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;    &quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">listing</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+
+<span class="c"># TEST - makes duplicates of the rst files in a test directory to test update():</span>
+<span class="n">dirs</span> <span class="o">=</span> <span class="n">set</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;_test&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">])</span>
+<span class="k">if</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">d</span><span class="p">)]:</span>
+    <span class="p">[</span><span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;_test&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">]</span>
+<span class="n">testFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;_test&quot;</span><span class="p">)</span>
+             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
+
+<span class="k">class</span> <span class="nc">Commands</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Each static method can be called from the command line. Add a new static</span>
+<span class="sd">    method here to add a new command to the program.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+        <span class="s">&quot;Print all the code listings&quot;</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
+            <span class="n">listings</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">listings</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;=&#39;</span> <span class="o">*</span> <span class="mf">60</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="s">&#39;=&#39;</span> <span class="o">*</span> <span class="mf">60</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">listings</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shift</span><span class="p">(</span><span class="n">l</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">listings</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;-&#39;</span> <span class="o">*</span> <span class="mf">60</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pull the code listings from the ReST files and write each</span>
+<span class="sd">        listing into its own file&quot;&quot;&quot;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">listing</span> <span class="ow">in</span> <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()):</span>
+                <span class="n">listing</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">listing</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: Duplicate file name: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dirname</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+                <span class="nb">file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">listing</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+        <span class="s">&quot;Ensure that external code files exist&quot;</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">[</span><span class="n">code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span>
+                     <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())]:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing&quot;</span><span class="p">,</span> <span class="n">language</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&quot;files:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">missing</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">language</span><span class="p">):</span> <span class="c"># Test until it is trustworthy</span>
+        <span class="s">&quot;Refresh external code files into ReST files&quot;</span>
+        <span class="k">if</span> <span class="n">Commands</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&quot;update aborted&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="n">matchobj</span><span class="p">):</span>
+            <span class="n">listing</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">matchobj</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mf">1</span><span class="p">))</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span><span class="n">listing</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;+ &quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;- &quot;</span><span class="p">):</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">HtmlDiff</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">)</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>\
+                        <span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">make_file</span><span class="p">(</span><span class="n">listing</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="n">language</span><span class="o">.</span><span class="n">codeMarker</span> <span class="o">+</span> \
+                <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([(</span><span class="s">&quot;    &quot;</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">listing</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">testFiles</span><span class="p">:</span>
+            <span class="n">updated</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">_update</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Commands</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Command line options:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">commands</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Languages</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">):</span>
+            <span class="n">commands</span><span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">1</span><span class="p">]](</span><span class="n">language</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -71,6 +211,14 @@
             </a></p>
     <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
     
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Comprehensions</a><ul>
+<li><a class="reference external" href="#a-more-complex-example">A More Complex Example</a></li>
+</ul>
+</li>
+</ul>
+
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="GeneratorsIterators.html" title="previous chapter">Generators, Iterators, and Itertools</a></p>

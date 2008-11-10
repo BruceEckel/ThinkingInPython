@@ -540,7 +540,7 @@ Here is a version of the above that doesn't use the Observer pattern, written by
 Kevin Altis using PythonCard, and placed here as a starting point for a
 translation that does include Observer::
 
-    # observer/BoxObserver.py
+    # observer/BoxObserverPythonCard.py
     """ Written by Kevin Altis as a first-cut for
     converting BoxObserver to Python. The Observer
     hasn't been integrated yet.

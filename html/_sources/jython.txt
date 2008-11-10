@@ -4,7 +4,8 @@
 Jython
 ********************************************************************************
 
-.. note:: This chapter has not been brought up-to-date with the current version of Jython.
+.. note:: This chapter has not been brought up-to-date with the current
+          version of Jython.
 
 This chapter looks at the value of crossing language boundaries. It is often
 advantageous to solve a problem using more than one programming language, rather
@@ -228,7 +229,7 @@ interact with Jython. The simplest way to exercise more control over the
 interpreter, and pull data back out.
 
 Putting Data In
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 To inject data into your Python program, the **PythonInterpreter** class has a
 deceptively simple method: **set( )**. However, **set( )** takes many different
@@ -501,7 +502,7 @@ Here is the (black-box) unit testing code:
 We'll see the use of the extraction tools in the next section.
 
 Getting Data Out
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 There are a number of different ways to extract data from the
 **PythonInterpreter**. If you simply call the **get( )** method, passing it the

@@ -4,6 +4,37 @@ Developer Guide
 
 Details for people participating in the book development process.
 
+Getting Started: The Easiest Approach
+===============================================================================
+
+If all of the details are a little overwhelming at first, there's an easy way
+for you to make contributions without learning about distributed version control
+and Sphinx:
+
+1.  Create an account at http://www.BitBucket.org.
+
+2.  In your account, you get a wiki. In your wiki, create a page for your
+    contribution. Just add your code and descriptions using plain text.
+
+3.  Point us to your wiki via the `newsgroup
+    <http://groups.google.com/group/python3patterns/>`_.
+
+4.  We'll take your contribution and do the necessary formatting.
+
+If you want to take another step, you can learn how to format your wiki page
+using Sphinx by looking at the source for pages in the book. You can try it
+right now -- on the left side of this page (in the HTML book) you'll see a
+header that says **This Page** and underneath it **Show Source**. Click on
+**Show Source** and you'll see the Sphinx source for this page. Just look at
+the page sources and imitate that.
+
+When you're ready, you can learn more about Sphinx and Mercurial and begin
+making contributions that way.
+
+The following sections are for those who are ready to build the book on their
+own machines.
+
+
 For Windows Users
 ===============================================================================
 
@@ -15,13 +46,13 @@ You need to install at least the ``make`` utility, but I find that ``chere``
 (command prompt here) is also very useful.
 
 Also install ``openssh`` (under **Net**), so you can create your RSA key
-for Bazaar.
+for Mercurial.
 
 I've discovered that it's best if you *don't* install Python as part of
 Cygwin; instead use a single Python installation under windows. Cygwin will
 find the installation if it is on your Windows PATH.
 
-Because of this, you shouldn't select "mercurial" or "bazaar" when you're
+Because of this, you shouldn't select "mercurial" when you're
 installing Cygwin because that will cause Python to be installed. Instead,
 install them as Windows applications (see below).
 
@@ -71,17 +102,17 @@ This book uses Launchpad.net tools, and additional tools if necessary.
 
 #.  Sign up for an account at http://Launchpad.net.
 
-#.  Install the Bazaar distributed version control system (DVCS):
+#.  Install the Mercurial distributed version control system (DVCS):
 
     https://launchpad.net/bzr
 
-    It's helpful to follow this Bazaar mini-tutorial:
+    It's helpful to follow this Mercurial mini-tutorial:
 
-    http://doc.bazaar-vcs.org/latest/en/mini-tutorial/index.html
+    http://doc.Mercurial-vcs.org/latest/en/mini-tutorial/index.html
 
-    And here's the complete Bazaar user guide:
+    And here's the complete Mercurial user guide:
 
-    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html
+    http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html
 
 #.  You must create an rsa key. Under OSX and Linux, and if you installed
     ``openssh with`` Cygwin under windows, you run ``ssh-keygen`` to generate
@@ -111,7 +142,7 @@ tasks involved. Type:
 
 to see the options.
 
-Working with Launchpad and Bazaar
+Working with Launchpad and Mercurial
 ===============================================================================
 
 (Adapted from a posting by Yarko T)
@@ -150,7 +181,7 @@ When you are ready to share your work have others review, register a branch.
     (``https://code.launchpad.net/python3patterns/+addbranch``). Suggest you
     create a hosted branch, then you can work locally, and pull/push as you make
     progress (see
-    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html#organizing).
+    http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html#organizing).
 
 3.  Once you have registered your branch, launchpad will provide you with
     instructions on how to pull and push to your personal development copy.
@@ -173,16 +204,17 @@ When you are ready to share your work have others review, register a branch.
 
 Branch Registration Details
 ===============================================================================
-Register a branch on http://code.launchpad.net/python3patterns/.  Since your login
-will identify your branch, ``devel`` is a good choice for a general development branch.
-If you're unsure, select ``Hosted`` branching.
+
+Register a branch on http://code.launchpad.net/python3patterns/.  Since your
+login will identify your branch, ``devel`` is a good choice for a general
+development branch. If you're unsure, select ``Hosted`` branching.
 
 You must submit a public key - this will get you there:
 
     https://launchpad.net/people/+me/+editsshkeys
 
-When you create your branch, Launchpad will show you the command to push to your branch.
-It will look something like this.
+When you create your branch, Launchpad will show you the command to push to your
+branch. It will look something like this.
 
 .. image:: _images/pushPath.*
 
@@ -199,10 +231,12 @@ Tips for Merging
 
 -   Consider using kdiff3: http://kdiff3.sourceforge.net/
 
--   You can use ``bzr diff --using=kdiff3`` to browse differences, and use a bazaar
+-   You can use ``bzr diff --using=kdiff3`` to browse differences, and use a
+Mercurial
     plugin to merge conflicts:
 
        ``bzr extmerge --all``
 
--    More here:  http://dev.mysql.com/tech-resources/articles/advanced-bazaar.html
+-    More here:  http://dev.mysql.com/tech-resources/articles/advanced-
+Mercurial.html
 

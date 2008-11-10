@@ -97,6 +97,10 @@
 </OBJECT>
 <UL>
 <LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Getting Started: The Easiest Approach">
+    <param name="Local" value="DeveloperGuide.html#getting-started-the-easiest-approach">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
     <param name="Name" value="For Windows Users">
     <param name="Local" value="DeveloperGuide.html#for-windows-users">
 </OBJECT>
@@ -113,8 +117,8 @@
     <param name="Local" value="DeveloperGuide.html#building-the-book">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Working with Launchpad and Bazaar">
-    <param name="Local" value="DeveloperGuide.html#working-with-launchpad-and-bazaar">
+    <param name="Name" value="Working with Launchpad and Mercurial">
+    <param name="Local" value="DeveloperGuide.html#working-with-launchpad-and-mercurial">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Branch Registration Details">
@@ -261,6 +265,12 @@
     <param name="Name" value="Comprehensions">
     <param name="Local" value="Comprehensions.html">
 </OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A More Complex Example">
+    <param name="Local" value="Comprehensions.html#a-more-complex-example">
+</OBJECT>
+</UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Coroutines &amp; Concurrency">
     <param name="Local" value="CoroutinesAndConcurrency.html">

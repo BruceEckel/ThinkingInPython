@@ -2,9 +2,9 @@
    decorator: Python decorators
    @: Python decorators
 
-************************************************************************************
+********************************************************************************
 Decorators
-************************************************************************************
+********************************************************************************
 
 .. note:: This chapter is a work in progress; it's probably better if you don't
           begin making changes until I've finished the original version, which

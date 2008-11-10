@@ -357,16 +357,20 @@ transition. Here&#8217;s what it looks like:</p>
 <li>Similar to flyweight</li>
 <li>Each state may move to many others</li>
 <li>Condition &amp; action functions must also be external to states</li>
-<li>Centralize description in a single table containing all variations, for ease of configuration</li>
+<li>Centralize description in a single table containing all variations,
+for ease of configuration</li>
 </ul>
 <p>Example:</p>
 <ul class="simple">
 <li>State Machine &amp; Table-Driven Code</li>
 <li>Implements a vending machine</li>
 <li>Uses several other patterns</li>
-<li>Separates common state-machine code from specific application (like template method)</li>
-<li>Each input causes a seek for appropriate solution (like chain of responsibility)</li>
-<li>Tests and transitions are encapsulated in function objects (objects that hold functions)</li>
+<li>Separates common state-machine code from specific application
+(like template method)</li>
+<li>Each input causes a seek for appropriate solution
+(like chain of responsibility)</li>
+<li>Tests and transitions are encapsulated in function objects
+(objects that hold functions)</li>
 <li>Java constraint: methods are not first-class objects</li>
 </ul>
 <img alt="_images/stateMachine.gif" src="_images/stateMachine.gif" />
@@ -676,7 +680,11 @@ class VendingMachine(StateMachine):
 </div>
 <div class="section" id="tools">
 <h2>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
-<p>Another approach, as your state machine gets bigger, is to use an automation tool whereby you configure a table and let the tool generate the state machine code for you. This can be created yourself using a language like Python, but there are also free, open-source tools such as <em>Libero</em>, at <a class="reference external" href="http://www.imatix.com">http://www.imatix.com</a>.</p>
+<p>Another approach, as your state machine gets bigger, is to use an automation
+tool whereby you configure a table and let the tool generate the state machine
+code for you. This can be created yourself using a language like Python, but
+there are also free, open-source tools such as <em>Libero</em>, at
+<a class="reference external" href="http://www.imatix.com">http://www.imatix.com</a>.</p>
 </div>
 <div class="section" id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
