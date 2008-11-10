@@ -117,16 +117,8 @@
     <param name="Local" value="DeveloperGuide.html#building-the-book">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Working with Launchpad and Mercurial">
-    <param name="Local" value="DeveloperGuide.html#working-with-launchpad-and-mercurial">
-</OBJECT>
-<LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Branch Registration Details">
-    <param name="Local" value="DeveloperGuide.html#branch-registration-details">
-</OBJECT>
-<LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Tips for Merging">
-    <param name="Local" value="DeveloperGuide.html#tips-for-merging">
+    <param name="Name" value="Working with BitBucket and Mercurial">
+    <param name="Local" value="DeveloperGuide.html#working-with-bitbucket-and-mercurial">
 </OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">

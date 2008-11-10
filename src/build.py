@@ -35,10 +35,14 @@ def clean():
 #@rule(["../Python3PatternsAndIdioms-html.zip",
 #       "../Python3PatternsAndIdioms-htmlhelp.zip"], html, winhelp)
 
-@rule(None, html, winhelp)
+@rule()
+def code():
+    "Extract code tree from book"
+    os.system("python CodeManager.py extract")
+
+@rule(None, html, winhelp, code)
 def all():
     "Build both html and windows help files; extract code from book"
-    os.system("python CodeManager extract")
 
 rule.default = all
 rule.main() # Does the build, handles command-line arguments

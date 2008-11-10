@@ -85,7 +85,7 @@ Cygwin; instead use a single Python installation under windows. Cygwin will
 find the installation if it is on your Windows PATH.</p>
 <p>Because of this, you shouldn&#8217;t select &#8220;mercurial&#8221; when you&#8217;re
 installing Cygwin because that will cause Python to be installed. Instead,
-install them as Windows applications (see below).</p>
+install them as standalone Windows applications (see below).</p>
 </div>
 <div class="section" id="installing-sphinx">
 <h2>Installing Sphinx<a class="headerlink" href="#installing-sphinx" title="Permalink to this headline">¶</a></h2>
@@ -106,6 +106,7 @@ debuggers.</p>
 <p><tt class="docutils literal"><span class="pre">$</span> <span class="pre">hg</span> <span class="pre">pull</span></tt></p>
 <p>Once you update, run</p>
 <p><tt class="docutils literal"><span class="pre">$</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt></p>
+<p>(You can repeat this step whenever you need to update).</p>
 <p>We may talk about minimum version numbers to process the book. Check your
 version with:</p>
 <p><tt class="docutils literal"><span class="pre">$</span> <span class="pre">hg</span> <span class="pre">identify</span> <span class="pre">-n</span></tt></p>
@@ -125,26 +126,16 @@ version with:</p>
 </div>
 <div class="section" id="getting-the-development-branch-of-the-book">
 <h2>Getting the Development Branch of the Book<a class="headerlink" href="#getting-the-development-branch-of-the-book" title="Permalink to this headline">¶</a></h2>
-<p>This book uses Launchpad.net tools, and additional tools if necessary.</p>
-<ol class="arabic">
-<li><p class="first">Sign up for an account at <a class="reference external" href="http://Launchpad.net">http://Launchpad.net</a>.</p>
-</li>
-<li><p class="first">Install the Mercurial distributed version control system (DVCS):</p>
-<p><a class="reference external" href="https://launchpad.net/bzr">https://launchpad.net/bzr</a></p>
-<p>It&#8217;s helpful to follow this Mercurial mini-tutorial:</p>
-<p><a class="reference external" href="http://doc.Mercurial-vcs.org/latest/en/mini-tutorial/index.html">http://doc.Mercurial-vcs.org/latest/en/mini-tutorial/index.html</a></p>
-<p>And here&#8217;s the complete Mercurial user guide:</p>
-<p><a class="reference external" href="http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html">http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html</a></p>
-</li>
-<li><p class="first">You must create an rsa key. Under OSX and Linux, and if you installed
+<p>This book uses BitBucket.org tools, and additional tools if necessary.</p>
+<ol class="arabic simple">
+<li>Sign up for an account at <a class="reference external" href="http://BitBucket.org">http://BitBucket.org</a>.</li>
+<li>You must create an rsa key. Under OSX and Linux, and if you installed
 <tt class="docutils literal"><span class="pre">openssh</span> <span class="pre">with</span></tt> Cygwin under windows, you run <tt class="docutils literal"><span class="pre">ssh-keygen</span></tt> to generate
-the key, and then add it to your Launchpad account.</p>
-</li>
-<li><p class="first">Go to <a class="reference external" href="https://code.launchpad.net/python3patterns">https://code.launchpad.net/python3patterns</a>, and you&#8217;ll see
-instructions for getting a branch for development.</p>
-</li>
-<li><p class="first">Work on your branch and make local commits.</p>
-</li>
+the key, and then add it to your BitBucket account.</li>
+<li>Go to <a class="reference external" href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/">http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/</a>, and
+you&#8217;ll see instructions for getting a branch for development.</li>
+<li>Work on your branch and make local commits and commits to your BitBucket
+account.</li>
 </ol>
 </div>
 <div class="section" id="building-the-book">
@@ -162,19 +153,23 @@ tasks involved. Type:</p>
 <tt class="docutils literal"><span class="pre">build</span> <span class="pre">help</span></tt></blockquote>
 <p>to see the options.</p>
 </div>
-<div class="section" id="working-with-launchpad-and-mercurial">
-<h2>Working with Launchpad and Mercurial<a class="headerlink" href="#working-with-launchpad-and-mercurial" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="working-with-bitbucket-and-mercurial">
+<h2>Working with BitBucket and Mercurial<a class="headerlink" href="#working-with-bitbucket-and-mercurial" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The remainder of this document needs rewriting.</p>
+</div>
 <p>(Adapted from a posting by Yarko T)</p>
 <p>This assumes that you have created a local branch on your private machine where
 you do work, and keep it merged with the trunk.</p>
 <p>That is, you&#8217;ve done:</p>
 <blockquote>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">branch</span> <span class="pre">lp:python3patterns</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'initial</span> <span class="pre">checkout'</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">branch</span> <span class="pre">lp:python3patterns</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'initial</span> <span class="pre">checkout'</span></tt></li>
 <li>(hack, hack, hack....)</li>
-<li><tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">merge</span></tt>   (pull new updates)</li>
-<li><tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'checkin</span> <span class="pre">after</span> <span class="pre">merge...'</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">merge</span></tt>   (pull new updates)</li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'checkin</span> <span class="pre">after</span> <span class="pre">merge...'</span></tt></li>
 <li>... and so on...</li>
 </ul>
 </blockquote>
@@ -182,9 +177,9 @@ you do work, and keep it merged with the trunk.</p>
 on the group.</p>
 <blockquote>
 <ul class="simple">
-<li>If you have a new feature, register a blueprint on Launchpad and
+<li>If you have a new feature, register a blueprint on BitBucket and
 describe what you&#8217;re going to do.</li>
-<li>If you have found a bug, make a bug report on Launchpad (later assign
+<li>If you have found a bug, make a bug report on BitBucket (later assign
 it to yourself, and link your branch to it);</li>
 <li>If you want to work on a project, look for an unassigned bug and try to
 work it out - then proceed as below...</li>
@@ -200,18 +195,18 @@ work it out - then proceed as below...</li>
 <p class="last">You can re-use one branch for multiple bug fixes.</p>
 </div>
 <ol class="arabic simple">
-<li>Sign up for an account on launchpad.net</li>
+<li>Sign up for an account on BitBucket.org</li>
 <li>Go to the project and select &#8220;register branch&#8221;
-(<tt class="docutils literal"><span class="pre">https://code.launchpad.net/python3patterns/+addbranch</span></tt>). Suggest you
+(<tt class="docutils literal"><span class="pre">https://code.BitBucket.org/python3patterns/+addbranch</span></tt>). Suggest you
 create a hosted branch, then you can work locally, and pull/push as you make
 progress (see
 <a class="reference external" href="http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html#organizing">http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html#organizing</a>).</li>
-<li>Once you have registered your branch, launchpad will provide you with
+<li>Once you have registered your branch, BitBucket will provide you with
 instructions on how to pull and push to your personal development copy.</li>
 <li>Link your bug report or blueprint to your branch.</li>
 <li>Merge from your &#8220;parent&#8221; (the trunk, or others you are working with) as needed.</li>
-<li>Push your working copy to launchpad as your work is ready for others to
-review or  test.</li>
+<li>Push your working copy to BitBucket as your work is ready for others to
+review or test.</li>
 <li>Once you are done making your changes, have completed testing, and are
 ready for the project team to inspect &amp; test, please select &#8220;propose for
 merging&#8221;</li>
@@ -219,44 +214,6 @@ merging&#8221;</li>
 merging with other patches). Once tests pass, and your branch is accepted,
 it will be merged into the trunk.</li>
 </ol>
-</div>
-<div class="section" id="branch-registration-details">
-<h2>Branch Registration Details<a class="headerlink" href="#branch-registration-details" title="Permalink to this headline">¶</a></h2>
-<p>Register a branch on <a class="reference external" href="http://code.launchpad.net/python3patterns/">http://code.launchpad.net/python3patterns/</a>.  Since your
-login will identify your branch, <tt class="docutils literal"><span class="pre">devel</span></tt> is a good choice for a general
-development branch. If you&#8217;re unsure, select <tt class="docutils literal"><span class="pre">Hosted</span></tt> branching.</p>
-<p>You must submit a public key - this will get you there:</p>
-<blockquote>
-<a class="reference external" href="https://launchpad.net/people/+me/+editsshkeys">https://launchpad.net/people/+me/+editsshkeys</a></blockquote>
-<p>When you create your branch, Launchpad will show you the command to push to your
-branch. It will look something like this.</p>
-<img alt="_images/pushPath.png" src="_images/pushPath.png" />
-<p>A good local setup is to keep an updated copy of the current trunk
-and a separate local development branch.</p>
-</div>
-<div class="section" id="tips-for-merging">
-<h2>Tips for Merging<a class="headerlink" href="#tips-for-merging" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">I want to eventually move to the mode where submissions are
-reviewed by another member of the team, rather than me reviewing everything.</p>
-</div>
-<ul class="simple">
-<li>Make a merge using a local test branch</li>
-<li>Consider using kdiff3: <a class="reference external" href="http://kdiff3.sourceforge.net/">http://kdiff3.sourceforge.net/</a></li>
-<li>You can use <tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">diff</span> <span class="pre">--using=kdiff3</span></tt> to browse differences, and use a</li>
-</ul>
-<dl class="docutils">
-<dt>Mercurial</dt>
-<dd><p class="first">plugin to merge conflicts:</p>
-<blockquote class="last">
-<tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">extmerge</span> <span class="pre">--all</span></tt></blockquote>
-</dd>
-</dl>
-<ul class="simple">
-<li>More here:  <a class="reference external" href="http://dev.mysql.com/tech-resources/articles/advanced">http://dev.mysql.com/tech-resources/articles/advanced</a>-</li>
-</ul>
-<p>Mercurial.html</p>
 </div>
 </div>
 
@@ -279,9 +236,7 @@ reviewed by another member of the team, rather than me reviewing everything.</p>
 <li><a class="reference external" href="#installing-sphinx">Installing Sphinx</a></li>
 <li><a class="reference external" href="#getting-the-development-branch-of-the-book">Getting the Development Branch of the Book</a></li>
 <li><a class="reference external" href="#building-the-book">Building the Book</a></li>
-<li><a class="reference external" href="#working-with-launchpad-and-mercurial">Working with Launchpad and Mercurial</a></li>
-<li><a class="reference external" href="#branch-registration-details">Branch Registration Details</a></li>
-<li><a class="reference external" href="#tips-for-merging">Tips for Merging</a></li>
+<li><a class="reference external" href="#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,8 @@
+# jython/Schedule.ghs
+Bell(7.00)
+ThermostatDay(6.00)
+WaterOn(3.30)
+LightOn(1.00)
+ThermostatNight(5.00)
+LightOff(2.00)
+WaterOff(4.45)
