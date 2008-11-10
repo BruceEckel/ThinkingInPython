@@ -101,13 +101,21 @@ class Commands:
             #for delta in diff.compare(listing, code):
             #    print delta
             #d = difflib.Differ()
+            """
             d = difflib.HtmlDiff()
             if not os.path.exists("_deltas"):
                 os.makedirs("_deltas")
             open(os.path.join("_deltas", filename + ".html"), 'w'). write(
                 d.make_file(listing, code) + d.make_table(listing,code))
-            #print '\n'.join(list(diff))
-            #sys.exit()
+            """
+            for i in difflib.ndiff(listing, code):
+                if i.startswith("+ ") or i.startswith("- "):
+                    d = difflib.HtmlDiff()
+                    if not os.path.exists("_deltas"):
+                        os.makedirs("_deltas")
+                    open(os.path.join("_deltas", filename + ".html"), 'w'). write(
+                        d.make_file(listing, code) + d.make_table(listing,code))
+                    break
             return language.codeMarker + "\n".join(["    " + line for line in listing])
         for f in testFiles:
             updated = language.listings.sub(_update, open(f).read())

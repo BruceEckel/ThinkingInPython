@@ -248,6 +248,10 @@
     <param name="Name" value="Decorator Functions with Decorator Arguments">
     <param name="Local" value="PythonDecorators.html#decorator-functions-with-decorator-arguments">
 </OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Further Reading">
+    <param name="Local" value="PythonDecorators.html#further-reading">
+</OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Generators, Iterators, and Itertools">

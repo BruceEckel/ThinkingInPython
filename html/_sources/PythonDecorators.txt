@@ -476,7 +476,7 @@ Further Reading
         Matt Wilson's *Decorators Are Fun*.
 
     http://loveandtheft.org/2008/09/22/python-decorators-explained
-        Another introduction to decorators
+        Another introduction to decorators.
 
     http://www.phyast.pitt.edu/~micheles/python/documentation.html
         Michele Simionato's decorator module wraps functions for you. The page
