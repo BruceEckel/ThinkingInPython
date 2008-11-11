@@ -47,7 +47,9 @@ class Commands:
 
     @staticmethod
     def display(language):
-        "Print all the code listings"
+        """
+        Print all the code listings in the .rst files.
+        """
         for f in restFiles:
             listings = language.listings.findall(open(f).read())
             if not listings: continue
@@ -59,8 +61,10 @@ class Commands:
 
     @staticmethod
     def extract(language):
-        """Pull the code listings from the ReST files and write each
-        listing into its own file"""
+        """
+        Pull the code listings from the ReST files and write each
+        listing into its own file.
+        """
         paths = set()
         for f in restFiles:
             for listing in language.listings.findall(open(f).read()):
@@ -80,7 +84,11 @@ class Commands:
 
     @staticmethod
     def check(language):
-        "Ensure that external code files exist"
+        """
+        Ensure that external code files exist and check which external files
+        have changed from what's in the .rst files. Generate files in the
+        _deltas subdirectory showing what has changed.
+        """
         missing = []
         for path in [code.splitlines()[0] for f in restFiles for code in
                      language.listings.findall(open(f).read())]:
@@ -96,7 +104,9 @@ class Commands:
 
     @staticmethod
     def update(language): # Test until it is trustworthy
-        "Refresh external code files into ReST files"
+        """
+        Refresh external code files into ReST files.
+        """
         if Commands.check(language):
             print(language.__name__, "update aborted")
             return
@@ -123,7 +133,7 @@ class Commands:
 if __name__ == "__main__":
     commands = dict(inspect.getmembers(Commands, inspect.isfunction))
     if len(sys.argv) < 2 or sys.argv[1] not in commands:
-        print("Command line options:")
+        print("Command line options:\n")
         for name in commands:
             print(name + ": " + commands[name].__doc__)
     else:
