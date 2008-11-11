@@ -28,6 +28,14 @@
 </OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="ToDo List">
+    <param name="Local" value="ToDo.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="The remainder are from context, from the book.">
+    <param name="Local" value="ToDo.html#the-remainder-are-from-context-from-the-book">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
     <param name="Name" value="A Note To Readers">
     <param name="Local" value="NoteToReaders.html">
 </OBJECT>
@@ -115,10 +123,6 @@
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Building the Book">
     <param name="Local" value="DeveloperGuide.html#building-the-book">
-</OBJECT>
-<LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Working with BitBucket and Mercurial">
-    <param name="Local" value="DeveloperGuide.html#working-with-bitbucket-and-mercurial">
 </OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
@@ -267,6 +271,12 @@
     <param name="Name" value="Coroutines &amp; Concurrency">
     <param name="Local" value="CoroutinesAndConcurrency.html">
 </OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Further Reading">
+    <param name="Local" value="CoroutinesAndConcurrency.html#further-reading">
+</OBJECT>
+</UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Jython">
     <param name="Local" value="jython.html">

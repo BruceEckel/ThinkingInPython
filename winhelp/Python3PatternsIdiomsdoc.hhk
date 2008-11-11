@@ -1,7 +1,7 @@
 <UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="@: Python decorators">
-    <param name="Local" value="PythonDecorators.html#index-5">
+    <param name="Local" value="PythonDecorators.html#index-8">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="script command-line">
@@ -21,15 +21,15 @@
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
     <param name="Name" value="concurrency">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="coroutines">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="decorator: Python decorators">
-    <param name="Local" value="PythonDecorators.html#index-5">
+    <param name="Local" value="PythonDecorators.html#index-8">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="comprehension">
@@ -37,23 +37,23 @@
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
     <param name="Name" value="generators">
-    <param name="Local" value="GeneratorsIterators.html#index-3">
+    <param name="Local" value="GeneratorsIterators.html#index-6">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="GIL: Global Interpreter Lock">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="iterators">
-    <param name="Local" value="GeneratorsIterators.html#index-3">
+    <param name="Local" value="GeneratorsIterators.html#index-6">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="itertools">
-    <param name="Local" value="GeneratorsIterators.html#index-3">
+    <param name="Local" value="GeneratorsIterators.html#index-6">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Python 3">
-    <param name="Local" value="LanguageChanges.html#index-4">
+    <param name="Local" value="LanguageChanges.html#index-7">
 </OBJECT>
 </UL><UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="comprehension">
@@ -61,15 +61,15 @@
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
     <param name="Name" value="multiprocessing">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="parallelism">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Language differences">
-    <param name="Local" value="LanguageChanges.html#index-4">
+    <param name="Local" value="LanguageChanges.html#index-7">
 </OBJECT>
 </UL><UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="command-line canonical form">
@@ -77,6 +77,6 @@
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
     <param name="Name" value="threads">
-    <param name="Local" value="CoroutinesAndConcurrency.html#index-2">
+    <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 </UL>
