@@ -133,8 +133,8 @@ tasks involved. Type:
 to see the options.
 
 .. todo:: The remainder of this document needs rewriting. Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
-Working with BitBucket and Mercurial
 
+Working with BitBucket and Mercurial
 ===============================================================================
 
 .. note:: Adapted from a posting by Yarko Tymciurak
@@ -201,4 +201,20 @@ When you are ready to share your work have others review, register a branch.
     merging with other patches). Once tests pass, and your branch is accepted,
     it will be merged into the trunk.
 
+A Simple Overview Of Editing and Merging
+===============================================================================
 
+#.  ``hg pull http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/``
+
+#.  ``hg merge`` This brought up kdiff3 (note: this requires a separate
+    installation     of **kdiff3**)on any file's w/ conflicts, and you get to
+    just visually look - left-to-right at A:base, B:mine, and C:yours.... the
+    NICE thing is when you want BOTH the other and yours, you can click BOTH B &
+    C buttons --- sweeet! you can also review the "automatic" merges, choose
+    which - conflicts only, or any merge.
+
+#.  ... ``make html;  make latex`` ...... look at outputs (simultaneously,
+    comparatively)... make any changes.... repeat....
+
+#.  ``hg ci`` without a message, it brought up an editor with a list of all
+    changed files - so you can comment individually.
