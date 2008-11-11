@@ -143,7 +143,7 @@ slightly better than chaos. If you change nothing else, add automated testing.</
 <h2>Simple Python Testing<a class="headerlink" href="#simple-python-testing" title="Permalink to this headline">¶</a></h2>
 <p>Sanity check for a quick test of the programs in this book, and to append the
 output of each program (as a string) to its listing:</p>
-<div class="highlight"><pre><span class="c"># SanityCheck.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># SanityCheck.py</span>
 <span class="c">#! /usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
 <span class="c"># Do not include the following in the automatic</span>
@@ -177,6 +177,7 @@ output of each program (as a string) to its listing:</p>
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">visitor</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Just run this from the root directory of the code listings for the book; it will
 descend into each subdirectory and run the program there. An easy way to check
 things is to redirect standard output to a file, then if there are any errors
@@ -204,7 +205,7 @@ one covering as much or as little as you find necessary.</p>
 <p>To create a set of tests, you start by making a <strong>static</strong> inner class inside
 the class you wish to test (your test code may also test other classes; it&#8217;s up
 to you). This test code is distinguished by inheriting from <strong>UnitTest</strong>:</p>
-<pre># unitTesting/UnitTest.py
+<div class="highlight-python"><pre># unitTesting/UnitTest.py
 # The basic unit testing class
 
 class UnitTest:
@@ -218,6 +219,7 @@ class UnitTest:
     def affirm(boolean condition):
         if(!condition)
             errors.add("failed: " + testID)</pre>
+</div>
 <p>The only testing method [[ So far ]] is <strong>affirm( )</strong> <a class="footnote-reference" href="#id4" id="id2">[2]</a>, which is
 <strong>protected</strong> so that it can be used from the inheriting class. All this method
 does is verify that something is <strong>true</strong>. If not, it adds an error to the list,
@@ -237,7 +239,7 @@ test object will allocate non-memory resources, in which case you must override
 <h2>Writing Tests<a class="headerlink" href="#writing-tests" title="Permalink to this headline">¶</a></h2>
 <p>Writing tests becomes very simple. Here&#8217;s an example that creates the necessary
 <strong>static</strong> inner class and performs trivial tests:</p>
-<pre># unitTesting/TestDemo.py
+<div class="highlight-python"><pre># unitTesting/TestDemo.py
 # Creating a test
 
 class TestDemo:
@@ -268,6 +270,7 @@ class TestDemo:
 
         # Causes the build to halt:
         #! def test3(): affirm(0)</pre>
+</div>
 <p>The <strong>test3( )</strong>  method is commented out because, as you&#8217;ll see, it causes the
 automatic build of this book&#8217;s source-code tree to stop.</p>
 <p>You can name your inner class anything you&#8217;d like; the only important factor is
@@ -294,7 +297,7 @@ knowledge other than that used for writing ordinary classes.</p>
 shortly). The command for the above code looks like this:</p>
 <p><strong>java com.bruceeckel.test.RunUnitTests TestDemo</strong></p>
 <p>It produces the following output:</p>
-<pre>test1: count = 1
+<div class="highlight-python"><pre>test1: count = 1
 test2: count = 2
 TestDemo.testA
 Cleaning up: 2
@@ -304,6 +307,7 @@ test2: count = 4
 TestDemo.testB
 Cleaning up: 4
 Cleaning up: 3</pre>
+</div>
 <p>All the output is noise as far as the success or failure of the unit testing is
 concerned. Only if one or more of the unit tests fail does the program returns a
 non-zero value to terminate the <strong>make</strong> process after the error messages are
@@ -313,7 +317,7 @@ if you do this, you tend to keep such code around rather than putting it in and
 stripping it out as is typically done with tracing code.</p>
 <p>If you need to add a test to a class derived from one that already has a test
 class, it&#8217;s no problem, as you can see here:</p>
-<div class="highlight"><pre><span class="c"># unitTesting/TestDemo2.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># unitTesting/TestDemo2.py</span>
 <span class="c"># Inheriting from a class that</span>
 <span class="c"># already has a test is no problem.</span>
 
@@ -330,6 +334,7 @@ class, it&#8217;s no problem, as you can see here:</p>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;TestDemo2.testB&quot;</span><span class="p">)</span>
             <span class="n">affirm</span><span class="p">(</span><span class="mf">2</span> <span class="o">*</span> <span class="mf">2</span> <span class="o">==</span> <span class="mf">4</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Even the name of the inner class can be the same. In the above code, all the
 assertions are always true so the tests will never fail.</p>
 </div>
@@ -360,7 +365,7 @@ test class in a separate directory than the class it tests, otherwise it will
 have package access to the elements of the class being tested. That is, you&#8217;ll
 be able to access <strong>protected</strong> and <strong>friendly</strong> elements of the class being
 tested. Here&#8217;s an example:</p>
-<div class="highlight"><pre><span class="c"># unitTesting/Testable.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># unitTesting/Testable.py</span>
 
 <span class="k">class</span> <span class="nc">Testable</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">f1</span><span class="p">():</span> <span class="k">pass</span>
@@ -368,11 +373,12 @@ tested. Here&#8217;s an example:</p>
     <span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span> <span class="c"># Also package access</span>
     <span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
 </pre></div>
+</div>
 <p>Normally, the only method that should be directly accessible to the client
 programmer is <strong>f4( )</strong>. However, if you put your black-box test in the same
 directory, it automatically becomes part of the same package (in this case, the
 default package since none is specified) and then has inappropriate access:</p>
-<pre># unitTesting/TooMuchAccess.py
+<div class="highlight-python"><pre># unitTesting/TooMuchAccess.py
 
 class TooMuchAccess(UnitTest):
     Testable tst = Testable()
@@ -380,13 +386,14 @@ class TooMuchAccess(UnitTest):
         tst.f2() # Oops!
         tst.f3() # Oops!
         tst.f4() # OK</pre>
+</div>
 <p>You can solve the problem by moving <strong>TooMuchAccess.py</strong> into its own
 subdirectory, thereby putting it in its own default package (thus a different
 package from <strong>Testable.py</strong>). Of course, when you do this, then <strong>Testable</strong>
 must be in its own package, so that it can be imported (note that it is also
 possible to import a &#8220;package-less&#8221; class by giving the class name in the
 <strong>import</strong> statement and ensuring that the class is in your CLASSPATH):</p>
-<pre># unitTesting/testable/Testable.py
+<div class="highlight-python"><pre># unitTesting/testable/Testable.py
 package c02.testable
 
 class Testable:
@@ -394,9 +401,10 @@ class Testable:
     def f2(self): # "Friendly": package access
     def f3(self): # Also package access
     def f4(self):</pre>
+</div>
 <p>Here&#8217;s the black-box test in its own package, showing how only public methods
 may be called:</p>
-<pre># unitTesting/BlackBoxTest.py
+<div class="highlight-python"><pre># unitTesting/BlackBoxTest.py
 
 class BlackBoxTest(UnitTest):
     Testable tst = Testable()
@@ -404,6 +412,7 @@ class BlackBoxTest(UnitTest):
         #! tst.f2() # Nope!
         #! tst.f3() # Nope!
         tst.f4() # Only public methods available</pre>
+</div>
 <p>Note that the above program is indeed very similar to the one that the client
 programmer would write to use your class, including the imports and available
 methods. So it does make a good programming example. Of course, it&#8217;s easier from
@@ -417,7 +426,7 @@ effort).</p>
 <h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h2>
 <p>The program that runs the tests makes significant use of reflection so that
 writing the tests can be simple for the client programmer:</p>
-<pre># unitTesting/RunUnitTests.py
+<div class="highlight-python"><pre># unitTesting/RunUnitTests.py
 # Discovering the unit test
 # class and running each test.
 
@@ -500,6 +509,7 @@ class RunUnitTests:
             while(it.hasNext()):
                 print(it.next())
             sys.exit(1)</pre>
+</div>
 </div>
 <div class="section" id="automatically-executing-tests">
 <h2>Automatically Executing Tests<a class="headerlink" href="#automatically-executing-tests" title="Permalink to this headline">¶</a></h2>
@@ -600,7 +610,7 @@ in JDK 1.4 when assertions were added to the language.</td></tr>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

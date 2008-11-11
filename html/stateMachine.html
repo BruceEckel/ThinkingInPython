@@ -63,7 +63,7 @@ on the &#8220;input&#8221;, whereas in the subsequent design all of the state tr
 are held in a single table. Another way to put it is that here, each <strong>State</strong>
 object has its own little <strong>State</strong> table, and in the subsequent design there is
 a single master state transition table for the whole system:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/State.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/State.py</span>
 <span class="c"># A State has an operation, and can be moved</span>
 <span class="c"># into the next State given an Input:</span>
 
@@ -73,12 +73,14 @@ a single master state transition table for the whole system:</p>
     <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;next not implemented&quot;</span>
 </pre></div>
+</div>
 <p>This class is clearly unnecessary, but it allows us to say that something is a
 <strong>State</strong> object in code, and provide a slightly different error message when
 all the methods are not implemented. We could have gotten basically the same
 effect by saying:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">State</span><span class="p">:</span> <span class="k">pass</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">State</span><span class="p">:</span> <span class="k">pass</span>
 </pre></div>
+</div>
 <p>because we would still get exceptions if <strong>run( )</strong> or <strong>next( )</strong> were called
 for a derived type, and they hadn&#8217;t been implemented.</p>
 <p>The <strong>StateMachine</strong> keeps track of the current state, which is initialized by
@@ -87,7 +89,7 @@ This method not only moves to the next state, but it also calls <strong>run( )</
 each state object - thus you can see it&#8217;s an expansion of the idea of the
 <strong>State</strong> pattern, since <strong>run( )</strong> does something different depending on the
 state that the system is in:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/StateMachine.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/StateMachine.py</span>
 <span class="c"># Takes a list of Inputs to move from State to</span>
 <span class="c"># State using a template method.</span>
 
@@ -102,6 +104,7 @@ state that the system is in:</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>I&#8217;ve also treated <strong>runAll( )</strong> as a template method. This is typical, but
 certainly not required - you could concievably want to override it, but
 typically the behavior change will occur in <strong>State</strong>&#8216;s <strong>run( )</strong> instead.</p>
@@ -111,7 +114,7 @@ mousetrap that can move through several states in the process of trapping a
 mouse <a class="footnote-reference" href="#id2" id="id1">[1]</a>. The mouse classes and information are stored in the <strong>mouse</strong>
 package, including a class representing all the possible moves that a mouse can
 make, which will be the inputs to the state machine:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/mouse/MouseAction.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/mouse/MouseAction.py</span>
 
 <span class="k">class</span> <span class="nc">MouseAction</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
@@ -133,12 +136,13 @@ make, which will be the inputs to the state machine:</p>
 <span class="n">MouseAction</span><span class="o">.</span><span class="n">trapped</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse trapped&quot;</span><span class="p">)</span>
 <span class="n">MouseAction</span><span class="o">.</span><span class="n">removed</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse removed&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>You&#8217;ll note that <strong>__cmp__( )</strong> has been overidden to implement a comparison
 between <strong>action</strong> values. Also, each possible move by a mouse is enumerated as
 a <strong>MouseAction</strong> object, all of which are static fields in <strong>MouseAction</strong>.</p>
 <p>For creating test code, a sequence of mouse inputs is provided from a text
 file:</p>
-<pre># stateMachine/mouse/MouseMoves.txt
+<div class="highlight-python"><pre># stateMachine/mouse/MouseMoves.txt
 mouse appears
 mouse runs away
 mouse appears
@@ -154,10 +158,11 @@ mouse appears
 mouse enters trap
 mouse trapped
 mouse removed</pre>
+</div>
 <p>With these tools in place, it&#8217;s now possible to create the first version of the
 mousetrap program. Each <strong>State</strong> subclass defines its <strong>run( )</strong> behavior, and
 also establishes its next state with an <strong>if-else</strong> clause:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/mousetrap1/MouseTrapTest.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/mousetrap1/MouseTrapTest.py</span>
 <span class="c"># State Machine pattern using &#39;if&#39; statements</span>
 <span class="c"># to determine the next state.</span>
 <span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
@@ -222,6 +227,7 @@ also establishes its next state with an <strong>if-else</strong> clause:</p>
   <span class="nb">open</span><span class="p">(</span><span class="s">&quot;../mouse/MouseMoves.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
 <span class="n">MouseTrap</span><span class="p">()</span><span class="o">.</span><span class="n">runAll</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">MouseAction</span><span class="p">,</span> <span class="n">moves</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>The <strong>StateMachine</strong> class simply defines all the possible states as static
 objects, and also sets up the initial state. The <strong>UnitTest</strong> creates a
 <strong>MouseTrap</strong> and then tests it with all the inputs from a <strong>MouseMoveList</strong>.</p>
@@ -242,7 +248,7 @@ methods can appear a little strange because of this.</p>
 <strong>next( )</strong> method has a base-class implementation which must be called from the
 overridden derived class <strong>next( )</strong> methods after they test for a <strong>null Map</strong>
 (and initialize it if it&#8217;s <strong>null</strong>):</p>
-<div class="highlight"><pre><span class="c"># stateMachine/mousetrap2/MouseTrap2Test.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/mousetrap2/MouseTrap2Test.py</span>
 <span class="c"># A better mousetrap using tables</span>
 <span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;../stateMachine&#39;</span><span class="p">,</span> <span class="s">&#39;../mouse&#39;</span><span class="p">]</span>
@@ -321,6 +327,7 @@ overridden derived class <strong>next( )</strong> methods after they test for a 
 <span class="n">mouseMoves</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">MouseAction</span><span class="p">,</span> <span class="n">moves</span><span class="p">)</span>
 <span class="n">MouseTrap</span><span class="p">()</span><span class="o">.</span><span class="n">runAll</span><span class="p">(</span><span class="n">mouseMoves</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>The rest of the code is identical - the difference is in the <strong>next( )</strong> methods
 and the <strong>StateT</strong> class.</p>
 <p>If you have to create and maintain a lot of <strong>State</strong> classes, this approach is
@@ -379,44 +386,48 @@ for ease of configuration</li>
 <p>The <strong>State</strong> class is distinctly different from before, since it is really just
 a placeholder with a name. Thus it is not inherited from previous <strong>State</strong>
 classes:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/State.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/State.py</span>
 
 <span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 </pre></div>
 </div>
+</div>
 <div class="section" id="conditions-for-transition">
 <h3>Conditions for Transition<a class="headerlink" href="#conditions-for-transition" title="Permalink to this headline">¶</a></h3>
 <p>In the state transition diagram, an input is tested to see if it meets the
 condition necessary to transfer to the state under question. As before, the
 <strong>Input</strong> is just a tagging interface:</p>
-<div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/Input.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/Input.py</span>
 <span class="c"># Inputs to a state machine</span>
 
 <span class="k">class</span> <span class="nc">Input</span><span class="p">:</span> <span class="k">pass</span>
 </pre></div>
+</div>
 <p>The <strong>Condition</strong> evaluates the <strong>Input</strong> to decide whether this row in the
 table is the correct transition:</p>
-<pre># stateMachine/stateMachine2/Condition.py
+<div class="highlight-python"><pre># stateMachine/stateMachine2/Condition.py
 # Condition function object for state machine
 
 class Condition:
     boolean condition(input) :
         assert 0, "condition() not implemented"</pre>
 </div>
+</div>
 <div class="section" id="transition-actions">
 <h3>Transition Actions<a class="headerlink" href="#transition-actions" title="Permalink to this headline">¶</a></h3>
 <p>If the <strong>Condition</strong> returns <strong>true</strong>, then the transition to a new state is
 made, and as that transition is made some kind of action occurs (in the previous
 state machine design, this was the <strong>run( )</strong> method):</p>
-<div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/Transition.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/stateMachine2/Transition.py</span>
 <span class="c"># Transition function object for state machine</span>
 
 <span class="k">class</span> <span class="nc">Transition</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;transition() not implemented&quot;</span>
 </pre></div>
+</div>
 </div>
 <div class="section" id="the-table">
 <h3>The Table<a class="headerlink" href="#the-table" title="Permalink to this headline">¶</a></h3>
@@ -428,16 +439,17 @@ change to be the correct one, the action that happens during transition, and the
 new state to move into. Note that the <strong>Input</strong> object is not just used for its
 type, it is also a <em>Messenger</em> object that carries information to the
 <strong>Condition</strong> and <strong>Transition</strong> objects:</p>
-<pre>{(CurrentState, InputA) : (ConditionA, TransitionA, NextA),
+<div class="highlight-python"><pre>{(CurrentState, InputA) : (ConditionA, TransitionA, NextA),
  (CurrentState, InputB) : (ConditionB, TransitionB, NextB),
  (CurrentState, InputC) : (ConditionC, TransitionC, NextC),
  ...
 }</pre>
 </div>
+</div>
 <div class="section" id="the-basic-machine">
 <h3>The Basic Machine<a class="headerlink" href="#the-basic-machine" title="Permalink to this headline">¶</a></h3>
 <p>Here&#8217;s the basic machine, (code only roughly converted):</p>
-<pre># stateMachine/stateMachine2/StateMachine.py
+<div class="highlight-python"><pre># stateMachine/stateMachine2/StateMachine.py
 # A table-driven state machine
 
 class StateMachine:
@@ -466,10 +478,11 @@ class StateMachine:
         throw RuntimeException(
           "Input not supported for current state")</pre>
 </div>
+</div>
 <div class="section" id="simple-vending-machine">
 <h3>Simple Vending Machine<a class="headerlink" href="#simple-vending-machine" title="Permalink to this headline">¶</a></h3>
 <p>Here&#8217;s the simple vending machine, (code only roughly converted):</p>
-<pre># stateMachine/vendingmachine/VendingMachine.py
+<div class="highlight-python"><pre># stateMachine/vendingmachine/VendingMachine.py
 # Demonstrates use of StateMachine.py
 import sys
 sys.path += ['../stateMachine2']
@@ -654,10 +667,11 @@ class VendingMachine(StateMachine):
         )
         """</pre>
 </div>
+</div>
 <div class="section" id="testing-the-machine">
 <h3>Testing the Machine<a class="headerlink" href="#testing-the-machine" title="Permalink to this headline">¶</a></h3>
 <p>Here&#8217;s a test of the machine, (code only roughly converted):</p>
-<div class="highlight"><pre><span class="c"># stateMachine/vendingmachine/VendingMachineTest.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># stateMachine/vendingmachine/VendingMachineTest.py</span>
 <span class="c"># Demonstrates use of StateMachine.py</span>
 
 <span class="n">vm</span> <span class="o">=</span> <span class="n">VendingMachine</span><span class="p">()</span>
@@ -676,6 +690,7 @@ class VendingMachine(StateMachine):
     <span class="n">Quit</span><span class="o">.</span><span class="n">quit</span><span class="p">]:</span>
     <span class="n">vm</span><span class="o">.</span><span class="n">nextState</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="tools">
@@ -810,7 +825,7 @@ number of moves to produce before <strong>hasNext()</strong> returns <strong>fal
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

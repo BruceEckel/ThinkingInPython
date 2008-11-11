@@ -66,7 +66,7 @@ it&#8217;s virtually always <strong>final</strong>. It calls other base-class me
 override) in order to do its job, but it is usually called only as part of an
 initialization process (and thus the client programmer isn&#8217;t necessarily able to
 call it directly):</p>
-<div class="highlight"><pre><span class="c"># appFrameworks/TemplateMethod.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># appFrameworks/TemplateMethod.py</span>
 <span class="c"># Simple demonstration of Template Method.</span>
 
 <span class="k">class</span> <span class="nc">ApplicationFramework</span><span class="p">:</span>
@@ -86,6 +86,7 @@ call it directly):</p>
 
 <span class="n">MyApp</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>The base-class constructor is responsible for performing the necessary
 initialization and then starting the &#8220;engine&#8221; (the template method) that runs
 the application (in a GUI application, this &#8220;engine&#8221; would be the main event
@@ -173,7 +174,7 @@ create two separate applications:</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

@@ -82,13 +82,14 @@ quite easy to read your own code long after you&#8217;ve written it, and also to
 other people&#8217;s code. This is accomplished partially through clean, to-the-point
 syntax, but a major factor in code readability is indentation - scoping in
 Python is determined by indentation. For example:</p>
-<div class="highlight"><pre><span class="c"># quickPython/if.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/if.py</span>
 <span class="n">response</span> <span class="o">=</span> <span class="s">&quot;yes&quot;</span>
 <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;yes&quot;</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;affirmative&quot;</span><span class="p">)</span>
     <span class="n">val</span> <span class="o">=</span> <span class="mf">1</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;continuing...&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>The &#8216;<strong>#</strong>&#8216; denotes a comment that goes until the end of the line, just like C++
 and Java &#8216;<strong>//</strong>&#8216; comments.</p>
 <p>First notice that the basic syntax of Python is C-ish as you can see in the
@@ -121,13 +122,14 @@ than just counting through a sequence of numbers. This makes a lot of sense when
 you think about it, since you&#8217;re almost always using a <strong>for</strong> loop to step
 through an array or a container. Python formalizes this by automatically making
 <strong>for</strong> use an iterator that works through a sequence. Here&#8217;s an example:</p>
-<div class="highlight"><pre><span class="c"># quickPython/list.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/list.py</span>
 <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="mf">7</span><span class="p">,</span> <span class="mf">9</span><span class="p">,</span> <span class="mf">11</span> <span class="p">]</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">13</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>The first line creates a list. You can print the list and it will look exactly
 as you put it in (in contrast, remember that I had to create a special
 <strong>Arrays2</strong> class in <em>Thinking in Java</em> in order to print arrays in Java). Lists
@@ -149,7 +151,7 @@ didn&#8217;t actually describe what your program was supposed to do.</p>
 <p>To create a function in Python, you use the <strong>def</strong> keyword, followed by the
 function name and argument list, and a colon to begin the function body. Here is
 the first example turned into a function:</p>
-<div class="highlight"><pre><span class="c"># quickPython/myFunction.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/myFunction.py</span>
 <span class="k">def</span> <span class="nf">myFunction</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="mf">0</span>
     <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;yes&quot;</span><span class="p">:</span>
@@ -161,12 +163,13 @@ the first example turned into a function:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">myFunction</span><span class="p">(</span><span class="s">&quot;no&quot;</span><span class="p">))</span>
 <span class="k">print</span><span class="p">(</span><span class="n">myFunction</span><span class="p">(</span><span class="s">&quot;yes&quot;</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>Notice there is no type information in the function signature - all it specifies
 is the name of the function and the argument identifiers, but no argument types
 or return types. Python is a <em>structurally-typed</em> language, which means it puts
 the minimum possible requirements on typing. For example, you could pass and
 return different types from the same function:</p>
-<div class="highlight"><pre><span class="c"># quickPython/differentReturns.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/differentReturns.py</span>
 <span class="k">def</span> <span class="nf">differentReturns</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="mf">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&quot;one&quot;</span>
@@ -176,17 +179,19 @@ return different types from the same function:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">differentReturns</span><span class="p">(</span><span class="mf">1</span><span class="p">))</span>
 <span class="k">print</span><span class="p">(</span><span class="n">differentReturns</span><span class="p">(</span><span class="s">&quot;one&quot;</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>The only constraints on an object that is passed into the function are that the
 function can apply its operations to that object, but other than that, it
 doesn&#8217;t care. Here, the same function applies the &#8216;<strong>+</strong>&#8216; operator to integers
 and strings:</p>
-<div class="highlight"><pre><span class="c"># quickPython/sum.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/sum.py</span>
 <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">arg1</span> <span class="o">+</span> <span class="n">arg2</span>
 
 <span class="k">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="mf">42</span><span class="p">,</span> <span class="mf">47</span><span class="p">))</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="s">&#39;spam &#39;</span><span class="p">,</span> <span class="s">&quot;eggs&quot;</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>When the operator &#8216;<strong>+</strong>&#8216; is used with strings, it means concatenation (yes,
 Python supports operator overloading, and it does a nice job of it).</p>
 </div>
@@ -196,7 +201,7 @@ Python supports operator overloading, and it does a nice job of it).</p>
 is the best of any language I&#8217;ve seen. You can use single or double quotes to
 represent strings, which is very nice because if you surround a string with
 double quotes, you can embed single quotes and vice versa:</p>
-<div class="highlight"><pre><span class="c"># quickPython/strings.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/strings.py</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;That isn&#39;t a horse&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;You are not a &quot;Viking&quot;&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;&quot;You&#39;re just pounding two</span>
@@ -205,6 +210,7 @@ double quotes, you can embed single quotes and vice versa:</p>
 <span class="s">&quot;It&#39;s the blemange!&quot;&#39;&#39;&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">r&#39;c:\python\lib\utils&#39;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Note that Python was not named after the snake, but rather the Monty Python
 comedy troupe, and so examples are virtually required to include Python-esque
 references.</p>
@@ -218,13 +224,14 @@ literal backslash.</p>
 <p>Substitution in strings is exceptionally easy, since Python uses C&#8217;s
 <strong>printf()</strong> substitution syntax, but for any string at all. You simply follow
 the string with a &#8216;<strong>%</strong>&#8216; and the values to substitute:</p>
-<div class="highlight"><pre><span class="c"># quickPython/stringFormatting.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/stringFormatting.py</span>
 <span class="n">val</span> <span class="o">=</span> <span class="mf">47</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;The number is </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
 <span class="n">val2</span> <span class="o">=</span> <span class="mf">63.4</span>
 <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;val: </span><span class="si">%d</span><span class="s">, val2: </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val2</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>As you can see in the second case, if you have more than one argument you
 surround them in parentheses (this forms a <em>tuple</em>, which is a list that cannot
 be modified - you can also use regular lists for multiple arguments, but tuples
@@ -238,7 +245,7 @@ regular expressions.</p>
 <p>Like everything else in Python, the definition of a class uses a minimum of
 additional syntax. You use the <strong>class</strong> keyword, and inside the body you use
 <strong>def</strong> to create methods. Here&#8217;s a simple class:</p>
-<div class="highlight"><pre><span class="c"># quickPython/SimpleClass.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/SimpleClass.py</span>
 <span class="k">class</span> <span class="nc">Simple</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Inside the Simple constructor&quot;</span><span class="p">)</span>
@@ -256,6 +263,7 @@ additional syntax. You use the <strong>class</strong> keyword, and inside the bo
     <span class="n">x</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="n">x</span><span class="o">.</span><span class="n">showMsg</span><span class="p">(</span><span class="s">&quot;A message&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Both methods have <strong>self</strong> as their first argument. C++ and Java both have a
 hidden first argument in their class methods, which points to the object that
 the method was called for and can be accessed using the keyword <strong>this</strong>. Python
@@ -282,7 +290,8 @@ described shortly). In that case, you just want the classes defined, but you
 don&#8217;t want the code at the bottom of the file to be executed. This particular
 <strong>if</strong> statement is only true when you are running this file directly; that is,
 if you say on the command line:</p>
-<pre>Python SimpleClass.py</pre>
+<div class="highlight-python"><pre>Python SimpleClass.py</pre>
+</div>
 <p>However, if this file is imported as a module into another program, the
 <strong>__main__</strong> code is not executed.</p>
 <p>Something that&#8217;s a little surprising at first is that while in C++ or Java you
@@ -321,7 +330,7 @@ listing the name(s) of the class inside parentheses after the name of the
 inheriting class. Note that the <strong>Simple</strong> class, which resides in the file (and
 thus, module) named <strong>SimpleClass</strong> is brought into this new name space using an
 <strong>import</strong> statement:</p>
-<div class="highlight"><pre><span class="c"># quickPython/Simple2.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/Simple2.py</span>
 <span class="kn">from</span> <span class="nn">SimpleClass</span> <span class="kn">import</span> <span class="n">Simple</span>
 
 <span class="k">class</span> <span class="nc">Simple2</span><span class="p">(</span><span class="n">Simple</span><span class="p">):</span>
@@ -352,6 +361,7 @@ thus, module) named <strong>SimpleClass</strong> is brought into this new name s
     <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">f</span><span class="p">(</span><span class="n">Different</span><span class="p">())</span>
 </pre></div>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">you don&#8217;t have to explicitly call the base-class constructor if the
@@ -467,7 +477,7 @@ with template mechanism is not appropriate.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

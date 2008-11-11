@@ -57,7 +57,7 @@ comfortable way to deal with a library or bundle of resources.</p>
 <p>When you&#8217;ve got <em>this</em>, and you need <em>that</em>, <em>Adapter</em> solves the problem. The
 only requirement is to produce a <em>that</em>, and there are a number of ways you can
 accomplish this adaptation:</p>
-<div class="highlight"><pre><span class="c"># changeInterface/Adapter.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># changeInterface/Adapter.py</span>
 <span class="c"># Variations on the Adapter pattern.</span>
 
 <span class="k">class</span> <span class="nc">WhatIHave</span><span class="p">:</span>
@@ -118,6 +118,7 @@ accomplish this adaptation:</p>
 <span class="c"># Approach 4:</span>
 <span class="n">whatIUse</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">whatIHave3</span><span class="o">.</span><span class="n">whatIWant</span><span class="p">())</span>
 </pre></div>
+</div>
 <p>I&#8217;m taking liberties with the term &#8220;proxy&#8221; here, because in <em>Design Patterns</em>
 they assert that a proxy must have an identical interface with the object that
 it is a surrogate for. However, if you have the two words together: &#8220;proxy
@@ -134,7 +135,7 @@ the client programmer and that only presents what&#8217;s necessary.</p>
 <p>Façade is often implemented as singleton abstract factory. Of course, you can
 easily get this effect by creating a class containing <strong>static</strong> factory
 methods:</p>
-<div class="highlight"><pre><span class="c"># changeInterface/Facade.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># changeInterface/Facade.py</span>
 <span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
@@ -159,6 +160,7 @@ methods:</p>
 <span class="n">b</span> <span class="o">=</span> <span class="n">Facade</span><span class="o">.</span><span class="n">makeB</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Facade</span><span class="o">.</span><span class="n">makeC</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span>
 </pre></div>
+</div>
 <p>[rewrite this section using research from Larman&#8217;s book]</p>
 <p>Example for Facade (?): my &#8220;nicer&#8221; version of the XML library.</p>
 </div>
@@ -233,7 +235,7 @@ objects into a dictionary as key-value pairs.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

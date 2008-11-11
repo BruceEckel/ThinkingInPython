@@ -63,7 +63,7 @@ creating a separate class hierarchy of type <strong>Visitor</strong> to virtuali
 operations performed upon the primary type. The objects of the primary type
 simply &#8220;accept&#8221; the visitor, then call the visitor&#8217;s dynamically-bound member
 function:</p>
-<div class="highlight"><pre><span class="c"># visitor/FlowerVisitors.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># visitor/FlowerVisitors.py</span>
 <span class="c"># Demonstration of &quot;visitor&quot; pattern.</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">generators</span>
 <span class="kn">import</span> <span class="nn">random</span>
@@ -121,6 +121,7 @@ function:</p>
     <span class="n">flower</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">fly</span><span class="p">)</span>
     <span class="n">flower</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">worm</span><span class="p">)</span>
 </pre></div>
+</div>
 <div class="section" id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
@@ -214,7 +215,7 @@ table lookup?</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>
