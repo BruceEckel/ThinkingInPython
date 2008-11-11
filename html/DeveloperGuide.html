@@ -154,10 +154,12 @@ tasks involved. Type:</p>
 <p>to see the options.</p>
 <div class="admonition-todo admonition " id="todo-4">
 <p class="first admonition-title">Todo</p>
-<p class="last">The remainder of this document needs rewriting. Rewrite this section for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
+<p class="last">The remainder of this document needs rewriting. Rewrite this section
+for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
 </div>
-<p>Working with BitBucket and Mercurial</p>
-<hr class="docutils" />
+</div>
+<div class="section" id="working-with-bitbucket-and-mercurial">
+<h2>Working with BitBucket and Mercurial<a class="headerlink" href="#working-with-bitbucket-and-mercurial" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Adapted from a posting by Yarko Tymciurak</p>
@@ -224,6 +226,22 @@ merging with other patches). Once tests pass, and your branch is accepted,
 it will be merged into the trunk.</li>
 </ol>
 </div>
+<div class="section" id="a-simple-overview-of-editing-and-merging">
+<h2>A Simple Overview Of Editing and Merging<a class="headerlink" href="#a-simple-overview-of-editing-and-merging" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">pull</span> <span class="pre">http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">merge</span></tt> This brought up kdiff3 (note: this requires a separate
+installation     of <strong>kdiff3</strong>)on any file&#8217;s w/ conflicts, and you get to
+just visually look - left-to-right at A:base, B:mine, and C:yours.... the
+NICE thing is when you want BOTH the other and yours, you can click BOTH B &amp;
+C buttons &#8212; sweeet! you can also review the &#8220;automatic&#8221; merges, choose
+which - conflicts only, or any merge.</li>
+<li>... <tt class="docutils literal"><span class="pre">make</span> <span class="pre">html;</span>&nbsp; <span class="pre">make</span> <span class="pre">latex</span></tt> ...... look at outputs (simultaneously,
+comparatively)... make any changes.... repeat....</li>
+<li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">ci</span></tt> without a message, it brought up an editor with a list of all
+changed files - so you can comment individually.</li>
+</ol>
+</div>
 </div>
 
 
@@ -245,6 +263,8 @@ it will be merged into the trunk.</li>
 <li><a class="reference external" href="#installing-sphinx">Installing Sphinx</a></li>
 <li><a class="reference external" href="#getting-the-development-branch-of-the-book">Getting the Development Branch of the Book</a></li>
 <li><a class="reference external" href="#building-the-book">Building the Book</a></li>
+<li><a class="reference external" href="#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
+<li><a class="reference external" href="#a-simple-overview-of-editing-and-merging">A Simple Overview Of Editing and Merging</a></li>
 </ul>
 </li>
 </ul>

@@ -142,3 +142,5 @@ if __name__ == "__main__":
     else:
         for language in inspect.getmembers(Languages, inspect.isclass):
             commands[sys.argv[1]](language[1])
+
+       

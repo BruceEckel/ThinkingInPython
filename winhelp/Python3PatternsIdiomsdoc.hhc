@@ -124,6 +124,14 @@
     <param name="Name" value="Building the Book">
     <param name="Local" value="DeveloperGuide.html#building-the-book">
 </OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Working with BitBucket and Mercurial">
+    <param name="Local" value="DeveloperGuide.html#working-with-bitbucket-and-mercurial">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A Simple Overview Of Editing and Merging">
+    <param name="Local" value="DeveloperGuide.html#a-simple-overview-of-editing-and-merging">
+</OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Part I: Foundations">

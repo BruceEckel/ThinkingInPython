@@ -132,7 +132,8 @@ tasks involved. Type:
 
 to see the options.
 
-.. todo:: The remainder of this document needs rewriting. Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
+.. todo::   The remainder of this document needs rewriting. Rewrite this section
+            for BitBucket & Mercurial; make some project specific diagrams;
 
 Working with BitBucket and Mercurial
 ===============================================================================

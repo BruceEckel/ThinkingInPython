@@ -30,10 +30,9 @@ A More Complex Example
 
 ::
 
-    # comprehensions/CodeManager.py
+    # CodeManager.py
     """
     TODO: update() is still only in test mode; doesn't actually work yet.
-    TODO: check() should generate deltas
 
     Extracts, checks and updates code examples in ReST files.
 
@@ -79,7 +78,9 @@ A More Complex Example
 
         @staticmethod
         def display(language):
-            "Print all the code listings"
+            """
+            Print all the code listings in the .rst files.
+            """
             for f in restFiles:
                 listings = language.listings.findall(open(f).read())
                 if not listings: continue
@@ -91,8 +92,10 @@ A More Complex Example
 
         @staticmethod
         def extract(language):
-            """Pull the code listings from the ReST files and write each
-            listing into its own file"""
+            """
+            Pull the code listings from the .rst files and write each
+            listing into its own file.
+            """
             paths = set()
             for f in restFiles:
                 for listing in language.listings.findall(open(f).read()):
@@ -112,23 +115,41 @@ A More Complex Example
 
         @staticmethod
         def check(language):
-            "Ensure that external code files exist"
+            """
+            Ensure that external code files exist and check which external files
+            have changed from what's in the .rst files. Generate files in the
+            _deltas subdirectory showing what has changed.
+            """
             missing = []
-            for path in [code.splitlines()[0] for f in restFiles for code in
-                         language.listings.findall(open(f).read())]:
-                path = path.strip()[len(language.commentTag):].strip()
-                path = os.path.normpath(os.path.join("..", "code", path))
+            listings = [shift(code) for f in restFiles for code in
+                        language.listings.findall(open(f).read())]
+            paths = [os.path.normpath(os.path.join("..", "code", path)) for path in
+                        [listing[0].strip()[len(language.commentTag):].strip()
+                         for listing in listings]]
+            for path, listing in zip(paths, listings):
                 if not os.path.exists(path):
                     missing.append(path)
+                else:
+                    code = open(path).read().splitlines()
+                    for i in difflib.ndiff(listing, code):
+                        if i.startswith("+ ") or i.startswith("- "):
+                            d = difflib.HtmlDiff()
+                            if not os.path.exists("_deltas"):
+                                os.makedirs("_deltas")
+                            html = os.path.join("_deltas",
+                                os.path.basename(path).split('.')[0] + ".html")
+                            open(html, 'w').write(d.make_file(listing, code))
+                            print("change in %s; see %s" % (path, html))
+                            break
             if missing:
-                print("Missing", language.__name__, "files:")
-                for p in missing:
-                    print(p)
+                print("Missing", language.__name__, "files:\n", "\n".join(missing))
             return missing
 
         @staticmethod
         def update(language): # Test until it is trustworthy
-            "Refresh external code files into ReST files"
+            """
+            Refresh external code files into ReST files.
+            """
             if Commands.check(language):
                 print(language.__name__, "update aborted")
                 return
@@ -138,14 +159,6 @@ A More Complex Example
                 filename = os.path.basename(path).split('.')[0]
                 path = os.path.join("..", "code", path)
                 code = open(path).read().splitlines()
-                for i in difflib.ndiff(listing, code):
-                    if i.startswith("+ ") or i.startswith("- "):
-                        d = difflib.HtmlDiff()
-                        if not os.path.exists("_deltas"):
-                            os.makedirs("_deltas")
-                        open(os.path.join("_deltas", filename + ".html"), 'w')\
-                            .write(d.make_file(listing, code))
-                        break
                 return language.codeMarker + \
                     "\n".join([("    " + line).rstrip() for line in listing])
             for f in testFiles:
@@ -155,7 +168,7 @@ A More Complex Example
     if __name__ == "__main__":
         commands = dict(inspect.getmembers(Commands, inspect.isfunction))
         if len(sys.argv) < 2 or sys.argv[1] not in commands:
-            print("Command line options:")
+            print("Command line options:\n")
             for name in commands:
                 print(name + ": " + commands[name].__doc__)
         else:
