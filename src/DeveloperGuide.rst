@@ -111,10 +111,12 @@ tasks involved. Type:
 
 to see the options.
 
+.. todo:: Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
+
 Working with Launchpad and Bazaar
 ===============================================================================
 
-(Adapted from a posting by Yarko T)
+(Adapted from a posting by Yarko Tymciurak)
 
 This assumes that you have created a local branch on your private machine where
 you do work, and keep it merged with the trunk.
@@ -140,7 +142,6 @@ on the group.
 
 When you are ready to share your work have others review, register a branch.
 
-.. note:: Once you create a branch, there is no easy way to remove it.
 
 .. note:: You can re-use one branch for multiple bug fixes.
 

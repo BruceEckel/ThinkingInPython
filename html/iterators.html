@@ -107,7 +107,7 @@ the same interface as the original <strong>Enumeration</strong> or <strong>Itera
 can be used in the same places (you may argue that this is actually a <em>Proxy</em>
 pattern, but it&#8217;s more likely <em>Decorator</em> because of its intent). Here is the
 code:</p>
-<pre># util/TypedIterator.py
+<div class="highlight-python"><pre># util/TypedIterator.py
 
 class TypedIterator(Iterator):
     def __init__(self, it, type):
@@ -125,6 +125,7 @@ class TypedIterator(Iterator):
               "TypedIterator for type " + type +
               " encountered type: " + obj.getClass())
         return obj</pre>
+</div>
 </div>
 </div>
 
@@ -185,7 +186,7 @@ class TypedIterator(Iterator):
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 09, 2008.
+      Last updated on Nov 10, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

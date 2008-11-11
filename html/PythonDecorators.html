@@ -46,7 +46,7 @@
             
   
   <div class="section" id="decorators">
-<span id="index-5"></span><h1>Decorators<a class="headerlink" href="#decorators" title="Permalink to this headline">¶</a></h1>
+<span id="index-6"></span><h1>Decorators<a class="headerlink" href="#decorators" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This chapter is a work in progress; it&#8217;s probably better if you don&#8217;t
@@ -110,7 +110,7 @@ it&#8217;s both much simpler and (as a result) much more powerful. For example,
 suppose you&#8217;d like to do something at the entry and exit points of a function
 (such as perform some kind of security, tracing, locking, etc. &#8211; all the
 standard arguments for AOP). With decorators, it looks like this:</p>
-<div class="highlight"><pre><span class="nd">@entryExit</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@entryExit</span>
 <span class="k">def</span> <span class="nf">func1</span><span class="p">():</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;inside func1()&quot;</span><span class="p">)</span>
 
@@ -118,16 +118,18 @@ standard arguments for AOP). With decorators, it looks like this:</p>
 <span class="k">def</span> <span class="nf">func2</span><span class="p">():</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;inside func2()&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>The <tt class="docutils literal"><span class="pre">&#64;</span></tt> indicates the application of the decorator.</p>
 </div>
 <div class="section" id="function-decorators">
 <h2>Function Decorators<a class="headerlink" href="#function-decorators" title="Permalink to this headline">¶</a></h2>
 <p>A function decorator is applied to a function definition by placing it on the
 line before that function definition begins. For example:</p>
-<div class="highlight"><pre><span class="nd">@myDecorator</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@myDecorator</span>
 <span class="k">def</span> <span class="nf">aFunction</span><span class="p">():</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;inside aFunction&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>When the compiler passes over this code, <tt class="docutils literal"><span class="pre">aFunction()</span></tt> is compiled and the
 resulting function object is passed to the <tt class="docutils literal"><span class="pre">myDecorator</span></tt> code, which does
 something to produce a function-like object that is then substituted for the
@@ -142,7 +144,7 @@ classes we use as decorators must implement <tt class="docutils literal"><span c
 <p>What should the decorator do? Well, it can do anything but usually you expect
 the original function code to be used at some point. This is not required,
 however:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">myDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">myDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;inside myDecorator.__init__()&quot;</span><span class="p">)</span>
@@ -159,11 +161,13 @@ however:</p>
 
 <span class="n">aFunction</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>When you run this code, you see:</p>
-<pre>inside myDecorator.__init__()
+<div class="highlight-python"><pre>inside myDecorator.__init__()
 inside aFunction()
 Finished decorating aFunction()
 inside myDecorator.__call__()</pre>
+</div>
 <p>Notice that the constructor for <tt class="docutils literal"><span class="pre">myDecorator</span></tt> is executed at the point of
 decoration of the function. Since we can call <tt class="docutils literal"><span class="pre">f()</span></tt> inside <tt class="docutils literal"><span class="pre">__init__()</span></tt>, it
 shows that the creation of <tt class="docutils literal"><span class="pre">f()</span></tt> is complete before the decorator is called.
@@ -178,14 +182,16 @@ the original code. That&#8217;s because the act of decoration <em>replaces</em> 
 function object with the result of the decoration &#8211; in our case, the
 <tt class="docutils literal"><span class="pre">myDecorator</span></tt> object replaces <tt class="docutils literal"><span class="pre">aFunction</span></tt>. Indeed, before decorators were
 added you had to do something much less elegant to achieve the same thing:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">foo</span><span class="p">():</span> <span class="k">pass</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">foo</span><span class="p">():</span> <span class="k">pass</span>
 <span class="n">foo</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>With the addition of the <tt class="docutils literal"><span class="pre">&#64;</span></tt> decoration operator, you now get the same result
 by saying:</p>
-<div class="highlight"><pre><span class="nd">@staticmethod</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">foo</span><span class="p">():</span> <span class="k">pass</span>
 </pre></div>
+</div>
 <p>This is the reason why people argued against decorators, because the <tt class="docutils literal"><span class="pre">&#64;</span></tt> is
 just a little syntax sugar meaning &#8220;pass a function object through another
 function and assign the result to the original function.&#8221;</p>
@@ -198,7 +204,7 @@ thinking by formalizing it as a language construct.</p>
 <h2>Slightly More Useful<a class="headerlink" href="#slightly-more-useful" title="Permalink to this headline">¶</a></h2>
 <p>Now let&#8217;s go back and implement the first example. Here, we&#8217;ll do the more
 typical thing and actually use the code in the decorated functions:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">entryExit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">entryExit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
@@ -219,13 +225,15 @@ typical thing and actually use the code in the decorated functions:</p>
 <span class="n">func1</span><span class="p">()</span>
 <span class="n">func2</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>The output is:</p>
-<pre>Entering func1
+<div class="highlight-python"><pre>Entering func1
 inside func1()
 Exited func1
 Entering func2
 inside func2()
 Exited func2</pre>
+</div>
 <p>You can see that the decorated functions now have the &#8220;Entering&#8221; and &#8220;Exited&#8221;
 trace statements around the call.</p>
 <p>The constructor stores the argument, which is the function object. In the call,
@@ -239,7 +247,7 @@ can properly replace the decorated function. In the above examples, I&#8217;ve
 replaced the original function with an object of a class that has a
 <tt class="docutils literal"><span class="pre">__call__()</span></tt> method. But a function object is also callable, so we can rewrite
 the previous example using a function instead of a class, like this:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">entryExit</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">entryExit</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">new_f</span><span class="p">():</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Entering&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
         <span class="n">f</span><span class="p">()</span>
@@ -258,6 +266,7 @@ the previous example using a function instead of a class, like this:</p>
 <span class="n">func2</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="n">func1</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
 </pre></div>
+</div>
 <p><tt class="docutils literal"><span class="pre">new_f()</span></tt> is defined within the body of <tt class="docutils literal"><span class="pre">entryExit()</span></tt>, so it is created and
 returned when <tt class="docutils literal"><span class="pre">entryExit()</span></tt> is called. Note that <tt class="docutils literal"><span class="pre">new_f()</span></tt> is a <em>closure</em>,
 because it captures the actual value of <tt class="docutils literal"><span class="pre">f</span></tt>.</p>
@@ -267,7 +276,7 @@ the decorator mechanism can assign the result as the decorated function.</p>
 <tt class="docutils literal"><span class="pre">new_f</span></tt> function has been substituted for the original function during
 decoration. If this is a problem you can change the name of the decorator
 function before you return it:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">entryExit</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">entryExit</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">new_f</span><span class="p">():</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Entering&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
         <span class="n">f</span><span class="p">()</span>
@@ -275,6 +284,7 @@ function before you return it:</p>
     <span class="n">new_f</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span>
     <span class="k">return</span> <span class="n">new_f</span>
 </pre></div>
+</div>
 <p>The information you can dynamically get about functions, and the modifications
 you can make to those functions, are quite powerful in Python.</p>
 </div>
@@ -283,7 +293,7 @@ you can make to those functions, are quite powerful in Python.</p>
 <p>If we create a decorator without arguments, the function to be decorated is
 passed to the constructor, and the <tt class="docutils literal"><span class="pre">__call__()</span></tt> method is called whenever the
 decorated function is invoked:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">decoratorWithoutArguments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">decoratorWithoutArguments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -314,9 +324,10 @@ decorated function is invoked:</p>
 <span class="n">sayHello</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="s">&quot;different&quot;</span><span class="p">,</span> <span class="s">&quot;set of&quot;</span><span class="p">,</span> <span class="s">&quot;arguments&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;After second sayHello() call&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Any arguments for the decorated function are just passed to <tt class="docutils literal"><span class="pre">__call__()</span></tt>. The
 output is:</p>
-<pre>Inside __init__()
+<div class="highlight-python"><pre>Inside __init__()
 After decoration
 Preparing to call sayHello()
 Inside __call__()
@@ -327,6 +338,7 @@ Inside __call__()
 sayHello arguments: a different set of arguments
 After self.f(*args)
 After second sayHello() call</pre>
+</div>
 <p>Notice that <tt class="docutils literal"><span class="pre">__init__()</span></tt> is the only method called to perform decoration, and
 <tt class="docutils literal"><span class="pre">__call__()</span></tt> is called every time you call the decorated <tt class="docutils literal"><span class="pre">sayHello()</span></tt>.</p>
 </div>
@@ -336,7 +348,7 @@ After second sayHello() call</pre>
 decorator.</p>
 <p>Let&#8217;s modify the above example to see what happens when we add arguments to the
 decorator:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">decoratorWithArguments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">decoratorWithArguments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -374,8 +386,9 @@ decorator:</p>
 <span class="n">sayHello</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="s">&quot;different&quot;</span><span class="p">,</span> <span class="s">&quot;set of&quot;</span><span class="p">,</span> <span class="s">&quot;arguments&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;after second sayHello() call&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>From the output, we can see that the behavior changes quite significantly:</p>
-<pre>Inside __init__()
+<div class="highlight-python"><pre>Inside __init__()
 Inside __call__()
 After decoration
 Preparing to call sayHello()
@@ -389,6 +402,7 @@ Decorator arguments: hello world 42
 sayHello arguments: a different set of arguments
 After f(*args)
 after second sayHello() call</pre>
+</div>
 <p>Now the process of decoration calls the constructor and then immediately invokes
 <tt class="docutils literal"><span class="pre">__call__()</span></tt>, which can only take a single argument (the function object) and
 must return the decorated function object that replaces the original. Notice
@@ -406,7 +420,7 @@ decorator very differently from the no-argument case.</p>
 <h2>Decorator Functions with Decorator Arguments<a class="headerlink" href="#decorator-functions-with-decorator-arguments" title="Permalink to this headline">¶</a></h2>
 <p>Finally, let&#8217;s look at the more complex decorator function implementation, where
 you have to do everything all at once:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">decoratorFunctionWithArguments</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decoratorFunctionWithArguments</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Inside wrap()&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">wrapped_f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -429,8 +443,9 @@ you have to do everything all at once:</p>
 <span class="n">sayHello</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="s">&quot;different&quot;</span><span class="p">,</span> <span class="s">&quot;set of&quot;</span><span class="p">,</span> <span class="s">&quot;arguments&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;after second sayHello() call&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>Here&#8217;s the output:</p>
-<pre>Inside wrap()
+<div class="highlight-python"><pre>Inside wrap()
 After decoration
 Preparing to call sayHello()
 Inside wrapped_f()
@@ -443,6 +458,7 @@ Decorator arguments: hello world 42
 sayHello arguments: a different set of arguments
 After f(*args)
 after second sayHello() call</pre>
+</div>
 <p>The return value of the decorator function must be a function used to wrap the
 function to be decorated. That is, Python will take the returned function and
 call it at decoration time, passing the function to be decorated. That&#8217;s why we
@@ -537,7 +553,7 @@ includes an introduction and some examples.</dd>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 09, 2008.
+      Last updated on Nov 10, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

@@ -61,7 +61,7 @@ the function object is repeated in a number of patterns in that book.</p>
 wrapping a method in an object, you can pass it to other methods or objects as a
 parameter, to tell them to perform this particular operation in the process of
 fulfilling your request:</p>
-<div class="highlight"><pre><span class="c"># functionObjects/CommandPattern.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># functionObjects/CommandPattern.py</span>
 
 <span class="k">class</span> <span class="nc">Command</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">pass</span>
@@ -94,6 +94,7 @@ fulfilling your request:</p>
 <span class="n">macro</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Afford</span><span class="p">())</span>
 <span class="n">macro</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>The primary point of <em>Command</em> is to allow you to hand a desired action to a
 method or object. In the above example, this provides a way to queue a set of
 actions to be performed collectively. In this case, it allows you to dynamically
@@ -123,7 +124,7 @@ program, whereas <em>Strategy</em>&#8216;s flexibility is at run time.</p>
 <p><em>Strategy</em> also adds a &#8220;Context&#8221; which can be a surrogate class that controls
 the selection and use of the particular strategy object-just like <em>State</em>!
 Here&#8217;s what it looks like:</p>
-<div class="highlight"><pre><span class="c"># functionObjects/StrategyPattern.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># functionObjects/StrategyPattern.py</span>
 
 <span class="c"># The strategy interface:</span>
 <span class="k">class</span> <span class="nc">FindMinima</span><span class="p">:</span>
@@ -164,6 +165,7 @@ Here&#8217;s what it looks like:</p>
 <span class="n">solver</span><span class="o">.</span><span class="n">changeAlgorithm</span><span class="p">(</span><span class="n">Bisection</span><span class="p">())</span>
 <span class="k">print</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">minima</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>Note similarity with template method - TM claims distinction that it has more
 than one method to call, does things piecewise. However, it&#8217;s not unlikely that
 strategy object would have more than one method call; consider Shalloway&#8217;s order
@@ -212,7 +214,7 @@ separate the chain-management parts of the implementation from the various
 find a solution. <em>Chain of Responsibility</em> provides a way to do this by chaining
 the <em>Strategy</em> objects together and providing a mechanism for them to
 automatically recurse through each one in the chain:</p>
-<div class="highlight"><pre><span class="c"># functionObjects/ChainOfResponsibility.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># functionObjects/ChainOfResponsibility.py</span>
 
 <span class="c"># Carry the information into the strategy:</span>
 <span class="k">class</span> <span class="nc">Messenger</span><span class="p">:</span> <span class="k">pass</span>
@@ -313,6 +315,7 @@ automatically recurse through each one in the chain:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">solutions</span><span class="p">[</span><span class="mf">0</span><span class="p">](</span><span class="n">line</span><span class="p">))</span>
 </pre></div>
 </div>
+</div>
 <div class="section" id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
@@ -401,7 +404,7 @@ is often redundant.</td></tr>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 09, 2008.
+      Last updated on Nov 10, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

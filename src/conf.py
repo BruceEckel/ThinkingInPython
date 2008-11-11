@@ -11,7 +11,7 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys, os
+import sys, os, re
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the book root, use os.path.abspath to make it
@@ -23,7 +23,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -157,13 +157,13 @@ htmlhelp_basename = 'Python3PatternsIdiomsdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'Python3PatternsIdioms.tex', u'Python 3 Patterns & Idioms book',
+  ('index', 'Python3PatternsIdioms.tex', u'Python 3 Patterns \& Idioms book',
    u'Bruce Eckel', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = '_static/Logo.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -171,9 +171,72 @@ latex_documents = [
 
 # Additional stuff for the LaTeX preamble.
 #latex_preamble = ''
+latex_elements = {
+    'fontpkg': '\\usepackage{palatino}'
+}
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+
+# Extension options
+# -----------------
+
+todo_include_todos = True
+
+
+# Extension interface
+# -------------------
+
+from sphinx import addnodes
+
+dir_sig_re = re.compile(r'\.\. ([^:]+)::(.*)$')
+
+def parse_directive(env, sig, signode):
+    if not sig.startswith('.'):
+        dec_sig = '.. %s::' % sig
+        signode += addnodes.desc_name(dec_sig, dec_sig)
+        return sig
+    m = dir_sig_re.match(sig)
+    if not m:
+        signode += addnodes.desc_name(sig, sig)
+        return sig
+    name, args = m.groups()
+    dec_name = '.. %s::' % name
+    signode += addnodes.desc_name(dec_name, dec_name)
+    signode += addnodes.desc_addname(args, args)
+    return name
+
+
+def parse_role(env, sig, signode):
+    signode += addnodes.desc_name(':%s:' % sig, ':%s:' % sig)
+    return sig
+
+
+event_sig_re = re.compile(r'([a-zA-Z-]+)\s*\((.*)\)')
+
+def parse_event(env, sig, signode):
+    m = event_sig_re.match(sig)
+    if not m:
+        signode += addnodes.desc_name(sig, sig)
+        return sig
+    name, args = m.groups()
+    signode += addnodes.desc_name(name, name)
+    plist = addnodes.desc_parameterlist()
+    for arg in args.split(','):
+        arg = arg.strip()
+        plist += addnodes.desc_parameter(arg, arg)
+    signode += plist
+    return name
+
+
+def setup(app):
+    from sphinx.ext.autodoc import cut_lines
+    app.connect('autodoc-process-docstring', cut_lines(4, what=['module']))
+    app.add_description_unit('directive', 'dir', 'pair: %s; directive', parse_directive)
+    app.add_description_unit('role', 'role', 'pair: %s; role', parse_role)
+    app.add_description_unit('confval', 'confval', 'pair: %s; configuration value')
+    app.add_description_unit('event', 'event', 'pair: %s; event', parse_event)

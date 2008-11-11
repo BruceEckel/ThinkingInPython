@@ -69,7 +69,7 @@ the implementation dynamically. However, if you expand your notion of
 <div class="section" id="proxy">
 <h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this headline">¶</a></h2>
 <p>If we implement <em>Proxy</em> by following the above diagram, it looks like this:</p>
-<div class="highlight"><pre><span class="c"># fronting/ProxyDemo.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># fronting/ProxyDemo.py</span>
 <span class="c"># Simple demonstration of the Proxy pattern.</span>
 
 <span class="k">class</span> <span class="nc">Implementation</span><span class="p">:</span>
@@ -91,6 +91,7 @@ the implementation dynamically. However, if you expand your notion of
 <span class="n">p</span> <span class="o">=</span> <span class="n">Proxy</span><span class="p">()</span>
 <span class="n">p</span><span class="o">.</span><span class="n">f</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">g</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
 </pre></div>
+</div>
 <p>It isn&#8217;t necessary that <strong>Implementation</strong> have the same interface as <strong>Proxy</strong>;
 as long as <strong>Proxy</strong> is somehow &#8220;speaking for&#8221; the class that it is referring
 method calls to then the basic idea is satisfied (note that this statement is at
@@ -99,7 +100,7 @@ common interface so that <strong>Implementation</strong> is forced to fulfill al
 that <strong>Proxy</strong> needs to call.</p>
 <p>Of course, in Python we have a delegation mechanism built in, so it makes the
 <strong>Proxy</strong> even simpler to implement:</p>
-<div class="highlight"><pre><span class="c"># fronting/ProxyDemo2.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># fronting/ProxyDemo2.py</span>
 <span class="c"># Simple demonstration of the Proxy pattern.</span>
 
 <span class="k">class</span> <span class="nc">Implementation2</span><span class="p">:</span>
@@ -119,6 +120,7 @@ that <strong>Proxy</strong> needs to call.</p>
 <span class="n">p</span> <span class="o">=</span> <span class="n">Proxy2</span><span class="p">()</span>
 <span class="n">p</span><span class="o">.</span><span class="n">f</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">g</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">();</span>
 </pre></div>
+</div>
 <p>The beauty of using <strong>__getattr__( )</strong> is that <strong>Proxy2</strong> is completely generic,
 and not tied to any particular implementation (in Java, a rather complicated
 &#8220;dynamic proxy&#8221; has been invented to accomplish this same thing).</p>
@@ -127,7 +129,7 @@ and not tied to any particular implementation (in Java, a rather complicated
 <h2>State<a class="headerlink" href="#state" title="Permalink to this headline">¶</a></h2>
 <p>The <em>State</em> pattern adds more implementations to <em>Proxy</em>, along with a way to
 switch from one implementation to another during the lifetime of the surrogate:</p>
-<div class="highlight"><pre><span class="c"># fronting/StateDemo.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># fronting/StateDemo.py</span>
 <span class="c"># Simple demonstration of the State pattern.</span>
 
 <span class="k">class</span> <span class="nc">State_d</span><span class="p">:</span>
@@ -166,6 +168,7 @@ switch from one implementation to another during the lifetime of the surrogate:<
 <span class="n">b</span><span class="o">.</span><span class="n">changeImp</span><span class="p">(</span><span class="n">Implementation2</span><span class="p">())</span>
 <span class="n">run</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 </pre></div>
+</div>
 <p>You can see that the first implementation is used for a bit, then the second
 implementation is swapped in and that is used.</p>
 <p>The difference between <em>Proxy</em> and <em>State</em> is in the problems that are solved.
@@ -247,7 +250,7 @@ number of calls to a particular method.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 09, 2008.
+      Last updated on Nov 10, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

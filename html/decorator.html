@@ -88,7 +88,7 @@ huge, and a part of the class diagram would look something like this:</p>
 <p>The key to using this method is to find the particular combination you want.
 So, once you&#8217;ve found the drink you would like, here is how you would use it, as
 shown in the <strong>CoffeeShop</strong> class in the following code:</p>
-<div class="highlight"><pre><span class="c"># decorator/nodecorators/CoffeeShop.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># decorator/nodecorators/CoffeeShop.py</span>
 <span class="c"># Coffee example with no decorators</span>
 
 <span class="k">class</span> <span class="nc">Espresso</span><span class="p">:</span> <span class="k">pass</span>
@@ -147,9 +147,11 @@ shown in the <strong>CoffeeShop</strong> class in the following code:</p>
 <span class="k">print</span><span class="p">((</span><span class="n">cafeMocha</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
   <span class="o">+</span> <span class="s">&quot;: $&quot;</span> <span class="o">+</span> <span class="sb">`cafeMocha.getCost()`</span><span class="p">))</span>
 </pre></div>
+</div>
 <p>And here is the corresponding output:</p>
-<pre>Cappucino: $1.0
+<div class="highlight-python"><pre>Cappucino: $1.0
 Cafe Mocha decaf whipped cream: $1.25</pre>
+</div>
 <p>You can see that creating the particular combination you want is easy, since you
 are just creating an instance of a class. However, there are a number of
 problems with this approach. Firstly, the combinations are fixed statically so
@@ -171,7 +173,7 @@ Decorators can also be nested without the loss of this transparency.</p>
 and can of course perform processing before or after the invocation.</p>
 <p>So if we added <strong>getTotalCost()</strong> and <strong>getDescription()</strong> methods to the
 <strong>DrinkComponent</strong> interface, an Espresso looks like this:</p>
-<pre># decorator/alldecorators/EspressoDecorator.py
+<div class="highlight-python"><pre># decorator/alldecorators/EspressoDecorator.py
 
 class Espresso(Decorator):
     cost = 0.75f
@@ -185,9 +187,10 @@ class Espresso(Decorator):
     def getDescription(self):
         return self.component.getDescription() +
             description</pre>
+</div>
 <p>You combine the components to create a drink as follows, as shown in the code
 below:</p>
-<pre># decorator/alldecorators/CoffeeShop.py
+<div class="highlight-python"><pre># decorator/alldecorators/CoffeeShop.py
 # Coffee example using decorators
 
 class DrinkComponent:
@@ -248,12 +251,14 @@ cafeMocha = Espresso(SteamedMilk(Chocolate(
 
 print(cafeMocha.getDescription().strip() + \)
   ": $" + `cafeMocha.getTotalCost()`</pre>
+</div>
 <p>This approach would certainly provide the most flexibility and the smallest
 menu. You have a small number of components to choose from, but assembling the
 description of the coffee then becomes rather arduous.</p>
 <p>If you want to describe a plain cappuccino, you create it with:</p>
-<div class="highlight"><pre><span class="n">plainCap</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">FoamedMilk</span><span class="p">(</span><span class="n">Mug</span><span class="p">()))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">plainCap</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">FoamedMilk</span><span class="p">(</span><span class="n">Mug</span><span class="p">()))</span>
 </pre></div>
+</div>
 <p>Creating a decaf Cafe Mocha with whipped cream requires an even longer
 description.</p>
 </div>
@@ -270,7 +275,7 @@ you would use decorators to make the modifications. This is the type of menu you
 are presented with in most coffee shops.</p>
 <img alt="_images/compromiseDecoration.gif" src="_images/compromiseDecoration.gif" />
 <p>Here is how to create a basic selection, as well as a decorated selection:</p>
-<pre># decorator/compromise/CoffeeShop.py
+<div class="highlight-python"><pre># decorator/compromise/CoffeeShop.py
 # Coffee example with a compromise of basic
 # combinations and decorators
 
@@ -337,6 +342,7 @@ print(cappuccino.getDescription() + ": $" + \)
 cafeMocha = Whipped(Decaf(CafeMocha()))
 print(cafeMocha.getDescription() + ": $" + \)
   `cafeMocha.getTotalCost()`</pre>
+</div>
 <p>You can see that creating a basic selection is quick and easy, which makes sense
 since they will be described regularly.  Describing a decorated drink is more
 work than when using a class per combination, but clearly less work than when
@@ -437,7 +443,7 @@ Olives.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 09, 2008.
+      Last updated on Nov 10, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>
