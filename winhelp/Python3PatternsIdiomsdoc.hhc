@@ -97,6 +97,10 @@
 </OBJECT>
 <UL>
 <LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Getting Started: The Easiest Approach">
+    <param name="Local" value="DeveloperGuide.html#getting-started-the-easiest-approach">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
     <param name="Name" value="For Windows Users">
     <param name="Local" value="DeveloperGuide.html#for-windows-users">
 </OBJECT>
@@ -113,16 +117,8 @@
     <param name="Local" value="DeveloperGuide.html#building-the-book">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Working with Launchpad and Bazaar">
-    <param name="Local" value="DeveloperGuide.html#working-with-launchpad-and-bazaar">
-</OBJECT>
-<LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Branch Registration Details">
-    <param name="Local" value="DeveloperGuide.html#branch-registration-details">
-</OBJECT>
-<LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Tips for Merging">
-    <param name="Local" value="DeveloperGuide.html#tips-for-merging">
+    <param name="Name" value="Working with BitBucket and Mercurial">
+    <param name="Local" value="DeveloperGuide.html#working-with-bitbucket-and-mercurial">
 </OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
@@ -248,6 +244,10 @@
     <param name="Name" value="Decorator Functions with Decorator Arguments">
     <param name="Local" value="PythonDecorators.html#decorator-functions-with-decorator-arguments">
 </OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Further Reading">
+    <param name="Local" value="PythonDecorators.html#further-reading">
+</OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Generators, Iterators, and Itertools">
@@ -257,6 +257,12 @@
     <param name="Name" value="Comprehensions">
     <param name="Local" value="Comprehensions.html">
 </OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="A More Complex Example">
+    <param name="Local" value="Comprehensions.html#a-more-complex-example">
+</OBJECT>
+</UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Coroutines &amp; Concurrency">
     <param name="Local" value="CoroutinesAndConcurrency.html">

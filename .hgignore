@@ -8,3 +8,5 @@ syntax: glob
 .svn
 .swp
 _build
+_deltas
+_test

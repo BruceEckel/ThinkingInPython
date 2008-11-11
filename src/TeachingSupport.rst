@@ -14,6 +14,7 @@ would like to teach from -- including myself.
 
 Here are some places to get ideas for exercises and projects:
 
-  - `For coding dojos <http://www.dtsato.com/blog/2008/10/21/source-of-problems-for-your-coding-dojo/>`_
+  - `For coding dojos
+    <http://www.dtsato.com/blog/2008/10/21/source-of-problems-for-your-coding-dojo/>`_
 
   - `Rosetta Code <http://www.rosettacode.org/wiki/Category:Python>`_

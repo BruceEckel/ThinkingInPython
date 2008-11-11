@@ -343,23 +343,27 @@ Observations:
 * Similar to flyweight
 * Each state may move to many others
 * Condition & action functions must also be external to states
-* Centralize description in a single table containing all variations, for ease of configuration
+* Centralize description in a single table containing all variations,
+  for ease of configuration
 
 Example:
 
 * State Machine & Table-Driven Code
 * Implements a vending machine
 * Uses several other patterns
-* Separates common state-machine code from specific application (like template method)
-* Each input causes a seek for appropriate solution (like chain of responsibility)
-* Tests and transitions are encapsulated in function objects (objects that hold functions)
+* Separates common state-machine code from specific application
+  (like template method)
+* Each input causes a seek for appropriate solution
+  (like chain of responsibility)
+* Tests and transitions are encapsulated in function objects
+  (objects that hold functions)
 * Java constraint: methods are not first-class objects
 
 .. image:: _images/stateMachine.*
 
 
 The State Class
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 The **State** class is distinctly different from before, since it is really just
 a placeholder with a name. Thus it is not inherited from previous **State**
@@ -373,7 +377,7 @@ classes::
 
 
 Conditions for Transition
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 In the state transition diagram, an input is tested to see if it meets the
 condition necessary to transfer to the state under question. As before, the
@@ -397,7 +401,7 @@ table is the correct transition::
 
 
 Transition Actions
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 If the **Condition** returns **true**, then the transition to a new state is
 made, and as that transition is made some kind of action occurs (in the previous
@@ -412,7 +416,7 @@ state machine design, this was the **run( )** method)::
 
 
 The Table
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 With these classes in place, we can set up a 3-dimensional table where each row
 completely describes a state. The first element in the row is the current state,
@@ -431,7 +435,7 @@ type, it is also a *Messenger* object that carries information to the
 
 
 The Basic Machine
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Here's the basic machine, (code only roughly converted)::
 
@@ -467,7 +471,7 @@ Here's the basic machine, (code only roughly converted)::
 
 
 Simple Vending Machine
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Here's the simple vending machine, (code only roughly converted)::
 
@@ -686,7 +690,12 @@ Here's a test of the machine, (code only roughly converted)::
 Tools
 =======================================================================
 
-Another approach, as your state machine gets bigger, is to use an automation tool whereby you configure a table and let the tool generate the state machine code for you. This can be created yourself using a language like Python, but there are also free, open-source tools such as *Libero*, at http://www.imatix.com.
+Another approach, as your state machine gets bigger, is to use an automation
+tool whereby you configure a table and let the tool generate the state machine
+code for you. This can be created yourself using a language like Python, but
+there are also free, open-source tools such as *Libero*, at
+http://www.imatix.com.
+
 
 Exercises
 =======================================================================

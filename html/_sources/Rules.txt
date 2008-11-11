@@ -105,22 +105,23 @@ Mechanics
 Diagrams
 ===============================================================================
 
-Create diagrams using whatever tool is convenient for you, as long as it produces
-formats that Sphinx can use.
+Create diagrams using whatever tool is convenient for you, as long as it
+produces formats that Sphinx can use.
 
-It doesn't matter if your diagram is imperfect. Even if you just sketch something
-by hand and scan it in, it will help readers visualize what's going on.
+It doesn't matter if your diagram is imperfect. Even if you just sketch
+something by hand and scan it in, it will help readers visualize what's going
+on.
 
-At some point, diagrams will be redone for consistency using a single tool,
-with print publication in mind. This tool may be a commercial product. However,
-if you need to change the diagram you can replace it with your new version using
+At some point, diagrams will be redone for consistency using a single tool, with
+print publication in mind. This tool may be a commercial product. However, if
+you need to change the diagram you can replace it with your new version using
 your tool of choice. The important thing is to get the diagram right; at some
 point it will be redone to look good.
 
 Note that all image tags should use a ``*`` at the end, not the file extension
 name. For example ``..image:: _images/foo.*``. This way the tag will work for
-both the HTML output and the Latex output. Also, all images should be placed
-in the ``_images`` directory.
+both the HTML output and the Latex output. Also, all images should be placed in
+the ``_images`` directory.
 
 Here's an example which was done with the free online service Gliffy.com, then
 modified using the free Windows program Paint.NET (note, however, that we should

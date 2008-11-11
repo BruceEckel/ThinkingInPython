@@ -1,7 +1,7 @@
 
-************************************************************************************
+********************************************************************************
 Fronting for an Implementation
-************************************************************************************
+********************************************************************************
 
 Both *Proxy* and *State* provide a surrogate class that you use in your code;
 the real class that does the work is hidden behind this surrogate class. When
@@ -159,9 +159,21 @@ The common uses for *Proxy* as described in *Design Patterns* are:
     idiom and prevent object aliasing. A simpler example is keeping track of the
     number of calls to a particular method.
 
-You could look at a Python reference as a kind of protection proxy, since it controls access to the actual object on the heap (and ensures, for example, that you don't use a **null** reference).
+You could look at a Python reference as a kind of protection proxy, since it
+controls access to the actual object on the heap (and ensures, for example, that
+you don't use a **null** reference).
 
-[[ Rewrite this: In *Design Patterns*, *Proxy* and *State* are not seen as related to each other because the two are given (what I consider arbitrarily) different structures. *State*, in particular, uses a separate implementation hierarchy but this seems to me to be unnecessary unless you have decided that the implementation is not under your control (certainly a possibility, but if you own all the code there seems to be no reason not to benefit from the elegance and helpfulness of the single base class). In addition, *Proxy* need not use the same base class for its implementation, as long as the proxy object is controlling access to the object it "fronting" for. Regardless of the specifics, in both *Proxy* and *State* a surrogate is passing method calls through to an implementation object.]]]
+[[ Rewrite this: In *Design Patterns*, *Proxy* and *State* are not seen as
+related to each other because the two are given (what I consider arbitrarily)
+different structures. *State*, in particular, uses a separate implementation
+hierarchy but this seems to me to be unnecessary unless you have decided that
+the implementation is not under your control (certainly a possibility, but if
+you own all the code there seems to be no reason not to benefit from the
+elegance and helpfulness of the single base class). In addition, *Proxy* need
+not use the same base class for its implementation, as long as the proxy object
+is controlling access to the object it "fronting" for. Regardless of the
+specifics, in both *Proxy* and *State* a surrogate is passing method calls
+through to an implementation object.]]]
 
 
 

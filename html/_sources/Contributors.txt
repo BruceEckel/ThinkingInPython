@@ -2,17 +2,18 @@
 Contributors
 *******************************************************************************
 
-Contributors ordered by the number of Launchpad.net Karma points.
+List of contributors.
 
-.. rubric:: Karma List
-
-..  note:: Launchpad.net now has a web services interface; we need to figure
-    out how to automatically download the Karma list.
+..  Note::  This needs some thought. I want to include everyone who makes a
+            contribution, but I'd also like to indicate people who have made
+            larger contributions -- there's no automatic way to do this now
+            that we have moved to BitBucket and are using Wikis to allow people
+            to make contributions more simply in the beginning.
 
 Thanks To
 ===============================================================================
 
-  * Launchpad.net
+  * BitBucket.org and the creators of Mercurial
 
   * Creator(s) of Sphinx
 

@@ -552,7 +552,7 @@ notification behavior then.</p>
 <p>Here is a version of the above that doesn&#8217;t use the Observer pattern, written by
 Kevin Altis using PythonCard, and placed here as a starting point for a
 translation that does include Observer:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># observer/BoxObserver.py</span>
+<div class="highlight"><pre><span class="c"># observer/BoxObserverPythonCard.py</span>
 <span class="sd">&quot;&quot;&quot; Written by Kevin Altis as a first-cut for</span>
 <span class="sd">converting BoxObserver to Python. The Observer</span>
 <span class="sd">hasn&#39;t been integrated yet.</span>
@@ -564,6 +564,8 @@ translation that does include Observer:</p>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="k">from</span> <span class="nn">PythonCardPrototype</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">model</span>
 <span class="k">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">PythonCardPrototype</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">model</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="n">GRID</span> <span class="o">=</span> <span class="mf">8</span>
 
@@ -640,7 +642,7 @@ translation that does include Observer:</p>
 </pre></div>
 </div>
 <p>This is the resource file for running the program (see PythonCard for details):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># observer/BoxObserver.rsrc.py</span>
+<div class="highlight"><pre><span class="c"># observer/BoxObserver.rsrc.py</span>
 <span class="p">{</span><span class="s">&#39;stack&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;Stack&#39;</span><span class="p">,</span>
           <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;BoxObserver&#39;</span><span class="p">,</span>
     <span class="s">&#39;backgrounds&#39;</span><span class="p">:</span> <span class="p">[</span>
@@ -690,6 +692,8 @@ the first one that was chosen.</li>
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/Logo.png" alt="Logo"/>
             </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Observer</a><ul>
@@ -701,6 +705,7 @@ the first one that was chosen.</li>
 </ul>
 </li>
 </ul>
+
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="tableDriven.html" title="previous chapter">Table-Driven Code: Configuration Flexibility</a></p>

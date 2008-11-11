@@ -1,7 +1,7 @@
 
-************************************************************************************
+********************************************************************************
 Pattern Refactoring
-************************************************************************************
+********************************************************************************
 
 .. note:: This chapter has not had any significant translation yet.
 
@@ -197,7 +197,7 @@ localized to those encapsulations. It turns out that this process also cleans up
 the rest of the code considerably.
 
 "Make More Objects"
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 This brings up a general object-oriented design principle that I first heard
 spoken by Grady Booch: "If the design is too complicated, make more objects."
@@ -494,7 +494,7 @@ that all **Trash** subclasses contain a constructor that takes a single
 **double** argument).
 
 **Trash** Subclasses
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 To fit into the prototyping scheme, the only thing that's required of each new
 subclass of **Trash** is that it contain a constructor that takes a **double**
@@ -553,7 +553,7 @@ You can see that, other than the constructor, there's nothing special about any
 of these classes.
 
 Parsing **Trash** from an External File
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 The information about **Trash** objects will be read from an outside file. The
 file has all of the necessary information about each piece of trash on a single
@@ -672,7 +672,7 @@ Alternatively, the container class can provide its own adapter that implements
 **Fillable**. (You'll see this later, in **DynaTrash.py**.)
 
 Recycling with Prototyping
-----------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 Now you can see the revised version of **RecycleA.py** using the prototyping
 technique::
@@ -903,7 +903,7 @@ this case there will be only two dispatches, which is referred to as *double
 dispatching*).
 
 Implementing the Double Dispatch
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Remember that polymorphism can occur only via method calls, so if you want
 double dispatching to occur, there must be two method calls: one used to
@@ -1258,7 +1258,7 @@ as an **interface**::
 
 
 A Reflective Decorator
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 At this point, you *could* follow the same approach that was used for double
 dispatching and create new subtypes of **Aluminum**, **Paper**, **Glass**, and
@@ -1462,7 +1462,7 @@ created, while here *each* one of the overloaded **visit( )** methods is
 overridden in every subclass of **Visitor**.
 
 More Coupling?
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 There's a lot more code here, and there's definite coupling between the
 **Trash** hierarchy and the **Visitor** hierarchy. However, there's also high

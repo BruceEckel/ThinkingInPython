@@ -204,9 +204,9 @@ The '**r**' right before a string means "raw," which takes the backslashes
 literally so you don't have to put in an extra backslash in order to insert a
 literal backslash.
 
-Substitution in strings is exceptionally easy, since Python uses C's **printf(
-)** substitution syntax, but for any string at all. You simply follow the string
-with a '**%**' and the values to substitute::
+Substitution in strings is exceptionally easy, since Python uses C's
+**printf()** substitution syntax, but for any string at all. You simply follow
+the string with a '**%**' and the values to substitute::
 
     # quickPython/stringFormatting.py
     val = 47
@@ -221,7 +221,7 @@ surround them in parentheses (this forms a *tuple*, which is a list that cannot
 be modified - you can also use regular lists for multiple arguments, but tuples
 are typical).
 
-All the formatting from **printf( )** is available, including control over the
+All the formatting from **printf()** is available, including control over the
 number of decimal places and alignment. Python also has very sophisticated
 regular expressions.
 
@@ -285,14 +285,14 @@ if you say on the command line::
 However, if this file is imported as a module into another program, the
 **__main__** code is not executed.
 
-Something that's a little surprising at first is that while in C++ or Java you 
-declare object level fields outside of the methods, you do not declare them in 
-Python.  To create an object field, you just name it - using **self** - inside 
+Something that's a little surprising at first is that while in C++ or Java you
+declare object level fields outside of the methods, you do not declare them in
+Python.  To create an object field, you just name it - using **self** - inside
 of one of the methods (usually in the constructor, but not always), and space is
-created when that method is run. This seems a little strange coming from C++ or 
-Java where you must decide ahead of time how much space your object is going to 
-occupy, but it turns out to be a very flexible way to program. If you declare 
-fields using the C++/Java style, they implicitly become class level fields 
+created when that method is run. This seems a little strange coming from C++ or
+Java where you must decide ahead of time how much space your object is going to
+occupy, but it turns out to be a very flexible way to program. If you declare
+fields using the C++/Java style, they implicitly become class level fields
 (similar to the static fields in C++/Java)
 
 Inheritance
@@ -363,9 +363,12 @@ thus, module) named **SimpleClass** is brought into this new name space using an
 ..  note:: you don't have to explicitly call the base-class constructor if the
            argument list is the same. Show example.
 
-..  note:: The note above is confusing. Did not understand. IMHO one still needs to invoke the base-class constructor if the argument is the same
-    
-    Probably one needs to state that in case the base class constructor functionality continues to be adequate for the derived class, then a new constructor need not be declared for the derived class at all. 
+..  note::  (Reader) The note above is confusing. Did not understand. IMHO one still
+            needs to invoke the base-class constructor if the argument is the
+            same.  Probably one needs to state that in case the base class
+            constructor functionality continues to be adequate for the derived
+            class, then a new constructor need not be declared for the derived
+            class at all.
 
 
 **Simple2** is inherited from **Simple**, and in the constructor, the base-class
@@ -390,7 +393,10 @@ to provide weak typing in a strongly-typed language. Thus, in Python you
 automatically get the equivalent of templates - without having to learn that
 particularly difficult syntax and semantics.
 
-.. note :: I am not sure if I agree with the remark about templates. One of the big objective of templates has always been type safety along with genericity. What python gives us is the genericity. IMHO the analogy with template mechanism is not appropriate.
+.. note ::  (Reader) I am not sure if I agree with the remark about templates. One of the
+            big objective of templates has always been type safety along with
+            genericity. What python gives us is the genericity. IMHO the analogy
+            with template mechanism is not appropriate.
 
 .. note:: Suggest Further Topics for inclusion in the introductory chapter
 

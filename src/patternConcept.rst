@@ -195,8 +195,10 @@ patterns.
 * **Variation in behavior**
 * **Notification**
 * **Transaction**
-* **Mirror**: "the ability to keep a parallel universe(s) in step with the golden world"
-* **Shadow**: "follows your movement and does something different in a different medium" (May be a variation on Proxy).
+* **Mirror**: "the ability to keep a parallel universe(s) in step with the
+    golden world"
+* **Shadow**: "follows your movement and does something different in a different
+    medium" (May be a variation on Proxy).
 
 Design Principles
 =======================================================================

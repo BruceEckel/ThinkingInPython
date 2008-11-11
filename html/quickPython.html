@@ -221,9 +221,9 @@ that you want without any other editing.</p>
 <p>The &#8216;<strong>r</strong>&#8216; right before a string means &#8220;raw,&#8221; which takes the backslashes
 literally so you don&#8217;t have to put in an extra backslash in order to insert a
 literal backslash.</p>
-<p>Substitution in strings is exceptionally easy, since Python uses C&#8217;s <strong>printf(
-)</strong> substitution syntax, but for any string at all. You simply follow the string
-with a &#8216;<strong>%</strong>&#8216; and the values to substitute:</p>
+<p>Substitution in strings is exceptionally easy, since Python uses C&#8217;s
+<strong>printf()</strong> substitution syntax, but for any string at all. You simply follow
+the string with a &#8216;<strong>%</strong>&#8216; and the values to substitute:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># quickPython/stringFormatting.py</span>
 <span class="n">val</span> <span class="o">=</span> <span class="mf">47</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;The number is </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
@@ -236,7 +236,7 @@ with a &#8216;<strong>%</strong>&#8216; and the values to substitute:</p>
 surround them in parentheses (this forms a <em>tuple</em>, which is a list that cannot
 be modified - you can also use regular lists for multiple arguments, but tuples
 are typical).</p>
-<p>All the formatting from <strong>printf( )</strong> is available, including control over the
+<p>All the formatting from <strong>printf()</strong> is available, including control over the
 number of decimal places and alignment. Python also has very sophisticated
 regular expressions.</p>
 </div>
@@ -369,8 +369,12 @@ argument list is the same. Show example.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>The note above is confusing. Did not understand. IMHO one still needs to invoke the base-class constructor if the argument is the same</p>
-<p class="last">Probably one needs to state that in case the base class constructor functionality continues to be adequate for the derived class, then a new constructor need not be declared for the derived class at all.</p>
+<p class="last">(Reader) The note above is confusing. Did not understand. IMHO one still
+needs to invoke the base-class constructor if the argument is the
+same.  Probably one needs to state that in case the base class
+constructor functionality continues to be adequate for the derived
+class, then a new constructor need not be declared for the derived
+class at all.</p>
 </div>
 <p><strong>Simple2</strong> is inherited from <strong>Simple</strong>, and in the constructor, the base-class
 constructor is called. In <strong>display( )</strong>, <strong>showMsg( )</strong> can be called as a
@@ -393,7 +397,10 @@ automatically get the equivalent of templates - without having to learn that
 particularly difficult syntax and semantics.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">I am not sure if I agree with the remark about templates. One of the big objective of templates has always been type safety along with genericity. What python gives us is the genericity. IMHO the analogy with template mechanism is not appropriate.</p>
+<p class="last">(Reader) I am not sure if I agree with the remark about templates. One of the
+big objective of templates has always been type safety along with
+genericity. What python gives us is the genericity. IMHO the analogy
+with template mechanism is not appropriate.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -412,6 +419,8 @@ particularly difficult syntax and semantics.</p>
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/Logo.png" alt="Logo"/>
             </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Quick Python for Programmers</a><ul>
@@ -426,6 +435,7 @@ particularly difficult syntax and semantics.</p>
 </ul>
 </li>
 </ul>
+
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="Part1.html" title="previous chapter">Part I: Foundations</a></p>

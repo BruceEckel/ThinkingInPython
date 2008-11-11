@@ -4,6 +4,36 @@ Developer Guide
 
 Details for people participating in the book development process.
 
+Getting Started: The Easiest Approach
+===============================================================================
+
+If all of the details are a little overwhelming at first, there's an easy way
+for you to make contributions without learning about distributed version control
+and Sphinx:
+
+1.  Create an account at http://www.BitBucket.org.
+
+2.  In your account, you get a wiki. In your wiki, create a page for your
+    contribution. Just add your code and descriptions using plain text.
+
+3.  Point us to your wiki via the `newsgroup
+    <http://groups.google.com/group/python3patterns/>`_.
+
+4.  We'll take your contribution and do the necessary formatting.
+
+If you want to take another step, you can learn how to format your wiki page
+using Sphinx by looking at the source for pages in the book. You can try it
+right now -- on the left side of this page (in the HTML book) you'll see a
+header that says **This Page** and underneath it **Show Source**. Click on
+**Show Source** and you'll see the Sphinx source for this page. Just look at
+the page sources and imitate that.
+
+When you're ready, you can learn more about Sphinx and Mercurial and begin
+making contributions that way.
+
+The following sections are for those who are ready to build the book on their
+own machines.
+
 For Windows Users
 ===============================================================================
 
@@ -15,15 +45,15 @@ You need to install at least the ``make`` utility, but I find that ``chere``
 (command prompt here) is also very useful.
 
 Also install ``openssh`` (under **Net**), so you can create your RSA key
-for Bazaar.
+for Mercurial.
 
 I've discovered that it's best if you *don't* install Python as part of
 Cygwin; instead use a single Python installation under windows. Cygwin will
 find the installation if it is on your Windows PATH.
 
-Because of this, you shouldn't select "mercurial" or "bazaar" when you're
+Because of this, you shouldn't select "mercurial" when you're
 installing Cygwin because that will cause Python to be installed. Instead,
-install them as Windows applications (see below).
+install them as standalone Windows applications (see below).
 
 Installing Sphinx
 ===============================================================================
@@ -50,6 +80,8 @@ the very latest development version (a.k.a. the "tip").
 
     ``$ python setup.py install``
 
+    (You can repeat this step whenever you need to update).
+
     We may talk about minimum version numbers to process the book. Check your
     version with:
 
@@ -67,30 +99,19 @@ Mercurial Cheat sheets & quick starts should be enough to answer your questions:
 Getting the Development Branch of the Book
 ===============================================================================
 
-This book uses Launchpad.net tools, and additional tools if necessary.
+This book uses BitBucket.org tools, and additional tools if necessary.
 
-#.  Sign up for an account at http://Launchpad.net.
-
-#.  Install the Bazaar distributed version control system (DVCS):
-
-    https://launchpad.net/bzr
-
-    It's helpful to follow this Bazaar mini-tutorial:
-
-    http://doc.bazaar-vcs.org/latest/en/mini-tutorial/index.html
-
-    And here's the complete Bazaar user guide:
-
-    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html
+#.  Sign up for an account at http://BitBucket.org.
 
 #.  You must create an rsa key. Under OSX and Linux, and if you installed
     ``openssh with`` Cygwin under windows, you run ``ssh-keygen`` to generate
-    the key, and then add it to your Launchpad account.
+    the key, and then add it to your BitBucket account.
 
-#.  Go to https://code.launchpad.net/python3patterns, and you'll see
-    instructions for getting a branch for development.
+#.  Go to http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/, and
+    you'll see instructions for getting a branch for development.
 
-#.  Work on your branch and make local commits.
+#.  Work on your branch and make local commits and commits to your BitBucket
+    account.
 
 Building the Book
 ===============================================================================
@@ -112,30 +133,32 @@ tasks involved. Type:
 to see the options.
 
 .. todo:: Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
+Working with BitBucket and Mercurial
 
-Working with Launchpad and Bazaar
 ===============================================================================
 
 (Adapted from a posting by Yarko Tymciurak)
+.. note::   The remainder of this document needs rewriting.
+
 
 This assumes that you have created a local branch on your private machine where
 you do work, and keep it merged with the trunk.
 
 That is, you've done:
 
-   - ``bzr branch lp:python3patterns``
-   - ``bzr commit -m 'initial checkout'``
+   - ``hg branch lp:python3patterns``
+   - ``hg commit -m 'initial checkout'``
    - (hack, hack, hack....)
-   - ``bzr merge``   (pull new updates)
-   - ``bzr commit -m 'checkin after merge...'``
+   - ``hg merge``   (pull new updates)
+   - ``hg commit -m 'checkin after merge...'``
    - ... and so on...
 
 When you have a new function idea, or think you've found a bug, ask Bruce
 on the group.
 
-   -  If you have a new feature, register a blueprint on Launchpad and
+   -  If you have a new feature, register a blueprint on BitBucket and
       describe what you're going to do.
-   -  If you have found a bug, make a bug report on Launchpad (later assign
+   -  If you have found a bug, make a bug report on BitBucket (later assign
       it to yourself, and link your branch to it);
    -  If you want to work on a project, look for an unassigned bug and try to
       work it out - then proceed as below...
@@ -145,23 +168,23 @@ When you are ready to share your work have others review, register a branch.
 
 .. note:: You can re-use one branch for multiple bug fixes.
 
-1.  Sign up for an account on launchpad.net
+1.  Sign up for an account on BitBucket.org
 
 2.  Go to the project and select "register branch"
-    (``https://code.launchpad.net/python3patterns/+addbranch``). Suggest you
+    (``https://code.BitBucket.org/python3patterns/+addbranch``). Suggest you
     create a hosted branch, then you can work locally, and pull/push as you make
     progress (see
-    http://doc.bazaar-vcs.org/latest/en/user-guide/index.html#organizing).
+    http://doc.Mercurial-vcs.org/latest/en/user-guide/index.html#organizing).
 
-3.  Once you have registered your branch, launchpad will provide you with
+3.  Once you have registered your branch, BitBucket will provide you with
     instructions on how to pull and push to your personal development copy.
 
 4.  Link your bug report or blueprint to your branch.
 
 5.  Merge from your "parent" (the trunk, or others you are working with) as needed.
 
-6.  Push your working copy to launchpad as your work is ready for others to
-    review or  test.
+6.  Push your working copy to BitBucket as your work is ready for others to
+    review or test.
 
 7.  Once you are done making your changes, have completed testing, and are
     ready for the project team to inspect & test, please select "propose for
@@ -171,39 +194,4 @@ When you are ready to share your work have others review, register a branch.
     merging with other patches). Once tests pass, and your branch is accepted,
     it will be merged into the trunk.
 
-
-Branch Registration Details
-===============================================================================
-Register a branch on http://code.launchpad.net/python3patterns/.  Since your login
-will identify your branch, ``devel`` is a good choice for a general development branch.
-If you're unsure, select ``Hosted`` branching.
-
-You must submit a public key - this will get you there:
-
-    https://launchpad.net/people/+me/+editsshkeys
-
-When you create your branch, Launchpad will show you the command to push to your branch.
-It will look something like this.
-
-.. image:: _images/pushPath.*
-
-A good local setup is to keep an updated copy of the current trunk
-and a separate local development branch.
-
-Tips for Merging
-===============================================================================
-
-..  note:: I want to eventually move to the mode where submissions are
-    reviewed by another member of the team, rather than me reviewing everything.
-
--   Make a merge using a local test branch
-
--   Consider using kdiff3: http://kdiff3.sourceforge.net/
-
--   You can use ``bzr diff --using=kdiff3`` to browse differences, and use a bazaar
-    plugin to merge conflicts:
-
-       ``bzr extmerge --all``
-
--    More here:  http://dev.mysql.com/tech-resources/articles/advanced-bazaar.html
 

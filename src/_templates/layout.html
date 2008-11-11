@@ -1,4 +1,8 @@
 {% extends "!layout.html" %}
+{% block sidebartoc %}
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    {{ super() }}
+{% endblock %}
 {% block sidebarsearch %}
     {{ super() }}
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>

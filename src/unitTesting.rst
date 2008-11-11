@@ -1,10 +1,10 @@
 
-
-************************************************************************************
+********************************************************************************
 Unit Testing & Test-Driven Development
-************************************************************************************
+********************************************************************************
 
-..  note:: This chapter has not had any significant translation yet. Should introduce and compare the various common test systems.
+..  note:: This chapter has not had any significant translation yet. Should
+           introduce and compare the various common test systems.
 
 One of the important recent realizations is the dramatic value of unit testing.
 
