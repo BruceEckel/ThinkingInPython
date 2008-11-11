@@ -152,22 +152,32 @@ tasks involved. Type:</p>
 <blockquote>
 <tt class="docutils literal"><span class="pre">build</span> <span class="pre">help</span></tt></blockquote>
 <p>to see the options.</p>
-<div class="admonition-todo admonition " id="todo-3">
+<div class="admonition-todo admonition " id="todo-11">
 <p class="first admonition-title">Todo</p>
-<p class="last">Rewrite this section for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
+<p class="last">The remainder of this document needs rewriting. Rewrite this section for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
 </div>
+<p>Working with BitBucket and Mercurial</p>
+<hr class="docutils" />
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The remainder of this document needs rewriting.</p>
-</div>
-<div class="section" id="working-with-launchpad-and-bazaar">
-<h2>Working with Launchpad and Bazaar<a class="headerlink" href="#working-with-launchpad-and-bazaar" title="Permalink to this headline">¶</a></h2>
-<p>(Adapted from a posting by Yarko Tymciurak)</p>
+<p class="last">Adapted from a posting by Yarko Tymciurak</p>
 </div>
 <p>This assumes that you have created a local branch on your private machine where
 you do work, and keep it merged with the trunk.</p>
 <p>That is, you&#8217;ve done:</p>
 <blockquote>
 <ul class="simple">
+<li>Forked a branch of <a class="reference external" href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/">http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/</a> (the main trunk; this fork will provide a place for review and comment)</li>
+<li>cloned the trunk to your local machine:
+- hg clone <a class="reference external" href="https://my_login&#64;bitbucket.org/BruceEckel/python-3-patterns-idioms/">https://my_login&#64;bitbucket.org/BruceEckel/python-3-patterns-idioms/</a></li>
+<li>cloned your local copy of trunk to create a working directory:
+- hg clone python-3-patterns-idioms devel</li>
+</ul>
+</blockquote>
+<div class="admonition-todo admonition " id="todo-12">
+<p class="first admonition-title">Todo</p>
+<p>This section still work in progress:</p>
+<ul class="last simple">
 <li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">branch</span> <span class="pre">lp:python3patterns</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'initial</span> <span class="pre">checkout'</span></tt></li>
 <li>(hack, hack, hack....)</li>
@@ -175,7 +185,7 @@ you do work, and keep it merged with the trunk.</p>
 <li><tt class="docutils literal"><span class="pre">hg</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'checkin</span> <span class="pre">after</span> <span class="pre">merge...'</span></tt></li>
 <li>... and so on...</li>
 </ul>
-</blockquote>
+</div>
 <p>When you have a new function idea, or think you&#8217;ve found a bug, ask Bruce
 on the group.</p>
 <blockquote>
@@ -235,7 +245,6 @@ it will be merged into the trunk.</li>
 <li><a class="reference external" href="#installing-sphinx">Installing Sphinx</a></li>
 <li><a class="reference external" href="#getting-the-development-branch-of-the-book">Getting the Development Branch of the Book</a></li>
 <li><a class="reference external" href="#building-the-book">Building the Book</a></li>
-<li><a class="reference external" href="#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
 </ul>
 </li>
 </ul>
@@ -281,7 +290,7 @@ it will be merged into the trunk.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 10, 2008.
+      Last updated on Nov 11, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

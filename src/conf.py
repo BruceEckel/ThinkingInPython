@@ -186,7 +186,7 @@ latex_elements = {
 # -----------------
 
 todo_include_todos = True
-
+todo_all_todos = True
 
 # Extension interface
 # -------------------

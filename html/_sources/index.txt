@@ -5,7 +5,7 @@ Python 3 Patterns & Idioms
 .. toctree::
 
    Contributors
-   ToDoList
+   ToDo
    NoteToReaders
    Introduction
    TeachingSupport

@@ -132,19 +132,26 @@ tasks involved. Type:
 
 to see the options.
 
-.. todo:: Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
+.. todo:: The remainder of this document needs rewriting. Rewrite this section for BitBucket & Mercurial; make some project specific diagrams;
 Working with BitBucket and Mercurial
 
 ===============================================================================
 
-(Adapted from a posting by Yarko Tymciurak)
-.. note::   The remainder of this document needs rewriting.
+.. note:: Adapted from a posting by Yarko Tymciurak
 
 
 This assumes that you have created a local branch on your private machine where
 you do work, and keep it merged with the trunk.
 
 That is, you've done:
+
+   - Forked a branch of http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/ (the main trunk; this fork will provide a place for review and comment)
+   - cloned the trunk to your local machine:
+     - hg clone https://my_login@bitbucket.org/BruceEckel/python-3-patterns-idioms/
+   - cloned your local copy of trunk to create a working directory:
+     - hg clone python-3-patterns-idioms devel
+
+.. ToDo:: This section still work in progress:
 
    - ``hg branch lp:python3patterns``
    - ``hg commit -m 'initial checkout'``
