@@ -33,7 +33,7 @@ Proxy
 
 If we implement *Proxy* by following the above diagram, it looks like this::
 
-    # fronting/ProxyDemo.py
+    # Fronting/ProxyDemo.py
     # Simple demonstration of the Proxy pattern.
 
     class Implementation:
@@ -65,7 +65,7 @@ that **Proxy** needs to call.
 Of course, in Python we have a delegation mechanism built in, so it makes the
 **Proxy** even simpler to implement::
 
-    # fronting/ProxyDemo2.py
+    # Fronting/ProxyDemo2.py
     # Simple demonstration of the Proxy pattern.
 
     class Implementation2:
@@ -96,7 +96,7 @@ State
 The *State* pattern adds more implementations to *Proxy*, along with a way to
 switch from one implementation to another during the lifetime of the surrogate::
 
-    # fronting/StateDemo.py
+    # Fronting/StateDemo.py
     # Simple demonstration of the State pattern.
 
     class State_d:

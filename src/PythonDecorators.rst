@@ -120,16 +120,17 @@ What should the decorator do? Well, it can do anything but usually you expect
 the original function code to be used at some point. This is not required,
 however::
 
-    class myDecorator(object):
+    # PythonDecorators/my_decorator.py
+    class my_decorator(object):
 
         def __init__(self, f):
-            print("inside myDecorator.__init__()")
+            print("inside my_decorator.__init__()")
             f() # Prove that function definition has completed
 
         def __call__(self):
-            print("inside myDecorator.__call__()")
+            print("inside my_decorator.__call__()")
 
-    @myDecorator
+    @my_decorator
     def aFunction():
         print("inside aFunction()")
 
@@ -137,15 +138,14 @@ however::
 
     aFunction()
 
-
 When you run this code, you see::
 
-    inside myDecorator.__init__()
+    inside my_decorator.__init__()
     inside aFunction()
     Finished decorating aFunction()
-    inside myDecorator.__call__()
+    inside my_decorator.__call__()
 
-Notice that the constructor for ``myDecorator`` is executed at the point of
+Notice that the constructor for ``my_decorator`` is executed at the point of
 decoration of the function. Since we can call ``f()`` inside ``__init__()``, it
 shows that the creation of ``f()`` is complete before the decorator is called.
 Note also that the decorator constructor receives the function object being
@@ -155,10 +155,10 @@ are two clear phases when using classes is why I argue that it's easier and more
 powerful this way).
 
 When ``aFunction()`` is called after it has been decorated, we get completely
-different behavior; the ``myDecorator.__call__()`` method is called instead of
+different behavior; the ``my_decorator.__call__()`` method is called instead of
 the original code. That's because the act of decoration *replaces* the original
 function object with the result of the decoration -- in our case, the
-``myDecorator`` object replaces ``aFunction``. Indeed, before decorators were
+``my_decorator`` object replaces ``aFunction``. Indeed, before decorators were
 added you had to do something much less elegant to achieve the same thing::
 
     def foo(): pass
@@ -185,7 +185,8 @@ Slightly More Useful
 Now let's go back and implement the first example. Here, we'll do the more
 typical thing and actually use the code in the decorated functions::
 
-    class entryExit(object):
+    # PythonDecorators/entry_exit_class.py
+    class entry_exit(object):
 
         def __init__(self, f):
             self.f = f
@@ -195,11 +196,11 @@ typical thing and actually use the code in the decorated functions::
             self.f()
             print("Exited", self.f.__name__)
 
-    @entryExit
+    @entry_exit
     def func1():
         print("inside func1()")
 
-    @entryExit
+    @entry_exit
     def func2():
         print("inside func2()")
 
@@ -231,18 +232,19 @@ replaced the original function with an object of a class that has a
 ``__call__()`` method. But a function object is also callable, so we can rewrite
 the previous example using a function instead of a class, like this::
 
-    def entryExit(f):
+    # PythonDecorators/entry_exit_function.py
+    def entry_exit(f):
         def new_f():
             print("Entering", f.__name__)
             f()
             print("Exited", f.__name__)
         return new_f
 
-    @entryExit
+    @entry_exit
     def func1():
         print("inside func1()")
 
-    @entryExit
+    @entry_exit
     def func2():
         print("inside func2()")
 
@@ -250,11 +252,11 @@ the previous example using a function instead of a class, like this::
     func2()
     print(func1.__name__)
 
-``new_f()`` is defined within the body of ``entryExit()``, so it is created and
-returned when ``entryExit()`` is called. Note that ``new_f()`` is a *closure*,
+``new_f()`` is defined within the body of ``entry_exit()``, so it is created and
+returned when ``entry_exit()`` is called. Note that ``new_f()`` is a *closure*,
 because it captures the actual value of ``f``.
 
-Once ``new_f()`` has been defined, it is returned from ``entryExit()`` so that
+Once ``new_f()`` has been defined, it is returned from ``entry_exit()`` so that
 the decorator mechanism can assign the result as the decorated function.
 
 The output of the line ``print(func1.__name__)`` is ``new_f``, because the
@@ -262,7 +264,7 @@ The output of the line ``print(func1.__name__)`` is ``new_f``, because the
 decoration. If this is a problem you can change the name of the decorator
 function before you return it::
 
-    def entryExit(f):
+    def entry_exit(f):
         def new_f():
             print("Entering", f.__name__)
             f()
@@ -280,7 +282,8 @@ If we create a decorator without arguments, the function to be decorated is
 passed to the constructor, and the ``__call__()`` method is called whenever the
 decorated function is invoked::
 
-    class decoratorWithoutArguments(object):
+    # PythonDecorators/decorator_without_arguments.py
+    class decorator_without_arguments(object):
 
         def __init__(self, f):
             """
@@ -299,7 +302,7 @@ decorated function is invoked::
             self.f(*args)
             print("After self.f(*args)")
 
-    @decoratorWithoutArguments
+    @decorator_without_arguments
     def sayHello(a1, a2, a3, a4):
         print('sayHello arguments:', a1, a2, a3, a4)
 
@@ -339,7 +342,8 @@ decorator.
 Let's modify the above example to see what happens when we add arguments to the
 decorator::
 
-    class decoratorWithArguments(object):
+    # PythonDecorators/decorator_with_arguments.py
+    class decorator_with_arguments(object):
 
         def __init__(self, arg1, arg2, arg3):
             """
@@ -365,7 +369,7 @@ decorator::
                 print("After f(*args)")
             return wrapped_f
 
-    @decoratorWithArguments("hello", "world", 42)
+    @decorator_with_arguments("hello", "world", 42)
     def sayHello(a1, a2, a3, a4):
         print('sayHello arguments:', a1, a2, a3, a4)
 
@@ -414,7 +418,8 @@ Decorator Functions with Decorator Arguments
 Finally, let's look at the more complex decorator function implementation, where
 you have to do everything all at once::
 
-    def decoratorFunctionWithArguments(arg1, arg2, arg3):
+    # PythonDecorators/decorator_function_with_arguments.py
+    def decorator_function_with_arguments(arg1, arg2, arg3):
         def wrap(f):
             print("Inside wrap()")
             def wrapped_f(*args):
@@ -425,7 +430,7 @@ you have to do everything all at once::
             return wrapped_f
         return wrap
 
-    @decoratorFunctionWithArguments("hello", "world", 42)
+    @decorator_function_with_arguments("hello", "world", 42)
     def sayHello(a1, a2, a3, a4):
         print('sayHello arguments:', a1, a2, a3, a4)
 

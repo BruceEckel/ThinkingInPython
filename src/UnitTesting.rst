@@ -177,7 +177,7 @@ To create a set of tests, you start by making a **static** inner class inside
 the class you wish to test (your test code may also test other classes; it's up
 to you). This test code is distinguished by inheriting from **UnitTest**::
 
-    # unitTesting/UnitTest.py
+    # UnitTesting/UnitTest.py
     # The basic unit testing class
 
     class UnitTest:
@@ -215,7 +215,7 @@ Writing Tests
 Writing tests becomes very simple. Here's an example that creates the necessary
 **static** inner class and performs trivial tests::
 
-    # unitTesting/TestDemo.py
+    # UnitTesting/TestDemo.py
     # Creating a test
 
     class TestDemo:
@@ -306,7 +306,7 @@ stripping it out as is typically done with tracing code.
 If you need to add a test to a class derived from one that already has a test
 class, it's no problem, as you can see here::
 
-    # unitTesting/TestDemo2.py
+    # UnitTesting/TestDemo2.py
     # Inheriting from a class that
     # already has a test is no problem.
 
@@ -359,7 +359,7 @@ have package access to the elements of the class being tested. That is, you'll
 be able to access **protected** and **friendly** elements of the class being
 tested. Here's an example::
 
-    # unitTesting/Testable.py
+    # UnitTesting/Testable.py
 
     class Testable:
         def f1(): pass
@@ -373,7 +373,7 @@ programmer is **f4( )**. However, if you put your black-box test in the same
 directory, it automatically becomes part of the same package (in this case, the
 default package since none is specified) and then has inappropriate access::
 
-    # unitTesting/TooMuchAccess.py
+    # UnitTesting/TooMuchAccess.py
 
     class TooMuchAccess(UnitTest):
         Testable tst = Testable()
@@ -390,7 +390,7 @@ must be in its own package, so that it can be imported (note that it is also
 possible to import a "package-less" class by giving the class name in the
 **import** statement and ensuring that the class is in your CLASSPATH)::
 
-    # unitTesting/testable/Testable.py
+    # UnitTesting/testable/Testable.py
     package c02.testable
 
     class Testable:
@@ -403,7 +403,7 @@ possible to import a "package-less" class by giving the class name in the
 Here's the black-box test in its own package, showing how only public methods
 may be called::
 
-    # unitTesting/BlackBoxTest.py
+    # UnitTesting/BlackBoxTest.py
 
     class BlackBoxTest(UnitTest):
         Testable tst = Testable()
@@ -428,7 +428,7 @@ Running tests
 The program that runs the tests makes significant use of reflection so that
 writing the tests can be simple for the client programmer::
 
-    # unitTesting/RunUnitTests.py
+    # UnitTesting/RunUnitTests.py
     # Discovering the unit test
     # class and running each test.
 

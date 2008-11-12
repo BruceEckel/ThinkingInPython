@@ -64,33 +64,31 @@ class Commands:
     def extract(language):
         """
         Pull the code listings from the .rst files and write each listing into
-        its own file. Will not overwrite changed code files unless you say
-        "extract -force".
+        its own file. Will not overwrite if code files and .rst files disagree
+        unless you say "extract -force".
         """
         force = len(sys.argv) == 3 and sys.argv[2] == '-force'
         paths = set()
-        for f in restFiles:
-            for listing in language.listings.findall(open(f).read()):
-                listing = shift(listing)
-                path = listing[0][len(language.commentTag):].strip()
-                if path in paths:
-                    print("ERROR: Duplicate file name: %s" % path)
-                    sys.exit(1)
-                else:
-                    paths.add(path)
-                path = os.path.join("..", "code", path)
-                dirname = os.path.dirname(path)
-                if dirname:
-                    if not os.path.exists(dirname):
-                        os.makedirs(dirname)
-                if os.path.exists(path) and not force:
-                    for i in difflib.ndiff(open(path).read().splitlines(), listing):
-                        if i.startswith("+ ") or i.startswith("- "):
-                            print("ERROR: Existing file different from .rst")
-                            print("Use 'extract -force' to force overwrite")
-                            Commands.check(language)
-                            return
-                file(path, 'w').write("\n".join(listing))
+        for listing in [shift(listing) for f in restFiles
+                    for listing in language.listings.findall(open(f).read())]:
+            path = listing[0][len(language.commentTag):].strip()
+            if path in paths:
+                print("ERROR: Duplicate file name: %s" % path)
+                sys.exit(1)
+            else:
+                paths.add(path)
+            path = os.path.join("..", "code", path)
+            dirname = os.path.dirname(path)
+            if dirname and not os.path.exists(dirname):
+                os.makedirs(dirname)
+            if os.path.exists(path) and not force:
+                for i in difflib.ndiff(open(path).read().splitlines(), listing):
+                    if i.startswith("+ ") or i.startswith("- "):
+                        print("ERROR: Existing file different from .rst")
+                        print("Use 'extract -force' to force overwrite")
+                        Commands.check(language)
+                        return
+            file(path, 'w').write("\n".join(listing))
 
     @staticmethod
     def check(language):

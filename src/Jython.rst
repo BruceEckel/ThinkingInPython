@@ -85,7 +85,7 @@ The constructor initializes these fields, and then adds the new **Event** object
 to a static list called **events** (defining it in the class, but outside of any
 methods, is what makes it static)::
 
-    # jython/GreenHouseLanguage.py
+    # Jython/GreenHouseLanguage.py
 
     class Event:
         events = [] # static
@@ -201,7 +201,7 @@ into our **PythonInterpreter** object, and so it now "holds" the greenhouse
 controller language. The **Schedule.ghs** file is the one created by the end
 user to control the greenhouse. Here's an example::
 
-    # jython/Schedule.ghs
+    # Jython/Schedule.ghs
     Bell(7.00)
     ThermostatDay(6.00)
     WaterOn(3.30)
@@ -699,7 +699,7 @@ from within Jython. Basically, a Java class looks like a Python class. This is
 true for standard Java library classes as well as classes that you create
 yourself, as you can see here::
 
-    # jython/JavaClassInPython.py
+    # Jython/JavaClassInPython.py
     # run with: jython.bat JavaClassInPython.py
     # Using Java classes within Jython
     from java.util import Date, HashSet, HashMap
@@ -884,7 +884,7 @@ source code for that book from `www.MindviewInc.com
 <http://www.MindviewInc.com>`_, since a number of examples in this book use
 libraries from that book). Here is its conversion to Jython::
 
-    # jython/PythonSwing.py
+    # Jython/PythonSwing.py
     # The HTMLButton.java example from
     # "Thinking in Java, 2nd edition," Chapter 13,
     # converted into Jython.
@@ -936,7 +936,7 @@ You can easily inherit from standard Java library classes in Jython. Here's the
 **Dialogs.java** example from Chapter 13 of *Thinking in Java*, converted into
 Jython::
 
-    # jython/PythonDialogs.py
+    # Jython/PythonDialogs.py
     # Dialogs.java from "Thinking in Java, 2nd
     # edition," Chapter 13, converted into Jython.
     # Don't run this as part of the automatic make:
@@ -1035,7 +1035,7 @@ the desired makefile target. To accomplish this, the default makefile command is
 replaced using the '**=M**' directive (notice how you can break across lines
 using '**\\**')::
 
-    # jython/PythonToJavaClass.py
+    # Jython/PythonToJavaClass.py
     #=T python\java\test\PythonToJavaClass.class
     #=M jythonc.bat --package python.java.test \
     #=M PythonToJavaClass.py

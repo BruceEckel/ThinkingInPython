@@ -34,7 +34,7 @@ have to have a polymorphic method call in each hierarchy.
 
 Here's an example of multiple dispatching::
 
-    # multipleDispatching/PaperScissorsRock.py
+    # MultipleDispatching/PaperScissorsRock.py
     # Demonstration of multiple dispatching.
     from __future__ import generators
     import random
@@ -122,7 +122,7 @@ easy to maintain if you ever expect to modify the behavior or to add a new
 **Item** class. Instead, it can be more sensible to make the table explicit,
 like this::
 
-    # multipleDispatching/PaperScissorsRock2.py
+    # MultipleDispatching/PaperScissorsRock2.py
     # Multiple dispatching using a table
     from __future__ import generators
     import random

@@ -39,7 +39,7 @@ responsible for the decision.
 
 An example implementation by Jeremy Meyer::
 
-    # projects/ratsAndMazes/Maze.py
+    # Projects/ratsAndMazes/Maze.py
 
     class Maze(Canvas):
         lines = [] # a line is a char array
@@ -131,7 +131,7 @@ An example implementation by Jeremy Meyer::
                             break::
 
 
-    # projects/ratsAndMazes/Rat.py
+    # Projects/ratsAndMazes/Rat.py
 
     class Rat:
         ratCount = 0
@@ -204,7 +204,7 @@ An example implementation by Jeremy Meyer::
 
 The maze initialization file::
 
-    # projects/ratsAndMazes/Amaze.txt
+    # Projects/ratsAndMazes/Amaze.txt
        * **      *  * **      *
      ***    * *******    * ****
          ***          ***

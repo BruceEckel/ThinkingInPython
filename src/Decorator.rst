@@ -55,7 +55,7 @@ The key to using this method is to find the particular combination you want.
 So, once you've found the drink you would like, here is how you would use it, as
 shown in the **CoffeeShop** class in the following code::
 
-    # decorator/nodecorators/CoffeeShop.py
+    # Decorator/nodecorators/CoffeeShop.py
     # Coffee example with no decorators
 
     class Espresso: pass
@@ -149,7 +149,7 @@ and can of course perform processing before or after the invocation.
 So if we added **getTotalCost()** and **getDescription()** methods to the
 **DrinkComponent** interface, an Espresso looks like this::
 
-    # decorator/alldecorators/EspressoDecorator.py
+    # Decorator/alldecorators/EspressoDecorator.py
 
     class Espresso(Decorator):
         cost = 0.75f
@@ -168,7 +168,7 @@ So if we added **getTotalCost()** and **getDescription()** methods to the
 You combine the components to create a drink as follows, as shown in the code
 below::
 
-    # decorator/alldecorators/CoffeeShop.py
+    # Decorator/alldecorators/CoffeeShop.py
     # Coffee example using decorators
 
     class DrinkComponent:
@@ -261,7 +261,7 @@ are presented with in most coffee shops.
 
 Here is how to create a basic selection, as well as a decorated selection::
 
-    # decorator/compromise/CoffeeShop.py
+    # Decorator/compromise/CoffeeShop.py
     # Coffee example with a compromise of basic
     # combinations and decorators
 

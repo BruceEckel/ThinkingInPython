@@ -9,7 +9,7 @@ must take control of object creation out of the hands of the programmer. One
 convenient way to do this is to delegate to a single instance of a private
 nested inner class::
 
-    # singleton/SingletonPattern.py
+    # Singleton/SingletonPattern.py
 
     class OnlyOne:
         class __OnlyOne:
@@ -71,7 +71,7 @@ in of the shared objects.
 A variation on this technique uses the class method **__new__** added in Python
 2.2::
 
-    # singleton/NewSingleton.py
+    # Singleton/NewSingleton.py
 
     class OnlyOne(object):
         class __OnlyOne:
@@ -117,7 +117,7 @@ of Singleton. He accomplishes this with what he calls the *Borg* [#]_, which is
 accomplished by setting all the **__dict__**\s to the same static piece of
 storage::
 
-    # singleton/BorgSingleton.py
+    # Singleton/BorgSingleton.py
     # Alex Martelli's 'Borg'
 
     class Borg:
@@ -160,7 +160,7 @@ your classes, but *Borg* is designed to be easily reused through inheritance.
 A simpler version [#]_ of this takes advantage of the fact that there's only one
 instance of a class variable::
 
-    # singleton/ClassVariableSingleton.py
+    # Singleton/ClassVariableSingleton.py
     class SingleTone(object):
         __instance = None
         def __new__(cls, val):
@@ -175,7 +175,7 @@ using metaclasses. The first approach could be thought of as a *class decorator*
 (decorators will be defined later in the book), because it takes the class of
 interest and adds functionality to it by wrapping it in another class::
 
-    # singleton/SingletonDecorator.py
+    # Singleton/SingletonDecorator.py
     class SingletonDecorator:
         def __init__(self,klass):
             self.klass = klass
@@ -206,7 +206,7 @@ The second approach uses metaclasses, a topic I do not yet understand but which
 looks very interesting and powerful indeed (note that Python 2.2 has
 improved/simplified the metaclass syntax, and so this example may change)::
 
-    # singleton/SingletonMetaClass.py
+    # Singleton/SingletonMetaClass.py
     class SingletonMetaClass(type):
         def __init__(cls,name,bases,dict):
             super(SingletonMetaClass,cls)\

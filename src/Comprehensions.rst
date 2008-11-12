@@ -32,13 +32,15 @@ A More Complex Example
 
     # CodeManager.py
     """
+    TODO: Break check into two pieces?
     TODO: update() is still only in test mode; doesn't actually work yet.
 
-    Extracts, checks and updates code examples in ReST files.
+    Extracts, displays, checks and updates code examples in restructured text (.rst)
+    files.
 
     You can just put in the codeMarker and the (indented) first line (containing the
-    file path) into your ReST file, then run the update program to automatically
-    insert the rest of the file.
+    file path) into your restructured text file, then run the update program to
+    automatically insert the rest of the file.
     """
     import os, re, sys, shutil, inspect, difflib
 
@@ -93,25 +95,32 @@ A More Complex Example
         @staticmethod
         def extract(language):
             """
-            Pull the code listings from the .rst files and write each
-            listing into its own file.
+            Pull the code listings from the .rst files and write each listing into
+            its own file. Will not overwrite if code files and .rst files disagree
+            unless you say "extract -force".
             """
+            force = len(sys.argv) == 3 and sys.argv[2] == '-force'
             paths = set()
-            for f in restFiles:
-                for listing in language.listings.findall(open(f).read()):
-                    listing = shift(listing)
-                    path = listing[0][len(language.commentTag):].strip()
-                    if path in paths:
-                        print("ERROR: Duplicate file name: %s" % path)
-                        sys.exit(1)
-                    else:
-                        paths.add(path)
-                    path = os.path.join("..", "code", path)
-                    dirname = os.path.dirname(path)
-                    if dirname:
-                        if not os.path.exists(dirname):
-                            os.makedirs(dirname)
-                    file(path, 'w').write("\n".join(listing))
+            for listing in [shift(listing) for f in restFiles
+                        for listing in language.listings.findall(open(f).read())]:
+                path = listing[0][len(language.commentTag):].strip()
+                if path in paths:
+                    print("ERROR: Duplicate file name: %s" % path)
+                    sys.exit(1)
+                else:
+                    paths.add(path)
+                path = os.path.join("..", "code", path)
+                dirname = os.path.dirname(path)
+                if dirname and not os.path.exists(dirname):
+                    os.makedirs(dirname)
+                if os.path.exists(path) and not force:
+                    for i in difflib.ndiff(open(path).read().splitlines(), listing):
+                        if i.startswith("+ ") or i.startswith("- "):
+                            print("ERROR: Existing file different from .rst")
+                            print("Use 'extract -force' to force overwrite")
+                            Commands.check(language)
+                            return
+                file(path, 'w').write("\n".join(listing))
 
         @staticmethod
         def check(language):
@@ -120,39 +129,55 @@ A More Complex Example
             have changed from what's in the .rst files. Generate files in the
             _deltas subdirectory showing what has changed.
             """
-            missing = []
-            listings = [shift(code) for f in restFiles for code in
+            class Result: # Messenger
+                def __init__(self, **kwargs):
+                    self.__dict__ = kwargs
+            result = Result(missing = [], deltas = [])
+            listings = [Result(code = shift(code), file = f)
+                        for f in restFiles for code in
                         language.listings.findall(open(f).read())]
             paths = [os.path.normpath(os.path.join("..", "code", path)) for path in
-                        [listing[0].strip()[len(language.commentTag):].strip()
+                        [listing.code[0].strip()[len(language.commentTag):].strip()
                          for listing in listings]]
+            if os.path.exists("_deltas"):
+                shutil.rmtree("_deltas")
             for path, listing in zip(paths, listings):
                 if not os.path.exists(path):
-                    missing.append(path)
+                    result.missing.append(path)
                 else:
                     code = open(path).read().splitlines()
-                    for i in difflib.ndiff(listing, code):
+                    for i in difflib.ndiff(listing.code, code):
                         if i.startswith("+ ") or i.startswith("- "):
                             d = difflib.HtmlDiff()
                             if not os.path.exists("_deltas"):
                                 os.makedirs("_deltas")
                             html = os.path.join("_deltas",
                                 os.path.basename(path).split('.')[0] + ".html")
-                            open(html, 'w').write(d.make_file(listing, code))
-                            print("change in %s; see %s" % (path, html))
+                            open(html, 'w').write(
+                                "<html><h1>Left: %s<br>Right: %s</h1>" %
+                                (listing.file, path) +
+                                d.make_file(listing.code, code))
+                            result.deltas.append(Result(file = listing.file,
+                                path = path, html = html, code = code))
                             break
-            if missing:
-                print("Missing", language.__name__, "files:\n", "\n".join(missing))
-            return missing
+            if result.missing:
+                print("Missing %s files:\n%s" %
+                      (language.__name__, "\n".join(result.missing)))
+            for delta in result.deltas:
+                print("%s changed in %s; see %s" %
+                      (delta.file, delta.path, delta.html))
+            return result
 
         @staticmethod
         def update(language): # Test until it is trustworthy
             """
-            Refresh external code files into ReST files.
+            Refresh external code files into .rst files.
             """
-            if Commands.check(language):
+            check_result = Commands.check(language)
+            if check_result.missing:
                 print(language.__name__, "update aborted")
                 return
+            changed = False
             def _update(matchobj):
                 listing = shift(matchobj.group(1))
                 path = listing[0].strip()[len(language.commentTag):].strip()

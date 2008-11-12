@@ -21,7 +21,7 @@ wrapping a method in an object, you can pass it to other methods or objects as a
 parameter, to tell them to perform this particular operation in the process of
 fulfilling your request::
 
-    # functionObjects/CommandPattern.py
+    # FunctionObjects/CommandPattern.py
 
     class Command:
         def execute(self): pass
@@ -88,7 +88,7 @@ program, whereas *Strategy*\'s flexibility is at run time.
 the selection and use of the particular strategy object-just like *State*!
 Here's what it looks like::
 
-    # functionObjects/StrategyPattern.py
+    # FunctionObjects/StrategyPattern.py
 
     # The strategy interface:
     class FindMinima:
@@ -182,7 +182,7 @@ find a solution. *Chain of Responsibility* provides a way to do this by chaining
 the *Strategy* objects together and providing a mechanism for them to
 automatically recurse through each one in the chain::
 
-    # functionObjects/ChainOfResponsibility.py
+    # FunctionObjects/ChainOfResponsibility.py
 
     # Carry the information into the strategy:
     class Messenger: pass

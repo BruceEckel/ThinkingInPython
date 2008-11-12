@@ -70,7 +70,7 @@ can be used in the same places (you may argue that this is actually a *Proxy*
 pattern, but it's more likely *Decorator* because of its intent). Here is the
 code::
 
-    # util/TypedIterator.py
+    # Util/TypedIterator.py
 
     class TypedIterator(Iterator):
         def __init__(self, it, type):

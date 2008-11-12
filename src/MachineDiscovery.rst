@@ -8,7 +8,8 @@ everything else.
 
 Just a starting point::
 
-    def detectCPUs():
+    # MachineDiscovery/detect_CPUs.py
+    def detect_CPUs():
         """
         Detects the number of CPUs on a system. Cribbed from pp.
         """

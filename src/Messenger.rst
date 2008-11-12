@@ -16,7 +16,7 @@ syntax which can be slightly less desireable.
 A Messenger is simply an object with attributes corresponding to the names of
 the data you want to pass around or return::
 
-    # messenger/MessengerIdiom.py
+    # Messenger/MessengerIdiom.py
 
     class Messenger:
         def __init__(self, **kwargs):
