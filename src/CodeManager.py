@@ -88,7 +88,10 @@ class Commands:
         have changed from what's in the .rst files. Generate files in the
         _deltas subdirectory showing what has changed.
         """
-        missing = []
+        class Result: pass
+        result = Result()
+        result.missing = []
+        result.deltas = []
         listings = [shift(code) for f in restFiles for code in
                     language.listings.findall(open(f).read())]
         paths = [os.path.normpath(os.path.join("..", "code", path)) for path in
@@ -96,7 +99,7 @@ class Commands:
                      for listing in listings]]
         for path, listing in zip(paths, listings):
             if not os.path.exists(path):
-                missing.append(path)
+                result.missing.append(path)
             else:
                 code = open(path).read().splitlines()
                 for i in difflib.ndiff(listing, code):
@@ -107,20 +110,27 @@ class Commands:
                         html = os.path.join("_deltas",
                             os.path.basename(path).split('.')[0] + ".html")
                         open(html, 'w').write(d.make_file(listing, code))
-                        print("change in %s; see %s" % (path, html))
+                        r = Result()
+                        r.path = path
+                        r.html = html
+                        result.deltas.append(r)
                         break
-        if missing:
+        if result.missing:
             print("Missing", language.__name__, "files:\n", "\n".join(missing))
-        return missing
+        for delta in result.deltas:
+            print("change in %s; see %s" % (delta.path, delta.html))
+        return result
 
     @staticmethod
     def update(language): # Test until it is trustworthy
         """
         Refresh external code files into ReST files.
         """
-        if Commands.check(language):
+        check_result = Commands.check(language)
+        if check_result.missing:
             print(language.__name__, "update aborted")
             return
+        changed = False
         def _update(matchobj):
             listing = shift(matchobj.group(1))
             path = listing[0].strip()[len(language.commentTag):].strip()

@@ -12,34 +12,35 @@ Python 3 Patterns & Idioms
    Rules
    DeveloperGuide
    Part1
-   quickPython
-   unitTesting
+   QuickPython
+   UnitTesting
    LanguageChanges
    PythonDecorators
    GeneratorsIterators
    Comprehensions
    CoroutinesAndConcurrency
-   jython
+   Jython
    Part2
    MachineDiscovery
    CanonicalScript
+   Messenger
    Part3
-   patternConcept
-   singleton
-   appFrameworks
-   fronting
-   stateMachine
-   decorator
-   iterators
-   factory
-   functionObjects
-   changeInterface
-   tableDriven
-   observer
-   multipleDispatching
-   visitor
-   patternRefactoring
-   projects
+   PatternConcept
+   Singleton
+   AppFrameworks
+   Fronting
+   StateMachine
+   Decorator
+   Iterators
+   Factory
+   FunctionObjects
+   ChangeInterface
+   TableDriven
+   Observer
+   MultipleDispatching
+   Visitor
+   PatternRefactoring
+   Projects
 
 Indices and tables
 ==================
