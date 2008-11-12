@@ -2,11 +2,12 @@
 """
 TODO: update() is still only in test mode; doesn't actually work yet.
 
-Extracts, checks and updates code examples in ReST files.
+Extracts, displays, checks and updates code examples in restructured text (.rst)
+files.
 
 You can just put in the codeMarker and the (indented) first line (containing the
-file path) into your ReST file, then run the update program to automatically
-insert the rest of the file.
+file path) into your restructured text file, then run the update program to
+automatically insert the rest of the file.
 """
 import os, re, sys, shutil, inspect, difflib
 
@@ -88,43 +89,47 @@ class Commands:
         have changed from what's in the .rst files. Generate files in the
         _deltas subdirectory showing what has changed.
         """
-        class Result: pass
-        result = Result()
-        result.missing = []
-        result.deltas = []
-        listings = [shift(code) for f in restFiles for code in
+        class Result: # Messenger
+            def __init__(self, **kwargs):
+                self.__dict__ = kwargs
+        result = Result(missing = [], deltas = [])
+        listings = [Result(code = shift(code), file = f)
+                    for f in restFiles for code in
                     language.listings.findall(open(f).read())]
         paths = [os.path.normpath(os.path.join("..", "code", path)) for path in
-                    [listing[0].strip()[len(language.commentTag):].strip()
+                    [listing.code[0].strip()[len(language.commentTag):].strip()
                      for listing in listings]]
         for path, listing in zip(paths, listings):
             if not os.path.exists(path):
                 result.missing.append(path)
             else:
                 code = open(path).read().splitlines()
-                for i in difflib.ndiff(listing, code):
+                for i in difflib.ndiff(listing.code, code):
                     if i.startswith("+ ") or i.startswith("- "):
                         d = difflib.HtmlDiff()
                         if not os.path.exists("_deltas"):
                             os.makedirs("_deltas")
                         html = os.path.join("_deltas",
                             os.path.basename(path).split('.')[0] + ".html")
-                        open(html, 'w').write(d.make_file(listing, code))
-                        r = Result()
-                        r.path = path
-                        r.html = html
-                        result.deltas.append(r)
+                        open(html, 'w').write(
+                            "<html><h1>Left: %s<br>Right: %s</h1>" %
+                            (listing.file, path) +
+                            d.make_file(listing.code, code))
+                        result.deltas.append(Result(file = listing.file,
+                            path = path, html = html, code = code))
                         break
         if result.missing:
-            print("Missing", language.__name__, "files:\n", "\n".join(missing))
+            print("Missing %s files:\n%s" %
+                  (language.__name__, "\n".join(result.missing)))
         for delta in result.deltas:
-            print("change in %s; see %s" % (delta.path, delta.html))
+            print("%s changed in %s; see %s" %
+                  (delta.file, delta.path, delta.html))
         return result
 
     @staticmethod
     def update(language): # Test until it is trustworthy
         """
-        Refresh external code files into ReST files.
+        Refresh external code files into .rst files.
         """
         check_result = Commands.check(language)
         if check_result.missing:

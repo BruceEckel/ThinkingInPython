@@ -1,7 +1,7 @@
 <UL>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="@: Python decorators">
-    <param name="Local" value="PythonDecorators.html#index-8">
+    <param name="Local" value="PythonDecorators.html#index-10">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="script command-line">
@@ -28,8 +28,12 @@
     <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="data transfer object (messenger)">
+    <param name="Local" value="Messenger.html#index-9">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
     <param name="Name" value="decorator: Python decorators">
-    <param name="Local" value="PythonDecorators.html#index-8">
+    <param name="Local" value="PythonDecorators.html#index-10">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="comprehension">
@@ -37,7 +41,7 @@
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
     <param name="Name" value="generators">
-    <param name="Local" value="GeneratorsIterators.html#index-6">
+    <param name="Local" value="GeneratorsIterators.html#index-7">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="GIL: Global Interpreter Lock">
@@ -45,21 +49,25 @@
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="iterators">
-    <param name="Local" value="GeneratorsIterators.html#index-6">
+    <param name="Local" value="GeneratorsIterators.html#index-7">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="itertools">
-    <param name="Local" value="GeneratorsIterators.html#index-6">
+    <param name="Local" value="GeneratorsIterators.html#index-7">
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Python 3">
-    <param name="Local" value="LanguageChanges.html#index-7">
+    <param name="Local" value="LanguageChanges.html#index-8">
 </OBJECT>
 </UL><UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="comprehension">
     <param name="Local" value="Comprehensions.html#index-1">
 </OBJECT>
 </UL><LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="messenger (data transfer object)">
+    <param name="Local" value="Messenger.html#index-9">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
     <param name="Name" value="multiprocessing">
     <param name="Local" value="CoroutinesAndConcurrency.html#index-3">
 </OBJECT>
@@ -69,7 +77,7 @@
 </OBJECT>
 <UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="Language differences">
-    <param name="Local" value="LanguageChanges.html#index-7">
+    <param name="Local" value="LanguageChanges.html#index-8">
 </OBJECT>
 </UL><UL> <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="command-line canonical form">
