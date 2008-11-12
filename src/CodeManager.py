@@ -1,5 +1,6 @@
 # CodeManager.py
 """
+TODO: Break check into two pieces?
 TODO: update() is still only in test mode; doesn't actually work yet.
 
 Extracts, displays, checks and updates code examples in restructured text (.rst)
@@ -62,9 +63,11 @@ class Commands:
     @staticmethod
     def extract(language):
         """
-        Pull the code listings from the .rst files and write each
-        listing into its own file.
+        Pull the code listings from the .rst files and write each listing into
+        its own file. Will not overwrite changed code files unless you say
+        "extract -force".
         """
+        force = len(sys.argv) == 3 and sys.argv[2] == '-force'
         paths = set()
         for f in restFiles:
             for listing in language.listings.findall(open(f).read()):
@@ -80,6 +83,13 @@ class Commands:
                 if dirname:
                     if not os.path.exists(dirname):
                         os.makedirs(dirname)
+                if os.path.exists(path) and not force:
+                    for i in difflib.ndiff(open(path).read().splitlines(), listing):
+                        if i.startswith("+ ") or i.startswith("- "):
+                            print("ERROR: Existing file different from .rst")
+                            print("Use 'extract -force' to force overwrite")
+                            Commands.check(language)
+                            return
                 file(path, 'w').write("\n".join(listing))
 
     @staticmethod
@@ -99,6 +109,8 @@ class Commands:
         paths = [os.path.normpath(os.path.join("..", "code", path)) for path in
                     [listing.code[0].strip()[len(language.commentTag):].strip()
                      for listing in listings]]
+        if os.path.exists("_deltas"):
+            shutil.rmtree("_deltas")
         for path, listing in zip(paths, listings):
             if not os.path.exists(path):
                 result.missing.append(path)
