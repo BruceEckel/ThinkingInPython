@@ -25,8 +25,7 @@ A two-level list comprehension using ``os.walk()``::
 A More Complex Example
 ==============================================================================
 
-..  note:: This is still under development. After finishing, it will get a full
-           description of all parts.
+..  note:: This will get a full description of all parts.
 
 ::
 
@@ -200,4 +199,3 @@ A More Complex Example
             for language in inspect.getmembers(Languages, inspect.isclass):
                 commands[sys.argv[1]](language[1])
 
-           

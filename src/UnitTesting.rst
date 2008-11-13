@@ -114,16 +114,14 @@ output of each program (as a string) to its listing::
     # SanityCheck.py
     #! /usr/bin/env python
     import string, glob, os
-    # Do not include the following in the automatic
-    # tests:
+    # Do not include the following in the automatic tests:
     exclude = ("SanityCheck.py", "BoxObserver.py",)
 
     def visitor(arg, dirname, names):
         dir = os.getcwd()
         os.chdir(dirname)
         try:
-            pyprogs = [p for p in glob.glob('*.py')
-                       if p not in exclude ]
+            pyprogs = [p for p in glob.glob('*.py') if p not in exclude ]
             if not pyprogs: return
             print('[' + os.getcwd() + ']')
             for program in pyprogs:
@@ -131,13 +129,11 @@ output of each program (as a string) to its listing::
                 os.system("python %s > tmp" % program)
                 file = open(program).read()
                 output = open('tmp').read()
-                # Append output if it's not already there:
-                if file.find("output = '''") == -1 and \
-                  len(output) > 0:
+                # Append program output if it's not already there:
+                if file.find("output = '''") == -1 and len(output) > 0:
                     divider = '#' * 50 + '\n'
                     file = file.replace('#' + ':~', '#<hr>\n')
-                    file += "output = '''\n" + \
-                      open('tmp').read() + "'''\n"
+                    file += "output = '''\n" + open('tmp').read() + "'''\n"
                     open(program,'w').write(file)
         finally:
             os.chdir(dir)
@@ -182,15 +178,14 @@ to you). This test code is distinguished by inheriting from **UnitTest**::
 
     class UnitTest:
         testID = ""
-        static List errors = ArrayList()
-        # Override cleanup() if test object
-        # creation allocates non-memory
+        errors = []
+        # Override cleanup() if test object creation allocates non-memory
         # resources that must be cleaned up:
-        def cleanup(self):
-        # Verify the truth of a condition:
-        def affirm(boolean condition):
+        def cleanup(self): pass
+        # Verify a condition is true:
+        def affirm(condition):
             if(!condition)
-                errors.add("failed: " + testID)
+                UnitTest.errors.append("failed: " + UnitTest.testID)
 
 
 The only testing method [[ So far ]] is **affirm( )** [#]_, which is

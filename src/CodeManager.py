@@ -1,7 +1,5 @@
 # CodeManager.py
 """
-TODO: update() is still only in test mode; doesn't actually work yet.
-
 Extracts, displays, checks and updates code examples in restructured text (.rst)
 files.
 
@@ -34,17 +32,14 @@ def shift(listing):
 
 def difference(listing1, listing2):
     "Is there any difference between these two code listings?"
-    for line in difflib.ndiff(listing1, listing2):
-        if line.startswith("+ ") or line.startswith("- "):
+    if type(listing1) is not list:
+        listing1 = listing1.splitlines()
+    if type(listing2) is not list:
+        listing2 = listing2.splitlines()
+    for line1, line2 in zip(listing1, listing2):
+        if line1 != line2:
             return True
     return False
-
-# TEST - makes duplicates of the rst files in a test directory to test update():
-dirs = set([os.path.join("_test", os.path.dirname(f)) for f in restFiles])
-if [os.makedirs(d) for d in dirs if not os.path.exists(d)]:
-    [shutil.copy(f, os.path.join("_test", f)) for f in restFiles]
-testFiles = [os.path.join(d[0], f) for d in os.walk("_test")
-             for f in d[2] if f.endswith(".rst")]
 
 class Commands:
     """
@@ -88,7 +83,7 @@ class Commands:
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             if os.path.exists(path) and not force:
-                if difference(open(path).read().splitlines(), listing):
+                if difference(open(path).read(), listing):
                     print("ERROR: Existing file different from .rst")
                     print("Use 'extract -force' to force overwrite")
                     Commands.check(language)
@@ -96,7 +91,7 @@ class Commands:
             file(path, 'w').write("\n".join(listing))
 
     @staticmethod
-    def check(language):
+    def check(language, verbose=True):
         """
         Ensure that external code files exist and check which external files
         have changed from what's in the .rst files. Generate files in the
@@ -134,37 +129,44 @@ class Commands:
         if result.missing:
             print("Missing %s files:\n%s" %
                   (language.__name__, "\n".join(result.missing)))
-        for delta in result.deltas:
-            print("%s changed in %s; see %s" %
-                  (delta.file, delta.path, delta.html))
+        if verbose:
+            for delta in result.deltas:
+                print("%s <==> %s; see %s" %
+                    (delta.file, delta.path, delta.html))
         return result
 
+    changed = False # Whether .rst file has changed
+
     @staticmethod
-    def update(language): # Test until it is trustworthy
+    def update(language):
         """
         Refresh external code files into .rst files.
         """
-        check_result = Commands.check(language)
+        force = len(sys.argv) == 3 and sys.argv[2] == '-force'
+        check_result = Commands.check(language, verbose=False)
         if check_result.missing:
             print(language.__name__, "update aborted")
             return
-        changed = False # Whether .rst file has changed
+        if not force and check_result.deltas:
+            print("The following files will be updated when you add -force:")
+            for delta in check_result.deltas:
+                print("%s via %s" % (delta.file, delta.path))
+            print("For details, see corresponding files in _deltas")
+            return
         def _update(matchobj):
             listing = shift(matchobj.group(1))
-            path = listing[0].strip()[len(language.commentTag):].strip()
-            #filename = os.path.basename(path).split('.')[0]
-            path = os.path.join("..", "code", path)
+            path = os.path.join("..", "code",
+                listing[0].strip()[len(language.commentTag):].strip())
             code = open(path).read().splitlines()
             if difference(listing, code):
-                global changed
-                changed = True
+                Commands.changed = True
             return language.codeMarker + \
                 "\n".join([("    " + line).rstrip() for line in code])
-        for f in testFiles:
-            changed = False
+        for f in restFiles:
+            Commands.changed = False
             updated = language.listings.sub(_update, open(f).read())
-            if changed:
-                print(f + " changed")
+            if Commands.changed:
+                print("updating %s" % f)
                 open(f, 'w').write(updated)
 
 if __name__ == "__main__":
