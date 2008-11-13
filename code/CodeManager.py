@@ -1,5 +1,6 @@
 # CodeManager.py
 """
+TODO: Break check into two pieces?
 TODO: update() is still only in test mode; doesn't actually work yet.
 
 Extracts, displays, checks and updates code examples in restructured text (.rst)
@@ -31,13 +32,6 @@ class Languages:
 def shift(listing):
     "Shift the listing left by 4 spaces"
     return [x[4:] if x.startswith("    ") else x for x in listing.splitlines()]
-
-def difference(listing1, listing2):
-    "Is there any difference between these two code listings?"
-    for line in difflib.ndiff(listing1, listing2):
-        if line.startswith("+ ") or line.startswith("- "):
-            return True
-    return False
 
 # TEST - makes duplicates of the rst files in a test directory to test update():
 dirs = set([os.path.join("_test", os.path.dirname(f)) for f in restFiles])
@@ -88,11 +82,12 @@ class Commands:
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             if os.path.exists(path) and not force:
-                if difference(open(path).read().splitlines(), listing):
-                    print("ERROR: Existing file different from .rst")
-                    print("Use 'extract -force' to force overwrite")
-                    Commands.check(language)
-                    return
+                for i in difflib.ndiff(open(path).read().splitlines(), listing):
+                    if i.startswith("+ ") or i.startswith("- "):
+                        print("ERROR: Existing file different from .rst")
+                        print("Use 'extract -force' to force overwrite")
+                        Commands.check(language)
+                        return
             file(path, 'w').write("\n".join(listing))
 
     @staticmethod
@@ -119,18 +114,20 @@ class Commands:
                 result.missing.append(path)
             else:
                 code = open(path).read().splitlines()
-                if difference(listing.code, code):
-                    d = difflib.HtmlDiff()
-                    if not os.path.exists("_deltas"):
-                        os.makedirs("_deltas")
-                    html = os.path.join("_deltas",
-                        os.path.basename(path).split('.')[0] + ".html")
-                    open(html, 'w').write(
-                        "<html><h1>Left: %s<br>Right: %s</h1>" %
-                        (listing.file, path) +
-                        d.make_file(listing.code, code))
-                    result.deltas.append(Result(file = listing.file,
-                        path = path, html = html, code = code))
+                for i in difflib.ndiff(listing.code, code):
+                    if i.startswith("+ ") or i.startswith("- "):
+                        d = difflib.HtmlDiff()
+                        if not os.path.exists("_deltas"):
+                            os.makedirs("_deltas")
+                        html = os.path.join("_deltas",
+                            os.path.basename(path).split('.')[0] + ".html")
+                        open(html, 'w').write(
+                            "<html><h1>Left: %s<br>Right: %s</h1>" %
+                            (listing.file, path) +
+                            d.make_file(listing.code, code))
+                        result.deltas.append(Result(file = listing.file,
+                            path = path, html = html, code = code))
+                        break
         if result.missing:
             print("Missing %s files:\n%s" %
                   (language.__name__, "\n".join(result.missing)))
@@ -148,24 +145,18 @@ class Commands:
         if check_result.missing:
             print(language.__name__, "update aborted")
             return
-        changed = False # Whether .rst file has changed
+        changed = False
         def _update(matchobj):
             listing = shift(matchobj.group(1))
             path = listing[0].strip()[len(language.commentTag):].strip()
-            #filename = os.path.basename(path).split('.')[0]
+            filename = os.path.basename(path).split('.')[0]
             path = os.path.join("..", "code", path)
             code = open(path).read().splitlines()
-            if difference(listing, code):
-                global changed
-                changed = True
             return language.codeMarker + \
-                "\n".join([("    " + line).rstrip() for line in code])
+                "\n".join([("    " + line).rstrip() for line in listing])
         for f in testFiles:
-            changed = False
             updated = language.listings.sub(_update, open(f).read())
-            if changed:
-                print(f + " changed")
-                open(f, 'w').write(updated)
+            open(f, 'w').write(updated)
 
 if __name__ == "__main__":
     commands = dict(inspect.getmembers(Commands, inspect.isfunction))
@@ -176,3 +167,5 @@ if __name__ == "__main__":
     else:
         for language in inspect.getmembers(Languages, inspect.isclass):
             commands[sys.argv[1]](language[1])
+
+       

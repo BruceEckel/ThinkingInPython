@@ -165,7 +165,7 @@ Python files to be loaded:
 
 .. code-block:: java
 
-    // jython/GreenHouseController.java
+    // Jython/GreenHouseController.java
     package jython;
     import org.python.util.PythonInterpreter;
     import org.python.core.*;
@@ -239,7 +239,7 @@ comments that should give a fairly complete explanation:
 
 .. code-block:: java
 
-    // jython/PythonInterpreterSetting.java
+    // Jython/PythonInterpreterSetting.java
     // Passing data from Java to python when using
     // the PythonInterpreter object.
     package jython;
@@ -392,7 +392,7 @@ dictionary into a Java **Map**:
 
 .. code-block:: java
 
-    // jython/PyUtil.java
+    // Jython/PyUtil.java
     // PythonInterpreter utilities
     package net.mindview.python;
     import org.python.util.PythonInterpreter;
@@ -454,7 +454,7 @@ Here is the (black-box) unit testing code:
 
 .. code-block:: java
 
-    // jython/Test.java
+    // Jython/Test.java
     package net.mindview.python;
     import org.python.util.PythonInterpreter;
     import java.util.*;
@@ -527,7 +527,7 @@ code:
 
 .. code-block:: java
 
-    // jython/PythonInterpreterGetting.java
+    // Jython/PythonInterpreterGetting.java
     // Getting data from the PythonInterpreter object.
     package jython;
     import org.python.util.PythonInterpreter;
@@ -656,7 +656,7 @@ in a program, and each one has its own name space:
 
 .. code-block:: java
 
-    // jython/MultipleJythons.java
+    // Jython/MultipleJythons.java
     // You can run multiple interpreters, each
     // with its own name space.
     package jython;
@@ -807,7 +807,7 @@ order to be able to use the Java class. Here is the Java code for **JavaClass**:
 
 .. code-block:: java
 
-    // jython/javaclass/JavaClass.java
+    // Jython/javaclass/JavaClass.java
     package jython.javaclass;
     import junit.framework.*;
     import java.util.*;
@@ -1150,7 +1150,7 @@ tool. Here, you can't compile **TestPythonToJavaClass.java** until
 
 .. code-block:: java
 
-    // jython/TestPythonToJavaClass.java
+    // Jython/TestPythonToJavaClass.java
     //+D python\java\test\PythonToJavaClass.class
     package jython;
     import java.lang.reflect.*;
