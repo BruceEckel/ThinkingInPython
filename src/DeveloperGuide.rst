@@ -135,6 +135,14 @@ to see the options.
 .. todo::   The remainder of this document needs rewriting. Rewrite this section
             for BitBucket & Mercurial; make some project specific diagrams;
 
+Building the PDF
+===============================================================================
+
+In order to build the Acrobat PDF verion of the book, you must install some
+additional software:
+
+.. ToDo:: Add additional steps here.
+
 Working with BitBucket and Mercurial
 ===============================================================================
 
@@ -146,7 +154,8 @@ you do work, and keep it merged with the trunk.
 
 That is, you've done:
 
-   - Forked a branch of http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/ (the main trunk; this fork will provide a place for review and comment)
+   - Forked a branch of http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/
+     (the main trunk; this fork will provide a place for review and comment)
    - cloned the trunk to your local machine:
      - hg clone https://my_login@bitbucket.org/BruceEckel/python-3-patterns-idioms/
    - cloned your local copy of trunk to create a working directory:
@@ -164,7 +173,7 @@ That is, you've done:
 When you have a new function idea, or think you've found a bug, ask Bruce
 on the group.
 
-   -  If you have a new feature, register a blueprint on BitBucket and
+   -  If you have a new feature, create a wiki page on BitBucket and
       describe what you're going to do.
    -  If you have found a bug, make a bug report on BitBucket (later assign
       it to yourself, and link your branch to it);
