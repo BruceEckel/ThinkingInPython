@@ -46,13 +46,13 @@
             
   
   <div class="section" id="comprehensions">
-<span id="index-1"></span><h1>Comprehensions<a class="headerlink" href="#comprehensions" title="Permalink to this headline">¶</a></h1>
+<span id="index-22"></span><h1>Comprehensions<a class="headerlink" href="#comprehensions" title="Permalink to this headline">¶</a></h1>
 <p>History: where did they come from?</p>
 <p>They require a mind shift.</p>
 <p>What makes them so compelling (once you &#8216;get it&#8217;)?</p>
 <p>A two-level list comprehension using <tt class="docutils literal"><span class="pre">os.walk()</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Comprehensions/os_walk_comprehension.py</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">import</span> <span class="nn">os</span>
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
@@ -76,7 +76,7 @@ description of all parts.</p>
 <span class="sd">file path) into your ReST file, then run the update program to automatically</span>
 <span class="sd">insert the rest of the file.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
+<span class="k">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
 
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="s">&quot;_test&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
