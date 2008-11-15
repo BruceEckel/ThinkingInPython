@@ -22,7 +22,7 @@ are held in a single table. Another way to put it is that here, each **State**
 object has its own little **State** table, and in the subsequent design there is
 a single master state transition table for the whole system::
 
-    # stateMachine/State.py
+    # StateMachine/State.py
     # A State has an operation, and can be moved
     # into the next State given an Input:
 
@@ -50,7 +50,7 @@ each state object - thus you can see it's an expansion of the idea of the
 **State** pattern, since **run( )** does something different depending on the
 state that the system is in::
 
-    # stateMachine/StateMachine.py
+    # StateMachine/StateMachine.py
     # Takes a list of Inputs to move from State to
     # State using a template method.
 
@@ -77,7 +77,7 @@ mouse [#]_. The mouse classes and information are stored in the **mouse**
 package, including a class representing all the possible moves that a mouse can
 make, which will be the inputs to the state machine::
 
-    # stateMachine/mouse/MouseAction.py
+    # StateMachine/mouse/MouseAction.py
 
     class MouseAction:
         def __init__(self, action):
@@ -108,7 +108,7 @@ a **MouseAction** object, all of which are static fields in **MouseAction**.
 For creating test code, a sequence of mouse inputs is provided from a text
 file::
 
-    # stateMachine/mouse/MouseMoves.txt
+    # StateMachine/mouse/MouseMoves.txt
     mouse appears
     mouse runs away
     mouse appears
@@ -130,7 +130,7 @@ With these tools in place, it's now possible to create the first version of the
 mousetrap program. Each **State** subclass defines its **run( )** behavior, and
 also establishes its next state with an **if-else** clause::
 
-    # stateMachine/mousetrap1/MouseTrapTest.py
+    # StateMachine/mousetrap1/MouseTrapTest.py
     # State Machine pattern using 'if' statements
     # to determine the next state.
     import string, sys
@@ -220,7 +220,7 @@ The **StateT** class is an implementation of **State** (so that the same
 overridden derived class **next( )** methods after they test for a **null Map**
 (and initialize it if it's **null**)::
 
-    # stateMachine/mousetrap2/MouseTrap2Test.py
+    # StateMachine/mousetrap2/MouseTrap2Test.py
     # A better mousetrap using tables
     import string, sys
     sys.path += ['../stateMachine', '../mouse']
@@ -369,7 +369,7 @@ The **State** class is distinctly different from before, since it is really just
 a placeholder with a name. Thus it is not inherited from previous **State**
 classes::
 
-    # stateMachine/stateMachine2/State.py
+    # StateMachine/stateMachine2/State.py
 
     class State:
         def __init__(self, name): self.name = name
@@ -383,7 +383,7 @@ In the state transition diagram, an input is tested to see if it meets the
 condition necessary to transfer to the state under question. As before, the
 **Input** is just a tagging interface::
 
-    # stateMachine/stateMachine2/Input.py
+    # StateMachine/stateMachine2/Input.py
     # Inputs to a state machine
 
     class Input: pass
@@ -392,7 +392,7 @@ condition necessary to transfer to the state under question. As before, the
 The **Condition** evaluates the **Input** to decide whether this row in the
 table is the correct transition::
 
-    # stateMachine/stateMachine2/Condition.py
+    # StateMachine/stateMachine2/Condition.py
     # Condition function object for state machine
 
     class Condition:
@@ -407,7 +407,7 @@ If the **Condition** returns **true**, then the transition to a new state is
 made, and as that transition is made some kind of action occurs (in the previous
 state machine design, this was the **run( )** method)::
 
-    # stateMachine/stateMachine2/Transition.py
+    # StateMachine/stateMachine2/Transition.py
     # Transition function object for state machine
 
     class Transition:
@@ -439,7 +439,7 @@ The Basic Machine
 
 Here's the basic machine, (code only roughly converted)::
 
-    # stateMachine/stateMachine2/StateMachine.py
+    # StateMachine/stateMachine2/StateMachine.py
     # A table-driven state machine
 
     class StateMachine:
@@ -475,7 +475,7 @@ Simple Vending Machine
 
 Here's the simple vending machine, (code only roughly converted)::
 
-    # stateMachine/vendingmachine/VendingMachine.py
+    # StateMachine/vendingmachine/VendingMachine.py
     # Demonstrates use of StateMachine.py
     import sys
     sys.path += ['../stateMachine2']
@@ -667,7 +667,7 @@ Testing the Machine
 
 Here's a test of the machine, (code only roughly converted)::
 
-    # stateMachine/vendingmachine/VendingMachineTest.py
+    # StateMachine/vendingmachine/VendingMachineTest.py
     # Demonstrates use of StateMachine.py
 
     vm = VendingMachine()

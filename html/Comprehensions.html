@@ -52,7 +52,7 @@
 <p>What makes them so compelling (once you &#8216;get it&#8217;)?</p>
 <p>A two-level list comprehension using <tt class="docutils literal"><span class="pre">os.walk()</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Comprehensions/os_walk_comprehension.py</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="k">import</span> <span class="nn">os</span>
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
@@ -63,20 +63,21 @@
 <h2>A More Complex Example<a class="headerlink" href="#a-more-complex-example" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is still under development. After finishing, it will get a full
-description of all parts.</p>
+<p class="last">This will get a full description of all parts.</p>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># CodeManager.py</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO: Break check into two pieces?</span>
 <span class="sd">TODO: update() is still only in test mode; doesn&#39;t actually work yet.</span>
 
-<span class="sd">Extracts, checks and updates code examples in ReST files.</span>
+<span class="sd">Extracts, displays, checks and updates code examples in restructured text (.rst)</span>
+<span class="sd">files.</span>
 
 <span class="sd">You can just put in the codeMarker and the (indented) first line (containing the</span>
-<span class="sd">file path) into your ReST file, then run the update program to automatically</span>
-<span class="sd">insert the rest of the file.</span>
+<span class="sd">file path) into your restructured text file, then run the update program to</span>
+<span class="sd">automatically insert the rest of the file.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
+<span class="k">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
 
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="s">&quot;_test&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
@@ -129,25 +130,32 @@ description of all parts.</p>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Pull the code listings from the .rst files and write each</span>
-<span class="sd">        listing into its own file.</span>
+<span class="sd">        Pull the code listings from the .rst files and write each listing into</span>
+<span class="sd">        its own file. Will not overwrite if code files and .rst files disagree</span>
+<span class="sd">        unless you say &quot;extract -force&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mf">3</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;-force&#39;</span>
         <span class="n">paths</span> <span class="o">=</span> <span class="n">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">listing</span> <span class="ow">in</span> <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()):</span>
-                <span class="n">listing</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">listing</span><span class="p">)</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: Duplicate file name: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
-                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-                <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">dirname</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
-                <span class="nb">file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">listing</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">listing</span> <span class="ow">in</span> <span class="p">[</span><span class="n">shift</span><span class="p">(</span><span class="n">listing</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span>
+                    <span class="k">for</span> <span class="n">listing</span> <span class="ow">in</span> <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())]:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: Duplicate file name: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dirname</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(),</span> <span class="n">listing</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;+ &quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;- &quot;</span><span class="p">):</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: Existing file different from .rst&quot;</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Use &#39;extract -force&#39; to force overwrite&quot;</span><span class="p">)</span>
+                        <span class="n">Commands</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+                        <span class="k">return</span>
+            <span class="nb">file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">listing</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
@@ -156,39 +164,55 @@ description of all parts.</p>
 <span class="sd">        have changed from what&#39;s in the .rst files. Generate files in the</span>
 <span class="sd">        _deltas subdirectory showing what has changed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">listings</span> <span class="o">=</span> <span class="p">[</span><span class="n">shift</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span>
+        <span class="k">class</span> <span class="nc">Result</span><span class="p">:</span> <span class="c"># Messenger</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Result</span><span class="p">(</span><span class="n">missing</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">deltas</span> <span class="o">=</span> <span class="p">[])</span>
+        <span class="n">listings</span> <span class="o">=</span> <span class="p">[</span><span class="n">Result</span><span class="p">(</span><span class="n">code</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">code</span><span class="p">),</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">f</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">restFiles</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span>
                     <span class="n">language</span><span class="o">.</span><span class="n">listings</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())]</span>
         <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span>
-                    <span class="p">[</span><span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="p">[</span><span class="n">listing</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                      <span class="k">for</span> <span class="n">listing</span> <span class="ow">in</span> <span class="n">listings</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">listing</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">listings</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-                <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">code</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span><span class="n">listing</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span><span class="n">listing</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;+ &quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;- &quot;</span><span class="p">):</span>
                         <span class="n">d</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">HtmlDiff</span><span class="p">()</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">):</span>
                             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">)</span>
                         <span class="n">html</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&quot;_deltas&quot;</span><span class="p">,</span>
                             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">)</span>
-                        <span class="nb">open</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">make_file</span><span class="p">(</span><span class="n">listing</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;change in </span><span class="si">%s</span><span class="s">; see </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">html</span><span class="p">))</span>
+                        <span class="nb">open</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                            <span class="s">&quot;&lt;html&gt;&lt;h1&gt;Left: </span><span class="si">%s</span><span class="s">&lt;br&gt;Right: </span><span class="si">%s</span><span class="s">&lt;/h1&gt;&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">listing</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="n">d</span><span class="o">.</span><span class="n">make_file</span><span class="p">(</span><span class="n">listing</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+                        <span class="n">result</span><span class="o">.</span><span class="n">deltas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Result</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">listing</span><span class="o">.</span><span class="n">file</span><span class="p">,</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">,</span> <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">))</span>
                         <span class="k">break</span>
-        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing&quot;</span><span class="p">,</span> <span class="n">language</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&quot;files:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">missing</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">missing</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Missing </span><span class="si">%s</span><span class="s"> files:</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">missing</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">delta</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">deltas</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> changed in </span><span class="si">%s</span><span class="s">; see </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">delta</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">delta</span><span class="o">.</span><span class="n">html</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">language</span><span class="p">):</span> <span class="c"># Test until it is trustworthy</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Refresh external code files into ReST files.</span>
+<span class="sd">        Refresh external code files into .rst files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">Commands</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+        <span class="n">check_result</span> <span class="o">=</span> <span class="n">Commands</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_result</span><span class="o">.</span><span class="n">missing</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&quot;update aborted&quot;</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="n">matchobj</span><span class="p">):</span>
             <span class="n">listing</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">matchobj</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mf">1</span><span class="p">))</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">listing</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="nb">len</span><span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">commentTag</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -275,7 +299,7 @@ description of all parts.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 12, 2008.
+      Last updated on Nov 13, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>

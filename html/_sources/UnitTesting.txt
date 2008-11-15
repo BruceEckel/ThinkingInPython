@@ -114,16 +114,14 @@ output of each program (as a string) to its listing::
     # SanityCheck.py
     #! /usr/bin/env python
     import string, glob, os
-    # Do not include the following in the automatic
-    # tests:
+    # Do not include the following in the automatic tests:
     exclude = ("SanityCheck.py", "BoxObserver.py",)
 
     def visitor(arg, dirname, names):
         dir = os.getcwd()
         os.chdir(dirname)
         try:
-            pyprogs = [p for p in glob.glob('*.py')
-                       if p not in exclude ]
+            pyprogs = [p for p in glob.glob('*.py') if p not in exclude ]
             if not pyprogs: return
             print('[' + os.getcwd() + ']')
             for program in pyprogs:
@@ -131,13 +129,11 @@ output of each program (as a string) to its listing::
                 os.system("python %s > tmp" % program)
                 file = open(program).read()
                 output = open('tmp').read()
-                # Append output if it's not already there:
-                if file.find("output = '''") == -1 and \
-                  len(output) > 0:
+                # Append program output if it's not already there:
+                if file.find("output = '''") == -1 and len(output) > 0:
                     divider = '#' * 50 + '\n'
                     file = file.replace('#' + ':~', '#<hr>\n')
-                    file += "output = '''\n" + \
-                      open('tmp').read() + "'''\n"
+                    file += "output = '''\n" + open('tmp').read() + "'''\n"
                     open(program,'w').write(file)
         finally:
             os.chdir(dir)
@@ -177,20 +173,19 @@ To create a set of tests, you start by making a **static** inner class inside
 the class you wish to test (your test code may also test other classes; it's up
 to you). This test code is distinguished by inheriting from **UnitTest**::
 
-    # unitTesting/UnitTest.py
+    # UnitTesting/UnitTest.py
     # The basic unit testing class
 
     class UnitTest:
         testID = ""
-        static List errors = ArrayList()
-        # Override cleanup() if test object
-        # creation allocates non-memory
+        errors = []
+        # Override cleanup() if test object creation allocates non-memory
         # resources that must be cleaned up:
-        def cleanup(self):
-        # Verify the truth of a condition:
-        def affirm(boolean condition):
+        def cleanup(self): pass
+        # Verify a condition is true:
+        def affirm(condition):
             if(!condition)
-                errors.add("failed: " + testID)
+                UnitTest.errors.append("failed: " + UnitTest.testID)
 
 
 The only testing method [[ So far ]] is **affirm( )** [#]_, which is
@@ -215,7 +210,7 @@ Writing Tests
 Writing tests becomes very simple. Here's an example that creates the necessary
 **static** inner class and performs trivial tests::
 
-    # unitTesting/TestDemo.py
+    # UnitTesting/TestDemo.py
     # Creating a test
 
     class TestDemo:
@@ -306,7 +301,7 @@ stripping it out as is typically done with tracing code.
 If you need to add a test to a class derived from one that already has a test
 class, it's no problem, as you can see here::
 
-    # unitTesting/TestDemo2.py
+    # UnitTesting/TestDemo2.py
     # Inheriting from a class that
     # already has a test is no problem.
 
@@ -359,7 +354,7 @@ have package access to the elements of the class being tested. That is, you'll
 be able to access **protected** and **friendly** elements of the class being
 tested. Here's an example::
 
-    # unitTesting/Testable.py
+    # UnitTesting/Testable.py
 
     class Testable:
         def f1(): pass
@@ -373,7 +368,7 @@ programmer is **f4( )**. However, if you put your black-box test in the same
 directory, it automatically becomes part of the same package (in this case, the
 default package since none is specified) and then has inappropriate access::
 
-    # unitTesting/TooMuchAccess.py
+    # UnitTesting/TooMuchAccess.py
 
     class TooMuchAccess(UnitTest):
         Testable tst = Testable()
@@ -390,7 +385,7 @@ must be in its own package, so that it can be imported (note that it is also
 possible to import a "package-less" class by giving the class name in the
 **import** statement and ensuring that the class is in your CLASSPATH)::
 
-    # unitTesting/testable/Testable.py
+    # UnitTesting/testable/Testable.py
     package c02.testable
 
     class Testable:
@@ -403,7 +398,7 @@ possible to import a "package-less" class by giving the class name in the
 Here's the black-box test in its own package, showing how only public methods
 may be called::
 
-    # unitTesting/BlackBoxTest.py
+    # UnitTesting/BlackBoxTest.py
 
     class BlackBoxTest(UnitTest):
         Testable tst = Testable()
@@ -428,7 +423,7 @@ Running tests
 The program that runs the tests makes significant use of reflection so that
 writing the tests can be simple for the client programmer::
 
-    # unitTesting/RunUnitTests.py
+    # UnitTesting/RunUnitTests.py
     # Discovering the unit test
     # class and running each test.
 

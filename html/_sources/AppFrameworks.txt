@@ -26,7 +26,7 @@ override) in order to do its job, but it is usually called only as part of an
 initialization process (and thus the client programmer isn't necessarily able to
 call it directly)::
 
-    # appFrameworks/TemplateMethod.py
+    # AppFrameworks/TemplateMethod.py
     # Simple demonstration of Template Method.
 
     class ApplicationFramework:

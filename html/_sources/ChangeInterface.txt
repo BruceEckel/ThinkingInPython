@@ -16,7 +16,7 @@ When you've got *this*, and you need *that*, *Adapter* solves the problem. The
 only requirement is to produce a *that*, and there are a number of ways you can
 accomplish this adaptation::
 
-    # changeInterface/Adapter.py
+    # ChangeInterface/Adapter.py
     # Variations on the Adapter pattern.
 
     class WhatIHave:
@@ -96,7 +96,7 @@ Façade is often implemented as singleton abstract factory. Of course, you can
 easily get this effect by creating a class containing **static** factory
 methods::
 
-    # changeInterface/Facade.py
+    # ChangeInterface/Facade.py
     class A:
         def __init__(self, x): pass
     class B:
