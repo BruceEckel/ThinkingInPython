@@ -23,7 +23,7 @@ operations performed upon the primary type. The objects of the primary type
 simply "accept" the visitor, then call the visitor's dynamically-bound member
 function::
 
-    # visitor/FlowerVisitors.py
+    # Visitor/FlowerVisitors.py
     # Demonstration of "visitor" pattern.
     from __future__ import generators
     import random

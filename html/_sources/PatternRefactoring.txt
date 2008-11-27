@@ -36,7 +36,7 @@ trash recycling plant all mixed together. The program must model the sorting of
 that trash. This is where RTTI comes in: you have a bunch of anonymous pieces of
 trash, and the program figures out exactly what type they are::
 
-    # patternRefactoring/recyclea/RecycleA.py
+    # PatternRefactoring/recyclea/RecycleA.py
     # Recycling with RTTI.
 
     class Trash:
@@ -211,7 +211,7 @@ structure and is more flexible.
 Consider first the place where **Trash** objects are created, which is a
 **switch** statement inside **main( )**::
 
-    # patternRefactoring/clip1.py
+    # PatternRefactoring/clip1.py
         for(int i = 0 i < 30 i++)
             switch((int)(Math.random() * 3)):
                 case 0 :
@@ -257,7 +257,7 @@ referring to *Messenger* as a design pattern, but it's simple enough that you
 may not choose to elevate it to that status). Here's a simple implementation of
 **Messenger**::
 
-    # patternRefactoring/clip2.py
+    # PatternRefactoring/clip2.py
     class Messenger:
         # Must change this to add another type:
         MAX_NUM = 4
@@ -276,7 +276,7 @@ fashion of subclassing.
 
 The **factory( )** method for this simple example looks like this::
 
-    # patternRefactoring/clip3.py
+    # PatternRefactoring/clip3.py
         def factory(messenger):
             switch(messenger.type):
                 default: # To quiet the compiler
@@ -299,7 +299,7 @@ come to this place when you add new types.
 
 The creation of new objects is now much simpler in **main( )**::
 
-    # patternRefactoring/clip4.py
+    # PatternRefactoring/clip4.py
         for(int i = 0 i < 30 i++)
             bin.add(
               Trash.factory(
@@ -369,7 +369,7 @@ what types it is working with, so it doesn't need any modifications when you add
 new types. This allows it to be easily reused throughout the rest of the
 chapter::
 
-    # patternRefactoring/trash/Trash.py
+    # PatternRefactoring/trash/Trash.py
     # Base class for Trash recycling examples.
 
     class Trash:
@@ -503,7 +503,7 @@ argument. Java reflection handles everything else.
 Here are the different types of **Trash**, each in their own file but part of
 the **Trash** package (again, to facilitate reuse within the chapter)::
 
-    # patternRefactoring/trash/Aluminum.py
+    # PatternRefactoring/trash/Aluminum.py
     # The Aluminum class with prototyping.
 
     class Aluminum(Trash):
@@ -514,7 +514,7 @@ the **Trash** package (again, to facilitate reuse within the chapter)::
             self.val = newVal::
 
 
-    # patternRefactoring/trash/Paper.py
+    # PatternRefactoring/trash/Paper.py
     # The Paper class with prototyping.
 
     class Paper(Trash):
@@ -525,7 +525,7 @@ the **Trash** package (again, to facilitate reuse within the chapter)::
             self.val = newVal::
 
 
-    # patternRefactoring/trash/Glass.py
+    # PatternRefactoring/trash/Glass.py
     # The Glass class with prototyping.
 
     class Glass(Trash):
@@ -538,7 +538,7 @@ the **Trash** package (again, to facilitate reuse within the chapter)::
 
 And here's a new type of **Trash**::
 
-    # patternRefactoring/trash/Cardboard.py
+    # PatternRefactoring/trash/Cardboard.py
     # The Cardboard class with prototyping.
 
     class Cardboard(Trash):
@@ -559,7 +559,7 @@ The information about **Trash** objects will be read from an outside file. The
 file has all of the necessary information about each piece of trash on a single
 line in the form **Trash:weight**, such as::
 
-    # patternRefactoring/trash/Trash.dat
+    # PatternRefactoring/trash/Trash.dat
     patternRefactoring.trash.Glass:54
     patternRefactoring.trash.Paper:22
     patternRefactoring.trash.Paper:11
@@ -609,7 +609,7 @@ turned into a **double** with the **static Double.valueOf( )** method. The
 The **Trash** parser is placed in a separate file since it will be reused
 throughout this chapter::
 
-    # patternRefactoring/trash/ParseTrash.py
+    # PatternRefactoring/trash/ParseTrash.py
     # Parse file contents into Trash objects,
     # placing each into a Fillable holder.
 
@@ -635,7 +635,7 @@ However, other types of containers can be used as well. To allow for this, the
 first version of **fillBin( )** takes a reference to a **Fillable**, which is
 simply an **interface** that supports a method called **addTrash( )**::
 
-    # patternRefactoring/trash/Fillable.py
+    # PatternRefactoring/trash/Fillable.py
     # Any object that can be filled with Trash.
 
     class Fillable:
@@ -648,7 +648,7 @@ Anything that supports this interface can be used with **fillBin**. Of course,
 overloaded **fillBin( )** method that takes a **Collection**. Any **Collection**
 can then be used as a **Fillable** object using an adapter class::
 
-    # patternRefactoring/trash/FillableCollection.py
+    # PatternRefactoring/trash/FillableCollection.py
     # Adapter that makes a Collection Fillable.
 
     class FillableCollection(Fillable):
@@ -677,7 +677,7 @@ Recycling with Prototyping
 Now you can see the revised version of **RecycleA.py** using the prototyping
 technique::
 
-    # patternRefactoring/recycleap/RecycleAP.py
+    # PatternRefactoring/recycleap/RecycleAP.py
     # Recycling with RTTI and Prototypes.
 
     class RecycleAP(UnitTest):
@@ -797,7 +797,7 @@ object you've handed it matches the type it's supposed to grab.
 
 Here is the new version of the program::
 
-    # patternRefactoring/recycleb/RecycleB.py
+    # PatternRefactoring/recycleb/RecycleB.py
     # Containers that grab objects of interest.
 
     # A container that admits only the right type
@@ -932,7 +932,7 @@ approach that will be taken here.
 Most of the classes in this design must be **public**, so they are placed in
 their own files. Here's the interface::
 
-    # patternRefactoring/doubledispatch/TypedBinMember.py
+    # PatternRefactoring/doubledispatch/TypedBinMember.py
     # An class for adding the double
     # dispatching method to the trash hierarchy
     # without modifying the original hierarchy.
@@ -946,7 +946,7 @@ In each particular subtype of **Aluminum**, **Paper**, **Glass,** and
 **Cardboard**, the **addToBin( )** method in the **interface TypedBinMember** is
 implemented, but it *looks* like the code is exactly the same in each case::
 
-    # patternRefactoring/doubledispatch/DDAluminum.py
+    # PatternRefactoring/doubledispatch/DDAluminum.py
     # Aluminum for double dispatching.
 
     class DDAluminum(Aluminum, TypedBinMember):
@@ -958,7 +958,7 @@ implemented, but it *looks* like the code is exactly the same in each case::
             return False::
 
 
-    # patternRefactoring/doubledispatch/DDPaper.py
+    # PatternRefactoring/doubledispatch/DDPaper.py
     # Paper for double dispatching.
 
     class DDPaper(Paper, TypedBinMember):
@@ -970,7 +970,7 @@ implemented, but it *looks* like the code is exactly the same in each case::
             return False::
 
 
-    # patternRefactoring/doubledispatch/DDGlass.py
+    # PatternRefactoring/doubledispatch/DDGlass.py
     # Glass for double dispatching.
 
     class DDGlass(Glass, TypedBinMember):
@@ -982,7 +982,7 @@ implemented, but it *looks* like the code is exactly the same in each case::
             return False::
 
 
-    # patternRefactoring/doubledispatch/DDCardboard.py
+    # PatternRefactoring/doubledispatch/DDCardboard.py
     # Cardboard for double dispatching.
 
     class DDCardboard(Cardboard, TypedBinMember):
@@ -1009,7 +1009,7 @@ currently selected. That is the second dispatch.
 
 Here's the base class for **TypedBin**::
 
-    # patternRefactoring/doubledispatch/TypedBin.py
+    # PatternRefactoring/doubledispatch/TypedBin.py
     # A container for the second dispatch.
 
     class TypedBin:
@@ -1054,7 +1054,7 @@ Since for this example the trash types have been customized and placed in a
 different directory, you'll need a different trash data file to make it work.
 Here's a possible **DDTrash.dat**::
 
-    # patternRefactoring/doubledispatch/DDTrash.dat
+    # PatternRefactoring/doubledispatch/DDTrash.dat
     DDGlass:54
     DDPaper:22
     DDPaper:11
@@ -1093,7 +1093,7 @@ Here's a possible **DDTrash.dat**::
 
 Here's the rest of the program::
 
-    # patternRefactoring/doubledispatch/DoubleDispatch.py
+    # PatternRefactoring/doubledispatch/DoubleDispatch.py
     # Using multiple dispatching to handle more
     # than one unknown type during a method call.
 
@@ -1234,7 +1234,7 @@ recycling program.
 As with **DoubleDispatch.py**, the **Trash** class is left alone and a new
 interface is created to add the **accept( )** method::
 
-    # patternRefactoring/trashvisitor/Visitable.py
+    # PatternRefactoring/trashvisitor/Visitable.py
     # An class to add visitor functionality
     # to the Trash hierarchy without
     # modifying the base class.
@@ -1247,7 +1247,7 @@ interface is created to add the **accept( )** method::
 Since there's nothing concrete in the **Visitor** base class, it can be created
 as an **interface**::
 
-    # patternRefactoring/trashvisitor/Visitor.py
+    # PatternRefactoring/trashvisitor/Visitor.py
     # The base class for visitors.
 
     class Visitor:
@@ -1265,7 +1265,7 @@ dispatching and create new subtypes of **Aluminum**, **Paper**, **Glass**, and
 **Cardboard** that implement the **accept( )** method. For example, the new
 **Visitable Aluminum** would look like this::
 
-    # patternRefactoring/trashvisitor/VAluminum.py
+    # PatternRefactoring/trashvisitor/VAluminum.py
     # Taking the previous approach of creating a
     # specialized Aluminum for the visitor pattern.
 
@@ -1295,7 +1295,7 @@ time, and it turns out to solve many problems that would seem to require
 templates (albeit not as simply). Here's the decorator that does the trick
 [#]_::
 
-    # patternRefactoring/trashvisitor/VisitableDecorator.py
+    # PatternRefactoring/trashvisitor/VisitableDecorator.py
     # A decorator that adapts the generic Trash
     # classes to the visitor pattern.
 
@@ -1326,7 +1326,7 @@ automatically decorates the objects as they are being created from the original
 **Trash.dat** file. But this might as well be a decorator itself, decorating any
 kind of **Fillable**::
 
-    # patternRefactoring/trashvisitor/FillableVisitor.py
+    # PatternRefactoring/trashvisitor/FillableVisitor.py
     # Adapter Decorator that adds the visitable
     # decorator as the Trash objects are
     # being created.
@@ -1343,7 +1343,7 @@ that haven't yet been created.
 The rest of the program creates specific **Visitor** types and sends them
 through a single list of **Trash** objects::
 
-    # patternRefactoring/trashvisitor/TrashVisitor.py
+    # PatternRefactoring/trashvisitor/TrashVisitor.py
     # The "visitor" pattern with VisitableDecorators.
 
     # Specific group of algorithms packaged
@@ -1508,7 +1508,7 @@ Our example will again build on the structure of the **Trash** types in
 **package patternRefactoring.Trash** (and the **Trash.dat** file used there can
 be used here without change)::
 
-    # patternRefactoring/dynatrash/DynaTrash.py
+    # PatternRefactoring/dynatrash/DynaTrash.py
     # Using a Map of Lists and RTTI
     # to automatically sort trash into
     # ArrayLists. This solution, despite the

@@ -1,5 +1,5 @@
 
-Python 3 Patterns & Idioms
+Python 3 Patterns, Recipes and Idioms
 ======================================================
 
 .. toctree::

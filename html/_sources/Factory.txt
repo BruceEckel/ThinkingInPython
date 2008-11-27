@@ -36,7 +36,7 @@ As an example, let's revisit the **Shape** system.
 
 One approach is to make the factory a **static** method of the base class::
 
-    # factory/shapefact1/ShapeFactory1.py
+    # Factory/shapefact1/ShapeFactory1.py
     # A simple static factory method.
     from __future__ import generators
     import random
@@ -136,7 +136,7 @@ Preventing direct creation
 To disallow direct access to the classes, you can nest the classes within the
 factory method, like this::
 
-    # factory/shapefact1/NestedShapeFactory.py
+    # Factory/shapefact1/NestedShapeFactory.py
     import random
 
     class Shape(object):
@@ -183,7 +183,7 @@ example of this in the next section). Here is **ShapeFactory1.py** modified so
 the factory methods are in a separate class as virtual functions. Notice also
 that the specific **Shape** classes are dynamically loaded on demand::
 
-    # factory/shapefact2/ShapeFactory2.py
+    # Factory/shapefact2/ShapeFactory2.py
     # Polymorphic factory methods.
     from __future__ import generators
     import random
@@ -266,7 +266,7 @@ As another example suppose you are creating a general-purpose gaming environment
 and you want to be able to support different types of games. Here's how it might
 look using an abstract factory::
 
-    # factory/Games.py
+    # Factory/Games.py
     # An example of the Abstract Factory pattern.
 
     class Obstacle:
@@ -340,7 +340,7 @@ example) is unnecessary - it's only required for languages that have static type
 checking. As long as the concrete Python classes follow the form of the required
 classes, we don't need any base classes::
 
-    # factory/Games2.py
+    # Factory/Games2.py
     # Simplified Abstract Factory.
 
     class Kitty:

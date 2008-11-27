@@ -84,7 +84,7 @@ a **synchronized** keyword that provides built-in support for thread
 synchronization. We could certainly accomplish the same thing by hand, using
 code like this::
 
-    # util/ToSynch.py
+    # Util/ToSynch.py
 
     import threading
     class ToSynch:
@@ -103,7 +103,7 @@ code like this::
 But this rapidly becomes tedious to write and to read. Peter Norvig provided me
 with a much nicer solution::
 
-    # util/Synchronization.py
+    # Util/Synchronization.py
     '''Simple emulation of Java's 'synchronized'
     keyword, from Peter Norvig.'''
     import threading
@@ -164,7 +164,7 @@ class author, but it's more consistent to use inheritance, so the base class
 
 Here's a simple test of the **Synchronization** module::
 
-    # util/TestSynchronization.py
+    # Util/TestSynchronization.py
     from Synchronization import *
 
     # To use for a method:
@@ -221,7 +221,7 @@ masse, and class **E** uses the convenience function to synchronize **m** and
 entered and left twice for every call, which isn't very desirable [there may be
 a fix for this]::
 
-    # util/Observer.py
+    # Util/Observer.py
     # Class support for "observer" pattern.
     from Synchronization import *
 
@@ -280,7 +280,7 @@ a fix for this]::
 
 Using this library, here is an example of the observer pattern::
 
-    # observer/ObservedFlower.py
+    # Observer/ObservedFlower.py
     # Demonstration of "observer" pattern.
     import sys
     sys.path += ['../util']
@@ -432,7 +432,7 @@ one that was clicked, and if so it changes its color to match the clicked box.
 (NOTE: this example has not been converted. See further down for a version that
 has the GUI but not the Observers, in PythonCard.)::
 
-    # observer/BoxObserver.py
+    # Observer/BoxObserver.py
     # Demonstration of Observer pattern using
     # Java's built-in observer classes.
 
@@ -540,7 +540,7 @@ Here is a version of the above that doesn't use the Observer pattern, written by
 Kevin Altis using PythonCard, and placed here as a starting point for a
 translation that does include Observer::
 
-    # observer/BoxObserverPythonCard.py
+    # Observer/BoxObserverPythonCard.py
     """ Written by Kevin Altis as a first-cut for
     converting BoxObserver to Python. The Observer
     hasn't been integrated yet.
@@ -629,7 +629,7 @@ translation that does include Observer::
 
 This is the resource file for running the program (see PythonCard for details)::
 
-    # observer/BoxObserver.rsrc.py
+    # Observer/BoxObserver.rsrc.py
     {'stack':{'type':'Stack',
               'name':'BoxObserver',
         'backgrounds': [
