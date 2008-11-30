@@ -238,7 +238,9 @@ Emacs has a long and venerable history, and is an extremely powerful editor.
 Emacs also has versions that are customized for operating systems to make it
 much more familiar.
 
-Here's a `simple introduction to emacs <http://lowfatlinux.com/linux-editor-emacs.html>`_.
+Here's a `simple introduction to emacs <http://lowfatlinux.com/linux-editor-emacs.html>`_
+and a `useful introductory help guide <http://www.linuxhelp.net/guides/emacs/>`_.
+For Windows, there's `a special FAQ <http://www.gnu.org/software/emacs/windows/ntemacs.html>`_.
 
 **Mac OSX**: `Aquamacs <http://aquamacs.org/>`_ looks and feels like a native
 Mac application.
@@ -257,3 +259,9 @@ there may also be more "windowy" versions that you can install separately.
 
 Finally, `here's the documentation for installing and using the emacs
 restructured-text mode <http://docutils.sourceforge.net/docs/user/emacs.html>`_.
+The elisp code it refers to is in the file 'rst.el <http://docutils.sourceforge.net/tools/editors/emacs/rst.el>`_.
+
+To customize your emacs, you need to open the ``.emacs`` file. The above Windows
+FAQ tells you how to put your ``.emacs`` file somewhere else, but the easiest
+thing to do is just open emacs and inside it type ``C-x C-f ~/.emacs``, which
+will open your default ``.emacs`` file.
