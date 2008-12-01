@@ -1,6 +1,6 @@
 # -*- coding: latin-1 -*-
 #
-# Python 3 Patterns & Idioms book build configuration file, created by
+# Python 3 Patterns, Recipes and Idioms book build configuration file, created by
 # sphinx-quickstart on Sun Oct 12 11:11:17 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -35,7 +35,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = u'Python 3 Patterns & Idioms'
+project = u'Python 3 Patterns, Recipes and Idioms'
 copyright = u'2008, Creative Commons Attribution-Share Alike 3.0'
 
 # The default replacements for |version| and |release|, also used in various
@@ -87,14 +87,15 @@ html_style = 'default.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> book".
-html_title = "Python 3 Patterns & Idioms"
+html_title = "Python 3 Patterns, Recipes and Idioms"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = "Python 3 Patterns & Idioms"
+html_short_title = "Python 3 Patterns, Recipes and Idioms"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/Logo.png"
+# html_logo = "_static/Logo.png"
+html_logo = "_static/cover.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -157,7 +158,7 @@ htmlhelp_basename = 'Python3PatternsIdiomsdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'Python3PatternsIdioms.tex', u'Python 3 Patterns \& Idioms book',
+  ('index', 'Python3PatternsIdioms.tex', u'Python 3 Patterns, Recipes and Idioms',
    u'Bruce Eckel', 'manual'),
 ]
 

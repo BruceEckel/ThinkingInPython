@@ -228,3 +228,40 @@ A Simple Overview Of Editing and Merging
 
 #.  ``hg ci`` without a message, it brought up an editor with a list of all
     changed files - so you can comment individually.
+
+Emacs for Editing Restructured Text
+===============================================================================
+
+If you want an editing system with support for restructured text, one choice is
+the free text editor *emacs*, which has an add-on mode for restructured text.
+Emacs has a long and venerable history, and is an extremely powerful editor.
+Emacs also has versions that are customized for operating systems to make it
+much more familiar.
+
+Here's a `simple introduction to emacs <http://lowfatlinux.com/linux-editor-emacs.html>`_
+and a `useful introductory help guide <http://www.linuxhelp.net/guides/emacs/>`_.
+For Windows, there's `a special FAQ <http://www.gnu.org/software/emacs/windows/ntemacs.html>`_.
+
+**Mac OSX**: `Aquamacs <http://aquamacs.org/>`_ looks and feels like a native
+Mac application.
+
+**Windows**: You can download the latest windows installer `here (choose the
+highest numbered zip file with "bin" in the name) <http://ftp.gnu.org/pub/gnu/emacs/windows/>`_.
+`This blog <http://www.arunrocks.com/blog/archives/2008/02/20/5-indespensible-tips-for-emacs-on-windows/>`_
+gives useful tips to make emacs on Windows even friendlier (in particular, it
+puts emacs on the right-click menu and improves the startup settings).
+
+**Linux**: It's virtually guaranteed that you already have emacs preinstalled
+on your Linux distribution, which you can start from a command prompt. However,
+there may also be more "windowy" versions that you can install separately.
+
+.. ToDo:: Someone who knows more about emacs for Linux please add more specific information the windowed version(s).
+
+Finally, `here's the documentation for installing and using the emacs
+restructured-text mode <http://docutils.sourceforge.net/docs/user/emacs.html>`_.
+The elisp code it refers to is in the file 'rst.el <http://docutils.sourceforge.net/tools/editors/emacs/rst.el>`_.
+
+To customize your emacs, you need to open the ``.emacs`` file. The above Windows
+FAQ tells you how to put your ``.emacs`` file somewhere else, but the easiest
+thing to do is just open emacs and inside it type ``C-x C-f ~/.emacs``, which
+will open your default ``.emacs`` file.

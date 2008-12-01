@@ -10,7 +10,7 @@
 </OBJECT>
 <UL>
 <LI> <OBJECT type="text/sitemap">
-    <param name="Name" value="Python 3 Patterns & Idioms">
+    <param name="Name" value="Python 3 Patterns, Recipes and Idioms">
     <param name="Local" value="index.html">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
@@ -135,6 +135,10 @@
 <LI> <OBJECT type="text/sitemap">
     <param name="Name" value="A Simple Overview Of Editing and Merging">
     <param name="Local" value="DeveloperGuide.html#a-simple-overview-of-editing-and-merging">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Emacs for Editing Restructured Text">
+    <param name="Local" value="DeveloperGuide.html#emacs-for-editing-restructured-text">
 </OBJECT>
 </UL>
 <LI> <OBJECT type="text/sitemap">
