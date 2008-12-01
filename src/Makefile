@@ -60,6 +60,11 @@ latex:
 	@echo "Build finished; the LaTeX files are in _build/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
+	# do it if we can:
+	[ -x "`which texify`" ] && (cd _build/latex; texify --batch --pdf Python3PatternsIdioms.tex)
+	# should probalby check success of texify somehow first
+	# cp _build/latex/Python3Patterns.pdf ..     
+
 
 changes:
 	mkdir -p _build/changes _build/doctrees

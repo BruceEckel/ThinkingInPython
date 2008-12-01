@@ -832,7 +832,11 @@ form.comment textarea {
     border: 3px solid red;
 }
 
-div.math {
+img.math {
+    vertical-align: middle;
+}
+
+div.math p {
     text-align: center;
 }
 
