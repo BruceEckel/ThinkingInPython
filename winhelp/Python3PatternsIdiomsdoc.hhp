@@ -9,10 +9,10 @@ Full text search stop list file=Python3PatternsIdiomsdoc.stp
 Full-text search=Yes
 Index file=Python3PatternsIdiomsdoc.hhk
 Language=0x409
-Title=Python 3 Patterns & Idioms
+Title=Python 3 Patterns, Recipes and Idioms
 
 [WINDOWS]
-Python3PatternsIdiomsdoc="Python 3 Patterns & Idioms","Python3PatternsIdiomsdoc.hhc","Python3PatternsIdiomsdoc.hhk","index.html","index.html",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
+Python3PatternsIdiomsdoc="Python 3 Patterns, Recipes and Idioms","Python3PatternsIdiomsdoc.hhc","Python3PatternsIdiomsdoc.hhk","index.html","index.html",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
 
 [FILES]
 AppFrameworks.html
@@ -55,6 +55,7 @@ ToDo.html
 UnitTesting.html
 Visitor.html
 _static\contents.png
+_static\cover.png
 _static\default.css
 _static\favicon.ico
 _static\file.png
