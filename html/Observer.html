@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Observer &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Multiple Dispatching" href="MultipleDispatching.html" />
+    <link rel="prev" title="Table-Driven Code: Configuration Flexibility" href="TableDriven.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="MultipleDispatching.html" title="Multiple Dispatching"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TableDriven.html" title="Table-Driven Code: Configuration Flexibility"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="observer">
+<h1>Observer<a class="headerlink" href="#observer" title="Permalink to this headline">¶</a></h1>
+<p>Decoupling code behavior</p>
+<p><em>Observer</em>, and a category of callbacks called &#8220;multiple dispatching (not in
+<em>Design Patterns</em>)&#8221; including the <em>Visitor</em> from <em>Design Patterns</em>. Like the
+other forms of callback, this contains a hook point where you can change code.
+The difference is in the observer&#8217;s completely dynamic nature. It is often used
+for the specific case of changes based on other object&#8217;s change of state, but is
+also the basis of event management. Anytime you want to decouple the source of
+the call from the called code in a completely dynamic way.</p>
+<p>The observer pattern solves a fairly common problem: What if a group of objects
+needs to update themselves when some object changes state? This can be seen in
+the &#8220;model-view&#8221; aspect of Smalltalk&#8217;s MVC (model-view-controller), or the
+almost-equivalent &#8220;Document-View Architecture.&#8221; Suppose that you have some data
+(the &#8220;document&#8221;) and more than one view, say a plot and a textual view. When you
+change the data, the two views must know to update themselves, and that&#8217;s what
+the observer facilitates. It&#8217;s a common enough problem that its solution has
+been made a part of the standard <strong>java.util</strong> library.</p>
+<p>There are two types of objects used to implement the observer pattern in Python.
+The <strong>Observable</strong> class keeps track of everybody who wants to be informed when
+a change happens, whether the &#8220;state&#8221; has changed or not. When someone says &#8220;OK,
+everybody should check and potentially update themselves,&#8221; the <strong>Observable</strong>
+class performs this task by calling the <strong>notifyObservers( )</strong> method for each
+one on the list. The <strong>notifyObservers( )</strong> method is part of the base class
+<strong>Observable</strong>.</p>
+<p>There are actually two &#8220;things that change&#8221; in the observer pattern: the
+quantity of observing objects and the way an update occurs. That is, the
+observer pattern allows you to modify both of these without affecting the
+surrounding code.</p>
+<p><strong>Observer</strong> is an &#8220;interface&#8221; class that only has one member function,
+<strong>update( )</strong>. This function is called by the object that&#8217;s being observed, when
+that object decides its time to update all its observers. The arguments are
+optional; you could have an <strong>update( )</strong> with no arguments and that would still
+fit the observer pattern; however this is more general-it allows the observed
+object to pass the object that caused the update (since an <strong>Observer</strong> may be
+registered with more than one observed object) and any extra information if
+that&#8217;s helpful, rather than forcing the <strong>Observer</strong> object to hunt around to
+see who is updating and to fetch any other information it needs.</p>
+<p>The &#8220;observed object&#8221; that decides when and how to do the updating will be
+called the <strong>Observable</strong>.</p>
+<p><strong>Observable</strong> has a flag to indicate whether it&#8217;s been changed. In a simpler
+design, there would be no flag; if something happened, everyone would be
+notified. The flag allows you to wait, and only notify the <strong>Observer</strong>s when
+you decide the time is right. Notice, however, that the control of the flag&#8217;s
+state is <strong>protected</strong>, so that only an inheritor can decide what constitutes a
+change, and not the end user of the resulting derived <strong>Observer</strong> class.</p>
+<p>Most of the work is done in <strong>notifyObservers( )</strong>. If the <strong>changed</strong> flag has
+not been set, this does nothing. Otherwise, it first clears the <strong>changed</strong> flag
+so repeated calls to <strong>notifyObservers( )</strong> won&#8217;t waste time. This is done
+before notifying the observers in case the calls to <strong>update( )</strong> do anything
+that causes a change back to this <strong>Observable</strong> object. Then it moves through
+the <strong>set</strong> and calls back to the <strong>update( )</strong> member function of each
+<strong>Observer</strong>.</p>
+<p>At first it may appear that you can use an ordinary <strong>Observable</strong> object to
+manage the updates. But this doesn&#8217;t work; to get an effect, you <em>must</em> inherit
+from <strong>Observable</strong> and somewhere in your derived-class code call <strong>setChanged(
+)</strong>. This is the member function that sets the &#8220;changed&#8221; flag, which means that
+when you call <strong>notifyObservers( )</strong> all of the observers will, in fact, get
+notified. <em>Where</em> you call <strong>setChanged( )</strong> depends on the logic of your
+program.</p>
+<div class="section" id="observing-flowers">
+<h2>Observing Flowers<a class="headerlink" href="#observing-flowers" title="Permalink to this headline">¶</a></h2>
+<p>Since Python doesn&#8217;t have standard library components to support the observer
+pattern (like Java does), we must first create one. The simplest thing to do is
+translate the Java standard library <strong>Observer</strong> and <strong>Observable</strong> classes.
+This also provides easier translation from Java code that uses these libraries.</p>
+<p>In trying to do this, we encounter a minor snag, which is the fact that Java has
+a <strong>synchronized</strong> keyword that provides built-in support for thread
+synchronization. We could certainly accomplish the same thing by hand, using
+code like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/ToSynch.py</span>
+
+<span class="k">import</span> <span class="nn">threading</span>
+<span class="k">class</span> <span class="nc">ToSynch</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="mf">1</span>
+    <span class="k">def</span> <span class="nf">aSynchronizedMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">+=</span> <span class="mf">1</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>But this rapidly becomes tedious to write and to read. Peter Norvig provided me
+with a much nicer solution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/Synchronization.py</span>
+<span class="sd">&#39;&#39;&#39;Simple emulation of Java&#39;s &#39;synchronized&#39;</span>
+<span class="sd">keyword, from Peter Norvig.&#39;&#39;&#39;</span>
+<span class="k">import</span> <span class="nn">threading</span>
+
+<span class="k">def</span> <span class="nf">synchronized</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">();</span>
+        <span class="c"># print(method.__name__, &#39;acquired&#39;)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">apply</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">();</span>
+            <span class="c"># print(method.__name__, &#39;released&#39;)</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+<span class="k">def</span> <span class="nf">synchronize</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Synchronize methods in the given class.</span>
+<span class="sd">    Only synchronize the methods whose names are</span>
+<span class="sd">    given, or all methods if names=None.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="o">==</span><span class="nb">type</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">):</span> <span class="n">names</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">!=</span> <span class="s">&#39;__init__&#39;</span> <span class="ow">and</span> \
+          <span class="p">(</span><span class="n">names</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">):</span>
+            <span class="c"># print(&quot;synchronizing&quot;, name)</span>
+            <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">synchronized</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+<span class="c"># You can create your own self.mutex, or inherit</span>
+<span class="c"># from this class:</span>
+<span class="k">class</span> <span class="nc">Synchronization</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <strong>synchronized( )</strong> function takes a method and wraps it in a function that
+adds the mutex functionality. The method is called inside this function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">return</span> <span class="nb">apply</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and as the <strong>return</strong> statement passes through the <strong>finally</strong> clause, the mutex
+is released.</p>
+<p>This is in some ways the <em>Decorator</em> design pattern, but much simpler to create
+and use. All you have to say is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">myMethod</span> <span class="o">=</span> <span class="n">synchronized</span><span class="p">(</span><span class="n">myMethod</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To surround your method with a mutex.</p>
+<p><strong>synchronize( )</strong> is a convenience function that applies <strong>synchronized( )</strong> to
+an entire class, either all the methods in the class (the default) or selected
+methods which are named in a string as the second argument.</p>
+<p>Finally, for <strong>synchronized( )</strong> to work there must be a <strong>self.mutex</strong> created
+in every class that uses <strong>synchronized( )</strong>. This can be created by hand by the
+class author, but it&#8217;s more consistent to use inheritance, so the base class
+<strong>Synchronization</strong> is provided.</p>
+<p>Here&#8217;s a simple test of the <strong>Synchronization</strong> module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/TestSynchronization.py</span>
+<span class="k">from</span> <span class="nn">Synchronization</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c"># To use for a method:</span>
+<span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">Synchronization</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Synchronization</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="mf">1</span>
+    <span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">+=</span> <span class="mf">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">synchronized</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="mf">47</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="s">&#39;spam&#39;</span>
+
+<span class="c"># So m is synchronized, f and g are not.</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+
+<span class="c"># On the class level:</span>
+<span class="k">class</span> <span class="nc">D</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="c"># You must override an un-synchronized method</span>
+    <span class="c"># in order to synchronize it (just like Java):</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="n">C</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c"># Synchronize every (defined) method in the class:</span>
+<span class="n">synchronize</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">D</span><span class="p">()</span>
+<span class="n">d</span><span class="o">.</span><span class="n">f</span><span class="p">()</span> <span class="c"># Synchronized</span>
+<span class="n">d</span><span class="o">.</span><span class="n">g</span><span class="p">()</span> <span class="c"># Not synchronized</span>
+<span class="n">d</span><span class="o">.</span><span class="n">m</span><span class="p">()</span> <span class="c"># Synchronized (in the base class)</span>
+
+<span class="k">class</span> <span class="nc">E</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="n">C</span><span class="o">.</span><span class="n">m</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="n">C</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="n">C</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="c"># Only synchronizes m and g. Note that m ends up</span>
+<span class="c"># being doubly-wrapped in synchronization, which</span>
+<span class="c"># doesn&#39;t hurt anything but is inefficient:</span>
+<span class="n">synchronize</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="s">&#39;m g&#39;</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">E</span><span class="p">()</span>
+<span class="n">e</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+<span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">e</span><span class="o">.</span><span class="n">m</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You must call the base class constructor for <strong>Synchronization</strong>, but that&#8217;s
+all. In class <strong>C</strong> you can see the use of <strong>synchronized( )</strong> for <strong>m</strong>,
+leaving <strong>f</strong> and <strong>g</strong> alone. Class <strong>D</strong> has all its methods synchronized en
+masse, and class <strong>E</strong> uses the convenience function to synchronize <strong>m</strong> and
+<strong>g</strong>. Note that since <strong>m</strong> ends up being synchronized twice, it will be
+entered and left twice for every call, which isn&#8217;t very desirable [there may be
+a fix for this]:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/Observer.py</span>
+<span class="c"># Class support for &quot;observer&quot; pattern.</span>
+<span class="k">from</span> <span class="nn">Synchronization</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">Observer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">observable</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Called when the observed object is</span>
+<span class="sd">        modified. You call an Observable object&#39;s</span>
+<span class="sd">        notifyObservers method to notify all the</span>
+<span class="sd">        object&#39;s observers of the change.&#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Observable</span><span class="p">(</span><span class="n">Synchronization</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="mf">0</span>
+        <span class="n">Synchronization</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">addObserver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">observer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">deleteObserver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">notifyObservers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;If &#39;changed&#39; indicates that this object</span>
+<span class="sd">        has changed, notify all its observers, then</span>
+<span class="sd">        call clearChanged(). Each observer has its</span>
+<span class="sd">        update() called with two arguments: this</span>
+<span class="sd">        observable object and the generic &#39;arg&#39;.&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">:</span> <span class="k">return</span>
+            <span class="c"># Make a local copy in case of synchronous</span>
+            <span class="c"># additions of observers:</span>
+            <span class="n">localArray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="p">[:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clearChanged</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="c"># Updating is not required to be synchronized:</span>
+        <span class="k">for</span> <span class="n">observer</span> <span class="ow">in</span> <span class="n">localArray</span><span class="p">:</span>
+            <span class="n">observer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">deleteObservers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">setChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="mf">1</span>
+    <span class="k">def</span> <span class="nf">clearChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="mf">0</span>
+    <span class="k">def</span> <span class="nf">hasChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed</span>
+    <span class="k">def</span> <span class="nf">countObservers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="p">)</span>
+
+<span class="n">synchronize</span><span class="p">(</span><span class="n">Observable</span><span class="p">,</span>
+  <span class="s">&quot;addObserver deleteObserver deleteObservers &quot;</span> <span class="o">+</span>
+  <span class="s">&quot;setChanged clearChanged hasChanged &quot;</span> <span class="o">+</span>
+  <span class="s">&quot;countObservers&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using this library, here is an example of the observer pattern:</p>
+<div class="highlight-python"><pre># Observer/ObservedFlower.py
+# Demonstration of "observer" pattern.
+import sys
+sys.path += ['../util']
+from Observer import Observer, Observable
+
+class Flower:
+    def __init__(self):
+        self.isOpen = 0
+        self.openNotifier = Flower.OpenNotifier(self)
+        self.closeNotifier= Flower.CloseNotifier(self)
+    def open(self): # Opens its petals
+        self.isOpen = 1
+        self.openNotifier.notifyObservers()
+        self.closeNotifier.open()
+    def close(self): # Closes its petals
+        self.isOpen = 0
+        self.closeNotifier.notifyObservers()
+        self.openNotifier.close()
+    def closing(self): return self.closeNotifier
+
+    class OpenNotifier(Observable):
+        def __init__(self, outer):
+            Observable.__init__(self)
+            self.outer = outer
+            self.alreadyOpen = 0
+        def notifyObservers(self):
+            if self.outer.isOpen and \
+            not self.alreadyOpen:
+                self.setChanged()
+                Observable.notifyObservers(self)
+                self.alreadyOpen = 1
+        def close(self):
+            self.alreadyOpen = 0
+
+    class CloseNotifier(Observable):
+        def __init__(self, outer):
+            Observable.__init__(self)
+            self.outer = outer
+            self.alreadyClosed = 0
+        def notifyObservers(self):
+            if not self.outer.isOpen and \
+            not self.alreadyClosed:
+                self.setChanged()
+                Observable.notifyObservers(self)
+                self.alreadyClosed = 1
+        def open(self):
+            alreadyClosed = 0
+
+class Bee:
+    def __init__(self, name):
+        self.name = name
+        self.openObserver = Bee.OpenObserver(self)
+        self.closeObserver = Bee.CloseObserver(self)
+    # An inner class for observing openings:
+    class OpenObserver(Observer):
+        def __init__(self, outer):
+            self.outer = outer
+        def update(self, observable, arg):
+            print("Bee " + self.outer.name + \)
+              "'s breakfast time!"
+    # Another inner class for closings:
+    class CloseObserver(Observer):
+        def __init__(self, outer):
+            self.outer = outer
+        def update(self, observable, arg):
+            print("Bee " + self.outer.name + \)
+              "'s bed time!"
+
+class Hummingbird:
+    def __init__(self, name):
+        self.name = name
+        self.openObserver = \
+          Hummingbird.OpenObserver(self)
+        self.closeObserver = \
+          Hummingbird.CloseObserver(self)
+    class OpenObserver(Observer):
+        def __init__(self, outer):
+            self.outer = outer
+        def update(self, observable, arg):
+            print("Hummingbird " + self.outer.name + \
+              "'s breakfast time!")
+    class CloseObserver(Observer):
+        def __init__(self, outer):
+            self.outer = outer
+        def update(self, observable, arg):
+            print("Hummingbird " + self.outer.name + \
+              "'s bed time!")
+
+f = Flower()
+ba = Bee("Eric")
+bb = Bee("Eric 0.5")
+ha = Hummingbird("A")
+hb = Hummingbird("B")
+f.openNotifier.addObserver(ha.openObserver)
+f.openNotifier.addObserver(hb.openObserver)
+f.openNotifier.addObserver(ba.openObserver)
+f.openNotifier.addObserver(bb.openObserver)
+f.closeNotifier.addObserver(ha.closeObserver)
+f.closeNotifier.addObserver(hb.closeObserver)
+f.closeNotifier.addObserver(ba.closeObserver)
+f.closeNotifier.addObserver(bb.closeObserver)
+# Hummingbird 2 decides to sleep in:
+f.openNotifier.deleteObserver(hb.openObserver)
+# A change that interests observers:
+f.open()
+f.open() # It's already open, no change.
+# Bee 1 doesn't want to go to bed:
+f.closeNotifier.deleteObserver(ba.closeObserver)
+f.close()
+f.close() # It's already closed; no change
+f.openNotifier.deleteObservers()
+f.open()
+f.close()</pre>
+</div>
+<p>The events of interest are that a <strong>Flower</strong> can open or close. Because of the
+use of the inner class idiom, both these events can be separately observable
+phenomena. <strong>OpenNotifier</strong> and <strong>CloseNotifier</strong> both inherit <strong>Observable</strong>,
+so they have access to <strong>setChanged( )</strong> and can be handed to anything that
+needs an <strong>Observable</strong>.</p>
+<p>The inner class idiom also comes in handy to define more than one kind of
+<strong>Observer</strong>, in <strong>Bee</strong> and <strong>Hummingbird</strong>, since both those classes may want
+to independently observe <strong>Flower</strong> openings and closings. Notice how the inner
+class idiom provides something that has most of the benefits of inheritance (the
+ability to access the <strong>private</strong> data in the outer class, for example) without
+the same restrictions.</p>
+<p>In <strong>main( )</strong>, you can see one of the prime benefits of the observer pattern:
+the ability to change behavior at run time by dynamically registering and un-
+registering <strong>Observer</strong>s with <strong>Observable</strong>s.</p>
+<p>If you study the code above you&#8217;ll see that <strong>OpenNotifier</strong> and
+<strong>CloseNotifier</strong> use the basic <strong>Observable</strong> interface. This means that you
+could inherit other completely different <strong>Observer</strong> classes; the only
+connection the <strong>Observer</strong>s have with <strong>Flower</strong>s is the <strong>Observer</strong>
+interface.</p>
+<div class="section" id="a-visual-example-of-observers">
+<h3>A Visual Example of Observers<a class="headerlink" href="#a-visual-example-of-observers" title="Permalink to this headline">¶</a></h3>
+<p>The following example is similar to the <strong>ColorBoxes</strong> example from <em>Thinking in
+Java</em>. Boxes are placed in a grid on the screen and each one is initialized to a
+random color. In addition, each box <strong>implements</strong> the <strong>Observer</strong> interface
+and is registered with an <strong>Observable</strong> object. When you click on a box, all of
+the other boxes are notified that a change has been made because the
+<strong>Observable</strong> object automatically calls each <strong>Observer</strong> object&#8217;s <strong>update(
+)</strong> method. Inside this method, the box checks to see if it&#8217;s adjacent to the
+one that was clicked, and if so it changes its color to match the clicked box.
+(NOTE: this example has not been converted. See further down for a version that
+has the GUI but not the Observers, in PythonCard.):</p>
+<div class="highlight-python"><pre># Observer/BoxObserver.py
+# Demonstration of Observer pattern using
+# Java's built-in observer classes.
+
+# You must inherit a type of Observable:
+class BoxObservable(Observable):
+    def notifyObservers(self, Object b):
+        # Otherwise it won't propagate changes:
+        setChanged()
+        super.notifyObservers(b)
+
+class BoxObserver(JFrame):
+    Observable notifier = BoxObservable()
+    def __init__(self, grid):
+        setTitle("Demonstrates Observer pattern")
+        Container cp = getContentPane()
+        cp.setLayout(GridLayout(grid, grid))
+        for(int x = 0 x &lt; grid x++)
+            for(int y = 0 y &lt; grid y++)
+                cp.add(OCBox(x, y, notifier))
+
+    def main(self, String[] args):
+        grid = 8
+            if(args.length &gt; 0)
+                grid = Integer.parseInt(args[0])
+            JFrame f = BoxObserver(grid)
+            f.setSize(500, 400)
+            f.setVisible(1)
+            # JDK 1.3:
+            f.setDefaultCloseOperation(EXIT_ON_CLOSE)
+            # Add a WindowAdapter if you have JDK 1.2
+
+class OCBox(JPanel) implements Observer:
+    Color cColor = newColor()
+    colors = [
+      Color.black, Color.blue, Color.cyan,
+      Color.darkGray, Color.gray, Color.green,
+      Color.lightGray, Color.magenta,
+      Color.orange, Color.pink, Color.red,
+      Color.white, Color.yellow
+    ]
+    def newColor():
+        return colors[
+          (int)(Math.random() * colors.length)
+        ]
+
+    def __init__(self, x, y, Observable notifier):
+        self.x = x
+        self.y = y
+        notifier.addObserver(self)
+        self.notifier = notifier
+        addMouseListener(ML())
+
+    def paintComponent(self, Graphics g):
+        super.paintComponent(g)
+        g.setColor(cColor)
+        Dimension s = getSize()
+        g.fillRect(0, 0, s.width, s.height)
+
+    class ML(MouseAdapter):
+        def mousePressed(self, MouseEvent e):
+            notifier.notifyObservers(OCBox.self)
+
+    def update(self, Observable o, Object arg):
+        OCBox clicked = (OCBox)arg
+        if(nextTo(clicked)):
+            cColor = clicked.cColor
+            repaint()
+
+    def nextTo(OCBox b):
+        return Math.abs(x - b.x) &lt;= 1 &amp;&amp;
+            Math.abs(y - b.y) &lt;= 1</pre>
+</div>
+<p>When you first look at the online documentation for <strong>Observable</strong>, it&#8217;s a bit
+confusing because it appears that you can use an ordinary <strong>Observable</strong> object
+to manage the updates. But this doesn&#8217;t work; try it-inside <strong>BoxObserver</strong>,
+create an <strong>Observable</strong> object instead of a <strong>BoxObservable</strong> object and see
+what happens: nothing. To get an effect, you <em>must</em> inherit from <strong>Observable</strong>
+and somewhere in your derived-class code call <strong>setChanged( )</strong>. This is the
+method that sets the &#8220;changed&#8221; flag, which means that when you call
+<strong>notifyObservers( )</strong> all of the observers will, in fact, get notified. In the
+example above <strong>setChanged( )</strong> is simply called within <strong>notifyObservers( )</strong>,
+but you could use any criterion you want to decide when to call <strong>setChanged(
+)</strong>.</p>
+<p><strong>BoxObserver</strong> contains a single <strong>Observable</strong> object called <strong>notifier</strong>, and
+every time an <strong>OCBox</strong> object is created, it is tied to <strong>notifier</strong>. In
+<strong>OCBox</strong>, whenever you click the mouse the <strong>notifyObservers( )</strong> method is
+called, passing the clicked object in as an argument so that all the boxes
+receiving the message (in their <strong>update( )</strong> method) know who was clicked and
+can decide whether to change themselves or not. Using a combination of code in
+<strong>notifyObservers( )</strong> and <strong>update( )</strong> you can work out some fairly complex
+schemes.</p>
+<p>It might appear that the way the observers are notified must be frozen at
+compile time in the <strong>notifyObservers( )</strong> method. However, if you look more
+closely at the code above you&#8217;ll see that the only place in <strong>BoxObserver</strong> or
+<strong>OCBox</strong> where you&#8217;re aware that you&#8217;re working with a <strong>BoxObservable</strong> is at
+the point of creation of the <strong>Observable</strong> object-from then on everything uses
+the basic <strong>Observable</strong> interface. This means that you could inherit other
+<strong>Observable</strong> classes and swap them at run time if you want to change
+notification behavior then.</p>
+<p>Here is a version of the above that doesn&#8217;t use the Observer pattern, written by
+Kevin Altis using PythonCard, and placed here as a starting point for a
+translation that does include Observer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Observer/BoxObserverPythonCard.py</span>
+<span class="sd">&quot;&quot;&quot; Written by Kevin Altis as a first-cut for</span>
+<span class="sd">converting BoxObserver to Python. The Observer</span>
+<span class="sd">hasn&#39;t been integrated yet.</span>
+<span class="sd">To run this program, you must:</span>
+<span class="sd">Install WxPython from</span>
+<span class="sd">http://www.wxpython.org/download.php</span>
+<span class="sd">Install PythonCard. See:</span>
+<span class="sd">http://pythoncard.sourceforge.net</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">from</span> <span class="nn">PythonCardPrototype</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">model</span>
+<span class="k">import</span> <span class="nn">random</span>
+
+<span class="n">GRID</span> <span class="o">=</span> <span class="mf">8</span>
+
+<span class="k">class</span> <span class="nc">ColorBoxesTest</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Background</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">on_openBackground</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">GRID</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">GRID</span><span class="p">):</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">createBox</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:])</span>
+    <span class="k">def</span> <span class="nf">createBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;cyan&#39;</span><span class="p">,</span>
+        <span class="s">&#39;darkGray&#39;</span><span class="p">,</span> <span class="s">&#39;gray&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span>
+        <span class="s">&#39;lightGray&#39;</span><span class="p">,</span> <span class="s">&#39;magenta&#39;</span><span class="p">,</span>
+        <span class="s">&#39;orange&#39;</span><span class="p">,</span> <span class="s">&#39;pink&#39;</span><span class="p">,</span> <span class="s">&#39;red&#39;</span><span class="p">,</span>
+        <span class="s">&#39;white&#39;</span><span class="p">,</span> <span class="s">&#39;yellow&#39;</span><span class="p">]</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">GetSizeTuple</span><span class="p">()</span>
+        <span class="n">boxWidth</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="n">GRID</span>
+        <span class="n">boxHeight</span> <span class="o">=</span> <span class="n">height</span> <span class="o">/</span> <span class="n">GRID</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;width:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">width</span><span class="p">)</span> <span class="o">+</span>
+          <span class="s">&quot; height:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">height</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;boxWidth:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">boxWidth</span><span class="p">)</span> <span class="o">+</span>
+          <span class="s">&quot; boxHeight:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">boxHeight</span><span class="p">))</span>
+        <span class="c"># use an empty image, though some other</span>
+        <span class="c"># widgets would work just as well</span>
+        <span class="n">boxDesc</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;Image&#39;</span><span class="p">,</span>
+          <span class="s">&#39;size&#39;</span><span class="p">:(</span><span class="n">boxWidth</span><span class="p">,</span> <span class="n">boxHeight</span><span class="p">),</span> <span class="s">&#39;file&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">}</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;box-</span><span class="si">%d</span><span class="s">-</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+        <span class="c"># There is probably a 1 off error in the</span>
+        <span class="c"># calculation below since the boxes should</span>
+        <span class="c"># probably have a slightly different offset</span>
+        <span class="c"># to prevent overlaps</span>
+        <span class="n">boxDesc</span><span class="p">[</span><span class="s">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> \
+          <span class="p">(</span><span class="n">column</span> <span class="o">*</span> <span class="n">boxWidth</span><span class="p">,</span> <span class="n">row</span> <span class="o">*</span> <span class="n">boxHeight</span><span class="p">)</span>
+        <span class="n">boxDesc</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">boxDesc</span><span class="p">[</span><span class="s">&#39;backgroundColor&#39;</span><span class="p">]</span> <span class="o">=</span> \
+          <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span>  <span class="n">boxDesc</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">changeNeighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+
+        <span class="c"># This algorithm will result in changing the</span>
+        <span class="c"># color of some boxes more than once, so an</span>
+        <span class="c"># OOP solution where only neighbors are asked</span>
+        <span class="c"># to change or boxes check to see if they are</span>
+        <span class="c"># neighbors before changing would be better</span>
+        <span class="c"># per the original example does the whole grid</span>
+        <span class="c"># need to change its state at once like in a</span>
+        <span class="c"># Life program? should the color change</span>
+        <span class="c"># in the propogation of another notification</span>
+        <span class="c"># event?</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">row</span> <span class="o">-</span> <span class="mf">1</span><span class="p">),</span>
+                       <span class="nb">min</span><span class="p">(</span><span class="n">GRID</span><span class="p">,</span> <span class="n">row</span> <span class="o">+</span> <span class="mf">2</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">column</span> <span class="o">-</span> <span class="mf">1</span><span class="p">),</span>
+                           <span class="nb">min</span><span class="p">(</span><span class="n">GRID</span><span class="p">,</span> <span class="n">column</span> <span class="o">+</span> <span class="mf">2</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">backgroundColor</span><span class="o">=</span><span class="n">color</span>
+
+    <span class="c"># this is a background handler, so it isn&#39;t</span>
+    <span class="c"># specific to a single widget. Image widgets</span>
+    <span class="c"># don&#39;t have a mouseClick event (wxCommandEvent</span>
+    <span class="c"># in wxPython)</span>
+    <span class="k">def</span> <span class="nf">on_mouseUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span>
+        <span class="n">prefix</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeNeighbors</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">column</span><span class="p">),</span>
+                             <span class="n">target</span><span class="o">.</span><span class="n">backgroundColor</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">PythonCardApp</span><span class="p">(</span><span class="n">ColorBoxesTest</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This is the resource file for running the program (see PythonCard for details):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Observer/BoxObserver.rsrc.py</span>
+<span class="p">{</span><span class="s">&#39;stack&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;Stack&#39;</span><span class="p">,</span>
+          <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;BoxObserver&#39;</span><span class="p">,</span>
+    <span class="s">&#39;backgrounds&#39;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;Background&#39;</span><span class="p">,</span>
+        <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;bgBoxObserver&#39;</span><span class="p">,</span>
+        <span class="s">&#39;title&#39;</span><span class="p">:</span><span class="s">&#39;Demonstrates Observer pattern&#39;</span><span class="p">,</span>
+        <span class="s">&#39;position&#39;</span><span class="p">:(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">5</span><span class="p">),</span>
+        <span class="s">&#39;size&#39;</span><span class="p">:(</span><span class="mf">500</span><span class="p">,</span> <span class="mf">400</span><span class="p">),</span>
+        <span class="s">&#39;components&#39;</span><span class="p">:</span> <span class="p">[</span>
+
+<span class="p">]</span> <span class="c"># end components</span>
+<span class="p">}</span> <span class="c"># end background</span>
+<span class="p">]</span> <span class="c"># end backgrounds</span>
+<span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h3>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Using the approach in <strong>Synchronization.py</strong>, create a tool that will
+automatically wrap all the methods in a class to provide an execution trace,
+so that you can see the name of the method and when it is entered and
+exited.</li>
+<li>Create a minimal Observer-Observable design in two classes. Just create the
+bare minimum in the two classes, then demonstrate your design by creating
+one <strong>Observable</strong> and many <strong>Observer</strong>s, and cause the <strong>Observable</strong> to
+update the <strong>Observer</strong>s.</li>
+<li>Modify <strong>BoxObserver.py</strong> to turn it into a simple game. If any of the
+squares surrounding the one you clicked is part of a contiguous patch of the
+same color, then all the squares in that patch are changed to the color you
+clicked on. You can configure the game for competition between players or to
+keep track of the number of clicks that a single player uses to turn the
+field into a single color. You may also want to restrict a player&#8217;s color to
+the first one that was chosen.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Observer</a><ul>
+<li><a class="reference external" href="#observing-flowers">Observing Flowers</a><ul>
+<li><a class="reference external" href="#a-visual-example-of-observers">A Visual Example of Observers</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="TableDriven.html" title="previous chapter">Table-Driven Code: Configuration Flexibility</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="MultipleDispatching.html" title="next chapter">Multiple Dispatching</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Observer.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="MultipleDispatching.html" title="Multiple Dispatching"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TableDriven.html" title="Table-Driven Code: Configuration Flexibility"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

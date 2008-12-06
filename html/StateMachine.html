@@ -1,0 +1,832 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>StateMachine &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Decorator: Dynamic Type Selection" href="Decorator.html" />
+    <link rel="prev" title="Fronting for an Implementation" href="Fronting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Decorator.html" title="Decorator: Dynamic Type Selection"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Fronting.html" title="Fronting for an Implementation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="statemachine">
+<h1>StateMachine<a class="headerlink" href="#statemachine" title="Permalink to this headline">¶</a></h1>
+<p>While <em>State</em> has a way to allow the client programmer to change the
+implementation, <em>StateMachine</em> imposes a structure to automatically change the
+implementation from one object to the next. The current implementation
+represents the state that a system is in, and the system behaves differently
+from one state to the next (because it uses <em>State</em>). Basically, this is a
+&#8220;state machine&#8221; using objects.</p>
+<p>The code that moves the system from one state to the next is often a <em>Template
+Method</em>, as seen in the following framework for a basic state machine.</p>
+<p>Each state can be <strong>run( )</strong> to perform its behavior, and (in this design) you
+can also pass it an &#8220;input&#8221; object so it can tell you what new state to move to
+based on that &#8220;input&#8221;. The key distinction between this design and the next is
+that here, each <strong>State</strong> object decides what other states it can move to, based
+on the &#8220;input&#8221;, whereas in the subsequent design all of the state transitions
+are held in a single table. Another way to put it is that here, each <strong>State</strong>
+object has its own little <strong>State</strong> table, and in the subsequent design there is
+a single master state transition table for the whole system:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/State.py</span>
+<span class="c"># A State has an operation, and can be moved</span>
+<span class="c"># into the next State given an Input:</span>
+
+<span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;run not implemented&quot;</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;next not implemented&quot;</span>
+</pre></div>
+</div>
+<p>This class is clearly unnecessary, but it allows us to say that something is a
+<strong>State</strong> object in code, and provide a slightly different error message when
+all the methods are not implemented. We could have gotten basically the same
+effect by saying:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">State</span><span class="p">:</span> <span class="k">pass</span>
+</pre></div>
+</div>
+<p>because we would still get exceptions if <strong>run( )</strong> or <strong>next( )</strong> were called
+for a derived type, and they hadn&#8217;t been implemented.</p>
+<p>The <strong>StateMachine</strong> keeps track of the current state, which is initialized by
+the constructor. The <strong>runAll( )</strong> method takes a list of <strong>Input</strong> objects.
+This method not only moves to the next state, but it also calls <strong>run( )</strong> for
+each state object - thus you can see it&#8217;s an expansion of the idea of the
+<strong>State</strong> pattern, since <strong>run( )</strong> does something different depending on the
+state that the system is in:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/StateMachine.py</span>
+<span class="c"># Takes a list of Inputs to move from State to</span>
+<span class="c"># State using a template method.</span>
+
+<span class="k">class</span> <span class="nc">StateMachine</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialState</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span> <span class="o">=</span> <span class="n">initialState</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="c"># Template method:</span>
+    <span class="k">def</span> <span class="nf">runAll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentState</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>I&#8217;ve also treated <strong>runAll( )</strong> as a template method. This is typical, but
+certainly not required - you could concievably want to override it, but
+typically the behavior change will occur in <strong>State</strong>&#8216;s <strong>run( )</strong> instead.</p>
+<p>At this point the basic framework for this style of <em>StateMachine</em> (where each
+state decides the next states) is complete. As an example, I&#8217;ll use a fancy
+mousetrap that can move through several states in the process of trapping a
+mouse <a class="footnote-reference" href="#id2" id="id1">[1]</a>. The mouse classes and information are stored in the <strong>mouse</strong>
+package, including a class representing all the possible moves that a mouse can
+make, which will be the inputs to the state machine:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/mouse/MouseAction.py</span>
+
+<span class="k">class</span> <span class="nc">MouseAction</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span>
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+    <span class="c"># Necessary when __cmp__ or __eq__ is defined</span>
+    <span class="c"># in order to make this class usable as a</span>
+    <span class="c"># dictionary key:</span>
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+
+<span class="c"># Static fields; an enumeration of instances:</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">appears</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse appears&quot;</span><span class="p">)</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">runsAway</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse runs away&quot;</span><span class="p">)</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse enters trap&quot;</span><span class="p">)</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">escapes</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse escapes&quot;</span><span class="p">)</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">trapped</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse trapped&quot;</span><span class="p">)</span>
+<span class="n">MouseAction</span><span class="o">.</span><span class="n">removed</span> <span class="o">=</span> <span class="n">MouseAction</span><span class="p">(</span><span class="s">&quot;mouse removed&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You&#8217;ll note that <strong>__cmp__( )</strong> has been overidden to implement a comparison
+between <strong>action</strong> values. Also, each possible move by a mouse is enumerated as
+a <strong>MouseAction</strong> object, all of which are static fields in <strong>MouseAction</strong>.</p>
+<p>For creating test code, a sequence of mouse inputs is provided from a text
+file:</p>
+<div class="highlight-python"><pre># StateMachine/mouse/MouseMoves.txt
+mouse appears
+mouse runs away
+mouse appears
+mouse enters trap
+mouse escapes
+mouse appears
+mouse enters trap
+mouse trapped
+mouse removed
+mouse appears
+mouse runs away
+mouse appears
+mouse enters trap
+mouse trapped
+mouse removed</pre>
+</div>
+<p>With these tools in place, it&#8217;s now possible to create the first version of the
+mousetrap program. Each <strong>State</strong> subclass defines its <strong>run( )</strong> behavior, and
+also establishes its next state with an <strong>if-else</strong> clause:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/mousetrap1/MouseTrapTest.py</span>
+<span class="c"># State Machine pattern using &#39;if&#39; statements</span>
+<span class="c"># to determine the next state.</span>
+<span class="k">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;../stateMachine&#39;</span><span class="p">,</span> <span class="s">&#39;../mouse&#39;</span><span class="p">]</span>
+<span class="k">from</span> <span class="nn">State</span> <span class="k">import</span> <span class="n">State</span>
+<span class="k">from</span> <span class="nn">StateMachine</span> <span class="k">import</span> <span class="n">StateMachine</span>
+<span class="k">from</span> <span class="nn">MouseAction</span> <span class="k">import</span> <span class="n">MouseAction</span>
+<span class="c"># A different subclass for each state:</span>
+
+<span class="k">class</span> <span class="nc">Waiting</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Waiting: Broadcasting cheese smell&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">appears</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">luring</span>
+        <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+
+<span class="k">class</span> <span class="nc">Luring</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Luring: Presenting Cheese, door open&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">runsAway</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">enters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">trapping</span>
+        <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">luring</span>
+
+<span class="k">class</span> <span class="nc">Trapping</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Trapping: Closing door&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">escapes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">trapped</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">holding</span>
+        <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">trapping</span>
+
+<span class="k">class</span> <span class="nc">Holding</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Holding: Mouse caught&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">MouseAction</span><span class="o">.</span><span class="n">removed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+        <span class="k">return</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">holding</span>
+
+<span class="k">class</span> <span class="nc">MouseTrap</span><span class="p">(</span><span class="n">StateMachine</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Initial state</span>
+        <span class="n">StateMachine</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span><span class="p">)</span>
+
+<span class="c"># Static variable initialization:</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span> <span class="o">=</span> <span class="n">Waiting</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">luring</span> <span class="o">=</span> <span class="n">Luring</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">trapping</span> <span class="o">=</span> <span class="n">Trapping</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">holding</span> <span class="o">=</span> <span class="n">Holding</span><span class="p">()</span>
+
+<span class="n">moves</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span>
+  <span class="nb">open</span><span class="p">(</span><span class="s">&quot;../mouse/MouseMoves.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+<span class="n">MouseTrap</span><span class="p">()</span><span class="o">.</span><span class="n">runAll</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">MouseAction</span><span class="p">,</span> <span class="n">moves</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The <strong>StateMachine</strong> class simply defines all the possible states as static
+objects, and also sets up the initial state. The <strong>UnitTest</strong> creates a
+<strong>MouseTrap</strong> and then tests it with all the inputs from a <strong>MouseMoveList</strong>.</p>
+<p>While the use of <strong>if</strong> statements inside the <strong>next( )</strong> methods is perfectly
+reasonable, managing a large number of these could become difficult. Another
+approach is to create tables inside each <strong>State</strong> object defining the various
+next states based on the input.</p>
+<p>Initially, this seems like it ought to be quite simple. You should be able to
+define a static table in each <strong>State</strong> subclass that defines the transitions in
+terms of the other <strong>State</strong> objects. However, it turns out that this approach
+generates cyclic initialization dependencies. To solve the problem, I&#8217;ve had to
+delay the initialization of the tables until the first time that the <strong>next( )</strong>
+method is called for a particular <strong>State</strong> object. Initially, the <strong>next( )</strong>
+methods can appear a little strange because of this.</p>
+<p>The <strong>StateT</strong> class is an implementation of <strong>State</strong> (so that the same
+<strong>StateMachine</strong> class can be used from the previous example) that adds a
+<strong>Map</strong> and a method to initialize the map from a two-dimensional array. The
+<strong>next( )</strong> method has a base-class implementation which must be called from the
+overridden derived class <strong>next( )</strong> methods after they test for a <strong>null Map</strong>
+(and initialize it if it&#8217;s <strong>null</strong>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/mousetrap2/MouseTrap2Test.py</span>
+<span class="c"># A better mousetrap using tables</span>
+<span class="k">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;../stateMachine&#39;</span><span class="p">,</span> <span class="s">&#39;../mouse&#39;</span><span class="p">]</span>
+<span class="k">from</span> <span class="nn">State</span> <span class="k">import</span> <span class="n">State</span>
+<span class="k">from</span> <span class="nn">StateMachine</span> <span class="k">import</span> <span class="n">StateMachine</span>
+<span class="k">from</span> <span class="nn">MouseAction</span> <span class="k">import</span> <span class="n">MouseAction</span>
+
+<span class="k">class</span> <span class="nc">StateT</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="nb">input</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="s">&quot;Input not supported for current state&quot;</span>
+
+<span class="k">class</span> <span class="nc">Waiting</span><span class="p">(</span><span class="n">StateT</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Waiting: Broadcasting cheese smell&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c"># Lazy initialization:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">appears</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">luring</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">StateT</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Luring</span><span class="p">(</span><span class="n">StateT</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Luring: Presenting Cheese, door open&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c"># Lazy initialization:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">enters</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">trapping</span><span class="p">,</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">runsAway</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">StateT</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Trapping</span><span class="p">(</span><span class="n">StateT</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Trapping: Closing door&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c"># Lazy initialization:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">escapes</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span><span class="p">,</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">trapped</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">holding</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">StateT</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Holding</span><span class="p">(</span><span class="n">StateT</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Holding: Mouse caught&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c"># Lazy initialization:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="n">MouseAction</span><span class="o">.</span><span class="n">removed</span> <span class="p">:</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">StateT</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MouseTrap</span><span class="p">(</span><span class="n">StateMachine</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Initial state</span>
+        <span class="n">StateMachine</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span><span class="p">)</span>
+
+<span class="c"># Static variable initialization:</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">waiting</span> <span class="o">=</span> <span class="n">Waiting</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">luring</span> <span class="o">=</span> <span class="n">Luring</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">trapping</span> <span class="o">=</span> <span class="n">Trapping</span><span class="p">()</span>
+<span class="n">MouseTrap</span><span class="o">.</span><span class="n">holding</span> <span class="o">=</span> <span class="n">Holding</span><span class="p">()</span>
+
+<span class="n">moves</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span>
+  <span class="nb">open</span><span class="p">(</span><span class="s">&quot;../mouse/MouseMoves.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+<span class="n">mouseMoves</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">MouseAction</span><span class="p">,</span> <span class="n">moves</span><span class="p">)</span>
+<span class="n">MouseTrap</span><span class="p">()</span><span class="o">.</span><span class="n">runAll</span><span class="p">(</span><span class="n">mouseMoves</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The rest of the code is identical - the difference is in the <strong>next( )</strong> methods
+and the <strong>StateT</strong> class.</p>
+<p>If you have to create and maintain a lot of <strong>State</strong> classes, this approach is
+an improvement, since it&#8217;s easier to quickly read and understand the state
+transitions from looking at the table.</p>
+<div class="section" id="table-driven-state-machine">
+<h2>Table-Driven State Machine<a class="headerlink" href="#table-driven-state-machine" title="Permalink to this headline">¶</a></h2>
+<p>The advantage of the previous design is that all the information about a state,
+including the state transition information, is located within the state class
+itself. This is generally a good design principle.</p>
+<p>However, in a pure state machine, the machine can be completely represented by a
+single state-transition table. This has the advantage of locating all the
+information about the state machine in a single place, which means that you can
+more easily create and maintain the table based on a classic state-transition
+diagram.</p>
+<p>The classic state-transition diagram uses a circle to represent each state, and
+lines from the state pointing to all states that state can transition into. Each
+transition line is annotated with conditions for transition and an action during
+transition. Here&#8217;s what it looks like:</p>
+<p>(Simple State Machine Diagram)</p>
+<p>Goals:</p>
+<ul class="simple">
+<li>Direct translation of state diagram</li>
+<li>Vector of change: the state diagram representation</li>
+<li>Reasonable implementation</li>
+<li>No excess of states (you could represent every single change with a new state)</li>
+<li>Simplicity and flexibility</li>
+</ul>
+<p>Observations:</p>
+<ul class="simple">
+<li>States are trivial - no information or functions/data, just an identity</li>
+<li>Not like the State pattern!</li>
+<li>The machine governs the move from state to state</li>
+<li>Similar to flyweight</li>
+<li>Each state may move to many others</li>
+<li>Condition &amp; action functions must also be external to states</li>
+<li>Centralize description in a single table containing all variations,
+for ease of configuration</li>
+</ul>
+<p>Example:</p>
+<ul class="simple">
+<li>State Machine &amp; Table-Driven Code</li>
+<li>Implements a vending machine</li>
+<li>Uses several other patterns</li>
+<li>Separates common state-machine code from specific application
+(like template method)</li>
+<li>Each input causes a seek for appropriate solution
+(like chain of responsibility)</li>
+<li>Tests and transitions are encapsulated in function objects
+(objects that hold functions)</li>
+<li>Java constraint: methods are not first-class objects</li>
+</ul>
+<img alt="_images/stateMachine.gif" src="_images/stateMachine.gif" />
+<div class="section" id="the-state-class">
+<h3>The State Class<a class="headerlink" href="#the-state-class" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>State</strong> class is distinctly different from before, since it is really just
+a placeholder with a name. Thus it is not inherited from previous <strong>State</strong>
+classes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/stateMachine2/State.py</span>
+
+<span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="conditions-for-transition">
+<h3>Conditions for Transition<a class="headerlink" href="#conditions-for-transition" title="Permalink to this headline">¶</a></h3>
+<p>In the state transition diagram, an input is tested to see if it meets the
+condition necessary to transfer to the state under question. As before, the
+<strong>Input</strong> is just a tagging interface:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/stateMachine2/Input.py</span>
+<span class="c"># Inputs to a state machine</span>
+
+<span class="k">class</span> <span class="nc">Input</span><span class="p">:</span> <span class="k">pass</span>
+</pre></div>
+</div>
+<p>The <strong>Condition</strong> evaluates the <strong>Input</strong> to decide whether this row in the
+table is the correct transition:</p>
+<div class="highlight-python"><pre># StateMachine/stateMachine2/Condition.py
+# Condition function object for state machine
+
+class Condition:
+    boolean condition(input) :
+        assert 0, "condition() not implemented"</pre>
+</div>
+</div>
+<div class="section" id="transition-actions">
+<h3>Transition Actions<a class="headerlink" href="#transition-actions" title="Permalink to this headline">¶</a></h3>
+<p>If the <strong>Condition</strong> returns <strong>true</strong>, then the transition to a new state is
+made, and as that transition is made some kind of action occurs (in the previous
+state machine design, this was the <strong>run( )</strong> method):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/stateMachine2/Transition.py</span>
+<span class="c"># Transition function object for state machine</span>
+
+<span class="k">class</span> <span class="nc">Transition</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mf">0</span><span class="p">,</span> <span class="s">&quot;transition() not implemented&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-table">
+<h3>The Table<a class="headerlink" href="#the-table" title="Permalink to this headline">¶</a></h3>
+<p>With these classes in place, we can set up a 3-dimensional table where each row
+completely describes a state. The first element in the row is the current state,
+and the rest of the elements are each a row indicating what the <em>type</em> of the
+input can be, the condition that must be satisfied in order for this state
+change to be the correct one, the action that happens during transition, and the
+new state to move into. Note that the <strong>Input</strong> object is not just used for its
+type, it is also a <em>Messenger</em> object that carries information to the
+<strong>Condition</strong> and <strong>Transition</strong> objects:</p>
+<div class="highlight-python"><pre>{(CurrentState, InputA) : (ConditionA, TransitionA, NextA),
+ (CurrentState, InputB) : (ConditionB, TransitionB, NextB),
+ (CurrentState, InputC) : (ConditionC, TransitionC, NextC),
+ ...
+}</pre>
+</div>
+</div>
+<div class="section" id="the-basic-machine">
+<h3>The Basic Machine<a class="headerlink" href="#the-basic-machine" title="Permalink to this headline">¶</a></h3>
+<p>Here&#8217;s the basic machine, (code only roughly converted):</p>
+<div class="highlight-python"><pre># StateMachine/stateMachine2/StateMachine.py
+# A table-driven state machine
+
+class StateMachine:
+    def __init__(self, initialState, tranTable):
+        self.state = initialState
+        self.transitionTable = tranTable
+
+    def nextState(self, input):
+
+        Iterator it=((List)map.get(state)).iterator()
+        while(it.hasNext()):
+            Object[] tran = (Object[])it.next()
+            if(input == tran[0] ||
+               input.getClass() == tran[0]):
+                if(tran[1] != null):
+                    Condition c = (Condition)tran[1]
+                    if(!c.condition(input))
+                        continue # Failed test
+
+                if(tran[2] != null)
+                    ((Transition)tran[2]).transition(input)
+                state = (State)tran[3]
+                return
+
+
+        throw RuntimeException(
+          "Input not supported for current state")</pre>
+</div>
+</div>
+<div class="section" id="simple-vending-machine">
+<h3>Simple Vending Machine<a class="headerlink" href="#simple-vending-machine" title="Permalink to this headline">¶</a></h3>
+<p>Here&#8217;s the simple vending machine, (code only roughly converted):</p>
+<div class="highlight-python"><pre># StateMachine/vendingmachine/VendingMachine.py
+# Demonstrates use of StateMachine.py
+import sys
+sys.path += ['../stateMachine2']
+import StateMachine
+
+class State:
+    def __init__(self, name): self.name = name
+    def __str__(self): return self.name
+
+State.quiescent = State("Quiesecent")
+State.collecting = State("Collecting")
+State.selecting = State("Selecting")
+State.unavailable = State("Unavailable")
+State.wantMore = State("Want More?")
+State.noChange = State("Use Exact Change Only")
+State.makesChange = State("Machine makes change")
+
+class HasChange:
+    def __init__(self, name): self.name = name
+    def __str__(self): return self.name
+
+HasChange.yes = HasChange("Has change")
+HasChange.no = HasChange("Cannot make change")
+
+class ChangeAvailable(StateMachine):
+    def __init__(self):
+        StateMachine.__init__(State.makesChange, {
+          # Current state, input
+          (State.makesChange, HasChange.no) :
+            # test, transition, next state:
+            (null, null, State.noChange),
+          (State.noChange, HasChange.yes) :
+            (null, null, State.noChange)
+        })
+
+class Money:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+    def __str__(self): return self.name
+    def getValue(self): return self.value
+
+Money.quarter = Money("Quarter", 25)
+Money.dollar = Money("Dollar", 100)
+
+class Quit:
+    def __str__(self): return "Quit"
+
+Quit.quit = Quit()
+
+class Digit:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+    def __str__(self): return self.name
+    def getValue(self): return self.value
+
+class FirstDigit(Digit): pass
+FirstDigit.A = FirstDigit("A", 0)
+FirstDigit.B = FirstDigit("B", 1)
+FirstDigit.C = FirstDigit("C", 2)
+FirstDigit.D = FirstDigit("D", 3)
+
+class SecondDigit(Digit): pass
+SecondDigit.one = SecondDigit("one", 0)
+SecondDigit.two = SecondDigit("two", 1)
+SecondDigit.three = SecondDigit("three", 2)
+SecondDigit.four = SecondDigit("four", 3)
+
+class ItemSlot:
+    id = 0
+    def __init__(self, price, quantity):
+        self.price = price
+        self.quantity = quantity
+    def __str__(self): return `ItemSlot.id`
+    def getPrice(self): return self.price
+    def getQuantity(self): return self.quantity
+    def decrQuantity(self): self.quantity -= 1
+
+class VendingMachine(StateMachine):
+    changeAvailable = ChangeAvailable()
+    amount = 0
+    FirstDigit first = null
+    ItemSlot[][] items = ItemSlot[4][4]
+
+    # Conditions:
+    def notEnough(self, input):
+        i1 = first.getValue()
+        i2 = input.getValue()
+        return items[i1][i2].getPrice() &gt; amount
+
+    def itemAvailable(self, input):
+        i1 = first.getValue()
+        i2 = input.getValue()
+        return items[i1][i2].getQuantity() &gt; 0
+
+    def itemNotAvailable(self, input):
+        return !itemAvailable.condition(input)
+        #i1 = first.getValue()
+        #i2 = input.getValue()
+        #return items[i1][i2].getQuantity() == 0
+
+    # Transitions:
+    def clearSelection(self, input):
+        i1 = first.getValue()
+        i2 = input.getValue()
+        ItemSlot is = items[i1][i2]
+        print (
+          "Clearing selection: item " + is +
+          " costs " + is.getPrice() +
+          " and has quantity " + is.getQuantity())
+        first = null
+
+    def dispense(self, input):
+        i1 = first.getValue()
+        i2 = input.getValue()
+        ItemSlot is = items[i1][i2]
+        print(("Dispensing item " +
+          is + " costs " + is.getPrice() +
+          " and has quantity " + is.getQuantity()))
+        items[i1][i2].decrQuantity()
+        print ("Quantity " +
+          is.getQuantity())
+        amount -= is.getPrice()
+        print("Amount remaining " +
+          amount)
+
+    def showTotal(self, input):
+        amount += ((Money)input).getValue()
+        print("Total amount = " + amount)
+
+    def returnChange(self, input):
+        print("Returning " + amount)
+        amount = 0
+
+    def showDigit(self, input):
+        first = (FirstDigit)input
+        print("First Digit= "+ first)
+
+    def __init__(self):
+        StateMachine.__init__(self, State.quiescent)
+        for(int i = 0 i &lt; items.length i++)
+            for(int j = 0 j &lt; items[i].length j++)
+                items[i][j] = ItemSlot((j+1)*25, 5)
+        items[3][0] = ItemSlot(25, 0)
+        """
+        buildTable(Object[][][]{
+         ::State.quiescent, # Current state
+            # Input, test, transition, next state:
+           :Money.class, null,
+             showTotal, State.collecting,
+         ::State.collecting, # Current state
+            # Input, test, transition, next state:
+           :Quit.quit, null,
+             returnChange, State.quiescent,
+           :Money.class, null,
+             showTotal, State.collecting,
+           :FirstDigit.class, null,
+             showDigit, State.selecting,
+         ::State.selecting, # Current state
+            # Input, test, transition, next state:
+           :Quit.quit, null,
+             returnChange, State.quiescent,
+           :SecondDigit.class, notEnough,
+             clearSelection, State.collecting,
+           :SecondDigit.class, itemNotAvailable,
+             clearSelection, State.unavailable,
+           :SecondDigit.class, itemAvailable,
+             dispense, State.wantMore,
+         ::State.unavailable, # Current state
+            # Input, test, transition, next state:
+           :Quit.quit, null,
+             returnChange, State.quiescent,
+           :FirstDigit.class, null,
+             showDigit, State.selecting,
+         ::State.wantMore, # Current state
+            # Input, test, transition, next state:
+           :Quit.quit, null,
+             returnChange, State.quiescent,
+           :FirstDigit.class, null,
+             showDigit, State.selecting,
+        )
+        """</pre>
+</div>
+</div>
+<div class="section" id="testing-the-machine">
+<h3>Testing the Machine<a class="headerlink" href="#testing-the-machine" title="Permalink to this headline">¶</a></h3>
+<p>Here&#8217;s a test of the machine, (code only roughly converted):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/vendingmachine/VendingMachineTest.py</span>
+<span class="c"># Demonstrates use of StateMachine.py</span>
+
+<span class="n">vm</span> <span class="o">=</span> <span class="n">VendingMachine</span><span class="p">()</span>
+<span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="n">Money</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
+    <span class="n">Money</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
+    <span class="n">Money</span><span class="o">.</span><span class="n">dollar</span><span class="p">,</span>
+    <span class="n">FirstDigit</span><span class="o">.</span><span class="n">A</span><span class="p">,</span>
+    <span class="n">SecondDigit</span><span class="o">.</span><span class="n">two</span><span class="p">,</span>
+    <span class="n">FirstDigit</span><span class="o">.</span><span class="n">A</span><span class="p">,</span>
+    <span class="n">SecondDigit</span><span class="o">.</span><span class="n">two</span><span class="p">,</span>
+    <span class="n">FirstDigit</span><span class="o">.</span><span class="n">C</span><span class="p">,</span>
+    <span class="n">SecondDigit</span><span class="o">.</span><span class="n">three</span><span class="p">,</span>
+    <span class="n">FirstDigit</span><span class="o">.</span><span class="n">D</span><span class="p">,</span>
+    <span class="n">SecondDigit</span><span class="o">.</span><span class="n">one</span><span class="p">,</span>
+    <span class="n">Quit</span><span class="o">.</span><span class="n">quit</span><span class="p">]:</span>
+    <span class="n">vm</span><span class="o">.</span><span class="n">nextState</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tools">
+<h2>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
+<p>Another approach, as your state machine gets bigger, is to use an automation
+tool whereby you configure a table and let the tool generate the state machine
+code for you. This can be created yourself using a language like Python, but
+there are also free, open-source tools such as <em>Libero</em>, at
+<a class="reference external" href="http://www.imatix.com">http://www.imatix.com</a>.</p>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Create an example of the &#8220;virtual proxy.&#8221;</li>
+<li>Create an example of the &#8220;Smart reference&#8221; proxy where you keep count of the
+number of method calls to a particular object.</li>
+<li>Create a program similar to certain DBMS systems that only allow a certain
+number of connections at any time. To implement this, use a singleton-like
+system that controls the number of &#8220;connection&#8221; objects that it creates.
+When a user is finished with a connection, the system must be informed so
+that it can check that connection back in to be reused. To guarantee this,
+provide a proxy object instead of a reference to the actual connection, and
+design the proxy so that it will cause the connection to be released back to
+the system.</li>
+<li>Using the <em>State</em>, make a class called <strong>UnpredictablePerson</strong> which changes
+the kind of response to its <strong>hello( )</strong> method depending on what kind of
+<strong>Mood</strong> it&#8217;s in. Add an additional kind of <strong>Mood</strong> called <strong>Prozac</strong>.</li>
+<li>Create a simple copy-on write implementation.</li>
+<li>Apply <strong>TransitionTable.py</strong> to the &#8220;Washer&#8221; problem.</li>
+<li>Create a <em>StateMachine</em> system whereby the current state along with input
+information determines the next state that the system will be in. To do
+this, each state must store a reference back to the proxy object (the state
+controller) so that it can request the state change. Use a <strong>HashMap</strong> to
+create a table of states, where the key is a <strong>String</strong> naming the new state
+and the value is the new state object. Inside each state subclass override a
+method <strong>nextState( )</strong> that has its own state-transition table. The input
+to <strong>nextState( )</strong> should be a single word that comes from a text file
+containing one word per line.</li>
+<li>Modify the previous exercise so that the state machine can be configured by
+creating/modifying a single multi-dimensional array.</li>
+<li>Modify the &#8220;mood&#8221; exercise from the previous session so that it becomes a
+state machine using StateMachine.py</li>
+<li>Create an elevator state machine system using StateMachine.py</li>
+<li>Create a heating/air-conditioning system using StateMachine.py</li>
+<li>A <em>generator</em> is an object that produces other objects, just like a factory,
+except that the generator function doesn&#8217;t require any arguments. Create a
+<strong>MouseMoveGenerator</strong> which produces correct <strong>MouseMove</strong> actions as
+outputs each time the generator function is called (that is, the mouse must
+move in the proper sequence, thus the possible moves are based on the
+previous move - it&#8217;s another state machine). Add a method to produce an
+iterator, but this method should take an <strong>int</strong> argument that specifies the
+number of moves to produce before <strong>hasNext()</strong> returns <strong>false</strong>.</li>
+</ol>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>No mice were harmed in the creation of this example.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">StateMachine</a><ul>
+<li><a class="reference external" href="#table-driven-state-machine">Table-Driven State Machine</a><ul>
+<li><a class="reference external" href="#the-state-class">The State Class</a></li>
+<li><a class="reference external" href="#conditions-for-transition">Conditions for Transition</a></li>
+<li><a class="reference external" href="#transition-actions">Transition Actions</a></li>
+<li><a class="reference external" href="#the-table">The Table</a></li>
+<li><a class="reference external" href="#the-basic-machine">The Basic Machine</a></li>
+<li><a class="reference external" href="#simple-vending-machine">Simple Vending Machine</a></li>
+<li><a class="reference external" href="#testing-the-machine">Testing the Machine</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#tools">Tools</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Fronting.html" title="previous chapter">Fronting for an Implementation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Decorator.html" title="next chapter">Decorator: Dynamic Type Selection</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/StateMachine.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Decorator.html" title="Decorator: Dynamic Type Selection"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Fronting.html" title="Fronting for an Implementation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

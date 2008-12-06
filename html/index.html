@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Python 3 Patterns &amp; Idioms &mdash; Python 3 Patterns &amp; Idioms</title>
+    <title>Python 3 Patterns, Recipes and Idioms &mdash; Python 3 Patterns, Recipes and Idioms</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="Python 3 Patterns &amp; Idioms" href="" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="" />
     <link rel="next" title="Contributors" href="Contributors.html" /> 
   </head>
   <body>
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="Contributors.html" title="Contributors"
              accesskey="N">next</a> |</li>
-        <li><a href="">Python 3 Patterns &amp; Idioms</a> &raquo;</li> 
+        <li><a href="">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>  
     <div class="document">
@@ -41,8 +41,8 @@
           <div class="body">
             
   
-  <div class="section" id="python-3-patterns-idioms">
-<h1>Python 3 Patterns &amp; Idioms<a class="headerlink" href="#python-3-patterns-idioms" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="python-3-patterns-recipes-and-idioms">
+<h1>Python 3 Patterns, Recipes and Idioms<a class="headerlink" href="#python-3-patterns-recipes-and-idioms" title="Permalink to this headline">¶</a></h1>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="Contributors.html">Contributors</a><ul>
 <li class="toctree-l2"><a class="reference external" href="Contributors.html#thanks-to">Thanks To</a></li>
@@ -90,11 +90,38 @@
 <li class="toctree-l2"><a class="reference external" href="DeveloperGuide.html#building-the-pdf">Building the PDF</a></li>
 <li class="toctree-l2"><a class="reference external" href="DeveloperGuide.html#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
 <li class="toctree-l2"><a class="reference external" href="DeveloperGuide.html#a-simple-overview-of-editing-and-merging">A Simple Overview Of Editing and Merging</a></li>
+<li class="toctree-l2"><a class="reference external" href="DeveloperGuide.html#emacs-for-editing-restructured-text">Emacs for Editing Restructured Text</a></li>
 </ul>
 </li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="Part1.html">Part I: Foundations</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="QuickPython.html">Quick Python for Programmers</a><ul>
+<li class="toctree-l2"><a class="reference external" href="QuickPython.html#scripting-vs-programming">Scripting vs. Programming</a></li>
+<li class="toctree-l2"><a class="reference external" href="QuickPython.html#built-in-containers">Built-In Containers</a></li>
+<li class="toctree-l2"><a class="reference external" href="QuickPython.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference external" href="QuickPython.html#strings">Strings</a></li>
+<li class="toctree-l2"><a class="reference external" href="QuickPython.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference external" href="QuickPython.html#inheritance">Inheritance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="UnitTesting.html">Unit Testing &amp; Test-Driven Development</a><ul>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#write-tests-first">Write Tests First</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#simple-python-testing">Simple Python Testing</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#a-very-simple-framework">A Very Simple Framework</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#writing-tests">Writing Tests</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#white-box-black-box-tests">White-Box &amp; Black-Box Tests</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#running-tests">Running tests</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#automatically-executing-tests">Automatically Executing Tests</a></li>
+<li class="toctree-l2"><a class="reference external" href="UnitTesting.html#exercises">Exercises</a></li>
+</ul>
+</li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="LanguageChanges.html">Python 3 Language Changes</a></li>
@@ -131,6 +158,33 @@
 </li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference external" href="Jython.html">Jython</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#interpreter-motivation">Interpreter Motivation</a></li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#creating-a-language">Creating a Language</a></li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#controlling-the-interpreter">Controlling the Interpreter</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#putting-data-in">Putting Data In</a></li>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#getting-data-out">Getting Data Out</a></li>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#multiple-interpreters">Multiple Interpreters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#controlling-java-from-jython">Controlling Java from Jython</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#inner-classes">Inner Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#using-java-libraries">Using Java libraries</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#inheriting-from-java-library-classes">Inheriting from Java library Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#creating-java-classes-with-jython">Creating Java classes with Jython</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Jython.html#building-java-classes-from-python">Building Java Classes from Python</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference external" href="Jython.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference external" href="Part2.html">Part II: Idioms</a></li>
 </ul>
 <ul>
@@ -144,6 +198,163 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="Part3.html">Part III: Patterns</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="PatternConcept.html">The Pattern Concept</a><ul>
+<li class="toctree-l2"><a class="reference external" href="PatternConcept.html#what-is-a-pattern">What is a Pattern?</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternConcept.html#classifying-patterns">Classifying Patterns</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternConcept.html#pattern-taxonomy">Pattern Taxonomy</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternConcept.html#design-structures">Design Structures</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternConcept.html#design-principles">Design Principles</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Singleton.html">The Singleton</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Singleton.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="AppFrameworks.html">Building Application Frameworks</a><ul>
+<li class="toctree-l2"><a class="reference external" href="AppFrameworks.html#template-method">Template Method</a></li>
+<li class="toctree-l2"><a class="reference external" href="AppFrameworks.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Fronting.html">Fronting for an Implementation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Fronting.html#proxy">Proxy</a></li>
+<li class="toctree-l2"><a class="reference external" href="Fronting.html#state">State</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="StateMachine.html">StateMachine</a><ul>
+<li class="toctree-l2"><a class="reference external" href="StateMachine.html#table-driven-state-machine">Table-Driven State Machine</a><ul>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#the-state-class">The State Class</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#conditions-for-transition">Conditions for Transition</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#transition-actions">Transition Actions</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#the-table">The Table</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#the-basic-machine">The Basic Machine</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#simple-vending-machine">Simple Vending Machine</a></li>
+<li class="toctree-l3"><a class="reference external" href="StateMachine.html#testing-the-machine">Testing the Machine</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="StateMachine.html#tools">Tools</a></li>
+<li class="toctree-l2"><a class="reference external" href="StateMachine.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Decorator.html">Decorator: Dynamic Type Selection</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#basic-decorator-structure">Basic Decorator Structure</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#a-coffee-example">A Coffee Example</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#class-for-each-combination">Class for Each Combination</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#the-decorator-approach">The Decorator Approach</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#compromise">Compromise</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#other-considerations">Other Considerations</a></li>
+<li class="toctree-l2"><a class="reference external" href="Decorator.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Iterators.html">Iterators: Decoupling Algorithms from Containers</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Iterators.html#type-safe-iterators">Type-Safe Iterators</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Factory.html">Factory: Encapsulating Object Creation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Factory.html#simple-factory-method">Simple Factory Method</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Factory.html#preventing-direct-creation">Preventing direct creation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="Factory.html#polymorphic-factories">Polymorphic Factories</a></li>
+<li class="toctree-l2"><a class="reference external" href="Factory.html#abstract-factories">Abstract Factories</a></li>
+<li class="toctree-l2"><a class="reference external" href="Factory.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="FunctionObjects.html">Function Objects</a><ul>
+<li class="toctree-l2"><a class="reference external" href="FunctionObjects.html#command-choosing-the-operation-at-runtime">Command: Choosing the Operation at Runtime</a></li>
+<li class="toctree-l2"><a class="reference external" href="FunctionObjects.html#strategy-choosing-the-algorithm-at-runtime">Strategy: Choosing the Algorithm at Runtime</a></li>
+<li class="toctree-l2"><a class="reference external" href="FunctionObjects.html#chain-of-responsibility">Chain of Responsibility</a></li>
+<li class="toctree-l2"><a class="reference external" href="FunctionObjects.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="ChangeInterface.html">Changing the Interface</a><ul>
+<li class="toctree-l2"><a class="reference external" href="ChangeInterface.html#adapter">Adapter</a></li>
+<li class="toctree-l2"><a class="reference external" href="ChangeInterface.html#facade">Façade</a></li>
+<li class="toctree-l2"><a class="reference external" href="ChangeInterface.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="TableDriven.html">Table-Driven Code: Configuration Flexibility</a><ul>
+<li class="toctree-l2"><a class="reference external" href="TableDriven.html#table-driven-code-using-anonymous-inner-classes">Table-Driven Code Using Anonymous Inner Classes</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Observer.html">Observer</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Observer.html#observing-flowers">Observing Flowers</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Observer.html#a-visual-example-of-observers">A Visual Example of Observers</a></li>
+<li class="toctree-l3"><a class="reference external" href="Observer.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="MultipleDispatching.html">Multiple Dispatching</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Visitor.html">Visitor</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Visitor.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="PatternRefactoring.html">Pattern Refactoring</a><ul>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#simulating-the-trash-recycler">Simulating the Trash Recycler</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#improving-the-design">Improving the Design</a><ul>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#make-more-objects">&#8220;Make More Objects&#8221;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#a-pattern-for-prototyping-creation">A Pattern for Prototyping Creation</a><ul>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#trash-subclasses"><strong>Trash</strong> Subclasses</a></li>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#parsing-trash-from-an-external-file">Parsing <strong>Trash</strong> from an External File</a></li>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#recycling-with-prototyping">Recycling with Prototyping</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#abstracting-usage">Abstracting Usage</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#multiple-dispatching">Multiple Dispatching</a><ul>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#implementing-the-double-dispatch">Implementing the Double Dispatch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#the-visitor-pattern">The <em>Visitor</em> Pattern</a><ul>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#a-reflective-decorator">A Reflective Decorator</a></li>
+<li class="toctree-l3"><a class="reference external" href="PatternRefactoring.html#more-coupling">More Coupling?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#rtti-considered-harmful">RTTI Considered Harmful?</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference external" href="PatternRefactoring.html#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="Projects.html">Projects</a><ul>
+<li class="toctree-l2"><a class="reference external" href="Projects.html#rats-mazes">Rats &amp; Mazes</a><ul>
+<li class="toctree-l3"><a class="reference external" href="Projects.html#other-maze-resources">Other Maze Resources</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="indices-and-tables">
@@ -161,13 +372,13 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="">
-              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
             </a></p>
     <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
     
             <h3><a href="">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Python 3 Patterns &amp; Idioms</a><ul>
+<li><a class="reference external" href="">Python 3 Patterns, Recipes and Idioms</a><ul>
 </ul>
 </li>
 <li><a class="reference external" href="#indices-and-tables">Indices and tables</a></li>
@@ -204,13 +415,13 @@
         <li class="right" >
           <a href="Contributors.html" title="Contributors"
              accesskey="N">next</a> |</li>
-        <li><a href="">Python 3 Patterns &amp; Idioms</a> &raquo;</li> 
+        <li><a href="">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 25, 2008.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
 </html>

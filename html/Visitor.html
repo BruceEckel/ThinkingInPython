@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Visitor &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Pattern Refactoring" href="PatternRefactoring.html" />
+    <link rel="prev" title="Multiple Dispatching" href="MultipleDispatching.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PatternRefactoring.html" title="Pattern Refactoring"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MultipleDispatching.html" title="Multiple Dispatching"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="visitor">
+<h1>Visitor<a class="headerlink" href="#visitor" title="Permalink to this headline">¶</a></h1>
+<p>The visitor pattern is implemented using multiple dispatching, but people often
+confuse the two, because they look at the implementation rather than the intent.</p>
+<p>The assumption is that you have a primary class hierarchy that is fixed; perhaps
+it&#8217;s from another vendor and you can&#8217;t make changes to that hierarchy. However,
+your intent is that you&#8217;d like to add new polymorphic methods to that hierarchy,
+which means that normally you&#8217;d have to add something to the base class
+interface. So the dilemma is that you need to add methods to the base class, but
+you can&#8217;t touch the base class. How do you get around this?</p>
+<p>The design pattern that solves this kind of problem is called a &#8220;visitor&#8221; (the
+final one in the <em>Design Patterns</em> book), and it builds on the double
+dispatching scheme shown in the last section.</p>
+<p>The visitor pattern allows you to extend the interface of the primary type by
+creating a separate class hierarchy of type <strong>Visitor</strong> to virtualize the
+operations performed upon the primary type. The objects of the primary type
+simply &#8220;accept&#8221; the visitor, then call the visitor&#8217;s dynamically-bound member
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Visitor/FlowerVisitors.py</span>
+<span class="c"># Demonstration of &quot;visitor&quot; pattern.</span>
+<span class="k">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
+<span class="k">import</span> <span class="nn">random</span>
+
+<span class="c"># The Flower hierarchy cannot be changed:</span>
+<span class="k">class</span> <span class="nc">Flower</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
+        <span class="n">visitor</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">pollinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pollinator</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;pollinated by&quot;</span><span class="p">,</span> <span class="n">pollinator</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">eat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eater</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;eaten by&quot;</span><span class="p">,</span> <span class="n">eater</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="k">class</span> <span class="nc">Gladiolus</span><span class="p">(</span><span class="n">Flower</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Runuculus</span><span class="p">(</span><span class="n">Flower</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Chrysanthemum</span><span class="p">(</span><span class="n">Flower</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Visitor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="k">class</span> <span class="nc">Bug</span><span class="p">(</span><span class="n">Visitor</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Pollinator</span><span class="p">(</span><span class="n">Bug</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Predator</span><span class="p">(</span><span class="n">Bug</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="c"># Add the ability to do &quot;Bee&quot; activities:</span>
+<span class="k">class</span> <span class="nc">Bee</span><span class="p">(</span><span class="n">Pollinator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flower</span><span class="p">):</span>
+        <span class="n">flower</span><span class="o">.</span><span class="n">pollinate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c"># Add the ability to do &quot;Fly&quot; activities:</span>
+<span class="k">class</span> <span class="nc">Fly</span><span class="p">(</span><span class="n">Pollinator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flower</span><span class="p">):</span>
+        <span class="n">flower</span><span class="o">.</span><span class="n">pollinate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c"># Add the ability to do &quot;Worm&quot; activities:</span>
+<span class="k">class</span> <span class="nc">Worm</span><span class="p">(</span><span class="n">Predator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flower</span><span class="p">):</span>
+        <span class="n">flower</span><span class="o">.</span><span class="n">eat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">flowerGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">flwrs</span> <span class="o">=</span> <span class="n">Flower</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">flwrs</span><span class="p">)()</span>
+
+<span class="c"># It&#39;s almost as if I had a method to Perform</span>
+<span class="c"># various &quot;Bug&quot; operations on all Flowers:</span>
+<span class="n">bee</span> <span class="o">=</span> <span class="n">Bee</span><span class="p">()</span>
+<span class="n">fly</span> <span class="o">=</span> <span class="n">Fly</span><span class="p">()</span>
+<span class="n">worm</span> <span class="o">=</span> <span class="n">Worm</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">flower</span> <span class="ow">in</span> <span class="n">flowerGen</span><span class="p">(</span><span class="mf">10</span><span class="p">):</span>
+    <span class="n">flower</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">bee</span><span class="p">)</span>
+    <span class="n">flower</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">fly</span><span class="p">)</span>
+    <span class="n">flower</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">worm</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Create a business-modeling environment with three types of <strong>Inhabitant</strong>:
+<strong>Dwarf</strong> (for engineers), <strong>Elf</strong> (for marketers) and <strong>Troll</strong> (for
+managers). Now create a class called <strong>Project</strong> that creates the different
+inhabitants and causes them to <strong>interact( )</strong> with each other using
+multiple dispatching.</li>
+<li>Modify the above example to make the interactions more detailed. Each
+<strong>Inhabitant</strong> can randomly produce a <strong>Weapon</strong> using <strong>getWeapon( )</strong>: a
+<strong>Dwarf</strong> uses <strong>Jargon</strong> or <strong>Play</strong>, an <strong>Elf</strong> uses <strong>InventFeature</strong> or
+<strong>SellImaginaryProduct</strong>, and a <strong>Troll</strong> uses <strong>Edict</strong> and <strong>Schedule</strong>.
+You must decide which weapons &#8220;win&#8221; and &#8220;lose&#8221; in each interaction (as in
+<strong>PaperScissorsRock.py</strong>). Add a <strong>battle( )</strong> member function to
+<strong>Project</strong> that takes two <strong>Inhabitant</strong>s and matches them against each
+other. Now create a <strong>meeting( )</strong> member function for <strong>Project</strong> that
+creates groups of <strong>Dwarf</strong>, <strong>Elf</strong> and <strong>Manager</strong> and battles the groups
+against each other until only members of one group are left standing. These
+are the &#8220;winners.&#8221;</li>
+<li>Modify <strong>PaperScissorsRock.py</strong> to replace the double dispatching with a
+table lookup. The easiest way to do this is to create a <strong>Map</strong> of
+<strong>Map</strong>s, with the key of each <strong>Map</strong> the class of each object. Then you
+can do the lookup by saying:
+<cite>((Map)map.get(o1.getClass())).get(o2.getClass())</cite> Notice how much easier it
+is to reconfigure the system. When is it more appropriate to use this
+approach vs. hard-coding the dynamic dispatches? Can you create a system
+that has the syntactic simplicity of use of the dynamic dispatch but uses a
+table lookup?</li>
+<li>Modify Exercise 2 to use the table lookup technique described in Exercise 3.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Visitor</a><ul>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="MultipleDispatching.html" title="previous chapter">Multiple Dispatching</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="PatternRefactoring.html" title="next chapter">Pattern Refactoring</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Visitor.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PatternRefactoring.html" title="Pattern Refactoring"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MultipleDispatching.html" title="Multiple Dispatching"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

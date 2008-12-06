@@ -1,0 +1,1670 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pattern Refactoring &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Projects" href="Projects.html" />
+    <link rel="prev" title="Visitor" href="Visitor.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Projects.html" title="Projects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Visitor.html" title="Visitor"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="pattern-refactoring">
+<h1>Pattern Refactoring<a class="headerlink" href="#pattern-refactoring" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This chapter has not had any significant translation yet.</p>
+</div>
+<p>This chapter will look at the process of solving a problem by applying design
+patterns in an evolutionary fashion. That is, a first cut design will be used
+for the initial solution, and then this solution will be examined and various
+design patterns will be applied to the problem (some of which will work, and
+some of which won&#8217;t). The key question that will always be asked in seeking
+improved solutions is &#8220;what will change?&#8221;</p>
+<p>This process is similar to what Martin Fowler talks about in his book
+<em>Refactoring: Improving the Design of Existing Code [#]_</em> (although he tends to
+talk about pieces of code more than pattern-level designs). You start with a
+solution, and then when you discover that it doesn&#8217;t continue to meet your
+needs, you fix it. Of course, this is a natural tendency but in computer
+programming it&#8217;s been extremely difficult to accomplish with procedural
+programs, and the acceptance of the idea that we <em>can</em> refactor code and designs
+adds to the body of proof that object-oriented programming is &#8220;a good thing.&#8221;</p>
+<div class="section" id="simulating-the-trash-recycler">
+<h2>Simulating the Trash Recycler<a class="headerlink" href="#simulating-the-trash-recycler" title="Permalink to this headline">¶</a></h2>
+<p>The nature of this problem is that the trash is thrown unclassified into a
+single bin, so the specific type information is lost. But later, the specific
+type information must be recovered to properly sort the trash. In the initial
+solution, RTTI (described in <em>Thinking in Java</em>) is used.</p>
+<p>This is not a trivial design because it has an added constraint. That&#8217;s what
+makes it interesting-it&#8217;s more like the messy problems you&#8217;re likely to
+encounter in your work. The extra constraint is that the trash arrives at the
+trash recycling plant all mixed together. The program must model the sorting of
+that trash. This is where RTTI comes in: you have a bunch of anonymous pieces of
+trash, and the program figures out exactly what type they are:</p>
+<div class="highlight-python"><pre># PatternRefactoring/recyclea/RecycleA.py
+# Recycling with RTTI.
+
+class Trash:
+    def __init__(self, wt):
+        self.weight = wt
+    abstract def getValue()
+    def getWeight(): return weight
+    # Sums the value of Trash in a bin:
+    def sumValue(Iterator it):
+        val = 0.0f
+        while(it.hasNext()):
+            # One kind of RTTI:
+            # A dynamically-checked cast
+            Trash t = (Trash)it.next()
+            # Polymorphism in action:
+            val += t.getWeight() * t.getValue()
+            print (
+              "weight of " +
+              # Using RTTI to get type
+              # information about the class:
+              t.getClass().getName() +
+              " = " + t.getWeight())
+
+        print("Total value = " + val)
+
+class Aluminum(Trash):
+    val  = 1.67f
+    def __init__(self, wt):
+        Trash.__init__(wt)
+    def getValue(): return self.val
+    setValue(newval):
+        val = newval
+
+class Paper(Trash):
+    val = 0.10f
+    def __init__(self, wt):
+        Trash.__init__(wt)
+    def getValue(): return self.val
+    def setValue(self, newval):
+        val = newval
+
+class Glass(Trash):
+    val = 0.23f
+    def __init__(self, wt):
+        Trash.__init__(wt)
+    def getValue(self):
+        return self.val
+    def setValue(self, newval):
+        val = newval
+
+class RecycleA(UnitTest):
+    bin = ArrayList()
+    glassBin = ArrayList()
+    paperBin = ArrayList()
+    alBin = ArrayList()
+    def __init__(self):
+        # Fill up the Trash bin:
+        for(int i = 0 i &lt; 30 i++)
+            switch((int)(Math.random() * 3)):
+                case 0:
+                    bin.add(new
+                      Aluminum(Math.random() * 100))
+                    break
+                case 1:
+                    bin.add(new
+                      Paper(Math.random() * 100))
+                    break
+                case 2:
+                    bin.add(new
+                      Glass(Math.random() * 100))
+
+    def test(self):
+        Iterator sorter = bin.iterator()
+        # Sort the Trash:
+        while(sorter.hasNext()):
+            Object t = sorter.next()
+            # RTTI to show class membership:
+            if(t instanceof Aluminum)
+                alBin.add(t)
+            if(t instanceof Paper)
+                paperBin.add(t)
+            if(t instanceof Glass)
+                glassBin.add(t)
+
+        Trash.sumValue(alBin.iterator())
+        Trash.sumValue(paperBin.iterator())
+        Trash.sumValue(glassBin.iterator())
+        Trash.sumValue(bin.iterator())
+
+    def main(self, String args[]):
+        RecycleA().test()</pre>
+</div>
+<p>In the source code listings available for this book, this file will be placed in
+the subdirectory <strong>recyclea</strong> that branches off from the subdirectory
+<strong>patternRefactoring</strong>. The unpacking tool takes care of placing it into the
+correct subdirectory. The reason for doing this is that this chapter rewrites
+this particular example a number of times and by putting each version in its own
+directory (using the default package in each directory so that invoking the
+program is easy), the class names will not clash.</p>
+<p>Several <strong>ArrayList</strong> objects are created to hold <strong>Trash</strong> references. Of
+course, <strong>ArrayList</strong>s actually hold <strong>Object</strong>s so they&#8217;ll hold anything at
+all. The reason they hold <strong>Trash</strong> (or something derived from <strong>Trash</strong>) is
+only because you&#8217;ve been careful to not put in anything except <strong>Trash</strong>. If you
+do put something &#8220;wrong&#8221; into the <strong>ArrayList</strong>, you won&#8217;t get any compile-time
+warnings or errors-you&#8217;ll find out only via an exception at run time.</p>
+<p>When the <strong>Trash</strong> references are added, they lose their specific identities and
+become simply <strong>Object reference</strong>s (they are <em>upcast</em>). However, because of
+polymorphism the proper behavior still occurs when the dynamically-bound methods
+are called through the <strong>Iterator sorter</strong>, once the resulting <strong>Object</strong> has
+been cast back to <strong>Trash</strong>. <strong>sumValue( )</strong> also takes an <strong>Iterator</strong> to
+perform operations on every object in the <strong>ArrayList</strong>.</p>
+<p>It looks silly to upcast the types of <strong>Trash</strong> into a container holding base
+type references, and then turn around and downcast. Why not just put the trash
+into the appropriate receptacle in the first place? (Indeed, this is the whole
+enigma of recycling). In this program it would be easy to repair, but sometimes
+a system&#8217;s structure and flexibility can benefit greatly from downcasting.</p>
+<p>The program satisfies the design requirements: it works. This might be fine as
+long as it&#8217;s a one-shot solution. However, a useful program tends to evolve over
+time, so you must ask, &#8220;What if the situation changes?&#8221; For example, cardboard
+is now a valuable recyclable commodity, so how will that be integrated into the
+system (especially if the program is large and complicated). Since the above
+type-check coding in the <strong>switch</strong> statement could be scattered throughout the
+program, you must go find all that code every time a new type is added, and if
+you miss one the compiler won&#8217;t give you any help by pointing out an error.</p>
+<p>The key to the misuse of RTTI here is that <em>every type is tested</em>. If you&#8217;re
+looking for only a subset of types because that subset needs special treatment,
+that&#8217;s probably fine. But if you&#8217;re hunting for every type inside a switch
+statement, then you&#8217;re probably missing an important point, and definitely
+making your code less maintainable. In the next section we&#8217;ll look at how this
+program evolved over several stages to become much more flexible. This should
+prove a valuable example in program design.</p>
+</div>
+<div class="section" id="improving-the-design">
+<h2>Improving the Design<a class="headerlink" href="#improving-the-design" title="Permalink to this headline">¶</a></h2>
+<p>The solutions in <em>Design Patterns</em> are organized around the question &#8220;What will
+change as this program evolves?&#8221; This is usually the most important question
+that you can ask about any design. If you can build your system around the
+answer, the results will be two-pronged: not only will your system allow easy
+(and inexpensive) maintenance, but you might also produce components that are
+reusable, so that other systems can be built more cheaply. This is the promise
+of object-oriented programming, but it doesn&#8217;t happen automatically; it requires
+thought and insight on your part. In this section we&#8217;ll see how this process can
+happen during the refinement of a system.</p>
+<p>The answer to the question &#8220;What will change?&#8221; for the recycling system is a
+common one: more types will be added to the system. The goal of the design,
+then, is to make this addition of types as painless as possible. In the
+recycling program, we&#8217;d like to encapsulate all places where specific type
+information is mentioned, so (if for no other reason) any changes can be
+localized to those encapsulations. It turns out that this process also cleans up
+the rest of the code considerably.</p>
+<div class="section" id="make-more-objects">
+<h3>&#8220;Make More Objects&#8221;<a class="headerlink" href="#make-more-objects" title="Permalink to this headline">¶</a></h3>
+<p>This brings up a general object-oriented design principle that I first heard
+spoken by Grady Booch: &#8220;If the design is too complicated, make more objects.&#8221;
+This is simultaneously counterintuitive and ludicrously simple, and yet it&#8217;s the
+most useful guideline I&#8217;ve found. (You might observe that &#8220;making more objects&#8221;
+is often equivalent to &#8220;add another level of indirection.&#8221;) In general, if you
+find a place with messy code, consider what sort of class would clean that up.
+Often the side effect of cleaning up the code will be a system that has better
+structure and is more flexible.</p>
+<p>Consider first the place where <strong>Trash</strong> objects are created, which is a
+<strong>switch</strong> statement inside <strong>main( )</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/clip1.py
+    for(int i = 0 i &lt; 30 i++)
+        switch((int)(Math.random() * 3)):
+            case 0 :
+                bin.add(new
+                  Aluminum(Math.random() * 100))
+                break
+            case 1 :
+                bin.add(new
+                  Paper(Math.random() * 100))
+                break
+            case 2 :
+                bin.add(new
+                  Glass(Math.random() * 100))</pre>
+</div>
+<p>This is definitely messy, and also a place where you must change code whenever a
+new type is added. If new types are commonly added, a better solution is a
+single method that takes all of the necessary information and produces a
+reference to an object of the correct type, already upcast to a trash object. In
+<em>Design Patterns</em> this is broadly referred to as a <em>creational pattern</em> (of
+which there are several). The specific pattern that will be applied here is a
+variant of the <em>Factory Method</em>. Here, the factory method is a <strong>static</strong> member
+of <strong>Trash</strong>, but more commonly it is a method that is overridden in the derived
+class.</p>
+<p>The idea of the factory method is that you pass it the essential information it
+needs to know to create your object, then stand back and wait for the reference
+(already upcast to the base type) to pop out as the return value. From then on,
+you treat the object polymorphically. Thus, you never even need to know the
+exact type of object that&#8217;s created. In fact, the factory method hides it from
+you to prevent accidental misuse. If you want to use the object without
+polymorphism, you must explicitly use RTTI and casting.</p>
+<p>But there&#8217;s a little problem, especially when you use the more complicated
+approach (not shown here) of making the factory method in the base class and
+overriding it in the derived classes. What if the information required in the
+derived class requires more or different arguments? &#8220;Creating more objects&#8221;
+solves this problem. To implement the factory method, the <strong>Trash</strong> class gets a
+new method called <strong>factory</strong>. To hide the creational data, there&#8217;s a new class
+called <strong>Messenger</strong> that carries all of the necessary information for the
+<strong>factory</strong> method to create the appropriate <strong>Trash</strong> object (we&#8217;ve started
+referring to <em>Messenger</em> as a design pattern, but it&#8217;s simple enough that you
+may not choose to elevate it to that status). Here&#8217;s a simple implementation of
+<strong>Messenger</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PatternRefactoring/clip2.py</span>
+<span class="k">class</span> <span class="nc">Messenger</span><span class="p">:</span>
+    <span class="c"># Must change this to add another type:</span>
+    <span class="n">MAX_NUM</span> <span class="o">=</span> <span class="mf">4</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeNum</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">typeNum</span> <span class="o">%</span> <span class="n">MAX_NUM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">val</span>
+</pre></div>
+</div>
+<p>A <strong>Messenger</strong> object&#8217;s only job is to hold information for the <strong>factory( )</strong>
+method. Now, if there&#8217;s a situation in which <strong>factory( )</strong> needs more or
+different information to create a new type of <strong>Trash</strong> object, the <strong>factory(
+)</strong> interface doesn&#8217;t need to be changed. The <strong>Messenger</strong> class can be changed
+by adding new data and new constructors, or in the more typical object-oriented
+fashion of subclassing.</p>
+<p>The <strong>factory( )</strong> method for this simple example looks like this:</p>
+<div class="highlight-python"><pre># PatternRefactoring/clip3.py
+    def factory(messenger):
+        switch(messenger.type):
+            default: # To quiet the compiler
+            case 0:
+                return Aluminum(messenger.data)
+            case 1:
+                return Paper(messenger.data)
+            case 2:
+                return Glass(messenger.data)
+            # Two lines here:
+            case 3:
+                return Cardboard(messenger.data)</pre>
+</div>
+<p>Here, the determination of the exact type of object is simple, but you can
+imagine a more complicated system in which <strong>factory( )</strong> uses an elaborate
+algorithm. The point is that it&#8217;s now hidden away in one place, and you know to
+come to this place when you add new types.</p>
+<p>The creation of new objects is now much simpler in <strong>main( )</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/clip4.py
+    for(int i = 0 i &lt; 30 i++)
+        bin.add(
+          Trash.factory(
+            Messenger(
+              (int)(Math.random() * Messenger.MAX_NUM),
+              Math.random() * 100)))</pre>
+</div>
+<p>A <strong>Messenger</strong> object is created to pass the data into <strong>factory( )</strong>, which in
+turn produces some kind of <strong>Trash</strong> object on the heap and returns the
+reference that&#8217;s added to the <strong>ArrayList bin</strong>. Of course, if you change the
+quantity and type of argument, this statement will still need to be modified,
+but that can be eliminated if the creation of the <strong>Messenger</strong> object is
+automated. For example, an <strong>ArrayList</strong> of arguments can be passed into the
+constructor of a <strong>Messenger</strong> object (or directly into a <strong>factory( )</strong> call,
+for that matter). This requires that the arguments be parsed and checked at run
+time, but it does provide the greatest flexibility.</p>
+<p>You can see from this code what &#8220;vector of change&#8221; problem the factory is
+responsible for solving: if you add new types to the system (the change), the
+only code that must be modified is within the factory, so the factory isolates
+the effect of that change.</p>
+</div>
+</div>
+<div class="section" id="a-pattern-for-prototyping-creation">
+<h2>A Pattern for Prototyping Creation<a class="headerlink" href="#a-pattern-for-prototyping-creation" title="Permalink to this headline">¶</a></h2>
+<p>A problem with the design above is that it still requires a central location
+where all the types of the objects must be known: inside the <strong>factory( )</strong>
+method. If new types are regularly being added to the system, the <strong>factory( )</strong>
+method must be changed for each new type. When you discover something like this,
+it is useful to try to go one step further and move <em>all</em> of the information
+about the type-including its creation-into the class representing that type.
+This way, the only thing you need to do to add a new type to the system is to
+inherit a single class.</p>
+<p>To move the information concerning type creation into each specific type of
+<strong>Trash</strong>, the &#8220;prototype&#8221; pattern (from the <em>Design Patterns</em> book) will be
+used. The general idea is that you have a master sequence of objects, one of
+each type you&#8217;re interested in making. The objects in this sequence are used
+<em>only</em> for making new objects, using an operation that&#8217;s not unlike the <strong>clone(
+)</strong> scheme built into Java&#8217;s root class <strong>Object</strong>. In this case, we&#8217;ll name the
+cloning method <strong>tClone( )</strong>. When you&#8217;re ready to make a new object, presumably
+you have some sort of information that establishes the type of object you want
+to create, then you move through the master sequence comparing your information
+with whatever appropriate information is in the prototype objects in the master
+sequence. When you find one that matches your needs, you clone it.</p>
+<p>In this scheme there is no hard-coded information for creation. Each object
+knows how to expose appropriate information and how to clone itself. Thus, the
+<strong>factory( )</strong> method doesn&#8217;t need to be changed when a new type is added to the
+system.</p>
+<p>One approach to the problem of prototyping is to add a number of methods to
+support the creation of new objects. However, in Java 1.1 there&#8217;s already
+support for creating new objects if you have a reference to the <strong>Class</strong>
+object. With Java 1.1 <em>reflection</em> (introduced in <em>Thinking in Java</em>) you can
+call a constructor even if you have only a reference to the <strong>Class</strong> object.
+This is the perfect solution for the prototyping problem.</p>
+<p>The list of prototypes will be represented indirectly by a list of references to
+all the <strong>Class</strong> objects you want to create. In addition, if the prototyping
+fails, the <strong>factory( )</strong> method will assume that it&#8217;s because a particular
+<strong>Class</strong> object wasn&#8217;t in the list, and it will attempt to load it. By loading
+the prototypes dynamically like this, the <strong>Trash</strong> class doesn&#8217;t need to know
+what types it is working with, so it doesn&#8217;t need any modifications when you add
+new types. This allows it to be easily reused throughout the rest of the
+chapter:</p>
+<div class="highlight-python"><pre>   # PatternRefactoring/trash/Trash.py
+   # Base class for Trash recycling examples.
+
+   class Trash:
+       def __init__(self, wt): self.weight = wt
+       def getValue(self): pass
+       def getWeight(self): return weight
+       # Sums the value of Trash given an
+       # Iterator to any container of Trash:
+       def sumValue(self, it):
+           val = 0.0f
+           while(it.hasNext()):
+               # One kind of RTTI:
+               # A dynamically-checked cast
+               Trash t = (Trash)it.next()
+               val += t.getWeight() * t.getValue()
+               print (
+                 "weight of " +
+                 # Using RTTI to get type
+                 # information about the class:
+                 t.getClass().getName() +
+                 " = " + t.getWeight())
+
+           print("Total value = " + val)
+
+       # Remainder of class provides
+       # support for prototyping:
+       trashTypes = ArrayList()
+       def factory(self, info):
+           for i in trashTypes:
+               # Somehow determine the type
+               # to create, and create one:
+               tc = trashTypes.get(i)
+               if (tc.getName().index(info.id) != -1):
+                   try:
+                       # Get the dynamic constructor method
+                       # that takes a double argument:
+                       ctor = tc.getConstructor(type(double))
+                       # Call the constructor
+                       # to create a object:
+                       return (Trash)ctor.newInstance()
+                   except ex:
+                       ex.printStackTrace(System.err)
+                       raise "Cannot Create Trash"
+
+           # Class was not in the list. Try to load it,
+           # but it must be in your class path!
+           try:
+               print("Loading " + info.id)
+               trashTypes.add(Class.forName(info.id))
+           except e:
+               e.printStackTrace(System.err)
+               raise "Prototype not found"
+
+           # Loaded successfully.
+           # Recursive call should work:
+           return factory(info)
+
+       class Messenger:
+           def __init__(self, name, val):
+               self.id = name
+               self.data = val
+
+The basic **Trash** class and **sumValue( )** remain as before. The rest of the
+class supports the prototyping pattern. You first see two inner classes (which
+are made **static**, so they are inner classes only for code organization
+purposes) describing exceptions that can occur. This is followed by an
+**ArrayList** called **trashTypes**, which is used to hold the **Class**
+references.</pre>
+</div>
+<p>In <strong>Trash.factory( )</strong>, the <strong>String</strong> inside the <strong>Messenger</strong> object <strong>id</strong>
+(a different version of the <strong>Messenger</strong> class than that of the prior
+discussion) contains the type name of the <strong>Trash</strong> to be created; this
+<strong>String</strong> is compared to the <strong>Class</strong> names in the list. If there&#8217;s a match,
+then that&#8217;s the object to create. Of course, there are many ways to determine
+what object you want to make. This one is used so that information read in from
+a file can be turned into objects.</p>
+<p>Once you&#8217;ve discovered which kind of <strong>Trash</strong> to create, then the reflection
+methods come into play. The <strong>getConstructor( )</strong> method takes an argument
+that&#8217;s an array of <strong>Class</strong> references. This array represents the arguments, in
+their proper order, for the constructor that you&#8217;re looking for. Here, the array
+is dynamically created using the Java 1.1 array-creation syntax:</p>
+<div class="highlight-python"><pre>Class[]:double.class</pre>
+</div>
+<p>This code assumes that every <strong>Trash</strong> type has a constructor that takes a
+<strong>double</strong> (and notice that <strong>double.class</strong> is distinct from <strong>Double.class</strong>).
+It&#8217;s also possible, for a more flexible solution, to call <strong>getConstructors(
+)</strong>, which returns an array of the possible constructors.</p>
+<p>What comes back from <strong>getConstructor( )</strong> is a reference to a <strong>Constructor</strong>
+object (part of <strong>java.lang.reflect</strong>). You call the constructor dynamically
+with the method <strong>newInstance( )</strong>, which takes an array of <strong>Object</strong>
+containing the actual arguments. This array is again created using the Java 1.1
+syntax:</p>
+<div class="highlight-python"><pre>Object[]{Double(Messenger.data)</pre>
+</div>
+<p>In this case, however, the <strong>double</strong> must be placed inside a wrapper class so
+that it can be part of this array of objects. The process of calling
+<strong>newInstance( )</strong> extracts the <strong>double</strong>, but you can see it is a bit
+confusing-an argument might be a <strong>double</strong> or a <strong>Double</strong>, but when you make
+the call you must always pass in a <strong>Double</strong>. Fortunately, this issue exists
+only for the primitive types.</p>
+<p>Once you understand how to do it, the process of creating a new object given
+only a <strong>Class</strong> reference is remarkably simple. Reflection also allows you to
+call methods in this same dynamic fashion.</p>
+<p>Of course, the appropriate <strong>Class</strong> reference might not be in the
+<strong>trashTypes</strong> list. In this case, the <strong>return</strong> in the inner loop is never
+executed and you&#8217;ll drop out at the end. Here, the program tries to rectify the
+situation by loading the <strong>Class</strong> object dynamically and adding it to the
+<strong>trashTypes</strong> list. If it still can&#8217;t be found something is really wrong, but
+if the load is successful then the <strong>factory</strong> method is called recursively to
+try again.</p>
+<p>As you&#8217;ll see, the beauty of this design is that this code doesn&#8217;t need to be
+changed, regardless of the different situations it will be used in (assuming
+that all <strong>Trash</strong> subclasses contain a constructor that takes a single
+<strong>double</strong> argument).</p>
+<div class="section" id="trash-subclasses">
+<h3><strong>Trash</strong> Subclasses<a class="headerlink" href="#trash-subclasses" title="Permalink to this headline">¶</a></h3>
+<p>To fit into the prototyping scheme, the only thing that&#8217;s required of each new
+subclass of <strong>Trash</strong> is that it contain a constructor that takes a <strong>double</strong>
+argument. Java reflection handles everything else.</p>
+<p>Here are the different types of <strong>Trash</strong>, each in their own file but part of
+the <strong>Trash</strong> package (again, to facilitate reuse within the chapter):</p>
+<div class="highlight-python"><pre># PatternRefactoring/trash/Aluminum.py
+# The Aluminum class with prototyping.
+
+class Aluminum(Trash):
+    val = 1.67f
+    def __init__(self, wt): Trash.__init__(wt)
+    def getValue(self): return val
+    def setValue(self, newVal):
+        self.val = newVal::
+
+
+# PatternRefactoring/trash/Paper.py
+# The Paper class with prototyping.
+
+class Paper(Trash):
+    val = 0.10f
+    def __init__(self, wt): Trash.__init__(wt)
+    def getValue(self): return self.val
+    def setValue(self, newVal):
+        self.val = newVal::
+
+
+# PatternRefactoring/trash/Glass.py
+# The Glass class with prototyping.
+
+class Glass(Trash):
+    val = 0.23f
+    def __init__(self, wt): Trash.__init__(wt)
+    def getValue(self): return self.val
+    def setValue(self, newVal):
+        self.val = newVal</pre>
+</div>
+<p>And here&#8217;s a new type of <strong>Trash</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trash/Cardboard.py
+# The Cardboard class with prototyping.
+
+class Cardboard(Trash):
+    val = 0.23f
+    def __init__(self, wt): Trash.__init__(wt)
+    def getValue(self): return self.val
+    def setValue(self, newVal):
+        self.val = newVal</pre>
+</div>
+<p>You can see that, other than the constructor, there&#8217;s nothing special about any
+of these classes.</p>
+</div>
+<div class="section" id="parsing-trash-from-an-external-file">
+<h3>Parsing <strong>Trash</strong> from an External File<a class="headerlink" href="#parsing-trash-from-an-external-file" title="Permalink to this headline">¶</a></h3>
+<p>The information about <strong>Trash</strong> objects will be read from an outside file. The
+file has all of the necessary information about each piece of trash on a single
+line in the form <strong>Trash:weight</strong>, such as:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trash/Trash.dat
+patternRefactoring.trash.Glass:54
+patternRefactoring.trash.Paper:22
+patternRefactoring.trash.Paper:11
+patternRefactoring.trash.Glass:17
+patternRefactoring.trash.Aluminum:89
+patternRefactoring.trash.Paper:88
+patternRefactoring.trash.Aluminum:76
+patternRefactoring.trash.Cardboard:96
+patternRefactoring.trash.Aluminum:25
+patternRefactoring.trash.Aluminum:34
+patternRefactoring.trash.Glass:11
+patternRefactoring.trash.Glass:68
+patternRefactoring.trash.Glass:43
+patternRefactoring.trash.Aluminum:27
+patternRefactoring.trash.Cardboard:44
+patternRefactoring.trash.Aluminum:18
+patternRefactoring.trash.Paper:91
+patternRefactoring.trash.Glass:63
+patternRefactoring.trash.Glass:50
+patternRefactoring.trash.Glass:80
+patternRefactoring.trash.Aluminum:81
+patternRefactoring.trash.Cardboard:12
+patternRefactoring.trash.Glass:12
+patternRefactoring.trash.Glass:54
+patternRefactoring.trash.Aluminum:36
+patternRefactoring.trash.Aluminum:93
+patternRefactoring.trash.Glass:93
+patternRefactoring.trash.Paper:80
+patternRefactoring.trash.Glass:36
+patternRefactoring.trash.Glass:12
+patternRefactoring.trash.Glass:60
+patternRefactoring.trash.Paper:66
+patternRefactoring.trash.Aluminum:36
+patternRefactoring.trash.Cardboard:22</pre>
+</div>
+<p>Note that the class path must be included when giving the class names, otherwise
+the class will not be found.</p>
+<p>This file is read using the previously-defined <strong>StringList</strong> tool, and each
+line is picked aparat using  the <strong>String</strong> method <strong>indexOf( )</strong> to produce the
+index of the &#8216;<strong>:</strong>&#8216;. This is first used with the <strong>String</strong> method <strong>substring(
+)</strong> to extract the name of the trash type, and next to get the weight that is
+turned into a <strong>double</strong> with the <strong>static Double.valueOf( )</strong> method. The
+<strong>trim( )</strong> method removes white space at both ends of a string.</p>
+<p>The <strong>Trash</strong> parser is placed in a separate file since it will be reused
+throughout this chapter:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trash/ParseTrash.py
+# Parse file contents into Trash objects,
+# placing each into a Fillable holder.
+
+class ParseTrash:
+    def fillBin(String filename, Fillable bin):
+        for line in open(filename).readlines():
+            String type = line.substring(0,
+              line.index(':')).strip()
+            weight = Double.valueOf(
+              line.substring(line.index(':') + 1)
+                .strip()).doubleValue()
+            bin.addTrash(
+              Trash.factory(
+                Trash.Messenger(type, weight)))
+
+    # Special case to handle Collection:
+    def fillBin(String filename, Bin):
+        fillBin(filename, FillableCollection(bin))</pre>
+</div>
+<p>In <strong>RecycleA.py</strong>, an <strong>ArrayList</strong> was used to hold the <strong>Trash</strong> objects.
+However, other types of containers can be used as well. To allow for this, the
+first version of <strong>fillBin( )</strong> takes a reference to a <strong>Fillable</strong>, which is
+simply an <strong>interface</strong> that supports a method called <strong>addTrash( )</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trash/Fillable.py
+# Any object that can be filled with Trash.
+
+class Fillable:
+    def addTrash(self, Trash t)</pre>
+</div>
+<p>Anything that supports this interface can be used with <strong>fillBin</strong>. Of course,
+<strong>Collection</strong> doesn&#8217;t implement <strong>Fillable</strong>, so it won&#8217;t work. Since
+<strong>Collection</strong> is used in most of the examples, it makes sense to add a second
+overloaded <strong>fillBin( )</strong> method that takes a <strong>Collection</strong>. Any <strong>Collection</strong>
+can then be used as a <strong>Fillable</strong> object using an adapter class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PatternRefactoring/trash/FillableCollection.py</span>
+<span class="c"># Adapter that makes a Collection Fillable.</span>
+
+<span class="k">class</span> <span class="nc">FillableCollection</span><span class="p">(</span><span class="n">Fillable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">cc</span>
+
+    <span class="k">def</span> <span class="nf">addTrash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see that the only job of this class is to connect <strong>Fillable</strong>&#8216;s
+<strong>addTrash( )</strong> method to <strong>Collection</strong>&#8216;s <strong>add( )</strong>. With this class in hand,
+the overloaded <strong>fillBin( )</strong> method can be used with a <strong>Collection</strong> in
+<strong>ParseTrash.py</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">fillBin</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">bin</span><span class="p">):</span>
+    <span class="n">fillBin</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">FillableCollection</span><span class="p">(</span><span class="n">bin</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This approach works for any container class that&#8217;s used frequently.
+Alternatively, the container class can provide its own adapter that implements
+<strong>Fillable</strong>. (You&#8217;ll see this later, in <strong>DynaTrash.py</strong>.)</p>
+</div>
+<div class="section" id="recycling-with-prototyping">
+<h3>Recycling with Prototyping<a class="headerlink" href="#recycling-with-prototyping" title="Permalink to this headline">¶</a></h3>
+<p>Now you can see the revised version of <strong>RecycleA.py</strong> using the prototyping
+technique:</p>
+<div class="highlight-python"><pre># PatternRefactoring/recycleap/RecycleAP.py
+# Recycling with RTTI and Prototypes.
+
+class RecycleAP(UnitTest):
+    Collection
+        bin = ArrayList(),
+        glassBin = ArrayList(),
+        paperBin = ArrayList(),
+        alBin = ArrayList()
+    def __init__(self):
+        # Fill up the Trash bin:
+        ParseTrash.fillBin(
+          "../trash/Trash.dat", bin)
+
+    def test(self):
+        Iterator sorter = bin.iterator()
+        # Sort the Trash:
+        while(sorter.hasNext()):
+            Object t = sorter.next()
+            # RTTI to show class membership:
+            if(t instanceof Aluminum)
+                alBin.add(t)
+            if(t instanceof Paper)
+                paperBin.add(t)
+            if(t instanceof Glass)
+                glassBin.add(t)
+
+        Trash.sumValue(alBin.iterator())
+        Trash.sumValue(paperBin.iterator())
+        Trash.sumValue(glassBin.iterator())
+        Trash.sumValue(bin.iterator())
+
+    def main(self, String args[]):
+        RecycleAP().test()</pre>
+</div>
+<p>All of the <strong>Trash</strong> objects, as well as the <strong>ParseTrash</strong> and support classes,
+are now part of the package <strong>patternRefactoring.trash</strong>, so they are simply
+imported.</p>
+<p>The process of opening the data file containing <strong>Trash</strong> descriptions and the
+parsing of that file have been wrapped into the <strong>static</strong> method
+<strong>ParseTrash.fillBin( )</strong>, so now it&#8217;s no longer a part of our design focus. You
+will see that throughout the rest of the chapter, no matter what new classes are
+added, <strong>ParseTrash.fillBin( )</strong> will continue to work without change, which
+indicates a good design.</p>
+<p>In terms of object creation, this design does indeed severely localize the
+changes you need to make to add a new type to the system. However, there&#8217;s a
+significant problem in the use of RTTI that shows up clearly here. The program
+seems to run fine, and yet it never detects any cardboard, even though there is
+cardboard in the list! This happens <em>because</em> of the use of RTTI, which looks
+for only the types that you tell it to look for. The clue that RTTI is being
+misused is that <em>every type in the system</em> is being tested, rather than a single
+type or subset of types. As you will see later, there are ways to use
+polymorphism instead when you&#8217;re testing for every type. But if you use RTTI a
+lot in this fashion, and you add a new type to your system, you can easily
+forget to make the necessary changes in your program and produce a difficult-to-
+find bug. So it&#8217;s worth trying to eliminate RTTI in this case, not just for
+aesthetic reasons-it produces more maintainable code.</p>
+</div>
+</div>
+<div class="section" id="abstracting-usage">
+<h2>Abstracting Usage<a class="headerlink" href="#abstracting-usage" title="Permalink to this headline">¶</a></h2>
+<p>With creation out of the way, it&#8217;s time to tackle the remainder of the design:
+where the classes are used. Since it&#8217;s the act of sorting into bins that&#8217;s
+particularly ugly and exposed, why not take that process and hide it inside a
+class? This is the principle of &#8220;If you must do something ugly, at least
+localize the ugliness inside a class.&#8221; It looks like this:</p>
+<img alt="_images/trashSorter1.gif" src="_images/trashSorter1.gif" />
+<p>The <strong>TrashSorter</strong> object initialization must now be changed whenever a new type of <strong>Trash</strong> is added to the model. You could imagine that the <strong>TrashSorter</strong> class might look something like this:</p>
+<div class="highlight-python"><pre>class TrashSorter(ArrayList):
+  def sort(self, Trash t): /* ... */</pre>
+</div>
+<p>That is, <strong>TrashSorter</strong> is an <strong>ArrayList</strong> of references to <strong>ArrayList</strong>s of <strong>Trash</strong> references, and with <strong>add( )</strong> you can install another one, like so:</p>
+<div class="highlight-python"><pre>TrashSorter ts = TrashSorter()
+ts.add(ArrayList())</pre>
+</div>
+<p>Now, however, <strong>sort( )</strong> becomes a problem. How does the statically-coded
+method deal with the fact that a new type has been added? To solve this, the
+type information must be removed from <strong>sort( )</strong> so that all it needs to do is
+call a generic method that takes care of the details of type. This, of course,
+is another way to describe a dynamically-bound method. So <strong>sort( )</strong> will
+simply move through the sequence and call a dynamically-bound method for each
+<strong>ArrayList</strong>. Since the job of this method is to grab the pieces of trash it is
+interested in, it&#8217;s called <strong>grab(Trash)</strong>. The structure now looks like:</p>
+<img alt="_images/trashSorter2.gif" src="_images/trashSorter2.gif" />
+<p><strong>TrashSorter</strong> needs to call each <strong>grab( )</strong> method and get a different result
+depending on what type of <strong>Trash</strong> the current <strong>ArrayList</strong> is holding. That
+is, each <strong>ArrayList</strong> must be aware of the type it holds. The classic approach
+to this problem is to create a base <strong>Trash</strong> bin class and inherit a new
+derived class for each different type you want to hold. If Java had a
+parameterized type mechanism that would probably be the most straightforward
+approach. But rather than hand-coding all the classes that such a mechanism
+should be building for us, further observation can produce a better approach.</p>
+<p>A basic OOP design principle is &#8220;Use data members for variation in state, use
+polymorphism for variation in behavior.&#8221; Your first thought might be that the
+<strong>grab( )</strong> method certainly behaves differently for an <strong>ArrayList</strong> that holds
+<strong>Paper</strong> than for one that holds <strong>Glass</strong>. But what it does is strictly
+dependent on the type, and nothing else. This could be interpreted as a
+different state, and since Java has a class to represent type (<strong>Class</strong>) this
+can be used to determine the type of <strong>Trash</strong> a particular <strong>Tbin</strong> will hold.</p>
+<p>The constructor for this <strong>Tbin</strong> requires that you hand it the <strong>Class</strong> of
+your choice. This tells the <strong>ArrayList</strong> what type it is supposed to hold. Then
+the <strong>grab( )</strong> method uses <strong>Class BinType</strong> and RTTI to see if the <strong>Trash</strong>
+object you&#8217;ve handed it matches the type it&#8217;s supposed to grab.</p>
+<p>Here is the new version of the program:</p>
+<div class="highlight-python"><pre># PatternRefactoring/recycleb/RecycleB.py
+# Containers that grab objects of interest.
+
+# A container that admits only the right type
+# of Trash (established in the constructor):
+class Tbin:
+    def __init__(self, binType):
+        self.list = ArrayList()
+        self.type = binType
+    def grab(self, t):
+        # Comparing class types:
+        if(t.getClass().equals(self.type)):
+            self.list.add(t)
+            return True # Object grabbed
+
+        return False # Object not grabbed
+
+    def iterator(self):
+        return self.list.iterator()
+
+class TbinList(ArrayList):
+    def sort(self, Trash t):
+        Iterator e = iterator() # Iterate over self
+        while(e.hasNext())
+            if(((Tbin)e.next()).grab(t)) return
+        # Need a Tbin for this type:
+        add(Tbin(t.getClass()))
+        sort(t) # Recursive call
+
+class RecycleB(UnitTest):
+    Bin = ArrayList()
+    TbinList trashBins = TbinList()
+    def __init__(self):
+        ParseTrash.fillBin("../trash/Trash.dat",bin)
+
+    def test(self):
+        Iterator it = bin.iterator()
+        while(it.hasNext())
+            trashBins.sort((Trash)it.next())
+        Iterator e = trashBins.iterator()
+        while(e.hasNext()):
+            Tbin b = (Tbin)e.next()
+            Trash.sumValue(b.iterator())
+
+        Trash.sumValue(bin.iterator())
+
+    def main(self, String args[]):
+        RecycleB().test()</pre>
+</div>
+<p><strong>Tbin</strong> contains a <strong>Class</strong> reference <strong>type</strong> which establishes in the
+constructor what what type it should grab. The <strong>grab()</strong> method checks this
+type against the object you pass it. Note that in this design, <strong>grab()</strong> only
+accepts <strong>Trash</strong> objects so you get compile-time type checking on the base
+type, but you could also just accept <strong>Object</strong> and it would still work.</p>
+<p><strong>TTbinList</strong> holds a set of <strong>Tbin</strong> references, so that <strong>sort( )</strong> can
+iterate through the <strong>Tbin</strong>s when it&#8217;s looking for a match for the <strong>Trash</strong>
+object you&#8217;ve handed it. If it doesn&#8217;t find a match, it creates a new <strong>Tbin</strong>
+for the type that hasn&#8217;t been found, and makes a recursive call to itself - the
+next time around, the new bin will be found.</p>
+<p>Notice the genericity of this code: it doesn&#8217;t change at all if new types are
+added. If the bulk of your code doesn&#8217;t need changing when a new type is added
+(or some other change occurs) then you have an easily extensible system.</p>
+</div>
+<div class="section" id="multiple-dispatching">
+<h2>Multiple Dispatching<a class="headerlink" href="#multiple-dispatching" title="Permalink to this headline">¶</a></h2>
+<p>The above design is certainly satisfactory. Adding new types to the system
+consists of adding or modifying distinct classes without causing code changes to
+be propagated throughout the system. In addition, RTTI is not &#8220;misused&#8221; as it
+was in <strong>RecycleA.py</strong>. However, it&#8217;s possible to go one step further and take a
+purist viewpoint about RTTI and say that it should be eliminated altogether from
+the operation of sorting the trash into bins.</p>
+<p>To accomplish this, you must first take the perspective that all type-dependent
+activities-such as detecting the type of a piece of trash and putting it into
+the appropriate bin-should be controlled through polymorphism and dynamic
+binding.</p>
+<p>The previous examples first sorted by type, then acted on sequences of elements
+that were all of a particular type. But whenever you find yourself picking out
+particular types, stop and think. The whole idea of polymorphism (dynamically-
+bound method calls) is to handle type-specific information for you. So why are
+you hunting for types?</p>
+<p>The answer is something you probably don&#8217;t think about: Python performs only
+single dispatching. That is, if you are performing an operation on more than one
+object whose type is unknown, Python will invoke the dynamic binding mechanism
+on only one of those types. This doesn&#8217;t solve the problem, so you end up
+detecting some types manually and effectively producing your own dynamic binding
+behavior.</p>
+<p>The solution is called <em>multiple dispatching</em>, which means setting up a
+configuration such that a single method call produces more than one dynamic
+method call and thus determines more than one type in the process. To get this
+effect, you need to work with more than one type hierarchy: you&#8217;ll need a type
+hierarchy for each dispatch. The following example works with two hierarchies:
+the existing <strong>Trash</strong> family and a hierarchy of the types of trash bins that
+the trash will be placed into. This second hierarchy isn&#8217;t always obvious and in
+this case it needed to be created in order to produce multiple dispatching (in
+this case there will be only two dispatches, which is referred to as <em>double
+dispatching</em>).</p>
+<div class="section" id="implementing-the-double-dispatch">
+<h3>Implementing the Double Dispatch<a class="headerlink" href="#implementing-the-double-dispatch" title="Permalink to this headline">¶</a></h3>
+<p>Remember that polymorphism can occur only via method calls, so if you want
+double dispatching to occur, there must be two method calls: one used to
+determine the type within each hierarchy. In the Trash hierarchy there will be a
+new method called addToBin( ), which takes an argument of an array of TypedBin.
+It uses this array to step through and try to add itself to the appropriate bin,
+and this is where you&#8217;ll see the double dispatch.</p>
+<img alt="_images/trashSorter3.gif" src="_images/trashSorter3.gif" />
+<p>The new hierarchy is TypedBin, and it contains its own method called add( ) that
+is also used polymorphically. But here&#8217;s an additional twist: add( ) is
+overloaded to take arguments of the different types of trash. So an essential
+part of the double dispatching scheme also involves overloading.</p>
+<p>Redesigning the program produces a dilemma: it&#8217;s now necessary for the base
+class <strong>Trash</strong> to contain an <strong>addToBin( )</strong> method. One approach is to copy
+all of the code and change the base class. Another approach, which you can take
+when you don&#8217;t have control of the source code, is to put the <strong>addToBin( )</strong>
+method into an <strong>interface</strong>, leave <strong>Trash</strong> alone, and inherit new specific
+types of <strong>Aluminum</strong>, <strong>Paper</strong>, <strong>Glass</strong>, and <strong>Cardboard</strong>. This is the
+approach that will be taken here.</p>
+<p>Most of the classes in this design must be <strong>public</strong>, so they are placed in
+their own files. Here&#8217;s the interface:</p>
+<div class="highlight-python"><pre># PatternRefactoring/doubledispatch/TypedBinMember.py
+# An class for adding the double
+# dispatching method to the trash hierarchy
+# without modifying the original hierarchy.
+
+class TypedBinMember:
+    # The method:
+    boolean addToBin(TypedBin[] tb)</pre>
+</div>
+<p>In each particular subtype of <strong>Aluminum</strong>, <strong>Paper</strong>, <strong>Glass,</strong> and
+<strong>Cardboard</strong>, the <strong>addToBin( )</strong> method in the <strong>interface TypedBinMember</strong> is
+implemented, but it <em>looks</em> like the code is exactly the same in each case:</p>
+<div class="highlight-python"><pre># PatternRefactoring/doubledispatch/DDAluminum.py
+# Aluminum for double dispatching.
+
+class DDAluminum(Aluminum, TypedBinMember):
+    def __init__(self, wt): Aluminum.__init__(wt)
+    def addToBin(self, TypedBin[] tb):
+        for(int i = 0 i &lt; tb.length i++)
+            if(tb[i].add(self)):
+                return True
+        return False::
+
+
+# PatternRefactoring/doubledispatch/DDPaper.py
+# Paper for double dispatching.
+
+class DDPaper(Paper, TypedBinMember):
+    def __init__(self, wt): Paper.__init__(wt)
+    def addToBin(self, TypedBin[] tb):
+        for(int i = 0 i &lt; tb.length i++)
+            if(tb[i].add(self))
+                return True
+        return False::
+
+
+# PatternRefactoring/doubledispatch/DDGlass.py
+# Glass for double dispatching.
+
+class DDGlass(Glass, TypedBinMember):
+    def __init__(self, wt): Glass.__init__(wt)
+    def addToBin(self, TypedBin[] tb):
+        for(int i = 0 i &lt; tb.length i++)
+            if(tb[i].add(self))
+                return True
+        return False::
+
+
+# PatternRefactoring/doubledispatch/DDCardboard.py
+# Cardboard for double dispatching.
+
+class DDCardboard(Cardboard, TypedBinMember):
+    def __init__(self, wt):
+        Cardboard.__init__(wt)
+    def addToBin(self, TypedBin[] tb):
+        for(int i = 0 i &lt; tb.length i++)
+            if(tb[i].add(self))
+                return True
+        return False</pre>
+</div>
+<p>The code in each <strong>addToBin( )</strong> calls <strong>add( )</strong> for each <strong>TypedBin</strong> object
+in the array. But notice the argument: <strong>this</strong>. The type of <strong>this</strong> is
+different for each subclass of <strong>Trash</strong>, so the code is different. (Although
+this code will benefit if a parameterized type mechanism is ever added to Java.)
+So this is the first part of the double dispatch, because once you&#8217;re inside
+this method you know you&#8217;re <strong>Aluminum</strong>, or <strong>Paper</strong>, etc. During the call to
+<strong>add( )</strong>, this information is passed via the type of <strong>this</strong>. The compiler
+resolves the call to the proper overloaded version of <strong>add( )</strong>. But since
+<strong>tb[i]</strong> produces a reference to the base type <strong>TypedBin</strong>, this call will end
+up calling a different method depending on the type of <strong>TypedBin</strong> that&#8217;s
+currently selected. That is the second dispatch.</p>
+<p>Here&#8217;s the base class for <strong>TypedBin</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/doubledispatch/TypedBin.py
+# A container for the second dispatch.
+
+class TypedBin:
+    c = ArrayList()
+    def addIt(self, Trash t):
+        c.add(t)
+        return True
+
+    def iterator(self):
+        return c.iterator()
+
+    def add(self, DDAluminum a):
+        return False
+
+    def add(self, DDPaper a):
+        return False
+
+    def add(self, DDGlass a):
+        return False
+
+    def add(self, DDCardboard a):
+        return False</pre>
+</div>
+<p>You can see that the overloaded <strong>add( )</strong> methods all return <strong>false</strong>. If the
+method is not overloaded in a derived class, it will continue to return
+<strong>false</strong>, and the caller (<strong>addToBin( )</strong>, in this case) will assume that the
+current <strong>Trash</strong> object has not been added successfully to a container, and
+continue searching for the right container.</p>
+<p>In each of the subclasses of <strong>TypedBin</strong>, only one overloaded method is
+overridden, according to the type of bin that&#8217;s being created. For example,
+<strong>CardboardBin</strong> overrides <strong>add(DDCardboard)</strong>. The overridden method adds the
+trash object to its container and returns <strong>true</strong>, while all the rest of the
+<strong>add( )</strong> methods in <strong>CardboardBin</strong> continue to return <strong>false</strong>, since they
+haven&#8217;t been overridden. This is another case in which a parameterized type
+mechanism in Java would allow automatic generation of code. (With C++
+<strong>template</strong>s, you wouldn&#8217;t have to explicitly write the subclasses or place
+the <strong>addToBin( )</strong> method in <strong>Trash</strong>.)</p>
+<p>Since for this example the trash types have been customized and placed in a
+different directory, you&#8217;ll need a different trash data file to make it work.
+Here&#8217;s a possible <strong>DDTrash.dat</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/doubledispatch/DDTrash.dat
+DDGlass:54
+DDPaper:22
+DDPaper:11
+DDGlass:17
+DDAluminum:89
+DDPaper:88
+DDAluminum:76
+DDCardboard:96
+DDAluminum:25
+DDAluminum:34
+DDGlass:11
+DDGlass:68
+DDGlass:43
+DDAluminum:27
+DDCardboard:44
+DDAluminum:18
+DDPaper:91
+DDGlass:63
+DDGlass:50
+DDGlass:80
+DDAluminum:81
+DDCardboard:12
+DDGlass:12
+DDGlass:54
+DDAluminum:36
+DDAluminum:93
+DDGlass:93
+DDPaper:80
+DDGlass:36
+DDGlass:12
+DDGlass:60
+DDPaper:66
+DDAluminum:36
+DDCardboard:22</pre>
+</div>
+<p>Here&#8217;s the rest of the program:</p>
+<div class="highlight-python"><pre># PatternRefactoring/doubledispatch/DoubleDispatch.py
+# Using multiple dispatching to handle more
+# than one unknown type during a method call.
+
+class AluminumBin(TypedBin):
+    def add(self, DDAluminum a):
+        return addIt(a)
+
+class PaperBin(TypedBin):
+    def add(self, DDPaper a):
+        return addIt(a)
+
+class GlassBin(TypedBin):
+    def add(self, DDGlass a):
+        return addIt(a)
+
+class CardboardBin(TypedBin):
+    def add(self, DDCardboard a):
+        return addIt(a)
+
+class TrashBinSet:
+    binSet = [
+      AluminumBin(),
+      PaperBin(),
+      GlassBin(),
+      CardboardBin()
+    ]
+
+    def sortIntoBins(self, bin):
+        Iterator e = bin.iterator()
+        while(e.hasNext()):
+            TypedBinMember t =
+                (TypedBinMember)e.next()
+            if(!t.addToBin(binSet))
+                System.err.println("Couldn't add " + t)
+
+    def binSet(): return binSet
+
+class DoubleDispatch(UnitTest):
+    Bin = ArrayList()
+    TrashBinSet bins = TrashBinSet()
+    def __init__(self):
+        # ParseTrash still works, without changes:
+        ParseTrash.fillBin("DDTrash.dat", bin)
+
+    def test(self):
+        # Sort from the master bin into
+        # the individually-typed bins:
+        bins.sortIntoBins(bin)
+        TypedBin[] tb = bins.binSet()
+        # Perform sumValue for each bin...
+        for(int i = 0 i &lt; tb.length i++)
+            Trash.sumValue(tb[i].c.iterator())
+        # ... and for the master bin
+        Trash.sumValue(bin.iterator())
+
+    def main(self, String args[]):
+        DoubleDispatch().test()</pre>
+</div>
+<p><strong>TrashBinSet</strong> encapsulates all of the different types of <strong>TypedBin</strong>s, along
+with the <strong>sortIntoBins( )</strong> method, which is where all the double dispatching
+takes place. You can see that once the structure is set up, sorting into the
+various <strong>TypedBin</strong>s is remarkably easy. In addition, the efficiency of two
+dynamic method calls is probably better than any other way you could sort.</p>
+<p>Notice the ease of use of this system in <strong>main( )</strong>, as well as the complete
+independence of any specific type information within <strong>main( )</strong>. All other
+methods that talk only to the <strong>Trash</strong> base-class interface will be equally
+invulnerable to changes in <strong>Trash</strong> types.</p>
+<p>The changes necessary to add a new type are relatively isolated: you modify
+<strong>TypedBin</strong>, inherit the new type of <strong>Trash</strong> with its <strong>addToBin( )</strong> method,
+then inherit a new <strong>TypedBin</strong> (this is really just a copy and simple edit),
+and finally add a new type into the aggregate initialization for
+<strong>TrashBinSet</strong>.</p>
+</div>
+</div>
+<div class="section" id="the-visitor-pattern">
+<h2>The <em>Visitor</em> Pattern<a class="headerlink" href="#the-visitor-pattern" title="Permalink to this headline">¶</a></h2>
+<p>Now consider applying a design pattern that has an entirely different goal to
+the trash sorting problem.</p>
+<p>For this pattern, we are no longer concerned with optimizing the addition of new
+types of <strong>Trash</strong> to the system. Indeed, this pattern makes adding a new type
+of <strong>Trash</strong> <em>more</em> complicated. The assumption is that you have a primary class
+hierarchy that is fixed; perhaps it&#8217;s from another vendor and you can&#8217;t make
+changes to that hierarchy. However, you&#8217;d like to add new polymorphic methods to
+that hierarchy, which means that normally you&#8217;d have to add something to the
+base class interface. So the dilemma is that you need to add methods to the base
+class, but you can&#8217;t touch the base class. How do you get around this?</p>
+<p>The design pattern that solves this kind of problem is called a &#8220;visitor&#8221; (the
+final one in the <em>Design Patterns</em> book), and it builds on the double
+dispatching scheme shown in the last section.</p>
+<p>The visitor pattern allows you to extend the interface of the primary type by
+creating a separate class hierarchy of type <strong>Visitor</strong> to virtualize the
+operations performed upon the primary type. The objects of the primary type
+simply &#8220;accept&#8221; the visitor, then call the visitor&#8217;s dynamically-bound method.
+It looks like this:</p>
+<img alt="_images/trashVisitor.gif" src="_images/trashVisitor.gif" />
+<p>Now, if <strong>v</strong> is a <strong>Visitable</strong> reference to an <strong>Aluminum</strong> object, the code:</p>
+<div class="highlight-python"><pre>PriceVisitor pv = PriceVisitor()
+v.accept(pv)</pre>
+</div>
+<p>uses double dispatching to cause two polymorphic method calls: the first one to
+select <strong>Aluminum</strong>&#8216;s version of <strong>accept( )</strong>, and the second one within
+<strong>accept( )</strong> when the specific version of <strong>visit( )</strong> is called dynamically
+using the base-class <strong>Visitor</strong> reference <strong>v</strong>.</p>
+<p>This configuration means that new functionality can be added to the system in
+the form of new subclasses of <strong>Visitor</strong>. The <strong>Trash</strong> hierarchy doesn&#8217;t need
+to be touched. This is the prime benefit of the visitor pattern: you can add new
+polymorphic functionality to a class hierarchy without touching that hierarchy
+(once the <strong>accept( )</strong> methods have been installed). Note that the benefit is
+helpful here but not exactly what we started out to accomplish, so at first
+blush you might decide that this isn&#8217;t the desired solution.</p>
+<p>But look at one thing that&#8217;s been accomplished: the visitor solution avoids
+sorting from the master <strong>Trash</strong> sequence into individual typed sequences.
+Thus, you can leave everything in the single master sequence and simply pass
+through that sequence using the appropriate visitor to accomplish the goal.
+Although this behavior seems to be a side effect of visitor, it does give us
+what we want (avoiding RTTI).</p>
+<p>The double dispatching in the visitor pattern takes care of determining both the
+type of <strong>Trash</strong> and the type of <strong>Visitor</strong>. In the following example, there
+are two implementations of <strong>Visitor</strong>: <strong>PriceVisitor</strong> to both determine and
+sum the price, and <strong>WeightVisitor</strong> to keep track of the weights.</p>
+<p>You can see all of this implemented in the new, improved version of the
+recycling program.</p>
+<p>As with <strong>DoubleDispatch.py</strong>, the <strong>Trash</strong> class is left alone and a new
+interface is created to add the <strong>accept( )</strong> method:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trashvisitor/Visitable.py
+# An class to add visitor functionality
+# to the Trash hierarchy without
+# modifying the base class.
+
+class Visitable:
+    # The method:
+    def accept(self, Visitor v)</pre>
+</div>
+<p>Since there&#8217;s nothing concrete in the <strong>Visitor</strong> base class, it can be created
+as an <strong>interface</strong>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trashvisitor/Visitor.py
+# The base class for visitors.
+
+class Visitor:
+    def visit(self, Aluminum a)
+    def visit(self, Paper p)
+    def visit(self, Glass g)
+    def visit(self, Cardboard c)</pre>
+</div>
+<div class="section" id="a-reflective-decorator">
+<h3>A Reflective Decorator<a class="headerlink" href="#a-reflective-decorator" title="Permalink to this headline">¶</a></h3>
+<p>At this point, you <em>could</em> follow the same approach that was used for double
+dispatching and create new subtypes of <strong>Aluminum</strong>, <strong>Paper</strong>, <strong>Glass</strong>, and
+<strong>Cardboard</strong> that implement the <strong>accept( )</strong> method. For example, the new
+<strong>Visitable Aluminum</strong> would look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PatternRefactoring/trashvisitor/VAluminum.py</span>
+<span class="c"># Taking the previous approach of creating a</span>
+<span class="c"># specialized Aluminum for the visitor pattern.</span>
+
+<span class="k">class</span> <span class="nc">VAluminum</span><span class="p">(</span><span class="n">Aluminum</span><span class="p">,</span> <span class="n">Visitable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wt</span><span class="p">):</span> <span class="n">Aluminum</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">wt</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, we seem to be encountering an &#8220;explosion of interfaces:&#8221; basic
+<strong>Trash</strong>, special versions for double dispatching, and now more special
+versions for visitor. Of course, this &#8220;explosion of interfaces&#8221; is arbitrary-one
+could simply put the additional methods in the <strong>Trash</strong> class. If we ignore
+that we can instead see an opportunity to use the <em>Decorator</em> pattern: it seems
+like it should be possible to create a <em>Decorator</em> that can be wrapped around an
+ordinary <strong>Trash</strong> object and will produce the same interface as <strong>Trash</strong> and
+add the extra <strong>accept( )</strong> method. In fact, it&#8217;s a perfect example of the value
+of <em>Decorator</em>.</p>
+<p>The double dispatch creates a problem, however. Since it relies on overloading
+of both <strong>accept( )</strong> and <strong>visit( )</strong>, it would seem to require specialized
+code for each different version of the <strong>accept( )</strong> method. With C++ templates,
+this would be fairly easy to accomplish (since templates automatically generate
+type-specialized code) but Python has no such mechanism-at least it does not
+appear to. However, reflection allows you to determine type information at run
+time, and it turns out to solve many problems that would seem to require
+templates (albeit not as simply). Here&#8217;s the decorator that does the trick
+<a class="footnote-reference" href="#id2" id="id1">[1]</a>:</p>
+<div class="highlight-python"><pre># PatternRefactoring/trashvisitor/VisitableDecorator.py
+# A decorator that adapts the generic Trash
+# classes to the visitor pattern.
+
+class VisitableDecorator(Trash, Visitable):
+    def __init__(self, t):
+        self.delegate = t
+        try:
+            self.dispatch = Visitor.class.getMethod (
+              "visit", Class[]: t.getClass()
+            )
+        except ex:
+            ex.printStackTrace()
+
+    def getValue(self):
+        return delegate.getValue()
+
+    def getWeight(self):
+        return delegate.getWeight()
+
+    def accept(self, Visitor v):
+        self.dispatch.invoke(v, delegate)</pre>
+</div>
+<p>[[ Description of Reflection use  ]]</p>
+<p>The only other tool we need is a new type of <strong>Fillable</strong> adapter that
+automatically decorates the objects as they are being created from the original
+<strong>Trash.dat</strong> file. But this might as well be a decorator itself, decorating any
+kind of <strong>Fillable</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PatternRefactoring/trashvisitor/FillableVisitor.py</span>
+<span class="c"># Adapter Decorator that adds the visitable</span>
+<span class="c"># decorator as the Trash objects are</span>
+<span class="c"># being created.</span>
+
+<span class="k">class</span> <span class="nc">FillableVisitor</span><span class="p">(</span><span class="n">Fillable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ff</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">ff</span>
+    <span class="k">def</span> <span class="nf">addTrash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">addTrash</span><span class="p">(</span><span class="n">VisitableDecorator</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now you can wrap it around any kind of existing <strong>Fillable</strong>, or any new ones
+that haven&#8217;t yet been created.</p>
+<p>The rest of the program creates specific <strong>Visitor</strong> types and sends them
+through a single list of <strong>Trash</strong> objects:</p>
+<div class="highlight-python"><pre>   # PatternRefactoring/trashvisitor/TrashVisitor.py
+   # The "visitor" pattern with VisitableDecorators.
+
+   # Specific group of algorithms packaged
+   # in each implementation of Visitor:
+   class PriceVisitor(Visitor):
+       alSum = 0.0 # Aluminum
+       pSum = 0.0  # Paper
+       gSum = 0.0  # Glass
+       cSum = 0.0  # Cardboard
+       def visit(self, al):
+           v = al.getWeight() * al.getValue()
+           print("value of Aluminum= " + v)
+           alSum += v
+
+       def visit(self, p):
+           v = p.getWeight() * p.getValue()
+           print("value of Paper= " + v)
+           pSum += v
+
+       def visit(self, g):
+           v = g.getWeight() * g.getValue()
+           print("value of Glass= " + v)
+           gSum += v
+
+       def visit(self, c):
+           v = c.getWeight() * c.getValue()
+           print("value of Cardboard = " + v)
+           cSum += v
+
+       def total(self):
+           print (
+             "Total Aluminum: $" + alSum +
+             "\n Total Paper: $" + pSum +
+             "\nTotal Glass: $" + gSum +
+             "\nTotal Cardboard: $" + cSum +
+             "\nTotal: $" +
+               (alSum + pSum + gSum + cSum))
+
+   class WeightVisitor(Visitor):
+       alSum = 0.0  # Aluminum
+       pSum = 0.0  # Paper
+       gSum = 0.0  # Glass
+       cSum = 0.0  # Cardboard
+       def visit(self, Aluminum al):
+           alSum += al.getWeight()
+           print ("weight of Aluminum = "
+               + al.getWeight())
+
+       def visit(self, Paper p):
+           pSum += p.getWeight()
+           print ("weight of Paper = "
+               + p.getWeight())
+
+       def visit(self, Glass g):
+           gSum += g.getWeight()
+           print ("weight of Glass = "
+               + g.getWeight())
+
+       def visit(self, Cardboard c):
+           cSum += c.getWeight()
+           print ("weight of Cardboard = "
+               + c.getWeight())
+
+       def total(self):
+           print (
+             "Total weight Aluminum: "  + alSum +
+             "\nTotal weight Paper: " + pSum +
+             "\nTotal weight Glass: " + gSum +
+             "\nTotal weight Cardboard: " + cSum +
+             "\nTotal weight: " +
+               (alSum + pSum + gSum + cSum))
+
+   class TrashVisitor(UnitTest):
+       Bin = ArrayList()
+       PriceVisitor pv = PriceVisitor()
+       WeightVisitor wv = WeightVisitor()
+       def __init__(self):
+           ParseTrash.fillBin("../trash/Trash.dat",
+             FillableVisitor(
+               FillableCollection(bin)))
+
+       def test(self):
+           Iterator it = bin.iterator()
+           while(it.hasNext()):
+               Visitable v = (Visitable)it.next()
+               v.accept(pv)
+               v.accept(wv)
+
+           pv.total()
+           wv.total()
+
+       def main(self, String args[]):
+           TrashVisitor().test()
+
+In **Test( )**, note how visitability is added by simply creating a different
+kind of bin using the decorator. Also notice that the **FillableCollection**
+adapter has the appearance of being used as a decorator (for **ArrayList**) in
+this situation. However, it completely changes the interface of the
+**ArrayList**, whereas the definition of *Decorator* is that the interface of
+the decorated class must still be there after decoration.</pre>
+</div>
+<p>Note that the shape of the client code (shown in the <strong>Test</strong> class) has changed
+again, from the original approaches to the problem. Now there&#8217;s only a single
+<strong>Trash</strong> bin. The two <strong>Visitor</strong> objects are accepted into every element in
+the sequence, and they perform their operations. The visitors keep their own
+internal data to tally the total weights and prices.</p>
+<p>Finally, there&#8217;s no run time type identification other than the inevitable cast
+to <strong>Trash</strong> when pulling things out of the sequence. This, too, could be
+eliminated with the implementation of parameterized types in Java.</p>
+<p>One way you can distinguish this solution from the double dispatching solution
+described previously is to note that, in the double dispatching solution, only
+one of the overloaded methods, <strong>add( )</strong>, was overridden when each subclass was
+created, while here <em>each</em> one of the overloaded <strong>visit( )</strong> methods is
+overridden in every subclass of <strong>Visitor</strong>.</p>
+</div>
+<div class="section" id="more-coupling">
+<h3>More Coupling?<a class="headerlink" href="#more-coupling" title="Permalink to this headline">¶</a></h3>
+<p>There&#8217;s a lot more code here, and there&#8217;s definite coupling between the
+<strong>Trash</strong> hierarchy and the <strong>Visitor</strong> hierarchy. However, there&#8217;s also high
+cohesion within the respective sets of classes: they each do only one thing
+(<strong>Trash</strong> describes Trash, while <strong>Visitor</strong> describes actions performed on
+<strong>Trash</strong>), which is an indicator of a good design. Of course, in this case it
+works well only if you&#8217;re adding new <strong>Visitor</strong>s, but it gets in the way when
+you add new types of <strong>Trash</strong>.</p>
+<p>Low coupling between classes and high cohesion within a class is definitely an
+important design goal. Applied mindlessly, though, it can prevent you from
+achieving a more elegant design. It seems that some classes inevitably have a
+certain intimacy with each other. These often occur in pairs that could perhaps
+be called <em>couplets</em>; for example, containers and iterators. The <strong>Trash-
+Visitor</strong> pair above appears to be another such couplet.</p>
+</div>
+</div>
+<div class="section" id="rtti-considered-harmful">
+<h2>RTTI Considered Harmful?<a class="headerlink" href="#rtti-considered-harmful" title="Permalink to this headline">¶</a></h2>
+<p>Various designs in this chapter attempt to remove RTTI, which might give you the
+impression that it&#8217;s &#8220;considered harmful&#8221; (the condemnation used for poor, ill-
+fated <strong>goto</strong>, which was thus never put into Java). This isn&#8217;t true; it is the
+<em>misuse</em> of RTTI that is the problem. The reason our designs removed RTTI is
+because the misapplication of that feature prevented extensibility, while the
+stated goal was to be able to add a new type to the system with as little impact
+on surrounding code as possible. Since RTTI is often misused by having it look
+for every single type in your system, it causes code to be non-extensible: when
+you add a new type, you have to go hunting for all the code in which RTTI is
+used, and if you miss any you won&#8217;t get help from the compiler.</p>
+<p>However, RTTI doesn&#8217;t automatically create non-extensible code. Let&#8217;s revisit
+the trash recycler once more. This time, a new tool will be introduced, which I
+call a <strong>TypeMap</strong>. It contains a <strong>HashMap</strong> that holds <strong>ArrayList</strong>s, but
+the interface is simple: you can <strong>add( )</strong> a new object, and you can <strong>get( )</strong>
+an <strong>ArrayList</strong> containing all the objects of a particular type. The keys for
+the contained <strong>HashMap</strong> are the types in the associated <strong>ArrayList</strong>. The
+beauty of this design (suggested by Larry O&#8217;Brien) is that the <strong>TypeMap</strong>
+dynamically adds a new pair whenever it encounters a new type, so whenever you
+add a new type to the system (even if you add the new type at run time), it
+adapts.</p>
+<p>Our example will again build on the structure of the <strong>Trash</strong> types in
+<strong>package patternRefactoring.Trash</strong> (and the <strong>Trash.dat</strong> file used there can
+be used here without change):</p>
+<div class="highlight-python"><pre># PatternRefactoring/dynatrash/DynaTrash.py
+# Using a Map of Lists and RTTI
+# to automatically sort trash into
+# ArrayLists. This solution, despite the
+# use of RTTI, is extensible.
+
+# Generic TypeMap works in any situation:
+class TypeMap:
+    t = HashMap()
+    def add(self, Object o):
+        Class type = o.getClass()
+        if(self.t.has_key(type))
+            self.t.get(type).add(o)
+        else:
+            List v = ArrayList()
+            v.add(o)
+            t.put(type,v)
+
+    def get(self, Class type):
+        return (List)t.get(type)
+
+    def keys(self):
+        return t.keySet().iterator()
+
+# Adapter class to allow callbacks
+# from ParseTrash.fillBin():
+class TypeMapAdapter(Fillable):
+    TypeMap map
+    def __init__(self, TypeMap tm): map = tm
+    def addTrash(self, Trash t): map.add(t)
+
+class DynaTrash(UnitTest):
+    TypeMap bin = TypeMap()
+    def __init__(self):
+        ParseTrash.fillBin("../trash/Trash.dat",
+          TypeMapAdapter(bin))
+
+    def test(self):
+        Iterator keys = bin.keys()
+        while(keys.hasNext())
+            Trash.sumValue(
+              bin.get((Class)keys.next()).iterator())
+
+    def main(self, String args[]):
+        DynaTrash().test()</pre>
+</div>
+<p>Although powerful, the definition for <strong>TypeMap</strong> is simple. It contains a
+<strong>HashMap</strong>, and the <strong>add( )</strong> method does most of the work. When you <strong>add(
+)</strong> a new object, the reference for the <strong>Class</strong> object for that type is
+extracted. This is used as a key to determine whether an <strong>ArrayList</strong> holding
+objects of that type is already present in the <strong>HashMap</strong>. If so, that
+<strong>ArrayList</strong> is extracted and the object is added to the <strong>ArrayList</strong>. If not,
+the <strong>Class</strong> object and a new <strong>ArrayList</strong> are added as a key-value pair.</p>
+<p>You can get an <strong>Iterator</strong> of all the <strong>Class</strong> objects from <strong>keys( )</strong>, and
+use each <strong>Class</strong> object to fetch the corresponding <strong>ArrayList</strong> with <strong>get(
+)</strong>. And that&#8217;s all there is to it.</p>
+<p>The <strong>filler( )</strong> method is interesting because it takes advantage of the design
+of <strong>ParseTrash.fillBin( )</strong>, which doesn&#8217;t just try to fill an <strong>ArrayList</strong>
+but instead anything that implements the <strong>Fillable</strong> interface with its
+<strong>addTrash( )</strong> method. All <strong>filler( )</strong> needs to do is to return a reference
+to an <strong>interface</strong> that implements <strong>Fillable</strong>, and then this reference can be
+used as an argument to <strong>fillBin( )</strong> like this:</p>
+<p>ParseTrash.fillBin(&#8220;Trash.dat&#8221;, bin.filler())</p>
+<p>To produce this reference, an <em>anonymous inner class</em> (described in <em>Thinking in
+Java</em>) is used. You never need a named class to implement <strong>Fillable</strong>, you just
+need a reference to an object of that class, thus this is an appropriate use of
+anonymous inner classes.</p>
+<p>An interesting thing about this design is that even though it wasn&#8217;t created to
+handle the sorting, <strong>fillBin( )</strong> is performing a sort every time it inserts a
+<strong>Trash</strong> object into <strong>bin</strong>.</p>
+<p>Much of <strong>class DynaTrash</strong> should be familiar from the previous examples. This
+time, instead of placing the new <strong>Trash</strong> objects into a <strong>bin</strong> of type
+<strong>ArrayList</strong>, the <strong>bin</strong> is of type <strong>TypeMap</strong>, so when the trash is thrown
+into <strong>bin</strong> it&#8217;s immediately sorted by <strong>TypeMap</strong>&#8216;s internal sorting
+mechanism. Stepping through the <strong>TypeMap</strong> and operating on each individual
+<strong>ArrayList</strong> becomes a simple matter.</p>
+<p>As you can see, adding a new type to the system won&#8217;t affect this code at all,
+and the code in <strong>TypeMap</strong> is completely independent. This is certainly the
+smallest solution to the problem, and arguably the most elegant as well. It does
+rely heavily on RTTI, but notice that each key-value pair in the <strong>HashMap</strong> is
+looking for only one type. In addition, there&#8217;s no way you can &#8220;forget&#8221; to add
+the proper code to this system when you add a new type, since there isn&#8217;t any
+code you need to add.</p>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Coming up with a design such as <strong>TrashVisitor.py</strong> that contains a larger
+amount of code than the earlier designs can seem at first to be
+counterproductive. It pays to notice what you&#8217;re trying to accomplish with
+various designs. Design patterns in general strive to <em>separate the things that
+change from the things that stay the same</em>. The &#8220;things that change&#8221; can refer
+to many different kinds of changes. Perhaps the change occurs because the
+program is placed into a new environment or because something in the current
+environment changes (this could be: &#8220;The user wants to add a new shape to the
+diagram currently on the screen&#8221;). Or, as in this case, the change could be the
+evolution of the code body. While previous versions of the trash sorting example
+emphasized the addition of new <em>types</em> of <strong>Trash</strong> to the system,
+<strong>TrashVisitor.py</strong> allows you to easily add new <em>functionality</em> without
+disturbing the <strong>Trash</strong> hierarchy. There&#8217;s more code in <strong>TrashVisitor.py</strong>,
+but adding new functionality to <strong>Visitor</strong> is cheap. If this is something that
+happens a lot, then it&#8217;s worth the extra effort and code to make it happen more
+easily.</p>
+<p>The discovery of the vector of change is no trivial matter; it&#8217;s not something
+that an analyst can usually detect before the program sees its initial design.
+The necessary information will probably not appear until later phases in the
+project: sometimes only at the design or implementation phases do you discover a
+deeper or more subtle need in your system. In the case of adding new types
+(which was the focus of most of the &#8220;recycle&#8221; examples) you might realize that
+you need a particular inheritance hierarchy only when you are in the maintenance
+phase and you begin extending the system!</p>
+<p>One of the most important things that you&#8217;ll learn by studying design patterns
+seems to be an about-face from what has been promoted so far in this book. That
+is: &#8220;OOP is all about polymorphism.&#8221; This statement can produce the &#8220;two-year-
+old with a hammer&#8221; syndrome (everything looks like a nail). Put another way,
+it&#8217;s hard enough to &#8220;get&#8221; polymorphism, and once you do, you try to cast all
+your designs into that one particular mold.</p>
+<p>What design patterns say is that OOP isn&#8217;t just about polymorphism. It&#8217;s about
+&#8220;separating the things that change from the things that stay the same.&#8221;
+Polymorphism is an especially important way to do this, and it turns out to be
+helpful if the programming language directly supports polymorphism (so you don&#8217;t
+have to wire it in yourself, which would tend to make it prohibitively
+expensive). But design patterns in general show <em>other</em> ways to accomplish the
+basic goal, and once your eyes have been opened to this you will begin to search
+for more creative designs.</p>
+<p>Since the <em>Design Patterns</em> book came out and made such an impact, people have
+been searching for other patterns. You can expect to see more of these appear as
+time goes on. Here are some sites recommended by Jim Coplien, of C++ fame
+(<em>http://www.bell-labs.com/~cope</em>), who is one of the main proponents of the
+patterns movement:</p>
+<p><a class="reference external" href="http://st-www.cs.uiuc.edu/users/patterns">http://st-www.cs.uiuc.edu/users/patterns</a>
+<a class="reference external" href="http://c2.com/cgi/wiki">http://c2.com/cgi/wiki</a>
+<a class="reference external" href="http://c2.com/ppr">http://c2.com/ppr</a>
+<a class="reference external" href="http://www.bell-labs.com/people/cope/Patterns/Process/index.html">http://www.bell-labs.com/people/cope/Patterns/Process/index.html</a>
+<a class="reference external" href="http://www.bell-labs.com/cgi-user/OrgPatterns/OrgPatterns">http://www.bell-labs.com/cgi-user/OrgPatterns/OrgPatterns</a>
+<a class="reference external" href="http://st-www.cs.uiuc.edu/cgi-bin/wikic/wikic">http://st-www.cs.uiuc.edu/cgi-bin/wikic/wikic</a>
+<a class="reference external" href="http://www.cs.wustl.edu/~schmidt/patterns.html">http://www.cs.wustl.edu/~schmidt/patterns.html</a>
+<a class="reference external" href="http://www.espinc.com/patterns/overview.html">http://www.espinc.com/patterns/overview.html</a></p>
+<p>Also note there has been a yearly conference on design patterns, called PLOP,
+that produces a published proceedings, the third of which came out in late 1997
+(all published by Addison-Wesley).</p>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Add a class <strong>Plastic</strong> to <strong>TrashVisitor.py</strong>.</li>
+<li>Add a class <strong>Plastic</strong> to <strong>DynaTrash.py</strong>.</li>
+<li>Create a decorator like <strong>VisitableDecorator</strong>, but for the multiple
+dispatching example, along with an &#8220;adapter decorator&#8221; class like the one
+created for <strong>VisitableDecorator</strong>. Build the rest of the example and show
+that it works.</li>
+</ol>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Addison-Wesley, 1999.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td>This was a solution created by Jaroslav Tulach in a design patterns class
+that I gave in Prague.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Pattern Refactoring</a><ul>
+<li><a class="reference external" href="#simulating-the-trash-recycler">Simulating the Trash Recycler</a></li>
+<li><a class="reference external" href="#improving-the-design">Improving the Design</a><ul>
+<li><a class="reference external" href="#make-more-objects">&#8220;Make More Objects&#8221;</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#a-pattern-for-prototyping-creation">A Pattern for Prototyping Creation</a><ul>
+<li><a class="reference external" href="#trash-subclasses"><strong>Trash</strong> Subclasses</a></li>
+<li><a class="reference external" href="#parsing-trash-from-an-external-file">Parsing <strong>Trash</strong> from an External File</a></li>
+<li><a class="reference external" href="#recycling-with-prototyping">Recycling with Prototyping</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#abstracting-usage">Abstracting Usage</a></li>
+<li><a class="reference external" href="#multiple-dispatching">Multiple Dispatching</a><ul>
+<li><a class="reference external" href="#implementing-the-double-dispatch">Implementing the Double Dispatch</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#the-visitor-pattern">The <em>Visitor</em> Pattern</a><ul>
+<li><a class="reference external" href="#a-reflective-decorator">A Reflective Decorator</a></li>
+<li><a class="reference external" href="#more-coupling">More Coupling?</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#rtti-considered-harmful">RTTI Considered Harmful?</a></li>
+<li><a class="reference external" href="#summary">Summary</a></li>
+<li><a class="reference external" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Visitor.html" title="previous chapter">Visitor</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Projects.html" title="next chapter">Projects</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/PatternRefactoring.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Projects.html" title="Projects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Visitor.html" title="Visitor"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

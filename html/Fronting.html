@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fronting for an Implementation &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="StateMachine" href="StateMachine.html" />
+    <link rel="prev" title="Building Application Frameworks" href="AppFrameworks.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="StateMachine.html" title="StateMachine"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AppFrameworks.html" title="Building Application Frameworks"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="fronting-for-an-implementation">
+<h1>Fronting for an Implementation<a class="headerlink" href="#fronting-for-an-implementation" title="Permalink to this headline">¶</a></h1>
+<p>Both <em>Proxy</em> and <em>State</em> provide a surrogate class that you use in your code;
+the real class that does the work is hidden behind this surrogate class. When
+you call a method in the surrogate, it simply turns around and calls the method
+in the implementing class. These two patterns are so similar that the <em>Proxy</em> is
+simply a special case of <em>State</em>. One is tempted to just lump the two together
+into a pattern called <em>Surrogate</em>, but the term &#8220;proxy&#8221; has a long-standing and
+specialized meaning, which probably explains the reason for the two different
+patterns.</p>
+<p>The basic idea is simple: from a base class, the surrogate is derived along with
+the class or classes that provide the actual implementation:</p>
+<img alt="_images/surrogate.gif" src="_images/surrogate.gif" />
+<p>When a surrogate object is created, it is given an implementation to which to
+send all of the method calls.</p>
+<p>Structurally, the difference between <em>Proxy</em> and <em>State</em> is simple: a <em>Proxy</em>
+has only one implementation, while <em>State</em> has more than one. The application of
+the patterns is considered (in <em>Design Patterns</em>) to be distinct: <em>Proxy</em> is
+used to control access to its implementation, while <em>State</em> allows you to change
+the implementation dynamically. However, if you expand your notion of
+&#8220;controlling access to implementation&#8221; then the two fit neatly together.</p>
+<div class="section" id="proxy">
+<h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this headline">¶</a></h2>
+<p>If we implement <em>Proxy</em> by following the above diagram, it looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Fronting/ProxyDemo.py</span>
+<span class="c"># Simple demonstration of the Proxy pattern.</span>
+
+<span class="k">class</span> <span class="nc">Implementation</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.f()&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.g()&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.h()&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Proxy</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span> <span class="o">=</span> <span class="n">Implementation</span><span class="p">()</span>
+    <span class="c"># Pass method calls to the implementation:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Proxy</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">f</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">g</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>It isn&#8217;t necessary that <strong>Implementation</strong> have the same interface as <strong>Proxy</strong>;
+as long as <strong>Proxy</strong> is somehow &#8220;speaking for&#8221; the class that it is referring
+method calls to then the basic idea is satisfied (note that this statement is at
+odds with the definition for Proxy in GoF). However, it is convenient to have a
+common interface so that <strong>Implementation</strong> is forced to fulfill all the methods
+that <strong>Proxy</strong> needs to call.</p>
+<p>Of course, in Python we have a delegation mechanism built in, so it makes the
+<strong>Proxy</strong> even simpler to implement:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Fronting/ProxyDemo2.py</span>
+<span class="c"># Simple demonstration of the Proxy pattern.</span>
+
+<span class="k">class</span> <span class="nc">Implementation2</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.f()&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.g()&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Implementation.h()&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Proxy2</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span> <span class="o">=</span> <span class="n">Implementation2</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Proxy2</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">f</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">g</span><span class="p">();</span> <span class="n">p</span><span class="o">.</span><span class="n">h</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The beauty of using <strong>__getattr__( )</strong> is that <strong>Proxy2</strong> is completely generic,
+and not tied to any particular implementation (in Java, a rather complicated
+&#8220;dynamic proxy&#8221; has been invented to accomplish this same thing).</p>
+</div>
+<div class="section" id="state">
+<h2>State<a class="headerlink" href="#state" title="Permalink to this headline">¶</a></h2>
+<p>The <em>State</em> pattern adds more implementations to <em>Proxy</em>, along with a way to
+switch from one implementation to another during the lifetime of the surrogate:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Fronting/StateDemo.py</span>
+<span class="c"># Simple demonstration of the State pattern.</span>
+
+<span class="k">class</span> <span class="nc">State_d</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span> <span class="o">=</span> <span class="n">imp</span>
+    <span class="k">def</span> <span class="nf">changeImp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newImp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span> <span class="o">=</span> <span class="n">newImp</span>
+    <span class="c"># Delegate calls to the implementation:</span>
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__implementation</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Implementation1</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Fiddle de dum, Fiddle de dee,&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Eric the half a bee.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Ho ho ho, tee hee hee,&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Implementation2</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;We&#39;re Knights of the Round Table.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;We dance whene&#39;er we&#39;re able.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;We do routines and chorus scenes&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">h</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">State_d</span><span class="p">(</span><span class="n">Implementation1</span><span class="p">())</span>
+<span class="n">run</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">b</span><span class="o">.</span><span class="n">changeImp</span><span class="p">(</span><span class="n">Implementation2</span><span class="p">())</span>
+<span class="n">run</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see that the first implementation is used for a bit, then the second
+implementation is swapped in and that is used.</p>
+<p>The difference between <em>Proxy</em> and <em>State</em> is in the problems that are solved.
+The common uses for <em>Proxy</em> as described in <em>Design Patterns</em> are:</p>
+<ol class="arabic simple">
+<li><strong>Remote proxy</strong>. This proxies for an object in a different address space. A
+remote proxy is created for you automatically by the RMI compiler <strong>rmic</strong>
+as it creates stubs and skeletons.</li>
+<li><strong>Virtual proxy</strong>. This provides &#8220;lazy initialization&#8221; to create expensive
+objects on demand.</li>
+<li><strong>Protection proxy</strong>. Used when you don&#8217;t want the client programmer to have
+full access to the proxied object.</li>
+<li><strong>Smart reference</strong>. To add additional actions when the proxied object is
+accessed. For example, or to keep track of the number of references that are
+held for a particular object, in order to implement the <em>copy-on-write</em>
+idiom and prevent object aliasing. A simpler example is keeping track of the
+number of calls to a particular method.</li>
+</ol>
+<p>You could look at a Python reference as a kind of protection proxy, since it
+controls access to the actual object on the heap (and ensures, for example, that
+you don&#8217;t use a <strong>null</strong> reference).</p>
+<p>[[ Rewrite this: In <em>Design Patterns</em>, <em>Proxy</em> and <em>State</em> are not seen as
+related to each other because the two are given (what I consider arbitrarily)
+different structures. <em>State</em>, in particular, uses a separate implementation
+hierarchy but this seems to me to be unnecessary unless you have decided that
+the implementation is not under your control (certainly a possibility, but if
+you own all the code there seems to be no reason not to benefit from the
+elegance and helpfulness of the single base class). In addition, <em>Proxy</em> need
+not use the same base class for its implementation, as long as the proxy object
+is controlling access to the object it &#8220;fronting&#8221; for. Regardless of the
+specifics, in both <em>Proxy</em> and <em>State</em> a surrogate is passing method calls
+through to an implementation object.]]]</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Fronting for an Implementation</a><ul>
+<li><a class="reference external" href="#proxy">Proxy</a></li>
+<li><a class="reference external" href="#state">State</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="AppFrameworks.html" title="previous chapter">Building Application Frameworks</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="StateMachine.html" title="next chapter">StateMachine</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Fronting.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="StateMachine.html" title="StateMachine"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AppFrameworks.html" title="Building Application Frameworks"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

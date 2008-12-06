@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Multiple Dispatching &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Visitor" href="Visitor.html" />
+    <link rel="prev" title="Observer" href="Observer.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Visitor.html" title="Visitor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Observer.html" title="Observer"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="multiple-dispatching">
+<h1>Multiple Dispatching<a class="headerlink" href="#multiple-dispatching" title="Permalink to this headline">¶</a></h1>
+<p>When dealing with multiple types which are interacting, a program can get
+particularly messy. For example, consider a system that parses and executes
+mathematical expressions. You want to be able to say <strong>Number + Number</strong>,
+<strong>Number * Number</strong>, etc., where <strong>Number</strong> is the base class for a family of
+numerical objects. But when you say <strong>a + b</strong>, and you don&#8217;t know the exact type
+of either <strong>a</strong> or <strong>b</strong>, so how can you get them to interact properly?</p>
+<p>The answer starts with something you probably don&#8217;t think about: Python performs
+only single dispatching. That is, if you are performing an operation on more
+than one object whose type is unknown, Python can invoke the dynamic binding
+mechanism on only one of those types. This doesn&#8217;t solve the problem, so you end
+up detecting some types manually and effectively producing your own dynamic
+binding behavior.</p>
+<p>The solution is called <em>multiple dispatching</em>. Remember that polymorphism can
+occur only via member function calls, so if you want double dispatching to
+occur, there must be two member function calls: the first to determine the first
+unknown type, and the second to determine the second unknown type. With multiple
+dispatching, you must have a polymorphic method call to determine each of the
+types. Generally, you&#8217;ll set up a configuration such that a single member
+function call produces more than one dynamic member function call and thus
+determines more than one type in the process. To get this effect, you need to
+work with more than one polymorphic method call: you&#8217;ll need one call for each
+dispatch. The methods in the following example are called <strong>compete( )</strong> and
+<strong>eval( )</strong>, and are both members of the same type. (In this case there will be
+only two dispatches, which is referred to as <em>double dispatching</em>). If you are
+working with two different type hierarchies that are interacting, then you&#8217;ll
+have to have a polymorphic method call in each hierarchy.</p>
+<p>Here&#8217;s an example of multiple dispatching:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># MultipleDispatching/PaperScissorsRock.py</span>
+<span class="c"># Demonstration of multiple dispatching.</span>
+<span class="k">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
+<span class="k">import</span> <span class="nn">random</span>
+
+<span class="c"># An enumeration type:</span>
+<span class="k">class</span> <span class="nc">Outcome</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+<span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="s">&quot;win&quot;</span><span class="p">)</span>
+<span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s">&quot;lose&quot;</span><span class="p">)</span>
+<span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="s">&quot;draw&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Item</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="k">class</span> <span class="nc">Paper</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># First dispatch: self was Paper</span>
+        <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">evalPaper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">evalPaper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Paper, we&#39;re in Paper</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span>
+    <span class="k">def</span> <span class="nf">evalScissors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Scissors, we&#39;re in Paper</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span>
+    <span class="k">def</span> <span class="nf">evalRock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Rock, we&#39;re in Paper</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span>
+
+<span class="k">class</span> <span class="nc">Scissors</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># First dispatch: self was Scissors</span>
+        <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">evalScissors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">evalPaper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Paper, we&#39;re in Scissors</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span>
+    <span class="k">def</span> <span class="nf">evalScissors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Scissors, we&#39;re in Scissors</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span>
+    <span class="k">def</span> <span class="nf">evalRock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Rock, we&#39;re in Scissors</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span>
+
+<span class="k">class</span> <span class="nc">Rock</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># First dispatch: self was Rock</span>
+        <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">evalRock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">evalPaper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Paper, we&#39;re in Rock</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span>
+    <span class="k">def</span> <span class="nf">evalScissors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Scissors, we&#39;re in Rock</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span>
+    <span class="k">def</span> <span class="nf">evalRock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Item was Rock, we&#39;re in Rock</span>
+        <span class="k">return</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span>
+
+<span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> &lt;--&gt; </span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+      <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">,</span> <span class="n">item1</span><span class="o">.</span><span class="n">compete</span><span class="p">(</span><span class="n">item2</span><span class="p">)))</span>
+
+<span class="c"># Generate the items:</span>
+<span class="k">def</span> <span class="nf">itemPairGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="c"># Create a list of instances of all Items:</span>
+    <span class="n">Items</span> <span class="o">=</span> <span class="n">Item</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">Items</span><span class="p">)(),</span>
+               <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">Items</span><span class="p">)())</span>
+
+<span class="k">for</span> <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">itemPairGen</span><span class="p">(</span><span class="mf">20</span><span class="p">):</span>
+    <span class="n">match</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This was a fairly literal translation from the Java version, and one of the
+things you might notice is that the information about the various combinations
+is encoded into each type of <strong>Item</strong>. It actually ends up being a kind of
+table, except that it is spread out through all the classes. This is not very
+easy to maintain if you ever expect to modify the behavior or to add a new
+<strong>Item</strong> class. Instead, it can be more sensible to make the table explicit,
+like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># MultipleDispatching/PaperScissorsRock2.py</span>
+<span class="c"># Multiple dispatching using a table</span>
+<span class="k">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
+<span class="k">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">Outcome</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+<span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="s">&quot;win&quot;</span><span class="p">)</span>
+<span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="s">&quot;lose&quot;</span><span class="p">)</span>
+<span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span> <span class="o">=</span> <span class="n">Outcome</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="s">&quot;draw&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Item</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c"># Use a tuple for table lookup:</span>
+        <span class="k">return</span> <span class="n">outcome</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">__class__</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+
+<span class="k">class</span> <span class="nc">Paper</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Scissors</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Rock</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="n">outcome</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">(</span><span class="n">Paper</span><span class="p">,</span> <span class="n">Rock</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Paper</span><span class="p">,</span> <span class="n">Scissors</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Paper</span><span class="p">,</span> <span class="n">Paper</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Scissors</span><span class="p">,</span> <span class="n">Paper</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Scissors</span><span class="p">,</span> <span class="n">Rock</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Scissors</span><span class="p">,</span> <span class="n">Scissors</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Rock</span><span class="p">,</span> <span class="n">Scissors</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">WIN</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Rock</span><span class="p">,</span> <span class="n">Paper</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">LOSE</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">Rock</span><span class="p">,</span> <span class="n">Rock</span><span class="p">):</span> <span class="n">Outcome</span><span class="o">.</span><span class="n">DRAW</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> &lt;--&gt; </span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+      <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">,</span> <span class="n">item1</span><span class="o">.</span><span class="n">compete</span><span class="p">(</span><span class="n">item2</span><span class="p">)))</span>
+
+<span class="c"># Generate the items:</span>
+<span class="k">def</span> <span class="nf">itemPairGen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="c"># Create a list of instances of all Items:</span>
+    <span class="n">Items</span> <span class="o">=</span> <span class="n">Item</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">Items</span><span class="p">)(),</span>
+               <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">Items</span><span class="p">)())</span>
+
+<span class="k">for</span> <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">itemPairGen</span><span class="p">(</span><span class="mf">20</span><span class="p">):</span>
+    <span class="n">match</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It&#8217;s a tribute to the flexibility of dictionaries that a tuple can be used as a
+key just as easily as a single object.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Observer.html" title="previous chapter">Observer</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Visitor.html" title="next chapter">Visitor</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/MultipleDispatching.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Visitor.html" title="Visitor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Observer.html" title="Observer"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

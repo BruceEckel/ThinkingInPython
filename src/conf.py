@@ -173,7 +173,11 @@ latex_logo = '_static/Logo.png'
 # Additional stuff for the LaTeX preamble.
 #latex_preamble = ''
 latex_elements = {
-    'fontpkg': '\\usepackage{palatino}'
+    'fontpkg': '\\usepackage{palatino}',
+    # test:
+    # 'preamble': '%\\test me Yarko\n%\\test me second Yarko'
+    # This is too late - has to be done w/in sphinx.sty:
+    # 'preamble': '\\paperheight 9.25in\n\\paperwidth 7in'
 }
 
 # Documents to append as an appendix to all manuals.

@@ -56,14 +56,18 @@ htmlhelp:
 latex:
 	mkdir -p _build/latex _build/doctrees
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) _build/latex
+	if [ -d _texinputs ]; then cp _texinputs/*[^~] _build/latex; fi
 	@echo
 	@echo "Build finished; the LaTeX files are in _build/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
+
+pdf:	# this works w/ MikTeX on Windows-XP
 	# do it if we can:
-	[ -x "`which texify`" ] && (cd _build/latex; texify --batch --pdf Python3PatternsIdioms.tex)
+	# the following works on Windows w/ MikTeX
+	[ -x "`which texify`" ] && (cd _build/latex;texify --batch --pdf Python3PatternsIdioms.tex;makeindex -s python.ist 'Python3PatternsIdioms.idx';texify --batch --pdf Python3PatternsIdioms.tex;)
 	# should probalby check success of texify somehow first
-	# cp _build/latex/Python3Patterns.pdf ..     
+	# [ _build/latex/Python3Patterns.pdf -nt ../Python3Patterns.pdf ] && cp _build/latex/Python3Patterns.pdf ..     
 
 
 changes:

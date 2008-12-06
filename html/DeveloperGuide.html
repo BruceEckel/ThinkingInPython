@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Developer Guide &mdash; Python 3 Patterns &amp; Idioms</title>
+    <title>Developer Guide &mdash; Python 3 Patterns, Recipes and Idioms</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="Python 3 Patterns &amp; Idioms" href="index.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
     <link rel="next" title="Part I: Foundations" href="Part1.html" />
     <link rel="prev" title="Book Development Rules" href="Rules.html" /> 
   </head>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="Rules.html" title="Book Development Rules"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns &amp; Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>  
     <div class="document">
@@ -252,6 +252,38 @@ comparatively)... make any changes.... repeat....</li>
 changed files - so you can comment individually.</li>
 </ol>
 </div>
+<div class="section" id="emacs-for-editing-restructured-text">
+<h2>Emacs for Editing Restructured Text<a class="headerlink" href="#emacs-for-editing-restructured-text" title="Permalink to this headline">¶</a></h2>
+<p>If you want an editing system with support for restructured text, one choice is
+the free text editor <em>emacs</em>, which has an add-on mode for restructured text.
+Emacs has a long and venerable history, and is an extremely powerful editor.
+Emacs also has versions that are customized for operating systems to make it
+much more familiar.</p>
+<p>Here&#8217;s a <a class="reference external" href="http://lowfatlinux.com/linux-editor-emacs.html">simple introduction to emacs</a>
+and a <a class="reference external" href="http://www.linuxhelp.net/guides/emacs/">useful introductory help guide</a>.
+For Windows, there&#8217;s <a class="reference external" href="http://www.gnu.org/software/emacs/windows/ntemacs.html">a special FAQ</a>.</p>
+<p><strong>Mac OSX</strong>: <a class="reference external" href="http://aquamacs.org/">Aquamacs</a> looks and feels like a native
+Mac application.</p>
+<p><strong>Windows</strong>: You can download the latest windows installer <a class="reference external" href="http://ftp.gnu.org/pub/gnu/emacs/windows/">here (choose the
+highest numbered zip file with &#8220;bin&#8221; in the name)</a>.
+<a class="reference external" href="http://www.arunrocks.com/blog/archives/2008/02/20/5-indespensible-tips-for-emacs-on-windows/">This blog</a>
+gives useful tips to make emacs on Windows even friendlier (in particular, it
+puts emacs on the right-click menu and improves the startup settings).</p>
+<p><strong>Linux</strong>: It&#8217;s virtually guaranteed that you already have emacs preinstalled
+on your Linux distribution, which you can start from a command prompt. However,
+there may also be more &#8220;windowy&#8221; versions that you can install separately.</p>
+<div class="admonition-todo admonition " id="todo-7">
+<p class="first admonition-title">Todo</p>
+<p class="last">Someone who knows more about emacs for Linux please add more specific information the windowed version(s).</p>
+</div>
+<p>Finally, <a class="reference external" href="http://docutils.sourceforge.net/docs/user/emacs.html">here&#8217;s the documentation for installing and using the emacs
+restructured-text mode</a>.
+The elisp code it refers to is in the file &#8216;rst.el &lt;<a class="reference external" href="http://docutils.sourceforge.net/tools/editors/emacs/rst.el">http://docutils.sourceforge.net/tools/editors/emacs/rst.el</a>&gt;`_.</p>
+<p>To customize your emacs, you need to open the <tt class="docutils literal"><span class="pre">.emacs</span></tt> file. The above Windows
+FAQ tells you how to put your <tt class="docutils literal"><span class="pre">.emacs</span></tt> file somewhere else, but the easiest
+thing to do is just open emacs and inside it type <tt class="docutils literal"><span class="pre">C-x</span> <span class="pre">C-f</span> <span class="pre">~/.emacs</span></tt>, which
+will open your default <tt class="docutils literal"><span class="pre">.emacs</span></tt> file.</p>
+</div>
 </div>
 
 
@@ -261,7 +293,7 @@ changed files - so you can comment individually.</li>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
-              <img class="logo" src="_static/Logo.png" alt="Logo"/>
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
             </a></p>
     <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
     
@@ -276,6 +308,7 @@ changed files - so you can comment individually.</li>
 <li><a class="reference external" href="#building-the-pdf">Building the PDF</a></li>
 <li><a class="reference external" href="#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
 <li><a class="reference external" href="#a-simple-overview-of-editing-and-merging">A Simple Overview Of Editing and Merging</a></li>
+<li><a class="reference external" href="#emacs-for-editing-restructured-text">Emacs for Editing Restructured Text</a></li>
 </ul>
 </li>
 </ul>
@@ -316,13 +349,13 @@ changed files - so you can comment individually.</li>
         <li class="right" >
           <a href="Rules.html" title="Book Development Rules"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns &amp; Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Nov 25, 2008.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
 </html>

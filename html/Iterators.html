@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Iterators: Decoupling Algorithms from Containers &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Factory: Encapsulating Object Creation" href="Factory.html" />
+    <link rel="prev" title="Decorator: Dynamic Type Selection" href="Decorator.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Factory.html" title="Factory: Encapsulating Object Creation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Decorator.html" title="Decorator: Dynamic Type Selection"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="iterators-decoupling-algorithms-from-containers">
+<h1>Iterators: Decoupling Algorithms from Containers<a class="headerlink" href="#iterators-decoupling-algorithms-from-containers" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This chapter has not had any significant translation yet.</p>
+</div>
+<p>Alexander Stepanov thought for years about the problem of generic programming
+techniques before creating the STL (along with Dave Musser). He came to the
+conclusion that all algorithms are defined on algebraic structures - what we
+would call containers.</p>
+<p>In the process, he realized that iterators are central to the use of algorithms,
+because they decouple the algorithms from the specific type of container that
+the algorithm might currently be working with. This means that you can describe
+the algorithm without worrying about the particular sequence it is operating on.
+More generally, <em>any</em> code that you write using iterators is decoupled from the
+data structure that the code is manipulating, and thus your code is more general
+and reusable.</p>
+<p>The use of iterators also extends your code into the realm of <em>functional
+programming</em>, whose objective is to describe <em>what</em> a program is doing at every
+step rather than <em>how</em> it is doing it. That is, you say &#8220;sort&#8221; rather than
+describing the sort. The objective of the C++ STL was to provide this <em>generic
+programming</em> approach for C++ (how successful this approach will actually be
+remains to be seen).</p>
+<p>If you&#8217;ve used containers in Java (and it&#8217;s hard to write code without using
+them), you&#8217;ve used iterators - in the form of the <strong>Enumeration</strong> in Java
+1.0/1.1 and the <strong>Iterator</strong> in Java 2. So you should already be familiar with
+their general use. If not, see Chapter 9, <em>Holding Your Objects</em>, under
+<em>Iterators</em> in <em>Thinking in Java, 3rd edition</em> (freely downloadable from
+<em>www.BruceEckel.com</em>).</p>
+<p>Because the Java 2 containers rely heavily on iterators they become excellent
+candidates for generic/functional programming techniques. This chapter will
+explore these techniques by converting the STL algorithms to Java, for use with
+the Java 2 container library.</p>
+<div class="section" id="type-safe-iterators">
+<h2>Type-Safe Iterators<a class="headerlink" href="#type-safe-iterators" title="Permalink to this headline">¶</a></h2>
+<p>In <em>Thinking in Java</em>, I show the creation of a type-safe container that will
+only accept a particular type of object. A reader, Linda Pazzaglia, asked for
+the other obvious type-safe component, an iterator that would work with the
+basic <strong>java.util</strong> containers, but impose the constraint that the type of
+objects that it iterates over be of a particular type.</p>
+<p>If Java ever includes a template mechanism, this kind of iterator will have the
+added advantage of being able to return a specific type of object, but without
+templates you are forced to return generic <strong>Object</strong>s, or to require a bit of
+hand-coding for every type that you want to iterate through. I will take the
+former approach.</p>
+<p>A second design decision involves the time that the type of object is
+determined. One approach is to take the type of the first object that the
+iterator encounters, but this is problematic because the containers may
+rearrange the objects according to an internal ordering mechanism (such as a
+hash table) and thus you may get different results from one iteration to the
+next. The safe approach is to require the user to establish the type during
+construction of the iterator.</p>
+<p>Lastly, how do we build the iterator? We cannot rewrite the existing Java
+library classes that already produce <strong>Enumeration</strong>s and <strong>Iterator</strong>s.
+However, we can use the <em>Decorator</em> design pattern, and create a class that
+simply wraps the <strong>Enumeration</strong> or <strong>Iterator</strong> that is produced, generating a
+new object that has the iteration behavior that we want (which is, in this case,
+to throw a <strong>RuntimeException</strong> if an incorrect type is encountered) but with
+the same interface as the original <strong>Enumeration</strong> or <strong>Iterator</strong>, so that it
+can be used in the same places (you may argue that this is actually a <em>Proxy</em>
+pattern, but it&#8217;s more likely <em>Decorator</em> because of its intent). Here is the
+code:</p>
+<div class="highlight-python"><pre># Util/TypedIterator.py
+
+class TypedIterator(Iterator):
+    def __init__(self, it, type):
+        self.imp = it
+        self.type = type
+
+    def hasNext(self):
+        return imp.hasNext()
+
+    def remove(self): imp.remove()
+    def next(self):
+        obj = imp.next()
+        if(!type.isInstance(obj))
+            throw ClassCastException(
+              "TypedIterator for type " + type +
+              " encountered type: " + obj.getClass())
+        return obj</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Iterators: Decoupling Algorithms from Containers</a><ul>
+<li><a class="reference external" href="#type-safe-iterators">Type-Safe Iterators</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Decorator.html" title="previous chapter">Decorator: Dynamic Type Selection</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Factory.html" title="next chapter">Factory: Encapsulating Object Creation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Iterators.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Factory.html" title="Factory: Encapsulating Object Creation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Decorator.html" title="Decorator: Dynamic Type Selection"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>

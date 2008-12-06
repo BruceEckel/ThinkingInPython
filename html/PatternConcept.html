@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Pattern Concept &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="The Singleton" href="Singleton.html" />
+    <link rel="prev" title="Part III: Patterns" href="Part3.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Singleton.html" title="The Singleton"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Part3.html" title="Part III: Patterns"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="the-pattern-concept">
+<h1>The Pattern Concept<a class="headerlink" href="#the-pattern-concept" title="Permalink to this headline">¶</a></h1>
+<p>&#8220;Design patterns help you learn from others&#8217; successes instead of your own
+failures <a class="footnote-reference" href="#id7" id="id1">[1]</a>.&#8221;</p>
+<p>Probably the most important step forward in object-oriented design is the
+&#8220;design patterns&#8221; movement, chronicled in <em>Design Patterns (ibid)</em> <a class="footnote-reference" href="#id8" id="id2">[2]</a>. That
+book shows 23 different solutions to particular classes of problems. In this
+book, the basic concepts of design patterns will be introduced along with
+examples. This should whet your appetite to read <em>Design Patterns</em> by Gamma, et.
+al., a source of what has now become an essential, almost mandatory, vocabulary
+for OOP programmers.</p>
+<p>The latter part of this book contains an example of the design evolution
+process, starting with an initial solution and moving through the logic and
+process of evolving the solution to more appropriate designs. The program shown
+(a trash sorting simulation) has evolved over time, and you can look at that
+evolution as a prototype for the way your own design can start as an adequate
+solution to a particular problem and evolve into a flexible approach to a class
+of problems.</p>
+<div class="section" id="what-is-a-pattern">
+<h2>What is a Pattern?<a class="headerlink" href="#what-is-a-pattern" title="Permalink to this headline">¶</a></h2>
+<p>Initially, you can think of a pattern as an especially clever and insightful way
+of solving a particular class of problems. That is, it looks like a lot of
+people have worked out all the angles of a problem and have come up with the
+most general, flexible solution for it. The problem could be one you have seen
+and solved before, but your solution probably didn&#8217;t have the kind of
+completeness you&#8217;ll see embodied in a pattern.</p>
+<p>Although they&#8217;re called &#8220;design patterns,&#8221; they really aren&#8217;t tied to the realm
+of design. A pattern seems to stand apart from the traditional way of thinking
+about analysis, design, and implementation. Instead, a pattern embodies a
+complete idea within a program, and thus it can sometimes appear at the analysis
+phase or high-level design phase. This is interesting because a pattern has a
+direct implementation in code and so you might not expect it to show up before
+low-level design or implementation (and in fact you might not realize that you
+need a particular pattern until you get to those phases).</p>
+<p>The basic concept of a pattern can also be seen as the basic concept of program
+design: adding a layer of abstraction. Whenever you abstract something you&#8217;re
+isolating particular details, and one of the most compelling motivations behind
+this is to <em>separate things that change from things that stay the same</em>. Another
+way to put this is that once you find some part of your program that&#8217;s likely to
+change for one reason or another, you&#8217;ll want to keep those changes from
+propagating other changes throughout your code. Not only does this make the code
+much cheaper to maintain, but it also turns out that it is usually simpler to
+understand (which results in lowered costs).</p>
+<p>Often, the most difficult part of developing an elegant and cheap-to-maintain
+design is in discovering what I call &#8220;the vector of change.&#8221; (Here, &#8220;vector&#8221;
+refers to the maximum gradient and not a container class.) This means finding
+the most important thing that changes in your system, or put another way,
+discovering where your greatest cost is. Once you discover the vector of change,
+you have the focal point around which to structure your design.</p>
+<p>So the goal of design patterns is to isolate changes in your code. If you look
+at it this way, you&#8217;ve been seeing some design patterns already in this book.
+For example, inheritance can be thought of as a design pattern (albeit one
+implemented by the compiler). It allows you to express differences in behavior
+(that&#8217;s the thing that changes) in objects that all have the same interface
+(that&#8217;s what stays the same). Composition can also be considered a pattern,
+since it allows you to change-dynamically or statically-the objects that
+implement your class, and thus the way that class works.</p>
+<p>Another pattern that appears in <em>Design Patterns</em> is the <em>iterator</em>, which has
+been implicitly available in <strong>for</strong> loops from the beginning of the language,
+and was introduced as an explicit feature in Python 2.2. An iterator allows you
+to hide the particular implementation of the container as you&#8217;re stepping
+through and selecting the elements one by one. Thus, you can write generic code
+that performs an operation on all of the elements in a sequence without regard
+to the way that sequence is built. Thus your generic code can be used with any
+object that can produce an iterator.</p>
+</div>
+<div class="section" id="classifying-patterns">
+<h2>Classifying Patterns<a class="headerlink" href="#classifying-patterns" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Design Patterns</em> book discusses 23 different patterns, classified under
+three purposes (all of which revolve around the particular aspect that can
+vary). The three purposes are:</p>
+<ol class="arabic simple">
+<li><strong>Creational</strong>: how an object can be created. This often involves isolating
+the details of object creation so your code isn&#8217;t dependent on what types of
+objects there are and thus doesn&#8217;t have to be changed when you add a new type of
+object. The aforementioned <em>Singleton</em> is classified as a creational pattern,
+and later in this book you&#8217;ll see examples of <em>Factory Method</em> and <em>Prototype</em>.</li>
+<li><strong>Structural</strong>: designing objects to satisfy particular project constraints.
+These work with the way objects are connected with other objects to ensure that
+changes in the system don&#8217;t require changes to those connections.</li>
+<li><strong>Behavioral</strong>: objects that handle particular types of actions within a
+program. These encapsulate processes that you want to perform, such as
+interpreting a language, fulfilling a request, moving through a sequence (as in
+an iterator), or implementing an algorithm. This book contains examples of the
+<em>Observer</em> and the <em>Visitor</em> patterns.</li>
+</ol>
+<p>The <em>Design Patterns</em> book has a section on each of its 23 patterns along with
+one or more examples for each, typically in C++ but sometimes in Smalltalk.
+(You&#8217;ll find that this doesn&#8217;t matter too much since you can easily translate
+the concepts from either language into Python.) This book will not repeat all
+the patterns shown in <em>Design Patterns</em> since that book stands on its own and
+should be studied separately. Instead, this book will give some examples that
+should provide you with a decent feel for what patterns are about and why they
+are so important.</p>
+<p>After years of looking at these things, it began to occur to me that the
+patterns themselves use basic principles of organization, other than (and more
+fundamental than) those described in <em>Design Patterns</em>. These principles are
+based on the structure of the implementations, which is where I have seen great
+similarities between patterns (more than those expressed in <em>Design Patterns</em>).
+Although we generally try to avoid implementation in favor of interface, I have
+found that it&#8217;s often easier to think about, and especially to learn about, the
+patterns in terms of these structural principles. This book will attempt to
+present the patterns based on their structure instead of the categories
+presented in <em>Design Patterns</em>.</p>
+</div>
+<div class="section" id="pattern-taxonomy">
+<h2>Pattern Taxonomy<a class="headerlink" href="#pattern-taxonomy" title="Permalink to this headline">¶</a></h2>
+<p>One of the events that&#8217;s occurred with the rise of design patterns is what could
+be thought of as the &#8220;pollution&#8221; of the term - people have begun to use the term
+to mean just about anything synonymous with &#8220;good.&#8221; After some pondering, I&#8217;ve
+come up with a sort of hierarchy describing a succession of different types of
+categories:</p>
+<ol class="arabic simple">
+<li><strong>Idiom</strong>: how we write code in a particular language to do this particular
+type of thing. This could be something as common as the way that you code
+the process of stepping through an array in C (and not running off the end).</li>
+<li><strong>Specific Design</strong>: the solution that we came up with to solve this
+particular problem. This might be a clever design, but it makes no attempt
+to be general.</li>
+<li><strong>Standard Design</strong>: a way to solve this <em>kind</em> of problem. A design that
+has become more general, typically through reuse.</li>
+<li><strong>Design Pattern</strong>: how to solve an entire class of similar problem. This
+usually only appears after applying a standard design a number of times, and
+then seeing a common pattern throughout these applications.</li>
+</ol>
+<p>I feel this helps put things in perspective, and to show where something might
+fit. However, it doesn&#8217;t say that one is better than another. It doesn&#8217;t make
+sense to try to take every problem solution and generalize it to a design
+pattern - it&#8217;s not a good use of your time, and you can&#8217;t force the discovery of
+patterns that way; they tend to be subtle and appear over time.</p>
+<p>One could also argue for the inclusion of <em>Analysis Pattern</em> and <em>Architectural
+Pattern</em> in this taxonomy.</p>
+</div>
+<div class="section" id="design-structures">
+<h2>Design Structures<a class="headerlink" href="#design-structures" title="Permalink to this headline">¶</a></h2>
+<p>One of the struggles that I&#8217;ve had with design patterns is their classification
+- I&#8217;ve often found the GoF approach to be too obscure, and not always very
+helpful. Certainly, the <em>Creational</em> patterns are fairly straightforward: how
+are you going to create your objects? This is a question you normally need to
+ask, and the name brings you right to that group of patterns. But I find
+<em>Structural</em> and <em>Behavioral</em> to be far less useful distinctions. I have not
+been able to look at a problem and say &#8220;clearly, you need a structural pattern
+here,&#8221; so that classification doesn&#8217;t lead me to a solution (I&#8217;ll readily admit
+that I may be missing something here).</p>
+<p>I&#8217;ve labored for awhile with this problem, first noting that the underlying
+structure of some of the GoF patterns are similar to each other, and trying to
+develop relationships based on that similarity. While this was an interesting
+experiment, I don&#8217;t think it produced much of use in the end because the point
+is to solve problems, so a helpful approach will look at the problem to solve
+and try to find relationships between the problem and potential solutions.</p>
+<p>To that end, I&#8217;ve begun to try to collect basic design structures, and to try to
+see if there&#8217;s a way to relate those structures to the various design patterns
+that appear in well thought-out systems. Currently, I&#8217;m just trying to make a
+list, but eventually I hope to make steps towards connecting these structures
+with patterns (or I may come up with a different approach altogether - this is
+still in its formative stages).</p>
+<p>Here <a class="footnote-reference" href="#id9" id="id3">[3]</a> is the present list of candidates, only some of which will make it to
+the final list. Feel free to suggest others, or possibly relationships with
+patterns.</p>
+<ul>
+<li><p class="first"><strong>Encapsulation</strong>: self containment and embodying a model of usage</p>
+</li>
+<li><p class="first"><strong>Gathering</strong></p>
+</li>
+<li><p class="first"><strong>Localization</strong></p>
+</li>
+<li><p class="first"><strong>Separation</strong></p>
+</li>
+<li><p class="first"><strong>Hiding</strong></p>
+</li>
+<li><p class="first"><strong>Guarding</strong></p>
+</li>
+<li><p class="first"><strong>Connector</strong></p>
+</li>
+<li><p class="first"><strong>Barrier/fence</strong></p>
+</li>
+<li><p class="first"><strong>Variation in behavior</strong></p>
+</li>
+<li><p class="first"><strong>Notification</strong></p>
+</li>
+<li><p class="first"><strong>Transaction</strong></p>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Mirror</strong>: &#8220;the ability to keep a parallel universe(s) in step with the</dt>
+<dd><p class="first last">golden world&#8221;</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Shadow</strong>: &#8220;follows your movement and does something different in a different</dt>
+<dd><p class="first last">medium&#8221; (May be a variation on Proxy).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="design-principles">
+<h2>Design Principles<a class="headerlink" href="#design-principles" title="Permalink to this headline">¶</a></h2>
+<p>When I put out a call for ideas in my newsletter <a class="footnote-reference" href="#id10" id="id4">[4]</a>, a number of suggestions
+came back which turned out to be very useful, but different than the above
+classification, and I realized that a list of design principles is at least as
+important as design structures, but for a different reason: these allow you to
+ask questions about your proposed design, to apply tests for quality.</p>
+<ul class="simple">
+<li><strong>Principle of least astonishment</strong> (don&#8217;t be astonishing).</li>
+<li><strong>Make common things easy, and rare things possible</strong></li>
+<li><strong>Consistency</strong>. One thing has become very clear to me, especially because of
+Python: the more random rules you pile onto the programmer, rules that have
+nothing to do with solving the problem at hand, the slower the programmer can
+produce. And this does not appear to be a linear factor, but an exponential one.</li>
+<li><strong>Law of Demeter</strong>: a.k.a. &#8220;Don&#8217;t talk to strangers.&#8221; An object should only
+reference itself, its attributes, and the arguments of its methods. This may
+also be a way to say &#8220;minimize coupling.&#8221;</li>
+<li><strong>Independence</strong> or <strong>Orthogonality</strong>. Express independent ideas independently.
+This complements Separation, Encapsulation and Variation, and is part of the
+Low-Coupling-High-Cohesion message.</li>
+<li><strong>Managed Coupling</strong>. Simply stating that we should have &#8220;low coupling&#8221; in a
+design is usually too vague - coupling happens, and the important issue is to
+acknowledge it and control it, to say &#8220;coupling can cause problems&#8221; and to
+compensate for those problems with a well-considered design or pattern.</li>
+<li><strong>Subtraction</strong>: a design is finished when you cannot take anything else away
+<a class="footnote-reference" href="#id11" id="id5">[5]</a>.</li>
+<li><strong>Simplicity before generality</strong> <a class="footnote-reference" href="#id12" id="id6">[6]</a>. (A variation of <em>Occam&#8217;s Razor</em>, which
+says &#8220;the simplest solution is the best&#8221;). A common problem we find in
+frameworks is that they are designed to be general purpose without reference to
+actual systems. This leads to a dizzying array of options that are often unused,
+misused or just not useful. However, most developers work on specific systems,
+and the quest for generality does not always serve them well. The best route to
+generality is through understanding well-defined specific examples. So, this
+principle acts as the tie breaker between otherwise equally viable design
+alternatives. Of course, it is entirely possible that the simpler solution is
+the more general one.</li>
+<li><strong>Reflexivity</strong> (my suggested term). One abstraction per class, one class per
+abstraction. Might also be called Isomorphism.</li>
+<li><strong>Once and once only</strong>: Avoid duplication of logic and structure where the
+duplication is not accidental, ie where both pieces of code express the same
+intent for the same reason.</li>
+</ul>
+<p>In the process of brainstorming this idea, I hope to come up with a small
+handful of fundamental ideas that can be held in your head while you analyze a
+problem. However, other ideas that come from this list may end up being useful
+as a checklist while walking through and analyzing your design.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>From Mark Johnson.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>But be warned: the examples are in C++.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>This list includes suggestions by Kevlin Henney, David Scott, and others.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>A free email publication. See <em>www.BruceEckel.com</em> to subscribe.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>This idea is generally attributed to Antoine de St. Exupery from <em>The
+Little Prince</em>: &#8220;La perfection est atteinte non quand il ne reste rien à
+ajouter, mais quand il ne reste rien à enlever,&#8221; or: &#8220;perfection is reached not
+when there&#8217;s nothing left to add, but when there&#8217;s nothing left to remove&#8221;.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[6]</a></td><td>From an email from Kevlin Henney.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">The Pattern Concept</a><ul>
+<li><a class="reference external" href="#what-is-a-pattern">What is a Pattern?</a></li>
+<li><a class="reference external" href="#classifying-patterns">Classifying Patterns</a></li>
+<li><a class="reference external" href="#pattern-taxonomy">Pattern Taxonomy</a></li>
+<li><a class="reference external" href="#design-structures">Design Structures</a></li>
+<li><a class="reference external" href="#design-principles">Design Principles</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Part3.html" title="previous chapter">Part III: Patterns</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Singleton.html" title="next chapter">The Singleton</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/PatternConcept.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Singleton.html" title="The Singleton"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Part3.html" title="Part III: Patterns"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Dec 06, 2008.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+    </div>
+  </body>
+</html>
