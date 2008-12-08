@@ -178,6 +178,7 @@ latex_elements = {
     # 'preamble': '%\\test me Yarko\n%\\test me second Yarko'
     # This is too late - has to be done w/in sphinx.sty:
     # 'preamble': '\\paperheight 9.25in\n\\paperwidth 7in'
+    'preamble': '\\usepackage[papersize={7in,9.25in}]{geometry}'
 }
 
 # Documents to append as an appendix to all manuals.
