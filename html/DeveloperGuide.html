@@ -45,7 +45,6 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
   <div class="section" id="developer-guide">
 <h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
 <p>Details for people participating in the book development process.</p>
@@ -168,6 +167,31 @@ additional software:</p>
 <p class="last">Add additional steps here.</p>
 </div>
 </div>
+<div class="section" id="setting-up-mercurial">
+<h2>Setting up Mercurial<a class="headerlink" href="#setting-up-mercurial" title="Permalink to this headline">¶</a></h2>
+<p>It&#8217;s easier if you put a configuration file called <strong>.hgrc</strong> in your
+home directory.  Here&#8217;s one that sets up the user name and configures
+<strong>kdiff3</strong> as the diff tool for Mercurial to use when showing you
+differences between files:</p>
+<div class="highlight-python"><pre># This is a Mercurial configuration file.
+[ui]
+username = Firstname Lastname &lt;email@mailer.net&gt;
+
+[merge-tools]
+# Override stock tool location
+kdiff3.executable = /usr/bin/kdiff3
+# Specify command line
+kdiff3.args = $base $local $other -o $output
+# Give higher priority
+kdiff3.priority = 1</pre>
+</div>
+<p>In addition, you can change the editor that Mercurial uses via an
+environment variable. For example, on OSX and Linux (and Windows with
+cygwin) you add this to your <strong>.bash_profile</strong> to set <strong>emacs</strong> as the
+default editor:</p>
+<div class="highlight-python"><pre>export set EDITOR=/usr/bin/emacs</pre>
+</div>
+</div>
 <div class="section" id="working-with-bitbucket-and-mercurial">
 <h2>Working with BitBucket and Mercurial<a class="headerlink" href="#working-with-bitbucket-and-mercurial" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
@@ -263,7 +287,8 @@ much more familiar.</p>
 <p>Here&#8217;s a <a class="reference external" href="http://lowfatlinux.com/linux-editor-emacs.html">simple introduction to emacs</a>
 and a <a class="reference external" href="http://www.linuxhelp.net/guides/emacs/">useful introductory help guide</a>.
 For Windows, there&#8217;s <a class="reference external" href="http://www.gnu.org/software/emacs/windows/ntemacs.html">a special FAQ</a>.</p>
-<p><strong>Mac OSX</strong>: <a class="reference external" href="http://aquamacs.org/">Aquamacs</a> looks and feels like a native
+<p><strong>Mac OSX</strong>: Comes with built-in emacs which you can invoke from the command line. For a nicer
+version, install <a class="reference external" href="http://aquamacs.org/">Aquamacs</a>, which looks and feels like a native
 Mac application.</p>
 <p><strong>Windows</strong>: You can download the latest windows installer <a class="reference external" href="http://ftp.gnu.org/pub/gnu/emacs/windows/">here (choose the
 highest numbered zip file with &#8220;bin&#8221; in the name)</a>.
@@ -275,15 +300,28 @@ on your Linux distribution, which you can start from a command prompt. However,
 there may also be more &#8220;windowy&#8221; versions that you can install separately.</p>
 <div class="admonition-todo admonition " id="todo-7">
 <p class="first admonition-title">Todo</p>
-<p class="last">Someone who knows more about emacs for Linux please add more specific information the windowed version(s).</p>
+<p class="last">Someone who knows more about emacs for Linux please add more specific information about the windowed version(s).</p>
 </div>
 <p>Finally, <a class="reference external" href="http://docutils.sourceforge.net/docs/user/emacs.html">here&#8217;s the documentation for installing and using the emacs
 restructured-text mode</a>.
-The elisp code it refers to is in the file &#8216;rst.el &lt;<a class="reference external" href="http://docutils.sourceforge.net/tools/editors/emacs/rst.el">http://docutils.sourceforge.net/tools/editors/emacs/rst.el</a>&gt;`_.</p>
+The elisp code it refers to is in the file <a class="reference external" href="http://docutils.sourceforge.net/tools/editors/emacs/rst.el">rst.el</a>.</p>
 <p>To customize your emacs, you need to open the <tt class="docutils literal"><span class="pre">.emacs</span></tt> file. The above Windows
 FAQ tells you how to put your <tt class="docutils literal"><span class="pre">.emacs</span></tt> file somewhere else, but the easiest
 thing to do is just open emacs and inside it type <tt class="docutils literal"><span class="pre">C-x</span> <span class="pre">C-f</span> <span class="pre">~/.emacs</span></tt>, which
-will open your default <tt class="docutils literal"><span class="pre">.emacs</span></tt> file.</p>
+will open your default <tt class="docutils literal"><span class="pre">.emacs</span></tt> file if you have one, or create a new one if you don&#8217;t.</p>
+<p>You&#8217;ll need to install <strong>rst.el</strong> someplace emacs will find it. Here&#8217;s an example <strong>.emacs</strong>
+file which adds a local directory called <strong>~/emacs/</strong> to the search path,
+(so you can put <strong>.el</strong> files there) and also automatically
+starts <strong>rst</strong> mode for files with extensions of <strong>rst</strong> and <strong>.rest</strong>:</p>
+<div class="highlight-python"><pre>(require 'cl)
+(defvar emacs-directory "~/emacs/"
+        "The directory containing the emacs configuration files.")
+(pushnew (expand-file-name emacs-directory) load-path)
+(require 'rst)
+(setq auto-mode-alist
+       (append '(("\\.rst$" . rst-mode)
+                 ("\\.rest$" . rst-mode)) auto-mode-alist))</pre>
+</div>
 </div>
 </div>
 
@@ -307,6 +345,7 @@ will open your default <tt class="docutils literal"><span class="pre">.emacs</sp
 <li><a class="reference external" href="#getting-the-development-branch-of-the-book">Getting the Development Branch of the Book</a></li>
 <li><a class="reference external" href="#building-the-book">Building the Book</a></li>
 <li><a class="reference external" href="#building-the-pdf">Building the PDF</a></li>
+<li><a class="reference external" href="#setting-up-mercurial">Setting up Mercurial</a></li>
 <li><a class="reference external" href="#working-with-bitbucket-and-mercurial">Working with BitBucket and Mercurial</a></li>
 <li><a class="reference external" href="#a-simple-overview-of-editing-and-merging">A Simple Overview Of Editing and Merging</a></li>
 <li><a class="reference external" href="#emacs-for-editing-restructured-text">Emacs for Editing Restructured Text</a></li>
@@ -321,7 +360,7 @@ will open your default <tt class="docutils literal"><span class="pre">.emacs</sp
             <p class="topless"><a href="Part1.html" title="next chapter">Part I: Foundations</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/DeveloperGuide.txt">Show Source</a></li>
+              <li><a href="_sources/DeveloperGuide.txt" rel="nofollow">Show Source</a></li>
             </ul>
     
           <h3>Quick search</h3>
@@ -330,6 +369,7 @@ will open your default <tt class="docutils literal"><span class="pre">.emacs</sp
               <input type="hidden" name="check_keywords" value="yes" />
               <input type="hidden" name="area" value="default" />
             </form>
+            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -355,7 +395,7 @@ will open your default <tt class="docutils literal"><span class="pre">.emacs</sp
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 08, 2008.
+      Last updated on Dec 26, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

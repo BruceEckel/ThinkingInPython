@@ -143,6 +143,34 @@ additional software:
 
 .. ToDo:: Add additional steps here.
 
+Setting up Mercurial
+===============================================================================
+
+It's easier if you put a configuration file called **.hgrc** in your
+home directory.  Here's one that sets up the user name and configures
+**kdiff3** as the diff tool for Mercurial to use when showing you
+differences between files::
+
+    # This is a Mercurial configuration file.
+    [ui]
+    username = Firstname Lastname <email@mailer.net>
+
+    [merge-tools]
+    # Override stock tool location
+    kdiff3.executable = /usr/bin/kdiff3
+    # Specify command line
+    kdiff3.args = $base $local $other -o $output
+    # Give higher priority
+    kdiff3.priority = 1
+
+In addition, you can change the editor that Mercurial uses via an
+environment variable. For example, on OSX and Linux (and Windows with
+cygwin) you add this to your **.bash_profile** to set **emacs** as the
+default editor::
+
+	 export set EDITOR=/usr/bin/emacs
+
+
 Working with BitBucket and Mercurial
 ===============================================================================
 
@@ -242,7 +270,8 @@ Here's a `simple introduction to emacs <http://lowfatlinux.com/linux-editor-emac
 and a `useful introductory help guide <http://www.linuxhelp.net/guides/emacs/>`_.
 For Windows, there's `a special FAQ <http://www.gnu.org/software/emacs/windows/ntemacs.html>`_.
 
-**Mac OSX**: `Aquamacs <http://aquamacs.org/>`_ looks and feels like a native
+**Mac OSX**: Comes with built-in emacs which you can invoke from the command line. For a nicer
+version, install `Aquamacs <http://aquamacs.org/>`_, which looks and feels like a native
 Mac application.
 
 **Windows**: You can download the latest windows installer `here (choose the
@@ -255,13 +284,29 @@ puts emacs on the right-click menu and improves the startup settings).
 on your Linux distribution, which you can start from a command prompt. However,
 there may also be more "windowy" versions that you can install separately.
 
-.. ToDo:: Someone who knows more about emacs for Linux please add more specific information the windowed version(s).
+.. ToDo:: Someone who knows more about emacs for Linux please add more specific information about the windowed version(s).
 
 Finally, `here's the documentation for installing and using the emacs
 restructured-text mode <http://docutils.sourceforge.net/docs/user/emacs.html>`_.
-The elisp code it refers to is in the file 'rst.el <http://docutils.sourceforge.net/tools/editors/emacs/rst.el>`_.
+The elisp code it refers to is in the file `rst.el <http://docutils.sourceforge.net/tools/editors/emacs/rst.el>`_.
 
 To customize your emacs, you need to open the ``.emacs`` file. The above Windows
 FAQ tells you how to put your ``.emacs`` file somewhere else, but the easiest
 thing to do is just open emacs and inside it type ``C-x C-f ~/.emacs``, which
-will open your default ``.emacs`` file.
+will open your default ``.emacs`` file if you have one, or create a new one if you don't.
+
+You'll need to install **rst.el** someplace emacs will find it. Here's an example **.emacs**
+file which adds a local directory called **~/emacs/** to the search path,
+(so you can put **.el** files there) and also automatically
+starts **rst** mode for files with extensions of **rst** and **.rest**::
+
+     (require 'cl)
+     (defvar emacs-directory "~/emacs/"
+     	     "The directory containing the emacs configuration files.")
+     (pushnew (expand-file-name emacs-directory) load-path)
+     (require 'rst)
+     (setq auto-mode-alist
+     	    (append '(("\\.rst$" . rst-mode)
+            	      ("\\.rest$" . rst-mode)) auto-mode-alist))
+
+
