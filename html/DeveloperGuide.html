@@ -152,7 +152,7 @@ tasks involved. Type:</p>
 <blockquote>
 <tt class="docutils literal"><span class="pre">build</span> <span class="pre">help</span></tt></blockquote>
 <p>to see the options.</p>
-<div class="admonition-todo admonition " id="todo-4">
+<div class="admonition-todo admonition " id="todo-12">
 <p class="first admonition-title">Todo</p>
 <p class="last">The remainder of this document needs rewriting. Rewrite this section
 for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
@@ -162,10 +162,16 @@ for BitBucket &amp; Mercurial; make some project specific diagrams;</p>
 <h2>Building the PDF<a class="headerlink" href="#building-the-pdf" title="Permalink to this headline">¶</a></h2>
 <p>In order to build the Acrobat PDF verion of the book, you must install some
 additional software:</p>
-<div class="admonition-todo admonition " id="todo-5">
-<p class="first admonition-title">Todo</p>
-<p class="last">Add additional steps here.</p>
-</div>
+<p><strong>Mac OSX</strong>: Install the <a class="reference external" href="http://www.tug.org/mactex/">http://www.tug.org/mactex/</a> distribution. Although this is
+a Mac installer, it installs all the necessary command-line binaries to create the
+PDF of the book, and modifies your PATH variable.</p>
+<p><strong>Windows</strong>: Install following these instructions:
+<a class="reference external" href="http://www.tug.org/texlive/windows.html">http://www.tug.org/texlive/windows.html</a></p>
+<p><strong>Linux</strong>: Your Linux install may already have support, but if not, install following
+these instructions:
+<a class="reference external" href="http://www.tug.org/texlive/quickinstall.html">http://www.tug.org/texlive/quickinstall.html</a></p>
+<p>Once TeX is installed, move to this book&#8217;s <strong>src</strong> directory and run <tt class="docutils literal"><span class="pre">make</span> <span class="pre">latex</span></tt>.
+When that command runs successfully, it will give you instructions as to how to finish.</p>
 </div>
 <div class="section" id="setting-up-mercurial">
 <h2>Setting up Mercurial<a class="headerlink" href="#setting-up-mercurial" title="Permalink to this headline">¶</a></h2>
@@ -211,7 +217,7 @@ you do work, and keep it merged with the trunk.</p>
 - hg clone python-3-patterns-idioms devel</li>
 </ul>
 </blockquote>
-<div class="admonition-todo admonition " id="todo-6">
+<div class="admonition-todo admonition " id="todo-13">
 <p class="first admonition-title">Todo</p>
 <p>This section still work in progress:</p>
 <ul class="last simple">
@@ -298,7 +304,7 @@ puts emacs on the right-click menu and improves the startup settings).</p>
 <p><strong>Linux</strong>: It&#8217;s virtually guaranteed that you already have emacs preinstalled
 on your Linux distribution, which you can start from a command prompt. However,
 there may also be more &#8220;windowy&#8221; versions that you can install separately.</p>
-<div class="admonition-todo admonition " id="todo-7">
+<div class="admonition-todo admonition " id="todo-14">
 <p class="first admonition-title">Todo</p>
 <p class="last">Someone who knows more about emacs for Linux please add more specific information about the windowed version(s).</p>
 </div>

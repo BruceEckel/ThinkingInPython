@@ -141,7 +141,19 @@ Building the PDF
 In order to build the Acrobat PDF verion of the book, you must install some
 additional software:
 
-.. ToDo:: Add additional steps here.
+**Mac OSX**: Install the http://www.tug.org/mactex/ distribution. Although this is
+a Mac installer, it installs all the necessary command-line binaries to create the
+PDF of the book, and modifies your PATH variable.
+
+**Windows**: Install following these instructions:
+http://www.tug.org/texlive/windows.html
+
+**Linux**: Your Linux install may already have support, but if not, install following
+these instructions:
+http://www.tug.org/texlive/quickinstall.html
+
+Once TeX is installed, move to this book's **src** directory and run ``make latex``.
+When that command runs successfully, it will give you instructions as to how to finish.
 
 Setting up Mercurial
 ===============================================================================
