@@ -49,8 +49,7 @@
 <h1>Jython<a class="headerlink" href="#jython" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This chapter has not been brought up-to-date with the current
-version of Jython.</p>
+<p class="last">This chapter is being brough up to date with Jython 2.5, and will need changes when Jython 3 comes out.</p>
 </div>
 <p>This chapter looks at the value of crossing language boundaries. It is often
 advantageous to solve a problem using more than one programming language, rather
@@ -58,23 +57,25 @@ than being arbitrarily stuck using a single language. As you&#8217;ll see in thi
 chapter, a problem that is very difficult or tedious to solve in one language
 can often be solved quickly and easily in another. If you can combine the use of
 languages, you can create your product much more quickly and cheaply.</p>
-<p>The most straightforward use of this idea is the <em>Interpreter</em> design pattern,
-which adds an interpreted language to your program to allow the end user to
-easily customize a solution. In Java, the easiest and most powerful way to do
-this is with <em>Jython</em> <a class="footnote-reference" href="#id3" id="id1">[1]</a>, an implementation of the Python language in pure
-Java byte codes.</p>
-<p><em>Interpreter</em> solves a particular problem - that of creating a scripting
-language for the user. But sometimes it&#8217;s just easier and faster to temporarily
-step into another language to solve a particular aspect of your problem. You&#8217;re
-not creating an interpreter, you&#8217;re just writing some code in another language.
-Again, Jython is a good example of this, but CORBA also allows you to cross
-language boundaries.</p>
+<p>The most straightforward use of this idea is the <em>Interpreter</em> design
+pattern, which adds an interpreted language to your program to allow
+the end user to easily customize a solution. If the application user
+needs greater run time flexibility, for example to create scripts
+describing the desired behavior of the system, you can use the
+<em>Interpreter</em> by creating and embedding a language interpreter into
+your program.</p>
+<p>In Java, the easiest and most powerful way to do this is with <em>Jython</em>
+<a class="footnote-reference" href="#id5" id="id1">[1]</a>, an implementation of Python in pure Java byte codes. As you will
+see, this brings together the benefits of both worlds.</p>
+<p><em>Interpreter</em> solves a particular problem - that of creating a
+scripting language for the user. But sometimes it&#8217;s just easier and
+faster to temporarily step into another language to solve a particular
+aspect of your problem. You&#8217;re not creating an interpreter, you&#8217;re
+just writing some code in another language.  Again, Jython is a good
+example of this, but CORBA also allows you to cross language
+boundaries.</p>
 <div class="section" id="interpreter-motivation">
 <h2>Interpreter Motivation<a class="headerlink" href="#interpreter-motivation" title="Permalink to this headline">¶</a></h2>
-<p>If the application user needs greater run time flexibility, for example to
-create scripts describing the desired behavior of the system, you can use the
-<em>Interpreter</em> design pattern. Here, you create and embed a language interpreter
-into your program.</p>
 <p>Remember that each design pattern allows one or more factors to change, so it&#8217;s
 important to first be aware of which factor is changing. Sometimes the end users
 of your application (rather than the programmers of that application) need
@@ -94,29 +95,101 @@ Jython. This is generated entirely in Java byte codes, so incorporating it into
 your application is quite simple,  and it&#8217;s as portable as Java is. It has an
 extremely clean interface with Java: Java can call Python classes, and Python
 can call Java classes.</p>
+<p>Because Jython is just Java classes, it can often be &#8220;stealthed&#8221; into
+companies that have rigid processes for using new languges and
+tools. If Java has been accepted, such companies often accept anything
+that runs on the JVM without question.</p>
 <p>Python is designed with classes from the ground up and is a truly pure object
 oriented language (both C++ and Java violate purity in various ways). Python
 scales up so that you can create very big programs without losing control of the
 code.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>To install Jython, go to <a class="reference external" href="http://jython.sourceforge.net">http://jython.sourceforge.net</a>.  The download is a <strong>.class</strong> file, which
 will run an installer when you execute it with Java.  You also need to add
 <strong>jython.jar</strong> to your Java CLASSPATH.</p>
+<p>When you run Jython, you might get the error: <tt class="docutils literal"><span class="pre">can't</span> <span class="pre">create</span> <span class="pre">package</span>
+<span class="pre">cache</span> <span class="pre">dir,</span> <span class="pre">'/cachedir/packages'</span></tt>. Jython caching requires
+<tt class="docutils literal"><span class="pre">/cachedir/packages/</span></tt> in the <tt class="docutils literal"><span class="pre">python.home</span></tt> directory. It is often the
+case on <a href="#id2"><span class="problematic" id="id3">*</span></a>nix that users lack sufficient priveledges to create or write
+to this directory. Because the problem is merely permissions,
+something similar to &#8220;mkdir cachedir; chmod a+rw cachedir&#8221; within
+Jython&#8217;s directory should eliminate this error message.</p>
+<div class="section" id="getting-the-trunk">
+<h3>Getting the Trunk<a class="headerlink" href="#getting-the-trunk" title="Permalink to this headline">¶</a></h3>
+<p>The Jython development trunk is very stable so it&#8217;s safe to get as the most recent
+version of the implementation. The subversion command is:</p>
+<div class="highlight-python"><pre>svn co https://jython.svn.sourceforge.net/svnroot/jython/trunk/jython</pre>
+</div>
+<p>Then just invoke <tt class="docutils literal"><span class="pre">ant</span></tt> against the <tt class="docutils literal"><span class="pre">build.xml</span></tt> file.
+<tt class="docutils literal"><span class="pre">dist/bin/jython</span></tt> is a shell script that starts up jython in console mode.
+Lastly, modify the registry (in dist/registry) so that:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">python</span><span class="o">.</span><span class="n">console</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ReadlineConsole</span>
+<span class="n">python</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">readlinelib</span><span class="o">=</span><span class="n">GnuReadline</span>
+</pre></div>
+</div>
+<p>(<tt class="docutils literal"><span class="pre">readline</span></tt> is GPL, so it makes it a bit harder to automate this part of the distro).
+See: <a class="reference external" href="http://wiki.python.org/jython/ReadlineSetup">http://wiki.python.org/jython/ReadlineSetup</a></p>
+</div>
+</div>
+<div class="section" id="scripting">
+<h2>Scripting<a class="headerlink" href="#scripting" title="Permalink to this headline">¶</a></h2>
+<p>One very compelling benefit of using a dynamic language on the JVM is
+scripting.  You can rapidly create and test code, and solve problems
+more quickly.</p>
+<p>Here&#8217;s an example that shows a little of what you can do in a Jython
+script, and also gives you a sense of performance (the <tt class="docutils literal"><span class="pre">timeit</span></tt> module
+could not be used as it tries to turn off the Java garbage collector):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/Simple.py</span>
+<span class="k">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">time</span>
+<span class="k">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+
+<span class="k">print</span> <span class="n">platform</span><span class="o">.</span><span class="n">uname</span><span class="p">()</span> <span class="c"># What are we running on?</span>
+<span class="k">print</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&quot;*.py&quot;</span><span class="p">)</span> <span class="c"># Find files with .py extensions</span>
+<span class="c"># Send a command to the OS and capture the results:</span>
+<span class="k">print</span> <span class="n">Popen</span><span class="p">([</span><span class="s">&quot;ping&quot;</span><span class="p">,</span> <span class="s">&quot;-c&quot;</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="s">&quot;www.mindview.net&quot;</span><span class="p">],</span>
+               <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+<span class="c"># Time an operation:</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mf">1000000</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mf">10</span><span class="p">):</span>
+            <span class="nb">oct</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>If you run this program under both cpython and Jython, you&#8217;ll see that
+the timed loop produces very similar results; Jython 2.5 is in beta so
+this is quite impressive and should get faster &#8211; there&#8217;s even talk
+that Jython could run faster than cpython, because of the optimization
+benefits of the JVM. The total runtime of the cpython version is
+faster because of its rapid startup time; the JVM always has a delay
+for startup.</p>
+<p>Note that things that require much more code (and often research) in
+Java are very quick to write in Jython.</p>
+<p>Often more sophisticated programs begin as scripts, and then evolve.
+The fact that you can quickly try things out allows you to test
+concepts, and then create more refined code as needed.</p>
 </div>
 <div class="section" id="creating-a-language">
 <h2>Creating a Language<a class="headerlink" href="#creating-a-language" title="Permalink to this headline">¶</a></h2>
-<p>It turns out to be remarkably simple to use Jython to create an interpreted
-language inside your application. Consider the greenhouse controller example
-from Chapter 8 of <em>Thinking in Java</em>. This is a situation where you want the end
-user - the person managing the greenhouse - to have configuration control over
-the system, and so a simple scripting language is the ideal solution.</p>
-<p>To create the language, we&#8217;ll simply write a set of Python classes, and the
-constructor of each will add itself to a (static) master list. The common data
-and behavior will be factored into the base class <strong>Event</strong>. Each <strong>Event</strong>
-object will contain an <strong>action</strong> string (for simplicity - in reality, you&#8217;d
-have some sort of functionality) and a time when the event is supposed to run.
-The constructor initializes these fields, and then adds the new <strong>Event</strong> object
-to a static list called <strong>events</strong> (defining it in the class, but outside of any
-methods, is what makes it static):</p>
+<p>It turns out to be remarkably simple to use Jython to create an
+interpreted language inside your application. Consider the greenhouse
+controller example from <em>Thinking in Java</em>. This is a situation where
+you want the end user &#8211; the person managing the greenhouse &#8211; to have
+configuration control over the system, and so a simple scripting
+language is the ideal solution.  These are often called
+<em>domain-specific languages</em> (DSL) because they solve a particular
+domain problem.</p>
+<p>To create the language, we&#8217;ll simply write a set of Python classes,
+and the constructor of each will add itself to a (static) master
+list. The common data and behavior will be factored into the base
+class <strong>Event</strong>. Each <strong>Event</strong> object will contain an <strong>action</strong>
+string (for simplicity - in reality, you&#8217;d have some sort of
+functionality) and a time when the event is supposed to run.  The
+constructor initializes these fields, and then adds the new <strong>Event</strong>
+object to a static list called <strong>events</strong> (defining it in the class,
+but outside of any methods, is what makes it static):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/GreenHouseLanguage.py</span>
 
 <span class="k">class</span> <span class="nc">Event</span><span class="p">:</span>
@@ -193,29 +266,18 @@ let&#8217;s use Jython, inside of Java. This turns out to be remarkably simple: 
 import some Jython classes, create a <strong>PythonInterpreter</strong> object, and cause the
 Python files to be loaded:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/GreenHouseController.java</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
+<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span>
-<span class="nc">GreenHouseController</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
-  <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span>
-    <span class="k">new</span> <span class="nf">PythonInterpreter</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
-      <span class="s">&quot;Loading GreenHouse Language&quot;</span><span class="o">);</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">GreenHouseController</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+    <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Loading GreenHouse Language&quot;</span><span class="o">);</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">execfile</span><span class="o">(</span><span class="s">&quot;GreenHouseLanguage.py&quot;</span><span class="o">);</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
-      <span class="s">&quot;Loading GreenHouse Script&quot;</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Loading GreenHouse Script&quot;</span><span class="o">);</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">execfile</span><span class="o">(</span><span class="s">&quot;Schedule.ghs&quot;</span><span class="o">);</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
-      <span class="s">&quot;Executing GreenHouse Script&quot;</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Executing GreenHouse Script&quot;</span><span class="o">);</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;run()&quot;</span><span class="o">);</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">GreenHouseController</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -261,18 +323,13 @@ comments that should give a fairly complete explanation:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterSetting.java</span>
 <span class="c">// Passing data from Java to python when using</span>
 <span class="c">// the PythonInterpreter object.</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">net.mindview.python.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span>
-<span class="nc">PythonInterpreterSetting</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
-  <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span>
-    <span class="k">new</span> <span class="nf">PythonInterpreter</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">PythonInterpreterSetting</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+    <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="c">// It automatically converts Strings</span>
     <span class="c">// into native Python strings:</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s">&quot;a&quot;</span><span class="o">,</span> <span class="s">&quot;This is a test&quot;</span><span class="o">);</span>
@@ -348,17 +405,11 @@ comments that should give a fairly complete explanation:</p>
     <span class="c">// Not a Python dictionary, so this fails:</span>
     <span class="c">//! interp.exec(&quot;for x in m.keys():&quot; +</span>
     <span class="c">//!   &quot;print(x, m[x])&quot;);</span>
-    <span class="c">// To convert a Map to a Python dictionary,</span>
-    <span class="c">// use net.mindview.python.PyUtil:</span>
+    <span class="c">// To convert a Map to a Python dictionary, use PyUtil:</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s">&quot;m&quot;</span><span class="o">,</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toPyDictionary</span><span class="o">(</span><span class="n">m</span><span class="o">));</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;print(m, m.__class__, &quot;</span> <span class="o">+</span>
       <span class="s">&quot;m[1], m[1].__class__)&quot;</span><span class="o">);</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;for x in m.keys():print(x,m[x])&quot;</span><span class="o">);</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span>
-      <span class="n">PythonInterpreterSetting</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -406,7 +457,6 @@ utilities to extract a Python array into a Java <strong>List</strong>, and a Pyt
 dictionary into a Java <strong>Map</strong>:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PyUtil.java</span>
 <span class="c">// PythonInterpreter utilities</span>
-<span class="k">package</span> <span class="n">net</span><span class="o">.</span><span class="na">mindview</span><span class="o">.</span><span class="na">python</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
@@ -447,8 +497,7 @@ dictionary into a Java <strong>Map</strong>:</p>
 <span class="c">  suitable for placing into a PythonInterpreter</span>
 <span class="c">  @param map The Java Map object</span>
 <span class="c">  */</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="n">PyDictionary</span>
-  <span class="nf">toPyDictionary</span><span class="o">(</span><span class="n">Map</span> <span class="n">map</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="n">PyDictionary</span> <span class="nf">toPyDictionary</span><span class="o">(</span><span class="n">Map</span> <span class="n">map</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">();</span>
     <span class="n">Iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">entrySet</span><span class="o">().</span><span class="na">iterator</span><span class="o">();</span>
     <span class="k">while</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
@@ -456,22 +505,18 @@ dictionary into a Java <strong>Map</strong>:</p>
       <span class="n">m</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">Py</span><span class="o">.</span><span class="na">java2py</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getKey</span><span class="o">()),</span>
         <span class="n">Py</span><span class="o">.</span><span class="na">java2py</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getValue</span><span class="o">()));</span>
     <span class="o">}</span>
-    <span class="c">// PyDictionary constructor wants a Hashtable:</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nf">PyDictionary</span><span class="o">(</span><span class="k">new</span> <span class="n">Hashtable</span><span class="o">(</span><span class="n">m</span><span class="o">));</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">PyDictionary</span><span class="o">(</span><span class="n">m</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>Here is the (black-box) unit testing code:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/Test.java</span>
-<span class="k">package</span> <span class="n">net</span><span class="o">.</span><span class="na">mindview</span><span class="o">.</span><span class="na">python</span><span class="o">;</span>
+<p>Here is the unit testing code:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/TestPyUtil.java</span>
 <span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">Test</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
-  <span class="n">PythonInterpreter</span> <span class="n">pi</span> <span class="o">=</span>
-    <span class="k">new</span> <span class="nf">PythonInterpreter</span><span class="o">();</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">TestPyUtil</span> <span class="o">{</span>
+  <span class="n">PythonInterpreter</span> <span class="n">pi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
   <span class="k">public</span> <span class="kt">void</span> <span class="nf">test1</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;tup=(&#39;fee&#39;,&#39;fi&#39;,&#39;fo&#39;,&#39;fum&#39;,&#39;fi&#39;)&quot;</span><span class="o">);</span>
     <span class="n">List</span> <span class="n">lst</span> <span class="o">=</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toList</span><span class="o">(</span><span class="n">pi</span><span class="o">,</span> <span class="s">&quot;tup&quot;</span><span class="o">);</span>
@@ -503,7 +548,11 @@ dictionary into a Java <strong>Map</strong>:</p>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;print(m[&#39;slithy&#39;])&quot;</span><span class="o">);</span>
   <span class="o">}</span>
   <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Test</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">TestPyUtil</span> <span class="n">test</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TestPyUtil</span><span class="o">();</span>
+    <span class="n">test</span><span class="o">.</span><span class="na">test1</span><span class="o">();</span>
+    <span class="n">test</span><span class="o">.</span><span class="na">test2</span><span class="o">();</span>
+    <span class="n">test</span><span class="o">.</span><span class="na">test3</span><span class="o">();</span>
+    <span class="n">test</span><span class="o">.</span><span class="na">test4</span><span class="o">();</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -532,18 +581,14 @@ file names using Python&#8217;s <strong>glob( )</strong>, as shown further down 
 code:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterGetting.java</span>
 <span class="c">// Getting data from the PythonInterpreter object.</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">net.mindview.python.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span>
-<span class="nc">PythonInterpreterGetting</span> <span class="k">extends</span> <span class="n">TestCase</span> <span class="o">{</span>
-  <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span>
-    <span class="k">new</span> <span class="nf">PythonInterpreter</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">PythonInterpreterGetting</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
+  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+    <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;a = 100&quot;</span><span class="o">);</span>
     <span class="c">// If you just use the ordinary get(),</span>
     <span class="c">// it returns a PyObject:</span>
@@ -607,8 +652,7 @@ code:</p>
 
     <span class="c">// You can extract tuples and arrays into</span>
     <span class="c">// Java Lists with net.mindview.PyUtil:</span>
-    <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span>
-      <span class="s">&quot;tup = (&#39;fee&#39;, &#39;fi&#39;, &#39;fo&#39;, &#39;fum&#39;, &#39;fi&#39;)&quot;</span><span class="o">);</span>
+    <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;tup = (&#39;fee&#39;, &#39;fi&#39;, &#39;fo&#39;, &#39;fum&#39;, &#39;fi&#39;)&quot;</span><span class="o">);</span>
     <span class="n">List</span> <span class="n">tup</span> <span class="o">=</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toList</span><span class="o">(</span><span class="n">interp</span><span class="o">,</span> <span class="s">&quot;tup&quot;</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">tup</span><span class="o">);</span>
     <span class="c">// It really is a list of String objects:</span>
@@ -634,11 +678,6 @@ code:</p>
     <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">)</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">getClass</span><span class="o">());</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">getClass</span><span class="o">());</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span>
-      <span class="n">PythonInterpreterGetting</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -844,7 +883,7 @@ order to be able to use the Java class. Here is the Java code for <strong>JavaCl
 </div>
 <p>You can see that this is just an ordinary Java class, without any awareness that
 it will be used in a Jython program. For this reason, one of the important uses
-of Jython is in testing Java code <a class="footnote-reference" href="#id4" id="id2">[2]</a>. Because Python is such a powerful,
+of Jython is in testing Java code <a class="footnote-reference" href="#id6" id="id4">[2]</a>. Because Python is such a powerful,
 flexible, dynamic language it is an ideal tool for automated test frameworks,
 without making any changes to the Java code that&#8217;s being tested.</p>
 <div class="section" id="inner-classes">
@@ -1264,7 +1303,7 @@ signatures, and create a makefile to build the Java <strong>.class</strong> file
 a Java program that uses these classes.</li>
 </ol>
 <p class="rubric">Footnotes</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
+<table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The original version of this was called <em>JPython</em>, but the project
@@ -1272,10 +1311,10 @@ changed and the name was changed to emphasize the distinctness of the new
 version.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
+<table class="docutils footnote" frame="void" id="id6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Changing the registry setting <strong>python.security.respectJavaAccessibility
+<tr><td class="label"><a class="fn-backref" href="#id4">[2]</a></td><td>Changing the registry setting <strong>python.security.respectJavaAccessibility
 = true</strong> to <strong>false</strong> makes testing even more powerful because it allows
 the test script to use <em>all</em> methods, even protected and package-
 private.</td></tr>
@@ -1299,6 +1338,11 @@ private.</td></tr>
             <ul>
 <li><a class="reference external" href="">Jython</a><ul>
 <li><a class="reference external" href="#interpreter-motivation">Interpreter Motivation</a></li>
+<li><a class="reference external" href="#installation">Installation</a><ul>
+<li><a class="reference external" href="#getting-the-trunk">Getting the Trunk</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#scripting">Scripting</a></li>
 <li><a class="reference external" href="#creating-a-language">Creating a Language</a></li>
 <li><a class="reference external" href="#controlling-the-interpreter">Controlling the Interpreter</a><ul>
 <li><a class="reference external" href="#putting-data-in">Putting Data In</a></li>
@@ -1366,7 +1410,7 @@ private.</td></tr>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Dec 29, 2008.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

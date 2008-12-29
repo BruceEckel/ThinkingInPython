@@ -4,8 +4,7 @@
 Jython
 ********************************************************************************
 
-.. note:: This chapter has not been brought up-to-date with the current
-          version of Jython.
+.. note:: This chapter is being brough up to date with Jython 2.5, and will need changes when Jython 3 comes out.
 
 This chapter looks at the value of crossing language boundaries. It is often
 advantageous to solve a problem using more than one programming language, rather
@@ -14,26 +13,28 @@ chapter, a problem that is very difficult or tedious to solve in one language
 can often be solved quickly and easily in another. If you can combine the use of
 languages, you can create your product much more quickly and cheaply.
 
-The most straightforward use of this idea is the *Interpreter* design pattern,
-which adds an interpreted language to your program to allow the end user to
-easily customize a solution. In Java, the easiest and most powerful way to do
-this is with *Jython* [#]_, an implementation of the Python language in pure
-Java byte codes.
+The most straightforward use of this idea is the *Interpreter* design
+pattern, which adds an interpreted language to your program to allow
+the end user to easily customize a solution. If the application user
+needs greater run time flexibility, for example to create scripts
+describing the desired behavior of the system, you can use the
+*Interpreter* by creating and embedding a language interpreter into
+your program.
 
-*Interpreter* solves a particular problem - that of creating a scripting
-language for the user. But sometimes it's just easier and faster to temporarily
-step into another language to solve a particular aspect of your problem. You're
-not creating an interpreter, you're just writing some code in another language.
-Again, Jython is a good example of this, but CORBA also allows you to cross
-language boundaries.
+In Java, the easiest and most powerful way to do this is with *Jython*
+[#]_, an implementation of Python in pure Java byte codes. As you will
+see, this brings together the benefits of both worlds.
+
+*Interpreter* solves a particular problem - that of creating a
+scripting language for the user. But sometimes it's just easier and
+faster to temporarily step into another language to solve a particular
+aspect of your problem. You're not creating an interpreter, you're
+just writing some code in another language.  Again, Jython is a good
+example of this, but CORBA also allows you to cross language
+boundaries.
 
 Interpreter Motivation
 =======================================================================
-
-If the application user needs greater run time flexibility, for example to
-create scripts describing the desired behavior of the system, you can use the
-*Interpreter* design pattern. Here, you create and embed a language interpreter
-into your program.
 
 Remember that each design pattern allows one or more factors to change, so it's
 important to first be aware of which factor is changing. Sometimes the end users
@@ -57,33 +58,114 @@ your application is quite simple,  and it's as portable as Java is. It has an
 extremely clean interface with Java: Java can call Python classes, and Python
 can call Java classes.
 
+Because Jython is just Java classes, it can often be "stealthed" into
+companies that have rigid processes for using new languges and
+tools. If Java has been accepted, such companies often accept anything
+that runs on the JVM without question.
+
 Python is designed with classes from the ground up and is a truly pure object
 oriented language (both C++ and Java violate purity in various ways). Python
 scales up so that you can create very big programs without losing control of the
 code.
+
+Installation
+=======================================================================
 
 To install Jython, go to `http://jython.sourceforge.net
 <http://jython.sourceforge.net>`_.  The download is a **.class** file, which
 will run an installer when you execute it with Java.  You also need to add
 **jython.jar** to your Java CLASSPATH.
 
+When you run Jython, you might get the error: ``can't create package
+cache dir, '/cachedir/packages'``. Jython caching requires
+``/cachedir/packages/`` in the ``python.home`` directory. It is often the
+case on *nix that users lack sufficient priveledges to create or write
+to this directory. Because the problem is merely permissions,
+something similar to "mkdir cachedir; chmod a+rw cachedir" within
+Jython's directory should eliminate this error message.
+
+Getting the Trunk
+-----------------------------------------------------------------------
+
+The Jython development trunk is very stable so it's safe to get as the most recent
+version of the implementation. The subversion command is::
+
+	svn co https://jython.svn.sourceforge.net/svnroot/jython/trunk/jython
+
+Then just invoke ``ant`` against the ``build.xml`` file.
+``dist/bin/jython`` is a shell script that starts up jython in console mode.
+Lastly, modify the registry (in dist/registry) so that::
+
+	python.console=org.python.util.ReadlineConsole
+	python.console.readlinelib=GnuReadline
+
+(``readline`` is GPL, so it makes it a bit harder to automate this part of the distro).
+See: http://wiki.python.org/jython/ReadlineSetup
+
+
+Scripting
+=======================================================================
+
+One very compelling benefit of using a dynamic language on the JVM is
+scripting.  You can rapidly create and test code, and solve problems
+more quickly.
+
+Here's an example that shows a little of what you can do in a Jython
+script, and also gives you a sense of performance (the ``timeit`` module
+could not be used as it tries to turn off the Java garbage collector)::
+
+	# Jython/Simple.py
+	import platform, glob, time
+	from subprocess import Popen, PIPE
+
+	print platform.uname() # What are we running on?
+	print glob.glob("*.py") # Find files with .py extensions
+	# Send a command to the OS and capture the results:
+	print Popen(["ping", "-c", "1", "www.mindview.net"], 
+	               stdout=PIPE).communicate()[0]
+        # Time an operation:
+	start = time.time()
+	for n in xrange(1000000):
+	    for i in xrange(10): 
+	            oct(i)
+        print time.time() - start
+
+If you run this program under both cpython and Jython, you'll see that
+the timed loop produces very similar results; Jython 2.5 is in beta so
+this is quite impressive and should get faster -- there's even talk
+that Jython could run faster than cpython, because of the optimization
+benefits of the JVM. The total runtime of the cpython version is
+faster because of its rapid startup time; the JVM always has a delay
+for startup.
+
+Note that things that require much more code (and often research) in
+Java are very quick to write in Jython.
+
+Often more sophisticated programs begin as scripts, and then evolve.
+The fact that you can quickly try things out allows you to test
+concepts, and then create more refined code as needed.
+
 Creating a Language
 =======================================================================
 
-It turns out to be remarkably simple to use Jython to create an interpreted
-language inside your application. Consider the greenhouse controller example
-from Chapter 8 of *Thinking in Java*. This is a situation where you want the end
-user - the person managing the greenhouse - to have configuration control over
-the system, and so a simple scripting language is the ideal solution.
+It turns out to be remarkably simple to use Jython to create an
+interpreted language inside your application. Consider the greenhouse
+controller example from *Thinking in Java*. This is a situation where
+you want the end user -- the person managing the greenhouse -- to have
+configuration control over the system, and so a simple scripting
+language is the ideal solution.  These are often called
+*domain-specific languages* (DSL) because they solve a particular
+domain problem.
 
-To create the language, we'll simply write a set of Python classes, and the
-constructor of each will add itself to a (static) master list. The common data
-and behavior will be factored into the base class **Event**. Each **Event**
-object will contain an **action** string (for simplicity - in reality, you'd
-have some sort of functionality) and a time when the event is supposed to run.
-The constructor initializes these fields, and then adds the new **Event** object
-to a static list called **events** (defining it in the class, but outside of any
-methods, is what makes it static)::
+To create the language, we'll simply write a set of Python classes,
+and the constructor of each will add itself to a (static) master
+list. The common data and behavior will be factored into the base
+class **Event**. Each **Event** object will contain an **action**
+string (for simplicity - in reality, you'd have some sort of
+functionality) and a time when the event is supposed to run.  The
+constructor initializes these fields, and then adds the new **Event**
+object to a static list called **events** (defining it in the class,
+but outside of any methods, is what makes it static)::
 
     # Jython/GreenHouseLanguage.py
 
@@ -163,32 +245,21 @@ let's use Jython, inside of Java. This turns out to be remarkably simple: you
 import some Jython classes, create a **PythonInterpreter** object, and cause the
 Python files to be loaded:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/GreenHouseController.java
-    package jython;
-    import org.python.util.PythonInterpreter;
     import org.python.core.*;
-    import junit.framework.*;
+    import org.python.util.PythonInterpreter;
 
-    public class
-    GreenHouseController extends TestCase  {
-      PythonInterpreter interp =
-        new PythonInterpreter();
-      public void test() throws PyException  {
-        System.out.println(
-          "Loading GreenHouse Language");
+    public class GreenHouseController {
+      public static void main(String[] args) throws PyException  {
+        PythonInterpreter interp = new PythonInterpreter();
+        System.out.println("Loading GreenHouse Language");
         interp.execfile("GreenHouseLanguage.py");
-        System.out.println(
-          "Loading GreenHouse Script");
+        System.out.println("Loading GreenHouse Script");
         interp.execfile("Schedule.ghs");
-        System.out.println(
-          "Executing GreenHouse Script");
+        System.out.println("Executing GreenHouse Script");
         interp.exec("run()");
-      }
-      public static void
-      main(String[] args) throws PyException  {
-        junit.textui.TestRunner.run(GreenHouseController.class);
       }
     }
 
@@ -237,23 +308,18 @@ data types and performs conversions upon them.  The following example is a
 reasonably thorough exercise of the various **set( )** possibilities, along with
 comments that should give a fairly complete explanation:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/PythonInterpreterSetting.java
     // Passing data from Java to python when using
     // the PythonInterpreter object.
-    package jython;
     import org.python.util.PythonInterpreter;
     import org.python.core.*;
     import java.util.*;
-    import net.mindview.python.*;
-    import junit.framework.*;
 
-    public class
-    PythonInterpreterSetting extends TestCase  {
-      PythonInterpreter interp =
-        new PythonInterpreter();
-      public void test() throws PyException  {
+    public class PythonInterpreterSetting {
+      public static void main(String[] args) throws PyException  {
+        PythonInterpreter interp = new PythonInterpreter();
         // It automatically converts Strings
         // into native Python strings:
         interp.set("a", "This is a test");
@@ -329,17 +395,11 @@ comments that should give a fairly complete explanation:
         // Not a Python dictionary, so this fails:
         //! interp.exec("for x in m.keys():" +
         //!   "print(x, m[x])");
-        // To convert a Map to a Python dictionary,
-        // use net.mindview.python.PyUtil:
+        // To convert a Map to a Python dictionary, use PyUtil:
         interp.set("m", PyUtil.toPyDictionary(m));
         interp.exec("print(m, m.__class__, " +
           "m[1], m[1].__class__)");
         interp.exec("for x in m.keys():print(x,m[x])");
-      }
-      public static void
-      main(String[] args) throws PyException  {
-        junit.textui.TestRunner.run(
-          PythonInterpreterSetting.class);
       }
     }
 
@@ -390,11 +450,10 @@ dictionary, and so I wrote a utility called **toPyDictionary( )** and made it a
 utilities to extract a Python array into a Java **List**, and a Python
 dictionary into a Java **Map**:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/PyUtil.java
     // PythonInterpreter utilities
-    package net.mindview.python;
     import org.python.util.PythonInterpreter;
     import org.python.core.*;
     import java.util.*;
@@ -435,8 +494,7 @@ dictionary into a Java **Map**:
       suitable for placing into a PythonInterpreter
       @param map The Java Map object
       */
-      public static PyDictionary
-      toPyDictionary(Map map) {
+      public static PyDictionary toPyDictionary(Map map) {
         Map m = new HashMap();
         Iterator it = map.entrySet().iterator();
         while(it.hasNext()) {
@@ -444,25 +502,21 @@ dictionary into a Java **Map**:
           m.put(Py.java2py(e.getKey()),
             Py.java2py(e.getValue()));
         }
-        // PyDictionary constructor wants a Hashtable:
-        return new PyDictionary(new Hashtable(m));
+        return new PyDictionary(m);
       }
     }
 
 
-Here is the (black-box) unit testing code:
+Here is the unit testing code:
 
-.. code-block:: java
+..  code-block:: java
 
-    // Jython/Test.java
-    package net.mindview.python;
+    // Jython/TestPyUtil.java
     import org.python.util.PythonInterpreter;
     import java.util.*;
-    import junit.framework.*;
 
-    public class Test extends TestCase  {
-      PythonInterpreter pi =
-        new PythonInterpreter();
+    public class TestPyUtil {
+      PythonInterpreter pi = new PythonInterpreter();
       public void test1() {
         pi.exec("tup=('fee','fi','fo','fum','fi')");
         List lst = PyUtil.toList(pi, "tup");
@@ -494,7 +548,11 @@ Here is the (black-box) unit testing code:
         pi.exec("print(m['slithy'])");
       }
       public static void main(String args[]) {
-        junit.textui.TestRunner.run(Test.class);
+        TestPyUtil test = new TestPyUtil();
+        test.test1();
+        test.test2();
+        test.test3();
+        test.test4();
       }
     }
 
@@ -525,22 +583,18 @@ results as an array of strings. For example, you can do a wildcard expansion of
 file names using Python's **glob( )**, as shown further down in the following
 code:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/PythonInterpreterGetting.java
     // Getting data from the PythonInterpreter object.
-    package jython;
     import org.python.util.PythonInterpreter;
     import org.python.core.*;
     import java.util.*;
-    import net.mindview.python.*;
-    import junit.framework.*;
 
-    public class
-    PythonInterpreterGetting extends TestCase {
-      PythonInterpreter interp =
-        new PythonInterpreter();
-      public void test() throws PyException  {
+    public class PythonInterpreterGetting {
+      public static void
+      main(String[] args) throws PyException  {
+        PythonInterpreter interp = new PythonInterpreter();
         interp.exec("a = 100");
         // If you just use the ordinary get(),
         // it returns a PyObject:
@@ -604,8 +658,7 @@ code:
 
         // You can extract tuples and arrays into
         // Java Lists with net.mindview.PyUtil:
-        interp.exec(
-          "tup = ('fee', 'fi', 'fo', 'fum', 'fi')");
+        interp.exec("tup = ('fee', 'fi', 'fo', 'fum', 'fi')");
         List tup = PyUtil.toList(interp, "tup");
         System.out.println(tup);
         // It really is a list of String objects:
@@ -632,11 +685,6 @@ code:
         System.out.println(e.getKey().getClass());
         System.out.println(e.getValue().getClass());
       }
-      public static void
-      main(String[] args) throws PyException  {
-        junit.textui.TestRunner.run(
-          PythonInterpreterGetting.class);
-      }
     }
 
 
@@ -654,7 +702,7 @@ Multiple Interpreters
 It's also worth noting that you can have multiple **PythonInterpreter** objects
 in a program, and each one has its own name space:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/MultipleJythons.java
     // You can run multiple interpreters, each
@@ -805,7 +853,7 @@ see each other's public methods.
 Java packages translate into Python modules, and Python must import a module in
 order to be able to use the Java class. Here is the Java code for **JavaClass**:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/javaclass/JavaClass.java
     package jython.javaclass;
@@ -1148,7 +1196,7 @@ builder tool, which specifies a dependency in addition to those detected by the
 tool. Here, you can't compile **TestPythonToJavaClass.java** until
 **PythonToJavaClass.class** is available:
 
-.. code-block:: java
+..  code-block:: java
 
     // Jython/TestPythonToJavaClass.java
     //+D python\java\test\PythonToJavaClass.class
