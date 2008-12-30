@@ -114,18 +114,21 @@ code.</p>
 </div>
 <p>The download is a <strong>.class</strong> file, which will run an installer when
 you execute it with Java.</p>
-<p>You also need to add <strong>jython-complete.jar</strong> to your Java CLASSPATH.
-As an example, here is the appropriate section in my <tt class="docutils literal"><span class="pre">.bashrc</span></tt>:</p>
+<p>You also need the Java Development Kit (JDK), and to add
+<strong>jython-complete.jar</strong> to your Java CLASSPATH.  As an example, here
+is the appropriate section in my <tt class="docutils literal"><span class="pre">.bashrc</span></tt> for <strong>*nix</strong>; for Windows you
+need to do the equivalent:</p>
 <div class="highlight-python"><pre>export set JYTHON_HOME="/Users/bruceeckel/jython2.5b0"
 export set CLASSPATH=.:..:$JYTHON_HOME/jython-complete.jar</pre>
 </div>
-<p>When you run Jython, you might get the error: <tt class="docutils literal"><span class="pre">can't</span> <span class="pre">create</span> <span class="pre">package</span>
-<span class="pre">cache</span> <span class="pre">dir,</span> <span class="pre">'/cachedir/packages'</span></tt>. Jython caching requires
-<tt class="docutils literal"><span class="pre">/cachedir/packages/</span></tt> in the <tt class="docutils literal"><span class="pre">python.home</span></tt> directory. It is often
-the case on *nix that users lack sufficient priveledges to create or
-write to this directory. Because the problem is merely permissions,
-something like <tt class="docutils literal"><span class="pre">mkdir</span> <span class="pre">cachedir;</span> <span class="pre">chmod</span> <span class="pre">a+rw</span> <span class="pre">cachedir</span></tt> within the
-Jython directory should eliminate this error message.</p>
+<p>When you run Jython, you might get the warning: <tt class="docutils literal"><span class="pre">can't</span> <span class="pre">create</span> <span class="pre">package</span>
+<span class="pre">cache</span> <span class="pre">dir,</span> <span class="pre">'/cachedir/packages'</span></tt>. Jython will still work, but startup
+will be slower because caching isn&#8217;t happening. Jython caching
+requires <tt class="docutils literal"><span class="pre">/cachedir/packages/</span></tt> in the <tt class="docutils literal"><span class="pre">python.home</span></tt> directory. It
+is often the case on <strong>*nix</strong> that users lack sufficient priveleges to
+create or write to this directory. Because the problem is merely
+permissions, something like <tt class="docutils literal"><span class="pre">mkdir</span> <span class="pre">cachedir;</span> <span class="pre">chmod</span> <span class="pre">a+rw</span> <span class="pre">cachedir</span></tt>
+within the Jython directory should eliminate this warning message.</p>
 <div class="section" id="getting-the-trunk">
 <h3>Getting the Trunk<a class="headerlink" href="#getting-the-trunk" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
@@ -275,8 +278,8 @@ but outside of any methods, is what makes it static):</p>
 <tt class="docutils literal"><span class="pre">jython</span> <span class="pre">GreenHouseLanguage.py</span></tt>.</p>
 </div>
 <p>The constructor of each derived class calls the base-class constructor, which
-adds the new object to the list. The <strong>run( )</strong> function sorts the list, which
-automatically uses the <strong>__cmp__( )</strong> method that was defined in <strong>Event</strong> to
+adds the new object to the list. The <strong>run()</strong> function sorts the list, which
+automatically uses the <strong>__cmp__()</strong> method that was defined in <strong>Event</strong> to
 base comparisons on time only. In this example, it only prints out the list, but
 in the real system it would wait for the time of each event to come up and then
 run the event.</p>
@@ -304,7 +307,7 @@ Python files to be loaded:</p>
 </pre></div>
 </div>
 <p>The <strong>PythonInterpreter</strong> object is a complete Python interpreter that accepts
-commands from the Java program. One of these commands is <strong>execfile( )</strong>, which
+commands from the Java program. One of these commands is <strong>execfile()</strong>, which
 tells it to execute all the statements it finds in a particular file. By
 executing <strong>GreenHouseLanguage.py</strong>, all the classes from that file are loaded
 into our <strong>PythonInterpreter</strong> object, and so it now &#8220;holds&#8221; the greenhouse
@@ -324,22 +327,183 @@ user to control the greenhouse. Here&#8217;s an example:</p>
 your program as simple as possible for the end user. With Jython you can achieve
 this with almost no effort at all.</p>
 <p>One of the other methods available to the <strong>PythonInterpreter</strong> is
-<strong>exec( )</strong>, which allows you to send a command to the interpreter. In
-the above program, the <strong>run( )</strong> function is called using <strong>exec()</strong>.</p>
+<strong>exec()</strong>, which allows you to send a command to the interpreter. In
+the above program, the <strong>run()</strong> function is called using <strong>exec()</strong>.</p>
+</div>
+<div class="section" id="controlling-java-from-jython">
+<h2>Controlling Java from Jython<a class="headerlink" href="#controlling-java-from-jython" title="Permalink to this headline">¶</a></h2>
+<p>Since you have the Java language at your disposal, and you can set and retrieve
+values in the interpreter, there&#8217;s a tremendous amount that you can accomplish
+with the above approach (controlling Python from Java).  But one of the amazing
+things about Jython is that it makes Java classes almost transparently available
+from within Jython. Basically, a Java class looks like a Python class. This is
+true for standard Java library classes as well as classes that you create
+yourself, as you can see here:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/JavaClassInPython.py</span>
+<span class="c"># run with: jython.bat JavaClassInPython.py</span>
+<span class="c"># Using Java classes within Jython</span>
+<span class="k">from</span> <span class="nn">java.util</span> <span class="k">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">HashSet</span><span class="p">,</span> <span class="n">HashMap</span>
+<span class="k">from</span> <span class="nn">Jython.javaclass</span> <span class="k">import</span> <span class="n">JavaClass</span>
+<span class="k">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sin</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span> <span class="c"># Creating a Java Date object</span>
+<span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="c"># Calls toString()</span>
+
+<span class="c"># A &quot;generator&quot; to easily create data:</span>
+<span class="k">class</span> <span class="nc">ValGen</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxVal</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxVal</span><span class="p">)</span>
+    <span class="c"># Called during &#39;for&#39; iteration:</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="c"># Returns a tuple of two elements:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c"># Java standard containers:</span>
+<span class="nb">map</span> <span class="o">=</span> <span class="n">HashMap</span><span class="p">()</span>
+<span class="n">set</span> <span class="o">=</span> <span class="n">HashSet</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">ValGen</span><span class="p">(</span><span class="mf">10</span><span class="p">):</span>
+    <span class="nb">map</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="nb">map</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">set</span><span class="p">)</span>
+
+<span class="c"># Iterating through a set:</span>
+<span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">set</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="nb">map</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span> <span class="c"># Uses Python dictionary indexing</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">keySet</span><span class="p">():</span> <span class="c"># keySet() is a Map method</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">map</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+
+<span class="c"># Using a Java class that you create yourself is</span>
+<span class="c"># just as easy:</span>
+<span class="n">jc</span> <span class="o">=</span> <span class="n">JavaClass</span><span class="p">()</span>
+<span class="n">jc2</span> <span class="o">=</span> <span class="n">JavaClass</span><span class="p">(</span><span class="s">&quot;Created within Jython&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jc2</span><span class="o">.</span><span class="n">getVal</span><span class="p">())</span>
+<span class="n">jc</span><span class="o">.</span><span class="n">setVal</span><span class="p">(</span><span class="s">&quot;Using a Java class is trivial&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">getVal</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">getChars</span><span class="p">())</span>
+<span class="n">jc</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="s">&quot;Using bean properties&quot;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the <strong>import</strong> statements map to the Java package structure exactly as
+you would expect. In the first example, a <strong>Date()</strong> object is created as if it
+were a native Python class, and printing this object just calls <strong>toString()</strong>.</p>
+<p><strong>ValGen</strong> implements the concept of a &#8220;generator&#8221; which is used a great deal in
+the C++ STL (<em>Standard Template Library</em>, part of the Standard C++ Library). A
+generator is an object that produces a new object every time its &#8220;generation
+method&#8221; is called, and it is quite convenient for filling containers. Here, I
+wanted to use it in a <strong>for</strong> iteration, and so I needed the generation method
+to be the one that is called by the iteration process. This is a special method
+called <strong>__getitem__()</strong>, which is actually the overloaded operator for
+indexing, &#8216;<strong>[ ]</strong>&#8216;. A <strong>for</strong> loop calls this method every time it wants to
+move the iteration forward, and when the elements run out, <strong>__getitem__()</strong>
+throws an out-of-bounds exception and that signals the end of the <strong>for</strong> loop
+(in other languages, you would never use an exception for ordinary control flow,
+but in Python it seems to work quite well). This exception happens automatically
+when <strong>self.val[i]</strong> runs out of elements, so the <strong>__getitem__()</strong> code turns
+out to be simple. The only complexity is that <strong>__getitem__()</strong> appears to
+return <em>two</em> objects instead of just one. What Python does is automatically
+package multiple return values into a tuple, so you still only end up returning
+a single object (in C++ or Java you would have to create your own data structure
+to accomplish this). In addition, in the <strong>for</strong> loop where <strong>ValGen</strong> is used,
+Python automatically &#8220;unpacks&#8221; the tuple so that you can have multiple iterators
+in the <strong>for</strong>. These are the kinds of syntax simplifications that make Python
+so endearing.</p>
+<p>The <strong>map</strong> and <strong>set</strong> objects are instances of Java&#8217;s <strong>HashMap</strong> and
+<strong>HashSet</strong>, again created as if those classes were just native Python
+components. In the <strong>for</strong> loop, the <strong>put()</strong> and <strong>add()</strong> methods work just
+like they do in Java. Also, indexing into a Java <strong>Map</strong> uses the same notation
+as for dictionaries, but note that to iterate through the keys in a <strong>Map</strong> you
+must use the <strong>Map</strong> method <strong>keySet()</strong> rather than the Python dictionary
+method <strong>keys()</strong>.</p>
+<p>The final part of the example shows the use of a Java class that I created from
+scratch, to demonstrate how trivial it is. Notice also that Jython intuitively
+understands JavaBeans properties, since you can either use the <strong>getVal()</strong> and
+<strong>setVal()</strong> methods, or assign to and read from the equivalent <strong>val</strong>
+property. Also, <strong>getChars()</strong> returns a <strong>Character[]</strong> in Java, and this
+becomes an array in Python.</p>
+<p>The easiest way to use Java classes that you create for use inside a Python
+program is to put them inside a package. Although Jython can also import
+unpackaged java classes (<strong>import JavaClass</strong>), all such unpackaged java classes
+will be treated as if they were defined in different packages so they can only
+see each other&#8217;s public methods.</p>
+<p>Java packages translate into Python modules, and Python must import a module in
+order to be able to use the Java class. Here is the Java code for <strong>JavaClass</strong>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/javaclass/JavaClass.java</span>
+<span class="k">package</span> <span class="n">Jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
+<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">JavaClass</span> <span class="o">{</span>
+  <span class="k">private</span> <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass()&quot;</span><span class="o">);</span>
+  <span class="o">}</span>
+  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass(String)&quot;</span><span class="o">);</span>
+  <span class="o">}</span>
+  <span class="k">public</span> <span class="n">String</span> <span class="nf">getVal</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getVal()&quot;</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="k">public</span> <span class="kt">void</span> <span class="nf">setVal</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;setVal()&quot;</span><span class="o">);</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="k">public</span> <span class="n">Character</span><span class="o">[]</span> <span class="n">getChars</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getChars()&quot;</span><span class="o">);</span>
+    <span class="n">Character</span><span class="o">[]</span> <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">[</span><span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()];</span>
+    <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span>
+      <span class="n">r</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+    <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">JavaClass</span>
+      <span class="n">x1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(),</span>
+      <span class="n">x2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(</span><span class="s">&quot;UnitTest&quot;</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">x2</span><span class="o">.</span><span class="na">getVal</span><span class="o">());</span>
+    <span class="n">x1</span><span class="o">.</span><span class="na">setVal</span><span class="o">(</span><span class="s">&quot;SpamEggsSausageAndSpam&quot;</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">x1</span><span class="o">.</span><span class="na">getChars</span><span class="o">()));</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>You can see that this is just an ordinary Java class, without any awareness that
+it will be used in a Jython program. For this reason, one of the important uses
+of Jython is in testing Java code <a class="footnote-reference" href="#id4" id="id2">[2]</a>. Because Python is such a powerful,
+flexible, dynamic language it is an ideal tool for automated test frameworks,
+without making any changes to the Java code that&#8217;s being tested.</p>
+<div class="section" id="inner-classes">
+<h3>Inner Classes<a class="headerlink" href="#inner-classes" title="Permalink to this headline">¶</a></h3>
+<p>Inner classes becomes attributes on the class object. Instances of <strong>static</strong>
+inner classes can be created with the usual call:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="o">.</span><span class="n">StaticInnerClass</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Non-<strong>static</strong> inner classes must have an outer class instance supplied
+explicitly as the first argument:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="o">.</span><span class="n">InnerClass</span><span class="p">(</span><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="controlling-the-interpreter">
 <h2>Controlling the Interpreter<a class="headerlink" href="#controlling-the-interpreter" title="Permalink to this headline">¶</a></h2>
-<p>The prior example only creates and runs the interpreter using external scripts.
-In the rest of this chapter, we shall look at more sophisticated ways to
+<p>In the rest of this chapter, we shall look at more sophisticated ways to
 interact with Jython. The simplest way to exercise more control over the
 <strong>PythonInterpreter</strong> object from within Java is to send data to the
 interpreter, and pull data back out.</p>
 <div class="section" id="putting-data-in">
 <h3>Putting Data In<a class="headerlink" href="#putting-data-in" title="Permalink to this headline">¶</a></h3>
 <p>To inject data into your Python program, the <strong>PythonInterpreter</strong> class has a
-deceptively simple method: <strong>set( )</strong>. However, <strong>set( )</strong> takes many different
+deceptively simple method: <strong>set()</strong>. However, <strong>set()</strong> takes many different
 data types and performs conversions upon them.  The following example is a
-reasonably thorough exercise of the various <strong>set( )</strong> possibilities, along with
+reasonably thorough exercise of the various <strong>set()</strong> possibilities, along with
 comments that should give a fairly complete explanation:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterSetting.java</span>
 <span class="c">// Passing data from Java to python when using</span>
@@ -436,13 +600,13 @@ comments that should give a fairly complete explanation:</p>
 </pre></div>
 </div>
 <p>As usual with Java, the distinction between real objects and primitive types
-causes trouble. In general, if you pass a regular object to <strong>set( )</strong>, it knows
+causes trouble. In general, if you pass a regular object to <strong>set()</strong>, it knows
 what to do with it, but if you want to pass in a primitive you must perform a
 conversion. One way to do this is to create a &#8220;Py&#8221; type, such as <strong>PyInteger</strong>
 or <strong>PyFloat</strong>. but it turns out you can also use Java&#8217;s own object wrappers
 like <strong>Integer</strong> and <strong>Float</strong>, which is probably going to be a lot easier to
 remember.</p>
-<p>Early in the program you&#8217;ll see an <strong>exec( )</strong> containing the Python statement:</p>
+<p>Early in the program you&#8217;ll see an <strong>exec()</strong> containing the Python statement:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mf">5</span><span class="p">:])</span>
 </pre></div>
 </div>
@@ -453,26 +617,26 @@ could also say &#8216;<strong>a[3:5]</strong>&#8216; to produce elements 3 throu
 produce the elements zero through 5. The reason a slice is used in this
 statement is to make sure that the Java <strong>String</strong> has really been converted to
 a Python string, which can also be treated as an array of characters.</p>
-<p>You can see that it&#8217;s possible, using <strong>exec( )</strong>, to create a Python function
-(although it&#8217;s a bit awkward). The <strong>prt( )</strong> function prints the whole array,
+<p>You can see that it&#8217;s possible, using <strong>exec()</strong>, to create a Python function
+(although it&#8217;s a bit awkward). The <strong>prt()</strong> function prints the whole array,
 and then (to make sure it&#8217;s a real Python array), iterates through each element
 of the array and prints it. Finally, it prints the class of the array, so we can
 see what conversion has taken place (Python not only has run-time type
-information, it also has the equivalent of Java reflection). The <strong>prt( )</strong>
+information, it also has the equivalent of Java reflection). The <strong>prt()</strong>
 function is used to print arrays that come from each of the Java primitive
 types.</p>
-<p>Although a Java <strong>ArrayList</strong> does pass into the interpreter using <strong>set( )</strong>,
+<p>Although a Java <strong>ArrayList</strong> does pass into the interpreter using <strong>set()</strong>,
 and you can index into it as if it were an array, trying to create a slice
 fails. To completely convert it into an array, one approach is to simply extract
-a Java array using <strong>toArray( )</strong>, and pass that in. The <strong>set( )</strong> method
+a Java array using <strong>toArray()</strong>, and pass that in. The <strong>set()</strong> method
 converts it to a <strong>PyArray</strong> - one of the classes provided with Jython - which
 can be treated as a Python array (you can also explicitly create a <strong>PyArray</strong>,
 but this seems unnecessary).</p>
 <p>Finally, a <strong>Map</strong> is created and passed directly into the interpreter. While it
 is possible to do simple things like index into the resulting object, it&#8217;s not a
-real Python dictionary so you can&#8217;t (for example) call the <strong>keys( )</strong> method.
+real Python dictionary so you can&#8217;t (for example) call the <strong>keys()</strong> method.
 There is no straightforward way to convert a Java <strong>Map</strong> into a Python
-dictionary, and so I wrote a utility called <strong>toPyDictionary( )</strong> and made it a
+dictionary, and so I wrote a utility called <strong>toPyDictionary()</strong> and made it a
 <strong>static</strong> method of <strong>net.mindview.python.PyUtil</strong>. This also includes
 utilities to extract a Python array into a Java <strong>List</strong>, and a Python
 dictionary into a Java <strong>Map</strong>:</p>
@@ -583,14 +747,14 @@ dictionary into a Java <strong>Map</strong>:</p>
 <div class="section" id="getting-data-out">
 <h3>Getting Data Out<a class="headerlink" href="#getting-data-out" title="Permalink to this headline">¶</a></h3>
 <p>There are a number of different ways to extract data from the
-<strong>PythonInterpreter</strong>. If you simply call the <strong>get( )</strong> method, passing it the
+<strong>PythonInterpreter</strong>. If you simply call the <strong>get()</strong> method, passing it the
 object identifier as a string, it returns a <strong>PyObject</strong> (part of the
 <strong>org.python.core</strong> support classes). It&#8217;s possible to &#8220;cast&#8221; it using the
-<strong>__tojava__( )</strong> method, but there are better alternatives:</p>
+<strong>__tojava__()</strong> method, but there are better alternatives:</p>
 <ol class="arabic simple">
-<li>The convenience methods in the <strong>Py</strong> class, such as <strong>py2int( )</strong>, take a
+<li>The convenience methods in the <strong>Py</strong> class, such as <strong>py2int()</strong>, take a
 <strong>PyObject</strong> and convert it to a number of different types.</li>
-<li>An overloaded version of <strong>get( )</strong> takes the desired Java <strong>Class</strong> object
+<li>An overloaded version of <strong>get()</strong> takes the desired Java <strong>Class</strong> object
 as a second argument, and produces an object that has that run-time type (so you
 still need to perform a cast on the result in your Java code).</li>
 </ol>
@@ -598,7 +762,7 @@ still need to perform a cast on the result in your Java code).</li>
 quite easy. This is especially useful because Python is exceptionally good at
 manipulating strings and files, and so you will commonly want to extract the
 results as an array of strings. For example, you can do a wildcard expansion of
-file names using Python&#8217;s <strong>glob( )</strong>, as shown further down in the following
+file names using Python&#8217;s <strong>glob()</strong>, as shown further down in the following
 code:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterGetting.java</span>
 <span class="c">// Getting data from the PythonInterpreter object.</span>
@@ -704,10 +868,10 @@ code:</p>
 </pre></div>
 </div>
 <p>The last two examples show the extraction of Python tuples and lists into Java
-<strong>List**s, and Python dictionaries into Java **Map**s. Both of these cases
+<strong>List</strong>s, and Python dictionaries into Java <strong>Map</strong>s. Both of these cases
 require more processing than is provided in the standard Jython library, so I
-have again created utilities in **net.mindview.pyton.PyUtil</strong>: <strong>toList( )</strong> to
-produce a <strong>List</strong> from a Python sequence, and <strong>toMap( )</strong> to produce a <strong>Map</strong>
+have again created utilities in <strong>net.mindview.pyton.PyUtil</strong>: <strong>toList()</strong> to
+produce a <strong>List</strong> from a Python sequence, and <strong>toMap()</strong> to produce a <strong>Map</strong>
 from a Python dictionary. The <strong>PyUtil</strong> methods make it easier to take
 important data structures back and forth between Java and Python.</p>
 </div>
@@ -743,275 +907,15 @@ in a program, and each one has its own name space:</p>
 each <strong>PythonInterpreter</strong>.</p>
 </div>
 </div>
-<div class="section" id="controlling-java-from-jython">
-<h2>Controlling Java from Jython<a class="headerlink" href="#controlling-java-from-jython" title="Permalink to this headline">¶</a></h2>
-<p>Since you have the Java language at your disposal, and you can set and retrieve
-values in the interpreter, there&#8217;s a tremendous amount that you can accomplish
-with the above approach (controlling Python from Java).  But one of the amazing
-things about Jython is that it makes Java classes almost transparently available
-from within Jython. Basically, a Java class looks like a Python class. This is
-true for standard Java library classes as well as classes that you create
-yourself, as you can see here:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/JavaClassInPython.py</span>
-<span class="c"># run with: jython.bat JavaClassInPython.py</span>
-<span class="c"># Using Java classes within Jython</span>
-<span class="k">from</span> <span class="nn">java.util</span> <span class="k">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">HashSet</span><span class="p">,</span> <span class="n">HashMap</span>
-<span class="k">from</span> <span class="nn">Jython.javaclass</span> <span class="k">import</span> <span class="n">JavaClass</span>
-<span class="k">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sin</span>
-
-<span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span> <span class="c"># Creating a Java Date object</span>
-<span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="c"># Calls toString()</span>
-
-<span class="c"># A &quot;generator&quot; to easily create data:</span>
-<span class="k">class</span> <span class="nc">ValGen</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxVal</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxVal</span><span class="p">)</span>
-    <span class="c"># Called during &#39;for&#39; iteration:</span>
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-        <span class="c"># Returns a tuple of two elements:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-<span class="c"># Java standard containers:</span>
-<span class="nb">map</span> <span class="o">=</span> <span class="n">HashMap</span><span class="p">()</span>
-<span class="n">set</span> <span class="o">=</span> <span class="n">HashSet</span><span class="p">()</span>
-
-<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">ValGen</span><span class="p">(</span><span class="mf">10</span><span class="p">):</span>
-    <span class="nb">map</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="nb">map</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">set</span><span class="p">)</span>
-
-<span class="c"># Iterating through a set:</span>
-<span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">set</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="nb">map</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span> <span class="c"># Uses Python dictionary indexing</span>
-<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">keySet</span><span class="p">():</span> <span class="c"># keySet() is a Map method</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">map</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
-
-<span class="c"># Using a Java class that you create yourself is</span>
-<span class="c"># just as easy:</span>
-<span class="n">jc</span> <span class="o">=</span> <span class="n">JavaClass</span><span class="p">()</span>
-<span class="n">jc2</span> <span class="o">=</span> <span class="n">JavaClass</span><span class="p">(</span><span class="s">&quot;Created within Jython&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">jc2</span><span class="o">.</span><span class="n">getVal</span><span class="p">())</span>
-<span class="n">jc</span><span class="o">.</span><span class="n">setVal</span><span class="p">(</span><span class="s">&quot;Using a Java class is trivial&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">getVal</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">getChars</span><span class="p">())</span>
-<span class="n">jc</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="s">&quot;Using bean properties&quot;</span>
-<span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The &#8220;<strong>=M</strong>&#8221; comment is recognized by the makefile generator tool (that I
-created for this book) as a replacement makefile command. This will be used
-instead of the commands that the extraction tool would normally place in the
-makefile.</p>
-<p>Note that the <strong>import</strong> statements map to the Java package structure exactly as
-you would expect. In the first example, a <strong>Date( )</strong> object is created as if it
-were a native Python class, and printing this object just calls <strong>toString( )</strong>.</p>
-<p><strong>ValGen</strong> implements the concept of a &#8220;generator&#8221; which is used a great deal in
-the C++ STL (<em>Standard Template Library</em>, part of the Standard C++ Library). A
-generator is an object that produces a new object every time its &#8220;generation
-method&#8221; is called, and it is quite convenient for filling containers. Here, I
-wanted to use it in a <strong>for</strong> iteration, and so I needed the generation method
-to be the one that is called by the iteration process. This is a special method
-called <strong>__getitem__( )</strong>, which is actually the overloaded operator for
-indexing, &#8216;<strong>[ ]</strong>&#8216;. A <strong>for</strong> loop calls this method every time it wants to
-move the iteration forward, and when the elements run out, <strong>__getitem__( )</strong>
-throws an out-of-bounds exception and that signals the end of the <strong>for</strong> loop
-(in other languages, you would never use an exception for ordinary control flow,
-but in Python it seems to work quite well). This exception happens automatically
-when <strong>self.val[i]</strong> runs out of elements, so the <strong>__getitem__( )</strong> code turns
-out to be simple. The only complexity is that <strong>__getitem__( )</strong> appears to
-return <em>two</em> objects instead of just one. What Python does is automatically
-package multiple return values into a tuple, so you still only end up returning
-a single object (in C++ or Java you would have to create your own data structure
-to accomplish this). In addition, in the <strong>for</strong> loop where <strong>ValGen</strong> is used,
-Python automatically &#8220;unpacks&#8221; the tuple so that you can have multiple iterators
-in the <strong>for</strong>. These are the kinds of syntax simplifications that make Python
-so endearing.</p>
-<p>The <strong>map</strong> and <strong>set</strong> objects are instances of Java&#8217;s <strong>HashMap</strong> and
-<strong>HashSet</strong>, again created as if those classes were just native Python
-components. In the <strong>for</strong> loop, the <strong>put( )</strong> and <strong>add( )</strong> methods work just
-like they do in Java. Also, indexing into a Java <strong>Map</strong> uses the same notation
-as for dictionaries, but note that to iterate through the keys in a <strong>Map</strong> you
-must use the <strong>Map</strong> method <strong>keySet( )</strong> rather than the Python dictionary
-method <strong>keys( )</strong>.</p>
-<p>The final part of the example shows the use of a Java class that I created from
-scratch, to demonstrate how trivial it is. Notice also that Jython intuitively
-understands JavaBeans properties, since you can either use the <strong>getVal( )</strong> and
-<strong>setVal( )</strong> methods, or assign to and read from the equivalent <strong>val</strong>
-property. Also, <strong>getChars( )</strong> returns a <strong>Character[]</strong> in Java, and this
-becomes an array in Python.</p>
-<p>The easiest way to use Java classes that you create for use inside a Python
-program is to put them inside a package. Although Jython can also import
-unpackaged java classes (<strong>import JavaClass</strong>), all such unpackaged java classes
-will be treated as if they were defined in different packages so they can only
-see each other&#8217;s public methods.</p>
-<p>Java packages translate into Python modules, and Python must import a module in
-order to be able to use the Java class. Here is the Java code for <strong>JavaClass</strong>:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/javaclass/JavaClass.java</span>
-<span class="k">package</span> <span class="n">Jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-
-<span class="k">public</span> <span class="k">class</span> <span class="nc">JavaClass</span> <span class="o">{</span>
-  <span class="k">private</span> <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
-  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass()&quot;</span><span class="o">);</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass(String)&quot;</span><span class="o">);</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="n">String</span> <span class="nf">getVal</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getVal()&quot;</span><span class="o">);</span>
-    <span class="k">return</span> <span class="n">s</span><span class="o">;</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">setVal</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;setVal()&quot;</span><span class="o">);</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="n">Character</span><span class="o">[]</span> <span class="n">getChars</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getChars()&quot;</span><span class="o">);</span>
-    <span class="n">Character</span><span class="o">[]</span> <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">[</span><span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()];</span>
-    <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span>
-      <span class="n">r</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">JavaClass</span>
-      <span class="n">x1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(),</span>
-      <span class="n">x2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(</span><span class="s">&quot;UnitTest&quot;</span><span class="o">);</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">x2</span><span class="o">.</span><span class="na">getVal</span><span class="o">());</span>
-    <span class="n">x1</span><span class="o">.</span><span class="na">setVal</span><span class="o">(</span><span class="s">&quot;SpamEggsSausageAndSpam&quot;</span><span class="o">);</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">x1</span><span class="o">.</span><span class="na">getChars</span><span class="o">()));</span>
-  <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-</div>
-<p>You can see that this is just an ordinary Java class, without any awareness that
-it will be used in a Jython program. For this reason, one of the important uses
-of Jython is in testing Java code <a class="footnote-reference" href="#id4" id="id2">[2]</a>. Because Python is such a powerful,
-flexible, dynamic language it is an ideal tool for automated test frameworks,
-without making any changes to the Java code that&#8217;s being tested.</p>
-<div class="section" id="inner-classes">
-<h3>Inner Classes<a class="headerlink" href="#inner-classes" title="Permalink to this headline">¶</a></h3>
-<p>Inner classes becomes attributes on the class object. Instances of <strong>static</strong>
-inner classes can be created with the usual call:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="o">.</span><span class="n">StaticInnerClass</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Non-<strong>static</strong> inner classes must have an outer class instance supplied
-explicitly as the first argument:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="o">.</span><span class="n">InnerClass</span><span class="p">(</span><span class="n">com</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">JavaClass</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="using-java-libraries">
-<h2>Using Java libraries<a class="headerlink" href="#using-java-libraries" title="Permalink to this headline">¶</a></h2>
-<p>Jython wraps the Java libraries so that any of them can be used directly or via
-inheritance. In addition, Python shorthand simplifies coding.</p>
-<p>As an example, consider the <strong>HTMLButton.java</strong> example from Chapter 9 of
-<em>Thinking in Java</em> (you presumably have already downloaded and installed the
-source code for that book from <a class="reference external" href="http://www.MindviewInc.com">www.MindviewInc.com</a>, since a number of examples in this book use
-libraries from that book). Here is its conversion to Jython:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonSwing.py</span>
-<span class="c"># The HTMLButton.java example from &quot;Thinking in Java&quot;</span>
-<span class="c"># converted into Jython.</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JButton</span><span class="p">,</span> <span class="n">JLabel</span>
-<span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
-
-<span class="n">frame</span> <span class="o">=</span> <span class="n">JFrame</span><span class="p">(</span><span class="s">&quot;HTMLButton&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span>
-  <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">kapow</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-    <span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-      <span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;&lt;html&gt;&lt;i&gt;&lt;font size=+4&gt;Kapow!&quot;</span><span class="p">))</span>
-    <span class="c"># Force a re-layout to include the new label:</span>
-    <span class="n">frame</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
-
-<span class="n">button</span> <span class="o">=</span> <span class="n">JButton</span><span class="p">(</span><span class="s">&quot;&lt;html&gt;&lt;b&gt;&lt;font size=+2&gt;&quot;</span> <span class="o">+</span>
-  <span class="s">&quot;&lt;center&gt;Hello!&lt;br&gt;&lt;i&gt;Press me now!&quot;</span><span class="p">,</span>
-  <span class="n">actionPerformed</span><span class="o">=</span><span class="n">kapow</span><span class="p">)</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">FlowLayout</span><span class="p">()</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">button</span><span class="p">)</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">=</span><span class="mf">200</span><span class="p">,</span> <span class="mf">500</span>
-</pre></div>
-</div>
-<p>If you compare the Java version of the program to the above Jython
-implementation, you&#8217;ll see that Jython is shorter and generally easier to
-understand. For example, in the Java version to set up the frame you had to make
-several calls: the constructor for <strong>JFrame( )</strong>, the <strong>setVisible( )</strong> method
-and the <strong>setDefaultCloseOperation( )</strong> method, whereas in the above code all
-three of these operations are performed with a single constructor call.</p>
-<p>Also notice that the <strong>JButton</strong> is configured with an <strong>actionListener( )</strong>
-method inside the constructor, with the assignment to <strong>kapow</strong>. In addition,
-Jython&#8217;s JavaBean awareness means that a call to any method with a name that
-begins with &#8220;<strong>set</strong>&#8221; can be replaced with an assignment, as you can see above.</p>
-<p>The only method that did not come over from Java is the <strong>pack( )</strong> method,
-which seems to be essential in order to force the layout to happen properly.
-It&#8217;s also important that the call to <strong>pack( )</strong> appear <em>before</em> the <strong>size</strong>
-setting.</p>
-<div class="section" id="inheriting-from-java-library-classes">
-<h3>Inheriting from Java library Classes<a class="headerlink" href="#inheriting-from-java-library-classes" title="Permalink to this headline">¶</a></h3>
-<p>You can easily inherit from standard Java library classes in
-Jython. Here&#8217;s the <strong>Dialogs.java</strong> example from <em>Thinking in Java</em>,
-converted into Jython:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonDialogs.py</span>
-<span class="c"># Dialogs.java from &quot;Thinking in Java,&quot; converted into Jython.</span>
-<span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JDialog</span><span class="p">,</span> <span class="n">JLabel</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JButton</span>
-
-<span class="k">class</span> <span class="nc">MyDialog</span><span class="p">(</span><span class="n">JDialog</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-      <span class="n">JDialog</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                       <span class="n">title</span><span class="o">=</span><span class="s">&quot;My dialog&quot;</span><span class="p">,</span> <span class="n">modal</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">FlowLayout</span><span class="p">()</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;A dialog!&quot;</span><span class="p">))</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JButton</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">,</span>
-          <span class="n">actionPerformed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">dispose</span><span class="p">()))</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-
-<span class="n">frame</span> <span class="o">=</span> <span class="n">JFrame</span><span class="p">(</span><span class="s">&quot;Dialogs&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span>
-               <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
-<span class="n">dlg</span> <span class="o">=</span> <span class="n">MyDialog</span><span class="p">()</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="n">JButton</span><span class="p">(</span><span class="s">&quot;Press here to get a Dialog Box&quot;</span><span class="p">,</span>
-            <span class="n">actionPerformed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">dlg</span><span class="o">.</span><span class="n">show</span><span class="p">()))</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-</pre></div>
-</div>
-<p><strong>MyDialog</strong> is inherited from <strong>JDialog</strong>, and you can see named arguments
-being used in the call to the base-class constructor.</p>
-<p>In the creation of the &#8220;OK&#8221; <strong>JButton</strong>, note that the <strong>actionPerformed</strong>
-method is set right inside the constructor, and that the function is created
-using the Python <strong>lambda</strong> keyword. This creates a nameless function with the
-arguments appearing before the colon and the expression that generates the
-returned value after the colon. As you should know, the Java prototype for the
-<strong>actionPerformed( )</strong> method only contains a single argument, but the lambda
-expression indicates two. However, the second argument is provided with a
-default value, so the function <em>can</em> be called with only one argument. The
-reason for the second argument is seen in the default value, because this is a
-way to pass <strong>self</strong> into the lambda expression, so that it can be used to
-dispose of the dialog.</p>
-<p>Compare this code with the version that&#8217;s published in <em>Thinking in Java</em>.
-You&#8217;ll find that Python language features allow a much more succinct and direct
-implementation.</p>
-</div>
-</div>
 <div class="section" id="creating-java-classes-with-jython">
 <h2>Creating Java classes with Jython<a class="headerlink" href="#creating-java-classes-with-jython" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Jython 2.5.0 does not support jythonc. Support is planned
-for 2.5.1. jythonc basically converted python source to java
-source, the replacement will generate bytecodes directly,
-and enable jython code to be imported directly into java
-(via generated proxies).</p>
+<p class="last">Jython 2.5.0 does not support <strong>jythonc</strong>. Support is
+planned for 2.5.1. <strong>jythonc</strong> basically converted python
+source to java source, the replacement will generate
+bytecodes directly, and enable jython code to be imported
+directly into java (via generated proxies).</p>
 </div>
 <p>Jython can also create Java classes directly from your Jython
 code. This can produce very useful results, as you are then able to
@@ -1025,7 +929,7 @@ because the methods in Java classes are statically typed, while Python
 functions and methods are dynamically typed. Thus, you must somehow
 tell <strong>jythonc</strong> that a Python method is intended to have a particular
 set of argument types and that its return value is a particular
-type. You accomplish this with the &#8220;&#64;sig&#8221; string, which is placed
+type. You accomplish this with the <strong>&#64;sig</strong> string, which is placed
 right after the beginning of the Python method definition (this is the
 standard location for the Python documentation string). For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">returnArray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1137,19 +1041,19 @@ class will do.</p>
 provide you with enough examples that you&#8217;ll be able to easily create your own
 signature strings. The first three of these are fairly self-explanatory, but
 note the full qualification of the Java name in the signature string.</p>
-<p>In <strong>returnArray( )</strong>, a Python array must be returned as a Java array. To do
-this, the Jython <strong>array( )</strong> function (from the <strong>jarray</strong> module) must be
+<p>In <strong>returnArray()</strong>, a Python array must be returned as a Java array. To do
+this, the Jython <strong>array()</strong> function (from the <strong>jarray</strong> module) must be
 used, along with the type of the class for the resulting array. Any time you
-need to return an array to Java, you must use <strong>array( )</strong>, as seen in the
-methods <strong>ints( )</strong> and <strong>doubles( )</strong>.</p>
+need to return an array to Java, you must use <strong>array()</strong>, as seen in the
+methods <strong>ints()</strong> and <strong>doubles()</strong>.</p>
 <p>The last methods show how to pass arguments in from Java. Basic types happen
 automatically as long as you specify them in the <strong>&#64;sig</strong> string, but you must
 use objects and you cannot pass in primitives (that is, primitives must be
 ensconced in wrapper objects, such as <strong>Integer</strong>).</p>
-<p>In <strong>argIn3( )</strong>, you can see that a Java <strong>List</strong> is transparently converted to
+<p>In <strong>argIn3()</strong>, you can see that a Java <strong>List</strong> is transparently converted to
 something that behaves just like a Python array, but is not a true array because
 you cannot take a slice from it. If you want a true Python array, then you must
-create and pass a <strong>PyArray</strong> as in <strong>argIn4( )</strong>, where the slice is
+create and pass a <strong>PyArray</strong> as in <strong>argIn4()</strong>, where the slice is
 successful. Similarly, a Java <strong>Map</strong> must come in as a <strong>PyDictionary</strong> in
 order to be treated as a Python dictionary.</p>
 <p>Here is the Java program to exercise the Java classes produced by the
@@ -1205,7 +1109,7 @@ until <strong>PythonToJavaClass.class</strong> is available:</p>
 <p>For Python support, you&#8217;ll usually only need to import the classes in
 <strong>org.python.core</strong>. Everything else in the above example is fairly
 straightforward, as <strong>PythonToJavaClass</strong> appears, from the Java side, to be
-just another Java class. <strong>dumpClassInfo( )</strong> uses reflection to verify that the
+just another Java class. <strong>dumpClassInfo()</strong> uses reflection to verify that the
 method signatures specified in <strong>PythonToJavaClass.py</strong> have come through
 properly.</p>
 <div class="section" id="building-java-classes-from-python">
@@ -1287,8 +1191,8 @@ Connect to a <strong>PythonInterpreter</strong> object so that the output will b
 the <strong>JTextArea</strong> (which should scroll). You&#8217;ll need to locate the
 <strong>PythonInterpreter</strong> command that redirects the output to a Java stream.</li>
 <li>Modify <strong>GreenHouseLanguage.py</strong> to add a master controller class (instead
-of the static array inside <strong>Event</strong>) and provide a <strong>run( )</strong> method for
-each of the subclasses. Each <strong>run( )</strong> should create and use an object from
+of the static array inside <strong>Event</strong>) and provide a <strong>run()</strong> method for
+each of the subclasses. Each <strong>run()</strong> should create and use an object from
 the standard Java library during its execution. Modify
 <strong>GreenHouseController.java</strong> to use this new class.</li>
 <li>Modify the resulting <strong>GreenHouseLanguage.py</strong> from exercise two to produce
@@ -1338,18 +1242,14 @@ private.</td></tr>
 </li>
 <li><a class="reference external" href="#scripting">Scripting</a></li>
 <li><a class="reference external" href="#creating-a-language">Creating a Language</a></li>
-<li><a class="reference external" href="#controlling-the-interpreter">Controlling the Interpreter</a><ul>
-<li><a class="reference external" href="#putting-data-in">Putting Data In</a></li>
-<li><a class="reference external" href="#getting-data-out">Getting Data Out</a></li>
-<li><a class="reference external" href="#multiple-interpreters">Multiple Interpreters</a></li>
-</ul>
-</li>
 <li><a class="reference external" href="#controlling-java-from-jython">Controlling Java from Jython</a><ul>
 <li><a class="reference external" href="#inner-classes">Inner Classes</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#using-java-libraries">Using Java libraries</a><ul>
-<li><a class="reference external" href="#inheriting-from-java-library-classes">Inheriting from Java library Classes</a></li>
+<li><a class="reference external" href="#controlling-the-interpreter">Controlling the Interpreter</a><ul>
+<li><a class="reference external" href="#putting-data-in">Putting Data In</a></li>
+<li><a class="reference external" href="#getting-data-out">Getting Data Out</a></li>
+<li><a class="reference external" href="#multiple-interpreters">Multiple Interpreters</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#creating-java-classes-with-jython">Creating Java classes with Jython</a><ul>
