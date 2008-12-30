@@ -1,6 +1,5 @@
 // Jython/javaclass/JavaClass.java
-package jython.javaclass;
-import junit.framework.*;
+package Jython.javaclass;
 import java.util.*;
 
 public class JavaClass {
@@ -27,18 +26,12 @@ public class JavaClass {
       r[i] = new Character(s.charAt(i));
     return r;
   }
-  public static class Test extends TestCase  {
+  public static void main(String[] args) {
     JavaClass
       x1 = new JavaClass(),
       x2 = new JavaClass("UnitTest");
-    public void test1() {
-      System.out.println(x2.getVal());
-      x1.setVal("SpamEggsSausageAndSpam");
-      System.out.println(
-        Arrays.toString(x1.getChars()));
-    }
-  }
-  public static void main(String[] args) {
-    junit.textui.TestRunner.run(Test.class);
+    System.out.println(x2.getVal());
+    x1.setVal("SpamEggsSausageAndSpam");
+    System.out.println(Arrays.toString(x1.getChars()));
   }
 }

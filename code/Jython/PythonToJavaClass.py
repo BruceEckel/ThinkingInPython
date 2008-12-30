@@ -1,15 +1,13 @@
 # Jython/PythonToJavaClass.py
-#=T python\java\test\PythonToJavaClass.class
-#=M jythonc.bat --package python.java.test \
-#=M PythonToJavaClass.py
-# A Python class created to produce a Java class
+# A Python class converted into a Java class
+# Compile with:
+# jythonc --package python.java.test PythonToJavaClass.py
 from jarray import array
 import java
 
 class PythonToJavaClass(java.lang.Object):
-    # The '@sig' signature string is used to create
-    # the proper signature in the resulting
-    # Java code:
+    # The '@sig' signature string is used to create the
+    # proper signature in the resulting Java code:
     def __init__(self):
         "@sig public PythonToJavaClass()"
         print("Constructor for PythonToJavaClass")

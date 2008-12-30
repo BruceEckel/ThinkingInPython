@@ -1,31 +1,26 @@
 // Jython/TestPythonToJavaClass.java
-//+D python\java\test\PythonToJavaClass.class
-package jython;
 import java.lang.reflect.*;
 import java.util.*;
 import org.python.core.*;
-import junit.framework.*;
 import java.util.*;
 import net.mindview.python.*;
 // The package with the Python-generated classes:
 import python.java.test.*;
 
-public class
-TestPythonToJavaClass extends TestCase  {
+public class TestPythonToJavaClass {
   PythonToJavaClass p2j = new PythonToJavaClass();
   public void testDumpClassInfo() {
     System.out.println(
       Arrays.toString(
         p2j.getClass().getConstructors()));
-    Method[] methods =
-      p2j.getClass().getMethods();
+    Method[] methods = p2j.getClass().getMethods();
     for(int i = 0; i < methods.length; i++) {
       String nm = methods[i].toString();
       if(nm.indexOf("PythonToJavaClass") != -1)
         System.out.println(nm);
     }
   }
-  public void test1() {
+  public static void main(String[] args) {
     p2j.simple();
     System.out.println(p2j.returnString());
     System.out.println(
@@ -46,9 +41,5 @@ TestPythonToJavaClass extends TestCase  {
     for(int i = 0; i < 10; i++)
       m.put("" + i, new Float(i));
     p2j.argIn5(PyUtil.toPyDictionary(m));
-  }
-  public static void main(String[] args) {
-    junit.textui.TestRunner.run(
-      TestPythonToJavaClass.class);
   }
 }

@@ -4,7 +4,8 @@
 Jython
 ********************************************************************************
 
-.. note:: This chapter is being brough up to date with Jython 2.5, and will need changes when Jython 3 comes out.
+.. note:: This chapter is being brought up to date with Jython 2.5,
+   	  and will need changes when Jython 3 comes out.
 
 This chapter looks at the value of crossing language boundaries. It is often
 advantageous to solve a problem using more than one programming language, rather
@@ -72,20 +73,31 @@ Installation
 =======================================================================
 
 To install Jython, go to `http://jython.sourceforge.net
-<http://jython.sourceforge.net>`_.  The download is a **.class** file, which
-will run an installer when you execute it with Java.  You also need to add
-**jython.jar** to your Java CLASSPATH.
+<http://jython.sourceforge.net>`_.  
+
+.. note:: Select "test the beta".
+
+The download is a **.class** file, which will run an installer when
+you execute it with Java.
+
+You also need to add **jython-complete.jar** to your Java CLASSPATH.
+As an example, here is the appropriate section in my ``.bashrc``::
+
+   export set JYTHON_HOME="/Users/bruceeckel/jython2.5b0"
+   export set CLASSPATH=.:..:$JYTHON_HOME/jython-complete.jar
 
 When you run Jython, you might get the error: ``can't create package
 cache dir, '/cachedir/packages'``. Jython caching requires
-``/cachedir/packages/`` in the ``python.home`` directory. It is often the
-case on *nix that users lack sufficient priveledges to create or write
-to this directory. Because the problem is merely permissions,
-something similar to "mkdir cachedir; chmod a+rw cachedir" within
-Jython's directory should eliminate this error message.
+``/cachedir/packages/`` in the ``python.home`` directory. It is often
+the case on \*nix that users lack sufficient priveledges to create or
+write to this directory. Because the problem is merely permissions,
+something like ``mkdir cachedir; chmod a+rw cachedir`` within the
+Jython directory should eliminate this error message.
 
 Getting the Trunk
 -----------------------------------------------------------------------
+
+.. note:: This section has not been successfuly tested yet.
 
 The Jython development trunk is very stable so it's safe to get as the most recent
 version of the implementation. The subversion command is::
@@ -111,8 +123,7 @@ scripting.  You can rapidly create and test code, and solve problems
 more quickly.
 
 Here's an example that shows a little of what you can do in a Jython
-script, and also gives you a sense of performance (the ``timeit`` module
-could not be used as it tries to turn off the Java garbage collector)::
+script, and also gives you a sense of performance::
 
 	# Jython/Simple.py
 	import platform, glob, time
@@ -129,6 +140,9 @@ could not be used as it tries to turn off the Java garbage collector)::
 	    for i in xrange(10): 
 	            oct(i)
         print time.time() - start
+
+..  note:: The ``timeit`` module in the alpha distribution could not
+   	   be used as it tries to turn off the Java garbage collector.
 
 If you run this program under both cpython and Jython, you'll see that
 the timed loop produces very similar results; Jython 2.5 is in beta so
@@ -153,8 +167,8 @@ interpreted language inside your application. Consider the greenhouse
 controller example from *Thinking in Java*. This is a situation where
 you want the end user -- the person managing the greenhouse -- to have
 configuration control over the system, and so a simple scripting
-language is the ideal solution.  These are often called
-*domain-specific languages* (DSL) because they solve a particular
+language is the ideal solution.  This is often called a
+*domain-specific language* (DSL) because it solves a particular
 domain problem.
 
 To create the language, we'll simply write a set of Python classes,
@@ -217,8 +231,6 @@ but outside of any methods, is what makes it static)::
         for e in Event.events:
             e.run()
 
-    # To test, this will be run when you say:
-    # python GreenHouseLanguage.py
     if __name__ == "__main__":
         ThermostatNight(5.00)
         LightOff(2.00)
@@ -229,6 +241,8 @@ but outside of any methods, is what makes it static)::
         Bell(7.00)
         run()
 
+.. note:: To run this program say ``python GreenHouseLanguage.py`` or
+   	  ``jython GreenHouseLanguage.py``.
 
 The constructor of each derived class calls the base-class constructor, which
 adds the new object to the list. The **run( )** function sorts the list, which
@@ -286,9 +300,9 @@ This is the goal of the interpreter design pattern: to make the configuration of
 your program as simple as possible for the end user. With Jython you can achieve
 this with almost no effort at all.
 
-One of the other methods available to the **PythonInterpreter** is **exec( )**,
-which allows you to send a command to the interpreter. Here, the **run( )**
-function is called using **exec( )**.
+One of the other methods available to the **PythonInterpreter** is
+**exec( )**, which allows you to send a command to the interpreter. In
+the above program, the **run( )** function is called using **exec()**.
 
 Controlling the Interpreter
 =======================================================================
@@ -707,16 +721,15 @@ in a program, and each one has its own name space:
     // Jython/MultipleJythons.java
     // You can run multiple interpreters, each
     // with its own name space.
-    package jython;
     import org.python.util.PythonInterpreter;
     import org.python.core.*;
-    import junit.framework.*;
 
-    public class MultipleJythons extends TestCase  {
-      PythonInterpreter
-        interp1 =  new PythonInterpreter(),
-        interp2 =  new PythonInterpreter();
-      public void test() throws PyException {
+    public class MultipleJythons {
+      public static void
+      main(String[] args) throws PyException  {
+        PythonInterpreter
+          interp1 =  new PythonInterpreter(),
+          interp2 =  new PythonInterpreter();
         interp1.set("a", new PyInteger(42));
         interp2.set("a", new PyInteger(47));
         interp1.exec("print(a)");
@@ -725,10 +738,6 @@ in a program, and each one has its own name space:
         PyObject x2 = interp2.get("a");
         System.out.println("a from interp1: " + x1);
         System.out.println("a from interp2: " + x2);
-      }
-      public static void
-      main(String[] args) throws PyException  {
-        junit.textui.TestRunner.run(MultipleJythons.class);
       }
     }
 
@@ -751,7 +760,7 @@ yourself, as you can see here::
     # run with: jython.bat JavaClassInPython.py
     # Using Java classes within Jython
     from java.util import Date, HashSet, HashMap
-    from jython.javaclass import JavaClass
+    from Jython.javaclass import JavaClass
     from math import sin
 
     d = Date() # Creating a Java Date object
@@ -856,8 +865,7 @@ order to be able to use the Java class. Here is the Java code for **JavaClass**:
 ..  code-block:: java
 
     // Jython/javaclass/JavaClass.java
-    package jython.javaclass;
-    import junit.framework.*;
+    package Jython.javaclass;
     import java.util.*;
 
     public class JavaClass {
@@ -884,19 +892,13 @@ order to be able to use the Java class. Here is the Java code for **JavaClass**:
           r[i] = new Character(s.charAt(i));
         return r;
       }
-      public static class Test extends TestCase  {
+      public static void main(String[] args) {
         JavaClass
           x1 = new JavaClass(),
           x2 = new JavaClass("UnitTest");
-        public void test1() {
-          System.out.println(x2.getVal());
-          x1.setVal("SpamEggsSausageAndSpam");
-          System.out.println(
-            Arrays.toString(x1.getChars()));
-        }
-      }
-      public static void main(String[] args) {
-        junit.textui.TestRunner.run(Test.class);
+        System.out.println(x2.getVal());
+        x1.setVal("SpamEggsSausageAndSpam");
+        System.out.println(Arrays.toString(x1.getChars()));
       }
     }
 
@@ -933,11 +935,8 @@ source code for that book from `www.MindviewInc.com
 libraries from that book). Here is its conversion to Jython::
 
     # Jython/PythonSwing.py
-    # The HTMLButton.java example from
-    # "Thinking in Java, 2nd edition," Chapter 13,
+    # The HTMLButton.java example from "Thinking in Java"
     # converted into Jython.
-    # Don't run this as part of the automatic make:
-    #=M @echo skipping PythonSwing.py
     from javax.swing import JFrame, JButton, JLabel
     from java.awt import FlowLayout
 
@@ -945,10 +944,9 @@ libraries from that book). Here is its conversion to Jython::
       defaultCloseOperation=JFrame.EXIT_ON_CLOSE)
 
     def kapow(e):
-        frame.contentPane.add(JLabel("<html>"+
-          "<i><font size=+4>Kapow!"))
-        # Force a re-layout to
-        # include the new label:
+        frame.contentPane.add(
+          JLabel("<html><i><font size=+4>Kapow!"))
+        # Force a re-layout to include the new label:
         frame.validate()
 
     button = JButton("<html><b><font size=+2>" +
@@ -980,36 +978,32 @@ setting.
 Inheriting from Java library Classes
 -------------------------------------------------------------------------------
 
-You can easily inherit from standard Java library classes in Jython. Here's the
-**Dialogs.java** example from Chapter 13 of *Thinking in Java*, converted into
-Jython::
+You can easily inherit from standard Java library classes in
+Jython. Here's the **Dialogs.java** example from *Thinking in Java*,
+converted into Jython::
 
     # Jython/PythonDialogs.py
-    # Dialogs.java from "Thinking in Java, 2nd
-    # edition," Chapter 13, converted into Jython.
-    # Don't run this as part of the automatic make:
-    #=M @echo skipping PythonDialogs.py
+    # Dialogs.java from "Thinking in Java," converted into Jython.
     from java.awt import FlowLayout
     from javax.swing import JFrame, JDialog, JLabel
     from javax.swing import JButton
 
     class MyDialog(JDialog):
-        def __init__(self, parent=None):
-            JDialog.__init__(self,
-              title="My dialog", modal=1)
-            self.contentPane.layout = FlowLayout()
-            self.contentPane.add(JLabel("A dialog!"))
-            self.contentPane.add(JButton("OK",
-              actionPerformed =
-                lambda e, t=self: t.dispose()))
-            self.pack()
+      def __init__(self, parent=None):
+          JDialog.__init__(self,
+                           title="My dialog", modal=1)
+          self.contentPane.layout = FlowLayout()
+          self.contentPane.add(JLabel("A dialog!"))
+          self.contentPane.add(JButton("OK",
+              actionPerformed = lambda e, t=self: t.dispose()))
+          self.pack()
 
     frame = JFrame("Dialogs", visible=1,
-      defaultCloseOperation=JFrame.EXIT_ON_CLOSE)
+                   defaultCloseOperation=JFrame.EXIT_ON_CLOSE)
     dlg = MyDialog()
     frame.contentPane.add(
-      JButton("Press here to get a Dialog Box",
-        actionPerformed = lambda e: dlg.show()))
+        JButton("Press here to get a Dialog Box",
+                actionPerformed = lambda e: dlg.show()))
     frame.pack()
 
 
@@ -1035,23 +1029,29 @@ implementation.
 Creating Java classes with Jython
 =======================================================================
 
-Although it does not directly relate to the original problem of this chapter
-(creating an interpreter), Jython has the additional ability to create Java
-classes directly from your Jython code. This can produce very useful results, as
-you are then able to treat the results as if they are native Java classes,
-albeit with Python power under the hood.
+.. note:: Jython 2.5.0 does not support jythonc. Support is planned
+   	  for 2.5.1. jythonc basically converted python source to java
+   	  source, the replacement will generate bytecodes directly,
+   	  and enable jython code to be imported directly into java
+   	  (via generated proxies).
+
+Jython can also create Java classes directly from your Jython
+code. This can produce very useful results, as you are then able to
+treat the results as if they are native Java classes, albeit with
+Python power under the hood.
 
 To produce Java classes from Python code, Jython comes with a compiler called
 **jythonc**.
 
-The process of creating Python classes that will produce Java classes is a bit
-more complex than when calling Java classes from Python, because the methods in
-Java classes are strongly typed, while Python functions and methods are weakly
-typed. Thus, you must somehow tell **jythonc** that a Python method is intended
-to have a particular set of argument types and that its return value is a
-particular type. You accomplish this with the "@sig" string, which is placed
-right after the beginning of the Python method definition (this is the standard
-location for the Python documentation string). For example::
+The process of creating Python classes that will produce Java classes
+is a bit more complex than when calling Java classes from Python,
+because the methods in Java classes are statically typed, while Python
+functions and methods are dynamically typed. Thus, you must somehow
+tell **jythonc** that a Python method is intended to have a particular
+set of argument types and that its return value is a particular
+type. You accomplish this with the "@sig" string, which is placed
+right after the beginning of the Python method definition (this is the
+standard location for the Python documentation string). For example::
 
     def returnArray(self):
         "@sig public java.lang.String[] returnArray()"
@@ -1079,22 +1079,18 @@ Here is an example of a Python class created to produce a Java class. This also
 introduces the '**=T**' directive for the makefile builder tool, which specifies
 a different target than the one that is normally used by the tool. In this case,
 the Python file is used to build a Java **.class** file, so the class file is
-the desired makefile target. To accomplish this, the default makefile command is
-replaced using the '**=M**' directive (notice how you can break across lines
-using '**\\**')::
+the desired target::
 
     # Jython/PythonToJavaClass.py
-    #=T python\java\test\PythonToJavaClass.class
-    #=M jythonc.bat --package python.java.test \
-    #=M PythonToJavaClass.py
-    # A Python class created to produce a Java class
+    # A Python class converted into a Java class
+    # Compile with:
+    # jythonc --package python.java.test PythonToJavaClass.py
     from jarray import array
     import java
 
     class PythonToJavaClass(java.lang.Object):
-        # The '@sig' signature string is used to create
-        # the proper signature in the resulting
-        # Java code:
+        # The '@sig' signature string is used to create the
+        # proper signature in the resulting Java code:
         def __init__(self):
             "@sig public PythonToJavaClass()"
             print("Constructor for PythonToJavaClass")
@@ -1190,42 +1186,35 @@ create and pass a **PyArray** as in **argIn4( )**, where the slice is
 successful. Similarly, a Java **Map** must come in as a **PyDictionary** in
 order to be treated as a Python dictionary.
 
-Here is the Java program to exercise the Java classes produced by the above
-Python code. This also introduces the '**=D**' directive for the makefile
-builder tool, which specifies a dependency in addition to those detected by the
-tool. Here, you can't compile **TestPythonToJavaClass.java** until
-**PythonToJavaClass.class** is available:
+Here is the Java program to exercise the Java classes produced by the
+above Python code. You can't compile **TestPythonToJavaClass.java**
+until **PythonToJavaClass.class** is available:
 
 ..  code-block:: java
 
     // Jython/TestPythonToJavaClass.java
-    //+D python\java\test\PythonToJavaClass.class
-    package jython;
     import java.lang.reflect.*;
     import java.util.*;
     import org.python.core.*;
-    import junit.framework.*;
     import java.util.*;
     import net.mindview.python.*;
     // The package with the Python-generated classes:
     import python.java.test.*;
 
-    public class
-    TestPythonToJavaClass extends TestCase  {
+    public class TestPythonToJavaClass {
       PythonToJavaClass p2j = new PythonToJavaClass();
       public void testDumpClassInfo() {
         System.out.println(
           Arrays.toString(
             p2j.getClass().getConstructors()));
-        Method[] methods =
-          p2j.getClass().getMethods();
+        Method[] methods = p2j.getClass().getMethods();
         for(int i = 0; i < methods.length; i++) {
           String nm = methods[i].toString();
           if(nm.indexOf("PythonToJavaClass") != -1)
             System.out.println(nm);
         }
       }
-      public void test1() {
+      public static void main(String[] args) {
         p2j.simple();
         System.out.println(p2j.returnString());
         System.out.println(
@@ -1246,10 +1235,6 @@ tool. Here, you can't compile **TestPythonToJavaClass.java** until
         for(int i = 0; i < 10; i++)
           m.put("" + i, new Float(i));
         p2j.argIn5(PyUtil.toPyDictionary(m));
-      }
-      public static void main(String[] args) {
-        junit.textui.TestRunner.run(
-          TestPythonToJavaClass.class);
       }
     }
 
@@ -1280,8 +1265,7 @@ CLASSPATH in order to run it from the code directory).
 
 Here are the **make** dependency rules that I used to build the above example
 (the backslashes at the ends of the lines are understood by **make** to be line
-continuations). These rules are encoded into the above Java and Python files
-using the comment syntax that's understood by my makefile builder tool::
+continuations)::
 
     TestPythonToJavaClass.class: \\
             TestPythonToJavaClass.java \\
@@ -1314,13 +1298,14 @@ sophisticated, often requiring more interesting data to be passed back and
 forth. When I encountered the limited documentation, I felt it necessary to come
 up with a more thorough examination of Jython.
 
-In the process, note that there could be another equally powerful design pattern
-lurking in here, which could perhaps be called *multiple languages*. This is
-based on the experience of having each language solve a certain class of
-problems better than the other; by combining languages you can solve problems
-much faster than with either language by itself. CORBA is another way to bridge
-across languages, and at the same time bridging between computers and operating
-systems.
+In the process, note that there could be another equally powerful
+design pattern lurking in here, which could perhaps be called
+*multiple languages* or *language hybridizing*. This is based on the
+experience of having each language solve a certain class of problems
+better than the other; by combining languages you can solve problems
+much faster than with either language by itself. CORBA is another way
+to bridge across languages, and at the same time bridging between
+computers and operating systems.
 
 To me, Python and Java present a very potent combination for program development
 because of Java's architecture and tool set, and Python's extremely rapid

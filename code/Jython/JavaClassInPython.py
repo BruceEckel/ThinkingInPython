@@ -2,7 +2,7 @@
 # run with: jython.bat JavaClassInPython.py
 # Using Java classes within Jython
 from java.util import Date, HashSet, HashMap
-from jython.javaclass import JavaClass
+from Jython.javaclass import JavaClass
 from math import sin
 
 d = Date() # Creating a Java Date object

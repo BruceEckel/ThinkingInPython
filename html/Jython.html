@@ -49,7 +49,8 @@
 <h1>Jython<a class="headerlink" href="#jython" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This chapter is being brough up to date with Jython 2.5, and will need changes when Jython 3 comes out.</p>
+<p class="last">This chapter is being brought up to date with Jython 2.5,
+and will need changes when Jython 3 comes out.</p>
 </div>
 <p>This chapter looks at the value of crossing language boundaries. It is often
 advantageous to solve a problem using more than one programming language, rather
@@ -65,7 +66,7 @@ describing the desired behavior of the system, you can use the
 <em>Interpreter</em> by creating and embedding a language interpreter into
 your program.</p>
 <p>In Java, the easiest and most powerful way to do this is with <em>Jython</em>
-<a class="footnote-reference" href="#id5" id="id1">[1]</a>, an implementation of Python in pure Java byte codes. As you will
+<a class="footnote-reference" href="#id3" id="id1">[1]</a>, an implementation of Python in pure Java byte codes. As you will
 see, this brings together the benefits of both worlds.</p>
 <p><em>Interpreter</em> solves a particular problem - that of creating a
 scripting language for the user. But sometimes it&#8217;s just easier and
@@ -106,18 +107,31 @@ code.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>To install Jython, go to <a class="reference external" href="http://jython.sourceforge.net">http://jython.sourceforge.net</a>.  The download is a <strong>.class</strong> file, which
-will run an installer when you execute it with Java.  You also need to add
-<strong>jython.jar</strong> to your Java CLASSPATH.</p>
+<p>To install Jython, go to <a class="reference external" href="http://jython.sourceforge.net">http://jython.sourceforge.net</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Select &#8220;test the beta&#8221;.</p>
+</div>
+<p>The download is a <strong>.class</strong> file, which will run an installer when
+you execute it with Java.</p>
+<p>You also need to add <strong>jython-complete.jar</strong> to your Java CLASSPATH.
+As an example, here is the appropriate section in my <tt class="docutils literal"><span class="pre">.bashrc</span></tt>:</p>
+<div class="highlight-python"><pre>export set JYTHON_HOME="/Users/bruceeckel/jython2.5b0"
+export set CLASSPATH=.:..:$JYTHON_HOME/jython-complete.jar</pre>
+</div>
 <p>When you run Jython, you might get the error: <tt class="docutils literal"><span class="pre">can't</span> <span class="pre">create</span> <span class="pre">package</span>
 <span class="pre">cache</span> <span class="pre">dir,</span> <span class="pre">'/cachedir/packages'</span></tt>. Jython caching requires
-<tt class="docutils literal"><span class="pre">/cachedir/packages/</span></tt> in the <tt class="docutils literal"><span class="pre">python.home</span></tt> directory. It is often the
-case on <a href="#id2"><span class="problematic" id="id3">*</span></a>nix that users lack sufficient priveledges to create or write
-to this directory. Because the problem is merely permissions,
-something similar to &#8220;mkdir cachedir; chmod a+rw cachedir&#8221; within
-Jython&#8217;s directory should eliminate this error message.</p>
+<tt class="docutils literal"><span class="pre">/cachedir/packages/</span></tt> in the <tt class="docutils literal"><span class="pre">python.home</span></tt> directory. It is often
+the case on *nix that users lack sufficient priveledges to create or
+write to this directory. Because the problem is merely permissions,
+something like <tt class="docutils literal"><span class="pre">mkdir</span> <span class="pre">cachedir;</span> <span class="pre">chmod</span> <span class="pre">a+rw</span> <span class="pre">cachedir</span></tt> within the
+Jython directory should eliminate this error message.</p>
 <div class="section" id="getting-the-trunk">
 <h3>Getting the Trunk<a class="headerlink" href="#getting-the-trunk" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section has not been successfuly tested yet.</p>
+</div>
 <p>The Jython development trunk is very stable so it&#8217;s safe to get as the most recent
 version of the implementation. The subversion command is:</p>
 <div class="highlight-python"><pre>svn co https://jython.svn.sourceforge.net/svnroot/jython/trunk/jython</pre>
@@ -139,8 +153,7 @@ See: <a class="reference external" href="http://wiki.python.org/jython/ReadlineS
 scripting.  You can rapidly create and test code, and solve problems
 more quickly.</p>
 <p>Here&#8217;s an example that shows a little of what you can do in a Jython
-script, and also gives you a sense of performance (the <tt class="docutils literal"><span class="pre">timeit</span></tt> module
-could not be used as it tries to turn off the Java garbage collector):</p>
+script, and also gives you a sense of performance:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/Simple.py</span>
 <span class="k">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">time</span>
 <span class="k">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
@@ -157,6 +170,11 @@ could not be used as it tries to turn off the Java garbage collector):</p>
             <span class="nb">oct</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">timeit</span></tt> module in the alpha distribution could not
+be used as it tries to turn off the Java garbage collector.</p>
 </div>
 <p>If you run this program under both cpython and Jython, you&#8217;ll see that
 the timed loop produces very similar results; Jython 2.5 is in beta so
@@ -178,8 +196,8 @@ interpreted language inside your application. Consider the greenhouse
 controller example from <em>Thinking in Java</em>. This is a situation where
 you want the end user &#8211; the person managing the greenhouse &#8211; to have
 configuration control over the system, and so a simple scripting
-language is the ideal solution.  These are often called
-<em>domain-specific languages</em> (DSL) because they solve a particular
+language is the ideal solution.  This is often called a
+<em>domain-specific language</em> (DSL) because it solves a particular
 domain problem.</p>
 <p>To create the language, we&#8217;ll simply write a set of Python classes,
 and the constructor of each will add itself to a (static) master
@@ -240,8 +258,6 @@ but outside of any methods, is what makes it static):</p>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
         <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-<span class="c"># To test, this will be run when you say:</span>
-<span class="c"># python GreenHouseLanguage.py</span>
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">ThermostatNight</span><span class="p">(</span><span class="mf">5.00</span><span class="p">)</span>
     <span class="n">LightOff</span><span class="p">(</span><span class="mf">2.00</span><span class="p">)</span>
@@ -252,6 +268,11 @@ but outside of any methods, is what makes it static):</p>
     <span class="n">Bell</span><span class="p">(</span><span class="mf">7.00</span><span class="p">)</span>
     <span class="n">run</span><span class="p">()</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To run this program say <tt class="docutils literal"><span class="pre">python</span> <span class="pre">GreenHouseLanguage.py</span></tt> or
+<tt class="docutils literal"><span class="pre">jython</span> <span class="pre">GreenHouseLanguage.py</span></tt>.</p>
 </div>
 <p>The constructor of each derived class calls the base-class constructor, which
 adds the new object to the list. The <strong>run( )</strong> function sorts the list, which
@@ -302,9 +323,9 @@ user to control the greenhouse. Here&#8217;s an example:</p>
 <p>This is the goal of the interpreter design pattern: to make the configuration of
 your program as simple as possible for the end user. With Jython you can achieve
 this with almost no effort at all.</p>
-<p>One of the other methods available to the <strong>PythonInterpreter</strong> is <strong>exec( )</strong>,
-which allows you to send a command to the interpreter. Here, the <strong>run( )</strong>
-function is called using <strong>exec( )</strong>.</p>
+<p>One of the other methods available to the <strong>PythonInterpreter</strong> is
+<strong>exec( )</strong>, which allows you to send a command to the interpreter. In
+the above program, the <strong>run( )</strong> function is called using <strong>exec()</strong>.</p>
 </div>
 <div class="section" id="controlling-the-interpreter">
 <h2>Controlling the Interpreter<a class="headerlink" href="#controlling-the-interpreter" title="Permalink to this headline">¶</a></h2>
@@ -697,16 +718,15 @@ in a program, and each one has its own name space:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/MultipleJythons.java</span>
 <span class="c">// You can run multiple interpreters, each</span>
 <span class="c">// with its own name space.</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">MultipleJythons</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
-  <span class="n">PythonInterpreter</span>
-    <span class="n">interp1</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">(),</span>
-    <span class="n">interp2</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="k">throws</span> <span class="n">PyException</span> <span class="o">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">MultipleJythons</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
+  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+    <span class="n">PythonInterpreter</span>
+      <span class="n">interp1</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">(),</span>
+      <span class="n">interp2</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="n">interp1</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s">&quot;a&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">PyInteger</span><span class="o">(</span><span class="mi">42</span><span class="o">));</span>
     <span class="n">interp2</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s">&quot;a&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">PyInteger</span><span class="o">(</span><span class="mi">47</span><span class="o">));</span>
     <span class="n">interp1</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;print(a)&quot;</span><span class="o">);</span>
@@ -715,10 +735,6 @@ in a program, and each one has its own name space:</p>
     <span class="n">PyObject</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">interp2</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;a&quot;</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;a from interp1: &quot;</span> <span class="o">+</span> <span class="n">x1</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;a from interp2: &quot;</span> <span class="o">+</span> <span class="n">x2</span><span class="o">);</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">MultipleJythons</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -740,7 +756,7 @@ yourself, as you can see here:</p>
 <span class="c"># run with: jython.bat JavaClassInPython.py</span>
 <span class="c"># Using Java classes within Jython</span>
 <span class="k">from</span> <span class="nn">java.util</span> <span class="k">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">HashSet</span><span class="p">,</span> <span class="n">HashMap</span>
-<span class="k">from</span> <span class="nn">jython.javaclass</span> <span class="k">import</span> <span class="n">JavaClass</span>
+<span class="k">from</span> <span class="nn">Jython.javaclass</span> <span class="k">import</span> <span class="n">JavaClass</span>
 <span class="k">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sin</span>
 
 <span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span> <span class="c"># Creating a Java Date object</span>
@@ -836,8 +852,7 @@ see each other&#8217;s public methods.</p>
 <p>Java packages translate into Python modules, and Python must import a module in
 order to be able to use the Java class. Here is the Java code for <strong>JavaClass</strong>:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/javaclass/JavaClass.java</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
+<span class="k">package</span> <span class="n">Jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">JavaClass</span> <span class="o">{</span>
@@ -864,26 +879,20 @@ order to be able to use the Java class. Here is the Java code for <strong>JavaCl
       <span class="n">r</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
     <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Test</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">JavaClass</span>
       <span class="n">x1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(),</span>
       <span class="n">x2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(</span><span class="s">&quot;UnitTest&quot;</span><span class="o">);</span>
-    <span class="k">public</span> <span class="kt">void</span> <span class="nf">test1</span><span class="o">()</span> <span class="o">{</span>
-      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">x2</span><span class="o">.</span><span class="na">getVal</span><span class="o">());</span>
-      <span class="n">x1</span><span class="o">.</span><span class="na">setVal</span><span class="o">(</span><span class="s">&quot;SpamEggsSausageAndSpam&quot;</span><span class="o">);</span>
-      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
-        <span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">x1</span><span class="o">.</span><span class="na">getChars</span><span class="o">()));</span>
-    <span class="o">}</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Test</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">x2</span><span class="o">.</span><span class="na">getVal</span><span class="o">());</span>
+    <span class="n">x1</span><span class="o">.</span><span class="na">setVal</span><span class="o">(</span><span class="s">&quot;SpamEggsSausageAndSpam&quot;</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">x1</span><span class="o">.</span><span class="na">getChars</span><span class="o">()));</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 </div>
 <p>You can see that this is just an ordinary Java class, without any awareness that
 it will be used in a Jython program. For this reason, one of the important uses
-of Jython is in testing Java code <a class="footnote-reference" href="#id6" id="id4">[2]</a>. Because Python is such a powerful,
+of Jython is in testing Java code <a class="footnote-reference" href="#id4" id="id2">[2]</a>. Because Python is such a powerful,
 flexible, dynamic language it is an ideal tool for automated test frameworks,
 without making any changes to the Java code that&#8217;s being tested.</p>
 <div class="section" id="inner-classes">
@@ -909,11 +918,8 @@ inheritance. In addition, Python shorthand simplifies coding.</p>
 source code for that book from <a class="reference external" href="http://www.MindviewInc.com">www.MindviewInc.com</a>, since a number of examples in this book use
 libraries from that book). Here is its conversion to Jython:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonSwing.py</span>
-<span class="c"># The HTMLButton.java example from</span>
-<span class="c"># &quot;Thinking in Java, 2nd edition,&quot; Chapter 13,</span>
+<span class="c"># The HTMLButton.java example from &quot;Thinking in Java&quot;</span>
 <span class="c"># converted into Jython.</span>
-<span class="c"># Don&#39;t run this as part of the automatic make:</span>
-<span class="c">#=M @echo skipping PythonSwing.py</span>
 <span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JButton</span><span class="p">,</span> <span class="n">JLabel</span>
 <span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
 
@@ -921,10 +927,9 @@ libraries from that book). Here is its conversion to Jython:</p>
   <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">kapow</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-    <span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;&lt;html&gt;&quot;</span><span class="o">+</span>
-      <span class="s">&quot;&lt;i&gt;&lt;font size=+4&gt;Kapow!&quot;</span><span class="p">))</span>
-    <span class="c"># Force a re-layout to</span>
-    <span class="c"># include the new label:</span>
+    <span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+      <span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;&lt;html&gt;&lt;i&gt;&lt;font size=+4&gt;Kapow!&quot;</span><span class="p">))</span>
+    <span class="c"># Force a re-layout to include the new label:</span>
     <span class="n">frame</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
 <span class="n">button</span> <span class="o">=</span> <span class="n">JButton</span><span class="p">(</span><span class="s">&quot;&lt;html&gt;&lt;b&gt;&lt;font size=+2&gt;&quot;</span> <span class="o">+</span>
@@ -952,35 +957,31 @@ It&#8217;s also important that the call to <strong>pack( )</strong> appear <em>b
 setting.</p>
 <div class="section" id="inheriting-from-java-library-classes">
 <h3>Inheriting from Java library Classes<a class="headerlink" href="#inheriting-from-java-library-classes" title="Permalink to this headline">¶</a></h3>
-<p>You can easily inherit from standard Java library classes in Jython. Here&#8217;s the
-<strong>Dialogs.java</strong> example from Chapter 13 of <em>Thinking in Java</em>, converted into
-Jython:</p>
+<p>You can easily inherit from standard Java library classes in
+Jython. Here&#8217;s the <strong>Dialogs.java</strong> example from <em>Thinking in Java</em>,
+converted into Jython:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonDialogs.py</span>
-<span class="c"># Dialogs.java from &quot;Thinking in Java, 2nd</span>
-<span class="c"># edition,&quot; Chapter 13, converted into Jython.</span>
-<span class="c"># Don&#39;t run this as part of the automatic make:</span>
-<span class="c">#=M @echo skipping PythonDialogs.py</span>
+<span class="c"># Dialogs.java from &quot;Thinking in Java,&quot; converted into Jython.</span>
 <span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
 <span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JDialog</span><span class="p">,</span> <span class="n">JLabel</span>
 <span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JButton</span>
 
 <span class="k">class</span> <span class="nc">MyDialog</span><span class="p">(</span><span class="n">JDialog</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">JDialog</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-          <span class="n">title</span><span class="o">=</span><span class="s">&quot;My dialog&quot;</span><span class="p">,</span> <span class="n">modal</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">FlowLayout</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;A dialog!&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JButton</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">,</span>
-          <span class="n">actionPerformed</span> <span class="o">=</span>
-            <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">dispose</span><span class="p">()))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+      <span class="n">JDialog</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">title</span><span class="o">=</span><span class="s">&quot;My dialog&quot;</span><span class="p">,</span> <span class="n">modal</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">FlowLayout</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JLabel</span><span class="p">(</span><span class="s">&quot;A dialog!&quot;</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">JButton</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">,</span>
+          <span class="n">actionPerformed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">dispose</span><span class="p">()))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
 
 <span class="n">frame</span> <span class="o">=</span> <span class="n">JFrame</span><span class="p">(</span><span class="s">&quot;Dialogs&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span>
-  <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
+               <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
 <span class="n">dlg</span> <span class="o">=</span> <span class="n">MyDialog</span><span class="p">()</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">contentPane</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-  <span class="n">JButton</span><span class="p">(</span><span class="s">&quot;Press here to get a Dialog Box&quot;</span><span class="p">,</span>
-    <span class="n">actionPerformed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">dlg</span><span class="o">.</span><span class="n">show</span><span class="p">()))</span>
+    <span class="n">JButton</span><span class="p">(</span><span class="s">&quot;Press here to get a Dialog Box&quot;</span><span class="p">,</span>
+            <span class="n">actionPerformed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">dlg</span><span class="o">.</span><span class="n">show</span><span class="p">()))</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1004,21 +1005,29 @@ implementation.</p>
 </div>
 <div class="section" id="creating-java-classes-with-jython">
 <h2>Creating Java classes with Jython<a class="headerlink" href="#creating-java-classes-with-jython" title="Permalink to this headline">¶</a></h2>
-<p>Although it does not directly relate to the original problem of this chapter
-(creating an interpreter), Jython has the additional ability to create Java
-classes directly from your Jython code. This can produce very useful results, as
-you are then able to treat the results as if they are native Java classes,
-albeit with Python power under the hood.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Jython 2.5.0 does not support jythonc. Support is planned
+for 2.5.1. jythonc basically converted python source to java
+source, the replacement will generate bytecodes directly,
+and enable jython code to be imported directly into java
+(via generated proxies).</p>
+</div>
+<p>Jython can also create Java classes directly from your Jython
+code. This can produce very useful results, as you are then able to
+treat the results as if they are native Java classes, albeit with
+Python power under the hood.</p>
 <p>To produce Java classes from Python code, Jython comes with a compiler called
 <strong>jythonc</strong>.</p>
-<p>The process of creating Python classes that will produce Java classes is a bit
-more complex than when calling Java classes from Python, because the methods in
-Java classes are strongly typed, while Python functions and methods are weakly
-typed. Thus, you must somehow tell <strong>jythonc</strong> that a Python method is intended
-to have a particular set of argument types and that its return value is a
-particular type. You accomplish this with the &#8220;&#64;sig&#8221; string, which is placed
-right after the beginning of the Python method definition (this is the standard
-location for the Python documentation string). For example:</p>
+<p>The process of creating Python classes that will produce Java classes
+is a bit more complex than when calling Java classes from Python,
+because the methods in Java classes are statically typed, while Python
+functions and methods are dynamically typed. Thus, you must somehow
+tell <strong>jythonc</strong> that a Python method is intended to have a particular
+set of argument types and that its return value is a particular
+type. You accomplish this with the &#8220;&#64;sig&#8221; string, which is placed
+right after the beginning of the Python method definition (this is the
+standard location for the Python documentation string). For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">returnArray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="s">&quot;@sig public java.lang.String[] returnArray()&quot;</span>
 </pre></div>
@@ -1043,21 +1052,17 @@ this wrong, so you must be patient and keep trying.</p>
 introduces the &#8216;<strong>=T</strong>&#8216; directive for the makefile builder tool, which specifies
 a different target than the one that is normally used by the tool. In this case,
 the Python file is used to build a Java <strong>.class</strong> file, so the class file is
-the desired makefile target. To accomplish this, the default makefile command is
-replaced using the &#8216;<strong>=M</strong>&#8216; directive (notice how you can break across lines
-using &#8216;<strong>\</strong>&#8216;):</p>
+the desired target:</p>
 <div class="highlight-python"><pre># Jython/PythonToJavaClass.py
-#=T python\java\test\PythonToJavaClass.class
-#=M jythonc.bat --package python.java.test \
-#=M PythonToJavaClass.py
-# A Python class created to produce a Java class
+# A Python class converted into a Java class
+# Compile with:
+# jythonc --package python.java.test PythonToJavaClass.py
 from jarray import array
 import java
 
 class PythonToJavaClass(java.lang.Object):
-    # The '@sig' signature string is used to create
-    # the proper signature in the resulting
-    # Java code:
+    # The '@sig' signature string is used to create the
+    # proper signature in the resulting Java code:
     def __init__(self):
         "@sig public PythonToJavaClass()"
         print("Constructor for PythonToJavaClass")
@@ -1147,39 +1152,32 @@ you cannot take a slice from it. If you want a true Python array, then you must
 create and pass a <strong>PyArray</strong> as in <strong>argIn4( )</strong>, where the slice is
 successful. Similarly, a Java <strong>Map</strong> must come in as a <strong>PyDictionary</strong> in
 order to be treated as a Python dictionary.</p>
-<p>Here is the Java program to exercise the Java classes produced by the above
-Python code. This also introduces the &#8216;<strong>=D</strong>&#8216; directive for the makefile
-builder tool, which specifies a dependency in addition to those detected by the
-tool. Here, you can&#8217;t compile <strong>TestPythonToJavaClass.java</strong> until
-<strong>PythonToJavaClass.class</strong> is available:</p>
+<p>Here is the Java program to exercise the Java classes produced by the
+above Python code. You can&#8217;t compile <strong>TestPythonToJavaClass.java</strong>
+until <strong>PythonToJavaClass.class</strong> is available:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/TestPythonToJavaClass.java</span>
-<span class="c">//+D python\java\test\PythonToJavaClass.class</span>
-<span class="k">package</span> <span class="n">jython</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.lang.reflect.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">junit.framework.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 <span class="k">import</span> <span class="nn">net.mindview.python.*</span><span class="o">;</span>
 <span class="c">// The package with the Python-generated classes:</span>
 <span class="k">import</span> <span class="nn">python.java.test.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span>
-<span class="nc">TestPythonToJavaClass</span> <span class="k">extends</span> <span class="n">TestCase</span>  <span class="o">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">TestPythonToJavaClass</span> <span class="o">{</span>
   <span class="n">PythonToJavaClass</span> <span class="n">p2j</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonToJavaClass</span><span class="o">();</span>
   <span class="k">public</span> <span class="kt">void</span> <span class="nf">testDumpClassInfo</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
       <span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span>
         <span class="n">p2j</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getConstructors</span><span class="o">()));</span>
-    <span class="n">Method</span><span class="o">[]</span> <span class="n">methods</span> <span class="o">=</span>
-      <span class="n">p2j</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getMethods</span><span class="o">();</span>
+    <span class="n">Method</span><span class="o">[]</span> <span class="n">methods</span> <span class="o">=</span> <span class="n">p2j</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getMethods</span><span class="o">();</span>
     <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">methods</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
       <span class="n">String</span> <span class="n">nm</span> <span class="o">=</span> <span class="n">methods</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">toString</span><span class="o">();</span>
       <span class="k">if</span><span class="o">(</span><span class="n">nm</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="s">&quot;PythonToJavaClass&quot;</span><span class="o">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span>
         <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">nm</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test1</span><span class="o">()</span> <span class="o">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">p2j</span><span class="o">.</span><span class="na">simple</span><span class="o">();</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">p2j</span><span class="o">.</span><span class="na">returnString</span><span class="o">());</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
@@ -1200,10 +1198,6 @@ tool. Here, you can&#8217;t compile <strong>TestPythonToJavaClass.java</strong> 
     <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
       <span class="n">m</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;&quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">,</span> <span class="k">new</span> <span class="n">Float</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
     <span class="n">p2j</span><span class="o">.</span><span class="na">argIn5</span><span class="o">(</span><span class="n">PyUtil</span><span class="o">.</span><span class="na">toPyDictionary</span><span class="o">(</span><span class="n">m</span><span class="o">));</span>
-  <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">junit</span><span class="o">.</span><span class="na">textui</span><span class="o">.</span><span class="na">TestRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span>
-      <span class="n">TestPythonToJavaClass</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -1231,8 +1225,7 @@ package in your Java program, as shown above (you&#8217;ll need &#8216;<strong>.
 CLASSPATH in order to run it from the code directory).</p>
 <p>Here are the <strong>make</strong> dependency rules that I used to build the above example
 (the backslashes at the ends of the lines are understood by <strong>make</strong> to be line
-continuations). These rules are encoded into the above Java and Python files
-using the comment syntax that&#8217;s understood by my makefile builder tool:</p>
+continuations):</p>
 <div class="highlight-python"><pre>TestPythonToJavaClass.class: \\
         TestPythonToJavaClass.java \\
         python\java\test\PythonToJavaClass.class
@@ -1262,13 +1255,14 @@ started by following the <strong>GreenHouseController</strong> example.</p>
 sophisticated, often requiring more interesting data to be passed back and
 forth. When I encountered the limited documentation, I felt it necessary to come
 up with a more thorough examination of Jython.</p>
-<p>In the process, note that there could be another equally powerful design pattern
-lurking in here, which could perhaps be called <em>multiple languages</em>. This is
-based on the experience of having each language solve a certain class of
-problems better than the other; by combining languages you can solve problems
-much faster than with either language by itself. CORBA is another way to bridge
-across languages, and at the same time bridging between computers and operating
-systems.</p>
+<p>In the process, note that there could be another equally powerful
+design pattern lurking in here, which could perhaps be called
+<em>multiple languages</em> or <em>language hybridizing</em>. This is based on the
+experience of having each language solve a certain class of problems
+better than the other; by combining languages you can solve problems
+much faster than with either language by itself. CORBA is another way
+to bridge across languages, and at the same time bridging between
+computers and operating systems.</p>
 <p>To me, Python and Java present a very potent combination for program development
 because of Java&#8217;s architecture and tool set, and Python&#8217;s extremely rapid
 development (generally considered to be 5-10 times faster than C++ or Java).
@@ -1303,7 +1297,7 @@ signatures, and create a makefile to build the Java <strong>.class</strong> file
 a Java program that uses these classes.</li>
 </ol>
 <p class="rubric">Footnotes</p>
-<table class="docutils footnote" frame="void" id="id5" rules="none">
+<table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The original version of this was called <em>JPython</em>, but the project
@@ -1311,10 +1305,10 @@ changed and the name was changed to emphasize the distinctness of the new
 version.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id6" rules="none">
+<table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[2]</a></td><td>Changing the registry setting <strong>python.security.respectJavaAccessibility
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Changing the registry setting <strong>python.security.respectJavaAccessibility
 = true</strong> to <strong>false</strong> makes testing even more powerful because it allows
 the test script to use <em>all</em> methods, even protected and package-
 private.</td></tr>
