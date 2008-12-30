@@ -8,9 +8,10 @@ frame = JFrame("HTMLButton", visible=1,
   defaultCloseOperation=JFrame.EXIT_ON_CLOSE)
 
 def kapow(e):
-    frame.contentPane.add(
-      JLabel("<html><i><font size=+4>Kapow!"))
-    # Force a re-layout to include the new label:
+    frame.contentPane.add(JLabel("<html>"+
+      "<i><font size=+4>Kapow!"))
+    # Force a re-layout to
+    # include the new label:
     frame.validate()
 
 button = JButton("<html><b><font size=+2>" +

@@ -1,6 +1,6 @@
 # Jython/JavaClassInPython.py
-# run with: jython.bat JavaClassInPython.py
 # Using Java classes within Jython
+# run with: jython.bat JavaClassInPython.py
 from java.util import Date, HashSet, HashMap
 from Jython.javaclass import JavaClass
 from math import sin
@@ -18,24 +18,24 @@ class ValGen:
         return self.val[i], sin(self.val[i])
 
 # Java standard containers:
-map = HashMap()
-set = HashSet()
+jmap = HashMap()
+jset = HashSet()
 
 for x, y in ValGen(10):
-    map.put(x, y)
-    set.add(y)
-    set.add(y)
+    jmap.put(x, y)
+    jset.add(y)
+    jset.add(y)
 
-print(map)
-print(set)
+print(jmap)
+print(jset)
 
 # Iterating through a set:
-for z in set:
+for z in jset:
     print(z, z.__class__)
 
-print(map[3]) # Uses Python dictionary indexing
-for x in map.keySet(): # keySet() is a Map method
-    print(x, map[x])
+print(jmap[3]) # Uses Python dictionary indexing
+for x in jmap.keySet(): # keySet() is a Map method
+    print(x, jmap[x])
 
 # Using a Java class that you create yourself is
 # just as easy:
