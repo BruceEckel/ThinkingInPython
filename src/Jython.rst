@@ -10,66 +10,48 @@ Jython
    	   that the material can be used to introduce Java programmers to
 	   Jython.
 
-This chapter looks at the value of crossing language boundaries. It is often
-advantageous to solve a problem using more than one programming language, rather
-than being arbitrarily stuck using a single language. As you'll see in this
-chapter, a problem that is very difficult or tedious to solve in one language
-can often be solved quickly and easily in another. If you can combine the use of
-languages, you can create your product much more quickly and cheaply.
+Sometimes it's easier and faster to temporarily step into another
+language to solve a particular aspect of your problem.
 
-The most straightforward use of this idea is the *Interpreter* design
-pattern, which adds an interpreted language to your program to allow
-the end user to easily customize a solution. If the application user
-needs greater run time flexibility, for example to create scripts
-describing the desired behavior of the system, you can use
-*Interpreter* by creating and embedding a language interpreter into
-your program.
+This chapter looks at the value of crossing language boundaries. It is
+often advantageous to solve a problem using more than one programming
+language; as you'll see, a problem that is very difficult or tedious
+to solve in one language can often be solved quickly and easily in
+another. By combining languages, you can create your product much more
+quickly and cheaply.
+
+One use of this idea is the *Interpreter* design pattern, which adds
+an interpreted language to your program to allow the end user to
+easily customize a solution. If the application user needs greater run
+time flexibility, for example to create scripts describing the desired
+behavior of the system, you can use *Interpreter* by creating and
+embedding a language interpreter into your program.
 
 In Java, the easiest and most powerful way to do this is with *Jython*
 [#]_, an implementation of Python in pure Java byte codes. As you will
 see, this brings together the benefits of both worlds.
 
-*Interpreter* solves a particular problem -- that of creating a
-scripting language for the user. But sometimes it's just easier and
-faster to temporarily step into another language to solve a particular
-aspect of your problem. You're not creating an interpreter, you're
-just writing some code in another language.
-
-Interpreter Motivation
-=======================================================================
-
-Remember that each design pattern allows one or more factors to change, so it's
-important to first be aware of which factor is changing. Sometimes the end users
-of your application (rather than the programmers of that application) need
-complete flexibility in the way that they configure some aspect of the program.
-That is, they need to do some kind of simple programming. The interpreter
-pattern provides this flexibility by adding a language interpreter.
-
-The problem is that developing your own language and building an interpreter is
-a time-consuming distraction from the process of developing your application.
-You must ask whether you want to finish writing your application or create a new
-language.  The best solution is to reuse code: embed an interpreter that's
-already been built and debugged for you. The Python language can be freely
-embedded into your for-profit application without signing any license agreement,
-paying royalties, or dealing with strings of any kind. There are basically no
-restrictions at all when you're using Python.
-
-For solving Java problems, we will look at a special version of Python called
-Jython. This is generated entirely in Java byte codes, so incorporating it into
-your application is quite simple,  and it's as portable as Java is. It has an
-extremely clean interface with Java: Java can call Python classes, and Python
-can call Java classes.
+Jython is generated entirely in Java byte codes, so incorporating it
+into your application is quite simple, and it's as portable as Java
+is. It has an extremely clean interface with Java: Java can call
+Python classes, and Python can call Java classes.
 
 Because Jython is just Java classes, it can often be "stealthed" into
 companies that have rigid processes for using new languges and
 tools. If Java has been accepted, such companies often accept anything
 that runs on the JVM without question.
 
-Python is designed with classes from the ground up and is a truly pure object
-oriented language (both C++ and Java violate purity in various ways). Python
-scales up so that you can create very big programs without losing control of the
-code. Java projects have been quickly created using Jython, then later optimized by
-rewriting sections of the Jython code that have profiled as bottlenecks into Java.
+The Python/Jython language can be freely embedded into your for-profit
+application without signing any license agreement, paying royalties,
+or dealing with strings of any kind. There are basically no
+restrictions when you're using Python/Jython.
+
+Python is designed with classes from the ground up and provides pure
+support for object-oriented programming (both C++ and Java violate
+purity in various ways). Python scales up so that you can create large
+programs without losing control of the code. Java projects have been
+quickly created using Jython, then later optimized by rewriting into
+Java sections of the Jython code that have profiled as bottlenecks.
 
 Installation
 =======================================================================
@@ -123,7 +105,7 @@ See: http://wiki.python.org/jython/ReadlineSetup
 Scripting
 =======================================================================
 
-One very compelling benefit of using a dynamic language on the JVM is
+One compelling benefit of using a dynamic language on the JVM is
 scripting.  You can rapidly create and test code, and solve problems
 more quickly.
 
@@ -157,21 +139,21 @@ benefits of the JVM. The total runtime of the cpython version is
 faster because of its rapid startup time; the JVM always has a delay
 for startup.
 
-Note that things that require much more code (and often research) in
-Java are very quick to write in Jython. Here's an example that uses
-a Python *list comprehension* with the **os.walk()** function to visit
-all the directories in a directory tree, and find all the files with names
-that end in **.java** (of course you can easily do more sophisticated things
-like opening the file and looking for information within it)::
+Note that things that are very quick to write in Jython require much
+more code (and often research) in Java. Here's an example that uses a
+Python *list comprehension* with the **os.walk()** function to visit
+all the directories in a directory tree, and find all the files with
+names that end in **.java** and contain the word **PythonInterpreter**::
 
-     # Jython/Walk_comprehension.py
-     import os
+       # Jython/Walk_comprehension.py
+       import os
 
-     restFiles = [os.path.join(d[0], f) for d in os.walk(".")
-                  for f in d[2] if f.endswith(".java")]
+       restFiles = [os.path.join(d[0], f) for d in os.walk(".")
+       		    for f in d[2] if f.endswith(".java") and
+                    "PythonInterpreter" in open(os.path.join(d[0], f)).read()]
 
-     for r in restFiles:
-     	 print(r)
+       for r in restFiles:
+       	   print(r)
 
 You can certainly achieve this in Java. It will just take a lot longer.
 
@@ -179,17 +161,35 @@ Often more sophisticated programs begin as scripts, and then evolve.
 The fact that you can quickly try things out allows you to test
 concepts, and then create more refined code as needed.
 
-Creating a Language
+Interpreter Motivation
 =======================================================================
+
+Remember that each design pattern allows one or more factors to
+change, so it's important to first be aware of which factor is
+changing. Sometimes the end users of your application (rather than the
+programmers of that application) need complete flexibility in the way
+that they configure some aspect of the program.  That is, they need to
+do some kind of simple programming. The *Interpreter* pattern provides
+this flexibility by adding a language interpreter.
+
+The problem is that creating your own language and building an
+interpreter is a time-consuming distraction from the process of
+developing your application.  You must ask whether you want to finish
+writing your application or make a new language.  The best solution is
+to reuse code: embed an interpreter that's already been built and
+debugged for you.
+
+Creating a Language
+-------------------------------------------------------------------------
 
 It turns out to be remarkably simple to use Jython to create an
 interpreted language inside your application. Consider the greenhouse
 controller example from *Thinking in Java*. This is a situation where
 you want the end user -- the person managing the greenhouse -- to have
 configuration control over the system, and so a simple scripting
-language is the ideal solution.  This is often called a
-*domain-specific language* (DSL) because it solves a particular
-domain problem.
+language is an ideal solution.  This is often called a
+*domain-specific language* (DSL) because it solves a particular domain
+problem.
 
 To create the language, we'll simply write a set of Python classes,
 and the constructor of each will add itself to a (static) master
@@ -268,21 +268,21 @@ but outside of any methods, is what makes it static)::
 .. note:: To run this program say ``python GreenHouseLanguage.py`` or
    	  ``jython GreenHouseLanguage.py``.
 
-The constructor of each derived class calls the base-class constructor, which
-adds the new object to the list. The **run()** function sorts the list, which
-automatically uses the **__cmp__()** method defined in **Event** to
-base comparisons on time only. In this example, it only prints out the list, but
-in the real system it would wait for the time of each event to come up and then
-run the event.
+The constructor of each derived class calls the base-class
+constructor, which adds the new object to the list. The **run()**
+function sorts the list, which automatically uses the **__cmp__()**
+method defined in **Event** to base comparisons on time only. In this
+example, it only prints out the list, but in the real system it would
+wait for the time of each event to come up and then run the event.
 
 The **__main__** section performs a simple test on the classes.
 
 The above file -- which is an ordinary Python program -- is now a
-module that can be included in another Python program.
-But instead of using it in an ordinary Python program,
-let's use Jython, inside of Java. This turns out to be remarkably
-simple: you import some Jython classes, create a **PythonInterpreter**
-object, and cause the Python files to be loaded:
+module that can be included in another Python program.  But instead of
+using it in an ordinary Python program, let's use Jython, inside of
+Java. This turns out to be remarkably simple: you import some Jython
+classes, create a **PythonInterpreter** object, and cause the Python
+files to be loaded:
 
 ..  code-block:: java
 
@@ -302,13 +302,14 @@ object, and cause the Python files to be loaded:
       }
     }
 
-The **PythonInterpreter** object is a complete Python interpreter that accepts
-commands from the Java program. One of these commands is **execfile()**, which
-tells it to execute all the statements it finds in a particular file. By
-executing **GreenHouseLanguage.py**, all the classes from that file are loaded
-into our **PythonInterpreter** object, and so it now "holds" the greenhouse
-controller language. The **Schedule.ghs** file is the one created by the end
-user to control the greenhouse. Here's an example::
+The **PythonInterpreter** object is a complete Python interpreter that
+accepts commands from the Java program. One of these commands is
+**execfile()**, which tells it to execute all the statements it finds
+in a particular file. By executing **GreenHouseLanguage.py**, all the
+classes from that file are loaded into our **PythonInterpreter**
+object, and so it now "holds" the greenhouse controller language. The
+**Schedule.ghs** file is the one created by the end user to control
+the greenhouse. Here's an example::
 
     # Jython/Schedule.ghs
     Bell(7.00)
@@ -319,9 +320,9 @@ user to control the greenhouse. Here's an example::
     LightOff(2.00)
     WaterOff(4.45)
 
-This is the goal of the interpreter design pattern: to make the configuration of
-your program as simple as possible for the end user. With Jython you can achieve
-this with almost no effort at all.
+This is the goal of the interpreter design pattern: to make the
+configuration of your program as simple as possible for the end
+user. With Jython you can achieve this with almost no effort at all.
 
 One of the other methods available to the **PythonInterpreter** is
 **exec()**, which allows you to send a command to the interpreter. In
@@ -330,11 +331,11 @@ the above program, the **run()** function is called using **exec()**.
 Using Java libraries
 =======================================================================
 
-Jython wraps the Java libraries so that any of them can be used directly or via
-inheritance. In addition, Python shorthand simplifies coding.
+Jython wraps Java libraries so that any of them can be used directly
+or via inheritance. In addition, Python shorthand simplifies coding.
 
-As an example, consider the **HTMLButton.java** example from
-*Thinking in Java*. Here is its conversion to Jython::
+As an example, consider the **HTMLButton.java** example from *Thinking
+in Java*. Here is its conversion to Jython::
 
     # Jython/PythonSwing.py
     # The HTMLButton.java example from "Thinking in Java"
@@ -361,21 +362,23 @@ As an example, consider the **HTMLButton.java** example from
     frame.size=200, 500
 
 If you compare the Java version of the program to the above Jython
-implementation, you'll see that Jython is shorter and generally easier to
-understand. For example, to set up the frame in the Java version you had to make
-several calls: the constructor for **JFrame()**, the **setVisible()** method
-and the **setDefaultCloseOperation()** method, whereas in the above code all
-three of these operations are performed with a single constructor call.
+implementation, you'll see that Jython is shorter and generally easier
+to understand. For example, to set up the frame in the Java version
+you had to make several calls: the constructor for **JFrame()**, the
+**setVisible()** method and the **setDefaultCloseOperation()** method,
+whereas in the above code all three of these operations are performed
+with a single constructor call.
 
-Also notice that the **JButton** is configured with an **actionListener()**
-method inside the constructor, with the assignment to **kapow**. In addition,
-Jython's JavaBean awareness means that a call to any method with a name that
-begins with "**set**" can be replaced with an assignment, as you see above.
+Also notice that the **JButton** is configured with an
+**actionListener()** method inside the constructor, with the
+assignment to **kapow**. In addition, Jython's JavaBean awareness
+means that a call to any method with a name that begins with "**set**"
+can be replaced with an assignment, as you see above.
 
-The only method that did not come over from Java is the **pack()** method,
-which seems to be essential in order to force the layout to happen properly.
-It's also important that the call to **pack()** appear *before* the **size**
-setting.
+The only method that did not come over from Java is the **pack()**
+method, which seems to be essential in order to force the layout to
+happen properly.  It's also important that the call to **pack()**
+appear *before* the **size** setting.
 
 Inheriting from Java library Classes
 -------------------------------------------------------------------------------
@@ -409,24 +412,25 @@ converted into Jython::
     frame.pack()
 
 
-**MyDialog** is inherited from **JDialog**, and you can see named arguments
-being used in the call to the base-class constructor.
+**MyDialog** is inherited from **JDialog**, and you can see named
+arguments being used in the call to the base-class constructor.
 
-In the creation of the "OK" **JButton**, note that the **actionPerformed**
-method is set right inside the constructor, and that the function is created
-using the Python **lambda** keyword. This creates a nameless function with the
-arguments appearing before the colon and the expression that generates the
-returned value after the colon. As you should know, the Java prototype for the
-**actionPerformed()** method only contains a single argument, but the lambda
-expression indicates two. However, the second argument is provided with a
-default value, so the function *can* be called with only one argument. The
-reason for the second argument is seen in the default value, because this is a
-way to pass **self** into the lambda expression, so that it can be used to
-dispose of the dialog.
+In the creation of the "OK" **JButton**, note that the
+**actionPerformed** method is set right inside the constructor, and
+that the function is created using the Python **lambda** keyword. This
+creates a nameless function with the arguments appearing before the
+colon and the expression that generates the returned value after the
+colon. As you should know, the Java prototype for the
+**actionPerformed()** method only contains a single argument, but the
+lambda expression indicates two. However, the second argument is
+provided with a default value, so the function *can* be called with
+only one argument. The reason for the second argument is seen in the
+default value, because this is a way to pass **self** into the lambda
+expression, so that it can be used to dispose of the dialog.
 
-Compare this code with the version that's published in *Thinking in Java*.
-You'll find that Python language features allow a much more succinct and direct
-implementation.
+Compare this code with the version that's published in *Thinking in
+Java*.  You'll find that Python language features allow a much more
+succinct and direct implementation.
 
 
 Controlling Java from Jython
@@ -492,55 +496,61 @@ create yourself, as you can see here::
 ..  todo:: rewrite to distinguish python generator from above description, or
     	   choose different name.
 
-Note that the **import** statements map to the Java package structure exactly as
-you would expect. In the first example, a **Date()** object is created as if it
-were a native Python class, and printing this object just calls **toString()**.
+Note that the **import** statements map to the Java package structure
+exactly as you would expect. In the first example, a **Date()** object
+is created as if it were a native Python class, and printing this
+object just calls **toString()**.
 
-**ValGen** implements the concept of a "generator" which is used a great deal in
-the C++ STL (*Standard Template Library*, part of the Standard C++ Library). A
-generator is an object that produces a new object every time its "generation
-method" is called, and it is quite convenient for filling containers. Here, I
-wanted to use it in a **for** iteration, and so I needed the generation method
-to be the one that is called by the iteration process. This is a special method
-called **__getitem__()**, which is actually the overloaded operator for
-indexing, '**[ ]**'. A **for** loop calls this method every time it wants to
-move the iteration forward, and when the elements run out, **__getitem__()**
-throws an out-of-bounds exception and that signals the end of the **for** loop
-(in other languages, you would never use an exception for ordinary control flow,
-but in Python it seems to work quite well). This exception happens automatically
-when **self.val[i]** runs out of elements, so the **__getitem__()** code turns
-out to be simple. The only complexity is that **__getitem__()** appears to
-return *two* objects instead of just one. What Python does is automatically
-package multiple return values into a tuple, so you still only end up returning
-a single object (in C++ or Java you would have to create your own data structure
-to accomplish this). In addition, in the **for** loop where **ValGen** is used,
-Python automatically "unpacks" the tuple so that you can have multiple iterators
-in the **for**. These are the kinds of syntax simplifications that make Python
-so endearing.
+**ValGen** implements the concept of a "generator" which is used a
+great deal in the C++ STL (*Standard Template Library*, part of the
+Standard C++ Library). A generator is an object that produces a new
+object every time its "generation method" is called, and it is quite
+convenient for filling containers. Here, I wanted to use it in a
+**for** iteration, and so I needed the generation method to be the one
+that is called by the iteration process. This is a special method
+called **__getitem__()**, which is actually the overloaded operator
+for indexing, '**[ ]**'. A **for** loop calls this method every time
+it wants to move the iteration forward, and when the elements run out,
+**__getitem__()** throws an out-of-bounds exception and that signals
+the end of the **for** loop (in other languages, you would never use
+an exception for ordinary control flow, but in Python it seems to work
+quite well). This exception happens automatically when **self.val[i]**
+runs out of elements, so the **__getitem__()** code turns out to be
+simple. The only complexity is that **__getitem__()** appears to
+return *two* objects instead of just one. What Python does is
+automatically package multiple return values into a tuple, so you
+still only end up returning a single object (in C++ or Java you would
+have to create your own data structure to accomplish this). In
+addition, in the **for** loop where **ValGen** is used, Python
+automatically "unpacks" the tuple so that you can have multiple
+iterators in the **for**. These are the kinds of syntax
+simplifications that make Python so endearing.
 
-The **jmap** and **jset** objects are instances of Java's **HashMap** and
-**HashSet**, again created as if those classes were just native Python
-components. In the **for** loop, the **put()** and **add()** methods work just
-like they do in Java. Also, indexing into a Java **Map** uses the same notation
-as for dictionaries, but note that to iterate through the keys in a **Map** you
-must use the **Map** method **keySet()** rather than the Python dictionary
-method **keys()**.
+The **jmap** and **jset** objects are instances of Java's **HashMap**
+and **HashSet**, again created as if those classes were just native
+Python components. In the **for** loop, the **put()** and **add()**
+methods work just like they do in Java. Also, indexing into a Java
+**Map** uses the same notation as for dictionaries, but note that to
+iterate through the keys in a **Map** you must use the **Map** method
+**keySet()** rather than the Python dictionary method **keys()**.
 
-The final part of the example shows the use of a Java class that I created from
-scratch, to demonstrate how trivial it is. Notice also that Jython intuitively
-understands JavaBeans properties, since you can either use the **getVal()** and
-**setVal()** methods, or assign to and read from the equivalent **val**
-property. Also, **getChars()** returns a **Character[]** in Java, and this
-automatically becomes an array in Python.
+The final part of the example shows the use of a Java class that I
+created from scratch, to demonstrate how trivial it is. Notice also
+that Jython intuitively understands JavaBeans properties, since you
+can either use the **getVal()** and **setVal()** methods, or assign to
+and read from the equivalent **val** property. Also, **getChars()**
+returns a **Character[]** in Java, and this automatically becomes an
+array in Python.
 
-The easiest way to use Java classes that you create for use inside a Python
-program is to put them inside a package. Although Jython can also import
-unpackaged java classes (**import JavaClass**), all such unpackaged java classes
-will be treated as if they were defined in different packages so they can only
-see each other's public methods.
+The easiest way to use Java classes that you create for use inside a
+Python program is to put them inside a package. Although Jython can
+also import unpackaged java classes (**import JavaClass**), all such
+unpackaged java classes will be treated as if they were defined in
+different packages so they can only see each other's public methods.
 
-Java packages translate into Jython modules, and Jython must import a module in
-order to be able to use the Java class. Here is the Java code for **JavaClass**:
+Java packages translate into Jython modules, and Jython must import a
+module in order to be able to use the Java class. Here is the Java
+code for **JavaClass**:
 
 ..  code-block:: java
 
@@ -582,41 +592,43 @@ order to be able to use the Java class. Here is the Java code for **JavaClass**:
       }
     }
 
-You can see that this is just an ordinary Java class, without any awareness that
-it will be used in a Jython program. For this reason, one of the important uses
-of Jython is in testing Java code [#]_. Because Python is such a powerful,
-flexible, dynamic language it is an ideal tool for automated test frameworks,
-without making any changes to the Java code that's being tested.
+You can see that this is just an ordinary Java class, without any
+awareness that it will be used in a Jython program. For this reason,
+one of the important uses of Jython is in testing Java code
+[#]_. Because Python is such a powerful, flexible, dynamic language it
+is an ideal tool for automated test frameworks, without making any
+changes to the Java code that's being tested.
 
 Inner Classes
 ------------------------------------------------------------------------------
 
-Inner classes becomes attributes on the class object. Instances of **static**
-inner classes can be created with the usual call::
+Inner classes becomes attributes on the class object. Instances of
+**static** inner classes can be created with the usual call::
 
     com.foo.JavaClass.StaticInnerClass()
 
-Non-**static** inner classes must have an outer class instance supplied
-explicitly as the first argument::
+Non-**static** inner classes must have an outer class instance
+supplied explicitly as the first argument::
 
     com.foo.JavaClass.InnerClass(com.foo.JavaClass())
 
 Controlling the Interpreter
 =======================================================================
 
-In the rest of this chapter, we shall look at more sophisticated ways to
-interact with Jython. The simplest way to exercise more control over the
-**PythonInterpreter** object from within Java is to send data to the
-interpreter, and pull data back out.
+In the rest of this chapter, we shall look at more sophisticated ways
+to interact with Jython. The simplest way to exercise more control
+over the **PythonInterpreter** object from within Java is to send data
+to the interpreter, and pull data back out.
 
 Putting Data In
 --------------------------------------------------------------------------------
 
-To inject data into your Python program, the **PythonInterpreter** class has a
-deceptively simple method: **set()**. However, **set()** takes many different
-data types and performs conversions upon them.  The following example is a
-reasonably thorough exercise of the various **set()** possibilities, along with
-comments that should give a fairly complete explanation:
+To inject data into your Python program, the **PythonInterpreter**
+class has a deceptively simple method: **set()**. However, **set()**
+takes many different data types and performs conversions upon them.
+The following example is a reasonably thorough exercise of the various
+**set()** possibilities, along with comments that should give a fairly
+complete explanation:
 
 ..  code-block:: java
 
@@ -713,51 +725,55 @@ comments that should give a fairly complete explanation:
       }
     }
 
-As usual with Java, the distinction between real objects and primitive types
-causes trouble. In general, if you pass a regular object to **set()**, it knows
-what to do with it, but if you want to pass in a primitive you must perform a
-conversion. One way to do this is to create a "Py" type, such as **PyInteger**
-or **PyFloat**. but it turns out you can also use Java's own object wrappers
-like **Integer** and **Float**, which is probably going to be a lot easier to
-remember.
+As usual with Java, the distinction between real objects and primitive
+types causes trouble. In general, if you pass a regular object to
+**set()**, it knows what to do with it, but if you want to pass in a
+primitive you must perform a conversion. One way to do this is to
+create a "Py" type, such as **PyInteger** or **PyFloat**. but it turns
+out you can also use Java's own object wrappers like **Integer** and
+**Float**, which is probably going to be a lot easier to remember.
 
-Early in the program you'll see an **exec()** containing the Python statement::
+Early in the program you'll see an **exec()** containing the Python
+statement::
 
     print(a[5:])
 
-The colon inside the indexing statement indicates a Python *slice*, which
-produces a range of elements from the original array. In this case, it produces
-an array containing the elements from number 5 until the end of the array. You
-could also say '**a[3:5]**' to produce elements 3 through 5, or '**a[:5]**' to
-produce the elements zero through 5. The reason a slice is used in this
-statement is to make sure that the Java **String** has really been converted to
-a Python string, which can also be treated as an array of characters.
+The colon inside the indexing statement indicates a Python *slice*,
+which produces a range of elements from the original array. In this
+case, it produces an array containing the elements from number 5 until
+the end of the array. You could also say '**a[3:5]**' to produce
+elements 3 through 5, or '**a[:5]**' to produce the elements zero
+through 5. The reason a slice is used in this statement is to make
+sure that the Java **String** has really been converted to a Python
+string, which can also be treated as an array of characters.
 
-You can see that it's possible, using **exec()**, to create a Python function
-(although it's a bit awkward). The **prt()** function prints the whole array,
-and then (to make sure it's a real Python array), iterates through each element
-of the array and prints it. Finally, it prints the class of the array, so we can
-see what conversion has taken place (Python not only has run-time type
-information, it also has the equivalent of Java reflection). The **prt()**
-function is used to print arrays that come from each of the Java primitive
-types.
+You can see that it's possible, using **exec()**, to create a Python
+function (although it's a bit awkward). The **prt()** function prints
+the whole array, and then (to make sure it's a real Python array),
+iterates through each element of the array and prints it. Finally, it
+prints the class of the array, so we can see what conversion has taken
+place (Python not only has run-time type information, it also has the
+equivalent of Java reflection). The **prt()** function is used to
+print arrays that come from each of the Java primitive types.
 
-Although a Java **ArrayList** does pass into the interpreter using **set()**,
-and you can index into it as if it were an array, trying to create a slice
-fails. To completely convert it into an array, one approach is to simply extract
-a Java array using **toArray()**, and pass that in. The **set()** method
-converts it to a **PyArray** -- one of the classes provided with Jython -- which
-can be treated as a Python array (you can also explicitly create a **PyArray**,
-but this seems unnecessary).
+Although a Java **ArrayList** does pass into the interpreter using
+**set()**, and you can index into it as if it were an array, trying to
+create a slice fails. To completely convert it into an array, one
+approach is to simply extract a Java array using **toArray()**, and
+pass that in. The **set()** method converts it to a **PyArray** -- one
+of the classes provided with Jython -- which can be treated as a
+Python array (you can also explicitly create a **PyArray**, but this
+seems unnecessary).
 
-Finally, a **Map** is created and passed directly into the interpreter. While it
-is possible to do simple things like index into the resulting object, it's not a
-real Python dictionary so you can't (for example) call the **keys()** method.
-There is no straightforward way to convert a Java **Map** into a Python
-dictionary, and so I wrote a utility called **toPyDictionary()** and made it a
-**static** method of **net.mindview.python.PyUtil**. This also includes
-utilities to extract a Python array into a Java **List**, and a Python
-dictionary into a Java **Map**:
+Finally, a **Map** is created and passed directly into the
+interpreter. While it is possible to do simple things like index into
+the resulting object, it's not a real Python dictionary so you can't
+(for example) call the **keys()** method.  There is no straightforward
+way to convert a Java **Map** into a Python dictionary, and so I wrote
+a utility called **toPyDictionary()** and made it a **static** method
+of **net.mindview.python.PyUtil**. This also includes utilities to
+extract a Python array into a Java **List**, and a Python dictionary
+into a Java **Map**:
 
 ..  code-block:: java
 
@@ -815,7 +831,6 @@ dictionary into a Java **Map**:
       }
     }
 
-
 Here is the unit testing code:
 
 ..  code-block:: java
@@ -872,24 +887,27 @@ Getting Data Out
 --------------------------------------------------------------------------------
 
 There are a number of different ways to extract data from the
-**PythonInterpreter**. If you simply call the **get()** method, passing it the
-object identifier as a string, it returns a **PyObject** (part of the
-**org.python.core** support classes). It's possible to "cast" it using the
-**__tojava__()** method, but there are better alternatives:
+**PythonInterpreter**. If you simply call the **get()** method,
+passing it the object identifier as a string, it returns a
+**PyObject** (part of the **org.python.core** support classes). It's
+possible to "cast" it using the **__tojava__()** method, but there are
+better alternatives:
 
 
-1.  The convenience methods in the **Py** class, such as **py2int()**, take a
-    **PyObject** and convert it to a number of different types.
+1.  The convenience methods in the **Py** class, such as **py2int()**,
+    take a **PyObject** and convert it to a number of different types.
 
-2.  An overloaded version of **get()** takes the desired Java **Class** object
-    as a second argument, and produces an object that has that run-time type (so you
-    still need to perform a cast on the result in your Java code).
+2.  An overloaded version of **get()** takes the desired Java
+    **Class** object as a second argument, and produces an object that
+    has that run-time type (so you still need to perform a cast on the
+    result in your Java code).
 
-Using the second approach, getting an array from the **PythonInterpreter** is
-quite easy. This is especially useful because Python is exceptionally good at
-manipulating strings and files, and so you will commonly want to extract the
-results as an array of strings. For example, you can do a wildcard expansion of
-file names using Python's **glob()**, as shown further down in the following
+Using the second approach, getting an array from the
+**PythonInterpreter** is quite easy. This is especially useful because
+Python is exceptionally good at manipulating strings and files, and so
+you will commonly want to extract the results as an array of
+strings. For example, you can do a wildcard expansion of file names
+using Python's **glob()**, as shown further down in the following
 code:
 
 ..  code-block:: java
@@ -996,19 +1014,21 @@ code:
       }
     }
 
-The last two examples show the extraction of Python tuples and lists into Java
-**List**\s, and Python dictionaries into Java **Map**\s. Both of these cases
-require more processing than is provided in the standard Jython library, so I
-have again created utilities in **net.mindview.pyton.PyUtil**: **toList()** to
-produce a **List** from a Python sequence, and **toMap()** to produce a **Map**
-from a Python dictionary. The **PyUtil** methods make it easier to take
-important data structures back and forth between Java and Python.
+The last two examples show the extraction of Python tuples and lists
+into Java **List**\s, and Python dictionaries into Java
+**Map**\s. Both of these cases require more processing than is
+provided in the standard Jython library, so I have again created
+utilities in **net.mindview.pyton.PyUtil**: **toList()** to produce a
+**List** from a Python sequence, and **toMap()** to produce a **Map**
+from a Python dictionary. The **PyUtil** methods make it easier to
+take important data structures back and forth between Java and Python.
 
 Multiple Interpreters
 --------------------------------------------------------------------------------
 
-It's also worth noting that you can have multiple **PythonInterpreter** objects
-in a program, and each one has its own name space:
+It's also worth noting that you can have multiple
+**PythonInterpreter** objects in a program, and each one has its own
+name space:
 
 ..  code-block:: java
 
@@ -1036,8 +1056,8 @@ in a program, and each one has its own name space:
     }
 
 
-When you run the program you'll see that the value of **a** is distinct within
-each **PythonInterpreter**.
+When you run the program you'll see that the value of **a** is
+distinct within each **PythonInterpreter**.
 
 Creating Java classes with Jython
 =======================================================================
@@ -1053,8 +1073,8 @@ code. This can produce very useful results, as you are then able to
 treat the results as if they are native Java classes, albeit with
 Python power under the hood.
 
-To produce Java classes from Python code, Jython comes with a compiler called
-**jythonc**.
+To produce Java classes from Python code, Jython comes with a compiler
+called **jythonc**.
 
 The process of creating Python classes that will produce Java classes
 is a bit more complex than when calling Java classes from Python,
@@ -1069,30 +1089,33 @@ standard location for the Python documentation string). For example::
     def returnArray(self):
         "@sig public java.lang.String[] returnArray()"
 
-The Python definition doesn't specify any return type, but the @sig string gives
-the full type information about what is being passed and returned. The
-**jythonc** compiler uses this information to generate the correct Java code.
+The Python definition doesn't specify any return type, but the @sig
+string gives the full type information about what is being passed and
+returned. The **jythonc** compiler uses this information to generate
+the correct Java code.
 
-There's one other set of rules you must follow in order to get a successful
-compilation: you must inherit from a Java class or interface in your Python
-class (you do not need to specify the **@sig** signature for methods defined in
-the superclass/interface). If you do not do this, you won't get your desired
-methods -- unfortunately, **jythonc** gives you no warnings or errors in this
-case, but you won't get what you want. If you don't see what's missing, it can
-be very frustrating.
+There's one other set of rules you must follow in order to get a
+successful compilation: you must inherit from a Java class or
+interface in your Python class (you do not need to specify the
+**@sig** signature for methods defined in the
+superclass/interface). If you do not do this, you won't get your
+desired methods -- unfortunately, **jythonc** gives you no warnings or
+errors in this case, but you won't get what you want. If you don't see
+what's missing, it can be very frustrating.
 
-In addition, you must import the appropriate java class and give the correct
-package specification.  In the example below, **java** is imported so you must
-inherit from **java.lang.Object**, but you could also say **from java.lang
-import Object** and then you'd just inherit from **Object** without the package
-specification. Unfortunately, you don't get any warnings or errors if you get
-this wrong, so you must be patient and keep trying.
+In addition, you must import the appropriate java class and give the
+correct package specification.  In the example below, **java** is
+imported so you must inherit from **java.lang.Object**, but you could
+also say **from java.lang import Object** and then you'd just inherit
+from **Object** without the package specification. Unfortunately, you
+don't get any warnings or errors if you get this wrong, so you must be
+patient and keep trying.
 
-Here is an example of a Python class created to produce a Java class. This also
-introduces the '**=T**' directive for the makefile builder tool, which specifies
-a different target than the one that is normally used by the tool. In this case,
-the Python file is used to build a Java **.class** file, so the class file is
-the desired target::
+Here is an example of a Python class created to produce a Java
+class. In this case, the Python file is used to build a Java
+**.class** file, so the class file is the desired target:
+
+..  code-block:: python
 
     # Jython/PythonToJavaClass.py
     # A Python class converted into a Java class
@@ -1170,34 +1193,37 @@ the desired target::
             for x in m.keys():
                 print(x, m[x])
 
+First note that **PythonToJavaClass** is inherited from
+**java.lang.Object**; if you don't do this you will quietly get a Java
+class without the right signatures. You are not required to inherit
+from **Object**; any other Java class will do.
 
-First note that **PythonToJavaClass** is inherited from **java.lang.Object**; if
-you don't do this you will quietly get a Java class without the right
-signatures. You are not required to inherit from **Object**; any other Java
-class will do.
+This class is designed to demonstrate different arguments and return
+values, to provide you with enough examples that you'll be able to
+easily create your own signature strings. The first three of these are
+fairly self-explanatory, but note the full qualification of the Java
+name in the signature string.
 
-This class is designed to demonstrate different  arguments and return values, to
-provide you with enough examples that you'll be able to easily create your own
-signature strings. The first three of these are fairly self-explanatory, but
-note the full qualification of the Java name in the signature string.
+In **returnArray()**, a Python array must be returned as a Java
+array. To do this, the Jython **array()** function (from the
+**jarray** module) must be used, along with the type of the class for
+the resulting array. Any time you need to return an array to Java, you
+must use **array()**, as seen in the methods **ints()** and
+**doubles()**.
 
-In **returnArray()**, a Python array must be returned as a Java array. To do
-this, the Jython **array()** function (from the **jarray** module) must be
-used, along with the type of the class for the resulting array. Any time you
-need to return an array to Java, you must use **array()**, as seen in the
-methods **ints()** and **doubles()**.
+The last methods show how to pass arguments in from Java. Basic types
+happen automatically as long as you specify them in the **@sig**
+string, but you must use objects and you cannot pass in primitives
+(that is, primitives must be ensconced in wrapper objects, such as
+**Integer**).
 
-The last methods show how to pass arguments in from Java. Basic types happen
-automatically as long as you specify them in the **@sig** string, but you must
-use objects and you cannot pass in primitives (that is, primitives must be
-ensconced in wrapper objects, such as **Integer**).
-
-In **argIn3()**, you can see that a Java **List** is transparently converted to
-something that behaves just like a Python array, but is not a true array because
-you cannot take a slice from it. If you want a true Python array, then you must
-create and pass a **PyArray** as in **argIn4()**, where the slice is
-successful. Similarly, a Java **Map** must come in as a **PyDictionary** in
-order to be treated as a Python dictionary.
+In **argIn3()**, you can see that a Java **List** is transparently
+converted to something that behaves just like a Python array, but is
+not a true array because you cannot take a slice from it. If you want
+a true Python array, then you must create and pass a **PyArray** as in
+**argIn4()**, where the slice is successful. Similarly, a Java **Map**
+must come in as a **PyDictionary** in order to be treated as a Python
+dictionary.
 
 Here is the Java program to exercise the Java classes produced by the
 above Python code. You can't compile **TestPythonToJavaClass.java**
@@ -1253,31 +1279,33 @@ until **PythonToJavaClass.class** is available:
 
 For Python support, you'll usually only need to import the classes in
 **org.python.core**. Everything else in the above example is fairly
-straightforward, as **PythonToJavaClass** appears, from the Java side, to be
-just another Java class. **dumpClassInfo()** uses reflection to verify that the
-method signatures specified in **PythonToJavaClass.py** have come through
-properly.
+straightforward, as **PythonToJavaClass** appears, from the Java side,
+to be just another Java class. **dumpClassInfo()** uses reflection to
+verify that the method signatures specified in
+**PythonToJavaClass.py** have come through properly.
 
 Building Java Classes from Python
 --------------------------------------------------------------------------------
 
-Part of the trick of creating Java classes from Python code is the @sig
-information in the method documentation strings. But there's a second problem
-which stems from the fact that Python has no "package" keyword -- the Python
-equivalent of packages (modules) are implicitly created based on the file name.
-However, to bring the resulting class files into the Java program, **jythonc**
-must be given information about how to create the Java package for the Python
-code. This is done on the **jythonc** command line using the **--package** flag,
-followed by the package name you wish to produce (including the separation dots,
-just as you would give the package name using the **package** keyword in a Java
-program). This will put the resulting **.class** files in the appropriate
-subdirectory off of the current directory. Then you only need to import the
-package in your Java program, as shown above (you'll need '**.**' in your
-CLASSPATH in order to run it from the code directory).
+Part of the trick of creating Java classes from Python code is the
+@sig information in the method documentation strings. But there's a
+second problem which stems from the fact that Python has no "package"
+keyword -- the Python equivalent of packages (modules) are implicitly
+created based on the file name.  However, to bring the resulting class
+files into the Java program, **jythonc** must be given information
+about how to create the Java package for the Python code. This is done
+on the **jythonc** command line using the **--package** flag, followed
+by the package name you wish to produce (including the separation
+dots, just as you would give the package name using the **package**
+keyword in a Java program). This will put the resulting **.class**
+files in the appropriate subdirectory off of the current
+directory. Then you only need to import the package in your Java
+program, as shown above (you'll need '**.**' in your CLASSPATH in
+order to run it from the code directory).
 
-Here are the **make** dependency rules that I used to build the above example
-(the backslashes at the ends of the lines are understood by **make** to be line
-continuations)::
+Here are the **make** dependency rules that I used to build the above
+example (the backslashes at the ends of the lines are understood by
+**make** to be line continuations)::
 
     TestPythonToJavaClass.class: \\
             TestPythonToJavaClass.java \\
@@ -1290,25 +1318,27 @@ continuations)::
         PythonToJavaClass.py
 
 The first target, **TestPythonToJavaClass.class**, depends on both
-**TestPythonToJavaClass.java** and the **PythonToJavaClass.class**, which is the
-Python code that's converted to a class file. This latter, in turn, depends on
-the Python source code. Note that it's important that the directory where the
-target lives be specified, so that the makefile will create the Java program
-with the minimum necessary amount of rebuilding.
+**TestPythonToJavaClass.java** and the **PythonToJavaClass.class**,
+which is the Python code that's converted to a class file. This
+latter, in turn, depends on the Python source code. Note that it's
+important that the directory where the target lives be specified, so
+that the makefile will create the Java program with the minimum
+necessary amount of rebuilding.
 
 Summary
 =======================================================================
 
-This chapter has arguably gone much deeper into Jython than required to use the
-interpreter design pattern. Indeed, once you decide that you need to use
-interpreter and that you're not going to get lost inventing your own language,
-the solution of installing Jython is quite simple, and you can at least get
-started by following the **GreenHouseController** example.
+This chapter has arguably gone much deeper into Jython than required
+to use the interpreter design pattern. Indeed, once you decide that
+you need to use interpreter and that you're not going to get lost
+inventing your own language, the solution of installing Jython is
+quite simple, and you can at least get started by following the
+**GreenHouseController** example.
 
-Of course, that example is often too simple and you may need something more
-sophisticated, often requiring more interesting data to be passed back and
-forth. When I encountered the limited documentation, I felt it necessary to come
-up with a more thorough examination of Jython.
+Of course, that example is often too simple and you may need something
+more sophisticated, often requiring more interesting data to be passed
+back and forth. When I encountered the limited documentation, I felt
+it necessary to come up with a more thorough examination of Jython.
 
 In the process, note that there could be another equally powerful
 design pattern lurking in here, which could perhaps be called
@@ -1319,57 +1349,63 @@ much faster than with either language by itself. CORBA is another way
 to bridge across languages, and at the same time bridging between
 computers and operating systems.
 
-To me, Python and Java present a very potent combination for program development
-because of Java's architecture and tool set, and Python's extremely rapid
-development (generally considered to be 5-10 times faster than C++ or Java).
-Python is usually slower, however, but even if you end up re-coding parts of
-your program for speed, the initial fast development will allow you to more
-quickly flesh out the system and uncover and solve the critical sections. And
-often, the execution speed of Python is not a problem -- in those cases it's an
-even bigger win. A number of commercial products already use Java and Jython,
-and because of the terrific productivity leverage I expect to see this happen
-more in the future.
+To me, Python and Java present a very potent combination for program
+development because of Java's architecture and tool set, and Python's
+extremely rapid development (generally considered to be 5-10 times
+faster than C++ or Java).  Python is usually slower, however, but even
+if you end up re-coding parts of your program for speed, the initial
+fast development will allow you to more quickly flesh out the system
+and uncover and solve the critical sections. And often, the execution
+speed of Python is not a problem -- in those cases it's an even bigger
+win. A number of commercial products already use Java and Jython, and
+because of the terrific productivity leverage I expect to see this
+happen more in the future.
 
 Exercises
 =======================================================================
 
-#.  Modify **GreenHouseLanguage.py** so that it checks the times for the events
-    and runs those events at the appropriate times.
+#.  Modify **GreenHouseLanguage.py** so that it checks the times for
+    the events and runs those events at the appropriate times.
 
-#.  Modify **GreenHouseLanguage.py** so that it calls a function for **action**
-    instead of just printing a string.
+#.  Modify **GreenHouseLanguage.py** so that it calls a function for
+    **action** instead of just printing a string.
 
-#.  Create a Swing application with a **JTextField** (where the user will enter
-    commands) and a **JTextArea** (where the command results will be displayed).
-    Connect to a **PythonInterpreter** object so that the output will be sent to
-    the **JTextArea** (which should scroll). You'll need to locate the
-    **PythonInterpreter** command that redirects the output to a Java stream.
+#.  Create a Swing application with a **JTextField** (where the user
+    will enter commands) and a **JTextArea** (where the command
+    results will be displayed).  Connect to a **PythonInterpreter**
+    object so that the output will be sent to the **JTextArea** (which
+    should scroll). You'll need to locate the **PythonInterpreter**
+    command that redirects the output to a Java stream.
 
-#.  Modify **GreenHouseLanguage.py** to add a master controller class (instead
-    of the static array inside **Event**) and provide a **run()** method for
-    each of the subclasses. Each **run()** should create and use an object from
-    the standard Java library during its execution. Modify
-    **GreenHouseController.java** to use this new class.
+#.  Modify **GreenHouseLanguage.py** to add a master controller class
+    (instead of the static array inside **Event**) and provide a
+    **run()** method for each of the subclasses. Each **run()** should
+    create and use an object from the standard Java library during its
+    execution. Modify **GreenHouseController.java** to use this new
+    class.
 
-#.  Modify the resulting **GreenHouseLanguage.py** from exercise two to produce
-    Java classes (add the @sig documentation strings to produce the correct Java
-    signatures, and create a makefile to build the Java **.class** files). Write
-    a Java program that uses these classes.
+#.  Modify the resulting **GreenHouseLanguage.py** from exercise two
+    to produce Java classes (add the @sig documentation strings to
+    produce the correct Java signatures, and create a makefile to
+    build the Java **.class** files). Write a Java program that uses
+    these classes.
 
-#.  Modify **GreenHouseLanguage.py** so that the subclasses of **Event** are not
-    discrete classes, but are instead *generated* by a single function which creates
-    the class and the associated string dynamically.
+#.  Modify **GreenHouseLanguage.py** so that the subclasses of
+    **Event** are not discrete classes, but are instead *generated* by
+    a single function which creates the class and the associated
+    string dynamically.
 
 .. rubric:: Footnotes
 
-.. [#]  The original version of this was called *JPython*\, but the project
-        changed and the name was changed to emphasize the distinctness of the new
-        version.
+.. [#] 	The original version of this was called *JPython*\, but the
+        project changed and the name was changed to emphasize the
+        distinctness of the new version.
 
-.. [#]  Changing the registry setting **python.security.respectJavaAccessibility
-        = true** to **false** makes testing even more powerful because it allows
-        the test script to use *all* methods, even protected and package-
-        private.
+.. [#]  Changing the registry setting
+        **python.security.respectJavaAccessibility = true** to
+        **false** makes testing even more powerful because it allows
+        the test script to use *all* methods, even protected and
+        package- private.
 
 
 
