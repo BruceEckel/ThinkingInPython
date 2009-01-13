@@ -19,6 +19,7 @@ Python 3 Patterns, Recipes and Idioms
    GeneratorsIterators
    Comprehensions
    CoroutinesAndConcurrency
+   Metaclasses
    Jython
    Part2
    MachineDiscovery
