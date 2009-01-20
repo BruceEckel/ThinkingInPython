@@ -398,6 +398,44 @@ particularly difficult syntax and semantics.
             genericity. What python gives us is the genericity. IMHO the analogy
             with template mechanism is not appropriate.
 
+Static Fields
+-------------------------------------------------------------------------------
+
+::
+	>>> class Foo(object):
+	...   x = "a"
+	... 
+	>>> Foo.x
+	'a'
+	>>> f = Foo()
+	>>> f.x
+	'a'
+	>>> f2 = Foo()
+	>>> f2.x
+	'a'
+	>>> f2.x = 'b'
+	>>> f.x
+	'a'
+	>>> Foo.x = 'c'
+	>>> f.x
+	'c'
+	>>> f2.x
+	'b'
+	>>> Foo.x = 'd'
+	>>> f2.x
+	'b'
+	>>> f.x
+	'd'
+	>>> f3 = Foo()
+	>>> f3.x
+	'd'
+	>>> Foo.x = 'e'
+	>>> f3.x
+	'e'
+	>>> f2.x
+	'b'
+
+
 .. note:: Suggest Further Topics for inclusion in the introductory chapter
 
 
