@@ -393,10 +393,22 @@ to provide weak typing in a strongly-typed language. Thus, in Python you
 automatically get the equivalent of templates - without having to learn that
 particularly difficult syntax and semantics.
 
-.. note ::  (Reader) I am not sure if I agree with the remark about templates. One of the
+..   (Reader) I am not sure if I agree with the remark about templates. One of the
             big objective of templates has always been type safety along with
             genericity. What python gives us is the genericity. IMHO the analogy
             with template mechanism is not appropriate.
+
+Constructor Calls
+-------------------------------------------------------------------------------
+
+Automatic base-class constructor calls.
+
+Calling the base-class constructor first, how to do it using super(), why you
+should always call it first even if it's optional when to call it.
+
+.. guideline: Be rigorous about calling base-class initializers as the
+.. first step of your __init__() method. Call them using super() so
+.. that modifications to the class hierarchy don't cause problems.
 
 Static Fields
 -------------------------------------------------------------------------------
