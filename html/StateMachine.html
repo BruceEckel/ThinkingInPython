@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -165,11 +167,11 @@ also establishes its next state with an <strong>if-else</strong> clause:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/mousetrap1/MouseTrapTest.py</span>
 <span class="c"># State Machine pattern using &#39;if&#39; statements</span>
 <span class="c"># to determine the next state.</span>
-<span class="k">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;../stateMachine&#39;</span><span class="p">,</span> <span class="s">&#39;../mouse&#39;</span><span class="p">]</span>
-<span class="k">from</span> <span class="nn">State</span> <span class="k">import</span> <span class="n">State</span>
-<span class="k">from</span> <span class="nn">StateMachine</span> <span class="k">import</span> <span class="n">StateMachine</span>
-<span class="k">from</span> <span class="nn">MouseAction</span> <span class="k">import</span> <span class="n">MouseAction</span>
+<span class="kn">from</span> <span class="nn">State</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">StateMachine</span> <span class="kn">import</span> <span class="n">StateMachine</span>
+<span class="kn">from</span> <span class="nn">MouseAction</span> <span class="kn">import</span> <span class="n">MouseAction</span>
 <span class="c"># A different subclass for each state:</span>
 
 <span class="k">class</span> <span class="nc">Waiting</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
@@ -250,11 +252,11 @@ overridden derived class <strong>next( )</strong> methods after they test for a 
 (and initialize it if it&#8217;s <strong>null</strong>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># StateMachine/mousetrap2/MouseTrap2Test.py</span>
 <span class="c"># A better mousetrap using tables</span>
-<span class="k">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">+=</span> <span class="p">[</span><span class="s">&#39;../stateMachine&#39;</span><span class="p">,</span> <span class="s">&#39;../mouse&#39;</span><span class="p">]</span>
-<span class="k">from</span> <span class="nn">State</span> <span class="k">import</span> <span class="n">State</span>
-<span class="k">from</span> <span class="nn">StateMachine</span> <span class="k">import</span> <span class="n">StateMachine</span>
-<span class="k">from</span> <span class="nn">MouseAction</span> <span class="k">import</span> <span class="n">MouseAction</span>
+<span class="kn">from</span> <span class="nn">State</span> <span class="kn">import</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">StateMachine</span> <span class="kn">import</span> <span class="n">StateMachine</span>
+<span class="kn">from</span> <span class="nn">MouseAction</span> <span class="kn">import</span> <span class="n">MouseAction</span>
 
 <span class="k">class</span> <span class="nc">StateT</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -786,21 +788,28 @@ number of moves to produce before <strong>hasNext()</strong> returns <strong>fal
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="Fronting.html" title="previous chapter">Fronting for an Implementation</a></p>
+            <p class="topless"><a href="Fronting.html"
+                                  title="previous chapter">Fronting for an Implementation</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="Decorator.html" title="next chapter">Decorator: Dynamic Type Selection</a></p>
+            <p class="topless"><a href="Decorator.html"
+                                  title="next chapter">Decorator: Dynamic Type Selection</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/StateMachine.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/StateMachine.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -826,7 +835,7 @@ number of moves to produce before <strong>hasNext()</strong> returns <strong>fal
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

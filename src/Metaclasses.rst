@@ -146,7 +146,7 @@ code: those who do not understand metaclasses.
 The Metaclass Hook
 ================================================================================
 
-So far, we've only used ``type`` metaclass directly. Metaclass
+So far, we've only used the ``type`` metaclass directly. Metaclass
 programming involves hooking our own operations into the creation of
 class objects. This is accomplished by:
 
@@ -194,7 +194,7 @@ By convention, when defining metaclasses ``cls`` is used rather than
 is the class object that is being modified.
 
 Note that the practice of calling the base-class constructor first (via
-super()) in the derived-class constructor should be followed with
+``super()``) in the derived-class constructor should be followed with
 metaclasses as well.
 
 ``__metaclass__`` only needs to be callable, so in Python
@@ -258,10 +258,10 @@ Python 3 changes the metaclass hook. It doesn't disallow the
 argument in the base-class list:
 
 This means that none of the (clever) alternative ways of defining
-``__metaclass__`` as a class or function are available in
-Python 3. All metaclasses must be defined as separate classes. This is
-probably just as well, as it makes metaclass programs more consistent
-and thus easier to read and understand.
+``__metaclass__`` directly as a class or function are available in
+Python 3 [[check this]]. All metaclasses must be defined as separate
+classes. This is probably just as well, as it makes metaclass programs
+more consistent and thus easier to read and understand.
 
 
 
@@ -274,22 +274,16 @@ Example: Self-Registration of Subclasses
 ================================================================================
 
 It is sometimes convienient to use inheritance as an organizing
-mechanism -- each sublclass become an element of a group that you work
-on. For example, in the **CodeManager.py** example in the
-**Comprehensions** chapter, the subclasses of **Language** were all
-the languages that needed to be processed. Each **Language** subclass
-described the traits of that language.
+mechanism -- each sublclass becomes an element of a group that you
+work on. For example, the **CodeManager.py** in the **Comprehensions**
+chapter, the subclasses of **Language** were all the languages that
+needed to be processed. Each **Language** subclass described specific
+processing traits for that language.
 
-As a simple example, let's consider a system that automatically keeps
-a list of all of it's "leaf" subclasses (only the classes that have no
-inheritors). This is useful when you are using the class hierarchy as
-a structure to keep track of a group of types, so you can easily
-enumerate through all the subtypes.
-
-To achieve this, you need to somehow keep a list of all subclasses
-that are inherited from your base class, so you can iterate through
-and perform processing for each one. One way of keeping track
-automatially is to use metaclasses::
+To solve this problem, consider a system that automatically keeps a
+list of all of it's "leaf" subclasses (only the classes that have no
+inheritors). This way we can easily enumerate through all the
+subtypes::
 
     # Metaclasses/RegisterLeafClasses.py
 
@@ -337,7 +331,10 @@ automatially is to use metaclasses::
     (Square, Ellipse, Boxy, Circle, Triangular)
     """
 
-
+Two separate tests are used to show that the registries are
+independent of each other. Each test shows what happens when another
+level of leaf classes are added -- the former leaf becomes a base
+class, and so is removed from the registry.
 
 Using Class Decorators
 --------------------------------------------------------------------------------
@@ -451,28 +448,30 @@ additional initialization before the class is handed to the caller::
     """
 
 
-The primary difference is that when overriding __new__ you can change
+The primary difference is that when overriding ``__new__()`` you can change
 things like the 'name', 'bases' and 'namespace' arguments before you
 call the super constructor and it will have an effect, but doing the
-same thing in __init__ you won't get any results from the constructor
+same thing in ``__init__()`` you won't get any results from the constructor
 call.
 
-One special case in __new__ is that you can
+One special case in ``__new__()`` is that you can
 manipulate things like ``__slots__``, but in ``__init__()`` you can't.
 
-Note that, since the base-class version of __init__ doesn't make any
+Note that, since the base-class version of ``__init__()`` doesn't make any
 modifications, it makes sense to call it first, then perform any
 additional operations. In C++ and Java, the base-class constructor
 *must* be called as the first operation in a derived-class
 constructor, which makes sense because derived-class constructions can
 then build upon base-class foundations.
 
-In many cases, the choice of __new__ vs __init__ is a style issue and
-doesn't matter, but because __new__ can do everything and __init__ is
-slightly more limited, some people just start using __new__ and stick with
-it. Because the use can be confusing, I prefer to only use __new__
+In many cases, the choice of ``__new__()`` vs ``__init__()`` is a style issue and
+doesn't matter, but because ``__new__()`` can do everything and ``__init__()`` is
+slightly more limited, some people just start using ``__new__()`` and stick with
+it. This use can be confusing -- I tend to hunt for the reason that
+``__init__()`` has been chosen, and if I can't find it wonder whether
+the author knew what they were doing. I prefer to only use ``__new__()``
 when it has meaning -- when you must in order to change things that
-only __new__ can change. 
+only ``__new__()`` can change. 
 
 Class Methods and Metamethods
 ================================================================================
@@ -515,25 +514,24 @@ Further Reading
 ================================================================================
 
     Excellent step-by-step introduction to metaclasses:
-    http://cleverdevil.org/computing/78/
-        
-    Metaclass intro and comparison of syntax between Python 2.x and
-    3.x:
-    http://mikewatkins.ca/2008/11/29/python-2-and-3-metaclasses/
+        http://cleverdevil.org/computing/78/
+
+    Metaclass intro and comparison of syntax between Python 2.x and 3.x:
+        http://mikewatkins.ca/2008/11/29/python-2-and-3-metaclasses/
 
     David Mertz's metaclass primer:
-    http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html
+        http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html
 
     Three-part in-depth coverage of metaclasses on IBM Developer
     Works. Quite useful and authoritative:
-    http://www.ibm.com/developerworks/linux/library/l-pymeta.html
-    http://www.ibm.com/developerworks/linux/library/l-pymeta2/
-    http://www.ibm.com/developerworks/linux/library/l-pymeta3.html
+      - http://www.ibm.com/developerworks/linux/library/l-pymeta.html
+      - http://www.ibm.com/developerworks/linux/library/l-pymeta2/
+      - http://www.ibm.com/developerworks/linux/library/l-pymeta3.html
 
     Michele Simionato's articles on Artima, with special emphasis on
     the difference between Python 2.x and 3.x metaclasses:
-    http://www.artima.com/weblogs/viewpost.jsp?thread=236234
-    http://www.artima.com/weblogs/viewpost.jsp?thread=236260
+      - http://www.artima.com/weblogs/viewpost.jsp?thread=236234
+      - http://www.artima.com/weblogs/viewpost.jsp?thread=236260
 
     Once you understand the foundations, you can find lots of examples
     by searching for "metaclass" within the Python Cookbook:
@@ -544,10 +542,10 @@ Further Reading
     and edited and so tends to be more authoritative.
 
     Ian Bicking writes about metaclasses:
-    http://blog.ianbicking.org/a-conservative-metaclass.html
-    http://blog.ianbicking.org/metaclass-fun.html
-    http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html
-    http://blog.ianbicking.org/self-take-two.html
+      - http://blog.ianbicking.org/a-conservative-metaclass.html
+      - http://blog.ianbicking.org/metaclass-fun.html
+      - http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html
+      - http://blog.ianbicking.org/self-take-two.html
 
     For more advanced study, the book `Putting Metaclasses to Work
     <http://www.pearsonhighered.com/educator/academic/product/0,,0201433052,00%2ben-USS_01DBC.html>`_.

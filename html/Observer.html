@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -117,7 +119,7 @@ synchronization. We could certainly accomplish the same thing by hand, using
 code like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/ToSynch.py</span>
 
-<span class="k">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">threading</span>
 <span class="k">class</span> <span class="nc">ToSynch</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
@@ -136,7 +138,7 @@ with a much nicer solution:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/Synchronization.py</span>
 <span class="sd">&#39;&#39;&#39;Simple emulation of Java&#39;s &#39;synchronized&#39;</span>
 <span class="sd">keyword, from Peter Norvig.&#39;&#39;&#39;</span>
-<span class="k">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">threading</span>
 
 <span class="k">def</span> <span class="nf">synchronized</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -190,7 +192,7 @@ class author, but it&#8217;s more consistent to use inheritance, so the base cla
 <strong>Synchronization</strong> is provided.</p>
 <p>Here&#8217;s a simple test of the <strong>Synchronization</strong> module:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/TestSynchronization.py</span>
-<span class="k">from</span> <span class="nn">Synchronization</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Synchronization</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c"># To use for a method:</span>
 <span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">Synchronization</span><span class="p">):</span>
@@ -247,7 +249,7 @@ entered and left twice for every call, which isn&#8217;t very desirable [there m
 a fix for this]:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Util/Observer.py</span>
 <span class="c"># Class support for &quot;observer&quot; pattern.</span>
-<span class="k">from</span> <span class="nn">Synchronization</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Synchronization</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="k">class</span> <span class="nc">Observer</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">observable</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
@@ -562,8 +564,8 @@ translation that does include Observer:</p>
 <span class="sd">Install PythonCard. See:</span>
 <span class="sd">http://pythoncard.sourceforge.net</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">from</span> <span class="nn">PythonCardPrototype</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">model</span>
-<span class="k">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">PythonCardPrototype</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">model</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="n">GRID</span> <span class="o">=</span> <span class="mf">8</span>
 
@@ -706,21 +708,28 @@ the first one that was chosen.</li>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="TableDriven.html" title="previous chapter">Table-Driven Code: Configuration Flexibility</a></p>
+            <p class="topless"><a href="TableDriven.html"
+                                  title="previous chapter">Table-Driven Code: Configuration Flexibility</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="MultipleDispatching.html" title="next chapter">Multiple Dispatching</a></p>
+            <p class="topless"><a href="MultipleDispatching.html"
+                                  title="next chapter">Multiple Dispatching</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Observer.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/Observer.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -746,7 +755,7 @@ the first one that was chosen.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

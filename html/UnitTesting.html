@@ -1,9 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Unit Testing &amp; Test-Driven Development &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <title>Unit Testing & Test-Driven Development &mdash; Python 3 Patterns, Recipes and Idioms</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -145,7 +147,7 @@ slightly better than chaos. If you change nothing else, add automated testing.</
 output of each program (as a string) to its listing:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># SanityCheck.py</span>
 <span class="c">#! /usr/bin/env python</span>
-<span class="k">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
 <span class="c"># Do not include the following in the automatic tests:</span>
 <span class="n">exclude</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;SanityCheck.py&quot;</span><span class="p">,</span> <span class="s">&quot;BoxObserver.py&quot;</span><span class="p">,)</span>
 
@@ -566,21 +568,28 @@ in JDK 1.4 when assertions were added to the language.</td></tr>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="QuickPython.html" title="previous chapter">Quick Python for Programmers</a></p>
+            <p class="topless"><a href="QuickPython.html"
+                                  title="previous chapter">Quick Python for Programmers</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="LanguageChanges.html" title="next chapter">Python 3 Language Changes</a></p>
+            <p class="topless"><a href="LanguageChanges.html"
+                                  title="next chapter">Python 3 Language Changes</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/UnitTesting.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/UnitTesting.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -606,7 +615,7 @@ in JDK 1.4 when assertions were added to the language.</td></tr>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

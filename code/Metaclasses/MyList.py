@@ -10,4 +10,3 @@ ml.append("Camembert")
 print(ml)
 print(ml.x)
 ml.howdy("John")
-

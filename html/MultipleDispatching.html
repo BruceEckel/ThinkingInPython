@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -76,8 +78,8 @@ have to have a polymorphic method call in each hierarchy.</p>
 <p>Here&#8217;s an example of multiple dispatching:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># MultipleDispatching/PaperScissorsRock.py</span>
 <span class="c"># Demonstration of multiple dispatching.</span>
-<span class="k">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
-<span class="k">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">generators</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="c"># An enumeration type:</span>
 <span class="k">class</span> <span class="nc">Outcome</span><span class="p">:</span>
@@ -163,8 +165,8 @@ easy to maintain if you ever expect to modify the behavior or to add a new
 like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># MultipleDispatching/PaperScissorsRock2.py</span>
 <span class="c"># Multiple dispatching using a table</span>
-<span class="k">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
-<span class="k">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">generators</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="k">class</span> <span class="nc">Outcome</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -234,21 +236,28 @@ key just as easily as a single object.</p>
     
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="Observer.html" title="previous chapter">Observer</a></p>
+            <p class="topless"><a href="Observer.html"
+                                  title="previous chapter">Observer</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="Visitor.html" title="next chapter">Visitor</a></p>
+            <p class="topless"><a href="Visitor.html"
+                                  title="next chapter">Visitor</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/MultipleDispatching.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/MultipleDispatching.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -274,7 +283,7 @@ key just as easily as a single object.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

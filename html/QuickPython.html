@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -21,7 +23,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
-    <link rel="next" title="Unit Testing &amp; Test-Driven Development" href="UnitTesting.html" />
+    <link rel="next" title="Unit Testing & Test-Driven Development" href="UnitTesting.html" />
     <link rel="prev" title="Part I: Foundations" href="Part1.html" /> 
   </head>
   <body>
@@ -32,7 +34,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="UnitTesting.html" title="Unit Testing &amp; Test-Driven Development"
+          <a href="UnitTesting.html" title="Unit Testing & Test-Driven Development"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Part1.html" title="Part I: Foundations"
@@ -331,7 +333,7 @@ inheriting class. Note that the <strong>Simple</strong> class, which resides in 
 thus, module) named <strong>SimpleClass</strong> is brought into this new name space using an
 <strong>import</strong> statement:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/Simple2.py</span>
-<span class="k">from</span> <span class="nn">SimpleClass</span> <span class="k">import</span> <span class="n">Simple</span>
+<span class="kn">from</span> <span class="nn">SimpleClass</span> <span class="kn">import</span> <span class="n">Simple</span>
 
 <span class="k">class</span> <span class="nc">Simple2</span><span class="p">(</span><span class="n">Simple</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -395,13 +397,53 @@ should see that the objective of the C++ <strong>template</strong> feature is ex
 to provide weak typing in a strongly-typed language. Thus, in Python you
 automatically get the equivalent of templates - without having to learn that
 particularly difficult syntax and semantics.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">(Reader) I am not sure if I agree with the remark about templates. One of the
-big objective of templates has always been type safety along with
-genericity. What python gives us is the genericity. IMHO the analogy
-with template mechanism is not appropriate.</p>
 </div>
+<div class="section" id="constructor-calls">
+<h3>Constructor Calls<a class="headerlink" href="#constructor-calls" title="Permalink to this headline">¶</a></h3>
+<p>Automatic base-class constructor calls.</p>
+<p>Calling the base-class constructor first, how to do it using super(), why you
+should always call it first even if it&#8217;s optional when to call it.</p>
+</div>
+<div class="section" id="static-fields">
+<h3>Static Fields<a class="headerlink" href="#static-fields" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>::</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;a&quot;</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;e&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;e&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Suggest Further Topics for inclusion in the introductory chapter</p>
@@ -430,6 +472,8 @@ with template mechanism is not appropriate.</p>
 <li><a class="reference external" href="#strings">Strings</a></li>
 <li><a class="reference external" href="#classes">Classes</a><ul>
 <li><a class="reference external" href="#inheritance">Inheritance</a></li>
+<li><a class="reference external" href="#constructor-calls">Constructor Calls</a></li>
+<li><a class="reference external" href="#static-fields">Static Fields</a></li>
 </ul>
 </li>
 </ul>
@@ -438,21 +482,28 @@ with template mechanism is not appropriate.</p>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="Part1.html" title="previous chapter">Part I: Foundations</a></p>
+            <p class="topless"><a href="Part1.html"
+                                  title="previous chapter">Part I: Foundations</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="UnitTesting.html" title="next chapter">Unit Testing &amp; Test-Driven Development</a></p>
+            <p class="topless"><a href="UnitTesting.html"
+                                  title="next chapter">Unit Testing &amp; Test-Driven Development</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/QuickPython.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/QuickPython.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -468,7 +519,7 @@ with template mechanism is not appropriate.</p>
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="UnitTesting.html" title="Unit Testing &amp; Test-Driven Development"
+          <a href="UnitTesting.html" title="Unit Testing & Test-Driven Development"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Part1.html" title="Part I: Foundations"
@@ -478,7 +529,7 @@ with template mechanism is not appropriate.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

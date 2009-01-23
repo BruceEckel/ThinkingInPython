@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -22,7 +24,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
     <link rel="next" title="Part II: Idioms" href="Part2.html" />
-    <link rel="prev" title="Coroutines &amp; Concurrency" href="CoroutinesAndConcurrency.html" /> 
+    <link rel="prev" title="Metaclasses" href="Metaclasses.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +37,7 @@
           <a href="Part2.html" title="Part II: Idioms"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="Metaclasses.html" title="Metaclasses"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
@@ -146,8 +148,8 @@ more quickly.</p>
 <p>Here&#8217;s an example that shows a little of what you can do in a Jython
 script, and also gives you a sense of performance:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/Simple.py</span>
-<span class="k">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">time</span>
-<span class="k">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+<span class="kn">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
 
 <span class="k">print</span> <span class="n">platform</span><span class="o">.</span><span class="n">uname</span><span class="p">()</span> <span class="c"># What are we running on?</span>
 <span class="k">print</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&quot;*.py&quot;</span><span class="p">)</span> <span class="c"># Find files with .py extensions</span>
@@ -180,7 +182,7 @@ Python <em>list comprehension</em> with the <strong>os.walk()</strong> function 
 all the directories in a directory tree, and find all the files with
 names that end in <strong>.java</strong> and contain the word <strong>PythonInterpreter</strong>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/Walk_comprehension.py</span>
-<span class="k">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.java&quot;</span><span class="p">)</span> <span class="ow">and</span>
@@ -313,11 +315,11 @@ Java. This turns out to be remarkably simple: you import some Jython
 classes, create a <strong>PythonInterpreter</strong> object, and cause the Python
 files to be loaded:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/GreenHouseController.java</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">GreenHouseController</span> <span class="o">{</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">GreenHouseController</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
     <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Loading GreenHouse Language&quot;</span><span class="o">);</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">execfile</span><span class="o">(</span><span class="s">&quot;GreenHouseLanguage.py&quot;</span><span class="o">);</span>
@@ -364,8 +366,8 @@ in Java</em>. Here is its conversion to Jython:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonSwing.py</span>
 <span class="c"># The HTMLButton.java example from &quot;Thinking in Java&quot;</span>
 <span class="c"># converted into Jython.</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JButton</span><span class="p">,</span> <span class="n">JLabel</span>
-<span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
+<span class="kn">from</span> <span class="nn">javax.swing</span> <span class="kn">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JButton</span><span class="p">,</span> <span class="n">JLabel</span>
+<span class="kn">from</span> <span class="nn">java.awt</span> <span class="kn">import</span> <span class="n">FlowLayout</span>
 
 <span class="n">frame</span> <span class="o">=</span> <span class="n">JFrame</span><span class="p">(</span><span class="s">&quot;HTMLButton&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span>
   <span class="n">defaultCloseOperation</span><span class="o">=</span><span class="n">JFrame</span><span class="o">.</span><span class="n">EXIT_ON_CLOSE</span><span class="p">)</span>
@@ -409,9 +411,9 @@ Jython. Here&#8217;s the <strong>Dialogs.java</strong> example from <em>Thinking
 converted into Jython:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/PythonDialogs.py</span>
 <span class="c"># Dialogs.java from &quot;Thinking in Java&quot; converted into Jython.</span>
-<span class="k">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">FlowLayout</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JDialog</span><span class="p">,</span> <span class="n">JLabel</span>
-<span class="k">from</span> <span class="nn">javax.swing</span> <span class="k">import</span> <span class="n">JButton</span>
+<span class="kn">from</span> <span class="nn">java.awt</span> <span class="kn">import</span> <span class="n">FlowLayout</span>
+<span class="kn">from</span> <span class="nn">javax.swing</span> <span class="kn">import</span> <span class="n">JFrame</span><span class="p">,</span> <span class="n">JDialog</span><span class="p">,</span> <span class="n">JLabel</span>
+<span class="kn">from</span> <span class="nn">javax.swing</span> <span class="kn">import</span> <span class="n">JButton</span>
 
 <span class="k">class</span> <span class="nc">MyDialog</span><span class="p">(</span><span class="n">JDialog</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -462,9 +464,9 @@ create yourself, as you can see here:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Jython/JavaClassInPython.py</span>
 <span class="c"># Using Java classes within Jython</span>
 <span class="c"># run with: jython.bat JavaClassInPython.py</span>
-<span class="k">from</span> <span class="nn">java.util</span> <span class="k">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">HashSet</span><span class="p">,</span> <span class="n">HashMap</span>
-<span class="k">from</span> <span class="nn">Jython.javaclass</span> <span class="k">import</span> <span class="n">JavaClass</span>
-<span class="k">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sin</span>
+<span class="kn">from</span> <span class="nn">java.util</span> <span class="kn">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">HashSet</span><span class="p">,</span> <span class="n">HashMap</span>
+<span class="kn">from</span> <span class="nn">Jython.javaclass</span> <span class="kn">import</span> <span class="n">JavaClass</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span>
 
 <span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span> <span class="c"># Creating a Java Date object</span>
 <span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="c"># Calls toString()</span>
@@ -510,7 +512,7 @@ create yourself, as you can see here:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition-todo admonition " id="todo-25">
+<div class="admonition-todo admonition " id="todo-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">rewrite to distinguish python generator from above description, or
 choose different name.</p>
@@ -566,34 +568,34 @@ different packages so they can only see each other&#8217;s public methods.</p>
 module in order to be able to use the Java class. Here is the Java
 code for <strong>JavaClass</strong>:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/javaclass/JavaClass.java</span>
-<span class="k">package</span> <span class="n">Jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">package</span> <span class="n">Jython</span><span class="o">.</span><span class="na">javaclass</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">JavaClass</span> <span class="o">{</span>
-  <span class="k">private</span> <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
-  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">()</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaClass</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="nf">JavaClass</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass()&quot;</span><span class="o">);</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="nf">JavaClass</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nf">JavaClass</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JavaClass(String)&quot;</span><span class="o">);</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="n">String</span> <span class="nf">getVal</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getVal</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getVal()&quot;</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">s</span><span class="o">;</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">setVal</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setVal</span><span class="o">(</span><span class="n">String</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;setVal()&quot;</span><span class="o">);</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="n">Character</span><span class="o">[]</span> <span class="n">getChars</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="n">Character</span><span class="o">[]</span> <span class="nf">getChars</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;getChars()&quot;</span><span class="o">);</span>
     <span class="n">Character</span><span class="o">[]</span> <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">[</span><span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()];</span>
     <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span>
       <span class="n">r</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
     <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">JavaClass</span>
       <span class="n">x1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(),</span>
       <span class="n">x2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JavaClass</span><span class="o">(</span><span class="s">&quot;UnitTest&quot;</span><span class="o">);</span>
@@ -641,12 +643,12 @@ complete explanation:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterSetting.java</span>
 <span class="c">// Passing data from Java to python when using</span>
 <span class="c">// the PythonInterpreter object.</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">PythonInterpreterSetting</span> <span class="o">{</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PythonInterpreterSetting</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
     <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="c">// It automatically converts Strings</span>
     <span class="c">// into native Python strings:</span>
@@ -779,18 +781,18 @@ extract a Python array into a Java <strong>List</strong>, and a Python dictionar
 into a Java <strong>Map</strong>:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PyUtil.java</span>
 <span class="c">// PythonInterpreter utilities</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">PyUtil</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PyUtil</span> <span class="o">{</span>
   <span class="c">/** Extract a Python tuple or array into a Java</span>
 <span class="c">  List (which can be converted into other kinds</span>
 <span class="c">  of lists and sets inside Java).</span>
 <span class="c">  @param interp The Python interpreter object</span>
 <span class="c">  @param pyName The id of the python list object</span>
 <span class="c">  */</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="n">List</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">List</span>
   <span class="nf">toList</span><span class="o">(</span><span class="n">PythonInterpreter</span> <span class="n">interp</span><span class="o">,</span> <span class="n">String</span> <span class="n">pyName</span><span class="o">){</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nf">ArrayList</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
       <span class="o">(</span><span class="n">Object</span><span class="o">[])</span><span class="n">interp</span><span class="o">.</span><span class="na">get</span><span class="o">(</span>
@@ -800,7 +802,7 @@ into a Java <strong>Map</strong>:</p>
 <span class="c">  @param interp The Python interpreter object</span>
 <span class="c">  @param pyName The id of the python dictionary</span>
 <span class="c">  */</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="n">Map</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Map</span>
   <span class="nf">toMap</span><span class="o">(</span><span class="n">PythonInterpreter</span> <span class="n">interp</span><span class="o">,</span> <span class="n">String</span> <span class="n">pyName</span><span class="o">){</span>
     <span class="n">PyList</span> <span class="n">pa</span> <span class="o">=</span> <span class="o">((</span><span class="n">PyDictionary</span><span class="o">)</span><span class="n">interp</span><span class="o">.</span><span class="na">get</span><span class="o">(</span>
       <span class="n">pyName</span><span class="o">)).</span><span class="na">items</span><span class="o">();</span>
@@ -819,7 +821,7 @@ into a Java <strong>Map</strong>:</p>
 <span class="c">  suitable for placing into a PythonInterpreter</span>
 <span class="c">  @param map The Java Map object</span>
 <span class="c">  */</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="n">PyDictionary</span> <span class="nf">toPyDictionary</span><span class="o">(</span><span class="n">Map</span> <span class="n">map</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">PyDictionary</span> <span class="nf">toPyDictionary</span><span class="o">(</span><span class="n">Map</span> <span class="n">map</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">();</span>
     <span class="n">Iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">entrySet</span><span class="o">().</span><span class="na">iterator</span><span class="o">();</span>
     <span class="k">while</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
@@ -834,29 +836,29 @@ into a Java <strong>Map</strong>:</p>
 </div>
 <p>Here is the unit testing code:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/TestPyUtil.java</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">TestPyUtil</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestPyUtil</span> <span class="o">{</span>
   <span class="n">PythonInterpreter</span> <span class="n">pi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test1</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test1</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;tup=(&#39;fee&#39;,&#39;fi&#39;,&#39;fo&#39;,&#39;fum&#39;,&#39;fi&#39;)&quot;</span><span class="o">);</span>
     <span class="n">List</span> <span class="n">lst</span> <span class="o">=</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toList</span><span class="o">(</span><span class="n">pi</span><span class="o">,</span> <span class="s">&quot;tup&quot;</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">lst</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="k">new</span> <span class="n">HashSet</span><span class="o">(</span><span class="n">lst</span><span class="o">));</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test2</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test2</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;ints=[1,3,5,7,9,11,13,17,19]&quot;</span><span class="o">);</span>
     <span class="n">List</span> <span class="n">lst</span> <span class="o">=</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toList</span><span class="o">(</span><span class="n">pi</span><span class="o">,</span> <span class="s">&quot;ints&quot;</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">lst</span><span class="o">);</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test3</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test3</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;dict = { 1 : &#39;a&#39;, 3 : &#39;b&#39;, &quot;</span> <span class="o">+</span>
       <span class="s">&quot;5 : &#39;c&#39;, 9 : &#39;d&#39;, 11 : &#39;e&#39;}&quot;</span><span class="o">);</span>
     <span class="n">Map</span> <span class="n">mp</span> <span class="o">=</span> <span class="n">PyUtil</span><span class="o">.</span><span class="na">toMap</span><span class="o">(</span><span class="n">pi</span><span class="o">,</span> <span class="s">&quot;dict&quot;</span><span class="o">);</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">mp</span><span class="o">);</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">test4</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test4</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">();</span>
     <span class="n">m</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;twas&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">11</span><span class="o">));</span>
     <span class="n">m</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;brillig&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">27</span><span class="o">));</span>
@@ -869,7 +871,7 @@ into a Java <strong>Map</strong>:</p>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;print(m)&quot;</span><span class="o">);</span>
     <span class="n">pi</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;print(m[&#39;slithy&#39;])&quot;</span><span class="o">);</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
     <span class="n">TestPyUtil</span> <span class="n">test</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TestPyUtil</span><span class="o">();</span>
     <span class="n">test</span><span class="o">.</span><span class="na">test1</span><span class="o">();</span>
     <span class="n">test</span><span class="o">.</span><span class="na">test2</span><span class="o">();</span>
@@ -906,13 +908,13 @@ using Python&#8217;s <strong>glob()</strong>, as shown further down in the follo
 code:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/PythonInterpreterGetting.java</span>
 <span class="c">// Getting data from the PythonInterpreter object.</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">PythonInterpreterGetting</span> <span class="o">{</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PythonInterpreterGetting</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span>
+  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
     <span class="n">PythonInterpreter</span> <span class="n">interp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
     <span class="n">interp</span><span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">&quot;a = 100&quot;</span><span class="o">);</span>
     <span class="c">// If you just use the ordinary get(),</span>
@@ -1024,12 +1026,12 @@ name space:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/MultipleJythons.java</span>
 <span class="c">// You can run multiple interpreters, each</span>
 <span class="c">// with its own name space.</span>
-<span class="k">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.util.PythonInterpreter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">MultipleJythons</span> <span class="o">{</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span>
-  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="k">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MultipleJythons</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span>
+  <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">PyException</span>  <span class="o">{</span>
     <span class="n">PythonInterpreter</span>
       <span class="n">interp1</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">(),</span>
       <span class="n">interp2</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">PythonInterpreter</span><span class="o">();</span>
@@ -1207,17 +1209,17 @@ dictionary.</p>
 above Python code. You can&#8217;t compile <strong>TestPythonToJavaClass.java</strong>
 until <strong>PythonToJavaClass.class</strong> is available:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="c">// Jython/TestPythonToJavaClass.java</span>
-<span class="k">import</span> <span class="nn">java.lang.reflect.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
-<span class="k">import</span> <span class="nn">net.mindview.python.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.reflect.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.python.core.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">net.mindview.python.*</span><span class="o">;</span>
 <span class="c">// The package with the Python-generated classes:</span>
-<span class="k">import</span> <span class="nn">python.java.test.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">python.java.test.*</span><span class="o">;</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">TestPythonToJavaClass</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestPythonToJavaClass</span> <span class="o">{</span>
   <span class="n">PythonToJavaClass</span> <span class="n">p2j</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PythonToJavaClass</span><span class="o">();</span>
-  <span class="k">public</span> <span class="kt">void</span> <span class="nf">testDumpClassInfo</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testDumpClassInfo</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
       <span class="n">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span>
         <span class="n">p2j</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getConstructors</span><span class="o">()));</span>
@@ -1228,7 +1230,7 @@ until <strong>PythonToJavaClass.class</strong> is available:</p>
         <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">nm</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
-  <span class="k">public</span> <span class="k">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">p2j</span><span class="o">.</span><span class="na">simple</span><span class="o">();</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">p2j</span><span class="o">.</span><span class="na">returnString</span><span class="o">());</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
@@ -1430,21 +1432,28 @@ package- private.</td></tr>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="CoroutinesAndConcurrency.html" title="previous chapter">Coroutines &amp; Concurrency</a></p>
+            <p class="topless"><a href="Metaclasses.html"
+                                  title="previous chapter">Metaclasses</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="Part2.html" title="next chapter">Part II: Idioms</a></p>
+            <p class="topless"><a href="Part2.html"
+                                  title="next chapter">Part II: Idioms</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Jython.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/Jython.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -1463,14 +1472,14 @@ package- private.</td></tr>
           <a href="Part2.html" title="Part II: Idioms"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="Metaclasses.html" title="Metaclasses"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 31, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -21,7 +23,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
-    <link rel="next" title="Coroutines &amp; Concurrency" href="CoroutinesAndConcurrency.html" />
+    <link rel="next" title="Coroutines & Concurrency" href="CoroutinesAndConcurrency.html" />
     <link rel="prev" title="Generators, Iterators, and Itertools" href="GeneratorsIterators.html" /> 
   </head>
   <body>
@@ -32,7 +34,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines & Concurrency"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="GeneratorsIterators.html" title="Generators, Iterators, and Itertools"
@@ -52,7 +54,7 @@
 <p>What makes them so compelling (once you &#8216;get it&#8217;)?</p>
 <p>A two-level list comprehension using <tt class="docutils literal"><span class="pre">os.walk()</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Comprehensions/os_walk_comprehension.py</span>
-<span class="k">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
@@ -77,7 +79,7 @@
 <span class="sd">file path) into your restructured text file, then run the update program to</span>
 <span class="sd">automatically insert the rest of the file.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">difflib</span>
 
 <span class="n">restFiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="s">&quot;_test&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.rst&quot;</span><span class="p">)]</span>
@@ -260,21 +262,28 @@
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="GeneratorsIterators.html" title="previous chapter">Generators, Iterators, and Itertools</a></p>
+            <p class="topless"><a href="GeneratorsIterators.html"
+                                  title="previous chapter">Generators, Iterators, and Itertools</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="CoroutinesAndConcurrency.html" title="next chapter">Coroutines &amp; Concurrency</a></p>
+            <p class="topless"><a href="CoroutinesAndConcurrency.html"
+                                  title="next chapter">Coroutines &amp; Concurrency</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Comprehensions.txt" rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/Comprehensions.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
-            <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -290,7 +299,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines & Concurrency"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="GeneratorsIterators.html" title="Generators, Iterators, and Itertools"
@@ -300,7 +309,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Dec 26, 2008.
+      Last updated on Jan 22, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
