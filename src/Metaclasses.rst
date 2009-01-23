@@ -6,16 +6,42 @@
 Metaclasses
 ********************************************************************************
 
+..  Note:: This chapter is written using Python 2.6 syntax; it will be
+    	   converted to Python 3 at a later date.
+
 Objects are created by other objects: special objects called "classes"
 that we can set up to spit out objects that are configured to our
-liking. What creates these special "class" objects, though? Class
-objects are created by other special objects, called metaclasses.
+liking. 
+
+Classes are just objects, and they can be modified the same
+way::
+
+    >>> class Foo: pass
+    ... 
+    >>> Foo.field = 42
+    >>> x = Foo()
+    >>> x.field
+    42
+    >>> Foo.field2 = 99
+    >>> x.field2
+    99
+    >>> Foo.method = lambda self: "Hi!"
+    >>> x.method()
+    'Hi!'
+
+To modify a class, you perform operations on it like any other
+object. You can add and subtract fields and methods, for example. The
+difference is that any change you make to a class affects all the
+objects of that class, even the ones that have already been instantiated.
+
+What creates these special "class" objects? Other special objects,
+called metaclasses.
 
 The default metaclass is called ``type`` and in the vast majority of
 cases it does the right thing. In some situations, however, you can
 gain leverage by modifying the way that classes are produced --
 typically by performing extra actions or injecting code. When this is
-the case, you can use *metaclass* programming to modify the way that
+the case, you can use *metaclass programming* to modify the way that
 some of your class objects are created.
 
 It's worth re-emphasizing that in *the vast majority of cases, you
@@ -180,10 +206,10 @@ class objects. This is accomplished by:
 In Python 2.x, the metaclass hook is a static field in the class
 called ``__metaclass__``. In the ordinary case, this is not assigned
 so Python just uses ``type`` to create the class. But if you define
-``__metaclass__`` to point to a callable that takes four arguments,
-Python will call ``__metaclass__()`` after the initial creation of the
-class object, passing in the class object, the class name, the list of
-base classes and the namespace dictionary.
+``__metaclass__`` to point to a callable, Python will call
+``__metaclass__()`` after the initial creation of the class object,
+passing in the class object, the class name, the list of base classes
+and the namespace dictionary.
 
 Thus, the basic process of metaclass programming looks like this::
 
@@ -278,7 +304,10 @@ The Metaclass Hook in Python 3
 
 Python 3 changes the metaclass hook. It doesn't disallow the
 ``__metaclass__`` field, but it ignores it. Instead, you use a keyword
-argument in the base-class list:
+argument in the base-class list::
+
+    class Simple1(object, metaclass = SimpleMeta1):
+	...
 
 This means that none of the (clever) alternative ways of defining
 ``__metaclass__`` directly as a class or function are available in
@@ -286,12 +315,8 @@ Python 3 [[check this]]. All metaclasses must be defined as separate
 classes. This is probably just as well, as it makes metaclass programs
 more consistent and thus easier to read and understand.
 
-
-
-
 .. Possible example: simplification of XML creation via operator
    overloading.
-
 
 Example: Self-Registration of Subclasses
 ================================================================================
@@ -310,18 +335,20 @@ subtypes::
 
     # Metaclasses/RegisterLeafClasses.py
 
-    class ClassSet(set):
-        "Simplify printing a set of classes"
-        def __str__(self):
-            return "(" + ", ".join([c.__name__ for c in self]) + ")"
-
     class RegisterLeafClasses(type):
         def __init__(cls, name, bases, nmspc):
             super(RegisterLeafClasses, cls).__init__(name, bases, nmspc)
             if not hasattr(cls, 'registry'):
-                cls.registry = ClassSet()
+                cls.registry = set()
             cls.registry.add(cls)
             cls.registry -= set(bases) # Remove base classes
+        # Metamethods, called on class objects:
+        def __iter__(cls):
+            return iter(cls.registry)
+        def __str__(cls):
+            if cls in cls.registry:
+                return cls.__name__
+            return cls.__name__ + ": " + ", ".join([sc.__name__ for sc in cls])
 
     class Color(object):
         __metaclass__ = RegisterLeafClasses
@@ -330,10 +357,12 @@ subtypes::
     class Red(Color): pass
     class Green(Color): pass
     class Yellow(Color): pass
-    print(Color.registry)
+    print(Color)
     class PhthaloBlue(Blue): pass
     class CeruleanBlue(Blue): pass
-    print(Color.registry)
+    print(Color)
+    for c in Color: # Iterate over subclasses
+        print(c)
 
     class Shape(object):
         __metaclass__ = RegisterLeafClasses
@@ -342,22 +371,32 @@ subtypes::
     class Square(Shape): pass
     class Triangular(Shape): pass
     class Boxy(Shape): pass
-    print(Shape.registry)
+    print(Shape)
     class Circle(Round): pass
     class Ellipse(Round): pass
-    print(Shape.registry)
+    print(Shape)
 
     """ Output:
-    (Red, Blue, Yellow, Green)
-    (Red, CeruleanBlue, Yellow, PhthaloBlue, Green)
-    (Square, Round, Boxy, Triangular)
-    (Square, Ellipse, Boxy, Circle, Triangular)
+    Color: Red, Blue, Green, Yellow
+    Color: Red, CeruleanBlue, Green, PhthaloBlue, Yellow
+    Red
+    CeruleanBlue
+    Green
+    PhthaloBlue
+    Yellow
+    Shape: Square, Round, Boxy, Triangular
+    Shape: Square, Ellipse, Circle, Boxy, Triangular
     """
 
 Two separate tests are used to show that the registries are
 independent of each other. Each test shows what happens when another
 level of leaf classes are added -- the former leaf becomes a base
 class, and so is removed from the registry.
+
+This also introduces *metamethods*, which are defined in the metaclass
+so that they become methods of the class. That is, you call them on
+the class rather than object instances, and their first argument is
+the class object rather than ``self``.
 
 Using Class Decorators
 --------------------------------------------------------------------------------
@@ -592,6 +631,11 @@ being "inherited" from the metaclass).
 
 Metaclass Conflicts
 ================================================================================
+
+Note that the ``metaclass`` argument is singular -- you can't attach
+more than one metaclass to a class. However, through multiple
+inheritance you can *accidentally* end up with more than one
+metaclass, and this produces a conflict which must be resolved.
 
 http://code.activestate.com/recipes/204197/
 

@@ -444,10 +444,37 @@ should always call it first even if it&#8217;s optional when to call it.</p>
 </div>
 </dd>
 </dl>
+<p>If you assign, you get a new one. If it&#8217;s modifiable, then unless you
+assign you are working on a singleton. So a typical pattern is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="n">something</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Static: visible to all classes</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">something</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># New local version for this object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is not a serious example because you would naturally just
+initialize <tt class="docutils literal"><span class="pre">something</span></tt> in <tt class="docutils literal"><span class="pre">Foo</span></tt>&#8216;s constructor.</p>
+</div>
+</div>
+<div class="section" id="useful-techniques">
+<h2>Useful Techniques<a class="headerlink" href="#useful-techniques" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">You can turn a list into function arguments using <tt class="docutils literal"><span class="pre">*</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">):</span> <span class="k">print</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">]</span>
+<span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Basic functional programming with <tt class="docutils literal"><span class="pre">map()</span></tt> etc.</p>
+</li>
+</ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Suggest Further Topics for inclusion in the introductory chapter</p>
-</div>
 </div>
 </div>
 </div>
@@ -476,6 +503,7 @@ should always call it first even if it&#8217;s optional when to call it.</p>
 <li><a class="reference external" href="#static-fields">Static Fields</a></li>
 </ul>
 </li>
+<li><a class="reference external" href="#useful-techniques">Useful Techniques</a></li>
 </ul>
 </li>
 </ul>
@@ -529,7 +557,7 @@ should always call it first even if it&#8217;s optional when to call it.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 22, 2009.
+      Last updated on Jan 23, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

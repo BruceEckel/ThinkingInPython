@@ -48,16 +48,42 @@
           <div class="body">
             
   <div class="section" id="metaclasses">
-<span id="index-29"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
+<span id="index-41"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This chapter is written using Python 2.6 syntax; it will be
+converted to Python 3 at a later date.</p>
+</div>
 <p>Objects are created by other objects: special objects called &#8220;classes&#8221;
 that we can set up to spit out objects that are configured to our
-liking. What creates these special &#8220;class&#8221; objects, though? Class
-objects are created by other special objects, called metaclasses.</p>
+liking.</p>
+<p>Classes are just objects, and they can be modified the same
+way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span> <span class="k">pass</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mf">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">field</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">field2</span> <span class="o">=</span> <span class="mf">99</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">field2</span>
+<span class="go">99</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="s">&quot;Hi!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">method</span><span class="p">()</span>
+<span class="go">&#39;Hi!&#39;</span>
+</pre></div>
+</div>
+<p>To modify a class, you perform operations on it like any other
+object. You can add and subtract fields and methods, for example. The
+difference is that any change you make to a class affects all the
+objects of that class, even the ones that have already been instantiated.</p>
+<p>What creates these special &#8220;class&#8221; objects? Other special objects,
+called metaclasses.</p>
 <p>The default metaclass is called <tt class="docutils literal"><span class="pre">type</span></tt> and in the vast majority of
 cases it does the right thing. In some situations, however, you can
 gain leverage by modifying the way that classes are produced &#8211;
 typically by performing extra actions or injecting code. When this is
-the case, you can use <em>metaclass</em> programming to modify the way that
+the case, you can use <em>metaclass programming</em> to modify the way that
 some of your class objects are created.</p>
 <p>It&#8217;s worth re-emphasizing that in <em>the vast majority of cases, you
 don&#8217;t need metaclasses</em>, because it&#8217;s a fascinating toy and the
@@ -216,10 +242,10 @@ using the <em>metaclass hook</em>.</li>
 <p>In Python 2.x, the metaclass hook is a static field in the class
 called <tt class="docutils literal"><span class="pre">__metaclass__</span></tt>. In the ordinary case, this is not assigned
 so Python just uses <tt class="docutils literal"><span class="pre">type</span></tt> to create the class. But if you define
-<tt class="docutils literal"><span class="pre">__metaclass__</span></tt> to point to a callable that takes four arguments,
-Python will call <tt class="docutils literal"><span class="pre">__metaclass__()</span></tt> after the initial creation of the
-class object, passing in the class object, the class name, the list of
-base classes and the namespace dictionary.</p>
+<tt class="docutils literal"><span class="pre">__metaclass__</span></tt> to point to a callable, Python will call
+<tt class="docutils literal"><span class="pre">__metaclass__()</span></tt> after the initial creation of the class object,
+passing in the class object, the class name, the list of base classes
+and the namespace dictionary.</p>
 <p>Thus, the basic process of metaclass programming looks like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Metaclasses/SimpleMeta1.py</span>
 <span class="c"># Two-step metaclass creation in Python 2.x</span>
@@ -310,6 +336,9 @@ happening: the class object is created, then modified, then returned.</p>
 <p>Python 3 changes the metaclass hook. It doesn&#8217;t disallow the
 <tt class="docutils literal"><span class="pre">__metaclass__</span></tt> field, but it ignores it. Instead, you use a keyword
 argument in the base-class list:</p>
+<div class="highlight-python"><pre>class Simple1(object, metaclass = SimpleMeta1):
+    ...</pre>
+</div>
 <p>This means that none of the (clever) alternative ways of defining
 <tt class="docutils literal"><span class="pre">__metaclass__</span></tt> directly as a class or function are available in
 Python 3 [[check this]]. All metaclasses must be defined as separate
@@ -331,18 +360,20 @@ inheritors). This way we can easily enumerate through all the
 subtypes:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Metaclasses/RegisterLeafClasses.py</span>
 
-<span class="k">class</span> <span class="nc">ClassSet</span><span class="p">(</span><span class="n">set</span><span class="p">):</span>
-    <span class="s">&quot;Simplify printing a set of classes&quot;</span>
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">__name__</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
-
 <span class="k">class</span> <span class="nc">RegisterLeafClasses</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">nmspc</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RegisterLeafClasses</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">nmspc</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;registry&#39;</span><span class="p">):</span>
-            <span class="n">cls</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">ClassSet</span><span class="p">()</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">set</span><span class="p">()</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">registry</span> <span class="o">-=</span> <span class="n">set</span><span class="p">(</span><span class="n">bases</span><span class="p">)</span> <span class="c"># Remove base classes</span>
+    <span class="c"># Metamethods, called on class objects:</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">registry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">sc</span><span class="o">.</span><span class="n">__name__</span> <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">cls</span><span class="p">])</span>
 
 <span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">RegisterLeafClasses</span>
@@ -351,10 +382,12 @@ subtypes:</p>
 <span class="k">class</span> <span class="nc">Red</span><span class="p">(</span><span class="n">Color</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">Green</span><span class="p">(</span><span class="n">Color</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">Yellow</span><span class="p">(</span><span class="n">Color</span><span class="p">):</span> <span class="k">pass</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Color</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">PhthaloBlue</span><span class="p">(</span><span class="n">Blue</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">CeruleanBlue</span><span class="p">(</span><span class="n">Blue</span><span class="p">):</span> <span class="k">pass</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Color</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Color</span><span class="p">:</span> <span class="c"># Iterate over subclasses</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">RegisterLeafClasses</span>
@@ -363,16 +396,21 @@ subtypes:</p>
 <span class="k">class</span> <span class="nc">Square</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">Triangular</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">Boxy</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span> <span class="k">pass</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Shape</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Round</span><span class="p">):</span> <span class="k">pass</span>
 <span class="k">class</span> <span class="nc">Ellipse</span><span class="p">(</span><span class="n">Round</span><span class="p">):</span> <span class="k">pass</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Shape</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span>
 
 <span class="sd">&quot;&quot;&quot; Output:</span>
-<span class="sd">(Red, Blue, Yellow, Green)</span>
-<span class="sd">(Red, CeruleanBlue, Yellow, PhthaloBlue, Green)</span>
-<span class="sd">(Square, Round, Boxy, Triangular)</span>
-<span class="sd">(Square, Ellipse, Boxy, Circle, Triangular)</span>
+<span class="sd">Color: Red, Blue, Green, Yellow</span>
+<span class="sd">Color: Red, CeruleanBlue, Green, PhthaloBlue, Yellow</span>
+<span class="sd">Red</span>
+<span class="sd">CeruleanBlue</span>
+<span class="sd">Green</span>
+<span class="sd">PhthaloBlue</span>
+<span class="sd">Yellow</span>
+<span class="sd">Shape: Square, Round, Boxy, Triangular</span>
+<span class="sd">Shape: Square, Ellipse, Circle, Boxy, Triangular</span>
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
@@ -380,6 +418,10 @@ subtypes:</p>
 independent of each other. Each test shows what happens when another
 level of leaf classes are added &#8211; the former leaf becomes a base
 class, and so is removed from the registry.</p>
+<p>This also introduces <em>metamethods</em>, which are defined in the metaclass
+so that they become methods of the class. That is, you call them on
+the class rather than object instances, and their first argument is
+the class object rather than <tt class="docutils literal"><span class="pre">self</span></tt>.</p>
 <div class="section" id="using-class-decorators">
 <h3>Using Class Decorators<a class="headerlink" href="#using-class-decorators" title="Permalink to this headline">¶</a></h3>
 </div>
@@ -598,6 +640,10 @@ being &#8220;inherited&#8221; from the metaclass).</p>
 </div>
 <div class="section" id="metaclass-conflicts">
 <h2>Metaclass Conflicts<a class="headerlink" href="#metaclass-conflicts" title="Permalink to this headline">¶</a></h2>
+<p>Note that the <tt class="docutils literal"><span class="pre">metaclass</span></tt> argument is singular &#8211; you can&#8217;t attach
+more than one metaclass to a class. However, through multiple
+inheritance you can <em>accidentally</em> end up with more than one
+metaclass, and this produces a conflict which must be resolved.</p>
 <p><a class="reference external" href="http://code.activestate.com/recipes/204197/">http://code.activestate.com/recipes/204197/</a></p>
 </div>
 <div class="section" id="further-reading">
@@ -730,7 +776,7 @@ and edited and so tends to be more authoritative.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 22, 2009.
+      Last updated on Jan 23, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

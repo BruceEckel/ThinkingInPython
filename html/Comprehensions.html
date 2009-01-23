@@ -48,10 +48,20 @@
           <div class="body">
             
   <div class="section" id="comprehensions">
-<span id="index-1"></span><h1>Comprehensions<a class="headerlink" href="#comprehensions" title="Permalink to this headline">¶</a></h1>
+<span id="index-32"></span><h1>Comprehensions<a class="headerlink" href="#comprehensions" title="Permalink to this headline">¶</a></h1>
 <p>History: where did they come from?</p>
 <p>They require a mind shift.</p>
 <p>What makes them so compelling (once you &#8216;get it&#8217;)?</p>
+<div class="section" id="techniques">
+<h2>Techniques<a class="headerlink" href="#techniques" title="Permalink to this headline">¶</a></h2>
+<p>Using <tt class="docutils literal"><span class="pre">zip()</span></tt> and dealing with two or more elements at a time:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_names</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Multiple types (auto unpacking of a tuple):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">all_slots</span><span class="p">,</span> <span class="n">values</span><span class="p">)]</span>
+</pre></div>
+</div>
 <p>A two-level list comprehension using <tt class="docutils literal"><span class="pre">os.walk()</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Comprehensions/os_walk_comprehension.py</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -60,6 +70,7 @@
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">restFiles</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 <div class="section" id="a-more-complex-example">
 <h2>A More Complex Example<a class="headerlink" href="#a-more-complex-example" title="Permalink to this headline">¶</a></h2>
@@ -255,6 +266,7 @@
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Comprehensions</a><ul>
+<li><a class="reference external" href="#techniques">Techniques</a></li>
 <li><a class="reference external" href="#a-more-complex-example">A More Complex Example</a></li>
 </ul>
 </li>
@@ -309,7 +321,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 22, 2009.
+      Last updated on Jan 23, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

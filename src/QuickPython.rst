@@ -447,6 +447,31 @@ Static Fields
 	>>> f2.x
 	'b'
 
+If you assign, you get a new one. If it's modifiable, then unless you
+assign you are working on a singleton. So a typical pattern is::
+
+       class Foo:
+           something = None # Static: visible to all classes
+	   def f(self, x):
+	       if not self.something:
+	       	   self.something = [] # New local version for this object
+	       self.something.append(x)
+
+This is not a serious example because you would naturally just
+initialize ``something`` in ``Foo``\'s constructor.
+
+Useful Techniques
+=======================================================================
+
+- You can turn a list into function arguments using ``*``::
+
+      def f(a,b,c): print a, b, c
+      x = [1,2,3]
+      f(*x)
+      f(*(1,2,3))
+
+- Basic functional programming with ``map()`` etc.
+
 
 .. note:: Suggest Further Topics for inclusion in the introductory chapter
 

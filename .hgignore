@@ -4,7 +4,8 @@ syntax: glob
 *.class
 *~
 *-
-#*
+\#*
+\.\#*
 .db
 .svn
 .swp

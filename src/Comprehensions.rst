@@ -12,6 +12,17 @@ They require a mind shift.
 
 What makes them so compelling (once you 'get it')?
 
+Techniques
+==============================================================================
+
+Using ``zip()`` and dealing with two or more elements at a time::
+
+    ['%s=%s' % (n, v) for n, v in zip(self.all_names, self)]
+
+Multiple types (auto unpacking of a tuple)::
+
+    [f(v) for (n, f), v in zip(cls.all_slots, values)]
+
 A two-level list comprehension using ``os.walk()``::
 
     # Comprehensions/os_walk_comprehension.py
