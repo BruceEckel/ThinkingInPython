@@ -50,3 +50,20 @@ if __name__ == "__main__":
     [create_exec(dsc) for dsc in descriptions]
     exec initializations in globals()
     Event.run_events()
+
+""" Output:
+1.00: Light on [mc]
+1.00: Light on [exec]
+2.00: Light off [mc]
+2.00: Light off [exec]
+3.30: Water on [mc]
+3.30: Water on [exec]
+4.45: Water off [mc]
+4.45: Water off [exec]
+5.00: Thermostat night [mc]
+5.00: Thermostat night [exec]
+6.00: Thermostat day [mc]
+6.00: Thermostat day [exec]
+7.00: Ring bell [mc]
+7.00: Ring bell [exec]
+"""

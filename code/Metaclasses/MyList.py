@@ -10,3 +10,9 @@ ml.append("Camembert")
 print(ml)
 print(ml.x)
 ml.howdy("John")
+
+""" Output:
+['Camembert']
+42
+Howdy, John
+"""
