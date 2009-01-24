@@ -470,11 +470,30 @@ Useful Techniques
       f(*x)
       f(*(1,2,3))
 
+- You can compose classes using ``import``. Here's a method that can
+  be reused by multiple classes:
+
+      # QuickPython/utility.py                                                        
+      def f(self): print "utility.f()!!!"
+
+  Here's how you compose that method into a class::
+
+      # QuickPython/compose.py                                                        
+
+      class Compose:
+      	   from utility import f
+
+      Compose().f()
+
 - Basic functional programming with ``map()`` etc.
 
 
 .. note:: Suggest Further Topics for inclusion in the introductory chapter
 
+Further Reading
+===========================================================================
 
+	Python Programming FAQ:
+	http://www.python.org/doc/faq/programming/
 
-
+	

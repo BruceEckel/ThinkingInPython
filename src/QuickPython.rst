@@ -490,4 +490,10 @@ Useful Techniques
 
 .. note:: Suggest Further Topics for inclusion in the introductory chapter
 
+Further Reading
+===========================================================================
 
+	Python Programming FAQ:
+	http://www.python.org/doc/faq/programming/
+
+	

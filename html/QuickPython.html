@@ -469,6 +469,22 @@ initialize <tt class="docutils literal"><span class="pre">something</span></tt> 
 </pre></div>
 </div>
 </li>
+<li><p class="first">You can compose classes using <tt class="docutils literal"><span class="pre">import</span></tt>. Here&#8217;s a method that can
+be reused by multiple classes:</p>
+<blockquote>
+<p># QuickPython/utility.py
+def f(self): print &#8220;utility.f()!!!&#8221;</p>
+</blockquote>
+<p>Here&#8217;s how you compose that method into a class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/compose.py</span>
+
+<span class="k">class</span> <span class="nc">Compose</span><span class="p">:</span>
+     <span class="kn">from</span> <span class="nn">utility</span> <span class="kn">import</span> <span class="n">f</span>
+
+<span class="n">Compose</span><span class="p">()</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
 <li><p class="first">Basic functional programming with <tt class="docutils literal"><span class="pre">map()</span></tt> etc.</p>
 </li>
 </ul>
@@ -476,6 +492,12 @@ initialize <tt class="docutils literal"><span class="pre">something</span></tt> 
 <p class="first admonition-title">Note</p>
 <p class="last">Suggest Further Topics for inclusion in the introductory chapter</p>
 </div>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+Python Programming FAQ:
+<a class="reference external" href="http://www.python.org/doc/faq/programming/">http://www.python.org/doc/faq/programming/</a></blockquote>
 </div>
 </div>
 
@@ -504,6 +526,7 @@ initialize <tt class="docutils literal"><span class="pre">something</span></tt> 
 </ul>
 </li>
 <li><a class="reference external" href="#useful-techniques">Useful Techniques</a></li>
+<li><a class="reference external" href="#further-reading">Further Reading</a></li>
 </ul>
 </li>
 </ul>
@@ -557,7 +580,7 @@ initialize <tt class="docutils literal"><span class="pre">something</span></tt> 
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 23, 2009.
+      Last updated on Jan 24, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

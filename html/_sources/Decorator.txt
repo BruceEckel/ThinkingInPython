@@ -354,6 +354,14 @@ the price of milk goes up? Having a class for each combination means that you
 need to change a method in each class, and thus maintain many classes. By using
 decorators, maintenance is reduced by defining the logic in one place.
 
+Further Reading
+=======================================================================
+
+    Philip Eby introduces decorators: http://www.ddj.com/web-development/184406073
+
+    Class Decorators:
+    	  - http://www.informit.com/articles/article.aspx?p=1309289&seqNum=4
+
 Exercises
 =======================================================================
 

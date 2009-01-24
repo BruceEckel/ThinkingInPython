@@ -257,6 +257,12 @@ handful of fundamental ideas that can be held in your head while you analyze a
 problem. However, other ideas that come from this list may end up being useful
 as a checklist while walking through and analyzing your design.
 
+Further Reading
+==================================================================================
+
+    Alex Martelli's Video Lectures on Design Patterns in Python:
+    http://www.catonmat.net/blog/learning-python-design-patterns-through-video-lectures/
+
 .. rubric:: Footnotes
 
 .. [#] From Mark Johnson.

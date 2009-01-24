@@ -48,7 +48,7 @@
           <div class="body">
             
   <div class="section" id="metaclasses">
-<span id="index-41"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
+<span id="index-42"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This chapter is written using Python 2.6 syntax; it will be
@@ -637,6 +637,75 @@ version. Because of this behavior, each class ends up with its own
 class-specific <tt class="docutils literal"><span class="pre">instance</span></tt> field (thus <tt class="docutils literal"><span class="pre">instance</span></tt> is not somehow
 being &#8220;inherited&#8221; from the metaclass).</p>
 </div>
+<div class="section" id="a-class-decorator-singleton">
+<h3>A Class Decorator Singleton<a class="headerlink" href="#a-class-decorator-singleton" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Metaclasses/SingletonDecorator.py</span>
+
+<span class="k">def</span> <span class="nf">singleton</span><span class="p">(</span><span class="n">klass</span><span class="p">):</span>
+    <span class="s">&quot;Simple replacement of object creation operation&quot;</span>
+    <span class="k">def</span> <span class="nf">getinstance</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="s">&#39;instance&#39;</span><span class="p">):</span>
+            <span class="n">klass</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">klass</span><span class="o">.</span><span class="n">instance</span>
+    <span class="k">return</span> <span class="n">getinstance</span>
+
+<span class="k">def</span> <span class="nf">singleton</span><span class="p">(</span><span class="n">klass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    More powerful approach: Change the behavior</span>
+<span class="sd">    of the instances AND the class object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">class</span> <span class="nc">Decorated</span><span class="p">(</span><span class="n">klass</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="s">&#39;__init__&#39;</span><span class="p">):</span>
+                <span class="n">klass</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">klass</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot; obj&quot;</span>
+        <span class="n">__str__</span> <span class="o">=</span> <span class="n">__repr__</span>
+    <span class="n">Decorated</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="k">class</span> <span class="nc">ClassObject</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">klass</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="n">__str__</span> <span class="o">=</span> <span class="n">__repr__</span>
+        <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; __call__ &quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">instance</span><span class="p">:</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">Decorated</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">instance</span>
+    <span class="k">return</span> <span class="n">ClassObject</span><span class="p">()</span>
+
+<span class="nd">@singleton</span>
+<span class="k">class</span> <span class="nc">ASingleton</span><span class="p">:</span> <span class="k">pass</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">ASingleton</span><span class="p">()</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">ASingleton</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+<span class="k">print</span> <span class="n">ASingleton</span>
+<span class="k">assert</span> <span class="n">a</span> <span class="ow">is</span> <span class="n">b</span>
+
+<span class="nd">@singleton</span>
+<span class="k">class</span> <span class="nc">BSingleton</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">BSingleton</span><span class="p">(</span><span class="mf">11</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">BSingleton</span><span class="p">(</span><span class="mf">22</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">c</span> <span class="ow">is</span> <span class="n">d</span>
+<span class="k">assert</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span>
+
+<span class="sd">&quot;&quot;&quot; Output:</span>
+<span class="sd">ASingleton __call__</span>
+<span class="sd">ASingleton __call__</span>
+<span class="sd">(ASingleton obj, ASingleton obj)</span>
+<span class="sd">ASingleton</span>
+<span class="sd">ASingleton</span>
+<span class="sd">BSingleton __call__</span>
+<span class="sd">BSingleton __call__</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="metaclass-conflicts">
 <h2>Metaclass Conflicts<a class="headerlink" href="#metaclass-conflicts" title="Permalink to this headline">¶</a></h2>
@@ -719,6 +788,7 @@ and edited and so tends to be more authoritative.</p>
 <li><a class="reference external" href="#using-init-vs-new-in-metaclasses">Using <tt class="docutils literal"><span class="pre">__init__</span></tt> vs. <tt class="docutils literal"><span class="pre">__new__</span></tt> in Metaclasses</a></li>
 <li><a class="reference external" href="#class-methods-and-metamethods">Class Methods and Metamethods</a><ul>
 <li><a class="reference external" href="#intercepting-class-creation">Intercepting Class Creation</a></li>
+<li><a class="reference external" href="#a-class-decorator-singleton">A Class Decorator Singleton</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#metaclass-conflicts">Metaclass Conflicts</a></li>
@@ -776,7 +846,7 @@ and edited and so tends to be more authoritative.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 23, 2009.
+      Last updated on Jan 24, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
