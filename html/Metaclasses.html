@@ -48,7 +48,7 @@
           <div class="body">
             
   <div class="section" id="metaclasses">
-<span id="index-42"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
+<span id="index-44"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This chapter is written using Python 2.6 syntax; it will be
@@ -355,7 +355,7 @@ chapter, the subclasses of <strong>Language</strong> were all the languages that
 needed to be processed. Each <strong>Language</strong> subclass described specific
 processing traits for that language.</p>
 <p>To solve this problem, consider a system that automatically keeps a
-list of all of it&#8217;s &#8220;leaf&#8221; subclasses (only the classes that have no
+list of all of its &#8220;leaf&#8221; subclasses (only the classes that have no
 inheritors). This way we can easily enumerate through all the
 subtypes:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Metaclasses/RegisterLeafClasses.py</span>
@@ -438,10 +438,10 @@ the class object rather than <tt class="docutils literal"><span class="pre">self
 
 <span class="k">class</span> <span class="nc">final</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">final</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">klass</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; is final&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">pass</span>
@@ -449,16 +449,30 @@ the class object rather than <tt class="docutils literal"><span class="pre">self
 <span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">__metaclass__</span><span class="o">=</span> <span class="n">final</span>
 
+<span class="k">print</span> <span class="n">B</span><span class="o">.</span><span class="n">__bases__</span>
+<span class="k">print</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">final</span><span class="p">)</span>
+
 <span class="c"># Produces compile-time error:</span>
 <span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
     <span class="k">pass</span>
 
 <span class="sd">&quot;&quot;&quot; Output:</span>
+<span class="sd">(&lt;class &#39;__main__.A&#39;&gt;,)</span>
+<span class="sd">True</span>
 <span class="sd">...</span>
 <span class="sd">TypeError: B is final</span>
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
+<p>During class object creation, we check to see if any of the bases are
+derived from <tt class="docutils literal"><span class="pre">final</span></tt>. Notice that using a metaclass makes the new
+type an instance of that metaclass, even though the metaclass doesn&#8217;t
+show up in the base-class list.</p>
+<p>Because this process of checking for finality must be installed to
+happen as the subclasses are created, rather than afterwards as
+performed by class decorators, it appears that this is an example of
+something that requires metaclasses and can&#8217;t be accomplished with
+class decorators.</p>
 </div>
 <div class="section" id="using-init-vs-new-in-metaclasses">
 <h2>Using <tt class="docutils literal"><span class="pre">__init__</span></tt> vs. <tt class="docutils literal"><span class="pre">__new__</span></tt> in Metaclasses<a class="headerlink" href="#using-init-vs-new-in-metaclasses" title="Permalink to this headline">¶</a></h2>
@@ -707,6 +721,23 @@ being &#8220;inherited&#8221; from the metaclass).</p>
 </div>
 </div>
 </div>
+<div class="section" id="the-prepare-metamethod">
+<h2>The <tt class="docutils literal"><span class="pre">__prepare__()</span></tt> Metamethod<a class="headerlink" href="#the-prepare-metamethod" title="Permalink to this headline">¶</a></h2>
+<p>One of the things you <em>can&#8217;t</em> do with class decorators is to replace
+the default dictionary. In Python 3 this is enabled with the
+<tt class="docutils literal"><span class="pre">__prepare__()</span></tt> metamethod:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">__prepare__</span><span class="p">(</span><span class="n">mcl</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">odict</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For an example of using both <tt class="docutils literal"><span class="pre">__prepare__()</span></tt> and <tt class="docutils literal"><span class="pre">__slots__</span></tt> in
+metaclasses, see <a class="reference external" href="http://www.artima.com/weblogs/viewpost.jsp?thread=236260">Michele Simionato&#8217;s article</a>.</p>
+</div>
+<div class="section" id="module-level-metaclass-assignment">
+<h2>Module-level <tt class="docutils literal"><span class="pre">__metaclass__</span></tt> Assignment<a class="headerlink" href="#module-level-metaclass-assignment" title="Permalink to this headline">¶</a></h2>
+<p>(Does this work in Python 3? If not is there an alternative?)</p>
+</div>
 <div class="section" id="metaclass-conflicts">
 <h2>Metaclass Conflicts<a class="headerlink" href="#metaclass-conflicts" title="Permalink to this headline">¶</a></h2>
 <p>Note that the <tt class="docutils literal"><span class="pre">metaclass</span></tt> argument is singular &#8211; you can&#8217;t attach
@@ -791,6 +822,8 @@ and edited and so tends to be more authoritative.</p>
 <li><a class="reference external" href="#a-class-decorator-singleton">A Class Decorator Singleton</a></li>
 </ul>
 </li>
+<li><a class="reference external" href="#the-prepare-metamethod">The <tt class="docutils literal"><span class="pre">__prepare__()</span></tt> Metamethod</a></li>
+<li><a class="reference external" href="#module-level-metaclass-assignment">Module-level <tt class="docutils literal"><span class="pre">__metaclass__</span></tt> Assignment</a></li>
 <li><a class="reference external" href="#metaclass-conflicts">Metaclass Conflicts</a></li>
 <li><a class="reference external" href="#further-reading">Further Reading</a></li>
 </ul>
@@ -846,7 +879,7 @@ and edited and so tends to be more authoritative.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 24, 2009.
+      Last updated on Jan 26, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

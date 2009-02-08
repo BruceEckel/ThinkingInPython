@@ -12,7 +12,7 @@ Python 3 Patterns, Recipes and Idioms
    Rules
    DeveloperGuide
    Part1
-   QuickPython
+   PythonForProgrammers
    UnitTesting
    LanguageChanges
    PythonDecorators

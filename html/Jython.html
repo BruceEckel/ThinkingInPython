@@ -242,15 +242,17 @@ but outside of any methods, is what makes it static):</p>
         <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__cmp__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        So sort() will compare only on time.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mf">1</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">:</span> <span class="k">return</span> <span class="mf">1</span>
-        <span class="k">return</span> <span class="mf">0</span>
+        <span class="s">&quot;So sort() will compare only on time.&quot;</span>
+        <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%.2f</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run_events</span><span class="p">():</span>
+        <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">sort</span><span class="p">();</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="k">class</span> <span class="nc">LightOn</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
@@ -280,11 +282,6 @@ but outside of any methods, is what makes it static):</p>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
         <span class="n">Event</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;Ring bell&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
-    <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">sort</span><span class="p">();</span>
-    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
-        <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">ThermostatNight</span><span class="p">(</span><span class="mf">5.00</span><span class="p">)</span>
     <span class="n">LightOff</span><span class="p">(</span><span class="mf">2.00</span><span class="p">)</span>
@@ -293,7 +290,7 @@ but outside of any methods, is what makes it static):</p>
     <span class="n">LightOn</span><span class="p">(</span><span class="mf">1.00</span><span class="p">)</span>
     <span class="n">ThermostatDay</span><span class="p">(</span><span class="mf">6.00</span><span class="p">)</span>
     <span class="n">Bell</span><span class="p">(</span><span class="mf">7.00</span><span class="p">)</span>
-    <span class="n">run</span><span class="p">()</span>
+    <span class="n">Event</span><span class="o">.</span><span class="n">run_events</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -512,7 +509,7 @@ create yourself, as you can see here:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">jc</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition-todo admonition " id="todo-8">
+<div class="admonition-todo admonition " id="todo-43">
 <p class="first admonition-title">Todo</p>
 <p class="last">rewrite to distinguish python generator from above description, or
 choose different name.</p>
@@ -1479,7 +1476,7 @@ package- private.</td></tr>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 22, 2009.
+      Last updated on Jan 26, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>

@@ -96,11 +96,15 @@ We can also add base classes, fields and methods::
     print(ml.x)
     ml.howdy("John")
 
+    print(ml.__class__.__class__)
+
     """ Output:
     ['Camembert']
     42
     Howdy, John
     """
+
+Note that printing the class of the class produces the metaclass.
 
 The ability to generate classes programmatically using ``type`` opens
 up some interesting possibilities. Consider the GreenHouseLanguage.py
@@ -210,6 +214,10 @@ so Python just uses ``type`` to create the class. But if you define
 ``__metaclass__()`` after the initial creation of the class object,
 passing in the class object, the class name, the list of base classes
 and the namespace dictionary.
+
+Python 2.x also allows you to assign to the global ``__metaclass__``
+hook, which will be used if there is not a class-local
+``__metaclass__`` hook (is there an equivalent in Python 3?).
 
 Thus, the basic process of metaclass programming looks like this::
 
@@ -329,7 +337,7 @@ needed to be processed. Each **Language** subclass described specific
 processing traits for that language.
 
 To solve this problem, consider a system that automatically keeps a
-list of all of it's "leaf" subclasses (only the classes that have no
+list of all of its "leaf" subclasses (only the classes that have no
 inheritors). This way we can easily enumerate through all the
 subtypes::
 
@@ -416,10 +424,10 @@ It is sometimes convenient to prevent a class from being inherited::
 
     class final(type):
         def __init__(cls, name, bases, namespace):
+            super(final, cls).__init__(name, bases, namespace)
             for klass in bases:
                 if isinstance(klass, final):
                     raise TypeError(str(klass.__name__) + " is final")
-            super(final, cls).__init__(name, bases, namespace)
 
     class A(object):
         pass
@@ -427,16 +435,30 @@ It is sometimes convenient to prevent a class from being inherited::
     class B(A):
         __metaclass__= final
 
+    print B.__bases__
+    print isinstance(B, final)
+
     # Produces compile-time error:
     class C(B):
         pass
 
     """ Output:
+    (<class '__main__.A'>,)
+    True
     ...
     TypeError: B is final
     """
 
-.. can this be done with decorators?
+During class object creation, we check to see if any of the bases are
+derived from ``final``. Notice that using a metaclass makes the new
+type an instance of that metaclass, even though the metaclass doesn't
+show up in the base-class list.
+
+Because this process of checking for finality must be installed to
+happen as the subclasses are created, rather than afterwards as
+performed by class decorators, it appears that this is an example of
+something that requires metaclasses and can't be accomplished with
+class decorators.
 
 
 Using ``__init__`` vs. ``__new__`` in Metaclasses
@@ -698,6 +720,25 @@ A Class Decorator Singleton
     """
 
 
+The ``__prepare__()`` Metamethod
+================================================================================
+
+One of the things you *can't* do with class decorators is to replace
+the default dictionary. In Python 3 this is enabled with the
+``__prepare__()`` metamethod::
+
+    @classmethod
+    def __prepare__(mcl, name, bases):
+        return odict()
+
+For an example of using both ``__prepare__()`` and ``__slots__`` in
+metaclasses, see `Michele Simionato's article <http://www.artima.com/weblogs/viewpost.jsp?thread=236260>`_.
+
+Module-level ``__metaclass__`` Assignment
+================================================================================
+
+(Does this work in Python 3? If not is there an alternative?)
+
 Metaclass Conflicts
 ================================================================================
 
@@ -743,6 +784,17 @@ Further Reading
       - http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html
       - http://blog.ianbicking.org/self-take-two.html
 
+    Lots of good information about classes, types, metaclasses, etc.,
+    including historical stuff in the Python 2.2 docs (is this
+    duplicated in later versions of the docs):
+      - http://www.python.org/download/releases/2.2/descrintro/
+
     For more advanced study, the book `Putting Metaclasses to Work
     <http://www.pearsonhighered.com/educator/academic/product/0,,0201433052,00%2ben-USS_01DBC.html>`_.
+
+.. Examples: http://www.python.org/doc/essays/metaclasses/
+.. http://www.python.org/download/releases/2.2/descrintro/#metaclasses
+.. http://www.python.org/download/releases/2.2/descrintro/#__new__
+.. http://jurjanpaul.blogspot.com/2009/01/small-metaclass-for-strongly-typed.html
+.. Tracking instances
 

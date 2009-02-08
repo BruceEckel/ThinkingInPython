@@ -4,6 +4,9 @@ Developer Guide
 
 Details for people participating in the book development process.
 
+.. Great article with ideas for document automation, including paver and cog:
+.. http://feedproxy.google.com/~r/DougHellmann/~3/JOnbNzmhSNU/writing-technical-documentation-with.html
+
 Getting Started: The Easiest Approach
 ===============================================================================
 

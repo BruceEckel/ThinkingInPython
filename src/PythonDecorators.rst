@@ -483,7 +483,25 @@ Further Reading
     http://loveandtheft.org/2008/09/22/python-decorators-explained
         Another introduction to decorators.
 
+    http://www.siafoo.net/article/68
+
+    http://www.ddj.com/web-development/184406073
+	Philip Eby introduces decorators. 
+
+    http://www.informit.com/articles/article.aspx?p=1309289&seqNum=4
+	Class Decorators.
+
     http://www.phyast.pitt.edu/~micheles/python/documentation.html
         Michele Simionato's decorator module wraps functions for you. The page
         includes an introduction and some examples.
 
+    http://www.blueskyonmars.com/projects/paver/
+	Kevin Djangoor's replacement for ``make``; heavy use of decorators.
+
+    http://blog.doughellmann.com/2009/01/converting-from-make-to-paver.html
+	Doug Hellman describes the experience of converting from make to paver.
+
+    http://www.informit.com/articles/article.aspx?p=1309289&seqNum=4
+	Class decorators
+
+.. Examples http://www.python.org/dev/peps/pep-0318/#examples

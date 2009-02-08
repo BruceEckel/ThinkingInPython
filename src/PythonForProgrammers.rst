@@ -1,11 +1,11 @@
 
 *******************************************************************************
-Quick Python for Programmers
+Python for Programmers
 *******************************************************************************
 
 This book assumes you're an experienced programmer, and it's best if you have
 learned Python through another book. For everyone else, this chapter gives a
-fast introduction to the language.
+programmer's introduction to the language.
 
 This is not an introductory book. I am assuming that you have worked your way
 through at least *Learning Python* (by Mark Lutz & David Ascher; Oreilly, 1999)
@@ -49,7 +49,7 @@ other people's code. This is accomplished partially through clean, to-the-point
 syntax, but a major factor in code readability is indentation - scoping in
 Python is determined by indentation. For example::
 
-    # QuickPython/if.py
+    # PythonForProgrammers/if.py
     response = "yes"
     if response == "yes":
         print("affirmative")
@@ -95,7 +95,7 @@ you think about it, since you're almost always using a **for** loop to step
 through an array or a container. Python formalizes this by automatically making
 **for** use an iterator that works through a sequence. Here's an example::
 
-    # QuickPython/list.py
+    # PythonForProgrammers/list.py
     list = [ 1, 3, 5, 7, 9, 11 ]
     print(list)
     list.append(13)
@@ -128,7 +128,7 @@ To create a function in Python, you use the **def** keyword, followed by the
 function name and argument list, and a colon to begin the function body. Here is
 the first example turned into a function::
 
-    # QuickPython/myFunction.py
+    # PythonForProgrammers/myFunction.py
     def myFunction(response):
         val = 0
         if response == "yes":
@@ -146,7 +146,7 @@ or return types. Python is a *structurally-typed* language, which means it puts
 the minimum possible requirements on typing. For example, you could pass and
 return different types from the same function::
 
-    # QuickPython/differentReturns.py
+    # PythonForProgrammers/differentReturns.py
     def differentReturns(arg):
         if arg == 1:
             return "one"
@@ -162,7 +162,7 @@ function can apply its operations to that object, but other than that, it
 doesn't care. Here, the same function applies the '**+**' operator to integers
 and strings::
 
-    # QuickPython/sum.py
+    # PythonForProgrammers/sum.py
     def sum(arg1, arg2):
         return arg1 + arg2
 
@@ -181,7 +181,7 @@ is the best of any language I've seen. You can use single or double quotes to
 represent strings, which is very nice because if you surround a string with
 double quotes, you can embed single quotes and vice versa::
 
-    # QuickPython/strings.py
+    # PythonForProgrammers/strings.py
     print("That isn't a horse")
     print('You are not a "Viking"')
     print("""You're just pounding two
@@ -208,7 +208,7 @@ Substitution in strings is exceptionally easy, since Python uses C's
 **printf()** substitution syntax, but for any string at all. You simply follow
 the string with a '**%**' and the values to substitute::
 
-    # QuickPython/stringFormatting.py
+    # PythonForProgrammers/stringFormatting.py
     val = 47
     print("The number is %d" % val)
     val2 = 63.4
@@ -232,7 +232,7 @@ Like everything else in Python, the definition of a class uses a minimum of
 additional syntax. You use the **class** keyword, and inside the body you use
 **def** to create methods. Here's a simple class::
 
-    # QuickPython/SimpleClass.py
+    # PythonForProgrammers/SimpleClass.py
     class Simple:
         def __init__(self, str):
             print("Inside the Simple constructor")
@@ -328,7 +328,7 @@ inheriting class. Note that the **Simple** class, which resides in the file (and
 thus, module) named **SimpleClass** is brought into this new name space using an
 **import** statement::
 
-    # QuickPython/Simple2.py
+    # PythonForProgrammers/Simple2.py
     from SimpleClass import Simple
 
     class Simple2(Simple):
@@ -471,15 +471,14 @@ Useful Techniques
       f(*(1,2,3))
 
 - You can compose classes using ``import``. Here's a method that can
-  be reused by multiple classes:
+  be reused by multiple classes::
 
-      # QuickPython/utility.py                                                        
+  # PythonForProgrammers/utility.py
       def f(self): print "utility.f()!!!"
 
-  Here's how you compose that method into a class::
+Here's how you compose that method into a class::
 
-      # QuickPython/compose.py                                                        
-
+      # PythonForProgrammers/compose.py
       class Compose:
       	   from utility import f
 
@@ -496,4 +495,15 @@ Further Reading
 	Python Programming FAQ:
 	http://www.python.org/doc/faq/programming/
 
-	
+	Python idioms:
+	http://jaynes.colorado.edu/PythonIdioms.html
+
+	Python Tips, Tricks and Hacks:
+	http://www.siafoo.net/article/52
+
+	Building a Virtual Environment for Running Python 3:
+	http://pypi.python.org/pypi/virtualenv
+
+
+.. Good description of the Python packaging system:
+.. http://nameless-sorrows.blogspot.com/2009/02/custom-namespacing-system-for-python.html

@@ -212,15 +212,17 @@ but outside of any methods, is what makes it static)::
             Event.events.append(self)
 
         def __cmp__ (self, other):
-	    """
-	    So sort() will compare only on time.
-	    """
-            if self.time < other.time: return -1
-            if self.time > other.time: return 1
-            return 0
+            "So sort() will compare only on time."
+            return cmp(self.time, other.time)
 
         def run(self):
             print("%.2f: %s" % (self.time, self.action))
+
+        @staticmethod
+        def run_events():
+            Event.events.sort();
+            for e in Event.events:
+                e.run()
 
     class LightOn(Event):
         def __init__(self, time):
@@ -250,11 +252,6 @@ but outside of any methods, is what makes it static)::
         def __init__(self, time):
             Event.__init__(self, "Ring bell", time)
 
-    def run():
-        Event.events.sort();
-        for e in Event.events:
-            e.run()
-
     if __name__ == "__main__":
         ThermostatNight(5.00)
         LightOff(2.00)
@@ -263,7 +260,7 @@ but outside of any methods, is what makes it static)::
         LightOn(1.00)
         ThermostatDay(6.00)
         Bell(7.00)
-        run()
+        Event.run_events()
 
 .. note:: To run this program say ``python GreenHouseLanguage.py`` or
    	  ``jython GreenHouseLanguage.py``.

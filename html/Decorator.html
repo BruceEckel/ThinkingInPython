@@ -64,7 +64,7 @@ interface</p>
 <p>Tradeoff: coding is more complicated when using decorators</p>
 <div class="section" id="basic-decorator-structure">
 <h2>Basic Decorator Structure<a class="headerlink" href="#basic-decorator-structure" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/decorator1.gif" src="_images/decorator1.gif" />
+<img alt="_images/decorator2.gif" src="_images/decorator2.gif" />
 </div>
 <div class="section" id="a-coffee-example">
 <h2>A Coffee Example<a class="headerlink" href="#a-coffee-example" title="Permalink to this headline">¶</a></h2>
@@ -86,7 +86,7 @@ espresso; and three changes - decaf, steamed milk (&#8220;wet&#8221;) and foamed
 <p>One solution is to create an individual class for every combination. Each class
 describes the drink and is responsible for the cost etc. The resulting menu is
 huge, and a part of the class diagram would look something like this:</p>
-<img alt="_images/coffeeExplosion1.gif" src="_images/coffeeExplosion1.gif" />
+<img alt="_images/coffeeExplosion2.gif" src="_images/coffeeExplosion2.gif" />
 <p>The key to using this method is to find the particular combination you want.
 So, once you&#8217;ve found the drink you would like, here is how you would use it, as
 shown in the <strong>CoffeeShop</strong> class in the following code:</p>
@@ -170,7 +170,7 @@ components to describe a particular coffee.</p>
 adds responsibility to a component by wrapping it, but the Decorator conforms to
 the interface of the component it encloses, so the wrapping is transparent.
 Decorators can also be nested without the loss of this transparency.</p>
-<img alt="_images/decoratedCoffee1.gif" src="_images/decoratedCoffee1.gif" />
+<img alt="_images/decoratedCoffee2.gif" src="_images/decoratedCoffee2.gif" />
 <p>Methods invoked on the Decorator can in turn invoke methods in the component,
 and can of course perform processing before or after the invocation.</p>
 <p>So if we added <strong>getTotalCost()</strong> and <strong>getDescription()</strong> methods to the
@@ -275,7 +275,7 @@ reasonably sized menu of basic selections, which would often work exactly as
 they are, but if you wanted to decorate them (whipped cream, decaf etc.) then
 you would use decorators to make the modifications. This is the type of menu you
 are presented with in most coffee shops.</p>
-<img alt="_images/compromiseDecoration1.gif" src="_images/compromiseDecoration1.gif" />
+<img alt="_images/compromiseDecoration2.gif" src="_images/compromiseDecoration2.gif" />
 <p>Here is how to create a basic selection, as well as a decorated selection:</p>
 <div class="highlight-python"><pre># Decorator/compromise/CoffeeShop.py
 # Coffee example with a compromise of basic
@@ -367,16 +367,6 @@ decorators, maintenance is reduced by defining the logic in one place.</p>
 </div>
 <div class="section" id="further-reading">
 <h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<p>Philip Eby introduces decorators: <a class="reference external" href="http://www.ddj.com/web-development/184406073">http://www.ddj.com/web-development/184406073</a></p>
-<dl class="docutils">
-<dt>Class Decorators:</dt>
-<dd><ul class="first last simple">
-<li><a class="reference external" href="http://www.informit.com/articles/article.aspx?p=1309289&amp;seqNum=4">http://www.informit.com/articles/article.aspx?p=1309289&amp;seqNum=4</a></li>
-</ul>
-</dd>
-</dl>
-</blockquote>
 </div>
 <div class="section" id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
@@ -470,7 +460,7 @@ Olives.</li>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 24, 2009.
+      Last updated on Jan 26, 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
