@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Initialization and Cleanup &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
+    <link rel="next" title="Unit Testing &amp; Test-Driven Development" href="UnitTesting.html" />
+    <link rel="prev" title="Python for Programmers" href="PythonForProgrammers.html" />
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UnitTesting.html" title="Unit Testing &amp; Test-Driven Development"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PythonForProgrammers.html" title="Python for Programmers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="initialization-and-cleanup">
+<h1>Initialization and Cleanup<a class="headerlink" href="#initialization-and-cleanup" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="initialization">
+<h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="constructor-calls">
+<h3>Constructor Calls<a class="headerlink" href="#constructor-calls" title="Permalink to this headline">¶</a></h3>
+<p>Automatic base-class constructor calls.</p>
+<p>Calling the base-class constructor first, how to do it using super(), why you
+should always call it first even if it&#8217;s optional when to call it.</p>
+</div>
+<div class="section" id="new-vs-init">
+<h3><strong>__new__()</strong> vs. <strong>__init__()</strong><a class="headerlink" href="#new-vs-init" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="static-fields">
+<h3>Static Fields<a class="headerlink" href="#static-fields" title="Permalink to this headline">¶</a></h3>
+<p>An excellent example of the subtleties of initialization is static fields
+in classes.</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;a&quot;</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;d&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;e&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;e&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&#39;b&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>If you assign, you get a new one. If it&#8217;s modifiable, then unless you
+assign you are working on a singleton. So a typical pattern is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="n">something</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Static: visible to all classes</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">something</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># New local version for this object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is not a serious example because you would naturally just
+initialize <tt class="docutils literal"><span class="pre">something</span></tt> in <tt class="docutils literal"><span class="pre">Foo</span></tt>&#8216;s constructor.</p>
+</div>
+</div>
+<div class="section" id="cleanup">
+<h2>Cleanup<a class="headerlink" href="#cleanup" title="Permalink to this headline">¶</a></h2>
+<p>Cleanup happens to globals by setting them to <tt class="xref docutils literal"><span class="pre">None</span></tt> (what about locals?).
+Does the act of setting them to None cause __del__ to be called, or is
+__del__ called by Python before a global is set to None?</p>
+<p>Consider the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
+    <span class="n">Count</span> <span class="o">=</span> <span class="mf">0</span>   <span class="c"># This represents the count of objects of this class</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="s">&#39;created&#39;</span>
+        <span class="n">Counter</span><span class="o">.</span><span class="n">Count</span> <span class="o">+=</span> <span class="mf">1</span>
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;deleted&#39;</span>
+        <span class="n">Counter</span><span class="o">.</span><span class="n">Count</span> <span class="o">-=</span> <span class="mf">1</span>
+        <span class="k">if</span> <span class="n">Counter</span><span class="o">.</span><span class="n">Count</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Last Counter object deleted&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">Counter</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="s">&#39;Counter objects remaining&#39;</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="s">&quot;First&quot;</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">x</span>
+</pre></div>
+</div>
+<p>Without the final del, you get an exception. Shouldn&#8217;t the normal cleanup
+process take care of this?</p>
+<p>From the Python docs regarding <strong>__del__</strong>:</p>
+<blockquote>
+Warning: Due to the precarious circumstances under which __del__()
+methods are invoked, exceptions that occur during their execution are
+ignored, and a warning is printed to sys.stderr instead. Also, when
+__del__() is invoked in response to a module being deleted (e.g., when
+execution of the program is done), <em>other globals referenced by the
+__del__() method may already have been deleted</em>. For this reason,
+__del__() methods should do the absolute minimum needed to maintain
+external invariants.</blockquote>
+<p>Without the explicit call to <tt class="docutils literal"><span class="pre">del</span></tt>, <tt class="docutils literal"><span class="pre">__del__</span></tt> is only called at the end
+of the program, Counter and/or Count may have already been GC-ed by the
+time <tt class="docutils literal"><span class="pre">__del__</span></tt> is called (the order in which objects are collected is not
+deterministic). The exception means that Counter has already been collectd.
+You can&#8217;t do anything particularly fancy with __del__.</p>
+<p>There are two possible solutions here.</p>
+<blockquote>
+<p>1. Use an explicit finalizer method, such as <tt class="docutils literal"><span class="pre">close()</span></tt> for file
+objects.</p>
+<ol class="arabic simple" start="2">
+<li>Use weak references.</li>
+</ol>
+</blockquote>
+<p>Here&#8217;s an example of weak references, using a WeakValueDictionary and the
+trick of mapping id(self) to self:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">weakref</span> <span class="kn">import</span> <span class="n">WeakValueDictionary</span>
+
+<span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
+    <span class="n">_instances</span> <span class="o">=</span> <span class="n">WeakValueDictionary</span><span class="p">()</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="s">&#39;created&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;deleted&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Count</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Last Counter object deleted&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="s">&#39;Counter objects remaining&#39;</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="s">&quot;First&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now cleanup happens properly without the need for an explicit call to
+<tt class="docutils literal"><span class="pre">del</span></tt>.</p>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/cover.png" alt="Logo"/>
+            </a></p>
+    <font color="Red">This book is in early development; you will find parts that are incorrect &amp; incomplete.</font>
+    
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Initialization and Cleanup</a><ul>
+<li><a class="reference external" href="#initialization">Initialization</a><ul>
+<li><a class="reference external" href="#constructor-calls">Constructor Calls</a></li>
+<li><a class="reference external" href="#new-vs-init"><strong>__new__()</strong> vs. <strong>__init__()</strong></a></li>
+<li><a class="reference external" href="#static-fields">Static Fields</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#cleanup">Cleanup</a></li>
+<li><a class="reference external" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+</ul>
+
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="PythonForProgrammers.html" title="previous chapter">Python for Programmers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="UnitTesting.html" title="next chapter">Unit Testing &amp; Test-Driven Development</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/InitializationAndCleanup.txt">Show Source</a></li>
+            </ul>
+    
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+    <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
+    <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
+    <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UnitTesting.html" title="Unit Testing &amp; Test-Driven Development"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PythonForProgrammers.html" title="Python for Programmers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
+      Last updated on Feb 13, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+    </div>
+  </body>
+</html>

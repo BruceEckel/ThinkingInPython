@@ -398,67 +398,6 @@ particularly difficult syntax and semantics.
             genericity. What python gives us is the genericity. IMHO the analogy
             with template mechanism is not appropriate.
 
-Constructor Calls
--------------------------------------------------------------------------------
-
-Automatic base-class constructor calls.
-
-Calling the base-class constructor first, how to do it using super(), why you
-should always call it first even if it's optional when to call it.
-
-.. guideline: Be rigorous about calling base-class initializers as the
-.. first step of your __init__() method. Call them using super() so
-.. that modifications to the class hierarchy don't cause problems.
-
-Static Fields
--------------------------------------------------------------------------------
-
-::
-	>>> class Foo(object):
-	...   x = "a"
-	... 
-	>>> Foo.x
-	'a'
-	>>> f = Foo()
-	>>> f.x
-	'a'
-	>>> f2 = Foo()
-	>>> f2.x
-	'a'
-	>>> f2.x = 'b'
-	>>> f.x
-	'a'
-	>>> Foo.x = 'c'
-	>>> f.x
-	'c'
-	>>> f2.x
-	'b'
-	>>> Foo.x = 'd'
-	>>> f2.x
-	'b'
-	>>> f.x
-	'd'
-	>>> f3 = Foo()
-	>>> f3.x
-	'd'
-	>>> Foo.x = 'e'
-	>>> f3.x
-	'e'
-	>>> f2.x
-	'b'
-
-If you assign, you get a new one. If it's modifiable, then unless you
-assign you are working on a singleton. So a typical pattern is::
-
-       class Foo:
-           something = None # Static: visible to all classes
-	   def f(self, x):
-	       if not self.something:
-	       	   self.something = [] # New local version for this object
-	       self.something.append(x)
-
-This is not a serious example because you would naturally just
-initialize ``something`` in ``Foo``\'s constructor.
 
 Useful Techniques
 =======================================================================
@@ -507,3 +446,6 @@ Further Reading
 
 .. Good description of the Python packaging system:
 .. http://nameless-sorrows.blogspot.com/2009/02/custom-namespacing-system-for-python.html
+
+.. Getters and setters in Python:
+.. http://eli.thegreenplace.net/2009/02/06/getters-and-setters-in-python/

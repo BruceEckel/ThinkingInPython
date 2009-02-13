@@ -96,11 +96,15 @@ We can also add base classes, fields and methods::
     print(ml.x)
     ml.howdy("John")
 
+    print(ml.__class__.__class__)
+
     """ Output:
     ['Camembert']
     42
     Howdy, John
     """
+
+Note that printing the class of the class produces the metaclass.
 
 The ability to generate classes programmatically using ``type`` opens
 up some interesting possibilities. Consider the GreenHouseLanguage.py
@@ -210,6 +214,10 @@ so Python just uses ``type`` to create the class. But if you define
 ``__metaclass__()`` after the initial creation of the class object,
 passing in the class object, the class name, the list of base classes
 and the namespace dictionary.
+
+Python 2.x also allows you to assign to the global ``__metaclass__``
+hook, which will be used if there is not a class-local
+``__metaclass__`` hook (is there an equivalent in Python 3?).
 
 Thus, the basic process of metaclass programming looks like this::
 
@@ -776,6 +784,17 @@ Further Reading
       - http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html
       - http://blog.ianbicking.org/self-take-two.html
 
+    Lots of good information about classes, types, metaclasses, etc.,
+    including historical stuff in the Python 2.2 docs (is this
+    duplicated in later versions of the docs):
+      - http://www.python.org/download/releases/2.2/descrintro/
+
     For more advanced study, the book `Putting Metaclasses to Work
     <http://www.pearsonhighered.com/educator/academic/product/0,,0201433052,00%2ben-USS_01DBC.html>`_.
+
+.. Examples: http://www.python.org/doc/essays/metaclasses/
+.. http://www.python.org/download/releases/2.2/descrintro/#metaclasses
+.. http://www.python.org/download/releases/2.2/descrintro/#__new__
+.. http://jurjanpaul.blogspot.com/2009/01/small-metaclass-for-strongly-typed.html
+.. Tracking instances
 

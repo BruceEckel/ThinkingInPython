@@ -1,7 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -10,11 +8,10 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
-        COLLAPSE_MODINDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -24,7 +21,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
     <link rel="next" title="Iterators: Decoupling Algorithms from Containers" href="Iterators.html" />
-    <link rel="prev" title="StateMachine" href="StateMachine.html" /> 
+    <link rel="prev" title="StateMachine" href="StateMachine.html" />
   </head>
   <body>
     <div class="related">
@@ -39,14 +36,15 @@
         <li class="right" >
           <a href="StateMachine.html" title="StateMachine"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
-    </div>  
+    </div>
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
+  
   <div class="section" id="decorator-dynamic-type-selection">
 <h1>Decorator: Dynamic Type Selection<a class="headerlink" href="#decorator-dynamic-type-selection" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
@@ -64,7 +62,7 @@ interface</p>
 <p>Tradeoff: coding is more complicated when using decorators</p>
 <div class="section" id="basic-decorator-structure">
 <h2>Basic Decorator Structure<a class="headerlink" href="#basic-decorator-structure" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/decorator2.gif" src="_images/decorator2.gif" />
+<img alt="_images/decorator.gif" src="_images/decorator.gif" />
 </div>
 <div class="section" id="a-coffee-example">
 <h2>A Coffee Example<a class="headerlink" href="#a-coffee-example" title="Permalink to this headline">¶</a></h2>
@@ -86,7 +84,7 @@ espresso; and three changes - decaf, steamed milk (&#8220;wet&#8221;) and foamed
 <p>One solution is to create an individual class for every combination. Each class
 describes the drink and is responsible for the cost etc. The resulting menu is
 huge, and a part of the class diagram would look something like this:</p>
-<img alt="_images/coffeeExplosion2.gif" src="_images/coffeeExplosion2.gif" />
+<img alt="_images/coffeeExplosion.gif" src="_images/coffeeExplosion.gif" />
 <p>The key to using this method is to find the particular combination you want.
 So, once you&#8217;ve found the drink you would like, here is how you would use it, as
 shown in the <strong>CoffeeShop</strong> class in the following code:</p>
@@ -170,7 +168,7 @@ components to describe a particular coffee.</p>
 adds responsibility to a component by wrapping it, but the Decorator conforms to
 the interface of the component it encloses, so the wrapping is transparent.
 Decorators can also be nested without the loss of this transparency.</p>
-<img alt="_images/decoratedCoffee2.gif" src="_images/decoratedCoffee2.gif" />
+<img alt="_images/decoratedCoffee.gif" src="_images/decoratedCoffee.gif" />
 <p>Methods invoked on the Decorator can in turn invoke methods in the component,
 and can of course perform processing before or after the invocation.</p>
 <p>So if we added <strong>getTotalCost()</strong> and <strong>getDescription()</strong> methods to the
@@ -275,7 +273,7 @@ reasonably sized menu of basic selections, which would often work exactly as
 they are, but if you wanted to decorate them (whipped cream, decaf etc.) then
 you would use decorators to make the modifications. This is the type of menu you
 are presented with in most coffee shops.</p>
-<img alt="_images/compromiseDecoration2.gif" src="_images/compromiseDecoration2.gif" />
+<img alt="_images/compromiseDecoration.gif" src="_images/compromiseDecoration.gif" />
 <p>Here is how to create a basic selection, as well as a decorated selection:</p>
 <div class="highlight-python"><pre># Decorator/compromise/CoffeeShop.py
 # Coffee example with a compromise of basic
@@ -413,28 +411,20 @@ Olives.</li>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="StateMachine.html"
-                                  title="previous chapter">StateMachine</a></p>
+            <p class="topless"><a href="StateMachine.html" title="previous chapter">StateMachine</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="Iterators.html"
-                                  title="next chapter">Iterators: Decoupling Algorithms from Containers</a></p>
+            <p class="topless"><a href="Iterators.html" title="next chapter">Iterators: Decoupling Algorithms from Containers</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Decorator.txt"
-                     rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/Decorator.txt">Show Source</a></li>
             </ul>
     
-	  <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -455,13 +445,13 @@ Olives.</li>
         <li class="right" >
           <a href="StateMachine.html" title="StateMachine"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 26, 2009.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+      Last updated on Feb 13, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>
 </html>

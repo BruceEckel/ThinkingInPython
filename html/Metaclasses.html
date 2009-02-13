@@ -1,7 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -10,11 +8,10 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
-        COLLAPSE_MODINDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -24,7 +21,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
     <link rel="next" title="Jython" href="Jython.html" />
-    <link rel="prev" title="Coroutines & Concurrency" href="CoroutinesAndConcurrency.html" /> 
+    <link rel="prev" title="Coroutines &amp; Concurrency" href="CoroutinesAndConcurrency.html" />
   </head>
   <body>
     <div class="related">
@@ -37,18 +34,19 @@
           <a href="Jython.html" title="Jython"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines & Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
-    </div>  
+    </div>
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
+  
   <div class="section" id="metaclasses">
-<span id="index-44"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
+<span id="index-11"></span><h1>Metaclasses<a class="headerlink" href="#metaclasses" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This chapter is written using Python 2.6 syntax; it will be
@@ -131,6 +129,8 @@ its arguments.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">ml</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 <span class="n">ml</span><span class="o">.</span><span class="n">howdy</span><span class="p">(</span><span class="s">&quot;John&quot;</span><span class="p">)</span>
 
+<span class="k">print</span><span class="p">(</span><span class="n">ml</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+
 <span class="sd">&quot;&quot;&quot; Output:</span>
 <span class="sd">[&#39;Camembert&#39;]</span>
 <span class="sd">42</span>
@@ -138,6 +138,7 @@ its arguments.</p>
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
+<p>Note that printing the class of the class produces the metaclass.</p>
 <p>The ability to generate classes programmatically using <tt class="docutils literal"><span class="pre">type</span></tt> opens
 up some interesting possibilities. Consider the GreenHouseLanguage.py
 example in the Jython chapter &#8211; all the subclasses in that case were
@@ -246,6 +247,9 @@ so Python just uses <tt class="docutils literal"><span class="pre">type</span></
 <tt class="docutils literal"><span class="pre">__metaclass__()</span></tt> after the initial creation of the class object,
 passing in the class object, the class name, the list of base classes
 and the namespace dictionary.</p>
+<p>Python 2.x also allows you to assign to the global <tt class="docutils literal"><span class="pre">__metaclass__</span></tt>
+hook, which will be used if there is not a class-local
+<tt class="docutils literal"><span class="pre">__metaclass__</span></tt> hook (is there an equivalent in Python 3?).</p>
 <p>Thus, the basic process of metaclass programming looks like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Metaclasses/SimpleMeta1.py</span>
 <span class="c"># Two-step metaclass creation in Python 2.x</span>
@@ -786,6 +790,14 @@ and edited and so tends to be more authoritative.</p>
 </ul>
 </dd>
 </dl>
+<p>Lots of good information about classes, types, metaclasses, etc.,
+including historical stuff in the Python 2.2 docs (is this
+duplicated in later versions of the docs):</p>
+<blockquote>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/download/releases/2.2/descrintro/">http://www.python.org/download/releases/2.2/descrintro/</a></li>
+</ul>
+</blockquote>
 <p>For more advanced study, the book <a class="reference external" href="http://www.pearsonhighered.com/educator/academic/product/0,,0201433052,00%2ben-USS_01DBC.html">Putting Metaclasses to Work</a>.</p>
 </blockquote>
 </div>
@@ -832,28 +844,20 @@ and edited and so tends to be more authoritative.</p>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="CoroutinesAndConcurrency.html"
-                                  title="previous chapter">Coroutines &amp; Concurrency</a></p>
+            <p class="topless"><a href="CoroutinesAndConcurrency.html" title="previous chapter">Coroutines &amp; Concurrency</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="Jython.html"
-                                  title="next chapter">Jython</a></p>
+            <p class="topless"><a href="Jython.html" title="next chapter">Jython</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Metaclasses.txt"
-                     rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/Metaclasses.txt">Show Source</a></li>
             </ul>
     
-	  <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -872,15 +876,15 @@ and edited and so tends to be more authoritative.</p>
           <a href="Jython.html" title="Jython"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines & Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 26, 2009.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+      Last updated on Feb 13, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>
 </html>

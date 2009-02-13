@@ -29,4 +29,5 @@ Further Reading
     ``multiprocessing`` supports -- is the more important problem to solve, and
     that functional languages don't help that much with this problem.
 
+    http://jessenoller.com/2009/02/01/python-threads-and-the-global-interpreter-lock/
         

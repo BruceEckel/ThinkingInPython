@@ -239,7 +239,7 @@ var Search = {
   },
 
   hasIndex : function() {
-      return this._index !== null;
+      return self._index !== null;
   },
 
   deferQuery : function(query) {
@@ -431,19 +431,13 @@ var Search = {
           listItem.slideDown(5, function() {
             displayNextItem();
           });
-        } else if (DOCUMENTATION_OPTIONS.HAS_SOURCE) {
+        } else {
           $.get('_sources/' + item[0] + '.txt', function(data) {
             listItem.append($.makeSearchSummary(data, searchterms, hlterms));
             Search.output.append(listItem);
             listItem.slideDown(5, function() {
               displayNextItem();
             });
-          });
-        } else {
-          // no source available, just display title
-          Search.output.append(listItem);
-          listItem.slideDown(5, function() {
-            displayNextItem();
           });
         }
       }

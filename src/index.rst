@@ -13,6 +13,7 @@ Python 3 Patterns, Recipes and Idioms
    DeveloperGuide
    Part1
    PythonForProgrammers
+   InitializationAndCleanup
    UnitTesting
    LanguageChanges
    PythonDecorators

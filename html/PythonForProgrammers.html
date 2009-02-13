@@ -1,20 +1,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Python for Programmers &mdash; Python 3 Patterns, Recipes and Idioms</title>
+    <title>Python for Programmers &mdash; Python 3 Patterns, Recipes and Idioms</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
-        COLLAPSE_MODINDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+          URL_ROOT:    '',
+          VERSION:     '1.0',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -23,8 +20,8 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
-    <link rel="next" title="Unit Testing & Test-Driven Development" href="UnitTesting.html" />
-    <link rel="prev" title="Part I: Foundations" href="Part1.html" /> 
+    <link rel="next" title="Initialization and Cleanup" href="InitializationAndCleanup.html" />
+    <link rel="prev" title="Part I: Foundations" href="Part1.html" />
   </head>
   <body>
     <div class="related">
@@ -34,24 +31,25 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="UnitTesting.html" title="Unit Testing & Test-Driven Development"
+          <a href="InitializationAndCleanup.html" title="Initialization and Cleanup"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Part1.html" title="Part I: Foundations"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
-    </div>  
+    </div>
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="quick-python-for-programmers">
-<h1>Quick Python for Programmers<a class="headerlink" href="#quick-python-for-programmers" title="Permalink to this headline">¶</a></h1>
+  
+  <div class="section" id="python-for-programmers">
+<h1>Python for Programmers<a class="headerlink" href="#python-for-programmers" title="Permalink to this headline">¶</a></h1>
 <p>This book assumes you&#8217;re an experienced programmer, and it&#8217;s best if you have
 learned Python through another book. For everyone else, this chapter gives a
-fast introduction to the language.</p>
+programmer&#8217;s introduction to the language.</p>
 <p>This is not an introductory book. I am assuming that you have worked your way
 through at least <em>Learning Python</em> (by Mark Lutz &amp; David Ascher; Oreilly, 1999)
 or an equivalent text before coming to this book.</p>
@@ -84,7 +82,7 @@ quite easy to read your own code long after you&#8217;ve written it, and also to
 other people&#8217;s code. This is accomplished partially through clean, to-the-point
 syntax, but a major factor in code readability is indentation - scoping in
 Python is determined by indentation. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/if.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/if.py</span>
 <span class="n">response</span> <span class="o">=</span> <span class="s">&quot;yes&quot;</span>
 <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;yes&quot;</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;affirmative&quot;</span><span class="p">)</span>
@@ -124,7 +122,7 @@ than just counting through a sequence of numbers. This makes a lot of sense when
 you think about it, since you&#8217;re almost always using a <strong>for</strong> loop to step
 through an array or a container. Python formalizes this by automatically making
 <strong>for</strong> use an iterator that works through a sequence. Here&#8217;s an example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/list.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/list.py</span>
 <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="mf">7</span><span class="p">,</span> <span class="mf">9</span><span class="p">,</span> <span class="mf">11</span> <span class="p">]</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">13</span><span class="p">)</span>
@@ -153,7 +151,7 @@ didn&#8217;t actually describe what your program was supposed to do.</p>
 <p>To create a function in Python, you use the <strong>def</strong> keyword, followed by the
 function name and argument list, and a colon to begin the function body. Here is
 the first example turned into a function:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/myFunction.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/myFunction.py</span>
 <span class="k">def</span> <span class="nf">myFunction</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="mf">0</span>
     <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;yes&quot;</span><span class="p">:</span>
@@ -171,7 +169,7 @@ is the name of the function and the argument identifiers, but no argument types
 or return types. Python is a <em>structurally-typed</em> language, which means it puts
 the minimum possible requirements on typing. For example, you could pass and
 return different types from the same function:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/differentReturns.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/differentReturns.py</span>
 <span class="k">def</span> <span class="nf">differentReturns</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="mf">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&quot;one&quot;</span>
@@ -186,7 +184,7 @@ return different types from the same function:</p>
 function can apply its operations to that object, but other than that, it
 doesn&#8217;t care. Here, the same function applies the &#8216;<strong>+</strong>&#8216; operator to integers
 and strings:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/sum.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/sum.py</span>
 <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">arg1</span> <span class="o">+</span> <span class="n">arg2</span>
 
@@ -203,7 +201,7 @@ Python supports operator overloading, and it does a nice job of it).</p>
 is the best of any language I&#8217;ve seen. You can use single or double quotes to
 represent strings, which is very nice because if you surround a string with
 double quotes, you can embed single quotes and vice versa:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/strings.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/strings.py</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;That isn&#39;t a horse&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;You are not a &quot;Viking&quot;&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;&quot;You&#39;re just pounding two</span>
@@ -226,7 +224,7 @@ literal backslash.</p>
 <p>Substitution in strings is exceptionally easy, since Python uses C&#8217;s
 <strong>printf()</strong> substitution syntax, but for any string at all. You simply follow
 the string with a &#8216;<strong>%</strong>&#8216; and the values to substitute:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/stringFormatting.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/stringFormatting.py</span>
 <span class="n">val</span> <span class="o">=</span> <span class="mf">47</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;The number is </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
 <span class="n">val2</span> <span class="o">=</span> <span class="mf">63.4</span>
@@ -247,7 +245,7 @@ regular expressions.</p>
 <p>Like everything else in Python, the definition of a class uses a minimum of
 additional syntax. You use the <strong>class</strong> keyword, and inside the body you use
 <strong>def</strong> to create methods. Here&#8217;s a simple class:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/SimpleClass.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/SimpleClass.py</span>
 <span class="k">class</span> <span class="nc">Simple</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Inside the Simple constructor&quot;</span><span class="p">)</span>
@@ -332,7 +330,7 @@ listing the name(s) of the class inside parentheses after the name of the
 inheriting class. Note that the <strong>Simple</strong> class, which resides in the file (and
 thus, module) named <strong>SimpleClass</strong> is brought into this new name space using an
 <strong>import</strong> statement:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/Simple2.py</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/Simple2.py</span>
 <span class="kn">from</span> <span class="nn">SimpleClass</span> <span class="kn">import</span> <span class="n">Simple</span>
 
 <span class="k">class</span> <span class="nc">Simple2</span><span class="p">(</span><span class="n">Simple</span><span class="p">):</span>
@@ -398,65 +396,6 @@ to provide weak typing in a strongly-typed language. Thus, in Python you
 automatically get the equivalent of templates - without having to learn that
 particularly difficult syntax and semantics.</p>
 </div>
-<div class="section" id="constructor-calls">
-<h3>Constructor Calls<a class="headerlink" href="#constructor-calls" title="Permalink to this headline">¶</a></h3>
-<p>Automatic base-class constructor calls.</p>
-<p>Calling the base-class constructor first, how to do it using super(), why you
-should always call it first even if it&#8217;s optional when to call it.</p>
-</div>
-<div class="section" id="static-fields">
-<h3>Static Fields<a class="headerlink" href="#static-fields" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt>::</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="gp">... </span>  <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;a&quot;</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;a&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;a&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;a&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;b&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;a&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;c&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;c&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;b&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;d&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;b&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;d&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;d&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Foo</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="s">&#39;e&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f3</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;e&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span><span class="o">.</span><span class="n">x</span>
-<span class="go">&#39;b&#39;</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<p>If you assign, you get a new one. If it&#8217;s modifiable, then unless you
-assign you are working on a singleton. So a typical pattern is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
-    <span class="n">something</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Static: visible to all classes</span>
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">something</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># New local version for this object</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">something</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This is not a serious example because you would naturally just
-initialize <tt class="docutils literal"><span class="pre">something</span></tt> in <tt class="docutils literal"><span class="pre">Foo</span></tt>&#8216;s constructor.</p>
-</div>
 </div>
 <div class="section" id="useful-techniques">
 <h2>Useful Techniques<a class="headerlink" href="#useful-techniques" title="Permalink to this headline">¶</a></h2>
@@ -471,22 +410,24 @@ initialize <tt class="docutils literal"><span class="pre">something</span></tt> 
 </li>
 <li><p class="first">You can compose classes using <tt class="docutils literal"><span class="pre">import</span></tt>. Here&#8217;s a method that can
 be reused by multiple classes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/utility.py</span>
+</pre></div>
+</div>
 <blockquote>
-<p># QuickPython/utility.py
-def f(self): print &#8220;utility.f()!!!&#8221;</p>
+<p>def f(self): print &#8220;utility.f()!!!&#8221;</p>
 </blockquote>
+</li>
+</ul>
 <p>Here&#8217;s how you compose that method into a class:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># QuickPython/compose.py</span>
-
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PythonForProgrammers/compose.py</span>
 <span class="k">class</span> <span class="nc">Compose</span><span class="p">:</span>
      <span class="kn">from</span> <span class="nn">utility</span> <span class="kn">import</span> <span class="n">f</span>
 
 <span class="n">Compose</span><span class="p">()</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>
 </pre></div>
 </div>
-</li>
-<li><p class="first">Basic functional programming with <tt class="docutils literal"><span class="pre">map()</span></tt> etc.</p>
-</li>
+<ul class="simple">
+<li>Basic functional programming with <tt class="docutils literal"><span class="pre">map()</span></tt> etc.</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -496,8 +437,15 @@ def f(self): print &#8220;utility.f()!!!&#8221;</p>
 <div class="section" id="further-reading">
 <h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-Python Programming FAQ:
-<a class="reference external" href="http://www.python.org/doc/faq/programming/">http://www.python.org/doc/faq/programming/</a></blockquote>
+<p>Python Programming FAQ:
+<a class="reference external" href="http://www.python.org/doc/faq/programming/">http://www.python.org/doc/faq/programming/</a></p>
+<p>Python idioms:
+<a class="reference external" href="http://jaynes.colorado.edu/PythonIdioms.html">http://jaynes.colorado.edu/PythonIdioms.html</a></p>
+<p>Python Tips, Tricks and Hacks:
+<a class="reference external" href="http://www.siafoo.net/article/52">http://www.siafoo.net/article/52</a></p>
+<p>Building a Virtual Environment for Running Python 3:
+<a class="reference external" href="http://pypi.python.org/pypi/virtualenv">http://pypi.python.org/pypi/virtualenv</a></p>
+</blockquote>
 </div>
 </div>
 
@@ -514,15 +462,13 @@ Python Programming FAQ:
     
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Quick Python for Programmers</a><ul>
+<li><a class="reference external" href="">Python for Programmers</a><ul>
 <li><a class="reference external" href="#scripting-vs-programming">Scripting vs. Programming</a></li>
 <li><a class="reference external" href="#built-in-containers">Built-In Containers</a></li>
 <li><a class="reference external" href="#functions">Functions</a></li>
 <li><a class="reference external" href="#strings">Strings</a></li>
 <li><a class="reference external" href="#classes">Classes</a><ul>
 <li><a class="reference external" href="#inheritance">Inheritance</a></li>
-<li><a class="reference external" href="#constructor-calls">Constructor Calls</a></li>
-<li><a class="reference external" href="#static-fields">Static Fields</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#useful-techniques">Useful Techniques</a></li>
@@ -533,28 +479,20 @@ Python Programming FAQ:
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="Part1.html"
-                                  title="previous chapter">Part I: Foundations</a></p>
+            <p class="topless"><a href="Part1.html" title="previous chapter">Part I: Foundations</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="UnitTesting.html"
-                                  title="next chapter">Unit Testing &amp; Test-Driven Development</a></p>
+            <p class="topless"><a href="InitializationAndCleanup.html" title="next chapter">Initialization and Cleanup</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/QuickPython.txt"
-                     rel="nofollow">Show Source</a></li>
+              <li><a href="_sources/PythonForProgrammers.txt">Show Source</a></li>
             </ul>
     
-	  <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -570,18 +508,18 @@ Python Programming FAQ:
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="UnitTesting.html" title="Unit Testing & Test-Driven Development"
+          <a href="InitializationAndCleanup.html" title="Initialization and Cleanup"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Part1.html" title="Part I: Foundations"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Jan 24, 2009.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
+      Last updated on Feb 13, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
   </body>
 </html>
