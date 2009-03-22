@@ -486,7 +486,7 @@ Further Reading
     http://www.siafoo.net/article/68
 
     http://www.ddj.com/web-development/184406073
-	Philip Eby introduces decorators. 
+	Philip Eby introduces decorators.
 
     http://www.informit.com/articles/article.aspx?p=1309289&seqNum=4
 	Class Decorators.
@@ -505,3 +505,6 @@ Further Reading
 	Class decorators
 
 .. Examples http://www.python.org/dev/peps/pep-0318/#examples
+
+.. Peek inside a decorated function:
+.. http://groups.google.com/group/comp.lang.python/browse_thread/thread/0fb2ee45dbc101b1
