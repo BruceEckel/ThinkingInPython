@@ -443,9 +443,15 @@ Further Reading
 	Building a Virtual Environment for Running Python 3:
 	http://pypi.python.org/pypi/virtualenv
 
+	Excellent Newsfeed Following Python Articles from Everywhere:
+	http://www.planetpython.org/
+
 
 .. Good description of the Python packaging system:
 .. http://nameless-sorrows.blogspot.com/2009/02/custom-namespacing-system-for-python.html
 
 .. Getters and setters in Python:
 .. http://eli.thegreenplace.net/2009/02/06/getters-and-setters-in-python/
+
+.. The 'with' statement (might require a separate chapter?):
+.. http://jessenoller.com/2009/02/03/get-with-the-program-as-contextmanager-completely-different/

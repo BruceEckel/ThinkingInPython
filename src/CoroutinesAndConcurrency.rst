@@ -70,3 +70,6 @@ Further Reading
 
 .. Also
 .. http://jessenoller.com/2009/02/02/an-interview-with-adam-olsen-author-of-safe-threading-completely-different/
+
+.. Generators and coroutines:
+.. http://groups.google.com/group/comp.lang.python/browse_thread/thread/aacd809829d6b6ce/

@@ -91,5 +91,5 @@ code::
 
 
 
-
+.. iterator patterns http://groups.google.com/group/comp.lang.python/browse_thread/thread/d364e7b16bf151c7
 

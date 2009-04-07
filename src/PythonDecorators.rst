@@ -508,3 +508,9 @@ Further Reading
 
 .. Peek inside a decorated function:
 .. http://groups.google.com/group/comp.lang.python/browse_thread/thread/0fb2ee45dbc101b1
+
+.. Suggestion from a reader:
+.. https://dfwpython.org/repo/Presentations/2009-02-28-Class_Decorators.pdf
+
+.. Another discussion:
+.. http://stackoverflow.com/questions/666216/decorator-classes-in-python

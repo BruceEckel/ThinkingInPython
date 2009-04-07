@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
@@ -8,10 +10,11 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-          URL_ROOT:    '',
-          VERSION:     '1.0',
-          COLLAPSE_MODINDEX: false,
-          FILE_SUFFIX: '.html'
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -20,8 +23,8 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Python 3 Patterns, Recipes and Idioms" href="index.html" />
-    <link rel="next" title="Coroutines &amp; Concurrency" href="CoroutinesAndConcurrency.html" />
-    <link rel="prev" title="Generators, Iterators, and Itertools" href="GeneratorsIterators.html" />
+    <link rel="next" title="Coroutines, Concurrency & Distributed Systems" href="CoroutinesAndConcurrency.html" />
+    <link rel="prev" title="Generators, Iterators, and Itertools" href="GeneratorsIterators.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,25 +34,79 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines, Concurrency & Distributed Systems"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="GeneratorsIterators.html" title="Generators, Iterators, and Itertools"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
-    </div>
+    </div>  
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
-  
   <div class="section" id="comprehensions">
 <span id="index-1"></span><h1>Comprehensions<a class="headerlink" href="#comprehensions" title="Permalink to this headline">¶</a></h1>
 <p>History: where did they come from?</p>
 <p>They require a mind shift.</p>
 <p>What makes them so compelling (once you &#8216;get it&#8217;)?</p>
+<p>Comprehensions are constructs that allow sequences to be built from other sequences. Python 2.0 introduced list comprehensions and Python 3.0 comes with dictionary and set comprehensions.</p>
+<div class="section" id="list-comprehensions">
+<h2>List Comprehensions<a class="headerlink" href="#list-comprehensions" title="Permalink to this headline">¶</a></h2>
+<p>A list comprehension consists of the following parts:</p>
+<ul class="simple">
+<li>An Input Sequence.</li>
+<li>A Variable representing members of the input sequence.</li>
+<li>An Optional Predicate expression.</li>
+<li>An Output Expression producing elements of the output list from members of the Input Sequence that satisfy the predicate.</li>
+</ul>
+<p>Say we need to obtain a list of all the integers in a sequence and then square them:</p>
+<div class="highlight-python"><pre>a_list = [1, ‘4’, 9, ‘a’, 0, 4]
+
+squared_ints = [ e**2 for e in a_list if type(e) == types.IntType ]
+
+print squared_ints
+# [ 1, 81, 0, 16 ]</pre>
+</div>
+<img alt="_images/listComprehensions.gif" src="_images/listComprehensions.gif" />
+<ul class="simple">
+<li>The iterator part iterates through each member <strong>e</strong> of the input sequence <strong>a_list</strong>.</li>
+<li>The predicate checks if the member is an integer.</li>
+<li>If the member is an integer then it is passed to the output expression, squared, to become a member of the output list.</li>
+</ul>
+<p>Much the same results can be achieved using the built in functions, <strong>map</strong>, <strong>filter</strong> and the anonymous <strong>lambda</strong> function.</p>
+<p>The filter function applies a predicate to a sequence:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">IntType</span><span class="p">,</span> <span class="n">a_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Map modifies each member of a sequence:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">**</span><span class="mf">2</span><span class="p">,</span> <span class="n">a_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The two can be combined:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">**</span><span class="mf">2</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">IntType</span><span class="p">,</span> <span class="n">a_list</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above example involves function calls to <strong>map</strong>, <strong>filter</strong>, <strong>type</strong> and two calls to <strong>lambda</strong>. Function calls in Python are expensive. Furthermore the input sequence is traversed through twice and an intermediate list is produced by filter.</p>
+<p>The list comprehension is enclosed within a list so, it is immediately evident that a list is being produced. There is only one function call to <strong>type</strong> and no call to the cryptic <strong>lambda</strong> instead the list comprehension uses a conventional iterator, an expression and an if expression for the optional predicate.</p>
+</div>
+<div class="section" id="nested-comprehensions">
+<h2>Nested Comprehensions<a class="headerlink" href="#nested-comprehensions" title="Permalink to this headline">¶</a></h2>
+<p>An identity matrix of size n is an n by n square matrix with ones on the main diagonal and zeros elsewhere. A 3 by 3 identity matrix is:</p>
+<img alt="_images/idMatrix.png" src="_images/idMatrix.png" />
+<p>In python we can represent such a matrix by a list of lists, where each sub-list represents a row. A 3 by 3 matrix would be represented by the following list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span> <span class="p">[</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span> <span class="p">],</span>
+  <span class="p">[</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span> <span class="p">],</span>
+  <span class="p">[</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span> <span class="p">]</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The above matrix can be generated by the following comprehension:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span> <span class="p">[</span> <span class="mf">1</span> <span class="k">if</span> <span class="n">item_idx</span> <span class="o">==</span> <span class="n">row_idx</span> <span class="k">else</span> <span class="mf">0</span> <span class="k">for</span> <span class="n">item_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">row_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span> <span class="p">]</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="techniques">
 <h2>Techniques<a class="headerlink" href="#techniques" title="Permalink to this headline">¶</a></h2>
 <p>Using <tt class="docutils literal"><span class="pre">zip()</span></tt> and dealing with two or more elements at a time:</p>
@@ -248,6 +305,37 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="set-comprehensions">
+<h2>Set Comprehensions<a class="headerlink" href="#set-comprehensions" title="Permalink to this headline">¶</a></h2>
+<p>Set comprehensions allow sets to be constructed using the same principles as list comprehensions, the only difference is that resulting sequence is a set.</p>
+<p>Say we have a list of names. The list can contain names which only differ in the case used to represent them,   duplicates and names consisting of only one character. We are only interested in names longer then one character and wish to represent all names in the same format: The first letter should be capitalised, all other characters should be lower case.</p>
+<p>Given the list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">names</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;Bob&#39;</span><span class="p">,</span> <span class="s">&#39;JOHN&#39;</span><span class="p">,</span> <span class="s">&#39;alice&#39;</span><span class="p">,</span> <span class="s">&#39;bob&#39;</span><span class="p">,</span> <span class="s">&#39;ALICE&#39;</span><span class="p">,</span> <span class="s">&#39;J&#39;</span><span class="p">,</span> <span class="s">&#39;Bob&#39;</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>We require the set:</p>
+<div class="highlight-python"><pre>{ 'Bob', 'John', 'Alice' }</pre>
+</div>
+<p>Note the new syntax for denoting a set. Members are enclosed in curly braces.</p>
+<p>The following set comprehension accomplishes this:</p>
+<div class="highlight-python"><pre>{ name[0].upper() + name[1:].lower() for name in names if len(name) &gt; 1 }</pre>
+</div>
+</div>
+<div class="section" id="dictionary-comprehensions">
+<h2>Dictionary Comprehensions<a class="headerlink" href="#dictionary-comprehensions" title="Permalink to this headline">¶</a></h2>
+<p>Say we have a dictionary the keys of which are characters and the values of which map to the number of times that character appears in some text. The dictionary currently distinguishes between upper and lower case characters.</p>
+<p>We require a dictionary in which the occurrences of upper and lower case characters are combined:</p>
+<div class="highlight-python"><pre>mcase = {'a':10, 'b': 34, 'A': 7, 'Z':3}
+
+mcase_frequency = { k.lower() : mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0) for k in mcase.keys() }
+
+# mcase_frequency == {'a': 17, 'z': 3, 'b': 34}</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Contributions by Michael Charlton, 3/23/09</p>
+</div>
+</div>
 </div>
 
 
@@ -264,28 +352,40 @@
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Comprehensions</a><ul>
+<li><a class="reference external" href="#list-comprehensions">List Comprehensions</a></li>
+<li><a class="reference external" href="#nested-comprehensions">Nested Comprehensions</a></li>
 <li><a class="reference external" href="#techniques">Techniques</a></li>
 <li><a class="reference external" href="#a-more-complex-example">A More Complex Example</a></li>
+<li><a class="reference external" href="#set-comprehensions">Set Comprehensions</a></li>
+<li><a class="reference external" href="#dictionary-comprehensions">Dictionary Comprehensions</a></li>
 </ul>
 </li>
 </ul>
 
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="GeneratorsIterators.html" title="previous chapter">Generators, Iterators, and Itertools</a></p>
+            <p class="topless"><a href="GeneratorsIterators.html"
+                                  title="previous chapter">Generators, Iterators, and Itertools</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="CoroutinesAndConcurrency.html" title="next chapter">Coroutines &amp; Concurrency</a></p>
+            <p class="topless"><a href="CoroutinesAndConcurrency.html"
+                                  title="next chapter">Coroutines, Concurrency &amp; Distributed Systems</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/Comprehensions.txt">Show Source</a></li>
+              <li><a href="_sources/Comprehensions.txt"
+                     rel="nofollow">Show Source</a></li>
             </ul>
     
-          <h3>Quick search</h3>
-            <form class="search" action="search.html" method="get">
-              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
-              <input type="hidden" name="check_keywords" value="yes" />
-              <input type="hidden" name="area" value="default" />
-            </form>
+	  <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+	      <p style="font-size: 90%">Enter search terms or a module, class or function name.</p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
     <h4><a href="http://www.mindviewinc.com/Books/Python3Patterns/Index.php">Project Homepage</a></h4>
     <h4><a href="http://www.bitbucket.org/BruceEckel/python-3-patterns-idioms/issues/">Corrections/Suggestions</a></h4>
     <h4><a href="http://www.mindviewinc.com/Consulting/Index.php">Consulting &amp; Training</a></h4><br><br>
@@ -301,18 +401,18 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="CoroutinesAndConcurrency.html" title="Coroutines &amp; Concurrency"
+          <a href="CoroutinesAndConcurrency.html" title="Coroutines, Concurrency & Distributed Systems"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="GeneratorsIterators.html" title="Generators, Iterators, and Itertools"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li>
+        <li><a href="index.html">Python 3 Patterns, Recipes and Idioms</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Creative Commons Attribution-Share Alike 3.0.
-      Last updated on Feb 13, 2009.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
+      Last updated on Apr 07, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.
     </div>
   </body>
 </html>
