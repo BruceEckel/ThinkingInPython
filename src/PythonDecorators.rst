@@ -514,3 +514,6 @@ Further Reading
 
 .. Another discussion:
 .. http://stackoverflow.com/questions/666216/decorator-classes-in-python
+
+.. memoization decorators:
+.. http://feedproxy.google.com/~r/GoDeh/~3/-c6IrxBJsvI/memoization-and-stack-use.html

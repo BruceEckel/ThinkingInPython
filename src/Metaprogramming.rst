@@ -1,9 +1,9 @@
 .. index::
-   Metaclasses
+   Metaprogramming
    class decorators
 
 ********************************************************************************
-Metaclasses
+Metaprogramming
 ********************************************************************************
 
 ..  Note:: This chapter is written using Python 2.6 syntax; it will be
@@ -57,7 +57,7 @@ decorators. It is still useful, however, to understand metaclasses,
 and certain results can still be achieved only through metaclass
 programming.
 
-Basic Metaclasses
+Basic Metaprogramming
 ================================================================================
 
 So metaclasses create classes, and classes create instances. Normally
@@ -83,7 +83,7 @@ its arguments.
 
 We can also add base classes, fields and methods::
 
-    # Metaclasses/MyList.py
+    # Metaprogramming/MyList.py
 
     def howdy(self, you):
         print("Howdy, " + you)
@@ -112,7 +112,7 @@ example in the Jython chapter -- all the subclasses in that case were
 written using repetetive code. We can automate the generation of the
 subclasses using ``type``::
 
-    # Metaclasses/GreenHouse.py
+    # Metaprogramming/GreenHouse.py
 
     class Event(object):
         events = [] # static
@@ -221,7 +221,7 @@ hook, which will be used if there is not a class-local
 
 Thus, the basic process of metaclass programming looks like this::
 
-    # Metaclasses/SimpleMeta1.py
+    # Metaprogramming/SimpleMeta1.py
     # Two-step metaclass creation in Python 2.x
 
     class SimpleMeta1(type):
@@ -257,7 +257,7 @@ metaclasses as well.
 ``__metaclass__`` only needs to be callable, so in Python
 2.x it's possible to define ``__metaclass__`` inline::
 
-    # Metaclasses/SimpleMeta2.py
+    # Metaprogramming/SimpleMeta2.py
     # Combining the steps for metaclass creation in Python 2.x
 
     class Simple2(object):
@@ -284,7 +284,7 @@ call to ``type.__init__()``.
 Because it only needs to be callable, it's even possible to define
 ``__metaclass__`` as a function::
 
-    # Metaclasses/SimpleMeta3.py
+    # Metaprogramming/SimpleMeta3.py
     # A function for __metaclass__ in Python 2.x
 
     class Simple4(object):
@@ -341,7 +341,7 @@ list of all of its "leaf" subclasses (only the classes that have no
 inheritors). This way we can easily enumerate through all the
 subtypes::
 
-    # Metaclasses/RegisterLeafClasses.py
+    # Metaprogramming/RegisterLeafClasses.py
 
     class RegisterLeafClasses(type):
         def __init__(cls, name, bases, nmspc):
@@ -419,7 +419,7 @@ Example: Making a Class "Final"
 
 It is sometimes convenient to prevent a class from being inherited::
 
-    # Metaclasses/Final.py
+    # Metaprogramming/Final.py
     # Emulating Java's 'final'
 
     class final(type):
@@ -471,7 +471,7 @@ arbitrarily use ``__new__`` or ``__init__`` -- why choose one over the other?
 ``__init__`` is called after the class is created, to perform
 additional initialization before the class is handed to the caller::
 
-    # Metaclasses/NewVSInit.py
+    # Metaprogramming/NewVSInit.py
     from pprint import pprint
 
     class Tag1: pass
@@ -605,7 +605,7 @@ This example implements *Singleton* using metaclasses, by overriding the
 ``__call__()`` metamethod, which is invoked when a new instance is
 created::
 
-    # Metaclasses/Singleton.py
+    # Metaprogramming/Singleton.py
 
     class Singleton(type):
         instance = None
@@ -654,7 +654,7 @@ A Class Decorator Singleton
 
 ::
 
-    # Metaclasses/SingletonDecorator.py
+    # Metaprogramming/SingletonDecorator.py
 
     def singleton(klass):
         "Simple replacement of object creation operation"
@@ -798,3 +798,10 @@ Further Reading
 .. http://jurjanpaul.blogspot.com/2009/01/small-metaclass-for-strongly-typed.html
 .. Tracking instances
 
+.. Simple example: a @main decorator so you don't have to say if __name__ == '__main__':
+
+.. @precondition and @postcondition (possibly also @invariant?)
+
+.. Clever uses (and bad examples) for metaclasses:
+.. http://blog.tplus1.com/index.php/2009/04/20/i-submitted-my-proposal-for-pyohio-2009/
+.. Note the Python Magazine article of the same name -- find that.

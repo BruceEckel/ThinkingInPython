@@ -54,6 +54,24 @@ to print a spin bar while a computation is running::
         finally:
             spinner.terminate()
 
+
+On the Erlang mail list, four years ago, Erlang expert Joe Armstrong posted this:
+
+    In Concurrency Oriented (CO) programming you concentrate on the concurrency and the messages between the processes. There is no sharing of data.
+
+    [A program] should be thought of thousands of little black boxes all doing things in parallel - these black boxes can send and receive messages. Black boxes can detect errors in other black boxes - that's all.
+    ...
+    Erlang uses a simple functional language inside the [black boxes] - this is not particularly interesting - *any* language that does the job would do - the important bit is the concurrency.
+
+On the Squeak mail list in 1998, Alan Kay had this to say:
+
+    ...Smalltalk is not only NOT its syntax or the class library, it is not even about classes. I'm sorry that I long ago coined the term "objects" for this topic because it gets many people to focus on the lesser idea.
+
+    The big idea is "messaging" -- that is what the kernal of Smalltalk/Squeak is all about... The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be. Think of the internet -- to live, it (a) has to allow many different kinds of ideas and realizations that are beyond any single standard and (b) to allow varying degrees of safe interoperability between these ideas.
+
+    If you focus on just messaging -- and realize that a good metasystem can late bind the various 2nd level architectures used in objects -- then much of the language-, UI-, and OS based discussions on this thread are really quite moot.
+
+
 Further Reading
 ================================================================================
 
@@ -73,3 +91,6 @@ Further Reading
 
 .. Generators and coroutines:
 .. http://groups.google.com/group/comp.lang.python/browse_thread/thread/aacd809829d6b6ce/
+
+.. ShowMeDo: Scientific and Parallel Computing Using IPython:
+.. http://blog.showmedo.com/2009/05/05/scientific-and-parallel-computing-using-ipython/

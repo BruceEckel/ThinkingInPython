@@ -450,8 +450,20 @@ Further Reading
 .. Good description of the Python packaging system:
 .. http://nameless-sorrows.blogspot.com/2009/02/custom-namespacing-system-for-python.html
 
+.. How to package:
+.. http://www.brenelz.com/blog/2009/04/09/writing-a-package-in-python/
+
 .. Getters and setters in Python:
 .. http://eli.thegreenplace.net/2009/02/06/getters-and-setters-in-python/
 
 .. The 'with' statement (might require a separate chapter?):
 .. http://jessenoller.com/2009/02/03/get-with-the-program-as-contextmanager-completely-different/
+
+.. For people who need more basics than this book has to offer, ShowMeDo tutorials on Python:
+.. http://blog.showmedo.com/2009/04/09/python-tutorials-via-learning-paths/
+
+.. importing properties into a class using the 'import' statement:
+.. http://www.artima.com/weblogs/viewpost.jsp?thread=246483
+
+.. need to talk about abstract base classes (not necessarily here; perhaps a "classes" chapter (which includes the previous note)
+
