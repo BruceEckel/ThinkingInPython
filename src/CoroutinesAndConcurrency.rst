@@ -10,6 +10,18 @@
 Coroutines, Concurrency & Distributed Systems
 ********************************************************************************
 
+[[ Will probably need to expand this to multiple chapters:
+
+1. Concurrency Concepts
+2. Coroutines
+3. Processes
+4. Threads
+
+(this isn't final; may need different organization or finer grained. However, it should start
+with simpler concepts and progress to the more difficult ones, as above.)
+
+]]
+
 Primary focus should be on:
 
 1) Using ``yield`` to create coroutines
@@ -19,6 +31,24 @@ Primary focus should be on:
 and then showing some alternative techniques.
 
 foo bar :func:`input` baz.
+
+The GIL
+===============================================================================
+
+The GIL prevents context switches from
+happening in the middle of C code. Basically, it makes any C
+code into a critical section, except when that C code explicitly releases
+the GIL. This greatly simplifies the task of writing extension
+modules as well the Python core. 
+
+The designers of Python made a design decision
+that extension writers would not have to take care of locking.
+Thus, Python is intended to be simple/easy to integrate with any C
+library.  In order to remove the GIL, you'd have to go into all existing
+C code and write explicit locking/unlocking code, and you'd have to do this with
+every new C library as well.
+
+[[ Description of how it supports/impacts reference-counted garbage collection]]
 
 Multiprocessing
 ===============================================================================
