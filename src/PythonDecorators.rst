@@ -504,6 +504,8 @@ Further Reading
     http://www.informit.com/articles/article.aspx?p=1309289&seqNum=4
 	Class decorators
 
+.. Decorating Methods: http://groups.google.com/group/comp.lang.python/browse_thread/thread/956ce6027df6f8e4
+
 .. Examples http://www.python.org/dev/peps/pep-0318/#examples
 
 .. Peek inside a decorated function:
