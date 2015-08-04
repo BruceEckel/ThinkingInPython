@@ -39,7 +39,7 @@ request is poorly named. It should be called a “patch request” or something 
 intuitive.
 
 I apologize profusely to all those whose pull requests I ignored. That’s why: I
-had no idea what they were about.
+had no idea what they were about. (I've written a [blog post explaining pull requests](http://bruceeckel.github.io/2015/08/03/pull-requests-the-linchpin-of-open-source/))
 
 And for everyone else, the DVCS was too big of a hurdle to figure out *and* at
 the same time help contribute to the book. Another lesson that we humans are not
@@ -53,7 +53,8 @@ By the time I had understood all this, it seemed like the moment had passed.
     from another language into Python. I’ve internalized the “design patterns
     represent language failures” concept so I wonder how many of these patterns
     will ultimately be useful. But clearly, a simple translation of the
-    Gang-of-Four patterns into Python is not that helpful.
+    Gang-of-Four patterns into Python is not that helpful. (Here's Peter Norvig on 
+    [Design Patterns for Dynamic Languages](http://norvig.com/design-patterns/)).
 
 I’m leaving this project up for archival etc. reasons, and in case someone wants
 to fork it and incorporate the pull requests (see, that’s another basic question
