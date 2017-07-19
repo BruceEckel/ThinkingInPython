@@ -101,7 +101,7 @@ Exercises
     **PaperScissorsRock.py**). Add a **battle( )** member function to
     **Project** that takes two **Inhabitant**\s and matches them against each
     other. Now create a **meeting( )** member function for **Project** that
-    creates groups of **Dwarf**, **Elf** and **Manager** and battles the groups
+    creates groups of **Dwarf**, **Elf** and **Troll** and battles the groups
     against each other until only members of one group are left standing. These
     are the "winners."
 
