@@ -1,3 +1,47 @@
+from pathlib import Path
+import os
+
+source_order = [
+   "Contributors",
+   "ToDo",
+   "NoteToReaders",
+   "Introduction",
+   "TeachingSupport",
+   "Rules",
+   # "DeveloperGuide",
+   "Part1",
+   "PythonForProgrammers",
+   "InitializationAndCleanup",
+   "UnitTesting",
+   "LanguageChanges",
+   "PythonDecorators",
+   "Metaprogramming",
+   "GeneratorsIterators",
+   "Comprehensions",
+   "CoroutinesAndConcurrency",
+   "Jython",
+   "Part2",
+   "MachineDiscovery",
+   "CanonicalScript",
+   "Messenger",
+   "Part3",
+   "PatternConcept",
+   "Singleton",
+   "AppFrameworks",
+   "Fronting",
+   "StateMachine",
+   "Decorator",
+   "Iterators",
+   "Factory",
+   "FunctionObjects",
+   "ChangeInterface",
+   "TableDriven",
+   "Observer",
+   "MultipleDispatching",
+   "Visitor",
+   "PatternRefactoring",
+   "Projects",
+]
 
 source_dir = Path.cwd().parent / "src"
 dest_dir = Path.cwd().parent / "Markdown"
