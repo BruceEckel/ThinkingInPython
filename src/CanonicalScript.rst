@@ -1,6 +1,3 @@
-..  index::
-    triple: script; command-line; canonical form
-
 ****************************************************************************
 A Canonical Form for Command-Line Programs
 ****************************************************************************

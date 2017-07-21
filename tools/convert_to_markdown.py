@@ -5,23 +5,27 @@ import shutil
 
 def main():
       source_dir = Path.cwd().parent / "src"
+      temp_dir = Path.cwd().parent / "temp"
       dest_dir = Path.cwd().parent / "Markdown"
       def source_file(f): return source_dir / (f + ".rst")
-      def pre_converted(f): return dest_dir / (f + ".rst")
+      def pre_converted(f): return temp_dir / (f + ".rst")
+      def converted(f): return temp_dir / (f + ".md")
       def destination(f, n): return dest_dir / ("%02d_" % n + f + ".md")
-      # source_files = [source_dir / (f + ".rst") for f in source_order]
-      # pre_converted = [dest_dir / (f + ".rst") for f in source_order]
-      # dest_files =   [dest_dir / ("%02d_" % n + f + ".md") for n, f in enumerate(source_order)]
       assert all([source_file(f).exists() for f in source_order])
-      all_files =  [(source_file(f), pre_converted(f), destination(f, n))
-                     for n, f in enumerate(source_order)]
+      all_files =  [
+            (source_file(f), pre_converted(f), converted(f), destination(f, n), n)
+             for n, f in enumerate(source_order)
+      ]
 
+      create_clean_dir(temp_dir)
       create_clean_dir(dest_dir)
-      for rst, pre, md in all_files:
+      for rst, pre, conv, md, n in all_files:
             print(f"{rst.name} -> {md.name}:")
             pre_convert(rst, pre)
-            os.system(f"pandoc {pre} -o {md}")
-            adjust_generated_markdown(md)
+            os.system(f"pandoc {pre} -o {conv}")
+            post_convert(conv, md)
+            if n > -1:
+                  os.system(f"subl {md}")
 
 
 source_order = [
@@ -90,7 +94,7 @@ def adjust_all_listings(lines):
       while(n < len(lines)):
             # Must be blank line followed by 4-space indented line:
             if lines[n-1].strip() == "" and lines[n].startswith("    #"):
-                  print(f"Listing: {lines[n]}")
+                  # print(f"Listing: {lines[n]}")
                   n, lines = adjust_listing(n, lines)
             n += 1
       return lines
@@ -121,13 +125,17 @@ def adjust_listing(n, lines):
             return finish(n, i)
 
 
-def adjust_generated_markdown(md):
+def post_convert(conv, md):
       "Fix up markdown produced by Pandoc transformation from restructured text"
-      lines = md.read_text().splitlines()
-      lines = [ln.replace("\t", "    ") for ln in lines]
+      lines = conv.read_text().splitlines()
+      def replace(old, new):
+            nonlocal lines
+            lines = [ln.replace(old, new) for ln in lines]
+      replace("\t", "    ")
       lines = adjust_all_listings(lines)
-      lines = [ln.replace("\_", "_") for ln in lines]
-      md.with_suffix(".2.md").write_text("\n".join(lines))
+      replace("\_", "_")
+      replace("**", "`")
+      md.write_text("\n".join(lines))
 
 
 if __name__ == '__main__':

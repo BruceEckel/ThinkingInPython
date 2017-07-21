@@ -1,11 +1,3 @@
-.. index::
-   coroutines
-   concurrency
-   threads
-   parallelism
-   multiprocessing
-   GIL: Global Interpreter Lock
-
 ********************************************************************************
 Coroutines, Concurrency & Distributed Systems
 ********************************************************************************
@@ -39,7 +31,7 @@ The GIL prevents context switches from
 happening in the middle of C code. Basically, it makes any C
 code into a critical section, except when that C code explicitly releases
 the GIL. This greatly simplifies the task of writing extension
-modules as well the Python core. 
+modules as well the Python core.
 
 The designers of Python made a design decision
 that extension writers would not have to take care of locking.

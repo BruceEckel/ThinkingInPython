@@ -1,7 +1,3 @@
-.. index::
-   Metaprogramming
-   class decorators
-
 ********************************************************************************
 Metaprogramming
 ********************************************************************************
@@ -11,13 +7,13 @@ Metaprogramming
 
 Objects are created by other objects: special objects called "classes"
 that we can set up to spit out objects that are configured to our
-liking. 
+liking.
 
 Classes are just objects, and they can be modified the same
 way::
 
     >>> class Foo: pass
-    ... 
+    ...
     >>> Foo.field = 42
     >>> x = Foo()
     >>> x.field
@@ -62,7 +58,7 @@ Basic Metaprogramming
 
 So metaclasses create classes, and classes create instances. Normally
 when we write a class, the default metaclass ``type`` is automatically
-invoked to create that class, and we aren't even aware that it's happening. 
+invoked to create that class, and we aren't even aware that it's happening.
 
 It's possible to explicitly code the metaclass' creation of a
 class. ``type`` called with one argument produces the type information
@@ -154,7 +150,7 @@ subclasses using ``type``::
         exec klass in globals()
 
     if __name__ == "__main__":
-        descriptions = ["Light on", "Light off", "Water on", "Water off", 
+        descriptions = ["Light on", "Light off", "Water on", "Water off",
                         "Thermostat night", "Thermostat day", "Ring bell"]
         initializations = "ThermostatNight(5.00); LightOff(2.00); \
             WaterOn(3.30); WaterOff(4.45); LightOn(1.00); \
@@ -279,7 +275,7 @@ metaclasses as well.
 
 The compiler won't accept the ``super()`` call because it says
 ``__metaclass__`` hasn't been defined, forcing us to use the specific
-call to ``type.__init__()``. 
+call to ``type.__init__()``.
 
 Because it only needs to be callable, it's even possible to define
 ``__metaclass__`` as a function::
@@ -587,7 +583,7 @@ it. This use can be confusing -- I tend to hunt for the reason that
 ``__init__()`` has been chosen, and if I can't find it wonder whether
 the author knew what they were doing. I prefer to only use ``__new__()``
 when it has meaning -- when you must in order to change things that
-only ``__new__()`` can change. 
+only ``__new__()`` can change.
 
 Class Methods and Metamethods
 ================================================================================
@@ -679,7 +675,7 @@ A Class Decorator Singleton
         class ClassObject:
             def __init__(cls):
                 cls.instance = None
-            def __repr__(cls): 
+            def __repr__(cls):
                 return klass.__name__
             __str__ = __repr__
             def __call__(cls, *args, **kwargs):
@@ -710,13 +706,13 @@ A Class Decorator Singleton
     assert c is not a
 
     """ Output:
-    ASingleton __call__ 
-    ASingleton __call__ 
+    ASingleton __call__
+    ASingleton __call__
     (ASingleton obj, ASingleton obj)
     ASingleton
     ASingleton
-    BSingleton __call__ 
-    BSingleton __call__ 
+    BSingleton __call__
+    BSingleton __call__
     """
 
 
