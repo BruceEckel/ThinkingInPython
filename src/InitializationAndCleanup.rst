@@ -25,51 +25,41 @@ Static Fields
 -------------------------------------------------------------------------------
 
 An excellent example of the subtleties of initialization is static fields
-in classes.
+in classes::
 
-::
-	>>> class Foo(object):
-	...   x = "a"
-	...
-	>>> Foo.x
-	'a'
-	>>> f = Foo()
-	>>> f.x
-	'a'
-	>>> f2 = Foo()
-	>>> f2.x
-	'a'
-	>>> f2.x = 'b'
-	>>> f.x
-	'a'
-	>>> Foo.x = 'c'
-	>>> f.x
-	'c'
-	>>> f2.x
-	'b'
-	>>> Foo.x = 'd'
-	>>> f2.x
-	'b'
-	>>> f.x
-	'd'
-	>>> f3 = Foo()
-	>>> f3.x
-	'd'
-	>>> Foo.x = 'e'
-	>>> f3.x
-	'e'
-	>>> f2.x
-	'b'
+    # InitializationAndCleanup/static_fields.py
+    class Foo(object):
+            x = "a"
+
+    Foo.x
+    f = Foo()
+    f.x
+    f2 = Foo()
+    f2.x
+    f2.x = 'b'
+    f.x
+    Foo.x = 'c'
+    f.x
+    f2.x
+    Foo.x = 'd'
+    f2.x
+    f.x
+    f3 = Foo()
+    f3.x
+    Foo.x = 'e'
+    f3.x
+    f2.x
 
 If you assign, you get a new one. If it's modifiable, then unless you
 assign you are working on a singleton. So a typical pattern is::
 
-       class Foo:
-           something = None # Static: visible to all classes
-	   def f(self, x):
-	       if not self.something:
-	       	   self.something = [] # New local version for this object
-	       self.something.append(x)
+    # InitializationAndCleanup/static_idiom.py
+    class Foo:
+        something = None # Static: visible to all classes
+    def f(self, x):
+        if not self.something:
+            self.something = [] # New local version for this object
+        self.something.append(x)
 
 This is not a serious example because you would naturally just
 initialize ``something`` in ``Foo``\'s constructor.
@@ -83,6 +73,7 @@ __del__ called by Python before a global is set to None?
 
 Consider the following::
 
+    # InitializationAndCleanup/cleanup.py
     class Counter:
         Count = 0   # This represents the count of objects of this class
         def __init__(self, name):
@@ -130,6 +121,7 @@ There are two possible solutions here.
 Here's an example of weak references, using a WeakValueDictionary and the
 trick of mapping id(self) to self::
 
+    # InitializationAndCleanup/weakref.py
     from weakref import WeakValueDictionary
 
     class Counter:
