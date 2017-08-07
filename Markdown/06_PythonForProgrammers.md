@@ -302,7 +302,9 @@ the bottom of the file to be executed. This particular `if` statement
 is only true when you are running this file directly; that is, if you
 say on the command line:
 
-    Python SimpleClass.py
+```
+python SimpleClass.py
+```
 
 However, if this file is imported as a module into another program, the
 `__main__` code is not executed.
@@ -342,7 +344,9 @@ refer to any of the functions or classes within a module, you give the
 module name, a period, and the function or class name. If you don't want
 the trouble of qualifying the name, you can say
 
+```python
 from module import name(s)
+```
 
 Where "name(s)" can be a list of names separated by commas.
 
@@ -385,18 +389,16 @@ if __name__ == "__main__":
     f(Different())
 ```
 
-> note:: you don't have to explicitly call the base-class constructor if the
+> Note: you don't have to explicitly call the base-class constructor if the
+> argument list is the same. Show example.
 >
-> :   argument list is the same. Show example.
->
-> note:: (Reader) The note above is confusing. Did not understand. IMHO one still
->
-> :   needs to invoke the base-class constructor if the argument is the
+> Note: (from a Reader) The note above is confusing. Did not understand. IMHO one still
+>     needs to invoke the base-class constructor if the argument is the
 >     same. Probably one needs to state that in case the base class
 >     constructor functionality continues to be adequate for the derived
 >     class, then a new constructor need not be declared for the derived
 >     class at all.
->
+
 `Simple2` is inherited from `Simple`, and in the constructor, the
 base-class constructor is called. In `display()`, `showMsg()` can
 be called as a method of `self`, but when calling the base-class
@@ -423,27 +425,29 @@ automatically get the equivalent of templates - without having to learn
 that particularly difficult syntax and semantics.
 
 > (Reader) I am not sure if I agree with the remark about templates. One of the
->
-> :   big objective of templates has always been type safety along with
+>     big objective of templates has always been type safety along with
 >     genericity. What python gives us is the genericity. IMHO the
 >     analogy with template mechanism is not appropriate.
->
+
 Useful Techniques
 -----------------
 
 -   You can turn a list into function arguments using `*`:
 
-        def f(a,b,c): print a, b, c
-        x = [1,2,3]
-        f(*x)
-        f(*(1,2,3))
+```python
+def f(a,b,c): print a, b, c
+    x = [1,2,3]
+    f(*x)
+    f(*(1,2,3))
+```
 
 -   You can compose classes using `import`. Here's a method that can be
     reused by multiple classes:
 
-        # PythonForProgrammers/utility.py
-
-    > def f(self): print "utility.f()!!!"
+```python
+# PythonForProgrammers/utility.py
+def f(self): print "utility.f()!!!"
+```
 
 Here's how you compose that method into a class:
 
@@ -457,20 +461,20 @@ Compose().f()
 
 -   Basic functional programming with `map()` etc.
 
-note:: Suggest Further Topics for inclusion in the introductory chapter
+Note: Suggest Further Topics for inclusion in the introductory chapter
 
 Further Reading
 ---------------
 
 > Python Programming FAQ: <http://www.python.org/doc/faq/programming/>
->
+
 > Python idioms: <http://jaynes.colorado.edu/PythonIdioms.html>
 >
 > Python Tips, Tricks and Hacks: <http://www.siafoo.net/article/52>
->
+
 > Building a Virtual Environment for Running Python 3:
 > <http://pypi.python.org/pypi/virtualenv>
->
+
 > Excellent Newsfeed Following Python Articles from Everywhere:
 > <http://www.planetpython.org/>
 
@@ -490,8 +494,8 @@ For people who need more basics than this book has to offer, ShowMeDo
 tutorials on Python:
 <http://blog.showmedo.com/2009/04/09/python-tutorials-via-learning-paths/>
 
-importing properties into a class using the 'import' statement:
+Importing properties into a class using the 'import' statement:
 <http://www.artima.com/weblogs/viewpost.jsp?thread=246483>
 
-need to talk about abstract base classes (not necessarily here; perhaps
+Need to talk about abstract base classes (not necessarily here; perhaps
 a "classes" chapter (which includes the previous note)
