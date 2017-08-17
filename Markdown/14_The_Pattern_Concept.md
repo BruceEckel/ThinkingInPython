@@ -87,17 +87,17 @@ The *Design Patterns* book discusses 23 different patterns, classified
 under three purposes (all of which revolve around the particular aspect
 that can vary). The three purposes are:
 
-1.  `Creational`: how an object can be created. This often involves
+1.  **Creational**: how an object can be created. This often involves
     isolating the details of object creation so your code isn't
     dependent on what types of objects there are and thus doesn't have
     to be changed when you add a new type of object. The aforementioned
     *Singleton* is classified as a creational pattern, and later in this
     book you'll see examples of *Factory Method* and *Prototype*.
-2.  `Structural`: designing objects to satisfy particular project
+2.  **Structural**: designing objects to satisfy particular project
     constraints. These work with the way objects are connected with
     other objects to ensure that changes in the system don't require
     changes to those connections.
-3.  `Behavioral`: objects that handle particular types of actions
+3.  **Behavioral**: objects that handle particular types of actions
     within a program. These encapsulate processes that you want to
     perform, such as interpreting a language, fulfilling a request,
     moving through a sequence (as in an iterator), or implementing an
@@ -134,16 +134,16 @@ begun to use the term to mean just about anything synonymous with
 "good." After some pondering, I've come up with a sort of hierarchy
 describing a succession of different types of categories:
 
-1.  `Idiom`: how we write code in a particular language to do this
+1.  **Idiom**: how we write code in a particular language to do this
     particular type of thing. This could be something as common as the
     way that you code the process of stepping through an array in C (and
     not running off the end).
-2.  `Specific Design`: the solution that we came up with to solve this
+2.  **Specific Design**: the solution that we came up with to solve this
     particular problem. This might be a clever design, but it makes no
     attempt to be general.
-3.  `Standard Design`: a way to solve this *kind* of problem. A design
+3.  **Standard Design**: a way to solve this *kind* of problem. A design
     that has become more general, typically through reuse.
-4.  `Design Pattern`: how to solve an entire class of similar problem.
+4.  **Design Pattern**: how to solve an entire class of similar problem.
     This usually only appears after applying a standard design a number
     of times, and then seeing a common pattern throughout these
     applications.
@@ -192,23 +192,19 @@ others.] is the present list of candidates, only some of which will make it
 to the final list. Feel free to suggest others, or possibly
 relationships with patterns.
 
--   `Encapsulation`: self containment and embodying a model of usage
--   `Gathering`
--   `Localization`
--   `Separation`
--   `Hiding`
--   `Guarding`
--   `Connector`
--   `Barrier/fence`
--   `Variation in behavior`
--   `Notification`
--   `Transaction`
--
-
-`Mirror`: "the ability to keep a parallel universe(s) in step with the golden
-world"
-
-`Shadow`: "follows your movement and does something different in a different
+-   **Encapsulation**: self containment and embodying a model of usage
+-   **Gathering**
+-   **Localization**
+-   **Separation**
+-   **Hiding**
+-   **Guarding**
+-   **Connector**
+-   **Barrier/fence**
+-   **Variation in behavior**
+-   **Notification**
+-   **Transaction**
+-   **Mirror**: "the ability to keep a parallel universe(s) in step with the golden world"
+-   **Shadow**: "follows your movement and does something different in a different
 medium" (May be a variation on Proxy).
 
 Design Principles
@@ -220,31 +216,31 @@ I realized that a list of design principles is at least as important as design
 structures, but for a different reason: these allow you to ask questions about
 your proposed design, to apply tests for quality.
 
--   `Principle of least astonishment` (don't be astonishing).
--   `Make common things easy, and rare things possible`
--   `Consistency`. One thing has become very clear to me, especially
+-   *Principle of least astonishment* (don't be astonishing).
+-   *Make common things easy, and rare things possible*
+-   *Consistency*. One thing has become very clear to me, especially
     because of Python: the more random rules you pile onto the
     programmer, rules that have nothing to do with solving the problem
     at hand, the slower the programmer can produce. And this does not
     appear to be a linear factor, but an exponential one.
--   `Law of Demeter`: a.k.a. "Don't talk to strangers." An object
+-   *Law of Demeter*: a.k.a. "Don't talk to strangers." An object
     should only reference itself, its attributes, and the arguments of
     its methods. This may also be a way to say "minimize coupling."
--   `Independence` or `Orthogonality`. Express independent ideas
+-   *Independence* or *Orthogonality*. Express independent ideas
     independently. This complements Separation, Encapsulation and
     Variation, and is part of the Low-Coupling-High-Cohesion message.
--   `Managed Coupling`. Simply stating that we should have "low
+-   *Managed Coupling*. Simply stating that we should have "low
     coupling" in a design is usually too vague---coupling happens, and
     the important issue is to acknowledge it and control it, to say
     "coupling can cause problems" and to compensate for those problems
     with a well-considered design or pattern.
--   `Subtraction`: a design is finished when you cannot take anything else
+-   *Subtraction*: a design is finished when you cannot take anything else
     away^[This idea is generally attributed to Antoine de St. Exupery from *The
     Little Prince*: "La perfection est atteinte non quand il ne reste rien à
     ajouter, mais quand il ne reste rien à enlever," or: "perfection is reached
     not when there's nothing left to add, but when there's nothing left to
     remove".].
--   `Simplicity before generality`^[From an email from Kevlin Henney.].
+-   *Simplicity before generality*^[From an email from Kevlin Henney.].
     (A variation of *Occam's Razor*,
     which says "the simplest solution is the best"). A common problem we
     find in frameworks is that they are designed to be general purpose
@@ -256,9 +252,9 @@ your proposed design, to apply tests for quality.
     So, this principle acts as the tie breaker between otherwise equally
     viable design alternatives. Of course, it is entirely possible that
     the simpler solution is the more general one.
--   `Reflexivity` (my suggested term). One abstraction per class, one
+-   *Reflexivity* (my suggested term). One abstraction per class, one
     class per abstraction. Might also be called Isomorphism.
--   `Once and once only`: Avoid duplication of logic and structure
+-   *Once and once only*: Avoid duplication of logic and structure
     where the duplication is not accidental, ie where both pieces of
     code express the same intent for the same reason.
 
