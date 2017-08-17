@@ -1,11 +1,11 @@
-Decorator: Dynamic Type Selection
-=================================
+Decorators
+==========
 
-> note:: I think we can rewrite this chapter to use Python decorators as
->
-> :   implementation (thus the decorators chapter should precede this
->     one).
->
+> Dynamic Type Selection
+
+Note: I think we can rewrite this chapter to use Python decorators as
+implementations (thus the decorators chapter should precede this one).
+
 The use of layered objects to dynamically and transparently add
 responsibilities to individual objects is referred to as the *decorator*
 pattern.

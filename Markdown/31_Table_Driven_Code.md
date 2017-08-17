@@ -1,5 +1,7 @@
-Table-Driven Code: Configuration Flexibility
-============================================
+Table-Driven Code
+=================
+
+>  Configuration Flexibility
 
 Table-Driven Code Using Anonymous Inner Classes
 -----------------------------------------------

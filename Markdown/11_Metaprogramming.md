@@ -1,10 +1,9 @@
 Metaprogramming
 ===============
 
-> Note:: This chapter is written using Python 2.6 syntax; it will be
->
-> :   converted to Python 3 at a later date.
->
+> Note:This chapter is written using Python 2.6 syntax; it will be
+> converted to Python 3 at a later date.
+
 Objects are created by other objects: special objects called "classes"
 that we can set up to spit out objects that are configured to our
 liking.

@@ -1,5 +1,5 @@
-Building Application Frameworks
-===============================
+Application Frameworks
+======================
 
 An application framework allows you to inherit from a class or set of
 classes and create a new application, reusing most of the code in the

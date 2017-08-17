@@ -1,9 +1,7 @@
 Introduction
 ============
 
-raw:: html
-
-> &lt;font size="+1"&gt;The vision for this book.&lt;/font&gt;
+> The vision for this book.
 
 A Team Effort
 -------------

@@ -1,5 +1,7 @@
-Factory: Encapsulating Object Creation
-======================================
+Factory
+=======
+
+> Encapsulating Object Creation
 
 When you discover that you need to add new types to a system, the most
 sensible first step is to use polymorphism to create a common interface

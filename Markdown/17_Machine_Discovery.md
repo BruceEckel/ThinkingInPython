@@ -1,5 +1,7 @@
-Discovering the Details About Your Platform
-===========================================
+Machine Discovery
+=================
+
+> Discovering the Details About Your Platform
 
 The Python library XXX will give you some information about your
 machine, but it falls short. Here's a rather messy, but useful way to

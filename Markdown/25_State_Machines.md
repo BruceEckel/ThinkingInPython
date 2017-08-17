@@ -1,5 +1,5 @@
-StateMachine
-============
+State Machines
+==============
 
 While *State* has a way to allow the client programmer to change the
 implementation, *StateMachine* imposes a structure to automatically

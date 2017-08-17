@@ -1,7 +1,7 @@
 Pattern Refactoring
 ===================
 
-note:: This chapter has not had any significant translation yet.
+Note: This chapter has not had any significant translation yet.
 
 This chapter will look at the process of solving a problem by applying
 design patterns in an evolutionary fashion. That is, a first cut design

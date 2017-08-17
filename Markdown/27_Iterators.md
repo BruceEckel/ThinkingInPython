@@ -1,7 +1,9 @@
-Iterators: Decoupling Algorithms from Containers
-================================================
+Iterators
+=========
 
-note:: This chapter has not had any significant translation yet.
+> Decoupling Algorithms from Containers
+
+Note: This chapter has not had any significant translation yet.
 
 Alexander Stepanov thought for years about the problem of generic
 programming techniques before creating the STL (along with Dave Musser).

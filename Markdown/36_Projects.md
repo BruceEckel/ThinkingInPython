@@ -1,7 +1,7 @@
 Projects
 ========
 
-note:: This chapter has not had any significant translation yet.
+Note: This chapter has not had any significant translation yet.
 
 A number of more challenging projects for you to solve. {{Some of
 these may turn into examples in the book, and so at some point might

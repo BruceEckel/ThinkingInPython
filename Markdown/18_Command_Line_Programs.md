@@ -1,5 +1,5 @@
-A Canonical Form for Command-Line Programs
-==========================================
+Command-Line Programs
+=====================
 
 Creating Python programs for command-line use involves a certain amount
 of repetitious coding, which can often be left off or forgotten. Here is

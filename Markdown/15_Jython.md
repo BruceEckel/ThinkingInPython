@@ -1,14 +1,12 @@
 Jython
 ======
 
-note:: This chapter is being brought up to date with Jython 2.5,
+Note: This chapter is being brought up to date with Jython 2.5,
+and will need changes when Jython 3 comes out.
 
-:   and will need changes when Jython 3 comes out.
-
-note:: Some of the descriptions in this chapter are introductory, so
-
-:   that the material can be used to introduce Java programmers to
-    Jython.
+Note: Some of the descriptions in this chapter are introductory, so
+that the material can be used to introduce Java programmers to
+Jython.
 
 Sometimes it's easier and faster to temporarily step into another
 language to solve a particular aspect of your problem.
@@ -118,12 +116,12 @@ from subprocess import Popen, PIPE
 print platform.uname() # What are we running on?
 print glob.glob("*.py") # Find files with .py extensions
 # Send a command to the OS and capture the results:
-print Popen(["ping", "-c", "1", "www.mindview.net"], 
+print Popen(["ping", "-c", "1", "www.mindview.net"],
                stdout=PIPE).communicate()[0]
     # Time an operation:
 start = time.time()
 for n in xrange(1000000):
-    for i in xrange(10): 
+    for i in xrange(10):
             oct(i)
     print time.time() - start
 ```
@@ -292,7 +290,7 @@ loaded:
 > >
 > > public class GreenHouseController {
 > >
-> > :   
+> > :
 > >
 > >     public static void main(String\[\] args) throws PyException {
 > >
@@ -631,7 +629,7 @@ complete explanation:
 > >
 > > public class PythonInterpreterSetting {
 > >
-> > :   
+> > :
 > >
 > >     public static void main(String\[\] args) throws PyException {
 > >

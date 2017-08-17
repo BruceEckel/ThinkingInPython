@@ -1,7 +1,7 @@
 Observer
 ========
 
-Decoupling code behavior
+> Decoupling code behavior
 
 *Observer*, and a category of callbacks called "multiple dispatching
 (not in *Design Patterns*)" including the *Visitor* from *Design

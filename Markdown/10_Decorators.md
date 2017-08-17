@@ -1,10 +1,8 @@
 Decorators
 ==========
 
-note:: This chapter is a work in progress; it's probably better if you don't
+> Note blog series on decorators can be incorporated here.
 
-:   begin making changes until I've finished the original version, which
-    is being posted as a series on my weblog.
 
 This amazing feature appeared in the language almost apologetically and
 with concern that it might not be that useful.

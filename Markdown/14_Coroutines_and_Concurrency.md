@@ -1,5 +1,5 @@
-Coroutines, Concurrency & Distributed Systems
-=============================================
+Coroutines and Concurrency
+=======================
 
 {{ Will probably need to expand this to multiple chapters:
 
