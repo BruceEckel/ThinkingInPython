@@ -133,7 +133,7 @@ solver.changeAlgorithm(Bisection())
 print(solver.minima(line))
 ```
 
-Note similarity with template method - TM claims distinction that it has
+Note similarity with template method---TM claims distinction that it has
 more than one method to call, does things piecewise. However, it's not
 unlikely that strategy object would have more than one method call;
 consider Shalloway's order fulfullment system with country information

@@ -99,7 +99,7 @@ Now, this may not look consistent with the code you see above:
     for i in shapeNameGen(7)
 
 looks like there's an initialization taking place. This is where a
-generator is a bit strange - when you call a function that contains a
+generator is a bit strange---when you call a function that contains a
 `yield` statement (`yield` is a new keyword that determines that a
 function is a generator), that function actually returns a generator
 object that has an iterator. This iterator is implicitly used in the
@@ -346,7 +346,7 @@ Method*, both of which will be explained later.
 
 Of course, the above scaffolding of `Obstacle`, `Character` and
 `GameElementFactory` (which was translated from the Java version of
-this example) is unnecessary - it's only required for languages that
+this example) is unnecessary---it's only required for languages that
 have static type checking. As long as the concrete Python classes follow
 the form of the required classes, we don't need any base classes:
 

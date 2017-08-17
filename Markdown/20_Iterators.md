@@ -8,7 +8,7 @@ Note: This chapter has not had any significant translation yet.
 Alexander Stepanov thought for years about the problem of generic
 programming techniques before creating the STL (along with Dave Musser).
 He came to the conclusion that all algorithms are defined on algebraic
-structures - what we would call containers.
+structures---what we would call containers.
 
 In the process, he realized that iterators are central to the use of
 algorithms, because they decouple the algorithms from the specific type
@@ -26,7 +26,7 @@ C++ STL was to provide this *generic programming* approach for C++ (how
 successful this approach will actually be remains to be seen).
 
 If you've used containers in Java (and it's hard to write code without
-using them), you've used iterators - in the form of the `Enumeration`
+using them), you've used iterators---in the form of the `Enumeration`
 in Java 1.0/1.1 and the `Iterator` in Java 2. So you should already be
 familiar with their general use. If not, see Chapter 9, *Holding Your
 Objects*, under *Iterators* in *Thinking in Java, 3rd edition* (freely

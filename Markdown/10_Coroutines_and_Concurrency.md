@@ -1,5 +1,5 @@
 Coroutines and Concurrency
-=======================
+==========================
 
 {{ Will probably need to expand this to multiple chapters:
 
@@ -83,11 +83,11 @@ posted this:
 > sharing of data.
 >
 > \[A program\] should be thought of thousands of little black boxes all
-> doing things in parallel - these black boxes can send and receive
-> messages. Black boxes can detect errors in other black boxes - that's
+> doing things in parallel---these black boxes can send and receive
+> messages. Black boxes can detect errors in other black boxes---that's
 > all. ... Erlang uses a simple functional language inside the \[black
-> boxes\] - this is not particularly interesting - *any* language that
-> does the job would do - the important bit is the concurrency.
+> boxes\]---this is not particularly interesting---*any* language that
+> does the job would do---the important bit is the concurrency.
 
 On the Squeak mail list in 1998, Alan Kay had this to say:
 

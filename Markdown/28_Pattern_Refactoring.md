@@ -896,7 +896,7 @@ accept `Object` and it would still work.
 can iterate through the `Tbin`s when it's looking for a match for the
 `Trash` object you've handed it. If it doesn't find a match, it
 creates a new `Tbin` for the type that hasn't been found, and makes a
-recursive call to itself - the next time around, the new bin will be
+recursive call to itself---the next time around, the new bin will be
 found.
 
 Notice the genericity of this code: it doesn't change at all if new
@@ -1755,4 +1755,3 @@ rubric:: Footnotes
 \[\#\] This was a solution created by Jaroslav Tulach in a design patterns class
 
 :   that I gave in Prague.
-

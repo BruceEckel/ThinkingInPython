@@ -67,4 +67,3 @@ Exercises
 
     > 1.  Converts all the letters in each file to uppercase.
     > 2.  Searches the files for words given in the first file.
-

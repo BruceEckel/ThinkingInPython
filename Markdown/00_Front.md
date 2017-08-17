@@ -32,4 +32,3 @@ This book was created as an eBook for tablets and computers. That is, it was not
 first created for print and then converted. It is an eBook first---all layout
 and formatting is designed to optimize your viewing experience on the various
 eBook reading platforms and systems.
-

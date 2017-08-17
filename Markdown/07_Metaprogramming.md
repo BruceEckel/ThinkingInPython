@@ -768,15 +768,15 @@ Further Reading
 > :   <http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html>
 >
 > Three-part in-depth coverage of metaclasses on IBM Developer Works. Quite useful and authoritative:
->
-> :   -   <http://www.ibm.com/developerworks/linux/library/l-pymeta.html>
->     -   <http://www.ibm.com/developerworks/linux/library/l-pymeta2/>
->     -   <http://www.ibm.com/developerworks/linux/library/l-pymeta3.html>
->
+
+-   <http://www.ibm.com/developerworks/linux/library/l-pymeta.html>
+-   <http://www.ibm.com/developerworks/linux/library/l-pymeta2/>
+-   <http://www.ibm.com/developerworks/linux/library/l-pymeta3.html>
+
 > Michele Simionato's articles on Artima, with special emphasis on the difference between Python 2.x and 3.x metaclasses:
->
-> :   -   <http://www.artima.com/weblogs/viewpost.jsp?thread=236234>
->     -   <http://www.artima.com/weblogs/viewpost.jsp?thread=236260>
+
+-   <http://www.artima.com/weblogs/viewpost.jsp?thread=236234>
+-   <http://www.artima.com/weblogs/viewpost.jsp?thread=236260>
 >
 > Once you understand the foundations, you can find lots of examples by
 > searching for "metaclass" within the Python Cookbook:
@@ -787,12 +787,12 @@ Further Reading
 > and so tends to be more authoritative.
 >
 > Ian Bicking writes about metaclasses:
->
-> :   -   <http://blog.ianbicking.org/a-conservative-metaclass.html>
->     -   <http://blog.ianbicking.org/metaclass-fun.html>
->     -   <http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html>
->     -   <http://blog.ianbicking.org/self-take-two.html>
->
+
+-   <http://blog.ianbicking.org/a-conservative-metaclass.html>
+-   <http://blog.ianbicking.org/metaclass-fun.html>
+-   <http://blog.ianbicking.org/A-Declarative-Syntax-Extension.html>
+-   <http://blog.ianbicking.org/self-take-two.html>
+
 > Lots of good information about classes, types, metaclasses, etc.,
 > including historical stuff in the Python 2.2 docs (is this duplicated
 > in later versions of the docs): -

@@ -357,7 +357,7 @@ can't see the internals; you can only access the `public` portions of
 the class. Thus, black-box testing corresponds more closely to
 functional testing, to verify the methods that the client programmer is
 going to use. In addition, black-box testing provides a minimal
-instruction sheet to the client programmer - in the absence of all other
+instruction sheet to the client programmer---in the absence of all other
 documentation, the black-box tests at least demonstrate how to make
 basic calls to the `public` class methods.
 
@@ -549,4 +549,3 @@ Exercises
     Type `make` and observe the results.
 3.  Modify your solutions to the exercises in Chapter 1 by adding unit
     tests. Write makefiles that incorporate the unit tests.
-

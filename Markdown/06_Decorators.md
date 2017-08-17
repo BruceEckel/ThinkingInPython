@@ -41,7 +41,7 @@ combinations, there will be sizeable class diagrams. So for clarity we
 will only consider a subset of the coffees: Espresso, Espresso Con
 Panna, Café Late, Cappuccino and Café Mocha. We'll include 2 extras -
 whipped cream ("whipped") and an extra shot of espresso; and three
-changes - decaf, steamed milk ("wet") and foamed milk ("dry").
+changes---decaf, steamed milk ("wet") and foamed milk ("dry").
 
 Class for Each Combination
 --------------------------
@@ -354,7 +354,7 @@ What happens if we decide to change the menu at a later stage, such as
 by adding a new type of drink? If we had used the class per combination
 approach, the effect of adding an extra such as syrup would be an
 exponential growth in the number of classes. However, the implications
-to the all decorator or compromise approaches are the same - one extra
+to the all decorator or compromise approaches are the same---one extra
 class is created.
 
 How about the effect of changing the cost of steamed milk and foamed

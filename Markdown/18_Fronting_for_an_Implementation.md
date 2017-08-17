@@ -1,6 +1,3 @@
-Fronting for an Implementation
-==============================
-
 Both *Proxy* and *State* provide a surrogate class that you use in your
 code; the real class that does the work is hidden behind this surrogate
 class. When you call a method in the surrogate, it simply turns around

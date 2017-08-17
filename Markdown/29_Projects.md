@@ -16,7 +16,7 @@ maze, and is used as information comes back about the structure of a
 maze from the rats that are investigating it.
 
 Now create the maze itself. Like a real maze, this object reveals very
-little information about itself - given a coordinate, it will tell you
+little information about itself---given a coordinate, it will tell you
 whether there are walls or spaces in the four directions immediately
 surrounding that coordinate, but no more. For starters, read the maze in
 from a text file but consider hunting on the internet for a

@@ -1247,4 +1247,3 @@ rubric:: Footnotes
 :   `python.security.respectJavaAccessibility = true` to `false`
     makes testing even more powerful because it allows the test script
     to use *all* methods, even protected and package- private.
-

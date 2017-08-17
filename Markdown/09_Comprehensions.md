@@ -27,8 +27,10 @@ A list comprehension consists of the following parts:
 Say we need to obtain a list of all the integers in a sequence and then
 square them:
 
-    a_list = [1, ‘4’, 9, ‘a’, 0, 4] 
-    squared_ints = [ e`2 for e in a_list if type(e) == types.IntType ] 
+    a_list = [1, ‘4’, 9, ‘a’, 0, 4]
+
+    squared_ints = [ e`2 for e in a_list if type(e) == types.IntType ]
+
     print squared_ints
     # [ 1, 81, 0, 16 ]
 
@@ -152,7 +154,7 @@ def shift(listing):
     "Shift the listing left by 4 spaces"
     return [x[4:] if x.startswith("    ") else x for x in listing.splitlines()]
 
-# TEST - makes duplicates of the rst files in a test directory to test update():
+# TEST---makes duplicates of the rst files in a test directory to test update():
 dirs = set([os.path.join("_test", os.path.dirname(f)) for f in restFiles])
 if [os.makedirs(d) for d in dirs if not os.path.exists(d)]:
     [shutil.copy(f, os.path.join("_test", f)) for f in restFiles]
