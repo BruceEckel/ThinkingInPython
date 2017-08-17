@@ -186,16 +186,16 @@ example in program design.
 Improving the Design
 --------------------
 
-The solutions in *Design Patterns* are organized around the question
-"What will change as this program evolves?" This is usually the most
-important question that you can ask about any design. If you can build
-your system around the answer, the results will be two-pronged: not only
-will your system allow easy (and inexpensive) maintenance, but you might
-also produce components that are reusable, so that other systems can be
-built more cheaply. This is the promise of object-oriented programming,
-but it doesn't happen automatically; it requires thought and insight on
-your part. In this section we'll see how this process can happen during
-the refinement of a system.
+The solutions in *Design Patterns*^[Addison-Wesley, 1999.] are organized
+around the question "What will change as this program evolves?" This is
+usually the most important question that you can ask about any design. If you
+can build your system around the answer, the results will be two-pronged: not
+only will your system allow easy (and inexpensive) maintenance, but you might
+also produce components that are reusable, so that other systems can be built
+more cheaply. This is the promise of object-oriented programming, but it
+doesn't happen automatically; it requires thought and insight on your part. In
+this section we'll see how this process can happen during the refinement of a
+system.
 
 The answer to the question "What will change?" for the recycling system
 is a common one: more types will be added to the system. The goal of the
@@ -1342,15 +1342,16 @@ class. If we ignore that we can instead see an opportunity to use the
 will produce the same interface as `Trash` and add the extra `accept(
 )` method. In fact, it's a perfect example of the value of *Decorator*.
 
-The double dispatch creates a problem, however. Since it relies on
-overloading of both `accept()` and `visit()`, it would seem to
-require specialized code for each different version of the `accept()`
-method. With C++ templates, this would be fairly easy to accomplish
-(since templates automatically generate type-specialized code) but
-Python has no such mechanism-at least it does not appear to. However,
-reflection allows you to determine type information at run time, and it
-turns out to solve many problems that would seem to require templates
-(albeit not as simply). Here's the decorator that does the trick :
+The double dispatch creates a problem, however. Since it relies on overloading
+of both `accept()` and `visit()`, it would seem to require specialized code
+for each different version of the `accept()` method. With C++ templates, this
+would be fairly easy to accomplish (since templates automatically generate
+type-specialized code) but Python has no such mechanism-at least it does not
+appear to. However, reflection allows you to determine type information at run
+time, and it turns out to solve many problems that would seem to require
+templates (albeit not as simply). Here's the decorator that does the
+trick^[This was a solution created by Jaroslav Tulach in a design patterns
+class that I gave in Prague.]:
 
 ```python
 # PatternRefactoring/trashvisitor/VisitableDecorator.py
@@ -1747,10 +1748,3 @@ Exercises
     dispatching example, along with an "adapter decorator" class like
     the one created for `VisitableDecorator`. Build the rest of the
     example and show that it works.
-
-rubric:: Footnotes
-
-\[\#\] Addison-Wesley, 1999.
-
-\[\#\] This was a solution created by Jaroslav Tulach in a design patterns class
-that I gave in Prague.
