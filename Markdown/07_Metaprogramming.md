@@ -225,7 +225,7 @@ Thus, the basic process of metaclass programming looks like this:
 class SimpleMeta1(type):
     def __init__(cls, name, bases, nmspc):
         super(SimpleMeta1, cls).__init__(name, bases, nmspc)
-        cls.uses_metaclass = lambda self : "Yes!"
+        cls.uses_metaclass = lambda self: "Yes!"
 
 class Simple1(object):
     __metaclass__ = SimpleMeta1
@@ -267,7 +267,7 @@ class Simple2(object):
             # super(__metaclass__, cls).__init__(name, bases, nmspc)
             # Less-flexible specific call:
             type.__init__(cls, name, bases, nmspc)
-            cls.uses_metaclass = lambda self : "Yes!"
+            cls.uses_metaclass = lambda self: "Yes!"
 
 class Simple3(Simple2): pass
 simple = Simple3()
@@ -292,7 +292,7 @@ Because it only needs to be callable, it's even possible to define
 class Simple4(object):
     def __metaclass__(name, bases, nmspc):
         cls = type(name, bases, nmspc)
-        cls.uses_metaclass = lambda self : "Yes!"
+        cls.uses_metaclass = lambda self: "Yes!"
         return cls
 
 simple = Simple4()
@@ -674,7 +674,7 @@ def singleton(klass):
         def __init__(self, *args, `kwargs):
             if hasattr(klass, '__init__'):
                 klass.__init__(self, *args, `kwargs)
-        def __repr__(self) : return klass.__name__ + " obj"
+        def __repr__(self): return klass.__name__ + " obj"
         __str__ = __repr__
     Decorated.__name__ = klass.__name__
     class ClassObject:
@@ -755,17 +755,14 @@ Further Reading
 ---------------
 
 > Excellent step-by-step introduction to metaclasses:
->
-> :   <http://cleverdevil.org/computing/78/>
->
+-   <http://cleverdevil.org/computing/78/>
+
 > Metaclass intro and comparison of syntax between Python 2.x and 3.x:
->
-> :   <http://mikewatkins.ca/2008/11/29/python-2-and-3-metaclasses/>
->
+-   <http://mikewatkins.ca/2008/11/29/python-2-and-3-metaclasses/>
+
 > David Mertz's metaclass primer:
->
-> :   <http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html>
->
+-   <http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html>
+
 > Three-part in-depth coverage of metaclasses on IBM Developer Works. Quite useful and authoritative:
 
 -   <http://www.ibm.com/developerworks/linux/library/l-pymeta.html>
@@ -776,15 +773,15 @@ Further Reading
 
 -   <http://www.artima.com/weblogs/viewpost.jsp?thread=236234>
 -   <http://www.artima.com/weblogs/viewpost.jsp?thread=236260>
->
+
 > Once you understand the foundations, you can find lots of examples by
 > searching for "metaclass" within the Python Cookbook:
-> <http://code.activestate.com/recipes/langs/python/>
->
+-   <http://code.activestate.com/recipes/langs/python/>
+
 > The printed version of the Python Cookbook has far fewer examples than
 > the online version, but the print version has been filtered and edited
 > and so tends to be more authoritative.
->
+
 > Ian Bicking writes about metaclasses:
 
 -   <http://blog.ianbicking.org/a-conservative-metaclass.html>
