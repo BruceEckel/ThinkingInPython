@@ -73,13 +73,13 @@ but certainly not required---you could concievably want to override it,
 but typically the behavior change will occur in `State`'s `run()`
 instead.
 
-At this point the basic framework for this style of *StateMachine*
-(where each state decides the next states) is complete. As an example,
-I'll use a fancy mousetrap that can move through several states in the
-process of trapping a mouse. The mouse classes and information are
-stored in the `mouse` package, including a class representing all the
-possible moves that a mouse can make, which will be the inputs to the
-state machine:
+At this point the basic framework for this style of *StateMachine* (where each
+state decides the next states) is complete. As an example, I'll use a fancy
+mousetrap that can move through several states in the process of trapping a
+mouse^[No mice were harmed in the creation of this example.]. The mouse
+classes and information are stored in the `mouse` package, including a class
+representing all the possible moves that a mouse can make, which will be the
+inputs to the state machine:
 
 ```python
 # StateMachine/mouse/MouseAction.py
@@ -752,10 +752,6 @@ Exercises
     state machine). Add a method to produce an iterator, but this method
     should take an `int` argument that specifies the number of moves
     to produce before `hasNext()` returns `false`.
-
-rubric:: Footnotes
-
-\[\#\] No mice were harmed in the creation of this example.
 
 Both *Proxy* and *State* provide a surrogate class that you use in your
 code; the real class that does the work is hidden behind this surrogate
