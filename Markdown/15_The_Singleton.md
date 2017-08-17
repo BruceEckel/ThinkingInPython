@@ -261,14 +261,12 @@ Exercises
     that manages a fixed number of its own objects. Assume the objects
     are database connections and you only have a license to use a fixed
     quantity of these at any one time.
-3.  Modify `BorgSingleton.py` so that it uses a class `__new__(
-    )` method.
+3.  Modify `BorgSingleton.py` so that it uses a class `__new__()` method.
 
 rubric:: Footnotes
 
 \[\#\] From the television show *Star Trek: The Next Generation*. The Borg are
-
-:   a hive-mind collective: "we are all one."
+a hive-mind collective: "we are all one."
 
 \[\#\] From Dmitry Balabanov.
 

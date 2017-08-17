@@ -325,8 +325,7 @@ classes. This is probably just as well, as it makes metaclass programs
 more consistent and thus easier to read and understand.
 
 Possible example: simplification of XML creation via operator
-
-:   overloading.
+overloading.
 
 Example: Self-Registration of Subclasses
 ----------------------------------------

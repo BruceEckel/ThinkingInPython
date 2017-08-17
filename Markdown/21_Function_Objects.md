@@ -142,9 +142,9 @@ in each strategy.
 Strategy example from standard Python: `sort()` takes a second
 optional argument that acts as a comparator object; this is a strategy.
 
-note:: A better, real world example is numerical integration, shown here:
+Note: A better, real world example is numerical integration, shown here:
 
-:   <http://www.rosettacode.org/wiki/Numerical_Integration#Python>
+-   <http://www.rosettacode.org/wiki/Numerical_Integration#Python>
 
 Chain of Responsibility
 -----------------------
@@ -309,7 +309,6 @@ Exercises
 rubric:: Footnotes
 
 \[\#\] In Python, all functions are already objects and so the *Command* pattern
-
-:   is often redundant.
+is often redundant.
 
 \[\#\] *Design Patterns*, Page 235.

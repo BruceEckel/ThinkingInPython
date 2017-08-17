@@ -1,3 +1,6 @@
+Fronting for an Implementation
+==============================
+
 Both *Proxy* and *State* provide a surrogate class that you use in your
 code; the real class that does the work is hidden behind this surrogate
 class. When you call a method in the surrogate, it simply turns around
@@ -175,4 +178,4 @@ of the single base class). In addition, *Proxy* need not use the same
 base class for its implementation, as long as the proxy object is
 controlling access to the object it "fronting" for. Regardless of the
 specifics, in both *Proxy* and *State* a surrogate is passing method
-calls through to an implementation object.}}\]
+calls through to an implementation object.}}

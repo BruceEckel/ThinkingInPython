@@ -285,9 +285,8 @@ others.
 \[\#\] A free email publication. See *www.BruceEckel.com* to subscribe.
 
 \[\#\] This idea is generally attributed to Antoine de St. Exupery from *The Little Prince*: "La perfection est atteinte non quand il ne reste rien à
-
-:   ajouter, mais quand il ne reste rien à enlever," or: "perfection is
-    reached not when there's nothing left to add, but when there's
-    nothing left to remove".
+ajouter, mais quand il ne reste rien à enlever," or: "perfection is
+reached not when there's nothing left to add, but when there's
+nothing left to remove".
 
 \[\#\] From an email from Kevlin Henney.

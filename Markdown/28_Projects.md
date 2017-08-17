@@ -130,7 +130,7 @@ class Maze(Canvas):
                         y*(canvasHeight/height),
                         canvasWidth/width,
                         canvasHeight/height)
-                        break::
+                        break
 
 
 # Projects/ratsAndMazes/Rat.py

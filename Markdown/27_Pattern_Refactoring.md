@@ -533,7 +533,7 @@ class Aluminum(Trash):
     def __init__(self, wt): Trash.__init__(wt)
     def getValue(self): return val
     def setValue(self, newVal):
-        self.val = newVal::
+        self.val = newVal
 
 
 # PatternRefactoring/trash/Paper.py
@@ -544,7 +544,7 @@ class Paper(Trash):
     def __init__(self, wt): Trash.__init__(wt)
     def getValue(self): return self.val
     def setValue(self, newVal):
-        self.val = newVal::
+        self.val = newVal
 
 
 # PatternRefactoring/trash/Glass.py
@@ -1001,7 +1001,7 @@ class DDAluminum(Aluminum, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self)):
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDPaper.py
@@ -1013,7 +1013,7 @@ class DDPaper(Paper, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self))
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDGlass.py
@@ -1025,7 +1025,7 @@ class DDGlass(Glass, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self))
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDCardboard.py
@@ -1753,5 +1753,4 @@ rubric:: Footnotes
 \[\#\] Addison-Wesley, 1999.
 
 \[\#\] This was a solution created by Jaroslav Tulach in a design patterns class
-
-:   that I gave in Prague.
+that I gave in Prague.

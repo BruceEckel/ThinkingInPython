@@ -116,7 +116,7 @@ for r in restFiles:
 A More Complex Example
 ----------------------
 
-> note:: This will get a full description of all parts.
+Note: This will get a full description of all parts.
 
 ```python
 # CodeManager.py
@@ -350,6 +350,6 @@ characters are combined:
 Might be a good idea to mention that the comprehensions are eagerly
 evaluated and that generators get around this problem
 
-note:: Contributions by Michael Charlton, 3/23/09
+Note: Contributions by Michael Charlton, 3/23/09
 
 EOF
