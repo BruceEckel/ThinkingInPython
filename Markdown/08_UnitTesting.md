@@ -1,10 +1,9 @@
 Unit Testing & Test-Driven Development
 ======================================
 
-> note:: This chapter has not had any significant translation yet. Should
->
-> :   introduce and compare the various common test systems.
->
+> This chapter has not had any significant translation yet. Should
+> introduce pytest.
+
 One of the important recent realizations is the dramatic value of unit
 testing.
 
@@ -550,12 +549,4 @@ Exercises
     Type `make` and observe the results.
 3.  Modify your solutions to the exercises in Chapter 1 by adding unit
     tests. Write makefiles that incorporate the unit tests.
-
-rubric:: Footnotes
-
-\[\#\] \*<http://www.junit.org*>
-
-\[\#\] I had originally called this `assert()`, but that word became reserved
-
-:   in JDK 1.4 when assertions were added to the language.
 
