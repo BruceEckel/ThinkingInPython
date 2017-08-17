@@ -15,10 +15,11 @@ book.
 Command: Choosing the Operation at Runtime
 ------------------------------------------
 
-This is the function object in its purest sense: a method that's an
-object. By wrapping a method in an object, you can pass it to other
-methods or objects as a parameter, to tell them to perform this
-particular operation in the process of fulfilling your request:
+This is the function object in its purest sense: a method that's an object^[In
+Python, all functions are already objects and so the *Command* pattern is
+often redundant.]. By wrapping a method in an object, you can pass it to other
+methods or objects as a parameter, to tell them to perform this particular
+operation in the process of fulfilling your request:
 
 ```python
 # FunctionObjects/CommandPattern.py
@@ -63,14 +64,14 @@ normally only do by writing new code but in the above example could be
 done by interpreting a script (see the *Interpreter* pattern if what you
 need to do gets very complex).
 
-*Design Patterns* says that "Commands are an object-oriented replacement
-for callbacks." However, I think that the word "back" is an essential
-part of the concept of callbacks. That is, I think a callback actually
-reaches back to the creator of the callback. On the other hand, with a
-*Command* object you typically just create it and hand it to some method
-or object, and are not otherwise connected over time to the *Command*
-object. That's my take on it, anyway. Later in this book, I combine a
-group of design patterns under the heading of "callbacks."
+*Design Patterns* says that "Commands are an object-oriented replacement for
+callbacks."^[*Design Patterns*, Page 235.] However, I think that the word
+"back" is an essential part of the concept of callbacks. That is, I think a
+callback actually reaches back to the creator of the callback. On the other
+hand, with a *Command* object you typically just create it and hand it to some
+method or object, and are not otherwise connected over time to the *Command*
+object. That's my take on it, anyway. Later in this book, I combine a group of
+design patterns under the heading of "callbacks."
 
 Strategy: Choosing the Algorithm at Runtime
 -------------------------------------------
@@ -305,10 +306,3 @@ Exercises
     a string match, but when a solution fits, the expert system should
     return the appropriate type of `ProblemSolver` object. What other
     pattern/patterns show up here?
-
-rubric:: Footnotes
-
-\[\#\] In Python, all functions are already objects and so the *Command* pattern
-is often redundant.
-
-\[\#\] *Design Patterns*, Page 235.
