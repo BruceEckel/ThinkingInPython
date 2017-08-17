@@ -307,7 +307,7 @@ As you'll see, Python 3 doesn't allow the syntax of these last two
 examples. Even so, the above example makes it quite clear what's
 happening: the class object is created, then modified, then returned.
 
-Note:: Or does it allow that syntax?
+Note: Or does it allow that syntax?
 
 ### The Metaclass Hook in Python 3
 

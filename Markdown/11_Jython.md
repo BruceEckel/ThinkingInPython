@@ -285,7 +285,7 @@ loaded:
 
 > code-block:: java
 >
-> > // Jython/GreenHouseController.java import org.python.core.\*;
+> > // Jython/GreenHouseController.java import org.python.core.*;
 > > import org.python.util.PythonInterpreter;
 > >
 > > public class GreenHouseController {
@@ -564,7 +564,7 @@ for `JavaClass`:
 > code-block:: java
 >
 > > // Jython/javaclass/JavaClass.java package Jython.javaclass; import
-> > java.util.\*;
+> > java.util.*;
 > >
 > > public class JavaClass {
 > >
@@ -776,7 +776,7 @@ Here is the unit testing code:
 > code-block:: java
 >
 > > // Jython/TestPyUtil.java import org.python.util.PythonInterpreter;
-> > import java.util.\*;
+> > import java.util.*;
 > >
 > > public class TestPyUtil {
 > >
@@ -920,7 +920,7 @@ objects in a program, and each one has its own name space:
 >
 > > // Jython/MultipleJythons.java // You can run multiple interpreters,
 > > each // with its own name space. import
-> > org.python.util.PythonInterpreter; import org.python.core.\*;
+> > org.python.util.PythonInterpreter; import org.python.core.*;
 > >
 > > public class MultipleJythons {
 > >

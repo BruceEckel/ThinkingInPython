@@ -778,7 +778,7 @@ hide it inside a class? This is the principle of "If you must do
 something ugly, at least localize the ugliness inside a class." It looks
 like this:
 
-image:: _images/trashSorter1.\*
+![image description](_images/trashSorter1)
 
 The `TrashSorter` object initialization must now be changed whenever a
 new type of `Trash` is added to the model. You could imagine that the
@@ -805,7 +805,7 @@ Since the job of this method is to grab the pieces of trash it is
 interested in, it's called `grab(Trash)`. The structure now looks
 like:
 
-image:: _images/trashSorter2.\*
+![image description](_images/trashSorter2)
 
 `TrashSorter` needs to call each `grab()` method and get a
 different result depending on what type of `Trash` the current
@@ -955,7 +955,7 @@ of an array of TypedBin. It uses this array to step through and try to
 add itself to the appropriate bin, and this is where you'll see the
 double dispatch.
 
-image:: _images/trashSorter3.\*
+![image description](_images/trashSorter3)
 
 The new hierarchy is TypedBin, and it contains its own method called
 add() that is also used polymorphically. But here's an additional
@@ -1248,7 +1248,7 @@ virtualize the operations performed upon the primary type. The objects
 of the primary type simply "accept" the visitor, then call the visitor's
 dynamically-bound method. It looks like this:
 
-image:: _images/trashVisitor.\*
+![image description](_images/trashVisitor)
 
 Now, if `v` is a `Visitable` reference to an `Aluminum` object,
 the code:

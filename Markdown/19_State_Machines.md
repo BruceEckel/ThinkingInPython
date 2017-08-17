@@ -372,7 +372,7 @@ Example:
     that hold functions)
 -   Java constraint: methods are not first-class objects
 
-image:: _images/stateMachine.\*
+![image description](_images/stateMachine)
 
 ### The State Class
 

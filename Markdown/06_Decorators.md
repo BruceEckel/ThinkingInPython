@@ -24,7 +24,7 @@ Tradeoff: coding is more complicated when using decorators
 Basic Decorator Structure
 -------------------------
 
-image:: _images/decorator.\*
+![image description](_images/decorator)
 
 A Coffee Example
 ----------------
@@ -51,7 +51,7 @@ Each class describes the drink and is responsible for the cost etc. The
 resulting menu is huge, and a part of the class diagram would look
 something like this:
 
-image:: _images/coffeeExplosion.\*
+![image description](_images/coffeeExplosion)
 
 The key to using this method is to find the particular combination you
 want. So, once you've found the drink you would like, here is how you
@@ -145,7 +145,7 @@ Decorator conforms to the interface of the component it encloses, so the
 wrapping is transparent. Decorators can also be nested without the loss
 of this transparency.
 
-image:: _images/decoratedCoffee.\*
+![image description](_images/decoratedCoffee)
 
 Methods invoked on the Decorator can in turn invoke methods in the
 component, and can of course perform processing before or after the
@@ -263,7 +263,7 @@ exactly as they are, but if you wanted to decorate them (whipped cream,
 decaf etc.) then you would use decorators to make the modifications.
 This is the type of menu you are presented with in most coffee shops.
 
-image:: _images/compromiseDecoration.\*
+![image description](_images/compromiseDecoration)
 
 Here is how to create a basic selection, as well as a decorated
 selection:
