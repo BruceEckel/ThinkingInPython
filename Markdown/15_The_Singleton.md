@@ -112,14 +112,14 @@ output = '''
 '''
 ```
 
-Alex Martelli makes the
-[observation](http://www.aleax.it/Python/5ep.html) that what we really
-want with a Singleton is to have a single set of state data for all
-objects. That is, you could create as many objects as you want and as
-long as they all refer to the same state information then you achieve
+Alex Martelli makes the [observation](http://www.aleax.it/Python/5ep.html)
+that what we really want with a Singleton is to have a single set of state
+data for all objects. That is, you could create as many objects as you want
+and as long as they all refer to the same state information then you achieve
 the effect of Singleton. He accomplishes this with what he calls the
-*Borg*, which is accomplished by setting all the `__dict__`s to
-the same static piece of storage:
+*Borg*^[From the television show *Star Trek: The Next Generation*. The Borg
+are a hive-mind collective: "we are all one."] , which is accomplished by
+setting all the `__dict__`s to the same static piece of storage:
 
 ```python
 # Singleton/BorgSingleton.py
@@ -164,8 +164,8 @@ more elegant. In the former case, you must wire in *Singleton* behavior
 to each of your classes, but *Borg* is designed to be easily reused
 through inheritance.
 
-A simpler version of this takes advantage of the fact that there's only
-one instance of a class variable:
+A simpler version^[From Dmitry Balabanov.] of this takes advantage of the fact
+that there's only one instance of a class variable:
 
 ```python
 # Singleton/ClassVariableSingleton.py
@@ -178,11 +178,11 @@ class SingleTone(object):
         return SingleTone.__instance
 ```
 
-Two other interesting ways to define singleton include wrapping a class
-and using metaclasses. The first approach could be thought of as a
-*class decorator* (decorators will be defined later in the book),
-because it takes the class of interest and adds functionality to it by
-wrapping it in another class:
+Two other interesting ways to define singleton^[Suggested by Chih-Chung
+Chang.]  include wrapping a class and using metaclasses. The first approach
+could be thought of as a *class decorator* (decorators will be defined later
+in the book), because it takes the class of interest and adds functionality to
+it by wrapping it in another class:
 
 ```python
 # Singleton/SingletonDecorator.py
@@ -262,12 +262,3 @@ Exercises
     are database connections and you only have a license to use a fixed
     quantity of these at any one time.
 3.  Modify `BorgSingleton.py` so that it uses a class `__new__()` method.
-
-rubric:: Footnotes
-
-\[\#\] From the television show *Star Trek: The Next Generation*. The Borg are
-a hive-mind collective: "we are all one."
-
-\[\#\] From Dmitry Balabanov.
-
-\[\#\] Suggested by Chih-Chung Chang.
