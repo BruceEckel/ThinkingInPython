@@ -2,15 +2,15 @@ The Pattern Concept
 ===================
 
 "Design patterns help you learn from others' successes instead of your
-own failures."
+own failures."^[From Mark Johnson.]
 
-Probably the most important step forward in object-oriented design is
-the "design patterns" movement, chronicled in *Design Patterns (ibid)*.
-That book shows 23 different solutions to particular classes of
-problems. In this book, the basic concepts of design patterns will be
-introduced along with examples. This should whet your appetite to read
-*Design Patterns* by Gamma, et. al., a source of what has now become an
-essential, almost mandatory, vocabulary for OOP programmers.
+Probably the most important step forward in object-oriented design is the
+"design patterns" movement, chronicled in *Design Patterns (ibid)*^[But be
+warned: the examples are in C++.]. That book shows 23 different solutions to
+particular classes of problems. In this book, the basic concepts of design
+patterns will be introduced along with examples. This should whet your
+appetite to read *Design Patterns* by Gamma, et. al., a source of what has now
+become an essential, almost mandatory, vocabulary for OOP programmers.
 
 The latter part of this book contains an example of the design evolution
 process, starting with an initial solution and moving through the logic
@@ -187,7 +187,8 @@ just trying to make a list, but eventually I hope to make steps towards
 connecting these structures with patterns (or I may come up with a
 different approach altogether---this is still in its formative stages).
 
-Here is the present list of candidates, only some of which will make it
+Here^[This list includes suggestions by Kevlin Henney, David Scott, and
+others.] is the present list of candidates, only some of which will make it
 to the final list. Feel free to suggest others, or possibly
 relationships with patterns.
 
@@ -204,25 +205,20 @@ relationships with patterns.
 -   `Transaction`
 -
 
-    `Mirror`: "the ability to keep a parallel universe(s) in step with the
+`Mirror`: "the ability to keep a parallel universe(s) in step with the golden
+world"
 
-    :   golden world"
-
--
-
-    `Shadow`: "follows your movement and does something different in a different
-
-    :   medium" (May be a variation on Proxy).
+`Shadow`: "follows your movement and does something different in a different
+medium" (May be a variation on Proxy).
 
 Design Principles
 -----------------
 
-When I put out a call for ideas in my newsletter, a number of
-suggestions came back which turned out to be very useful, but different
-than the above classification, and I realized that a list of design
-principles is at least as important as design structures, but for a
-different reason: these allow you to ask questions about your proposed
-design, to apply tests for quality.
+When I put out a call for ideas, a number of suggestions came back which
+turned out to be very useful, but different than the above classification, and
+I realized that a list of design principles is at least as important as design
+structures, but for a different reason: these allow you to ask questions about
+your proposed design, to apply tests for quality.
 
 -   `Principle of least astonishment` (don't be astonishing).
 -   `Make common things easy, and rare things possible`
@@ -242,9 +238,14 @@ design, to apply tests for quality.
     the important issue is to acknowledge it and control it, to say
     "coupling can cause problems" and to compensate for those problems
     with a well-considered design or pattern.
--   `Subtraction`: a design is finished when you cannot take anything
-    else away .
--   `Simplicity before generality`. (A variation of *Occam's Razor*,
+-   `Subtraction`: a design is finished when you cannot take anything else
+    away^[This idea is generally attributed to Antoine de St. Exupery from *The
+    Little Prince*: "La perfection est atteinte non quand il ne reste rien à
+    ajouter, mais quand il ne reste rien à enlever," or: "perfection is reached
+    not when there's nothing left to add, but when there's nothing left to
+    remove".].
+-   `Simplicity before generality`^[From an email from Kevlin Henney.].
+    (A variation of *Occam's Razor*,
     which says "the simplest solution is the best"). A common problem we
     find in frameworks is that they are designed to be general purpose
     without reference to actual systems. This leads to a dizzying array
@@ -270,23 +271,5 @@ your design.
 Further Reading
 ---------------
 
-> Alex Martelli's Video Lectures on Design Patterns in Python:
-> <http://www.catonmat.net/blog/learning-python-design-patterns-through-video-lectures/>
-
-rubric:: Footnotes
-
-\[\#\] From Mark Johnson.
-
-\[\#\] But be warned: the examples are in C++.
-
-\[\#\] This list includes suggestions by Kevlin Henney, David Scott, and
-others.
-
-\[\#\] A free email publication. See *www.BruceEckel.com* to subscribe.
-
-\[\#\] This idea is generally attributed to Antoine de St. Exupery from *The Little Prince*: "La perfection est atteinte non quand il ne reste rien à
-ajouter, mais quand il ne reste rien à enlever," or: "perfection is
-reached not when there's nothing left to add, but when there's
-nothing left to remove".
-
-\[\#\] From an email from Kevlin Henney.
+- Alex Martelli's Video Lectures on Design Patterns in Python:
+<http://www.catonmat.net/blog/learning-python-design-patterns-through-video-lectures/>
