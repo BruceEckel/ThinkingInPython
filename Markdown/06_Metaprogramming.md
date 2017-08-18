@@ -201,9 +201,9 @@ So far, we've only used the `type` metaclass directly. Metaclass
 programming involves hooking our own operations into the creation of
 class objects. This is accomplished by:
 
-> 1.  Writing a subclass of the metaclass `type`.
-> 2.  Inserting the new metaclass into the class creation process using
->     the *metaclass hook*.
+1.  Writing a subclass of the metaclass `type`.
+2.  Inserting the new metaclass into the class creation process using
+    the *metaclass hook*.
 
 In Python 2.x, the metaclass hook is a static field in the class called
 `__metaclass__`. In the ordinary case, this is not assigned so Python
@@ -278,9 +278,8 @@ Yes!
 """
 ```
 
-The compiler won't accept the `super()` call because it says
-`__metaclass__` hasn't been defined, forcing us to use the specific call
-to `type.__init__()`.
+The compiler won't accept the `super()` call because it says `__metaclass__`
+hasn't been defined, forcing us to use the specific call to `type.__init__()`.
 
 Because it only needs to be callable, it's even possible to define
 `__metaclass__` as a function:
@@ -315,8 +314,10 @@ Python 3 changes the metaclass hook. It doesn't disallow the
 `__metaclass__` field, but it ignores it. Instead, you use a keyword
 argument in the base-class list:
 
-    class Simple1(object, metaclass = SimpleMeta1):
+```python
+class Simple1(object, metaclass = SimpleMeta1):
     ...
+```
 
 This means that none of the (clever) alternative ways of defining
 `__metaclass__` directly as a class or function are available in Python
@@ -412,7 +413,7 @@ class object rather than `self`.
 
 ### Using the `inspect` module
 
-(As in the Comprehensions chapter)
+(As in the [Comprehensions] chapter)
 
 Example: Making a Class "Final"
 -------------------------------

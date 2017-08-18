@@ -77,7 +77,7 @@ Consider the following:
 ```python
 # InitializationAndCleanup/cleanup.py
 class Counter:
-    Count = 0   # This represents the count of objects of this class
+    Count = 0   # Number of objects of this class
     def __init__(self, name):
         self.name = name
         print name, 'created'
@@ -116,9 +116,9 @@ collectd. You can't do anything particularly fancy with __del__.
 
 There are two possible solutions here.
 
-> 1\. Use an explicit finalizer method, such as `close()` for file objects.
->
-> 2.  Use weak references.
+1. Use an explicit finalizer method, such as `close()` for file objects.
+
+2. Use weak references.
 
 Here's an example of weak references, using a WeakValueDictionary and
 the trick of mapping id(self) to self:
