@@ -3,66 +3,32 @@ Introduction
 
 > The vision for this book.
 
-A Team Effort
--------------
+This is a collection of essays that give you a deeper understanding of
+programming in Python. Although the first chapter in the book is [Python for
+Programmers], this is not intended to be an introductory Python book (there
+are plenty of excellent Python tutorials and online learning resources). The
+remaining chapters assume you have an adequate grasp of the language and can
+follow along---this might require that you study other resources if there are
+language features you don't understand.
 
-This book is an experiment to see if we can combine everyone's best
-efforts to create something great.
-
-You can find the contributors right before this introduction. They are
-listed in order of *Karma Points*, a system Launchpad.net uses to keep
-track of contributions from everyone working on an open-source project.
-
-In my case, I will write new material, as well as rewriting other
-contributions to clarify and give voice, setting up the architecture and
-being the *Benevolent Dictator* for the book. But I definitely won't be
-doing everything; my goal is that this is a team project and that
-everyone who wants to will have something useful to contribute.
-
-We'll be using Launchpad.net's "Blueprints" facility to add "features"
-to the book, so that's where you'll find the main repository of things
-to do.
-
-What can you contribute? Anything as small as spelling and grammatical
-correctons, and as large as a whole chapter. Research into new topics
-and creating examples is what takes me the most time, so if you know
-something already or are willing to figure it out, don't worry if your
-writing or programming isn't perfect -- contribute it and I and the rest
-of the group will improve it.
-
-You may also have talents in figuring things out. Sphinx formatting, for
-example, or how to produce camera-ready formatting. These are all very
-useful things which will not only benefit this book but also any future
-book built on this template (every bit of the build system for the book
-will be out in the open, so if you want to take what we've done here and
-start your own book, you can).
-
-Of course, not everything can make it into the final print book, but
-things that don't fit into the main book can be moved into an "appendix
-book" or a "volume 2" book or something like that.
-
-Not an Introductory Book
-------------------------
-
-Although there is an introduction for programmers, this book is not
-intended to be introductory. There are already lots of good introductory
-books out there.
-
-You can think of it as an "intermediate" or "somewhat advanced" book,
-but the "somewhat" modifier is very important here. Because it is not
-introductory, two difficult constraints are removed.
+You can think of this as an "intermediate" or "somewhat advanced" book, but
+the "somewhat" modifier is important. Because it is not introductory, two
+difficult constraints are removed.
 
 1.  In an introductory book you are forced to describe everything in
     lock step, never mentioning anything before it has been thoroughly
-    introduced. That's still a good goal, but we don't have to agonize
-    over it when it doesn't happen (just cross-reference the material).
-2.  In addition, the topics are not restricted; in this book topics are
-    chosen based on whether they are interesting and/or useful, not on
-    whether they are introductory or not.
+    introduced.
 
-That said, people will still be coming to a topic without knowing about
-it and it will need to be introduced, as much as possible, as if they
-have never seen it before.
+2.  In this book topics are chosen based on whether they are interesting
+    and/or useful, not on whether they are introductory or not.
+
+Contributors
+------------
+
+When someone has done the majority of the work on a chapter (and I've only
+edited), their name is shown as the author at the beginning of that chapter.
+
+
 
 The License
 -----------
@@ -74,7 +40,7 @@ license](http://creativecommons.org/licenses/by-sa/3.0/).
 If you make contributions, you must own the rights to your material and
 be able to place them under this license. Please don't contribute
 something unless you are sure this is the case (read your company's
-employment contract -- these often specify that anything you think of or
+employment contract---these often specify that anything you think of or
 create at any time of day or night belongs to the company).
 
 The Printed Book
@@ -140,3 +106,17 @@ Just so it's clear, I have the following motives for creating this book:
     ability to print the book yourself).
 5.  Help raise money for non-U.S. Python user groups via translations,
     from which I might gain a small percentage.
+
+
+Contributions
+-------------
+
+This book is hosted on Github and we use the tools there to support
+contributions. You can either open an issue or make a pull request.
+
+What can you contribute? Anything as small as spelling and grammatical
+corrections, and as large as a whole chapter. Research into new topics
+and creating examples is what takes me the most time, so if you know
+something already or are willing to figure it out, don't worry if your
+writing or programming isn't perfect---contribute it and I and the rest
+of the group will improve it.

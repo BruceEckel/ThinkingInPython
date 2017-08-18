@@ -2,10 +2,11 @@
 title:
 - type: main
   text: Thinking in Python
+subtitle: Insights, Idioms and Patterns
 creator:
 - role: author
   text: Bruce Eckel
-publisher:  MindView LLC
+publisher: MindView LLC
 language: eng
 date: 2017
 subject: Computer Programming
@@ -28,7 +29,7 @@ for errors or omissions. No liability is assumed for incidental or consequential
 damages in connection with or arising out of the use of the information or
 programs contained herein.
 
-This book was created as an eBook for tablets and computers. That is, it was not
+This book was created as an eBook for tablets and computers. That is, it was *not*
 first created for print and then converted. It is an eBook first---all layout
 and formatting is designed to optimize your viewing experience on the various
 eBook reading platforms and systems.
