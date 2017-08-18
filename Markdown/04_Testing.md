@@ -1,6 +1,8 @@
 Testing
 =======
 
+> Testing is flawed, but not testing is reckless.
+
 > This chapter has not had any significant translation yet. Should
 > introduce pytest.
 
