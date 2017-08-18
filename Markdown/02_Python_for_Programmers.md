@@ -247,9 +247,9 @@ sophisticated regular expressions.
 Classes
 -------
 
-Like everything else in Python, the definition of a class uses a minimum
-of additional syntax. You use the `class` keyword, and inside the body
-you use `def` to create methods. Here's a simple class:
+Like most things in Python, class definitions use minimal syntax. You start
+with the `class` keyword followed by the class name and a colon. Inside the
+(indented) class body you use `def` to create methods. Here's a simple class:
 
 ```python
 # PythonForProgrammers/SimpleClass.py
@@ -271,36 +271,34 @@ if __name__ == "__main__":
     x.showMsg("A message")
 ```
 
-Both methods have `self` as their first argument. C++ and Java both
-have a hidden first argument in their class methods, which points to the
-object that the method was called for and can be accessed using the
-keyword `this`. Python methods also use a reference to the current
-object, but when you are *defining* a method you must explicitly specify
-the reference as the first argument. Traditionally, the reference is
-called `self` but you could use any identifier you want (if you do not
-use `self` you will probably confuse a lot of people, however). If you
-need to refer to fields in the object or other methods in the object,
-you must use `self` in the expression. However, when you call a method
-for an object as in `x.show()`, you do not hand it the reference to
-the object---*that* is done for you.
+Both methods have `self` as their first argument. C++ and Java both have a
+hidden first argument in their class methods, which points to the object that
+the method was called for and can be accessed using the keyword `this`. Python
+methods also use a reference to the current object, but when you are
+*defining* a method you must explicitly specify the reference as the first
+argument. Traditionally, the reference is called `self` but you could use any
+identifier you want (if you do not use `self` you will probably confuse a lot
+of people, however). To refer to fields in the object or other methods in the
+object, you must use `self` in the expression. However, when you call a method
+for an object as in `x.show()`, you do not hand it the reference to the
+object---*that* is done for you.
 
-Here, the first method is special, as is any identifier that begins and
-ends with double underscores. In this case, it defines the constructor,
-which is automatically called when the object is created, just like in
-C++ and Java. However, at the bottom of the example you can see that the
-creation of an object looks just like a function call using the class
-name. Python's spare syntax makes you realize that the `new` keyword
-isn't really necessary in C++ or Java, either.
+The first method, `__init__()` is special, as is any identifier that begins
+and ends with double underscores. In this case, it defines the constructor,
+which is automatically called when the object is created, just like in C++ and
+Java. However, at the bottom of the example you can see that the creation of
+an object looks just like a function call using the class name. Python's spare
+syntax makes you realize that the `new` keyword isn't really necessary in C++
+or Java, either.
 
-All the code at the bottom is set off by an `if` clause, which checks
-to see if something called `__name__` is equivalent to
-`__main__`. Again, the double underscores indicate special names.
-The reason for the `if` is that any file can also be used as a library
-module within another program (modules are described shortly). In that
-case, you just want the classes defined, but you don't want the code at
-the bottom of the file to be executed. This particular `if` statement
-is only true when you are running this file directly; that is, if you
-say on the command line:
+All the code at the bottom is set off by an `if` clause, which checks to see
+if something called `__name__` is equivalent to `__main__`. Again, the double
+underscores indicate special names. The reason for the `if` is that any file
+can also be used as a library module within another program (modules are
+described shortly). In that case, you just want the classes defined, but you
+don't want the code at the bottom of the file to be executed. This particular
+`if` statement is only true when you are running this file directly. That is,
+`__name__` is `__main__` when you use the command line:
 
 ```
 python SimpleClass.py
@@ -309,16 +307,16 @@ python SimpleClass.py
 However, if this file is imported as a module into another program, the
 `__main__` code is not executed.
 
-Something that's a little surprising at first is that while in C++ or
-Java you declare object level fields outside of the methods, you do not
-declare them in Python. To create an object field, you just name it -
-using `self`---inside of one of the methods (usually in the
-constructor, but not always), and space is created when that method is
-run. This seems a little strange coming from C++ or Java where you must
-decide ahead of time how much space your object is going to occupy, but
-it turns out to be a very flexible way to program. If you declare fields
-using the C++/Java style, they implicitly become class level fields
-(similar to the static fields in C++/Java)
+In C++ or Java you declare object level fields inside the class body but
+outside of the methods. Something that's a little surprising at first is that
+you do not declare them this way in Python. To create an object field, you
+just name it---using `self`---inside one of the methods (usually in the
+constructor, but not always), and space is created when that method is run.
+This seems a little strange coming from C++ or Java where you must decide
+ahead of time how much space your object is going to occupy, but it turns out
+to be a very flexible way to program. If you declare fields using the C++/Java
+style, they implicitly become class level fields (similar to the static fields
+in C++/Java)
 
 ### Inheritance
 
