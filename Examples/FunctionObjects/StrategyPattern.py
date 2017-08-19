@@ -3,7 +3,7 @@
 # The strategy interface:
 class FindMinima:
     # Line is a sequence of points:
-    def algorithm(self, line) : pass
+    def algorithm(self, line): pass
 
 # The various strategies:
 class LeastSquares(FindMinima):

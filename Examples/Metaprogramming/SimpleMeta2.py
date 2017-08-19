@@ -8,7 +8,7 @@ class Simple2(object):
             # super(__metaclass__, cls).__init__(name, bases, nmspc)
             # Less-flexible specific call:
             type.__init__(cls, name, bases, nmspc)
-            cls.uses_metaclass = lambda self : "Yes!"
+            cls.uses_metaclass = lambda self: "Yes!"
 
 class Simple3(Simple2): pass
 simple = Simple3()

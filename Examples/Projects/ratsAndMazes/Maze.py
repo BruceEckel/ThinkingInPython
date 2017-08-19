@@ -43,7 +43,7 @@ class Maze(Canvas):
           FileReader(filename))
         for(currentLine = br.readLine()
             currentLine != null
-            currentLine = br.readLine()) :
+            currentLine = br.readLine()
             lines.addElement(currentLine.getBytes())
             if(width < 0 ||
                currentLine.getBytes().length > width)
@@ -87,7 +87,7 @@ class Maze(Canvas):
                         y*(canvasHeight/height),
                         canvasWidth/width,
                         canvasHeight/height)
-                        break::
+                        break
 
 
 # Projects/ratsAndMazes/Rat.py

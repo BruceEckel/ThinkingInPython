@@ -277,14 +277,15 @@ This automatically prevents name clashes between the names in the imported
 module and the local names. To call `useful_function()`, you must *qualify* it
 with the name of the module: `module.useful_function()`.
 
-All the code at the bottom is set off by an `if` clause, which checks to see
-if something called `__name__` is equivalent to `__main__`. Again, the double
-underscores indicate special names. The reason for the `if` is that any file
-can also be used as a library module within another program (modules are
-described shortly). In that case, you just want the classes defined, but you
-don't want the code at the bottom of the file to be executed. This particular
-`if` statement is only true when you are running this file directly. That is,
-`__name__` is `__main__` when you use the command line:
+The code at the end of the file starts with an `if` clause which checks to see
+if something called `__name__` is equivalent to `__main__`. In Python, any
+identifier that begins and ends with double underscores is special in some
+way. The reason for the `if` is that any file can also be used as a library
+module within another program (modules are described shortly). In that case,
+you just want the classes defined, but you don't want the code at the bottom
+of the file to be executed. This particular `if` statement is only true when
+you are running this file directly. That is, `__name__` is `__main__` when you
+use the command line:
 
 ```
 python use_module.py
@@ -312,7 +313,7 @@ if __name__ == "__main__":
     print(useful_function())
 ```
 
-You can change the namespace of a module as you import it using the `as`
+You can change the namespace of a module during an import using the `as`
 keyword:
 
 ```python
@@ -326,8 +327,8 @@ if __name__ == "__main__":
 ### Packages
 
 As your programs get larger you'll want to further organize your code into
-*packages*. A package is a directory---and its own namespace, the name of that
-directory---which can contain multiple modules.
+*packages*. A package is a directory---and its own namespace, which has the
+name of that directory---that can contain multiple modules.
 
 To make something a package, you put a special file named `__init__.py` in that
 directory. Except in special cases, this file is empty---it is only there to
@@ -356,15 +357,41 @@ def function2():
     return "function2 in module2 in a_package"
 ```
 
-You can import the entire package, or modules from the package.
-We'll start by importing the whole package:
+To import a module from a package, you must qualify it with the package name:
 
 ```python
 # PythonForProgrammers/using_packages.py
-import a_package
+import a_package.module1
+import a_package.module2
 
+print(a_package.module1.function1())
+print(a_package.module2.function2())
 ```
 
+You can also name the package with `from`:
+
+```python
+# PythonForProgrammers/from_packages.py
+from a_package import module1
+from a_package import module2
+
+print(module1.function1())
+print(module2.function2())
+```
+
+Here you no longer need to qualify the module with the package name.
+
+Finally, you can bring specific functions into the namespace by
+naming both the package and the module:
+
+```python
+# PythonForProgrammers/no_qualification.py
+from a_package.module1 import function1
+from a_package.module2 import function2
+
+print(function1())
+print(function2())
+```
 
 
 
@@ -407,15 +434,12 @@ object, you must use `self` in the expression. However, when you call a method
 for an object as in `x.show()`, you do not hand it the reference to the
 object---*that* is done for you.
 
-The first method, `__init__()` is special, as is any identifier that begins
-and ends with double underscores. In this case, it defines the constructor,
-which is automatically called when the object is created, just like in C++ and
-Java. However, at the bottom of the example you can see that the creation of
-an object looks just like a function call using the class name. Python's spare
-syntax makes you realize that the `new` keyword isn't really necessary in C++
-or Java, either.
-
-
+The first method, `__init__()`, defines the constructor (again, the double
+underscores indicate a special name), which is automatically called when the
+object is created, just like in C++ and Java. However, at the bottom of the
+example you can see that the creation of an object looks just like a function
+call using the class name. Python's spare syntax makes you realize that the
+`new` keyword isn't really necessary in C++ or Java, either.
 
 In C++ or Java you declare object level fields inside the class body but
 outside of the methods. Something that's a little surprising at first is that

@@ -146,39 +146,39 @@ class VendingMachine(StateMachine):
         items[3][0] = ItemSlot(25, 0)
         """
         buildTable(Object[][][]{
-         ::State.quiescent, # Current state
+         State.quiescent, # Current state
             # Input, test, transition, next state:
-           :Money.class, null,
-             showTotal, State.collecting,
-         ::State.collecting, # Current state
+            Money.class, null,
+            showTotal, State.collecting,
+         State.collecting, # Current state
             # Input, test, transition, next state:
-           :Quit.quit, null,
-             returnChange, State.quiescent,
-           :Money.class, null,
-             showTotal, State.collecting,
-           :FirstDigit.class, null,
-             showDigit, State.selecting,
-         ::State.selecting, # Current state
+            Quit.quit, null,
+            returnChange, State.quiescent,
+            Money.class, null,
+            showTotal, State.collecting,
+            FirstDigit.class, null,
+            showDigit, State.selecting,
+         State.selecting, # Current state
             # Input, test, transition, next state:
-           :Quit.quit, null,
-             returnChange, State.quiescent,
-           :SecondDigit.class, notEnough,
-             clearSelection, State.collecting,
-           :SecondDigit.class, itemNotAvailable,
-             clearSelection, State.unavailable,
-           :SecondDigit.class, itemAvailable,
-             dispense, State.wantMore,
-         ::State.unavailable, # Current state
+            Quit.quit, null,
+            returnChange, State.quiescent,
+            SecondDigit.class, notEnough,
+            clearSelection, State.collecting,
+            SecondDigit.class, itemNotAvailable,
+            clearSelection, State.unavailable,
+            SecondDigit.class, itemAvailable,
+            dispense, State.wantMore,
+         State.unavailable, # Current state
             # Input, test, transition, next state:
-           :Quit.quit, null,
-             returnChange, State.quiescent,
-           :FirstDigit.class, null,
-             showDigit, State.selecting,
-         ::State.wantMore, # Current state
+            Quit.quit, null,
+            returnChange, State.quiescent,
+            FirstDigit.class, null,
+            showDigit, State.selecting,
+         State.wantMore, # Current state
             # Input, test, transition, next state:
-           :Quit.quit, null,
-             returnChange, State.quiescent,
-           :FirstDigit.class, null,
-             showDigit, State.selecting,
+            Quit.quit, null,
+            returnChange, State.quiescent,
+            FirstDigit.class, null,
+            showDigit, State.selecting,
         )
         """

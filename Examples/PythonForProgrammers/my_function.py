@@ -1,5 +1,5 @@
-# PythonForProgrammers/myFunction.py
-def myFunction(response):
+# PythonForProgrammers/my_function.py
+def my_function(response):
     val = 0
     if response == "yes":
         print("affirmative")
@@ -7,5 +7,5 @@ def myFunction(response):
     print("continuing...")
     return val
 
-print(myFunction("no"))
-print(myFunction("yes"))
+print(my_function("no"))
+print(my_function("yes"))

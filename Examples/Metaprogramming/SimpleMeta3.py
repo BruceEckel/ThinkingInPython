@@ -4,7 +4,7 @@
 class Simple4(object):
     def __metaclass__(name, bases, nmspc):
         cls = type(name, bases, nmspc)
-        cls.uses_metaclass = lambda self : "Yes!"
+        cls.uses_metaclass = lambda self: "Yes!"
         return cls
 
 simple = Simple4()

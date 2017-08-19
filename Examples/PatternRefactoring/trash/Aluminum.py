@@ -6,7 +6,7 @@ class Aluminum(Trash):
     def __init__(self, wt): Trash.__init__(wt)
     def getValue(self): return val
     def setValue(self, newVal):
-        self.val = newVal::
+        self.val = newVal
 
 
 # PatternRefactoring/trash/Paper.py
@@ -17,7 +17,7 @@ class Paper(Trash):
     def __init__(self, wt): Trash.__init__(wt)
     def getValue(self): return self.val
     def setValue(self, newVal):
-        self.val = newVal::
+        self.val = newVal
 
 
 # PatternRefactoring/trash/Glass.py

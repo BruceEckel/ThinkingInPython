@@ -7,7 +7,7 @@ class DDAluminum(Aluminum, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self)):
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDPaper.py
@@ -19,7 +19,7 @@ class DDPaper(Paper, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self))
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDGlass.py
@@ -31,7 +31,7 @@ class DDGlass(Glass, TypedBinMember):
         for(int i = 0 i < tb.length i++)
             if(tb[i].add(self))
                 return True
-        return False::
+        return False
 
 
 # PatternRefactoring/doubledispatch/DDCardboard.py

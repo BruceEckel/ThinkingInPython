@@ -4,7 +4,7 @@
 class SimpleMeta1(type):
     def __init__(cls, name, bases, nmspc):
         super(SimpleMeta1, cls).__init__(name, bases, nmspc)
-        cls.uses_metaclass = lambda self : "Yes!"
+        cls.uses_metaclass = lambda self: "Yes!"
 
 class Simple1(object):
     __metaclass__ = SimpleMeta1

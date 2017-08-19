@@ -1,6 +1,6 @@
 # InitializationAndCleanup/cleanup.py
 class Counter:
-    Count = 0   # This represents the count of objects of this class
+    Count = 0   # Number of objects of this class
     def __init__(self, name):
         self.name = name
         print name, 'created'
