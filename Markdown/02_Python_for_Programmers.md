@@ -393,6 +393,26 @@ print(function1())
 print(function2())
 ```
 
+We can even put a second package underneath the first one:
+
+```python
+# PythonForProgrammers/a_package/b_package/__init__.py
+```
+
+```python
+# PythonForProgrammers/a_package/b_package/module3.py
+
+def function3():
+    return "function3 in module3 in b_package"
+```
+
+```python
+# PythonForProgrammers/two_levels.py
+from a_package.b_package import module3
+
+print(module3.function3())
+```
+
 
 
 Classes
