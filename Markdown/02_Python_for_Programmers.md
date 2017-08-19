@@ -47,6 +47,7 @@ indentation---scoping in Python is determined by indentation. For example:
 
 ```python
 # Py4Prog/if.py
+
 response = "yes"
 if response == "yes":
     print("affirmative")
@@ -95,6 +96,7 @@ making `for` use an iterator that works through a sequence. Here's an example:
 
 ```python
 # Py4Prog/list.py
+
 list = [ 1, 3, 5, 7, 9, 11 ]
 print(list)
 list.append(13)
@@ -143,6 +145,9 @@ pointed out) using tools such as
 [AutoPEP8](https://pypi.python.org/pypi/autopep8) or
 [YAPF](https://github.com/google/yapf).
 
+**Note**: File names have no relationship to what they contain---you can name
+them whatever makes sense to you.
+
 Functions
 ---------
 
@@ -152,6 +157,7 @@ is the first example turned into a function:
 
 ```python
 # Py4Prog/my_function.py
+
 def my_function(response):
     val = 0
     if response == "yes":
@@ -172,6 +178,7 @@ you could pass and return different types from the same function:
 
 ```python
 # Py4Prog/different_returns.py
+
 def different_returns(arg):
     if arg == 1:
         return "one"
@@ -189,6 +196,7 @@ and strings:
 
 ```python
 # Py4Prog/sum.py
+
 def sum(arg1, arg2):
     return arg1 + arg2
 
@@ -209,6 +217,7 @@ double quotes, you can embed single quotes and vice versa:
 
 ```python
 # Py4Prog/strings.py
+
 print("That isn't a horse")
 print('You are not a "Viking"')
 print("""You're just pounding two
@@ -237,6 +246,7 @@ the string with a '`%`' and the values to substitute:
 
 ```python
 # Py4Prog/string_formatting.py
+
 val = 47
 print("The number is %d" % val)
 val2 = 63.4
@@ -429,7 +439,13 @@ complex project.
 What if your module or package isn't placed in the same directory as the Python file
 that's doing the importing? The original (and now semi-deprecated) solution to this
 was to set an environment variable called `PYTHONPATH` which tells Python where to
-look for
+look for modules and packages. `PYTHONPATH` can take multiple paths, and Python will
+keep searching through those paths until it finds your module or package (or doesn't,
+and reports an error).
+
+`PYTHONPATH` still works, but has been effectively superseded by the *virtual
+environment*, which solves much more than just "where are the modules and
+packages." [Virtual Environments] have their own chapter.
 
 Classes
 -------
@@ -440,6 +456,7 @@ with the `class` keyword followed by the class name and a colon. Inside the
 
 ```python
 # Py4Prog/simple_class.py
+
 class Simple:
     def __init__(self, str):
         print("Inside the Simple constructor")
@@ -613,6 +630,7 @@ def f(a,b,c): print a, b, c
 
 ```python
 # Py4Prog/utility.py
+
 def f(self): print "utility.f()!!!"
 ```
 
@@ -620,6 +638,7 @@ Here's how you compose that method into a class:
 
 ```python
 # Py4Prog/compose.py
+
 class Compose:
      from utility import f
 
