@@ -124,6 +124,24 @@ supposed to do.
 Naming Conventions
 -----------------
 
+Although naming conventions are more detailed than this---you can find them in
+[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)---the
+basic strategy for naming is to use "snake-case" for identifiers, functions
+and file names. This means lower case with words separated by underscores, as
+in `this_is_snake_case`.
+
+If something represents a constant, you use all uppercase letters, as in
+`THIS_IS_A_CONSTANT`.
+
+The one exception is class names, which are "camel-cased," starting with a
+capital letter, without underscores and capitalizing intermediate words. For
+example: `ThisIsMyClass`.
+
+[PEP 8]([PEP 8](https://www.python.org/dev/peps/pep-0008/) covers all manner
+of style issues. These can be automatically applied to your code (or at least,
+pointed out) using tools such as
+[AutoPEP8](https://pypi.python.org/pypi/autopep8) or
+[YAPF](https://github.com/google/yapf).
 
 Functions
 ---------
@@ -405,6 +423,13 @@ print(module3.function3())
 This example is primarily useful to show you the consistency of the package
 model. You will rarely do anything like this, probably only with an especially
 complex project.
+
+### `PYTHONPATH`
+
+What if your module or package isn't placed in the same directory as the Python file
+that's doing the importing? The original (and now semi-deprecated) solution to this
+was to set an environment variable called `PYTHONPATH` which tells Python where to
+look for
 
 Classes
 -------
