@@ -131,6 +131,10 @@ semicolons, curly braces, and all sorts of other extra verbiage that was
 demanded by your non-Python programming language but didn't actually
 describe what your program was supposed to do.
 
+Naming Convetions
+-----------------
+
+
 Functions
 ---------
 
@@ -139,8 +143,8 @@ the function name and argument list, and a colon to begin the function
 body. Here is the first example turned into a function:
 
 ```python
-# PythonForProgrammers/myFunction.py
-def myFunction(response):
+# PythonForProgrammers/my_function.py
+def my_function(response):
     val = 0
     if response == "yes":
         print("affirmative")
@@ -148,8 +152,8 @@ def myFunction(response):
     print("continuing...")
     return val
 
-print(myFunction("no"))
-print(myFunction("yes"))
+print(my_function("no"))
+print(my_function("yes"))
 ```
 
 Notice there is no type information in the function signature---all it
@@ -160,15 +164,15 @@ typing. For example, you could pass and return different types from the
 same function:
 
 ```python
-# PythonForProgrammers/differentReturns.py
-def differentReturns(arg):
+# PythonForProgrammers/different_returns.py
+def different_returns(arg):
     if arg == 1:
         return "one"
     if arg == "one":
         return True
 
-print(differentReturns(1))
-print(differentReturns("one"))
+print(different_returns(1))
+print(different_returns("one"))
 ```
 
 The only constraints on an object that is passed into the function are
@@ -227,7 +231,7 @@ Substitution in strings is exceptionally easy, since Python uses C's
 follow the string with a '`%`' and the values to substitute:
 
 ```python
-# PythonForProgrammers/stringFormatting.py
+# PythonForProgrammers/string_formatting.py
 val = 47
 print("The number is %d" % val)
 val2 = 63.4
@@ -244,6 +248,89 @@ All the formatting from `printf()` is available, including control
 over the number of decimal places and alignment. Python also has very
 sophisticated regular expressions.
 
+Imports, Namespaces and Packages
+--------------------------------
+
+Each python file is a *module* that you can use inside another python file by
+*importing* it. If the file is in the same directory, you can use a
+straightforward `import` statement:
+
+```python
+# PythonForProgrammers/module.py
+
+def useful_function():
+    return "Use this elsewhere!"
+```
+
+```python
+# PythonForProgrammers/use_module.py
+import module
+
+print("'module' imported")
+
+if __name__ == "__main__":
+    print(module.useful_function())
+```
+
+When you import a module, it creates a *namespace* within the importing file.
+This automatically prevents name clashes between the names in the imported
+module and the local names. To call `useful_function()`, you must *qualify* it
+with the name of the module: `module.useful_function()`.
+
+All the code at the bottom is set off by an `if` clause, which checks to see
+if something called `__name__` is equivalent to `__main__`. Again, the double
+underscores indicate special names. The reason for the `if` is that any file
+can also be used as a library module within another program (modules are
+described shortly). In that case, you just want the classes defined, but you
+don't want the code at the bottom of the file to be executed. This particular
+`if` statement is only true when you are running this file directly. That is,
+`__name__` is `__main__` when you use the command line:
+
+```
+python use_module.py
+```
+
+However, if this file is imported as a module into another program, `__name__`
+will not be `__main__`, so the `__main__` code is not executed:
+
+```python
+# PythonForProgrammers/import_module.py
+import use_module
+```
+
+If you run `python import_module.py`, you should only see `'module' imported`
+as the result.
+
+If you want to bring a name into the current namespace, you can do so using
+the `from` keyword:
+
+```python
+# PythonForProgrammers/using_from.py
+from module import useful_function
+
+if __name__ == "__main__":
+    print(useful_function())
+```
+
+You can change the namespace of a module as you import it using the `as`
+keyword:
+
+```python
+# PythonForProgrammers/using_from.py
+import module as m
+
+if __name__ == "__main__":
+    print(m.useful_function())
+```
+
+### Packages
+
+As your programs get larger you'll want to further organize your code into
+*packages*. A package is a directory---and its own namespace, the name of that
+directory---which can contain multiple modules.
+
+
+
 Classes
 -------
 
@@ -252,7 +339,7 @@ with the `class` keyword followed by the class name and a colon. Inside the
 (indented) class body you use `def` to create methods. Here's a simple class:
 
 ```python
-# PythonForProgrammers/SimpleClass.py
+# PythonForProgrammers/simple_class.py
 class Simple:
     def __init__(self, str):
         print("Inside the Simple constructor")
@@ -291,21 +378,7 @@ an object looks just like a function call using the class name. Python's spare
 syntax makes you realize that the `new` keyword isn't really necessary in C++
 or Java, either.
 
-All the code at the bottom is set off by an `if` clause, which checks to see
-if something called `__name__` is equivalent to `__main__`. Again, the double
-underscores indicate special names. The reason for the `if` is that any file
-can also be used as a library module within another program (modules are
-described shortly). In that case, you just want the classes defined, but you
-don't want the code at the bottom of the file to be executed. This particular
-`if` statement is only true when you are running this file directly. That is,
-`__name__` is `__main__` when you use the command line:
 
-```
-python SimpleClass.py
-```
-
-However, if this file is imported as a module into another program, the
-`__main__` code is not executed.
 
 In C++ or Java you declare object level fields inside the class body but
 outside of the methods. Something that's a little surprising at first is that
@@ -328,19 +401,18 @@ Java, where you often inherit simply to establish a common interface. In
 Python, the only reason you inherit is to inherit an implementation---to
 re-use the code in the base class.
 
-If you're going to inherit from a class, you must tell Python to bring
-that class into your new file. Python controls its name spaces as
-aggressively as Java does, and in a similar fashion (albeit with
-Python's penchant for simplicity). Every time you create a file, you
-implicitly create a module (which is like a package in Java) with the
-same name as that file. Thus, no `package` keyword is needed in
-Python. When you want to use a module, you just say `import` and give
-the name of the module. Python searches the PYTHONPATH in the same way
-that Java searches the CLASSPATH (but for some reason, Python doesn't
-have the same kinds of pitfalls as Java does) and reads in the file. To
-refer to any of the functions or classes within a module, you give the
-module name, a period, and the function or class name. If you don't want
-the trouble of qualifying the name, you can say
+To inherit from a class, you must tell Python to bring that class into your
+new file. Python controls its name spaces as aggressively as Java does, and in
+a similar fashion (albeit with Python's penchant for simplicity). Every time
+you create a file, you implicitly create a module (which is like a package in
+Java) with the same name as that file. Thus, no `package` keyword is needed in
+Python. When you want to use a module, you just say `import` and give the name
+of the module. Python searches the PYTHONPATH in the same way that Java
+searches the CLASSPATH (but for some reason, Python doesn't have the same
+kinds of pitfalls as Java does) and reads in the file. To refer to any of the
+functions or classes within a module, you give the module name, a period, and
+the function or class name. If you don't want the trouble of qualifying the
+name, you can say
 
 ```python
 from module import name(s)
@@ -351,12 +423,12 @@ Where "name(s)" can be a list of names separated by commas.
 You inherit a class (or classes---Python supports multiple inheritance)
 by listing the name(s) of the class inside parentheses after the name of
 the inheriting class. Note that the `Simple` class, which resides in
-the file (and thus, module) named `SimpleClass` is brought into this
+the file (and thus, module) named `simple_class` is brought into this
 new name space using an `import` statement:
 
 ```python
-# PythonForProgrammers/Simple2.py
-from SimpleClass import Simple
+# PythonForProgrammers/simple2.py
+from simple_class import Simple
 
 class Simple2(Simple):
     def __init__(self, str):
