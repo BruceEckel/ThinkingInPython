@@ -406,6 +406,8 @@ def function3():
     return "function3 in module3 in b_package"
 ```
 
+To import `module3` we must specify both packages:
+
 ```python
 # PythonForProgrammers/two_levels.py
 from a_package.b_package import module3
@@ -413,7 +415,9 @@ from a_package.b_package import module3
 print(module3.function3())
 ```
 
-
+This example is primarily useful to show you the consistency of the package
+model. You will rarely do anything like this, probably only with an especially
+complex project.
 
 Classes
 -------
