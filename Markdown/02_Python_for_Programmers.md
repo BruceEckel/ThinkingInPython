@@ -329,6 +329,43 @@ As your programs get larger you'll want to further organize your code into
 *packages*. A package is a directory---and its own namespace, the name of that
 directory---which can contain multiple modules.
 
+To make something a package, you put a special file named `__init__.py` in that
+directory. Except in special cases, this file is empty---it is only there to
+flag the directory as a package.
+
+To demonstrate, we'll create a directory called `a_package` and give it an
+`__init__.py` containing nothing but a comment:
+
+```python
+# PythonForProgrammers/a_package/__init__.py
+```
+
+Now we'll add two modules to the package:
+
+```python
+# PythonForProgrammers/a_package/module1.py
+
+def function1():
+    return "function1 in module1 in a_package"
+```
+
+```python
+# PythonForProgrammers/a_package/module2.py
+
+def function2():
+    return "function2 in module2 in a_package"
+```
+
+You can import the entire package, or modules from the package.
+We'll start by importing the whole package:
+
+```python
+# PythonForProgrammers/using_packages.py
+import a_package
+
+```
+
+
 
 
 Classes
