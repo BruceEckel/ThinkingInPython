@@ -1,4 +1,4 @@
-# PythonForProgrammers/string_formatting.py
+# Py4Prog/string_formatting.py
 val = 47
 print("The number is %d" % val)
 val2 = 63.4

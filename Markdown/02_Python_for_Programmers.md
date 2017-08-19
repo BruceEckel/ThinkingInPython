@@ -13,46 +13,40 @@ This brief introduction is for the experienced programmer (which is what
 you should be if you're reading this book). You can refer to the full
 documentation at [www.Python.org](http://www.python.org/doc/).
 
-I find the HTML page [A Python Quick
-Reference](http://rgruet.free.fr/#QuickRef) to be incredibly useful.
+In addition, I'll assume you have more than just a grasp of the syntax of
+Python. You should have a good understanding of objects and what they're
+about, including polymorphism.
 
-In addition, I'll assume you have more than just a grasp of the syntax
-of Python. You should have a good understanding of objects and what
-they're about, including polymorphism.
-
-On the other hand, by going through this book you're going to learn a
-*lot* about object-oriented programming by seeing objects used in many
-different situations. If your knowledge of objects is rudimentary, it
-will get much stronger in the process of understanding the designs in
-this book.
+On the other hand, by going through this book you're going to learn a *lot*
+about object-oriented programming by seeing objects used in many different
+situations. If your knowledge of objects is rudimentary, it will get much
+stronger in the process of understanding the designs in this book.
 
 Scripting vs. Programming
 -------------------------
 
-Python is often referred to as a scripting language, but scripting
-languages tend to be limiting, especially in the scope of the problems
-that they solve. Python, on the other hand, is a programming language
-that also supports scripting. It *is* marvelous for scripting, and you
-may find yourself replacing all your batch files, shell scripts, and
-simple programs with Python scripts. But it is far more than a scripting
-language.
+Python is often referred to as a scripting language, but scripting languages
+tend to be limiting, especially in the scope of the problems that they solve.
+Python, on the other hand, is a programming language that also supports
+scripting. It *is* marvelous for scripting, and you may find yourself
+replacing all your batch files, shell scripts, and simple programs with Python
+scripts. But it is far more than a scripting language.
 
-The goal of Python is improved productivity. This productivity comes in
-many ways, but the language is designed to aid you as much as possible,
-while hindering you as little as possible with arbitrary rules or any
-requirement that you use a particular set of features. Python is
-practical; Python language design decisions were based on providing the
-maximum benefits to the programmer.
+The goal of Python is improved productivity. This productivity comes in many
+ways, but the language is designed to aid you as much as possible, while
+hindering you as little as possible with arbitrary rules or any requirement
+that you use a particular set of features. Python is practical; Python
+language design decisions were based on providing the maximum benefits to the
+programmer.
 
-Python is very clean to write and especially to read. You will find that
-it's quite easy to read your own code long after you've written it, and
-also to read other people's code. This is accomplished partially through
-clean, to-the-point syntax, but a major factor in code readability is
-indentation---scoping in Python is determined by indentation. For
-example:
+Python is very clean to write and especially to read. You will find that it's
+quite easy to read your own code long after you've written it, and also to
+read other people's code. This is accomplished partially through clean, to-
+the-point syntax, but a major factor in code readability is
+indentation---scoping in Python is determined by indentation. For example:
 
 ```python
-# PythonForProgrammers/if.py
+# Py4Prog/if.py
 response = "yes"
 if response == "yes":
     print("affirmative")
@@ -60,50 +54,47 @@ if response == "yes":
 print("continuing...")
 ```
 
-The '`\#`' denotes a comment that goes until the end of the line, just
-like C++ and Java '`//`' comments.
+The '`\#`' denotes a comment that goes until the end of the line, just like
+C++ and Java '`//`' comments.
 
-First notice that the basic syntax of Python is C-ish as you can see in
-the `if` statement. But in a C `if`, you would be required to use
-parentheses around the conditional, whereas they are not necessary in
-Python (it won't complain if you use them anyway).
+First notice that the basic syntax of Python is C-ish as you can see in the
+`if` statement. But in a C `if`, you would be required to use parentheses
+around the conditional, whereas they are not necessary in Python (it won't
+complain if you use them anyway).
 
-The conditional clause ends with a colon, and this indicates that what
-follows will be a group of indented statements, which are the "then"
-part of the `if` statement. In this case, there is a "print" statement
-which sends the result to standard output, followed by an assignment to
-a variable named `val`. The subsequent statement is not indented so it
-is no longer part of the `if`. Indenting can nest to any level, just
-like curly braces in C++ or Java, but unlike those languages there is no
-option (and no argument) about where the braces are placed---the
-compiler forces everyone's code to be formatted the same way, which is
-one of the main reasons for Python's consistent readability.
+The conditional clause ends with a colon, and this indicates that what follows
+will be a group of indented statements, which are the "then" part of the `if`
+statement. In this case, there is a "print" statement which sends the result
+to standard output, followed by an assignment to a variable named `val`. The
+subsequent statement is not indented so it is no longer part of the `if`.
+Indenting can nest to any level, just like curly braces in C++ or Java, but
+unlike those languages there is no option (and no argument) about where the
+braces are placed---the compiler forces everyone's code to be formatted the
+same way, which is one of the main reasons for Python's consistent
+readability.
 
 Python normally has only one statement per line (you can put more by
-separating them with semicolons), thus no terminating semicolon is
-necessary. Even from the brief example above you can see that the
-language is designed to be as simple as possible, and yet still very
-readable.
+separating them with semicolons), thus no terminating semicolon is necessary.
+Even from the brief example above you can see that the language is designed to
+be as simple as possible, and yet still very readable.
 
 Built-In Containers
 -------------------
 
-With languages like C++ and Java, containers are add-on libraries and
-not integral to the language. In Python, the essential nature of
-containers for programming is acknowledged by building them into the
-core of the language: both lists and associative arrays (a.k.a. maps,
-dictionaries, hash tables) are fundamental data types. This adds much to
-the elegance of the language.
+With languages like C++ and Java, containers are add-on libraries and not
+integral to the language. In Python, the essential nature of containers for
+programming is acknowledged by building them into the core of the language:
+both lists and associative arrays (a.k.a. maps, dictionaries, hash tables) are
+fundamental data types. This adds much to the elegance of the language.
 
-In addition, the `for` statement automatically iterates through lists
-rather than just counting through a sequence of numbers. This makes a
-lot of sense when you think about it, since you're almost always using a
-`for` loop to step through an array or a container. Python formalizes
-this by automatically making `for` use an iterator that works through
-a sequence. Here's an example:
+In addition, the `for` statement automatically iterates through lists rather
+than just counting through a sequence of numbers. This makes a lot of sense
+when you think about it, since you're almost always using a `for` loop to step
+through an array or a container. Python formalizes this by automatically
+making `for` use an iterator that works through a sequence. Here's an example:
 
 ```python
-# PythonForProgrammers/list.py
+# Py4Prog/list.py
 list = [ 1, 3, 5, 7, 9, 11 ]
 print(list)
 list.append(13)
@@ -111,39 +102,38 @@ for x in list:
     print(x)
 ```
 
-The first line creates a list. You can print the list and it will look
-exactly as you put it in (in contrast, remember that I had to create a
-special `Arrays2` class in *Thinking in Java* in order to print arrays
-in Java). Lists are like Java containers---you can add new elements to
-them (here, `append()` is used) and they will automatically resize
-themselves. The `for` statement creates an iterator `x` which takes
-on each value in the list.
+The first line creates a list. You can print the list and it will look exactly
+as you put it in (in contrast, remember that I had to create a special
+`Arrays2` class in *Thinking in Java* in order to print arrays in Java). Lists
+are like Java containers---you can add new elements to them (here, `append()`
+is used) and they will automatically resize themselves. The `for` statement
+creates an iterator `x` which takes on each value in the list.
 
-You can create a list of numbers with the `range()` function, so if
-you really need to imitate C's `for`, you can.
+You can create a list of numbers with the `range()` function, so if you really
+need to imitate C's `for`, you can.
 
 Notice that there aren't any type declarations---the object names simply
-appear, and Python infers their type by the way that you use them. It's
-as if Python is designed so that you only need to press the keys that
-absolutely must. You'll find after you've worked with Python for a short
-while that you've been using up a lot of brain cycles parsing
-semicolons, curly braces, and all sorts of other extra verbiage that was
-demanded by your non-Python programming language but didn't actually
-describe what your program was supposed to do.
+appear, and Python infers their type by the way that you use them. It's as if
+Python is designed so that you only need to press the keys that absolutely
+must. You'll find after you've worked with Python for a short while that
+you've been using up a lot of brain cycles parsing semicolons, curly braces,
+and all sorts of other extra verbiage that was demanded by your non-Python
+programming language but didn't actually describe what your program was
+supposed to do.
 
-Naming Convetions
+Naming Conventions
 -----------------
 
 
 Functions
 ---------
 
-To create a function in Python, you use the `def` keyword, followed by
-the function name and argument list, and a colon to begin the function
-body. Here is the first example turned into a function:
+To create a function in Python, you use the `def` keyword, followed by the
+function name and argument list, and a colon to begin the function body. Here
+is the first example turned into a function:
 
 ```python
-# PythonForProgrammers/my_function.py
+# Py4Prog/my_function.py
 def my_function(response):
     val = 0
     if response == "yes":
@@ -157,14 +147,13 @@ print(my_function("yes"))
 ```
 
 Notice there is no type information in the function signature---all it
-specifies is the name of the function and the argument identifiers, but
-no argument types or return types. Python is a *structurally-typed*
-language, which means it puts the minimum possible requirements on
-typing. For example, you could pass and return different types from the
-same function:
+specifies is the name of the function and the argument identifiers, but no
+argument types or return types. Python is a *structurally-typed* language,
+which means it puts the minimum possible requirements on typing. For example,
+you could pass and return different types from the same function:
 
 ```python
-# PythonForProgrammers/different_returns.py
+# Py4Prog/different_returns.py
 def different_returns(arg):
     if arg == 1:
         return "one"
@@ -175,13 +164,13 @@ print(different_returns(1))
 print(different_returns("one"))
 ```
 
-The only constraints on an object that is passed into the function are
-that the function can apply its operations to that object, but other
-than that, it doesn't care. Here, the same function applies the '`+`'
-operator to integers and strings:
+The only constraints on an object that is passed into the function are that
+the function can apply its operations to that object, but other than that, it
+doesn't care. Here, the same function applies the '`+`' operator to integers
+and strings:
 
 ```python
-# PythonForProgrammers/sum.py
+# Py4Prog/sum.py
 def sum(arg1, arg2):
     return arg1 + arg2
 
@@ -189,21 +178,19 @@ print(sum(42, 47))
 print(sum('spam ', "eggs"))
 ```
 
-When the operator '`+`' is used with strings, it means concatenation
-(yes, Python supports operator overloading, and it does a nice job of
-it).
+When the operator '`+`' is used with strings, it means concatenation (yes,
+Python supports operator overloading, and it does a nice job of it).
 
 Strings
 -------
 
-The above example also shows a little bit about Python string handling,
-which is the best of any language I've seen. You can use single or
-double quotes to represent strings, which is very nice because if you
-surround a string with double quotes, you can embed single quotes and
-vice versa:
+The above example also shows a little bit about Python string handling, which
+is the best of any language I've seen. You can use single or double quotes to
+represent strings, which is very nice because if you surround a string with
+double quotes, you can embed single quotes and vice versa:
 
 ```python
-# PythonForProgrammers/strings.py
+# Py4Prog/strings.py
 print("That isn't a horse")
 print('You are not a "Viking"')
 print("""You're just pounding two
@@ -213,25 +200,25 @@ print('''"Oh no!" He exclaimed.
 print(r'c:\python\lib\utils')
 ```
 
-Note that Python was not named after the snake, but rather the Monty
-Python comedy troupe, and so examples are virtually required to include
-Python-esque references.
+Note that Python was not named after the snake, but rather the Monty Python
+comedy troupe, and so examples are virtually required to include Python-esque
+references.
 
-The triple-quote syntax quotes everything, including newlines. This
-makes it particularly useful for doing things like generating web pages
-(Python is an especially good CGI language), since you can just
-triple-quote the entire page that you want without any other editing.
+The triple-quote syntax quotes everything, including newlines. This makes it
+particularly useful for doing things like generating web pages (Python is an
+especially good CGI language), since you can just triple-quote the entire page
+that you want without any other editing.
 
-The '`r`' right before a string means "raw," which takes the
-backslashes literally so you don't have to put in an extra backslash in
-order to insert a literal backslash.
+The '`r`' right before a string means "raw," which takes the backslashes
+literally so you don't have to put in an extra backslash in order to insert a
+literal backslash.
 
 Substitution in strings is exceptionally easy, since Python uses C's
-`printf()` substitution syntax, but for any string at all. You simply
-follow the string with a '`%`' and the values to substitute:
+`printf()` substitution syntax, but for any string at all. You simply follow
+the string with a '`%`' and the values to substitute:
 
 ```python
-# PythonForProgrammers/string_formatting.py
+# Py4Prog/string_formatting.py
 val = 47
 print("The number is %d" % val)
 val2 = 63.4
@@ -251,19 +238,19 @@ sophisticated regular expressions.
 Imports, Namespaces and Packages
 --------------------------------
 
-Each python file is a *module* that you can use inside another python file by
-*importing* it. If the file is in the same directory, you can use a
-straightforward `import` statement:
+Each Python file is a *module* that you can use inside another Python file by
+*importing* it. If the file is in the same directory, you can simply use an
+`import` statement:
 
 ```python
-# PythonForProgrammers/module.py
+# Py4Prog/module.py
 
 def useful_function():
     return "Use this elsewhere!"
 ```
 
 ```python
-# PythonForProgrammers/use_module.py
+# Py4Prog/use_module.py
 import module
 
 print("'module' imported")
@@ -295,7 +282,7 @@ However, if this file is imported as a module into another program, `__name__`
 will not be `__main__`, so the `__main__` code is not executed:
 
 ```python
-# PythonForProgrammers/import_module.py
+# Py4Prog/import_module.py
 import use_module
 ```
 
@@ -306,7 +293,7 @@ If you want to bring a name into the current namespace, you can do so using
 the `from` keyword:
 
 ```python
-# PythonForProgrammers/using_from.py
+# Py4Prog/using_from.py
 from module import useful_function
 
 if __name__ == "__main__":
@@ -317,7 +304,7 @@ You can change the namespace of a module during an import using the `as`
 keyword:
 
 ```python
-# PythonForProgrammers/using_from.py
+# Py4Prog/using_from.py
 import module as m
 
 if __name__ == "__main__":
@@ -338,20 +325,20 @@ To demonstrate, we'll create a directory called `a_package` and give it an
 `__init__.py` containing nothing but a comment:
 
 ```python
-# PythonForProgrammers/a_package/__init__.py
+# Py4Prog/a_package/__init__.py
 ```
 
 Now we'll add two modules to the package:
 
 ```python
-# PythonForProgrammers/a_package/module1.py
+# Py4Prog/a_package/module1.py
 
 def function1():
     return "function1 in module1 in a_package"
 ```
 
 ```python
-# PythonForProgrammers/a_package/module2.py
+# Py4Prog/a_package/module2.py
 
 def function2():
     return "function2 in module2 in a_package"
@@ -360,7 +347,7 @@ def function2():
 To import a module from a package, you must qualify it with the package name:
 
 ```python
-# PythonForProgrammers/using_packages.py
+# Py4Prog/using_packages.py
 import a_package.module1
 import a_package.module2
 
@@ -371,7 +358,7 @@ print(a_package.module2.function2())
 You can also name the package with `from`:
 
 ```python
-# PythonForProgrammers/from_packages.py
+# Py4Prog/from_packages.py
 from a_package import module1
 from a_package import module2
 
@@ -385,7 +372,7 @@ Finally, you can bring specific functions into the namespace by
 naming both the package and the module:
 
 ```python
-# PythonForProgrammers/no_qualification.py
+# Py4Prog/no_qualification.py
 from a_package.module1 import function1
 from a_package.module2 import function2
 
@@ -396,11 +383,11 @@ print(function2())
 We can even put a second package underneath the first one:
 
 ```python
-# PythonForProgrammers/a_package/b_package/__init__.py
+# Py4Prog/a_package/b_package/__init__.py
 ```
 
 ```python
-# PythonForProgrammers/a_package/b_package/module3.py
+# Py4Prog/a_package/b_package/module3.py
 
 def function3():
     return "function3 in module3 in b_package"
@@ -409,7 +396,7 @@ def function3():
 To import `module3` we must specify both packages:
 
 ```python
-# PythonForProgrammers/two_levels.py
+# Py4Prog/two_levels.py
 from a_package.b_package import module3
 
 print(module3.function3())
@@ -427,7 +414,7 @@ with the `class` keyword followed by the class name and a colon. Inside the
 (indented) class body you use `def` to create methods. Here's a simple class:
 
 ```python
-# PythonForProgrammers/simple_class.py
+# Py4Prog/simple_class.py
 class Simple:
     def __init__(self, str):
         print("Inside the Simple constructor")
@@ -512,7 +499,7 @@ the file (and thus, module) named `simple_class` is brought into this
 new name space using an `import` statement:
 
 ```python
-# PythonForProgrammers/simple2.py
+# Py4Prog/simple2.py
 from simple_class import Simple
 
 class Simple2(Simple):
@@ -600,14 +587,14 @@ def f(a,b,c): print a, b, c
     reused by multiple classes:
 
 ```python
-# PythonForProgrammers/utility.py
+# Py4Prog/utility.py
 def f(self): print "utility.f()!!!"
 ```
 
 Here's how you compose that method into a class:
 
 ```python
-# PythonForProgrammers/compose.py
+# Py4Prog/compose.py
 class Compose:
      from utility import f
 
@@ -621,10 +608,13 @@ Note: Suggest Further Topics for inclusion in the introductory chapter
 Further Reading
 ---------------
 
+> Although it is (alas) only for Python 2.7, I still find the [Python Quick
+Reference](http://rgruet.free.fr/#QuickRef) to be incredibly useful.
+
 > Python Programming FAQ: <http://www.python.org/doc/faq/programming/>
 
 > Python idioms: <http://jaynes.colorado.edu/PythonIdioms.html>
->
+
 > Python Tips, Tricks and Hacks: <http://www.siafoo.net/article/52>
 
 > Building a Virtual Environment for Running Python 3:
@@ -643,7 +633,7 @@ Getters and setters in Python:
 <http://eli.thegreenplace.net/2009/02/06/getters-and-setters-in-python/>
 
 The 'with' statement (might require a separate chapter?):
-<http://jessenoller.com/2009/02/03/get-with-the-program-as-contextmanager-completely-different/>
+<http://jessenoller.com/2009/02/03/get-with-the-program-as-contextmanager-completely-different/
 
 For people who need more basics than this book has to offer, ShowMeDo
 tutorials on Python:

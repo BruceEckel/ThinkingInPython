@@ -1,4 +1,4 @@
-# PythonForProgrammers/simple_class.py
+# Py4Prog/simple_class.py
 class Simple:
     def __init__(self, str):
         print("Inside the Simple constructor")

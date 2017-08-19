@@ -1,4 +1,4 @@
-# PythonForProgrammers/simple2.py
+# Py4Prog/simple2.py
 from simple_class import Simple
 
 class Simple2(Simple):

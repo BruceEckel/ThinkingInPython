@@ -1,4 +1,4 @@
-# PythonForProgrammers/use_module.py
+# Py4Prog/use_module.py
 import module
 
 print("'module' imported")

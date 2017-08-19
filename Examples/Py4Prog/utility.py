@@ -1,2 +1,2 @@
-# PythonForProgrammers/utility.py
+# Py4Prog/utility.py
 def f(self): print "utility.f()!!!"

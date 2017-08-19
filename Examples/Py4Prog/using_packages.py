@@ -1,4 +1,4 @@
-# PythonForProgrammers/using_packages.py
+# Py4Prog/using_packages.py
 import a_package.module1
 import a_package.module2
 

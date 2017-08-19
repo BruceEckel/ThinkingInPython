@@ -1,4 +1,4 @@
-# PythonForProgrammers/different_returns.py
+# Py4Prog/different_returns.py
 def different_returns(arg):
     if arg == 1:
         return "one"

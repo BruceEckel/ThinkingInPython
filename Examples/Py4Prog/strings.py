@@ -1,4 +1,4 @@
-# PythonForProgrammers/strings.py
+# Py4Prog/strings.py
 print("That isn't a horse")
 print('You are not a "Viking"')
 print("""You're just pounding two

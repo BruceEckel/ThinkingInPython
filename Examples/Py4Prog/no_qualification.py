@@ -1,4 +1,4 @@
-# PythonForProgrammers/no_qualification.py
+# Py4Prog/no_qualification.py
 from a_package.module1 import function1
 from a_package.module2 import function2
 

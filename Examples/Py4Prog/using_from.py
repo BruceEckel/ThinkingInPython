@@ -1,4 +1,4 @@
-# PythonForProgrammers/using_from.py
+# Py4Prog/using_from.py
 import module as m
 
 if __name__ == "__main__":

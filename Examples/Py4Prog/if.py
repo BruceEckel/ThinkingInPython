@@ -1,4 +1,4 @@
-# PythonForProgrammers/if.py
+# Py4Prog/if.py
 response = "yes"
 if response == "yes":
     print("affirmative")
