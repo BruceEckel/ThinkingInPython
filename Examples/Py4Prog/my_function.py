@@ -1,4 +1,5 @@
 # Py4Prog/my_function.py
+
 def my_function(response):
     val = 0
     if response == "yes":

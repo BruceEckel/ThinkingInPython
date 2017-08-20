@@ -345,9 +345,11 @@ As your programs get larger you'll want to further organize your code into
 *packages*. A package is a directory---and its own namespace, which has the
 name of that directory---that can contain multiple modules.
 
-To make something a package, you put a special file named `__init__.py` in that
-directory. Except in special cases, this file is empty---it is only there to
-flag the directory as a package.
+To make something a package, you put a special file named `__init__.py` in
+that directory. Except in special cases, this file is empty---it is only there
+to flag the directory as a package.^[People are often confused by the name
+`__init__.py`. In hindsight, it might have been better to have named the file
+`__package__.py`.]
 
 To demonstrate, we'll create a directory called `a_package` and give it an
 `__init__.py` containing nothing but a comment:
