@@ -3,5 +3,6 @@
 - chapter on testing, then set up testing for examples throughout the book
 - chapter on optional static typing, so that can be used throughout
 
-- For anything graphical, is it possible to use [http://py.processing.org](http://py.processing.org)?
-  It appears it might require Jython, which limits it to Python 2.7.
+- Introductory Python YouTube Playlists:
+  - [Socratica's Python Programming Tutorials](https://www.youtube.com/playlist?list=PLi01XoE8jYohWFPpC17Z-wWhPOSuh8Er-)
+  - [TheNewBoston's Python 3.4 Programming Tutorials](https://www.youtube.com/playlist?list=PL6gx4Cwl9DGAcbMi1sH6oAMk4JHw91mC_)
