@@ -3,7 +3,5 @@
 - chapter on testing, then set up testing for examples throughout the book
 - chapter on optional static typing, so that can be used throughout
 
-- Jeremy's Rats & Mazes example shows that TKInter is reasonable for anything where you
-  need graphics. Maybe it's not perfect but this isn't a book about GUIs, and there's
-  no installation hassle with TKInter. Also here is a
-  [named color chart for TKInter](http://www.science.smith.edu/dftwiki/images/thumb/3/3d/TkInterColorCharts.png/700px-TkInterColorCharts.png)
+- For anything graphical, is it possible to use [http://py.processing.org](http://py.processing.org)?
+  It appears it might require Jython, which limits it to Python 2.7.
