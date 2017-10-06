@@ -1,4 +1,4 @@
 Thinking in Python
 ==================
-
-### Only a test, for now ...
+.
+### What you see here is the beginning of conversion from the abandoned https://bitbucket.org/BruceEckel/python-3-patterns-idioms
