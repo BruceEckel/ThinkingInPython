@@ -7,6 +7,8 @@
   no installation hassle with TKInter. Also here is a
   [named color chart for TKInter](http://www.science.smith.edu/dftwiki/images/thumb/3/3d/TkInterColorCharts.png/700px-TkInterColorCharts.png)
 
+- Maze generator: https://github.com/jostbr/MazeGenerator
+
 ******************
 
 - Introductory Python YouTube Playlists:
