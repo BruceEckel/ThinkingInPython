@@ -135,7 +135,7 @@ in `this_is_snake_case`.
 If something represents a constant, you use all uppercase letters, as in
 `THIS_IS_A_CONSTANT`.
 
-The one exception is class names, which are "camel-cased," starting with a
+The one exception is class names, which are "pascal-cased," starting with a
 capital letter, without underscores and capitalizing intermediate words. For
 example: `ThisIsMyClass`.
 
