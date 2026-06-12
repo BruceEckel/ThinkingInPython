@@ -1,0 +1,17 @@
+# Examples that run_examples.py should NOT execute.
+#
+# Only list examples that cannot run unattended even when fully correct:
+# GUI windows, interactive input, infinite loops, or dead external
+# dependencies. Do NOT list examples that merely fail today because of
+# Python 2 syntax or broken imports. Those are Phase 2 fixes and must stay
+# visible as failures until repaired.
+#
+# One glob pattern per line, matched against the forward-slash relative path
+# (e.g. Observer/BoxObserverPythonCard.py or StateMachine/*GUI*.py).
+# A "# extract: no-run" line inside a file does the same job inline.
+
+# Depends on PythonCard, an abandoned GUI framework that no longer installs.
+Observer/BoxObserverPythonCard.py
+
+# TKInter GUI application; opens a window and waits for the user.
+Projects/ratsAndMazes/*
