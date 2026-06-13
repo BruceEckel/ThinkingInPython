@@ -1,5 +1,5 @@
 # Py4Prog/using_from.py
-import module as m
+from module import useful_function
 
 if __name__ == "__main__":
-    print(m.useful_function())
+    print(useful_function())

@@ -621,10 +621,11 @@ Useful Techniques
 -   You can turn a list into function arguments using `*`:
 
 ```python
-def f(a,b,c): print a, b, c
-    x = [1,2,3]
-    f(*x)
-    f(*(1,2,3))
+def f(a, b, c): print(a, b, c)
+
+x = [1, 2, 3]
+f(*x)
+f(*(1, 2, 3))
 ```
 
 -   You can compose classes using `import`. Here's a method that can be
@@ -633,7 +634,9 @@ def f(a,b,c): print a, b, c
 ```python
 # Py4Prog/utility.py
 
-def f(self): print "utility.f()!!!"
+
+def f(self):
+    print("utility.f()!!!")
 ```
 
 Here's how you compose that method into a class:
@@ -642,7 +645,8 @@ Here's how you compose that method into a class:
 # Py4Prog/compose.py
 
 class Compose:
-     from utility import f
+    from utility import f
+
 
 Compose().f()
 ```
