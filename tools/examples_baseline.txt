@@ -4,29 +4,6 @@
 # One forward-slash relative path per line.
 
 Observer/BoxObserver.py
-PatternRefactoring/clip1.py
-PatternRefactoring/clip3.py
-PatternRefactoring/clip4.py
-PatternRefactoring/doubledispatch/DDAluminum.py
-PatternRefactoring/doubledispatch/DoubleDispatch.py
-PatternRefactoring/doubledispatch/TypedBin.py
-PatternRefactoring/doubledispatch/TypedBinMember.py
-PatternRefactoring/dynatrash/DynaTrash.py
-PatternRefactoring/recyclea/RecycleA.py
-PatternRefactoring/recycleap/RecycleAP.py
-PatternRefactoring/recycleb/RecycleB.py
-PatternRefactoring/trash/Aluminum.py
-PatternRefactoring/trash/Cardboard.py
-PatternRefactoring/trash/Fillable.py
-PatternRefactoring/trash/FillableCollection.py
-PatternRefactoring/trash/ParseTrash.py
-PatternRefactoring/trash/Trash.py
-PatternRefactoring/trashvisitor/FillableVisitor.py
-PatternRefactoring/trashvisitor/TrashVisitor.py
-PatternRefactoring/trashvisitor/VAluminum.py
-PatternRefactoring/trashvisitor/Visitable.py
-PatternRefactoring/trashvisitor/VisitableDecorator.py
-PatternRefactoring/trashvisitor/Visitor.py
 StateMachine/stateMachine2/Condition.py
 StateMachine/stateMachine2/StateMachine.py
 StateMachine/vendingmachine/VendingMachine.py

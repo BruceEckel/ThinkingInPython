@@ -211,7 +211,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
 | P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
-| P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 28; see below) |
+| P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 5; see below) |
 | P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
@@ -238,19 +238,14 @@ Every example in these subtrees now runs and is `ty`-clean, with the book and
 | StateMachine | PARTIAL: mousetrap half DONE; table-driven half left (see below) |
 | UnitTesting | DONE (reframed around pytest; Java framework removed; pytest is now a CI hard gate) |
 | Metaprogramming | DONE (Pythonic reframe: leads with `__init_subclass__`, `__set_name__`, class decorators; metaclasses kept only where they earn it; Py2-only examples removed) |
+| PatternRefactoring | DONE (Pythonic reframe: `__init_subclass__` registry factory, `dict` keyed by `type` for sorting, `functools.singledispatch` replacing double-dispatch and Visitor; 23 Java files collapsed to 6. This also covers the chapter's P4 reframe.) |
 | Root scripts | `CodeManager.py` marked `# extract: no-run`; `SanityCheck.py` removed (obsolete, replaced by pytest) |
 
-**The 28 remaining baseline failures are NOT Python 2 syntax.** They are
+**The 5 remaining baseline failures are NOT Python 2 syntax.** They are
 unconverted Java. The agreed direction is a Pythonic reframe (and sophisticated
 pytest, now in place). They stay in `tools/examples_baseline.txt` so CI stays
 green. Breakdown:
 
-- **PatternRefactoring (23)** — the *Trash* sorting example imported straight
-  from *Thinking in Java*: `0.75f` literals, `Trash t = (Trash)it.next()`,
-  `ArrayList()`, reflection-based prototype factory (`getConstructor`). Target:
-  Pythonic reframe (`isinstance`/`match` for RTTI, a registry dict or
-  `__init_subclass__` for the factory, `functools.singledispatch` for
-  double-dispatch and Visitor). Pairs with the Phase 4 reframe of this chapter.
 - **StateMachine table-driven half (4)** — `stateMachine2/` and `vendingmachine/`
   are labeled "(code only roughly converted)" three times in the prose; they are
   still Java (`boolean condition(input):`, `Iterator it=((List)...)`,
