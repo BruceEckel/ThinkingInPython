@@ -7,7 +7,7 @@ build tests into the code you write and run them on every change. It is as if
 you extend the language: the test suite checks not just that the code parses,
 but that it still means what you intended.
 
-Unit testing is not a design pattern. It might be called a development
+Unit testing is not a design pattern but a development
 practice. Its effect on the quality of this book is large enough that tests
 appear throughout, so the practice is introduced here.
 
@@ -76,8 +76,8 @@ class Account:
         self.balance += self.balance * rate
 ```
 
-Now the tests. By convention they live in a file whose name starts with
-`test_`. This one file exercises the whole `Account` class, and the sections
+By convention tests live in a file whose name starts with
+`test_`. The following file exercises the whole `Account` class, and the sections
 below walk through each technique it uses:
 
 ```python
@@ -125,7 +125,7 @@ def test_nonpositive_deposit_raises(bad: float) -> None:
         Account().deposit(bad)
 ```
 
-Run the whole suite by typing `pytest` in the project. It discovers every
+Run the test suite by typing `pytest` in the project. It discovers every
 `test_*.py` file, collects every `test_` function, runs them, and reports. A
 passing run is quiet. A failing `assert` prints the expression and the actual
 values, so you rarely need a debugger to see what went wrong.

@@ -4,4 +4,4 @@
 
 - Why it works well for Python
 
-- Using MyPy
+- Using `ty`

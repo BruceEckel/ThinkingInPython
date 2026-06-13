@@ -71,7 +71,10 @@ print(total(Countdown(5)))   # and on a custom iterable
 generator, the list, and the custom `Countdown` without knowing or caring which.
 Generators are also lazy. `fibonacci(1_000_000)` computes nothing until you
 iterate, and produces one value at a time, so it works on streams too large to
-hold in memory.
+hold in memory. A generator can even be *infinite*: a `while True` loop that
+yields forever, or `itertools.count()`, produces values on demand with no end.
+You take only as many as you need (see `itertools.islice` below), which a list
+could never do.
 
 ## Reusable Algorithms
 
