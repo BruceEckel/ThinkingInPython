@@ -42,12 +42,12 @@ ty:
 test:
 	$(PYTEST) ExtractedExamples
 
-# Mirrors the GitHub Actions gate: drift check, regression-only example run,
-# the book's pytest examples, and a clean site build. All hard gates.
+# Mirrors the GitHub Actions gate: drift check, the example run, the book's
+# pytest examples, and a clean site build. All hard gates.
 ci:
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
-	$(PY) tools/run_examples.py --baseline
+	$(PY) tools/run_examples.py
 	$(PYTEST) ExtractedExamples
 	$(PY) tools/build_site.py
 

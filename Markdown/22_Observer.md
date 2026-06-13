@@ -433,238 +433,84 @@ the only connection the `Observer`s have with `Flower`s is the
 
 ### A Visual Example of Observers
 
-The following example is similar to the `ColorBoxes` example from
-*Thinking in Java*. Boxes are placed in a grid on the screen and each
-one is initialized to a random color. In addition, each box
-`implements` the `Observer` interface and is registered with an
-`Observable` object. When you click on a box, all of the other boxes
-are notified that a change has been made because the `Observable`
-object automatically calls each `Observer` object's `update()`
-method. Inside this method, the box checks to see if it's adjacent to
-the one that was clicked, and if so it changes its color to match the
-clicked box. (NOTE: this example has not been converted. See further
-down for a version that has the GUI but not the Observers, in
-PythonCard.):
+This is the `ColorBoxes` example from *Thinking in Java*. A grid of boxes each
+start with some color. Every box observes a shared `Observable`. When one box is
+"clicked," the `Observable` notifies every box, and each box adjacent to the
+clicked one changes its color to match it.
+
+The original was a Swing GUI. The pattern itself has nothing to do with a GUI,
+so here it is as a headless program that clicks a box in code and then checks
+the result. That keeps the focus on the Observer mechanics and lets the example
+verify itself. It reuses the `Observable` and `Observer` classes from
+`Util/Observer.py`:
 
 ```python
 # Observer/BoxObserver.py
-# Demonstration of Observer pattern using
-# Java's built-in observer classes.
+# A headless version of the ColorBoxes Observer example. Boxes in a grid
+# observe a shared Observable; "clicking" one recolors its neighbors.
+import sys
+from typing import Any
 
-# You must inherit a type of Observable:
+sys.path += ['../Util']
+from Observer import Observer, Observable  # type: ignore
+
+
 class BoxObservable(Observable):
-    def notifyObservers(self, Object b):
-        # Otherwise it won't propagate changes:
-        setChanged()
-        super.notifyObservers(b)
+    # You must subclass Observable and call setChanged(), or notify does nothing:
+    def notifyObservers(self, arg: Any = None) -> None:
+        self.setChanged()
+        Observable.notifyObservers(self, arg)
 
-class BoxObserver(JFrame):
-    Observable notifier = BoxObservable()
-    def __init__(self, grid):
-        setTitle("Demonstrates Observer pattern")
-        Container cp = getContentPane()
-        cp.setLayout(GridLayout(grid, grid))
-        for(int x = 0 x < grid x++)
-            for(int y = 0 y < grid y++)
-                cp.add(OCBox(x, y, notifier))
 
-    def main(self, String[] args):
-        grid = 8
-            if(args.length > 0)
-                grid = Integer.parseInt(args[0])
-            JFrame f = BoxObserver(grid)
-            f.setSize(500, 400)
-            f.setVisible(1)
-            # JDK 1.3:
-            f.setDefaultCloseOperation(EXIT_ON_CLOSE)
-            # Add a WindowAdapter if you have JDK 1.2
-
-class OCBox(JPanel) implements Observer:
-    Color cColor = newColor()
-    colors = [
-      Color.black, Color.blue, Color.cyan,
-      Color.darkGray, Color.gray, Color.green,
-      Color.lightGray, Color.magenta,
-      Color.orange, Color.pink, Color.red,
-      Color.white, Color.yellow
-    ]
-    def newColor():
-        return colors[
-          (int)(Math.random() * colors.length)
-        ]
-
-    def __init__(self, x, y, Observable notifier):
+class Box(Observer):
+    def __init__(self, x: int, y: int, color: str,
+                 notifier: BoxObservable) -> None:
         self.x = x
         self.y = y
-        notifier.addObserver(self)
+        self.color = color
         self.notifier = notifier
-        addMouseListener(ML())
+        notifier.addObserver(self)
 
-    def paintComponent(self, Graphics g):
-        super.paintComponent(g)
-        g.setColor(cColor)
-        Dimension s = getSize()
-        g.fillRect(0, 0, s.width, s.height)
+    def click(self) -> None:
+        # A click announces this box to every observer:
+        self.notifier.notifyObservers(self)
 
-    class ML(MouseAdapter):
-        def mousePressed(self, MouseEvent e):
-            notifier.notifyObservers(OCBox.self)
+    def update(self, observable: Any, clicked: "Box") -> None:
+        if self is not clicked and self.next_to(clicked):
+            self.color = clicked.color
 
-    def update(self, Observable o, Object arg):
-        OCBox clicked = (OCBox)arg
-        if(nextTo(clicked)):
-            cColor = clicked.cColor
-            repaint()
+    def next_to(self, other: "Box") -> bool:
+        return abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1
 
-    def nextTo(OCBox b):
-        return Math.abs(x - b.x) <= 1 &&
-            Math.abs(y - b.y) <= 1
+
+def make_grid(size: int, notifier: BoxObservable) -> list[list["Box"]]:
+    return [[Box(x, y, f"color{(x + y) % 3}", notifier)
+             for y in range(size)]
+            for x in range(size)]
+
+
+if __name__ == "__main__":
+    notifier = BoxObservable()
+    grid = make_grid(5, notifier)
+    center = grid[2][2]
+    center.color = "red"
+    center.click()
+    print(f"(1,1) -> {grid[1][1].color}")
+    print(f"(2,3) -> {grid[2][3].color}")
+    print(f"(0,0) -> {grid[0][0].color}")
+    assert grid[1][1].color == "red"   # diagonally adjacent: changed
+    assert grid[2][3].color == "red"   # adjacent: changed
+    assert grid[0][0].color != "red"   # two away: unchanged
+    print("Observer notifications verified.")
 ```
 
-When you first look at the online documentation for `Observable`, it's
-a bit confusing because it appears that you can use an ordinary
-`Observable` object to manage the updates. But this doesn't work; try
-it-inside `BoxObserver`, create an `Observable` object instead of a
-`BoxObservable` object and see what happens: nothing. To get an
-effect, you *must* inherit from `Observable` and somewhere in your
-derived-class code call `setChanged()`. This is the method that sets
-the "changed" flag, which means that when you call `notifyObservers(
-)` all of the observers will, in fact, get notified. In the example
-above `setChanged()` is simply called within `notifyObservers()`,
-but you could use any criterion you want to decide when to call
-`setChanged()`.
+As with the flower example, a bare `Observable` does nothing: you must subclass
+it and call `setChanged()`, or `notifyObservers()` is a no-op. `BoxObservable`
+does that in one place, inside its own `notifyObservers()`. Because every box
+talks only to the base `Observable` interface after it is constructed, you could
+swap in a different `Observable` subclass to change notification behavior
+without touching the boxes at all.
 
-`BoxObserver` contains a single `Observable` object called
-`notifier`, and every time an `OCBox` object is created, it is tied
-to `notifier`. In `OCBox`, whenever you click the mouse the
-`notifyObservers()` method is called, passing the clicked object in
-as an argument so that all the boxes receiving the message (in their
-`update()` method) know who was clicked and can decide whether to
-change themselves or not. Using a combination of code in
-`notifyObservers()` and `update()` you can work out some fairly
-complex schemes.
-
-It might appear that the way the observers are notified must be frozen
-at compile time in the `notifyObservers()` method. However, if you
-look more closely at the code above you'll see that the only place in
-`BoxObserver` or `OCBox` where you're aware that you're working with
-a `BoxObservable` is at the point of creation of the `Observable`
-object-from then on everything uses the basic `Observable` interface.
-This means that you could inherit other `Observable` classes and swap
-them at run time if you want to change notification behavior then.
-
-Here is a version of the above that doesn't use the Observer pattern,
-written by Kevin Altis using PythonCard, and placed here as a starting
-point for a translation that does include Observer:
-
-```python
-# Observer/BoxObserverPythonCard.py
-""" Written by Kevin Altis as a first-cut for
-converting BoxObserver to Python. The Observer
-hasn't been integrated yet.
-To run this program, you must:
-Install WxPython from
-http://www.wxpython.org/download.php
-Install PythonCard. See:
-http://pythoncard.sourceforge.net
-"""
-from PythonCardPrototype import log, model
-import random
-
-GRID = 8
-
-class ColorBoxesTest(model.Background):
-    def on_openBackground(self, event):
-        self.document = []
-        for row in range(GRID):
-            line = []
-            for column in range(GRID):
-                line.append(self.createBox(row, column))
-            self.document.append(line[:])
-    def createBox(self, row, column):
-        colors = ['black', 'blue', 'cyan',
-        'darkGray', 'gray', 'green',
-        'lightGray', 'magenta',
-        'orange', 'pink', 'red',
-        'white', 'yellow']
-        width, height = self.panel.GetSizeTuple()
-        boxWidth = width / GRID
-        boxHeight = height / GRID
-        log.info("width:" + str(width) +
-          " height:" + str(height))
-        log.info("boxWidth:" + str(boxWidth) +
-          " boxHeight:" + str(boxHeight))
-        # use an empty image, though some other
-        # widgets would work just as well
-        boxDesc = {'type':'Image',
-          'size':(boxWidth, boxHeight), 'file':''}
-        name = 'box-%d-%d' % (row, column)
-        # There is probably a 1 off error in the
-        # calculation below since the boxes should
-        # probably have a slightly different offset
-        # to prevent overlaps
-        boxDesc['position'] = \
-          (column * boxWidth, row * boxHeight)
-        boxDesc['name'] = name
-        boxDesc['backgroundColor'] = \
-          random.choice(colors)
-        self.components[name] =  boxDesc
-        return self.components[name]
-
-    def changeNeighbors(self, row, column, color):
-
-        # This algorithm will result in changing the
-        # color of some boxes more than once, so an
-        # OOP solution where only neighbors are asked
-        # to change or boxes check to see if they are
-        # neighbors before changing would be better
-        # per the original example does the whole grid
-        # need to change its state at once like in a
-        # Life program? should the color change
-        # in the propogation of another notification
-        # event?
-
-        for r in range(max(0, row - 1),
-                       min(GRID, row + 2)):
-            for c in range(max(0, column - 1),
-                           min(GRID, column + 2)):
-                self.document[r][c].backgroundColor=color
-
-    # this is a background handler, so it isn't
-    # specific to a single widget. Image widgets
-    # don't have a mouseClick event (wxCommandEvent
-    # in wxPython)
-    def on_mouseUp(self, event):
-        target = event.target
-        prefix, row, column = target.name.split('-')
-        self.changeNeighbors(int(row), int(column),
-                             target.backgroundColor)
-
-if __name__ == '__main__':
-    app = model.PythonCardApp(ColorBoxesTest)
-    app.MainLoop()
-```
-
-This is the resource file for running the program (see PythonCard for
-details):
-
-```python
-# Observer/BoxObserver.rsrc.py
-{'stack':{'type':'Stack',
-          'name':'BoxObserver',
-    'backgrounds': [
-      { 'type':'Background',
-        'name':'bgBoxObserver',
-        'title':'Demonstrates Observer pattern',
-        'position':(5, 5),
-        'size':(500, 400),
-        'components': [
-
-] # end components
-} # end background
-] # end backgrounds
-} }
-```
 
 ### Exercises
 

@@ -3,4 +3,3 @@
 # CI uses this with --baseline to fail only on NEW breakage.
 # One forward-slash relative path per line.
 
-Observer/BoxObserver.py

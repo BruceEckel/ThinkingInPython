@@ -1,72 +1,57 @@
 # Observer/BoxObserver.py
-# Demonstration of Observer pattern using
-# Java's built-in observer classes.
+# A headless version of the ColorBoxes Observer example. Boxes in a grid
+# observe a shared Observable; "clicking" one recolors its neighbors.
+import sys
+from typing import Any
 
-# You must inherit a type of Observable:
+sys.path += ['../Util']
+from Observer import Observer, Observable  # type: ignore
+
+
 class BoxObservable(Observable):
-    def notifyObservers(self, Object b):
-        # Otherwise it won't propagate changes:
-        setChanged()
-        super.notifyObservers(b)
+    # You must subclass Observable and call setChanged(), or notify does nothing:
+    def notifyObservers(self, arg: Any = None) -> None:
+        self.setChanged()
+        Observable.notifyObservers(self, arg)
 
-class BoxObserver(JFrame):
-    Observable notifier = BoxObservable()
-    def __init__(self, grid):
-        setTitle("Demonstrates Observer pattern")
-        Container cp = getContentPane()
-        cp.setLayout(GridLayout(grid, grid))
-        for(int x = 0 x < grid x++)
-            for(int y = 0 y < grid y++)
-                cp.add(OCBox(x, y, notifier))
 
-    def main(self, String[] args):
-        grid = 8
-            if(args.length > 0)
-                grid = Integer.parseInt(args[0])
-            JFrame f = BoxObserver(grid)
-            f.setSize(500, 400)
-            f.setVisible(1)
-            # JDK 1.3:
-            f.setDefaultCloseOperation(EXIT_ON_CLOSE)
-            # Add a WindowAdapter if you have JDK 1.2
-
-class OCBox(JPanel) implements Observer:
-    Color cColor = newColor()
-    colors = [
-      Color.black, Color.blue, Color.cyan,
-      Color.darkGray, Color.gray, Color.green,
-      Color.lightGray, Color.magenta,
-      Color.orange, Color.pink, Color.red,
-      Color.white, Color.yellow
-    ]
-    def newColor():
-        return colors[
-          (int)(Math.random() * colors.length)
-        ]
-
-    def __init__(self, x, y, Observable notifier):
+class Box(Observer):
+    def __init__(self, x: int, y: int, color: str,
+                 notifier: BoxObservable) -> None:
         self.x = x
         self.y = y
-        notifier.addObserver(self)
+        self.color = color
         self.notifier = notifier
-        addMouseListener(ML())
+        notifier.addObserver(self)
 
-    def paintComponent(self, Graphics g):
-        super.paintComponent(g)
-        g.setColor(cColor)
-        Dimension s = getSize()
-        g.fillRect(0, 0, s.width, s.height)
+    def click(self) -> None:
+        # A click announces this box to every observer:
+        self.notifier.notifyObservers(self)
 
-    class ML(MouseAdapter):
-        def mousePressed(self, MouseEvent e):
-            notifier.notifyObservers(OCBox.self)
+    def update(self, observable: Any, clicked: "Box") -> None:
+        if self is not clicked and self.next_to(clicked):
+            self.color = clicked.color
 
-    def update(self, Observable o, Object arg):
-        OCBox clicked = (OCBox)arg
-        if(nextTo(clicked)):
-            cColor = clicked.cColor
-            repaint()
+    def next_to(self, other: "Box") -> bool:
+        return abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1
 
-    def nextTo(OCBox b):
-        return Math.abs(x - b.x) <= 1 &&
-            Math.abs(y - b.y) <= 1
+
+def make_grid(size: int, notifier: BoxObservable) -> list[list["Box"]]:
+    return [[Box(x, y, f"color{(x + y) % 3}", notifier)
+             for y in range(size)]
+            for x in range(size)]
+
+
+if __name__ == "__main__":
+    notifier = BoxObservable()
+    grid = make_grid(5, notifier)
+    center = grid[2][2]
+    center.color = "red"
+    center.click()
+    print(f"(1,1) -> {grid[1][1].color}")
+    print(f"(2,3) -> {grid[2][3].color}")
+    print(f"(0,0) -> {grid[0][0].color}")
+    assert grid[1][1].color == "red"   # diagonally adjacent: changed
+    assert grid[2][3].color == "red"   # adjacent: changed
+    assert grid[0][0].color != "red"   # two away: unchanged
+    print("Observer notifications verified.")

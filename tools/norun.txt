@@ -7,11 +7,8 @@
 # visible as failures until repaired.
 #
 # One glob pattern per line, matched against the forward-slash relative path
-# (e.g. Observer/BoxObserverPythonCard.py or StateMachine/*GUI*.py).
+# (e.g. Projects/ratsAndMazes/* or StateMachine/*GUI*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
-
-# Depends on PythonCard, an abandoned GUI framework that no longer installs.
-Observer/BoxObserverPythonCard.py
 
 # TKInter GUI application; opens a window and waits for the user.
 Projects/ratsAndMazes/*

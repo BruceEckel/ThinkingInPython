@@ -104,10 +104,11 @@ python tools/run_examples.py --baseline        # fail only on NEW breakage
 python tools/run_examples.py --write-baseline   # regenerate the baseline
 ```
 
-CI runs `--baseline`, so the pipeline is green today and goes red the moment a
-change breaks something that currently works. When Phase 2 repairs an example,
-the runner reports it as "now passes": trim it from the baseline (or rerun
-`--write-baseline`) so future regressions of it are caught.
+The book is now fully modernized, so the baseline is **empty** and CI runs a
+strict pass: every example must run. The `--baseline` mechanism remains for
+future bulk work (e.g. importing a batch of new, not-yet-fixed examples): record
+them with `--write-baseline`, gate only regressions with `--baseline`, then trim
+entries as you repair them.
 
 ## build_site.py
 
@@ -128,10 +129,9 @@ use `-o DIR` to build elsewhere.
 `.github/workflows/ci.yml` runs on every push and pull request. It installs uv
 (`astral-sh/setup-uv`, Python 3.14, cached), runs `uv sync --locked`, then
 drives the harness with `uv run`. Hard gates: the drift check
-(`extract_examples.py`), the regression run (`run_examples.py --baseline`), the
+(`extract_examples.py`), the example run (`run_examples.py`, all must pass), the
 book's pytest examples (`pytest ExtractedExamples`), and the site build. `ty`
-stays advisory until Phase 2 modernizes the rest of the example tree. `make ci`
-runs the same sequence locally.
+stays advisory. `make ci` runs the same sequence locally.
 
 ## Current baseline
 
