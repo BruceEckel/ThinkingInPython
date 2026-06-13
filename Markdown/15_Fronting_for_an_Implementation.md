@@ -160,19 +160,53 @@ are:
     simpler example is keeping track of the number of calls to a
     particular method.
 
-You could look at a Python reference as a kind of protection proxy,
-since it controls access to the actual object on the heap (and ensures,
-for example, that you don't use a `null` reference).
+A *Smart reference* proxy adds behavior around each access. With `__getattr__`
+you can wrap every method call, for example to count them:
 
-{{ Rewrite this: In *Design Patterns*, *Proxy* and *State* are not
-seen as related to each other because the two are given (what I consider
-arbitrarily) different structures. *State*, in particular, uses a
-separate implementation hierarchy but this seems to me to be unnecessary
-unless you have decided that the implementation is not under your
-control (certainly a possibility, but if you own all the code there
-seems to be no reason not to benefit from the elegance and helpfulness
-of the single base class). In addition, *Proxy* need not use the same
-base class for its implementation, as long as the proxy object is
-controlling access to the object it "fronting" for. Regardless of the
-specifics, in both *Proxy* and *State* a surrogate is passing method
-calls through to an implementation object.}}
+```python
+# Fronting/CountingProxy.py
+# A "smart reference" proxy: count calls by intercepting attribute access.
+from typing import Any
+
+
+class Implementation:
+    def f(self) -> None: print("f()")
+    def g(self) -> None: print("g()")
+
+
+class CountingProxy:
+    def __init__(self, impl: Any) -> None:
+        self._impl = impl
+        self.calls = 0
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self._impl, name)
+        if callable(attr):
+            def counted(*args: Any, **kwargs: Any) -> Any:
+                self.calls += 1
+                return attr(*args, **kwargs)
+            return counted
+        return attr
+
+
+p = CountingProxy(Implementation())
+p.f()
+p.g()
+p.f()
+print("calls:", p.calls)
+```
+
+Because `__getattr__` intercepts only the lookups not found directly on the
+proxy, one generic proxy can add lazy initialization (a *virtual proxy*), access
+checks (a *protection proxy*), or call tracking (a *smart reference*) to any
+object, with no per-method code.
+
+In *Design Patterns*, *Proxy* and *State* are given different structures and so
+are treated as unrelated. But both are really a *Surrogate*: a front object that
+passes method calls through to an implementation. *Proxy* fronts for one
+implementation to control access to it; *State* swaps among several to change
+behavior over time. In Python both are the same few lines of `__getattr__`
+delegation, with *State* adding a method to change the implementation. The
+separate implementation hierarchy that *Design Patterns* uses is needed only
+when you do not control the implementing code; when you do, the single generic
+surrogate above is simpler and just as flexible.
