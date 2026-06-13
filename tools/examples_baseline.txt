@@ -3,7 +3,6 @@
 # CI uses this with --baseline to fail only on NEW breakage.
 # One forward-slash relative path per line.
 
-CodeManager.py
 Metaprogramming/Final.py
 Metaprogramming/GreenHouse.py
 Metaprogramming/NewVSInit.py
@@ -37,7 +36,6 @@ PatternRefactoring/trashvisitor/VAluminum.py
 PatternRefactoring/trashvisitor/Visitable.py
 PatternRefactoring/trashvisitor/VisitableDecorator.py
 PatternRefactoring/trashvisitor/Visitor.py
-SanityCheck.py
 StateMachine/stateMachine2/Condition.py
 StateMachine/stateMachine2/StateMachine.py
 StateMachine/vendingmachine/VendingMachine.py

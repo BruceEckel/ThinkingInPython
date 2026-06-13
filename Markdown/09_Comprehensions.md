@@ -120,6 +120,7 @@ Note: This will get a full description of all parts.
 
 ```python
 # CodeManager.py
+# extract: no-run  (dead RST-era tool, superseded by tools/extract_examples.py)
 """
 TODO: Break check into two pieces?
 TODO: update() is still only in test mode; doesn't actually work yet.
