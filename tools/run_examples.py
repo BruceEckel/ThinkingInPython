@@ -16,10 +16,25 @@ input, or loop forever. Exclude those two ways:
 
 Exit status is non-zero if any non-skipped example fails or times out.
 
+Most examples fail today because of unmodernized Python 2 code (Phase 2 of the
+publishing plan). A run that is red on every one of those is useless as a gate,
+so this script also supports a *baseline* of currently-known failures:
+
+  * ``--write-baseline`` records the set of failing/timing-out examples to
+    ``tools/examples_baseline.txt``.
+  * ``--baseline`` runs, then fails only on *new* breakage (an example that
+    fails but is not in the baseline). Examples that used to fail and now pass
+    are reported as good news; trim them from the baseline as Phase 2 lands.
+
+That makes CI green today and red the moment a change breaks something that
+currently works.
+
 Usage:
     python tools/run_examples.py                 # run everything
     python tools/run_examples.py StateMachine    # only that subtree
     python tools/run_examples.py --timeout 20
+    python tools/run_examples.py --baseline      # fail only on regressions
+    python tools/run_examples.py --write-baseline
 """
 from __future__ import annotations
 
@@ -32,6 +47,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TREE = ROOT / "ExtractedExamples"
 NORUN_FILE = ROOT / "tools" / "norun.txt"
+BASELINE_FILE = ROOT / "tools" / "examples_baseline.txt"
 INLINE_MARKER = "# extract: no-run"
 
 
@@ -52,6 +68,28 @@ def is_skipped(rel: str, text: str, skips: list[str]) -> bool:
     return any(fnmatch.fnmatch(rel, pat) for pat in skips)
 
 
+def load_baseline() -> set[str]:
+    if not BASELINE_FILE.exists():
+        return set()
+    out: set[str] = set()
+    for line in BASELINE_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            out.add(line.replace("\\", "/"))
+    return out
+
+
+def write_baseline(failing: list[str]) -> None:
+    header = (
+        "# Examples known to fail or time out right now (Phase 2 backlog).\n"
+        "# Regenerate with: python tools/run_examples.py --write-baseline\n"
+        "# CI uses this with --baseline to fail only on NEW breakage.\n"
+        "# One forward-slash relative path per line.\n\n"
+    )
+    body = "".join(f"{rel}\n" for rel in sorted(failing))
+    BASELINE_FILE.write_text(header + body, encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -61,6 +99,10 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"root of extracted examples (default: {DEFAULT_TREE.name})")
     ap.add_argument("--timeout", type=float, default=15.0,
                     help="seconds before an example is killed (default: 15)")
+    ap.add_argument("--baseline", action="store_true",
+                    help="fail only on examples not already in the baseline")
+    ap.add_argument("--write-baseline", action="store_true",
+                    help="record current failures as the baseline and exit 0")
     args = ap.parse_args(argv)
 
     if not args.tree.exists():
@@ -113,6 +155,32 @@ def main(argv: list[str] | None = None) -> int:
         print("\nFailures (last stderr line):")
         for rel, tail in failed:
             print(f"  F {rel}\n      {tail}")
+
+    failing = [rel for rel, _ in failed] + timed_out
+
+    if args.write_baseline:
+        write_baseline(failing)
+        print(f"\nWrote {len(failing)} entries to {BASELINE_FILE.name}.")
+        return 0
+
+    if args.baseline:
+        baseline = load_baseline()
+        current = set(failing)
+        regressions = sorted(current - baseline)
+        fixed = sorted(baseline - current)
+        if fixed:
+            print(f"\n{len(fixed)} example(s) in the baseline now pass. "
+                  "Trim them from tools/examples_baseline.txt:")
+            for rel in fixed:
+                print(f"  + {rel}")
+        if regressions:
+            print(f"\n{len(regressions)} NEW failure(s) not in the baseline:")
+            for rel in regressions:
+                print(f"  ! {rel}")
+            return 1
+        print("\nNo new failures against the baseline.")
+        return 0
+
     return 1 if failed or timed_out else 0
 
 

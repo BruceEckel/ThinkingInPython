@@ -20,7 +20,7 @@ build scripts.
 - **Patterns:** Keep the pattern chapters (12–26) but reframe each around the
   Pythonic idiom that replaces or simplifies the GoF pattern. Be honest where a
   pattern is a "language failure" in Python.
-- **Python target:** 3.12+ with type hints throughout. `ty`-clean (use
+- **Python target:** 3.14+ with type hints throughout. `ty`-clean (use
   Astral's `ty` type checker, not mypy).
 - **Output:** Clean Markdown/web only for now. Do **not** build print/EPUB
   tooling yet.
@@ -35,7 +35,7 @@ build scripts.
 **Code conventions for examples:**
 - Every fenced Python block that is a real file starts with a comment naming its
   path, e.g. `# Decorator/nodecorators/CoffeeShop.py`. Preserve this convention.
-- Target Python 3.12+. No Python 2 idioms (`has_key`, `print` statement,
+- Target Python 3.14+. No Python 2 idioms (`has_key`, `print` statement,
   `xrange`, `iteritems`, `os.popen2`, `<>`, `raw_input`).
 - Add type hints. Code must run and must pass `ty` (Astral's type checker).
 
@@ -58,7 +58,7 @@ P2, P3, P4 ──► P5 (editorial pass, last)
 ### TASK P1-1 — Markdown example extractor + runner
 - **Goal:** A tool that extracts every fenced `python` code block whose first
   line is a `# path/file.py` comment from `Markdown/*.md`, writes each to
-  `Examples/<path>`, then executes each extracted file under Python 3.12 and
+  `Examples/<path>`, then executes each extracted file under Python 3.14 and
   reports failures.
 - **Inputs:** `Markdown/*.md`; existing dead reference `Examples/CodeManager.py`
   (RST-era, replace its role, do not reuse its RST regexes).
@@ -93,20 +93,20 @@ P2, P3, P4 ──► P5 (editorial pass, last)
 ### TASK P1-3 — CI pipeline
 - **Goal:** On every push, run `examples`, `ty`, and `site` build; fail on any
   error.
-- **Steps:** Add a CI workflow (GitHub Actions) using Python 3.12. Cache deps.
+- **Steps:** Add a CI workflow (GitHub Actions) using Python 3.14. Cache deps.
 - **Acceptance:** Green on a clean checkout once P2 is underway; red when an
   example breaks or the site fails to build.
 - **Dependencies:** P1-1, P1-2.
 
 ---
 
-## Phase 2 — Modernize code to typed Python 3.12+
+## Phase 2 — Modernize code to typed Python 3.14+
 
 > Partition by directory so tasks fork cleanly. One task per `Examples/`
 > subtree. Each is independent. Template repeated below.
 
 **TASK TEMPLATE P2-*** (instantiate per subtree):
-- **Goal:** Modernize all `.py` under `Examples/<SUBTREE>` to typed 3.12+.
+- **Goal:** Modernize all `.py` under `Examples/<SUBTREE>` to typed 3.14+.
 - **Steps:** (1) Remove Py2 idioms. (2) Add type hints to all functions,
   methods, and module-level names where non-obvious. (3) Ensure each file runs
   and is `ty`-clean. (4) If the file's source is an inline block in a
@@ -209,8 +209,8 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | Task | Description | Status |
 |------|-------------|--------|
 | P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
-| P1-2 | Static web build | TODO |
-| P1-3 | CI pipeline | TODO |
+| P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
+| P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
 | P2-* | Code modernization (per subtree) | TODO |
 | P3-1 | Rewrite Introduction | TODO |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |

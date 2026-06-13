@@ -1,0 +1,53 @@
+name: CI
+
+# Gates every push and pull request: the book's examples must still match the
+# Markdown, no currently-passing example may regress, the code must stay
+# ty-clean, and the static site must build.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Install ty
+        run: pip install ty
+
+      # Advisory until the 4 known drift items are resolved (one is a genuine
+      # conflict needing an author decision; see PUBLISHING_PLAN.md). Drop the
+      # "|| true" to make book/Examples drift a hard failure.
+      - name: Check examples match the Markdown (advisory)
+        run: python tools/extract_examples.py || true
+
+      - name: Extract examples for running
+        run: python tools/extract_examples.py --write || true
+
+      # Hard gate: fails if a change breaks a currently-passing example.
+      - name: Run examples (fail only on new breakage)
+        run: python tools/run_examples.py --baseline
+
+      # Advisory until Phase 2 modernizes the examples; the unconverted Py2
+      # code does not even parse. Tighten per-subtree as modernization lands.
+      - name: Type-check examples with ty (advisory)
+        run: ty check ExtractedExamples || true
+
+      # Hard gate: the static site must build cleanly.
+      - name: Build the static site
+        run: python tools/build_site.py

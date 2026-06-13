@@ -1,8 +1,9 @@
 # Book tooling
 
-Scripts that keep the book's code examples honest. They implement task **P1-1**
-in `PUBLISHING_PLAN.md`: extract every code example from the Markdown, run it,
-and report what fails.
+Scripts that keep the book honest. They implement tasks **P1-1** (extract every
+code example from the Markdown, run it, report failures), **P1-2** (render the
+Markdown into a static HTML site), and **P1-3** (the CI gate that ties them
+together) in `PUBLISHING_PLAN.md`.
 
 ## The idea
 
@@ -35,6 +36,8 @@ make check      # do the book's examples match the committed Examples/ tree?
 make extract    # write ExtractedExamples/ from the Markdown
 make run        # run every extracted .py, report failures
 make examples   # extract then run (the full pass)
+make site       # render Markdown/ into build/site/
+make ci         # what CI runs: drift check, regression run, site build
 ```
 
 Without `make` (e.g. Windows PowerShell), call the scripts directly:
@@ -43,6 +46,7 @@ Without `make` (e.g. Windows PowerShell), call the scripts directly:
 python tools/extract_examples.py            # = make check
 python tools/extract_examples.py --write    # = make extract
 python tools/run_examples.py                # = make run
+python tools/build_site.py                  # = make site
 ```
 
 ## extract_examples.py
@@ -77,13 +81,50 @@ Only skip examples that cannot run even when correct. Examples that fail today
 because of Python 2 syntax are **Phase 2 fixes** and should stay visible as
 failures, not be skipped.
 
+### Regression baseline
+
+Most examples fail today (Phase 2 backlog), so a runner that is red on every
+one of them gates nothing. `tools/examples_baseline.txt` records the set of
+currently-failing examples. Two modes use it:
+
+```
+python tools/run_examples.py --baseline        # fail only on NEW breakage
+python tools/run_examples.py --write-baseline   # regenerate the baseline
+```
+
+CI runs `--baseline`, so the pipeline is green today and goes red the moment a
+change breaks something that currently works. When Phase 2 repairs an example,
+the runner reports it as "now passes": trim it from the baseline (or rerun
+`--write-baseline`) so future regressions of it are caught.
+
+## build_site.py
+
+Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
+Pandoc converts each chapter; the script adds the title page, an ordered
+contents list, a sidebar, previous/next links, and syntax-highlighting CSS.
+
+Book images are referenced in the Markdown as `_images/<name>` with no
+extension. The builder resolves each to the real file in `resources/images`
+(`decorator` to `decorator.gif`), copies the referenced ones into
+`build/site/images/`, and warns about any reference with no matching file.
+
+Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
+use `-o DIR` to build elsewhere.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request under Python
+3.12. Hard gates: the regression run (`run_examples.py --baseline`) and the
+site build. Advisory for now (each has a known backlog): the drift check and
+`ty`. `make ci` runs the same sequence locally.
+
 ## Current baseline
 
-The first full run establishes the modernization backlog for Phase 2. As of the
-initial run: 55 examples pass, ~69 fail. The failures are overwhelmingly Python
-2 syntax (`print` statements, `has_key`), Java leftovers (`0.75f` float
-literals, dangling `+` line continuations), and Python 2 implicit relative
-imports (`from State import ...`). Each is a Phase 2 work item. Drift the
-checker found between the book and `Examples/`: `Py4Prog/using_from.py` (tagged
-twice with different content), `InitializationAndCleanup/cleanup.py`, and
-`InitializationAndCleanup/weakref.py`.
+The first full run establishes the modernization backlog for Phase 2, captured
+in `tools/examples_baseline.txt`: 55 examples pass, 67 fail or time out. The
+failures are overwhelmingly Python 2 syntax (`print` statements, `has_key`),
+Java leftovers (`0.75f` float literals, dangling `+` line continuations), and
+Python 2 implicit relative imports (`from State import ...`). Each is a Phase 2
+work item. Drift the checker found between the book and `Examples/`:
+`Py4Prog/using_from.py` (tagged twice with different content),
+`InitializationAndCleanup/cleanup.py`, and `InitializationAndCleanup/weakref.py`.

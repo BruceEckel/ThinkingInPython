@@ -3,5 +3,6 @@ tools/tmp.txt
 temp
 ebook_build
 ExtractedExamples
+build/
 *.pyc
 .cache

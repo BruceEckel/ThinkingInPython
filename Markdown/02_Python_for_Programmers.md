@@ -332,7 +332,7 @@ You can change the namespace of a module during an import using the `as`
 keyword:
 
 ```python
-# Py4Prog/using_from.py
+# Py4Prog/using_as.py
 import module as m
 
 if __name__ == "__main__":
