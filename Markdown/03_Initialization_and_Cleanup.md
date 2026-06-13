@@ -77,18 +77,21 @@ Consider the following:
 ```python
 # InitializationAndCleanup/cleanup.py
 class Counter:
-    Count = 0   # Number of objects of this class
-    def __init__(self, name):
+    Count: int = 0   # Number of objects of this class
+
+    def __init__(self, name: str) -> None:
         self.name = name
         print(name, 'created')
         Counter.Count += 1
-    def __del__(self):
+
+    def __del__(self) -> None:
         print(self.name, 'deleted')
         Counter.Count -= 1
         if Counter.Count == 0:
             print('Last Counter object deleted')
         else:
             print(Counter.Count, 'Counter objects remaining')
+
 
 x = Counter("First")
 del x
@@ -124,26 +127,29 @@ Here's an example of weak references, using a WeakValueDictionary and
 the trick of mapping id(self) to self:
 
 ```python
-# InitializationAndCleanup/weakref.py
+# InitializationAndCleanup/weak_value.py
 from weakref import WeakValueDictionary
 
+
 class Counter:
-    _instances = WeakValueDictionary()
+    _instances: WeakValueDictionary[int, "Counter"] = WeakValueDictionary()
+
     @property
-    def Count(self):
+    def Count(self) -> int:
         return len(self._instances)
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self._instances[id(self)] = self
         print(name, 'created')
 
-    def __del__(self):
+    def __del__(self) -> None:
         print(self.name, 'deleted')
         if self.Count == 0:
             print('Last Counter object deleted')
         else:
             print(self.Count, 'Counter objects remaining')
+
 
 x = Counter("First")
 ```

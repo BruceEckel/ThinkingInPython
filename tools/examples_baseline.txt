@@ -10,7 +10,6 @@ Decorator/compromise/CoffeeShop.py
 Decorator/nodecorators/CoffeeShop.py
 Factory/shapefact2/ShapeFactory2.py
 FunctionObjects/ChainOfResponsibility.py
-InitializationAndCleanup/weakref.py
 Messenger/MessengerIdiom.py
 Metaprogramming/Final.py
 Metaprogramming/GreenHouse.py

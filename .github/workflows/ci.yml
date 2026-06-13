@@ -30,14 +30,13 @@ jobs:
       - name: Install ty
         run: pip install ty
 
-      # Advisory until the 4 known drift items are resolved (one is a genuine
-      # conflict needing an author decision; see PUBLISHING_PLAN.md). Drop the
-      # "|| true" to make book/Examples drift a hard failure.
-      - name: Check examples match the Markdown (advisory)
-        run: python tools/extract_examples.py || true
+      # Hard gate: the book's code blocks must match the committed Examples/
+      # tree (no drift, no conflicting duplicates).
+      - name: Check examples match the Markdown
+        run: python tools/extract_examples.py
 
       - name: Extract examples for running
-        run: python tools/extract_examples.py --write || true
+        run: python tools/extract_examples.py --write
 
       # Hard gate: fails if a change breaks a currently-passing example.
       - name: Run examples (fail only on new breakage)

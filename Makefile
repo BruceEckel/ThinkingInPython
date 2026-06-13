@@ -31,11 +31,11 @@ examples: extract run
 site:
 	$(PY) tools/build_site.py
 
-# Mirrors the GitHub Actions gate. Drift check is advisory for now (leading
-# "-" ignores its exit); the regression run and site build are hard gates.
+# Mirrors the GitHub Actions gate: drift check, regression-only example run,
+# and a clean site build. All hard gates now that the book is drift-free.
 ci:
-	-$(PY) tools/extract_examples.py
-	-$(PY) tools/extract_examples.py --write
+	$(PY) tools/extract_examples.py
+	$(PY) tools/extract_examples.py --write
 	$(PY) tools/run_examples.py --baseline
 	$(PY) tools/build_site.py
 
