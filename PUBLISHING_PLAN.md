@@ -211,9 +211,56 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
 | P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
-| P2-* | Code modernization (per subtree) | TODO |
+| P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 44; see below) |
 | P3-1 | Rewrite Introduction | TODO |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
-| P3-3 | Exclude residual from build | TODO |
+| P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
 | P4-* | Pattern reframe (per chapter 12–26) | TODO |
 | P5-1 | Editorial sweep | TODO |
+
+### P2 detail: what is done and what remains
+
+The "easy" half of P2 was genuine Python 2 / Java-leftover syntax and is **done**.
+Every example in these subtrees now runs and is `ty`-clean, with the book and
+`Examples/` in sync:
+
+| Subtree | Status |
+|---------|--------|
+| Singleton | DONE |
+| Py4Prog | DONE (kept untyped on purpose: the chapter teaches that Python needs no type declarations) |
+| InitializationAndCleanup | DONE (`weakref.py` renamed `weak_value.py` to stop shadowing stdlib) |
+| Decorator | DONE |
+| Factory | DONE |
+| FunctionObjects | DONE |
+| Messenger | DONE |
+| Util | DONE (Synchronization/Observer cluster) |
+| Observer | PARTIAL: `ObservedFlower.py` DONE; `BoxObserver.py` left (see below) |
+| StateMachine | PARTIAL: mousetrap half DONE; table-driven half left (see below) |
+| Root scripts | `SanityCheck.py`, `CodeManager.py` marked `# extract: no-run` (build tools) |
+
+**The 44 remaining baseline failures are NOT Python 2 syntax.** They are
+unconverted Java or chapters mid-conversion, each needing an authorial
+decision rather than a mechanical fix. They stay in `tools/examples_baseline.txt`
+so CI stays green. Breakdown:
+
+- **PatternRefactoring (23)** — the *Trash* sorting example imported straight
+  from *Thinking in Java*: `0.75f` literals, `Trash t = (Trash)it.next()`,
+  `ArrayList()`, reflection-based prototype factory (`getConstructor`). A full
+  multi-file Python port with real design choices. Phase 4 will reframe this
+  chapter anyway, so port + reframe should be done together.
+- **Metaprogramming (9)** — a chapter the author left mid-conversion: the prose
+  deliberately contrasts Python 2 `__metaclass__` examples (`SimpleMeta1/2/3`)
+  against a "Metaclass Hook in Python 3" section, and carries open questions
+  (`{{check this}}`, "is there an equivalent in Python 3?"). Forcing the
+  examples to run would erase the teaching contrast. Needs an authorial call on
+  how to present the Py2→Py3 metaclass story.
+- **UnitTesting (7)** — chapter 05's framework is unconverted Java
+  (`def affirm(condition): if(!condition)`, `Class.forName`, `package c02...`).
+  Needs reconception as a Python testing framework, or reframing around
+  `unittest`/`pytest`.
+- **StateMachine table-driven half (4)** — `stateMachine2/` and `vendingmachine/`
+  are labeled "(code only roughly converted)" three times in the prose; they are
+  still Java (`boolean condition(input):`, `Iterator it=((List)...)`,
+  `for(int i...)`). Needs a Python port of the table-driven machine.
+- **Observer/BoxObserver.py (1)** — a Swing GUI example the prose itself flags
+  "has not been converted." A GUI port (and would need `# extract: no-run`).
