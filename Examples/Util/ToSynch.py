@@ -2,10 +2,10 @@
 
 import threading
 class ToSynch:
-    def __init__(self):
+    def __init__(self) -> None:
         self.mutex = threading.RLock()
         self.val = 1
-    def aSynchronizedMethod(self):
+    def aSynchronizedMethod(self) -> int:
         self.mutex.acquire()
         try:
             self.val += 1

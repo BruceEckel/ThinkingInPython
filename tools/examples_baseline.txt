@@ -14,7 +14,6 @@ Metaprogramming/SimpleMeta3.py
 Metaprogramming/Singleton.py
 Metaprogramming/SingletonDecorator.py
 Observer/BoxObserver.py
-Observer/ObservedFlower.py
 PatternRefactoring/clip1.py
 PatternRefactoring/clip3.py
 PatternRefactoring/clip4.py
@@ -52,5 +51,3 @@ UnitTesting/TestDemo2.py
 UnitTesting/TooMuchAccess.py
 UnitTesting/UnitTest.py
 UnitTesting/testable/Testable.py
-Util/Observer.py
-Util/TestSynchronization.py

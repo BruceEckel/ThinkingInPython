@@ -92,10 +92,10 @@ hand, using code like this:
 
 import threading
 class ToSynch:
-    def __init__(self):
+    def __init__(self) -> None:
         self.mutex = threading.RLock()
         self.val = 1
-    def aSynchronizedMethod(self):
+    def aSynchronizedMethod(self) -> int:
         self.mutex.acquire()
         try:
             self.val += 1
@@ -112,34 +112,35 @@ provided me with a much nicer solution:
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading
+from typing import Any, Callable
 
-def synchronized(method):
-    def f(*args):
+def synchronized(method: Callable[..., Any]) -> Callable[..., Any]:
+    def f(*args: Any) -> Any:
         self = args[0]
-        self.mutex.acquire();
+        self.mutex.acquire()
         # print(method.__name__, 'acquired')
         try:
-            return apply(method, args)
+            return method(*args)
         finally:
-            self.mutex.release();
+            self.mutex.release()
             # print(method.__name__, 'released')
     return f
 
-def synchronize(klass, names=None):
+def synchronize(klass: type, names: str | None = None) -> None:
     """Synchronize methods in the given class.
     Only synchronize the methods whose names are
     given, or all methods if names=None."""
-    if type(names)==type(''): names = names.split()
-    for (name, val) in klass.__dict__.items():
+    selected = names.split() if names is not None else None
+    for (name, val) in list(klass.__dict__.items()):
         if callable(val) and name != '__init__' and \
-          (names == None or name in names):
+          (selected is None or name in selected):
             # print("synchronizing", name)
-            klass.__dict__[name] = synchronized(val)
+            setattr(klass, name, synchronized(val))
 
 # You can create your own self.mutex, or inherit
 # from this class:
 class Synchronization:
-    def __init__(self):
+    def __init__(self) -> None:
         self.mutex = threading.RLock()
 ```
 
@@ -147,7 +148,7 @@ The `synchronized()` function takes a method and wraps it in a
 function that adds the mutex functionality. The method is called inside
 this function:
 
-    return apply(method, args)
+    return method(*args)
 
 and as the `return` statement passes through the `finally` clause,
 the mutex is released.
@@ -177,26 +178,26 @@ from Synchronization import *
 
 # To use for a method:
 class C(Synchronization):
-    def __init__(self):
+    def __init__(self) -> None:
         Synchronization.__init__(self)
         self.data = 1
-    def m(self):
+    @synchronized
+    def m(self) -> int:
         self.data += 1
         return self.data
-    m = synchronized(m)
-    def f(self): return 47
-    def g(self): return 'spam'
+    def f(self) -> int: return 47
+    def g(self) -> str: return 'spam'
 
 # So m is synchronized, f and g are not.
 c = C()
 
 # On the class level:
 class D(C):
-    def __init__(self):
+    def __init__(self) -> None:
         C.__init__(self)
     # You must override an un-synchronized method
     # in order to synchronize it (just like Java):
-    def f(self): C.f(self)
+    def f(self) -> int: return C.f(self)
 
 # Synchronize every (defined) method in the class:
 synchronize(D)
@@ -206,11 +207,11 @@ d.g() # Not synchronized
 d.m() # Synchronized (in the base class)
 
 class E(C):
-    def __init__(self):
+    def __init__(self) -> None:
         C.__init__(self)
-    def m(self): C.m(self)
-    def g(self): C.g(self)
-    def f(self): C.f(self)
+    def m(self) -> int: return C.m(self)
+    def g(self) -> str: return C.g(self)
+    def f(self) -> int: return C.f(self)
 # Only synchronizes m and g. Note that m ends up
 # being doubly-wrapped in synchronization, which
 # doesn't hurt anything but is inefficient:
@@ -232,10 +233,12 @@ call, which isn't very desirable \[there may be a fix for this\]:
 ```python
 # Util/Observer.py
 # Class support for "observer" pattern.
+from typing import Any
+
 from Synchronization import *
 
 class Observer:
-    def update(observable, arg):
+    def update(self, observable: Any, arg: Any) -> None:
         '''Called when the observed object is
         modified. You call an Observable object's
         notifyObservers method to notify all the
@@ -243,19 +246,19 @@ class Observer:
         pass
 
 class Observable(Synchronization):
-    def __init__(self):
-        self.obs = []
+    def __init__(self) -> None:
+        self.obs: list[Observer] = []
         self.changed = 0
         Synchronization.__init__(self)
 
-    def addObserver(self, observer):
+    def addObserver(self, observer: Observer) -> None:
         if observer not in self.obs:
             self.obs.append(observer)
 
-    def deleteObserver(self, observer):
+    def deleteObserver(self, observer: Observer) -> None:
         self.obs.remove(observer)
 
-    def notifyObservers(self, arg = None):
+    def notifyObservers(self, arg: Any = None) -> None:
         '''If 'changed' indicates that this object
         has changed, notify all its observers, then
         call clearChanged(). Each observer has its
@@ -275,11 +278,11 @@ class Observable(Synchronization):
         for observer in localArray:
             observer.update(self, arg)
 
-    def deleteObservers(self): self.obs = []
-    def setChanged(self): self.changed = 1
-    def clearChanged(self): self.changed = 0
-    def hasChanged(self): return self.changed
-    def countObservers(self): return len(self.obs)
+    def deleteObservers(self) -> None: self.obs = []
+    def setChanged(self) -> None: self.changed = 1
+    def clearChanged(self) -> None: self.changed = 0
+    def hasChanged(self) -> int: return self.changed
+    def countObservers(self) -> int: return len(self.obs)
 
 synchronize(Observable,
   "addObserver deleteObserver deleteObservers " +
@@ -293,8 +296,8 @@ Using this library, here is an example of the observer pattern:
 # Observer/ObservedFlower.py
 # Demonstration of "observer" pattern.
 import sys
-sys.path += ['../util']
-from Observer import Observer, Observable
+sys.path += ['../Util']
+from Observer import Observer, Observable  # type: ignore
 
 class Flower:
     def __init__(self):
@@ -349,15 +352,15 @@ class Bee:
         def __init__(self, outer):
             self.outer = outer
         def update(self, observable, arg):
-            print("Bee " + self.outer.name + \)
-              "'s breakfast time!"
+            print("Bee " + self.outer.name +
+              "'s breakfast time!")
     # Another inner class for closings:
     class CloseObserver(Observer):
         def __init__(self, outer):
             self.outer = outer
         def update(self, observable, arg):
-            print("Bee " + self.outer.name + \)
-              "'s bed time!"
+            print("Bee " + self.outer.name +
+              "'s bed time!")
 
 class Hummingbird:
     def __init__(self, name):
