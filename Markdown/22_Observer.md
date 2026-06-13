@@ -72,6 +72,67 @@ that sets the "changed" flag, which means that when you call
 `notifyObservers()` all of the observers will, in fact, get notified.
 *Where* you call `setChanged()` depends on the logic of your program.
 
+## The Pythonic Observer: a List of Callables
+
+The description above is the Java design. In Python an *observer* need not be an
+object implementing an `Observer` interface; it is simply a callable. An
+*observable* need not be a base class with a `changed` flag; it is a list of
+callables and a way to notify them. A `@property` setter is a natural place to
+fire the notification when state changes:
+
+```python
+# Observer/observers.py
+# An observer is just a callable; an observable is a list of them. No Observer
+# interface and no Observable base class to inherit.
+from collections.abc import Callable
+from typing import Any
+
+
+class Observable:
+    def __init__(self) -> None:
+        self._observers: list[Callable[[Any], None]] = []
+
+    def subscribe(self, observer: Callable[[Any], None]) -> None:
+        self._observers.append(observer)
+
+    def notify(self, data: Any) -> None:
+        for observer in self._observers:
+            observer(data)
+
+
+class Thermometer(Observable):
+    def __init__(self) -> None:
+        super().__init__()
+        self._celsius = 0.0
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        self._celsius = value
+        self.notify(value)   # state changed; tell the observers
+
+
+thermo = Thermometer()
+thermo.subscribe(lambda c: print(f"display: {c}C"))
+thermo.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
+thermo.celsius = 25
+thermo.celsius = 150
+```
+
+The observers here are lambdas, but any function or bound method works. There is
+no `Observer` base class to inherit and no `setChanged()`/`notifyObservers()`
+protocol: assigning to `celsius` notifies everyone. For event-heavy programs
+there are mature libraries (signal/slot systems, `asyncio` events), but for most
+cases a list of callbacks is all the Observer pattern amounts to.
+
+The rest of this chapter translates Java's `Observable` and `Observer` classes
+directly. That is useful when you are porting Java code or need the exact
+`setChanged()` semantics, but reach for it only when the simple version above is
+not enough.
+
 ## Observing Flowers
 
 Since Python doesn't have standard library components to support the
