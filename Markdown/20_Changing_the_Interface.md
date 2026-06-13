@@ -81,6 +81,46 @@ Patterns* they assert that a proxy must have an identical interface with
 the object that it is a surrogate for. However, if you have the two
 words together: "proxy adapter," it is perhaps more reasonable.
 
+### Adapter in Python
+
+The four variations above are Java habits. Python is duck-typed: `WhatIUse.op()`
+only calls `f()`, so it accepts *any* object that has an `f()`. You do not need a
+shared base class or a declared interface, only the method. The common adapter
+need is "forward most calls unchanged, and add or change a few." `__getattr__`
+does the forwarding, so the adapter stays tiny:
+
+```python
+# ChangeInterface/getattr_adapter.py
+# The usual adapter need: forward most calls, change a few. __getattr__
+# delegates everything you do not override, so the wrapper stays small.
+from typing import Any
+
+
+class WhatIHave:
+    def g(self) -> str: return "g"
+    def h(self) -> str: return "h"
+
+
+class Adapter:
+    def __init__(self, adaptee: WhatIHave) -> None:
+        self._adaptee = adaptee
+
+    def f(self) -> str:                       # the new interface
+        return self._adaptee.g() + self._adaptee.h()
+
+    def __getattr__(self, name: str) -> Any:  # forward everything else
+        return getattr(self._adaptee, name)
+
+
+a = Adapter(WhatIHave())
+print(a.f())   # adapted method
+print(a.g())   # forwarded to the adaptee unchanged
+```
+
+`__getattr__` runs only for attributes Python does not find normally, so `f()`
+uses the adapter's own version while everything else falls through to the
+adaptee. This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+
 ## Façade
 
 A general principle that I apply when I'm casting about trying to mold
@@ -122,9 +162,13 @@ b = Facade.makeB(1);
 c = Facade.makeC(1.0);
 ```
 
-\[rewrite this section using research from Larman's book\]
-
-Example for Facade (?): my "nicer" version of the XML library.
+The cleaner Python façade is a *module*. A module already presents a curated set
+of names over whatever tangle of classes lives behind it, and, as the Singleton
+chapter notes, it is imported once and shared everywhere. Put the friendly
+functions and the few classes you want to expose at module level, keep the messy
+internals private (a leading underscore, by convention), and the `import` *is*
+the façade. A `Facade` class full of static methods only reproduces, with more
+ceremony, what a module gives you for free.
 
 ## Exercises
 
