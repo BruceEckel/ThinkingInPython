@@ -215,7 +215,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
-| P4-* | Pattern reframe (per chapter 12–26) | IN PROGRESS (done: 13 Singleton, 16 State Machines, 18 Factory, 19 Function Objects, 25 Pattern Refactoring) |
+| P4-* | Pattern reframe (per chapter 12–26) | IN PROGRESS (done: 13 Singleton, 16 State Machines, 18 Factory, 19 Function Objects, 23 Multiple Dispatching, 24 Visitor, 25 Pattern Refactoring) |
 | P5-1 | Editorial sweep | TODO |
 
 ### P2 detail: what is done and what remains

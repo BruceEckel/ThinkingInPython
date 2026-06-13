@@ -82,6 +82,79 @@ for flower in flowerGen(10):
     flower.accept(worm)
 ```
 
+The `accept()`/`visit()` pair is *double dispatch*: `accept()` resolves the
+flower's type, then `visit()` resolves the visitor's type. The whole apparatus
+exists because Java and C++ dispatch on only one type at a time and cannot add a
+method to a class from outside it.
+
+## The Pythonic Visitor: singledispatch
+
+Python can add a method to a fixed hierarchy from outside, with
+`functools.singledispatch`. It turns a plain function into one that dispatches
+on the type of its first argument, with per-type implementations registered from
+anywhere. That is precisely Visitor's goal, without the `accept()` hook or the
+`Visitor` class hierarchy:
+
+```python
+# Visitor/visit_singledispatch.py
+# Adding operations to a fixed hierarchy without touching it, the Python way.
+from functools import singledispatch
+
+
+class Flower:
+    def __str__(self) -> str:
+        return type(self).__name__
+
+
+class Gladiolus(Flower): pass
+class Runuculus(Flower): pass
+class Chrysanthemum(Flower): pass
+
+
+# A new operation, defined entirely outside the Flower hierarchy:
+@singledispatch
+def nectar(flower: Flower) -> str:
+    return f"{flower}: no nectar"
+
+
+@nectar.register
+def _(flower: Gladiolus) -> str:
+    return f"{flower}: abundant nectar"
+
+
+@nectar.register
+def _(flower: Chrysanthemum) -> str:
+    return f"{flower}: a little nectar"
+
+
+# A second operation, added independently of the first:
+@singledispatch
+def fragrance(flower: Flower) -> str:
+    return "faint"
+
+
+@fragrance.register
+def _(flower: Runuculus) -> str:
+    return "strong"
+
+
+flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
+for f in flowers:
+    print(nectar(f), "| fragrance:", fragrance(f))
+```
+
+`Flower` is never touched. Each operation is a separate function, and the
+`@singledispatch` default handles any type you have not registered. Adding a new
+operation is a new function; adding a new flower is a class plus, where needed, a
+one-line registration. When the operation should read like a method, use
+`functools.singledispatchmethod` instead.
+
+Visitor still has a place: when you truly cannot define functions over the
+hierarchy, or you need the `accept()` hook for some other reason. But in Python
+that is rare. As with the Pattern Refactoring chapter's price-and-weight
+example, `singledispatch` is the open-method mechanism Visitor was invented to
+fake.
+
 ## Exercises
 
 1.  Create a business-modeling environment with three types of

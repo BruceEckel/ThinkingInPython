@@ -182,3 +182,19 @@ for item1, item2 in itemPairGen(20):
 
 It's a tribute to the flexibility of dictionaries that a tuple can be
 used as a key just as easily as a single object.
+
+## One Type or Many
+
+Python dispatches on a single type at a time. For dispatch on *one* argument's
+type, `functools.singledispatch` (see the Visitor chapter) gives you open,
+per-type functions. For dispatch on *two or more* types at once, the table above
+is the idiomatic answer: a `dict` keyed by a tuple of types. Adding a new `Item`
+is then a matter of adding rows to the table, with no methods to edit across the
+classes.
+
+The double-dispatch version, where each class implements `evalPaper`,
+`evalScissors`, and `evalRock`, is a workaround for languages that cannot store
+types in a table and look a behavior up by them. Python can, so the table is
+both shorter and easier to maintain. Reach for the spread-out method version
+only when a combination needs substantial, type-specific code that will not fit
+in a table cell.
