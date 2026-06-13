@@ -186,7 +186,7 @@ used as a key just as easily as a single object.
 ## One Type or Many
 
 Python dispatches on a single type at a time. For dispatch on *one* argument's
-type, `functools.singledispatch` (see [the Visitor chapter](24_Visitor.md)) gives you open,
+type, `functools.singledispatch` (see [the Visitor chapter](21_Visitor.md)) gives you open,
 per-type functions. For dispatch on *two or more* types at once, the table above
 is the idiomatic answer: a `dict` keyed by a tuple of types. Adding a new `Item`
 is then a matter of adding rows to the table, with no methods to edit across the

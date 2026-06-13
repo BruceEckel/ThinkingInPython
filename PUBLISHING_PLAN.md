@@ -219,6 +219,10 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 
 ## Progress tracker
 
+> Note: after the P3-2 cuts the chapters were renumbered contiguously to
+> `00`–`23`. Status entries below name chapters by title; any numbers refer to
+> the current (post-renumber) positions.
+
 | Task | Description | Status |
 |------|-------------|--------|
 | P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
@@ -226,9 +230,9 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
 | P2-* | Code modernization (per subtree) | DONE (baseline 67 → 0; every example runs, CI gate is now strict) |
 | P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
-| P3-2 | Stub chapter decisions | DONE (cut 08/10/21; 11 Messenger reframed; 04 Static Type Checking drafted, revoice pending; 14 kept + reframed; 12/26 kept). No empty stubs remain. |
+| P3-2 | Stub chapter decisions | DONE (cut Generators and Iterators, Machine Discovery, Table-Driven Code; Messenger reframed; Static Type Checking drafted, revoice pending; Application Frameworks kept + reframed; Pattern Concept / Simulation kept). No empty stubs remain. |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
-| P4-* | Pattern reframe (per chapter 12–26) | DONE (reframed: 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25. 21 cut. 12 Pattern Concept is conceptual (editorial only); 26 Simulation kept as-is, not a GoF pattern.) |
+| P4-* | Pattern reframe (per pattern chapter) | DONE (reframed: Singleton, Application Frameworks, Fronting, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Multiple Dispatching, Visitor, Pattern Refactoring. Table-Driven Code cut. The Pattern Concept is conceptual (editorial only); Simulation kept, not a GoF pattern.) |
 | P5-1 | Editorial sweep | PARTIAL (em-dashes removed from all prose, grep clean; front-matter date → 2026; cross-references now use standard relative `.md` links that the site rewrites to `.html`, and all resolve). Remaining: a deeper proofread (hyphen-as-dash like `types-you`, dated "Python 2.2" asides) and the dangling `[Virtual Environments]` reference points to a chapter that does not exist yet (P3-2). |
 
 ### P2 detail: what is done and what remains
