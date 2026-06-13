@@ -1,8 +1,6 @@
 Introduction
 ============
 
-> The vision for this book.
-
 This is a collection of essays that give you a deeper understanding of
 programming in Python. Although the first chapter in the book is [Python for
 Programmers], this is not intended to be an introductory Python book (there
