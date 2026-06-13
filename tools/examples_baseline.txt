@@ -49,11 +49,6 @@ PatternRefactoring/trashvisitor/Visitor.py
 Py4Prog/compose.py
 Py4Prog/utility.py
 SanityCheck.py
-Singleton/BorgSingleton.py
-Singleton/NewSingleton.py
-Singleton/SingletonDecorator.py
-Singleton/SingletonMetaClass.py
-Singleton/SingletonPattern.py
 StateMachine/mousetrap1/MouseTrapTest.py
 StateMachine/mousetrap2/MouseTrap2Test.py
 StateMachine/stateMachine2/Condition.py

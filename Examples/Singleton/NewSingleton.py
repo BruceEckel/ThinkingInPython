@@ -1,20 +1,28 @@
 # Singleton/NewSingleton.py
+from typing import Any
 
-class OnlyOne(object):
+
+class OnlyOne:
     class __OnlyOne:
-        def __init__(self):
-            self.val = None
-        def __str__(self):
-            return `self` + self.val
-    instance = None
-    def __new__(cls): # __new__ always a classmethod
+        def __init__(self) -> None:
+            self.val: str | None = None
+
+        def __str__(self) -> str:
+            return repr(self) + str(self.val)
+
+    instance: Any = None
+
+    def __new__(cls) -> Any:  # __new__ is always a classmethod
         if not OnlyOne.instance:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
-    def __getattr__(self, name):
+
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
-    def __setattr__(self, name):
-        return setattr(self.instance, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        setattr(self.instance, name, value)
+
 
 x = OnlyOne()
 x.val = 'sausage'
@@ -27,11 +35,3 @@ z.val = 'spam'
 print(z)
 print(x)
 print(y)
-#<hr>
-output = '''
-<__main__.__OnlyOne instance at 0x00798900>sausage
-<__main__.__OnlyOne instance at 0x00798900>eggs
-<__main__.__OnlyOne instance at 0x00798900>spam
-<__main__.__OnlyOne instance at 0x00798900>spam
-<__main__.__OnlyOne instance at 0x00798900>spam
-'''

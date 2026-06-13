@@ -1,8 +1,15 @@
 # Singleton/ClassVariableSingleton.py
-class SingleTone(object):
-    __instance = None
-    def __new__(cls, val):
-        if SingleTone.__instance is None:
-            SingleTone.__instance = object.__new__(cls)
-        SingleTone.__instance.val = val
-        return SingleTone.__instance
+from typing import Any
+
+
+class SingleTone:
+    val: Any
+    __instance: "SingleTone | None" = None
+
+    def __new__(cls, val: Any) -> "SingleTone":
+        instance = SingleTone.__instance
+        if instance is None:
+            instance = object.__new__(cls)
+            SingleTone.__instance = instance
+        instance.val = val
+        return instance

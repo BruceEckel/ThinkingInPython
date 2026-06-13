@@ -1,16 +1,23 @@
 # Singleton/BorgSingleton.py
 # Alex Martelli's 'Borg'
+from typing import Any
+
 
 class Borg:
-    _shared_state = {}
-    def __init__(self):
+    _shared_state: dict[str, Any] = {}
+
+    def __init__(self) -> None:
         self.__dict__ = self._shared_state
 
+
 class Singleton(Borg):
-    def __init__(self, arg):
+    def __init__(self, arg: str) -> None:
         Borg.__init__(self)
         self.val = arg
-    def __str__(self): return self.val
+
+    def __str__(self) -> str:
+        return self.val
+
 
 x = Singleton('sausage')
 print(x)
@@ -20,16 +27,6 @@ z = Singleton('spam')
 print(z)
 print(x)
 print(y)
-print(`x`)
-print(`y`)
-print(`z`)
-output = '''
-sausage
-eggs
-spam
-spam
-spam
-<__main__.Singleton instance at 0079EF2C>
-<__main__.Singleton instance at 0079E10C>
-<__main__.Singleton instance at 00798F9C>
-'''
+print(repr(x))
+print(repr(y))
+print(repr(z))

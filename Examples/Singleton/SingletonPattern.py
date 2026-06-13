@@ -1,19 +1,29 @@
 # Singleton/SingletonPattern.py
+from typing import Any
+
 
 class OnlyOne:
     class __OnlyOne:
-        def __init__(self, arg):
+        def __init__(self, arg: str) -> None:
             self.val = arg
-        def __str__(self):
-            return `self` + self.val
-    instance = None
-    def __init__(self, arg):
+
+        def __str__(self) -> str:
+            return repr(self) + self.val
+
+    instance: Any = None
+
+    def __init__(self, arg: str) -> None:
         if not OnlyOne.instance:
             OnlyOne.instance = OnlyOne.__OnlyOne(arg)
         else:
             OnlyOne.instance.val = arg
-    def __getattr__(self, name):
+
+    def __str__(self) -> str:
+        return str(self.instance)
+
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
+
 
 x = OnlyOne('sausage')
 print(x)
@@ -23,16 +33,6 @@ z = OnlyOne('spam')
 print(z)
 print(x)
 print(y)
-print(`x`)
-print(`y`)
-print(`z`)
-output = '''
-<__main__.__OnlyOne instance at 0076B7AC>sausage
-<__main__.__OnlyOne instance at 0076B7AC>eggs
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.OnlyOne instance at 0076C54C>
-<__main__.OnlyOne instance at 0076DAAC>
-<__main__.OnlyOne instance at 0076AA3C>
-'''
+print(repr(x))
+print(repr(y))
+print(repr(z))

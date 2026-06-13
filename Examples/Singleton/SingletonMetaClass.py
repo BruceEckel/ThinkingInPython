@@ -1,27 +1,34 @@
 # Singleton/SingletonMetaClass.py
+from typing import Any
+
+
 class SingletonMetaClass(type):
-    def __init__(cls,name,bases,dict):
-        super(SingletonMetaClass,cls)\
-          .__init__(name,bases,dict)
-        original_new = cls.__new__
-        def my_new(cls,*args,`kwds):
-            if cls.instance == None:
-                cls.instance = \
-                  original_new(cls,*args,`kwds)
-            return cls.instance
-        cls.instance = None
-        cls.__new__ = staticmethod(my_new)
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
+        klass: Any = cls
+        original_new = klass.__new__
 
-class bar(object):
-    __metaclass__ = SingletonMetaClass
-    def __init__(self,val):
+        def my_new(c: Any, *args: Any, **kwds: Any) -> Any:
+            if c.instance is None:
+                c.instance = original_new(c)
+            return c.instance
+
+        klass.instance = None
+        klass.__new__ = staticmethod(my_new)
+
+
+class Bar(metaclass=SingletonMetaClass):
+    def __init__(self, val: str) -> None:
         self.val = val
-    def __str__(self):
-        return `self` + self.val
 
-x=bar('sausage')
-y=bar('eggs')
-z=bar('spam')
+    def __str__(self) -> str:
+        return repr(self) + self.val
+
+
+x = Bar('sausage')
+y = Bar('eggs')
+z = Bar('spam')
 print(x)
 print(y)
 print(z)

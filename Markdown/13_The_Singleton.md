@@ -9,21 +9,31 @@ instance of a private nested inner class:
 
 ```python
 # Singleton/SingletonPattern.py
+from typing import Any
+
 
 class OnlyOne:
     class __OnlyOne:
-        def __init__(self, arg):
+        def __init__(self, arg: str) -> None:
             self.val = arg
-        def __str__(self):
-            return `self` + self.val
-    instance = None
-    def __init__(self, arg):
+
+        def __str__(self) -> str:
+            return repr(self) + self.val
+
+    instance: Any = None
+
+    def __init__(self, arg: str) -> None:
         if not OnlyOne.instance:
             OnlyOne.instance = OnlyOne.__OnlyOne(arg)
         else:
             OnlyOne.instance.val = arg
-    def __getattr__(self, name):
+
+    def __str__(self) -> str:
+        return str(self.instance)
+
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
+
 
 x = OnlyOne('sausage')
 print(x)
@@ -33,19 +43,9 @@ z = OnlyOne('spam')
 print(z)
 print(x)
 print(y)
-print(`x`)
-print(`y`)
-print(`z`)
-output = '''
-<__main__.__OnlyOne instance at 0076B7AC>sausage
-<__main__.__OnlyOne instance at 0076B7AC>eggs
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.__OnlyOne instance at 0076B7AC>spam
-<__main__.OnlyOne instance at 0076C54C>
-<__main__.OnlyOne instance at 0076DAAC>
-<__main__.OnlyOne instance at 0076AA3C>
-'''
+print(repr(x))
+print(repr(y))
+print(repr(z))
 ```
 
 Because the inner class is named with a double underscore, it is private
@@ -74,22 +74,30 @@ added in Python 2.2:
 
 ```python
 # Singleton/NewSingleton.py
+from typing import Any
 
-class OnlyOne(object):
+
+class OnlyOne:
     class __OnlyOne:
-        def __init__(self):
-            self.val = None
-        def __str__(self):
-            return `self` + self.val
-    instance = None
-    def __new__(cls): # __new__ always a classmethod
+        def __init__(self) -> None:
+            self.val: str | None = None
+
+        def __str__(self) -> str:
+            return repr(self) + str(self.val)
+
+    instance: Any = None
+
+    def __new__(cls) -> Any:  # __new__ is always a classmethod
         if not OnlyOne.instance:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
-    def __getattr__(self, name):
+
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
-    def __setattr__(self, name):
-        return setattr(self.instance, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        setattr(self.instance, name, value)
+
 
 x = OnlyOne()
 x.val = 'sausage'
@@ -102,14 +110,6 @@ z.val = 'spam'
 print(z)
 print(x)
 print(y)
-#<hr>
-output = '''
-<__main__.__OnlyOne instance at 0x00798900>sausage
-<__main__.__OnlyOne instance at 0x00798900>eggs
-<__main__.__OnlyOne instance at 0x00798900>spam
-<__main__.__OnlyOne instance at 0x00798900>spam
-<__main__.__OnlyOne instance at 0x00798900>spam
-'''
 ```
 
 Alex Martelli makes the [observation](http://www.aleax.it/Python/5ep.html)
@@ -124,17 +124,24 @@ setting all the `__dict__`s to the same static piece of storage:
 ```python
 # Singleton/BorgSingleton.py
 # Alex Martelli's 'Borg'
+from typing import Any
+
 
 class Borg:
-    _shared_state = {}
-    def __init__(self):
+    _shared_state: dict[str, Any] = {}
+
+    def __init__(self) -> None:
         self.__dict__ = self._shared_state
 
+
 class Singleton(Borg):
-    def __init__(self, arg):
+    def __init__(self, arg: str) -> None:
         Borg.__init__(self)
         self.val = arg
-    def __str__(self): return self.val
+
+    def __str__(self) -> str:
+        return self.val
+
 
 x = Singleton('sausage')
 print(x)
@@ -144,19 +151,9 @@ z = Singleton('spam')
 print(z)
 print(x)
 print(y)
-print(`x`)
-print(`y`)
-print(`z`)
-output = '''
-sausage
-eggs
-spam
-spam
-spam
-<__main__.Singleton instance at 0079EF2C>
-<__main__.Singleton instance at 0079E10C>
-<__main__.Singleton instance at 00798F9C>
-'''
+print(repr(x))
+print(repr(y))
+print(repr(z))
 ```
 
 This has an identical effect as `SingletonPattern.py` does, but it's
@@ -169,13 +166,20 @@ that there's only one instance of a class variable:
 
 ```python
 # Singleton/ClassVariableSingleton.py
-class SingleTone(object):
-    __instance = None
-    def __new__(cls, val):
-        if SingleTone.__instance is None:
-            SingleTone.__instance = object.__new__(cls)
-        SingleTone.__instance.val = val
-        return SingleTone.__instance
+from typing import Any
+
+
+class SingleTone:
+    val: Any
+    __instance: "SingleTone | None" = None
+
+    def __new__(cls, val: Any) -> "SingleTone":
+        instance = SingleTone.__instance
+        if instance is None:
+            instance = object.__new__(cls)
+            SingleTone.__instance = instance
+        instance.val = val
+        return instance
 ```
 
 Two other interesting ways to define singleton^[Suggested by Chih-Chung
@@ -186,21 +190,29 @@ it by wrapping it in another class:
 
 ```python
 # Singleton/SingletonDecorator.py
+from typing import Any
+
+
 class SingletonDecorator:
-    def __init__(self,klass):
+    def __init__(self, klass: type) -> None:
         self.klass = klass
-        self.instance = None
-    def __call__(self,*args,`kwds):
-        if self.instance == None:
-            self.instance = self.klass(*args,`kwds)
+        self.instance: Any = None
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        if self.instance is None:
+            self.instance = self.klass(*args, **kwds)
         return self.instance
 
-class foo: pass
-foo = SingletonDecorator(foo)
 
-x=foo()
-y=foo()
-z=foo()
+class Foo:
+    pass
+
+
+foo = SingletonDecorator(Foo)
+
+x = foo()
+y = foo()
+z = foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
@@ -219,29 +231,36 @@ may change):
 
 ```python
 # Singleton/SingletonMetaClass.py
+from typing import Any
+
+
 class SingletonMetaClass(type):
-    def __init__(cls,name,bases,dict):
-        super(SingletonMetaClass,cls)\
-          .__init__(name,bases,dict)
-        original_new = cls.__new__
-        def my_new(cls,*args,`kwds):
-            if cls.instance == None:
-                cls.instance = \
-                  original_new(cls,*args,`kwds)
-            return cls.instance
-        cls.instance = None
-        cls.__new__ = staticmethod(my_new)
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
+        klass: Any = cls
+        original_new = klass.__new__
 
-class bar(object):
-    __metaclass__ = SingletonMetaClass
-    def __init__(self,val):
+        def my_new(c: Any, *args: Any, **kwds: Any) -> Any:
+            if c.instance is None:
+                c.instance = original_new(c)
+            return c.instance
+
+        klass.instance = None
+        klass.__new__ = staticmethod(my_new)
+
+
+class Bar(metaclass=SingletonMetaClass):
+    def __init__(self, val: str) -> None:
         self.val = val
-    def __str__(self):
-        return `self` + self.val
 
-x=bar('sausage')
-y=bar('eggs')
-z=bar('spam')
+    def __str__(self) -> str:
+        return repr(self) + self.val
+
+
+x = Bar('sausage')
+y = Bar('eggs')
+z = Bar('spam')
 print(x)
 print(y)
 print(z)

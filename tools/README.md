@@ -114,7 +114,7 @@ use `-o DIR` to build elsewhere.
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push and pull request under Python
-3.12. Hard gates: the regression run (`run_examples.py --baseline`) and the
+3.14. Hard gates: the regression run (`run_examples.py --baseline`) and the
 site build. Advisory for now (each has a known backlog): the drift check and
 `ty`. `make ci` runs the same sequence locally.
 

@@ -1,19 +1,27 @@
 # Singleton/SingletonDecorator.py
+from typing import Any
+
+
 class SingletonDecorator:
-    def __init__(self,klass):
+    def __init__(self, klass: type) -> None:
         self.klass = klass
-        self.instance = None
-    def __call__(self,*args,`kwds):
-        if self.instance == None:
-            self.instance = self.klass(*args,`kwds)
+        self.instance: Any = None
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        if self.instance is None:
+            self.instance = self.klass(*args, **kwds)
         return self.instance
 
-class foo: pass
-foo = SingletonDecorator(foo)
 
-x=foo()
-y=foo()
-z=foo()
+class Foo:
+    pass
+
+
+foo = SingletonDecorator(Foo)
+
+x = foo()
+y = foo()
+z = foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
