@@ -17,7 +17,7 @@ description = "Build and verification tooling for the book Thinking in Python."
 requires-python = ">=3.14"
 
 [dependency-groups]
-dev = ["ty"]
+dev = ["ty", "pytest"]
 
 [tool.uv]
 package = false

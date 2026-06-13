@@ -5,8 +5,9 @@
 
 PY ?= uv run python
 TY ?= uv run ty
+PYTEST ?= uv run pytest
 
-.PHONY: help check extract run examples site ty clean-examples clean-site ci
+.PHONY: help check extract run examples site ty test clean-examples clean-site ci
 
 help:
 	@echo "Targets:"
@@ -16,7 +17,8 @@ help:
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
 	@echo "  ty        - type-check the extracted examples (advisory)"
-	@echo "  ci        - what CI runs: check, baseline run, site"
+	@echo "  test      - run the book's pytest examples (test_*.py)"
+	@echo "  ci        - what CI runs: check, baseline run, pytest, site"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -37,12 +39,16 @@ site:
 ty:
 	$(TY) check ExtractedExamples
 
+test:
+	$(PYTEST) ExtractedExamples
+
 # Mirrors the GitHub Actions gate: drift check, regression-only example run,
-# and a clean site build. All hard gates now that the book is drift-free.
+# the book's pytest examples, and a clean site build. All hard gates.
 ci:
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/run_examples.py --baseline
+	$(PYTEST) ExtractedExamples
 	$(PY) tools/build_site.py
 
 clean-examples:

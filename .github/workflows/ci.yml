@@ -42,6 +42,10 @@ jobs:
       - name: Run examples (fail only on new breakage)
         run: uv run python tools/run_examples.py --baseline
 
+      # Hard gate: the book's pytest examples (test_*.py) must pass.
+      - name: Run the book's pytest examples
+        run: uv run pytest ExtractedExamples
+
       # Advisory until Phase 2 modernizes the examples; the unconverted
       # Java/Py2 code does not even parse. Tighten per-subtree as it lands.
       - name: Type-check examples with ty (advisory)

@@ -62,6 +62,12 @@ def load_skips() -> list[str]:
     return out
 
 
+def is_pytest_file(name: str) -> bool:
+    """pytest owns these (run via `pytest`, not as standalone scripts)."""
+    return name == "conftest.py" or (name.startswith("test_")
+                                     and name.endswith(".py"))
+
+
 def is_skipped(rel: str, text: str, skips: list[str]) -> bool:
     if INLINE_MARKER in text:
         return True
@@ -120,6 +126,9 @@ def main(argv: list[str] | None = None) -> int:
     for f in py_files:
         rel = f.relative_to(args.tree).as_posix()
         if args.subtree and args.subtree not in rel:
+            continue
+        if is_pytest_file(f.name):
+            skipped.append(rel)  # run by `pytest`, not as a script
             continue
         text = f.read_text(encoding="utf-8", errors="replace")
         if is_skipped(rel, text, skips):

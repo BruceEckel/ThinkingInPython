@@ -211,7 +211,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
 | P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
-| P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 44; see below) |
+| P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 36; see below) |
 | P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
@@ -236,28 +236,27 @@ Every example in these subtrees now runs and is `ty`-clean, with the book and
 | Util | DONE (Synchronization/Observer cluster) |
 | Observer | PARTIAL: `ObservedFlower.py` DONE; `BoxObserver.py` left (see below) |
 | StateMachine | PARTIAL: mousetrap half DONE; table-driven half left (see below) |
-| Root scripts | `SanityCheck.py`, `CodeManager.py` marked `# extract: no-run` (build tools) |
+| UnitTesting | DONE (reframed around pytest; Java framework removed; pytest is now a CI hard gate) |
+| Metaprogramming | PARTIAL: `GreenHouse.py` DONE; the `__metaclass__` examples await the Python 3 reframe (`__init_subclass__`) |
+| Root scripts | `CodeManager.py` marked `# extract: no-run`; `SanityCheck.py` removed (obsolete, replaced by pytest) |
 
-**The 44 remaining baseline failures are NOT Python 2 syntax.** They are
-unconverted Java or chapters mid-conversion, each needing an authorial
-decision rather than a mechanical fix. They stay in `tools/examples_baseline.txt`
-so CI stays green. Breakdown:
+**The 36 remaining baseline failures are NOT Python 2 syntax.** They are
+unconverted Java or chapters mid-conversion. The agreed direction is a Pythonic
+reframe for each (and sophisticated pytest, now in place from the Testing
+chapter). They stay in `tools/examples_baseline.txt` so CI stays green.
+Breakdown:
 
 - **PatternRefactoring (23)** — the *Trash* sorting example imported straight
   from *Thinking in Java*: `0.75f` literals, `Trash t = (Trash)it.next()`,
-  `ArrayList()`, reflection-based prototype factory (`getConstructor`). A full
-  multi-file Python port with real design choices. Phase 4 will reframe this
-  chapter anyway, so port + reframe should be done together.
-- **Metaprogramming (9)** — a chapter the author left mid-conversion: the prose
-  deliberately contrasts Python 2 `__metaclass__` examples (`SimpleMeta1/2/3`)
-  against a "Metaclass Hook in Python 3" section, and carries open questions
-  (`{{check this}}`, "is there an equivalent in Python 3?"). Forcing the
-  examples to run would erase the teaching contrast. Needs an authorial call on
-  how to present the Py2→Py3 metaclass story.
-- **UnitTesting (7)** — chapter 05's framework is unconverted Java
-  (`def affirm(condition): if(!condition)`, `Class.forName`, `package c02...`).
-  Needs reconception as a Python testing framework, or reframing around
-  `unittest`/`pytest`.
+  `ArrayList()`, reflection-based prototype factory (`getConstructor`). Target:
+  Pythonic reframe (`isinstance`/`match` for RTTI, a registry dict or
+  `__init_subclass__` for the factory, `functools.singledispatch` for
+  double-dispatch and Visitor). Pairs with the Phase 4 reframe of this chapter.
+- **Metaprogramming (8 left; `GreenHouse.py` done)** — target: Pythonic reframe.
+  Move `RegisterLeafClasses` and `Final` to `__init_subclass__`, show
+  `__set_name__`/descriptors and class decorators, convert the `__metaclass__`
+  examples to `class C(metaclass=...)`, and replace the Python 2 `SimpleMeta1/2/3`
+  contrast with a short "Python 2 did X; Python 3 does Y" note.
 - **StateMachine table-driven half (4)** — `stateMachine2/` and `vendingmachine/`
   are labeled "(code only roughly converted)" three times in the prose; they are
   still Java (`boolean condition(input):`, `Iterator it=((List)...)`,

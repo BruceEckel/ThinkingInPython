@@ -74,6 +74,10 @@ Runs every `.py` under `ExtractedExamples/`, each in its own directory so the
 examples' relative data paths resolve. Reports passed / skipped / timed-out /
 failed and exits non-zero if anything fails or times out.
 
+`test_*.py` and `conftest.py` are skipped here: they are pytest files, run by
+`make test` (`uv run pytest ExtractedExamples`), not as standalone scripts. See
+the Testing chapter.
+
 * Narrow the run: `python tools/run_examples.py StateMachine`
 * Adjust the kill timeout: `--timeout 20` (default 15s)
 
@@ -124,9 +128,10 @@ use `-o DIR` to build elsewhere.
 `.github/workflows/ci.yml` runs on every push and pull request. It installs uv
 (`astral-sh/setup-uv`, Python 3.14, cached), runs `uv sync --locked`, then
 drives the harness with `uv run`. Hard gates: the drift check
-(`extract_examples.py`), the regression run (`run_examples.py --baseline`), and
-the site build. `ty` stays advisory until Phase 2 modernizes the rest of the
-example tree. `make ci` runs the same sequence locally.
+(`extract_examples.py`), the regression run (`run_examples.py --baseline`), the
+book's pytest examples (`pytest ExtractedExamples`), and the site build. `ty`
+stays advisory until Phase 2 modernizes the rest of the example tree. `make ci`
+runs the same sequence locally.
 
 ## Current baseline
 

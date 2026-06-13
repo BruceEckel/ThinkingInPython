@@ -39,10 +39,3 @@ StateMachine/stateMachine2/Condition.py
 StateMachine/stateMachine2/StateMachine.py
 StateMachine/vendingmachine/VendingMachine.py
 StateMachine/vendingmachine/VendingMachineTest.py
-UnitTesting/BlackBoxTest.py
-UnitTesting/RunUnitTests.py
-UnitTesting/TestDemo.py
-UnitTesting/TestDemo2.py
-UnitTesting/TooMuchAccess.py
-UnitTesting/UnitTest.py
-UnitTesting/testable/Testable.py
