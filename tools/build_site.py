@@ -33,6 +33,11 @@ DEFAULT_OUT = ROOT / "build" / "site"
 
 FRONT_STEM = "00_Front"
 IMG_REF = re.compile(r"(!\[[^\]]*\]\()_images/([^)\s]+)(\))")
+# Cross-references are standard relative links to a chapter's .md file
+# (e.g. [the Factory chapter](18_Factory.md)); the site serves .html, so
+# rewrite intra-book .md links to .html. External links (with a scheme) are
+# left alone because the path before .md would contain a colon.
+MD_LINK = re.compile(r"(\]\()([\w./-]+)\.md(#[\w-]+)?(\))")
 SETEXT = re.compile(r"^(=+|-+)\s*$")
 ATX = re.compile(r"^#+\s+(.*?)\s*#*\s*$")
 
@@ -119,6 +124,12 @@ def rewrite_images(text: str, img_map: dict[str, str], missing: set[str]) -> str
         return f"{m.group(1)}images/{filename}{m.group(3)}"
 
     return IMG_REF.sub(repl, text)
+
+
+def rewrite_md_links(text: str) -> str:
+    """Point intra-book cross-references at the built .html pages."""
+    return MD_LINK.sub(lambda m: f"{m.group(1)}{m.group(2)}.html"
+                                 f"{m.group(3) or ''}{m.group(4)}", text)
 
 
 # --------------------------------------------------------------------------- #
@@ -287,6 +298,7 @@ def build(out_dir: Path) -> int:
         for m in IMG_REF.finditer(text):
             used_images.add(m.group(2))
         text = rewrite_images(text, img_map, missing)
+        text = rewrite_md_links(text)
         body = render_body(text)
         content = body + "\n" + chapter_nav(prev, nxt)
         sb = sidebar(chapters, ch.out_name, meta)

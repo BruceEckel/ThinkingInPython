@@ -163,8 +163,8 @@ c = Facade.makeC(1.0);
 ```
 
 The cleaner Python façade is a *module*. A module already presents a curated set
-of names over whatever tangle of classes lives behind it, and, as the Singleton
-chapter notes, it is imported once and shared everywhere. Put the friendly
+of names over whatever tangle of classes lives behind it, and, as [the Singleton chapter](13_The_Singleton.md)
+notes, it is imported once and shared everywhere. Put the friendly
 functions and the few classes you want to expose at module level, keep the messy
 internals private (a leading underscore, by convention), and the `import` *is*
 the façade. A `Facade` class full of static methods only reproduces, with more

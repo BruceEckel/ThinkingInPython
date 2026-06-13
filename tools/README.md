@@ -121,6 +121,12 @@ extension. The builder resolves each to the real file in `resources/images`
 (`decorator` to `decorator.gif`), copies the referenced ones into
 `build/site/images/`, and warns about any reference with no matching file.
 
+Cross-references between chapters use standard relative Markdown links to the
+target chapter's `.md` file, for example `[the Factory chapter](18_Factory.md)`.
+These render correctly on GitHub; the builder rewrites intra-book `.md` links to
+`.html` so they also resolve in the site. External links (which carry a scheme)
+are left alone.
+
 Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
 use `-o DIR` to build elsewhere.
 
