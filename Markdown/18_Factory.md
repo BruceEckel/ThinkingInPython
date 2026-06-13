@@ -171,6 +171,59 @@ for shape in shapeNameGen(7):
     shape.erase()
 ```
 
+## The Pythonic Factory: a Dictionary
+
+A factory exists to turn data, such as a name, into an object without scattering
+constructors through your code. In Python a class is itself a first-class
+object: you can store it in a variable and call it to make an instance. So the
+simplest factory is a dictionary that maps names to classes:
+
+    shapes = {"Circle": Circle, "Square": Square}
+    shapes[name]()          # construct one
+
+There is no factory method and no factory class; the dict *is* the factory. You
+can go one step further so the factory never needs editing when a type is added:
+let each subclass register itself through `__init_subclass__`:
+
+```python
+# Factory/registry.py
+# A class is a first-class object, so a factory is just a dict of classes.
+# __init_subclass__ lets each subclass register itself, so the factory never
+# needs editing when you add a type.
+
+
+class Shape:
+    registry: dict[str, type["Shape"]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        Shape.registry[cls.__name__] = cls
+
+    def draw(self) -> None: ...
+
+
+class Circle(Shape):
+    def draw(self) -> None: print("Circle.draw")
+
+
+class Square(Shape):
+    def draw(self) -> None: print("Square.draw")
+
+
+def make(name: str) -> Shape:
+    return Shape.registry[name]()
+
+
+for name in ["Circle", "Square", "Circle"]:
+    make(name).draw()
+```
+
+Adding a `Triangle` is now a single class definition: it registers itself, and
+`make()` builds it with no change to the factory. This is the same
+self-registration used in the Pattern Refactoring chapter, and it is the most
+common form of factory in idiomatic Python. The sections below show the classic
+object-oriented factories for contrast.
+
 ## Polymorphic Factories
 
 The static `factory()` method in the previous example forces all the
@@ -260,6 +313,13 @@ polymorphic factory method, and a single static method in the base class
 Notice that the `ShapeFactory` must be initialized by loading its
 dictionary with factory objects, which takes place in the static
 initialization clause of each of the shape implementations.
+
+This version leans on `eval()` and a `Factory` class nested in every shape,
+neither of which Python needs. Because classes are already first-class objects,
+the registry shown above does the same job: it maps a name straight to a class
+and constructs it. Prefer that. A separate factory *class* earns its keep only
+when creating an object takes real work beyond calling a constructor, such as
+pooling, caching, or consulting external configuration.
 
 ## Abstract Factories
 
