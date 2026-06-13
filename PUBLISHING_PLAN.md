@@ -157,6 +157,19 @@ Known offenders to prioritize (contain confirmed Py2 idioms):
 - **Dependencies:** P1-1 for any new examples. **Author sign-off required for
   cuts.**
 
+#### P3-2 recommendations (awaiting author sign-off)
+
+| Chapter | State | Recommendation |
+|---------|-------|----------------|
+| `04_Static_Type_Checking` | empty stub (3 bullets) | **FINISH.** Core material. Write it around type hints + Astral's `ty` (per the locked decision, not mypy). New authorial content; can be drafted. |
+| `08_Generators_and_Iterators` | empty stub | **CUT (redundant).** The reframed `17_Iterators` now covers the protocol, generators, `__iter__`, laziness, and `itertools` in full. Fold the one unique note (infinite generators) into 17 and drop 08, or move 17's content here and leave 17 a short pattern note. Default: cut 08. |
+| `10_Machine_Discovery` | 1 utility, Py2 | **CUT.** Off-theme for "Insights, Idioms and Patterns," and its only example (`detect_CPUs`) is obsoleted by `os.cpu_count()` / `os.process_cpu_count()`. Move to `residual/` if kept at all. |
+| `11_Messenger` | one small idiom | **KEEP, short, reframed.** The `self.__dict__ = kwargs` idiom is `types.SimpleNamespace`; the modern DTO answers are `SimpleNamespace`, `@dataclass`, and `NamedTuple`. Reframe to say so. Borderline-merge if a "small idioms" chapter is ever created. |
+| `14_Application_Frameworks` | Template Method, working example | **KEEP + P4 reframe.** Real GoF content (Template Method) with a runnable example. Reframe: in Python the customization hooks can be plain functions passed in, not just overridden methods. Not a cut. |
+| `21_Table_Driven_Code` | empty stub | **CUT (redundant).** The table-driven idea is covered by `16_State_Machines` (table-driven machine), `23_Multiple_Dispatching` (dict-of-tuples), and `25_Pattern_Refactoring` (dict dispatch). |
+| `12_The_Pattern_Concept` | ~2300 words | **KEEP.** Substantial conceptual intro; editorial pass only. |
+| `26_Simulation` | ~900 words, 3 examples | **KEEP.** Real content; examples pass. Optional light reframe. |
+
 ### TASK P3-3 — Remove non-book material from the build
 - **Goal:** Ensure `residual/` (including "Why This Project Failed") is excluded
   from the site build and not referenced from book chapters.
