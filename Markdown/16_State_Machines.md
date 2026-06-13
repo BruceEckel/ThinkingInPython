@@ -341,381 +341,194 @@ understand the state transitions from looking at the table.
 
 ## Table-Driven State Machine
 
-The advantage of the previous design is that all the information about a
-state, including the state transition information, is located within the
-state class itself. This is generally a good design principle.
+The previous design keeps each state's transitions inside the state class. A
+pure state machine can go further and represent the *entire* machine as a
+single transition table. All the behavior then lives in one place, so you can
+build and maintain it directly from a state-transition diagram.
 
-However, in a pure state machine, the machine can be completely
-represented by a single state-transition table. This has the advantage
-of locating all the information about the state machine in a single
-place, which means that you can more easily create and maintain the
-table based on a classic state-transition diagram.
+For a given current state and input, a transition row answers three questions:
+is there a condition to check, what action runs during the transition, and what
+state do we move to next. As a table:
 
-The classic state-transition diagram uses a circle to represent each
-state, and lines from the state pointing to all states that state can
-transition into. Each transition line is annotated with conditions for
-transition and an action during transition. Here's what it looks like:
+    {(current_state, InputType): [(condition, action, next_state), ...]}
 
-(Simple State Machine Diagram)
+The original Java version of this example needed two extra class hierarchies,
+`Condition` and `Transition`, because in Java a method is not a value you can
+store in a table. Python functions are first-class, so those hierarchies
+vanish: a condition is any callable returning a bool, an action is any callable,
+and the table is an ordinary `dict`.
 
-Goals:
+![Vending machine state diagram](_images/stateMachine)
 
--   Direct translation of state diagram
--   Vector of change: the state diagram representation
--   Reasonable implementation
--   No excess of states (you could represent every single change with a
-    new state)
--   Simplicity and flexibility
+### The Engine
 
-Observations:
-
--   States are trivial---no information or functions/data, just an
-    identity
--   Not like the State pattern!
--   The machine governs the move from state to state
--   Similar to flyweight
--   Each state may move to many others
--   Condition & action functions must also be external to states
--   Centralize description in a single table containing all variations,
-    for ease of configuration
-
-Example:
-
--   State Machine & Table-Driven Code
--   Implements a vending machine
--   Uses several other patterns
--   Separates common state-machine code from specific application (like
-    template method)
--   Each input causes a seek for appropriate solution (like chain of
-    responsibility)
--   Tests and transitions are encapsulated in function objects (objects
-    that hold functions)
--   Java constraint: methods are not first-class objects
-
-![image description](_images/stateMachine)
-
-### The State Class
-
-The `State` class is distinctly different from before, since it is
-really just a placeholder with a name. Thus it is not inherited from
-previous `State` classes:
+The engine is tiny. For the current state and the type of the incoming event,
+it walks the candidate transitions in order, takes the first whose condition
+passes (or has no condition), runs that transition's action, and moves to the
+next state:
 
 ```python
-# StateMachine/stateMachine2/State.py
+# StateMachine/tabledriven/state_machine.py
+# A generic table-driven state machine.
+#
+# The whole machine is one transition table. Because Python functions are
+# first-class, a transition's condition and action are just callables, so the
+# Condition and Transition classes a Java version needs disappear.
+from collections.abc import Callable
+from typing import Any
 
-class State:
-    def __init__(self, name): self.name = name
-    def __str__(self): return self.name
-```
+# (condition, action, next_state); condition and action may be None.
+Transition = tuple[Callable[..., bool] | None, Callable[..., None] | None, str]
+Table = dict[tuple[str, type], list[Transition]]
 
-### Conditions for Transition
-
-In the state transition diagram, an input is tested to see if it meets
-the condition necessary to transfer to the state under question. As
-before, the `Input` is just a tagging interface:
-
-```python
-# StateMachine/stateMachine2/Input.py
-# Inputs to a state machine
-
-class Input: pass
-```
-
-The `Condition` evaluates the `Input` to decide whether this row in
-the table is the correct transition:
-
-```python
-# StateMachine/stateMachine2/Condition.py
-# Condition function object for state machine
-
-class Condition:
-    boolean condition(input) :
-        assert 0, "condition() not implemented"
-```
-
-### Transition Actions
-
-If the `Condition` returns `true`, then the transition to a new
-state is made, and as that transition is made some kind of action occurs
-(in the previous state machine design, this was the `run()` method):
-
-```python
-# StateMachine/stateMachine2/Transition.py
-# Transition function object for state machine
-
-class Transition:
-    def transition(self, input):
-        assert 0, "transition() not implemented"
-```
-
-### The Table
-
-With these classes in place, we can set up a 3-dimensional table where
-each row completely describes a state. The first element in the row is
-the current state, and the rest of the elements are each a row
-indicating what the *type* of the input can be, the condition that must
-be satisfied in order for this state change to be the correct one, the
-action that happens during transition, and the new state to move into.
-Note that the `Input` object is not just used for its type, it is also
-a *Messenger* object that carries information to the `Condition` and
-`Transition` objects:
-
-    {(CurrentState, InputA) : (ConditionA, TransitionA, NextA),
-     (CurrentState, InputB) : (ConditionB, TransitionB, NextB),
-     (CurrentState, InputC) : (ConditionC, TransitionC, NextC),
-     ...
-    }
-
-### The Basic Machine
-
-Here's the basic machine, (code only roughly converted):
-
-```python
-# StateMachine/stateMachine2/StateMachine.py
-# A table-driven state machine
 
 class StateMachine:
-    def __init__(self, initialState, tranTable):
-        self.state = initialState
-        self.transitionTable = tranTable
+    def __init__(self, initial: str, table: Table) -> None:
+        self.state = initial
+        self.table = table
 
-    def nextState(self, input):
-
-        Iterator it=((List)map.get(state)).iterator()
-        while(it.hasNext()):
-            Object[] tran = (Object[])it.next()
-            if(input == tran[0] ||
-               input.getClass() == tran[0]):
-                if(tran[1] != null):
-                    Condition c = (Condition)tran[1]
-                    if(!c.condition(input))
-                        continue # Failed test
-
-                if(tran[2] != null)
-                    ((Transition)tran[2]).transition(input)
-                state = (State)tran[3]
+    def handle(self, event: Any) -> None:
+        for condition, action, next_state in self.table.get(
+                (self.state, type(event)), []):
+            if condition is None or condition(event):
+                if action is not None:
+                    action(event)
+                self.state = next_state
                 return
-
-
-        throw RuntimeException(
-          "Input not supported for current state")
+        raise RuntimeError(
+            f"no transition from {self.state!r} on {type(event).__name__}")
 ```
 
-### Simple Vending Machine
+Several candidate transitions can share one `(state, input)` key, told apart by
+their conditions. The engine tries them top to bottom, which is how a single
+input can lead to different states depending on a test.
 
-Here's the simple vending machine, (code only roughly converted):
+### A Vending Machine
+
+The machine is now entirely a table. It collects money, takes a two-digit
+selection, then either dispenses the item, reports it sold out, or clears a
+selection that costs more than the money inserted. The conditions and actions
+are plain methods, stored directly in the table:
 
 ```python
-# StateMachine/vendingmachine/VendingMachine.py
-# Demonstrates use of StateMachine.py
-import sys
-sys.path += ['../stateMachine2']
-import StateMachine
+# StateMachine/tabledriven/vending_machine.py
+# A vending machine expressed entirely as a transition table.
+from state_machine import StateMachine, Table
 
-class State:
-    def __init__(self, name): self.name = name
-    def __str__(self): return self.name
-
-State.quiescent = State("Quiesecent")
-State.collecting = State("Collecting")
-State.selecting = State("Selecting")
-State.unavailable = State("Unavailable")
-State.wantMore = State("Want More?")
-State.noChange = State("Use Exact Change Only")
-State.makesChange = State("Machine makes change")
-
-class HasChange:
-    def __init__(self, name): self.name = name
-    def __str__(self): return self.name
-
-HasChange.yes = HasChange("Has change")
-HasChange.no = HasChange("Cannot make change")
-
-class ChangeAvailable(StateMachine):
-    def __init__(self):
-        StateMachine.__init__(State.makesChange, {
-          # Current state, input
-          (State.makesChange, HasChange.no) :
-            # test, transition, next state:
-            (null, null, State.noChange),
-          (State.noChange, HasChange.yes) :
-            (null, null, State.noChange)
-        })
 
 class Money:
-    def __init__(self, name, value):
+    def __init__(self, name: str, value: int) -> None:
         self.name = name
         self.value = value
-    def __str__(self): return self.name
-    def getValue(self): return self.value
 
-Money.quarter = Money("Quarter", 25)
-Money.dollar = Money("Dollar", 100)
+    def __str__(self) -> str:
+        return self.name
+
 
 class Quit:
-    def __str__(self): return "Quit"
+    def __str__(self) -> str:
+        return "Quit"
 
-Quit.quit = Quit()
 
 class Digit:
-    def __init__(self, name, value):
+    def __init__(self, name: str, value: int) -> None:
         self.name = name
         self.value = value
-    def __str__(self): return self.name
-    def getValue(self): return self.value
+
+    def __str__(self) -> str:
+        return self.name
+
 
 class FirstDigit(Digit): pass
-FirstDigit.A = FirstDigit("A", 0)
-FirstDigit.B = FirstDigit("B", 1)
-FirstDigit.C = FirstDigit("C", 2)
-FirstDigit.D = FirstDigit("D", 3)
-
 class SecondDigit(Digit): pass
-SecondDigit.one = SecondDigit("one", 0)
-SecondDigit.two = SecondDigit("two", 1)
-SecondDigit.three = SecondDigit("three", 2)
-SecondDigit.four = SecondDigit("four", 3)
+
 
 class ItemSlot:
-    id = 0
-    def __init__(self, price, quantity):
+    def __init__(self, price: int, quantity: int) -> None:
         self.price = price
         self.quantity = quantity
-    def __str__(self): return `ItemSlot.id`
-    def getPrice(self): return self.price
-    def getQuantity(self): return self.quantity
-    def decrQuantity(self): self.quantity -= 1
+
 
 class VendingMachine(StateMachine):
-    changeAvailable = ChangeAvailable()
-    amount = 0
-    FirstDigit first = null
-    ItemSlot[][] items = ItemSlot[4][4]
+    def __init__(self) -> None:
+        self.amount = 0  # money inserted, in cents
+        self.row = 0     # the first selection digit
+        # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
+        self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
+                      for _ in range(4)]
+        self.items[3][0] = ItemSlot(25, 0)  # one sold-out slot
+        table: Table = {
+            ("quiescent", Money): [(None, self.add_money, "collecting")],
+            ("collecting", Money): [(None, self.add_money, "collecting")],
+            ("collecting", Quit): [(None, self.refund, "quiescent")],
+            ("collecting", FirstDigit): [(None, self.choose_row, "selecting")],
+            ("selecting", Quit): [(None, self.refund, "quiescent")],
+            ("selecting", SecondDigit): [
+                (self.too_expensive, self.clear, "collecting"),
+                (self.sold_out, self.clear, "unavailable"),
+                (None, self.dispense, "want_more"),
+            ],
+            ("unavailable", Quit): [(None, self.refund, "quiescent")],
+            ("unavailable", FirstDigit): [(None, self.choose_row, "selecting")],
+            ("want_more", Quit): [(None, self.refund, "quiescent")],
+            ("want_more", FirstDigit): [(None, self.choose_row, "selecting")],
+        }
+        super().__init__("quiescent", table)
+
+    def _slot(self, col: SecondDigit) -> ItemSlot:
+        return self.items[self.row][col.value]
 
     # Conditions:
-    def notEnough(self, input):
-        i1 = first.getValue()
-        i2 = input.getValue()
-        return items[i1][i2].getPrice() > amount
+    def too_expensive(self, col: SecondDigit) -> bool:
+        return self._slot(col).price > self.amount
 
-    def itemAvailable(self, input):
-        i1 = first.getValue()
-        i2 = input.getValue()
-        return items[i1][i2].getQuantity() > 0
+    def sold_out(self, col: SecondDigit) -> bool:
+        return self._slot(col).quantity == 0
 
-    def itemNotAvailable(self, input):
-        return !itemAvailable.condition(input)
-        #i1 = first.getValue()
-        #i2 = input.getValue()
-        #return items[i1][i2].getQuantity() == 0
+    # Actions:
+    def add_money(self, money: Money) -> None:
+        self.amount += money.value
+        print(f"Total = {self.amount}")
 
-    # Transitions:
-    def clearSelection(self, input):
-        i1 = first.getValue()
-        i2 = input.getValue()
-        ItemSlot is = items[i1][i2]
-        print (
-          "Clearing selection: item " + is +
-          " costs " + is.getPrice() +
-          " and has quantity " + is.getQuantity())
-        first = null
+    def choose_row(self, digit: FirstDigit) -> None:
+        self.row = digit.value
+        print(f"Row {digit}")
 
-    def dispense(self, input):
-        i1 = first.getValue()
-        i2 = input.getValue()
-        ItemSlot is = items[i1][i2]
-        print(("Dispensing item " +
-          is + " costs " + is.getPrice() +
-          " and has quantity " + is.getQuantity()))
-        items[i1][i2].decrQuantity()
-        print ("Quantity " +
-          is.getQuantity())
-        amount -= is.getPrice()
-        print("Amount remaining " +
-          amount)
+    def clear(self, col: SecondDigit) -> None:
+        slot = self._slot(col)
+        print(f"Clearing selection: costs {slot.price}, "
+              f"quantity {slot.quantity}")
 
-    def showTotal(self, input):
-        amount += ((Money)input).getValue()
-        print("Total amount = " + amount)
+    def dispense(self, col: SecondDigit) -> None:
+        slot = self._slot(col)
+        slot.quantity -= 1
+        self.amount -= slot.price
+        print(f"Dispensing; amount remaining {self.amount}")
 
-    def returnChange(self, input):
-        print("Returning " + amount)
-        amount = 0
+    def refund(self, event: object) -> None:
+        print(f"Returning {self.amount}")
+        self.amount = 0
 
-    def showDigit(self, input):
-        first = (FirstDigit)input
-        print("First Digit= "+ first)
 
-    def __init__(self):
-        StateMachine.__init__(self, State.quiescent)
-        for(int i = 0 i < items.length i++)
-            for(int j = 0 j < items[i].length j++)
-                items[i][j] = ItemSlot((j+1)*25, 5)
-        items[3][0] = ItemSlot(25, 0)
-        """
-        buildTable(Object[][][]{
-         State.quiescent, # Current state
-            # Input, test, transition, next state:
-            Money.class, null,
-            showTotal, State.collecting,
-         State.collecting, # Current state
-            # Input, test, transition, next state:
-            Quit.quit, null,
-            returnChange, State.quiescent,
-            Money.class, null,
-            showTotal, State.collecting,
-            FirstDigit.class, null,
-            showDigit, State.selecting,
-         State.selecting, # Current state
-            # Input, test, transition, next state:
-            Quit.quit, null,
-            returnChange, State.quiescent,
-            SecondDigit.class, notEnough,
-            clearSelection, State.collecting,
-            SecondDigit.class, itemNotAvailable,
-            clearSelection, State.unavailable,
-            SecondDigit.class, itemAvailable,
-            dispense, State.wantMore,
-         State.unavailable, # Current state
-            # Input, test, transition, next state:
-            Quit.quit, null,
-            returnChange, State.quiescent,
-            FirstDigit.class, null,
-            showDigit, State.selecting,
-         State.wantMore, # Current state
-            # Input, test, transition, next state:
-            Quit.quit, null,
-            returnChange, State.quiescent,
-            FirstDigit.class, null,
-            showDigit, State.selecting,
-        )
-        """
+if __name__ == "__main__":
+    events = [
+        Money("quarter", 25), Money("quarter", 25), Money("dollar", 100),
+        FirstDigit("A", 0), SecondDigit("two", 1),    # buy item [0][1]
+        FirstDigit("A", 0), SecondDigit("two", 1),    # buy it again
+        FirstDigit("C", 2), SecondDigit("three", 2),  # too expensive
+        FirstDigit("D", 3), SecondDigit("one", 0),    # sold out
+        Quit(),                                        # refund and reset
+    ]
+    machine = VendingMachine()
+    for event in events:
+        machine.handle(event)
 ```
 
-### Testing the Machine
+Adding a state or an input is now a local change: an entry in the table and a
+method or two. There is no `switch`, no reflection, and no `Condition` or
+`Transition` class hierarchy. The language's first-class functions and its
+`dict` supply what those patterns existed to provide.
 
-Here's a test of the machine, (code only roughly converted):
-
-```python
-# StateMachine/vendingmachine/VendingMachineTest.py
-# Demonstrates use of StateMachine.py
-
-vm = VendingMachine()
-for input in [
-    Money.quarter,
-    Money.quarter,
-    Money.dollar,
-    FirstDigit.A,
-    SecondDigit.two,
-    FirstDigit.A,
-    SecondDigit.two,
-    FirstDigit.C,
-    SecondDigit.three,
-    FirstDigit.D,
-    SecondDigit.one,
-    Quit.quit]:
-    vm.nextState(input)
-```
 
 ## Tools
 

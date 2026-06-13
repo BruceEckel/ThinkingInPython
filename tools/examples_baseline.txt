@@ -4,7 +4,3 @@
 # One forward-slash relative path per line.
 
 Observer/BoxObserver.py
-StateMachine/stateMachine2/Condition.py
-StateMachine/stateMachine2/StateMachine.py
-StateMachine/vendingmachine/VendingMachine.py
-StateMachine/vendingmachine/VendingMachineTest.py
