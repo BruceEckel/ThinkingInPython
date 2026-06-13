@@ -29,7 +29,13 @@ throwaway tree (git-ignored) regenerated from the Markdown for running.
 
 ## Commands
 
-With `make`:
+Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
+
+```
+uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
+```
+
+With `make` (targets run through `uv run`):
 
 ```
 make check      # do the book's examples match the committed Examples/ tree?
@@ -37,16 +43,18 @@ make extract    # write ExtractedExamples/ from the Markdown
 make run        # run every extracted .py, report failures
 make examples   # extract then run (the full pass)
 make site       # render Markdown/ into build/site/
+make ty         # type-check the extracted examples (advisory)
 make ci         # what CI runs: drift check, regression run, site build
 ```
 
-Without `make` (e.g. Windows PowerShell), call the scripts directly:
+Without `make` (e.g. Windows PowerShell), call the scripts through `uv run`:
 
 ```
-python tools/extract_examples.py            # = make check
-python tools/extract_examples.py --write    # = make extract
-python tools/run_examples.py                # = make run
-python tools/build_site.py                  # = make site
+uv run python tools/extract_examples.py            # = make check
+uv run python tools/extract_examples.py --write    # = make extract
+uv run python tools/run_examples.py                # = make run
+uv run python tools/build_site.py                  # = make site
+uv run ty check ExtractedExamples                  # = make ty
 ```
 
 ## extract_examples.py
@@ -113,11 +121,12 @@ use `-o DIR` to build elsewhere.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on every push and pull request under Python
-3.14. Hard gates: the drift check (`extract_examples.py`), the regression run
-(`run_examples.py --baseline`), and the site build. `ty` stays advisory until
-Phase 2 modernizes the rest of the example tree. `make ci` runs the same
-sequence locally.
+`.github/workflows/ci.yml` runs on every push and pull request. It installs uv
+(`astral-sh/setup-uv`, Python 3.14, cached), runs `uv sync --locked`, then
+drives the harness with `uv run`. Hard gates: the drift check
+(`extract_examples.py`), the regression run (`run_examples.py --baseline`), and
+the site build. `ty` stays advisory until Phase 2 modernizes the rest of the
+example tree. `make ci` runs the same sequence locally.
 
 ## Current baseline
 

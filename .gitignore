@@ -4,5 +4,6 @@ temp
 ebook_build
 ExtractedExamples
 build/
+.venv/
 *.pyc
 .cache

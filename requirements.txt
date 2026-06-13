@@ -1,4 +1,0 @@
-# Python tooling for building and checking the book's examples.
-# Used by CI (.github/workflows/ci.yml) and for local development.
-# pandoc is a system package (see the Makefile / tools/README.md), not pip.
-ty

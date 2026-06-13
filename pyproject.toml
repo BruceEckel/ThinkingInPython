@@ -1,0 +1,23 @@
+# uv-managed tooling for building and checking the book's examples.
+# This is not a distributable package (package = false); it only pins the
+# Python version and the dev tools the harness and CI use.
+#
+# Common commands:
+#   uv sync                                  # create .venv with the dev tools
+#   uv run python tools/run_examples.py      # run any harness script
+#   uv run ty check ExtractedExamples        # type-check
+#   make ci                                  # the full local gate (uses uv)
+#
+# pandoc is a system package (see tools/README.md), not a Python dependency.
+
+[project]
+name = "thinking-in-python"
+version = "0"
+description = "Build and verification tooling for the book Thinking in Python."
+requires-python = ">=3.14"
+
+[dependency-groups]
+dev = ["ty"]
+
+[tool.uv]
+package = false

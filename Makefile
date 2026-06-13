@@ -1,10 +1,12 @@
 # Thinking in Python: build and verification targets.
-# On Windows without `make`, run the underlying python commands directly
-# (see tools/README.md).
+# Tooling is managed by uv, so targets run through `uv run`. Override with
+# `make PY=python ...` to use a plain interpreter. On Windows without `make`,
+# run the underlying `uv run python ...` commands directly (see tools/README.md).
 
-PY ?= python
+PY ?= uv run python
+TY ?= uv run ty
 
-.PHONY: help check extract run examples site clean-examples clean-site ci
+.PHONY: help check extract run examples site ty clean-examples clean-site ci
 
 help:
 	@echo "Targets:"
@@ -13,6 +15,7 @@ help:
 	@echo "  run       - run every extracted .py and report failures"
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
+	@echo "  ty        - type-check the extracted examples (advisory)"
 	@echo "  ci        - what CI runs: check, baseline run, site"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
@@ -30,6 +33,9 @@ examples: extract run
 
 site:
 	$(PY) tools/build_site.py
+
+ty:
+	$(TY) check ExtractedExamples
 
 # Mirrors the GitHub Actions gate: drift check, regression-only example run,
 # and a clean site build. All hard gates now that the book is drift-free.

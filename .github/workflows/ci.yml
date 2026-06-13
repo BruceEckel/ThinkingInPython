@@ -2,7 +2,7 @@ name: CI
 
 # Gates every push and pull request: the book's examples must still match the
 # Markdown, no currently-passing example may regress, the code must stay
-# ty-clean, and the static site must build.
+# ty-clean, and the static site must build. Tooling is managed by uv.
 
 on:
   push:
@@ -18,35 +18,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.14"
-          cache: pip
+          enable-cache: true
 
       - name: Install pandoc
         run: sudo apt-get update && sudo apt-get install -y pandoc
 
-      - name: Install Python tooling
-        run: pip install -r requirements.txt
+      - name: Install tooling
+        run: uv sync --locked
 
       # Hard gate: the book's code blocks must match the committed Examples/
       # tree (no drift, no conflicting duplicates).
       - name: Check examples match the Markdown
-        run: python tools/extract_examples.py
+        run: uv run python tools/extract_examples.py
 
       - name: Extract examples for running
-        run: python tools/extract_examples.py --write
+        run: uv run python tools/extract_examples.py --write
 
       # Hard gate: fails if a change breaks a currently-passing example.
       - name: Run examples (fail only on new breakage)
-        run: python tools/run_examples.py --baseline
+        run: uv run python tools/run_examples.py --baseline
 
-      # Advisory until Phase 2 modernizes the examples; the unconverted Py2
-      # code does not even parse. Tighten per-subtree as modernization lands.
+      # Advisory until Phase 2 modernizes the examples; the unconverted
+      # Java/Py2 code does not even parse. Tighten per-subtree as it lands.
       - name: Type-check examples with ty (advisory)
-        run: ty check ExtractedExamples || true
+        run: uv run ty check ExtractedExamples || true
 
       # Hard gate: the static site must build cleanly.
       - name: Build the static site
-        run: python tools/build_site.py
+        run: uv run python tools/build_site.py
