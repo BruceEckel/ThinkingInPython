@@ -1,18 +1,17 @@
 # Util/TypedIterator.py
+from collections.abc import Iterator
+from typing import Any
 
-class TypedIterator(Iterator):
-    def __init__(self, it, type):
+
+class TypedIterator(Iterator[Any]):
+    def __init__(self, it: Iterator[Any], expected: type) -> None:
         self.imp = it
-        self.type = type
+        self.expected = expected
 
-    def hasNext(self):
-        return imp.hasNext()
-
-    def remove(self): imp.remove()
-    def next(self):
-        obj = imp.next()
-        if(!type.isInstance(obj))
-            throw ClassCastException(
-              "TypedIterator for type " + type +
-              " encountered type: " + obj.getClass())
+    def __next__(self) -> Any:
+        obj = next(self.imp)
+        if not isinstance(obj, self.expected):
+            raise TypeError(
+                f"TypedIterator for {self.expected} "
+                f"encountered {type(obj).__name__}")
         return obj

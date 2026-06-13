@@ -6,12 +6,12 @@ class DoubleEspresso: pass
 class EspressoConPanna: pass
 
 class Cappuccino:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cost = 1
         self.description = "Cappucino"
-    def getCost(self):
+    def getCost(self) -> float:
         return self.cost
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.description
 
 class CappuccinoDecaf: pass
@@ -25,13 +25,12 @@ class CappuccinoWhipped: pass
 class CafeMocha: pass
 class CafeMochaDecaf: pass
 class CafeMochaDecafWhipped:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cost = 1.25
-        self.description = \
-          "Cafe Mocha decaf whipped cream"
-    def getCost(self):
+        self.description = "Cafe Mocha decaf whipped cream"
+    def getCost(self) -> float:
         return self.cost
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.description
 
 class CafeMochaExtraEspresso: pass
@@ -50,9 +49,7 @@ class CafeLatteWetWhipped: pass
 class CafeLatteWhipped: pass
 
 cappuccino = Cappuccino()
-print((cappuccino.getDescription() + ": $" +
-  `cappuccino.getCost()`))
+print(cappuccino.getDescription() + ": $" + repr(cappuccino.getCost()))
 
 cafeMocha = CafeMochaDecafWhipped()
-print((cafeMocha.getDescription()
-  + ": $" + `cafeMocha.getCost()`))
+print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getCost()))

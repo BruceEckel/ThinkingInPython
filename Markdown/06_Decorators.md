@@ -67,12 +67,12 @@ class DoubleEspresso: pass
 class EspressoConPanna: pass
 
 class Cappuccino:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cost = 1
         self.description = "Cappucino"
-    def getCost(self):
+    def getCost(self) -> float:
         return self.cost
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.description
 
 class CappuccinoDecaf: pass
@@ -86,13 +86,12 @@ class CappuccinoWhipped: pass
 class CafeMocha: pass
 class CafeMochaDecaf: pass
 class CafeMochaDecafWhipped:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cost = 1.25
-        self.description = \
-          "Cafe Mocha decaf whipped cream"
-    def getCost(self):
+        self.description = "Cafe Mocha decaf whipped cream"
+    def getCost(self) -> float:
         return self.cost
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.description
 
 class CafeMochaExtraEspresso: pass
@@ -111,12 +110,10 @@ class CafeLatteWetWhipped: pass
 class CafeLatteWhipped: pass
 
 cappuccino = Cappuccino()
-print((cappuccino.getDescription() + ": $" +
-  `cappuccino.getCost()`))
+print(cappuccino.getDescription() + ": $" + repr(cappuccino.getCost()))
 
 cafeMocha = CafeMochaDecafWhipped()
-print((cafeMocha.getDescription()
-  + ": $" + `cafeMocha.getCost()`))
+print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getCost()))
 ```
 
 And here is the corresponding output:
@@ -156,19 +153,20 @@ the `DrinkComponent` interface, an Espresso looks like this:
 
 ```python
 # Decorator/alldecorators/EspressoDecorator.py
+from CoffeeShop import Decorator, DrinkComponent
+
 
 class Espresso(Decorator):
-    cost = 0.75f
+    cost = 0.75
     description = " espresso"
-    def __init__(DrinkComponent):
+    def __init__(self, component: DrinkComponent) -> None:
         Decorator.__init__(self, component)
 
-    def getTotalCost(self):
-        return self.component.getTotalCost() + cost
+    def getTotalCost(self) -> float:
+        return self.component.getTotalCost() + self.cost
 
-    def getDescription(self):
-        return self.component.getDescription() +
-            description
+    def getDescription(self) -> str:
+        return self.component.getDescription() + self.description
 ```
 
 You combine the components to create a drink as follows, as shown in the
@@ -179,63 +177,63 @@ code below:
 # Coffee example using decorators
 
 class DrinkComponent:
-    def getDescription(self):
+    cost: float = 0.0
+    def getDescription(self) -> str:
         return self.__class__.__name__
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.__class__.cost
 
 class Mug(DrinkComponent):
     cost = 0.0
 
 class Decorator(DrinkComponent):
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         self.component = drinkComponent
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.component.getTotalCost() + \
           DrinkComponent.getTotalCost(self)
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.component.getDescription() + \
           ' ' + DrinkComponent.getDescription(self)
 
 class Espresso(Decorator):
     cost = 0.75
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Decaf(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class FoamedMilk(Decorator):
     cost = 0.25
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class SteamedMilk(Decorator):
     cost = 0.25
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Whipped(Decorator):
     cost = 0.25
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Chocolate(Decorator):
     cost = 0.25
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
-cappuccino = Espresso(FoamedMilk(Mug()))
-print(cappuccino.getDescription().strip() + \)
-  ": $" + `cappuccino.getTotalCost()`
+if __name__ == "__main__":
+    cappuccino = Espresso(FoamedMilk(Mug()))
+    print(cappuccino.getDescription().strip() + ": $" +
+          repr(cappuccino.getTotalCost()))
 
-cafeMocha = Espresso(SteamedMilk(Chocolate(
-  Whipped(Decaf(Mug())))))
-
-print(cafeMocha.getDescription().strip() + \)
-  ": $" + `cafeMocha.getTotalCost()`
+    cafeMocha = Espresso(SteamedMilk(Chocolate(Whipped(Decaf(Mug())))))
+    print(cafeMocha.getDescription().strip() + ": $" +
+          repr(cafeMocha.getTotalCost()))
 ```
 
 This approach would certainly provide the most flexibility and the
@@ -274,9 +272,10 @@ selection:
 # combinations and decorators
 
 class DrinkComponent:
-    def getDescription(self):
+    cost: float = 0.0
+    def getDescription(self) -> str:
         return self.__class__.__name__
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.__class__.cost
 
 class Espresso(DrinkComponent):
@@ -295,47 +294,45 @@ class CafeMocha(DrinkComponent):
     cost = 1.25
 
 class Decorator(DrinkComponent):
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         self.component = drinkComponent
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.component.getTotalCost() + \
           DrinkComponent.getTotalCost(self)
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.component.getDescription() + \
           ' ' + DrinkComponent.getDescription(self)
 
 class ExtraEspresso(Decorator):
     cost = 0.75
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Whipped(Decorator):
     cost = 0.50
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Decaf(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Dry(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Wet(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 cappuccino = Cappuccino()
-print(cappuccino.getDescription() + ": $" + \)
-  `cappuccino.getTotalCost()`
+print(cappuccino.getDescription() + ": $" + repr(cappuccino.getTotalCost()))
 
 cafeMocha = Whipped(Decaf(CafeMocha()))
-print(cafeMocha.getDescription() + ": $" + \)
-  `cafeMocha.getTotalCost()`
+print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getTotalCost()))
 ```
 
 You can see that creating a basic selection is quick and easy, which

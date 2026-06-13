@@ -4,13 +4,6 @@
 # One forward-slash relative path per line.
 
 CodeManager.py
-Decorator/alldecorators/CoffeeShop.py
-Decorator/alldecorators/EspressoDecorator.py
-Decorator/compromise/CoffeeShop.py
-Decorator/nodecorators/CoffeeShop.py
-Factory/shapefact2/ShapeFactory2.py
-FunctionObjects/ChainOfResponsibility.py
-Messenger/MessengerIdiom.py
 Metaprogramming/Final.py
 Metaprogramming/GreenHouse.py
 Metaprogramming/NewVSInit.py
@@ -61,4 +54,3 @@ UnitTesting/UnitTest.py
 UnitTesting/testable/Testable.py
 Util/Observer.py
 Util/TestSynchronization.py
-Util/TypedIterator.py

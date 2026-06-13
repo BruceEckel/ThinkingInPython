@@ -3,9 +3,10 @@
 # combinations and decorators
 
 class DrinkComponent:
-    def getDescription(self):
+    cost: float = 0.0
+    def getDescription(self) -> str:
         return self.__class__.__name__
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.__class__.cost
 
 class Espresso(DrinkComponent):
@@ -24,44 +25,42 @@ class CafeMocha(DrinkComponent):
     cost = 1.25
 
 class Decorator(DrinkComponent):
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         self.component = drinkComponent
-    def getTotalCost(self):
+    def getTotalCost(self) -> float:
         return self.component.getTotalCost() + \
           DrinkComponent.getTotalCost(self)
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self.component.getDescription() + \
           ' ' + DrinkComponent.getDescription(self)
 
 class ExtraEspresso(Decorator):
     cost = 0.75
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Whipped(Decorator):
     cost = 0.50
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Decaf(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Dry(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 class Wet(Decorator):
     cost = 0.0
-    def __init__(self, drinkComponent):
+    def __init__(self, drinkComponent: DrinkComponent) -> None:
         Decorator.__init__(self, drinkComponent)
 
 cappuccino = Cappuccino()
-print(cappuccino.getDescription() + ": $" + \)
-  `cappuccino.getTotalCost()`
+print(cappuccino.getDescription() + ": $" + repr(cappuccino.getTotalCost()))
 
 cafeMocha = Whipped(Decaf(CafeMocha()))
-print(cafeMocha.getDescription() + ": $" + \)
-  `cafeMocha.getTotalCost()`
+print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getTotalCost()))
