@@ -3,14 +3,6 @@
 # CI uses this with --baseline to fail only on NEW breakage.
 # One forward-slash relative path per line.
 
-Metaprogramming/Final.py
-Metaprogramming/NewVSInit.py
-Metaprogramming/RegisterLeafClasses.py
-Metaprogramming/SimpleMeta1.py
-Metaprogramming/SimpleMeta2.py
-Metaprogramming/SimpleMeta3.py
-Metaprogramming/Singleton.py
-Metaprogramming/SingletonDecorator.py
 Observer/BoxObserver.py
 PatternRefactoring/clip1.py
 PatternRefactoring/clip3.py

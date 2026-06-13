@@ -1,29 +1,26 @@
 # Metaprogramming/Final.py
-# Emulating Java's 'final'
+# Preventing inheritance with __init_subclass__, no metaclass required.
 
-class final(type):
-    def __init__(cls, name, bases, namespace):
-        super(final, cls).__init__(name, bases, namespace)
-        for klass in bases:
-            if isinstance(klass, final):
-                raise TypeError(str(klass.__name__) + " is final")
 
-class A(object):
+class A:
     pass
+
 
 class B(A):
-    __metaclass__= final
+    # Make B final: any attempt to subclass it fails at class creation.
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        raise TypeError(f"{B.__name__} is final; you cannot subclass it")
 
-print B.__bases__
-print isinstance(B, final)
 
-# Produces compile-time error:
-class C(B):
-    pass
+print(B.__bases__)
+
+try:
+    class C(B):
+        pass
+except TypeError as error:
+    print(error)
 
 """ Output:
 (<class '__main__.A'>,)
-True
-...
-TypeError: B is final
+B is final; you cannot subclass it
 """

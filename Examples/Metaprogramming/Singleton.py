@@ -1,30 +1,35 @@
 # Metaprogramming/Singleton.py
+# A Singleton metaclass: intercept instance creation through __call__.
+from typing import Any
+
 
 class Singleton(type):
-    instance = None
-    def __call__(cls, *args, `kw):
-        if not cls.instance:
-             cls.instance = super(Singleton, cls).__call__(*args, `kw)
-        return cls.instance
+    _instances: dict[type, Any] = {}
 
-class ASingleton(object):
-    __metaclass__ = Singleton
+    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class ASingleton(metaclass=Singleton):
+    pass
+
+
+class BSingleton(metaclass=Singleton):
+    pass
+
 
 a = ASingleton()
 b = ASingleton()
 assert a is b
-print(a.__class__.__name__, b.__class__.__name__)
-
-class BSingleton(object):
-    __metaclass__ = Singleton
 
 c = BSingleton()
 d = BSingleton()
 assert c is d
-print(c.__class__.__name__, d.__class__.__name__)
-assert c is not a
+assert a is not c
+print(a.__class__.__name__, c.__class__.__name__)
 
 """ Output:
-('ASingleton', 'ASingleton')
-('BSingleton', 'BSingleton')
+ASingleton BSingleton
 """

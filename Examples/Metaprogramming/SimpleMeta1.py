@@ -1,21 +1,26 @@
 # Metaprogramming/SimpleMeta1.py
-# Two-step metaclass creation in Python 2.x
+# Writing a metaclass and applying it with the `metaclass=` keyword.
+from typing import Any
+
 
 class SimpleMeta1(type):
-    def __init__(cls, name, bases, nmspc):
-        super(SimpleMeta1, cls).__init__(name, bases, nmspc)
-        cls.uses_metaclass = lambda self: "Yes!"
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 nmspc: dict[str, Any]) -> None:
+        super().__init__(name, bases, nmspc)
+        setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
-class Simple1(object):
-    __metaclass__ = SimpleMeta1
-    def foo(self): pass
+
+class Simple1(metaclass=SimpleMeta1):
+    def foo(self) -> None: pass
+
     @staticmethod
-    def bar(): pass
+    def bar() -> None: pass
+
 
 simple = Simple1()
-print([m for m in dir(simple) if not m.startswith('__')])
-# A new method has been injected by the metaclass:
-print simple.uses_metaclass()
+print([m for m in dir(simple) if not m.startswith("__")])
+# A method injected by the metaclass:
+print(simple.uses_metaclass())  # type: ignore
 
 """ Output:
 ['bar', 'foo', 'uses_metaclass']
