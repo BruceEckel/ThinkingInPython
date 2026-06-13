@@ -1,66 +1,100 @@
 # Application Frameworks
 
-An application framework allows you to inherit from a class or set of
-classes and create a new application, reusing most of the code in the
-existing classes and overriding one or more methods in order to
-customize the application to your needs. A fundamental concept in the
-application framework is the *Template Method* which is typically hidden
-beneath the covers and drives the application by calling the various
-methods in the base class (some of which you have overridden in order to
-create the application).
+An application framework lets you build a new application by reusing existing
+classes and overriding one or more methods to customize the behavior. At the
+heart of a framework is the *Template Method*: a method, defined in the base
+class, that drives the application by calling other base-class methods, some of
+which you override.
 
-For example, whenever you create an applet you're using an application
-framework: you inherit from `JApplet` and then override `init()`.
-The applet mechanism (which is a *Template Method*) does the rest by
-drawing the screen, handling the event loop, resizing, etc.
+Python's own `unittest` is an application framework of this kind. You subclass
+`TestCase` and supply `setUp()`, your `test_*` methods, and `tearDown()`. The
+framework's runner is the template method: it calls `setUp()`, then your test,
+then `tearDown()`, for each test, and you never call that sequence yourself.
 
 ## Template Method
 
-An important characteristic of the *Template Method* is that it is
-defined in the base class and cannot be changed. It's sometimes a
-`private` method but it's virtually always `final`. It calls other
-base-class methods (the ones you override) in order to do its job, but
-it is usually called only as part of an initialization process (and thus
-the client programmer isn't necessarily able to call it directly):
+The defining trait of a Template Method is that the *shape* of the algorithm is
+fixed in the base class, while the individual steps are left open for subclasses
+to fill in. In languages with `final`, the template method is locked so a
+subclass cannot change the overall flow. Python has no `final` keyword (the
+Singleton and Metaprogramming chapters show how it is emulated when truly
+needed), so here it is a matter of convention: the base defines the algorithm,
+subclasses define the steps.
 
 ```python
 # AppFrameworks/TemplateMethod.py
 # Simple demonstration of Template Method.
 
 class ApplicationFramework:
-    def __init__(self):
-        self.__templateMethod()
-    def __templateMethod(self):
-        for i in range(5):
+    def __init__(self) -> None:
+        self.run()
+
+    # The fixed algorithm. Subclasses supply the steps, not the flow:
+    def run(self) -> None:
+        for _ in range(2):
             self.customize1()
             self.customize2()
 
-# Create an "application":
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+
+# Create an "application" by filling in the steps:
 class MyApp(ApplicationFramework):
-    def customize1(self):
-        print("Nudge, nudge, wink, wink! ",)
-    def customize2(self):
-        print("Say no more, Say no more!")
+    def customize1(self) -> None:
+        print("Nudge, nudge, wink, wink!")
+
+    def customize2(self) -> None:
+        print("Say no more, say no more!")
+
 
 MyApp()
 ```
 
-The base-class constructor is responsible for performing the necessary
-initialization and then starting the "engine" (the template method) that
-runs the application (in a GUI application, this "engine" would be the
-main event loop). The client programmer simply provides definitions for
-`customize1()` and `customize2()` and the "application" is ready
-to run.
+The base-class constructor starts the engine (`run()`), which drives the
+application. The client supplies `customize1()` and `customize2()`, and the
+application runs. In a GUI program that engine would be the main event loop.
 
-We'll see *Template Method* numerous other times throughout the book.
+## Passing the Steps as Functions
+
+Subclassing is one way to supply the varying steps, but not the only one. Because
+Python functions are first-class, you can pass the steps in directly, with no
+subclass at all:
+
+```python
+# AppFrameworks/template_function.py
+# The same Template Method, with the varying steps passed as functions
+# instead of supplied by a subclass.
+from collections.abc import Callable
+
+
+def run_framework(customize1: Callable[[], None],
+                  customize2: Callable[[], None]) -> None:
+    for _ in range(2):   # the fixed algorithm
+        customize1()
+        customize2()
+
+
+run_framework(
+    lambda: print("Nudge, nudge, wink, wink!"),
+    lambda: print("Say no more, say no more!"),
+)
+```
+
+Both versions hold the algorithm fixed and let the steps vary, which is the whole
+point of Template Method. Choose based on what the steps need. If they share
+state, build on each other, or come as a coherent group, the subclass is clearer.
+If each step is independent, passing functions is lighter and avoids a class
+hierarchy. This is the same trade-off seen in the Function Objects chapter: a
+hook that holds no state is usually better as a function than as a method to
+override.
 
 ## Exercises
 
-1.  Create a framework that takes a list of file names on the command
-    line. It opens each file except the last for reading, and the last
-    for writing. The framework will process each input file using an
-    undetermined policy and write the output to the last file. Inherit
-    to customize this framework to create two separate applications:
+1.  Create a framework that takes a list of file names. It opens each file except
+    the last for reading and the last for writing, processes each input file by
+    an undetermined policy, and writes the output to the last file. Customize it
+    two ways, once by subclassing and once by passing a function:
 
-    > 1.  Converts all the letters in each file to uppercase.
-    > 2.  Searches the files for words given in the first file.
+    > 1.  Convert all the letters in each file to uppercase.
+    > 2.  Search the files for words given in the first file.

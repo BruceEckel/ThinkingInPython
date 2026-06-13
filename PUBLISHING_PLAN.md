@@ -226,9 +226,9 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
 | P2-* | Code modernization (per subtree) | DONE (baseline 67 → 0; every example runs, CI gate is now strict) |
 | P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
-| P3-2 | Stub chapter decisions | IN PROGRESS (author-approved: cut 08/10/21 DONE; 11 Messenger reframed; 04 Static Type Checking drafted (revoice pending); 14 keep + P4 reframe pending; 12/26 keep) |
+| P3-2 | Stub chapter decisions | DONE (cut 08/10/21; 11 Messenger reframed; 04 Static Type Checking drafted, revoice pending; 14 kept + reframed; 12/26 kept). No empty stubs remain. |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
-| P4-* | Pattern reframe (per chapter 12–26) | IN PROGRESS (done: 13 Singleton, 15 Fronting, 16 State Machines, 17 Iterators, 18 Factory, 19 Function Objects, 20 Changing the Interface, 22 Observer, 23 Multiple Dispatching, 24 Visitor, 25 Pattern Refactoring; remaining: 12 Pattern Concept, 14 App Frameworks, 21 Table-Driven Code, 26 Simulation — conceptual/stub) |
+| P4-* | Pattern reframe (per chapter 12–26) | DONE (reframed: 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25. 21 cut. 12 Pattern Concept is conceptual (editorial only); 26 Simulation kept as-is, not a GoF pattern.) |
 | P5-1 | Editorial sweep | PARTIAL (em-dashes removed from all prose, grep clean; front-matter date → 2026; cross-references now use standard relative `.md` links that the site rewrites to `.html`, and all resolve). Remaining: a deeper proofread (hyphen-as-dash like `types-you`, dated "Python 2.2" asides) and the dangling `[Virtual Environments]` reference points to a chapter that does not exist yet (P3-2). |
 
 ### P2 detail: what is done and what remains
