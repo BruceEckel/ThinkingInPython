@@ -4,7 +4,6 @@
 # One forward-slash relative path per line.
 
 Metaprogramming/Final.py
-Metaprogramming/GreenHouse.py
 Metaprogramming/NewVSInit.py
 Metaprogramming/RegisterLeafClasses.py
 Metaprogramming/SimpleMeta1.py
