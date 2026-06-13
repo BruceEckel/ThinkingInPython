@@ -41,7 +41,7 @@ Python is very clean to write and especially to read. You will find that it's
 quite easy to read your own code long after you've written it, and also to
 read other people's code. This is accomplished partially through clean, to-
 the-point syntax, but a major factor in code readability is
-indentation---scoping in Python is determined by indentation. For example:
+indentation: scoping in Python is determined by indentation. For example:
 
 ```python
 # Py4Prog/if.py
@@ -68,7 +68,7 @@ to standard output, followed by an assignment to a variable named `val`. The
 subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level, just like curly braces in C++ or Java, but
 unlike those languages there is no option (and no argument) about where the
-braces are placed---the compiler forces everyone's code to be formatted the
+braces are placed; the compiler forces everyone's code to be formatted the
 same way, which is one of the main reasons for Python's consistent
 readability.
 
@@ -104,14 +104,14 @@ for x in list:
 The first line creates a list. You can print the list and it will look exactly
 as you put it in (in contrast, remember that I had to create a special
 `Arrays2` class in *Thinking in Java* in order to print arrays in Java). Lists
-are like Java containers---you can add new elements to them (here, `append()`
+are like Java containers: you can add new elements to them (here, `append()`
 is used) and they will automatically resize themselves. The `for` statement
 creates an iterator `x` which takes on each value in the list.
 
 You can create a list of numbers with the `range()` function, so if you really
 need to imitate C's `for`, you can.
 
-Notice that there aren't any type declarations---the object names simply
+Notice that there aren't any type declarations: the object names simply
 appear, and Python infers their type by the way that you use them. It's as if
 Python is designed so that you only need to press the keys that absolutely
 must. You'll find after you've worked with Python for a short while that
@@ -122,8 +122,8 @@ supposed to do.
 
 ## Naming Conventions
 
-Although naming conventions are more detailed than this---you can find them in
-[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)---the
+Although naming conventions are more detailed than this (you can find them in
+[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)), the
 basic strategy for naming is to use "snake-case" for identifiers, functions
 and file names. This means lower case with words separated by underscores, as
 in `this_is_snake_case`.
@@ -141,7 +141,7 @@ pointed out) using tools such as
 [AutoPEP8](https://pypi.python.org/pypi/autopep8) or
 [YAPF](https://github.com/google/yapf).
 
-**Note**: File names have no relationship to what they contain---you can name
+**Note**: File names have no relationship to what they contain: you can name
 them whatever makes sense to you.
 
 ## Functions
@@ -165,7 +165,7 @@ print(my_function("no"))
 print(my_function("yes"))
 ```
 
-Notice there is no type information in the function signature---all it
+Notice there is no type information in the function signature: all it
 specifies is the name of the function and the argument identifiers, but no
 argument types or return types. Python is a *structurally-typed* language,
 which means it puts the minimum possible requirements on typing. For example,
@@ -250,7 +250,7 @@ print(s)
 
 As you can see in the second case, if you have more than one argument
 you surround them in parentheses (this forms a *tuple*, which is a list
-that cannot be modified---you can also use regular lists for multiple
+that cannot be modified; you can also use regular lists for multiple
 arguments, but tuples are typical).
 
 All the formatting from `printf()` is available, including control
@@ -335,11 +335,11 @@ if __name__ == "__main__":
 ### Packages
 
 As your programs get larger you'll want to further organize your code into
-*packages*. A package is a directory---and its own namespace, which has the
-name of that directory---that can contain multiple modules.
+*packages*. A package is a directory (and its own namespace, which has the
+name of that directory) that can contain multiple modules.
 
 To make something a package, you put a special file named `__init__.py` in
-that directory. Except in special cases, this file is empty---it is only there
+that directory. Except in special cases, this file is empty; it is only there
 to flag the directory as a package.^[People are often confused by the name
 `__init__.py`. In hindsight, it might have been better to have named the file
 `__package__.py`.]
@@ -479,7 +479,7 @@ identifier you want (if you do not use `self` you will probably confuse a lot
 of people, however). To refer to fields in the object or other methods in the
 object, you must use `self` in the expression. However, when you call a method
 for an object as in `x.show()`, you do not hand it the reference to the
-object---*that* is done for you.
+object; *that* is done for you.
 
 The first method, `__init__()`, defines the constructor (again, the double
 underscores indicate a special name), which is automatically called when the
@@ -491,7 +491,7 @@ call using the class name. Python's spare syntax makes you realize that the
 In C++ or Java you declare object level fields inside the class body but
 outside of the methods. Something that's a little surprising at first is that
 you do not declare them this way in Python. To create an object field, you
-just name it---using `self`---inside one of the methods (usually in the
+just name it, using `self`, inside one of the methods (usually in the
 constructor, but not always), and space is created when that method is run.
 This seems a little strange coming from C++ or Java where you must decide
 ahead of time how much space your object is going to occupy, but it turns out
@@ -506,7 +506,7 @@ interfaces -all it cares about is applying operations to objects (in
 fact, Java's `interface` keyword would be wasted in Python). This
 means that inheritance in Python is different from inheritance in C++ or
 Java, where you often inherit simply to establish a common interface. In
-Python, the only reason you inherit is to inherit an implementation---to
+Python, the only reason you inherit is to inherit an implementation, to
 re-use the code in the base class.
 
 To inherit from a class, you must tell Python to bring that class into your
@@ -528,7 +528,7 @@ from module import name(s)
 
 Where "name(s)" can be a list of names separated by commas.
 
-You inherit a class (or classes---Python supports multiple inheritance)
+You inherit a class (or classes, since Python supports multiple inheritance)
 by listing the name(s) of the class inside parentheses after the name of
 the inheriting class. Note that the `Simple` class, which resides in
 the file (and thus, module) named `simple_class` is brought into this
@@ -599,7 +599,7 @@ an object of a class derived from `Simple` and one that isn't, without
 discrimination. If you're a C++ programmer, you should see that the
 objective of the C++ `template` feature is exactly this: to provide
 weak typing in a strongly-typed language. Thus, in Python you
-automatically get the equivalent of templates---without having to learn
+automatically get the equivalent of templates, without having to learn
 that particularly difficult syntax and semantics.
 
 > (Reader) I am not sure if I agree with the remark about templates. One of the

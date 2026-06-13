@@ -125,7 +125,7 @@ presented in *Design Patterns*.
 ## Pattern Taxonomy
 
 One of the events that's occurred with the rise of design patterns is
-what could be thought of as the "pollution" of the term---people have
+what could be thought of as the "pollution" of the term: people have
 begun to use the term to mean just about anything synonymous with
 "good." After some pondering, I've come up with a sort of hierarchy
 describing a succession of different types of categories:
@@ -147,7 +147,7 @@ describing a succession of different types of categories:
 I feel this helps put things in perspective, and to show where something
 might fit. However, it doesn't say that one is better than another. It
 doesn't make sense to try to take every problem solution and generalize
-it to a design pattern---it's not a good use of your time, and you can't
+it to a design pattern; it's not a good use of your time, and you can't
 force the discovery of patterns that way; they tend to be subtle and
 appear over time.
 
@@ -157,7 +157,7 @@ One could also argue for the inclusion of *Analysis Pattern* and
 ## Design Structures
 
 One of the struggles that I've had with design patterns is their
-classification---I've often found the GoF approach to be too obscure,
+classification. I've often found the GoF approach to be too obscure,
 and not always very helpful. Certainly, the *Creational* patterns are
 fairly straightforward: how are you going to create your objects? This
 is a question you normally need to ask, and the name brings you right to
@@ -180,7 +180,7 @@ to try to see if there's a way to relate those structures to the various
 design patterns that appear in well thought-out systems. Currently, I'm
 just trying to make a list, but eventually I hope to make steps towards
 connecting these structures with patterns (or I may come up with a
-different approach altogether---this is still in its formative stages).
+different approach altogether; this is still in its formative stages).
 
 Here^[This list includes suggestions by Kevlin Henney, David Scott, and
 others.] is the present list of candidates, only some of which will make it
@@ -224,7 +224,7 @@ your proposed design, to apply tests for quality.
     independently. This complements Separation, Encapsulation and
     Variation, and is part of the Low-Coupling-High-Cohesion message.
 -   *Managed Coupling*. Simply stating that we should have "low
-    coupling" in a design is usually too vague---coupling happens, and
+    coupling" in a design is usually too vague; coupling happens, and
     the important issue is to acknowledge it and control it, to say
     "coupling can cause problems" and to compensate for those problems
     with a well-considered design or pattern.

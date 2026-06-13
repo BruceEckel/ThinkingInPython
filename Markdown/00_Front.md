@@ -8,7 +8,7 @@ creator:
   text: Bruce Eckel
 publisher: MindView LLC
 language: eng
-date: 2017
+date: 2026
 subject: Computer Programming
 subject: Python Programming Language
 ...
@@ -30,6 +30,6 @@ damages in connection with or arising out of the use of the information or
 programs contained herein.
 
 This book was created as an eBook for tablets and computers. That is, it was *not*
-first created for print and then converted. It is an eBook first---all layout
+first created for print and then converted. It is an eBook first: all layout
 and formatting is designed to optimize your viewing experience on the various
 eBook reading platforms and systems.

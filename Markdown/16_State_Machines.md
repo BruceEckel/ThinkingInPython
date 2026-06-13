@@ -46,7 +46,7 @@ called for a derived type, and they hadn't been implemented.
 The `StateMachine` keeps track of the current state, which is
 initialized by the constructor. The `runAll()` method takes a list of
 `Input` objects. This method not only moves to the next state, but it
-also calls `run()` for each state object---thus you can see it's an
+also calls `run()` for each state object; thus you can see it's an
 expansion of the idea of the `State` pattern, since `run()` does
 something different depending on the state that the system is in:
 
@@ -68,7 +68,7 @@ class StateMachine:
 ```
 
 I've also treated `runAll()` as a template method. This is typical,
-but certainly not required---you could concievably want to override it,
+but certainly not required; you could concievably want to override it,
 but typically the behavior change will occur in `State`'s `run()`
 instead.
 
@@ -332,7 +332,7 @@ mouseMoves = [MouseAction(m) for m in moves]
 MouseTrap().runAll(mouseMoves)
 ```
 
-The rest of the code is identical---the difference is in the `next()`
+The rest of the code is identical; the difference is in the `next()`
 methods and the `StateT` class.
 
 If you have to create and maintain a lot of `State` classes, this
@@ -579,7 +579,7 @@ language like Python, but there are also free, open-source tools such as
     arguments. Create a `MouseMoveGenerator` which produces correct
     `MouseMove` actions as outputs each time the generator function is
     called (that is, the mouse must move in the proper sequence, thus
-    the possible moves are based on the previous move---it's another
+    the possible moves are based on the previous move; it's another
     state machine). Add a method to produce an iterator, but this method
     should take an `int` argument that specifies the number of moves
     to produce before `hasNext()` returns `false`.

@@ -27,7 +27,7 @@ Tradeoff: coding is more complicated when using decorators
 ## A Coffee Example
 
 Consider going down to the local coffee shop, *BeanMeUp*, for a coffee.
-There are typically many different drinks on offer -- espressos, lattes,
+There are typically many different drinks on offer: espressos, lattes,
 teas, iced coffees, hot chocolate to name a few, as well as a number of
 extras (which cost extra too) such as whipped cream or an extra shot of
 espresso. You can also make certain changes to your drink at no extra
@@ -38,7 +38,7 @@ combinations, there will be sizeable class diagrams. So for clarity we
 will only consider a subset of the coffees: Espresso, Espresso Con
 Panna, Café Late, Cappuccino and Café Mocha. We'll include 2 extras -
 whipped cream ("whipped") and an extra shot of espresso; and three
-changes---decaf, steamed milk ("wet") and foamed milk ("dry").
+changes: decaf, steamed milk ("wet") and foamed milk ("dry").
 
 ## Class for Each Combination
 
@@ -344,7 +344,7 @@ What happens if we decide to change the menu at a later stage, such as
 by adding a new type of drink? If we had used the class per combination
 approach, the effect of adding an extra such as syrup would be an
 exponential growth in the number of classes. However, the implications
-to the all decorator or compromise approaches are the same---one extra
+to the all decorator or compromise approaches are the same: one extra
 class is created.
 
 How about the effect of changing the cost of steamed milk and foamed

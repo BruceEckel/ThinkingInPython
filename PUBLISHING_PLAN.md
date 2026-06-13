@@ -216,7 +216,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
 | P4-* | Pattern reframe (per chapter 12–26) | IN PROGRESS (done: 13 Singleton, 15 Fronting, 16 State Machines, 17 Iterators, 18 Factory, 19 Function Objects, 20 Changing the Interface, 22 Observer, 23 Multiple Dispatching, 24 Visitor, 25 Pattern Refactoring; remaining: 12 Pattern Concept, 14 App Frameworks, 21 Table-Driven Code, 26 Simulation — conceptual/stub) |
-| P5-1 | Editorial sweep | TODO |
+| P5-1 | Editorial sweep | PARTIAL (em-dashes removed from all prose, grep clean; front-matter date → 2026). Remaining: cross-reference resolution (needs a link convention; depends on P3-2 chapter decisions) and a deeper proofread (hyphen-as-dash like `types-you`, dated "Python 2.2" asides). |
 
 ### P2 detail: what is done and what remains
 

@@ -30,5 +30,4 @@ the `dict` that is automatically created by the ``kwargs` argument.
 
 Although one could easily create a `Messenger` class and put it into a
 library and import it, there are so few lines to describe it that it
-usually makes more sense to just define it in-place whenever you need it
--- it is probably easier for the reader to follow, as well.
+usually makes more sense to just define it in-place whenever you need it. It is probably easier for the reader to follow, as well.

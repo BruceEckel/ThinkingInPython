@@ -5,7 +5,7 @@ programming in Python. Although the first chapter in the book is [Python for
 Programmers], this is not intended to be an introductory Python book (there
 are plenty of excellent Python tutorials and online learning resources). The
 remaining chapters assume you have an adequate grasp of the language and can
-follow along---this might require that you study other resources if there are
+follow along. This might require that you study other resources if there are
 language features you don't understand.
 
 You can think of this as an "intermediate" or "somewhat advanced" book, but
