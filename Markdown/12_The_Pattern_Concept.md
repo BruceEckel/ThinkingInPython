@@ -1,5 +1,4 @@
-The Pattern Concept
-===================
+# The Pattern Concept
 
 "Design patterns help you learn from others' successes instead of your
 own failures."^[From Mark Johnson.]
@@ -20,8 +19,7 @@ you can look at that evolution as a prototype for the way your own
 design can start as an adequate solution to a particular problem and
 evolve into a flexible approach to a class of problems.
 
-What is a Pattern?
-------------------
+## What is a Pattern?
 
 Initially, you can think of a pattern as an especially clever and
 insightful way of solving a particular class of problems. That is, it
@@ -80,8 +78,7 @@ of the elements in a sequence without regard to the way that sequence is
 built. Thus your generic code can be used with any object that can
 produce an iterator.
 
-Classifying Patterns
---------------------
+## Classifying Patterns
 
 The *Design Patterns* book discusses 23 different patterns, classified
 under three purposes (all of which revolve around the particular aspect
@@ -125,8 +122,7 @@ terms of these structural principles. This book will attempt to present
 the patterns based on their structure instead of the categories
 presented in *Design Patterns*.
 
-Pattern Taxonomy
-----------------
+## Pattern Taxonomy
 
 One of the events that's occurred with the rise of design patterns is
 what could be thought of as the "pollution" of the term---people have
@@ -158,8 +154,7 @@ appear over time.
 One could also argue for the inclusion of *Analysis Pattern* and
 *Architectural Pattern* in this taxonomy.
 
-Design Structures
------------------
+## Design Structures
 
 One of the struggles that I've had with design patterns is their
 classification---I've often found the GoF approach to be too obscure,
@@ -207,8 +202,7 @@ relationships with patterns.
 -   **Shadow**: "follows your movement and does something different in a different
 medium" (May be a variation on Proxy).
 
-Design Principles
------------------
+## Design Principles
 
 When I put out a call for ideas, a number of suggestions came back which
 turned out to be very useful, but different than the above classification, and
@@ -264,8 +258,7 @@ you analyze a problem. However, other ideas that come from this list may
 end up being useful as a checklist while walking through and analyzing
 your design.
 
-Further Reading
----------------
+## Further Reading
 
 - Alex Martelli's Video Lectures on Design Patterns in Python:
 <http://www.catonmat.net/blog/learning-python-design-patterns-through-video-lectures/>

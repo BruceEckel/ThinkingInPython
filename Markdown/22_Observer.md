@@ -1,5 +1,4 @@
-Observer
-========
+# Observer
 
 > Decoupling code behavior
 
@@ -73,8 +72,7 @@ that sets the "changed" flag, which means that when you call
 `notifyObservers()` all of the observers will, in fact, get notified.
 *Where* you call `setChanged()` depends on the logic of your program.
 
-Observing Flowers
------------------
+## Observing Flowers
 
 Since Python doesn't have standard library components to support the
 observer pattern (like Java does), we must first create one. The

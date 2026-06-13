@@ -1,5 +1,4 @@
-Function Objects
-================
+# Function Objects
 
 In *Advanced C++:Programming Styles And Idioms (Addison-Wesley, 1992)*,
 Jim Coplien coins the term *functor* which is an object whose sole
@@ -12,8 +11,7 @@ This term is mentioned but not used in *Design Patterns*. However, the
 theme of the function object is repeated in a number of patterns in that
 book.
 
-Command: Choosing the Operation at Runtime
-------------------------------------------
+## Command: Choosing the Operation at Runtime
 
 This is the function object in its purest sense: a method that's an object^[In
 Python, all functions are already objects and so the *Command* pattern is
@@ -73,8 +71,7 @@ method or object, and are not otherwise connected over time to the *Command*
 object. That's my take on it, anyway. Later in this book, I combine a group of
 design patterns under the heading of "callbacks."
 
-Strategy: Choosing the Algorithm at Runtime
--------------------------------------------
+## Strategy: Choosing the Algorithm at Runtime
 
 *Strategy* appears to be a family of *Command* classes, all inherited
 from the same base. But if you look at *Command*, you'll see that it has
@@ -147,8 +144,7 @@ Note: A better, real world example is numerical integration, shown here:
 
 -   <http://www.rosettacode.org/wiki/Numerical_Integration#Python>
 
-Chain of Responsibility
------------------------
+## Chain of Responsibility
 
 *Chain of Responsibility* might be thought of as a dynamic
 generalization of recursion using *Strategy* objects. You make a call,
@@ -298,8 +294,7 @@ line = LineData([
 print(solutions[0](line))
 ```
 
-Exercises
----------
+## Exercises
 
 1.  Use *Command* in Chapter 3, Exercise 1.
 2.  Implement *Chain of Responsibility* to create an "expert system"

@@ -1,5 +1,4 @@
-Generators and Iterators
-========================
+# Generators and Iterators
 
 and Itertools
 

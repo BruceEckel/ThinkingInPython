@@ -1,5 +1,4 @@
-Iterators
-=========
+# Iterators
 
 > Decoupling Algorithms from Containers
 
@@ -37,8 +36,7 @@ excellent candidates for generic/functional programming techniques. This
 chapter will explore these techniques by converting the STL algorithms
 to Java, for use with the Java 2 container library.
 
-Type-Safe Iterators
--------------------
+## Type-Safe Iterators
 
 In *Thinking in Java*, I show the creation of a type-safe container that
 will only accept a particular type of object. A reader, Linda Pazzaglia,

@@ -1,5 +1,4 @@
-Application Frameworks
-======================
+# Application Frameworks
 
 An application framework allows you to inherit from a class or set of
 classes and create a new application, reusing most of the code in the
@@ -15,8 +14,7 @@ framework: you inherit from `JApplet` and then override `init()`.
 The applet mechanism (which is a *Template Method*) does the rest by
 drawing the screen, handling the event loop, resizing, etc.
 
-Template Method
----------------
+## Template Method
 
 An important characteristic of the *Template Method* is that it is
 defined in the base class and cannot be changed. It's sometimes a
@@ -56,8 +54,7 @@ to run.
 
 We'll see *Template Method* numerous other times throughout the book.
 
-Exercises
----------
+## Exercises
 
 1.  Create a framework that takes a list of file names on the command
     line. It opens each file except the last for reading, and the last

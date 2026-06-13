@@ -1,5 +1,4 @@
-Python for Programmers
-======================
+# Python for Programmers
 
 This book assumes you're an experienced programmer, and it's best if you
 have learned Python through another book. For everyone else, this
@@ -22,8 +21,7 @@ about object-oriented programming by seeing objects used in many different
 situations. If your knowledge of objects is rudimentary, it will get much
 stronger in the process of understanding the designs in this book.
 
-Scripting vs. Programming
--------------------------
+## Scripting vs. Programming
 
 Python is often referred to as a scripting language, but scripting languages
 tend to be limiting, especially in the scope of the problems that they solve.
@@ -79,8 +77,7 @@ separating them with semicolons), thus no terminating semicolon is necessary.
 Even from the brief example above you can see that the language is designed to
 be as simple as possible, and yet still very readable.
 
-Built-In Containers
--------------------
+## Built-In Containers
 
 With languages like C++ and Java, containers are add-on libraries and not
 integral to the language. In Python, the essential nature of containers for
@@ -123,8 +120,7 @@ and all sorts of other extra verbiage that was demanded by your non-Python
 programming language but didn't actually describe what your program was
 supposed to do.
 
-Naming Conventions
------------------
+## Naming Conventions
 
 Although naming conventions are more detailed than this---you can find them in
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)---the
@@ -148,8 +144,7 @@ pointed out) using tools such as
 **Note**: File names have no relationship to what they contain---you can name
 them whatever makes sense to you.
 
-Functions
----------
+## Functions
 
 To create a function in Python, you use the `def` keyword, followed by the
 function name and argument list, and a colon to begin the function body. Here
@@ -207,8 +202,7 @@ print(sum('spam ', "eggs"))
 When the operator '`+`' is used with strings, it means concatenation (yes,
 Python supports operator overloading, and it does a nice job of it).
 
-Strings
--------
+## Strings
 
 The above example also shows a little bit about Python string handling, which
 is the best of any language I've seen. You can use single or double quotes to
@@ -263,8 +257,7 @@ All the formatting from `printf()` is available, including control
 over the number of decimal places and alignment. Python also has very
 sophisticated regular expressions.
 
-Imports, Namespaces and Packages
---------------------------------
+## Imports, Namespaces and Packages
 
 Each Python file is a *module* that you can use inside another Python file by
 *importing* it. If the file is in the same directory, you can simply use an
@@ -449,8 +442,7 @@ and reports an error).
 environment*, which solves much more than just "where are the modules and
 packages." [Virtual Environments] have their own chapter.
 
-Classes
--------
+## Classes
 
 Like most things in Python, class definitions use minimal syntax. You start
 with the `class` keyword followed by the class name and a colon. Inside the
@@ -615,8 +607,7 @@ that particularly difficult syntax and semantics.
 >     genericity. What python gives us is the genericity. IMHO the
 >     analogy with template mechanism is not appropriate.
 
-Useful Techniques
------------------
+## Useful Techniques
 
 -   You can turn a list into function arguments using `*`:
 
@@ -655,8 +646,7 @@ Compose().f()
 
 Note: Suggest Further Topics for inclusion in the introductory chapter
 
-Further Reading
----------------
+## Further Reading
 
 > Although it is (alas) only for Python 2.7, I still find the [Python Quick
 Reference](http://rgruet.free.fr/#QuickRef) to be incredibly useful.

@@ -1,5 +1,4 @@
-The Singleton
-=============
+# The Singleton
 
 Possibly the simplest design pattern is the *singleton*, which is a way
 to provide one and only one object of a particular type. To accomplish
@@ -270,8 +269,7 @@ print(x is y is z)
 {{ Long, detailed, informative description of what metaclasses are and
 how they work, magically inserted here }}
 
-Exercises
----------
+## Exercises
 
 1.  `SingletonPattern.py` always creates an object, even if it's never
     used. Modify this program to use *lazy initialization*, so the

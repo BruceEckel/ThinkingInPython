@@ -1,8 +1,6 @@
-Initialization and Cleanup
-==========================
+# Initialization and Cleanup
 
-Initialization
---------------
+## Initialization
 
 ### Constructor Calls
 
@@ -64,8 +62,7 @@ def f(self, x):
 This is not a serious example because you would naturally just
 initialize `something` in `Foo`'s constructor.
 
-Cleanup
--------
+## Cleanup
 
 Cleanup happens to globals by setting them to `None` (what about
 locals?). Does the act of setting them to None cause __del__ to be
@@ -159,5 +156,4 @@ Now cleanup happens properly without the need for an explicit call to
 
 What about local variables?
 
-Further Reading
----------------
+## Further Reading

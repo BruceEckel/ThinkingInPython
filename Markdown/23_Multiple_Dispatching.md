@@ -1,5 +1,4 @@
-Multiple Dispatching
-====================
+# Multiple Dispatching
 
 When dealing with multiple types which are interacting, a program can
 get particularly messy. For example, consider a system that parses and

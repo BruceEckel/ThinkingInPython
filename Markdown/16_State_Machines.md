@@ -1,5 +1,4 @@
-State Machines
-==============
+# State Machines
 
 While *State* has a way to allow the client programmer to change the
 implementation, *StateMachine* imposes a structure to automatically
@@ -340,8 +339,7 @@ If you have to create and maintain a lot of `State` classes, this
 approach is an improvement, since it's easier to quickly read and
 understand the state transitions from looking at the table.
 
-Table-Driven State Machine
---------------------------
+## Table-Driven State Machine
 
 The advantage of the previous design is that all the information about a
 state, including the state transition information, is located within the
@@ -719,8 +717,7 @@ for input in [
     vm.nextState(input)
 ```
 
-Tools
------
+## Tools
 
 Another approach, as your state machine gets bigger, is to use an
 automation tool whereby you configure a table and let the tool generate
@@ -728,8 +725,7 @@ the state machine code for you. This can be created yourself using a
 language like Python, but there are also free, open-source tools such as
 *Libero*, at <http://www.imatix.com>.
 
-Exercises
----------
+## Exercises
 
 1.  Create an example of the "virtual proxy."
 2.  Create an example of the "Smart reference" proxy where you keep
@@ -800,8 +796,7 @@ while *State* allows you to change the implementation dynamically.
 However, if you expand your notion of "controlling access to
 implementation" then the two fit neatly together.
 
-Proxy
------
+## Proxy
 
 If we implement *Proxy* by following the above diagram, it looks like
 this:
@@ -868,8 +863,7 @@ completely generic, and not tied to any particular implementation (in
 Java, a rather complicated "dynamic proxy" has been invented to
 accomplish this same thing).
 
-State
------
+## State
 
 The *State* pattern adds more implementations to *Proxy*, along with a
 way to switch from one implementation to another during the lifetime of

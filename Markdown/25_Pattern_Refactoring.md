@@ -1,5 +1,4 @@
-Pattern Refactoring
-===================
+# Pattern Refactoring
 
 This chapter follows one problem through several designs. A first solution
 solves it, then we ask "what will change?" and reshape the design to absorb that
@@ -12,8 +11,7 @@ languages without multiple dispatch. Python removes some of those limitations,
 so a few famous patterns simply dissolve here. We will call that out as it
 happens.
 
-Simulating the Trash Recycler
------------------------------
+## Simulating the Trash Recycler
 
 Trash arrives at the recycling plant mixed together. The program must sort it by
 material and report the total value of each kind. The catch is the one that
@@ -129,8 +127,7 @@ def parse(filename: str) -> list[Trash]:
     return items
 ```
 
-The First Cut: Checking Every Type
-----------------------------------
+## The First Cut: Checking Every Type
 
 The most obvious way to sort is to look at each piece and test what it is. The
 original design used run-time type information (RTTI) for this, and so can we
@@ -174,8 +171,7 @@ trash on the floor. Testing for one type, or a small subset that needs special
 handling, is fine. Testing for all of them means you are doing by hand the job
 that polymorphism exists to do for you.
 
-Let a Dictionary Do the Sorting
--------------------------------
+## Let a Dictionary Do the Sorting
 
 The original chapter spent several designs removing this RTTI: a hierarchy of
 typed bins, then "double dispatch," each adding classes to push the type
@@ -211,8 +207,7 @@ the same idea the original reached only at the very end of the chapter, as a
 `HashMap` of typed lists. Here it is the natural first thing a Python programmer
 writes.
 
-Adding Operations: Visitor, and Why Python Skips It
----------------------------------------------------
+## Adding Operations: Visitor, and Why Python Skips It
 
 So far we have changed *types* cheaply. The other axis of change is adding new
 *operations*. Suppose the `Trash` hierarchy is fixed (maybe it ships from a
@@ -289,8 +284,7 @@ single dispatch. `sum_value` earlier was just a function. Reach for
 operations that belong on the objects and vary by type, `singledispatchmethod`
 does the same thing as a method.
 
-Summary
--------
+## Summary
 
 Watching this problem evolve, notice which patterns survived the move to Python
 and which dissolved:
@@ -312,8 +306,7 @@ isolates it. In Python that construct is often a language feature, not a
 multi-class pattern. The honest measure of a pattern is whether it still earns
 its keep once the language does part of the work for you.
 
-Exercises
----------
+## Exercises
 
 1.  Add a `Plastic` material with a per-pound value. Confirm that
     `recycle_dict.py` and `parse_trash.py` need no changes, and that only

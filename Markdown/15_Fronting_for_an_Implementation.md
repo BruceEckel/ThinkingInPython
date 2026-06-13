@@ -1,5 +1,4 @@
-Fronting for an Implementation
-==============================
+# Fronting for an Implementation
 
 Both *Proxy* and *State* provide a surrogate class that you use in your
 code; the real class that does the work is hidden behind this surrogate
@@ -26,8 +25,7 @@ while *State* allows you to change the implementation dynamically.
 However, if you expand your notion of "controlling access to
 implementation" then the two fit neatly together.
 
-Proxy
------
+## Proxy
 
 If we implement *Proxy* by following the above diagram, it looks like
 this:
@@ -94,8 +92,7 @@ completely generic, and not tied to any particular implementation (in
 Java, a rather complicated "dynamic proxy" has been invented to
 accomplish this same thing).
 
-State
------
+## State
 
 The *State* pattern adds more implementations to *Proxy*, along with a
 way to switch from one implementation to another during the lifetime of

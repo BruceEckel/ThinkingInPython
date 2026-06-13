@@ -1,5 +1,4 @@
-Changing the Interface
-======================
+# Changing the Interface
 
 Sometimes the problem that you're solving is as simple as "I don't have
 the interface that I want." Two of the patterns in *Design Patterns*
@@ -8,8 +7,7 @@ to some other type. *Façade* creates an interface to a set of classes,
 simply to provide a more comfortable way to deal with a library or
 bundle of resources.
 
-Adapter
--------
+## Adapter
 
 When you've got *this*, and you need *that*, *Adapter* solves the
 problem. The only requirement is to produce a *that*, and there are a
@@ -83,8 +81,7 @@ Patterns* they assert that a proxy must have an identical interface with
 the object that it is a surrogate for. However, if you have the two
 words together: "proxy adapter," it is perhaps more reasonable.
 
-Façade
-------
+## Façade
 
 A general principle that I apply when I'm casting about trying to mold
 requirements into a first-cut object is "If something is ugly, hide it
@@ -129,8 +126,7 @@ c = Facade.makeC(1.0);
 
 Example for Facade (?): my "nicer" version of the XML library.
 
-Exercises
----------
+## Exercises
 
 1.  Create an adapter class that automatically loads a two-dimensional
     array of objects into a dictionary as key-value pairs.

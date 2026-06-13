@@ -1,5 +1,4 @@
-Visitor
-=======
+# Visitor
 
 The visitor pattern is implemented using multiple dispatching, but
 people often confuse the two, because they look at the implementation
@@ -83,8 +82,7 @@ for flower in flowerGen(10):
     flower.accept(worm)
 ```
 
-Exercises
----------
+## Exercises
 
 1.  Create a business-modeling environment with three types of
     `Inhabitant`: `Dwarf` (for engineers), `Elf` (for marketers)

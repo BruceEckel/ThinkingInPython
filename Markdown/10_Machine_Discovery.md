@@ -1,5 +1,4 @@
-Machine Discovery
-=================
+# Machine Discovery
 
 > Discovering the Details About Your Platform
 

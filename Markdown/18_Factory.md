@@ -1,5 +1,4 @@
-Factory
-=======
+# Factory
 
 > Encapsulating Object Creation
 
@@ -30,8 +29,7 @@ Since every object-oriented program creates objects, and since it's very
 likely you will extend your program by adding new types, I suspect that
 factories may be the most universally useful kinds of design patterns.
 
-Simple Factory Method
----------------------
+## Simple Factory Method
 
 As an example, let's revisit the `Shape` system.
 
@@ -173,8 +171,7 @@ for shape in shapeNameGen(7):
     shape.erase()
 ```
 
-Polymorphic Factories
----------------------
+## Polymorphic Factories
 
 The static `factory()` method in the previous example forces all the
 creation operations to be focused in one spot, so that's the only place
@@ -264,8 +261,7 @@ Notice that the `ShapeFactory` must be initialized by loading its
 dictionary with factory objects, which takes place in the static
 initialization clause of each of the shape implementations.
 
-Abstract Factories
-------------------
+## Abstract Factories
 
 The *Abstract Factory* pattern looks like the factory objects we've seen
 previously, with not one but several factory methods. Each of the
@@ -418,8 +414,7 @@ classes" like this:
 Then the inheritance serves only to indicate the type of the derived
 classes.
 
-Exercises
----------
+## Exercises
 
 1.  Add a class `Triangle` to `ShapeFactory1.py`
 2.  Add a class `Triangle` to `ShapeFactory2.py`

@@ -1,5 +1,4 @@
-Simulation
-==========
+# Simulation
 
 Note: This chapter has not had any significant translation yet.
 
@@ -7,8 +6,7 @@ A number of more challenging projects for you to solve. {{Some of
 these may turn into examples in the book, and so at some point might
 disappear from here}}
 
-Rats & Mazes
-------------
+## Rats & Mazes
 
 First, create a *Blackboard* (cite reference) which is an object on
 which anyone may record information. This particular blackboard draws a

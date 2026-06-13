@@ -1,5 +1,4 @@
-Metaprogramming
-===============
+# Metaprogramming
 
 Objects are created by other objects: special objects called "classes" that we
 set up to produce objects configured to our liking.
@@ -38,8 +37,7 @@ is a fascinating tool, and the temptation to reach for it is strong, but Python
 Reach for a metaclass only when these cannot do the job. This chapter shows the
 simpler tools first, then metaclasses for the cases that still need them.
 
-Generating Classes with type
-----------------------------
+## Generating Classes with type
 
 Since metaclasses create classes, you can call the metaclass yourself. `type`
 with one argument gives the type of an existing object. `type` with three
@@ -139,8 +137,7 @@ version is easier for most readers to follow, because it looks like ordinary
 class definitions. Reach for `type` only when the dynamic version is genuinely
 clearer than generated source text.
 
-Self-Registration of Subclasses
--------------------------------
+## Self-Registration of Subclasses
 
 A common need is for a base class to keep track of its subclasses, so you can
 enumerate them. This is the textbook reason people used to write a metaclass.
@@ -200,8 +197,7 @@ and removes its base classes, so only the current leaves remain. No metaclass
 is involved. `__init_subclass__` is implicitly a class method; its first
 argument is the new subclass.
 
-Learning a Name with __set_name__
----------------------------------
+## Learning a Name with __set_name__
 
 Another job that once needed a metaclass is letting an attribute object
 discover the name it was assigned to. A *descriptor* with `__set_name__` gets
@@ -246,8 +242,7 @@ The `Field` descriptors do not know they are called `x` and `y` until Python
 tells them through `__set_name__`. This is metaprogramming, but it needs no
 metaclass.
 
-Writing a Metaclass
--------------------
+## Writing a Metaclass
 
 When the simpler hooks are not enough, you write a metaclass. A metaclass is a
 subclass of `type`. You attach it with the `metaclass=` keyword in the class
@@ -295,8 +290,7 @@ being built. As with any subclass, call the base-class version first through
 > now, the `metaclass=` keyword, and the metaclass must be a real class. This
 > is simpler and more consistent, so the Python 2 forms are not shown here.
 
-`__init__` versus `__new__` in a Metaclass
-------------------------------------------
+## `__init__` versus `__new__` in a Metaclass
 
 Metaclass examples seem to use `__new__` and `__init__` interchangeably. The
 difference is timing. `__new__` runs *before* the class object exists, so it can
@@ -349,8 +343,7 @@ So override `__new__` when you must change `name`, `bases`, or the namespace
 Otherwise prefer `__init__`, which is simpler. When the choice does not matter,
 pick `__init__` and reserve `__new__` for when it has a real reason.
 
-Intercepting Instance Creation
-------------------------------
+## Intercepting Instance Creation
 
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances. These are sometimes called
@@ -439,8 +432,7 @@ print(b.items)
 The simplest Python singleton of all is a module: import it anywhere and you get
 the same object. Choose the lightest tool that solves your problem.
 
-Making a Class Final
---------------------
+## Making a Class Final
 
 It is sometimes useful to forbid inheritance, the way Java's `final` does. The
 older literature claims this *requires* a metaclass, because the check must run
@@ -479,8 +471,7 @@ The check happens at class-creation time, exactly when it must, and `B` itself
 is built normally because `A` does not forbid subclassing. This is a good
 example of how Python 3 retired one of the classic reasons to write a metaclass.
 
-When You Still Need a Metaclass
--------------------------------
+## When You Still Need a Metaclass
 
 After all this, when is a metaclass the right tool? When you need to change the
 class object itself rather than react to its creation: adding methods *to the
@@ -496,8 +487,7 @@ accidentally combine classes with different metaclasses, which raises a
 metaclass conflict you then have to resolve. That is one more reason to avoid
 metaclasses unless you truly need them.
 
-Further Reading
----------------
+## Further Reading
 
 > The `__init_subclass__` and `__set_name__` hooks were added in PEP 487:
 -   <https://peps.python.org/pep-0487/>

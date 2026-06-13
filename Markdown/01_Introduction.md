@@ -1,5 +1,4 @@
-Introduction
-============
+# Introduction
 
 This is a collection of essays that give you a deeper understanding of
 programming in Python. Although the first chapter in the book is [Python for

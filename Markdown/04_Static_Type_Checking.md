@@ -1,5 +1,4 @@
-Static Type Checking
-====================
+# Static Type Checking
 
 - History and arguments
 

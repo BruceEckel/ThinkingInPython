@@ -1,5 +1,4 @@
-Testing
-=======
+# Testing
 
 > Testing is flawed, but not testing is reckless.
 
@@ -16,8 +15,7 @@ Tests give you a safety net. With them you can refactor boldly, change designs,
 and clean up code, because a regression announces itself immediately instead of
 months later in a bug report. The cost is small and the payoff compounds.
 
-Write Tests First
------------------
+## Write Tests First
 
 A common failure is to write the code, get it working, and intend to write the
 tests later. Later rarely comes. The tests lose importance and then vanish.
@@ -35,8 +33,7 @@ Testing then becomes a design tool, not a verification step you skip when you
 happen to feel good about the code you just wrote. That feeling is usually
 wrong.
 
-pytest
-------
+## pytest
 
 Python has a testing framework in the standard library, `unittest`, modeled on
 Java's JUnit. It works, but it carries the class-based boilerplate of its
@@ -133,8 +130,7 @@ Run the whole suite by typing `pytest` in the project. It discovers every
 passing run is quiet. A failing `assert` prints the expression and the actual
 values, so you rarely need a debugger to see what went wrong.
 
-Fixtures Replace setup and teardown
------------------------------------
+## Fixtures Replace setup and teardown
 
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 `pytest` replaces both with *fixtures*: functions that build what a test needs,
@@ -153,8 +149,7 @@ Each test gets its own freshly built `funded` account, so tests cannot leak
 state into each other. If a fixture needs cleanup, it can `yield` the value and
 run teardown code after the `yield`.
 
-Testing for Exceptions and Floating Point
------------------------------------------
+## Testing for Exceptions and Floating Point
 
 Two checks come up constantly. The first is "this call should raise."
 `test_overdraft_raises` uses `pytest.raises` as a context manager; the test
@@ -163,16 +158,14 @@ comparing floating-point numbers, where exact equality is a trap.
 `test_interest_uses_approx` compares with `pytest.approx`, which allows a small
 tolerance. Both techniques appear in `test_account.py` above.
 
-Parametrizing Tests
--------------------
+## Parametrizing Tests
 
 When the same logic should run against several inputs, do not copy the test.
 Mark it with `parametrize`, as `test_nonpositive_deposit_raises` does, and
 `pytest` runs it once per case, reporting each separately. That single function
 becomes three independent tests, and a failure names the exact case that broke.
 
-Sharing Fixtures with conftest.py
----------------------------------
+## Sharing Fixtures with conftest.py
 
 A fixture defined in a file named `conftest.py` is available to every test in
 that directory and below, with no import. This is where shared setup lives.
@@ -218,8 +211,7 @@ def test_deposit_on_any_balance(preloaded: Account, bank_name: str) -> None:
 Neither fixture is imported. `pytest` finds them in `conftest.py` and supplies
 them by name.
 
-Isolating Tests from the World
-------------------------------
+## Isolating Tests from the World
 
 Good tests do not depend on the real filesystem, clock, network, or
 environment. `pytest` ships built-in fixtures for this. `tmp_path` gives each
@@ -272,8 +264,7 @@ def test_missing_file_raises(
         storage.load("absent.txt")
 ```
 
-White-Box and Black-Box Tests
------------------------------
+## White-Box and Black-Box Tests
 
 A *white-box* test reaches into the internals of the code it checks. A
 *black-box* test treats the code as an opaque box and exercises only its public
@@ -291,16 +282,14 @@ a private attribute. When you do need a white-box test for a tricky internal,
 nothing stops you, but treat each one as a test that may break when you
 refactor.
 
-How This Book Runs Its Tests
-----------------------------
+## How This Book Runs Its Tests
 
 The examples in this book are extracted from the chapters and checked
 automatically. Plain programs are run, and their failures are reported. Files
 named `test_*.py` and `conftest.py` are handed to `pytest` instead, and a
 failing test fails the build. The tests in this chapter run exactly that way.
 
-Exercises
----------
+## Exercises
 
 1.  Add a `transfer(other, amount)` method to `Account` and write its tests
     first: a successful transfer, and an overdraft that leaves both accounts

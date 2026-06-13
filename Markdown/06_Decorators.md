@@ -1,5 +1,4 @@
-Decorators
-==========
+# Decorators
 
 > Dynamic Type Selection
 
@@ -21,13 +20,11 @@ This accounts for the odd inheritance structure
 
 Tradeoff: coding is more complicated when using decorators
 
-Basic Decorator Structure
--------------------------
+## Basic Decorator Structure
 
 ![image description](_images/decorator)
 
-A Coffee Example
-----------------
+## A Coffee Example
 
 Consider going down to the local coffee shop, *BeanMeUp*, for a coffee.
 There are typically many different drinks on offer -- espressos, lattes,
@@ -43,8 +40,7 @@ Panna, Café Late, Cappuccino and Café Mocha. We'll include 2 extras -
 whipped cream ("whipped") and an extra shot of espresso; and three
 changes---decaf, steamed milk ("wet") and foamed milk ("dry").
 
-Class for Each Combination
---------------------------
+## Class for Each Combination
 
 One solution is to create an individual class for every combination.
 Each class describes the drink and is responsible for the cost etc. The
@@ -129,8 +125,7 @@ needs to be created up front. Secondly, the resulting menu is so huge
 that finding your particular combination is difficult and time
 consuming.
 
-The Decorator Approach
-----------------------
+## The Decorator Approach
 
 Another approach would be to break the drinks down into the various
 components such as espresso and foamed milk, and then let the customer
@@ -247,8 +242,7 @@ If you want to describe a plain cappuccino, you create it with:
 Creating a decaf Cafe Mocha with whipped cream requires an even longer
 description.
 
-Compromise
-----------
+## Compromise
 
 The previous approach takes too long to describe a coffee. There will
 also be certain combinations that you will describe regularly, and it
@@ -344,8 +338,7 @@ The final result is not too many classes, but not too many decorators
 either. Most of the time it's possible to get away without using any
 decorators at all, so we have the benefits of both approaches.
 
-Other Considerations
---------------------
+## Other Considerations
 
 What happens if we decide to change the menu at a later stage, such as
 by adding a new type of drink? If we had used the class per combination
@@ -360,11 +353,9 @@ combination means that you need to change a method in each class, and
 thus maintain many classes. By using decorators, maintenance is reduced
 by defining the logic in one place.
 
-Further Reading
----------------
+## Further Reading
 
-Exercises
----------
+## Exercises
 
 1.  Add a Syrup class to the decorator approach described above. Then
     create a Café Latte (you'll need to use steamed milk with an
