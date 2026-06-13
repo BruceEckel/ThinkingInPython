@@ -212,7 +212,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
 | P2-* | Code modernization (per subtree) | IN PROGRESS (baseline 67 → 44; see below) |
-| P3-1 | Rewrite Introduction | TODO |
+| P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md`; revoicing + prerequisites/"how to read" still TODO (author) |
 | P3-2 | Stub chapter decisions | TODO (needs author sign-off on cuts) |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
 | P4-* | Pattern reframe (per chapter 12–26) | TODO |
