@@ -38,8 +38,6 @@ PatternRefactoring/trashvisitor/Visitable.py
 PatternRefactoring/trashvisitor/VisitableDecorator.py
 PatternRefactoring/trashvisitor/Visitor.py
 SanityCheck.py
-StateMachine/mousetrap1/MouseTrapTest.py
-StateMachine/mousetrap2/MouseTrap2Test.py
 StateMachine/stateMachine2/Condition.py
 StateMachine/stateMachine2/StateMachine.py
 StateMachine/vendingmachine/VendingMachine.py

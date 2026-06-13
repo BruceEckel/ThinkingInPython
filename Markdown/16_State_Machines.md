@@ -85,15 +85,23 @@ inputs to the state machine:
 # StateMachine/mouse/MouseAction.py
 
 class MouseAction:
-    def __init__(self, action):
+    appears: "MouseAction"
+    runsAway: "MouseAction"
+    enters: "MouseAction"
+    escapes: "MouseAction"
+    trapped: "MouseAction"
+    removed: "MouseAction"
+
+    def __init__(self, action: str) -> None:
         self.action = action
-    def __str__(self): return self.action
-    def __cmp__(self, other):
-        return cmp(self.action, other.action)
-    # Necessary when __cmp__ or __eq__ is defined
+    def __str__(self) -> str: return self.action
+    def __eq__(self, other: object) -> bool:
+        return (isinstance(other, MouseAction)
+                and self.action == other.action)
+    # Necessary when __eq__ is defined
     # in order to make this class usable as a
     # dictionary key:
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.action)
 
 # Static fields; an enumeration of instances:
@@ -141,11 +149,11 @@ clause:
 # StateMachine/mousetrap1/MouseTrapTest.py
 # State Machine pattern using 'if' statements
 # to determine the next state.
-import string, sys
-sys.path += ['../stateMachine', '../mouse']
+import sys
+sys.path += ['..', '../mouse']
 from State import State
 from StateMachine import StateMachine
-from MouseAction import MouseAction
+from MouseAction import MouseAction  # type: ignore
 # A different subclass for each state:
 
 class Waiting(State):
@@ -189,7 +197,12 @@ class Holding(State):
         return MouseTrap.holding
 
 class MouseTrap(StateMachine):
-    def __init__(self):
+    waiting: State
+    luring: State
+    trapping: State
+    holding: State
+
+    def __init__(self) -> None:
         # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
 
@@ -199,9 +212,10 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-moves = map(string.strip,
-  open("../mouse/MouseMoves.txt").readlines())
-MouseTrap().runAll(map(MouseAction, moves))
+with open("../mouse/MouseMoves.txt") as f:
+    moves = [line.strip() for line in f
+             if line.strip() and not line.startswith('#')]
+MouseTrap().runAll([MouseAction(m) for m in moves])
 ```
 
 The `StateMachine` class simply defines all the possible states as
@@ -233,20 +247,22 @@ they test for a `null Map` (and initialize it if it's `null`):
 ```python
 # StateMachine/mousetrap2/MouseTrap2Test.py
 # A better mousetrap using tables
-import string, sys
-sys.path += ['../stateMachine', '../mouse']
+import sys
+from typing import Any
+sys.path += ['..', '../mouse']
 from State import State
 from StateMachine import StateMachine
-from MouseAction import MouseAction
+from MouseAction import MouseAction  # type: ignore
 
 class StateT(State):
-    def __init__(self):
-        self.transitions = None
+    def __init__(self) -> None:
+        self.transitions: dict[Any, Any] | None = None
     def next(self, input):
-        if self.transitions.has_key(input):
+        assert self.transitions is not None
+        if input in self.transitions:
             return self.transitions[input]
         else:
-            raise "Input not supported for current state"
+            raise Exception("Input not supported for current state")
 
 class Waiting(StateT):
     def run(self):
@@ -295,7 +311,12 @@ class Holding(StateT):
         return StateT.next(self, input)
 
 class MouseTrap(StateMachine):
-    def __init__(self):
+    waiting: State
+    luring: State
+    trapping: State
+    holding: State
+
+    def __init__(self) -> None:
         # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
 
@@ -305,9 +326,10 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-moves = map(string.strip,
-  open("../mouse/MouseMoves.txt").readlines())
-mouseMoves = map(MouseAction, moves)
+with open("../mouse/MouseMoves.txt") as f:
+    moves = [line.strip() for line in f
+             if line.strip() and not line.startswith('#')]
+mouseMoves = [MouseAction(m) for m in moves]
 MouseTrap().runAll(mouseMoves)
 ```
 

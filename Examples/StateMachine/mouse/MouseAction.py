@@ -1,15 +1,23 @@
 # StateMachine/mouse/MouseAction.py
 
 class MouseAction:
-    def __init__(self, action):
+    appears: "MouseAction"
+    runsAway: "MouseAction"
+    enters: "MouseAction"
+    escapes: "MouseAction"
+    trapped: "MouseAction"
+    removed: "MouseAction"
+
+    def __init__(self, action: str) -> None:
         self.action = action
-    def __str__(self): return self.action
-    def __cmp__(self, other):
-        return cmp(self.action, other.action)
-    # Necessary when __cmp__ or __eq__ is defined
+    def __str__(self) -> str: return self.action
+    def __eq__(self, other: object) -> bool:
+        return (isinstance(other, MouseAction)
+                and self.action == other.action)
+    # Necessary when __eq__ is defined
     # in order to make this class usable as a
     # dictionary key:
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.action)
 
 # Static fields; an enumeration of instances:

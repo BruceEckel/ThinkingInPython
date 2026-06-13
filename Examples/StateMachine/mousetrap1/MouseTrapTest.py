@@ -1,11 +1,11 @@
 # StateMachine/mousetrap1/MouseTrapTest.py
 # State Machine pattern using 'if' statements
 # to determine the next state.
-import string, sys
-sys.path += ['../stateMachine', '../mouse']
+import sys
+sys.path += ['..', '../mouse']
 from State import State
 from StateMachine import StateMachine
-from MouseAction import MouseAction
+from MouseAction import MouseAction  # type: ignore
 # A different subclass for each state:
 
 class Waiting(State):
@@ -49,7 +49,12 @@ class Holding(State):
         return MouseTrap.holding
 
 class MouseTrap(StateMachine):
-    def __init__(self):
+    waiting: State
+    luring: State
+    trapping: State
+    holding: State
+
+    def __init__(self) -> None:
         # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
 
@@ -59,6 +64,7 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-moves = map(string.strip,
-  open("../mouse/MouseMoves.txt").readlines())
-MouseTrap().runAll(map(MouseAction, moves))
+with open("../mouse/MouseMoves.txt") as f:
+    moves = [line.strip() for line in f
+             if line.strip() and not line.startswith('#')]
+MouseTrap().runAll([MouseAction(m) for m in moves])

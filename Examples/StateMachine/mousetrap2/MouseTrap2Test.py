@@ -1,19 +1,21 @@
 # StateMachine/mousetrap2/MouseTrap2Test.py
 # A better mousetrap using tables
-import string, sys
-sys.path += ['../stateMachine', '../mouse']
+import sys
+from typing import Any
+sys.path += ['..', '../mouse']
 from State import State
 from StateMachine import StateMachine
-from MouseAction import MouseAction
+from MouseAction import MouseAction  # type: ignore
 
 class StateT(State):
-    def __init__(self):
-        self.transitions = None
+    def __init__(self) -> None:
+        self.transitions: dict[Any, Any] | None = None
     def next(self, input):
-        if self.transitions.has_key(input):
+        assert self.transitions is not None
+        if input in self.transitions:
             return self.transitions[input]
         else:
-            raise "Input not supported for current state"
+            raise Exception("Input not supported for current state")
 
 class Waiting(StateT):
     def run(self):
@@ -62,7 +64,12 @@ class Holding(StateT):
         return StateT.next(self, input)
 
 class MouseTrap(StateMachine):
-    def __init__(self):
+    waiting: State
+    luring: State
+    trapping: State
+    holding: State
+
+    def __init__(self) -> None:
         # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
 
@@ -72,7 +79,8 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-moves = map(string.strip,
-  open("../mouse/MouseMoves.txt").readlines())
-mouseMoves = map(MouseAction, moves)
+with open("../mouse/MouseMoves.txt") as f:
+    moves = [line.strip() for line in f
+             if line.strip() and not line.startswith('#')]
+mouseMoves = [MouseAction(m) for m in moves]
 MouseTrap().runAll(mouseMoves)
