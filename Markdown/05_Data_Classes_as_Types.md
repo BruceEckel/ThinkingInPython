@@ -220,12 +220,12 @@ through ten. The only way to make a `Stars` is through the constructor, and the
 constructor refuses anything outside the set. So if you are holding a `Stars`, it
 is legal. You know it without looking.
 
-That changes how the functions are written. `f1` and `f2` take a `Stars` and
+This changes how the functions are written. `f1` and `f2` take a `Stars` and
 return a `Stars`. They do not check their argument, because a `Stars` is already
-known to be good. They do not check their result either, because building the
+known to be good. They do not check their result, because building the
 returned `Stars` runs the check again. The validation lives in exactly one place,
 the constructor, and immutability guarantees no one can damage the value after
-that. Illegal values have become unrepresentable.
+that. Illegal values are unrepresentable.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value. The
