@@ -3,6 +3,10 @@ name: CI
 # Gates every push and pull request: the book's examples must still match the
 # Markdown, no currently-passing example may regress, the code must stay
 # ty-clean, and the static site must build. Tooling is managed by uv.
+#
+# On a push to master, and only after every gate passes, the freshly built site
+# is published to GitHub Pages by the deploy job. Pull requests run the gates
+# but do not deploy.
 
 on:
   push:
@@ -56,3 +60,30 @@ jobs:
       # Hard gate: the static site must build cleanly.
       - name: Build the static site
         run: uv run python tools/build_site.py
+
+      # On master only, hand the built site to the deploy job below.
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+
+  # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython),
+  # but only after the build job's gates have all passed, and only on master.
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
