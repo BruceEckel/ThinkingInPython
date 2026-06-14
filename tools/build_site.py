@@ -181,6 +181,7 @@ nav.sidebar li { margin:.15rem 0; }
 nav.sidebar li.current > a { font-weight:700; color:var(--fg); }
 main { flex:1 1 auto; padding:2rem 2.5rem; min-width:0; max-width:820px; }
 main img { max-width:100%; height:auto; }
+main h1, main h2, main h3 { overflow-wrap:break-word; }
 pre { background:#f6f8fa; padding:1rem; overflow:auto; border-radius:6px; }
 code { font-family:"SF Mono",Consolas,Menlo,monospace; font-size:.9em; }
 p code, li code { background:#f0f0f0; padding:.1em .3em; border-radius:3px; }
@@ -193,6 +194,16 @@ table { border-collapse:collapse; } th,td { border:1px solid var(--rule); paddin
 .titlepage h1 { font-size:2.4rem; margin:.2rem 0; }
 .titlepage .subtitle { font-size:1.3rem; color:var(--muted); }
 .titlepage .author { margin-top:1rem; font-size:1.1rem; }
+
+/* Narrow screens: stack the sidebar on top so the text gets the full width. */
+@media (max-width: 800px) {
+  .wrap { flex-direction:column; }
+  nav.sidebar { flex:0 0 auto; width:auto; height:auto; position:static;
+    overflow:visible; border-right:none; border-bottom:1px solid var(--rule); }
+  main { max-width:none; padding:1.5rem 1.25rem; }
+  .titlepage { padding:2rem 1rem 1rem; }
+  .titlepage h1 { font-size:1.9rem; }
+}
 """
 
 
