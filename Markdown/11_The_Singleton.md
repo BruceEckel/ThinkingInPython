@@ -249,15 +249,14 @@ class SingletonDecorator:
         return self.instance
 
 
+@SingletonDecorator
 class Foo:
     pass
 
 
-foo = SingletonDecorator(Foo)
-
-x = foo()
-y = foo()
-z = foo()
+x = Foo()
+y = Foo()
+z = Foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
@@ -266,6 +265,13 @@ print(y.val)
 print(z.val)
 print(x is y is z)
 ```
+
+Applying `@SingletonDecorator` to `Foo` runs `Foo = SingletonDecorator(Foo)`, so
+the name `Foo` now refers to the decorator instance rather than to the class.
+Calling `Foo()` returns the cached instance, which is what we want. But the name
+no longer points at a class. `isinstance(x, Foo)` and subclassing `Foo` no longer
+work. The `__new__` and metaclass versions below keep the name pointing at a real
+class, which is the reason to prefer them when you need that.
 
 ### As a Metaclass
 

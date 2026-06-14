@@ -13,15 +13,14 @@ class SingletonDecorator:
         return self.instance
 
 
+@SingletonDecorator
 class Foo:
     pass
 
 
-foo = SingletonDecorator(Foo)
-
-x = foo()
-y = foo()
-z = foo()
+x = Foo()
+y = Foo()
+z = Foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
