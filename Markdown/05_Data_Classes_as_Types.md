@@ -215,7 +215,7 @@ if __name__ == "__main__":
     print(f2(Stars(2)))
 ```
 
-This is the whole idea. `Stars` now names a set of values: the integers one
+`Stars` now names a set of values: the integers one
 through ten. The only way to make a `Stars` is through the constructor, and the
 constructor refuses anything outside the set. So if you are holding a `Stars`, it
 is legal. You know it without looking.
@@ -227,7 +227,7 @@ returned `Stars` runs the check again. The validation lives in exactly one place
 the constructor, and immutability guarantees no one can damage the value after
 that. Illegal values have become unrepresentable.
 
-This is the functional move: instead of mutating an object and re-guarding it,
+The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value. The
 [Static Type Checking](04_Static_Type_Checking.md) chapter argues for letting
 the type carry the meaning. Here the type carries a guarantee.
@@ -515,9 +515,9 @@ def test_transformation_can_produce_illegal_value() -> None:
         f2(Stars(4))  # 4 * 5 = 20
 ```
 
-The last test makes the strongest point. `f2(Stars(4))` would compute twenty,
-which is outside the legal set, so constructing the returned `Stars` raises. The
-illegal value never escapes as an object. Cross-field rules test the same way:
+In the last test, `f2(Stars(4))` would compute twenty, which is outside the
+legal set, so constructing the returned `Stars` raises. The illegal value never
+escapes as an object. Cross-field rules test the same way:
 
 ```python
 # DataClassesAsTypes/test_birth_date.py
