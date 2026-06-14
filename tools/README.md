@@ -128,7 +128,19 @@ These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 are left alone.
 
 Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
-use `-o DIR` to build elsewhere.
+use `-o DIR` to build elsewhere. `make serve` builds nothing and serves the
+existing `build/site/` at <http://localhost:8000>; `make local` builds then
+serves.
+
+### Publishing to GitHub Pages
+
+`.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages
+at <https://bruceeckel.github.io/ThinkingInPython> on every push to `master`
+(and on manual `workflow_dispatch`). It uses the GitHub Actions Pages flow:
+`actions/upload-pages-artifact` uploads `build/site/`, then
+`actions/deploy-pages` deploys it. The site is built fresh in CI, so the
+generated HTML is never committed (`build/` stays git-ignored). All in-page
+links are relative, so the project subpath (`/ThinkingInPython/`) just works.
 
 ## Continuous integration
 

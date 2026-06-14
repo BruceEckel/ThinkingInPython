@@ -7,7 +7,7 @@ PY ?= uv run python
 TY ?= uv run ty
 PYTEST ?= uv run pytest
 
-.PHONY: help check extract run examples site ty test clean-examples clean-site ci
+.PHONY: help check extract run examples site serve local ty test clean-examples clean-site ci
 
 help:
 	@echo "Targets:"
@@ -16,6 +16,8 @@ help:
 	@echo "  run       - run every extracted .py and report failures"
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
+	@echo "  serve     - serve build/site/ at http://localhost:8000"
+	@echo "  local     - build the site, then serve it locally"
 	@echo "  ty        - type-check the extracted examples (advisory)"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ci        - what CI runs: check, baseline run, pytest, site"
@@ -35,6 +37,12 @@ examples: extract run
 
 site:
 	$(PY) tools/build_site.py
+
+serve:
+	$(PY) -m http.server --directory build/site
+
+local: site
+	$(PY) -m http.server --directory build/site
 
 ty:
 	$(TY) check ExtractedExamples
