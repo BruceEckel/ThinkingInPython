@@ -22,7 +22,7 @@ An excellent example of the subtleties of initialization is static
 fields in classes:
 
 ```python
-# InitializationAndCleanup/static_fields.py
+# static_fields.py
 class Foo(object):
         x = "a"
 
@@ -50,7 +50,7 @@ If you assign, you get a new one. If it's modifiable, then unless you
 assign you are working on a singleton. So a typical pattern is:
 
 ```python
-# InitializationAndCleanup/static_idiom.py
+# static_idiom.py
 class Foo:
     something = None # Static: visible to all classes
 def f(self, x):
@@ -72,7 +72,7 @@ None?
 Consider the following:
 
 ```python
-# InitializationAndCleanup/cleanup.py
+# cleanup.py
 class Counter:
     Count: int = 0   # Number of objects of this class
 
@@ -124,7 +124,7 @@ Here's an example of weak references, using a WeakValueDictionary and
 the trick of mapping id(self) to self:
 
 ```python
-# InitializationAndCleanup/weak_value.py
+# weak_value.py
 from weakref import WeakValueDictionary
 
 

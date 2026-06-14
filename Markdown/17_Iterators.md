@@ -30,7 +30,7 @@ iterator that produces each yielded value in turn, pausing and resuming its own
 state. A class becomes iterable by writing `__iter__()` as a generator:
 
 ```python
-# Iterators/iterators.py
+# iterators.py
 # Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
 
@@ -93,7 +93,7 @@ behavior. Here is one that enforces that every item is of an expected type,
 raising otherwise:
 
 ```python
-# Util/TypedIterator.py
+# TypedIterator.py
 from collections.abc import Iterator
 from typing import Any
 

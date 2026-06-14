@@ -22,7 +22,7 @@ needed), so here it is a matter of convention: the base defines the algorithm,
 subclasses define the steps.
 
 ```python
-# AppFrameworks/TemplateMethod.py
+# TemplateMethod.py
 # Simple demonstration of Template Method.
 
 class ApplicationFramework:
@@ -62,7 +62,7 @@ Python functions are first-class, you can pass the steps in directly, with no
 subclass at all:
 
 ```python
-# AppFrameworks/template_function.py
+# template_function.py
 # The same Template Method, with the varying steps passed as functions
 # instead of supplied by a subclass.
 from collections.abc import Callable

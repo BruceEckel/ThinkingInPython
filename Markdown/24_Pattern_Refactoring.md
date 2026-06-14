@@ -26,7 +26,7 @@ the original design worked hard to build with reflection, in a few lines and
 with no reflection at all:
 
 ```python
-# PatternRefactoring/trash.py
+# trash.py
 # The Trash hierarchy, with self-registration and a per-pound value.
 from __future__ import annotations
 
@@ -80,7 +80,7 @@ The trash to process is described in a data file, one `Name:weight` line per
 piece:
 
 ```python
-# PatternRefactoring/Trash.dat
+# Trash.dat
 Glass:54
 Paper:22
 Paper:11
@@ -110,7 +110,7 @@ mentions a concrete material. Add a new kind of trash and the parser keeps
 working unchanged, which is the sign of a good seam:
 
 ```python
-# PatternRefactoring/parse_trash.py
+# parse_trash.py
 # Read "Name:weight" lines into Trash objects through the registry.
 from trash import Trash
 
@@ -134,7 +134,7 @@ original design used run-time type information (RTTI) for this, and so can we
 with `isinstance`:
 
 ```python
-# PatternRefactoring/recycle_rtti.py
+# recycle_rtti.py
 # First cut: sort by testing each type. It works, but it checks for EVERY
 # type. Add a new kind of Trash and you must find and edit this code, with
 # no help from the tools if you miss a spot. That is the smell to watch for.
@@ -179,7 +179,7 @@ decision into the language. In Python the whole problem disappears with one
 line. Group the pieces in a dictionary keyed by their own type:
 
 ```python
-# PatternRefactoring/recycle_dict.py
+# recycle_dict.py
 # The Pythonic sort: the object's own type is the key. No type is named
 # here, so this code never changes when you add a new kind of Trash.
 from collections import defaultdict
@@ -226,7 +226,7 @@ type of its first argument, with new types registered from anywhere.
 So you do not write Visitor in Python. You write a single-dispatch function:
 
 ```python
-# PatternRefactoring/visitor_singledispatch.py
+# visitor_singledispatch.py
 # Visitor's goal is to add operations to a fixed hierarchy from outside it.
 # functools.singledispatch does that directly: a polymorphic function whose
 # behavior is registered per type. Trash is never touched, new operations are

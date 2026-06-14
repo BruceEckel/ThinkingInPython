@@ -31,7 +31,7 @@ object. The simplest way is to hide construction behind a cached factory.
 `functools.cache` makes a zero-argument factory return the one instance forever:
 
 ```python
-# Singleton/cache_singleton.py
+# cache_singleton.py
 # The simplest class-based singleton: a cached factory.
 from functools import cache
 
@@ -67,7 +67,7 @@ The classic approach takes control of creation by delegating to a single
 instance of a private nested class:
 
 ```python
-# Singleton/SingletonPattern.py
+# SingletonPattern.py
 from typing import Any
 
 
@@ -119,7 +119,7 @@ A variation uses `__new__`, the method that actually creates an instance, to
 return the same object every time:
 
 ```python
-# Singleton/NewSingleton.py
+# NewSingleton.py
 from typing import Any
 
 
@@ -168,7 +168,7 @@ Generation*. The Borg are a hive-mind collective: "we are all one."], and it
 points every instance's `__dict__` at the same storage:
 
 ```python
-# Singleton/BorgSingleton.py
+# BorgSingleton.py
 # Alex Martelli's 'Borg'
 from typing import Any
 
@@ -211,7 +211,7 @@ A simpler version relies on the fact that a class variable has a single shared
 value:
 
 ```python
-# Singleton/ClassVariableSingleton.py
+# ClassVariableSingleton.py
 from typing import Any
 
 
@@ -234,7 +234,7 @@ You can wrap a class so that calling it returns a cached instance. This is a
 *class decorator* (see [the Decorators chapter](08_Decorators.md)):
 
 ```python
-# Singleton/Singleton.py
+# Singleton.py
 from typing import Any
 
 
@@ -280,7 +280,7 @@ in [the Metaprogramming chapter](09_Metaprogramming.md), where this same singlet
 simpler hooks that usually replace them. It is included here for completeness:
 
 ```python
-# Singleton/SingletonMetaClass.py
+# SingletonMetaClass.py
 from typing import Any
 
 

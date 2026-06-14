@@ -14,7 +14,7 @@ problem. The only requirement is to produce a *that*, and there are a
 number of ways you can accomplish this adaptation:
 
 ```python
-# ChangeInterface/Adapter.py
+# Adapter.py
 # Variations on the Adapter pattern.
 
 class WhatIHave:
@@ -90,7 +90,7 @@ need is "forward most calls unchanged, and add or change a few." `__getattr__`
 does the forwarding, so the adapter stays tiny:
 
 ```python
-# ChangeInterface/getattr_adapter.py
+# getattr_adapter.py
 # The usual adapter need: forward most calls, change a few. __getattr__
 # delegates everything you do not override, so the wrapper stays small.
 from typing import Any
@@ -136,7 +136,7 @@ you can easily get this effect by creating a class containing `static`
 factory methods:
 
 ```python
-# ChangeInterface/Facade.py
+# Facade.py
 class A:
     def __init__(self, x): pass
 class B:

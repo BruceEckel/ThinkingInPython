@@ -23,7 +23,7 @@ of the primary type simply "accept" the visitor, then call the visitor's
 dynamically-bound member function:
 
 ```python
-# Visitor/FlowerVisitors.py
+# FlowerVisitors.py
 # Demonstration of "visitor" pattern.
 import random
 
@@ -95,7 +95,7 @@ anywhere. That is precisely Visitor's goal, without the `accept()` hook or the
 `Visitor` class hierarchy:
 
 ```python
-# Visitor/visit_singledispatch.py
+# visit_singledispatch.py
 # Adding operations to a fixed hierarchy without touching it, the Python way.
 from functools import singledispatch
 

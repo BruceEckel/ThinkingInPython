@@ -18,7 +18,7 @@ Here a function raises partway through a comprehension. The successful results
 computed before the failure are lost with the rest:
 
 ```python
-# FunctionalErrorHandling/exceptions_lose_data.py
+# exceptions_lose_data.py
 # An exception unwinds the whole computation. Partial results are thrown away:
 # func_a(0) succeeded, but its result is gone.
 
@@ -52,7 +52,7 @@ value that is one thing or another. Nothing is thrown away, because the error is
 just another return value:
 
 ```python
-# FunctionalErrorHandling/sum_type.py
+# sum_type.py
 # Return the error as a value instead of raising. The return type becomes a
 # union, a "sum type". Nothing is lost, but success and failure are not
 # clearly distinguished: both are just values you have to tell apart by type.
@@ -94,7 +94,7 @@ wraps an error, and `Result` is the union of the two. Both are frozen data
 classes, parameterized over the answer type and the error type:
 
 ```python
-# FunctionalErrorHandling/result.py
+# result.py
 # A Result is either a Success holding an answer, or a Failure holding an error.
 # Both are frozen, like the types in the Data Classes as Types chapter. bind
 # chains steps: it feeds a Success into the next function, and passes a Failure
@@ -131,7 +131,7 @@ enough to report errors. A function that might fail returns a `Result`. Now the
 signature tells the whole story:
 
 ```python
-# FunctionalErrorHandling/returning_result.py
+# returning_result.py
 # A function reports failure by returning Failure, success by returning Success.
 # The return type now says exactly that: Result[int, str].
 from result import Failure, Result, Success
@@ -168,7 +168,7 @@ caught and turned into a `Failure`, so the failure becomes data rather than
 control flow:
 
 ```python
-# FunctionalErrorHandling/composing.py
+# composing.py
 # Composing functions that return Results, by hand. Each step checks for a
 # Failure and returns early. An exception can be turned into a Failure value
 # instead of being raised.
@@ -224,7 +224,7 @@ ignores the function and returns the failure unchanged. So a `Failure` anywhere
 in a chain skips the rest of the steps and falls through to the end:
 
 ```python
-# FunctionalErrorHandling/composing_with_bind.py
+# composing_with_bind.py
 # bind removes the boilerplate. Chain the steps; a Failure anywhere in the
 # chain short-circuits the rest and is passed through to the end.
 from composing import func_b, func_c
@@ -261,7 +261,7 @@ inputs, nest the binds so each answer stays in scope for the next step. The firs
 `Failure` still short-circuits the whole thing:
 
 ```python
-# FunctionalErrorHandling/combining.py
+# combining.py
 # Combining several Results that come from different inputs. Nested binds carry
 # each answer inward; a Failure anywhere short-circuits to the end.
 from composing import func_b, func_c
@@ -318,7 +318,7 @@ that combining returns the right value. See the [Testing](07_Testing.md)
 chapter for pytest in general.
 
 ```python
-# FunctionalErrorHandling/test_result.py
+# test_result.py
 from combining import combined
 from composing import composed as composed_manual
 from composing_with_bind import composed as composed_bind

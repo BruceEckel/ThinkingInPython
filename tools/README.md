@@ -9,20 +9,23 @@ together) in `PUBLISHING_PLAN.md`.
 
 The Markdown chapters in `Markdown/` are the source of truth for the book's
 prose *and* its code. A fenced block becomes an extractable file when its first
-non-blank line is a path comment:
+non-blank line is a path comment naming the file, relative to its chapter:
 
 ````markdown
 ```python
-# Decorator/nodecorators/CoffeeShop.py
-class Espresso: pass
-...
+# trace.py
+def trace(func): ...
 ```
 ````
 
-The path (`Decorator/nodecorators/CoffeeShop.py`) is taken relative to the
-example tree. Blocks without such a first line are illustrative fragments and
-are ignored. Data files (`.txt`, `.dat`) tagged the same way are extracted too,
-so examples that read them can run.
+The file is written under a directory named for the chapter it appears in (the
+Markdown file's stem). So `# trace.py` in `08_Decorators.md` is extracted to
+`08_Decorators/trace.py`. The slug carries no chapter prefix; the extractor adds
+it. A slug may include a sub-path (`# mouse/MouseAction.py`) to group related
+files within one chapter. Renaming or renumbering a chapter therefore moves its
+example folder to match. Blocks without such a first line are illustrative
+fragments and are ignored. Data files (`.txt`, `.dat`) tagged the same way are
+extracted too, so examples that read them can run.
 
 `Examples/` is the curated copy committed to git. `ExtractedExamples/` is a
 throwaway tree (git-ignored) regenerated from the Markdown for running.
@@ -78,7 +81,7 @@ failed and exits non-zero if anything fails or times out.
 `make test` (`uv run pytest ExtractedExamples`), not as standalone scripts. See
 the Testing chapter.
 
-* Narrow the run: `python tools/run_examples.py StateMachine`
+* Narrow the run: `python tools/run_examples.py 16_State_Machines`
 * Adjust the kill timeout: `--timeout 20` (default 15s)
 
 ### Skipping examples that can't run unattended

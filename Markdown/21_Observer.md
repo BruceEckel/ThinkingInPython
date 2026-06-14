@@ -81,7 +81,7 @@ callables and a way to notify them. A `@property` setter is a natural place to
 fire the notification when state changes:
 
 ```python
-# Observer/observers.py
+# observers.py
 # An observer is just a callable; an observable is a list of them. No Observer
 # interface and no Observable base class to inherit.
 from collections.abc import Callable
@@ -147,7 +147,7 @@ thread synchronization. We could certainly accomplish the same thing by
 hand, using code like this:
 
 ```python
-# Util/ToSynch.py
+# ToSynch.py
 
 import threading
 class ToSynch:
@@ -167,7 +167,7 @@ But this rapidly becomes tedious to write and to read. Peter Norvig
 provided me with a much nicer solution:
 
 ```python
-# Util/Synchronization.py
+# Synchronization.py
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading
@@ -232,7 +232,7 @@ inheritance, so the base class `Synchronization` is provided.
 Here's a simple test of the `Synchronization` module:
 
 ```python
-# Util/TestSynchronization.py
+# TestSynchronization.py
 from Synchronization import *
 
 # To use for a method:
@@ -290,7 +290,7 @@ being synchronized twice, it will be entered and left twice for every
 call, which isn't very desirable \[there may be a fix for this\]:
 
 ```python
-# Util/Observer.py
+# Observer.py
 # Class support for "observer" pattern.
 from typing import Any
 
@@ -352,7 +352,7 @@ synchronize(Observable,
 Using this library, here is an example of the observer pattern:
 
 ```python
-# Observer/ObservedFlower.py
+# ObservedFlower.py
 # Demonstration of "observer" pattern.
 import sys
 sys.path += ['../Util']
@@ -503,10 +503,10 @@ The original was a Swing GUI. The pattern itself has nothing to do with a GUI,
 so here it is as a headless program that clicks a box in code and then checks
 the result. That keeps the focus on the Observer mechanics and lets the example
 verify itself. It reuses the `Observable` and `Observer` classes from
-`Util/Observer.py`:
+`Observer.py`:
 
 ```python
-# Observer/BoxObserver.py
+# BoxObserver.py
 # A headless version of the ColorBoxes Observer example. Boxes in a grid
 # observe a shared Observable; "clicking" one recolors its neighbors.
 import sys

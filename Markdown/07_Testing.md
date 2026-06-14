@@ -49,7 +49,7 @@ sides of the comparison.
 Here is a small unit to test. Put it in its own file:
 
 ```python
-# UnitTesting/account.py
+# account.py
 # The unit under test.
 
 
@@ -81,7 +81,7 @@ By convention tests live in a file whose name starts with
 below walk through each technique it uses:
 
 ```python
-# UnitTesting/test_account.py
+# test_account.py
 import pytest
 
 from account import Account, InsufficientFunds
@@ -174,7 +174,7 @@ Fixtures can also be *parametrized*, which multiplies coverage for free: every
 test that requests the fixture runs once for each parameter value.
 
 ```python
-# UnitTesting/conftest.py
+# conftest.py
 import pytest
 
 from account import Account
@@ -197,7 +197,7 @@ expensive resources. The `preloaded` fixture is rebuilt for each parameter, so
 a test that uses it is automatically checked at every starting balance:
 
 ```python
-# UnitTesting/test_fixtures.py
+# test_fixtures.py
 from account import Account
 
 
@@ -221,7 +221,7 @@ variables and attributes, undoing every change when the test ends.
 Here is a unit that reads an environment variable and touches files:
 
 ```python
-# UnitTesting/storage.py
+# storage.py
 # A unit that depends on the filesystem and the environment.
 import os
 from pathlib import Path
@@ -243,7 +243,7 @@ The tests redirect it at a throwaway directory, so they never touch real data
 and never collide with each other:
 
 ```python
-# UnitTesting/test_storage.py
+# test_storage.py
 from pathlib import Path
 
 import pytest

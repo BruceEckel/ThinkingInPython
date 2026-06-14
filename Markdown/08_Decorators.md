@@ -17,7 +17,7 @@ returned function usually does some work, calls the original, and does some more
 work. Here is a decorator that traces calls:
 
 ```python
-# Decorator/trace.py
+# trace.py
 from functools import wraps
 from typing import Callable, ParamSpec, TypeVar
 
@@ -66,7 +66,7 @@ To pass arguments to a decorator, add another layer. A decorator with arguments
 is a function that returns a decorator:
 
 ```python
-# Decorator/repeat.py
+# repeat.py
 from functools import wraps
 from typing import Callable, ParamSpec, TypeVar
 
@@ -117,7 +117,7 @@ A decorator can take a class instead of a function. This one records every class
 it is applied to:
 
 ```python
-# Decorator/register.py
+# register.py
 registry: dict[str, type] = {}
 
 
@@ -159,7 +159,7 @@ description. Because an extra is itself a drink, you can wrap an extra in anothe
 extra.
 
 ```python
-# Decorator/coffee.py
+# coffee.py
 from __future__ import annotations
 from typing import Protocol
 
@@ -240,7 +240,7 @@ a price change touches every class that includes that extra.
 A test fixes the behavior:
 
 ```python
-# Decorator/test_coffee.py
+# test_coffee.py
 from coffee import Cappuccino, Decaf, Espresso, ExtraShot, Whipped
 
 

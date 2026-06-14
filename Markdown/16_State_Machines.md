@@ -22,7 +22,7 @@ own little `State` table, and in the subsequent design there is a
 single master state transition table for the whole system:
 
 ```python
-# StateMachine/State.py
+# State.py
 # A State has an operation, and can be moved
 # into the next State given an Input:
 
@@ -51,7 +51,7 @@ expansion of the idea of the `State` pattern, since `run()` does
 something different depending on the state that the system is in:
 
 ```python
-# StateMachine/StateMachine.py
+# StateMachine.py
 # Takes a list of Inputs to move from State to
 # State using a template method.
 
@@ -81,7 +81,7 @@ representing all the possible moves that a mouse can make, which will be the
 inputs to the state machine:
 
 ```python
-# StateMachine/mouse/MouseAction.py
+# mouse/MouseAction.py
 
 class MouseAction:
     appears: "MouseAction"
@@ -121,7 +121,7 @@ For creating test code, a sequence of mouse inputs is provided from a
 text file:
 
 ```python
-# StateMachine/mouse/MouseMoves.txt
+# mouse/MouseMoves.txt
 mouse appears
 mouse runs away
 mouse appears
@@ -145,7 +145,7 @@ behavior, and also establishes its next state with an `if-else`
 clause:
 
 ```python
-# StateMachine/mousetrap1/MouseTrapTest.py
+# mousetrap1/MouseTrapTest.py
 # State Machine pattern using 'if' statements
 # to determine the next state.
 import sys
@@ -244,7 +244,7 @@ be called from the overridden derived class `next()` methods after
 they test for a `null Map` (and initialize it if it's `null`):
 
 ```python
-# StateMachine/mousetrap2/MouseTrap2Test.py
+# mousetrap2/MouseTrap2Test.py
 # A better mousetrap using tables
 import sys
 from typing import Any
@@ -368,7 +368,7 @@ passes (or has no condition), runs that transition's action, and moves to the
 next state:
 
 ```python
-# StateMachine/tabledriven/state_machine.py
+# tabledriven/state_machine.py
 # A generic table-driven state machine.
 #
 # The whole machine is one transition table. Because Python functions are
@@ -411,7 +411,7 @@ selection that costs more than the money inserted. The conditions and actions
 are plain methods, stored directly in the table:
 
 ```python
-# StateMachine/tabledriven/vending_machine.py
+# tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
 from state_machine import StateMachine, Table
 
@@ -615,7 +615,7 @@ If we implement *Proxy* by following the above diagram, it looks like
 this:
 
 ```python
-# Fronting/ProxyDemo.py
+# ProxyDemo.py
 # Simple demonstration of the Proxy pattern.
 
 class Implementation:
@@ -650,7 +650,7 @@ Of course, in Python we have a delegation mechanism built in, so it
 makes the `Proxy` even simpler to implement:
 
 ```python
-# Fronting/ProxyDemo2.py
+# ProxyDemo2.py
 # Simple demonstration of the Proxy pattern.
 
 class Implementation2:
@@ -683,7 +683,7 @@ way to switch from one implementation to another during the lifetime of
 the surrogate:
 
 ```python
-# Fronting/StateDemo.py
+# StateDemo.py
 # Simple demonstration of the State pattern.
 
 class State_d:

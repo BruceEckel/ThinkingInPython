@@ -2,16 +2,19 @@
 """Extract tagged code/data examples from the book's Markdown into a tree.
 
 A fenced block in any ``Markdown/*.md`` file is treated as an extractable
-*file* when its first non-blank content line is a path comment, e.g.::
+*file* when its first non-blank content line is a path comment naming the file
+relative to its chapter, e.g.::
 
     ```python
-    # Decorator/nodecorators/CoffeeShop.py
+    # trace.py
     ...
     ```
 
-The captured path (``Decorator/nodecorators/CoffeeShop.py``) is written,
-verbatim block contents and all, under the output directory. Blocks without
-such a first line are illustrative fragments and are skipped.
+The file is written under a directory named for the chapter it appears in (the
+Markdown file's stem). A ``# trace.py`` slug in ``08_Decorators.md`` is written
+to ``08_Decorators/trace.py``, verbatim block contents and all. Slugs may
+include sub-paths (``# mouse/MouseAction.py``) to group files within a chapter.
+Blocks without such a first line are illustrative fragments and are skipped.
 
 Default mode is ``check``: nothing is written, drift between the Markdown and
 the committed ``Examples/`` tree is reported, and a non-zero exit signals
@@ -83,7 +86,7 @@ def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
             if not pm:
                 result.fragments += 1
                 continue
-            rel = pm.group(1).replace("\\", "/")
+            rel = f"{md.stem}/" + pm.group(1).replace("\\", "/")
             content = "\n".join(block).rstrip("\n") + "\n"
             existing = result.examples.get(rel)
             if existing and existing.content != content:

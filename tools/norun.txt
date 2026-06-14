@@ -7,5 +7,5 @@
 # visible as failures until repaired.
 #
 # One glob pattern per line, matched against the forward-slash relative path
-# (e.g. Projects/ratsAndMazes/* or StateMachine/*GUI*.py).
+# (e.g. 25_Simulation/ratsAndMazes/* or 16_State_Machines/*GUI*.py).
 # A "# extract: no-run" line inside a file does the same job inline.

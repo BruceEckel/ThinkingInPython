@@ -35,7 +35,7 @@ method call in each hierarchy.
 Here's an example of multiple dispatching:
 
 ```python
-# MultipleDispatching/PaperScissorsRock.py
+# PaperScissorsRock.py
 # Demonstration of multiple dispatching.
 import random
 
@@ -123,7 +123,7 @@ the behavior or to add a new `Item` class. Instead, it can be more
 sensible to make the table explicit, like this:
 
 ```python
-# MultipleDispatching/PaperScissorsRock2.py
+# PaperScissorsRock2.py
 # Multiple dispatching using a table
 import random
 

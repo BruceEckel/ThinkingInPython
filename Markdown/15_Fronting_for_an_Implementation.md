@@ -31,7 +31,7 @@ If we implement *Proxy* by following the above diagram, it looks like
 this:
 
 ```python
-# Fronting/ProxyDemo.py
+# ProxyDemo.py
 # Simple demonstration of the Proxy pattern.
 
 class Implementation:
@@ -66,7 +66,7 @@ Of course, in Python we have a delegation mechanism built in, so it
 makes the `Proxy` even simpler to implement:
 
 ```python
-# Fronting/ProxyDemo2.py
+# ProxyDemo2.py
 # Simple demonstration of the Proxy pattern.
 
 class Implementation2:
@@ -99,7 +99,7 @@ way to switch from one implementation to another during the lifetime of
 the surrogate:
 
 ```python
-# Fronting/StateDemo.py
+# StateDemo.py
 # Simple demonstration of the State pattern.
 
 class State_d:
@@ -164,7 +164,7 @@ A *Smart reference* proxy adds behavior around each access. With `__getattr__`
 you can wrap every method call, for example to count them:
 
 ```python
-# Fronting/CountingProxy.py
+# CountingProxy.py
 # A "smart reference" proxy: count calls by intercepting attribute access.
 from typing import Any
 

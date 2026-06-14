@@ -37,7 +37,7 @@ One approach is to make the factory a `static` method of the base
 class:
 
 ```python
-# Factory/shapefact1/ShapeFactory1.py
+# shapefact1/ShapeFactory1.py
 # A simple static factory method.
 import random
 
@@ -138,7 +138,7 @@ To disallow direct access to the classes, you can nest the classes
 within the factory method, like this:
 
 ```python
-# Factory/shapefact1/NestedShapeFactory.py
+# shapefact1/NestedShapeFactory.py
 import random
 
 class Shape(object):
@@ -183,7 +183,7 @@ can go one step further so the factory never needs editing when a type is added:
 let each subclass register itself through `__init_subclass__`:
 
 ```python
-# Factory/registry.py
+# registry.py
 # A class is a first-class object, so a factory is just a dict of classes.
 # __init_subclass__ lets each subclass register itself, so the factory never
 # needs editing when you add a type.
@@ -238,7 +238,7 @@ class as virtual functions. Notice also that the specific `Shape`
 classes are dynamically loaded on demand:
 
 ```python
-# Factory/shapefact2/ShapeFactory2.py
+# shapefact2/ShapeFactory2.py
 # Polymorphic factory methods.
 import random
 from typing import Any
@@ -337,7 +337,7 @@ environment and you want to be able to support different types of games.
 Here's how it might look using an abstract factory:
 
 ```python
-# Factory/Games.py
+# Games.py
 # An example of the Abstract Factory pattern.
 
 class Obstacle:
@@ -412,7 +412,7 @@ have static type checking. As long as the concrete Python classes follow
 the form of the required classes, we don't need any base classes:
 
 ```python
-# Factory/Games2.py
+# Games2.py
 # Simplified Abstract Factory.
 
 class Kitty:

@@ -16,7 +16,7 @@ talk, [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5
 We will lean on one tiny helper that raises when a value is not legal:
 
 ```python
-# DataClassesAsTypes/validation.py
+# validation.py
 class TypeFailure(ValueError):
     "Raised when a value falls outside the set its type allows."
 
@@ -33,7 +33,7 @@ Suppose a rating is an integer from one to ten. If you represent it as a plain
 function that takes a rating has to check it:
 
 ```python
-# DataClassesAsTypes/stars_unchecked.py
+# stars_unchecked.py
 # A bare int for a 1-10 rating must be re-checked everywhere it is used.
 from validation import check
 
@@ -66,7 +66,7 @@ mutable, so every method that changes it must re-validate, and a method can leav
 the object in an illegal state between steps:
 
 ```python
-# DataClassesAsTypes/stars_class.py
+# stars_class.py
 # "A class is not a type." Encapsulation guards the value, but every method
 # must re-check it, and the object stays mutable underneath.
 from validation import check
@@ -113,7 +113,7 @@ A *data class* writes the boilerplate for a class whose job is to hold data. The
 fields you declare:
 
 ```python
-# DataClassesAsTypes/messenger.py
+# messenger.py
 # A data class generates __init__, __repr__, and __eq__ for you.
 from dataclasses import dataclass, replace
 
@@ -153,7 +153,7 @@ raises `FrozenInstanceError`. As a bonus, a frozen instance is hashable, so you
 can use it as a dictionary key or put it in a set:
 
 ```python
-# DataClassesAsTypes/frozen_messenger.py
+# frozen_messenger.py
 # frozen=True makes instances immutable and hashable.
 from dataclasses import dataclass
 
@@ -185,7 +185,7 @@ validate it in `__post_init__`, the hook the data class calls right after it
 fills in the fields:
 
 ```python
-# DataClassesAsTypes/stars.py
+# stars.py
 # A type is a set of values. Validate once, at construction, in a frozen data
 # class. Every Stars that exists is then guaranteed to be a legal value.
 from dataclasses import dataclass
@@ -243,7 +243,7 @@ them. A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid
 by construction, with no extra work:
 
 ```python
-# DataClassesAsTypes/person.py
+# person.py
 # Composing a type from other types. Each part validates itself, so a Person
 # built from valid parts is valid by construction.
 from dataclasses import dataclass
@@ -292,7 +292,7 @@ and knows how to check a `Day` against it. A `BirthDate` then validates across
 its fields: the day must fit the month.
 
 ```python
-# DataClassesAsTypes/birth_date.py
+# birth_date.py
 # An Enum is also a type, and is the better choice when the set of values is
 # small and fixed. Each Month knows its length and validates a Day against it.
 from dataclasses import dataclass
@@ -370,7 +370,7 @@ more code for less safety. You have to construct the twelve months yourself and
 carry them around, where the enum simply is that set:
 
 ```python
-# DataClassesAsTypes/month_dataclass.py
+# month_dataclass.py
 # Month can also be a data class instead of an Enum. It works, but it is more
 # code for less safety: you have to build and hand around the set of months
 # yourself, where the Enum simply is that set.
@@ -441,7 +441,7 @@ copies with changes. `KW_ONLY` forces the fields after it to be passed by
 keyword:
 
 ```python
-# DataClassesAsTypes/dataclass_features.py
+# dataclass_features.py
 # A few data class tools worth knowing: asdict, astuple, replace, KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
@@ -486,7 +486,7 @@ constructor rejects every value outside the set. See the
 [Testing](07_Testing.md) chapter for pytest in general.
 
 ```python
-# DataClassesAsTypes/test_stars.py
+# test_stars.py
 import pytest
 from stars import Stars, f1, f2
 from validation import TypeFailure
@@ -520,7 +520,7 @@ legal set, so constructing the returned `Stars` raises. The illegal value never
 escapes as an object. Cross-field rules test the same way:
 
 ```python
-# DataClassesAsTypes/test_birth_date.py
+# test_birth_date.py
 import pytest
 from birth_date import BirthDate, Day, Month, Year
 from validation import TypeFailure

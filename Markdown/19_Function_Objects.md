@@ -23,7 +23,7 @@ A *Command* wraps an action so you can pass it around and run it later. In
 Python the action is just a function, and a "macro" is just a list of them:
 
 ```python
-# FunctionObjects/command.py
+# command.py
 # A function is already a command object; a macro is a list of them.
 from collections.abc import Callable
 
@@ -49,7 +49,7 @@ The classic object form wraps each action in a `Command` subclass with an
 `execute()` method:
 
 ```python
-# FunctionObjects/CommandPattern.py
+# CommandPattern.py
 
 class Command:
     def execute(self): pass
@@ -95,7 +95,7 @@ A *Strategy* is an interchangeable algorithm chosen at run time. Again, the
 algorithm is a function, and you pass it in:
 
 ```python
-# FunctionObjects/strategy.py
+# strategy.py
 # A strategy is a function you pass in. No class hierarchy, no Context object.
 from collections.abc import Callable
 
@@ -124,7 +124,7 @@ The classic form makes each algorithm a class deriving from a common interface,
 and adds a "Context" object to hold the current strategy:
 
 ```python
-# FunctionObjects/StrategyPattern.py
+# StrategyPattern.py
 
 # The strategy interface:
 class FindMinima:
@@ -180,7 +180,7 @@ Python the chain is just a list of functions, and the first one to produce a
 result wins:
 
 ```python
-# FunctionObjects/chain.py
+# chain.py
 # Try each handler in order; the first to return a result wins. The "chain"
 # is an ordinary list of functions, not a hand-built linked list.
 from collections.abc import Callable

@@ -11,7 +11,7 @@ A Messenger is simply an object with attributes corresponding to the
 names of the data you want to pass around or return:
 
 ```python
-# Messenger/MessengerIdiom.py
+# MessengerIdiom.py
 from typing import Any
 
 
@@ -41,7 +41,7 @@ gives you a typed mutable record with a generated `__init__`, `repr`, and
 equality, and a `NamedTuple` gives you a typed immutable one:
 
 ```python
-# Messenger/messenger_modern.py
+# messenger_modern.py
 # The standard library already provides this idiom and its typed cousins.
 from dataclasses import dataclass
 from types import SimpleNamespace

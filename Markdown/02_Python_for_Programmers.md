@@ -44,7 +44,7 @@ the-point syntax, but a major factor in code readability is
 indentation: scoping in Python is determined by indentation. For example:
 
 ```python
-# Py4Prog/if.py
+# if.py
 
 response = "yes"
 if response == "yes":
@@ -92,7 +92,7 @@ through an array or a container. Python formalizes this by automatically
 making `for` use an iterator that works through a sequence. Here's an example:
 
 ```python
-# Py4Prog/list.py
+# list.py
 
 list = [ 1, 3, 5, 7, 9, 11 ]
 print(list)
@@ -151,7 +151,7 @@ function name and argument list, and a colon to begin the function body. Here
 is the first example turned into a function:
 
 ```python
-# Py4Prog/my_function.py
+# my_function.py
 
 def my_function(response):
     val = 0
@@ -172,7 +172,7 @@ which means it puts the minimum possible requirements on typing. For example,
 you could pass and return different types from the same function:
 
 ```python
-# Py4Prog/different_returns.py
+# different_returns.py
 
 def different_returns(arg):
     if arg == 1:
@@ -190,7 +190,7 @@ doesn't care. Here, the same function applies the '`+`' operator to integers
 and strings:
 
 ```python
-# Py4Prog/sum.py
+# sum.py
 
 def sum(arg1, arg2):
     return arg1 + arg2
@@ -210,7 +210,7 @@ represent strings, which is very nice because if you surround a string with
 double quotes, you can embed single quotes and vice versa:
 
 ```python
-# Py4Prog/strings.py
+# strings.py
 
 print("That isn't a horse")
 print('You are not a "Viking"')
@@ -239,7 +239,7 @@ Substitution in strings is exceptionally easy, since Python uses C's
 the string with a '`%`' and the values to substitute:
 
 ```python
-# Py4Prog/string_formatting.py
+# string_formatting.py
 
 val = 47
 print("The number is %d" % val)
@@ -264,14 +264,14 @@ Each Python file is a *module* that you can use inside another Python file by
 `import` statement:
 
 ```python
-# Py4Prog/module.py
+# module.py
 
 def useful_function():
     return "Use this elsewhere!"
 ```
 
 ```python
-# Py4Prog/use_module.py
+# use_module.py
 import module
 
 print("'module' imported")
@@ -303,7 +303,7 @@ However, if this file is imported as a module into another program, `__name__`
 will not be `__main__`, so the `__main__` code is not executed:
 
 ```python
-# Py4Prog/import_module.py
+# import_module.py
 import use_module
 ```
 
@@ -314,7 +314,7 @@ If you want to bring a name into the current namespace, you can do so using
 the `from` keyword:
 
 ```python
-# Py4Prog/using_from.py
+# using_from.py
 from module import useful_function
 
 if __name__ == "__main__":
@@ -325,7 +325,7 @@ You can change the namespace of a module during an import using the `as`
 keyword:
 
 ```python
-# Py4Prog/using_as.py
+# using_as.py
 import module as m
 
 if __name__ == "__main__":
@@ -348,20 +348,20 @@ To demonstrate, we'll create a directory called `a_package` and give it an
 `__init__.py` containing nothing but a comment:
 
 ```python
-# Py4Prog/a_package/__init__.py
+# a_package/__init__.py
 ```
 
 Now we'll add two modules to the package:
 
 ```python
-# Py4Prog/a_package/module1.py
+# a_package/module1.py
 
 def function1():
     return "function1 in module1 in a_package"
 ```
 
 ```python
-# Py4Prog/a_package/module2.py
+# a_package/module2.py
 
 def function2():
     return "function2 in module2 in a_package"
@@ -370,7 +370,7 @@ def function2():
 To import a module from a package, you must qualify it with the package name:
 
 ```python
-# Py4Prog/using_packages.py
+# using_packages.py
 import a_package.module1
 import a_package.module2
 
@@ -381,7 +381,7 @@ print(a_package.module2.function2())
 You can also name the package with `from`:
 
 ```python
-# Py4Prog/from_packages.py
+# from_packages.py
 from a_package import module1
 from a_package import module2
 
@@ -395,7 +395,7 @@ Finally, you can bring specific functions into the namespace by
 naming both the package and the module:
 
 ```python
-# Py4Prog/no_qualification.py
+# no_qualification.py
 from a_package.module1 import function1
 from a_package.module2 import function2
 
@@ -406,11 +406,11 @@ print(function2())
 We can even put a second package underneath the first one:
 
 ```python
-# Py4Prog/a_package/b_package/__init__.py
+# a_package/b_package/__init__.py
 ```
 
 ```python
-# Py4Prog/a_package/b_package/module3.py
+# a_package/b_package/module3.py
 
 def function3():
     return "function3 in module3 in b_package"
@@ -419,7 +419,7 @@ def function3():
 To import `module3` we must specify both packages:
 
 ```python
-# Py4Prog/two_levels.py
+# two_levels.py
 from a_package.b_package import module3
 
 print(module3.function3())
@@ -449,7 +449,7 @@ with the `class` keyword followed by the class name and a colon. Inside the
 (indented) class body you use `def` to create methods. Here's a simple class:
 
 ```python
-# Py4Prog/simple_class.py
+# simple_class.py
 
 class Simple:
     def __init__(self, str):
@@ -535,7 +535,7 @@ the file (and thus, module) named `simple_class` is brought into this
 new name space using an `import` statement:
 
 ```python
-# Py4Prog/simple2.py
+# simple2.py
 from simple_class import Simple
 
 class Simple2(Simple):
@@ -623,7 +623,7 @@ f(*(1, 2, 3))
     reused by multiple classes:
 
 ```python
-# Py4Prog/utility.py
+# utility.py
 
 
 def f(self):
@@ -633,7 +633,7 @@ def f(self):
 Here's how you compose that method into a class:
 
 ```python
-# Py4Prog/compose.py
+# compose.py
 
 class Compose:
     from utility import f

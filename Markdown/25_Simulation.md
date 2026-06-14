@@ -35,7 +35,7 @@ works with anything that can claim a cell, spawn a rat, record a message, and
 hand out a number.
 
 ```python
-# Projects/ratsAndMazes/rat.py
+# ratsAndMazes/rat.py
 # A rat explores the maze on its own thread, spawning a new rat at every
 # branch. It talks to a blackboard but never imports one: any object with the
 # four methods below will do.
@@ -80,7 +80,7 @@ The maze is a grid of characters. A `*` is a wall and a space is an opening.
 Out-of-bounds coordinates count as walls, so the rats stay inside.
 
 ```python
-# Projects/ratsAndMazes/maze.py
+# ratsAndMazes/maze.py
 # Reads a maze layout and reports walls, openings, and an entry point.
 from __future__ import annotations
 from pathlib import Path
@@ -124,7 +124,7 @@ entry, releases the first rat, then waits for every thread, including the ones
 spawned along the way.
 
 ```python
-# Projects/ratsAndMazes/blackboard.py
+# ratsAndMazes/blackboard.py
 # The shared surface the rats write to. It owns the maze, records visited
 # cells, hands out rat numbers, and launches rats. One lock guards every update.
 from __future__ import annotations
@@ -200,7 +200,7 @@ The maze layout lives in a text file. The loader skips blank lines and the path
 comment, so the file is the maze and nothing else.
 
 ```text
-# Projects/ratsAndMazes/amaze.txt
+# ratsAndMazes/amaze.txt
 *********
 *       *
 *** *** *
@@ -213,7 +213,7 @@ comment, so the file is the maze and nothing else.
 Running it turns the rats loose and prints what they mapped.
 
 ```python
-# Projects/ratsAndMazes/ratsandmazes.py
+# ratsAndMazes/ratsandmazes.py
 # Turn a pack of rats loose on the maze and print what they mapped.
 from __future__ import annotations
 
@@ -240,7 +240,7 @@ entry, no matter how the threads interleave. A test pins that down by comparing
 the cells the rats visited against a plain flood fill of the same maze.
 
 ```python
-# Projects/ratsAndMazes/test_ratsandmazes.py
+# ratsAndMazes/test_ratsandmazes.py
 from blackboard import Blackboard
 from maze import Maze
 

@@ -20,7 +20,7 @@ A hint annotates a parameter, a return value, or a variable. You write a colon
 for parameters and variables, and an arrow for the return type:
 
 ```python
-# StaticTypeChecking/typed_basics.py
+# typed_basics.py
 # Hints annotate parameters, returns, and variables. They do not change how the
 # code runs; they let a checker and an editor reason about it.
 
@@ -91,7 +91,7 @@ A *Protocol* types duck typing directly. You describe a shape, and any object
 with that shape satisfies it, with no inheritance:
 
 ```python
-# StaticTypeChecking/protocols.py
+# protocols.py
 # A Protocol types duck typing: any object with the right shape qualifies,
 # without inheriting from a base class.
 from typing import Protocol
