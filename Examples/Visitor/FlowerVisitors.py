@@ -1,6 +1,5 @@
 # Visitor/FlowerVisitors.py
 # Demonstration of "visitor" pattern.
-from __future__ import generators
 import random
 
 # The Flower hierarchy cannot be changed:

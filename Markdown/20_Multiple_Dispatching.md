@@ -37,7 +37,6 @@ Here's an example of multiple dispatching:
 ```python
 # MultipleDispatching/PaperScissorsRock.py
 # Demonstration of multiple dispatching.
-from __future__ import generators
 import random
 
 # An enumeration type:
@@ -126,7 +125,6 @@ sensible to make the table explicit, like this:
 ```python
 # MultipleDispatching/PaperScissorsRock2.py
 # Multiple dispatching using a table
-from __future__ import generators
 import random
 
 class Outcome:

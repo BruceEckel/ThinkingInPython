@@ -1,6 +1,5 @@
 # MultipleDispatching/PaperScissorsRock.py
 # Demonstration of multiple dispatching.
-from __future__ import generators
 import random
 
 # An enumeration type:

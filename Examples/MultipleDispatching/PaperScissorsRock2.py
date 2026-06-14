@@ -1,6 +1,5 @@
 # MultipleDispatching/PaperScissorsRock2.py
 # Multiple dispatching using a table
-from __future__ import generators
 import random
 
 class Outcome:
