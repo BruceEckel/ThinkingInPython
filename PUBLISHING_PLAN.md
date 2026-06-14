@@ -229,7 +229,7 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 | P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
 | P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
 | P2-* | Code modernization (per subtree) | DONE (baseline 67 → 0; every example runs, CI gate is now strict) |
-| P3-1 | Rewrite Introduction | PARTIAL: meta content relocated to `CONTRIBUTING.md` (now revoiced and house-styled). The Introduction itself still needs its finished front matter (prerequisites, "how to read this book") — author. |
+| P3-1 | Rewrite Introduction | DONE (drafted): meta content relocated to `CONTRIBUTING.md` (revoiced); Introduction is now finished front matter (vision, who it is for, prerequisites, how to read) in the author's voice, with working cross-references. Author review welcome. |
 | P3-2 | Stub chapter decisions | DONE (cut Generators and Iterators, Machine Discovery, Table-Driven Code; Messenger reframed; Static Type Checking written and revoiced; Application Frameworks kept + reframed; Pattern Concept / Simulation kept). No empty stubs remain. |
 | P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
 | P4-* | Pattern reframe (per pattern chapter) | DONE (reframed: Singleton, Application Frameworks, Fronting, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Multiple Dispatching, Visitor, Pattern Refactoring. Table-Driven Code cut. The Pattern Concept is conceptual (editorial only); Simulation kept, not a GoF pattern.) |
