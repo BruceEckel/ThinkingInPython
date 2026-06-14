@@ -256,7 +256,7 @@ Every example in these subtrees now runs and is `ty`-clean, with the book and
 | UnitTesting | DONE (reframed around pytest; Java framework removed; pytest is now a CI hard gate) |
 | Metaprogramming | DONE (Pythonic reframe: leads with `__init_subclass__`, `__set_name__`, class decorators; metaclasses kept only where they earn it; Py2-only examples removed) |
 | PatternRefactoring | DONE (Pythonic reframe: `__init_subclass__` registry factory, `dict` keyed by `type` for sorting, `functools.singledispatch` replacing double-dispatch and Visitor; 23 Java files collapsed to 6. This also covers the chapter's P4 reframe.) |
-| Root scripts | `CodeManager.py` marked `# extract: no-run`; `SanityCheck.py` removed (obsolete, replaced by pytest) |
+| Root scripts | `CodeManager.py` removed with its "A More Complex Example" section; `SanityCheck.py` removed (obsolete, replaced by pytest) |
 
 **Nothing remains in the baseline.** Every extracted example runs (89 pass, 6
 skipped build-tools/GUI), is `ty`-clean or reframed, and the book and `Examples/`
