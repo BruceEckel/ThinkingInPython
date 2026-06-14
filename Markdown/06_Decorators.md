@@ -1,360 +1,275 @@
 # Decorators
 
-Note: I think we can rewrite this chapter to use Python decorators as
-implementations (thus the decorators chapter should precede this one).
+Python builds decoration into the language. You write `@something` above a
+function or a class, and Python wraps it. The same idea appears in *Design
+Patterns* as the *decorator* pattern: wrap an object to add responsibilities to
+it, while keeping the wrapped object's interface so the wrapping stays invisible
+to the code that uses it.
 
-The use of layered objects to dynamically and transparently add responsibilities
-to individual objects is the *decorator* pattern. You use it when subclassing
-would create too many inflexible classes. Every decorator wraps the original
-object and presents the same interface, so the wrapping is transparent and
-decorators can nest. The tradeoff is that code using decorators is more
-complicated to write.
+This chapter starts with the language feature, because that is where you meet
+decoration first. Then it shows the object-level pattern, for when you need to
+decorate individual objects at runtime.
 
-## Basic Decorator Structure
+## The `@` Syntax
 
-![image description](_images/decorator)
-
-## A Coffee Example
-
-Consider going down to the local coffee shop, *BeanMeUp*, for a coffee.
-There are typically many different drinks on offer: espressos, lattes,
-teas, iced coffees, hot chocolate to name a few, as well as a number of
-extras (which cost extra too) such as whipped cream or an extra shot of
-espresso. You can also make certain changes to your drink at no extra
-cost, such as asking for decaf coffee instead of regular coffee.
-
-Quite clearly if we are going to model all these drinks and
-combinations, there will be sizeable class diagrams. So for clarity we
-will only consider a subset of the coffees: Espresso, Espresso Con
-Panna, Café Late, Cappuccino and Café Mocha. We'll include 2 extras -
-whipped cream ("whipped") and an extra shot of espresso; and three
-changes: decaf, steamed milk ("wet") and foamed milk ("dry").
-
-## Class for Each Combination
-
-One solution is to create an individual class for every combination.
-Each class describes the drink and is responsible for the cost etc. The
-resulting menu is huge, and a part of the class diagram would look
-something like this:
-
-![image description](_images/coffeeExplosion)
-
-The key to using this method is to find the particular combination you
-want. So, once you've found the drink you would like, here is how you
-would use it, as shown in the `CoffeeShop` class in the following
-code:
+A *decorator* is a callable that takes a function and returns a function. The
+returned function usually does some work, calls the original, and does some more
+work. Here is a decorator that traces calls:
 
 ```python
-# Decorator/nodecorators/CoffeeShop.py
-# Coffee example with no decorators
+# Decorator/trace.py
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
 
-class Espresso: pass
-class DoubleEspresso: pass
-class EspressoConPanna: pass
-
-class Cappuccino:
-    def __init__(self) -> None:
-        self.cost = 1
-        self.description = "Cappucino"
-    def getCost(self) -> float:
-        return self.cost
-    def getDescription(self) -> str:
-        return self.description
-
-class CappuccinoDecaf: pass
-class CappuccinoDecafWhipped: pass
-class CappuccinoDry: pass
-class CappuccinoDryWhipped: pass
-class CappuccinoExtraEspresso: pass
-class CappuccinoExtraEspressoWhipped: pass
-class CappuccinoWhipped: pass
-
-class CafeMocha: pass
-class CafeMochaDecaf: pass
-class CafeMochaDecafWhipped:
-    def __init__(self) -> None:
-        self.cost = 1.25
-        self.description = "Cafe Mocha decaf whipped cream"
-    def getCost(self) -> float:
-        return self.cost
-    def getDescription(self) -> str:
-        return self.description
-
-class CafeMochaExtraEspresso: pass
-class CafeMochaExtraEspressoWhipped: pass
-class CafeMochaWet: pass
-class CafeMochaWetWhipped: pass
-class CafeMochaWhipped: pass
-
-class CafeLatte: pass
-class CafeLatteDecaf: pass
-class CafeLatteDecafWhipped: pass
-class CafeLatteExtraEspresso: pass
-class CafeLatteExtraEspressoWhipped: pass
-class CafeLatteWet: pass
-class CafeLatteWetWhipped: pass
-class CafeLatteWhipped: pass
-
-cappuccino = Cappuccino()
-print(cappuccino.getDescription() + ": $" + repr(cappuccino.getCost()))
-
-cafeMocha = CafeMochaDecafWhipped()
-print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getCost()))
-```
-
-And here is the corresponding output:
-
-    Cappucino: $1.0
-    Cafe Mocha decaf whipped cream: $1.25
-
-You can see that creating the particular combination you want is easy,
-since you are just creating an instance of a class. However, there are a
-number of problems with this approach. Firstly, the combinations are
-fixed statically so that any combination a customer may wish to order
-needs to be created up front. Secondly, the resulting menu is so huge
-that finding your particular combination is difficult and time
-consuming.
-
-## The Decorator Approach
-
-Another approach would be to break the drinks down into the various
-components such as espresso and foamed milk, and then let the customer
-combine the components to describe a particular coffee.
-
-In order to do this programmatically, we use the Decorator pattern. A
-Decorator adds responsibility to a component by wrapping it, but the
-Decorator conforms to the interface of the component it encloses, so the
-wrapping is transparent. Decorators can also be nested without the loss
-of this transparency.
-
-![image description](_images/decoratedCoffee)
-
-Methods invoked on the Decorator can in turn invoke methods in the
-component, and can of course perform processing before or after the
-invocation.
-
-So if we added `getTotalCost()` and `getDescription()` methods to
-the `DrinkComponent` interface, an Espresso looks like this:
-
-```python
-# Decorator/alldecorators/EspressoDecorator.py
-from CoffeeShop import Decorator, DrinkComponent
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-class Espresso(Decorator):
-    cost = 0.75
-    description = " espresso"
-    def __init__(self, component: DrinkComponent) -> None:
-        Decorator.__init__(self, component)
+def trace(func: Callable[P, R]) -> Callable[P, R]:
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"-> {func.__name__}{args}")
+        result = func(*args, **kwargs)
+        print(f"<- {func.__name__} = {result!r}")
+        return result
+    return wrapper
 
-    def getTotalCost(self) -> float:
-        return self.component.getTotalCost() + self.cost
 
-    def getDescription(self) -> str:
-        return self.component.getDescription() + self.description
-```
+@trace
+def add(a: int, b: int) -> int:
+    return a + b
 
-You combine the components to create a drink as follows, as shown in the
-code below:
-
-```python
-# Decorator/alldecorators/CoffeeShop.py
-# Coffee example using decorators
-
-class DrinkComponent:
-    cost: float = 0.0
-    def getDescription(self) -> str:
-        return self.__class__.__name__
-    def getTotalCost(self) -> float:
-        return self.__class__.cost
-
-class Mug(DrinkComponent):
-    cost = 0.0
-
-class Decorator(DrinkComponent):
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        self.component = drinkComponent
-    def getTotalCost(self) -> float:
-        return self.component.getTotalCost() + \
-          DrinkComponent.getTotalCost(self)
-    def getDescription(self) -> str:
-        return self.component.getDescription() + \
-          ' ' + DrinkComponent.getDescription(self)
-
-class Espresso(Decorator):
-    cost = 0.75
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Decaf(Decorator):
-    cost = 0.0
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class FoamedMilk(Decorator):
-    cost = 0.25
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class SteamedMilk(Decorator):
-    cost = 0.25
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Whipped(Decorator):
-    cost = 0.25
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Chocolate(Decorator):
-    cost = 0.25
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
 
 if __name__ == "__main__":
-    cappuccino = Espresso(FoamedMilk(Mug()))
-    print(cappuccino.getDescription().strip() + ": $" +
-          repr(cappuccino.getTotalCost()))
-
-    cafeMocha = Espresso(SteamedMilk(Chocolate(Whipped(Decaf(Mug())))))
-    print(cafeMocha.getDescription().strip() + ": $" +
-          repr(cafeMocha.getTotalCost()))
+    add(2, 3)
 ```
 
-This approach would certainly provide the most flexibility and the
-smallest menu. You have a small number of components to choose from, but
-assembling the description of the coffee then becomes rather arduous.
+The output is:
 
-If you want to describe a plain cappuccino, you create it with:
+    -> add(2, 3)
+    <- add = 5
 
-    plainCap = Espresso(FoamedMilk(Mug()))
+The `@trace` above `add` is just sugar. It means:
 
-Creating a decaf Cafe Mocha with whipped cream requires an even longer
-description.
+    add = trace(add)
 
-## Compromise
+`trace` returns `wrapper`, so the name `add` now refers to `wrapper`. Calling
+`add(2, 3)` runs the wrapper, which prints, calls the real `add`, prints again,
+and returns the result.
 
-The previous approach takes too long to describe a coffee. There will
-also be certain combinations that you will describe regularly, and it
-would be convenient to have a quick way of describing them.
+`functools.wraps` copies the original function's name and docstring onto the
+wrapper, so the wrapped function still looks like itself when you inspect it.
 
-The 3rd approach is a mixture of the first 2 approaches, and combines
-flexibility with ease of use. This compromise is achieved by creating a
-reasonably sized menu of basic selections, which would often work
-exactly as they are, but if you wanted to decorate them (whipped cream,
-decaf etc.) then you would use decorators to make the modifications.
-This is the type of menu you are presented with in most coffee shops.
+### Decorators That Take Arguments
 
-![image description](_images/compromiseDecoration)
-
-Here is how to create a basic selection, as well as a decorated
-selection:
+To pass arguments to a decorator, add another layer. A decorator with arguments
+is a function that returns a decorator:
 
 ```python
-# Decorator/compromise/CoffeeShop.py
-# Coffee example with a compromise of basic
-# combinations and decorators
+# Decorator/repeat.py
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
 
-class DrinkComponent:
-    cost: float = 0.0
-    def getDescription(self) -> str:
-        return self.__class__.__name__
-    def getTotalCost(self) -> float:
-        return self.__class__.cost
+P = ParamSpec("P")
+R = TypeVar("R")
 
-class Espresso(DrinkComponent):
-    cost = 0.75
 
-class EspressoConPanna(DrinkComponent):
-    cost = 1.0
+def repeat(times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorate(func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            result = func(*args, **kwargs)
+            for _ in range(times - 1):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorate
 
-class Cappuccino(DrinkComponent):
-    cost = 1.0
 
-class CafeLatte(DrinkComponent):
-    cost = 1.0
+@repeat(times=3)
+def greet(name: str) -> str:
+    print(f"Hello, {name}")
+    return name
 
-class CafeMocha(DrinkComponent):
-    cost = 1.25
 
-class Decorator(DrinkComponent):
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        self.component = drinkComponent
-    def getTotalCost(self) -> float:
-        return self.component.getTotalCost() + \
-          DrinkComponent.getTotalCost(self)
-    def getDescription(self) -> str:
-        return self.component.getDescription() + \
-          ' ' + DrinkComponent.getDescription(self)
-
-class ExtraEspresso(Decorator):
-    cost = 0.75
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Whipped(Decorator):
-    cost = 0.50
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Decaf(Decorator):
-    cost = 0.0
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Dry(Decorator):
-    cost = 0.0
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-class Wet(Decorator):
-    cost = 0.0
-    def __init__(self, drinkComponent: DrinkComponent) -> None:
-        Decorator.__init__(self, drinkComponent)
-
-cappuccino = Cappuccino()
-print(cappuccino.getDescription() + ": $" + repr(cappuccino.getTotalCost()))
-
-cafeMocha = Whipped(Decaf(CafeMocha()))
-print(cafeMocha.getDescription() + ": $" + repr(cafeMocha.getTotalCost()))
+if __name__ == "__main__":
+    greet("Bob")
 ```
 
-You can see that creating a basic selection is quick and easy, which
-makes sense since they will be described regularly. Describing a
-decorated drink is more work than when using a class per combination,
-but clearly less work than when only using decorators.
+`@repeat(times=3)` calls `repeat(3)`, which returns the real decorator, which
+then wraps `greet`. The greeting prints three times.
 
-The final result is not too many classes, but not too many decorators
-either. Most of the time it's possible to get away without using any
-decorators at all, so we have the benefits of both approaches.
+### Stacking Decorators
 
-## Other Considerations
+You can apply more than one decorator. They nest from the bottom up:
 
-What happens if we decide to change the menu at a later stage, such as
-by adding a new type of drink? If we had used the class per combination
-approach, the effect of adding an extra such as syrup would be an
-exponential growth in the number of classes. However, the implications
-to the all decorator or compromise approaches are the same: one extra
-class is created.
+    @trace
+    @repeat(times=2)
+    def f() -> None: ...
 
-How about the effect of changing the cost of steamed milk and foamed
-milk, when the price of milk goes up? Having a class for each
-combination means that you need to change a method in each class, and
-thus maintain many classes. By using decorators, maintenance is reduced
-by defining the logic in one place.
+This is `f = trace(repeat(2)(f))`. Each decorator wraps the result of the one
+below it. That nesting is the transparency the pattern depends on. Every layer
+presents the same interface, so the layers compose.
 
-## Further Reading
+### Decorating Classes
+
+A decorator can take a class instead of a function. This one records every class
+it is applied to:
+
+```python
+# Decorator/register.py
+registry: dict[str, type] = {}
+
+
+def register(cls: type) -> type:
+    registry[cls.__name__] = cls
+    return cls
+
+
+@register
+class Espresso: ...
+
+
+@register
+class Latte: ...
+
+
+if __name__ == "__main__":
+    print(sorted(registry))
+```
+
+The output is `['Espresso', 'Latte']`. The [Metaprogramming](07_Metaprogramming.md)
+chapter shows `__init_subclass__`, which builds a registry like this without a
+decorator.
+
+## The Decorator Pattern
+
+The `@` syntax decorates a function or class once, at definition. Every call or
+every instance gets the wrapping. Sometimes you want to add responsibilities to
+one object at runtime, and let the caller choose which responsibilities to add.
+That is the object decorator pattern.
+
+Consider a coffee shop. A class for every drink-and-extra combination explodes:
+espresso, espresso with whipped cream, decaf espresso with whipped cream, and so
+on. Each new extra doubles the menu.
+
+Instead, model the extras as decorators. A plain drink knows its own cost and
+description. An extra wraps a drink, adds to the cost, and adds to the
+description. Because an extra is itself a drink, you can wrap an extra in another
+extra.
+
+```python
+# Decorator/coffee.py
+from __future__ import annotations
+from typing import Protocol
+
+
+class Drink(Protocol):
+    @property
+    def cost(self) -> float: ...
+    @property
+    def description(self) -> str: ...
+
+
+class Espresso:
+    cost = 1.50
+    description = "espresso"
+
+
+class Cappuccino:
+    cost = 1.75
+    description = "cappuccino"
+
+
+class Extra:
+    "Base object decorator: wraps a Drink and adds to it."
+    add_cost = 0.0
+    name = ""
+
+    def __init__(self, drink: Drink) -> None:
+        self.drink = drink
+
+    @property
+    def cost(self) -> float:
+        return self.drink.cost + self.add_cost
+
+    @property
+    def description(self) -> str:
+        return f"{self.drink.description} + {self.name}"
+
+
+class Whipped(Extra):
+    add_cost = 0.50
+    name = "whipped cream"
+
+
+class Decaf(Extra):
+    add_cost = 0.0
+    name = "decaf"
+
+
+class ExtraShot(Extra):
+    add_cost = 0.75
+    name = "extra shot"
+
+
+if __name__ == "__main__":
+    order = Whipped(ExtraShot(Espresso()))
+    print(f"{order.description}: ${order.cost:.2f}")
+
+    plain = Cappuccino()
+    print(f"{plain.description}: ${plain.cost:.2f}")
+```
+
+The output is:
+
+    espresso + extra shot + whipped cream: $2.75
+    cappuccino: $1.75
+
+`Whipped(ExtraShot(Espresso()))` is the object version of stacked `@`
+decorators. Each extra wraps the drink inside it and forwards through the same
+two-property interface, `cost` and `description`. The `Drink` `Protocol`
+describes that interface. Both the plain drinks and the extras satisfy it
+structurally, with no shared base class required. This is the structural typing
+from the [Static Type Checking](04_Static_Type_Checking.md) chapter.
+
+Adding a new extra means adding one class. Changing the price of an extra means
+changing one number, in one place. Compare that to a class per combination, where
+a price change touches every class that includes that extra.
+
+A test fixes the behavior:
+
+```python
+# Decorator/test_coffee.py
+from coffee import Cappuccino, Decaf, Espresso, ExtraShot, Whipped
+
+
+def test_plain_drink() -> None:
+    cap = Cappuccino()
+    assert cap.cost == 1.75
+    assert cap.description == "cappuccino"
+
+
+def test_stacked_extras() -> None:
+    order = Whipped(ExtraShot(Espresso()))
+    assert order.cost == 2.75
+    assert order.description == "espresso + extra shot + whipped cream"
+
+
+def test_decaf_adds_no_cost() -> None:
+    order = Decaf(Espresso())
+    assert order.cost == 1.50
+    assert order.description == "espresso + decaf"
+```
 
 ## Exercises
 
-1.  Add a Syrup class to the decorator approach described above. Then
-    create a Café Latte (you'll need to use steamed milk with an
-    espresso) with syrup.
-2.  Repeat Exercise 1 for the compromise approach.
-3.  Implement the decorator pattern to create a Pizza restaurant, which
-    has a set menu of choices as well as the option to design your own
-    pizza. Follow the compromise approach to create a menu consisting of
-    a Margherita, Hawaiian, Regina, and Vegetarian pizzas, with toppings
-    (decorators) of Garlic, Olives, Spinach, Avocado, Feta and
-    Pepperdews. Create a Hawaiian pizza, as well as a Margherita
-    decorated with Spinach, Feta, Pepperdews and Olives.
+1.  Add a `Syrup` extra (cost 0.30) and use it to build a decaf latte with
+    syrup.
+2.  Write a `timing` decorator that prints how long the wrapped function took,
+    using `time.perf_counter`. Apply it together with `@trace` and predict the
+    order of the output.
+3.  Implement the object decorator pattern for a pizza shop: plain pizzas
+    (Margherita, Hawaiian) and topping decorators (Garlic, Olives, Feta). Build a
+    Margherita decorated with Olives and Feta, then print its cost and
+    description.
