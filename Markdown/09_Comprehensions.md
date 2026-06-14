@@ -173,6 +173,6 @@ time, on demand:
     squares = (n ** 2 for n in range(1_000_000))
 
 Nothing is computed until you iterate over `squares`, and only one value exists at
-a time. The [Iterators](15_Iterators.md) chapter covers generators in depth.
+a time. The [Iterators](16_Iterators.md) chapter covers generators in depth.
 
 Portions of this chapter were contributed by Michael Charlton.

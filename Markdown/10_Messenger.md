@@ -76,4 +76,6 @@ print(Color(255, 0, 0).r)
 
 Reach for `SimpleNamespace` for an ad-hoc bag of attributes, a `@dataclass` for
 a typed mutable record, and a `NamedTuple` for a typed immutable one. Write the
-hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
+hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath. To
+make a `@dataclass` guarantee that its values are legal, not merely typed, see
+[Data Classes as Types](05_Data_Classes_as_Types.md).

@@ -231,7 +231,7 @@ class SingleTone:
 ### As a Class Decorator
 
 You can wrap a class so that calling it returns a cached instance. This is a
-*class decorator* (see [the Decorators chapter](06_Decorators.md)):
+*class decorator* (see [the Decorators chapter](07_Decorators.md)):
 
 ```python
 # Singleton/Singleton.py
@@ -267,7 +267,7 @@ print(x is y is z)
 ```
 
 Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`, so
-the name `Foo` now refers to the decorator instance rather than to the class.
+the name `Foo` now refers to the decorated instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want. But the name
 no longer points at a class. `isinstance(x, Foo)` and subclassing `Foo` no longer
 work. The `__new__` and metaclass versions below keep the name pointing at a real
@@ -276,7 +276,7 @@ class, which is the reason to prefer them when you need that.
 ### As a Metaclass
 
 Finally, a metaclass can intercept construction itself. Metaclasses are covered
-in [the Metaprogramming chapter](07_Metaprogramming.md), where this same singleton appears next to the
+in [the Metaprogramming chapter](08_Metaprogramming.md), where this same singleton appears next to the
 simpler hooks that usually replace them. It is included here for completeness:
 
 ```python

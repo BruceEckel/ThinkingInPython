@@ -222,6 +222,13 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 > Note: after the P3-2 cuts the chapters were renumbered contiguously to
 > `00`–`23`. Status entries below name chapters by title; any numbers refer to
 > the current (post-renumber) positions.
+>
+> Update: a new chapter `05_Data_Classes_as_Types` was added after Static Type
+> Checking (adapted from the author's PyCon 2022 talk / the DataClassesAsTypes
+> repo: types as sets of values, frozen data classes that validate in
+> `__post_init__`, with rejection demonstrated in pytest). Chapters `05`–`23`
+> shifted to `06`–`24`; cross-reference links were updated. The book is now
+> `00`–`24` (25 chapters).
 
 | Task | Description | Status |
 |------|-------------|--------|
