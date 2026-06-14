@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
 `replace` returns a copy with some fields changed, leaving the original alone.
 That copy-instead-of-mutate style is the one we want. (This is the same `dataclass`
-the [Messenger](10_Messenger.md) chapter uses for passing bundles of data
+the [Messenger](11_Messenger.md) chapter uses for passing bundles of data
 around.) But notice the last two lines: a plain data class is still mutable, so
 `m.name = "bar"` works.
 
@@ -234,7 +234,7 @@ the type carry the meaning. Here the type carries a guarantee.
 
 `__post_init__` is one of the hooks the data class machinery generates code
 around, in the same spirit as the class-creation hooks in the
-[Metaprogramming](08_Metaprogramming.md) chapter.
+[Metaprogramming](09_Metaprogramming.md) chapter.
 
 ## Composing Types from Types
 
@@ -483,7 +483,7 @@ if __name__ == "__main__":
 The claim is that an illegal value cannot exist. That is exactly the kind of
 claim a test should pin down. Using `pytest.raises`, you assert that the
 constructor rejects every value outside the set. See the
-[Testing](06_Testing.md) chapter for pytest in general.
+[Testing](07_Testing.md) chapter for pytest in general.
 
 ```python
 # DataClassesAsTypes/test_stars.py

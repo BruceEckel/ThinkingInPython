@@ -227,8 +227,14 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 > Checking (adapted from the author's PyCon 2022 talk / the DataClassesAsTypes
 > repo: types as sets of values, frozen data classes that validate in
 > `__post_init__`, with rejection demonstrated in pytest). Chapters `05`–`23`
-> shifted to `06`–`24`; cross-reference links were updated. The book is now
-> `00`–`24` (25 chapters).
+> shifted to `06`–`24`; cross-reference links were updated.
+>
+> Update: a further new chapter `06_Functional_Error_Handling` was added after
+> Data Classes as Types (adapted from the author's PyCon 2024 talk: exceptions
+> discard context, return errors as values, a self-contained generic `Result`
+> with `Success`/`Failure` and `bind`; the `returns` library is referenced, not
+> required). Chapters `06`–`24` shifted to `07`–`25`. The book is now `00`–`25`
+> (26 chapters).
 
 | Task | Description | Status |
 |------|-------------|--------|

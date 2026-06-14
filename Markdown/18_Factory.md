@@ -217,7 +217,7 @@ for name in ["Circle", "Square", "Circle"]:
 
 Adding a `Triangle` is now a single class definition: it registers itself, and
 `make()` builds it with no change to the factory. This is the same
-self-registration used in [the Pattern Refactoring chapter](23_Pattern_Refactoring.md), and it is the most
+self-registration used in [the Pattern Refactoring chapter](24_Pattern_Refactoring.md), and it is the most
 common form of factory in idiomatic Python. The sections below show the classic
 object-oriented factories for contrast.
 
