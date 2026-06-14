@@ -9,6 +9,3 @@
 # One glob pattern per line, matched against the forward-slash relative path
 # (e.g. Projects/ratsAndMazes/* or StateMachine/*GUI*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
-
-# TKInter GUI application; opens a window and waits for the user.
-Projects/ratsAndMazes/*

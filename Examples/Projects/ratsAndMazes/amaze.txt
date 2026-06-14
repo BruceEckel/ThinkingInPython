@@ -1,0 +1,8 @@
+# Projects/ratsAndMazes/amaze.txt
+*********
+*       *
+*** *** *
+*   *   *
+* ***** *
+*       *
+*********
