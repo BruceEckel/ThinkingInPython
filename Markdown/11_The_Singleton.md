@@ -234,11 +234,11 @@ You can wrap a class so that calling it returns a cached instance. This is a
 *class decorator* (see [the Decorators chapter](06_Decorators.md)):
 
 ```python
-# Singleton/SingletonDecorator.py
+# Singleton/Singleton.py
 from typing import Any
 
 
-class SingletonDecorator:
+class Singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
@@ -249,7 +249,7 @@ class SingletonDecorator:
         return self.instance
 
 
-@SingletonDecorator
+@Singleton
 class Foo:
     pass
 
@@ -266,7 +266,7 @@ print(z.val)
 print(x is y is z)
 ```
 
-Applying `@SingletonDecorator` to `Foo` runs `Foo = SingletonDecorator(Foo)`, so
+Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`, so
 the name `Foo` now refers to the decorator instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want. But the name
 no longer points at a class. `isinstance(x, Foo)` and subclassing `Foo` no longer

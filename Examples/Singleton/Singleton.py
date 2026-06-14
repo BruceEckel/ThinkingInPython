@@ -1,8 +1,8 @@
-# Singleton/SingletonDecorator.py
+# Singleton/Singleton.py
 from typing import Any
 
 
-class SingletonDecorator:
+class Singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
@@ -13,7 +13,7 @@ class SingletonDecorator:
         return self.instance
 
 
-@SingletonDecorator
+@Singleton
 class Foo:
     pass
 
