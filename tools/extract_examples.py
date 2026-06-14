@@ -102,7 +102,9 @@ def write_tree(result: ExtractResult, out_dir: Path) -> int:
         dest = out_dir / ex.path
         dest.parent.mkdir(parents=True, exist_ok=True)
         if not dest.exists() or dest.read_text(encoding="utf-8") != ex.content:
-            dest.write_text(ex.content, encoding="utf-8")
+            # newline="\n" forces LF even on Windows, so regenerating the tree
+            # never introduces CRLF (which .gitattributes would warn about).
+            dest.write_text(ex.content, encoding="utf-8", newline="\n")
             written += 1
     return written
 
