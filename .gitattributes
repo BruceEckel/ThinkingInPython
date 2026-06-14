@@ -1,0 +1,13 @@
+# Keep line endings as LF in the repository and on checkout, on every platform.
+# This overrides the Windows-default core.autocrlf=true (set in the Git for
+# Windows system config), which otherwise warns on every `git add` that LF will
+# be replaced by CRLF. CI and the site build run on Linux, so LF is canonical.
+* text=auto eol=lf
+
+# Binary files: never apply any line-ending conversion.
+*.png  binary
+*.gif  binary
+*.jpg  binary
+*.jpeg binary
+*.pdf  binary
+*.ico  binary

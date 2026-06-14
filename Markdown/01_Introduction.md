@@ -63,5 +63,31 @@ later, use type hints throughout, and are checked with Astral's `ty`. If type
 checking is new to you, [Static Type Checking](04_Static_Type_Checking.md) has
 its own chapter.
 
+## The Code Examples
+
+Every code block that starts with a filename comment, like `# trace.py`, is a
+complete program. These files are extracted from the chapters and live in the
+`Examples/` directory of the
+[source repository](https://github.com/BruceEckel/ThinkingInPython), one folder
+per chapter, named to match the chapter. So a block tagged `# trace.py` in the
+Decorators chapter is the file `Examples/08_Decorators/trace.py`. The examples
+that read a data file, or that span several files, keep them together in the same
+chapter folder.
+
+The build tooling is managed by [uv](https://docs.astral.sh/uv), and a `Makefile`
+drives it. Once you have cloned the repository and installed uv, these are the
+targets worth knowing:
+
+- `make examples` extracts every example from the chapters and runs each one.
+- `make test` runs the book's pytest examples.
+- `make ty` type-checks the examples with `ty`.
+- `make site` builds the browsable HTML version of the book, and `make serve`
+  serves it at a local address.
+- `make ci` runs the whole set of checks, the same ones that guard every change
+  to the book.
+
+If you do not have `make`, each target is a short `uv run python tools/...`
+command. The details are in `tools/README.md`.
+
 If you find a mistake, corrections are welcome. See `CONTRIBUTING.md` in the
 source repository.
