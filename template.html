@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$if(title)$$title$ — $endif$$book-title$</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=$heading-font-google$&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cormorant+SC:wght@400;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  $if(highlighting-css)$
+  <style>
+  $highlighting-css$
+  </style>
+  $endif$
+  <style>
+    :root {
+      --ink: #1a1612;
+      --paper: #f5f0e8;
+      --muted: #7a6e62;
+      --accent: #8b1a1a;
+      --rule: #c8bfb0;
+      --max-width: 680px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { font-size: 18px; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Georgia, serif;
+      line-height: 1.75;
+      padding: 0 1.5rem;
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 4rem 0 6rem;
+    }
+
+    /* TOC toggle */
+    .toc-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1px;
+      transition: color 0.2s;
+      z-index: 100;
+    }
+    .toc-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* Chapter header */
+    .chapter-label {
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: '$heading-font$', sans-serif;
+      font-weight: 600;
+      font-size: 2.6rem;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .title-rule {
+      width: 3rem;
+      height: 1px;
+      background: var(--accent);
+      margin: 1.5rem 0 2.5rem;
+    }
+
+    h2 {
+      font-family: '$heading-font$', sans-serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin: 2.5rem 0 0.75rem;
+      color: var(--ink);
+    }
+
+    h3 {
+      font-family: '$heading-font$', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 2rem 0 0.5rem;
+      color: var(--muted);
+    }
+
+    p { margin-bottom: 1.2rem; }
+
+    p + p { margin-top: 0.6rem; }
+
+    ul, ol {
+      margin-bottom: 1.2rem;
+      padding-left: 1.5rem;
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    em { font-style: italic; }
+    strong { font-weight: 600; }
+
+    code {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.82em;
+      background: rgba(0,0,0,0.04);
+      padding: 0.1em 0.35em;
+      border-radius: 2px;
+    }
+
+    pre {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 1.5rem;
+      border-radius: 3px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    /* Pandoc wraps highlighted blocks in div.sourceCode */
+    div.sourceCode {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      margin: 1.5rem 0;
+    }
+
+    div.sourceCode pre {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    blockquote {
+      border-left: 2px solid var(--accent);
+      margin: 1.5rem 0;
+      padding: 0.5rem 1.5rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+    a:hover { border-color: var(--accent); }
+
+    hr {
+      border: none;
+      text-align: center;
+      margin: 2.5rem 0;
+      color: var(--muted);
+    }
+    hr::after { content: '· · ·'; letter-spacing: 0.5em; }
+
+    /* Navigation */
+    .chapter-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--rule);
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .chapter-nav a { color: var(--muted); border: none; }
+    .chapter-nav a:hover { color: var(--accent); }
+    .chapter-nav .spacer { flex: 1; }
+
+    /* Index / TOC page */
+    .book-title {
+      font-family: '$heading-font$', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .book-author {
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+    .toc-list {
+      list-style: none;
+      margin-top: 2rem;
+    }
+    .toc-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .toc-list li:first-child { border-top: 1px solid var(--rule); }
+    .toc-num {
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      min-width: 2.5rem;
+    }
+    .toc-list a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      color: var(--ink);
+      border: none;
+      flex: 1;
+    }
+    .toc-list a:hover { color: var(--accent); }
+
+    .copyright {
+      margin-top: 5rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'Cormorant SC', serif;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <a class="toc-toggle" href="index.html">Contents</a>
+  <div class="page">
+    $if(chapter-label)$
+    <div class="chapter-label">$chapter-label$</div>
+    $endif$
+    <h1>$title$</h1>
+    <div class="title-rule"></div>
+    $body$
+    <nav class="chapter-nav">
+      $if(prev-url)$<a href="$prev-url$">← $prev-title$</a>$else$<span></span>$endif$
+      <span class="spacer"></span>
+      $if(next-url)$<a href="$next-url$">$next-title$ →</a>$endif$
+    </nav>
+  </div>
+</body>
+</html>

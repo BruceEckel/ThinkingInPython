@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Render the book's Markdown into a static, navigable HTML site.
+"""Render the book's Markdown into a static site, styled like OOPology.
 
-One command turns ``Markdown/*.md`` into ``build/site/``: a title page with an
-ordered table of contents, one HTML page per chapter with previous/next links
-and a sidebar, and syntax-highlighted code. Images referenced in the book as
-``_images/<name>`` (no extension) are resolved against ``resources/images``
-and copied alongside the pages.
+Pandoc converts each chapter through `template.html`: a single readable column
+on a warm "paper" background, a small fixed "Contents" link to the index, a
+chapter label and title rule, and previous/next navigation. There is no
+persistent sidebar. The index page is the table of contents.
 
-Pandoc does the Markdown-to-HTML conversion per chapter; this script handles
-discovery, ordering, navigation, image wiring, and the page shell.
+This adapts the OOPology build to this book: the chapter title comes from the
+first `#` heading (not YAML front matter), images referenced as `_images/<name>`
+are resolved against `resources/images`, and intra-book `.md` links are
+rewritten to `.html` so cross-references resolve in the site.
 
 Usage:
     python tools/build_site.py            # build into build/site/
@@ -17,7 +18,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import html
 import re
 import shutil
 import subprocess
@@ -29,88 +29,79 @@ ROOT = Path(__file__).resolve().parent.parent
 MARKDOWN_DIR = ROOT / "Markdown"
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
+TEMPLATE = ROOT / "template.html"
 DEFAULT_OUT = ROOT / "build" / "site"
 
 FRONT_STEM = "00_Front"
+BOOK_TITLE = "Thinking in Python"
+BOOK_SUBTITLE = "Insights, Idioms and Patterns"
+BOOK_AUTHOR = "Bruce Eckel"
+HEADING_FONT = "Lexend Deca"
+HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
+COPYRIGHT = (f"© 2026 {BOOK_AUTHOR}. Licensed CC BY-NC-ND 4.0.<br>"
+             "Freely readable online. No reproduction without permission.")
+
 IMG_REF = re.compile(r"(!\[[^\]]*\]\()_images/([^)\s]+)(\))")
-# Cross-references are standard relative links to a chapter's .md file
-# (e.g. [the Factory chapter](18_Factory.md)); the site serves .html, so
-# rewrite intra-book .md links to .html. External links (with a scheme) are
-# left alone because the path before .md would contain a colon.
 MD_LINK = re.compile(r"(\]\()([\w./-]+)\.md(#[\w-]+)?(\))")
-SETEXT = re.compile(r"^(=+|-+)\s*$")
-ATX = re.compile(r"^#+\s+(.*?)\s*#*\s*$")
+ATX = re.compile(r"^#\s+(.*?)\s*#*\s*$")
 
 
 @dataclass
 class Chapter:
     md: Path
-    out_name: str  # e.g. "13_The_Singleton.html"
-    title: str  # human title for nav and headings
+    out_name: str   # e.g. "11_The_Singleton.html"
+    number: str     # the 2-digit filename prefix, e.g. "11"
+    title: str      # human title from the first heading
+    label: str      # "Chapter 11", or "Front Matter"
 
 
 # --------------------------------------------------------------------------- #
 # Discovery and metadata
 # --------------------------------------------------------------------------- #
 def derive_label(stem: str) -> str:
-    """Turn a file stem like ``13_The_Singleton`` into ``The Singleton``."""
-    body = re.sub(r"^\d+_", "", stem)
-    return body.replace("_", " ")
+    return re.sub(r"^\d+_", "", stem).replace("_", " ")
 
 
-def first_heading(text: str) -> str | None:
-    lines = text.splitlines()
+def load_chapter(md: Path) -> tuple[str, str]:
+    """Return (title, body). Strips 00_Front YAML and the leading `#` heading."""
+    text = md.read_text(encoding="utf-8")
+    if md.stem == FRONT_STEM:
+        text = re.sub(r"\A---.*?(?:\n\.\.\.|\n---)\s*\n", "", text, count=1,
+                      flags=re.DOTALL)
+        return "Front Matter", text.lstrip("\n")
+    title = derive_label(md.stem)
+    lines = text.split("\n")
     for i, line in enumerate(lines):
         if not line.strip():
             continue
         m = ATX.match(line)
         if m:
-            return m.group(1).strip()
-        nxt = lines[i + 1] if i + 1 < len(lines) else ""
-        if SETEXT.match(nxt):
-            return line.strip()
-        return None  # first real content is not a heading
-    return None
-
-
-def book_metadata(front_text: str) -> dict[str, str]:
-    """Pull title/subtitle/author out of 00_Front's pandoc YAML block."""
-    meta = {"title": "Thinking in Python", "subtitle": "", "author": ""}
-    m = re.search(r"type:\s*main\s*\n\s*text:\s*(.+)", front_text)
-    if m:
-        meta["title"] = m.group(1).strip()
-    m = re.search(r"^subtitle:\s*(.+)$", front_text, re.MULTILINE)
-    if m:
-        meta["subtitle"] = m.group(1).strip()
-    m = re.search(r"role:\s*author\s*\n\s*text:\s*(.+)", front_text)
-    if m:
-        meta["author"] = m.group(1).strip()
-    return meta
+            title = m.group(1)
+            del lines[i]
+            break
+        break  # first real content is not a heading; leave body as-is
+    return title, "\n".join(lines).lstrip("\n")
 
 
 def discover() -> list[Chapter]:
     chapters: list[Chapter] = []
     for md in sorted(MARKDOWN_DIR.glob("*.md")):
-        text = md.read_text(encoding="utf-8")
-        if md.stem == FRONT_STEM:
-            title = "Front Matter"
-        else:
-            title = first_heading(text) or derive_label(md.stem)
-        chapters.append(Chapter(md, f"{md.stem}.html", title))
+        title, _ = load_chapter(md)
+        number = md.stem.split("_", 1)[0]
+        label = "Front Matter" if number == "00" else f"Chapter {int(number)}"
+        chapters.append(Chapter(md, f"{md.stem}.html", number, title, label))
     return chapters
 
 
 # --------------------------------------------------------------------------- #
-# Image handling
+# Markdown rewriting (images and cross-references)
 # --------------------------------------------------------------------------- #
 def build_image_map() -> dict[str, str]:
-    """Map bare reference names (``decorator``) to real files (``decorator.gif``)."""
     out: dict[str, str] = {}
-    if not IMAGES_SRC.is_dir():
-        return out
-    for f in IMAGES_SRC.iterdir():
-        if f.suffix.lower() in {".png", ".gif", ".jpg", ".jpeg", ".svg"}:
-            out[f.stem] = f.name
+    if IMAGES_SRC.is_dir():
+        for f in IMAGES_SRC.iterdir():
+            if f.suffix.lower() in {".png", ".gif", ".jpg", ".jpeg", ".svg"}:
+                out[f.stem] = f.name
     return out
 
 
@@ -120,14 +111,13 @@ def rewrite_images(text: str, img_map: dict[str, str], missing: set[str]) -> str
         filename = img_map.get(name)
         if not filename:
             missing.add(name)
-            filename = f"{name}.png"  # best guess; flagged below
+            filename = f"{name}.png"
         return f"{m.group(1)}images/{filename}{m.group(3)}"
 
     return IMG_REF.sub(repl, text)
 
 
 def rewrite_md_links(text: str) -> str:
-    """Point intra-book cross-references at the built .html pages."""
     return MD_LINK.sub(lambda m: f"{m.group(1)}{m.group(2)}.html"
                                  f"{m.group(3) or ''}{m.group(4)}", text)
 
@@ -137,142 +127,100 @@ def rewrite_md_links(text: str) -> str:
 # --------------------------------------------------------------------------- #
 def check_pandoc() -> None:
     if shutil.which("pandoc") is None:
-        sys.exit("error: pandoc not found on PATH. Install it: https://pandoc.org/installing.html")
+        sys.exit("error: pandoc not found on PATH. "
+                 "Install it: https://pandoc.org/installing.html")
 
 
-def render_body(markdown: str) -> str:
+def render_chapter(body: str, ch: Chapter,
+                   prev: Chapter | None, nxt: Chapter | None) -> str:
+    variables = [
+        f"--variable=title:{ch.title}",
+        f"--variable=chapter-label:{ch.label}",
+        f"--variable=book-title:{BOOK_TITLE}",
+        f"--variable=heading-font:{HEADING_FONT}",
+        f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
+    ]
+    if prev is not None:
+        variables += [f"--variable=prev-url:{prev.out_name}",
+                      f"--variable=prev-title:{prev.title}"]
+    if nxt is not None:
+        variables += [f"--variable=next-url:{nxt.out_name}",
+                      f"--variable=next-title:{nxt.title}"]
     proc = subprocess.run(
-        ["pandoc", "-f", "markdown", "-t", "html", "--highlight-style", "pygments"],
-        input=markdown, capture_output=True, text=True, encoding="utf-8",
+        ["pandoc", "--template", str(TEMPLATE), "--from", "markdown+smart",
+         "--highlight-style", "pygments", *variables],
+        input=body, capture_output=True, text=True, encoding="utf-8",
     )
     if proc.returncode != 0:
-        sys.exit(f"pandoc failed:\n{proc.stderr}")
+        sys.exit(f"pandoc failed on {ch.md.name}:\n{proc.stderr}")
     return proc.stdout
 
 
-def highlight_css() -> str:
-    """Ask pandoc for its pygments highlighting CSS, once."""
-    sample = "```python\ndef f(x: int) -> int:\n    return x\n```\n"
-    proc = subprocess.run(
-        ["pandoc", "-f", "markdown", "-t", "html", "--standalone",
-         "--highlight-style", "pygments"],
-        input=sample, capture_output=True, text=True, encoding="utf-8",
-    )
-    blocks = re.findall(r"<style>(.*?)</style>", proc.stdout, re.DOTALL)
-    wanted = [b for b in blocks if "sourceCode" in b or "code span" in b]
-    return "\n".join(wanted).strip()
-
-
 # --------------------------------------------------------------------------- #
-# Page shell
+# Index page and shared CSS (the table of contents)
 # --------------------------------------------------------------------------- #
-SITE_CSS = """\
-:root { --fg:#1b1b1b; --muted:#666; --accent:#1a5fb4; --rule:#e2e2e2; }
-* { box-sizing: border-box; }
-body { margin:0; color:var(--fg); font:16px/1.6 -apple-system,Segoe UI,Roboto,sans-serif; }
-a { color:var(--accent); text-decoration:none; }
-a:hover { text-decoration:underline; }
-.wrap { display:flex; max-width:1180px; margin:0 auto; }
-nav.sidebar { flex:0 0 260px; padding:1.5rem 1rem; border-right:1px solid var(--rule);
-  height:100vh; position:sticky; top:0; overflow:auto; font-size:14px; }
-nav.sidebar .booktitle { font-weight:700; font-size:15px; display:block; margin-bottom:1rem; }
-nav.sidebar ol { list-style:none; margin:0; padding:0; }
-nav.sidebar li { margin:.15rem 0; }
-nav.sidebar li.current > a { font-weight:700; color:var(--fg); }
-main { flex:1 1 auto; padding:2rem 2.5rem; min-width:0; max-width:820px; }
-main img { max-width:100%; height:auto; }
-main h1, main h2, main h3 { overflow-wrap:break-word; }
-pre { background:#f6f8fa; padding:1rem; overflow:auto; border-radius:6px; }
-code { font-family:"SF Mono",Consolas,Menlo,monospace; font-size:.9em; }
-p code, li code { background:#f0f0f0; padding:.1em .3em; border-radius:3px; }
-blockquote { color:var(--muted); border-left:3px solid var(--rule); margin:1rem 0; padding:.2rem 1rem; }
-table { border-collapse:collapse; } th,td { border:1px solid var(--rule); padding:.4rem .6rem; }
-.chapnav { display:flex; justify-content:space-between; margin-top:3rem;
-  padding-top:1rem; border-top:1px solid var(--rule); font-size:14px; }
-.chapnav .next { margin-left:auto; text-align:right; }
-.titlepage { text-align:center; padding:4rem 1rem 2rem; }
-.titlepage h1 { font-size:2.4rem; margin:.2rem 0; }
-.titlepage .subtitle { font-size:1.3rem; color:var(--muted); }
-.titlepage .author { margin-top:1rem; font-size:1.1rem; }
-
-/* Narrow screens: stack the sidebar on top so the text gets the full width. */
-@media (max-width: 800px) {
-  .wrap { flex-direction:column; }
-  nav.sidebar { flex:0 0 auto; width:auto; height:auto; position:static;
-    overflow:visible; border-right:none; border-bottom:1px solid var(--rule); }
-  main { max-width:none; padding:1.5rem 1.25rem; }
-  .titlepage { padding:2rem 1rem 1rem; }
-  .titlepage h1 { font-size:1.9rem; }
-}
-"""
-
-
-def sidebar(chapters: list[Chapter], current: str, meta: dict[str, str]) -> str:
-    items = []
-    for ch in chapters:
-        cls = ' class="current"' if ch.out_name == current else ""
-        items.append(
-            f'    <li{cls}><a href="{ch.out_name}">{html.escape(ch.title)}</a></li>'
-        )
-    return (
-        '<nav class="sidebar">\n'
-        f'  <a class="booktitle" href="index.html">{html.escape(meta["title"])}</a>\n'
-        "  <ol>\n" + "\n".join(items) + "\n  </ol>\n</nav>"
+def render_index(chapters: list[Chapter]) -> str:
+    rows = "\n".join(
+        f'    <li><span class="toc-num">{ch.number}</span>'
+        f'<a href="{ch.out_name}">{ch.title}</a></li>'
+        for ch in chapters
     )
-
-
-def chapter_nav(prev: Chapter | None, nxt: Chapter | None) -> str:
-    parts = ['<div class="chapnav">']
-    if prev:
-        parts.append(
-            f'  <a class="prev" href="{prev.out_name}">&larr; {html.escape(prev.title)}</a>'
-        )
-    if nxt:
-        parts.append(
-            f'  <a class="next" href="{nxt.out_name}">{html.escape(nxt.title)} &rarr;</a>'
-        )
-    parts.append("</div>")
-    return "\n".join(parts)
-
-
-PAGE = """\
-<!DOCTYPE html>
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
-<link rel="stylesheet" href="static/site.css">
-<link rel="stylesheet" href="static/highlight.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{BOOK_TITLE}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-{sidebar}
-<main>
-{content}
-</main>
-</div>
+  <div class="page">
+    <p class="book-author">{BOOK_AUTHOR}</p>
+    <h1 class="book-title">{BOOK_TITLE}</h1>
+    <p class="book-subtitle">{BOOK_SUBTITLE}</p>
+    <div class="title-rule"></div>
+    <ul class="toc-list">
+{rows}
+    </ul>
+    <p class="copyright">{COPYRIGHT}</p>
+  </div>
 </body>
 </html>
 """
 
 
-def render_index(chapters: list[Chapter], meta: dict[str, str], sb: str) -> str:
-    rows = "\n".join(
-        f'    <li><a href="{ch.out_name}">{html.escape(ch.title)}</a></li>'
-        for ch in chapters
-    )
-    sub = (f'<div class="subtitle">{html.escape(meta["subtitle"])}</div>'
-           if meta["subtitle"] else "")
-    auth = (f'<div class="author">{html.escape(meta["author"])}</div>'
-            if meta["author"] else "")
-    content = (
-        '<div class="titlepage">\n'
-        f'  <h1>{html.escape(meta["title"])}</h1>\n'
-        f"  {sub}\n  {auth}\n</div>\n"
-        "<h2>Contents</h2>\n<ol>\n" + rows + "\n</ol>"
-    )
-    return PAGE.format(title=html.escape(meta["title"]), sidebar=sb, content=content)
+def render_css() -> str:
+    return f""":root {{
+  --ink: #1a1612; --paper: #f5f0e8; --muted: #7a6e62;
+  --accent: #8b1a1a; --rule: #c8bfb0; --max-width: 680px;
+}}
+* {{ margin: 0; padding: 0; box-sizing: border-box; }}
+html {{ font-size: 18px; }}
+body {{ background: var(--paper); color: var(--ink);
+  font-family: Georgia, serif; line-height: 1.75; padding: 0 1.5rem; }}
+.page {{ max-width: var(--max-width); margin: 0 auto; padding: 4rem 0 6rem; }}
+.book-title {{ font-family: '{HEADING_FONT}', sans-serif; font-size: 3.5rem;
+  font-weight: 600; line-height: 1.1; margin-bottom: 0.5rem; }}
+.book-author {{ font-family: 'Cormorant SC', serif; font-size: 0.85rem;
+  letter-spacing: 0.15em; color: var(--muted); margin-bottom: 0.5rem; }}
+.book-subtitle {{ font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 1.1rem; color: var(--muted); margin-bottom: 0.25rem; }}
+.title-rule {{ width: 3rem; height: 1px; background: var(--accent);
+  margin: 1.5rem 0 2.5rem; }}
+.toc-list {{ list-style: none; margin-top: 2rem; }}
+.toc-list li {{ display: flex; align-items: baseline;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }}
+.toc-list li:first-child {{ border-top: 1px solid var(--rule); }}
+.toc-num {{ font-family: 'Cormorant SC', serif; font-size: 0.7rem;
+  letter-spacing: 0.1em; color: var(--muted); min-width: 2.5rem; }}
+.toc-list a {{ font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+  color: var(--ink); text-decoration: none; flex: 1; }}
+.toc-list a:hover {{ color: var(--accent); }}
+.copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
+  font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
+"""
 
 
 # --------------------------------------------------------------------------- #
@@ -280,20 +228,15 @@ def render_index(chapters: list[Chapter], meta: dict[str, str], sb: str) -> str:
 # --------------------------------------------------------------------------- #
 def build(out_dir: Path) -> int:
     check_pandoc()
+    if not TEMPLATE.exists():
+        sys.exit(f"error: template not found at {TEMPLATE}")
     chapters = discover()
-    front_text = (MARKDOWN_DIR / f"{FRONT_STEM}.md").read_text(encoding="utf-8")
-    meta = book_metadata(front_text)
     img_map = build_image_map()
 
     if out_dir.exists():
         shutil.rmtree(out_dir)
-    static_out = out_dir / "static"
     images_out = out_dir / "images"
-    static_out.mkdir(parents=True)
     images_out.mkdir(parents=True)
-
-    (static_out / "site.css").write_text(SITE_CSS, encoding="utf-8")
-    (static_out / "highlight.css").write_text(highlight_css(), encoding="utf-8")
 
     used_images: set[str] = set()
     missing: set[str] = set()
@@ -301,26 +244,17 @@ def build(out_dir: Path) -> int:
     for i, ch in enumerate(chapters):
         prev = chapters[i - 1] if i > 0 else None
         nxt = chapters[i + 1] if i + 1 < len(chapters) else None
-        text = ch.md.read_text(encoding="utf-8")
-        # Strip 00_Front's YAML metadata block; pandoc would render it oddly.
-        if ch.md.stem == FRONT_STEM:
-            text = re.sub(r"\A---.*?(?:\n\.\.\.|\n---)\s*\n", "", text, count=1,
-                          flags=re.DOTALL)
-        for m in IMG_REF.finditer(text):
+        _, body = load_chapter(ch.md)
+        for m in IMG_REF.finditer(body):
             used_images.add(m.group(2))
-        text = rewrite_images(text, img_map, missing)
-        text = rewrite_md_links(text)
-        body = render_body(text)
-        content = body + "\n" + chapter_nav(prev, nxt)
-        sb = sidebar(chapters, ch.out_name, meta)
-        page = PAGE.format(title=html.escape(ch.title), sidebar=sb, content=content)
+        body = rewrite_images(body, img_map, missing)
+        body = rewrite_md_links(body)
+        page = render_chapter(body, ch, prev, nxt)
         (out_dir / ch.out_name).write_text(page, encoding="utf-8")
 
-    sb = sidebar(chapters, "index.html", meta)
-    (out_dir / "index.html").write_text(
-        render_index(chapters, meta, sb), encoding="utf-8")
+    (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
+    (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
-    # Copy only the images the book actually references.
     copied = 0
     for name in sorted(used_images):
         filename = img_map.get(name)
@@ -328,13 +262,13 @@ def build(out_dir: Path) -> int:
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
             copied += 1
     if (STATIC_SRC / "favicon.ico").exists():
-        shutil.copy2(STATIC_SRC / "favicon.ico", static_out / "favicon.ico")
+        shutil.copy2(STATIC_SRC / "favicon.ico", out_dir / "favicon.ico")
 
     print(f"Built {len(chapters)} pages + index into {out_dir}")
     print(f"Copied {copied} image(s).")
     if missing:
-        print(f"\nWARNING: {len(missing)} referenced image(s) had no file in "
-              f"{IMAGES_SRC.relative_to(ROOT)} (linked with a .png guess):")
+        print(f"\nWARNING: {len(missing)} referenced image(s) not found in "
+              f"{IMAGES_SRC.relative_to(ROOT)}:")
         for name in sorted(missing):
             print(f"  ? _images/{name}")
         return 1
