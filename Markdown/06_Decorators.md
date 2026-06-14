@@ -1,24 +1,14 @@
 # Decorators
 
-> Dynamic Type Selection
-
 Note: I think we can rewrite this chapter to use Python decorators as
 implementations (thus the decorators chapter should precede this one).
 
-The use of layered objects to dynamically and transparently add
-responsibilities to individual objects is referred to as the *decorator*
-pattern.
-
-Used when subclassing creates too many (& inflexible) classes
-
-All decorators that wrap around the original object must have the same
-basic interface
-
-Dynamic proxy/surrogate?
-
-This accounts for the odd inheritance structure
-
-Tradeoff: coding is more complicated when using decorators
+The use of layered objects to dynamically and transparently add responsibilities
+to individual objects is the *decorator* pattern. You use it when subclassing
+would create too many inflexible classes. Every decorator wraps the original
+object and presents the same interface, so the wrapping is transparent and
+decorators can nest. The tradeoff is that code using decorators is more
+complicated to write.
 
 ## Basic Decorator Structure
 

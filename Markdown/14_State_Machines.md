@@ -748,15 +748,12 @@ You could look at a Python reference as a kind of protection proxy,
 since it controls access to the actual object on the heap (and ensures,
 for example, that you don't use a `null` reference).
 
-{{ Rewrite this: In *Design Patterns*, *Proxy* and *State* are not
-seen as related to each other because the two are given (what I consider
-arbitrarily) different structures. *State*, in particular, uses a
-separate implementation hierarchy but this seems to me to be unnecessary
-unless you have decided that the implementation is not under your
-control (certainly a possibility, but if you own all the code there
-seems to be no reason not to benefit from the elegance and helpfulness
-of the single base class). In addition, *Proxy* need not use the same
-base class for its implementation, as long as the proxy object is
-controlling access to the object it "fronting" for. Regardless of the
-specifics, in both *Proxy* and *State* a surrogate is passing method
-calls through to an implementation object.}}\]
+In *Design Patterns*, Proxy and State are not presented as related to each other,
+because the two are given different structures. That distinction seems arbitrary
+to me. State, in particular, uses a separate implementation hierarchy. That
+hierarchy is unnecessary unless you have decided the implementation is not under
+your control. That can happen. But if you own all the code, there is no reason not
+to benefit from the elegance of a single base class. Proxy need not use the same
+base class for its implementation either, as long as the proxy controls access to
+the object it fronts for. The specifics aside, in both Proxy and State a surrogate
+passes method calls through to an implementation object.

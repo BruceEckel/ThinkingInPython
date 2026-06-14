@@ -75,7 +75,7 @@ expression for the optional predicate.
 An identity matrix of size n is an n by n square matrix with ones on the
 main diagonal and zeros elsewhere. A 3 by 3 identity matrix is:
 
-insert picture of 3x3 matrix here. ![image description](_images/idMatrix)
+![A 3 by 3 identity matrix](_images/idMatrix)
 
 In python we can represent such a matrix by a list of lists, where each
 sub-list represents a row. A 3 by 3 matrix would be represented by the
@@ -134,18 +134,14 @@ We require the set:
 
     { 'Bob', 'John', 'Alice' }
 
-no need to include this if sets are defined else where in the document.
-
-Note the new syntax for denoting a set. Members are enclosed in curly
-braces.
-
 The following set comprehension accomplishes this:
 
     { name[0].upper() + name[1:].lower() for name in names if len(name) > 1 }
 
-the same could be achieved by embedding a list comprehension in a set:
-.. set( \[ name\[0\].upper() + name\[1:\].lower() for name in names if
-len(name) &gt; 1 \] )
+You could get the same result by passing a list comprehension to `set()`. That
+builds a throwaway list first, so the set comprehension is the better choice:
+
+    set([name[0].upper() + name[1:].lower() for name in names if len(name) > 1])
 
 ## Dictionary Comprehensions
 
@@ -168,9 +164,15 @@ characters are combined:
 # mcase_frequency == {'a': 17, 'z': 3, 'b': 34}
 ```
 
-Might be a good idea to mention that the comprehensions are eagerly
-evaluated and that generators get around this problem
+A comprehension is evaluated eagerly. It builds the whole result in memory before
+the next statement runs. For a large input that wastes time and space, especially
+when you consume the result only once. A *generator expression* uses the same
+syntax with parentheses instead of brackets, and produces its values one at a
+time, on demand:
 
-Note: Contributions by Michael Charlton, 3/23/09
+    squares = (n ** 2 for n in range(1_000_000))
 
-EOF
+Nothing is computed until you iterate over `squares`, and only one value exists at
+a time. The [Iterators](15_Iterators.md) chapter covers generators in depth.
+
+Portions of this chapter were contributed by Michael Charlton.
