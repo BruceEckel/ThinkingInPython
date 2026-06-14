@@ -13,7 +13,7 @@ other web sites, etc., as long as you attribute it.
 
 This book or a derivative work cannot be published by a publisher without a contract with the author.
 
-You can print your own version of the book. I may create a printed
+You can print your own version of the book. I may create a print
 version of the book for sale, with a nice cover and binding. Many people
 do like to have a print version of the book, and part of the motivation
 for doing a print version is to make some income off the effort I put
