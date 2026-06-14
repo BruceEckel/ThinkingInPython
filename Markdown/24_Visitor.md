@@ -150,7 +150,7 @@ one-line registration. When the operation should read like a method, use
 
 Visitor still has a place: when you truly cannot define functions over the
 hierarchy, or you need the `accept()` hook for some other reason. But in Python
-that is rare. As with [the Pattern Refactoring chapter](24_Pattern_Refactoring.md)'s price-and-weight
+that is rare. As with [the Pattern Refactoring chapter](25_Pattern_Refactoring.md)'s price-and-weight
 example, `singledispatch` is the open-method mechanism Visitor was invented to
 fake.
 

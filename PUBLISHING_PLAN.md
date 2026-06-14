@@ -235,6 +235,14 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 > with `Success`/`Failure` and `bind`; the `returns` library is referenced, not
 > required). Chapters `06`–`24` shifted to `07`–`25`. The book is now `00`–`25`
 > (26 chapters).
+>
+> Update: a new chapter `12_Rethinking_Objects` was added right before The
+> Pattern Concept (adapted from the author's PyCon 2023 talk: a skeptical look at
+> OOP before the patterns section, using immutable data classes, free functions,
+> protocols, composition, and pattern matching instead of encapsulation and
+> inheritance). Chapters `12`–`25` shifted to `13`–`26`. The book is now `00`–`26`
+> (27 chapters). Note: under the chapter-stem example-folder scheme, renumbering
+> now also renames the matching `Examples/NN_*` folders (regenerate the tree).
 
 | Task | Description | Status |
 |------|-------------|--------|
