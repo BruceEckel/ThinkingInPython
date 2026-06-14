@@ -65,7 +65,7 @@ pattern (albeit one implemented by the compiler). It allows you to
 express differences in behavior (that's the thing that changes) in
 objects that all have the same interface (that's what stays the same).
 Composition can also be considered a pattern, since it allows you to
-change-dynamically or statically-the objects that implement your class,
+change, dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
 Another pattern that appears in *Design Patterns* is the *iterator*,

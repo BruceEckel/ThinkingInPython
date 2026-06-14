@@ -5,7 +5,7 @@ information around. The most typical place for this is in return values
 from functions, where tuples or dictionaries are often used. However,
 those rely on indexing; in the case of tuples this requires the consumer
 to keep track of numerical order, and in the case of a `dict` you must
-use the `d["name"]` syntax which can be slightly less desireable.
+use the `d["name"]` syntax which can be slightly less desirable.
 
 A Messenger is simply an object with attributes corresponding to the
 names of the data you want to pass around or return:

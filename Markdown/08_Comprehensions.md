@@ -25,12 +25,12 @@ A list comprehension consists of the following parts:
 Say we need to obtain a list of all the integers in a sequence and then
 square them:
 
-    a_list = [1, ‘4’, 9, ‘a’, 0, 4]
+    a_list = [1, '4', 9, 'a', 0, 4]
 
-    squared_ints = [ e`2 for e in a_list if type(e) == types.IntType ]
+    squared_ints = [e ** 2 for e in a_list if isinstance(e, int)]
 
-    print squared_ints
-    # [ 1, 81, 0, 16 ]
+    print(squared_ints)
+    # [1, 81, 0, 16]
 
 ![image description](_images/listComprehensions)
 
@@ -45,24 +45,24 @@ Much the same results can be achieved using the built in functions,
 
 The filter function applies a predicate to a sequence:
 
-    filter(lambda e: type(e) == types.IntType, a_list)
+    filter(lambda e: isinstance(e, int), a_list)
 
 Map modifies each member of a sequence:
 
-    map(lambda e: e`2, a_list)
+    map(lambda e: e ** 2, a_list)
 
 The two can be combined:
 
-    map(lambda e: e`2, filter(lambda e: type(e) == types.IntType, a_list))
+    map(lambda e: e ** 2, filter(lambda e: isinstance(e, int), a_list))
 
 The above example involves function calls to `map`, `filter`,
-`type` and two calls to `lambda`. Function calls in Python are
+`isinstance` and two calls to `lambda`. Function calls in Python are
 expensive. Furthermore the input sequence is traversed through twice and
 an intermediate list is produced by filter.
 
 The list comprehension is enclosed within a list so, it is immediately
 evident that a list is being produced. There is only one function call
-to `type` and no call to the cryptic `lambda` instead the list
+to `isinstance` and no call to the cryptic `lambda`; instead the list
 comprehension uses a conventional iterator, an expression and an if
 expression for the optional predicate.
 

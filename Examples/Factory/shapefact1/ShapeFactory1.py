@@ -1,16 +1,14 @@
 # Factory/shapefact1/ShapeFactory1.py
 # A simple static factory method.
-from __future__ import generators
 import random
 
-class Shape(object):
+class Shape:
     # Create based on class name:
+    @staticmethod
     def factory(type):
-        #return eval(type + "()")
         if type == "Circle": return Circle()
         if type == "Square": return Square()
         assert 0, "Bad shape creation: " + type
-    factory = staticmethod(factory)
 
 class Circle(Shape):
     def draw(self): print("Circle.draw")

@@ -39,7 +39,7 @@ the surrounding code.
 observed, when that object decides its time to update all its observers.
 The arguments are optional; you could have an `update()` with no
 arguments and that would still fit the observer pattern; however this is
-more general-it allows the observed object to pass the object that
+more general: it allows the observed object to pass the object that
 caused the update (since an `Observer` may be registered with more
 than one observed object) and any extra information if that's helpful,
 rather than forcing the `Observer` object to hunt around to see who is

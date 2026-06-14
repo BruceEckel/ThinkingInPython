@@ -68,7 +68,7 @@ class StateMachine:
 ```
 
 I've also treated `runAll()` as a template method. This is typical,
-but certainly not required; you could concievably want to override it,
+but certainly not required; you could conceivably want to override it,
 but typically the behavior change will occur in `State`'s `run()`
 instead.
 

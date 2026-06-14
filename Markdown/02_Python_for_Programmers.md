@@ -440,7 +440,7 @@ and reports an error).
 
 `PYTHONPATH` still works, but has been effectively superseded by the *virtual
 environment*, which solves much more than just "where are the modules and
-packages." Virtual environments have their own chapter.
+packages."
 
 ## Classes
 
