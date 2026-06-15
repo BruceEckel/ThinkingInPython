@@ -44,6 +44,11 @@ You should be comfortable with:
   sets.
 - Running a Python program and installing a package.
 
+The book is about the language, not the tooling around it. It does not explain
+installing Python, setting up virtual environments, or managing packages. Those
+are assumed, or easy to find elsewhere, starting with the official Python
+documentation.
+
 You do not need to know design patterns, metaclasses, or type checking before
 you start. The book builds those up. If your grasp of objects is shaky, it will
 grow stronger as you watch objects used in many different situations here.

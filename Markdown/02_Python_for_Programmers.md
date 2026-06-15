@@ -658,9 +658,6 @@ Reference](http://rgruet.free.fr/#QuickRef) to be incredibly useful.
 
 > Python Tips, Tricks and Hacks: <http://www.siafoo.net/article/52>
 
-> Building a Virtual Environment for Running Python 3:
-> <http://pypi.python.org/pypi/virtualenv>
-
 > Excellent Newsfeed Following Python Articles from Everywhere:
 > <http://www.planetpython.org/>
 
