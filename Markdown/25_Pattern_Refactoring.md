@@ -135,9 +135,10 @@ with `isinstance`:
 
 ```python
 # recycle_rtti.py
-# First cut: sort by testing each type. It works, but it checks for EVERY
-# type. Add a new kind of Trash and you must find and edit this code, with
-# no help from the tools if you miss a spot. That is the smell to watch for.
+# First cut: sort by testing each type. It works, but it checks for
+# EVERY type. Add a new kind of Trash and you must find and edit
+# this code, with no help from the tools if you miss a spot. That is
+# the smell to watch for.
 from collections import defaultdict
 
 from parse_trash import parse
@@ -180,8 +181,9 @@ line. Group the pieces in a dictionary keyed by their own type:
 
 ```python
 # recycle_dict.py
-# The Pythonic sort: the object's own type is the key. No type is named
-# here, so this code never changes when you add a new kind of Trash.
+# The Pythonic sort: the object's own type is the key. No type is
+# named here, so this code never changes when you add a new kind of
+# Trash.
 from collections import defaultdict
 
 from parse_trash import parse
@@ -191,7 +193,7 @@ from trash import Trash, sum_value
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
     for t in parse("Trash.dat"):
-        bins[type(t)].append(t)  # the bin is chosen by the piece itself
+        bins[type(t)].append(t)  # bin chosen by the piece itself
     for kind, items in bins.items():
         print(f"--- {kind.__name__} ---")
         sum_value(items)
@@ -227,10 +229,11 @@ So you do not write Visitor in Python. You write a single-dispatch function:
 
 ```python
 # visitor_singledispatch.py
-# Visitor's goal is to add operations to a fixed hierarchy from outside it.
-# functools.singledispatch does that directly: a polymorphic function whose
-# behavior is registered per type. Trash is never touched, new operations are
-# independent functions, and new types just register themselves.
+# Visitor's goal is to add operations to a fixed hierarchy from
+# outside it. functools.singledispatch does that directly: a
+# polymorphic function whose behavior is registered per type. Trash
+# is never touched, new operations are independent functions, and
+# new types just register themselves.
 from functools import singledispatch
 
 from parse_trash import parse

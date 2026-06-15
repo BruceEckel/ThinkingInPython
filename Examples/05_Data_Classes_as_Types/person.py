@@ -1,6 +1,6 @@
 # person.py
-# Composing a type from other types. Each part validates itself, so a Person
-# built from valid parts is valid by construction.
+# Composing a type from other types. Each part validates itself, so
+# a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
 from validation import check
 
@@ -19,7 +19,8 @@ class EmailAddress:
     text: str
 
     def __post_init__(self) -> None:
-        check("@" in self.text, f"EmailAddress({self.text!r})", "needs an @")
+        check("@" in self.text, f"EmailAddress({self.text!r})",
+              "needs an @")
 
 
 @dataclass(frozen=True)

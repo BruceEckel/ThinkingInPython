@@ -1,7 +1,7 @@
 # composing.py
-# Composing functions that return Results, by hand. Each step checks for a
-# Failure and returns early. An exception can be turned into a Failure value
-# instead of being raised.
+# Composing functions that return Results, by hand. Each step checks
+# for a Failure and returns early. An exception can be turned into a
+# Failure value instead of being raised.
 from result import Failure, Result, Success
 from returning_result import func_a
 
@@ -16,7 +16,8 @@ def func_c(i: int) -> Result[int, str]:
     try:
         1 / (i - 3)
     except ZeroDivisionError as e:
-        return Failure(f"func_c({i}): {e}")  # Exception becomes a value.
+        # The exception becomes a value:
+        return Failure(f"func_c({i}): {e}")
     return Success(i)
 
 

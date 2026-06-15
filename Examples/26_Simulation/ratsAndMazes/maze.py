@@ -21,7 +21,8 @@ class Maze:
 
     @classmethod
     def from_file(cls, filename: str) -> "Maze":
-        return cls.from_text(Path(filename).read_text(encoding="utf-8"))
+        return cls.from_text(
+            Path(filename).read_text(encoding="utf-8"))
 
     def is_open(self, x: int, y: int) -> bool:
         return (0 <= y < self.height and 0 <= x < self.width

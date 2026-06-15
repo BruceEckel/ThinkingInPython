@@ -1,7 +1,8 @@
 # sum_type.py
-# Return the error as a value instead of raising. The return type becomes a
-# union, a "sum type". Nothing is lost, but success and failure are not
-# clearly distinguished: both are just values you have to tell apart by type.
+# Return the error as a value instead of raising. The return type
+# becomes a union, a "sum type". Nothing is lost, but success and
+# failure are not clearly distinguished: both are just values you
+# have to tell apart by type.
 
 
 def func_a(i: int) -> int | str:

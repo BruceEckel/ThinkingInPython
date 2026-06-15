@@ -1,6 +1,6 @@
 # protocols.py
-# A Protocol types duck typing: any object with the right shape qualifies,
-# without inheriting from a base class.
+# A Protocol types duck typing: any object with the right shape
+# qualifies, without inheriting from a base class.
 from typing import Protocol
 
 

@@ -36,9 +36,9 @@ hand out a number.
 
 ```python
 # ratsAndMazes/rat.py
-# A rat explores the maze on its own thread, spawning a new rat at every
-# branch. It talks to a blackboard but never imports one: any object with the
-# four methods below will do.
+# A rat explores the maze on its own thread, spawning a new rat at
+# every branch. It talks to a blackboard but never imports one: any
+# object with the four methods below will do.
 from __future__ import annotations
 import threading
 from typing import Protocol
@@ -65,11 +65,14 @@ class Rat(threading.Thread):
 
     def run(self) -> None:
         while True:
-            neighbors = [(self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
-            moves = [pos for pos in neighbors if self.blackboard.claim(*pos)]
+            neighbors = [
+                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+            moves = [pos for pos in neighbors
+                     if self.blackboard.claim(*pos)]
             if not moves:
                 self.blackboard.log(
-                    f"Rat {self.number} dead-ends at {(self.x, self.y)}.")
+                    f"Rat {self.number} dead-ends "
+                    f"at {(self.x, self.y)}.")
                 return
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
@@ -103,7 +106,8 @@ class Maze:
 
     @classmethod
     def from_file(cls, filename: str) -> "Maze":
-        return cls.from_text(Path(filename).read_text(encoding="utf-8"))
+        return cls.from_text(
+            Path(filename).read_text(encoding="utf-8"))
 
     def is_open(self, x: int, y: int) -> bool:
         return (0 <= y < self.height and 0 <= x < self.width
@@ -125,8 +129,9 @@ spawned along the way.
 
 ```python
 # ratsAndMazes/blackboard.py
-# The shared surface the rats write to. It owns the maze, records visited
-# cells, hands out rat numbers, and launches rats. One lock guards every update.
+# The shared surface the rats write to. It owns the maze, records
+# visited cells, hands out rat numbers, and launches rats. One lock
+# guards every update.
 from __future__ import annotations
 import itertools
 import threading

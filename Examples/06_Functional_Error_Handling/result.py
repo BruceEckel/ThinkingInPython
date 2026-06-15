@@ -1,8 +1,9 @@
 # result.py
-# A Result is either a Success holding an answer, or a Failure holding an error.
-# Both are frozen, like the types in the Data Classes as Types chapter. bind
-# chains steps: it feeds a Success into the next function, and passes a Failure
-# straight through unchanged.
+# A Result is either a Success holding an answer, or a Failure
+# holding an error. Both are frozen, like the types in the Data
+# Classes as Types chapter. bind chains steps: it feeds a Success
+# into the next function, and passes a Failure straight through
+# unchanged.
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
@@ -15,7 +16,9 @@ class Success[A]:
     def unwrap(self) -> A:
         return self.answer
 
-    def bind[B, E](self, func: Callable[[A], Result[B, E]]) -> Result[B, E]:
+    def bind[B, E](
+        self, func: Callable[[A], Result[B, E]]
+    ) -> Result[B, E]:
         return func(self.answer)
 
 
@@ -23,7 +26,9 @@ class Success[A]:
 class Failure[E]:
     error: E
 
-    def bind[B](self, func: Callable[..., Result[B, E]]) -> Failure[E]:
+    def bind[B](
+        self, func: Callable[..., Result[B, E]]
+    ) -> Failure[E]:
         return self  # Pass the failure forward unchanged.
 
 

@@ -34,17 +34,20 @@ function that takes a rating has to check it:
 
 ```python
 # stars_unchecked.py
-# A bare int for a 1-10 rating must be re-checked everywhere it is used.
+# A bare int for a 1-10 rating must be re-checked everywhere it is
+# used.
 from validation import check
 
 
 def f1(stars: int) -> int:
-    check(1 <= stars <= 10, f"f1({stars})")  # Check the argument here...
+    # Check the argument here...
+    check(1 <= stars <= 10, f"f1({stars})")
     return stars + 5
 
 
 def f2(stars: int) -> int:
-    check(1 <= stars <= 10, f"f2({stars})")  # ...and again here.
+    # ...and again in every other function.
+    check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 
 
@@ -67,8 +70,8 @@ the object in an illegal state between steps:
 
 ```python
 # stars_class.py
-# "A class is not a type." Encapsulation guards the value, but every method
-# must re-check it, and the object stays mutable underneath.
+# "A class is not a type." Encapsulation guards the value, but every
+# method must re-check it, and the object stays mutable underneath.
 from validation import check
 
 
@@ -130,7 +133,8 @@ if __name__ == "__main__":
     print(m)
     print(m.name, m.number, m.depth)
 
-    print(Messenger("xx", 1) == Messenger("xx", 1))  # __eq__ generated.
+    # __eq__ is generated, so equal fields compare equal:
+    print(Messenger("xx", 1) == Messenger("xx", 1))
     print(Messenger("xx", 1) == Messenger("xx", 2))
 
     mc = replace(m, depth=9.9)  # Copy with one field changed.
@@ -186,8 +190,9 @@ fills in the fields:
 
 ```python
 # stars.py
-# A type is a set of values. Validate once, at construction, in a frozen data
-# class. Every Stars that exists is then guaranteed to be a legal value.
+# A type is a set of values. Validate once, at construction, in a
+# frozen data class. Every Stars that exists is then guaranteed to
+# be a legal value.
 from dataclasses import dataclass
 from validation import check
 
@@ -244,8 +249,8 @@ by construction, with no extra work:
 
 ```python
 # person.py
-# Composing a type from other types. Each part validates itself, so a Person
-# built from valid parts is valid by construction.
+# Composing a type from other types. Each part validates itself, so
+# a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
 from validation import check
 
@@ -264,7 +269,8 @@ class EmailAddress:
     text: str
 
     def __post_init__(self) -> None:
-        check("@" in self.text, f"EmailAddress({self.text!r})", "needs an @")
+        check("@" in self.text, f"EmailAddress({self.text!r})",
+              "needs an @")
 
 
 @dataclass(frozen=True)
@@ -293,8 +299,9 @@ its fields: the day must fit the month.
 
 ```python
 # birth_date.py
-# An Enum is also a type, and is the better choice when the set of values is
-# small and fixed. Each Month knows its length and validates a Day against it.
+# An Enum is also a type, and is the better choice when the set of
+# values is small and fixed. Each Month knows its length and
+# validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
 from validation import check
@@ -340,7 +347,8 @@ class Month(Enum):
         return self.value[1]
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days, f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days,
+              f"{self.name} has no day {day.n}")
 
     def __repr__(self) -> str:
         return self.name
@@ -371,9 +379,9 @@ carry them around, where the enum simply is that set:
 
 ```python
 # month_dataclass.py
-# Month can also be a data class instead of an Enum. It works, but it is more
-# code for less safety: you have to build and hand around the set of months
-# yourself, where the Enum simply is that set.
+# Month can also be a data class instead of an Enum. It works, but
+# it is more code for less safety: you have to build and hand around
+# the set of months yourself, where the Enum simply is that set.
 from dataclasses import dataclass, field
 from validation import check
 
@@ -394,18 +402,20 @@ class Month:
 
     def __post_init__(self) -> None:
         check(1 <= self.n <= 12, f"Month({self.n})")
-        check(self.max_days in (28, 30, 31), f"max_days {self.max_days}")
+        check(self.max_days in (28, 30, 31),
+              f"max_days {self.max_days}")
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days, f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days,
+              f"{self.name} has no day {day.n}")
 
 
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([
-        ("January", 31), ("February", 28), ("March", 31), ("April", 30),
-        ("May", 31), ("June", 30), ("July", 31), ("August", 31),
-        ("September", 30), ("October", 31), ("November", 30),
-        ("December", 31),
+        ("January", 31), ("February", 28), ("March", 31),
+        ("April", 30), ("May", 31), ("June", 30),
+        ("July", 31), ("August", 31), ("September", 30),
+        ("October", 31), ("November", 30), ("December", 31),
     ], start=1)]
 
 
@@ -442,7 +452,8 @@ keyword:
 
 ```python
 # dataclass_features.py
-# A few data class tools worth knowing: asdict, astuple, replace, KW_ONLY.
+# A few data class tools worth knowing: asdict, astuple, replace,
+# KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
 
@@ -460,20 +471,21 @@ class Line:
 @dataclass
 class Config:
     source: str
-    _: KW_ONLY            # Everything after this must be passed by keyword.
+    # Everything after this must be passed by keyword:
+    _: KW_ONLY
     verbose: bool = False
     retries: int = 3
 
 
 if __name__ == "__main__":
     p = Point(10, 20)
-    print(asdict(p))                  # Nested dict.
-    print(astuple(p))                 # Nested tuple.
+    print(asdict(p))   # Nested dict.
+    print(astuple(p))  # Nested tuple.
 
     line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))               # Recurses into the list of Points.
+    print(asdict(line))  # Recurses into the list of Points.
 
-    print(replace(p, x=1))            # Copy with one field changed.
+    print(replace(p, x=1))  # Copy with one field changed.
 
     print(Config("data.csv", retries=5))
 ```
@@ -509,8 +521,9 @@ def test_transformations_return_legal_values() -> None:
 
 
 def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can leave the legal set. Construction of
-    # the returned Stars catches it: no illegal Stars can ever exist.
+    # f2 multiplies, so its result can leave the legal set.
+    # Construction of the returned Stars catches it: no illegal
+    # Stars can ever exist.
     with pytest.raises(TypeFailure):
         f2(Stars(4))  # 4 * 5 = 20
 ```

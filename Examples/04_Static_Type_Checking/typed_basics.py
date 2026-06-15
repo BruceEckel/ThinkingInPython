@@ -1,6 +1,7 @@
 # typed_basics.py
-# Hints annotate parameters, returns, and variables. They do not change how the
-# code runs; they let a checker and an editor reason about it.
+# Hints annotate parameters, returns, and variables. They do not
+# change how the code runs; they let a checker and an editor reason
+# about it.
 
 
 def repeat(text: str, times: int) -> str:

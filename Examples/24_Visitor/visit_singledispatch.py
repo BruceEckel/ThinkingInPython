@@ -1,5 +1,6 @@
 # visit_singledispatch.py
-# Adding operations to a fixed hierarchy without touching it, the Python way.
+# Adding operations to a fixed hierarchy without touching it, the
+# Python way.
 from functools import singledispatch
 
 

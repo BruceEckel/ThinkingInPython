@@ -1,6 +1,7 @@
 # BoxObserver.py
-# A headless version of the ColorBoxes Observer example. Boxes in a grid
-# observe a shared Observable; "clicking" one recolors its neighbors.
+# A headless version of the ColorBoxes Observer example. Boxes in a
+# grid observe a shared Observable; "clicking" one recolors its
+# neighbors.
 import sys
 from typing import Any
 
@@ -9,7 +10,8 @@ from Observer import Observer, Observable  # type: ignore
 
 
 class BoxObservable(Observable):
-    # You must subclass Observable and call setChanged(), or notify does nothing:
+    # You must subclass Observable and call setChanged(), or notify
+    # does nothing:
     def notifyObservers(self, arg: Any = None) -> None:
         self.setChanged()
         Observable.notifyObservers(self, arg)
@@ -33,10 +35,12 @@ class Box(Observer):
             self.color = clicked.color
 
     def next_to(self, other: "Box") -> bool:
-        return abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1
+        return (abs(self.x - other.x) <= 1
+                and abs(self.y - other.y) <= 1)
 
 
-def make_grid(size: int, notifier: BoxObservable) -> list[list["Box"]]:
+def make_grid(size: int,
+              notifier: BoxObservable) -> list[list["Box"]]:
     return [[Box(x, y, f"color{(x + y) % 3}", notifier)
              for y in range(size)]
             for x in range(size)]

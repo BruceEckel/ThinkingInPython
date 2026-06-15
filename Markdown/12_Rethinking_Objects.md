@@ -51,8 +51,9 @@ a mutable object hands the caller a reference to the real internals:
 
 ```python
 # leaky.py
-# Encapsulation with private fields and getters still leaks. A getter that
-# returns a mutable object hands the caller a reference to the real internals.
+# Encapsulation with private fields and getters still leaks. A
+# getter that returns a mutable object hands the caller a reference
+# to the real internals.
 from dataclasses import dataclass
 
 
@@ -77,8 +78,9 @@ class Leaky:
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
-    leaky.numbers.append(999)  # Mutating the "private" list through the getter.
-    leaky.bob.name = "Ralph"   # Mutating the "private" Bob.
+    # Both mutate the "private" internals through the getters:
+    leaky.numbers.append(999)
+    leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
 ```
 
@@ -97,8 +99,9 @@ forever:
 
 ```python
 # plugged.py
-# Plugging the leaks means defensively copying everything a getter returns.
-# It works, but every getter has to remember to do it, forever.
+# Plugging the leaks means defensively copying everything a getter
+# returns. It works, but every getter has to remember to do it,
+# forever.
 from copy import deepcopy
 from dataclasses import dataclass
 
@@ -144,9 +147,10 @@ fields are public, there are no getters, and there are no copies:
 
 ```python
 # immutable.py
-# Encapsulation is only needed because of mutability. Freeze the data and the
-# problem dissolves: the fields are public, there are no getters and no copies,
-# and nothing can leak because nothing can change.
+# Encapsulation is only needed because of mutability. Freeze the
+# data and the problem dissolves: the fields are public, there are
+# no getters and no copies, and nothing can leak because nothing can
+# change.
 from dataclasses import dataclass
 
 
@@ -180,8 +184,9 @@ with a plain function that does the same thing:
 
 ```python
 # point_distance.py
-# A method bound to the class, versus a plain function. The function reads the
-# same and computes the same. The class does not need to own it.
+# A method bound to the class, versus a plain function. The function
+# reads the same and computes the same. The class does not need to
+# own it.
 from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
@@ -219,10 +224,10 @@ type that does not fit, you adapt it by composition, not inheritance:
 
 ```python
 # distance_protocol.py
-# The free function generalizes to anything with x and y, described by a
-# Protocol. That is the structural typing from the Static Type Checking
-# chapter. A class that lacks x and y can be adapted by composition, with no
-# inheritance.
+# The free function generalizes to anything with x and y, described
+# by a Protocol. That is the structural typing from the Static Type
+# Checking chapter. A class that lacks x and y can be adapted by
+# composition, with no inheritance.
 from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
@@ -283,8 +288,9 @@ frozen instances compare by value and can be used as keys:
 
 ```python
 # composition.py
-# Build new types by composing data, not by inheriting implementation.
-# replace() copies with changes, and frozen instances compare and hash.
+# Build new types by composing data, not by inheriting
+# implementation. replace() copies with changes, and frozen
+# instances compare and hash.
 from dataclasses import dataclass, replace
 
 
@@ -307,13 +313,16 @@ class Contact:  # A Contact has a Name and an Address.
 
 
 if __name__ == "__main__":
-    c = Contact(Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    c = Contact(
+        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
     print(c)
 
     moved = replace(c, address=replace(c.address, city="Carbondale"))
     print(moved)
 
-    print(c == Contact(Name("Bruce", "Eckel"), Address("Crested Butte", "81224")))
+    twin = Contact(
+        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    print(c == twin)  # Value equality, field by field.
     print({c: "value"}[c])  # Hashable, so it works as a dict key.
 ```
 
@@ -325,8 +334,8 @@ and an overridden method:
 
 ```python
 # shapes_oo.py
-# The classic object-oriented shapes: an abstract base class with an overridden
-# method, dispatched by inheritance.
+# The classic object-oriented shapes: an abstract base class with an
+# overridden method, dispatched by inheritance.
 import math
 from abc import ABC, abstractmethod
 
@@ -365,8 +374,9 @@ checker confirms the match covers every shape:
 
 ```python
 # shapes_match.py
-# The same shapes as immutable data, with one free function that dispatches by
-# pattern matching. No base class and no overridden methods.
+# The same shapes as immutable data, with one free function that
+# dispatches by pattern matching. No base class and no overridden
+# methods.
 import math
 from dataclasses import dataclass
 from typing import assert_never
@@ -440,7 +450,8 @@ def test_defensive_copy_prevents_the_leak() -> None:
 def test_frozen_cannot_be_mutated() -> None:
     immutable = Immutable((1, 2), Bob())
     with pytest.raises(dataclasses.FrozenInstanceError):
-        setattr(immutable.bob, "name", "Ralph")  # Frozen: assignment fails.
+        # Frozen, so the assignment fails:
+        setattr(immutable.bob, "name", "Ralph")
 ```
 
 ```python
@@ -464,7 +475,8 @@ def test_protocol_and_adapter() -> None:
 
 
 def test_oo_and_match_shapes_agree() -> None:
-    assert so.Rectangle(3.0, 4.0).area() == sm.area(sm.Rectangle(3.0, 4.0))
+    assert (so.Rectangle(3.0, 4.0).area()
+            == sm.area(sm.Rectangle(3.0, 4.0)))
     assert so.Circle(1.0).area() == sm.area(sm.Circle(1.0))
 ```
 

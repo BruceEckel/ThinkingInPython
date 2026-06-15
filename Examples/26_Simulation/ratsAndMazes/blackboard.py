@@ -1,6 +1,7 @@
 # ratsAndMazes/blackboard.py
-# The shared surface the rats write to. It owns the maze, records visited
-# cells, hands out rat numbers, and launches rats. One lock guards every update.
+# The shared surface the rats write to. It owns the maze, records
+# visited cells, hands out rat numbers, and launches rats. One lock
+# guards every update.
 from __future__ import annotations
 import itertools
 import threading

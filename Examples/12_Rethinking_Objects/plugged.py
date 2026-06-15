@@ -1,6 +1,7 @@
 # plugged.py
-# Plugging the leaks means defensively copying everything a getter returns.
-# It works, but every getter has to remember to do it, forever.
+# Plugging the leaks means defensively copying everything a getter
+# returns. It works, but every getter has to remember to do it,
+# forever.
 from copy import deepcopy
 from dataclasses import dataclass
 

@@ -1,6 +1,6 @@
 # exceptions_lose_data.py
-# An exception unwinds the whole computation. Partial results are thrown away:
-# func_a(0) succeeded, but its result is gone.
+# An exception unwinds the whole computation. Partial results are
+# thrown away: func_a(0) succeeded, but its result is gone.
 
 
 def func_a(i: int) -> int:

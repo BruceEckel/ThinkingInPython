@@ -1,5 +1,6 @@
 # strategy.py
-# A strategy is a function you pass in. No class hierarchy, no Context object.
+# A strategy is a function you pass in. No class hierarchy, no
+# Context object.
 from collections.abc import Callable
 
 Line = list[float]

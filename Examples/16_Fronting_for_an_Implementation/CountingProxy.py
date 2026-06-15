@@ -1,5 +1,6 @@
 # CountingProxy.py
-# A "smart reference" proxy: count calls by intercepting attribute access.
+# A "smart reference" proxy: count calls by intercepting attribute
+# access.
 from typing import Any
 
 

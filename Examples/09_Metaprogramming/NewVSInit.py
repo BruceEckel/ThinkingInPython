@@ -16,8 +16,10 @@ class Meta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:
         super().__init__(name, bases, nmspc)
-        nmspc["added_in_init"] = 99            # no effect: class already built
-        setattr(cls, "patched_in_init", 3.14)  # effect: modifies the class
+        # No effect: the class is already built.
+        nmspc["added_in_init"] = 99
+        # Effect: this modifies the finished class.
+        setattr(cls, "patched_in_init", 3.14)
 
 
 class Demo(metaclass=Meta):

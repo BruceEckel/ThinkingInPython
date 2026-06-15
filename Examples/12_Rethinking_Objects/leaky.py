@@ -1,6 +1,7 @@
 # leaky.py
-# Encapsulation with private fields and getters still leaks. A getter that
-# returns a mutable object hands the caller a reference to the real internals.
+# Encapsulation with private fields and getters still leaks. A
+# getter that returns a mutable object hands the caller a reference
+# to the real internals.
 from dataclasses import dataclass
 
 
@@ -25,6 +26,7 @@ class Leaky:
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
-    leaky.numbers.append(999)  # Mutating the "private" list through the getter.
-    leaky.bob.name = "Ralph"   # Mutating the "private" Bob.
+    # Both mutate the "private" internals through the getters:
+    leaky.numbers.append(999)
+    leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)

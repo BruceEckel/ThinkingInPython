@@ -1,6 +1,7 @@
 # composing_with_bind.py
-# bind removes the boilerplate. Chain the steps; a Failure anywhere in the
-# chain short-circuits the rest and is passed through to the end.
+# bind removes the boilerplate. Chain the steps; a Failure anywhere
+# in the chain short-circuits the rest and is passed through to the
+# end.
 from composing import func_b, func_c
 from result import Result
 from returning_result import func_a

@@ -1,6 +1,7 @@
 # composition.py
-# Build new types by composing data, not by inheriting implementation.
-# replace() copies with changes, and frozen instances compare and hash.
+# Build new types by composing data, not by inheriting
+# implementation. replace() copies with changes, and frozen
+# instances compare and hash.
 from dataclasses import dataclass, replace
 
 
@@ -23,11 +24,14 @@ class Contact:  # A Contact has a Name and an Address.
 
 
 if __name__ == "__main__":
-    c = Contact(Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    c = Contact(
+        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
     print(c)
 
     moved = replace(c, address=replace(c.address, city="Carbondale"))
     print(moved)
 
-    print(c == Contact(Name("Bruce", "Eckel"), Address("Crested Butte", "81224")))
+    twin = Contact(
+        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    print(c == twin)  # Value equality, field by field.
     print({c: "value"}[c])  # Hashable, so it works as a dict key.

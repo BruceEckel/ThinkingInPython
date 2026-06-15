@@ -1,14 +1,17 @@
 # tabledriven/state_machine.py
 # A generic table-driven state machine.
 #
-# The whole machine is one transition table. Because Python functions are
-# first-class, a transition's condition and action are just callables, so the
-# Condition and Transition classes a Java version needs disappear.
+# The whole machine is one transition table. Because Python
+# functions are first-class, a transition's condition and action are
+# just callables, so the Condition and Transition classes a Java
+# version needs disappear.
 from collections.abc import Callable
 from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
-Transition = tuple[Callable[..., bool] | None, Callable[..., None] | None, str]
+Transition = tuple[
+    Callable[..., bool] | None, Callable[..., None] | None, str
+]
 Table = dict[tuple[str, type], list[Transition]]
 
 
@@ -26,4 +29,5 @@ class StateMachine:
                 self.state = next_state
                 return
         raise RuntimeError(
-            f"no transition from {self.state!r} on {type(event).__name__}")
+            f"no transition from {self.state!r} "
+            f"on {type(event).__name__}")

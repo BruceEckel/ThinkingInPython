@@ -3,7 +3,8 @@ from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances: WeakValueDictionary[int, "Counter"] = WeakValueDictionary()
+    _instances: WeakValueDictionary[int, "Counter"] = (
+        WeakValueDictionary())
 
     @property
     def Count(self) -> int:

@@ -19,8 +19,8 @@ computed before the failure are lost with the rest:
 
 ```python
 # exceptions_lose_data.py
-# An exception unwinds the whole computation. Partial results are thrown away:
-# func_a(0) succeeded, but its result is gone.
+# An exception unwinds the whole computation. Partial results are
+# thrown away: func_a(0) succeeded, but its result is gone.
 
 
 def func_a(i: int) -> int:
@@ -53,9 +53,10 @@ just another return value:
 
 ```python
 # sum_type.py
-# Return the error as a value instead of raising. The return type becomes a
-# union, a "sum type". Nothing is lost, but success and failure are not
-# clearly distinguished: both are just values you have to tell apart by type.
+# Return the error as a value instead of raising. The return type
+# becomes a union, a "sum type". Nothing is lost, but success and
+# failure are not clearly distinguished: both are just values you
+# have to tell apart by type.
 
 
 def func_a(i: int) -> int | str:
@@ -95,10 +96,11 @@ classes, parameterized over the answer type and the error type:
 
 ```python
 # result.py
-# A Result is either a Success holding an answer, or a Failure holding an error.
-# Both are frozen, like the types in the Data Classes as Types chapter. bind
-# chains steps: it feeds a Success into the next function, and passes a Failure
-# straight through unchanged.
+# A Result is either a Success holding an answer, or a Failure
+# holding an error. Both are frozen, like the types in the Data
+# Classes as Types chapter. bind chains steps: it feeds a Success
+# into the next function, and passes a Failure straight through
+# unchanged.
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
@@ -111,7 +113,9 @@ class Success[A]:
     def unwrap(self) -> A:
         return self.answer
 
-    def bind[B, E](self, func: Callable[[A], Result[B, E]]) -> Result[B, E]:
+    def bind[B, E](
+        self, func: Callable[[A], Result[B, E]]
+    ) -> Result[B, E]:
         return func(self.answer)
 
 
@@ -119,7 +123,9 @@ class Success[A]:
 class Failure[E]:
     error: E
 
-    def bind[B](self, func: Callable[..., Result[B, E]]) -> Failure[E]:
+    def bind[B](
+        self, func: Callable[..., Result[B, E]]
+    ) -> Failure[E]:
         return self  # Pass the failure forward unchanged.
 
 
@@ -132,8 +138,9 @@ signature tells the whole story:
 
 ```python
 # returning_result.py
-# A function reports failure by returning Failure, success by returning Success.
-# The return type now says exactly that: Result[int, str].
+# A function reports failure by returning Failure, success by
+# returning Success. The return type now says exactly that:
+# Result[int, str].
 from result import Failure, Result, Success
 
 
@@ -169,9 +176,9 @@ control flow:
 
 ```python
 # composing.py
-# Composing functions that return Results, by hand. Each step checks for a
-# Failure and returns early. An exception can be turned into a Failure value
-# instead of being raised.
+# Composing functions that return Results, by hand. Each step checks
+# for a Failure and returns early. An exception can be turned into a
+# Failure value instead of being raised.
 from result import Failure, Result, Success
 from returning_result import func_a
 
@@ -186,7 +193,8 @@ def func_c(i: int) -> Result[int, str]:
     try:
         1 / (i - 3)
     except ZeroDivisionError as e:
-        return Failure(f"func_c({i}): {e}")  # Exception becomes a value.
+        # The exception becomes a value:
+        return Failure(f"func_c({i}): {e}")
     return Success(i)
 
 
@@ -225,8 +233,9 @@ in a chain skips the rest of the steps and falls through to the end:
 
 ```python
 # composing_with_bind.py
-# bind removes the boilerplate. Chain the steps; a Failure anywhere in the
-# chain short-circuits the rest and is passed through to the end.
+# bind removes the boilerplate. Chain the steps; a Failure anywhere
+# in the chain short-circuits the rest and is passed through to the
+# end.
 from composing import func_b, func_c
 from result import Result
 from returning_result import func_a
@@ -262,8 +271,9 @@ inputs, nest the binds so each answer stays in scope for the next step. The firs
 
 ```python
 # combining.py
-# Combining several Results that come from different inputs. Nested binds carry
-# each answer inward; a Failure anywhere short-circuits to the end.
+# Combining several Results that come from different inputs. Nested
+# binds carry each answer inward; a Failure anywhere short-circuits
+# to the end.
 from composing import func_b, func_c
 from result import Result, Success
 from returning_result import func_a

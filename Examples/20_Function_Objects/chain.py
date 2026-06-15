@@ -1,6 +1,7 @@
 # chain.py
-# Try each handler in order; the first to return a result wins. The "chain"
-# is an ordinary list of functions, not a hand-built linked list.
+# Try each handler in order; the first to return a result wins. The
+# "chain" is an ordinary list of functions, not a hand-built linked
+# list.
 from collections.abc import Callable
 
 Line = list[float]
@@ -19,7 +20,8 @@ def bisection(line: Line) -> Result:
     return [5.5, 6.6]  # success
 
 
-def solve(line: Line, chain: list[Callable[[Line], Result]]) -> Result:
+def solve(line: Line,
+          chain: list[Callable[[Line], Result]]) -> Result:
     for strategy in chain:
         result = strategy(line)
         if result is not None:

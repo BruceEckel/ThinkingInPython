@@ -1,8 +1,9 @@
 # visitor_singledispatch.py
-# Visitor's goal is to add operations to a fixed hierarchy from outside it.
-# functools.singledispatch does that directly: a polymorphic function whose
-# behavior is registered per type. Trash is never touched, new operations are
-# independent functions, and new types just register themselves.
+# Visitor's goal is to add operations to a fixed hierarchy from
+# outside it. functools.singledispatch does that directly: a
+# polymorphic function whose behavior is registered per type. Trash
+# is never touched, new operations are independent functions, and
+# new types just register themselves.
 from functools import singledispatch
 
 from parse_trash import parse

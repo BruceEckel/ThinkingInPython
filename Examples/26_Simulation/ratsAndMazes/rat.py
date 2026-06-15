@@ -1,7 +1,7 @@
 # ratsAndMazes/rat.py
-# A rat explores the maze on its own thread, spawning a new rat at every
-# branch. It talks to a blackboard but never imports one: any object with the
-# four methods below will do.
+# A rat explores the maze on its own thread, spawning a new rat at
+# every branch. It talks to a blackboard but never imports one: any
+# object with the four methods below will do.
 from __future__ import annotations
 import threading
 from typing import Protocol
@@ -28,11 +28,14 @@ class Rat(threading.Thread):
 
     def run(self) -> None:
         while True:
-            neighbors = [(self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
-            moves = [pos for pos in neighbors if self.blackboard.claim(*pos)]
+            neighbors = [
+                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+            moves = [pos for pos in neighbors
+                     if self.blackboard.claim(*pos)]
             if not moves:
                 self.blackboard.log(
-                    f"Rat {self.number} dead-ends at {(self.x, self.y)}.")
+                    f"Rat {self.number} dead-ends "
+                    f"at {(self.x, self.y)}.")
                 return
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)

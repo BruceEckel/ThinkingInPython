@@ -1,5 +1,6 @@
 # messenger_modern.py
-# The standard library already provides this idiom and its typed cousins.
+# The standard library already provides this idiom and its typed
+# cousins.
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import NamedTuple

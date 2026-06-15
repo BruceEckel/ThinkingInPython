@@ -1,5 +1,6 @@
 # dataclass_features.py
-# A few data class tools worth knowing: asdict, astuple, replace, KW_ONLY.
+# A few data class tools worth knowing: asdict, astuple, replace,
+# KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
 
@@ -17,19 +18,20 @@ class Line:
 @dataclass
 class Config:
     source: str
-    _: KW_ONLY            # Everything after this must be passed by keyword.
+    # Everything after this must be passed by keyword:
+    _: KW_ONLY
     verbose: bool = False
     retries: int = 3
 
 
 if __name__ == "__main__":
     p = Point(10, 20)
-    print(asdict(p))                  # Nested dict.
-    print(astuple(p))                 # Nested tuple.
+    print(asdict(p))   # Nested dict.
+    print(astuple(p))  # Nested tuple.
 
     line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))               # Recurses into the list of Points.
+    print(asdict(line))  # Recurses into the list of Points.
 
-    print(replace(p, x=1))            # Copy with one field changed.
+    print(replace(p, x=1))  # Copy with one field changed.
 
     print(Config("data.csv", retries=5))

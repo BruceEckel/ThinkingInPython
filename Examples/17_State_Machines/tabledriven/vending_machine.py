@@ -45,10 +45,13 @@ class VendingMachine(StateMachine):
                       for _ in range(4)]
         self.items[3][0] = ItemSlot(25, 0)  # one sold-out slot
         table: Table = {
-            ("quiescent", Money): [(None, self.add_money, "collecting")],
-            ("collecting", Money): [(None, self.add_money, "collecting")],
+            ("quiescent", Money):
+                [(None, self.add_money, "collecting")],
+            ("collecting", Money):
+                [(None, self.add_money, "collecting")],
             ("collecting", Quit): [(None, self.refund, "quiescent")],
-            ("collecting", FirstDigit): [(None, self.choose_row, "selecting")],
+            ("collecting", FirstDigit):
+                [(None, self.choose_row, "selecting")],
             ("selecting", Quit): [(None, self.refund, "quiescent")],
             ("selecting", SecondDigit): [
                 (self.too_expensive, self.clear, "collecting"),
@@ -56,9 +59,11 @@ class VendingMachine(StateMachine):
                 (None, self.dispense, "want_more"),
             ],
             ("unavailable", Quit): [(None, self.refund, "quiescent")],
-            ("unavailable", FirstDigit): [(None, self.choose_row, "selecting")],
+            ("unavailable", FirstDigit):
+                [(None, self.choose_row, "selecting")],
             ("want_more", Quit): [(None, self.refund, "quiescent")],
-            ("want_more", FirstDigit): [(None, self.choose_row, "selecting")],
+            ("want_more", FirstDigit):
+                [(None, self.choose_row, "selecting")],
         }
         super().__init__("quiescent", table)
 
@@ -99,12 +104,13 @@ class VendingMachine(StateMachine):
 
 if __name__ == "__main__":
     events = [
-        Money("quarter", 25), Money("quarter", 25), Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),    # buy item [0][1]
+        Money("quarter", 25), Money("quarter", 25),
+        Money("dollar", 100),
+        FirstDigit("A", 0), SecondDigit("two", 1),    # buy [0][1]
         FirstDigit("A", 0), SecondDigit("two", 1),    # buy it again
         FirstDigit("C", 2), SecondDigit("three", 2),  # too expensive
         FirstDigit("D", 3), SecondDigit("one", 0),    # sold out
-        Quit(),                                        # refund and reset
+        Quit(),  # refund and reset
     ]
     machine = VendingMachine()
     for event in events:

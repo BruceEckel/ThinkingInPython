@@ -22,4 +22,5 @@ def test_defensive_copy_prevents_the_leak() -> None:
 def test_frozen_cannot_be_mutated() -> None:
     immutable = Immutable((1, 2), Bob())
     with pytest.raises(dataclasses.FrozenInstanceError):
-        setattr(immutable.bob, "name", "Ralph")  # Frozen: assignment fails.
+        # Frozen, so the assignment fails:
+        setattr(immutable.bob, "name", "Ralph")

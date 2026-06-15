@@ -165,7 +165,8 @@ you can wrap every method call, for example to count them:
 
 ```python
 # CountingProxy.py
-# A "smart reference" proxy: count calls by intercepting attribute access.
+# A "smart reference" proxy: count calls by intercepting attribute
+# access.
 from typing import Any
 
 

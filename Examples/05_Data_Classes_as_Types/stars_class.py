@@ -1,6 +1,6 @@
 # stars_class.py
-# "A class is not a type." Encapsulation guards the value, but every method
-# must re-check it, and the object stays mutable underneath.
+# "A class is not a type." Encapsulation guards the value, but every
+# method must re-check it, and the object stays mutable underneath.
 from validation import check
 
 

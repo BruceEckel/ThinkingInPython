@@ -1,6 +1,7 @@
 # stars.py
-# A type is a set of values. Validate once, at construction, in a frozen data
-# class. Every Stars that exists is then guaranteed to be a legal value.
+# A type is a set of values. Validate once, at construction, in a
+# frozen data class. Every Stars that exists is then guaranteed to
+# be a legal value.
 from dataclasses import dataclass
 from validation import check
 

@@ -21,8 +21,9 @@ for parameters and variables, and an arrow for the return type:
 
 ```python
 # typed_basics.py
-# Hints annotate parameters, returns, and variables. They do not change how the
-# code runs; they let a checker and an editor reason about it.
+# Hints annotate parameters, returns, and variables. They do not
+# change how the code runs; they let a checker and an editor reason
+# about it.
 
 
 def repeat(text: str, times: int) -> str:
@@ -92,8 +93,8 @@ with that shape satisfies it, with no inheritance:
 
 ```python
 # protocols.py
-# A Protocol types duck typing: any object with the right shape qualifies,
-# without inheriting from a base class.
+# A Protocol types duck typing: any object with the right shape
+# qualifies, without inheriting from a base class.
 from typing import Protocol
 
 

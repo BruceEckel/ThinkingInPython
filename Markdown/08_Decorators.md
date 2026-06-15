@@ -253,7 +253,8 @@ def test_plain_drink() -> None:
 def test_stacked_extras() -> None:
     order = Whipped(ExtraShot(Espresso()))
     assert order.cost == 2.75
-    assert order.description == "espresso + extra shot + whipped cream"
+    assert order.description == (
+        "espresso + extra shot + whipped cream")
 
 
 def test_decaf_adds_no_cost() -> None:

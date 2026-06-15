@@ -15,7 +15,8 @@ if __name__ == "__main__":
     print(m)
     print(m.name, m.number, m.depth)
 
-    print(Messenger("xx", 1) == Messenger("xx", 1))  # __eq__ generated.
+    # __eq__ is generated, so equal fields compare equal:
+    print(Messenger("xx", 1) == Messenger("xx", 1))
     print(Messenger("xx", 1) == Messenger("xx", 2))
 
     mc = replace(m, depth=9.9)  # Copy with one field changed.

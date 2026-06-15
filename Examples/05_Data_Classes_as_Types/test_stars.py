@@ -21,7 +21,8 @@ def test_transformations_return_legal_values() -> None:
 
 
 def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can leave the legal set. Construction of
-    # the returned Stars catches it: no illegal Stars can ever exist.
+    # f2 multiplies, so its result can leave the legal set.
+    # Construction of the returned Stars catches it: no illegal
+    # Stars can ever exist.
     with pytest.raises(TypeFailure):
         f2(Stars(4))  # 4 * 5 = 20

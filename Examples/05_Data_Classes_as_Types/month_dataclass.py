@@ -1,7 +1,7 @@
 # month_dataclass.py
-# Month can also be a data class instead of an Enum. It works, but it is more
-# code for less safety: you have to build and hand around the set of months
-# yourself, where the Enum simply is that set.
+# Month can also be a data class instead of an Enum. It works, but
+# it is more code for less safety: you have to build and hand around
+# the set of months yourself, where the Enum simply is that set.
 from dataclasses import dataclass, field
 from validation import check
 
@@ -22,18 +22,20 @@ class Month:
 
     def __post_init__(self) -> None:
         check(1 <= self.n <= 12, f"Month({self.n})")
-        check(self.max_days in (28, 30, 31), f"max_days {self.max_days}")
+        check(self.max_days in (28, 30, 31),
+              f"max_days {self.max_days}")
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days, f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days,
+              f"{self.name} has no day {day.n}")
 
 
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([
-        ("January", 31), ("February", 28), ("March", 31), ("April", 30),
-        ("May", 31), ("June", 30), ("July", 31), ("August", 31),
-        ("September", 30), ("October", 31), ("November", 30),
-        ("December", 31),
+        ("January", 31), ("February", 28), ("March", 31),
+        ("April", 30), ("May", 31), ("June", 30),
+        ("July", 31), ("August", 31), ("September", 30),
+        ("October", 31), ("November", 30), ("December", 31),
     ], start=1)]
 
 

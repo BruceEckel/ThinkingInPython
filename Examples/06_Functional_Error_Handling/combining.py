@@ -1,6 +1,7 @@
 # combining.py
-# Combining several Results that come from different inputs. Nested binds carry
-# each answer inward; a Failure anywhere short-circuits to the end.
+# Combining several Results that come from different inputs. Nested
+# binds carry each answer inward; a Failure anywhere short-circuits
+# to the end.
 from composing import func_b, func_c
 from result import Result, Success
 from returning_result import func_a

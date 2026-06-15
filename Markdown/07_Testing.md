@@ -201,7 +201,9 @@ a test that uses it is automatically checked at every starting balance:
 from account import Account
 
 
-def test_deposit_on_any_balance(preloaded: Account, bank_name: str) -> None:
+def test_deposit_on_any_balance(
+    preloaded: Account, bank_name: str
+) -> None:
     start = preloaded.balance
     preloaded.deposit(1)
     assert preloaded.balance == start + 1
@@ -251,7 +253,9 @@ import pytest
 import storage
 
 
-def test_round_trip(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_round_trip(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("APP_DATA", str(tmp_path))
     storage.save("greeting.txt", "hello")
     assert storage.load("greeting.txt") == "hello"

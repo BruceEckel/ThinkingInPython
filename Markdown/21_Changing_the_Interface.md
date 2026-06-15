@@ -91,8 +91,9 @@ does the forwarding, so the adapter stays tiny:
 
 ```python
 # getattr_adapter.py
-# The usual adapter need: forward most calls, change a few. __getattr__
-# delegates everything you do not override, so the wrapper stays small.
+# The usual adapter need: forward most calls, change a few.
+# __getattr__ delegates everything you do not override, so the
+# wrapper stays small.
 from typing import Any
 
 
@@ -108,7 +109,7 @@ class Adapter:
     def f(self) -> str:                       # the new interface
         return self._adaptee.g() + self._adaptee.h()
 
-    def __getattr__(self, name: str) -> Any:  # forward everything else
+    def __getattr__(self, name: str) -> Any:  # forwards the rest
         return getattr(self._adaptee, name)
 
 
