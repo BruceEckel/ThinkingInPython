@@ -691,7 +691,7 @@ if __name__ == "__main__":
     print(B().x, B(7).x)  # 100 7
 ```
 
-The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter builds on this:
+The [Data Classes as Types](04_Data_Classes_as_Types.md) chapter builds on this:
 a `@dataclass` reads the class-attribute declarations as a template and generates
 a constructor from them.
 

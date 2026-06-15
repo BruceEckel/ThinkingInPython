@@ -1,5 +1,3 @@
-Move "Testing" chapter right after "Python for Programmers" chapter
-
 Move "Metaprogramming" chapter right before "Rethinking Objects" chapter
 
 ---

@@ -1,6 +1,6 @@
 # Functional Error Handling
 
-The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter made a value
+The [Data Classes as Types](04_Data_Classes_as_Types.md) chapter made a value
 carry a guarantee. This chapter does the same for errors. Instead of raising an
 exception, a function returns its error as an ordinary value, and the type
 system tracks it.
@@ -432,7 +432,7 @@ range. Those are not exceptional. They are expected, and the type should say so.
 Because failures are values, you can assert on them directly, without
 `pytest.raises`. The tests below check that `bind` chains a success and
 short-circuits a failure, that the hand-written and `bind` versions agree, and
-that combining returns the right value. See the [Testing](05_Testing.md)
+that combining returns the right value. See the [Testing](03_Testing.md)
 chapter for pytest in general.
 
 ```python

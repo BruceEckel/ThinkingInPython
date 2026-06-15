@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # immutable.bob.name = "Ralph" raises FrozenInstanceError.
 ```
 
-The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter makes the fuller
+The [Data Classes as Types](04_Data_Classes_as_Types.md) chapter makes the fuller
 case for frozen data classes. Here the point is narrower: most encapsulation is
 work you only do because you allowed mutation in the first place.
 
@@ -539,7 +539,7 @@ def test_oo_and_match_shapes_agree() -> None:
 None of this means objects are a mistake. They improved real things. A class is a
 clean namespace with dot-completion. A class guarantees initialization and, as a
 data class, generates equality, representation, and hashing for free. Defining a
-type is itself valuable, as the [Data Classes as Types](03_Data_Classes_as_Types.md)
+type is itself valuable, as the [Data Classes as Types](04_Data_Classes_as_Types.md)
 chapter argues.
 
 The shift is in the default. Start with functions and data. When a program truly

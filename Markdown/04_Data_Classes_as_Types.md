@@ -499,7 +499,7 @@ if __name__ == "__main__":
 The claim is that an illegal value cannot exist. That is exactly the kind of
 claim a test should pin down. Using `pytest.raises`, you assert that the
 constructor rejects every value outside the set. See the
-[Testing](05_Testing.md) chapter for pytest in general.
+[Testing](03_Testing.md) chapter for pytest in general.
 
 ```python
 # test_stars.py
