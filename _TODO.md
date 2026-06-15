@@ -1,5 +1,3 @@
-Move "Metaprogramming" chapter right before "Rethinking Objects" chapter
-
 ---
 
 Flesh out "Python for Programmers" chapter to give coverage for programmers from other languages, briefly touch on everything that should be considered basics, with short examples for each.

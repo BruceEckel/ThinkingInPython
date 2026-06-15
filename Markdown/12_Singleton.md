@@ -292,7 +292,7 @@ class, which is the reason to prefer them when you need that.
 ### As a Metaclass
 
 Finally, a metaclass can intercept construction itself. Metaclasses are covered
-in [the Metaprogramming chapter](07_Metaprogramming.md), where this same singleton appears next to the
+in [the Metaprogramming chapter](08_Metaprogramming.md), where this same singleton appears next to the
 simpler hooks that usually replace them. It is included here for completeness:
 
 ```python

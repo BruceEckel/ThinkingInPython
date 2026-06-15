@@ -240,7 +240,7 @@ the type carry the meaning. Here the type carries a guarantee.
 
 `__post_init__` is one of the hooks the data class machinery generates code
 around, in the same spirit as the class-creation hooks in the
-[Metaprogramming](07_Metaprogramming.md) chapter.
+[Metaprogramming](08_Metaprogramming.md) chapter.
 
 ## Composing Types from Types
 
