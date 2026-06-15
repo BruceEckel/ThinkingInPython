@@ -284,6 +284,290 @@ def test_rats_map_every_reachable_cell() -> None:
 
 The original Java version of this example was written by Jeremy Meyer.
 
+## A Robot in a Maze
+
+Concurrency is one way to build a simulation. Object-oriented design is another.
+This second example, adapted from my *Atomic Kotlin* book, walks a single robot
+through a maze. Its lesson is how polymorphism removes conditionals: a `Room`
+asks its occupant what to do, and each kind of occupant answers for itself.
+
+The occupants are `Item`s. `Room.enter()` calls `occupant.interact()`, and the
+return value is the room the robot ends up in. A wall keeps the robot where it
+is, food is eaten and the robot moves in, a teleport returns a distant room.
+There is no `if` or `elif` on the type of occupant anywhere:
+
+```python
+# robot_explorer/items.py
+# The things that can occupy a room. Room.enter() calls
+# occupant.interact(), and each Item subclass decides what happens.
+# There is no conditional on the item's type.
+from __future__ import annotations
+
+from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from world import Room
+
+
+class Urge(Enum):
+    NORTH = 1
+    SOUTH = 2
+    EAST = 3
+    WEST = 4
+
+
+class Item:
+    symbol = ""
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        return room  # Default: the robot enters the room.
+
+    def __str__(self) -> str:
+        return self.symbol
+
+
+class Robot(Item):
+    symbol = "R"
+
+    def __init__(self) -> None:
+        self.room: Room | None = None
+
+    def move(self, urge: Urge) -> None:
+        assert self.room is not None
+        self.room = self.room.doors.open(urge).enter(self)
+
+
+class Wall(Item):
+    symbol = "#"
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        assert robot.room is not None
+        return robot.room  # Cannot pass: stay put.
+
+
+class Food(Item):
+    symbol = "."
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        room.occupant = Empty()  # Eaten.
+        return room
+
+
+class Teleport(Item):
+    symbol = ""  # set per target letter
+
+    def __init__(self, target: str) -> None:
+        self.target = target
+        self.target_room: Room | None = None
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        assert self.target_room is not None
+        return self.target_room
+
+    def __str__(self) -> str:
+        return self.target
+
+
+class Empty(Item):
+    symbol = "_"
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        return room
+
+
+class Edge(Item):
+    symbol = "/"
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        assert robot.room is not None
+        return robot.room  # The void outside the maze: stay put.
+
+
+class EndGame(Item):
+    symbol = "!"
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        print("Game over!")
+        return room
+
+
+def item_factory(symbol: str) -> Item:
+    for item_type in Item.__subclasses__():
+        if symbol == item_type.symbol:
+            return item_type()
+    return Teleport(symbol)  # Anything else is a teleport target.
+```
+
+`item_factory()` turns a maze character into an `Item`. It searches
+`Item.__subclasses__()` for a matching `symbol`, so adding a new kind of item
+needs no change here: define the subclass with its symbol and the factory finds
+it. This is the registry idea from the [Factory](19_Factory.md) chapter, using
+the class hierarchy itself as the registry.
+
+A `Room` holds one item and connects to its neighbors through a `Doors` object.
+Doors that lead nowhere point at one shared `EDGE` room, the void outside the
+maze, so the robot can try any direction without a special case:
+
+```python
+# robot_explorer/world.py
+# A Room holds one Item and connects to neighbors through its Doors.
+# Unset doors point at the shared EDGE room outside the maze.
+from __future__ import annotations
+
+from items import Edge, Item, Robot, Urge
+
+
+class Room:
+    def __init__(self, occupant: Item) -> None:
+        self.occupant = occupant
+        self.doors = Doors()
+
+    def enter(self, robot: Robot) -> Room:
+        return self.occupant.interact(robot, self)
+
+    def __repr__(self) -> str:
+        return f"Room({self.occupant})"
+
+
+class Doors:
+    def __init__(self) -> None:
+        self.north: Room | None = None
+        self.south: Room | None = None
+        self.east: Room | None = None
+        self.west: Room | None = None
+
+    def connect(self, row: int, col: int,
+                rooms: dict[tuple[int, int], Room]) -> None:
+        self.north = rooms.get((row - 1, col))
+        self.south = rooms.get((row + 1, col))
+        self.east = rooms.get((row, col + 1))
+        self.west = rooms.get((row, col - 1))
+
+    def open(self, urge: Urge) -> Room:
+        neighbor = {
+            Urge.NORTH: self.north,
+            Urge.SOUTH: self.south,
+            Urge.EAST: self.east,
+            Urge.WEST: self.west,
+        }[urge]
+        return neighbor if neighbor is not None else EDGE
+
+
+# Created once both classes exist; its own doors stay unset.
+EDGE = Room(Edge())
+```
+
+`GameBuilder` assembles the maze in stages: a room for every character, then the
+connections between rooms, then the teleport pairs. Building in stages, instead
+of in one tangled constructor, is the *Builder* pattern. `run()` walks a string
+of moves, and `show_maze()` renders the current state:
+
+```python
+# robot_explorer/game.py
+# The Builder pattern: build the maze in stages, then run it.
+from __future__ import annotations
+
+from items import Empty, Robot, Teleport, Urge, item_factory
+from world import Room
+
+
+class GameBuilder:
+    def __init__(self, maze: str) -> None:
+        self.rooms: dict[tuple[int, int], Room] = {}
+        teleports: list[Room] = []
+        # Stage 1: a Room for every character.
+        for row, line in enumerate(maze.splitlines()):
+            for col, char in enumerate(line):
+                occupant = item_factory(char)
+                if isinstance(occupant, Robot):
+                    room = Room(Empty())
+                    self.robot = occupant
+                    self.robot.room = room
+                else:
+                    room = Room(occupant)
+                self.rooms[row, col] = room
+                if isinstance(occupant, Teleport):
+                    teleports.append(room)
+        # Stage 2: connect each room to its neighbors.
+        for (row, col), room in self.rooms.items():
+            room.doors.connect(row, col, self.rooms)
+        # Stage 3: pair the teleports that share a target letter.
+        def target(room: Room) -> str:
+            assert isinstance(room.occupant, Teleport)
+            return room.occupant.target
+
+        teleports.sort(key=target)
+        pairs = iter(teleports)
+        for room1, room2 in zip(pairs, pairs):
+            assert isinstance(room1.occupant, Teleport)
+            assert isinstance(room2.occupant, Teleport)
+            room1.occupant.target_room = room2
+            room2.occupant.target_room = room1
+
+    def show_maze(self) -> str:
+        rows: list[str] = []
+        current = -1
+        for (row, _), room in self.rooms.items():
+            if row != current:
+                rows.append("")
+                current = row
+            if room is self.robot.room:
+                rows[-1] += str(self.robot)
+            else:
+                rows[-1] += str(room.occupant)
+        return "\n".join(rows)
+
+    def run(self, solution: str) -> None:
+        moves = {"n": Urge.NORTH, "s": Urge.SOUTH,
+                 "e": Urge.EAST, "w": Urge.WEST}
+        for char in "".join(solution.split()):
+            self.robot.move(moves[char])
+
+
+string_maze = """
+a_...#..._c
+R_...#...__
+###########
+a_......._b
+###########
+!_c_....._b
+""".strip()
+
+solution = "eeeenwwww eeeeeeeeee wwwwwwww eeennnwwwwwsseeeeeen ww"
+
+if __name__ == "__main__":
+    game = GameBuilder(string_maze)
+    print("start:")
+    print(game.show_maze())
+    game.run(solution)
+    print("\nfinal:")
+    print(game.show_maze())
+```
+
+Running it prints the maze before and after the walk. The robot eats the food
+along its path, takes a teleport, and reaches the `!` that ends the game:
+
+    start:
+    a_...#..._c
+    R_...#...__
+    ###########
+    a_......._b
+    ###########
+    !_c_....._b
+    Game over!
+
+    final:
+    a____#____c
+    _____#_____
+    ###########
+    a_________b
+    ###########
+    R_c_______b
+
+Two patterns from earlier chapters carry the design: polymorphism replaces a
+type switch, and a factory builds objects from data. Neither needs threads.
+
 ## Other Maze Resources
 
 A discussion of algorithms to create mazes:

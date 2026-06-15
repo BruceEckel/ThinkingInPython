@@ -1,4 +1,4 @@
-# The Singleton
+# Singleton
 
 A *singleton* is a class with exactly one instance, reachable from a well-known
 place. It is the simplest design pattern, and in Python it is also the one most
