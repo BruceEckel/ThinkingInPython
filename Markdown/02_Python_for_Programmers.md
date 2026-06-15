@@ -611,7 +611,11 @@ that particularly difficult syntax and semantics.
 -   You can turn a list into function arguments using `*`:
 
 ```python
-def f(a, b, c): print(a, b, c)
+# unpacking.py
+# Turn a sequence into positional arguments with *.
+def f(a: int, b: int, c: int) -> None:
+    print(a, b, c)
+
 
 x = [1, 2, 3]
 f(*x)

@@ -118,12 +118,24 @@ Subclassing `collections.abc.Iterator` provides `__iter__()` automatically, so
 only `__next__()` is needed. A generator wraps an iterator just as well and in
 fewer lines:
 
-    def typed(it, expected):
-        for obj in it:
-            if not isinstance(obj, expected):
-                raise TypeError(
-                    f"expected {expected}, got {type(obj).__name__}")
-            yield obj
+```python
+# typed_generator.py
+# A generator that type-checks each item as it passes through.
+from collections.abc import Iterable, Iterator
+from typing import Any
+
+
+def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
+    for obj in it:
+        if not isinstance(obj, expected):
+            raise TypeError(
+                f"expected {expected}, got {type(obj).__name__}")
+        yield obj
+
+
+if __name__ == "__main__":
+    print(list(typed([1, 2, 3], int)))
+```
 
 Use the class when the wrapper needs its own state or extra methods; use the
 generator when it does not. Either way, the result plugs into every place that
