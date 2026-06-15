@@ -32,6 +32,26 @@ to as *double dispatching*). If you are working with two different type
 hierarchies that are interacting, then you'll have to have a polymorphic
 method call in each hierarchy.
 
+Both versions below share one result type: an enumeration of the three outcomes,
+win, lose, and draw. Rather than duplicate it, put it in its own module that both
+examples import. Python's `enum` library makes the type directly, and each member
+is a singleton you can compare and print:
+
+```python
+# outcome.py
+# The win/lose/draw result of one Item competing with another.
+from enum import Enum
+
+
+class Outcome(Enum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+    def __str__(self):
+        return self.value
+```
+
 Here's an example of multiple dispatching:
 
 ```python
@@ -39,19 +59,8 @@ Here's an example of multiple dispatching:
 # Demonstration of multiple dispatching.
 import random
 
+from outcome import Outcome
 
-# An enumeration type:
-class Outcome:
-    def __init__(self, value, name):
-        self.value = value
-        self.name = name
-    def __str__(self): return self.name
-    def __eq__(self, other):
-        return self.value == other.value
-
-Outcome.WIN = Outcome(0, "win")
-Outcome.LOSE = Outcome(1, "lose")
-Outcome.DRAW = Outcome(2, "draw")
 
 class Item:
     def __str__(self):
@@ -126,18 +135,8 @@ sensible to make the table explicit, like this:
 # Multiple dispatching using a table
 import random
 
+from outcome import Outcome
 
-class Outcome:
-    def __init__(self, value, name):
-        self.value = value
-        self.name = name
-    def __str__(self): return self.name
-    def __eq__(self, other):
-        return self.value == other.value
-
-Outcome.WIN = Outcome(0, "win")
-Outcome.LOSE = Outcome(1, "lose")
-Outcome.DRAW = Outcome(2, "draw")
 
 class Item:
     def compete(self, item):
