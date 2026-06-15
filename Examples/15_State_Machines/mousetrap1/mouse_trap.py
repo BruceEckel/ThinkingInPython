@@ -15,7 +15,7 @@ class Waiting(State):
         print("Waiting: Broadcasting cheese smell")
 
     def next(self, input):
-        if input == MouseAction.appears:
+        if input == MouseAction.APPEARS:
             return MouseTrap.luring
         return MouseTrap.waiting
 
@@ -24,9 +24,9 @@ class Luring(State):
         print("Luring: Presenting Cheese, door open")
 
     def next(self, input):
-        if input == MouseAction.runs_away:
+        if input == MouseAction.RUNS_AWAY:
             return MouseTrap.waiting
-        if input == MouseAction.enters:
+        if input == MouseAction.ENTERS:
             return MouseTrap.trapping
         return MouseTrap.luring
 
@@ -35,9 +35,9 @@ class Trapping(State):
         print("Trapping: Closing door")
 
     def next(self, input):
-        if input == MouseAction.escapes:
+        if input == MouseAction.ESCAPES:
             return MouseTrap.waiting
-        if input == MouseAction.trapped:
+        if input == MouseAction.TRAPPED:
             return MouseTrap.holding
         return MouseTrap.trapping
 
@@ -46,7 +46,7 @@ class Holding(State):
         print("Holding: Mouse caught")
 
     def next(self, input):
-        if input == MouseAction.removed:
+        if input == MouseAction.REMOVED:
             return MouseTrap.waiting
         return MouseTrap.holding
 

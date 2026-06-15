@@ -82,40 +82,26 @@ inputs to the state machine:
 
 ```python
 # mouse/mouse_action.py
+from enum import Enum
 
-class MouseAction:
-    appears: MouseAction
-    runs_away: MouseAction
-    enters: MouseAction
-    escapes: MouseAction
-    trapped: MouseAction
-    removed: MouseAction
 
-    def __init__(self, action: str) -> None:
-        self.action = action
-    def __str__(self) -> str: return self.action
-    def __eq__(self, other: object) -> bool:
-        return (isinstance(other, MouseAction)
-                and self.action == other.action)
-    # Necessary when __eq__ is defined
-    # in order to make this class usable as a
-    # dictionary key:
-    def __hash__(self) -> int:
-        return hash(self.action)
+class MouseAction(Enum):
+    APPEARS = "mouse appears"
+    RUNS_AWAY = "mouse runs away"
+    ENTERS = "mouse enters trap"
+    ESCAPES = "mouse escapes"
+    TRAPPED = "mouse trapped"
+    REMOVED = "mouse removed"
 
-# Static fields; an enumeration of instances:
-MouseAction.appears = MouseAction("mouse appears")
-MouseAction.runs_away = MouseAction("mouse runs away")
-MouseAction.enters = MouseAction("mouse enters trap")
-MouseAction.escapes = MouseAction("mouse escapes")
-MouseAction.trapped = MouseAction("mouse trapped")
-MouseAction.removed = MouseAction("mouse removed")
+    def __str__(self) -> str:
+        return self.value
 ```
 
-You'll note that `__cmp__()` has been overidden to implement a
-comparison between `action` values. Also, each possible move by a
-mouse is enumerated as a `MouseAction` object, all of which are static
-fields in `MouseAction`.
+Each possible move by a mouse is a member of the `MouseAction` enumeration.
+Because it is an `Enum`, the members compare and hash correctly with no extra
+code, so they work directly as dictionary keys. Looking one up by its string
+value, as in `MouseAction("mouse appears")`, returns the matching member, which
+is how the test input below is parsed.
 
 For creating test code, a sequence of mouse inputs is provided from a
 text file:
@@ -162,7 +148,7 @@ class Waiting(State):
         print("Waiting: Broadcasting cheese smell")
 
     def next(self, input):
-        if input == MouseAction.appears:
+        if input == MouseAction.APPEARS:
             return MouseTrap.luring
         return MouseTrap.waiting
 
@@ -171,9 +157,9 @@ class Luring(State):
         print("Luring: Presenting Cheese, door open")
 
     def next(self, input):
-        if input == MouseAction.runs_away:
+        if input == MouseAction.RUNS_AWAY:
             return MouseTrap.waiting
-        if input == MouseAction.enters:
+        if input == MouseAction.ENTERS:
             return MouseTrap.trapping
         return MouseTrap.luring
 
@@ -182,9 +168,9 @@ class Trapping(State):
         print("Trapping: Closing door")
 
     def next(self, input):
-        if input == MouseAction.escapes:
+        if input == MouseAction.ESCAPES:
             return MouseTrap.waiting
-        if input == MouseAction.trapped:
+        if input == MouseAction.TRAPPED:
             return MouseTrap.holding
         return MouseTrap.trapping
 
@@ -193,7 +179,7 @@ class Holding(State):
         print("Holding: Mouse caught")
 
     def next(self, input):
-        if input == MouseAction.removed:
+        if input == MouseAction.REMOVED:
             return MouseTrap.waiting
         return MouseTrap.holding
 
@@ -274,7 +260,7 @@ class Waiting(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.appears : MouseTrap.luring
+              MouseAction.APPEARS : MouseTrap.luring
             }
         return StateT.next(self, input)
 
@@ -285,8 +271,8 @@ class Luring(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.enters : MouseTrap.trapping,
-              MouseAction.runs_away : MouseTrap.waiting
+              MouseAction.ENTERS : MouseTrap.trapping,
+              MouseAction.RUNS_AWAY : MouseTrap.waiting
             }
         return StateT.next(self, input)
 
@@ -297,8 +283,8 @@ class Trapping(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.escapes : MouseTrap.waiting,
-              MouseAction.trapped : MouseTrap.holding
+              MouseAction.ESCAPES : MouseTrap.waiting,
+              MouseAction.TRAPPED : MouseTrap.holding
             }
         return StateT.next(self, input)
 
@@ -309,7 +295,7 @@ class Holding(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.removed : MouseTrap.waiting
+              MouseAction.REMOVED : MouseTrap.waiting
             }
         return StateT.next(self, input)
 

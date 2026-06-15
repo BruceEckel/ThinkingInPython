@@ -26,7 +26,7 @@ class Waiting(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.appears : MouseTrap.luring
+              MouseAction.APPEARS : MouseTrap.luring
             }
         return StateT.next(self, input)
 
@@ -37,8 +37,8 @@ class Luring(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.enters : MouseTrap.trapping,
-              MouseAction.runs_away : MouseTrap.waiting
+              MouseAction.ENTERS : MouseTrap.trapping,
+              MouseAction.RUNS_AWAY : MouseTrap.waiting
             }
         return StateT.next(self, input)
 
@@ -49,8 +49,8 @@ class Trapping(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.escapes : MouseTrap.waiting,
-              MouseAction.trapped : MouseTrap.holding
+              MouseAction.ESCAPES : MouseTrap.waiting,
+              MouseAction.TRAPPED : MouseTrap.holding
             }
         return StateT.next(self, input)
 
@@ -61,7 +61,7 @@ class Holding(StateT):
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
-              MouseAction.removed : MouseTrap.waiting
+              MouseAction.REMOVED : MouseTrap.waiting
             }
         return StateT.next(self, input)
 

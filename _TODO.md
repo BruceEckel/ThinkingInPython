@@ -30,3 +30,15 @@ Ask for suggestions
 ---
 
 Look for other places where code is duplicated and could be lifted into a file to be imported.
+
+---
+
+In 02, This is confusing because I don't see an import in that listing.
+
+However, if this file is imported as a module into another program, __name__ will not be __main__, so the __main__ code is not executed:
+
+# import_module.py
+
+If you run python import_module.py, you should only see 'module' imported as the result.
+
+---

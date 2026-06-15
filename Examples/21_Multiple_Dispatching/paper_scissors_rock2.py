@@ -1,7 +1,6 @@
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
-import random
-
+from arena import item_pair_gen, match
 from outcome import Outcome
 
 
@@ -31,16 +30,5 @@ outcome = {
   (Rock, Rock): Outcome.DRAW,
 }
 
-def match(item1, item2):
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
-
-# Generate the items:
-def item_pair_gen(n):
-    # Create a list of instances of all items:
-    items = Item.__subclasses__()
-    for i in range(n):
-        yield (random.choice(items)(),
-               random.choice(items)())
-
-for item1, item2 in item_pair_gen(20):
+for item1, item2 in item_pair_gen(Item, 20):
     match(item1, item2)

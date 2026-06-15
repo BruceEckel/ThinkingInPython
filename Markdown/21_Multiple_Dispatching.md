@@ -52,13 +52,33 @@ class Outcome(Enum):
         return self.value
 ```
 
+Both versions also share two small helpers: one to generate random pairs of
+items, and one to play a pair off and print the result. Those go in a module too,
+so each example below shows only its dispatch mechanism:
+
+```python
+# arena.py
+# Helpers shared by both versions: generate random pairs of Items, and
+# play one pair off against the other.
+import random
+
+
+def item_pair_gen(base, n):
+    items = base.__subclasses__()
+    for _ in range(n):
+        yield random.choice(items)(), random.choice(items)()
+
+
+def match(item1, item2):
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+```
+
 Here's an example of multiple dispatching:
 
 ```python
 # paper_scissors_rock.py
 # Demonstration of multiple dispatching.
-import random
-
+from arena import item_pair_gen, match
 from outcome import Outcome
 
 
@@ -108,18 +128,7 @@ class Rock(Item):
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
-def match(item1, item2):
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
-
-# Generate the items:
-def item_pair_gen(n):
-    # Create a list of instances of all items:
-    items = Item.__subclasses__()
-    for i in range(n):
-        yield (random.choice(items)(),
-               random.choice(items)())
-
-for item1, item2 in item_pair_gen(20):
+for item1, item2 in item_pair_gen(Item, 20):
     match(item1, item2)
 ```
 
@@ -133,8 +142,7 @@ sensible to make the table explicit, like this:
 ```python
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
-import random
-
+from arena import item_pair_gen, match
 from outcome import Outcome
 
 
@@ -164,18 +172,7 @@ outcome = {
   (Rock, Rock): Outcome.DRAW,
 }
 
-def match(item1, item2):
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
-
-# Generate the items:
-def item_pair_gen(n):
-    # Create a list of instances of all items:
-    items = Item.__subclasses__()
-    for i in range(n):
-        yield (random.choice(items)(),
-               random.choice(items)())
-
-for item1, item2 in item_pair_gen(20):
+for item1, item2 in item_pair_gen(Item, 20):
     match(item1, item2)
 ```
 
