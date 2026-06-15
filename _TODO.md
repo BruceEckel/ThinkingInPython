@@ -35,5 +35,3 @@ https://www.artima.com/weblogs/viewpost.jsp?thread=241209
 ----
 
 GIL presentation?
-
-"/loop modernize the next chapter that needs work"
