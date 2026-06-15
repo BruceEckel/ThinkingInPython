@@ -147,7 +147,7 @@ thread synchronization. We could certainly accomplish the same thing by
 hand, using code like this:
 
 ```python
-# ToSynch.py
+# to_synch.py
 
 import threading
 class ToSynch:
@@ -167,7 +167,7 @@ But this rapidly becomes tedious to write and to read. Peter Norvig
 provided me with a much nicer solution:
 
 ```python
-# Synchronization.py
+# synchronization.py
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading
@@ -232,8 +232,8 @@ inheritance, so the base class `Synchronization` is provided.
 Here's a simple test of the `Synchronization` module:
 
 ```python
-# TestSynchronization.py
-from Synchronization import *
+# synchronization_demo.py
+from synchronization import *
 
 # To use for a method:
 class C(Synchronization):
@@ -290,11 +290,11 @@ being synchronized twice, it will be entered and left twice for every
 call, which isn't very desirable \[there may be a fix for this\]:
 
 ```python
-# Observer.py
+# observer.py
 # Class support for "observer" pattern.
 from typing import Any
 
-from Synchronization import *
+from synchronization import *
 
 class Observer:
     def update(self, observable: Any, arg: Any) -> None:
@@ -352,11 +352,11 @@ synchronize(Observable,
 Using this library, here is an example of the observer pattern:
 
 ```python
-# ObservedFlower.py
+# observed_flower.py
 # Demonstration of "observer" pattern.
 import sys
 sys.path += ['../Util']
-from Observer import Observer, Observable  # type: ignore
+from observer import Observer, Observable  # type: ignore
 
 class Flower:
     def __init__(self):
@@ -503,10 +503,10 @@ The original was a Swing GUI. The pattern itself has nothing to do with a GUI,
 so here it is as a headless program that clicks a box in code and then checks
 the result. That keeps the focus on the Observer mechanics and lets the example
 verify itself. It reuses the `Observable` and `Observer` classes from
-`Observer.py`:
+`observer.py`:
 
 ```python
-# BoxObserver.py
+# box_observer.py
 # A headless version of the ColorBoxes Observer example. Boxes in a
 # grid observe a shared Observable; "clicking" one recolors its
 # neighbors.
@@ -514,7 +514,7 @@ import sys
 from typing import Any
 
 sys.path += ['../Util']
-from Observer import Observer, Observable  # type: ignore
+from observer import Observer, Observable  # type: ignore
 
 
 class BoxObservable(Observable):
@@ -579,7 +579,7 @@ without touching the boxes at all.
 
 ### Exercises
 
-1.  Using the approach in `Synchronization.py`, create a tool that
+1.  Using the approach in `synchronization.py`, create a tool that
     will automatically wrap all the methods in a class to provide an
     execution trace, so that you can see the name of the method and when
     it is entered and exited.
@@ -587,7 +587,7 @@ without touching the boxes at all.
     create the bare minimum in the two classes, then demonstrate your
     design by creating one `Observable` and many `Observer`s, and
     cause the `Observable` to update the `Observer`s.
-3.  Modify `BoxObserver.py` to turn it into a simple game. If any of
+3.  Modify `box_observer.py` to turn it into a simple game. If any of
     the squares surrounding the one you clicked is part of a contiguous
     patch of the same color, then all the squares in that patch are
     changed to the color you clicked on. You can configure the game for

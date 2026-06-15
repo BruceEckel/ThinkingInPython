@@ -1,4 +1,4 @@
-# Singleton.py
+# singleton.py
 from typing import Any
 
 

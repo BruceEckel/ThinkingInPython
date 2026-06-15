@@ -1,4 +1,4 @@
-# Adapter.py
+# adapter.py
 # Variations on the Adapter pattern.
 
 class WhatIHave:

@@ -22,7 +22,7 @@ needed), so here it is a matter of convention: the base defines the algorithm,
 subclasses define the steps.
 
 ```python
-# TemplateMethod.py
+# template_method.py
 # Simple demonstration of Template Method.
 
 class ApplicationFramework:

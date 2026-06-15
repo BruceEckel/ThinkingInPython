@@ -1,4 +1,4 @@
-# Facade.py
+# facade.py
 class A:
     def __init__(self, x): pass
 class B:

@@ -67,7 +67,7 @@ The classic approach takes control of creation by delegating to a single
 instance of a private nested class:
 
 ```python
-# SingletonPattern.py
+# singleton_pattern.py
 from typing import Any
 
 
@@ -119,7 +119,7 @@ A variation uses `__new__`, the method that actually creates an instance, to
 return the same object every time:
 
 ```python
-# NewSingleton.py
+# new_singleton.py
 from typing import Any
 
 
@@ -168,7 +168,7 @@ Generation*. The Borg are a hive-mind collective: "we are all one."], and it
 points every instance's `__dict__` at the same storage:
 
 ```python
-# BorgSingleton.py
+# borg_singleton.py
 # Alex Martelli's 'Borg'
 from typing import Any
 
@@ -211,7 +211,7 @@ A simpler version relies on the fact that a class variable has a single shared
 value:
 
 ```python
-# ClassVariableSingleton.py
+# class_variable_singleton.py
 from typing import Any
 
 
@@ -234,7 +234,7 @@ You can wrap a class so that calling it returns a cached instance. This is a
 *class decorator* (see [the Decorators chapter](08_Decorators.md)):
 
 ```python
-# Singleton.py
+# singleton.py
 from typing import Any
 
 
@@ -280,7 +280,7 @@ in [the Metaprogramming chapter](09_Metaprogramming.md), where this same singlet
 simpler hooks that usually replace them. It is included here for completeness:
 
 ```python
-# SingletonMetaClass.py
+# singleton_metaclass.py
 from typing import Any
 
 
@@ -335,7 +335,7 @@ most of the ceremony falls away.
 
 ## Exercises
 
-1.  `SingletonPattern.py` always creates an object, even if it's never used.
+1.  `singleton_pattern.py` always creates an object, even if it's never used.
     Modify it to use *lazy initialization*, so the singleton object is created
     only the first time it is needed.
 2.  Using `cache_singleton.py` as a starting point, create a factory that

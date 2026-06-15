@@ -1,4 +1,4 @@
-# Games2.py
+# games2.py
 # Simplified Abstract Factory.
 
 class Kitty:

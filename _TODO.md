@@ -6,4 +6,10 @@
   3. One-voice / short-sentence pass across the chapters I reframed, so the whole book reads as you.
   4. Optional: decide whether virtual environments and the dead CodeManager.py belong in the book at all.
 
-  Incorporate https://github.com/BruceEckel/LazyGuide, but not as a single chapter. Distribute the information appropriately into existing chapters, making new chapters only if it makes sense.
+Incorporate https://github.com/BruceEckel/LazyGuide, but not as a single chapter. Distribute the information appropriately into existing chapters, making new chapters only if it makes sense.
+
+Look for examples in https://github.com/BruceEckel/python-experiments that might be candidates for this book
+
+Look for code fragments that can be turned into extractable python files
+
+make sure everything conforms to PEP8

@@ -1,4 +1,4 @@
-# Synchronization.py
+# synchronization.py
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading

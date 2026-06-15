@@ -53,7 +53,7 @@ is:
 You can add bases, fields, and methods the same way:
 
 ```python
-# MyList.py
+# my_list.py
 
 def howdy(self, you):
     print("Howdy, " + you)
@@ -82,7 +82,7 @@ Where you might otherwise write many near-identical subclasses by hand, you can
 generate them in a loop:
 
 ```python
-# GreenHouse.py
+# greenhouse.py
 
 class Event:
     events: list["Event"] = [] # static
@@ -145,7 +145,7 @@ In Python 3 it is a few lines with `__init_subclass__`, which Python calls
 automatically every time a subclass is created:
 
 ```python
-# InitSubclass.py
+# init_subclass.py
 # Track the "leaf" subclasses (those with no subclasses of their own),
 # using __init_subclass__ instead of a metaclass.
 
@@ -204,7 +204,7 @@ discover the name it was assigned to. A *descriptor* with `__set_name__` gets
 that name when the class is created:
 
 ```python
-# SetName.py
+# set_name.py
 # A descriptor learns its attribute name at class-creation time.
 from typing import Any
 
@@ -249,7 +249,7 @@ subclass of `type`. You attach it with the `metaclass=` keyword in the class
 header. Python then uses your metaclass, instead of `type`, to build the class.
 
 ```python
-# SimpleMeta1.py
+# simple_meta1.py
 # Writing a metaclass and applying it with the `metaclass=` keyword.
 from typing import Any
 
@@ -299,7 +299,7 @@ runs *after* the class exists, so changing those arguments has no effect, though
 you can still modify the finished class object:
 
 ```python
-# NewVSInit.py
+# new_vs_init.py
 from typing import Any
 
 
@@ -354,7 +354,7 @@ an instance. Overriding it lets a metaclass intercept instance creation, which
 is one way to build a Singleton:
 
 ```python
-# Singleton.py
+# singleton.py
 # A Singleton metaclass: intercept instance creation through __call__.
 from typing import Any
 
@@ -398,7 +398,7 @@ This works, but it is heavier than the problem usually requires. A Singleton is
 often clearer as a class decorator, which needs no metaclass at all:
 
 ```python
-# SingletonDecorator.py
+# singleton_decorator.py
 # The same idea as a class decorator. Simpler than a metaclass.
 from typing import Any, Callable
 
@@ -441,7 +441,7 @@ older literature claims this *requires* a metaclass, because the check must run
 as each subclass is created. With `__init_subclass__`, it does not:
 
 ```python
-# Final.py
+# final.py
 # Preventing inheritance with __init_subclass__, no metaclass
 # required.
 

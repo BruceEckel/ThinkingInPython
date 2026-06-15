@@ -1,4 +1,4 @@
-# Games.py
+# games.py
 # An example of the Abstract Factory pattern.
 
 class Obstacle:

@@ -11,7 +11,7 @@ A Messenger is simply an object with attributes corresponding to the
 names of the data you want to pass around or return:
 
 ```python
-# MessengerIdiom.py
+# messenger_idiom.py
 from typing import Any
 
 

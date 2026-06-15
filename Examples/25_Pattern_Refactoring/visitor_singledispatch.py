@@ -32,7 +32,7 @@ def _(t: Cardboard) -> str:
 
 def main() -> None:
     seen: set[type] = set()
-    for t in parse("Trash.dat"):
+    for t in parse("trash.dat"):
         if type(t) not in seen:
             seen.add(type(t))
             print(recycling_note(t))

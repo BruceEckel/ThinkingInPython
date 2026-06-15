@@ -95,7 +95,7 @@ behavior. Here is one that enforces that every item is of an expected type,
 raising otherwise:
 
 ```python
-# TypedIterator.py
+# typed_iterator.py
 from collections.abc import Iterator
 from typing import Any
 

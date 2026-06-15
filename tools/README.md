@@ -21,7 +21,7 @@ def trace(func): ...
 The file is written under a directory named for the chapter it appears in (the
 Markdown file's stem). So `# trace.py` in `08_Decorators.md` is extracted to
 `08_Decorators/trace.py`. The slug carries no chapter prefix; the extractor adds
-it. A slug may include a sub-path (`# mouse/MouseAction.py`) to group related
+it. A slug may include a sub-path (`# mouse/mouse_action.py`) to group related
 files within one chapter. Renaming or renumbering a chapter therefore moves its
 example folder to match. Blocks without such a first line are illustrative
 fragments and are ignored. Data files (`.txt`, `.dat`) tagged the same way are

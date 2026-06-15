@@ -49,7 +49,7 @@ The classic object form wraps each action in a `Command` subclass with an
 `execute()` method:
 
 ```python
-# CommandPattern.py
+# command_pattern.py
 
 class Command:
     def execute(self): pass
@@ -125,7 +125,7 @@ The classic form makes each algorithm a class deriving from a common interface,
 and adds a "Context" object to hold the current strategy:
 
 ```python
-# StrategyPattern.py
+# strategy_pattern.py
 
 # The strategy interface:
 class FindMinima:

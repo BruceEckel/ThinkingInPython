@@ -11,7 +11,7 @@ from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
-    for t in parse("Trash.dat"):
+    for t in parse("trash.dat"):
         if isinstance(t, Aluminum):
             bins[Aluminum].append(t)
         elif isinstance(t, Paper):

@@ -1,4 +1,4 @@
-# Singleton.py
+# singleton.py
 # A Singleton metaclass: intercept instance creation through __call__.
 from typing import Any
 

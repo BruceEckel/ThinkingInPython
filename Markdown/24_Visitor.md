@@ -23,7 +23,7 @@ of the primary type simply "accept" the visitor, then call the visitor's
 dynamically-bound member function:
 
 ```python
-# FlowerVisitors.py
+# flower_visitors.py
 # Demonstration of "visitor" pattern.
 import random
 
@@ -168,13 +168,13 @@ fake.
     `Elf` uses `InventFeature` or `SellImaginaryProduct`, and a
     `Troll` uses `Edict` and `Schedule`. You must decide which
     weapons "win" and "lose" in each interaction (as in
-    `PaperScissorsRock.py`). Add a `battle()` member function to
+    `paper_scissors_rock.py`). Add a `battle()` member function to
     `Project` that takes two `Inhabitant`s and matches them against
     each other. Now create a `meeting()` member function for
     `Project` that creates groups of `Dwarf`, `Elf` and `Troll`
     and battles the groups against each other until only members of one
     group are left standing. These are the "winners."
-3.  Modify `PaperScissorsRock.py` to replace the double dispatching
+3.  Modify `paper_scissors_rock.py` to replace the double dispatching
     with a table lookup. The easiest way to do this is to create a
     `Map` of `Map`s, with the key of each `Map` the class of each
     object. Then you can do the lookup by saying:

@@ -1,8 +1,8 @@
-# Observer.py
+# observer.py
 # Class support for "observer" pattern.
 from typing import Any
 
-from Synchronization import *
+from synchronization import *
 
 class Observer:
     def update(self, observable: Any, arg: Any) -> None:

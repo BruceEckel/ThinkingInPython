@@ -37,7 +37,7 @@ One approach is to make the factory a `static` method of the base
 class:
 
 ```python
-# shapefact1/ShapeFactory1.py
+# shapefact1/shape_factory1.py
 # A simple static factory method.
 import random
 
@@ -138,7 +138,7 @@ To disallow direct access to the classes, you can nest the classes
 within the factory method, like this:
 
 ```python
-# shapefact1/NestedShapeFactory.py
+# shapefact1/nested_shape_factory.py
 import random
 
 class Shape(object):
@@ -233,12 +233,12 @@ subclassed from the basic factory (the above design is mentioned as a
 special case). However, the book does not provide an example, but
 instead just repeats the example used for the *Abstract Factory* (you'll
 see an example of this in the next section). Here is
-`ShapeFactory1.py` modified so the factory methods are in a separate
+`shape_factory1.py` modified so the factory methods are in a separate
 class as virtual functions. Notice also that the specific `Shape`
 classes are dynamically loaded on demand:
 
 ```python
-# shapefact2/ShapeFactory2.py
+# shapefact2/shape_factory2.py
 # Polymorphic factory methods.
 import random
 from typing import Any
@@ -305,7 +305,7 @@ where the appropriate factory object is returned and then used by the
 caller to create an object in a more sophisticated way. However, it
 seems that much of the time you don't need the intricacies of the
 polymorphic factory method, and a single static method in the base class
-(as shown in `ShapeFactory1.py`) will work fine.
+(as shown in `shape_factory1.py`) will work fine.
 
 Notice that the `ShapeFactory` must be initialized by loading its
 dictionary with factory objects, which takes place in the static
@@ -337,7 +337,7 @@ environment and you want to be able to support different types of games.
 Here's how it might look using an abstract factory:
 
 ```python
-# Games.py
+# games.py
 # An example of the Abstract Factory pattern.
 
 class Obstacle:
@@ -412,7 +412,7 @@ have static type checking. As long as the concrete Python classes follow
 the form of the required classes, we don't need any base classes:
 
 ```python
-# Games2.py
+# games2.py
 # Simplified Abstract Factory.
 
 class Kitty:
@@ -473,11 +473,11 @@ classes.
 
 ## Exercises
 
-1.  Add a class `Triangle` to `ShapeFactory1.py`
-2.  Add a class `Triangle` to `ShapeFactory2.py`
+1.  Add a class `Triangle` to `shape_factory1.py`
+2.  Add a class `Triangle` to `shape_factory2.py`
 3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to
-    `GameEnvironment.py`
-4.  Modify `ShapeFactory2.py` so that it uses an *Abstract Factory* to
+    `game_environment.py`
+4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to
     create different sets of shapes (for example, one particular type of
     factory object creates "thick shapes," another creates "thin
     shapes," but each factory object can create all the shapes: circles,

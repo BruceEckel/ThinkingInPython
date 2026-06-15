@@ -80,7 +80,7 @@ The trash to process is described in a data file, one `Name:weight` line per
 piece:
 
 ```python
-# Trash.dat
+# trash.dat
 Glass:54
 Paper:22
 Paper:11
@@ -147,7 +147,7 @@ from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
-    for t in parse("Trash.dat"):
+    for t in parse("trash.dat"):
         if isinstance(t, Aluminum):
             bins[Aluminum].append(t)
         elif isinstance(t, Paper):
@@ -192,7 +192,7 @@ from trash import Trash, sum_value
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
-    for t in parse("Trash.dat"):
+    for t in parse("trash.dat"):
         bins[type(t)].append(t)  # bin chosen by the piece itself
     for kind, items in bins.items():
         print(f"--- {kind.__name__} ---")
@@ -262,7 +262,7 @@ def _(t: Cardboard) -> str:
 
 def main() -> None:
     seen: set[type] = set()
-    for t in parse("Trash.dat"):
+    for t in parse("trash.dat"):
         if type(t) not in seen:
             seen.add(type(t))
             print(recycling_note(t))
@@ -313,7 +313,7 @@ its keep once the language does part of the work for you.
 
 1.  Add a `Plastic` material with a per-pound value. Confirm that
     `recycle_dict.py` and `parse_trash.py` need no changes, and that only
-    `Trash.dat` and (optionally) a one-line `recycling_note` registration do.
+    `trash.dat` and (optionally) a one-line `recycling_note` registration do.
 2.  Write a `price` operation as a plain function over a list of `Trash`, and a
     `heaviest` operation that returns the single heaviest piece. Decide for each
     whether it needs `singledispatch`.

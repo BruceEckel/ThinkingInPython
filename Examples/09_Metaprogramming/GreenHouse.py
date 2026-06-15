@@ -1,4 +1,4 @@
-# GreenHouse.py
+# greenhouse.py
 
 class Event:
     events: list["Event"] = [] # static

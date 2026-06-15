@@ -1,4 +1,4 @@
-# Final.py
+# final.py
 # Preventing inheritance with __init_subclass__, no metaclass
 # required.
 

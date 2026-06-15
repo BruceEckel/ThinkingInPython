@@ -1,4 +1,4 @@
-# State.py
+# state.py
 # A State has an operation, and can be moved
 # into the next State given an Input:
 

@@ -14,7 +14,7 @@ problem. The only requirement is to produce a *that*, and there are a
 number of ways you can accomplish this adaptation:
 
 ```python
-# Adapter.py
+# adapter.py
 # Variations on the Adapter pattern.
 
 class WhatIHave:
@@ -137,7 +137,7 @@ you can easily get this effect by creating a class containing `static`
 factory methods:
 
 ```python
-# Facade.py
+# facade.py
 class A:
     def __init__(self, x): pass
 class B:
