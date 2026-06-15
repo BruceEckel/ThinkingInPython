@@ -29,5 +29,4 @@ Ask for suggestions
 
 ---
 
-Look for other places where enumerations might be appropriate.
 Look for other places where code is duplicated and could be lifted into a file to be imported.
