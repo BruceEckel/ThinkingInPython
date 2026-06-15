@@ -243,6 +243,15 @@ Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
 > inheritance). Chapters `12`–`25` shifted to `13`–`26`. The book is now `00`–`26`
 > (27 chapters). Note: under the chapter-stem example-folder scheme, renumbering
 > now also renames the matching `Examples/NN_*` folders (regenerate the tree).
+>
+> Update: `Initialization and Cleanup` and `Static Type Checking` were folded
+> into `02_Python_for_Programmers` (their polished material became sections;
+> the rougher author notes became a "Notes" section). The two standalone
+> chapters were removed and `05`–`26` shifted down to `03`–`24`; their
+> `Examples/NN_*` folders were renamed to match and all cross-references updated
+> (links to the old Static Type Checking chapter now target
+> `02_Python_for_Programmers.md#static-type-checking`). The book is now `00`–`24`
+> (25 chapters).
 
 | Task | Description | Status |
 |------|-------------|--------|

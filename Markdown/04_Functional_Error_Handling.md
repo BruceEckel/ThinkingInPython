@@ -1,6 +1,6 @@
 # Functional Error Handling
 
-The [Data Classes as Types](05_Data_Classes_as_Types.md) chapter made a value
+The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter made a value
 carry a guarantee. This chapter does the same for errors. Instead of raising an
 exception, a function returns its error as an ordinary value, and the type
 system tracks it.
@@ -165,7 +165,7 @@ The output is:
 `Result[int, str]` says this function returns an `int` on success or a `str` on
 failure. The caller cannot ignore that, because to get the answer it has to open
 the `Result`. This is the same idea as the
-[Static Type Checking](04_Static_Type_Checking.md) chapter: put the meaning in
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter: put the meaning in
 the type.
 
 ## Composing by Hand
@@ -432,7 +432,7 @@ range. Those are not exceptional. They are expected, and the type should say so.
 Because failures are values, you can assert on them directly, without
 `pytest.raises`. The tests below check that `bind` chains a success and
 short-circuits a failure, that the hand-written and `bind` versions agree, and
-that combining returns the right value. See the [Testing](07_Testing.md)
+that combining returns the right value. See the [Testing](05_Testing.md)
 chapter for pytest in general.
 
 ```python

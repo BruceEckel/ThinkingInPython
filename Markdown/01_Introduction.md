@@ -65,7 +65,7 @@ Every example is real. The examples are extracted from these chapters, then run
 and type-checked automatically, so the code you read is the code that ran, and
 the output shown is the output it produced. The examples target Python 3.14 and
 later, use type hints throughout, and are checked with Astral's `ty`. If type
-checking is new to you, [Static Type Checking](04_Static_Type_Checking.md) has
+checking is new to you, [Static Type Checking](02_Python_for_Programmers.md#static-type-checking) has
 its own chapter.
 
 ## The Code Examples

@@ -235,12 +235,12 @@ that. Illegal values are unrepresentable.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value. The
-[Static Type Checking](04_Static_Type_Checking.md) chapter argues for letting
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter argues for letting
 the type carry the meaning. Here the type carries a guarantee.
 
 `__post_init__` is one of the hooks the data class machinery generates code
 around, in the same spirit as the class-creation hooks in the
-[Metaprogramming](09_Metaprogramming.md) chapter.
+[Metaprogramming](07_Metaprogramming.md) chapter.
 
 ## Composing Types from Types
 
@@ -499,7 +499,7 @@ if __name__ == "__main__":
 The claim is that an illegal value cannot exist. That is exactly the kind of
 claim a test should pin down. Using `pytest.raises`, you assert that the
 constructor rejects every value outside the set. See the
-[Testing](07_Testing.md) chapter for pytest in general.
+[Testing](05_Testing.md) chapter for pytest in general.
 
 ```python
 # test_stars.py

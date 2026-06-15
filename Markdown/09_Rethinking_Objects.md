@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # immutable.bob.name = "Ralph" raises FrozenInstanceError.
 ```
 
-The [Data Classes as Types](05_Data_Classes_as_Types.md) chapter makes the fuller
+The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter makes the fuller
 case for frozen data classes. Here the point is narrower: most encapsulation is
 work you only do because you allowed mutation in the first place.
 
@@ -220,7 +220,7 @@ have to live inside `Point`.
 Because the function is free, it can work on anything shaped like a point. A
 `Protocol` describes that shape, and any type with the right attributes satisfies
 it, with no declared inheritance. This is the structural typing from the
-[Static Type Checking](04_Static_Type_Checking.md) chapter. When you are handed a
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter. When you are handed a
 type that does not fit, you adapt it by composition, not inheritance:
 
 ```python
@@ -416,7 +416,7 @@ if __name__ == "__main__":
 
 `show` accepts anything. Pass it something without a `display` method and you find
 out only when the line runs. The
-[Static Type Checking](04_Static_Type_Checking.md) chapter gives this a static
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter gives this a static
 form with `Protocol`: a structural type describes the required shape, and the
 checker verifies it ahead of time. Duck typing and protocols are the same idea,
 checked at different times.
@@ -471,8 +471,8 @@ Adding a new *shape* is easier in the object version: write one class. Adding a
 new *operation* over all shapes is easier in the data version: write one function,
 and the type checker tells you if you missed a case. The object-oriented default
 quietly assumes you will add types more often than operations, which is not always
-true. The [Multiple Dispatching](22_Multiple_Dispatching.md) and
-[Visitor](24_Visitor.md) chapters return to this trade-off.
+true. The [Multiple Dispatching](21_Multiple_Dispatching.md) and
+[Visitor](22_Visitor.md) chapters return to this trade-off.
 
 ## Verifying the Claims
 
@@ -539,7 +539,7 @@ def test_oo_and_match_shapes_agree() -> None:
 None of this means objects are a mistake. They improved real things. A class is a
 clean namespace with dot-completion. A class guarantees initialization and, as a
 data class, generates equality, representation, and hashing for free. Defining a
-type is itself valuable, as the [Data Classes as Types](05_Data_Classes_as_Types.md)
+type is itself valuable, as the [Data Classes as Types](03_Data_Classes_as_Types.md)
 chapter argues.
 
 The shift is in the default. Start with functions and data. When a program truly
@@ -562,4 +562,4 @@ around limitations of older object-oriented languages. Read them with the lens o
 this chapter. For each pattern, ask whether you need the objects and the
 inheritance, or whether immutable data, a function, and a protocol already solve
 the problem. The next chapter,
-[The Pattern Concept](13_The_Pattern_Concept.md), begins that examination.
+[The Pattern Concept](10_The_Pattern_Concept.md), begins that examination.

@@ -557,7 +557,7 @@ language like Python, but there are also free, open-source tools such as
 ## Exercises
 
 The *Proxy* and *State* patterns that several of these exercises build on are
-covered in [Fronting for an Implementation](16_Fronting_for_an_Implementation.md).
+covered in [Fronting for an Implementation](14_Fronting_for_an_Implementation.md).
 
 1.  Create an example of the "virtual proxy."
 2.  Create an example of the "Smart reference" proxy where you keep

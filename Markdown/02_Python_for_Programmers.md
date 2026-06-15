@@ -606,6 +606,316 @@ that particularly difficult syntax and semantics.
 >     genericity. What python gives us is the genericity. IMHO the
 >     analogy with template mechanism is not appropriate.
 
+## Initialization and Cleanup
+
+A constructor sets up an object, and you saw `__init__()` do that above. Two
+parts of an object's lifetime surprise programmers coming from C++ or Java: how
+class-level attributes behave, and how and when objects are cleaned up.
+
+### Class Attributes Are Not Default Values
+
+A field declared in the class body, outside any method, is a *class attribute*. It
+is easy to misread one as a per-object default value. It is not. There is one
+shared variable for the whole class, and an instance variable of the same name
+*shadows* it. This trips up programmers coming from C++ or Java, where storage for
+such a field is allocated per object before the constructor runs.
+
+Simple use looks exactly like a default value, which is the trap:
+
+```python
+# class_attribute_confusion.py
+# A class attribute looks like a per-object default, but it is one
+# shared value, and an instance variable of the same name shadows it.
+class Stars:
+    rating = 5  # One value, shared by the whole class.
+
+
+a = Stars()
+b = Stars()
+print(a.rating, b.rating)  # 5 5: both read the class attribute
+a.rating = 1  # Assigning makes an instance variable on a.
+print(a.rating, b.rating)  # 1 5: a shadows it, b sees the class
+Stars.rating = 9  # Now change the shared class attribute.
+print(a.rating, b.rating)  # 1 9: a keeps its own, b follows
+```
+
+The reason is that an instance and its class each have their own attribute
+dictionary. Reading an attribute checks the instance first, then falls back to
+the class. Assigning always writes to the instance, creating the variable there
+the first time:
+
+```python
+# inside_objects.py
+# An instance and its class each have their own attribute dictionary.
+# Reading falls back to the class; assigning writes to the instance.
+class A:
+    x = 100  # class attribute
+
+
+a = A()
+print(vars(A)["x"])  # 100: the attribute lives in the class dict
+print(vars(a))  # {}: the instance has no attributes yet
+a.x = 1
+print(vars(a))  # {'x': 1}: assignment created it on the instance
+```
+
+So a class attribute behaves like a default only until someone assigns to the
+instance. Changing the class attribute then reaches into every object that has
+not shadowed it yet. That produces bugs that surface far from their cause.
+
+For real per-object defaults, write a constructor with default arguments, or use
+a `@dataclass`, which turns the class-attribute syntax into exactly that. Each
+object then gets its own storage:
+
+```python
+# real_defaults.py
+# For per-object defaults, write a constructor, or use a @dataclass,
+# which turns the class-attribute syntax into exactly that.
+from dataclasses import dataclass
+
+
+class A:
+    def __init__(self, x: int = 100) -> None:
+        self.x = x  # an instance variable, one per object
+
+
+@dataclass
+class B:
+    x: int = 100  # a constructor default, not a shared value
+
+
+if __name__ == "__main__":
+    a = A()
+    a.x = -1
+    print(a.x, A().x)  # -1 100: a's change does not leak
+    print(B().x, B(7).x)  # 100 7
+```
+
+The [Data Classes as Types](03_Data_Classes_as_Types.md) chapter builds on this:
+a `@dataclass` reads the class-attribute declarations as a template and generates
+a constructor from them.
+
+### Cleanup
+
+Python manages memory for you, so most objects need no explicit cleanup. When an
+object owns an outside resource (a file, a socket, a lock), you still have to
+release it. Python calls an object's `__del__()` method when it collects the
+object, which looks like the place for that work:
+
+```python
+# cleanup.py
+class Counter:
+    count: int = 0   # Number of objects of this class
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        print(name, 'created')
+        Counter.count += 1
+
+    def __del__(self) -> None:
+        print(self.name, 'deleted')
+        Counter.count -= 1
+        if Counter.count == 0:
+            print('Last Counter object deleted')
+        else:
+            print(Counter.count, 'Counter objects remaining')
+
+
+x = Counter("First")
+del x
+```
+
+This runs, but leaning on `__del__()` is fragile. Its timing is not guaranteed,
+and at interpreter shutdown the globals it refers to may already be gone. The
+Python documentation warns:
+
+> Warning: Due to the precarious circumstances under which __del__()
+> methods are invoked, exceptions that occur during their execution are
+> ignored, and a warning is printed to sys.stderr instead. Also, when
+> __del__() is invoked in response to a module being deleted (e.g.,
+> when execution of the program is done), *other globals referenced by
+> the __del__() method may already have been deleted*. For this
+> reason, __del__() methods should do the absolute minimum needed to
+> maintain external invariants.
+
+The explicit `del x` above forces collection while `Counter` is still intact.
+Without it the cleanup fires during shutdown, when `Counter` may already be gone.
+So `__del__()` should do the minimum, and you should not depend on it. Two
+approaches are sturdier.
+
+First, an explicit finalizer such as the `close()` that file objects provide,
+called from a `with` block so it runs even when an error interrupts the code.
+
+Second, a weak reference, which tracks an object without keeping it alive. Here a
+`WeakValueDictionary` counts live instances, using `id(self)` as each object's
+key:
+
+```python
+# weak_value.py
+from weakref import WeakValueDictionary
+
+
+class Counter:
+    _instances: WeakValueDictionary[int, Counter] = (
+        WeakValueDictionary())
+
+    @property
+    def count(self) -> int:
+        return len(self._instances)
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self._instances[id(self)] = self
+        print(name, 'created')
+
+    def __del__(self) -> None:
+        print(self.name, 'deleted')
+        if self.count == 0:
+            print('Last Counter object deleted')
+        else:
+            print(self.count, 'Counter objects remaining')
+
+
+x = Counter("First")
+```
+
+The count now falls on its own as objects are collected, with no explicit `del`
+required.
+
+## Static Type Checking
+
+The functions earlier in this chapter declare no types. C++ and Java make you
+declare the type of everything, and they check those types before the program
+runs. Python checks types at run time, only when an operation is actually
+attempted, and so far this chapter has leaned on that freedom.
+
+On a small program you do not miss the declarations. On a large one you start to.
+A type error that a compiler would have caught now waits until the code runs, and
+sometimes that means it waits until a bug report. Python's answer keeps the
+freedom and adds the safety net back on your terms. You annotate code with *type
+hints*, and a separate tool reads them and tells you, before you run anything,
+where the types do not line up. The hints are optional and the checking is a
+separate step, so you opt in as much as it pays off and no more.
+
+### Type Hints
+
+A hint annotates a parameter, a return value, or a variable. You write a colon
+for parameters and variables, and an arrow for the return type:
+
+```python
+# typed_basics.py
+# Hints annotate parameters, returns, and variables. They do not
+# change how the code runs; they let a checker and an editor reason
+# about it.
+
+
+def repeat(text: str, times: int) -> str:
+    return text * times
+
+
+total: int = 0
+for word in ["a", "bb", "ccc"]:
+    total += len(word)
+
+print(repeat("ab", 3))
+print(total)
+```
+
+The container and optional types read the way you say them: `list[int]`,
+`dict[str, float]`, `tuple[int, ...]`, and `str | None` for "a string or
+nothing." There is almost no new vocabulary to learn for everyday code.
+
+### Gradual Typing
+
+You do not have to annotate everything, or anything. Add hints one function at a
+time, and the unannotated code keeps working. The checker treats whatever it
+cannot see as the type `Any`, which is compatible with everything, so typed and
+untyped code live together. This is *gradual typing*. Start untyped, then add
+hints where they earn their keep: the public interfaces, the tricky data, the
+code other people depend on. Throwaway scripts you leave bare. When a value
+really is dynamic, `Any` is an honest way to say so.
+
+### The Checker: ty
+
+The hints do nothing on their own. You need a tool to read them. This book uses
+[`ty`](https://github.com/astral-sh/ty), Astral's fast checker. You point it at
+your code:
+
+    ty check
+
+It complains where the hints and the code disagree, and stays quiet when they
+agree. Every runnable example in this book is checked this way, and the build
+runs `ty` on every change, so the code you read here checks as well as runs.
+
+### Catching Mistakes
+
+The whole point is to hear about a mistake before it ships. Look at this:
+
+```python
+def area(width: int, height: int) -> int:
+    return width * height
+
+area("3", 4)   # ty: argument of type "str" is not assignable to "int"
+```
+
+At run time `area("3", 4)` does not even raise. It returns `"3333"`, because
+`"3" * 4` is perfectly good string repetition. The bug would surface much later,
+somewhere that expected a number, far from the line that caused it. The checker
+points at the call right away.
+
+### Structural Typing with Protocols
+
+This feature fits the way Python already works. Some statically typed languages
+make you declare, up front, that a class "is a" `Drawable` by inheriting from it.
+That fights duck typing, where what matters is whether an object *has* the methods
+you call, not what it inherits from.
+
+A *Protocol* types duck typing directly. You describe a shape, and any object
+with that shape satisfies it, with no inheritance:
+
+```python
+# protocols.py
+# A Protocol types duck typing: any object with the right shape
+# qualifies, without inheriting from a base class.
+from typing import Protocol
+
+
+class Drawable(Protocol):
+    def draw(self) -> str: ...
+
+
+class Circle:
+    def draw(self) -> str:
+        return "circle"
+
+
+class Square:
+    def draw(self) -> str:
+        return "square"
+
+
+def render(shape: Drawable) -> str:   # accepts anything with draw()
+    return shape.draw()
+
+
+print(render(Circle()))
+print(render(Square()))
+```
+
+`Circle` and `Square` never mention `Drawable`, and both are accepted, because
+each has a `draw()` of the right shape. Hand `render()` an object with no
+`draw()` and `ty` rejects it. You keep the flexibility of duck typing and gain
+the early warning of static types.
+
+### The Hints Are Not Enforced at Run Time
+
+Keep one thing straight: the hints do not change what the program does. Python
+stores them and otherwise ignores them. A wrong type that slips past the checker
+behaves exactly as it would have with no hints at all. Checking is a separate
+step you run, like the tests. If you need a guarantee at run time, you still
+write `isinstance`, or reach for a library built to validate data. The hints are
+for the tools and for the reader. The run-time behavior is unchanged.
+
 ## Useful Techniques
 
 -   You can turn a list into function arguments using `*`:
@@ -648,6 +958,30 @@ Compose().f()
 -   Basic functional programming with `map()` etc.
 
 Note: Suggest Further Topics for inclusion in the introductory chapter
+
+## Notes
+
+Open points and rougher material gathered while writing, kept for a later pass:
+
+- **Base-class constructors.** Be rigorous about calling base-class initializers
+  as the first step of your `__init__()` method. Call them with `super()` so that
+  changes to the class hierarchy do not break the chain.
+- **`__new__()` vs. `__init__()`.** `__init__()` initializes an already-created
+  object; `__new__()` creates it. The distinction matters for immutable types and
+  some metaprogramming. Expand this with an example.
+- **Static fields as a shared singleton.** A modifiable class attribute is shared
+  by every instance until one assigns to it. A pattern sometimes seen is lazily
+  creating a per-object value on first use, `if not self.something: self.something
+  = []`, though normally you would just initialize it in the constructor.
+- **Cleanup of locals.** Setting a global to `None` drops a reference. What
+  governs `__del__` timing for local variables, and whether assigning `None`
+  triggers `__del__` versus Python collecting the object first, deserves a worked
+  example.
+- **Garbage-collection order.** When `__del__` runs at interpreter shutdown, the
+  order in which objects are collected is not deterministic, so an object's
+  `__del__` may find other globals already gone.
+- **Further basics to cover.** `map()` and basic functional programming, and the
+  other everyday features a programmer from another language expects.
 
 ## Further Reading
 
