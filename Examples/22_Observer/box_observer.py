@@ -10,11 +10,11 @@ from observer import Observable, Observer  # type: ignore
 
 
 class BoxObservable(Observable):
-    # You must subclass Observable and call setChanged(), or notify
+    # You must subclass Observable and call set_changed(), or notify
     # does nothing:
-    def notifyObservers(self, arg: Any = None) -> None:
-        self.setChanged()
-        Observable.notifyObservers(self, arg)
+    def notify_observers(self, arg: Any = None) -> None:
+        self.set_changed()
+        Observable.notify_observers(self, arg)
 
 
 class Box(Observer):
@@ -24,11 +24,11 @@ class Box(Observer):
         self.y = y
         self.color = color
         self.notifier = notifier
-        notifier.addObserver(self)
+        notifier.add_observer(self)
 
     def click(self) -> None:
         # A click announces this box to every observer:
-        self.notifier.notifyObservers(self)
+        self.notifier.notify_observers(self)
 
     def update(self, observable: Any, clicked: Box) -> None:
         if self is not clicked and self.next_to(clicked):

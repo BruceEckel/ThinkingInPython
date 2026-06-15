@@ -7,7 +7,7 @@ class Counter:
         WeakValueDictionary())
 
     @property
-    def Count(self) -> int:
+    def count(self) -> int:
         return len(self._instances)
 
     def __init__(self, name: str) -> None:
@@ -17,10 +17,10 @@ class Counter:
 
     def __del__(self) -> None:
         print(self.name, 'deleted')
-        if self.Count == 0:
+        if self.count == 0:
             print('Last Counter object deleted')
         else:
-            print(self.Count, 'Counter objects remaining')
+            print(self.count, 'Counter objects remaining')
 
 
 x = Counter("First")

@@ -44,7 +44,7 @@ because we would still get exceptions if `run()` or `next()` were
 called for a derived type, and they hadn't been implemented.
 
 The `StateMachine` keeps track of the current state, which is
-initialized by the constructor. The `runAll()` method takes a list of
+initialized by the constructor. The `run_all()` method takes a list of
 `Input` objects. This method not only moves to the next state, but it
 also calls `run()` for each state object; thus you can see it's an
 expansion of the idea of the `State` pattern, since `run()` does
@@ -56,18 +56,18 @@ something different depending on the state that the system is in:
 # State using a template method.
 
 class StateMachine:
-    def __init__(self, initialState):
-        self.currentState = initialState
+    def __init__(self, initial_state):
+        self.currentState = initial_state
         self.currentState.run()
     # Template method:
-    def runAll(self, inputs):
+    def run_all(self, inputs):
         for i in inputs:
             print(i)
             self.currentState = self.currentState.next(i)
             self.currentState.run()
 ```
 
-I've also treated `runAll()` as a template method. This is typical,
+I've also treated `run_all()` as a template method. This is typical,
 but certainly not required; you could conceivably want to override it,
 but typically the behavior change will occur in `State`'s `run()`
 instead.
@@ -85,7 +85,7 @@ inputs to the state machine:
 
 class MouseAction:
     appears: MouseAction
-    runsAway: MouseAction
+    runs_away: MouseAction
     enters: MouseAction
     escapes: MouseAction
     trapped: MouseAction
@@ -105,7 +105,7 @@ class MouseAction:
 
 # Static fields; an enumeration of instances:
 MouseAction.appears = MouseAction("mouse appears")
-MouseAction.runsAway = MouseAction("mouse runs away")
+MouseAction.runs_away = MouseAction("mouse runs away")
 MouseAction.enters = MouseAction("mouse enters trap")
 MouseAction.escapes = MouseAction("mouse escapes")
 MouseAction.trapped = MouseAction("mouse trapped")
@@ -171,7 +171,7 @@ class Luring(State):
         print("Luring: Presenting Cheese, door open")
 
     def next(self, input):
-        if input == MouseAction.runsAway:
+        if input == MouseAction.runs_away:
             return MouseTrap.waiting
         if input == MouseAction.enters:
             return MouseTrap.trapping
@@ -216,7 +216,7 @@ MouseTrap.holding = Holding()
 with open("../mouse/mouse_moves.txt") as f:
     moves = [line.strip() for line in f
              if line.strip() and not line.startswith('#')]
-MouseTrap().runAll([MouseAction(m) for m in moves])
+MouseTrap().run_all([MouseAction(m) for m in moves])
 ```
 
 The `StateMachine` class simply defines all the possible states as
@@ -286,7 +286,7 @@ class Luring(StateT):
         if not self.transitions:
             self.transitions = {
               MouseAction.enters : MouseTrap.trapping,
-              MouseAction.runsAway : MouseTrap.waiting
+              MouseAction.runs_away : MouseTrap.waiting
             }
         return StateT.next(self, input)
 
@@ -332,8 +332,8 @@ MouseTrap.holding = Holding()
 with open("../mouse/mouse_moves.txt") as f:
     moves = [line.strip() for line in f
              if line.strip() and not line.startswith('#')]
-mouseMoves = [MouseAction(m) for m in moves]
-MouseTrap().runAll(mouseMoves)
+mouse_moves = [MouseAction(m) for m in moves]
+MouseTrap().run_all(mouse_moves)
 ```
 
 The rest of the code is identical; the difference is in the `next()`
@@ -447,8 +447,10 @@ class Digit:
         return self.name
 
 
-class FirstDigit(Digit): pass
-class SecondDigit(Digit): pass
+class FirstDigit(Digit):
+    pass
+class SecondDigit(Digit):
+    pass
 
 
 class ItemSlot:

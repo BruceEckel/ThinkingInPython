@@ -14,16 +14,18 @@ def factory(type):
         def draw(self): print("Square.draw")
         def erase(self): print("Square.erase")
 
-    if type == "Circle": return Circle()
-    if type == "Square": return Square()
+    if type == "Circle":
+        return Circle()
+    if type == "Square":
+        return Square()
     assert 0, "Bad shape creation: " + type
 
-def shapeNameGen(n):
+def shape_name_gen(n):
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 # Circle() # Not defined
 
-for shape in shapeNameGen(7):
+for shape in shape_name_gen(7):
     shape.draw()
     shape.erase()

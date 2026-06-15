@@ -26,8 +26,10 @@ class Digit:
         return self.name
 
 
-class FirstDigit(Digit): pass
-class SecondDigit(Digit): pass
+class FirstDigit(Digit):
+    pass
+class SecondDigit(Digit):
+    pass
 
 
 class ItemSlot:

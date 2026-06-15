@@ -10,15 +10,20 @@ class C:
 # facade go here ...
 
 class Facade:
-    def makeA(x): return A(x)
-    makeA = staticmethod(makeA)
-    def makeB(x): return B(x)
-    makeB = staticmethod(makeB)
-    def makeC(x): return C(x)
-    makeC = staticmethod(makeC)
+    @staticmethod
+    def make_a(x):
+        return A(x)
+
+    @staticmethod
+    def make_b(x):
+        return B(x)
+
+    @staticmethod
+    def make_c(x):
+        return C(x)
 
 # The client programmer gets the objects
 # by calling the static methods:
-a = Facade.makeA(1)
-b = Facade.makeB(1)
-c = Facade.makeC(1.0)
+a = Facade.make_a(1)
+b = Facade.make_b(1)
+c = Facade.make_c(1.0)

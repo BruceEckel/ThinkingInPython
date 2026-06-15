@@ -8,12 +8,12 @@ class ShapeFactory:
     factories: dict[str, Any] = {}
 
     @staticmethod
-    def addFactory(id: str, shapeFactory: Any) -> None:
-        ShapeFactory.factories[id] = shapeFactory
+    def add_factory(id: str, shape_factory: Any) -> None:
+        ShapeFactory.factories[id] = shape_factory
 
     # A Template Method:
     @staticmethod
-    def createShape(id: str) -> Shape:
+    def create_shape(id: str) -> Shape:
         if id not in ShapeFactory.factories:
             ShapeFactory.factories[id] = eval(id + '.Factory()')
         return ShapeFactory.factories[id].create()
@@ -40,13 +40,13 @@ class Square(Shape):
         def create(self) -> Square: return Square()
 
 
-def shapeNameGen(n: int):
+def shape_name_gen(n: int):
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
 
 
-shapes = [ShapeFactory.createShape(i) for i in shapeNameGen(7)]
+shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
 
 for shape in shapes:
     shape.draw()

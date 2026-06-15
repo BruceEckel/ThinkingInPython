@@ -9,9 +9,12 @@ class Flower:
         return type(self).__name__
 
 
-class Gladiolus(Flower): pass
-class Runuculus(Flower): pass
-class Chrysanthemum(Flower): pass
+class Gladiolus(Flower):
+    pass
+class Runuculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
 
 
 # A new operation, defined entirely outside the Flower hierarchy:

@@ -456,7 +456,7 @@ class Simple:
     # Two methods:
     def show(self):
         print(self.s)
-    def showMsg(self, msg):
+    def show_msg(self, msg):
         print(msg + ':',
         self.show()) # Calling another method
 
@@ -464,7 +464,7 @@ if __name__ == "__main__":
     # Create an object:
     x = Simple("constructor argument")
     x.show()
-    x.showMsg("A message")
+    x.show_msg("A message")
 ```
 
 Both methods have `self` as their first argument. C++ and Java both have a
@@ -544,7 +544,7 @@ class Simple2(Simple):
         # the base-class constructor:
         Simple.__init__(self, str)
     def display(self):
-        self.showMsg("Called from display()")
+        self.show_msg("Called from display()")
     # Overriding a base-class method
     def show(self):
         print("Overridden show() method")
@@ -560,7 +560,7 @@ if __name__ == "__main__":
     x = Simple2("Simple2 constructor argument")
     x.display()
     x.show()
-    x.showMsg("Inside main")
+    x.show_msg("Inside main")
     def f(obj): obj.show() # One-line definition
     f(x)
     f(Different())
@@ -577,7 +577,7 @@ if __name__ == "__main__":
 >     class at all.
 
 `Simple2` is inherited from `Simple`, and in the constructor, the
-base-class constructor is called. In `display()`, `showMsg()` can
+base-class constructor is called. In `display()`, `show_msg()` can
 be called as a method of `self`, but when calling the base-class
 version of the method you are overriding, you must fully qualify the
 name and pass `self` in as the first argument, as shown in the
@@ -585,7 +585,7 @@ base-class constructor call. This can also be seen in the overridden
 version of `show()`.
 
 In `__main__`, you will see (when you run the program) that the
-base-class constructor is called. You can also see that the `showMsg(
+base-class constructor is called. You can also see that the `show_msg(
 )` method is available in the derived class, just as you would expect
 with inheritance.
 

@@ -1,13 +1,9 @@
 # trace.py
 from collections.abc import Callable
 from functools import wraps
-from typing import ParamSpec, TypeVar
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 
-def trace(func: Callable[P, R]) -> Callable[P, R]:
+def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         print(f"-> {func.__name__}{args}")

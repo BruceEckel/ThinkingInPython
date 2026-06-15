@@ -18,4 +18,6 @@ class Proxy:
     def h(self): self.__implementation.h()
 
 p = Proxy()
-p.f(); p.g(); p.h()
+p.f()
+p.g()
+p.h()

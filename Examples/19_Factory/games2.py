@@ -2,12 +2,12 @@
 # Simplified Abstract Factory.
 
 class Kitty:
-    def interactWith(self, obstacle):
+    def interact_with(self, obstacle):
         print("Kitty has encountered a",
         obstacle.action())
 
 class KungFuGuy:
-    def interactWith(self, obstacle):
+    def interact_with(self, obstacle):
         print("KungFuGuy now battles a",
         obstacle.action())
 
@@ -19,20 +19,20 @@ class NastyWeapon:
 
 # Concrete factories:
 class KittiesAndPuzzles:
-    def makeCharacter(self): return Kitty()
-    def makeObstacle(self): return Puzzle()
+    def make_character(self): return Kitty()
+    def make_obstacle(self): return Puzzle()
 
 class KillAndDismember:
-    def makeCharacter(self): return KungFuGuy()
-    def makeObstacle(self): return NastyWeapon()
+    def make_character(self): return KungFuGuy()
+    def make_obstacle(self): return NastyWeapon()
 
 class GameEnvironment:
     def __init__(self, factory):
         self.factory = factory
-        self.p = factory.makeCharacter()
-        self.ob = factory.makeObstacle()
+        self.p = factory.make_character()
+        self.ob = factory.make_obstacle()
     def play(self):
-        self.p.interactWith(self.ob)
+        self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(KillAndDismember())

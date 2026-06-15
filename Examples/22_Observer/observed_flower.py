@@ -13,11 +13,11 @@ class Flower:
         self.closeNotifier= Flower.CloseNotifier(self)
     def open(self): # Opens its petals
         self.isOpen = 1
-        self.openNotifier.notifyObservers()
+        self.openNotifier.notify_observers()
         self.closeNotifier.open()
     def close(self): # Closes its petals
         self.isOpen = 0
-        self.closeNotifier.notifyObservers()
+        self.closeNotifier.notify_observers()
         self.openNotifier.close()
     def closing(self): return self.closeNotifier
 
@@ -26,11 +26,11 @@ class Flower:
             Observable.__init__(self)
             self.outer = outer
             self.alreadyOpen = 0
-        def notifyObservers(self):
+        def notify_observers(self):
             if self.outer.isOpen and \
             not self.alreadyOpen:
-                self.setChanged()
-                Observable.notifyObservers(self)
+                self.set_changed()
+                Observable.notify_observers(self)
                 self.alreadyOpen = 1
         def close(self):
             self.alreadyOpen = 0
@@ -39,15 +39,15 @@ class Flower:
         def __init__(self, outer):
             Observable.__init__(self)
             self.outer = outer
-            self.alreadyClosed = 0
-        def notifyObservers(self):
+            self.already_closed = 0
+        def notify_observers(self):
             if not self.outer.isOpen and \
-            not self.alreadyClosed:
-                self.setChanged()
-                Observable.notifyObservers(self)
-                self.alreadyClosed = 1
+            not self.already_closed:
+                self.set_changed()
+                Observable.notify_observers(self)
+                self.already_closed = 1
         def open(self):
-            alreadyClosed = 0
+            self.already_closed = 0
 
 class Bee:
     def __init__(self, name):
@@ -94,23 +94,23 @@ ba = Bee("Eric")
 bb = Bee("Eric 0.5")
 ha = Hummingbird("A")
 hb = Hummingbird("B")
-f.openNotifier.addObserver(ha.openObserver)
-f.openNotifier.addObserver(hb.openObserver)
-f.openNotifier.addObserver(ba.openObserver)
-f.openNotifier.addObserver(bb.openObserver)
-f.closeNotifier.addObserver(ha.closeObserver)
-f.closeNotifier.addObserver(hb.closeObserver)
-f.closeNotifier.addObserver(ba.closeObserver)
-f.closeNotifier.addObserver(bb.closeObserver)
+f.openNotifier.add_observer(ha.openObserver)
+f.openNotifier.add_observer(hb.openObserver)
+f.openNotifier.add_observer(ba.openObserver)
+f.openNotifier.add_observer(bb.openObserver)
+f.closeNotifier.add_observer(ha.closeObserver)
+f.closeNotifier.add_observer(hb.closeObserver)
+f.closeNotifier.add_observer(ba.closeObserver)
+f.closeNotifier.add_observer(bb.closeObserver)
 # Hummingbird 2 decides to sleep in:
-f.openNotifier.deleteObserver(hb.openObserver)
+f.openNotifier.delete_observer(hb.openObserver)
 # A change that interests observers:
 f.open()
 f.open() # It's already open, no change.
 # Bee 1 doesn't want to go to bed:
-f.closeNotifier.deleteObserver(ba.closeObserver)
+f.closeNotifier.delete_observer(ba.closeObserver)
 f.close()
 f.close() # It's already closed; no change
-f.openNotifier.deleteObservers()
+f.openNotifier.delete_observers()
 f.open()
 f.close()

@@ -74,20 +74,20 @@ Consider the following:
 ```python
 # cleanup.py
 class Counter:
-    Count: int = 0   # Number of objects of this class
+    count: int = 0   # Number of objects of this class
 
     def __init__(self, name: str) -> None:
         self.name = name
         print(name, 'created')
-        Counter.Count += 1
+        Counter.count += 1
 
     def __del__(self) -> None:
         print(self.name, 'deleted')
-        Counter.Count -= 1
-        if Counter.Count == 0:
+        Counter.count -= 1
+        if Counter.count == 0:
             print('Last Counter object deleted')
         else:
-            print(Counter.Count, 'Counter objects remaining')
+            print(Counter.count, 'Counter objects remaining')
 
 
 x = Counter("First")
@@ -109,7 +109,7 @@ From the Python docs regarding `__del__`:
 > maintain external invariants.
 
 Without the explicit call to `del`, `__del__` is only called at the end
-of the program, Counter and/or Count may have already been GC-ed by the
+of the program, Counter and/or count may have already been GC-ed by the
 time `__del__` is called (the order in which objects are collected is
 not deterministic). The exception means that Counter has already been
 collectd. You can't do anything particularly fancy with __del__.
@@ -133,7 +133,7 @@ class Counter:
         WeakValueDictionary())
 
     @property
-    def Count(self) -> int:
+    def count(self) -> int:
         return len(self._instances)
 
     def __init__(self, name: str) -> None:
@@ -143,10 +143,10 @@ class Counter:
 
     def __del__(self) -> None:
         print(self.name, 'deleted')
-        if self.Count == 0:
+        if self.count == 0:
             print('Last Counter object deleted')
         else:
-            print(self.Count, 'Counter objects remaining')
+            print(self.count, 'Counter objects remaining')
 
 
 x = Counter("First")

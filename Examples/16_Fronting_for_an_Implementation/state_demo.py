@@ -1,11 +1,11 @@
 # state_demo.py
 # Simple demonstration of the State pattern.
 
-class State_d:
+class StateD:
     def __init__(self, imp):
         self.__implementation = imp
-    def changeImp(self, newImp):
-        self.__implementation = newImp
+    def change_imp(self, new_imp):
+        self.__implementation = new_imp
     # Delegate calls to the implementation:
     def __getattr__(self, name):
         return getattr(self.__implementation, name)
@@ -32,7 +32,7 @@ def run(b):
     b.h()
     b.g()
 
-b = State_d(Implementation1())
+b = StateD(Implementation1())
 run(b)
-b.changeImp(Implementation2())
+b.change_imp(Implementation2())
 run(b)

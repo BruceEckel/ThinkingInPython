@@ -38,7 +38,7 @@ class Luring(StateT):
         if not self.transitions:
             self.transitions = {
               MouseAction.enters : MouseTrap.trapping,
-              MouseAction.runsAway : MouseTrap.waiting
+              MouseAction.runs_away : MouseTrap.waiting
             }
         return StateT.next(self, input)
 
@@ -84,5 +84,5 @@ MouseTrap.holding = Holding()
 with open("../mouse/mouse_moves.txt") as f:
     moves = [line.strip() for line in f
              if line.strip() and not line.startswith('#')]
-mouseMoves = [MouseAction(m) for m in moves]
-MouseTrap().runAll(mouseMoves)
+mouse_moves = [MouseAction(m) for m in moves]
+MouseTrap().run_all(mouse_moves)

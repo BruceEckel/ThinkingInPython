@@ -60,58 +60,57 @@ class Item:
 class Paper(Item):
     def compete(self, item):
         # First dispatch: self was Paper
-        return item.evalPaper(self)
-    def evalPaper(self, item):
+        return item.eval_paper(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Paper
         return Outcome.DRAW
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Paper
         return Outcome.WIN
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Paper
         return Outcome.LOSE
 
 class Scissors(Item):
     def compete(self, item):
         # First dispatch: self was Scissors
-        return item.evalScissors(self)
-    def evalPaper(self, item):
+        return item.eval_scissors(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Scissors
         return Outcome.LOSE
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Scissors
         return Outcome.DRAW
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Scissors
         return Outcome.WIN
 
 class Rock(Item):
     def compete(self, item):
         # First dispatch: self was Rock
-        return item.evalRock(self)
-    def evalPaper(self, item):
+        return item.eval_rock(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Rock
         return Outcome.WIN
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Rock
         return Outcome.LOSE
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
 def match(item1, item2):
-    print("%s <--> %s : %s" % (
-      item1, item2, item1.compete(item2)))
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
 # Generate the items:
-def itemPairGen(n):
-    # Create a list of instances of all Items:
-    Items = Item.__subclasses__()
+def item_pair_gen(n):
+    # Create a list of instances of all items:
+    items = Item.__subclasses__()
     for i in range(n):
-        yield (random.choice(Items)(),
-               random.choice(Items)())
+        yield (random.choice(items)(),
+               random.choice(items)())
 
-for item1, item2 in itemPairGen(20):
+for item1, item2 in item_pair_gen(20):
     match(item1, item2)
 ```
 
@@ -148,9 +147,12 @@ class Item:
     def __str__(self):
         return self.__class__.__name__
 
-class Paper(Item): pass
-class Scissors(Item): pass
-class Rock(Item): pass
+class Paper(Item):
+    pass
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
 
 outcome = {
   (Paper, Rock): Outcome.WIN,
@@ -165,18 +167,17 @@ outcome = {
 }
 
 def match(item1, item2):
-    print("%s <--> %s : %s" % (
-      item1, item2, item1.compete(item2)))
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
 # Generate the items:
-def itemPairGen(n):
-    # Create a list of instances of all Items:
-    Items = Item.__subclasses__()
+def item_pair_gen(n):
+    # Create a list of instances of all items:
+    items = Item.__subclasses__()
     for i in range(n):
-        yield (random.choice(Items)(),
-               random.choice(Items)())
+        yield (random.choice(items)(),
+               random.choice(items)())
 
-for item1, item2 in itemPairGen(20):
+for item1, item2 in item_pair_gen(20):
     match(item1, item2)
 ```
 
@@ -192,8 +193,8 @@ is the idiomatic answer: a `dict` keyed by a tuple of types. Adding a new `Item`
 is then a matter of adding rows to the table, with no methods to edit across the
 classes.
 
-The double-dispatch version, where each class implements `evalPaper`,
-`evalScissors`, and `evalRock`, is a workaround for languages that cannot store
+The double-dispatch version, where each class implements `eval_paper`,
+`eval_scissors`, and `eval_rock`, is a workaround for languages that cannot store
 types in a table and look a behavior up by them. Python can, so the table is
 both shorter and easier to maintain. Reach for the spread-out method version
 only when a combination needs substantial, type-specific code that will not fit

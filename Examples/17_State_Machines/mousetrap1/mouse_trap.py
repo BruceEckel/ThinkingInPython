@@ -24,7 +24,7 @@ class Luring(State):
         print("Luring: Presenting Cheese, door open")
 
     def next(self, input):
-        if input == MouseAction.runsAway:
+        if input == MouseAction.runs_away:
             return MouseTrap.waiting
         if input == MouseAction.enters:
             return MouseTrap.trapping
@@ -69,4 +69,4 @@ MouseTrap.holding = Holding()
 with open("../mouse/mouse_moves.txt") as f:
     moves = [line.strip() for line in f
              if line.strip() and not line.startswith('#')]
-MouseTrap().runAll([MouseAction(m) for m in moves])
+MouseTrap().run_all([MouseAction(m) for m in moves])

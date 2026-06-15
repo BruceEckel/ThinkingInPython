@@ -6,8 +6,9 @@
 PY ?= uv run python
 TY ?= uv run ty
 PYTEST ?= uv run pytest
+RUFF ?= uv run ruff
 
-.PHONY: help check extract run examples site serve local ty test clean-examples clean-site ci
+.PHONY: help check extract run examples site serve local ty lint test clean-examples clean-site ci
 
 help:
 	@echo "Targets:"
@@ -19,6 +20,7 @@ help:
 	@echo "  serve     - serve build/site/ at http://localhost:8000"
 	@echo "  local     - build the site, then serve it locally"
 	@echo "  ty        - type-check the extracted examples (advisory)"
+	@echo "  lint      - PEP8-lint the extracted examples with ruff (advisory)"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ci        - what CI runs: check, baseline run, pytest, site"
 	@echo "  clean-examples - remove ExtractedExamples/"
@@ -46,6 +48,9 @@ local: site
 
 ty:
 	$(TY) check ExtractedExamples
+
+lint:
+	$(RUFF) check ExtractedExamples
 
 test:
 	$(PYTEST) ExtractedExamples

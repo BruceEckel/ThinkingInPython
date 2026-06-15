@@ -3,11 +3,11 @@
 # State using a template method.
 
 class StateMachine:
-    def __init__(self, initialState):
-        self.currentState = initialState
+    def __init__(self, initial_state):
+        self.currentState = initial_state
         self.currentState.run()
     # Template method:
-    def runAll(self, inputs):
+    def run_all(self, inputs):
         for i in inputs:
             print(i)
             self.currentState = self.currentState.next(i)

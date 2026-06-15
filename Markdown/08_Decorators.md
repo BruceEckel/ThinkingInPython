@@ -20,13 +20,9 @@ work. Here is a decorator that traces calls:
 # trace.py
 from collections.abc import Callable
 from functools import wraps
-from typing import ParamSpec, TypeVar
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 
-def trace(func: Callable[P, R]) -> Callable[P, R]:
+def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         print(f"-> {func.__name__}{args}")
@@ -129,11 +125,13 @@ def register(cls: type) -> type:
 
 
 @register
-class Espresso: ...
+class Espresso:
+    ...
 
 
 @register
-class Latte: ...
+class Latte:
+    ...
 
 
 if __name__ == "__main__":

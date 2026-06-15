@@ -39,17 +39,23 @@ class Flower:
     def __str__(self):
         return self.__class__.__name__
 
-class Gladiolus(Flower): pass
-class Runuculus(Flower): pass
-class Chrysanthemum(Flower): pass
+class Gladiolus(Flower):
+    pass
+class Runuculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
 
 class Visitor:
     def __str__(self):
         return self.__class__.__name__
 
-class Bug(Visitor): pass
-class Pollinator(Bug): pass
-class Predator(Bug): pass
+class Bug(Visitor):
+    pass
+class Pollinator(Bug):
+    pass
+class Predator(Bug):
+    pass
 
 # Add the ability to do "Bee" activities:
 class Bee(Pollinator):
@@ -66,7 +72,7 @@ class Worm(Predator):
     def visit(self, flower):
         flower.eat(self)
 
-def flowerGen(n):
+def flower_gen(n):
     flwrs = Flower.__subclasses__()
     for i in range(n):
         yield random.choice(flwrs)()
@@ -76,7 +82,7 @@ def flowerGen(n):
 bee = Bee()
 fly = Fly()
 worm = Worm()
-for flower in flowerGen(10):
+for flower in flower_gen(10):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
@@ -107,9 +113,12 @@ class Flower:
         return type(self).__name__
 
 
-class Gladiolus(Flower): pass
-class Runuculus(Flower): pass
-class Chrysanthemum(Flower): pass
+class Gladiolus(Flower):
+    pass
+class Runuculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
 
 
 # A new operation, defined entirely outside the Flower hierarchy:

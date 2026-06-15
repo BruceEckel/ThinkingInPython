@@ -93,7 +93,7 @@ class Event:
         Event.events.append(self)
 
     def run(self) -> None:
-        print("%.2f: %s" % (self.time, self.action))
+        print(f"{self.time:.2f}: {self.action}")
 
     @staticmethod
     def run_events() -> None:
@@ -103,19 +103,19 @@ class Event:
 def create_mc(description: str) -> None:
     "Create subclass using the 'type' metaclass"
     class_name = "".join(x.capitalize() for x in description.split())
-    def __init__(self, time):
+    def init(self, time):
         Event.__init__(self, description + " [mc]", time)
-    globals()[class_name] = \
-        type(class_name, (Event,), dict(__init__ = __init__))
+    globals()[class_name] = type(
+        class_name, (Event,), {"__init__": init})
 
 def create_exec(description: str) -> None:
     "Create subclass by exec-ing a string"
     class_name = "".join(x.capitalize() for x in description.split())
-    klass = """
-class %s(Event):
+    klass = f"""
+class {class_name}(Event):
     def __init__(self, time):
-        Event.__init__(self, "%s [exec]", time)
-""" % (class_name, description)
+        Event.__init__(self, "{description} [exec]", time)
+"""
     exec(klass, globals())
 
 if __name__ == "__main__":
@@ -159,14 +159,19 @@ class Color:
         Color.registry -= set(cls.__bases__)  # keep only the leaves
 
 
-class Blue(Color): pass
-class Red(Color): pass
-class Green(Color): pass
+class Blue(Color):
+    pass
+class Red(Color):
+    pass
+class Green(Color):
+    pass
 print(sorted(c.__name__ for c in Color.registry))
 
 
-class PhthaloBlue(Blue): pass
-class CeruleanBlue(Blue): pass
+class PhthaloBlue(Blue):
+    pass
+class CeruleanBlue(Blue):
+    pass
 print(sorted(c.__name__ for c in Color.registry))
 
 
@@ -180,9 +185,12 @@ class Shape:
         Shape.registry -= set(cls.__bases__)
 
 
-class Round(Shape): pass
-class Square(Shape): pass
-class Circle(Round): pass
+class Round(Shape):
+    pass
+class Square(Shape):
+    pass
+class Circle(Round):
+    pass
 print(sorted(c.__name__ for c in Shape.registry))
 
 """ Output:
@@ -303,7 +311,8 @@ you can still modify the finished class object:
 from typing import Any
 
 
-class Tag: pass
+class Tag:
+    pass
 
 
 class Meta(type):

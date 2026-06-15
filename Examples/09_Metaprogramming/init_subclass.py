@@ -12,14 +12,19 @@ class Color:
         Color.registry -= set(cls.__bases__)  # keep only the leaves
 
 
-class Blue(Color): pass
-class Red(Color): pass
-class Green(Color): pass
+class Blue(Color):
+    pass
+class Red(Color):
+    pass
+class Green(Color):
+    pass
 print(sorted(c.__name__ for c in Color.registry))
 
 
-class PhthaloBlue(Blue): pass
-class CeruleanBlue(Blue): pass
+class PhthaloBlue(Blue):
+    pass
+class CeruleanBlue(Blue):
+    pass
 print(sorted(c.__name__ for c in Color.registry))
 
 
@@ -33,9 +38,12 @@ class Shape:
         Shape.registry -= set(cls.__bases__)
 
 
-class Round(Shape): pass
-class Square(Shape): pass
-class Circle(Round): pass
+class Round(Shape):
+    pass
+class Square(Shape):
+    pass
+class Circle(Round):
+    pass
 print(sorted(c.__name__ for c in Shape.registry))
 
 """ Output:

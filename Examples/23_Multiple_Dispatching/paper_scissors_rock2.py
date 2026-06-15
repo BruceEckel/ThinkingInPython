@@ -22,9 +22,12 @@ class Item:
     def __str__(self):
         return self.__class__.__name__
 
-class Paper(Item): pass
-class Scissors(Item): pass
-class Rock(Item): pass
+class Paper(Item):
+    pass
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
 
 outcome = {
   (Paper, Rock): Outcome.WIN,
@@ -39,16 +42,15 @@ outcome = {
 }
 
 def match(item1, item2):
-    print("%s <--> %s : %s" % (
-      item1, item2, item1.compete(item2)))
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
 # Generate the items:
-def itemPairGen(n):
-    # Create a list of instances of all Items:
-    Items = Item.__subclasses__()
+def item_pair_gen(n):
+    # Create a list of instances of all items:
+    items = Item.__subclasses__()
     for i in range(n):
-        yield (random.choice(Items)(),
-               random.choice(Items)())
+        yield (random.choice(items)(),
+               random.choice(items)())
 
-for item1, item2 in itemPairGen(20):
+for item1, item2 in item_pair_gen(20):
     match(item1, item2)

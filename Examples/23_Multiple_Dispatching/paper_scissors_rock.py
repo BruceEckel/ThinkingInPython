@@ -23,56 +23,55 @@ class Item:
 class Paper(Item):
     def compete(self, item):
         # First dispatch: self was Paper
-        return item.evalPaper(self)
-    def evalPaper(self, item):
+        return item.eval_paper(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Paper
         return Outcome.DRAW
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Paper
         return Outcome.WIN
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Paper
         return Outcome.LOSE
 
 class Scissors(Item):
     def compete(self, item):
         # First dispatch: self was Scissors
-        return item.evalScissors(self)
-    def evalPaper(self, item):
+        return item.eval_scissors(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Scissors
         return Outcome.LOSE
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Scissors
         return Outcome.DRAW
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Scissors
         return Outcome.WIN
 
 class Rock(Item):
     def compete(self, item):
         # First dispatch: self was Rock
-        return item.evalRock(self)
-    def evalPaper(self, item):
+        return item.eval_rock(self)
+    def eval_paper(self, item):
         # Item was Paper, we're in Rock
         return Outcome.WIN
-    def evalScissors(self, item):
+    def eval_scissors(self, item):
         # Item was Scissors, we're in Rock
         return Outcome.LOSE
-    def evalRock(self, item):
+    def eval_rock(self, item):
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
 def match(item1, item2):
-    print("%s <--> %s : %s" % (
-      item1, item2, item1.compete(item2)))
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
 # Generate the items:
-def itemPairGen(n):
-    # Create a list of instances of all Items:
-    Items = Item.__subclasses__()
+def item_pair_gen(n):
+    # Create a list of instances of all items:
+    items = Item.__subclasses__()
     for i in range(n):
-        yield (random.choice(Items)(),
-               random.choice(Items)())
+        yield (random.choice(items)(),
+               random.choice(items)())
 
-for item1, item2 in itemPairGen(20):
+for item1, item2 in item_pair_gen(20):
     match(item1, item2)

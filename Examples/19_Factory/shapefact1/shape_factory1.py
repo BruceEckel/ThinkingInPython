@@ -7,8 +7,10 @@ class Shape:
     # Create based on class name:
     @staticmethod
     def factory(type):
-        if type == "Circle": return Circle()
-        if type == "Square": return Square()
+        if type == "Circle":
+            return Circle()
+        if type == "Square":
+            return Square()
         assert 0, "Bad shape creation: " + type
 
 class Circle(Shape):
@@ -20,13 +22,13 @@ class Square(Shape):
     def erase(self): print("Square.erase")
 
 # Generate shape name strings:
-def shapeNameGen(n):
+def shape_name_gen(n):
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
 
 shapes = \
-  [ Shape.factory(i) for i in shapeNameGen(7)]
+  [ Shape.factory(i) for i in shape_name_gen(7)]
 
 for shape in shapes:
     shape.draw()

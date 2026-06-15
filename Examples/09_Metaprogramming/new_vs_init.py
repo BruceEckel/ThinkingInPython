@@ -2,7 +2,8 @@
 from typing import Any
 
 
-class Tag: pass
+class Tag:
+    pass
 
 
 class Meta(type):

@@ -1,4 +1,4 @@
-Decide whether virtual environments belong in the book
+No explanation of virtual environments, possibly note that in the introduction (are there other things like this that should be noted in the intro?)
 
 Look for code fragments that can be turned into extractable python files
 

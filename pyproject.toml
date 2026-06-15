@@ -32,3 +32,7 @@ target-version = "py314"
 select = ["E", "W", "F", "N", "I", "UP"]
 # N818: exception names need not end in "Error" (author preference).
 ignore = ["N818"]
+
+[tool.ruff.lint.per-file-ignores]
+# This example deliberately demonstrates printf-style % formatting.
+"**/string_formatting.py" = ["UP031"]

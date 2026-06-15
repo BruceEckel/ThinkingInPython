@@ -8,11 +8,13 @@ def register(cls: type) -> type:
 
 
 @register
-class Espresso: ...
+class Espresso:
+    ...
 
 
 @register
-class Latte: ...
+class Latte:
+    ...
 
 
 if __name__ == "__main__":

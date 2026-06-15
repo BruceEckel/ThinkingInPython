@@ -1,5 +1,5 @@
 # synchronization_demo.py
-from synchronization import *
+from synchronization import Synchronization, synchronize, synchronized
 
 
 # To use for a method:

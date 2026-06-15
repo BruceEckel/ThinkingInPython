@@ -30,11 +30,11 @@ class MinimaSolver:
     def minima(self, line):
         return self.strategy.algorithm(line)
 
-    def changeAlgorithm(self, newAlgorithm):
-        self.strategy = newAlgorithm
+    def change_algorithm(self, new_algorithm):
+        self.strategy = new_algorithm
 
 solver = MinimaSolver(LeastSquares())
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solver.minima(line))
-solver.changeAlgorithm(Bisection())
+solver.change_algorithm(Bisection())
 print(solver.minima(line))

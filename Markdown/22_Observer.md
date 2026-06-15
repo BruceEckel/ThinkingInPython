@@ -26,8 +26,8 @@ Python. The `Observable` class keeps track of everybody who wants to
 be informed when a change happens, whether the "state" has changed or
 not. When someone says "OK, everybody should check and potentially
 update themselves," the `Observable` class performs this task by
-calling the `notifyObservers()` method for each one on the list. The
-`notifyObservers()` method is part of the base class `Observable`.
+calling the `notify_observers()` method for each one on the list. The
+`notify_observers()` method is part of the base class `Observable`.
 
 There are actually two "things that change" in the observer pattern: the
 quantity of observing objects and the way an update occurs. That is, the
@@ -56,9 +56,9 @@ the control of the flag's state is `protected`, so that only an
 inheritor can decide what constitutes a change, and not the end user of
 the resulting derived `Observer` class.
 
-Most of the work is done in `notifyObservers()`. If the `changed`
+Most of the work is done in `notify_observers()`. If the `changed`
 flag has not been set, this does nothing. Otherwise, it first clears the
-`changed` flag so repeated calls to `notifyObservers()` won't waste
+`changed` flag so repeated calls to `notify_observers()` won't waste
 time. This is done before notifying the observers in case the calls to
 `update()` do anything that causes a change back to this
 `Observable` object. Then it moves through the `set` and calls back
@@ -67,10 +67,10 @@ to the `update()` member function of each `Observer`.
 At first it may appear that you can use an ordinary `Observable`
 object to manage the updates. But this doesn't work; to get an effect,
 you *must* inherit from `Observable` and somewhere in your
-derived-class code call `setChanged()`. This is the member function
+derived-class code call `set_changed()`. This is the member function
 that sets the "changed" flag, which means that when you call
-`notifyObservers()` all of the observers will, in fact, get notified.
-*Where* you call `setChanged()` depends on the logic of your program.
+`notify_observers()` all of the observers will, in fact, get notified.
+*Where* you call `set_changed()` depends on the logic of your program.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -123,14 +123,14 @@ thermo.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works. There is
-no `Observer` base class to inherit and no `setChanged()`/`notifyObservers()`
+no `Observer` base class to inherit and no `set_changed()`/`notify_observers()`
 protocol: assigning to `celsius` notifies everyone. For event-heavy programs
 there are mature libraries (signal/slot systems, `asyncio` events), but for most
 cases a list of callbacks is all the Observer pattern amounts to.
 
 The rest of this chapter translates Java's `Observable` and `Observer` classes
 directly. That is useful when you are porting Java code or need the exact
-`setChanged()` semantics, but reach for it only when the simple version above is
+`set_changed()` semantics, but reach for it only when the simple version above is
 not enough.
 
 ## Observing Flowers
@@ -156,7 +156,7 @@ class ToSynch:
     def __init__(self) -> None:
         self.mutex = threading.RLock()
         self.val = 1
-    def aSynchronizedMethod(self) -> int:
+    def a_synchronized_method(self) -> int:
         self.mutex.acquire()
         try:
             self.val += 1
@@ -237,7 +237,7 @@ Here's a simple test of the `Synchronization` module:
 
 ```python
 # synchronization_demo.py
-from synchronization import *
+from synchronization import Synchronization, synchronize, synchronized
 
 
 # To use for a method:
@@ -299,14 +299,14 @@ call, which isn't very desirable \[there may be a fix for this\]:
 # Class support for "observer" pattern.
 from typing import Any
 
-from synchronization import *
+from synchronization import Synchronization, synchronize
 
 
 class Observer:
     def update(self, observable: Any, arg: Any) -> None:
         '''Called when the observed object is
         modified. You call an Observable object's
-        notifyObservers method to notify all the
+        notify_observers method to notify all the
         object's observers of the change.'''
         pass
 
@@ -316,43 +316,44 @@ class Observable(Synchronization):
         self.changed = 0
         Synchronization.__init__(self)
 
-    def addObserver(self, observer: Observer) -> None:
+    def add_observer(self, observer: Observer) -> None:
         if observer not in self.obs:
             self.obs.append(observer)
 
-    def deleteObserver(self, observer: Observer) -> None:
+    def delete_observer(self, observer: Observer) -> None:
         self.obs.remove(observer)
 
-    def notifyObservers(self, arg: Any = None) -> None:
+    def notify_observers(self, arg: Any = None) -> None:
         '''If 'changed' indicates that this object
         has changed, notify all its observers, then
-        call clearChanged(). Each observer has its
+        call clear_changed(). Each observer has its
         update() called with two arguments: this
         observable object and the generic 'arg'.'''
 
         self.mutex.acquire()
         try:
-            if not self.changed: return
+            if not self.changed:
+                return
             # Make a local copy in case of synchronous
             # additions of observers:
-            localArray = self.obs[:]
-            self.clearChanged()
+            local_array = self.obs[:]
+            self.clear_changed()
         finally:
             self.mutex.release()
         # Updating is not required to be synchronized:
-        for observer in localArray:
+        for observer in local_array:
             observer.update(self, arg)
 
-    def deleteObservers(self) -> None: self.obs = []
-    def setChanged(self) -> None: self.changed = 1
-    def clearChanged(self) -> None: self.changed = 0
-    def hasChanged(self) -> int: return self.changed
-    def countObservers(self) -> int: return len(self.obs)
+    def delete_observers(self) -> None: self.obs = []
+    def set_changed(self) -> None: self.changed = 1
+    def clear_changed(self) -> None: self.changed = 0
+    def has_changed(self) -> int: return self.changed
+    def count_observers(self) -> int: return len(self.obs)
 
 synchronize(Observable,
-  "addObserver deleteObserver deleteObservers " +
-  "setChanged clearChanged hasChanged " +
-  "countObservers")
+  "add_observer delete_observer delete_observers " +
+  "set_changed clear_changed has_changed " +
+  "count_observers")
 ```
 
 Using this library, here is an example of the observer pattern:
@@ -373,11 +374,11 @@ class Flower:
         self.closeNotifier= Flower.CloseNotifier(self)
     def open(self): # Opens its petals
         self.isOpen = 1
-        self.openNotifier.notifyObservers()
+        self.openNotifier.notify_observers()
         self.closeNotifier.open()
     def close(self): # Closes its petals
         self.isOpen = 0
-        self.closeNotifier.notifyObservers()
+        self.closeNotifier.notify_observers()
         self.openNotifier.close()
     def closing(self): return self.closeNotifier
 
@@ -386,11 +387,11 @@ class Flower:
             Observable.__init__(self)
             self.outer = outer
             self.alreadyOpen = 0
-        def notifyObservers(self):
+        def notify_observers(self):
             if self.outer.isOpen and \
             not self.alreadyOpen:
-                self.setChanged()
-                Observable.notifyObservers(self)
+                self.set_changed()
+                Observable.notify_observers(self)
                 self.alreadyOpen = 1
         def close(self):
             self.alreadyOpen = 0
@@ -399,15 +400,15 @@ class Flower:
         def __init__(self, outer):
             Observable.__init__(self)
             self.outer = outer
-            self.alreadyClosed = 0
-        def notifyObservers(self):
+            self.already_closed = 0
+        def notify_observers(self):
             if not self.outer.isOpen and \
-            not self.alreadyClosed:
-                self.setChanged()
-                Observable.notifyObservers(self)
-                self.alreadyClosed = 1
+            not self.already_closed:
+                self.set_changed()
+                Observable.notify_observers(self)
+                self.already_closed = 1
         def open(self):
-            alreadyClosed = 0
+            self.already_closed = 0
 
 class Bee:
     def __init__(self, name):
@@ -454,24 +455,24 @@ ba = Bee("Eric")
 bb = Bee("Eric 0.5")
 ha = Hummingbird("A")
 hb = Hummingbird("B")
-f.openNotifier.addObserver(ha.openObserver)
-f.openNotifier.addObserver(hb.openObserver)
-f.openNotifier.addObserver(ba.openObserver)
-f.openNotifier.addObserver(bb.openObserver)
-f.closeNotifier.addObserver(ha.closeObserver)
-f.closeNotifier.addObserver(hb.closeObserver)
-f.closeNotifier.addObserver(ba.closeObserver)
-f.closeNotifier.addObserver(bb.closeObserver)
+f.openNotifier.add_observer(ha.openObserver)
+f.openNotifier.add_observer(hb.openObserver)
+f.openNotifier.add_observer(ba.openObserver)
+f.openNotifier.add_observer(bb.openObserver)
+f.closeNotifier.add_observer(ha.closeObserver)
+f.closeNotifier.add_observer(hb.closeObserver)
+f.closeNotifier.add_observer(ba.closeObserver)
+f.closeNotifier.add_observer(bb.closeObserver)
 # Hummingbird 2 decides to sleep in:
-f.openNotifier.deleteObserver(hb.openObserver)
+f.openNotifier.delete_observer(hb.openObserver)
 # A change that interests observers:
 f.open()
 f.open() # It's already open, no change.
 # Bee 1 doesn't want to go to bed:
-f.closeNotifier.deleteObserver(ba.closeObserver)
+f.closeNotifier.delete_observer(ba.closeObserver)
 f.close()
 f.close() # It's already closed; no change
-f.openNotifier.deleteObservers()
+f.openNotifier.delete_observers()
 f.open()
 f.close()
 ```
@@ -479,7 +480,7 @@ f.close()
 The events of interest are that a `Flower` can open or close. Because
 of the use of the inner class idiom, both these events can be separately
 observable phenomena. `OpenNotifier` and `CloseNotifier` both
-inherit `Observable`, so they have access to `setChanged()` and can
+inherit `Observable`, so they have access to `set_changed()` and can
 be handed to anything that needs an `Observable`.
 
 The inner class idiom also comes in handy to define more than one kind
@@ -526,11 +527,11 @@ from observer import Observable, Observer  # type: ignore
 
 
 class BoxObservable(Observable):
-    # You must subclass Observable and call setChanged(), or notify
+    # You must subclass Observable and call set_changed(), or notify
     # does nothing:
-    def notifyObservers(self, arg: Any = None) -> None:
-        self.setChanged()
-        Observable.notifyObservers(self, arg)
+    def notify_observers(self, arg: Any = None) -> None:
+        self.set_changed()
+        Observable.notify_observers(self, arg)
 
 
 class Box(Observer):
@@ -540,11 +541,11 @@ class Box(Observer):
         self.y = y
         self.color = color
         self.notifier = notifier
-        notifier.addObserver(self)
+        notifier.add_observer(self)
 
     def click(self) -> None:
         # A click announces this box to every observer:
-        self.notifier.notifyObservers(self)
+        self.notifier.notify_observers(self)
 
     def update(self, observable: Any, clicked: Box) -> None:
         if self is not clicked and self.next_to(clicked):
@@ -578,8 +579,8 @@ if __name__ == "__main__":
 ```
 
 As with the flower example, a bare `Observable` does nothing: you must subclass
-it and call `setChanged()`, or `notifyObservers()` is a no-op. `BoxObservable`
-does that in one place, inside its own `notifyObservers()`. Because every box
+it and call `set_changed()`, or `notify_observers()` is a no-op. `BoxObservable`
+does that in one place, inside its own `notify_observers()`. Because every box
 talks only to the base `Observable` interface after it is constructed, you could
 swap in a different `Observable` subclass to change notification behavior
 without touching the boxes at all.

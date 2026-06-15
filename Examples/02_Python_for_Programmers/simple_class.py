@@ -7,7 +7,7 @@ class Simple:
     # Two methods:
     def show(self):
         print(self.s)
-    def showMsg(self, msg):
+    def show_msg(self, msg):
         print(msg + ':',
         self.show()) # Calling another method
 
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     # Create an object:
     x = Simple("constructor argument")
     x.show()
-    x.showMsg("A message")
+    x.show_msg("A message")

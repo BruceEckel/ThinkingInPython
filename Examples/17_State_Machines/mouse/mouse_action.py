@@ -2,7 +2,7 @@
 
 class MouseAction:
     appears: MouseAction
-    runsAway: MouseAction
+    runs_away: MouseAction
     enters: MouseAction
     escapes: MouseAction
     trapped: MouseAction
@@ -22,7 +22,7 @@ class MouseAction:
 
 # Static fields; an enumeration of instances:
 MouseAction.appears = MouseAction("mouse appears")
-MouseAction.runsAway = MouseAction("mouse runs away")
+MouseAction.runs_away = MouseAction("mouse runs away")
 MouseAction.enters = MouseAction("mouse enters trap")
 MouseAction.escapes = MouseAction("mouse escapes")
 MouseAction.trapped = MouseAction("mouse trapped")
