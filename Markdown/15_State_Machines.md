@@ -205,10 +205,9 @@ with open("../mouse/mouse_moves.txt") as f:
 MouseTrap().run_all([MouseAction(m) for m in moves])
 ```
 
-The `StateMachine` class simply defines all the possible states as
-static objects, and also sets up the initial state. The `UnitTest`
-creates a `MouseTrap` and then tests it with all the inputs from a
-`MouseMoveList`.
+`MouseTrap` holds all the possible states as class attributes and sets up the
+initial state. The code at the bottom of the file builds a `MouseTrap` and runs
+it through the whole sequence of moves read from the text file.
 
 While the use of `if` statements inside the `next()` methods is
 perfectly reasonable, managing a large number of these could become

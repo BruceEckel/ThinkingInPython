@@ -4,13 +4,12 @@ This book assumes you're an experienced programmer, and it's best if you
 have learned Python through another book. For everyone else, this
 chapter gives a programmer's introduction to the language.
 
-This is not an introductory book. I am assuming that you have worked
-your way through at least *Learning Python* (by Mark Lutz & David
-Ascher; Oreilly, 1999) or an equivalent text before coming to this book.
+This is not an introductory book. I assume you have worked through at least one
+introductory text, such as *Learning Python* by Mark Lutz, or an equivalent,
+before coming to this book.
 
-This brief introduction is for the experienced programmer (which is what
-you should be if you're reading this book). You can refer to the full
-documentation at [www.Python.org](http://www.python.org/doc/).
+This brief introduction is for the experienced programmer. You can refer to the
+full documentation at <https://docs.python.org/3/>.
 
 In addition, I'll assume you have more than just a grasp of the syntax of
 Python. You should have a good understanding of objects and what they're
@@ -630,9 +629,8 @@ comedy troupe, and so examples are virtually required to include Python-esque
 references.
 
 The triple-quote syntax quotes everything, including newlines. This makes it
-particularly useful for doing things like generating web pages (Python is an
-especially good CGI language), since you can just triple-quote the entire page
-that you want without any other editing.
+useful for any block of literal text, such as an embedded template, a SQL query,
+or a chunk of HTML, which you can write out in full without escaping line breaks.
 
 The '`r`' right before a string means "raw," which takes the backslashes
 literally so you don't have to put in an extra backslash in order to insert a
@@ -1009,16 +1007,6 @@ if __name__ == "__main__":
     f(Different())
 ```
 
-> Note: you don't have to explicitly call the base-class constructor if the
-> argument list is the same. Show example.
->
-> Note: (from a Reader) The note above is confusing. Did not understand. IMHO one still
->     needs to invoke the base-class constructor if the argument is the
->     same. Probably one needs to state that in case the base class
->     constructor functionality continues to be adequate for the derived
->     class, then a new constructor need not be declared for the derived
->     class at all.
-
 `Simple2` is inherited from `Simple`, and in the constructor, the
 base-class constructor is called. In `display()`, `show_msg()` can
 be called as a method of `self`, but when calling the base-class
@@ -1043,11 +1031,6 @@ objective of the C++ `template` feature is exactly this: to provide
 weak typing in a strongly-typed language. Thus, in Python you
 automatically get the equivalent of templates, without having to learn
 that particularly difficult syntax and semantics.
-
-> (Reader) I am not sure if I agree with the remark about templates. One of the
->     big objective of templates has always been type safety along with
->     genericity. What python gives us is the genericity. IMHO the
->     analogy with template mechanism is not appropriate.
 
 ### Properties
 
@@ -1503,21 +1486,8 @@ Open points and rougher material gathered while writing, kept for a later pass:
 
 ## Further Reading
 
-> Although it is (alas) only for Python 2.7, I still find the [Python Quick
-Reference](http://rgruet.free.fr/#QuickRef) to be incredibly useful.
-
-> Python Programming FAQ: <http://www.python.org/doc/faq/programming/>
-
-> Python Tips, Tricks and Hacks: <http://www.siafoo.net/article/52>
-
-> Excellent Newsfeed Following Python Articles from Everywhere:
-> <http://www.planetpython.org/>
-
-Getters and setters in Python:
-<http://eli.thegreenplace.net/2009/02/06/getters-and-setters-in-python/>
-
-Importing properties into a class using the 'import' statement:
-<http://www.artima.com/weblogs/viewpost.jsp?thread=246483>
-
-Need to talk about abstract base classes (not necessarily here; perhaps
-a "classes" chapter (which includes the previous note)
+- The official Python tutorial: <https://docs.python.org/3/tutorial/>
+- The Python Programming FAQ:
+  <https://docs.python.org/3/faq/programming.html>
+- Planet Python, an aggregator of Python articles from around the web:
+  <https://planetpython.org/>

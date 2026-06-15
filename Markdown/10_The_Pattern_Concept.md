@@ -4,11 +4,11 @@
 own failures."^[From Mark Johnson.]
 
 Probably the most important step forward in object-oriented design is the
-"design patterns" movement, chronicled in *Design Patterns (ibid)*^[But be
+"design patterns" movement, chronicled in the book *Design Patterns*^[But be
 warned: the examples are in C++.]. That book shows 23 different solutions to
 particular classes of problems. In this book, the basic concepts of design
 patterns will be introduced along with examples. This should whet your
-appetite to read *Design Patterns* by Gamma, et. al., a source of what has now
+appetite to read *Design Patterns* by Gamma et al., a source of what has now
 become an essential, almost mandatory, vocabulary for OOP programmers.
 
 The latter part of this book contains an example of the design evolution
