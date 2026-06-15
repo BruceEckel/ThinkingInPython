@@ -330,9 +330,15 @@ if __name__ == "__main__":
 
 ## Polymorphism Without Inheritance
 
-The fourth promise is polymorphism: call one method, get behavior that depends on
-the object's type. The classic object-oriented version uses an abstract base class
-and an overridden method:
+The fourth promise is polymorphism. It is usually taught through inheritance, but
+that is only one form of it. More broadly, polymorphism means a function parameter
+accepts more than one type. The questions are which types it accepts, and what the
+function may do with them. This section draws on my talk
+[Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
+
+The classic object-oriented answer uses an abstract base class. The base type
+names both the allowed types, its subclasses, and what you may do with them, its
+methods:
 
 ```python
 # shapes_oo.py
@@ -370,9 +376,55 @@ if __name__ == "__main__":
         print(round(shape.area(), 4))
 ```
 
-The same behavior comes from immutable data and one free function that dispatches
-with `match`. There is no base class and no overridden method, and the type
-checker confirms the match covers every shape:
+Duck typing gives a different answer: any type works as long as it has the method
+the function calls. There is no shared base class and no declared set of types,
+and validity is checked only at run time, when the call happens:
+
+```python
+# duck_typing.py
+# Duck typing: any type works as long as it has the method that gets
+# called. There is no base class and no type union. The check happens
+# only at run time, when the method is called.
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True)
+class Bicycle:
+    id: str
+
+    def display(self) -> str:
+        return f"Bicycle {self.id}"
+
+
+@dataclass(frozen=True)
+class Glider:
+    size: int
+
+    def display(self) -> str:
+        return f"Glider {self.size}"
+
+
+def show(t: Any) -> str:
+    return t.display()
+
+
+if __name__ == "__main__":
+    for item in (Bicycle("Bob"), Glider(65)):
+        print(show(item))
+```
+
+`show` accepts anything. Pass it something without a `display` method and you find
+out only when the line runs. The
+[Static Type Checking](04_Static_Type_Checking.md) chapter gives this a static
+form with `Protocol`: a structural type describes the required shape, and the
+checker verifies it ahead of time. Duck typing and protocols are the same idea,
+checked at different times.
+
+A third answer names a closed set of types as a union and dispatches with `match`.
+The shapes become immutable data, and one free function handles each case. There
+is no base class and no overridden method, and the type checker confirms the match
+covers every shape:
 
 ```python
 # shapes_match.py
