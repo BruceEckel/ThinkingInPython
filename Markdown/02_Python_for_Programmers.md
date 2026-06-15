@@ -77,6 +77,99 @@ separating them with semicolons), thus no terminating semicolon is necessary.
 Even from the brief example above you can see that the language is designed to
 be as simple as possible, and yet still very readable.
 
+## Variables and References
+
+A variable in Python is a name bound to an object, not a box that holds a value.
+Assignment binds a name; it does not copy. You never declare a variable's type,
+and one name can bind to objects of different types over its life. This is
+*dynamic typing*.
+
+```python
+# references.py
+
+x = 10        # x names an int
+x = "ten"     # the same name now binds to a str
+a = [1, 2, 3]
+b = a         # b binds to the same list, not a copy
+b.append(4)
+print(a)       # [1, 2, 3, 4]: a and b are the same object
+print(a is b)  # True: identical objects
+c = a[:]       # a shallow copy
+print(a is c, a == c)  # False True: different object, equal value
+```
+
+Use `==` to ask whether two objects have equal values. Use `is` to ask whether
+two names refer to the *same* object. Reserve `is` for `None` and other
+singletons.
+
+You can assign several names at once, which makes swapping a one-liner with no
+temporary:
+
+```python
+# multiple_assignment.py
+
+a, b = 1, 2
+a, b = b, a         # swap, no temporary needed
+print(a, b)         # 2 1
+first, *rest = [10, 20, 30, 40]
+print(first, rest)  # 10 [20, 30, 40]
+```
+
+Numbers, strings, and tuples are *immutable*: operations produce new objects
+rather than changing the original. Lists, dictionaries, and sets are *mutable*.
+Knowing which is which explains when a change is visible through another name, as
+with `a` and `b` above.
+
+## Numbers and Arithmetic
+
+Integers have unlimited precision, so they never overflow. Floating point is the
+usual IEEE double. The operators are what you expect, with two worth noting: `/`
+always produces a float, and `//` is floor division.
+
+```python
+# numbers.py
+
+print(7 / 2)    # 3.5: true division, always a float
+print(7 // 2)   # 3: floor division
+print(7 % 2)    # 1: remainder
+print(2 ** 10)  # 1024: exponentiation
+print(10 ** 30) # a 31-digit int, no overflow
+print(abs(-5), round(3.14159, 2))  # 5 3.14
+total = 0
+total += 5      # augmented assignment, like other languages
+print(total)
+```
+
+There is no `++` or `--`; use `+= 1`. A `bool` is a subtype of `int`, so `True`
+equals `1` and `False` equals `0`, which is occasionally handy for counting.
+
+## Booleans, None, and Truthiness
+
+`None` is Python's single "no value" object, like `null` elsewhere. It is the
+default return value of a function that returns nothing.
+
+Any object can be tested in a boolean context. Numbers are false when zero,
+containers are false when empty, and `None` is always false. Everything else is
+true. This is *truthiness*, and it lets you write `if items:` instead of
+`if len(items) != 0:`.
+
+```python
+# truthiness.py
+
+for value in [0, 1, "", "hi", [], [1], None]:
+    print(repr(value), "->", bool(value))
+
+items = []
+if not items:
+    print("empty")        # an empty list is falsy
+
+name = "" or "default"    # 'or' returns the first truthy operand
+print(name)               # default
+```
+
+`and` and `or` short-circuit and return one of their operands, not a coerced
+boolean. `x or default` is a common way to supply a fallback.
+
 ## Built-In Containers
 
 With languages like C++ and Java, containers are add-on libraries and not
@@ -119,6 +212,246 @@ you've been using up a lot of brain cycles parsing semicolons, curly braces,
 and all sorts of other extra verbiage that was demanded by your non-Python
 programming language but didn't actually describe what your program was
 supposed to do.
+
+### Lists and Slicing
+
+A list holds an ordered, mutable sequence of any objects. Indexing starts at
+zero, and negative indices count from the end. A *slice* `[start:stop:step]`
+copies a subrange, with `stop` excluded:
+
+```python
+# slicing.py
+
+xs = [10, 20, 30, 40, 50]
+print(xs[0], xs[-1])  # 10 50: first and last
+print(xs[1:3])        # [20, 30]: the stop index is excluded
+print(xs[:2])         # [10, 20]: from the start
+print(xs[2:])         # [30, 40, 50]: to the end
+print(xs[::2])        # [10, 30, 50]: every second item
+print(xs[::-1])       # [50, 40, 30, 20, 10]: reversed
+xs.append(60)
+xs.insert(0, 5)
+print(len(xs), 30 in xs)  # 7 True
+```
+
+Slicing works on any sequence, including strings and tuples.
+
+### Tuples and Unpacking
+
+A tuple is an immutable sequence. The comma makes the tuple, not the
+parentheses. Tuples are the natural way to return several values from a function
+and to group values for unpacking:
+
+```python
+# tuples.py
+
+point = (3, 4)
+x, y = point        # unpacking
+print(x, y)         # 3 4
+single = (42,)      # a one-element tuple needs the trailing comma
+print(len(single))  # 1
+
+def min_max(values):
+    return min(values), max(values)  # returns a tuple
+
+low, high = min_max([5, 2, 9, 1])
+print(low, high)    # 1 9
+```
+
+### Dictionaries
+
+A dictionary maps keys to values, with fast lookup. Keys must be immutable.
+
+```python
+# dictionaries.py
+
+ages = {"Alice": 30, "Bob": 25}
+print(ages["Alice"])       # 30
+ages["Carol"] = 41         # add or update
+print("Bob" in ages)       # True: membership tests the keys
+print(ages.get("Dan", 0))  # 0: a default when the key is missing
+for name, age in ages.items():
+    print(name, age)
+```
+
+Reach for `dict.get()` to avoid a `KeyError` when a key might be absent.
+
+### Sets
+
+A set is an unordered collection of unique items, with fast membership tests and
+the usual set algebra:
+
+```python
+# sets.py
+
+a = {1, 2, 3, 3}  # duplicates collapse
+b = {3, 4, 5}
+print(a)          # {1, 2, 3}
+print(a & b)      # {3}: intersection
+print(a | b)      # {1, 2, 3, 4, 5}: union
+print(a - b)      # {1, 2}: difference
+print(2 in a)     # True
+```
+
+## Control Flow
+
+You already saw `if`. Add `elif` for chained tests, and note that Python's
+comparison operators chain the way they do in mathematics:
+
+```python
+# control_flow.py
+
+def classify(n):
+    if n < 0:
+        return "negative"
+    elif n == 0:
+        return "zero"
+    else:
+        return "positive"
+
+print(classify(-3), classify(0), classify(7))
+
+x = 5
+print(0 < x < 10)  # True: chained comparison
+grade = "pass" if x >= 3 else "fail"  # conditional expression
+print(grade)
+```
+
+A `while` loop runs until its condition is false. `break` leaves the loop and
+`continue` skips to the next iteration:
+
+```python
+# while_loop.py
+
+n = 27
+steps = 0
+while n != 1:  # the Collatz sequence
+    n = n // 2 if n % 2 == 0 else 3 * n + 1
+    steps += 1
+print(steps, "steps")
+```
+
+For iteration, `for` walks any sequence directly. Use `range()` for counting,
+`enumerate()` when you also need the index, and `zip()` to walk two sequences
+together:
+
+```python
+# looping.py
+
+for i in range(3):  # 0, 1, 2
+    print(i, end=" ")
+print()
+names = ["Alice", "Bob", "Carol"]
+for index, name in enumerate(names):
+    print(index, name)
+scores = [88, 91, 79]
+for name, score in zip(names, scores):
+    print(name, score)
+```
+
+### Pattern Matching
+
+The `match` statement compares a value against structural patterns. It is more
+than a C `switch`: a pattern can destructure a value and bind its parts. (The
+`f"..."` strings below are *f-strings*, covered under Strings.)
+
+```python
+# match_command.py
+
+def run(command):
+    match command.split():
+        case ["go", direction]:
+            return f"moving {direction}"
+        case ["quit"]:
+            return "goodbye"
+        case _:
+            return "unknown command"
+
+print(run("go north"))
+print(run("quit"))
+print(run("dance"))
+```
+
+## Errors and Exceptions
+
+Python signals an error by *raising* an exception, which propagates up until a
+`try`/`except` handles it. Catch specific exception types, not everything:
+
+```python
+# exceptions.py
+
+def parse_int(text):
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+print(parse_int("42"))    # 42
+print(parse_int("oops"))  # None
+
+def checked_divide(a, b):
+    if b == 0:
+        raise ValueError("cannot divide by zero")
+    return a / b
+
+try:
+    checked_divide(1, 0)
+except ValueError as e:
+    print("caught:", e)
+finally:
+    print("finally always runs")
+```
+
+An `except` clause names the exception type. An optional `else` runs when no
+exception was raised, and `finally` always runs, which makes it the place for
+cleanup. Python's culture leans on "easier to ask forgiveness than permission":
+try the operation and handle the exception, rather than checking every
+precondition first.
+
+## Context Managers
+
+A `with` block guarantees that setup and cleanup happen as a pair, even if the
+body raises. Opening a file is the canonical case: the file is closed on the way
+out, no matter what:
+
+```python
+# context_manager.py
+import os
+import tempfile
+
+path = os.path.join(tempfile.gettempdir(), "demo.txt")
+with open(path, "w") as f:
+    f.write("one\ntwo\n")  # f.close() happens automatically
+
+with open(path) as f:
+    for line in f:
+        print(line.strip())
+os.remove(path)
+```
+
+This is the explicit-finalizer approach mentioned under Cleanup. Anything that
+acquires a resource (a file, a lock, a network connection) can be a context
+manager.
+
+## Comprehensions
+
+A *comprehension* builds a list, dictionary, or set from another sequence in one
+expression, replacing a loop that builds up a result:
+
+```python
+# comprehensions_intro.py
+
+squares = [n * n for n in range(5)]           # list comprehension
+print(squares)                                # [0, 1, 4, 9, 16]
+evens = [n for n in range(10) if n % 2 == 0]  # with a filter
+print(evens)                                  # [0, 2, 4, 6, 8]
+lengths = {w: len(w) for w in ["a", "bb"]}    # dict comprehension
+print(lengths)                                # {'a': 1, 'bb': 2}
+```
+
+This is such a core idiom that it has its own chapter,
+[Comprehensions](07_Comprehensions.md), which also covers generator expressions
+and the functional tools `map()` and `filter()`.
 
 ## Naming Conventions
 
@@ -202,6 +535,77 @@ print(sum('spam ', "eggs"))
 When the operator '`+`' is used with strings, it means concatenation (yes,
 Python supports operator overloading, and it does a nice job of it).
 
+### Default and Keyword Arguments
+
+Parameters can have defaults, and callers can pass arguments by name in any
+order. Keyword arguments make a call self-documenting:
+
+```python
+# default_args.py
+
+def connect(host, port=5432, timeout=30):
+    return f"{host}:{port} (timeout {timeout}s)"
+
+print(connect("db.example.com"))                 # uses both defaults
+print(connect("db.example.com", timeout=5))      # skip to a keyword
+print(connect(port=80, host="web.example.com"))  # any order by name
+```
+
+A default value is evaluated once, when the function is defined, not on each
+call. A *mutable* default is therefore shared across calls, a classic trap:
+
+```python
+# mutable_default.py
+
+def bad_append(item, target=[]):  # the same list every call
+    target.append(item)
+    return target
+
+print(bad_append(1))  # [1]
+print(bad_append(2))  # [1, 2]: surprise, the default kept the 1
+
+def good_append(item, target=None):
+    if target is None:
+        target = []               # a fresh list each call
+    target.append(item)
+    return target
+
+print(good_append(1))  # [1]
+print(good_append(2))  # [2]
+```
+
+### Variable Argument Lists
+
+A `*args` parameter collects extra positional arguments into a tuple, and
+`**kwargs` collects extra keyword arguments into a dictionary:
+
+```python
+# var_args.py
+
+def report(label, *values, **options):
+    print(label, values, options)
+
+report("nums", 1, 2, 3)                       # nums (1, 2, 3) {}
+report("point", 3, 4, color="red", size=10)   # extras land in options
+```
+
+The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a
+call site, the mirror image of collecting them.
+
+### Lambdas
+
+A `lambda` is a small anonymous function written as a single expression. It is
+handy for passing behavior to functions like `sorted()`:
+
+```python
+# lambdas.py
+
+words = ["banana", "kiwi", "apple", "fig"]
+print(sorted(words, key=lambda w: len(w)))  # sort by length
+square = lambda n: n * n                     # usually prefer def
+print(square(9))                             # 81
+```
+
 ## Strings
 
 The above example also shows a little bit about Python string handling, which
@@ -256,6 +660,45 @@ arguments, but tuples are typical).
 All the formatting from `printf()` is available, including control
 over the number of decimal places and alignment. Python also has very
 sophisticated regular expressions.
+
+### f-Strings
+
+The `%` syntax above still works, but the modern way to build strings is the
+*f-string*: prefix the string with `f` and put expressions in braces. It is
+readable and fast, and it is what you should reach for:
+
+```python
+# fstrings.py
+
+name = "Alice"
+score = 91.5
+print(f"{name} scored {score}")             # Alice scored 91.5
+print(f"{name} scored {score:.0f}%")        # Alice scored 92%
+print(f"{name!r} has {len(name)} letters")  # 'Alice' has 5 letters
+total = 7
+print(f"{total = }")                         # total = 7: handy when debugging
+```
+
+The format spec after a colon controls width, precision, and alignment, the same
+mini-language the older formatting used.
+
+### Common String Operations
+
+Strings are immutable sequences, so slicing and `in` work on them, and the
+methods return new strings rather than changing the original:
+
+```python
+# string_methods.py
+
+s = "  Hello, World  "
+print(s.strip())              # 'Hello, World'
+print(s.strip().lower())      # 'hello, world'
+print("World" in s)           # True
+print("a,b,c".split(","))     # ['a', 'b', 'c']
+print("-".join(["2024", "06", "15"]))  # '2024-06-15'
+print("ababab".replace("a", "X"))      # 'XbXbXb'
+print(s.strip()[0:5])         # 'Hello': slicing
+```
 
 ## Imports, Namespaces and Packages
 
@@ -606,6 +1049,87 @@ that particularly difficult syntax and semantics.
 >     genericity. What python gives us is the genericity. IMHO the
 >     analogy with template mechanism is not appropriate.
 
+### Properties
+
+In Java or C++ you often write getters and setters up front, in case you later
+need logic behind a field. Python lets you expose a plain attribute and convert
+it to a computed one later, without changing the calling code, using
+`@property`:
+
+```python
+# properties.py
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius  # a plain attribute
+
+    @property
+    def area(self):           # used like an attribute, not a call
+        return 3.14159 * self.radius ** 2
+
+c = Circle(10)
+print(c.radius)  # 10
+print(c.area)    # 314.159: no parentheses, it is a property
+```
+
+Because the change is invisible at the call site, you do not write getters and
+setters in advance. Add a property only when you actually need the logic.
+
+### String Representation
+
+Two special methods control how an object prints. `__str__` is the readable form
+for users, and `__repr__` is the unambiguous form for developers, shown in the
+REPL and inside containers:
+
+```python
+# representation.py
+
+class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return f"Point({self.x}, {self.y})"
+
+p = Point(3, 4)
+print(p)       # Point(3, 4): falls back to __repr__
+print([p, p])  # [Point(3, 4), Point(3, 4)]
+```
+
+Define `__repr__` on classes you debug. Methods named with double underscores are
+*special methods*, and they hook your class into the language's operators and
+built-in functions.
+
+### Static and Class Methods
+
+A method that ignores `self` can be a `@staticmethod`. One that needs the class
+rather than an instance can be a `@classmethod`, which receives the class as its
+first argument, conventionally `cls`:
+
+```python
+# class_methods.py
+
+class Temperature:
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    @classmethod
+    def from_fahrenheit(cls, f):    # an alternative constructor
+        return cls((f - 32) * 5 / 9)
+
+    @staticmethod
+    def is_freezing(celsius):        # needs no self or cls
+        return celsius <= 0
+
+t = Temperature.from_fahrenheit(212)
+print(round(t.celsius))             # 100
+print(Temperature.is_freezing(-4))  # True
+```
+
+For classes that are mostly a bundle of typed data, the
+[Data Classes as Types](04_Data_Classes_as_Types.md) chapter shows a much shorter
+path that writes the constructor and `__repr__` for you.
+
 ## Initialization and Cleanup
 
 A constructor sets up an object, and you saw `__init__()` do that above. Two
@@ -955,10 +1479,6 @@ class Compose:
 Compose().f()
 ```
 
--   Basic functional programming with `map()` etc.
-
-Note: Suggest Further Topics for inclusion in the introductory chapter
-
 ## Notes
 
 Open points and rougher material gathered while writing, kept for a later pass:
@@ -980,8 +1500,6 @@ Open points and rougher material gathered while writing, kept for a later pass:
 - **Garbage-collection order.** When `__del__` runs at interpreter shutdown, the
   order in which objects are collected is not deterministic, so an object's
   `__del__` may find other globals already gone.
-- **Further basics to cover.** `map()` and basic functional programming, and the
-  other everyday features a programmer from another language expects.
 
 ## Further Reading
 

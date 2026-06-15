@@ -114,11 +114,10 @@ for item1, item2 in item_pair_gen(20):
     match(item1, item2)
 ```
 
-This was a fairly literal translation from the Java version, and one of
-the things you might notice is that the information about the various
+One of the things you might notice is that the information about the various
 combinations is encoded into each type of `Item`. It actually ends up
 being a kind of table, except that it is spread out through all the
-classes. This is not very easy to maintain if you ever expect to modify
+classes. This is not very easy to maintain if you expect to modify
 the behavior or to add a new `Item` class. Instead, it can be more
 sensible to make the table explicit, like this:
 
