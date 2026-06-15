@@ -3,7 +3,7 @@ from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances: WeakValueDictionary[int, "Counter"] = (
+    _instances: WeakValueDictionary[int, Counter] = (
         WeakValueDictionary())
 
     @property

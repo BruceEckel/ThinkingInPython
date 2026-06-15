@@ -3,6 +3,7 @@
 # reads the same and computes the same. The class does not need to
 # own it.
 from __future__ import annotations
+
 from dataclasses import dataclass
 from math import sqrt
 

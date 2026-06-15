@@ -1,6 +1,5 @@
 # test_account.py
 import pytest
-
 from account import Account, InsufficientFunds
 
 

@@ -188,6 +188,7 @@ with a plain function that does the same thing:
 # reads the same and computes the same. The class does not need to
 # own it.
 from __future__ import annotations
+
 from dataclasses import dataclass
 from math import sqrt
 
@@ -229,6 +230,7 @@ type that does not fit, you adapt it by composition, not inheritance:
 # Checking chapter. A class that lacks x and y can be adapted by
 # composition, with no inheritance.
 from __future__ import annotations
+
 from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol

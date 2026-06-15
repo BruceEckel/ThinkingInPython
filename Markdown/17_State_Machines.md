@@ -84,12 +84,12 @@ inputs to the state machine:
 # mouse/mouse_action.py
 
 class MouseAction:
-    appears: "MouseAction"
-    runsAway: "MouseAction"
-    enters: "MouseAction"
-    escapes: "MouseAction"
-    trapped: "MouseAction"
-    removed: "MouseAction"
+    appears: MouseAction
+    runsAway: MouseAction
+    enters: MouseAction
+    escapes: MouseAction
+    trapped: MouseAction
+    removed: MouseAction
 
     def __init__(self, action: str) -> None:
         self.action = action
@@ -149,10 +149,12 @@ clause:
 # State Machine pattern using 'if' statements
 # to determine the next state.
 import sys
+
 sys.path += ['..', '../mouse']
+from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-from mouse_action import MouseAction  # type: ignore
+
 # A different subclass for each state:
 
 class Waiting(State):
@@ -248,10 +250,12 @@ they test for a `null Map` (and initialize it if it's `null`):
 # A better mousetrap using tables
 import sys
 from typing import Any
+
 sys.path += ['..', '../mouse']
+from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-from mouse_action import MouseAction  # type: ignore
+
 
 class StateT(State):
     def __init__(self) -> None:

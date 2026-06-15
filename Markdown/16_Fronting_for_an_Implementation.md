@@ -84,7 +84,7 @@ class Proxy2:
         return getattr(self.__implementation, name)
 
 p = Proxy2()
-p.f(); p.g(); p.h();
+p.f(); p.g(); p.h()
 ```
 
 The beauty of using `__getattr__()` is that `Proxy2` is

@@ -1,6 +1,7 @@
 # simple2.py
 from simple_class import Simple
 
+
 class Simple2(Simple):
     def __init__(self, str):
         print("Inside Simple2 constructor")

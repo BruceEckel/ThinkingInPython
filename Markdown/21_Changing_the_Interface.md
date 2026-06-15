@@ -158,9 +158,9 @@ class Facade:
 
 # The client programmer gets the objects
 # by calling the static methods:
-a = Facade.makeA(1);
-b = Facade.makeB(1);
-c = Facade.makeC(1.0);
+a = Facade.makeA(1)
+b = Facade.makeB(1)
+c = Facade.makeC(1.0)
 ```
 
 The cleaner Python façade is a *module*. A module already presents a curated set

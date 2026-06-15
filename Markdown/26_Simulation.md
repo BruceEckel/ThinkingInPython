@@ -40,6 +40,7 @@ hand out a number.
 # every branch. It talks to a blackboard but never imports one: any
 # object with the four methods below will do.
 from __future__ import annotations
+
 import threading
 from typing import Protocol
 
@@ -86,6 +87,7 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 # rats_and_mazes/maze.py
 # Reads a maze layout and reports walls, openings, and an entry point.
 from __future__ import annotations
+
 from pathlib import Path
 
 
@@ -99,13 +101,13 @@ class Maze:
         self.rows = [r.ljust(self.width, self.WALL) for r in rows]
 
     @classmethod
-    def from_text(cls, text: str) -> "Maze":
+    def from_text(cls, text: str) -> Maze:
         rows = [line for line in text.splitlines()
                 if line and not line.lstrip().startswith("#")]
         return cls(rows)
 
     @classmethod
-    def from_file(cls, filename: str) -> "Maze":
+    def from_file(cls, filename: str) -> Maze:
         return cls.from_text(
             Path(filename).read_text(encoding="utf-8"))
 
@@ -133,6 +135,7 @@ spawned along the way.
 # visited cells, hands out rat numbers, and launches rats. One lock
 # guards every update.
 from __future__ import annotations
+
 import itertools
 import threading
 

@@ -57,6 +57,11 @@ jobs:
       - name: Type-check examples with ty (advisory)
         run: uv run ty check ExtractedExamples || true
 
+      # Advisory: PEP 8 lint (naming, imports, modernization). See pyproject
+      # [tool.ruff]. Not a gate yet; tighten once the backlog is clear.
+      - name: Lint examples with ruff (advisory)
+        run: uv run ruff check ExtractedExamples || true
+
       # Hard gate: the static site must build cleanly.
       - name: Build the static site
         run: uv run python tools/build_site.py

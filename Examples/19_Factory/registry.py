@@ -5,7 +5,7 @@
 
 
 class Shape:
-    registry: dict[str, type["Shape"]] = {}
+    registry: dict[str, type[Shape]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)

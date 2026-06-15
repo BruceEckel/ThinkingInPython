@@ -304,7 +304,6 @@ will not be `__main__`, so the `__main__` code is not executed:
 
 ```python
 # import_module.py
-import use_module
 ```
 
 If you run `python import_module.py`, you should only see `'module' imported`
@@ -382,8 +381,7 @@ You can also name the package with `from`:
 
 ```python
 # from_packages.py
-from a_package import module1
-from a_package import module2
+from a_package import module1, module2
 
 print(module1.function1())
 print(module2.function2())
@@ -537,6 +535,7 @@ new name space using an `import` statement:
 ```python
 # simple2.py
 from simple_class import Simple
+
 
 class Simple2(Simple):
     def __init__(self, str):

@@ -1,12 +1,12 @@
 # mouse/mouse_action.py
 
 class MouseAction:
-    appears: "MouseAction"
-    runsAway: "MouseAction"
-    enters: "MouseAction"
-    escapes: "MouseAction"
-    trapped: "MouseAction"
-    removed: "MouseAction"
+    appears: MouseAction
+    runsAway: MouseAction
+    enters: MouseAction
+    escapes: MouseAction
+    trapped: MouseAction
+    removed: MouseAction
 
     def __init__(self, action: str) -> None:
         self.action = action

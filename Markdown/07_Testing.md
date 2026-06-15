@@ -83,7 +83,6 @@ below walk through each technique it uses:
 ```python
 # test_account.py
 import pytest
-
 from account import Account, InsufficientFunds
 
 
@@ -176,7 +175,6 @@ test that requests the fixture runs once for each parameter value.
 ```python
 # conftest.py
 import pytest
-
 from account import Account
 
 
@@ -249,7 +247,6 @@ and never collide with each other:
 from pathlib import Path
 
 import pytest
-
 import storage
 
 

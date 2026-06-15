@@ -2,8 +2,9 @@
 # Demonstration of "visitor" pattern.
 import random
 
+
 # The Flower hierarchy cannot be changed:
-class Flower(object):
+class Flower:
     def accept(self, visitor):
         visitor.visit(self)
     def pollinate(self, pollinator):

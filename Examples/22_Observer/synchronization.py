@@ -2,7 +2,9 @@
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
+
 
 def synchronized(method: Callable[..., Any]) -> Callable[..., Any]:
     def f(*args: Any) -> Any:

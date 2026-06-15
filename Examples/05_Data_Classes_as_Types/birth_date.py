@@ -4,6 +4,7 @@
 # validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
+
 from validation import check
 
 
@@ -38,7 +39,7 @@ class Month(Enum):
     DECEMBER = (12, 31)
 
     @staticmethod
-    def of(month_number: int) -> "Month":
+    def of(month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return list(Month)[month_number - 1]
 

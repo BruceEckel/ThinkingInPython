@@ -17,7 +17,18 @@ description = "Build and verification tooling for the book Thinking in Python."
 requires-python = ">=3.14"
 
 [dependency-groups]
-dev = ["ty", "pytest"]
+dev = ["ty", "pytest", "ruff"]
 
 [tool.uv]
 package = false
+
+# PEP 8 linting for the examples. line-length is 70 to match the book's HTML
+# listing box, not ruff's default 88. ruff runs as an advisory CI step.
+[tool.ruff]
+line-length = 70
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "N", "I", "UP"]
+# N818: exception names need not end in "Error" (author preference).
+ignore = ["N818"]

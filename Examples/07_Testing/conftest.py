@@ -1,6 +1,5 @@
 # conftest.py
 import pytest
-
 from account import Account
 
 

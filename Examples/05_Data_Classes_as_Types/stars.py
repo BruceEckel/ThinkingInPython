@@ -3,6 +3,7 @@
 # frozen data class. Every Stars that exists is then guaranteed to
 # be a legal value.
 from dataclasses import dataclass
+
 from validation import check
 
 

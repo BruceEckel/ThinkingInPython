@@ -1,5 +1,5 @@
 # static_fields.py
-class Foo(object):
+class Foo:
         x = "a"
 
 Foo.x

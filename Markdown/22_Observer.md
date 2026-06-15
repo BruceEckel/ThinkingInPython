@@ -150,6 +150,8 @@ hand, using code like this:
 # to_synch.py
 
 import threading
+
+
 class ToSynch:
     def __init__(self) -> None:
         self.mutex = threading.RLock()
@@ -171,7 +173,9 @@ provided me with a much nicer solution:
 '''Simple emulation of Java's 'synchronized'
 keyword, from Peter Norvig.'''
 import threading
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
+
 
 def synchronized(method: Callable[..., Any]) -> Callable[..., Any]:
     def f(*args: Any) -> Any:
@@ -235,6 +239,7 @@ Here's a simple test of the `Synchronization` module:
 # synchronization_demo.py
 from synchronization import *
 
+
 # To use for a method:
 class C(Synchronization):
     def __init__(self) -> None:
@@ -296,6 +301,7 @@ from typing import Any
 
 from synchronization import *
 
+
 class Observer:
     def update(self, observable: Any, arg: Any) -> None:
         '''Called when the observed object is
@@ -355,8 +361,10 @@ Using this library, here is an example of the observer pattern:
 # observed_flower.py
 # Demonstration of "observer" pattern.
 import sys
+
 sys.path += ['../Util']
-from observer import Observer, Observable  # type: ignore
+from observer import Observable, Observer  # type: ignore
+
 
 class Flower:
     def __init__(self):
@@ -514,7 +522,7 @@ import sys
 from typing import Any
 
 sys.path += ['../Util']
-from observer import Observer, Observable  # type: ignore
+from observer import Observable, Observer  # type: ignore
 
 
 class BoxObservable(Observable):
@@ -538,17 +546,17 @@ class Box(Observer):
         # A click announces this box to every observer:
         self.notifier.notifyObservers(self)
 
-    def update(self, observable: Any, clicked: "Box") -> None:
+    def update(self, observable: Any, clicked: Box) -> None:
         if self is not clicked and self.next_to(clicked):
             self.color = clicked.color
 
-    def next_to(self, other: "Box") -> bool:
+    def next_to(self, other: Box) -> bool:
         return (abs(self.x - other.x) <= 1
                 and abs(self.y - other.y) <= 1)
 
 
 def make_grid(size: int,
-              notifier: BoxObservable) -> list[list["Box"]]:
+              notifier: BoxObservable) -> list[list[Box]]:
     return [[Box(x, y, f"color{(x + y) % 3}", notifier)
              for y in range(size)]
             for x in range(size)]

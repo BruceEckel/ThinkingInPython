@@ -18,8 +18,9 @@ work. Here is a decorator that traces calls:
 
 ```python
 # trace.py
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
+from typing import ParamSpec, TypeVar
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -67,8 +68,9 @@ is a function that returns a decorator:
 
 ```python
 # repeat.py
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
+from typing import ParamSpec, TypeVar
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -161,6 +163,7 @@ extra.
 ```python
 # coffee.py
 from __future__ import annotations
+
 from typing import Protocol
 
 

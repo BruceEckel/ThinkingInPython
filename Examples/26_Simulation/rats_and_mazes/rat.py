@@ -3,6 +3,7 @@
 # every branch. It talks to a blackboard but never imports one: any
 # object with the four methods below will do.
 from __future__ import annotations
+
 import threading
 from typing import Protocol
 

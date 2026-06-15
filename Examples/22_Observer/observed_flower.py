@@ -1,8 +1,10 @@
 # observed_flower.py
 # Demonstration of "observer" pattern.
 import sys
+
 sys.path += ['../Util']
-from observer import Observer, Observable  # type: ignore
+from observer import Observable, Observer  # type: ignore
+
 
 class Flower:
     def __init__(self):

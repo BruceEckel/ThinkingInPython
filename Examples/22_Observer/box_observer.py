@@ -6,7 +6,7 @@ import sys
 from typing import Any
 
 sys.path += ['../Util']
-from observer import Observer, Observable  # type: ignore
+from observer import Observable, Observer  # type: ignore
 
 
 class BoxObservable(Observable):
@@ -30,17 +30,17 @@ class Box(Observer):
         # A click announces this box to every observer:
         self.notifier.notifyObservers(self)
 
-    def update(self, observable: Any, clicked: "Box") -> None:
+    def update(self, observable: Any, clicked: Box) -> None:
         if self is not clicked and self.next_to(clicked):
             self.color = clicked.color
 
-    def next_to(self, other: "Box") -> bool:
+    def next_to(self, other: Box) -> bool:
         return (abs(self.x - other.x) <= 1
                 and abs(self.y - other.y) <= 1)
 
 
 def make_grid(size: int,
-              notifier: BoxObservable) -> list[list["Box"]]:
+              notifier: BoxObservable) -> list[list[Box]]:
     return [[Box(x, y, f"color{(x + y) % 3}", notifier)
              for y in range(size)]
             for x in range(size)]

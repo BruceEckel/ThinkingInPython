@@ -2,6 +2,7 @@
 # Demonstration of multiple dispatching.
 import random
 
+
 # An enumeration type:
 class Outcome:
     def __init__(self, value, name):
@@ -15,7 +16,7 @@ Outcome.WIN = Outcome(0, "win")
 Outcome.LOSE = Outcome(1, "lose")
 Outcome.DRAW = Outcome(2, "draw")
 
-class Item(object):
+class Item:
     def __str__(self):
         return self.__class__.__name__
 

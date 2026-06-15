@@ -2,10 +2,12 @@
 # State Machine pattern using 'if' statements
 # to determine the next state.
 import sys
+
 sys.path += ['..', '../mouse']
+from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-from mouse_action import MouseAction  # type: ignore
+
 # A different subclass for each state:
 
 class Waiting(State):

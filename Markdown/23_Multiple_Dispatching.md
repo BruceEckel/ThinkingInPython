@@ -39,6 +39,7 @@ Here's an example of multiple dispatching:
 # Demonstration of multiple dispatching.
 import random
 
+
 # An enumeration type:
 class Outcome:
     def __init__(self, value, name):
@@ -52,7 +53,7 @@ Outcome.WIN = Outcome(0, "win")
 Outcome.LOSE = Outcome(1, "lose")
 Outcome.DRAW = Outcome(2, "draw")
 
-class Item(object):
+class Item:
     def __str__(self):
         return self.__class__.__name__
 
@@ -127,6 +128,7 @@ sensible to make the table explicit, like this:
 # Multiple dispatching using a table
 import random
 
+
 class Outcome:
     def __init__(self, value, name):
         self.value = value
@@ -139,7 +141,7 @@ Outcome.WIN = Outcome(0, "win")
 Outcome.LOSE = Outcome(1, "lose")
 Outcome.DRAW = Outcome(2, "draw")
 
-class Item(object):
+class Item:
     def compete(self, item):
         # Use a tuple for table lookup:
         return outcome[self.__class__, item.__class__]

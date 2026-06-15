@@ -1,6 +1,7 @@
 # singleton_decorator.py
 # The same idea as a class decorator. Simpler than a metaclass.
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 
 def singleton(klass: type) -> Callable[..., Any]:

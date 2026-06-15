@@ -1,6 +1,7 @@
 # synchronization_demo.py
 from synchronization import *
 
+
 # To use for a method:
 class C(Synchronization):
     def __init__(self) -> None:

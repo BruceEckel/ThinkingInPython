@@ -2,6 +2,7 @@
 # A simple static factory method.
 import random
 
+
 class Shape:
     # Create based on class name:
     @staticmethod

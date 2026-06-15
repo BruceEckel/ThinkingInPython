@@ -13,7 +13,7 @@ class ShapeFactory:
 
     # A Template Method:
     @staticmethod
-    def createShape(id: str) -> "Shape":
+    def createShape(id: str) -> Shape:
         if id not in ShapeFactory.factories:
             ShapeFactory.factories[id] = eval(id + '.Factory()')
         return ShapeFactory.factories[id].create()
@@ -28,7 +28,7 @@ class Circle(Shape):
     def draw(self) -> None: print("Circle.draw")
     def erase(self) -> None: print("Circle.erase")
     class Factory:
-        def create(self) -> "Circle": return Circle()
+        def create(self) -> Circle: return Circle()
 
 
 class Square(Shape):
@@ -37,7 +37,7 @@ class Square(Shape):
     def erase(self) -> None:
         print("Square.erase")
     class Factory:
-        def create(self) -> "Square": return Square()
+        def create(self) -> Square: return Square()
 
 
 def shapeNameGen(n: int):

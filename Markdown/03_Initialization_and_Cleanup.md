@@ -23,7 +23,7 @@ fields in classes:
 
 ```python
 # static_fields.py
-class Foo(object):
+class Foo:
         x = "a"
 
 Foo.x
@@ -129,7 +129,7 @@ from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances: WeakValueDictionary[int, "Counter"] = (
+    _instances: WeakValueDictionary[int, Counter] = (
         WeakValueDictionary())
 
     @property

@@ -1,7 +1,8 @@
 # shapefact1/nested_shape_factory.py
 import random
 
-class Shape(object):
+
+class Shape:
     types = []
 
 def factory(type):

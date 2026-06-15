@@ -1,6 +1,7 @@
 # rats_and_mazes/maze.py
 # Reads a maze layout and reports walls, openings, and an entry point.
 from __future__ import annotations
+
 from pathlib import Path
 
 
@@ -14,13 +15,13 @@ class Maze:
         self.rows = [r.ljust(self.width, self.WALL) for r in rows]
 
     @classmethod
-    def from_text(cls, text: str) -> "Maze":
+    def from_text(cls, text: str) -> Maze:
         rows = [line for line in text.splitlines()
                 if line and not line.lstrip().startswith("#")]
         return cls(rows)
 
     @classmethod
-    def from_file(cls, filename: str) -> "Maze":
+    def from_file(cls, filename: str) -> Maze:
         return cls.from_text(
             Path(filename).read_text(encoding="utf-8"))
 

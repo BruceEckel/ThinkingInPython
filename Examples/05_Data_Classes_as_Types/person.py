@@ -2,6 +2,7 @@
 # Composing a type from other types. Each part validates itself, so
 # a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
+
 from validation import check
 
 

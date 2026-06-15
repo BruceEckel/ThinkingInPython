@@ -3,6 +3,7 @@
 # visited cells, hands out rat numbers, and launches rats. One lock
 # guards every update.
 from __future__ import annotations
+
 import itertools
 import threading
 

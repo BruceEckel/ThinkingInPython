@@ -4,6 +4,7 @@
 # Checking chapter. A class that lacks x and y can be adapted by
 # composition, with no inheritance.
 from __future__ import annotations
+
 from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol

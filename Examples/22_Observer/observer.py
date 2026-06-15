@@ -4,6 +4,7 @@ from typing import Any
 
 from synchronization import *
 
+
 class Observer:
     def update(self, observable: Any, arg: Any) -> None:
         '''Called when the observed object is

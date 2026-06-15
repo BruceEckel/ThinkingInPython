@@ -194,6 +194,7 @@ fills in the fields:
 # frozen data class. Every Stars that exists is then guaranteed to
 # be a legal value.
 from dataclasses import dataclass
+
 from validation import check
 
 
@@ -252,6 +253,7 @@ by construction, with no extra work:
 # Composing a type from other types. Each part validates itself, so
 # a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
+
 from validation import check
 
 
@@ -304,6 +306,7 @@ its fields: the day must fit the month.
 # validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
+
 from validation import check
 
 
@@ -338,7 +341,7 @@ class Month(Enum):
     DECEMBER = (12, 31)
 
     @staticmethod
-    def of(month_number: int) -> "Month":
+    def of(month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return list(Month)[month_number - 1]
 
@@ -383,6 +386,7 @@ carry them around, where the enum simply is that set:
 # it is more code for less safety: you have to build and hand around
 # the set of months yourself, where the Enum simply is that set.
 from dataclasses import dataclass, field
+
 from validation import check
 
 

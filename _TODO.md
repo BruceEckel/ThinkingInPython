@@ -1,15 +1,13 @@
- What's left for you (authorial — where I stopped)
+Decide whether virtual environments belong in the book
 
-  1. Revoice my drafts into your voice: chapter 04 Static Type Checking and CONTRIBUTING.md (the relocated intro
-  material — still has its original --- em-dashes, left untouched so I wasn't rewriting your words).
-  2. P3-1 Introduction: finish it as real front matter (prerequisites, "how to read this book").
-  3. One-voice / short-sentence pass across the chapters I reframed, so the whole book reads as you.
-  4. Optional: decide whether virtual environments and the dead CodeManager.py belong in the book at all.
+Look for code fragments that can be turned into extractable python files
+
+Incorporate https://www.bruceeckel.com/2022/05/11/misunderstanding-python-class-attributes/, into an existing chapter unless it needs its own chapter
 
 Incorporate https://github.com/BruceEckel/LazyGuide, but not as a single chapter. Distribute the information appropriately into existing chapters, making new chapters only if it makes sense.
 
 Look for examples in https://github.com/BruceEckel/python-experiments that might be candidates for this book
 
-Look for code fragments that can be turned into extractable python files
+Incorporate https://github.com/BruceEckel/PatternMatching/tree/master/src/python if it hasn't already been
 
-make sure everything conforms to PEP8
+Would https://github.com/BruceEckel/RobotExplorerPy fit anywhere?

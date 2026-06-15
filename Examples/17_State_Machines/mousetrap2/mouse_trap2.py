@@ -2,10 +2,12 @@
 # A better mousetrap using tables
 import sys
 from typing import Any
+
 sys.path += ['..', '../mouse']
+from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-from mouse_action import MouseAction  # type: ignore
+
 
 class StateT(State):
     def __init__(self) -> None:
