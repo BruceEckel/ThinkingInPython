@@ -37,7 +37,7 @@ print(squared_ints)
 # [1, 81, 0, 16]
 ```
 
-![image description](_images/listComprehensions)
+The comprehension has three parts:
 
 -   The iterator part iterates through each member `e` of the input
     sequence `a_list`.
@@ -74,11 +74,9 @@ expression for the optional predicate.
 ## Nested Comprehensions
 
 An identity matrix of size n is an n by n square matrix with ones on the
-main diagonal and zeros elsewhere. A 3 by 3 identity matrix is:
+main diagonal and zeros elsewhere.
 
-![A 3 by 3 identity matrix](_images/idMatrix)
-
-In python we can represent such a matrix by a list of lists, where each
+In Python we can represent such a matrix by a list of lists, where each
 sub-list represents a row. A 3 by 3 matrix would be represented by the
 following list:
 
