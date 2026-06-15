@@ -380,17 +380,20 @@ next state:
 # just callables, so the Condition and Transition classes a Java
 # version needs disappear.
 from collections.abc import Callable
+from enum import Enum
 from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
+# A state is any Enum member, so a misspelled state is a type error
+# rather than a silent dead end.
 Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, str
+    Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
-Table = dict[tuple[str, type], list[Transition]]
+Table = dict[tuple[Enum, type], list[Transition]]
 
 
 class StateMachine:
-    def __init__(self, initial: str, table: Table) -> None:
+    def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 
@@ -416,12 +419,24 @@ input can lead to different states depending on a test.
 The machine is now entirely a table. It collects money, takes a two-digit
 selection, then either dispenses the item, reports it sold out, or clears a
 selection that costs more than the money inserted. The conditions and actions
-are plain methods, stored directly in the table:
+are plain methods, stored directly in the table. The states are an `Enum`, so a
+misspelled state name is caught by the type checker instead of failing silently
+at run time:
 
 ```python
 # tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
+from enum import Enum, auto
+
 from state_machine import StateMachine, Table
+
+
+class State(Enum):
+    QUIESCENT = auto()
+    COLLECTING = auto()
+    SELECTING = auto()
+    UNAVAILABLE = auto()
+    WANT_MORE = auto()
 
 
 class Money:
@@ -468,27 +483,31 @@ class VendingMachine(StateMachine):
                       for _ in range(4)]
         self.items[3][0] = ItemSlot(25, 0)  # one sold-out slot
         table: Table = {
-            ("quiescent", Money):
-                [(None, self.add_money, "collecting")],
-            ("collecting", Money):
-                [(None, self.add_money, "collecting")],
-            ("collecting", Quit): [(None, self.refund, "quiescent")],
-            ("collecting", FirstDigit):
-                [(None, self.choose_row, "selecting")],
-            ("selecting", Quit): [(None, self.refund, "quiescent")],
-            ("selecting", SecondDigit): [
-                (self.too_expensive, self.clear, "collecting"),
-                (self.sold_out, self.clear, "unavailable"),
-                (None, self.dispense, "want_more"),
+            (State.QUIESCENT, Money):
+                [(None, self.add_money, State.COLLECTING)],
+            (State.COLLECTING, Money):
+                [(None, self.add_money, State.COLLECTING)],
+            (State.COLLECTING, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.COLLECTING, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
+            (State.SELECTING, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.SELECTING, SecondDigit): [
+                (self.too_expensive, self.clear, State.COLLECTING),
+                (self.sold_out, self.clear, State.UNAVAILABLE),
+                (None, self.dispense, State.WANT_MORE),
             ],
-            ("unavailable", Quit): [(None, self.refund, "quiescent")],
-            ("unavailable", FirstDigit):
-                [(None, self.choose_row, "selecting")],
-            ("want_more", Quit): [(None, self.refund, "quiescent")],
-            ("want_more", FirstDigit):
-                [(None, self.choose_row, "selecting")],
+            (State.UNAVAILABLE, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.UNAVAILABLE, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
+            (State.WANT_MORE, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.WANT_MORE, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
         }
-        super().__init__("quiescent", table)
+        super().__init__(State.QUIESCENT, table)
 
     def _slot(self, col: SecondDigit) -> ItemSlot:
         return self.items[self.row][col.value]

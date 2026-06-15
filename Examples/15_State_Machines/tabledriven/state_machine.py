@@ -6,17 +6,20 @@
 # just callables, so the Condition and Transition classes a Java
 # version needs disappear.
 from collections.abc import Callable
+from enum import Enum
 from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
+# A state is any Enum member, so a misspelled state is a type error
+# rather than a silent dead end.
 Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, str
+    Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
-Table = dict[tuple[str, type], list[Transition]]
+Table = dict[tuple[Enum, type], list[Transition]]
 
 
 class StateMachine:
-    def __init__(self, initial: str, table: Table) -> None:
+    def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 

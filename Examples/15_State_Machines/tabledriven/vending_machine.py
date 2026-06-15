@@ -1,6 +1,16 @@
 # tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
+from enum import Enum, auto
+
 from state_machine import StateMachine, Table
+
+
+class State(Enum):
+    QUIESCENT = auto()
+    COLLECTING = auto()
+    SELECTING = auto()
+    UNAVAILABLE = auto()
+    WANT_MORE = auto()
 
 
 class Money:
@@ -47,27 +57,31 @@ class VendingMachine(StateMachine):
                       for _ in range(4)]
         self.items[3][0] = ItemSlot(25, 0)  # one sold-out slot
         table: Table = {
-            ("quiescent", Money):
-                [(None, self.add_money, "collecting")],
-            ("collecting", Money):
-                [(None, self.add_money, "collecting")],
-            ("collecting", Quit): [(None, self.refund, "quiescent")],
-            ("collecting", FirstDigit):
-                [(None, self.choose_row, "selecting")],
-            ("selecting", Quit): [(None, self.refund, "quiescent")],
-            ("selecting", SecondDigit): [
-                (self.too_expensive, self.clear, "collecting"),
-                (self.sold_out, self.clear, "unavailable"),
-                (None, self.dispense, "want_more"),
+            (State.QUIESCENT, Money):
+                [(None, self.add_money, State.COLLECTING)],
+            (State.COLLECTING, Money):
+                [(None, self.add_money, State.COLLECTING)],
+            (State.COLLECTING, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.COLLECTING, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
+            (State.SELECTING, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.SELECTING, SecondDigit): [
+                (self.too_expensive, self.clear, State.COLLECTING),
+                (self.sold_out, self.clear, State.UNAVAILABLE),
+                (None, self.dispense, State.WANT_MORE),
             ],
-            ("unavailable", Quit): [(None, self.refund, "quiescent")],
-            ("unavailable", FirstDigit):
-                [(None, self.choose_row, "selecting")],
-            ("want_more", Quit): [(None, self.refund, "quiescent")],
-            ("want_more", FirstDigit):
-                [(None, self.choose_row, "selecting")],
+            (State.UNAVAILABLE, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.UNAVAILABLE, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
+            (State.WANT_MORE, Quit):
+                [(None, self.refund, State.QUIESCENT)],
+            (State.WANT_MORE, FirstDigit):
+                [(None, self.choose_row, State.SELECTING)],
         }
-        super().__init__("quiescent", table)
+        super().__init__(State.QUIESCENT, table)
 
     def _slot(self, col: SecondDigit) -> ItemSlot:
         return self.items[self.row][col.value]
