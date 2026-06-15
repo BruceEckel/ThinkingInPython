@@ -62,6 +62,90 @@ def f(self, x):
 This is not a serious example because you would naturally just
 initialize `something` in `Foo`'s constructor.
 
+### Class Attributes Are Not Default Values
+
+A static field is also called a *class attribute*, and it is easy to misread one
+as a per-object default value. It is not. There is one shared variable for the
+whole class, and an instance variable of the same name *shadows* it. This trips
+up programmers coming from C++ or Java, where storage for such a field is
+allocated per object before the constructor runs. I wrote about this confusion in
+[Misunderstanding Python Class Attributes](https://www.bruceeckel.com/2022/05/11/misunderstanding-python-class-attributes/).
+
+Simple use looks exactly like a default value, which is the trap:
+
+```python
+# class_attribute_confusion.py
+# A class attribute looks like a per-object default, but it is one
+# shared value, and an instance variable of the same name shadows it.
+class Stars:
+    rating = 5  # One value, shared by the whole class.
+
+
+a = Stars()
+b = Stars()
+print(a.rating, b.rating)  # 5 5: both read the class attribute
+a.rating = 1  # Assigning makes an instance variable on a.
+print(a.rating, b.rating)  # 1 5: a shadows it, b sees the class
+Stars.rating = 9  # Now change the shared class attribute.
+print(a.rating, b.rating)  # 1 9: a keeps its own, b follows
+```
+
+The reason is that an instance and its class each have their own attribute
+dictionary. Reading an attribute checks the instance first, then falls back to
+the class. Assigning always writes to the instance, creating the variable there
+the first time:
+
+```python
+# inside_objects.py
+# An instance and its class each have their own attribute dictionary.
+# Reading falls back to the class; assigning writes to the instance.
+class A:
+    x = 100  # class attribute
+
+
+a = A()
+print(vars(A)["x"])  # 100: the attribute lives in the class dict
+print(vars(a))  # {}: the instance has no attributes yet
+a.x = 1
+print(vars(a))  # {'x': 1}: assignment created it on the instance
+```
+
+So a class attribute behaves like a default only until someone assigns to the
+instance. Changing the class attribute then reaches into every object that has
+not shadowed it yet. That produces bugs that surface far from their cause.
+
+For real per-object defaults, write a constructor with default arguments, or use
+a `@dataclass`, which turns the class-attribute syntax into exactly that. Each
+object then gets its own storage:
+
+```python
+# real_defaults.py
+# For per-object defaults, write a constructor, or use a @dataclass,
+# which turns the class-attribute syntax into exactly that.
+from dataclasses import dataclass
+
+
+class A:
+    def __init__(self, x: int = 100) -> None:
+        self.x = x  # an instance variable, one per object
+
+
+@dataclass
+class B:
+    x: int = 100  # a constructor default, not a shared value
+
+
+if __name__ == "__main__":
+    a = A()
+    a.x = -1
+    print(a.x, A().x)  # -1 100: a's change does not leak
+    print(B().x, B(7).x)  # 100 7
+```
+
+The [Data Classes as Types](05_Data_Classes_as_Types.md) chapter builds on this:
+a `@dataclass` reads the class-attribute declarations as a template and generates
+a constructor from them.
+
 ## Cleanup
 
 Cleanup happens to globals by setting them to `None` (what about

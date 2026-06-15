@@ -1,7 +1,5 @@
 No explanation of virtual environments, note that in the introduction along with other things like this that should be noted in the intro
 
-Find code fragments in the book that can be turned into extractable python files and convert them to extractable files and make sure they work.
-
 Incorporate https://www.bruceeckel.com/2022/05/11/misunderstanding-python-class-attributes/, into an existing chapter unless it needs its own chapter
 
 Incorporate https://github.com/BruceEckel/LazyGuide, but not as a single chapter. Distribute the information appropriately into existing chapters, making new chapters only if it makes sense.
