@@ -1,6 +1,6 @@
 # Introduction
 
-This is a collection of essays that give you a deeper understanding of
+This is a collection of topics to give you a deeper understanding of
 programming in Python. The next chapter,
 [Python for Programmers](02_Python_for_Programmers.md), is a fast tour of the
 language, but this is not an introductory book. There are plenty of excellent

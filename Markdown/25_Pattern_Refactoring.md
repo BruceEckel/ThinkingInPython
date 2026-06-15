@@ -11,7 +11,7 @@ languages without multiple dispatch. Python removes some of those limitations,
 so a few famous patterns simply dissolve here. We will call that out as it
 happens.
 
-## Simulating the Trash Recycler
+## Simulating a Trash Recycler
 
 Trash arrives at the recycling plant mixed together. The program must sort it by
 material and report the total value of each kind. The catch is the one that
@@ -72,7 +72,7 @@ def sum_value(items: list[Trash]) -> float:
     return total
 ```
 
-Adding a new material is now one class definition. It registers itself, and
+Adding a new recyclable type is now one class definition. It registers itself, and
 `create` can build it. `sum_value` is an ordinary function: it relies on
 polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
@@ -129,9 +129,7 @@ def parse(filename: str) -> list[Trash]:
 
 ## The First Cut: Checking Every Type
 
-The most obvious way to sort is to look at each piece and test what it is. The
-original design used run-time type information (RTTI) for this, and so can we
-with `isinstance`:
+The most obvious way to sort is to look at each piece and test what it is using `isinstance`:
 
 ```python
 # recycle_rtti.py
@@ -174,10 +172,7 @@ that polymorphism exists to do for you.
 
 ## Let a Dictionary Do the Sorting
 
-The original chapter spent several designs removing this RTTI: a hierarchy of
-typed bins, then "double dispatch," each adding classes to push the type
-decision into the language. In Python the whole problem disappears with one
-line. Group the pieces in a dictionary keyed by their own type:
+Group the pieces in a dictionary keyed by their own type:
 
 ```python
 # recycle_dict.py
@@ -204,10 +199,7 @@ if __name__ == "__main__":
 ```
 
 `type(t)` is the perfect key: it adapts to whatever types show up, even ones
-added at run time. There is no chain to maintain and nothing to forget. This is
-the same idea the original reached only at the very end of the chapter, as a
-`HashMap` of typed lists. Here it is the natural first thing a Python programmer
-writes.
+added at run time. There is no chain to maintain and nothing to forget.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
@@ -289,20 +281,8 @@ does the same thing as a method.
 
 ## Summary
 
-Watching this problem evolve, notice which patterns survived the move to Python
-and which dissolved:
-
-- The *Factory* survived, but shrank. Self-registration through
-  `__init_subclass__` plus a name-keyed `registry` replaced an entire
-  reflection-based prototyping scheme. Adding a type is one class definition.
-- The typed-bin hierarchy and *double dispatch* dissolved. A `dict` keyed by
-  `type(piece)` sorts anything and never needs editing.
-- *Visitor* dissolved into `functools.singledispatch`. The pattern is largely a
-  workaround for languages that lack multiple dispatch and open methods; Python
-  supplies both, so the ceremony is unnecessary.
-
 Design patterns are about *separating what changes from what stays the same*.
-Polymorphism is one way to do that, and the most important one, but it is not the
+Polymorphism is one way to do that, but it is not the
 only one. The deeper skill is spotting the "vector of change" in a problem (here,
 new types versus new operations) and choosing the lightest construct that
 isolates it. In Python that construct is often a language feature, not a

@@ -1,20 +1,9 @@
-Currently >>
-/loop In Markdown\14_Singleton.md:
+Incorporate 03 and 04 into 02
+Flesh out Chapter 02 for programmers from other languages, briefly touch on everything that should be considered basics, with short examples for each.
 
-    # config.py
-    settings: dict[str, str] = {}
-
-    # anywhere.py
-    from config import settings   # the same dict, everywhere
-
-These are named, extractable examples but they are not extracted to Examples\14_Singleton.
-Look through the book for similar cases and fix them.
-Also if there are code fragments that can be turned into extractable examples fix those.
-The goal is to maximize the automatic checking of all code that appears in the book.
-
----
-
-Could rats_and_mazes be done with async instead of threading?
+Move 11_Messenger.md to right after 13_The_Pattern_Concept.md
+Maybe testing should be moved right after 02
+Metaprogramming right before rethinking objects
 
 ---
 
