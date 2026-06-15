@@ -2,10 +2,8 @@
 # A headless version of the ColorBoxes Observer example. Boxes in a
 # grid observe a shared Observable; "clicking" one recolors its
 # neighbors.
-import sys
 from typing import Any
 
-sys.path += ['../Util']
 from observer import Observable, Observer  # type: ignore
 
 

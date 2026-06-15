@@ -11,3 +11,5 @@ Look for examples in https://github.com/BruceEckel/python-experiments that might
 Incorporate https://github.com/BruceEckel/PatternMatching/tree/master/src/python if it hasn't already been
 
 Would https://github.com/BruceEckel/RobotExplorerPy fit anywhere?
+
+GIL presentation?

@@ -361,9 +361,6 @@ Using this library, here is an example of the observer pattern:
 ```python
 # observed_flower.py
 # Demonstration of "observer" pattern.
-import sys
-
-sys.path += ['../Util']
 from observer import Observable, Observer  # type: ignore
 
 
@@ -519,10 +516,8 @@ verify itself. It reuses the `Observable` and `Observer` classes from
 # A headless version of the ColorBoxes Observer example. Boxes in a
 # grid observe a shared Observable; "clicking" one recolors its
 # neighbors.
-import sys
 from typing import Any
 
-sys.path += ['../Util']
 from observer import Observable, Observer  # type: ignore
 
 

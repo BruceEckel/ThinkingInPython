@@ -1,8 +1,5 @@
 # observed_flower.py
 # Demonstration of "observer" pattern.
-import sys
-
-sys.path += ['../Util']
 from observer import Observable, Observer  # type: ignore
 
 
