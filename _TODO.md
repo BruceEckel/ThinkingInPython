@@ -1,10 +1,3 @@
----
-
-Flesh out "Python for Programmers" chapter to give coverage for programmers from other languages.
-Briefly touch on everything that should be considered basics, with short examples for each.
-It's OK if "Python for Programmers" chapter is bigger since it's for programmers who know another programming language.
-
----
 
 Incorporate
 https://www.bruceeckel.com/2018/09/16/json-encoding-python-dataclasses/
