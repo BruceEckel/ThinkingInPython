@@ -1,4 +1,6 @@
 # rats_and_mazes/test_ratsandmazes.py
+import asyncio
+
 from blackboard import Blackboard
 from maze import Maze
 
@@ -28,5 +30,5 @@ def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
 def test_rats_map_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)
     blackboard = Blackboard(maze)
-    blackboard.explore()
+    asyncio.run(blackboard.explore())
     assert blackboard.visited == flood(maze, maze.entry())

@@ -1,10 +1,10 @@
 # rats_and_mazes/rat.py
-# A rat explores the maze on its own thread, spawning a new rat at
-# every branch. It talks to a blackboard but never imports one: any
-# object with the four methods below will do.
+# A rat explores the maze as its own task, spawning a new rat at every
+# branch. It talks to a blackboard but never imports one: any object
+# with the four methods below will do.
 from __future__ import annotations
 
-import threading
+import asyncio
 from typing import Protocol
 
 # South, north, west, east.
@@ -18,16 +18,15 @@ class Recorder(Protocol):
     def next_number(self) -> int: ...
 
 
-class Rat(threading.Thread):
+class Rat:
     def __init__(self, blackboard: Recorder, x: int, y: int) -> None:
-        super().__init__()
         self.blackboard = blackboard
         self.x = x
         self.y = y
         self.number = blackboard.next_number()
         blackboard.log(f"Rat {self.number} starts at {(x, y)}.")
 
-    def run(self) -> None:
+    async def run(self) -> None:
         while True:
             neighbors = [
                 (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
@@ -41,3 +40,4 @@ class Rat(threading.Thread):
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
+            await asyncio.sleep(0)  # Yield so sibling rats can run.

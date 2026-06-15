@@ -2,8 +2,8 @@
 
 A simulation models a system as a set of objects that act on their own and
 interact through shared state. This chapter works one example from end to end: a
-pack of rats mapping a maze. It puts threads, a shared coordination object, and
-structural typing together in one small program.
+pack of rats mapping a maze. It puts asyncio tasks, a shared coordination
+object, and structural typing together in one small program.
 
 ## Rats & Mazes
 
@@ -17,16 +17,17 @@ A *blackboard* is the shared surface every rat writes to. The blackboard is a
 classic coordination idea: independent agents read from and write to one common
 data structure instead of talking to each other directly. Here the blackboard
 owns the maze, records which cells have been explored, hands out rat numbers, and
-launches new rats. One lock guards every update, so the rats can run at the same
-time without corrupting the shared record.
+launches new rats. The rats run as cooperative `asyncio` tasks. They take turns
+instead of running at the same instant, so no lock is needed: a rat is never
+interrupted partway through an update.
 
-A *rat* explores. Each rat runs on its own thread. From its current cell it looks
+A *rat* explores. Each rat runs as its own task. From its current cell it looks
 at the four neighbors and tries to claim the open ones. Claiming a cell is how a
 rat both marks it visited and reserves it, so no two rats ever cover the same
 ground. When a rat finds more than one open neighbor, it keeps the first for
-itself and spawns a new rat down each of the others. When it can claim nothing,
-it has reached a dead end and its thread ends. When the last rat dies, the maze
-is fully mapped.
+itself and spawns a new rat down each of the others, then yields so its siblings
+can run. When it can claim nothing, it has reached a dead end and its task ends.
+When the last rat dies, the maze is fully mapped.
 
 The rat does not import the blackboard. It only needs an object with the right
 methods, so a `Protocol` describes what it expects. This is the structural typing
@@ -36,12 +37,12 @@ hand out a number.
 
 ```python
 # rats_and_mazes/rat.py
-# A rat explores the maze on its own thread, spawning a new rat at
-# every branch. It talks to a blackboard but never imports one: any
-# object with the four methods below will do.
+# A rat explores the maze as its own task, spawning a new rat at every
+# branch. It talks to a blackboard but never imports one: any object
+# with the four methods below will do.
 from __future__ import annotations
 
-import threading
+import asyncio
 from typing import Protocol
 
 # South, north, west, east.
@@ -55,16 +56,15 @@ class Recorder(Protocol):
     def next_number(self) -> int: ...
 
 
-class Rat(threading.Thread):
+class Rat:
     def __init__(self, blackboard: Recorder, x: int, y: int) -> None:
-        super().__init__()
         self.blackboard = blackboard
         self.x = x
         self.y = y
         self.number = blackboard.next_number()
         blackboard.log(f"Rat {self.number} starts at {(x, y)}.")
 
-    def run(self) -> None:
+    async def run(self) -> None:
         while True:
             neighbors = [
                 (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
@@ -78,6 +78,7 @@ class Rat(threading.Thread):
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
+            await asyncio.sleep(0)  # Yield so sibling rats can run.
 ```
 
 The maze is a grid of characters. A `*` is a wall and a space is an opening.
@@ -124,20 +125,20 @@ class Maze:
 ```
 
 The blackboard holds everything the rats share. `claim()` is the heart of the
-program. It tests and marks a cell in a single locked step, so a cell is handed
-to exactly one rat even when several reach it at once. `explore()` claims the
-entry, releases the first rat, then waits for every thread, including the ones
+program. It tests and marks a cell in one step with no `await` in between, so a
+cell is handed to exactly one rat even when several reach it. `explore()` claims
+the entry, releases the first rat, then awaits every task, including the ones
 spawned along the way.
 
 ```python
 # rats_and_mazes/blackboard.py
 # The shared surface the rats write to. It owns the maze, records
-# visited cells, hands out rat numbers, and launches rats. One lock
-# guards every update.
+# visited cells, hands out rat numbers, and launches rats. Cooperative
+# async has no preemption, so no lock is needed.
 from __future__ import annotations
 
+import asyncio
 import itertools
-import threading
 
 from maze import Maze
 from rat import Rat
@@ -147,47 +148,34 @@ class Blackboard:
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
         self.visited: set[tuple[int, int]] = set()
-        self.threads: list[Rat] = []
+        self.tasks: list[asyncio.Task[None]] = []
         self.messages: list[str] = []
-        self.lock = threading.Lock()
         self._numbers = itertools.count(1)
 
     def claim(self, x: int, y: int) -> bool:
-        with self.lock:
-            if self.maze.is_open(x, y) and (x, y) not in self.visited:
-                self.visited.add((x, y))
-                return True
-            return False
+        # No await between the test and the add, so this is atomic.
+        if self.maze.is_open(x, y) and (x, y) not in self.visited:
+            self.visited.add((x, y))
+            return True
+        return False
 
     def spawn(self, x: int, y: int) -> None:
         rat = Rat(self, x, y)
-        with self.lock:
-            self.threads.append(rat)
-        rat.start()
+        self.tasks.append(asyncio.create_task(rat.run()))
 
     def next_number(self) -> int:
-        with self.lock:
-            return next(self._numbers)
+        return next(self._numbers)
 
     def log(self, message: str) -> None:
-        with self.lock:
-            self.messages.append(message)
+        self.messages.append(message)
 
-    def explore(self) -> None:
+    async def explore(self) -> None:
         start = self.maze.entry()
         self.claim(*start)
         self.spawn(*start)
-        self._wait_all()
-
-    def _wait_all(self) -> None:
-        i = 0
-        while True:
-            with self.lock:
-                threads = list(self.threads)
-            if i >= len(threads):
-                return
-            threads[i].join()
-            i += 1
+        # Wait for every rat, including ones spawned while we wait.
+        while pending := [t for t in self.tasks if not t.done()]:
+            await asyncio.gather(*pending)
 
     def render(self) -> str:
         lines = []
@@ -225,30 +213,34 @@ Running it turns the rats loose and prints what they mapped.
 # Turn a pack of rats loose on the maze and print what they mapped.
 from __future__ import annotations
 
+import asyncio
+
 from blackboard import Blackboard
 from maze import Maze
 
 
-def main() -> None:
+async def main() -> None:
     maze = Maze.from_file("amaze.txt")
     blackboard = Blackboard(maze)
-    blackboard.explore()
+    await blackboard.explore()
     print("Mapped maze (# wall, . visited):")
     print(blackboard.render())
-    print(f"{len(blackboard.threads)} rats mapped "
+    print(f"{len(blackboard.tasks)} rats mapped "
           f"{len(blackboard.visited)} cells.")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 ```
 
 Because claiming is atomic, the rats always cover every cell reachable from the
-entry, no matter how the threads interleave. A test pins that down by comparing
-the cells the rats visited against a plain flood fill of the same maze.
+entry, no matter how the tasks interleave. A test pins that down by comparing the
+cells the rats visited against a plain flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_ratsandmazes.py
+import asyncio
+
 from blackboard import Blackboard
 from maze import Maze
 
@@ -278,7 +270,7 @@ def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
 def test_rats_map_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)
     blackboard = Blackboard(maze)
-    blackboard.explore()
+    asyncio.run(blackboard.explore())
     assert blackboard.visited == flood(maze, maze.entry())
 ```
 
@@ -566,7 +558,7 @@ along its path, takes a teleport, and reaches the `!` that ends the game:
     R_c_______b
 
 Two patterns from earlier chapters carry the design: polymorphism replaces a
-type switch, and a factory builds objects from data. Neither needs threads.
+type switch, and a factory builds objects from data. Neither needs concurrency.
 
 ## Other Maze Resources
 
