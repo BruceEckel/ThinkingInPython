@@ -12,13 +12,29 @@ it does.
 
 Python imports each module once and caches it in `sys.modules`. Every `import`
 after the first hands back the same module object. So a module *is* a singleton,
-and module-level names are a single, shared, one-and-only-one piece of state:
+and module-level names are a single, shared, one-and-only-one piece of state.
+Put the state in a module:
 
-    # config.py
-    settings: dict[str, str] = {}
+```python
+# config.py
+settings: dict[str, str] = {}
+```
 
-    # anywhere.py
-    from config import settings   # the same dict, everywhere
+Then every import of `settings`, from anywhere, hands back the same dict.
+Mutating it through one import is visible through every other:
+
+```python
+# shared_config.py
+# A module is imported once and cached in sys.modules, so its globals
+# are shared. The settings you import is config's own dict, the same
+# object everywhere it is imported.
+import config
+from config import settings
+
+settings["theme"] = "dark"  # Write through the imported name.
+print(config.settings)  # {'theme': 'dark'}: the very same dict.
+print(config.settings is settings)  # True
+```
 
 No class, no ceremony. For the large majority of "I need one shared X" cases,
 the answer is a module with module-level state or functions. This is the
