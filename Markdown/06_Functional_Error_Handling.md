@@ -305,13 +305,120 @@ The output is:
 
 Only the last input passes all three steps, so only it reaches `add`.
 
+## Turning Exceptions into Results
+
+In `composing.py`, `func_c` wrapped a risky call in `try`/`except` and returned a
+`Failure` by hand. A decorator captures that pattern once. `@safe` takes a
+function that raises and gives back one that returns a `Result`, with the
+exception as the `Failure` value:
+
+```python
+# safe.py
+# @safe turns a function that raises into one that returns a Result.
+# The exception becomes the Failure value, so a caller handles it like
+# any other Result.
+from collections.abc import Callable
+from functools import wraps
+
+from result import Failure, Result, Success
+
+
+def safe[A](
+    func: Callable[..., A],
+) -> Callable[..., Result[A, Exception]]:
+    @wraps(func)
+    def wrapper(
+        *args: object, **kwargs: object
+    ) -> Result[A, Exception]:
+        try:
+            return Success(func(*args, **kwargs))
+        except Exception as e:
+            return Failure(e)
+    return wrapper
+
+
+@safe
+def parse(text: str) -> int:
+    return int(text)
+
+
+if __name__ == "__main__":
+    for text in ("42", "oops"):
+        match parse(text):
+            case Success(answer):
+                print(f"{text}: parsed {answer}")
+            case Failure(error):
+                print(f"{text}: {type(error).__name__}")
+```
+
+The output is:
+
+    42: parsed 42
+    oops: ValueError
+
+`parse` still reads like a normal function that returns an `int`, but `@safe` has
+changed its type to `Result[int, Exception]`. The caller cannot ignore the
+failure, because it has to open the `Result` to reach the number.
+
+## Matching on the Error
+
+Because the error is a value, and is often an exception, you can pattern-match the
+`Result` and the exception type together. Each kind of failure gets its own
+branch:
+
+```python
+# matching_errors.py
+# Because the error is a value, often an exception, you can match the
+# Result and the exception type together, and handle each kind.
+from result import Failure, Result, Success
+from safe import safe
+
+
+@safe
+def parse(text: str) -> int:
+    return int(text)
+
+
+@safe
+def reciprocal(n: int) -> float:
+    return 1 / n
+
+
+def describe(text: str) -> str:
+    result: Result[float, Exception] = parse(text).bind(reciprocal)
+    match result:
+        case Success(answer):
+            return f"{text}: {answer}"
+        case Failure(ValueError()):
+            return f"{text}: not a number"
+        case Failure(ZeroDivisionError()):
+            return f"{text}: cannot divide by zero"
+        case Failure(error):
+            return f"{text}: {type(error).__name__}"
+
+
+if __name__ == "__main__":
+    for text in ("4", "0", "oops"):
+        print(describe(text))
+```
+
+The output is:
+
+    4: 0.25
+    0: cannot divide by zero
+    oops: not a number
+
+`parse` and `reciprocal` are both wrapped with `@safe`, so `bind` chains them. A
+`ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero
+arrive as ordinary `Failure` values, and the `match` tells them apart.
+
 ## The returns Library
 
 You do not have to build `Result` yourself. The
 [returns](https://github.com/dry-python/returns) library provides a `Result`
-type with `Success` and `Failure`, a `@safe` decorator that converts an
-exception-raising function into one that returns a `Result`, and do-notation that
-makes combining multiple results read more directly than nested binds. Building
+type with `Success` and `Failure`, the same `@safe` decorator we just built, and
+do-notation that makes combining multiple results read more directly than nested
+binds. Building
 the type here, in a few lines, shows that there is no magic in it.
 
 This style does not replace exceptions everywhere. Exceptions are still right for
@@ -358,6 +465,32 @@ def test_combined() -> None:
     assert combined(7, 5) == Success("add(7 + 5 + 12): 24")
     assert combined(1, 5) == Failure("func_a(1)")
     assert combined(2, 1) == Failure("func_c(3): division by zero")
+```
+
+`@safe` deserves its own check: a good input becomes a `Success`, and a raised
+exception becomes a `Failure` holding that exception.
+
+```python
+# test_safe.py
+from result import Failure, Success
+from safe import safe
+
+
+@safe
+def parse(text: str) -> int:
+    return int(text)
+
+
+def test_safe_wraps_a_success() -> None:
+    assert parse("42") == Success(42)
+
+
+def test_safe_captures_the_exception() -> None:
+    match parse("oops"):
+        case Failure(error):
+            assert isinstance(error, ValueError)
+        case _:
+            raise AssertionError("expected a Failure")
 ```
 
 ## Exercises
