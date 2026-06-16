@@ -44,6 +44,7 @@ def _(flower: Runuculus) -> str:
     return "strong"
 
 
-flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
-for f in flowers:
-    print(nectar(f), "| fragrance:", fragrance(f))
+if __name__ == "__main__":
+    flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
+    for f in flowers:
+        print(nectar(f), "| fragrance:", fragrance(f))

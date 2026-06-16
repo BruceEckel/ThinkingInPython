@@ -148,9 +148,10 @@ def _(flower: Runuculus) -> str:
     return "strong"
 
 
-flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
-for f in flowers:
-    print(nectar(f), "| fragrance:", fragrance(f))
+if __name__ == "__main__":
+    flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
+    for f in flowers:
+        print(nectar(f), "| fragrance:", fragrance(f))
 ```
 
 `Flower` is never touched. Each operation is a separate function, and the
@@ -164,6 +165,50 @@ hierarchy, or you need the `accept()` hook for some other reason. But in Python
 that is rare. As with [the Pattern Refactoring chapter](23_Pattern_Refactoring.md)'s price-and-weight
 example, `singledispatch` is the open-method mechanism Visitor was invented to
 fake.
+
+## Verifying the Operations
+
+Because each operation is a plain function, testing is direct: call it with each
+flower type and assert the result. The cases worth covering are the registered
+types, the `@singledispatch` default for an unregistered type, and the fact that
+the two operations dispatch independently:
+
+```python
+# test_visitor.py
+from visit_singledispatch import (
+    Chrysanthemum,
+    Flower,
+    Gladiolus,
+    Runuculus,
+    fragrance,
+    nectar,
+)
+
+
+def test_nectar_registered_types() -> None:
+    assert nectar(Gladiolus()) == "Gladiolus: abundant nectar"
+    assert nectar(Chrysanthemum()) == "Chrysanthemum: a little nectar"
+
+
+def test_nectar_default_for_unregistered() -> None:
+    assert nectar(Runuculus()) == "Runuculus: no nectar"
+    assert nectar(Flower()) == "Flower: no nectar"
+
+
+def test_fragrance_registered_and_default() -> None:
+    assert fragrance(Runuculus()) == "strong"
+    assert fragrance(Gladiolus()) == "faint"
+    assert fragrance(Chrysanthemum()) == "faint"
+
+
+def test_operations_dispatch_independently() -> None:
+    # nectar knows Gladiolus and Chrysanthemum; fragrance knows
+    # Runuculus. A Runuculus falls to nectar's default but hits
+    # fragrance's registered case.
+    runuculus = Runuculus()
+    assert nectar(runuculus) == "Runuculus: no nectar"
+    assert fragrance(runuculus) == "strong"
+```
 
 ## Exercises
 
