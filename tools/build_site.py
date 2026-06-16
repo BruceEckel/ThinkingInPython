@@ -39,7 +39,10 @@ BOOK_AUTHOR = "Bruce Eckel"
 REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
-COPYRIGHT = (f"© 2026 {BOOK_AUTHOR}. Licensed CC BY-NC-ND 4.0.<br>"
+LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
+COPYRIGHT = (f"© 2026 {BOOK_AUTHOR}. "
+             f'<a href="{LICENSE_URL}" target="_blank" '
+             f'rel="noopener">Licensed CC BY-NC-ND 4.0</a>.<br>'
              "Freely readable online. No reproduction without permission.")
 
 IMG_REF = re.compile(r"(!\[[^\]]*\]\()_images/([^)\s]+)(\))")
@@ -186,7 +189,7 @@ def render_index(chapters: list[Chapter]) -> str:
 {rows}
     </ul>
     <p class="copyright">{COPYRIGHT}</p>
-    <p class="repo-link"><a href="{REPO_URL}">View the source on GitHub</a></p>
+    <p class="repo-link"><a href="{REPO_URL}" target="_blank" rel="noopener">View the source on GitHub</a></p>
   </div>
 </body>
 </html>
@@ -222,9 +225,11 @@ body {{ background: var(--paper); color: var(--ink);
 .toc-list a:hover {{ color: var(--accent); }}
 .copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
   font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
-.repo-link {{ margin-top: 0.75rem; font-size: 0.78rem;
-  font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
-.repo-link a {{ color: var(--muted); text-decoration: none; }}
+.copyright a {{ color: var(--muted); text-decoration: none; }}
+.copyright a:hover {{ color: var(--accent); }}
+.repo-link {{ margin-top: 1.5rem; }}
+.repo-link a {{ font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
+  color: var(--ink); text-decoration: none; }}
 .repo-link a:hover {{ color: var(--accent); }}
 """
 

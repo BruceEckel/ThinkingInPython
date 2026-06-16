@@ -18,7 +18,7 @@ help:
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
 	@echo "  serve     - serve build/site/ at http://localhost:8000"
-	@echo "  local     - build the site, then serve it locally"
+	@echo "  local     - build the site, serve it, and open a browser"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
@@ -41,10 +41,10 @@ site:
 	$(PY) tools/build_site.py
 
 serve:
-	$(PY) -m http.server --directory build/site
+	$(PY) tools/serve.py
 
 local: site
-	$(PY) -m http.server --directory build/site
+	$(PY) tools/serve.py --open
 
 ty:
 	$(TY) check ExtractedExamples

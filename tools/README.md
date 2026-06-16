@@ -132,8 +132,15 @@ are left alone.
 
 Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
 use `-o DIR` to build elsewhere. `make serve` builds nothing and serves the
-existing `build/site/` at <http://localhost:8000>; `make local` builds then
-serves.
+existing `build/site/` at <http://localhost:8000>; `make local` builds, serves,
+and opens a browser at the site.
+
+## serve.py
+
+Serves `build/site/` over HTTP for local preview. `make serve` runs it as-is;
+`make local` builds the site first, then runs it with `--open` to launch a
+browser. Use `--port N` for another port. It does not build anything, so run a
+site build first if `build/site/` is missing.
 
 ### Publishing to GitHub Pages
 
