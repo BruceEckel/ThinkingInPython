@@ -122,6 +122,31 @@ print(a.g())   # forwarded to the adaptee unchanged
 uses the adapter's own version while everything else falls through to the
 adaptee. This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
+A test pins down both halves of that behavior: the new `f()` combines the
+adaptee's methods, and unoverridden calls forward straight through to the wrapped
+object:
+
+```python
+# test_adapter.py
+from getattr_adapter import Adapter, WhatIHave
+
+
+def test_new_interface_combines_methods() -> None:
+    assert Adapter(WhatIHave()).f() == "gh"
+
+
+def test_getattr_forwards_existing_methods_unchanged() -> None:
+    a = Adapter(WhatIHave())
+    assert a.g() == "g"
+    assert a.h() == "h"
+
+
+def test_forwarding_targets_the_wrapped_object() -> None:
+    have = WhatIHave()
+    a = Adapter(have)
+    assert a.g.__self__ is have  # __getattr__ delegates to the adaptee
+```
+
 ## Façade
 
 A general principle that I apply when I'm casting about trying to mold
