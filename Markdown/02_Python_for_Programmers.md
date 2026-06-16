@@ -591,6 +591,40 @@ report("point", 3, 4, color="red", size=10)   # extras land in options
 The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a
 call site, the mirror image of collecting them.
 
+### Positional-Only and Keyword-Only Parameters
+
+Two markers in a parameter list control how callers may pass arguments. A `/`
+ends the *positional-only* parameters: every parameter before it must be passed
+by position, never by name. A `*` begins the *keyword-only* parameters: every
+parameter after it must be passed by name.
+
+```python
+# param_markers.py
+# `/` ends the positional-only parameters.
+# `*` begins the keyword-only parameters.
+
+def divide(a, b, /):
+    return a / b
+
+print(divide(10, 2))  # 5.0
+
+def make_user(name, *, admin=False):
+    return f"{name} (admin={admin})"
+
+print(make_user("Bob"))              # Bob (admin=False)
+print(make_user("Sue", admin=True))  # Sue (admin=True)
+```
+
+Calling `divide(a=10, b=2)` is an error, because `a` and `b` are positional-only.
+Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
+
+You meet `/` throughout the standard library, where many built-in functions take
+positional-only arguments, such as `dict.get(key, default, /)`. Marking a
+parameter positional-only also keeps its name out of the method's contract. That
+matters when a subclass overrides a method: since the name is not part of the
+interface, the subclass can rename the parameter, and a type checker will not
+object.
+
 ### Lambdas
 
 A `lambda` is a small anonymous function written as a single expression. It is
