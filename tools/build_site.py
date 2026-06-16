@@ -36,6 +36,7 @@ FRONT_STEM = "00_Front"
 BOOK_TITLE = "Thinking in Python"
 BOOK_SUBTITLE = "Insights, Idioms and Patterns"
 BOOK_AUTHOR = "Bruce Eckel"
+REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 COPYRIGHT = (f"© 2026 {BOOK_AUTHOR}. Licensed CC BY-NC-ND 4.0.<br>"
@@ -185,6 +186,7 @@ def render_index(chapters: list[Chapter]) -> str:
 {rows}
     </ul>
     <p class="copyright">{COPYRIGHT}</p>
+    <p class="repo-link"><a href="{REPO_URL}">View the source on GitHub</a></p>
   </div>
 </body>
 </html>
@@ -220,6 +222,10 @@ body {{ background: var(--paper); color: var(--ink);
 .toc-list a:hover {{ color: var(--accent); }}
 .copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
   font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
+.repo-link {{ margin-top: 0.75rem; font-size: 0.78rem;
+  font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
+.repo-link a {{ color: var(--muted); text-decoration: none; }}
+.repo-link a:hover {{ color: var(--accent); }}
 """
 
 
