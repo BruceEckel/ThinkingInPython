@@ -98,17 +98,16 @@ from simple_class import Simple
 class Simple2(Simple):
     def __init__(self, str):
         print("Inside Simple2 constructor")
-        # You must explicitly call
-        # the base-class constructor:
-        Simple.__init__(self, str)
+        # Call the base-class constructor with super():
+        super().__init__(str)
     def display(self):
         self.show_msg("Called from display()")
     # Overriding a base-class method
     def show(self):
         print("Overridden show() method")
-        # Calling a base-class method from inside
+        # Calling the base-class method from inside
         # the overridden method:
-        Simple.show(self)
+        super().show()
 
 class Different:
     def show(self):
@@ -125,12 +124,10 @@ if __name__ == "__main__":
 ```
 
 `Simple2` is inherited from `Simple`, and in the constructor, the
-base-class constructor is called. In `display()`, `show_msg()` can
-be called as a method of `self`, but when calling the base-class
-version of the method you are overriding, you must fully qualify the
-name and pass `self` in as the first argument, as shown in the
-base-class constructor call. This can also be seen in the overridden
-version of `show()`.
+base-class constructor is called with `super().__init__()`. In
+`display()`, `show_msg()` can be called as a method of `self`. When you
+override a method but still want the base-class version, call it through
+`super()`, as the overridden `show()` does.
 
 In `__main__`, you will see (when you run the program) that the
 base-class constructor is called. You can also see that the `show_msg(

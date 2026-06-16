@@ -18,7 +18,7 @@ def factory(type):
         return Circle()
     if type == "Square":
         return Square()
-    assert 0, "Bad shape creation: " + type
+    raise ValueError(f"Bad shape creation: {type}")
 
 def shape_name_gen(n):
     for i in range(n):

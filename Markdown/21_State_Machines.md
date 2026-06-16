@@ -28,9 +28,9 @@ single master state transition table for the whole system:
 
 class State:
     def run(self):
-        assert 0, "run not implemented"
+        raise NotImplementedError("run not implemented")
     def next(self, input):
-        assert 0, "next not implemented"
+        raise NotImplementedError("next not implemented")
 ```
 
 This class is clearly unnecessary, but it allows us to say that

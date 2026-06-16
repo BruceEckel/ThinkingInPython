@@ -11,7 +11,7 @@ class Shape:
             return Circle()
         if type == "Square":
             return Square()
-        assert 0, "Bad shape creation: " + type
+        raise ValueError(f"Bad shape creation: {type}")
 
 class Circle(Shape):
     def draw(self): print("Circle.draw")

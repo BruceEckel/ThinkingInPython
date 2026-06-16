@@ -5,17 +5,16 @@ from simple_class import Simple
 class Simple2(Simple):
     def __init__(self, str):
         print("Inside Simple2 constructor")
-        # You must explicitly call
-        # the base-class constructor:
-        Simple.__init__(self, str)
+        # Call the base-class constructor with super():
+        super().__init__(str)
     def display(self):
         self.show_msg("Called from display()")
     # Overriding a base-class method
     def show(self):
         print("Overridden show() method")
-        # Calling a base-class method from inside
+        # Calling the base-class method from inside
         # the overridden method:
-        Simple.show(self)
+        super().show()
 
 class Different:
     def show(self):
