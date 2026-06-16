@@ -227,6 +227,39 @@ self-registration used in [the Pattern Refactoring chapter](23_Pattern_Refactori
 common form of factory in idiomatic Python. The sections below show the classic
 object-oriented factories for contrast.
 
+A test confirms the two behaviors that matter: every subclass registers itself,
+and a new subclass needs no change to `make()`. Defining a fresh `Shape` inside
+the test is enough to see it appear in the registry:
+
+```python
+# test_registry.py
+import pytest
+from registry import Circle, Shape, Square, make
+
+
+def test_subclasses_auto_register() -> None:
+    assert Shape.registry["Circle"] is Circle
+    assert Shape.registry["Square"] is Square
+
+
+def test_make_builds_the_right_type() -> None:
+    assert isinstance(make("Circle"), Circle)
+    assert isinstance(make("Square"), Square)
+
+
+def test_new_subclass_registers_itself() -> None:
+    class Triangle(Shape):
+        def draw(self) -> None: ...
+
+    assert Shape.registry["Triangle"] is Triangle
+    assert isinstance(make("Triangle"), Triangle)
+
+
+def test_unknown_name_raises() -> None:
+    with pytest.raises(KeyError):
+        make("Hexagon")
+```
+
 ## Polymorphic Factories
 
 The static `factory()` method in the previous example forces all the
