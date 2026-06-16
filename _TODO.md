@@ -1,6 +1,4 @@
-Perform the following tasks one at a time, committing after each.
-My goal is to get as far as possible using prompts before I start my edit/rewrite pass.
-
----
-
-(All queued tasks complete. Whole-book review written to REVIEW.md.)
+Let's look at the organization of the book.
+- Should there be sections? What should they be called?
+- If there are sections, "Python for Programmers" could be one. This would allow that big
+  chapter to be broken up into smaller, more accessible ones. If we do that, what should those chapters be?

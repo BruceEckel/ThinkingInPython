@@ -1517,7 +1517,7 @@ def f(self):
     print("utility.f()!!!")
 ```
 
-Here's how you compose that method into a class:
+Here we compose that method into a class:
 
 ```python
 # compose.py
