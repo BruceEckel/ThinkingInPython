@@ -740,15 +740,18 @@ use the command line:
 python use_module.py
 ```
 
-However, if this file is imported as a module into another program, `__name__`
-will not be `__main__`, so the `__main__` code is not executed:
+However, if `use_module.py` is imported as a module into another program,
+`__name__` will not be `__main__`, so its `__main__` code is not executed. Here
+is such a program, which does nothing but import it:
 
 ```python
 # import_module.py
+import use_module
 ```
 
-If you run `python import_module.py`, you should only see `'module' imported`
-as the result.
+If you run `python import_module.py`, you should only see `'module' imported` as
+the result. Importing `use_module` runs its top-level code, including that
+`print()`, but not its `__main__` block.
 
 If you want to bring a name into the current namespace, you can do so using
 the `from` keyword:
