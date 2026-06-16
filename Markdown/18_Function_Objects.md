@@ -101,18 +101,19 @@ algorithm is a function, and you pass it in:
 from collections.abc import Callable
 
 Line = list[float]
-Minima = list[float]
 
 
-def least_squares(line: Line) -> Minima:
-    return [1.1, 2.2]  # dummy result
+def least_squares(line: Line) -> float:
+    # A flat least-squares fit minimizes squared error at the mean.
+    return sum(line) / len(line)
 
 
-def bisection(line: Line) -> Minima:
-    return [5.5, 6.6]  # dummy result
+def bisection(line: Line) -> float:
+    # Halve the interval: the midpoint of the value range.
+    return (min(line) + max(line)) / 2
 
 
-def solve(line: Line, strategy: Callable[[Line], Minima]) -> Minima:
+def solve(line: Line, strategy: Callable[[Line], float]) -> float:
     return strategy(line)
 
 
@@ -135,19 +136,19 @@ class FindMinima:
 # The various strategies:
 class LeastSquares(FindMinima):
     def algorithm(self, line):
-        return [ 1.1, 2.2 ] # Dummy
+        return sum(line) / len(line)  # mean
 
 class NewtonsMethod(FindMinima):
     def algorithm(self, line):
-        return [ 3.3, 4.4 ]  # Dummy
+        return min(line)
 
 class Bisection(FindMinima):
     def algorithm(self, line):
-        return [ 5.5, 6.6 ] # Dummy
+        return (min(line) + max(line)) / 2  # midpoint
 
 class ConjugateGradient(FindMinima):
     def algorithm(self, line):
-        return [ 3.3, 4.4 ] # Dummy
+        return max(line)
 
 # The "Context" controls the strategy:
 class MinimaSolver:

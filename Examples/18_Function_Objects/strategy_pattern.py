@@ -8,19 +8,19 @@ class FindMinima:
 # The various strategies:
 class LeastSquares(FindMinima):
     def algorithm(self, line):
-        return [ 1.1, 2.2 ] # Dummy
+        return sum(line) / len(line)  # mean
 
 class NewtonsMethod(FindMinima):
     def algorithm(self, line):
-        return [ 3.3, 4.4 ]  # Dummy
+        return min(line)
 
 class Bisection(FindMinima):
     def algorithm(self, line):
-        return [ 5.5, 6.6 ] # Dummy
+        return (min(line) + max(line)) / 2  # midpoint
 
 class ConjugateGradient(FindMinima):
     def algorithm(self, line):
-        return [ 3.3, 4.4 ] # Dummy
+        return max(line)
 
 # The "Context" controls the strategy:
 class MinimaSolver:

@@ -220,7 +220,8 @@ have to live inside `Point`.
 Because the function is free, it can work on anything shaped like a point. A
 `Protocol` describes that shape, and any type with the right attributes satisfies
 it, with no declared inheritance. This is the structural typing from the
-[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter. When you are handed a
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) section of the Python for
+Programmers chapter. When you are handed a
 type that does not fit, you adapt it by composition, not inheritance:
 
 ```python
@@ -416,7 +417,8 @@ if __name__ == "__main__":
 
 `show` accepts anything. Pass it something without a `display` method and you find
 out only when the line runs. The
-[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter gives this a static
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) section of the Python for
+Programmers chapter gives this a static
 form with `Protocol`: a structural type describes the required shape, and the
 checker verifies it ahead of time. Duck typing and protocols are the same idea,
 checked at different times.

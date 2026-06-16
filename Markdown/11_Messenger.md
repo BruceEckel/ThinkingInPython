@@ -26,11 +26,12 @@ print(m.info, m.b, m.more)
 ```
 
 The trick here is that the `__dict__` for the object is just assigned to
-the `dict` that is automatically created by the ``kwargs` argument.
+the `dict` that is automatically created by the `**kwargs` argument.
 
-Although one could easily create a `Messenger` class and put it into a
-library and import it, there are so few lines to describe it that it
-usually makes more sense to just define it in-place whenever you need it. It is probably easier for the reader to follow, as well.
+You could create a `Messenger` class and put it in a library to import.
+But it takes so few lines that defining it in-place, wherever you need it,
+usually makes more sense. That is probably easier for the reader to follow,
+too.
 
 ## The Standard-Library Versions
 

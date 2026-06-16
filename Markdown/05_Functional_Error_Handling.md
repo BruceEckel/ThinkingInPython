@@ -165,7 +165,8 @@ The output is:
 `Result[int, str]` says this function returns an `int` on success or a `str` on
 failure. The caller cannot ignore that, because to get the answer it has to open
 the `Result`. This is the same idea as the
-[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) chapter: put the meaning in
+[Static Type Checking](02_Python_for_Programmers.md#static-type-checking) section of the Python for
+Programmers chapter: put the meaning in
 the type.
 
 ## Composing by Hand

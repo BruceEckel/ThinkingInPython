@@ -8,8 +8,8 @@ Patterns*. Like the other forms of callback, this contains a hook point
 where you can change code. The difference is in the observer's
 completely dynamic nature. It is often used for the specific case of
 changes based on other object's change of state, but is also the basis
-of event management. Anytime you want to decouple the source of the call
-from the called code in a completely dynamic way.
+of event management. Use it anytime you want to decouple the source of the
+call from the called code in a completely dynamic way.
 
 The observer pattern solves a fairly common problem: What if a group of
 objects needs to update themselves when some object changes state? This
@@ -36,7 +36,7 @@ the surrounding code.
 
 `Observer` is an "interface" class that only has one member function,
 `update()`. This function is called by the object that's being
-observed, when that object decides its time to update all its observers.
+observed, when that object decides it's time to update all its observers.
 The arguments are optional; you could have an `update()` with no
 arguments and that would still fit the observer pattern; however this is
 more general: it allows the observed object to pass the object that
@@ -529,7 +529,7 @@ most of the benefits of inheritance (the ability to access the
 `private` data in the outer class, for example) without the same
 restrictions.
 
-In `main()`, you can see one of the prime benefits of the observer
+In the code above, you can see one of the prime benefits of the observer
 pattern: the ability to change behavior at run time by dynamically
 registering and un-registering `Observer`s with `Observable`s.
 

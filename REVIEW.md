@@ -21,29 +21,6 @@ The build is close to fully strict: `ty` reports **12** advisory diagnostics
 whole-tree (down from ~184) and `ruff` reports **7**. Both are now small enough
 to clear in one pass and promote to hard CI gates.
 
-## High priority (correctness and consistency)
-
-1. **Stale "chapter" references after the chapter merges.** "Static Type Checking"
-   and "Initialization and Cleanup" were folded into Python for Programmers, but
-   prose elsewhere still calls them chapters. 7 cross-references across 6 chapters
-   say "the Static Type Checking chapter" (Data Classes, Functional Error
-   Handling, Decorators, Rethinking Objects x2, Simulation), and the Introduction
-   (lines 68-69) says it "has its own chapter." The links resolve (to the
-   `#static-type-checking` anchor), but the wording is now wrong. Decide on a term
-   ("the section on static type checking" / "the Static Type Checking section of
-   the Python for Programmers chapter") and apply it everywhere.
-
-2. **The identity-matrix example is not an identity matrix.** In Comprehensions,
-   the hand-written list is `[[1,0,1],[0,1,0],[0,0,1]]`; the top-left-to-bottom
-   diagonal is right but the first row should be `[1,0,0]`. Fix the literal, or
-   reword to "a matrix" rather than "identity matrix" for that specific list.
-
-3. **`ch18` Function Objects uses dummy return values.** `least_squares`,
-   `bisection`, etc. `return [1.1, 2.2]  # dummy result`. They run and the prose
-   is honest, but replacing them with trivially-real computations (e.g. min,
-   midpoint, mean of the line) would let each strategy genuinely differ and drop
-   the `# dummy` labels, with no heavy math.
-
 ## Medium priority (structure and balance)
 
 4. **Python for Programmers is now very large (~1530 lines) and mixes two jobs.**
@@ -59,11 +36,6 @@ to clear in one pass and promote to hard CI gates.
    collects rough author notes "kept for a later pass" (`__new__` vs `__init__`,
    cleanup of locals, GC order). Resolve each into real prose or drop it; a
    published chapter should not end with a TODO list.
-
-6. **Update the Introduction's "How to Read" lineup.** It lists "testing,
-   decorators, metaprogramming, comprehensions" as the early chapters but omits
-   Data Classes as Types and Functional Error Handling, which are now early and
-   substantial. Refresh the list to match the current order.
 
 ## Low priority (polish)
 

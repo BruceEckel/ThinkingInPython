@@ -55,8 +55,9 @@ grow stronger as you watch objects used in many different situations here.
 
 ## How to Read This Book
 
-The early chapters cover language features and idioms: testing, decorators,
-metaprogramming, comprehensions, and more. The later chapters work through the
+The early chapters cover language features and idioms: testing, data classes as
+types, functional error handling, decorators, comprehensions, metaprogramming,
+and more. The later chapters work through the
 design patterns, reframed for Python. You can read straight through, or jump to
 a chapter that matches a problem in front of you, since each one is largely
 self-contained.
@@ -65,8 +66,8 @@ Every example is real. The examples are extracted from these chapters, then run
 and type-checked automatically, so the code you read is the code that ran, and
 the output shown is the output it produced. The examples target Python 3.14 and
 later, use type hints throughout, and are checked with Astral's `ty`. If type
-checking is new to you, [Static Type Checking](02_Python_for_Programmers.md#static-type-checking) has
-its own chapter.
+checking is new to you, the [Static Type Checking](02_Python_for_Programmers.md#static-type-checking)
+section of the Python for Programmers chapter covers it.
 
 ## The Code Examples
 
