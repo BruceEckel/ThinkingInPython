@@ -10,9 +10,9 @@ class trace:
         update_wrapper(self, func)  # copy __name__, __doc__, etc.
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        print(f"-> {self.func.__name__}{args}")
+        print(f"-> {self.func.__name__}{args}")  # type: ignore
         result = self.func(*args, **kwargs)
-        print(f"<- {self.func.__name__} = {result!r}")
+        print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
         return result
 
 

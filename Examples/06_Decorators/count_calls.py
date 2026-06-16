@@ -12,7 +12,7 @@ class count_calls:
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         self.count += 1
-        print(f"call {self.count} of {self.func.__name__}")
+        print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
 
 

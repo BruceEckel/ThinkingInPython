@@ -39,17 +39,6 @@ to clear in one pass and promote to hard CI gates.
 
 ## Low priority (polish)
 
-7. **`func.__name__` typing in decorators.** Several decorator examples (`trace`,
-   `repeat`, and the new class forms) trip the same `ty` diagnostic: `Callable`
-   has no `__name__`. A single project-wide decision (a typed alias, a documented
-   `# ty: ignore`, or `getattr`) would clear most of the 12 remaining diagnostics
-   and is a prerequisite for making `ty` a hard gate.
-
-8. **Small typos found**: Messenger line 29 has a stray double backtick in
-   `` ``kwargs` ``; Messenger line 33 is a run-on. A focused proofreading sweep of
-   the older chapters (Observer, Factory, Simulation, Metaprogramming) is worth a
-   pass.
-
 9. **Thin chapters are fine, but verify intent.** Messenger (81 lines) and
    Application Frameworks (100) are short and complete; that suits small idioms.
    No action needed unless you want them merged into neighbors.
