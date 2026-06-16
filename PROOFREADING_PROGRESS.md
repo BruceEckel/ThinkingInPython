@@ -4,9 +4,9 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 4 done (chapters 10-12, all clean, no changes),
-committed on branch `proofread/prose-pass`.
-Next action: proofread chapters 13-15.
+Last updated: iteration 5 done (chapters 13-15), committed on branch
+`proofread/prose-pass`.
+Next action: proofread chapters 16-18.
 
 ## Policy
 
@@ -40,9 +40,9 @@ Next action: proofread chapters 13-15.
 - [x] 10 Data Classes as Types
 - [x] 11 Functional Error Handling
 - [x] 12 Decorators
-- [ ] 13 Comprehensions
-- [ ] 14 Metaprogramming
-- [ ] 15 Rethinking Objects
+- [x] 13 Comprehensions
+- [x] 14 Metaprogramming
+- [x] 15 Rethinking Objects
 - [ ] 16 The Pattern Concept
 - [ ] 17 Messenger
 - [ ] 18 Singleton
