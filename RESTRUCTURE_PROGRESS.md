@@ -5,10 +5,19 @@ truth for a looped or resumed run. On restart, read this first, find the first
 unchecked stage, and continue from its "next action". Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: (none yet, stage 1 not started)
-Current stage: 1 (Split)
-Next action: split `Markdown/02_Python_for_Programmers.md` into files 02-08 per
-the table below, starting with `02_A_Python_Tour.md`.
+Last updated: Stage 1 complete, verified, committed on branch
+`restructure/book-sections`.
+Current stage: 2 (Renumber)
+Next action: renumber old chapters 03-24 to 09-30 (Markdown files and their
+`Examples/` folders) per the mapping below. Cross-references stay broken until
+stage 3; that is expected.
+
+Gotcha (applies to every stage that renames/removes a chapter): `extract
+--write` does NOT prune folders for removed chapters, so a stale
+`ExtractedExamples/<old>` inflates `run_examples` and masks results. Always
+`rm -rf ExtractedExamples` (or `python -c "import shutil;
+shutil.rmtree('ExtractedExamples', ignore_errors=True)"`) before re-extracting
+in the verify block.
 
 ## Confirmed design
 
@@ -111,10 +120,27 @@ left in the wrong folder.
   and render Part headings in `render_index()` (the TOC), with a `.part` CSS
   rule. Introduction stays above Part I. Keep the sequential "Chapter N" labels.
 
+## Stage 1 outcome (done) and decisions made
+
+- Naming Conventions placed in 02 A Python Tour (not 04 Functions): cleaner,
+  keeps 04 purely about functions. Foundational style fits the Tour.
+- Useful Techniques distributed: `unpacking.py` -> 04 as "## Unpacking
+  Arguments"; `utility.py` + `compose.py` -> 06 as "## Composing Methods by
+  Import".
+- Notes holding pen: dropped entirely (every point is covered elsewhere or was
+  explicitly speculative). Resolves REVIEW #5.
+- Further Reading: moved to the end of 08 Static Type Checking.
+- Comprehensions brief: kept in 03 with its forward pointer to the full
+  Comprehensions chapter. (Resolves the earlier DECISION PENDING.)
+- Each chapter's namesake H2 heading was dropped and its `###` children
+  promoted to `##`, so e.g. 04 is `# Functions` then `## Default and Keyword
+  Arguments`, not `# Functions` then `## Functions`.
+
 ## Verify after every stage (all must pass)
 
 ```
 uv run python tools/extract_examples.py            # drift: book == Examples/
+rm -rf ExtractedExamples                           # prune stale chapter folders
 uv run python tools/extract_examples.py --write
 uv run python tools/run_examples.py
 uv run pytest ExtractedExamples
@@ -125,8 +151,8 @@ uv run python tools/build_site.py                  # site builds clean
 
 ## Stages
 
-- [ ] Stage 1 — Split old 02 into 02-08, redistribute its Examples, trim the
-      intro overlap, resolve the Notes section. Verify.
+- [x] Stage 1 — Split old 02 into 02-08, redistribute its Examples, trim the
+      intro overlap, resolve the Notes section. Verify. DONE + committed.
 - [ ] Stage 2 — Renumber old 03-24 to 09-30 (Markdown files and Examples/
       folders). Verify.
 - [ ] Stage 3 — Fix all cross-references and the Static Type Checking wording.
