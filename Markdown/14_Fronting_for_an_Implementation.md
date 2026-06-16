@@ -215,3 +215,57 @@ delegation, with *State* adding a method to change the implementation. The
 separate implementation hierarchy that *Design Patterns* uses is needed only
 when you do not control the implementing code; when you do, the single generic
 surrogate above is simpler and just as flexible.
+
+## Testing the Surrogates
+
+Because each surrogate wraps any object, a test can hand it a small stand-in with
+real return values and check the delegation directly. For the proxy, that the
+call is forwarded with its result and counted; for the state, that calls reach
+the current implementation and that `change_imp` swaps it:
+
+```python
+# test_fronting.py
+from counting_proxy import CountingProxy
+from state_demo import StateD
+
+
+class Doubler:
+    def double(self, n: int) -> int:
+        return n * 2
+
+
+def test_proxy_forwards_call_and_result() -> None:
+    p = CountingProxy(Doubler())
+    assert p.double(5) == 10
+    assert p.double(3) == 6
+
+
+def test_proxy_counts_only_calls() -> None:
+    class HasValue:
+        answer = 42
+
+    p = CountingProxy(HasValue())
+    assert p.answer == 42  # a non-callable attribute is passed through
+    p2 = CountingProxy(Doubler())
+    p2.double(1)
+    p2.double(1)
+    assert p.calls == 0
+    assert p2.calls == 2
+
+
+class StateA:
+    def name(self) -> str:
+        return "A"
+
+
+class StateB:
+    def name(self) -> str:
+        return "B"
+
+
+def test_state_delegates_and_change_imp_swaps() -> None:
+    s = StateD(StateA())
+    assert s.name() == "A"
+    s.change_imp(StateB())
+    assert s.name() == "B"
+```
