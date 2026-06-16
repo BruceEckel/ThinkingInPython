@@ -89,6 +89,35 @@ hierarchy. This is the same trade-off seen in the Function Objects chapter: a
 hook that holds no state is usually better as a function than as a method to
 override.
 
+The behavior to test is the same for both: the fixed algorithm calls the steps in
+order, twice. Recording steps make that order visible:
+
+```python
+# test_framework.py
+from template_function import run_framework
+from template_method import ApplicationFramework
+
+
+def test_template_method_runs_steps_in_order() -> None:
+    calls: list[str] = []
+
+    class Recorder(ApplicationFramework):
+        def customize1(self) -> None:
+            calls.append("one")
+
+        def customize2(self) -> None:
+            calls.append("two")
+
+    Recorder()  # constructing it runs the framework
+    assert calls == ["one", "two", "one", "two"]  # the loop runs twice
+
+
+def test_template_function_runs_steps_in_order() -> None:
+    calls: list[str] = []
+    run_framework(lambda: calls.append("a"), lambda: calls.append("b"))
+    assert calls == ["a", "b", "a", "b"]
+```
+
 ## Exercises
 
 1.  Create a framework that takes a list of file names. It opens each file except
