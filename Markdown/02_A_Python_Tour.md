@@ -88,8 +88,7 @@ Use `==` to ask whether two objects have equal values. Use `is` to ask whether
 two names refer to the *same* object. Reserve `is` for `None` and other
 singletons.
 
-You can assign several names at once, which makes swapping a one-liner with no
-temporary:
+You can assign several names at once, which makes it easy to swap without a temporary:
 
 ```python
 # multiple_assignment.py
@@ -126,8 +125,11 @@ total += 5      # augmented assignment, like other languages
 print(total)
 ```
 
-There is no `++` or `--`; use `+= 1`. A `bool` is a subtype of `int`, so `True`
-equals `1` and `False` equals `0`, which is occasionally handy for counting.
+There is no `++` or `--`; use `+= 1` and `-= 1`. Each arithmetic operator has an
+augmented-assignment form: `+=`, `-=`, `*=`, `/=`, `//=`, `%=`, and `**=`. The
+bitwise and shift operators have them too. A `bool` is a subtype of `int`, so
+`True` equals `1` and `False` equals `0`, which is occasionally handy for
+counting.
 
 ## Booleans, None, and Truthiness
 
@@ -145,8 +147,7 @@ true. This is *truthiness*, and it lets you write `if items:` instead of
 for value in [0, 1, "", "hi", [], [1], None]:
     print(repr(value), "->", bool(value))
 
-items = []
-if not items:
+if not []:
     print("empty")        # an empty list is falsy
 
 name = "" or "default"    # 'or' returns the first truthy operand
