@@ -3,6 +3,4 @@ My goal is to get as far as possible using prompts before I start my edit/rewrit
 
 ---
 
-Review the book and suggest improvements.
-
----
+(All queued tasks complete. Whole-book review written to REVIEW.md.)
