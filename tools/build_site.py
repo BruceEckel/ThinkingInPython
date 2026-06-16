@@ -166,9 +166,9 @@ def render_chapter(body: str, ch: Chapter,
 # A Part heading is emitted before the chapter whose number starts it.
 # Introduction (01) stands alone above Part I.
 PARTS = {
-    "02": ("I", "Python Foundations"),
-    "09": ("II", "Idioms and Techniques"),
-    "16": ("III", "Design Patterns"),
+    "02": ("I", "Foundations"),
+    "09": ("II", "Techniques"),
+    "16": ("III", "Patterns"),
 }
 
 
@@ -240,7 +240,7 @@ body {{ background: var(--paper); color: var(--ink);
   color: var(--ink); text-decoration: none; flex: 1; }}
 .toc-list a:hover {{ color: var(--accent); }}
 .toc-part {{ display: block; border-bottom: none; margin-top: 1.5rem;
-  padding: 0.4rem 0; font-family: 'Cormorant SC', serif; font-size: 0.85rem;
+  padding: 0.4rem 0; font-family: 'Cormorant SC', serif; font-size: 1.7rem;
   letter-spacing: 0.15em; color: var(--accent); }}
 .toc-list li.toc-part:first-child {{ border-top: none; }}
 .copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
