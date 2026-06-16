@@ -50,5 +50,6 @@ class Rock(Item):
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
-for item1, item2 in item_pair_gen(Item, 20):
-    match(item1, item2)
+if __name__ == "__main__":
+    for item1, item2 in item_pair_gen(Item, 20):
+        match(item1, item2)

@@ -128,8 +128,9 @@ class Rock(Item):
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
-for item1, item2 in item_pair_gen(Item, 20):
-    match(item1, item2)
+if __name__ == "__main__":
+    for item1, item2 in item_pair_gen(Item, 20):
+        match(item1, item2)
 ```
 
 One of the things you might notice is that the information about the various
@@ -172,8 +173,9 @@ outcome = {
   (Rock, Rock): Outcome.DRAW,
 }
 
-for item1, item2 in item_pair_gen(Item, 20):
-    match(item1, item2)
+if __name__ == "__main__":
+    for item1, item2 in item_pair_gen(Item, 20):
+        match(item1, item2)
 ```
 
 It's a tribute to the flexibility of dictionaries that a tuple can be
@@ -194,3 +196,64 @@ types in a table and look a behavior up by them. Python can, so the table is
 both shorter and easier to maintain. Reach for the spread-out method version
 only when a combination needs substantial, type-specific code that will not fit
 in a table cell.
+
+## Verifying the Table
+
+The win/lose/draw result is pure logic, which makes it easy to pin down with a
+test. The strongest check is that the two versions agree: the spread-out method
+version and the table version must return the same `Outcome` for every one of the
+nine combinations. If they ever diverge, one of them has a bug.
+
+```python
+# test_paper_scissors.py
+from typing import Any
+
+import paper_scissors_rock as methods
+import paper_scissors_rock2 as table
+from outcome import Outcome
+
+# (player, opponent): the player's result.
+EXPECTED = {
+    ("Paper", "Rock"): Outcome.WIN,
+    ("Paper", "Scissors"): Outcome.LOSE,
+    ("Paper", "Paper"): Outcome.DRAW,
+    ("Scissors", "Paper"): Outcome.WIN,
+    ("Scissors", "Rock"): Outcome.LOSE,
+    ("Scissors", "Scissors"): Outcome.DRAW,
+    ("Rock", "Scissors"): Outcome.WIN,
+    ("Rock", "Paper"): Outcome.LOSE,
+    ("Rock", "Rock"): Outcome.DRAW,
+}
+
+
+def compete(module: Any, player: str, opponent: str) -> Outcome:
+    result = getattr(module, player)().compete(getattr(module, opponent)())
+    assert isinstance(result, Outcome)
+    return result
+
+
+def test_table_version_matches_expected() -> None:
+    for (player, opponent), result in EXPECTED.items():
+        assert compete(table, player, opponent) == result
+
+
+def test_method_version_matches_expected() -> None:
+    for (player, opponent), result in EXPECTED.items():
+        assert compete(methods, player, opponent) == result
+
+
+def test_both_versions_agree() -> None:
+    for player, opponent in EXPECTED:
+        assert (compete(methods, player, opponent)
+                == compete(table, player, opponent))
+
+
+def test_outcome_str() -> None:
+    assert str(Outcome.WIN) == "win"
+    assert str(Outcome.LOSE) == "lose"
+    assert str(Outcome.DRAW) == "draw"
+```
+
+Importing both modules works cleanly because each guards its demonstration loop
+with `if __name__ == "__main__"`, so the loop runs only when the file is executed
+directly, not when it is imported for testing.
