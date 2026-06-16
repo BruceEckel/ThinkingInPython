@@ -262,7 +262,7 @@ create and use. All you have to say is:
 
     myMethod = synchronized(myMethod)
 
-To surround your method with a mutex.
+to surround your method with a mutex.
 
 `synchronize()` is a convenience function that applies
 `synchronized()` to an entire class, either all the methods in the
@@ -541,8 +541,8 @@ the only connection the `Observer`s have with `Flower`s is the
 
 ### A Visual Example of Observers
 
-This is the `ColorBoxes` example from *Thinking in Java*. A grid of boxes each
-start with some color. Every box observes a shared `Observable`. When one box is
+This is the `ColorBoxes` example from *Thinking in Java*. A grid of boxes, each
+starting with some color. Every box observes a shared `Observable`. When one box is
 "clicked," the `Observable` notifies every box, and each box adjacent to the
 clicked one changes its color to match it.
 

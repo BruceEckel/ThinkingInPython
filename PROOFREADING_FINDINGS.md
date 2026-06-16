@@ -86,3 +86,17 @@ Format per entry:
 > .py` that does not exist in the chapter. Suggest Pythonizing: `dict`, `str`,
 > `next_state()`/snake_case, `False`, and pointing ex 6 at the real
 > `tabledriven/` files (or dropping it).
+
+---
+
+> **26_Observer.md:5-12** (broken opening paragraph)
+> The chapter opens with a sentence fragment: "*Observer*, and a category of
+> callbacks called 'multiple dispatching (not in *Design Patterns*)' including
+> the *Visitor* from *Design Patterns*." There is no main verb, and the next
+> sentence's "this contains a hook point" has no clear referent. Line 10 also
+> has an awkward possessive, "based on other object's change of state". Suggest
+> a rewrite, e.g.: "The *Observer* pattern is a kind of callback: an object
+> registers interest in another object and is notified when that object's state
+> changes. It is the most dynamic of the callback patterns. (A related family,
+> multiple dispatching, includes the *Visitor* pattern from *Design Patterns*;
+> see the Multiple Dispatching and Visitor chapters.)"

@@ -4,9 +4,9 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 8 done (chapters 22-24), committed on branch
+Last updated: iteration 9 done (chapters 25-27), committed on branch
 `proofread/prose-pass`.
-Next action: proofread chapters 25-27.
+Next action: proofread chapters 28-30 (final batch).
 
 ## Policy
 
@@ -52,9 +52,9 @@ Next action: proofread chapters 25-27.
 - [x] 22 Iterators
 - [x] 23 Factory
 - [x] 24 Function Objects
-- [ ] 25 Changing the Interface
-- [ ] 26 Observer
-- [ ] 27 Multiple Dispatching
+- [x] 25 Changing the Interface
+- [x] 26 Observer
+- [x] 27 Multiple Dispatching
 - [ ] 28 Visitor
 - [ ] 29 Pattern Refactoring
 - [ ] 30 Simulation
