@@ -1,13 +1,12 @@
 # Functions
 
 To create a function in Python, you use the `def` keyword, followed by the
-function name and argument list, and a colon to begin the function body. Here
-is the first example turned into a function:
+function name and argument list, and a colon to begin the function body:
 
 ```python
-# my_function.py
+# a_function.py
 
-def my_function(response):
+def a_function(response):
     val = 0
     if response == "yes":
         print("affirmative")
@@ -15,8 +14,8 @@ def my_function(response):
     print("continuing...")
     return val
 
-print(my_function("no"))
-print(my_function("yes"))
+print(a_function("no"))
+print(a_function("yes"))
 ```
 
 Notice there is no type information in the function signature: all it
@@ -95,6 +94,8 @@ print(good_append(1))  # [1]
 print(good_append(2))  # [2]
 ```
 
+Thus, a default value creates an implicit global variable.
+
 ## Variable Argument Lists
 
 A `*args` parameter collects extra positional arguments into a tuple, and
@@ -157,8 +158,8 @@ handy for passing behavior to functions like `sorted()`:
 
 words = ["banana", "kiwi", "apple", "fig"]
 print(sorted(words, key=lambda w: len(w)))  # sort by length
-square = lambda n: n * n                     # usually prefer def
-print(square(9))                             # 81
+square = lambda n: n * n                    # usually prefer def
+print(square(9))                            # 81
 ```
 
 
