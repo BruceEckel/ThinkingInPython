@@ -4,9 +4,14 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 9 done (chapters 25-27), committed on branch
-`proofread/prose-pass`.
-Next action: proofread chapters 28-30 (final batch).
+Last updated: ALL 30 CHAPTERS PROOFREAD. Pass complete, committed on branch
+`proofread/prose-pass`. The loop has stopped.
+
+Mechanical fixes (spelling, grammar, em-dashes, stale post-split references,
+Java-isms) were applied and committed per batch. Judgment calls are in
+PROOFREADING_FINDINGS.md for the user to review and approve. Remaining (human):
+merge the branch; act on the findings; optionally delete the two tracking
+files.
 
 ## Policy
 
@@ -55,9 +60,9 @@ Next action: proofread chapters 28-30 (final batch).
 - [x] 25 Changing the Interface
 - [x] 26 Observer
 - [x] 27 Multiple Dispatching
-- [ ] 28 Visitor
-- [ ] 29 Pattern Refactoring
-- [ ] 30 Simulation
+- [x] 28 Visitor
+- [x] 29 Pattern Refactoring
+- [x] 30 Simulation
 
 When all are checked, stop the loop (no further ScheduleWakeup). The user
 reviews PROOFREADING_FINDINGS.md and decides which rewrites to apply.

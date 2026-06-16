@@ -100,3 +100,14 @@ Format per entry:
 > changes. It is the most dynamic of the callback patterns. (A related family,
 > multiple dispatching, includes the *Visitor* pattern from *Design Patterns*;
 > see the Multiple Dispatching and Visitor chapters.)"
+
+---
+
+> **28_Visitor.md exercises 2-3** (unconverted Java)
+> Exercise 2 uses `getWeapon()` and "member function"; exercise 3 contains
+> literal Java: "create a `Map` of `Map`s", `o1.getClass()`, and the cast
+> expression `((Map)map.get(o1.getClass())).get(o2.getClass())`. Suggest
+> Pythonizing to a `dict` of `dict`s keyed by `type(o1)`/`type(o2)`,
+> `type(...)` instead of `getClass()`, snake_case method names, and "method"
+> instead of "member function". (Same class of issue as the State Machines
+> exercises.)
