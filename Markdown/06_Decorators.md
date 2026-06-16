@@ -97,6 +97,137 @@ if __name__ == "__main__":
 `@repeat(times=3)` calls `repeat(3)`, which returns the real decorator, which
 then wraps `greet`. The greeting prints three times.
 
+### Decorators as Classes
+
+A decorator only has to be a callable that takes a function and returns a
+callable. A class with `__call__` is a callable, so a decorator can be a class
+instead of a function. The class form separates the two phases cleanly: the
+constructor runs once, when the function is decorated, and `__call__` runs on
+every call to the decorated function. Here is the `trace` decorator written as a
+class:
+
+```python
+# trace_class.py
+from collections.abc import Callable
+from functools import update_wrapper
+from typing import Any
+
+
+class trace:
+    def __init__(self, func: Callable[..., Any]) -> None:
+        self.func = func
+        update_wrapper(self, func)  # copy __name__, __doc__, etc.
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        print(f"-> {self.func.__name__}{args}")
+        result = self.func(*args, **kwargs)
+        print(f"<- {self.func.__name__} = {result!r}")
+        return result
+
+
+@trace
+def add(a: int, b: int) -> int:
+    return a + b
+
+
+if __name__ == "__main__":
+    add(2, 3)
+```
+
+`@trace` runs `add = trace(add)`, so the constructor receives the function and
+stores it. The name `add` now refers to a `trace` instance, and calling
+`add(2, 3)` invokes `__call__`. `functools.update_wrapper` does for a class
+instance what `functools.wraps` does for a function: it copies the wrapped
+function's name and docstring across.
+
+Because the instance can hold attributes, state between calls is natural. A class
+decorator that counts calls keeps the count on the instance, with no closure
+trick:
+
+```python
+# count_calls.py
+from collections.abc import Callable
+from functools import update_wrapper
+from typing import Any
+
+
+class count_calls:
+    def __init__(self, func: Callable[..., Any]) -> None:
+        self.func = func
+        self.count = 0
+        update_wrapper(self, func)
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        self.count += 1
+        print(f"call {self.count} of {self.func.__name__}")
+        return self.func(*args, **kwargs)
+
+
+@count_calls
+def hello() -> None:
+    print("hello")
+
+
+if __name__ == "__main__":
+    hello()
+    hello()
+    print(hello.count)  # 2: the state lives on the decorator instance
+```
+
+The class form shifts in an important way when the decorator itself takes
+arguments. Without arguments, the constructor receives the function. With
+arguments, the constructor receives the *arguments*, and `__call__` receives the
+function and returns the wrapper:
+
+```python
+# repeat_class.py
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
+
+
+class repeat:
+    def __init__(self, times: int) -> None:
+        self.times = times  # the decoration arguments
+
+    def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            result = None
+            for _ in range(self.times):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+
+
+@repeat(times=3)
+def greet(name: str) -> None:
+    print(f"Hello, {name}")
+
+
+if __name__ == "__main__":
+    greet("Bob")
+```
+
+Compare the two cases. `@trace` with no arguments calls `trace(add)`: the
+function goes straight to the constructor. `@repeat(times=3)` calls `repeat(3)`
+first, producing an instance, then applies that instance to `greet`: the
+arguments go to the constructor, and the function arrives later, at `__call__`.
+The function form hides this shift inside an extra nested `def`. The class form
+makes it visible: the function moves from `__init__` to `__call__` the moment the
+decorator gains arguments.
+
+Which form to use is mostly taste. The function form is more compact, and with
+`ParamSpec` it preserves the wrapped function's exact signature for the type
+checker, where the class form erases it to `Callable[..., Any]`. The class form
+reads better when the decorator carries state or grows complicated, because the
+phases are separate methods instead of nested closures. That argument-capturing
+class decorator scales up to small frameworks: a build tool or task runner can
+offer a `@rule(target, *deps)` decorator whose constructor records the target and
+dependencies, whose `__call__` registers the decorated function in a class-level
+table with that metadata, and whose driver later walks the table to run things in
+order. The decorator becomes the registration mechanism for the whole system.
+
 ### Stacking Decorators
 
 You can apply more than one decorator. They nest from the bottom up:
@@ -275,3 +406,7 @@ def test_decaf_adds_no_cost() -> None:
     (Margherita, Hawaiian) and topping decorators (Garlic, Olives, Feta). Build a
     Margherita decorated with Olives and Feta, then print its cost and
     description.
+4.  Write `trace` as a class decorator that also keeps a class-level counter
+    shared across every decorated function, and report the total number of traced
+    calls in the program. Note where the shared state lives compared to the
+    per-instance `count` in `count_calls`.
