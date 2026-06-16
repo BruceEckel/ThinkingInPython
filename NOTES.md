@@ -2,6 +2,8 @@
   Maybe it's not perfect but this isn't a book about GUIs, and there's
   no installation hassle with TKInter.
 
+- Indexing using Leanpub format, before publishing to leanpub
+
 
 ******************
 

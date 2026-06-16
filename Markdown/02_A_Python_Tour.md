@@ -225,10 +225,8 @@ s = "val: %d, val2: %f" % (val, val2)
 print(s)
 ```
 
-As you can see in the second case, if you have more than one argument
-you surround them in parentheses (this forms a *tuple*, which is a list
-that cannot be modified; you can also use regular lists for multiple
-arguments, but tuples are typical).
+As you can see in the second case, more than one argument is grouped in
+parentheses as a tuple (covered in the next chapter).
 
 All the formatting from `printf()` is available, including control
 over the number of decimal places and alignment. Python also has very

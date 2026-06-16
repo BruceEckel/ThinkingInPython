@@ -68,7 +68,7 @@ Slicing works on any sequence, including strings and tuples.
 
 ### Tuples and Unpacking
 
-A tuple is an immutable sequence. The comma makes the tuple, not the
+A *tuple* is an immutable sequence. The comma makes the tuple, not the
 parentheses. Tuples are the natural way to return several values from a function
 and to group values for unpacking:
 
