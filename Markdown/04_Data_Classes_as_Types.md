@@ -494,6 +494,94 @@ if __name__ == "__main__":
     print(Config("data.csv", retries=5))
 ```
 
+## Serializing to JSON
+
+A data class has no built-in JSON support. Hand one to `json.dumps` and it raises
+`TypeError: Object of type Person is not JSON serializable`. The fix is small.
+`asdict` turns the object into a nested dictionary, and `json.dumps` already knows
+how to serialize dictionaries. Decoding goes the other way: parse the JSON into a
+dictionary, then hand its parts to the constructors.
+
+```python
+# json_round_trip.py
+# A data class has no built-in JSON support, but asdict() turns one
+# into a dict that json.dumps understands, and the constructors turn
+# the parsed dict back into a validated object.
+import json
+from dataclasses import asdict
+
+from person import EmailAddress, FullName, Person
+
+
+def to_json(person: Person) -> str:
+    return json.dumps(asdict(person), indent=2)
+
+
+def from_json(text: str) -> Person:
+    data = json.loads(text)
+    return Person(
+        FullName(data["name"]["text"]),
+        EmailAddress(data["email"]["text"]),
+    )
+
+
+if __name__ == "__main__":
+    original = Person(FullName("Bruce Eckel"),
+                      EmailAddress("bruce@example.com"))
+    text = to_json(original)
+    print(text)
+    print(from_json(text) == original)  # True: it round-trips
+```
+
+The decode step is where this chapter's idea pays off again. JSON usually arrives
+from outside the program, untrusted. Rebuilding the value through `Person`,
+`FullName`, and `EmailAddress` runs each constructor's validation, so malformed
+JSON is rejected at the boundary instead of leaking a bad object into the rest of
+the code. The type guards itself, even against data it never saw.
+
+When a data class is buried inside a larger structure you are dumping, converting
+it by hand first is awkward. A custom `JSONEncoder` handles every data class it
+meets, wherever it appears:
+
+```python
+# json_encoder.py
+# A custom encoder serializes any data class it meets, even nested
+# inside other structures, by converting each one to a dict.
+import json
+from dataclasses import asdict, is_dataclass
+from typing import Any
+
+from person import EmailAddress, FullName, Person
+
+
+class DataClassEncoder(json.JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if is_dataclass(o) and not isinstance(o, type):
+            return asdict(o)
+        return super().default(o)
+
+
+if __name__ == "__main__":
+    people = [
+        Person(FullName("Bruce Eckel"),
+               EmailAddress("bruce@example.com")),
+        Person(FullName("Ada Lovelace"),
+               EmailAddress("ada@example.com")),
+    ]
+    print(json.dumps(people, cls=DataClassEncoder, indent=2))
+```
+
+`json.dumps` calls `default` for any object it cannot serialize on its own. The
+encoder converts each data class to a dictionary and lets the base encoder take
+it from there, recursing through lists and nested objects.
+
+Encoding is mechanical, but decoding has to know which type to rebuild, and that
+is the part the standard library leaves to you. For deep or evolving structures,
+[Pydantic](https://docs.pydantic.dev) and
+[dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the
+decode side, reconstructing nested types from the parsed JSON and validating as
+they go.
+
 ## Proving the Guarantee
 
 The claim is that an illegal value cannot exist. That is exactly the kind of
@@ -573,3 +661,6 @@ def test_bad_month_number(bad: int) -> None:
 3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that
     returns a new `Stars`, and show that the precondition and postcondition
     disappear.
+4.  Feed `from_json` a JSON string whose email has no `@`, and confirm it raises
+    `TypeFailure`. The validation you wrote once, in `EmailAddress`, now also
+    guards your JSON input.
