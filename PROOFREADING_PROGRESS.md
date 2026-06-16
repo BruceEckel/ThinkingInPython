@@ -4,9 +4,9 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 2 done (chapters 04-06), committed on branch
+Last updated: iteration 3 done (chapters 07-09), committed on branch
 `proofread/prose-pass`.
-Next action: proofread chapters 07-09.
+Next action: proofread chapters 10-12.
 
 ## Policy
 
@@ -34,9 +34,9 @@ Next action: proofread chapters 07-09.
 - [x] 04 Functions
 - [x] 05 Modules and Packages
 - [x] 06 Classes
-- [ ] 07 Initialization and Cleanup
-- [ ] 08 Static Type Checking
-- [ ] 09 Testing
+- [x] 07 Initialization and Cleanup
+- [x] 08 Static Type Checking
+- [x] 09 Testing
 - [ ] 10 Data Classes as Types
 - [ ] 11 Functional Error Handling
 - [ ] 12 Decorators
