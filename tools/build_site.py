@@ -163,12 +163,28 @@ def render_chapter(body: str, ch: Chapter,
 # --------------------------------------------------------------------------- #
 # Index page and shared CSS (the table of contents)
 # --------------------------------------------------------------------------- #
+# A Part heading is emitted before the chapter whose number starts it.
+# Introduction (01) stands alone above Part I.
+PARTS = {
+    "02": ("I", "Python Foundations"),
+    "09": ("II", "Idioms and Techniques"),
+    "16": ("III", "Design Patterns"),
+}
+
+
 def render_index(chapters: list[Chapter]) -> str:
-    rows = "\n".join(
-        f'    <li><span class="toc-num">{ch.number}</span>'
-        f'<a href="{ch.out_name}">{ch.title}</a></li>'
-        for ch in chapters
-    )
+    items: list[str] = []
+    for ch in chapters:
+        part = PARTS.get(ch.number)
+        if part is not None:
+            roman, title = part
+            items.append(
+                '    <li class="toc-part">'
+                f'Part {roman} &middot; {title}</li>')
+        items.append(
+            f'    <li><span class="toc-num">{ch.number}</span>'
+            f'<a href="{ch.out_name}">{ch.title}</a></li>')
+    rows = "\n".join(items)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -223,6 +239,10 @@ body {{ background: var(--paper); color: var(--ink);
 .toc-list a {{ font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
   color: var(--ink); text-decoration: none; flex: 1; }}
 .toc-list a:hover {{ color: var(--accent); }}
+.toc-part {{ display: block; border-bottom: none; margin-top: 1.5rem;
+  padding: 0.4rem 0; font-family: 'Cormorant SC', serif; font-size: 0.85rem;
+  letter-spacing: 0.15em; color: var(--accent); }}
+.toc-list li.toc-part:first-child {{ border-top: none; }}
 .copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
   font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
 .copyright a {{ color: var(--muted); text-decoration: none; }}

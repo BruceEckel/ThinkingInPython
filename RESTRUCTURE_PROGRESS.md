@@ -5,20 +5,16 @@ truth for a looped or resumed run. On restart, read this first, find the first
 unchecked stage, and continue from its "next action". Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: Stage 3 complete, verified, committed on branch
-`restructure/book-sections`.
-Current stage: 4 (Part dividers in the TOC)
-Next action: teach `tools/build_site.py` to render the three Part headings in
-the table of contents (`render_index`), grouping chapters by number range:
-Introduction (01) stands alone above Part I; Part I "Python Foundations" =
-02-08; Part II "Idioms and Techniques" = 09-15; Part III "Design Patterns" =
-16-30. Add a `.part` CSS rule in `render_css`. Keep the sequential "Chapter N"
-labels. Then build the site and eyeball index.html. This is the last stage;
-when done, stop the loop (no further ScheduleWakeup).
+Last updated: ALL FOUR STAGES COMPLETE. Restructure done, verified, committed
+on branch `restructure/book-sections`. The loop has stopped.
 
-All cross-references now point at the new filenames and resolve. The 7 Static
-Type Checking references read "the Static Type Checking chapter" again, linking
-to `08_Static_Type_Checking.md`.
+The book is now 30 chapters in three Parts: Introduction (01) stands alone;
+Part I Python Foundations (02-08); Part II Idioms and Techniques (09-15);
+Part III Design Patterns (16-30). The TOC renders the Part dividers. All gates
+green: drift in sync, 175 examples run, ty + ruff + pytest clean, site builds.
+
+Remaining (not part of this restructure, for a human to decide): merge
+`restructure/book-sections` into master; optionally delete this progress file.
 
 Gotcha (applies to every stage that renames/removes a chapter): `extract
 --write` does NOT prune folders for removed chapters, so a stale
@@ -165,8 +161,8 @@ uv run python tools/build_site.py                  # site builds clean
       folders). Verify. DONE + committed.
 - [x] Stage 3 — Fix all cross-references and the Static Type Checking wording.
       Verify. DONE + committed.
-- [ ] Stage 4 — Add Part dividers to build_site.py TOC. Verify (build site,
-      eyeball index.html).
+- [x] Stage 4 — Add Part dividers to build_site.py TOC. Verify (build site,
+      eyeball index.html). DONE + committed.
 
 When all four are checked and the verify block is green, the restructure is
 done. Stop the loop (stop scheduling wakeups) and delete this file or leave it
