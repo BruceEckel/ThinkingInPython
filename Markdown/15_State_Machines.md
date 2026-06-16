@@ -615,13 +615,9 @@ def test_no_transition_raises() -> None:
         vm.handle(Quit())
 ```
 
-## Tools
-
-Another approach, as your state machine gets bigger, is to use an
-automation tool whereby you configure a table and let the tool generate
-the state machine code for you. This can be created yourself using a
-language like Python, but there are also free, open-source tools such as
-*Libero*, at <http://www.imatix.com>.
+As your state machine gets bigger, you might decide to use an
+automation tool whereby you configure a table and the tool generates
+the state machine code for you.
 
 ## Exercises
 
