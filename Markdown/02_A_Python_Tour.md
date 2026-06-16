@@ -23,11 +23,11 @@ that you use a particular set of features. Python is practical; Python
 language design decisions were based on providing the maximum benefits to the
 programmer.
 
-Python is very clean to write and especially to read. You will find that it's
-quite easy to read your own code long after you've written it, and also to
-read other people's code. This is accomplished partially through clean, to-
-the-point syntax, but a major factor in code readability is
-indentation: scoping in Python is determined by indentation. For example:
+Python is very clean to write and you will find that it's
+quite easy to read your own code long after you've written it.
+This is accomplished through clean, to-the-point syntax.
+A major factor in code readability is
+that scoping in Python is determined by indentation. For example:
 
 ```python
 # if.py
@@ -42,10 +42,10 @@ print("continuing...")
 The '`\#`' denotes a comment that goes until the end of the line, just like
 C++ and Java '`//`' comments.
 
-First notice that the basic syntax of Python is C-ish as you can see in the
-`if` statement. But in a C `if`, you would be required to use parentheses
-around the conditional, whereas they are not necessary in Python (it won't
-complain if you use them anyway).
+First notice the `if` statement.
+You can see that the basic syntax of Python is C-ish.
+But in a C `if`, you would be required to use parentheses around the conditional,
+whereas they are not necessary in Python (it won't complain if you use them anyway).
 
 The conditional clause ends with a colon, and this indicates that what follows
 will be a group of indented statements, which are the "then" part of the `if`
@@ -272,4 +272,3 @@ pointed out) using tools such as
 
 **Note**: File names have no relationship to what they contain: you can name
 them whatever makes sense to you.
-
