@@ -510,9 +510,9 @@ and store under it, and a final class should refuse to be subclassed:
 
 ```python
 # test_metaprogramming.py
-import pytest
 import final
 import init_subclass
+import pytest
 import set_name
 
 

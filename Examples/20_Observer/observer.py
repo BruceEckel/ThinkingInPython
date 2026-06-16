@@ -6,7 +6,7 @@ from synchronization import Synchronization, synchronize
 
 
 class Observer:
-    def update(self, observable: Any, arg: Any) -> None:
+    def update(self, observable: Any, arg: Any, /) -> None:
         '''Called when the observed object is
         modified. You call an Observable object's
         notify_observers method to notify all the

@@ -2,7 +2,8 @@ name: CI
 
 # Gates every push and pull request: the book's examples must still match the
 # Markdown, no currently-passing example may regress, the code must stay
-# ty-clean, and the static site must build. Tooling is managed by uv.
+# ty-clean and ruff-clean, and the static site must build. Tooling is managed
+# by uv.
 #
 # On a push to master, and only after every gate passes, the freshly built site
 # is published to GitHub Pages by the deploy job. Pull requests run the gates
@@ -52,15 +53,15 @@ jobs:
       - name: Run the book's pytest examples
         run: uv run pytest ExtractedExamples
 
-      # Advisory until Phase 2 modernizes the examples; the unconverted
-      # Java/Py2 code does not even parse. Tighten per-subtree as it lands.
-      - name: Type-check examples with ty (advisory)
-        run: uv run ty check ExtractedExamples || true
+      # Hard gate: the examples must stay ty-clean (zero diagnostics).
+      - name: Type-check examples with ty
+        run: uv run ty check ExtractedExamples
 
-      # Advisory: PEP 8 lint (naming, imports, modernization). See pyproject
-      # [tool.ruff]. Not a gate yet; tighten once the backlog is clear.
-      - name: Lint examples with ruff (advisory)
-        run: uv run ruff check ExtractedExamples || true
+      # Hard gate: PEP 8 lint (naming, imports, modernization) must pass.
+      # See pyproject [tool.ruff]; deliberate exceptions live in
+      # per-file-ignores.
+      - name: Lint examples with ruff
+        run: uv run ruff check ExtractedExamples
 
       # Hard gate: the static site must build cleanly.
       - name: Build the static site

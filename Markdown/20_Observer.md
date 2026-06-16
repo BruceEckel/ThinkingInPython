@@ -344,7 +344,7 @@ from synchronization import Synchronization, synchronize
 
 
 class Observer:
-    def update(self, observable: Any, arg: Any) -> None:
+    def update(self, observable: Any, arg: Any, /) -> None:
         '''Called when the observed object is
         modified. You call an Observable object's
         notify_observers method to notify all the
@@ -402,7 +402,7 @@ Using this library, here is an example of the observer pattern:
 ```python
 # observed_flower.py
 # Demonstration of "observer" pattern.
-from observer import Observable, Observer  # type: ignore
+from observer import Observable, Observer
 
 
 class Flower:
@@ -425,11 +425,11 @@ class Flower:
             Observable.__init__(self)
             self.outer = outer
             self.alreadyOpen = 0
-        def notify_observers(self):
+        def notify_observers(self, arg=None):
             if self.outer.isOpen and \
             not self.alreadyOpen:
                 self.set_changed()
-                Observable.notify_observers(self)
+                Observable.notify_observers(self, arg)
                 self.alreadyOpen = 1
         def close(self):
             self.alreadyOpen = 0
@@ -439,11 +439,11 @@ class Flower:
             Observable.__init__(self)
             self.outer = outer
             self.already_closed = 0
-        def notify_observers(self):
+        def notify_observers(self, arg=None):
             if not self.outer.isOpen and \
             not self.already_closed:
                 self.set_changed()
-                Observable.notify_observers(self)
+                Observable.notify_observers(self, arg)
                 self.already_closed = 1
         def open(self):
             self.already_closed = 0
@@ -559,7 +559,7 @@ verify itself. It reuses the `Observable` and `Observer` classes from
 # neighbors.
 from typing import Any
 
-from observer import Observable, Observer  # type: ignore
+from observer import Observable, Observer
 
 
 class BoxObservable(Observable):

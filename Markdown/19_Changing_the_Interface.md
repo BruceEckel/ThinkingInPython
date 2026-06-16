@@ -35,7 +35,7 @@ class ProxyAdapter(WhatIWant):
         self.what_i_have.h()
 
 class WhatIUse:
-    def op(self, what_i_want):
+    def op(self, what_i_want, /):
         what_i_want.f()
 
 # Approach 2: build adapter use into op():
@@ -144,7 +144,7 @@ def test_getattr_forwards_existing_methods_unchanged() -> None:
 def test_forwarding_targets_the_wrapped_object() -> None:
     have = WhatIHave()
     a = Adapter(have)
-    assert a.g.__self__ is have  # __getattr__ delegates to the adaptee
+    assert a.g.__self__ is have  # __getattr__ delegates to adaptee
 ```
 
 ## Façade

@@ -227,7 +227,14 @@ order decides the winner, and an exhausted or empty chain returns `None`:
 
 ```python
 # test_chain.py
-from chain import Line, Result, bisection, least_squares, newtons_method, solve
+from chain import (
+    Line,
+    Result,
+    bisection,
+    least_squares,
+    newtons_method,
+    solve,
+)
 
 
 def test_first_successful_handler_wins() -> None:

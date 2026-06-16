@@ -149,7 +149,8 @@ def _(flower: Runuculus) -> str:
 
 
 if __name__ == "__main__":
-    flowers: list[Flower] = [Gladiolus(), Runuculus(), Chrysanthemum()]
+    flowers: list[Flower] = [
+        Gladiolus(), Runuculus(), Chrysanthemum()]
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
 ```

@@ -109,12 +109,13 @@ def test_template_method_runs_steps_in_order() -> None:
             calls.append("two")
 
     Recorder()  # constructing it runs the framework
-    assert calls == ["one", "two", "one", "two"]  # the loop runs twice
+    assert calls == ["one", "two", "one", "two"]  # loop runs twice
 
 
 def test_template_function_runs_steps_in_order() -> None:
     calls: list[str] = []
-    run_framework(lambda: calls.append("a"), lambda: calls.append("b"))
+    run_framework(
+        lambda: calls.append("a"), lambda: calls.append("b"))
     assert calls == ["a", "b", "a", "b"]
 ```
 

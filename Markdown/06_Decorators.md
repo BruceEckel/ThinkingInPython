@@ -190,7 +190,8 @@ class repeat:
     def __init__(self, times: int) -> None:
         self.times = times  # the decoration arguments
 
-    def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
+    def __call__(
+        self, func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             result = None

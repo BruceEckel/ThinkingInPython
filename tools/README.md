@@ -46,8 +46,8 @@ make extract    # write ExtractedExamples/ from the Markdown
 make run        # run every extracted .py, report failures
 make examples   # extract then run (the full pass)
 make site       # render Markdown/ into build/site/
-make ty         # type-check the extracted examples (advisory)
-make ci         # what CI runs: drift check, regression run, site build
+make ty         # type-check the extracted examples (must be clean)
+make ci         # what CI runs: drift, run, pytest, ty, ruff, site
 ```
 
 Without `make` (e.g. Windows PowerShell), call the scripts through `uv run`:
@@ -151,8 +151,11 @@ links are relative, so the project subpath (`/ThinkingInPython/`) just works.
 (`astral-sh/setup-uv`, Python 3.14, cached), runs `uv sync --locked`, then
 drives the harness with `uv run`. Hard gates: the drift check
 (`extract_examples.py`), the example run (`run_examples.py`, all must pass), the
-book's pytest examples (`pytest ExtractedExamples`), and the site build. `ty`
-stays advisory. `make ci` runs the same sequence locally.
+book's pytest examples (`pytest ExtractedExamples`), the type check (`ty check
+ExtractedExamples`, zero diagnostics), the lint (`ruff check ExtractedExamples`,
+zero findings), and the site build. Deliberate lint exceptions live in
+`[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`. `make ci` runs the same
+sequence locally.
 
 ## Current baseline
 

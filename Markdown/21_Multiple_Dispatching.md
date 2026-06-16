@@ -161,7 +161,7 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-outcome = {
+outcome: dict[tuple[type, type], Outcome] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -227,7 +227,8 @@ EXPECTED = {
 
 
 def compete(module: Any, player: str, opponent: str) -> Outcome:
-    result = getattr(module, player)().compete(getattr(module, opponent)())
+    result = getattr(module, player)().compete(
+        getattr(module, opponent)())
     assert isinstance(result, Outcome)
     return result
 

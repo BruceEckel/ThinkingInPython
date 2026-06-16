@@ -18,8 +18,9 @@ def feed(vm: VendingMachine, *events: object) -> None:
 def test_buy_dispenses_and_charges() -> None:
     vm = VendingMachine()
     assert vm.state is State.QUIESCENT
+    # item [0][1], 50c
     feed(vm, Money("quarter", 25), Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("two", 1))  # item [0][1], 50c
+         FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0                 # 50 in, 50 spent
     assert vm.items[0][1].quantity == 4   # one dispensed from five
@@ -27,8 +28,9 @@ def test_buy_dispenses_and_charges() -> None:
 
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
+    # 50c item, 25c in
     feed(vm, Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("two", 1))  # 50c item, 25c in
+         FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.COLLECTING
     assert vm.amount == 25                # money kept
     assert vm.items[0][1].quantity == 5   # nothing dispensed
@@ -36,8 +38,9 @@ def test_too_expensive_clears_back_to_collecting() -> None:
 
 def test_sold_out_goes_to_unavailable() -> None:
     vm = VendingMachine()
+    # [3][0] is sold out
     feed(vm, Money("quarter", 25),
-         FirstDigit("D", 3), SecondDigit("one", 0))  # [3][0] is sold out
+         FirstDigit("D", 3), SecondDigit("one", 0))
     assert vm.state is State.UNAVAILABLE
     assert vm.items[3][0].quantity == 0
 

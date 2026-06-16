@@ -36,3 +36,13 @@ ignore = ["N818"]
 [tool.ruff.lint.per-file-ignores]
 # This example deliberately demonstrates printf-style % formatting.
 "**/string_formatting.py" = ["UP031"]
+# Decorators written as classes use the lowercase decorator naming
+# convention (@trace, @count_calls, @repeat), not CapWords.
+"**/trace_class.py" = ["N801"]
+"**/count_calls.py" = ["N801"]
+"**/repeat_class.py" = ["N801"]
+# This example exists to show that importing a module runs its top-level
+# code; the imported name is intentionally unused.
+"**/import_module.py" = ["F401"]
+# This example deliberately demonstrates assigning a lambda to a name.
+"**/lambdas.py" = ["E731"]

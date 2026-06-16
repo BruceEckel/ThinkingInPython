@@ -18,7 +18,7 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-outcome = {
+outcome: dict[tuple[type, type], Outcome] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,

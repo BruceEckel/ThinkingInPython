@@ -1,7 +1,7 @@
 # test_metaprogramming.py
-import pytest
 import final
 import init_subclass
+import pytest
 import set_name
 
 

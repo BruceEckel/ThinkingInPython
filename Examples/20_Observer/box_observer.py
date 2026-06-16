@@ -4,7 +4,7 @@
 # neighbors.
 from typing import Any
 
-from observer import Observable, Observer  # type: ignore
+from observer import Observable, Observer
 
 
 class BoxObservable(Observable):

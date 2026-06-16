@@ -19,10 +19,10 @@ help:
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
 	@echo "  serve     - serve build/site/ at http://localhost:8000"
 	@echo "  local     - build the site, then serve it locally"
-	@echo "  ty        - type-check the extracted examples (advisory)"
-	@echo "  lint      - PEP8-lint the extracted examples with ruff (advisory)"
+	@echo "  ty        - type-check the extracted examples (must be clean)"
+	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
-	@echo "  ci        - what CI runs: check, baseline run, pytest, site"
+	@echo "  ci        - what CI runs: check, run, pytest, ty, ruff, site"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -62,6 +62,8 @@ ci:
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/run_examples.py
 	$(PYTEST) ExtractedExamples
+	$(TY) check ExtractedExamples
+	$(RUFF) check ExtractedExamples
 	$(PY) tools/build_site.py
 
 clean-examples:

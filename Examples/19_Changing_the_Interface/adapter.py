@@ -19,7 +19,7 @@ class ProxyAdapter(WhatIWant):
         self.what_i_have.h()
 
 class WhatIUse:
-    def op(self, what_i_want):
+    def op(self, what_i_want, /):
         what_i_want.f()
 
 # Approach 2: build adapter use into op():
