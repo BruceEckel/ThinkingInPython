@@ -105,9 +105,11 @@ if __name__ == "__main__":
 
 A read-only property keeps outsiders from assigning to `number`, but the class
 itself still mutates `_number` and has to guard it with a precondition and a
-postcondition. That is the same scattering of checks as before, just moved
-inside the class. The class encapsulates the value. It does not pin it down to a
-set of legal values.
+postcondition. Checking arguments on the way in and results on the way out is the
+practice known as *Design by Contract*, and the trouble is exactly this: the
+contract is spread across every method that touches the value. That is the same
+scattering of checks as before, just moved inside the class. The class
+encapsulates the value. It does not pin it down to a set of legal values.
 
 ## Data Classes
 
@@ -232,6 +234,12 @@ known to be good. They do not check their result, because building the
 returned `Stars` runs the check again. The validation lives in exactly one place,
 the constructor, and immutability guarantees no one can damage the value after
 that. Illegal values are unrepresentable.
+
+This is the principle often stated as *parse, don't validate*. Instead of
+checking a loose value over and over and hoping you never miss a spot, you parse
+it once into a precise type. After that, holding the type is proof the check
+passed. The check is not repeated because it cannot fail: an illegal value never
+became a `Stars` in the first place.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value. The

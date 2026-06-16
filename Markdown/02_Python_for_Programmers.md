@@ -1335,6 +1335,32 @@ The container and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`, and `str | None` for "a string or
 nothing." There is almost no new vocabulary to learn for everyday code.
 
+### Constants with Final
+
+The naming convention earlier used ALL_CAPS to signal a constant, but that is
+only a hint to human readers. `Final` makes it a hint the checker enforces:
+reassign a `Final` name and the checker reports it, even though Python itself
+still allows the assignment at run time.
+
+```python
+# final_constants.py
+# Final marks a name as a constant. Reassigning it is a type error,
+# caught by the checker before the program runs.
+from typing import Final
+
+MAX_RETRIES: Final = 3
+GREETING: Final[str] = "hello"
+
+# MAX_RETRIES = 5  # ty: cannot assign to final name "MAX_RETRIES"
+
+print(MAX_RETRIES, GREETING)
+```
+
+You can give the type explicitly, as in `Final[str]`, or let it be inferred from
+the value, as with `MAX_RETRIES`. Marking the values that are meant to stay
+fixed turns a class of accidental reassignments into errors you hear about at
+once.
+
 ### Gradual Typing
 
 You do not have to annotate everything, or anything. Add hints one function at a
@@ -1423,8 +1449,12 @@ Keep one thing straight: the hints do not change what the program does. Python
 stores them and otherwise ignores them. A wrong type that slips past the checker
 behaves exactly as it would have with no hints at all. Checking is a separate
 step you run, like the tests. If you need a guarantee at run time, you still
-write `isinstance`, or reach for a library built to validate data. The hints are
-for the tools and for the reader. The run-time behavior is unchanged.
+write `isinstance`, or reach for a library built to validate data. The
+[typeguard](https://typeguard.readthedocs.io) library reads your existing
+annotations and enforces them at run time, and [Pydantic](https://docs.pydantic.dev)
+validates and parses data against typed models, which is useful at the edges of a
+program where untrusted input comes in. The hints themselves are for the tools and
+for the reader. The run-time behavior is unchanged.
 
 ## Useful Techniques
 
