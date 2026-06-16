@@ -259,7 +259,8 @@ with open(path) as f:
 os.remove(path)
 ```
 
-This is the explicit-finalizer approach mentioned under Cleanup. Anything that
+This is the explicit-finalizer approach from the [Initialization and
+Cleanup](07_Initialization_and_Cleanup.md) chapter. Anything that
 acquires a resource (a file, a lock, a network connection) can be a context
 manager.
 

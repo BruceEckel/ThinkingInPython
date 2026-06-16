@@ -76,7 +76,7 @@ complete program. These files are extracted from the chapters and live in the
 `Examples/` directory of the
 [source repository](https://github.com/BruceEckel/ThinkingInPython), one folder
 per chapter, named to match the chapter. So a block tagged `# trace.py` in the
-Decorators chapter is the file `Examples/08_Decorators/trace.py`. The examples
+Decorators chapter is the file `Examples/12_Decorators/trace.py`. The examples
 that read a data file, or that span several files, keep them together in the same
 chapter folder.
 

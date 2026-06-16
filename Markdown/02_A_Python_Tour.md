@@ -39,7 +39,7 @@ if response == "yes":
 print("continuing...")
 ```
 
-The '`\#`' denotes a comment that goes until the end of the line, just like
+The '`#`' denotes a comment that goes until the end of the line, just like
 C++ and Java '`//`' comments.
 
 First notice the `if` statement.
@@ -286,7 +286,7 @@ The one exception is class names, which are "pascal-cased," starting with a
 capital letter, without underscores and capitalizing intermediate words. For
 example: `ThisIsMyClass`.
 
-[PEP 8]([PEP 8](https://www.python.org/dev/peps/pep-0008/) covers all manner
+[PEP 8](https://www.python.org/dev/peps/pep-0008/) covers all manner
 of style issues. These can be automatically applied to your code (or at least,
 pointed out) using tools such as
 [AutoPEP8](https://pypi.python.org/pypi/autopep8) or
