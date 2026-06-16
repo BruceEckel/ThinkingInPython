@@ -64,3 +64,25 @@ Format per entry:
 > redundant here. Suggest trimming to the one point inheritance needs: you
 > import the base class before subclassing it (as `simple2.py` imports
 > `Simple`). Flagging rather than cutting, since it is a sizable removal.
+
+---
+
+> **21_State_Machines.md:226-231** (prose does not match the code)
+> The paragraph introducing `StateT` says it "adds a `Map` and a method to
+> initialize the map from a two-dimensional array," and that the `next()`
+> methods "test for a `null Map` ... and initialize it if it's `null`." The
+> Python code has no `Map`, no `null`, and no two-dimensional array: it uses a
+> `dict` named `transitions`, tests `if not self.transitions`, and each subclass
+> builds its dict inline. This is leftover Java-translation prose. Suggest
+> rewriting to: a dict of transitions, lazily initialized on first `next()`
+> when it is still `None`.
+
+---
+
+> **21_State_Machines.md exercises 6, 7, 12** (Java leftovers)
+> The exercises use Java vocabulary and mechanics: ex 7 says "Use a `HashMap`",
+> "the key is a `String`", "override a method `nextState()`", and ex 12 ends
+> with "before `hasNext()` returns `false`". Ex 6 refers to a `transition_table
+> .py` that does not exist in the chapter. Suggest Pythonizing: `dict`, `str`,
+> `next_state()`/snake_case, `False`, and pointing ex 6 at the real
+> `tabledriven/` files (or dropping it).

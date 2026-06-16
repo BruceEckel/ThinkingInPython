@@ -640,7 +640,7 @@ covered in [Fronting for an Implementation](20_Fronting_for_an_Implementation.md
     changes the kind of response to its `hello()` method depending on
     what kind of `Mood` it's in. Add an additional kind of `Mood`
     called `Prozac`.
-5.  Create a simple copy-on write implementation.
+5.  Create a simple copy-on-write implementation.
 6.  Apply `transition_table.py` to the "Washer" problem.
 7.  Create a *StateMachine* system whereby the current state along with
     input information determines the next state that the system will be
