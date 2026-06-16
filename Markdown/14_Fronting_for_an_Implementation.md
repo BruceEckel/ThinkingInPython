@@ -10,7 +10,9 @@ but the term "proxy" has a long-standing and specialized meaning, which
 probably explains the reason for the two different patterns.
 
 The basic idea is simple: from a base class, the surrogate is derived
-along with the class or classes that provide the actual implementation.
+along with the class or classes that provide the actual implementation:
+
+![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
 When a surrogate object is created, it is given an implementation to
 which to send all of the method calls.
@@ -25,7 +27,7 @@ implementation" then the two fit neatly together.
 
 ## Proxy
 
-If we implement *Proxy* by following the structure just described, it looks like
+If we implement *Proxy* by following the above diagram, it looks like
 this:
 
 ```python

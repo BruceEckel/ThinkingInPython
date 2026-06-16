@@ -347,6 +347,8 @@ store in a table. Python functions are first-class, so those hierarchies
 vanish: a condition is any callable returning a bool, an action is any callable,
 and the table is an ordinary `dict`.
 
+![Vending machine state diagram](_images/stateMachine)
+
 ### The Engine
 
 The engine is tiny. For the current state and the type of the incoming event,
