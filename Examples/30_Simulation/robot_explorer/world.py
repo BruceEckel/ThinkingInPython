@@ -1,7 +1,6 @@
 # robot_explorer/world.py
 # A Room holds one Item and connects to neighbors through its Doors.
 # Unset doors point at the shared EDGE room outside the maze.
-from __future__ import annotations
 
 from items import Edge, Item, Robot, Urge
 

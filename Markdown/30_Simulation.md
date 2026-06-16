@@ -40,7 +40,6 @@ hand out a number.
 # A rat explores the maze as its own task, spawning a new rat at every
 # branch. It talks to a blackboard but never imports one: any object
 # with the four methods below will do.
-from __future__ import annotations
 
 import asyncio
 from typing import Protocol
@@ -87,7 +86,6 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 ```python
 # rats_and_mazes/maze.py
 # Reads a maze layout and reports walls, openings, and an entry point.
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -135,7 +133,6 @@ spawned along the way.
 # The shared surface the rats write to. It owns the maze, records
 # visited cells, hands out rat numbers, and launches rats. Cooperative
 # async has no preemption, so no lock is needed.
-from __future__ import annotations
 
 import asyncio
 import itertools
@@ -211,7 +208,6 @@ Running it turns the rats loose and prints what they mapped.
 ```python
 # rats_and_mazes/ratsandmazes.py
 # Turn a pack of rats loose on the maze and print what they mapped.
-from __future__ import annotations
 
 import asyncio
 
@@ -293,7 +289,6 @@ There is no `if` or `elif` on the type of occupant anywhere:
 # The things that can occupy a room. Room.enter() calls
 # occupant.interact(), and each Item subclass decides what happens.
 # There is no conditional on the item's type.
-from __future__ import annotations
 
 from enum import Enum
 from typing import TYPE_CHECKING
@@ -405,7 +400,6 @@ maze, so the robot can try any direction without a special case:
 # robot_explorer/world.py
 # A Room holds one Item and connects to neighbors through its Doors.
 # Unset doors point at the shared EDGE room outside the maze.
-from __future__ import annotations
 
 from items import Edge, Item, Robot, Urge
 
@@ -458,7 +452,6 @@ of moves, and `show_maze()` renders the current state:
 ```python
 # robot_explorer/game.py
 # The Builder pattern: build the maze in stages, then run it.
-from __future__ import annotations
 
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room

@@ -1,6 +1,5 @@
 # rats_and_mazes/maze.py
 # Reads a maze layout and reports walls, openings, and an entry point.
-from __future__ import annotations
 
 from pathlib import Path
 

@@ -3,7 +3,6 @@
 # by a Protocol. That is the structural typing from the Static Type
 # Checking chapter. A class that lacks x and y can be adapted by
 # composition, with no inheritance.
-from __future__ import annotations
 
 from dataclasses import dataclass
 from math import sqrt

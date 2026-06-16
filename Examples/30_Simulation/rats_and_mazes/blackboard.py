@@ -2,7 +2,6 @@
 # The shared surface the rats write to. It owns the maze, records
 # visited cells, hands out rat numbers, and launches rats. Cooperative
 # async has no preemption, so no lock is needed.
-from __future__ import annotations
 
 import asyncio
 import itertools

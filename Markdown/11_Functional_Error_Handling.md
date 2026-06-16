@@ -101,7 +101,6 @@ classes, parameterized over the answer type and the error type:
 # Classes as Types chapter. bind chains steps: it feeds a Success
 # into the next function, and passes a Failure straight through
 # unchanged.
-from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass

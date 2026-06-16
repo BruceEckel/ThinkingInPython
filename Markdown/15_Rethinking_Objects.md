@@ -187,7 +187,6 @@ with a plain function that does the same thing:
 # A method bound to the class, versus a plain function. The function
 # reads the same and computes the same. The class does not need to
 # own it.
-from __future__ import annotations
 
 from dataclasses import dataclass
 from math import sqrt
@@ -229,7 +228,6 @@ type that does not fit, you adapt it by composition, not inheritance:
 # by a Protocol. That is the structural typing from the Static Type
 # Checking chapter. A class that lacks x and y can be adapted by
 # composition, with no inheritance.
-from __future__ import annotations
 
 from dataclasses import dataclass
 from math import sqrt

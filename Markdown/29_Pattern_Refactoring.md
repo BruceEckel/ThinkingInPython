@@ -28,7 +28,6 @@ with no reflection at all:
 ```python
 # trash.py
 # The Trash hierarchy, with self-registration and a per-pound value.
-from __future__ import annotations
 
 
 class Trash:

@@ -1,6 +1,5 @@
 # rats_and_mazes/ratsandmazes.py
 # Turn a pack of rats loose on the maze and print what they mapped.
-from __future__ import annotations
 
 import asyncio
 

@@ -2,7 +2,6 @@
 # A rat explores the maze as its own task, spawning a new rat at every
 # branch. It talks to a blackboard but never imports one: any object
 # with the four methods below will do.
-from __future__ import annotations
 
 import asyncio
 from typing import Protocol

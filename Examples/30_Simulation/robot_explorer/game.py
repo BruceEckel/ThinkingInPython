@@ -1,6 +1,5 @@
 # robot_explorer/game.py
 # The Builder pattern: build the maze in stages, then run it.
-from __future__ import annotations
 
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room
