@@ -5,19 +5,20 @@ truth for a looped or resumed run. On restart, read this first, find the first
 unchecked stage, and continue from its "next action". Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: Stage 2 complete, verified, committed on branch
+Last updated: Stage 3 complete, verified, committed on branch
 `restructure/book-sections`.
-Current stage: 3 (Cross-references)
-Next action: fix all intra-book cross-references for the new numbering. Every
-`](NN_OldName.md...)` link must point at the new filename, and the links that
-targeted `02_Python_for_Programmers.md#anchor` must point at whichever split
-file (02-08) now holds that section. Also revert the 7 "Static Type Checking
-section of the Python for Programmers chapter" phrases to "the Static Type
-Checking chapter" -> `08_Static_Type_Checking.md`. See the rules section below.
-Grep for `](0` and `](1` and `](2` and `.md` in Markdown/ to find every link.
+Current stage: 4 (Part dividers in the TOC)
+Next action: teach `tools/build_site.py` to render the three Part headings in
+the table of contents (`render_index`), grouping chapters by number range:
+Introduction (01) stands alone above Part I; Part I "Python Foundations" =
+02-08; Part II "Idioms and Techniques" = 09-15; Part III "Design Patterns" =
+16-30. Add a `.part` CSS rule in `render_css`. Keep the sequential "Chapter N"
+labels. Then build the site and eyeball index.html. This is the last stage;
+when done, stop the loop (no further ScheduleWakeup).
 
-Note: chapters were renamed with `git mv`; old->new map is the table below.
-`Examples/16_*` does not exist on purpose (The Pattern Concept has no examples).
+All cross-references now point at the new filenames and resolve. The 7 Static
+Type Checking references read "the Static Type Checking chapter" again, linking
+to `08_Static_Type_Checking.md`.
 
 Gotcha (applies to every stage that renames/removes a chapter): `extract
 --write` does NOT prune folders for removed chapters, so a stale
@@ -162,8 +163,8 @@ uv run python tools/build_site.py                  # site builds clean
       intro overlap, resolve the Notes section. Verify. DONE + committed.
 - [x] Stage 2 — Renumber old 03-24 to 09-30 (Markdown files and Examples/
       folders). Verify. DONE + committed.
-- [ ] Stage 3 — Fix all cross-references and the Static Type Checking wording.
-      Verify.
+- [x] Stage 3 — Fix all cross-references and the Static Type Checking wording.
+      Verify. DONE + committed.
 - [ ] Stage 4 — Add Part dividers to build_site.py TOC. Verify (build site,
       eyeball index.html).
 

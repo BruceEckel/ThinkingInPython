@@ -227,7 +227,7 @@ print(Temperature.is_freezing(-4))  # True
 ```
 
 For classes that are mostly a bundle of typed data, the
-[Data Classes as Types](04_Data_Classes_as_Types.md) chapter shows a much shorter
+[Data Classes as Types](10_Data_Classes_as_Types.md) chapter shows a much shorter
 path that writes the constructor and `__repr__` for you.
 
 

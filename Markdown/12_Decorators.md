@@ -270,7 +270,7 @@ if __name__ == "__main__":
     print(sorted(registry))
 ```
 
-The output is `['Espresso', 'Latte']`. The [Metaprogramming](08_Metaprogramming.md)
+The output is `['Espresso', 'Latte']`. The [Metaprogramming](14_Metaprogramming.md)
 chapter shows `__init_subclass__`, which builds a registry like this without a
 decorator.
 
@@ -364,8 +364,7 @@ decorators. Each extra wraps the drink inside it and forwards through the same
 two-property interface, `cost` and `description`. The `Drink` `Protocol`
 describes that interface. Both the plain drinks and the extras satisfy it
 structurally, with no shared base class required. This is the structural typing
-from the [Static Type Checking](02_Python_for_Programmers.md#static-type-checking) section of the
-Python for Programmers chapter.
+from the [Static Type Checking](08_Static_Type_Checking.md) chapter.
 
 Adding a new extra means adding one class. Changing the price of an extra means
 changing one number, in one place. Compare that to a class per combination, where

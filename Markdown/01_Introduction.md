@@ -2,7 +2,7 @@
 
 This is a collection of topics to give you a deeper understanding of
 programming in Python. The next chapter,
-[Python for Programmers](02_Python_for_Programmers.md), is a fast tour of the
+[A Python Tour](02_A_Python_Tour.md), is a fast tour of the
 language, but this is not an introductory book. There are plenty of excellent
 Python tutorials and online courses for that. The rest of the chapters assume
 you can already read and write Python and follow along. If a language feature is
@@ -66,8 +66,8 @@ Every example is real. The examples are extracted from these chapters, then run
 and type-checked automatically, so the code you read is the code that ran, and
 the output shown is the output it produced. The examples target Python 3.14 and
 later, use type hints throughout, and are checked with Astral's `ty`. If type
-checking is new to you, the [Static Type Checking](02_Python_for_Programmers.md#static-type-checking)
-section of the Python for Programmers chapter covers it.
+checking is new to you, the [Static Type Checking](08_Static_Type_Checking.md)
+chapter covers it.
 
 ## The Code Examples
 
