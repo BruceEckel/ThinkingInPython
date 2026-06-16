@@ -139,7 +139,7 @@ describing a succession of different types of categories:
     attempt to be general.
 3.  **Standard Design**: a way to solve this *kind* of problem. A design
     that has become more general, typically through reuse.
-4.  **Design Pattern**: how to solve an entire class of similar problem.
+4.  **Design Pattern**: how to solve an entire class of similar problems.
     This usually only appears after applying a standard design a number
     of times, and then seeing a common pattern throughout these
     applications.
@@ -167,7 +167,7 @@ and say "clearly, you need a structural pattern here," so that
 classification doesn't lead me to a solution (I'll readily admit that I
 may be missing something here).
 
-I've labored for awhile with this problem, first noting that the
+I've labored for a while with this problem, first noting that the
 underlying structure of some of the GoF patterns are similar to each
 other, and trying to develop relationships based on that similarity.
 While this was an interesting experiment, I don't think it produced much
@@ -249,7 +249,7 @@ your proposed design, to apply tests for quality.
 -   *Reflexivity* (my suggested term). One abstraction per class, one
     class per abstraction. Might also be called Isomorphism.
 -   *Once and once only*: Avoid duplication of logic and structure
-    where the duplication is not accidental, ie where both pieces of
+    where the duplication is not accidental, i.e., where both pieces of
     code express the same intent for the same reason.
 
 In the process of brainstorming this idea, I hope to come up with a

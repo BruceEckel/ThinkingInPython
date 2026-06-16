@@ -4,9 +4,9 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 5 done (chapters 13-15), committed on branch
+Last updated: iteration 6 done (chapters 16-18), committed on branch
 `proofread/prose-pass`.
-Next action: proofread chapters 16-18.
+Next action: proofread chapters 19-21.
 
 ## Policy
 
@@ -43,9 +43,9 @@ Next action: proofread chapters 16-18.
 - [x] 13 Comprehensions
 - [x] 14 Metaprogramming
 - [x] 15 Rethinking Objects
-- [ ] 16 The Pattern Concept
-- [ ] 17 Messenger
-- [ ] 18 Singleton
+- [x] 16 The Pattern Concept
+- [x] 17 Messenger
+- [x] 18 Singleton
 - [ ] 19 Application Frameworks
 - [ ] 20 Fronting for an Implementation
 - [ ] 21 State Machines
