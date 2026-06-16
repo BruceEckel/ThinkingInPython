@@ -4,9 +4,9 @@ Checkpoint for the prose proofreading pass. On restart, read this first, find
 the first unchecked chapter, and continue from there. Update the checkboxes and
 the "Last updated" line before ending each iteration.
 
-Last updated: iteration 1 done (chapters 01-03), committed on branch
+Last updated: iteration 2 done (chapters 04-06), committed on branch
 `proofread/prose-pass`.
-Next action: proofread chapters 04-06.
+Next action: proofread chapters 07-09.
 
 ## Policy
 
@@ -31,9 +31,9 @@ Next action: proofread chapters 04-06.
 - [x] 01 Introduction
 - [x] 02 A Python Tour
 - [x] 03 Containers and Control Flow
-- [ ] 04 Functions
-- [ ] 05 Modules and Packages
-- [ ] 06 Classes
+- [x] 04 Functions
+- [x] 05 Modules and Packages
+- [x] 06 Classes
 - [ ] 07 Initialization and Cleanup
 - [ ] 08 Static Type Checking
 - [ ] 09 Testing
