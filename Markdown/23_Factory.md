@@ -75,7 +75,7 @@ for shape in shapes:
 ```
 
 The `factory()` takes an argument that allows it to determine what
-type of `Shape` to create; it happens to be a `String` in this case
+type of `Shape` to create; it happens to be a string in this case
 but it could be any set of data. The `factory()` is now the only
 other code in the system that needs to be changed when a new type of
 `Shape` is added (the initialization data for the objects will
@@ -129,7 +129,7 @@ Also note that in `shape_name_gen()` the statement:
 
     types = Shape.__subclasses__()
 
-Is only executed when the generator object is produced; each time the
+is only executed when the generator object is produced; each time the
 `next()` method of this generator object is called (which, as noted
 above, may happen implicitly), only the code in the `for` loop will be
 executed, so you don't have wasteful execution (as you would if this
