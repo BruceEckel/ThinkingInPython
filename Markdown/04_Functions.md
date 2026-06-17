@@ -94,7 +94,8 @@ print(good_append(1))  # [1]
 print(good_append(2))  # [2]
 ```
 
-Thus, a default value creates an implicit global variable.
+Thus a mutable default persists between calls: it is created once,
+at definition time, and lives on the function, not recreated on each call.
 This behavior is a common confusion for newcomers to the language.
 
 ## Variable Argument Lists

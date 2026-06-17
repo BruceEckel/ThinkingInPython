@@ -54,7 +54,7 @@ The filter function applies a predicate to a sequence:
 
     filter(lambda e: isinstance(e, int), a_list)
 
-Map modifies each member of a sequence:
+`map` modifies each member of a sequence:
 
     map(lambda e: e ** 2, a_list)
 

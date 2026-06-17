@@ -6,6 +6,8 @@
   First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
   before doing any other examples.
 
+- 27 Observer intro needs a rewrite, right now it's confusing to read.
+
 - Indexing using Leanpub format, before publishing to leanpub
 
 
