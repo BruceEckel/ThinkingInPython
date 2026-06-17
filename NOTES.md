@@ -6,6 +6,8 @@
   First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
   before doing any other examples.
 
+- Find all the places where it makes sense to use triple quotes and apply them
+
 - Check order of examples in 30_Pattern_Refactoring.md
 
 - Check exercises. Potentially create new exercises.

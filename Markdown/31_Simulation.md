@@ -512,15 +512,35 @@ class GameBuilder:
 
 
 string_maze = """
-a_...#..._c
-R_...#...__
-###########
-a_......._b
-###########
-!_c_....._b
+###############################
+#R#.____#____.#_______#_______#
+#_###_#_###_#_#_#_#####_#####_#
+#___#_#___#_#_#_#.#__b__#___#_#
+###_#_###_#_#_###_#_#####_#_#_#
+#.#_#_#.__#_#__.#_#__b__#_#___#
+#_#_#_#_###_###_#_#####_#_#####
+#_#_#_#__.#_#_#_____#___#_____#
+#_#_#_###_#_#_#_#####_#######_#
+#.#___#___#_#___#____.#_____#_#
+#_#####_###_#_###_#####_#_###_#
+#___#a__#.__#.__#__.#___#_#___#
+#_#_#_###_#####_###_###_###_#_#
+#_#.#_#___#!______#_____#___#_#
+#_#_#_###_#############_#_###_#
+#_#_#__a#_______________#___#_#
+#_#####_###_###########_###_#_#
+#_____#.__#_#___#_____#_#___#_#
+#_#_#####_###_#_#_###_###_###_#
+#.#___________#___#____.__#___#
+###############################
 """.strip()
 
-solution = "eeeenwwww eeeeeeeeee wwwwwwww eeennnwwwwwsseeeeeen ww"
+solution = (
+    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeeenneessee"
+    "nneeeesseeeenneennwwnneenneennnnwwwwnnnneesseennnnwwwwwwssww"
+    "eesswwsswwwwsseesseeeesswwwwwwwwwwwwwwnnnneennnnnnnnnneessss"
+    "eesssswwsseesswwww"
+)
 
 if __name__ == "__main__":
     game = GameBuilder(string_maze)
@@ -535,21 +555,168 @@ Running it prints the maze before and after the walk. The robot eats the food
 along its path, takes a teleport, and reaches the `!` that ends the game:
 
     start:
-    a_...#..._c
-    R_...#...__
-    ###########
-    a_......._b
-    ###########
-    !_c_....._b
+    ###############################
+    #R#.____#____.#_______#_______#
+    #_###_#_###_#_#_#_#####_#####_#
+    #___#_#___#_#_#_#.#__b__#___#_#
+    ###_#_###_#_#_###_#_#####_#_#_#
+    #.#_#_#.__#_#__.#_#__b__#_#___#
+    #_#_#_#_###_###_#_#####_#_#####
+    #_#_#_#__.#_#_#_____#___#_____#
+    #_#_#_###_#_#_#_#####_#######_#
+    #.#___#___#_#___#____.#_____#_#
+    #_#####_###_#_###_#####_#_###_#
+    #___#a__#.__#.__#__.#___#_#___#
+    #_#_#_###_#####_###_###_###_#_#
+    #_#.#_#___#!______#_____#___#_#
+    #_#_#_###_#############_#_###_#
+    #_#_#__a#_______________#___#_#
+    #_#####_###_###########_###_#_#
+    #_____#.__#_#___#_____#_#___#_#
+    #_#_#####_###_#_#_###_###_###_#
+    #.#___________#___#____.__#___#
+    ###############################
     Game over!
 
     final:
-    a____#____c
-    _____#_____
-    ###########
-    a_________b
-    ###########
-    R_c_______b
+    ###############################
+    #_#.____#_____#_______#_______#
+    #_###_#_###_#_#_#_#####_#####_#
+    #___#_#___#_#_#_#.#__b__#___#_#
+    ###_#_###_#_#_###_#_#####_#_#_#
+    #.#_#_#___#_#___#_#__b__#_#___#
+    #_#_#_#_###_###_#_#####_#_#####
+    #_#_#_#___#_#_#_____#___#_____#
+    #_#_#_###_#_#_#_#####_#######_#
+    #.#___#___#_#___#_____#_____#_#
+    #_#####_###_#_###_#####_#_###_#
+    #___#a__#___#___#___#___#_#___#
+    #_#_#_###_#####_###_###_###_#_#
+    #_#.#_#___#R______#_____#___#_#
+    #_#_#_###_#############_#_###_#
+    #_#_#__a#_______________#___#_#
+    #_#####_###_###########_###_#_#
+    #_____#___#_#___#_____#_#___#_#
+    #_#_#####_###_#_#_###_###_###_#
+    #.#___________#___#_______#___#
+    ###############################
+
+The maze rendering, `show_maze()`, returns a string, so the model's correctness
+is something a test can pin down with no window in sight. Build the maze, run the
+solution, and check that the robot finished on the `!` square and that the final
+rendering matches, food eaten and all:
+
+```python
+# robot_explorer/test_robot.py
+from game import GameBuilder, solution, string_maze
+from items import EndGame
+
+FINISHED = """
+###############################
+#_#.____#_____#_______#_______#
+#_###_#_###_#_#_#_#####_#####_#
+#___#_#___#_#_#_#.#__b__#___#_#
+###_#_###_#_#_###_#_#####_#_#_#
+#.#_#_#___#_#___#_#__b__#_#___#
+#_#_#_#_###_###_#_#####_#_#####
+#_#_#_#___#_#_#_____#___#_____#
+#_#_#_###_#_#_#_#####_#######_#
+#.#___#___#_#___#_____#_____#_#
+#_#####_###_#_###_#####_#_###_#
+#___#a__#___#___#___#___#_#___#
+#_#_#_###_#####_###_###_###_#_#
+#_#.#_#___#R______#_____#___#_#
+#_#_#_###_#############_#_###_#
+#_#_#__a#_______________#___#_#
+#_#####_###_###########_###_#_#
+#_____#___#_#___#_____#_#___#_#
+#_#_#####_###_#_#_###_###_###_#
+#.#___________#___#_______#___#
+###############################
+""".strip()
+
+
+def test_solution_walks_the_robot_to_the_end() -> None:
+    game = GameBuilder(string_maze)
+    game.run(solution)
+    room = game.robot.room
+    assert room is not None
+    assert isinstance(room.occupant, EndGame)  # finished on the "!"
+    assert game.show_maze() == FINISHED  # food eaten, robot moved
+
+
+def test_walls_block_and_food_is_eaten() -> None:
+    game = GameBuilder("R.#")  # robot, food, wall in one row
+    start = game.robot.room
+    game.run("e")  # east: eat the food and move in
+    assert "." not in game.show_maze()  # food gone
+    assert game.robot.room is not start
+    blocked = game.robot.room
+    game.run("e")  # east again: a wall, so stay put
+    assert game.robot.room is blocked
+```
+
+That same model drives a graphical view, in its own file. It imports the maze and
+the moves, draws each room as a colored cell, and steps the robot along the
+solution on a timer. The view is the only part that touches the screen. Run it to
+watch the walk; it opens a window, so the example harness skips it (listed in
+`tools/norun.txt`):
+
+```python
+# robot_explorer/maze_view.py
+# A tkinter view of the robot maze. The model (items.py, world.py,
+# game.py) holds the maze and the rules; this file only draws, and
+# steps the robot through the solution one move at a time. Run it to
+# watch. The same model is checked headlessly in test_robot.py.
+import tkinter as tk
+
+from game import GameBuilder, solution, string_maze
+from items import Urge
+
+CELL = 20
+FILL = {"#": "dimgray", "!": "tomato", ".": "khaki",
+        "_": "white", "R": "royalblue"}
+MOVES = {"n": Urge.NORTH, "s": Urge.SOUTH,
+         "e": Urge.EAST, "w": Urge.WEST}
+
+
+def show(maze: str = string_maze, moves: str = solution,
+         step_ms: int = 80) -> None:
+    "Draw the maze and step the robot through the moves."
+    game = GameBuilder(maze)
+    rows = maze.splitlines()
+    width = max(len(row) for row in rows)
+    root = tk.Tk()
+    root.title("Robot in a Maze")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=width * CELL, height=len(rows) * CELL)
+    canvas.pack()
+
+    def draw() -> None:
+        canvas.delete("all")
+        for (row, col), room in game.rooms.items():
+            symbol = ("R" if room is game.robot.room
+                      else str(room.occupant))
+            canvas.create_rectangle(
+                col * CELL, row * CELL,
+                (col + 1) * CELL, (row + 1) * CELL,
+                fill=FILL.get(symbol, "palegreen"), outline="gray")
+
+    queue = list("".join(moves.split()))
+
+    def step() -> None:
+        draw()
+        if queue:
+            game.robot.move(MOVES[queue.pop(0)])
+            root.after(step_ms, step)
+
+    step()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    show()
+```
 
 Two patterns from earlier chapters carry the design: polymorphism replaces a
 type switch, and a factory builds objects from data. Neither needs concurrency.
