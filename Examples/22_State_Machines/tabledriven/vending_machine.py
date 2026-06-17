@@ -50,8 +50,9 @@ class ItemSlot:
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
-        self.amount = 0  # money inserted, in cents
-        self.row = 0     # the first selection digit
+        self.amount = 0    # money inserted, in cents
+        self.row = 0       # the first selection digit
+        self.message = ""  # last action, for a view to display
         # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
                       for _ in range(4)]
@@ -93,28 +94,29 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions:
+    # Actions record a message instead of printing, so the model never
+    # touches the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
-        print(f"Total = {self.amount}")
+        self.message = f"Total = {self.amount}"
 
     def choose_row(self, digit: FirstDigit) -> None:
         self.row = digit.value
-        print(f"Row {digit}")
+        self.message = f"Row {digit}"
 
     def clear(self, col: SecondDigit) -> None:
         slot = self._slot(col)
-        print(f"Clearing selection: costs {slot.price}, "
-              f"quantity {slot.quantity}")
+        self.message = (f"Clearing selection: costs {slot.price}, "
+                        f"quantity {slot.quantity}")
 
     def dispense(self, col: SecondDigit) -> None:
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        print(f"Dispensing; amount remaining {self.amount}")
+        self.message = f"Dispensing; amount remaining {self.amount}"
 
     def refund(self, event: object) -> None:
-        print(f"Returning {self.amount}")
+        self.message = f"Returning {self.amount}"
         self.amount = 0
 
 
@@ -131,3 +133,4 @@ if __name__ == "__main__":
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
+        print(f"{event}: {machine.message}")  # a plain text view

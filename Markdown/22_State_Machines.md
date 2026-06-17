@@ -471,8 +471,9 @@ class ItemSlot:
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
-        self.amount = 0  # money inserted, in cents
-        self.row = 0     # the first selection digit
+        self.amount = 0    # money inserted, in cents
+        self.row = 0       # the first selection digit
+        self.message = ""  # last action, for a view to display
         # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
                       for _ in range(4)]
@@ -514,28 +515,29 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions:
+    # Actions record a message instead of printing, so the model never
+    # touches the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
-        print(f"Total = {self.amount}")
+        self.message = f"Total = {self.amount}"
 
     def choose_row(self, digit: FirstDigit) -> None:
         self.row = digit.value
-        print(f"Row {digit}")
+        self.message = f"Row {digit}"
 
     def clear(self, col: SecondDigit) -> None:
         slot = self._slot(col)
-        print(f"Clearing selection: costs {slot.price}, "
-              f"quantity {slot.quantity}")
+        self.message = (f"Clearing selection: costs {slot.price}, "
+                        f"quantity {slot.quantity}")
 
     def dispense(self, col: SecondDigit) -> None:
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        print(f"Dispensing; amount remaining {self.amount}")
+        self.message = f"Dispensing; amount remaining {self.amount}"
 
     def refund(self, event: object) -> None:
-        print(f"Returning {self.amount}")
+        self.message = f"Returning {self.amount}"
         self.amount = 0
 
 
@@ -552,6 +554,7 @@ if __name__ == "__main__":
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
+        print(f"{event}: {machine.message}")  # a plain text view
 ```
 
 Adding a state or an input is now a local change: an entry in the table and a
@@ -591,6 +594,7 @@ def test_buy_dispenses_and_charges() -> None:
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0                 # 50 in, 50 spent
     assert vm.items[0][1].quantity == 4   # one dispensed from five
+    assert vm.message == "Dispensing; amount remaining 0"
 
 
 def test_too_expensive_clears_back_to_collecting() -> None:
@@ -623,6 +627,89 @@ def test_no_transition_raises() -> None:
     vm = VendingMachine()  # QUIESCENT has no transition for Quit
     with pytest.raises(RuntimeError):
         vm.handle(Quit())
+```
+
+Because the actions set `vm.message` instead of printing, the model never draws
+anything, and the same machine drives more than one view. The text demo in
+`vending_machine.py` reads `message` and prints it; the panel below reads
+`amount`, the stock, and `message` and shows them on screen. `vending_view.py`
+is a `tkinter` front for the machine: the coin and item buttons turn presses
+into events for `handle()`, and a click that the state machine rejects (a
+selection before any money, say) is caught and shown rather than crashing. It is
+the only file that draws, so the harness skips it (`tools/norun.txt`):
+
+```python
+# tabledriven/vending_view.py
+# A tkinter front panel for the vending machine. The model
+# (vending_machine.py) holds the state machine and the money and stock
+# logic; this file only draws and turns button presses into events.
+import tkinter as tk
+from functools import partial
+
+from vending_machine import (
+    FirstDigit,
+    Money,
+    Quit,
+    SecondDigit,
+    VendingMachine,
+)
+
+
+def show() -> None:
+    "Open the vending-machine panel."
+    vm = VendingMachine()
+    root = tk.Tk()
+    root.title("Vending Machine")
+    display = tk.Label(root, width=34, anchor="w")
+    display.grid(row=0, column=0, columnspan=4, sticky="we")
+    buttons: list[list[tk.Button]] = []
+
+    def render() -> None:
+        display.config(text=f"Inserted {vm.amount}c   {vm.message}")
+        for r, row in enumerate(vm.items):
+            for c, slot in enumerate(row):
+                out = slot.quantity == 0
+                qty = "OUT" if out else f"x{slot.quantity}"
+                buttons[r][c].config(
+                    text=f"{r}{c}\n{slot.price}c\n{qty}",
+                    state="disabled" if out else "normal")
+
+    def send(event: object) -> None:
+        try:
+            vm.handle(event)
+        except RuntimeError:
+            vm.message = "not allowed yet"
+        render()
+
+    def select(r: int, c: int) -> None:
+        send(FirstDigit(f"row {r}", r))
+        send(SecondDigit(f"col {c}", c))
+
+    tk.Button(root, text="+25c",
+              command=lambda: send(Money("quarter", 25))
+              ).grid(row=1, column=0, sticky="we")
+    tk.Button(root, text="+$1",
+              command=lambda: send(Money("dollar", 100))
+              ).grid(row=1, column=1, sticky="we")
+    tk.Button(root, text="Refund",
+              command=lambda: send(Quit())
+              ).grid(row=1, column=2, columnspan=2, sticky="we")
+
+    for r in range(4):
+        button_row: list[tk.Button] = []
+        for c in range(4):
+            b = tk.Button(root, width=6, height=3,
+                          command=partial(select, r, c))
+            b.grid(row=2 + r, column=c)
+            button_row.append(b)
+        buttons.append(button_row)
+
+    render()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    show()
 ```
 
 

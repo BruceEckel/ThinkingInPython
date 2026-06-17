@@ -24,6 +24,7 @@ def test_buy_dispenses_and_charges() -> None:
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0                 # 50 in, 50 spent
     assert vm.items[0][1].quantity == 4   # one dispensed from five
+    assert vm.message == "Dispensing; amount remaining 0"
 
 
 def test_too_expensive_clears_back_to_collecting() -> None:
