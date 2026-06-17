@@ -1,6 +1,6 @@
 # my_list.py
 
-def howdy(self, you):
+def howdy(self, you: str) -> None:
     print("Howdy, " + you)
 
 MyList = type('MyList', (list,), dict(x=42, howdy=howdy))

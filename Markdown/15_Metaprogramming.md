@@ -55,7 +55,7 @@ You can add bases, fields, and methods the same way:
 ```python
 # my_list.py
 
-def howdy(self, you):
+def howdy(self, you: str) -> None:
     print("Howdy, " + you)
 
 MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
@@ -103,7 +103,7 @@ class Event:
 def create_mc(description: str) -> None:
     "Create subclass using the 'type' metaclass"
     class_name = "".join(x.capitalize() for x in description.split())
-    def init(self, time):
+    def init(self, time: float) -> None:
         Event.__init__(self, description + " [mc]", time)
     globals()[class_name] = type(
         class_name, (Event,), {"__init__": init})
@@ -113,7 +113,7 @@ def create_exec(description: str) -> None:
     class_name = "".join(x.capitalize() for x in description.split())
     klass = f"""
 class {class_name}(Event):
-    def __init__(self, time):
+    def __init__(self, time: float) -> None:
         Event.__init__(self, "{description} [exec]", time)
 """
     exec(klass, globals())
