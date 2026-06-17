@@ -107,17 +107,26 @@ points at the call right away.
 
 ## Structural Typing with Protocols
 
-This feature fits the way Python already works. Some statically typed languages
-make you declare, up front, that a class "is a" `Drawable` by inheriting from it.
-That fights duck typing, where what matters is whether an object *has* the methods
-you call, not what it inherits from.
+This feature fits the way Python already works. The earlier chapters relied on
+*dynamic typing*: a function accepts any object, and the only requirement is
+that the object supports the operations performed on it. The type is checked at
+run time, when the operation runs. This is often called *duck typing*: if it
+looks like a duck and quacks like a duck, treat it as a duck.
 
-A *Protocol* types duck typing directly. You describe a shape, and any object
-with that shape satisfies it, with no inheritance:
+*Structural typing* is the static counterpart. Rather than wait for run time, a
+type checker verifies ahead of time that an object has the required shape: the
+right methods and attributes, whatever class it was declared as. Dynamic typing
+and structural typing are the same idea checked at different moments. Dynamic
+typing trusts the object when the code runs; structural typing proves the shape
+before the code runs.
+
+A *Protocol* expresses that shape. Some statically typed languages make you
+declare up front that a class "is a" `Drawable` by inheriting from it. A
+`Protocol` asks only that an object have the right shape, with no inheritance:
 
 ```python
 # protocols.py
-# A Protocol types duck typing: any object with the right shape
+# A Protocol describes a required shape: any object with that shape
 # qualifies, without inheriting from a base class.
 from typing import Protocol
 
@@ -146,7 +155,7 @@ print(render(Square()))
 
 `Circle` and `Square` never mention `Drawable`, and both are accepted, because
 each has a `draw()` of the right shape. Hand `render()` an object with no
-`draw()` and `ty` rejects it. You keep the flexibility of duck typing and gain
+`draw()` and `ty` rejects it. You keep the flexibility of dynamic typing and gain
 the early warning of static types.
 
 ## The Hints Are Not Enforced at Run Time

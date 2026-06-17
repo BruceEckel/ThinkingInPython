@@ -83,7 +83,7 @@ words together: "proxy adapter," it is perhaps more reasonable.
 
 ### Adapter in Python
 
-The four variations above are Java habits. Python is duck-typed: `WhatIUse.op()`
+The four variations above are Java habits. Python is dynamically typed: `WhatIUse.op()`
 only calls `f()`, so it accepts *any* object that has an `f()`. You do not need a
 shared base class or a declared interface, only the method. The common adapter
 need is "forward most calls unchanged, and add or change a few." `__getattr__`

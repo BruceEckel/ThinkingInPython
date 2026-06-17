@@ -374,15 +374,15 @@ if __name__ == "__main__":
         print(round(shape.area(), 4))
 ```
 
-Duck typing gives a different answer: any type works as long as it has the method
+Dynamic typing gives a different answer: any type works as long as it has the method
 the function calls. There is no shared base class and no declared set of types,
 and validity is checked only at run time, when the call happens:
 
 ```python
-# duck_typing.py
-# Duck typing: any type works as long as it has the method that gets
-# called. There is no base class and no type union. The check happens
-# only at run time, when the method is called.
+# dynamic_typing.py
+# Dynamic typing: any type works as long as it has the method that
+# gets called. There is no base class and no type union. The check
+# happens only at run time, when the method is called.
 from dataclasses import dataclass
 from typing import Any
 
@@ -416,7 +416,7 @@ if __name__ == "__main__":
 out only when the line runs. The
 [Static Type Checking](08_Static_Type_Checking.md) chapter gives this a static
 form with `Protocol`: a structural type describes the required shape, and the
-checker verifies it ahead of time. Duck typing and protocols are the same idea,
+checker verifies it ahead of time. Dynamic typing and protocols are the same idea,
 checked at different times.
 
 A third answer names a closed set of types as a union and dispatches with `match`.
