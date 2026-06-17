@@ -167,88 +167,157 @@ class Observable:
 
 A bare `Observable` does nothing on its own: you must subclass it and call
 `set_changed()`, or `notify_observers()` is a no-op. The example below shows
-exactly that, and checks the result.
+exactly that, and a test pins down the result.
 
 ### A Visual Example of Observers
 
-This creates a grid of boxes, each starting with some color.
-Every box observes a shared `Observable`. When one box is
-"clicked," the `Observable` notifies every box, and each box adjacent to the
-clicked one changes its color to match it.
+This is the model-view split from the chapter's opening, made visible with
+`tkinter` (in the standard library, so there is nothing to install). The *model*
+is a grid of colored boxes. Click a box and every box touching it, diagonals
+included, repaints to the clicked box's color. The model is an `Observable`; the
+on-screen view is an `Observer` that repaints whenever the model announces a
+change.
 
-The pattern itself has nothing to do with a GUI,
-so here it is as a headless program that clicks a box in code and then checks
-the result. That keeps the focus on the Observer mechanics and lets the example
-verify itself. It reuses the `Observable` and `Observer` classes from
+The logic is kept apart from the screen. Building the grid, testing adjacency,
+and computing the grid that results from a click are plain functions: values in,
+values out. Only one function, the view's `draw()`, puts anything on screen.
+That split is what lets the model be tested with no display open, in
+`test_box_observer.py` below. The classic `Observable` and `Observer` come from
 `observer.py`:
 
 ```python
 # box_observer.py
-# A headless version of the ColorBoxes Observer example. Boxes in a
-# grid observe a shared Observable; "clicking" one recolors its
-# neighbors.
+# A visual ColorBoxes: the model-view split wired with the classic
+# Observer. The model holds the grid and announces each change; the
+# view observes it and repaints. Every function that computes returns
+# a value; only the view's draw() touches the screen.
+import tkinter as tk
 from typing import Any
 
 from observer import Observable, Observer
 
+COLORS = ("skyblue", "palegreen", "khaki")
+type Grid = dict[tuple[int, int], str]   # (column, row) -> color
 
-class BoxObservable(Observable):
-    # You must subclass Observable and call set_changed(), or notify
-    # does nothing:
-    def notify_observers(self, arg: Any = None) -> None:
+
+def new_grid(size: int) -> Grid:
+    "Build a size x size grid, banded into three colors."
+    return {(x, y): COLORS[(x + y) % len(COLORS)]
+            for x in range(size) for y in range(size)}
+
+
+def adjacent(a: tuple[int, int], b: tuple[int, int]) -> bool:
+    "True if two distinct cells touch, including diagonally."
+    return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
+
+
+def recolored(grid: Grid, clicked: tuple[int, int]) -> Grid:
+    "Return a new grid: every neighbor of the click takes its color."
+    color = grid[clicked]
+    return {cell: color if adjacent(cell, clicked) else current
+            for cell, current in grid.items()}
+
+
+class BoxModel(Observable):
+    "The subject: holds the grid and announces every change."
+    def __init__(self, size: int) -> None:
+        super().__init__()
+        self.size = size
+        self.grid = new_grid(size)
+
+    def click(self, cell: tuple[int, int]) -> None:
+        self.grid = recolored(self.grid, cell)
         self.set_changed()
-        Observable.notify_observers(self, arg)
+        self.notify_observers(self.grid)
 
 
-class Box(Observer):
-    def __init__(self, x: int, y: int, color: str,
-                 notifier: BoxObservable) -> None:
-        self.x = x
-        self.y = y
-        self.color = color
-        self.notifier = notifier
-        notifier.add_observer(self)
+def show(model: BoxModel, cell: int = 60) -> None:
+    "The only function that touches the screen."
+    root = tk.Tk()
+    root.title("ColorBoxes")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=model.size * cell,
+                       height=model.size * cell)
+    canvas.pack()
 
-    def click(self) -> None:
-        # A click announces this box to every observer:
-        self.notifier.notify_observers(self)
+    def draw(grid: Grid) -> None:
+        for (x, y), color in grid.items():
+            canvas.create_rectangle(
+                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
+                fill=color, outline="white")
 
-    def update(self, observable: Any, clicked: Box) -> None:
-        if self is not clicked and self.next_to(clicked):
-            self.color = clicked.color
+    # The observer is the view: repaint when the model changes.
+    class View(Observer):
+        def update(self, observable: Any, grid: Any) -> None:
+            draw(grid)
 
-    def next_to(self, other: Box) -> bool:
-        return (abs(self.x - other.x) <= 1
-                and abs(self.y - other.y) <= 1)
-
-
-def make_grid(size: int,
-              notifier: BoxObservable) -> list[list[Box]]:
-    return [[Box(x, y, f"color{(x + y) % 3}", notifier)
-             for y in range(size)]
-            for x in range(size)]
+    model.add_observer(View())
+    canvas.bind("<Button-1>",
+                lambda e: model.click((e.x // cell, e.y // cell)))
+    draw(model.grid)
+    root.mainloop()
 
 
 if __name__ == "__main__":
-    notifier = BoxObservable()
-    grid = make_grid(5, notifier)
-    center = grid[2][2]
-    center.color = "red"
-    center.click()
-    print(f"(1,1) -> {grid[1][1].color}")
-    print(f"(2,3) -> {grid[2][3].color}")
-    print(f"(0,0) -> {grid[0][0].color}")
-    assert grid[1][1].color == "red"   # diagonally adjacent: changed
-    assert grid[2][3].color == "red"   # adjacent: changed
-    assert grid[0][0].color != "red"   # two away: unchanged
-    print("Observer notifications verified.")
+    show(BoxModel(8))
 ```
 
-`BoxObservable` does the required `set_changed()` in one place, inside its own
-`notify_observers()`, so a click always notifies. Because every box
-talks only to the base `Observable` interface after it is constructed, you could
-swap in a different `Observable` subclass to change notification behavior
-without touching the boxes at all.
+`box_observer.py` opens a window, so the example harness does not run it (it is
+listed in `tools/norun.txt`). The model carries the logic, though, so a test
+drives it with no display: build a model, click a cell, and check that the
+neighbors took its color and that the observers were notified with the new grid.
+
+```python
+# test_box_observer.py
+from typing import Any
+
+from box_observer import BoxModel, adjacent, new_grid, recolored
+from observer import Observer
+
+
+def test_new_grid_size_and_banding() -> None:
+    grid = new_grid(3)
+    assert len(grid) == 9
+    assert grid[(0, 0)] == "skyblue"     # COLORS[0]
+    assert grid[(0, 1)] == grid[(1, 0)]  # same (x + y) color band
+
+
+def test_adjacent() -> None:
+    assert adjacent((1, 1), (2, 2))      # diagonal
+    assert adjacent((1, 1), (1, 2))      # edge
+    assert not adjacent((1, 1), (1, 1))  # not its own neighbor
+    assert not adjacent((0, 0), (2, 0))  # two away
+
+
+def test_recolored_touches_only_neighbors() -> None:
+    grid = new_grid(5)
+    out = recolored(grid, (2, 2))
+    assert out[(1, 1)] == grid[(2, 2)]   # diagonal neighbor: changed
+    assert out[(2, 3)] == grid[(2, 2)]   # edge neighbor: changed
+    assert out[(0, 0)] == grid[(0, 0)]   # two away: unchanged
+    assert out is not grid               # pure: a new grid
+
+
+def test_model_notifies_with_the_new_grid() -> None:
+    model = BoxModel(5)
+    seen: list[Any] = []
+
+    class Recorder(Observer):
+        def update(self, observable: Any, grid: Any) -> None:
+            seen.append(grid)
+
+    model.add_observer(Recorder())
+    model.click((2, 2))
+    assert seen[-1] is model.grid        # observer got the new grid
+    assert model.grid[(1, 1)] == model.grid[(2, 2)]
+```
+
+`BoxModel` is the subject: its `click()` builds the next grid with `recolored()`,
+sets the changed flag, and notifies. The view is the `Observer`, and its
+`update()` does nothing but repaint. Neither side knows much about the other, so
+you can test the model with no window open, or attach a second view to the same
+model and both stay in step. That decoupling, with the model-view split, is the
+whole point of *Observer*.
 
 
 ### Exercises

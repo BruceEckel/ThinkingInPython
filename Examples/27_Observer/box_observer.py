@@ -1,59 +1,74 @@
 # box_observer.py
-# A headless version of the ColorBoxes Observer example. Boxes in a
-# grid observe a shared Observable; "clicking" one recolors its
-# neighbors.
+# A visual ColorBoxes: the model-view split wired with the classic
+# Observer. The model holds the grid and announces each change; the
+# view observes it and repaints. Every function that computes returns
+# a value; only the view's draw() touches the screen.
+import tkinter as tk
 from typing import Any
 
 from observer import Observable, Observer
 
+COLORS = ("skyblue", "palegreen", "khaki")
+type Grid = dict[tuple[int, int], str]   # (column, row) -> color
 
-class BoxObservable(Observable):
-    # You must subclass Observable and call set_changed(), or notify
-    # does nothing:
-    def notify_observers(self, arg: Any = None) -> None:
+
+def new_grid(size: int) -> Grid:
+    "Build a size x size grid, banded into three colors."
+    return {(x, y): COLORS[(x + y) % len(COLORS)]
+            for x in range(size) for y in range(size)}
+
+
+def adjacent(a: tuple[int, int], b: tuple[int, int]) -> bool:
+    "True if two distinct cells touch, including diagonally."
+    return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
+
+
+def recolored(grid: Grid, clicked: tuple[int, int]) -> Grid:
+    "Return a new grid: every neighbor of the click takes its color."
+    color = grid[clicked]
+    return {cell: color if adjacent(cell, clicked) else current
+            for cell, current in grid.items()}
+
+
+class BoxModel(Observable):
+    "The subject: holds the grid and announces every change."
+    def __init__(self, size: int) -> None:
+        super().__init__()
+        self.size = size
+        self.grid = new_grid(size)
+
+    def click(self, cell: tuple[int, int]) -> None:
+        self.grid = recolored(self.grid, cell)
         self.set_changed()
-        Observable.notify_observers(self, arg)
+        self.notify_observers(self.grid)
 
 
-class Box(Observer):
-    def __init__(self, x: int, y: int, color: str,
-                 notifier: BoxObservable) -> None:
-        self.x = x
-        self.y = y
-        self.color = color
-        self.notifier = notifier
-        notifier.add_observer(self)
+def show(model: BoxModel, cell: int = 60) -> None:
+    "The only function that touches the screen."
+    root = tk.Tk()
+    root.title("ColorBoxes")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=model.size * cell,
+                       height=model.size * cell)
+    canvas.pack()
 
-    def click(self) -> None:
-        # A click announces this box to every observer:
-        self.notifier.notify_observers(self)
+    def draw(grid: Grid) -> None:
+        for (x, y), color in grid.items():
+            canvas.create_rectangle(
+                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
+                fill=color, outline="white")
 
-    def update(self, observable: Any, clicked: Box) -> None:
-        if self is not clicked and self.next_to(clicked):
-            self.color = clicked.color
+    # The observer is the view: repaint when the model changes.
+    class View(Observer):
+        def update(self, observable: Any, grid: Any) -> None:
+            draw(grid)
 
-    def next_to(self, other: Box) -> bool:
-        return (abs(self.x - other.x) <= 1
-                and abs(self.y - other.y) <= 1)
-
-
-def make_grid(size: int,
-              notifier: BoxObservable) -> list[list[Box]]:
-    return [[Box(x, y, f"color{(x + y) % 3}", notifier)
-             for y in range(size)]
-            for x in range(size)]
+    model.add_observer(View())
+    canvas.bind("<Button-1>",
+                lambda e: model.click((e.x // cell, e.y // cell)))
+    draw(model.grid)
+    root.mainloop()
 
 
 if __name__ == "__main__":
-    notifier = BoxObservable()
-    grid = make_grid(5, notifier)
-    center = grid[2][2]
-    center.color = "red"
-    center.click()
-    print(f"(1,1) -> {grid[1][1].color}")
-    print(f"(2,3) -> {grid[2][3].color}")
-    print(f"(0,0) -> {grid[0][0].color}")
-    assert grid[1][1].color == "red"   # diagonally adjacent: changed
-    assert grid[2][3].color == "red"   # adjacent: changed
-    assert grid[0][0].color != "red"   # two away: unchanged
-    print("Observer notifications verified.")
+    show(BoxModel(8))

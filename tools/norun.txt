@@ -9,3 +9,7 @@
 # One glob pattern per line, matched against the forward-slash relative path
 # (e.g. 26_Simulation/rats_and_mazes/* or 17_State_Machines/*gui*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
+
+# Opens a Tkinter window; its logic is verified headlessly by
+# 27_Observer/test_box_observer.py.
+27_Observer/box_observer.py
