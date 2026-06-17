@@ -136,13 +136,13 @@ with inheritance.
 
 The class `Different` also has a method named `show()`, but this
 class is not derived from `Simple`. The `f()` method defined in
-`__main__` demonstrates weak typing: all it cares about is that
+`__main__` demonstrates duck typing: all it cares about is that
 `show()` can be applied to `obj`, and it doesn't have any other
 type requirements. You can see that `f()` can be applied equally to
 an object of a class derived from `Simple` and one that isn't, without
 discrimination. If you're a C++ programmer, you should see that the
 objective of the C++ `template` feature is exactly this: to provide
-weak typing in a strongly-typed language. Thus, in Python you
+duck typing in a statically-typed language. Thus, in Python you
 automatically get the equivalent of templates, without having to learn
 that particularly difficult syntax and semantics.
 

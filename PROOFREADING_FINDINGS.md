@@ -25,7 +25,7 @@ Format per entry:
 
 ---
 
-> **04_Functions.md:23** (conceptual)
+> **04_Functions.md:23** (conceptual) — APPLIED
 > Original: "Python is a *structurally-typed* language, which means it puts the
 > minimum possible requirements on typing."
 > Proposed: "Python is *dynamically typed*, so it puts the minimum possible
@@ -45,7 +45,7 @@ Format per entry:
 
 ---
 
-> **06_Classes.md:139 and :145** (terminology)
+> **06_Classes.md:139 and :145** (terminology) — APPLIED
 > Original: "demonstrates weak typing" ... "to provide weak typing in a
 > strongly-typed language."
 > Proposed: "demonstrates duck typing" ... "to provide duck typing in a

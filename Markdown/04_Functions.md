@@ -20,8 +20,8 @@ print(a_function("yes"))
 
 Notice there is no type information in the function signature: all it
 specifies is the name of the function and the argument identifiers, but no
-argument types or return types. Python is a *structurally-typed* language,
-which means it puts the minimum possible requirements on typing. For example,
+argument types or return types. Python is dynamically typed, which means it
+puts the minimum possible requirements on typing. For example,
 you could pass and return different types from the same function:
 
 ```python
