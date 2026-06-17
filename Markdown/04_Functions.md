@@ -21,8 +21,8 @@ print(a_function("yes"))
 Notice there is no type information in the function signature: all it
 specifies is the name of the function and the argument identifiers, but no
 argument types or return types. Python is dynamically typed, which means it
-puts the minimum possible requirements on typing. For example,
-you could pass and return different types from the same function:
+enforces type constraints at runtime. For example,
+different types can be both passed to and returned from the same function:
 
 ```python
 # different_returns.py
@@ -162,6 +162,8 @@ square = lambda n: n * n                    # usually prefer def
 print(square(9))                            # 81
 ```
 
+Python's lambdas are rather constrained because they comprise a single expression.
+For anything more complicated you are expected to write a separate function.
 
 ## Unpacking Arguments
 
