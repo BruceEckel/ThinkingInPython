@@ -515,7 +515,7 @@ classes.
 1.  Add a class `Triangle` to `shape_factory1.py`
 2.  Add a class `Triangle` to `shape_factory2.py`
 3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to
-    `game_environment.py`
+    `games.py`
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to
     create different sets of shapes (for example, one particular type of
     factory object creates "thick shapes," another creates "thin

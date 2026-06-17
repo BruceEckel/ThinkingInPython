@@ -648,29 +648,23 @@ covered in [Fronting for an Implementation](21_Fronting_for_an_Implementation.md
     what kind of `Mood` it's in. Add an additional kind of `Mood`
     called `Prozac`.
 5.  Create a simple copy-on-write implementation.
-6.  Apply `transition_table.py` to the "Washer" problem.
-7.  Create a *StateMachine* system whereby the current state along with
-    input information determines the next state that the system will be
-    in. To do this, each state must store a reference back to the proxy
-    object (the state controller) so that it can request the state
-    change. Use a `HashMap` to create a table of states, where the key
-    is a `String` naming the new state and the value is the new state
-    object. Inside each state subclass override a method `nextState(
-    )` that has its own state-transition table. The input to
-    `nextState()` should be a single word that comes from a text file
-    containing one word per line.
-8.  Modify the previous exercise so that the state machine can be
-    configured by creating/modifying a single multi-dimensional array.
-9.  Modify the "mood" exercise from the previous session so that it
-    becomes a state machine using state_machine.py
+6.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py`
+    to a washing-machine problem.
+7.  Create a *StateMachine* system whereby the current state along with the
+    input determines the next state. Each state stores a reference back to the
+    controller object so that it can request the state change. Use a `dict` to
+    map a `str` naming a state to its state object. In each state subclass,
+    override a `next_state()` method that holds its own transition table. The
+    input to `next_state()` is a single word read from a text file containing
+    one word per line.
+8.  Modify the previous exercise so that the state machine can be configured
+    by editing a single transition table.
+9.  Modify the "mood" exercise (exercise 4) so that it becomes a state machine
+    using `state_machine.py`.
 10. Create an elevator state machine system using state_machine.py
 11. Create a heating/air-conditioning system using state_machine.py
-12. A *generator* is an object that produces other objects, just like a
-    factory, except that the generator function doesn't require any
-    arguments. Create a `MouseMoveGenerator` which produces correct
-    `MouseMove` actions as outputs each time the generator function is
-    called (that is, the mouse must move in the proper sequence, thus
-    the possible moves are based on the previous move; it's another
-    state machine). Add a method to produce an iterator, but this method
-    should take an `int` argument that specifies the number of moves
-    to produce before `hasNext()` returns `false`.
+12. A *generator* produces objects, like a factory but taking no arguments.
+    Write a `mouse_move_generator` (using `yield`) that produces correct
+    `MouseAction` moves in sequence, where each possible move depends on the
+    previous one (it is another state machine). Have it accept an `int` for
+    the number of moves to produce, then stop.

@@ -220,7 +220,7 @@ def test_operations_dispatch_independently() -> None:
     `interact()` with each other using multiple dispatching.
 2.  Modify the above example to make the interactions more detailed.
     Each `Inhabitant` can randomly produce a `Weapon` using
-    `getWeapon()`: a `Dwarf` uses `Jargon` or `Play`, an
+    `get_weapon()`: a `Dwarf` uses `Jargon` or `Play`, an
     `Elf` uses `InventFeature` or `SellImaginaryProduct`, and a
     `Troll` uses `Edict` and `Schedule`. You must decide which
     weapons "win" and "lose" in each interaction (as in
@@ -230,14 +230,11 @@ def test_operations_dispatch_independently() -> None:
     `Project` that creates groups of `Dwarf`, `Elf` and `Troll`
     and battles the groups against each other until only members of one
     group are left standing. These are the "winners."
-3.  Modify `paper_scissors_rock.py` to replace the double dispatching
-    with a table lookup. The easiest way to do this is to create a
-    `Map` of `Map`s, with the key of each `Map` the class of each
-    object. Then you can do the lookup by saying:
-    ((Map)map.get(o1.getClass())).get(o2.getClass()) Notice how much
-    easier it is to reconfigure the system. When is it more appropriate
-    to use this approach vs. hard-coding the dynamic dispatches? Can you
-    create a system that has the syntactic simplicity of use of the
-    dynamic dispatch but uses a table lookup?
+3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a
+    table lookup. The simplest way is a `dict` keyed by a tuple of the two
+    objects' types, looked up as `table[type(o1), type(o2)]` (this is what
+    `paper_scissors_rock2.py` does). When is the table lookup more appropriate
+    than hard-coding the dynamic dispatch? Can you keep the syntactic
+    simplicity of the dispatch while using a table underneath?
 4.  Modify Exercise 2 to use the table lookup technique described in
     Exercise 3.
