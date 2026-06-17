@@ -274,7 +274,7 @@ function. Adding a `Plastic` material means defining the class and, if it needs
 a special note, registering one line.
 
 When the operation is the *same* for every type, you do not even need
-single dispatch. `sum_value` earlier was just a function. Reach for
+single dispatch. `sum_value` earlier was just a function. Use
 `singledispatch` only when the behavior genuinely differs by type. For
 operations that belong on the objects and vary by type, `singledispatchmethod`
 does the same thing as a method.

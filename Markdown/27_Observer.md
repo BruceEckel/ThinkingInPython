@@ -165,7 +165,7 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 
 The rest of this chapter translates Java's `Observable` and `Observer` classes
 directly. That is useful when you are porting Java code or need the exact
-`set_changed()` semantics, but reach for it only when the simple version above is
+`set_changed()` semantics, but use it only when the simple version above is
 not enough.
 
 ## The Classic Observable and Observer

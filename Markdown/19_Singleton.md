@@ -392,7 +392,7 @@ def test_borg_shares_state_but_not_identity() -> None:
 
 ## Which Should You Use?
 
-Reach for the lightest tool that fits:
+Use the lightest tool that fits:
 
 - For almost everything, use a *module* with module-level state. It is the
   truest Python singleton and needs no class.

@@ -25,7 +25,7 @@ running extra code or injecting members as the class is built. That is
 metaclass programming.
 
 It is worth saying plainly: *most of the time you do not need a metaclass.* It
-is a fascinating tool, and the temptation to reach for it is strong, but Python
+is a fascinating tool, and the temptation to use it is strong, but Python
 3 added simpler hooks that cover almost every case a metaclass used to handle:
 
 - `__init_subclass__` runs when a subclass is created. It replaces most "do
@@ -34,7 +34,7 @@ is a fascinating tool, and the temptation to reach for it is strong, but Python
   at class-creation time.
 - *Class decorators* transform a class after it is built.
 
-Reach for a metaclass only when these cannot do the job. This chapter shows the
+Use a metaclass only when these cannot do the job. This chapter shows the
 simpler tools first, then metaclasses for the cases that still need them.
 
 ## Generating Classes with type
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 `create_mc()` builds each subclass with `type`. `create_exec()` does the same
 thing by running a string of class-definition code with `exec`. The `exec`
 version is easier for most readers to follow, because it looks like ordinary
-class definitions. Reach for `type` only when the dynamic version is genuinely
+class definitions. Use `type` only when the dynamic version is genuinely
 clearer than generated source text.
 
 ## Self-Registration of Subclasses

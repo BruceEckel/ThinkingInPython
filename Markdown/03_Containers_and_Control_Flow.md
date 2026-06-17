@@ -97,7 +97,7 @@ for name, age in ages.items():
     print(name, age)
 ```
 
-Reach for `dict.get()` to avoid a `KeyError` when a key might be absent.
+Use `dict.get()` to avoid a `KeyError` when a key might be absent.
 
 ### Sets
 

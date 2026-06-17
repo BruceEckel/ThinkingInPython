@@ -228,7 +228,7 @@ over the number of decimal places and alignment.
 
 The `%` syntax above still works, but the modern way to build strings is the
 *f-string*: prefix the string with `f` and put expressions in braces. It is
-readable and fast, and it is what you should reach for:
+readable, fast, and preferred:
 
 ```python
 # fstrings.py

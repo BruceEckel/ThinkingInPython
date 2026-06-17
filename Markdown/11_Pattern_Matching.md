@@ -326,7 +326,7 @@ The output is:
 
 And when the set of types is *open* (anyone can add a new one), polymorphism is
 better than a `match`: each type carries its own behavior, so adding a type needs
-no change to a central `match`. Reach for `match` when the set of cases is closed
+no change to a central `match`. Use `match` when the set of cases is closed
 and you want to handle them in one place, especially when the cases need to look
 inside the value.
 
