@@ -5,25 +5,21 @@ solves it, then we ask "what will change?" and reshape the design to absorb that
 change cheaply. This is the spirit of Martin Fowler's *Refactoring*, applied at
 the level of patterns rather than single statements.
 
-The lesson is also a Python lesson. Several of the patterns that the original
+This is also a Python lesson. Several of the patterns that the original
 *Design Patterns* book needed are answers to limitations of statically typed
 languages without multiple dispatch. Python removes some of those limitations,
-so a few famous patterns simply dissolve here. We will call that out as it
+so a few common patterns simply dissolve here. We will call that out as it
 happens.
 
 ## Simulating a Trash Recycler
 
 Trash arrives at the recycling plant mixed together. The program must sort it by
-material and report the total value of each kind. The catch is the one that
-makes real problems interesting: the trash starts out as an undifferentiated
+material and report the total value of each kind. The trash starts out as an undifferentiated
 pile, and the type of each piece must be recovered to sort it.
 
-Here is the Trash hierarchy. Each material carries a per-pound `value`. Two
-small touches make the rest of the chapter easy. The base class keeps a
+In the `Trash` hierarchy, each material carries a per-pound `value`. The base class keeps a
 `registry` of its subclasses, filled automatically by `__init_subclass__`, and
-a `create` method builds an instance from a material name. This is the *factory*
-the original design worked hard to build with reflection, in a few lines and
-with no reflection at all:
+a `create` method builds an instance from a material name (this is a *factory*):
 
 ```python
 # trash.py
@@ -106,7 +102,7 @@ Cardboard:12
 
 Parsing it into `Trash` objects goes through the registry, so the parser never
 mentions a concrete material. Add a new kind of trash and the parser keeps
-working unchanged, which is the sign of a good seam:
+working unchanged:
 
 ```python
 # parse_trash.py
@@ -163,12 +159,11 @@ if __name__ == "__main__":
     main()
 ```
 
-This satisfies the requirement, but it has the classic flaw. It tests for *every
+This satisfies the requirement, but it has a classic flaw: it tests for *every
 type in the system*. When cardboard becomes valuable and you add it, you must
 hunt down this chain of `isinstance` checks, and any you miss will silently drop
 trash on the floor. Testing for one type, or a small subset that needs special
-handling, is fine. Testing for all of them means you are doing by hand the job
-that polymorphism exists to do for you.
+handling, is fine. Testing for all of them means you are doing polymorphism's job by hand.
 
 ## Let a Dictionary Do the Sorting
 
@@ -213,8 +208,8 @@ elaborate: a `Visitor` base class with one `visit` overload per material, an
 `accept` method added to every element, and "double dispatch" to route each
 piece to the right `visit`. It exists because languages like Java and C++
 dispatch on only one type at a time and cannot add methods to a class from
-outside. Python has neither limitation in this case, because the standard
-library provides `functools.singledispatch`: a function that dispatches on the
+outside. Python has neither limitation; the standard
+library provides `functools.singledispatch` which dispatches on the
 type of its first argument, with new types registered from anywhere.
 
 So you do not write Visitor in Python. You write a single-dispatch function:
@@ -264,14 +259,16 @@ if __name__ == "__main__":
     main()
 ```
 
-Compare this to a Visitor implementation. There is no `Visitor` class, no
-`accept` method bolted onto every material, and no decorator gymnastics to fake
-overloading. `recycling_note` is a new operation defined entirely outside the
-`Trash` hierarchy, which is Visitor's whole purpose. `Paper` has no registered
+`recycling_note` is a new operation defined entirely outside the
+`Trash` hierarchy. `Paper` has no registered
 note, so it falls through to the base function: the default behavior, for free.
 Adding a `price` or `weight` operation means writing another single-dispatch
 function. Adding a `Plastic` material means defining the class and, if it needs
 a special note, registering one line.
+
+Compare this to a Visitor implementation. There is no `Visitor` class, no
+`accept` method bolted onto every material, and no decorator gymnastics to fake
+overloading.
 
 When the operation is the *same* for every type, you do not even need
 single dispatch. `sum_value` earlier was just a function. Use
@@ -281,8 +278,8 @@ does the same thing as a method.
 
 ## Testing the Recycler
 
-The `Trash` hierarchy carries the logic worth testing: each subclass registers
-itself, `create()` builds one by name, the per-pound values are right, and
+We want to test the way each subclass registers
+itself, `create()` builds one by name, that the per-pound values are right, and that
 `sum_value` totals weight times value. The parser is tested against a small file
 written on the spot, so it does not depend on `trash.dat`:
 

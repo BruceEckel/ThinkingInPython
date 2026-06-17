@@ -6,6 +6,8 @@
   First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
   before doing any other examples.
 
+- Check order of examples in 30_Pattern_Refactoring.md
+
 - Check exercises. Potentially create new exercises.
 
 - passive voice
@@ -13,6 +15,8 @@
 - Ask for a good strategy to polish things before my edit/rewrite pass.
 
 - Indexing using Leanpub format, before publishing to leanpub
+
+- App to turn Markdown into one sentence per line?
 
 ******************
 
