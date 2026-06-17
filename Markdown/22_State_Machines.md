@@ -27,9 +27,9 @@ single master state transition table for the whole system:
 # into the next State given an Input:
 
 class State:
-    def run(self):
+    def run(self) -> None:
         raise NotImplementedError("run not implemented")
-    def next(self, input):
+    def next(self, input: object) -> State:
         raise NotImplementedError("next not implemented")
 ```
 
@@ -54,17 +54,21 @@ something different depending on the state that the system is in:
 # state_machine.py
 # Takes a list of Inputs to move from State to
 # State using a template method.
+from collections.abc import Iterable
+
+from state import State
+
 
 class StateMachine:
-    def __init__(self, initial_state):
-        self.currentState = initial_state
-        self.currentState.run()
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
     # Template method:
-    def run_all(self, inputs):
+    def run_all(self, inputs: Iterable[object]) -> None:
         for i in inputs:
             print(i)
-            self.currentState = self.currentState.next(i)
-            self.currentState.run()
+            self.current_state = self.current_state.next(i)
+            self.current_state.run()
 ```
 
 I've also treated `run_all()` as a template method. This is typical,
@@ -142,10 +146,10 @@ from state_machine import StateMachine
 # A different subclass for each state:
 
 class Waiting(State):
-    def run(self):
+    def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
@@ -153,10 +157,10 @@ class Waiting(State):
                 return MouseTrap.waiting
 
 class Luring(State):
-    def run(self):
+    def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.RUNS_AWAY:
                 return MouseTrap.waiting
@@ -166,10 +170,10 @@ class Luring(State):
                 return MouseTrap.luring
 
 class Trapping(State):
-    def run(self):
+    def run(self) -> None:
         print("Trapping: Closing door")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.ESCAPES:
                 return MouseTrap.waiting
@@ -179,10 +183,10 @@ class Trapping(State):
                 return MouseTrap.trapping
 
 class Holding(State):
-    def run(self):
+    def run(self) -> None:
         print("Holding: Mouse caught")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
@@ -252,7 +256,7 @@ from state_machine import StateMachine
 class StateT(State):
     def __init__(self) -> None:
         self.transitions: dict[Any, Any] | None = None
-    def next(self, input):
+    def next(self, input: object) -> State:
         assert self.transitions is not None
         if input in self.transitions:
             return self.transitions[input]
@@ -260,9 +264,9 @@ class StateT(State):
             raise Exception("Input not supported for current state")
 
 class Waiting(StateT):
-    def run(self):
+    def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
-    def next(self, input):
+    def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
@@ -271,9 +275,9 @@ class Waiting(StateT):
         return StateT.next(self, input)
 
 class Luring(StateT):
-    def run(self):
+    def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
-    def next(self, input):
+    def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
@@ -283,9 +287,9 @@ class Luring(StateT):
         return StateT.next(self, input)
 
 class Trapping(StateT):
-    def run(self):
+    def run(self) -> None:
         print("Trapping: Closing door")
-    def next(self, input):
+    def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
@@ -295,9 +299,9 @@ class Trapping(StateT):
         return StateT.next(self, input)
 
 class Holding(StateT):
-    def run(self):
+    def run(self) -> None:
         print("Holding: Mouse caught")
-    def next(self, input):
+    def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {

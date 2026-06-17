@@ -3,7 +3,7 @@
 # into the next State given an Input:
 
 class State:
-    def run(self):
+    def run(self) -> None:
         raise NotImplementedError("run not implemented")
-    def next(self, input):
+    def next(self, input: object) -> State:
         raise NotImplementedError("next not implemented")

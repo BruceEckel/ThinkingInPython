@@ -1,14 +1,18 @@
 # state_machine.py
 # Takes a list of Inputs to move from State to
 # State using a template method.
+from collections.abc import Iterable
+
+from state import State
+
 
 class StateMachine:
-    def __init__(self, initial_state):
-        self.currentState = initial_state
-        self.currentState.run()
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
     # Template method:
-    def run_all(self, inputs):
+    def run_all(self, inputs: Iterable[object]) -> None:
         for i in inputs:
             print(i)
-            self.currentState = self.currentState.next(i)
-            self.currentState.run()
+            self.current_state = self.current_state.next(i)
+            self.current_state.run()

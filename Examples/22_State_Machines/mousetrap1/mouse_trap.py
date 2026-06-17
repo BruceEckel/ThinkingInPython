@@ -11,10 +11,10 @@ from state_machine import StateMachine
 # A different subclass for each state:
 
 class Waiting(State):
-    def run(self):
+    def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
@@ -22,10 +22,10 @@ class Waiting(State):
                 return MouseTrap.waiting
 
 class Luring(State):
-    def run(self):
+    def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.RUNS_AWAY:
                 return MouseTrap.waiting
@@ -35,10 +35,10 @@ class Luring(State):
                 return MouseTrap.luring
 
 class Trapping(State):
-    def run(self):
+    def run(self) -> None:
         print("Trapping: Closing door")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.ESCAPES:
                 return MouseTrap.waiting
@@ -48,10 +48,10 @@ class Trapping(State):
                 return MouseTrap.trapping
 
 class Holding(State):
-    def run(self):
+    def run(self) -> None:
         print("Holding: Mouse caught")
 
-    def next(self, input):
+    def next(self, input: object) -> State:
         match input:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
