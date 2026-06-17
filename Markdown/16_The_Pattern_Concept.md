@@ -139,7 +139,7 @@ describing a succession of different types of categories:
     attempt to be general.
 3.  **Standard Design**: a way to solve this *kind* of problem. A design
     that has become more general, typically through reuse.
-4.  **Design Pattern**: how to solve an entire class of similar problem.
+4.  **Design Pattern**: how to solve an entire class of similar problems.
     This usually only appears after applying a standard design a number
     of times, and then seeing a common pattern throughout these
     applications.
@@ -167,7 +167,7 @@ and say "clearly, you need a structural pattern here," so that
 classification doesn't lead me to a solution (I'll readily admit that I
 may be missing something here).
 
-I've labored for awhile with this problem, first noting that the
+I've labored for a while with this problem, first noting that the
 underlying structure of some of the GoF patterns are similar to each
 other, and trying to develop relationships based on that similarity.
 While this was an interesting experiment, I don't think it produced much
@@ -183,9 +183,7 @@ connecting these structures with patterns (or I may come up with a
 different approach altogether; this is still in its formative stages).
 
 Here^[This list includes suggestions by Kevlin Henney, David Scott, and
-others.] is the present list of candidates, only some of which will make it
-to the final list. Feel free to suggest others, or possibly
-relationships with patterns.
+others.] is the present list of candidates:
 
 -   **Encapsulation**: self containment and embodying a model of usage
 -   **Gathering**
@@ -204,9 +202,7 @@ medium" (May be a variation on Proxy).
 
 ## Design Principles
 
-When I put out a call for ideas, a number of suggestions came back which
-turned out to be very useful, but different than the above classification, and
-I realized that a list of design principles is at least as important as design
+A list of design principles is at least as important as design
 structures, but for a different reason: these allow you to ask questions about
 your proposed design, to apply tests for quality.
 
@@ -235,8 +231,7 @@ your proposed design, to apply tests for quality.
     not when there's nothing left to add, but when there's nothing left to
     remove".].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
-    (A variation of *Occam's Razor*,
-    which says "the simplest solution is the best"). A common problem we
+    A common problem we
     find in frameworks is that they are designed to be general purpose
     without reference to actual systems. This leads to a dizzying array
     of options that are often unused, misused or just not useful.
@@ -246,17 +241,14 @@ your proposed design, to apply tests for quality.
     So, this principle acts as the tie breaker between otherwise equally
     viable design alternatives. Of course, it is entirely possible that
     the simpler solution is the more general one.
--   *Reflexivity* (my suggested term). One abstraction per class, one
+-   *Reflexivity*. One abstraction per class, one
     class per abstraction. Might also be called Isomorphism.
 -   *Once and once only*: Avoid duplication of logic and structure
-    where the duplication is not accidental, ie where both pieces of
+    where the duplication is not accidental, i.e., where both pieces of
     code express the same intent for the same reason.
 
-In the process of brainstorming this idea, I hope to come up with a
-small handful of fundamental ideas that can be held in your head while
-you analyze a problem. However, other ideas that come from this list may
-end up being useful as a checklist while walking through and analyzing
-your design.
+This is a small handful of fundamental ideas that can be held in your
+head while walking through and analyzing your design.
 
 ## Further Reading
 

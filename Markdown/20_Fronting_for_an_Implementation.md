@@ -158,7 +158,7 @@ are:
 3.  `Protection proxy`. Used when you don't want the client programmer
     to have full access to the proxied object.
 4.  `Smart reference`. To add additional actions when the proxied
-    object is accessed. For example, or to keep track of the number of
+    object is accessed. For example, to keep track of the number of
     references that are held for a particular object, in order to
     implement the *copy-on-write* idiom and prevent object aliasing. A
     simpler example is keeping track of the number of calls to a

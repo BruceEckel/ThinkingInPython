@@ -53,12 +53,12 @@ This seems a little strange coming from C++ or Java where you must decide
 ahead of time how much space your object is going to occupy, but it turns out
 to be a very flexible way to program. If you declare fields using the C++/Java
 style, they implicitly become class level fields (similar to the static fields
-in C++/Java)
+in C++/Java).
 
 ## Inheritance
 
 Because Python is dynamically typed, it doesn't really care about
-interfaces -all it cares about is applying operations to objects (in
+interfaces: all it cares about is applying operations to objects (in
 fact, Java's `interface` keyword would be wasted in Python). This
 means that inheritance in Python is different from inheritance in C++ or
 Java, where you often inherit simply to establish a common interface. In
@@ -66,7 +66,7 @@ Python, the only reason you inherit is to inherit an implementation, to
 re-use the code in the base class.
 
 To inherit from a class, you must tell Python to bring that class into your
-new file. Python controls its name spaces as aggressively as Java does, and in
+new file. Python controls its namespaces as aggressively as Java does, and in
 a similar fashion (albeit with Python's penchant for simplicity). Every time
 you create a file, you implicitly create a module (which is like a package in
 Java) with the same name as that file. Thus, no `package` keyword is needed in
@@ -88,7 +88,7 @@ You inherit a class (or classes, since Python supports multiple inheritance)
 by listing the name(s) of the class inside parentheses after the name of
 the inheriting class. Note that the `Simple` class, which resides in
 the file (and thus, module) named `simple_class` is brought into this
-new name space using an `import` statement:
+new namespace using an `import` statement:
 
 ```python
 # simple2.py
@@ -130,19 +130,19 @@ override a method but still want the base-class version, call it through
 `super()`, as the overridden `show()` does.
 
 In `__main__`, you will see (when you run the program) that the
-base-class constructor is called. You can also see that the `show_msg(
-)` method is available in the derived class, just as you would expect
+base-class constructor is called. You can also see that the `show_msg()`
+method is available in the derived class, just as you would expect
 with inheritance.
 
 The class `Different` also has a method named `show()`, but this
 class is not derived from `Simple`. The `f()` method defined in
-`__main__` demonstrates weak typing: all it cares about is that
+`__main__` demonstrates duck typing: all it cares about is that
 `show()` can be applied to `obj`, and it doesn't have any other
 type requirements. You can see that `f()` can be applied equally to
 an object of a class derived from `Simple` and one that isn't, without
 discrimination. If you're a C++ programmer, you should see that the
 objective of the C++ `template` feature is exactly this: to provide
-weak typing in a strongly-typed language. Thus, in Python you
+duck typing in a statically-typed language. Thus, in Python you
 automatically get the equivalent of templates, without having to learn
 that particularly difficult syntax and semantics.
 

@@ -1,9 +1,9 @@
 # Static Type Checking
 
-The functions earlier in this chapter declare no types. C++ and Java make you
+The functions in the earlier chapters declare no types. C++ and Java make you
 declare the type of everything, and they check those types before the program
 runs. Python checks types at run time, only when an operation is actually
-attempted, and so far this chapter has leaned on that freedom.
+attempted, and the book so far has leaned on that freedom.
 
 On a small program you do not miss the declarations. On a large one you start to.
 A type error that a compiler would have caught now waits until the code runs, and

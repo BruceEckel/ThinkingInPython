@@ -1,0 +1,68 @@
+# Proofreading Progress
+
+Checkpoint for the prose proofreading pass. On restart, read this first, find
+the first unchecked chapter, and continue from there. Update the checkboxes and
+the "Last updated" line before ending each iteration.
+
+Last updated: ALL 30 CHAPTERS PROOFREAD. Pass complete, committed on branch
+`proofread/prose-pass`. The loop has stopped.
+
+Mechanical fixes (spelling, grammar, em-dashes, stale post-split references,
+Java-isms) were applied and committed per batch. Judgment calls are in
+PROOFREADING_FINDINGS.md for the user to review and approve. Remaining (human):
+merge the branch; act on the findings; optionally delete the two tracking
+files.
+
+## Policy
+
+- Work 2-3 chapters per iteration.
+- AUTO-FIX (in both Markdown and, if a code block changes, the matching
+  Examples/ file): spelling, doubled words, `it's`/`its` and similar, spacing,
+  and the global style rules: no em-dashes (`--` or the character), break
+  run-ons into short sentences, italics only to introduce a new term.
+- DO NOT silently rewrite voice. For confusing sentences or awkward phrasing,
+  append an entry to `PROOFREADING_FINDINGS.md` (chapter, original, proposed
+  rewrite) for the user to approve later. Do not change the prose.
+- Only touch prose. Do not change code blocks except to fix a comment typo;
+  if a code block changes, sync the matching `Examples/` file.
+- After each iteration: run `uv run python tools/extract_examples.py` (drift
+  must stay in sync), update this file, then commit. Stage explicitly
+  (`git add Markdown PROOFREADING_PROGRESS.md PROOFREADING_FINDINGS.md` plus any
+  touched `Examples/` paths). Do NOT `git add -A` (an unrelated `_TODO.md` edit
+  is in the tree and must not be committed).
+
+## Chapters
+
+- [x] 01 Introduction
+- [x] 02 A Python Tour
+- [x] 03 Containers and Control Flow
+- [x] 04 Functions
+- [x] 05 Modules and Packages
+- [x] 06 Classes
+- [x] 07 Initialization and Cleanup
+- [x] 08 Static Type Checking
+- [x] 09 Testing
+- [x] 10 Data Classes as Types
+- [x] 11 Functional Error Handling
+- [x] 12 Decorators
+- [x] 13 Comprehensions
+- [x] 14 Metaprogramming
+- [x] 15 Rethinking Objects
+- [x] 16 The Pattern Concept
+- [x] 17 Messenger
+- [x] 18 Singleton
+- [x] 19 Application Frameworks
+- [x] 20 Fronting for an Implementation
+- [x] 21 State Machines
+- [x] 22 Iterators
+- [x] 23 Factory
+- [x] 24 Function Objects
+- [x] 25 Changing the Interface
+- [x] 26 Observer
+- [x] 27 Multiple Dispatching
+- [x] 28 Visitor
+- [x] 29 Pattern Refactoring
+- [x] 30 Simulation
+
+When all are checked, stop the loop (no further ScheduleWakeup). The user
+reviews PROOFREADING_FINDINGS.md and decides which rewrites to apply.
