@@ -46,7 +46,7 @@ The output is:
     -> add(2, 3)
     <- add = 5
 
-The `@trace` above `add` is just sugar. It means:
+The `@trace` above `add` means:
 
     add = trace(add)
 
@@ -365,8 +365,6 @@ from the [Static Type Checking](08_Static_Type_Checking.md) chapter.
 Adding a new extra means adding one class. Changing the price of an extra means
 changing one number, in one place. Compare that to a class per combination, where
 a price change touches every class that includes that extra.
-
-A test fixes the behavior:
 
 ```python
 # test_coffee.py

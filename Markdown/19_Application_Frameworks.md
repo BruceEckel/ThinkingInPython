@@ -89,7 +89,7 @@ hierarchy. This is the same trade-off seen in the Function Objects chapter: a
 hook that holds no state is usually better as a function than as a method to
 override.
 
-The behavior to test is the same for both: the fixed algorithm calls the steps in
+We want to test that algorithm calls the steps in
 order, twice. Recording steps make that order visible:
 
 ```python
