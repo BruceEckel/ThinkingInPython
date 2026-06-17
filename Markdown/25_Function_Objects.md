@@ -52,27 +52,27 @@ The classic object form wraps each action in a `Command` subclass with an
 # command_pattern.py
 
 class Command:
-    def execute(self): pass
+    def execute(self) -> None: pass
 
 class Loony(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("You're a loony.")
 
 class NewBrain(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("You might even need a new brain.")
 
 class Afford(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("I couldn't afford a whole new brain.")
 
 # An object that holds commands:
 class Macro:
-    def __init__(self):
-        self.commands = []
-    def add(self, command):
+    def __init__(self) -> None:
+        self.commands: list[Command] = []
+    def add(self, command: Command) -> None:
         self.commands.append(command)
-    def run(self):
+    def run(self) -> None:
         for c in self.commands:
             c.execute()
 
@@ -131,34 +131,35 @@ and adds a "Context" object to hold the current strategy:
 # The strategy interface:
 class FindMinima:
     # Line is a sequence of points:
-    def algorithm(self, line): pass
+    def algorithm(self, line: list[float]) -> float:
+        raise NotImplementedError
 
 # The various strategies:
 class LeastSquares(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return sum(line) / len(line)  # mean
 
 class NewtonsMethod(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return min(line)
 
 class Bisection(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return (min(line) + max(line)) / 2  # midpoint
 
 class ConjugateGradient(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return max(line)
 
 # The "Context" controls the strategy:
 class MinimaSolver:
-    def __init__(self, strategy):
+    def __init__(self, strategy: FindMinima) -> None:
         self.strategy = strategy
 
-    def minima(self, line):
+    def minima(self, line: list[float]) -> float:
         return self.strategy.algorithm(line)
 
-    def change_algorithm(self, new_algorithm):
+    def change_algorithm(self, new_algorithm: FindMinima) -> None:
         self.strategy = new_algorithm
 
 solver = MinimaSolver(LeastSquares())

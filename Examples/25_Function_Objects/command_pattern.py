@@ -1,27 +1,27 @@
 # command_pattern.py
 
 class Command:
-    def execute(self): pass
+    def execute(self) -> None: pass
 
 class Loony(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("You're a loony.")
 
 class NewBrain(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("You might even need a new brain.")
 
 class Afford(Command):
-    def execute(self):
+    def execute(self) -> None:
         print("I couldn't afford a whole new brain.")
 
 # An object that holds commands:
 class Macro:
-    def __init__(self):
-        self.commands = []
-    def add(self, command):
+    def __init__(self) -> None:
+        self.commands: list[Command] = []
+    def add(self, command: Command) -> None:
         self.commands.append(command)
-    def run(self):
+    def run(self) -> None:
         for c in self.commands:
             c.execute()
 

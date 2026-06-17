@@ -1,25 +1,25 @@
 # facade.py
 class A:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 class B:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 class C:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 
 # Other classes that aren't exposed by the
 # facade go here ...
 
 class Facade:
     @staticmethod
-    def make_a(x):
+    def make_a(x: object) -> A:
         return A(x)
 
     @staticmethod
-    def make_b(x):
+    def make_b(x: object) -> B:
         return B(x)
 
     @staticmethod
-    def make_c(x):
+    def make_c(x: object) -> C:
         return C(x)
 
 # The client programmer gets the objects

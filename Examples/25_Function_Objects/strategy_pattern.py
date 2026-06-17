@@ -3,34 +3,35 @@
 # The strategy interface:
 class FindMinima:
     # Line is a sequence of points:
-    def algorithm(self, line): pass
+    def algorithm(self, line: list[float]) -> float:
+        raise NotImplementedError
 
 # The various strategies:
 class LeastSquares(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return sum(line) / len(line)  # mean
 
 class NewtonsMethod(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return min(line)
 
 class Bisection(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return (min(line) + max(line)) / 2  # midpoint
 
 class ConjugateGradient(FindMinima):
-    def algorithm(self, line):
+    def algorithm(self, line: list[float]) -> float:
         return max(line)
 
 # The "Context" controls the strategy:
 class MinimaSolver:
-    def __init__(self, strategy):
+    def __init__(self, strategy: FindMinima) -> None:
         self.strategy = strategy
 
-    def minima(self, line):
+    def minima(self, line: list[float]) -> float:
         return self.strategy.algorithm(line)
 
-    def change_algorithm(self, new_algorithm):
+    def change_algorithm(self, new_algorithm: FindMinima) -> None:
         self.strategy = new_algorithm
 
 solver = MinimaSolver(LeastSquares())

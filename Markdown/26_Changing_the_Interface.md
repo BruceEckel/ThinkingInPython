@@ -16,54 +16,56 @@ number of ways you can accomplish this adaptation:
 ```python
 # adapter.py
 # Variations on the Adapter pattern.
+from typing import Any
+
 
 class WhatIHave:
-    def g(self): pass
-    def h(self): pass
+    def g(self) -> None: pass
+    def h(self) -> None: pass
 
 class WhatIWant:
-    def f(self): pass
+    def f(self) -> None: pass
 
 class ProxyAdapter(WhatIWant):
-    def __init__(self, what_i_have):
+    def __init__(self, what_i_have: Any) -> None:
         self.what_i_have = what_i_have
 
-    def f(self):
+    def f(self) -> None:
         # Implement behavior using
         # methods in WhatIHave:
         self.what_i_have.g()
         self.what_i_have.h()
 
 class WhatIUse:
-    def op(self, what_i_want, /):
+    def op(self, what_i_want: Any, /) -> None:
         what_i_want.f()
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
-    def op(self, what_i_have):
+    def op(self, what_i_have: Any) -> None:
         ProxyAdapter(what_i_have).f()
 
 # Approach 3: build adapter into WhatIHave:
 class WhatIHave2(WhatIHave, WhatIWant):
-    def f(self):
+    def f(self) -> None:
         self.g()
         self.h()
 
 # Approach 4: use an inner class:
 class WhatIHave3(WhatIHave):
     class InnerAdapter(WhatIWant):
-        def __init__(self, outer):
+        def __init__(self, outer: Any) -> None:
             self.outer = outer
-        def f(self):
+        def f(self) -> None:
             self.outer.g()
             self.outer.h()
 
-    def what_i_want(self):
+    def what_i_want(self) -> WhatIWant:
         return WhatIHave3.InnerAdapter(self)
 
 what_i_use = WhatIUse()
 what_i_have = WhatIHave()
-adapt= ProxyAdapter(what_i_have)
+adapt = ProxyAdapter(what_i_have)
 what_i_use2 = WhatIUse2()
 what_i_have2 = WhatIHave2()
 what_i_have3 = WhatIHave3()
@@ -164,26 +166,26 @@ factory methods:
 ```python
 # facade.py
 class A:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 class B:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 class C:
-    def __init__(self, x): pass
+    def __init__(self, x: object) -> None: pass
 
 # Other classes that aren't exposed by the
 # facade go here ...
 
 class Facade:
     @staticmethod
-    def make_a(x):
+    def make_a(x: object) -> A:
         return A(x)
 
     @staticmethod
-    def make_b(x):
+    def make_b(x: object) -> B:
         return B(x)
 
     @staticmethod
-    def make_c(x):
+    def make_c(x: object) -> C:
         return C(x)
 
 # The client programmer gets the objects
