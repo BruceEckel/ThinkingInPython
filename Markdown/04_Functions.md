@@ -52,8 +52,7 @@ print(sum(42, 47))
 print(sum('spam ', "eggs"))
 ```
 
-When the operator '`+`' is used with strings, it means concatenation (yes,
-Python supports operator overloading, and it does a nice job of it).
+
 
 ## Default and Keyword Arguments
 

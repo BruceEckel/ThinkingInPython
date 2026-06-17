@@ -167,9 +167,7 @@ from a_package.b_package import module3
 print(module3.function3())
 ```
 
-This example is primarily useful to show you the consistency of the package
-model. You will rarely do anything like this, probably only with an especially
-complex project.
+
 
 ## `PYTHONPATH`
 

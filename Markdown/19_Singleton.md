@@ -70,7 +70,7 @@ a.data["theme"] = "dark"
 print(b.data)
 ```
 
-This is small and obvious. If you need the class itself to hand back one instance
+If you need the class itself to hand back one instance
 from its own constructor, override `__new__`, shown below.
 
 ## The Classic Implementations

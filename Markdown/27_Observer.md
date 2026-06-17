@@ -26,13 +26,10 @@ Python. The `Observable` class keeps track of everybody who wants to
 be informed when a change happens, whether the "state" has changed or
 not. When someone says "OK, everybody should check and potentially
 update themselves," the `Observable` class performs this task by
-calling the `notify_observers()` method for each one on the list. The
-`notify_observers()` method is part of the base class `Observable`.
+calling the `notify_observers()` method for each one on the list.
 
 There are actually two "things that change" in the observer pattern: the
-quantity of observing objects and the way an update occurs. That is, the
-observer pattern allows you to modify both of these without affecting
-the surrounding code.
+quantity of observing objects and the way an update occurs.
 
 `Observer` is an "interface" class that only has one method,
 `update()`. This function is called by the object that's being

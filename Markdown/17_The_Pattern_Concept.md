@@ -7,9 +7,7 @@ Probably the most important step forward in object-oriented design is the
 "design patterns" movement, chronicled in the book *Design Patterns*^[But be
 warned: the examples are in C++.]. That book shows 23 different solutions to
 particular classes of problems. In this book, the basic concepts of design
-patterns will be introduced along with examples. This should whet your
-appetite to read *Design Patterns* by Gamma et al., a source of what has now
-become an essential, almost mandatory, vocabulary for OOP programmers.
+patterns will be introduced along with examples.
 
 The latter part of this book contains an example of the design evolution
 process, starting with an initial solution and moving through the logic
@@ -144,15 +142,13 @@ describing a succession of different types of categories:
     of times, and then seeing a common pattern throughout these
     applications.
 
-I feel this helps put things in perspective, and to show where something
-might fit. However, it doesn't say that one is better than another. It
+However, it doesn't say that one is better than another. It
 doesn't make sense to try to take every problem solution and generalize
 it to a design pattern; it's not a good use of your time, and you can't
 force the discovery of patterns that way; they tend to be subtle and
 appear over time.
 
-One could also argue for the inclusion of *Analysis Pattern* and
-*Architectural Pattern* in this taxonomy.
+
 
 ## Design Structures
 
@@ -170,17 +166,11 @@ may be missing something here).
 I've labored for a while with this problem, first noting that the
 underlying structure of some of the GoF patterns are similar to each
 other, and trying to develop relationships based on that similarity.
-While this was an interesting experiment, I don't think it produced much
-of use in the end because the point is to solve problems, so a helpful
-approach will look at the problem to solve and try to find relationships
-between the problem and potential solutions.
+
 
 To that end, I've begun to try to collect basic design structures, and
 to try to see if there's a way to relate those structures to the various
-design patterns that appear in well thought-out systems. Currently, I'm
-just trying to make a list, but eventually I hope to make steps towards
-connecting these structures with patterns (or I may come up with a
-different approach altogether; this is still in its formative stages).
+design patterns that appear in well thought-out systems.
 
 Here^[This list includes suggestions by Kevlin Henney, David Scott, and
 others.] is the present list of candidates:

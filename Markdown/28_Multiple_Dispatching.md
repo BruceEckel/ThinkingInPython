@@ -21,11 +21,7 @@ double dispatching to occur, there must be two method calls:
 the first to determine the first unknown type, and the second to
 determine the second unknown type. With multiple dispatching, you must
 have a polymorphic method call to determine each of the types.
-Generally, you'll set up a configuration such that a single member
-function call produces more than one dynamic method call and
-thus determines more than one type in the process. To get this effect,
-you need to work with more than one polymorphic method call: you'll need
-one call for each dispatch. The methods in the following example are
+The methods in the following example are
 called `compete()` and `eval()`, and are both members of the same
 type. (In this case there will be only two dispatches, which is referred
 to as *double dispatching*). If you are working with two different type

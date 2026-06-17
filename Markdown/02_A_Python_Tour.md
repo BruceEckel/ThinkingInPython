@@ -14,18 +14,15 @@ tend to be limiting, especially in the scope of the problems that they solve.
 Python, on the other hand, is a programming language that also supports
 scripting. It *is* marvelous for scripting, and you may find yourself
 replacing all your batch files, shell scripts, and simple programs with Python
-scripts. But it is far more than a scripting language.
+scripts.
 
 The goal of Python is improved productivity. This productivity comes in many
 ways, but the language is designed to aid you as much as possible, while
 hindering you as little as possible with arbitrary rules or any requirement
-that you use a particular set of features. Python is practical; Python
-language design decisions were based on providing the maximum benefits to the
-programmer.
+that you use a particular set of features.
 
 Python is very clean to write and you will find that it's
 quite easy to read your own code long after you've written it.
-This is accomplished through clean, to-the-point syntax.
 A major factor in code readability is
 that scoping in Python is determined by indentation. For example:
 
@@ -42,8 +39,6 @@ print("continuing...")
 The '`#`' denotes a comment that goes until the end of the line, just like
 C++ and Java '`//`' comments.
 
-First notice the `if` statement.
-You can see that the basic syntax of Python is C-ish.
 But in a C `if`, you would be required to use parentheses around the conditional,
 whereas they are not necessary in Python (it won't complain if you use them anyway).
 
@@ -60,8 +55,7 @@ readability.
 
 Python normally has only one statement per line (you can put more by
 separating them with semicolons), thus no terminating semicolon is necessary.
-Even from the brief example above you can see that the language is designed to
-be as simple as possible, and yet still very readable.
+
 
 ## Variables and References
 
@@ -182,8 +176,7 @@ boolean. `x or default` is a common way to supply a fallback.
 
 ## Strings
 
-The above example also shows a little bit about Python string handling, which
-is the best of any language I've seen. You can use single or double quotes to
+You can use single or double quotes to
 represent strings, which is very nice because if you surround a string with
 double quotes, you can embed single quotes and vice versa:
 
@@ -229,8 +222,7 @@ As you can see in the second case, more than one argument is grouped in
 parentheses as a tuple (covered in the next chapter).
 
 All the formatting from `printf()` is available, including control
-over the number of decimal places and alignment. Python also has very
-sophisticated regular expressions.
+over the number of decimal places and alignment.
 
 ### f-Strings
 

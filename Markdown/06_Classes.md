@@ -41,17 +41,14 @@ The first method, `__init__()`, defines the constructor (again, the double
 underscores indicate a special name), which is automatically called when the
 object is created, just like in C++ and Java. However, at the bottom of the
 example you can see that the creation of an object looks just like a function
-call using the class name. Python's spare syntax makes you realize that the
-`new` keyword isn't really necessary in C++ or Java, either.
+call using the class name.
 
 In C++ or Java you declare object level fields inside the class body but
 outside of the methods. Something that's a little surprising at first is that
 you do not declare them this way in Python. To create an object field, you
 just name it, using `self`, inside one of the methods (usually in the
 constructor, but not always), and space is created when that method is run.
-This seems a little strange coming from C++ or Java where you must decide
-ahead of time how much space your object is going to occupy, but it turns out
-to be a very flexible way to program. If you declare fields using the C++/Java
+If you declare fields using the C++/Java
 style, they implicitly become class level fields (similar to the static fields
 in C++/Java).
 
@@ -124,9 +121,7 @@ type requirements. You can see that `f()` can be applied equally to
 an object of a class derived from `Simple` and one that isn't, without
 discrimination. If you're a C++ programmer, you should see that the
 objective of the C++ `template` feature is exactly this: to provide
-dynamic typing in a statically-typed language. Thus, in Python you
-automatically get the equivalent of templates, without having to learn
-that particularly difficult syntax and semantics.
+dynamic typing in a statically-typed language.
 
 ## Properties
 

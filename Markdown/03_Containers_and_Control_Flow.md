@@ -6,12 +6,10 @@ With languages like C++ and Java, containers are add-on libraries and not
 integral to the language. In Python, the essential nature of containers for
 programming is acknowledged by building them into the core of the language:
 both lists and associative arrays (a.k.a. maps, dictionaries, hash tables) are
-fundamental data types. This adds much to the elegance of the language.
+fundamental data types.
 
 In addition, the `for` statement automatically iterates through lists rather
-than just counting through a sequence of numbers. This makes a lot of sense
-when you think about it, since you're almost always using a `for` loop to step
-through an array or a container. Python formalizes this by automatically
+than just counting through a sequence of numbers. Python formalizes this by automatically
 making `for` use an iterator that works through a sequence. Here's an example:
 
 ```python
@@ -24,20 +22,15 @@ for x in list:
     print(x)
 ```
 
-The first line creates a list. You can print the list and it will look exactly
-as you put it in (in contrast, remember that I had to create a special
-`Arrays2` class in *Thinking in Java* in order to print arrays in Java). Lists
+The first line creates a list. Lists
 are like Java containers: you can add new elements to them (here, `append()`
 is used) and they will automatically resize themselves. The `for` statement
 creates an iterator `x` which takes on each value in the list.
 
-You can create a list of numbers with the `range()` function, so if you really
-need to imitate C's `for`, you can.
+
 
 Notice that there aren't any type declarations: the object names simply
-appear, and Python infers their type by the way that you use them. It's as if
-Python is designed so that you only need to press the keys that absolutely
-must. You'll find after you've worked with Python for a short while that
+appear, and Python infers their type by the way that you use them. You'll find after you've worked with Python for a short while that
 you've been using up a lot of brain cycles parsing semicolons, curly braces,
 and all sorts of other extra verbiage that was demanded by your non-Python
 programming language but didn't actually describe what your program was

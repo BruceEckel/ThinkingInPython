@@ -5,7 +5,7 @@ implementation, *StateMachine* imposes a structure to automatically
 change the implementation from one object to the next. The current
 implementation represents the state that a system is in, and the system
 behaves differently from one state to the next (because it uses
-*State*). Basically, this is a "state machine" using objects.
+*State*).
 
 The code that moves the system from one state to the next is often a
 *Template Method*, as seen in the following framework for a basic state
@@ -626,9 +626,7 @@ def test_no_transition_raises() -> None:
         vm.handle(Quit())
 ```
 
-As your state machine gets bigger, you might decide to use an
-automation tool whereby you configure a table and the tool generates
-the state machine code for you.
+
 
 ## Exercises
 

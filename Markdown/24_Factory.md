@@ -106,8 +106,7 @@ generator is a bit strange: when you call a function that contains a
 function actually returns a generator
 object that has an iterator. This iterator is implicitly used in the
 `for` statement above, so it appears that you are iterating through
-the generator function, not what it returns. This was done for
-convenience of use.
+the generator function, not what it returns.
 
 Thus, the code that you write is actually a kind of factory, that
 creates the generator objects that do the actual generation. You can use
@@ -270,8 +269,7 @@ def test_unknown_name_raises() -> None:
 
 The static `factory()` method in the previous example forces all the
 creation operations to be focused in one spot, so that's the only place
-you need to change the code. This is certainly a reasonable solution, as
-it throws a box around the process of creating objects. However, the
+you need to change the code. However, the
 *Design Patterns* book emphasizes that the reason for the *Factory
 Method* pattern is so that different types of factories can be
 subclassed from the basic factory (the above design is mentioned as a
@@ -509,7 +507,7 @@ implementation inheritance; since Python does its type-checking at
 runtime, there's no need to use interface inheritance so that you can
 upcast to the base type.
 
-You might want to study the two examples for comparison, however. Does
+Does
 the first one add enough useful information about the pattern that it's
 worth keeping some aspect of it? Perhaps all you need is "tagging
 classes" like this:

@@ -39,7 +39,7 @@ print(total)
 
 The container and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`, and `str | None` for "a string or
-nothing." There is almost no new vocabulary to learn for everyday code.
+nothing."
 
 ## Constants with Final
 

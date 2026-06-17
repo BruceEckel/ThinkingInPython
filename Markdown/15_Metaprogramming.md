@@ -483,8 +483,7 @@ B is final; you cannot subclass it
 ```
 
 The check happens at class-creation time, exactly when it must, and `B` itself
-is built normally because `A` does not forbid subclassing. This is a good
-example of how Python 3 retired one of the classic reasons to write a metaclass.
+is built normally because `A` does not forbid subclassing.
 
 ## When You Still Need a Metaclass
 

@@ -8,9 +8,7 @@ The assumption is that you have a primary class hierarchy that is fixed;
 perhaps it's from another vendor and you can't make changes to that
 hierarchy. However, your intent is that you'd like to add new
 polymorphic methods to that hierarchy, which means that normally you'd
-have to add something to the base class interface. So the dilemma is
-that you need to add methods to the base class, but you can't touch the
-base class. How do you get around this?
+have to add something to the base class interface. How do you get around this?
 
 The design pattern that solves this kind of problem is called a
 "visitor" (the final one in the *Design Patterns* book), and it builds

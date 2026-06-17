@@ -80,8 +80,7 @@ what_i_use.op(what_i_have3.what_i_want())
 
 I'm taking liberties with the term "proxy" here, because in *Design
 Patterns* they assert that a proxy must have an identical interface with
-the object that it is a surrogate for. However, if you have the two
-words together: "proxy adapter," it is perhaps more reasonable.
+the object that it is a surrogate for.
 
 ### Adapter in Python
 

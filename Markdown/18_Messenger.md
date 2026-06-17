@@ -30,8 +30,7 @@ the `dict` that is automatically created by the `**kwargs` argument.
 
 You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in-place, wherever you need it,
-usually makes more sense. That is probably easier for the reader to follow,
-too.
+usually makes more sense.
 
 ## The Standard-Library Versions
 

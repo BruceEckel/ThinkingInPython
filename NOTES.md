@@ -1,3 +1,9 @@
+- Search for "Java" and "C++"
+
+- 27 Observer intro needs a rewrite, right now it's confusing to read.
+
+- Indexing using Leanpub format, before publishing to leanpub
+
 - Consider TKInter for simulation chapter, or any example that might benefit from graphics.
   Maybe it's not perfect but this isn't a book about GUIs, and there's
   no installation hassle with TKInter.
@@ -5,11 +11,6 @@
   *except* the function that takes the values and displays them; that's all that function should do.
   First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
   before doing any other examples.
-
-- 27 Observer intro needs a rewrite, right now it's confusing to read.
-
-- Indexing using Leanpub format, before publishing to leanpub
-
 
 ******************
 

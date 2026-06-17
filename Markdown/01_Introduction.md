@@ -1,10 +1,9 @@
 # Introduction
 
 This is a collection of topics to give you a deeper understanding of
-programming in Python. The next chapter,
-[A Python Tour](02_A_Python_Tour.md), is a fast tour of the
-language, but this is not an introductory book. There are plenty of excellent
-Python tutorials and online courses for that. The rest of the chapters assume
+programming in Python. The next section, **Part I:  Foundations**,
+is a fast tour of the language, but this is not an introductory book.
+The rest of the chapters assume
 you can already read and write Python and follow along. If a language feature is
 new to you, look it up as you go.
 
@@ -50,8 +49,7 @@ are assumed, or easy to find elsewhere, starting with the official Python
 documentation.
 
 You do not need to know design patterns, metaclasses, or type checking before
-you start. The book builds those up. If your grasp of objects is shaky, it will
-grow stronger as you watch objects used in many different situations here.
+you start. The book builds those up.
 
 ## How to Read This Book
 
