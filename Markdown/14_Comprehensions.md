@@ -106,15 +106,18 @@ Multiple types (auto unpacking of a tuple):
 
     [f(v) for (n, f), v in zip(cls.all_slots, values)]
 
-A two-level list comprehension using `os.walk()`:
+A two-level list comprehension using `Path.walk()`:
 
 ```python
 # os_walk_comprehension.py
-import os
+from pathlib import Path
 
-rest_files = [os.path.join(d[0], f) for d in os.walk(".")
-             for f in d[2] if f.endswith(".rst")]
-for r in rest_files:
+rst_files = [
+    dirpath / f
+    for dirpath, _, files in Path(".").walk()
+    for f in files if f.endswith(".rst")
+]
+for r in rst_files:
     print(r)
 ```
 

@@ -12,10 +12,10 @@ from typing import Any
 # (condition, action, next_state); condition and action may be None.
 # A state is any Enum member, so a misspelled state is a type error
 # rather than a silent dead end.
-Transition = tuple[
+type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
-Table = dict[tuple[Enum, type], list[Transition]]
+type Table = dict[tuple[Enum, type], list[Transition]]
 
 
 class StateMachine:

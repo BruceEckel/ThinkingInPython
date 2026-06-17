@@ -1,12 +1,9 @@
 # outcome.py
 # The win/lose/draw result of one Item competing with another.
-from enum import Enum
+from enum import StrEnum
 
 
-class Outcome(Enum):
+class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
-
-    def __str__(self):
-        return self.value

@@ -1,12 +1,12 @@
 # context_manager.py
-import os
 import tempfile
+from pathlib import Path
 
-path = os.path.join(tempfile.gettempdir(), "demo.txt")
-with open(path, "w") as f:
+path = Path(tempfile.gettempdir()) / "demo.txt"
+with path.open("w") as f:
     f.write("one\ntwo\n")  # f.close() happens automatically
 
-with open(path) as f:
+with path.open() as f:
     for line in f:
         print(line.strip())
-os.remove(path)
+path.unlink()

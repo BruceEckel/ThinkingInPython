@@ -4,8 +4,8 @@
 # list.
 from collections.abc import Callable
 
-Line = list[float]
-Result = list[float] | None
+type Line = list[float]
+type Result = list[float] | None
 
 
 def least_squares(line: Line) -> Result:

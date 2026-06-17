@@ -3,7 +3,7 @@
 # Context object.
 from collections.abc import Callable
 
-Line = list[float]
+type Line = list[float]
 
 
 def least_squares(line: Line) -> float:

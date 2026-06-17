@@ -1,6 +1,7 @@
 # mousetrap1/mouse_trap.py
 # State Machine pattern using match to determine the next state.
 import sys
+from pathlib import Path
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -73,7 +74,7 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-with open("../mouse/mouse_moves.txt") as f:
-    moves = [line.strip() for line in f
-             if line.strip() and not line.startswith('#')]
+text = Path("../mouse/mouse_moves.txt").read_text()
+moves = [line.strip() for line in text.splitlines()
+         if line.strip() and not line.startswith('#')]
 MouseTrap().run_all([MouseAction(m) for m in moves])

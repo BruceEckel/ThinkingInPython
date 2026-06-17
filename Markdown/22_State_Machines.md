@@ -82,26 +82,24 @@ inputs to the state machine:
 
 ```python
 # mouse/mouse_action.py
-from enum import Enum
+from enum import StrEnum
 
 
-class MouseAction(Enum):
+class MouseAction(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"
     ESCAPES = "mouse escapes"
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
-
-    def __str__(self) -> str:
-        return self.value
 ```
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration.
-Because it is an `Enum`, the members compare and hash correctly with no extra
-code, so they work directly as dictionary keys. Looking one up by its string
-value, as in `MouseAction("mouse appears")`, returns the matching member, which
-is how the test input below is parsed.
+Because it is a `StrEnum`, each member *is* its string value: `str` needs no
+help, and a member even compares equal to its string. The members still hash
+and look up correctly, so they work as dictionary keys, and
+`MouseAction("mouse appears")` returns the matching member, which is how the
+test input below is parsed.
 
 For creating test code, a sequence of mouse inputs is provided from a
 text file:
@@ -134,6 +132,7 @@ clause:
 # mousetrap1/mouse_trap.py
 # State Machine pattern using match to determine the next state.
 import sys
+from pathlib import Path
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -206,9 +205,9 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-with open("../mouse/mouse_moves.txt") as f:
-    moves = [line.strip() for line in f
-             if line.strip() and not line.startswith('#')]
+text = Path("../mouse/mouse_moves.txt").read_text()
+moves = [line.strip() for line in text.splitlines()
+         if line.strip() and not line.startswith('#')]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 ```
 
@@ -241,6 +240,7 @@ they test for a `null Map` (and initialize it if it's `null`):
 # mousetrap2/mouse_trap2.py
 # A better mousetrap using tables
 import sys
+from pathlib import Path
 from typing import Any
 
 sys.path += ['..', '../mouse']
@@ -321,9 +321,9 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-with open("../mouse/mouse_moves.txt") as f:
-    moves = [line.strip() for line in f
-             if line.strip() and not line.startswith('#')]
+text = Path("../mouse/mouse_moves.txt").read_text()
+moves = [line.strip() for line in text.splitlines()
+         if line.strip() and not line.startswith('#')]
 mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)
 ```
@@ -378,10 +378,10 @@ from typing import Any
 # (condition, action, next_state); condition and action may be None.
 # A state is any Enum member, so a misspelled state is a type error
 # rather than a silent dead end.
-Transition = tuple[
+type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
-Table = dict[tuple[Enum, type], list[Transition]]
+type Table = dict[tuple[Enum, type], list[Transition]]
 
 
 class StateMachine:

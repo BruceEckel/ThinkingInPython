@@ -1,6 +1,7 @@
 # mousetrap2/mouse_trap2.py
 # A better mousetrap using tables
 import sys
+from pathlib import Path
 from typing import Any
 
 sys.path += ['..', '../mouse']
@@ -81,8 +82,8 @@ MouseTrap.luring = Luring()
 MouseTrap.trapping = Trapping()
 MouseTrap.holding = Holding()
 
-with open("../mouse/mouse_moves.txt") as f:
-    moves = [line.strip() for line in f
-             if line.strip() and not line.startswith('#')]
+text = Path("../mouse/mouse_moves.txt").read_text()
+moves = [line.strip() for line in text.splitlines()
+         if line.strip() and not line.startswith('#')]
 mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)

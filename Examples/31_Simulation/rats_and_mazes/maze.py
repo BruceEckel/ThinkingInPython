@@ -2,6 +2,7 @@
 # Reads a maze layout and reports walls, openings, and an entry point.
 
 from pathlib import Path
+from typing import Self
 
 
 class Maze:
@@ -14,13 +15,13 @@ class Maze:
         self.rows = [r.ljust(self.width, self.WALL) for r in rows]
 
     @classmethod
-    def from_text(cls, text: str) -> Maze:
+    def from_text(cls, text: str) -> Self:
         rows = [line for line in text.splitlines()
                 if line and not line.lstrip().startswith("#")]
         return cls(rows)
 
     @classmethod
-    def from_file(cls, filename: str) -> Maze:
+    def from_file(cls, filename: str) -> Self:
         return cls.from_text(
             Path(filename).read_text(encoding="utf-8"))
 

@@ -34,22 +34,19 @@ method call in each hierarchy.
 
 Both versions below share one result type: an enumeration of the three outcomes,
 win, lose, and draw. Rather than duplicate it, put it in its own module that both
-examples import. Python's `enum` library makes the type directly, and each member
-is a singleton you can compare and print:
+examples import. It is a `StrEnum`, so each member is its string value and prints
+as `win`, `lose`, or `draw` with no extra code:
 
 ```python
 # outcome.py
 # The win/lose/draw result of one Item competing with another.
-from enum import Enum
+from enum import StrEnum
 
 
-class Outcome(Enum):
+class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
-
-    def __str__(self):
-        return self.value
 ```
 
 Both versions also share two small helpers: one to generate random pairs of

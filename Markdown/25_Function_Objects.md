@@ -100,7 +100,7 @@ algorithm is a function, and you pass it in:
 # Context object.
 from collections.abc import Callable
 
-Line = list[float]
+type Line = list[float]
 
 
 def least_squares(line: Line) -> float:
@@ -188,8 +188,8 @@ result wins:
 # list.
 from collections.abc import Callable
 
-Line = list[float]
-Result = list[float] | None
+type Line = list[float]
+type Result = list[float] | None
 
 
 def least_squares(line: Line) -> Result:
