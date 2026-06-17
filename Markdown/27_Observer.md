@@ -2,69 +2,23 @@
 
 > Decoupling code behavior
 
-The *Observer* pattern is a kind of callback: an object
-registers interest in another object and is notified when that object's state
-changes. It is the most dynamic of the callback patterns. (A related family,
-multiple dispatching, includes the *Visitor* pattern from *Design Patterns*;
-see the Multiple Dispatching and Visitor chapters. [[Create links]]
+The *Observer* pattern is a kind of callback. One object, the *observer*,
+registers interest in another, the *observable*, and is notified whenever the
+observable's state changes. Of the callback patterns it is the most dynamic:
+observers attach and detach at run time, and the observable never needs to know
+their types. It underlies event handling, and the model-view split that keeps a
+display in step with the data behind it.
 
-*Observer* is often used for the specific case of
-changes based on another object's change of state, but is also the basis
-of event management.
+The problem it solves is common: a group of objects must update themselves when
+some other object changes state. The classic example is Smalltalk's MVC
+(model-view-controller), or the almost-equivalent Document-View architecture.
+You have some data, the *document*, and more than one view of it, say a plot and
+a table. When the data changes, every view must refresh. The observer pattern
+arranges that, without the data having to know which views exist.
 
-The observer pattern solves a fairly common problem: What if a group of
-objects needs to update themselves when some object changes state? This
-can be seen in the "model-view" aspect of Smalltalk's MVC
-(model-view-controller), or the almost-equivalent "Document-View
-Architecture." Suppose that you have some data (the "document") and more
-than one view, say a plot and a textual view. When you change the data,
-the two views must know to update themselves. This is what
-observer facilitates.
-
-There are two types of objects used to implement the observer pattern in
-Python. The `Observable` class keeps track of everybody who wants to
-be informed when a change happens, whether the "state" has changed or
-not. When someone says "OK, everybody should check and potentially
-update themselves," the `Observable` class performs this task by
-calling the `notify_observers()` method for each one on the list.
-
-There are actually two "things that change" in the observer pattern: the
-quantity of observing objects and the way an update occurs.
-
-`Observer` is an "interface" class that only has one method,
-`update()`. This function is called by the object that's being
-observed, when that object decides it's time to update all its observers.
-The arguments are optional; you can have an `update()` with no
-arguments which still fits the observer pattern.
-This allows the observed object to pass the object that
-caused the update (since an `Observer` may be registered with more
-than one observed object) and any extra information if that's helpful,
-rather than forcing the `Observer` object to hunt around to see who is
-updating and to fetch any other information it needs.
-
-`Observable` has a flag to indicate whether it's been changed. In a
-simpler design, there would be no flag; if something happened, everyone
-would be notified. The flag allows you to wait, and only notify the
-`Observer`s when you decide the time is right. Notice, however, that
-the control of the flag's state is `protected`, so that only an
-inheritor can decide what constitutes a change, and not the end user of
-the resulting derived `Observer` class.
-
-Most of the work is done in `notify_observers()`. If the `changed`
-flag has not been set, this does nothing. Otherwise, it first clears the
-`changed` flag so repeated calls to `notify_observers()` won't waste
-time. This is done before notifying the observers in case the calls to
-`update()` do anything that causes a change back to this
-`Observable` object. Then it moves through the `set` and calls back
-to the `update()` method of each `Observer`.
-
-At first it may appear that you can use an ordinary `Observable`
-object to manage the updates. But this doesn't work; to get an effect,
-you *must* inherit from `Observable` and somewhere in your
-derived-class code call `set_changed()`. This is the method
-that sets the "changed" flag, which means that when you call
-`notify_observers()` all of the observers will, in fact, get notified.
-*Where* you call `set_changed()` depends on the logic of your program.
+Python expresses this with far less machinery than the classic design needs, so
+this chapter shows the Pythonic version first, then the literal translation of
+Java's `Observable` and `Observer` classes for when you actually need it.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -222,7 +176,7 @@ Every box observes a shared `Observable`. When one box is
 "clicked," the `Observable` notifies every box, and each box adjacent to the
 clicked one changes its color to match it.
 
-The original was a Swing GUI. The pattern itself has nothing to do with a GUI,
+The pattern itself has nothing to do with a GUI,
 so here it is as a headless program that clicks a box in code and then checks
 the result. That keeps the focus on the Observer mechanics and lets the example
 verify itself. It reuses the `Observable` and `Observer` classes from

@@ -91,7 +91,7 @@ runs `ty` on every change, so the code you read here checks as well as runs.
 
 ## Catching Mistakes
 
-The whole point is to hear about a mistake before it ships. Look at this:
+The goal is to discover mistakes before the program runs. Consider:
 
 ```python
 def area(width: int, height: int) -> int:
@@ -100,10 +100,10 @@ def area(width: int, height: int) -> int:
 area("3", 4)   # ty: argument of type "str" is not assignable to "int"
 ```
 
-At run time `area("3", 4)` does not even raise. It returns `"3333"`, because
+At run time `area("3", 4)` does not cause an error. It returns `"3333"`, because
 `"3" * 4` is perfectly good string repetition. The bug would surface much later,
-somewhere that expected a number, far from the line that caused it. The checker
-points at the call right away.
+far from the line that caused it. The checker
+discovers the problem right away.
 
 ## Structural Typing with Protocols
 
