@@ -25,9 +25,7 @@ if __name__ == "__main__":
     x.show_msg("A message")
 ```
 
-Both methods have `self` as their first argument. C++ and Java both have a
-hidden first argument in their class methods, which points to the object that
-the method was called for and can be accessed using the keyword `this`. Python
+Both methods have `self` as their first argument. Python
 methods also use a reference to the current object, but when you are
 *defining* a method you must explicitly specify the reference as the first
 argument. Traditionally, the reference is called `self` but you could use any
@@ -39,7 +37,7 @@ object; *that* is done for you.
 
 The first method, `__init__()`, defines the constructor (again, the double
 underscores indicate a special name), which is automatically called when the
-object is created, just like in C++ and Java. However, at the bottom of the
+object is created. However, at the bottom of the
 example you can see that the creation of an object looks just like a function
 call using the class name.
 
@@ -55,8 +53,7 @@ in C++/Java).
 ## Inheritance
 
 Because Python is dynamically typed, it doesn't really care about
-interfaces: all it cares about is applying operations to objects (in
-fact, Java's `interface` keyword would be wasted in Python). This
+interfaces: all it cares about is applying operations to object. This
 means that inheritance in Python is different from inheritance in C++ or
 Java, where you often inherit simply to establish a common interface. In
 Python, the only reason you inherit is to inherit an implementation, to
@@ -125,8 +122,7 @@ dynamic typing in a statically-typed language.
 
 ## Properties
 
-In Java or C++ you often write getters and setters up front, in case you later
-need logic behind a field. Python lets you expose a plain attribute and convert
+Python lets you expose a plain attribute and convert
 it to a computed one later, without changing the calling code, using
 `@property`:
 

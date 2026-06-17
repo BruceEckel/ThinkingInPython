@@ -68,7 +68,7 @@ that sets the "changed" flag, which means that when you call
 
 ## The Pythonic Observer: a List of Callables
 
-The description above is the Java design. In Python an *observer* need not be an
+In Python an *observer* need not be an
 object implementing an `Observer` interface; it is simply a callable. An
 *observable* need not be a base class with a `changed` flag; it is a list of
 callables and a way to notify them. A `@property` setter is a natural place to
@@ -174,9 +174,7 @@ The classic design, translated from Java's `java.util`, makes the two roles
 explicit base classes. An `Observable` keeps a list of observers and a
 `changed` flag. You call `set_changed()` and then `notify_observers()`, and
 every registered `Observer` has its `update()` called. The flag lets the
-subject decide when a batch of changes is worth announcing. (Java guards all of
-this with thread synchronization; the pattern itself does not need it, so this
-version leaves it out.)
+subject decide when a batch of changes is worth announcing.
 
 ```python
 # observer.py
@@ -219,8 +217,8 @@ exactly that, and checks the result.
 
 ### A Visual Example of Observers
 
-This is the `ColorBoxes` example from *Thinking in Java*. A grid of boxes, each
-starting with some color. Every box observes a shared `Observable`. When one box is
+This creates a grid of boxes, each starting with some color.
+Every box observes a shared `Observable`. When one box is
 "clicked," the `Observable` notifies every box, and each box adjacent to the
 clicked one changes its color to match it.
 

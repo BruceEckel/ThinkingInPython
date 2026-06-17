@@ -89,9 +89,7 @@ for flower in flower_gen(10):
 ```
 
 The `accept()`/`visit()` pair is *double dispatch*: `accept()` resolves the
-flower's type, then `visit()` resolves the visitor's type. The whole apparatus
-exists because Java and C++ dispatch on only one type at a time and cannot add a
-method to a class from outside it.
+flower's type, then `visit()` resolves the visitor's type.
 
 ## The Pythonic Visitor: singledispatch
 

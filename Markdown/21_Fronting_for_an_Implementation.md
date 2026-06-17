@@ -91,9 +91,7 @@ p.h()
 ```
 
 The beauty of using `__getattr__()` is that `Proxy2` is
-completely generic, and not tied to any particular implementation (in
-Java, a rather complicated "dynamic proxy" has been invented to
-accomplish this same thing).
+completely generic, and not tied to any particular implementation.
 
 ## State
 

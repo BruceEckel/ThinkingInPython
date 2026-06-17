@@ -22,8 +22,8 @@ for x in list:
     print(x)
 ```
 
-The first line creates a list. Lists
-are like Java containers: you can add new elements to them (here, `append()`
+The first line creates a list.
+You can add new elements to lists (here, `append()`
 is used) and they will automatically resize themselves. The `for` statement
 creates an iterator `x` which takes on each value in the list.
 
@@ -276,4 +276,3 @@ print(lengths)                                # {'a': 1, 'bb': 2}
 This is such a core idiom that it has its own chapter,
 [Comprehensions](14_Comprehensions.md), which also covers generator expressions
 and the functional tools `map()` and `filter()`.
-

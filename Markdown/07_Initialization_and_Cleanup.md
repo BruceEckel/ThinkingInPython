@@ -1,7 +1,7 @@
 # Initialization and Cleanup
 
-A constructor sets up an object, and you saw `__init__()` do that in the [Classes](06_Classes.md) chapter. Two
-parts of an object's lifetime surprise programmers coming from C++ or Java: how
+A constructor sets up an object, and you saw `__init__()` do that in the [Classes](06_Classes.md) chapter.
+Two parts of an object's lifetime surprise programmers coming from C++ or Java: how
 class-level attributes behave, and how and when objects are cleaned up.
 
 ## Class Attributes Are Not Default Values
@@ -173,4 +173,3 @@ x = Counter("First")
 
 The count now falls on its own as objects are collected, with no explicit `del`
 required.
-
