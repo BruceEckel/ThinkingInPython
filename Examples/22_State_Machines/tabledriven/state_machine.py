@@ -3,8 +3,7 @@
 #
 # The whole machine is one transition table. Because Python
 # functions are first-class, a transition's condition and action are
-# just callables, so the Condition and Transition classes a Java
-# version needs disappear.
+# just callables.
 from collections.abc import Callable
 from enum import Enum
 from typing import Any

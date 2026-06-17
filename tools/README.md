@@ -38,26 +38,35 @@ Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
 uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
 ```
 
-With `make` (targets run through `uv run`):
+With `make` (targets run through `uv run`); `make help` lists them all, most-used
+first:
 
 ```
+make sync-ci    # update Examples/ from the Markdown, then run the full gate
+make ci         # the full local gate: check, run, pytest, ty, ruff, site
+make sync       # update the committed Examples/ tree from the Markdown
 make check      # do the book's examples match the committed Examples/ tree?
-make extract    # write ExtractedExamples/ from the Markdown
-make run        # run every extracted .py, report failures
-make examples   # extract then run (the full pass)
 make site       # render Markdown/ into build/site/
+make examples   # extract then run (the full verification pass)
+make test       # run the book's pytest examples
 make ty         # type-check the extracted examples (must be clean)
-make ci         # what CI runs: drift, run, pytest, ty, ruff, site
+make lint       # PEP 8 lint the extracted examples with ruff (must be clean)
 ```
+
+`make sync-ci` is the everyday command after editing the book: it pushes your
+Markdown changes out to `Examples/` (so the drift check passes), then runs the
+full gate. `make ci` runs the gate without syncing first, so it still fails on
+drift, the way GitHub Actions does.
 
 Without `make` (e.g. Windows PowerShell), call the scripts through `uv run`:
 
 ```
-uv run python tools/extract_examples.py            # = make check
-uv run python tools/extract_examples.py --write    # = make extract
-uv run python tools/run_examples.py                # = make run
-uv run python tools/build_site.py                  # = make site
-uv run ty check ExtractedExamples                  # = make ty
+uv run python tools/extract_examples.py                  # = make check
+uv run python tools/extract_examples.py --write -o Examples  # = make sync
+uv run python tools/extract_examples.py --write          # = make extract
+uv run python tools/run_examples.py                      # = make run
+uv run python tools/build_site.py                        # = make site
+uv run ty check ExtractedExamples                        # = make ty
 ```
 
 ## extract_examples.py
@@ -144,25 +153,76 @@ site build first if `build/site/` is missing.
 
 ### Publishing to GitHub Pages
 
-`.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages
-at <https://bruceeckel.github.io/ThinkingInPython> on every push to `master`
-(and on manual `workflow_dispatch`). It uses the GitHub Actions Pages flow:
-`actions/upload-pages-artifact` uploads `build/site/`, then
-`actions/deploy-pages` deploys it. The site is built fresh in CI, so the
-generated HTML is never committed (`build/` stays git-ignored). All in-page
-links are relative, so the project subpath (`/ThinkingInPython/`) just works.
+The `deploy` job in `.github/workflows/ci.yml` publishes the site to GitHub
+Pages at <https://bruceeckel.github.io/ThinkingInPython> on every push to
+`master`. It uses the GitHub Actions Pages flow: `actions/upload-pages-artifact`
+uploads `build/site/`, then `actions/deploy-pages` deploys it. The site is built
+fresh in CI, so the generated HTML is never committed (`build/` stays
+git-ignored). All in-page links are relative, so the project subpath
+(`/ThinkingInPython/`) just works. See "Continuous integration" below for how
+the build and publish steps relate to the opt-in test gates.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on every push and pull request. It installs uv
-(`astral-sh/setup-uv`, Python 3.14, cached), runs `uv sync --locked`, then
-drives the harness with `uv run`. Hard gates: the drift check
-(`extract_examples.py`), the example run (`run_examples.py`, all must pass), the
-book's pytest examples (`pytest ExtractedExamples`), the type check (`ty check
-ExtractedExamples`, zero diagnostics), the lint (`ruff check ExtractedExamples`,
-zero findings), and the site build. Deliberate lint exceptions live in
-`[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`. `make ci` runs the same
-sequence locally.
+`.github/workflows/ci.yml` runs on every push to `master`, every pull request,
+and manual `workflow_dispatch`. The full example/test suite already runs on your
+machine before you push (and Actions can be slow), so **the default CI path only
+builds and publishes the site**. The workflow has two jobs:
+
+* **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.14,
+  cached) and pandoc, runs `uv sync --locked`, and builds the static site. On a
+  push to `master` it hands the site to the `deploy` job, which publishes it to
+  GitHub Pages. Pull requests build the site but do not deploy.
+* **`gates` (opt-in only):** the full suite, the same one `make ci` runs
+  locally: the drift check (`extract_examples.py`), the example run
+  (`run_examples.py`, all must pass), the pytest examples
+  (`pytest ExtractedExamples`), the type check (`ty check ExtractedExamples`,
+  zero diagnostics), and the lint (`ruff check ExtractedExamples`, zero
+  findings). Deliberate lint exceptions live in
+  `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
+
+`deploy` depends only on `site`, not on `gates`, so publishing is never blocked
+by the test suite. The trade-off is that a push can publish even if an example
+would fail a gate, which is why you run `make ci` locally first.
+
+### Requesting the full gates in CI
+
+The `gates` job runs only when you ask for it, in either of two ways:
+
+* **Manually:** on the repo's **Actions** tab, select **CI**, click **Run
+  workflow**, and leave the `run_gates` input at its default of `true`. From the
+  command line that is:
+
+  ```
+  gh workflow run ci.yml -f run_gates=true
+  ```
+
+* **From a push:** include the marker `[full-ci]` anywhere in the commit message
+  of the push, for example:
+
+  ```
+  git commit -m "Rework the Visitor example [full-ci]"
+  ```
+
+Either way, treat CI as a second opinion: run `make ci` locally first.
+
+### Suggested workflow
+
+Day to day:
+
+1. Make your changes by editing `Markdown/` (the source of truth for prose and
+   code alike).
+2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/`, then
+   runs the full gate (drift, run, pytest, ty, ruff, site). On Windows without
+   `make`, run the equivalent `uv run` commands from "Commands" above (the
+   `make sync` line, then the gate). Use plain `make ci` when you want to
+   confirm there is no drift rather than paper over it.
+3. When it is green, commit and push, including any updated `Examples/` files.
+   The default CI path just rebuilds and publishes the site; it does not re-run
+   the gates, so the push is fast.
+4. Only when you want CI to re-check the suite itself (an environment-specific
+   change, say, or a release) request the gates: add `[full-ci]` to the push
+   commit message, or trigger the workflow manually as shown above.
 
 ## Current baseline
 

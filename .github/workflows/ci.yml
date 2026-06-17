@@ -1,24 +1,73 @@
 name: CI
 
-# Gates every push and pull request: the book's examples must still match the
-# Markdown, no currently-passing example may regress, the code must stay
-# ty-clean and ruff-clean, and the static site must build. Tooling is managed
-# by uv.
+# Default behavior, on every push to master and every pull request: build the
+# static site, and (on master) publish it to GitHub Pages. That is all that runs
+# by default, because the full example/test/type/lint suite is already run on the
+# local machine before pushing, and GitHub Actions can be slow.
 #
-# On a push to master, and only after every gate passes, the freshly built site
-# is published to GitHub Pages by the deploy job. Pull requests run the gates
-# but do not deploy.
+# The full gates (examples match the Markdown, every example runs clean, pytest
+# passes, ty-clean, ruff-clean) are opt-in. Run them only when you want a
+# second opinion in CI, in either of two ways:
+#   * From the Actions tab, choose this workflow and click "Run workflow"
+#     (the "run_gates" input defaults to true), or run
+#       gh workflow run ci.yml -f run_gates=true
+#   * Include the marker [full-ci] anywhere in a push commit message.
+#
+# Tooling is managed by uv.
 
 on:
   push:
     branches: [master]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      run_gates:
+        description: "Run the full example/run/test/type/lint gates"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  # Default work: build the static site. Fast, because it skips running the
+  # examples, type-checking, and linting. On a push to master it hands the
+  # built site to the deploy job below.
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.14"
+          enable-cache: true
+
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Install tooling
+        run: uv sync --locked
+
+      - name: Build the static site
+        run: uv run python tools/build_site.py
+
+      # On master only, hand the built site to the deploy job below.
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+
+  # The full gates, opt-in only (manual dispatch with run_gates=true, or a push
+  # commit message containing [full-ci]). These run on the local machine on
+  # every change, so they are not part of the default CI path.
+  gates:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.run_gates) ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[full-ci]'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,21 +112,11 @@ jobs:
       - name: Lint examples with ruff
         run: uv run ruff check ExtractedExamples
 
-      # Hard gate: the static site must build cleanly.
-      - name: Build the static site
-        run: uv run python tools/build_site.py
-
-      # On master only, hand the built site to the deploy job below.
-      - name: Upload Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/site
-
-  # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython),
-  # but only after the build job's gates have all passed, and only on master.
+  # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython)
+  # on a push to master. It depends only on the site build, not on the opt-in
+  # gates, so publishing is not blocked by them.
   deploy:
-    needs: build
+    needs: site
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:

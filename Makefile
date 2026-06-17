@@ -8,43 +8,54 @@ TY ?= uv run ty
 PYTEST ?= uv run pytest
 RUFF ?= uv run ruff
 
-.PHONY: help check extract run examples site serve local ty lint test clean-examples clean-site ci
+.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract clean-examples clean-site
 
 help:
 	@echo "Targets:"
+	@echo "  sync-ci   - update Examples/ from the Markdown, then run the full CI gate"
+	@echo "  ci        - run the full local gate: check, run, pytest, ty, ruff, site"
+	@echo "  sync      - update the committed Examples/ tree from the Markdown"
 	@echo "  check     - verify book examples match the committed Examples/ tree"
-	@echo "  extract   - write ExtractedExamples/ from the Markdown"
-	@echo "  run       - run every extracted .py and report failures"
-	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
-	@echo "  serve     - serve build/site/ at http://localhost:8000"
 	@echo "  local     - build the site, serve it, and open a browser"
+	@echo "  serve     - serve build/site/ at http://localhost:8000"
+	@echo "  examples  - extract then run (the full verification pass)"
+	@echo "  run       - run every extracted .py and report failures"
+	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
-	@echo "  test      - run the book's pytest examples (test_*.py)"
-	@echo "  ci        - what CI runs: check, run, pytest, ty, ruff, site"
+	@echo "  extract   - write ExtractedExamples/ from the Markdown"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
+
+# Update the committed Examples/ tree from the Markdown (the source of truth),
+# then run the full local gate. Use this after editing code blocks in Markdown/.
+sync-ci: sync ci
+
+# Write the extracted tree straight into Examples/, syncing the committed copy
+# to the Markdown. Run after editing a code block so the drift check passes.
+sync:
+	$(PY) tools/extract_examples.py --write -o Examples
 
 check:
 	$(PY) tools/extract_examples.py
 
-extract:
-	$(PY) tools/extract_examples.py --write
-
-run:
-	$(PY) tools/run_examples.py
-
-examples: extract run
-
 site:
 	$(PY) tools/build_site.py
+
+local: site
+	$(PY) tools/serve.py --open
 
 serve:
 	$(PY) tools/serve.py
 
-local: site
-	$(PY) tools/serve.py --open
+examples: extract run
+
+run:
+	$(PY) tools/run_examples.py
+
+test:
+	$(PYTEST) ExtractedExamples
 
 ty:
 	$(TY) check ExtractedExamples
@@ -52,11 +63,12 @@ ty:
 lint:
 	$(RUFF) check ExtractedExamples
 
-test:
-	$(PYTEST) ExtractedExamples
+extract:
+	$(PY) tools/extract_examples.py --write
 
-# Mirrors the GitHub Actions gate: drift check, the example run, the book's
-# pytest examples, and a clean site build. All hard gates.
+# Mirrors the GitHub Actions gates plus a site build, all run locally. The
+# default GitHub Actions path only builds and publishes the site; these gates
+# run in CI only on request (see tools/README.md).
 ci:
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
