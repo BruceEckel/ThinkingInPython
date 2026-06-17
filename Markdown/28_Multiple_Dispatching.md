@@ -16,13 +16,13 @@ doesn't solve the problem, so you end up detecting some types manually
 and effectively producing your own dynamic binding behavior.
 
 The solution is called *multiple dispatching*. Remember that
-polymorphism can occur only via member function calls, so if you want
-double dispatching to occur, there must be two member function calls:
+polymorphism can occur only via method calls, so if you want
+double dispatching to occur, there must be two method calls:
 the first to determine the first unknown type, and the second to
 determine the second unknown type. With multiple dispatching, you must
 have a polymorphic method call to determine each of the types.
 Generally, you'll set up a configuration such that a single member
-function call produces more than one dynamic member function call and
+function call produces more than one dynamic method call and
 thus determines more than one type in the process. To get this effect,
 you need to work with more than one polymorphic method call: you'll need
 one call for each dispatch. The methods in the following example are

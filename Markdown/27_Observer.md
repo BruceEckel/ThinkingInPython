@@ -34,7 +34,7 @@ quantity of observing objects and the way an update occurs. That is, the
 observer pattern allows you to modify both of these without affecting
 the surrounding code.
 
-`Observer` is an "interface" class that only has one member function,
+`Observer` is an "interface" class that only has one method,
 `update()`. This function is called by the object that's being
 observed, when that object decides it's time to update all its observers.
 The arguments are optional; you could have an `update()` with no
@@ -62,12 +62,12 @@ flag has not been set, this does nothing. Otherwise, it first clears the
 time. This is done before notifying the observers in case the calls to
 `update()` do anything that causes a change back to this
 `Observable` object. Then it moves through the `set` and calls back
-to the `update()` member function of each `Observer`.
+to the `update()` method of each `Observer`.
 
 At first it may appear that you can use an ordinary `Observable`
 object to manage the updates. But this doesn't work; to get an effect,
 you *must* inherit from `Observable` and somewhere in your
-derived-class code call `set_changed()`. This is the member function
+derived-class code call `set_changed()`. This is the method
 that sets the "changed" flag, which means that when you call
 `notify_observers()` all of the observers will, in fact, get notified.
 *Where* you call `set_changed()` depends on the logic of your program.
