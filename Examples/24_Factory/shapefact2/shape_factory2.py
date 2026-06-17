@@ -1,6 +1,7 @@
 # shapefact2/shape_factory2.py
 # Polymorphic factory methods.
 import random
+from collections.abc import Iterator
 from typing import Any
 
 
@@ -40,7 +41,7 @@ class Square(Shape):
         def create(self) -> Square: return Square()
 
 
-def shape_name_gen(n: int):
+def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__

@@ -1,18 +1,21 @@
 # shapefact1/nested_shape_factory.py
 import random
+from collections.abc import Iterator
 
 
 class Shape:
-    types = []
+    types: list[type] = []
+    def draw(self) -> None: ...
+    def erase(self) -> None: ...
 
-def factory(type):
+def factory(type: str) -> Shape:
     class Circle(Shape):
-        def draw(self): print("Circle.draw")
-        def erase(self): print("Circle.erase")
+        def draw(self) -> None: print("Circle.draw")
+        def erase(self) -> None: print("Circle.erase")
 
     class Square(Shape):
-        def draw(self): print("Square.draw")
-        def erase(self): print("Square.erase")
+        def draw(self) -> None: print("Square.draw")
+        def erase(self) -> None: print("Square.erase")
 
     if type == "Circle":
         return Circle()
@@ -20,7 +23,7 @@ def factory(type):
         return Square()
     raise ValueError(f"Bad shape creation: {type}")
 
-def shape_name_gen(n):
+def shape_name_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 

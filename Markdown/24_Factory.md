@@ -40,12 +40,15 @@ class:
 # shapefact1/shape_factory1.py
 # A simple static factory method.
 import random
+from collections.abc import Iterator
 
 
 class Shape:
+    def draw(self) -> None: ...
+    def erase(self) -> None: ...
     # Create based on class name:
     @staticmethod
-    def factory(type):
+    def factory(type: str) -> Shape:
         if type == "Circle":
             return Circle()
         if type == "Square":
@@ -53,15 +56,15 @@ class Shape:
         raise ValueError(f"Bad shape creation: {type}")
 
 class Circle(Shape):
-    def draw(self): print("Circle.draw")
-    def erase(self): print("Circle.erase")
+    def draw(self) -> None: print("Circle.draw")
+    def erase(self) -> None: print("Circle.erase")
 
 class Square(Shape):
-    def draw(self): print("Square.draw")
-    def erase(self): print("Square.erase")
+    def draw(self) -> None: print("Square.draw")
+    def erase(self) -> None: print("Square.erase")
 
 # Generate shape name strings:
-def shape_name_gen(n):
+def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
@@ -143,19 +146,22 @@ within the factory method, like this:
 ```python
 # shapefact1/nested_shape_factory.py
 import random
+from collections.abc import Iterator
 
 
 class Shape:
-    types = []
+    types: list[type] = []
+    def draw(self) -> None: ...
+    def erase(self) -> None: ...
 
-def factory(type):
+def factory(type: str) -> Shape:
     class Circle(Shape):
-        def draw(self): print("Circle.draw")
-        def erase(self): print("Circle.erase")
+        def draw(self) -> None: print("Circle.draw")
+        def erase(self) -> None: print("Circle.erase")
 
     class Square(Shape):
-        def draw(self): print("Square.draw")
-        def erase(self): print("Square.erase")
+        def draw(self) -> None: print("Square.draw")
+        def erase(self) -> None: print("Square.erase")
 
     if type == "Circle":
         return Circle()
@@ -163,7 +169,7 @@ def factory(type):
         return Square()
     raise ValueError(f"Bad shape creation: {type}")
 
-def shape_name_gen(n):
+def shape_name_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
@@ -280,6 +286,7 @@ classes are dynamically loaded on demand:
 # shapefact2/shape_factory2.py
 # Polymorphic factory methods.
 import random
+from collections.abc import Iterator
 from typing import Any
 
 
@@ -319,7 +326,7 @@ class Square(Shape):
         def create(self) -> Square: return Square()
 
 
-def shape_name_gen(n: int):
+def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
@@ -380,49 +387,51 @@ Here's how it might look using an abstract factory:
 # An example of the Abstract Factory pattern.
 
 class Obstacle:
-    def action(self): pass
+    def action(self) -> None: pass
 
 class Character:
-    def interact_with(self, obstacle): pass
+    def interact_with(self, obstacle: Obstacle) -> None: pass
 
 class Kitty(Character):
-    def interact_with(self, obstacle):
+    def interact_with(self, obstacle: Obstacle) -> None:
         print("Kitty has encountered a",
         obstacle.action())
 
 class KungFuGuy(Character):
-    def interact_with(self, obstacle):
+    def interact_with(self, obstacle: Obstacle) -> None:
         print("KungFuGuy now battles a",
         obstacle.action())
 
 class Puzzle(Obstacle):
-    def action(self):
+    def action(self) -> None:
         print("Puzzle")
 
 class NastyWeapon(Obstacle):
-    def action(self):
+    def action(self) -> None:
         print("NastyWeapon")
 
 # The Abstract Factory:
 class GameElementFactory:
-    def make_character(self): pass
-    def make_obstacle(self): pass
+    def make_character(self) -> Character:
+        raise NotImplementedError
+    def make_obstacle(self) -> Obstacle:
+        raise NotImplementedError
 
 # Concrete factories:
 class KittiesAndPuzzles(GameElementFactory):
-    def make_character(self): return Kitty()
-    def make_obstacle(self): return Puzzle()
+    def make_character(self) -> Character: return Kitty()
+    def make_obstacle(self) -> Obstacle: return Puzzle()
 
 class KillAndDismember(GameElementFactory):
-    def make_character(self): return KungFuGuy()
-    def make_obstacle(self): return NastyWeapon()
+    def make_character(self) -> Character: return KungFuGuy()
+    def make_obstacle(self) -> Obstacle: return NastyWeapon()
 
 class GameEnvironment:
-    def __init__(self, factory):
+    def __init__(self, factory: GameElementFactory) -> None:
         self.factory = factory
         self.p = factory.make_character()
         self.ob = factory.make_obstacle()
-    def play(self):
+    def play(self) -> None:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
@@ -453,38 +462,40 @@ the form of the required classes, we don't need any base classes:
 ```python
 # games2.py
 # Simplified Abstract Factory.
+from typing import Any
+
 
 class Kitty:
-    def interact_with(self, obstacle):
+    def interact_with(self, obstacle: Any) -> None:
         print("Kitty has encountered a",
         obstacle.action())
 
 class KungFuGuy:
-    def interact_with(self, obstacle):
+    def interact_with(self, obstacle: Any) -> None:
         print("KungFuGuy now battles a",
         obstacle.action())
 
 class Puzzle:
-    def action(self): print("Puzzle")
+    def action(self) -> None: print("Puzzle")
 
 class NastyWeapon:
-    def action(self): print("NastyWeapon")
+    def action(self) -> None: print("NastyWeapon")
 
 # Concrete factories:
 class KittiesAndPuzzles:
-    def make_character(self): return Kitty()
-    def make_obstacle(self): return Puzzle()
+    def make_character(self) -> Kitty: return Kitty()
+    def make_obstacle(self) -> Puzzle: return Puzzle()
 
 class KillAndDismember:
-    def make_character(self): return KungFuGuy()
-    def make_obstacle(self): return NastyWeapon()
+    def make_character(self) -> KungFuGuy: return KungFuGuy()
+    def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
 
 class GameEnvironment:
-    def __init__(self, factory):
+    def __init__(self, factory: Any) -> None:
         self.factory = factory
         self.p = factory.make_character()
         self.ob = factory.make_obstacle()
-    def play(self):
+    def play(self) -> None:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
