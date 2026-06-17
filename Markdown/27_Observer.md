@@ -172,29 +172,25 @@ exactly that, and a test pins down the result.
 ### A Visual Example of Observers
 
 This is the model-view split from the chapter's opening, made visible with
-`tkinter` (in the standard library, so there is nothing to install). The *model*
-is a grid of colored boxes. Click a box and every box touching it, diagonals
-included, repaints to the clicked box's color. The model is an `Observable`; the
-on-screen view is an `Observer` that repaints whenever the model announces a
-change.
+`tkinter` (in the standard library, so there is nothing to install), and split
+across two files to make the point. The *model*, `box_observer.py`, is a grid of
+colored boxes and the rule for a click; it holds no display code. The *view*,
+`box_view.py`, is the only file that draws. Click a box and every box touching
+it, diagonals included, repaints to the clicked box's color.
 
-The logic is kept apart from the screen. Building the grid, testing adjacency,
-and computing the grid that results from a click are plain functions: values in,
-values out. Only one function, the view's `draw()`, puts anything on screen.
-That split is what lets the model be tested with no display open, in
-`test_box_observer.py` below. The classic `Observable` and `Observer` come from
-`observer.py`:
+The model is an `Observable`. Building the grid, testing adjacency, and computing
+the grid that results from a click are plain functions: values in, values out.
+`BoxModel.click()` makes the next grid with `recolored()` and announces it. There
+is no `tkinter` here at all, which is what lets the model be tested with no
+window open. The classic `Observable` comes from `observer.py`:
 
 ```python
 # box_observer.py
-# A visual ColorBoxes: the model-view split wired with the classic
-# Observer. The model holds the grid and announces each change; the
-# view observes it and repaints. Every function that computes returns
-# a value; only the view's draw() touches the screen.
-import tkinter as tk
-from typing import Any
-
-from observer import Observable, Observer
+# The model for the ColorBoxes example: a grid of colors and the rule
+# for a click, wired as a classic Observable. No display code lives
+# here, so the model runs and is tested with no window open. The view
+# is box_view.py.
+from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")
 type Grid = dict[tuple[int, int], str]   # (column, row) -> color
@@ -229,43 +225,12 @@ class BoxModel(Observable):
         self.grid = recolored(self.grid, cell)
         self.set_changed()
         self.notify_observers(self.grid)
-
-
-def show(model: BoxModel, cell: int = 60) -> None:
-    "The only function that touches the screen."
-    root = tk.Tk()
-    root.title("ColorBoxes")
-    canvas = tk.Canvas(root, highlightthickness=0,
-                       width=model.size * cell,
-                       height=model.size * cell)
-    canvas.pack()
-
-    def draw(grid: Grid) -> None:
-        for (x, y), color in grid.items():
-            canvas.create_rectangle(
-                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
-                fill=color, outline="white")
-
-    # The observer is the view: repaint when the model changes.
-    class View(Observer):
-        def update(self, observable: Any, grid: Any) -> None:
-            draw(grid)
-
-    model.add_observer(View())
-    canvas.bind("<Button-1>",
-                lambda e: model.click((e.x // cell, e.y // cell)))
-    draw(model.grid)
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    show(BoxModel(8))
 ```
 
-`box_observer.py` opens a window, so the example harness does not run it (it is
-listed in `tools/norun.txt`). The model carries the logic, though, so a test
-drives it with no display: build a model, click a cell, and check that the
-neighbors took its color and that the observers were notified with the new grid.
+Because the model carries no display code, a test drives it with no window open:
+build a model, click a cell, and check that the neighbors took its color and that
+observers were notified with the new grid. This is the model's correctness,
+established apart from how it is shown:
 
 ```python
 # test_box_observer.py
@@ -312,12 +277,60 @@ def test_model_notifies_with_the_new_grid() -> None:
     assert model.grid[(1, 1)] == model.grid[(2, 2)]
 ```
 
-`BoxModel` is the subject: its `click()` builds the next grid with `recolored()`,
-sets the changed flag, and notifies. The view is the `Observer`, and its
-`update()` does nothing but repaint. Neither side knows much about the other, so
-you can test the model with no window open, or attach a second view to the same
-model and both stay in step. That decoupling, with the model-view split, is the
-whole point of *Observer*.
+The view lives in its own file. It is the only `Observer` and the only code that
+touches the screen: `draw()` paints the grid, and `update()` calls `draw()`
+whenever the model changes. A click on the canvas becomes a model `click()`, and
+the resulting notification repaints the view. Run `box_view.py` to play; it opens
+a window, so the example harness does not run it (it is listed in
+`tools/norun.txt`).
+
+```python
+# box_view.py
+# The view for the ColorBoxes example: the only file that draws, and
+# the only Observer. It repaints whenever the BoxModel announces a
+# change. The model in box_observer.py is what the tests check.
+import tkinter as tk
+from typing import Any
+
+from box_observer import BoxModel, Grid
+from observer import Observer
+
+
+def show(model: BoxModel, cell: int = 60) -> None:
+    "Open the window and keep it in step with the model."
+    root = tk.Tk()
+    root.title("ColorBoxes")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=model.size * cell,
+                       height=model.size * cell)
+    canvas.pack()
+
+    def draw(grid: Grid) -> None:
+        for (x, y), color in grid.items():
+            canvas.create_rectangle(
+                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
+                fill=color, outline="white")
+
+    class View(Observer):  # repaints on every model change
+        def update(self, observable: Any, grid: Any) -> None:
+            draw(grid)
+
+    model.add_observer(View())
+    canvas.bind("<Button-1>",
+                lambda e: model.click((e.x // cell, e.y // cell)))
+    draw(model.grid)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    show(BoxModel(8))
+```
+
+The model and the view share only the `Observable`/`Observer` contract. That is
+what lets the test exercise the model with no display, and what would let you
+attach a second view to the same model and keep both in step. Showing that the
+model is correct, separately from how it is drawn, is the model-view split made
+concrete.
 
 
 ### Exercises

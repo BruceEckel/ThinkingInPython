@@ -6,6 +6,8 @@
   First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
   before doing any other examples.
 
+- Check exercises. Potentially create new exercises.
+
 - passive voice
 
 - Ask for a good strategy to polish things before my edit/rewrite pass.

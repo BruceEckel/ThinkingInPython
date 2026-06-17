@@ -1,12 +1,9 @@
 # box_observer.py
-# A visual ColorBoxes: the model-view split wired with the classic
-# Observer. The model holds the grid and announces each change; the
-# view observes it and repaints. Every function that computes returns
-# a value; only the view's draw() touches the screen.
-import tkinter as tk
-from typing import Any
-
-from observer import Observable, Observer
+# The model for the ColorBoxes example: a grid of colors and the rule
+# for a click, wired as a classic Observable. No display code lives
+# here, so the model runs and is tested with no window open. The view
+# is box_view.py.
+from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")
 type Grid = dict[tuple[int, int], str]   # (column, row) -> color
@@ -41,34 +38,3 @@ class BoxModel(Observable):
         self.grid = recolored(self.grid, cell)
         self.set_changed()
         self.notify_observers(self.grid)
-
-
-def show(model: BoxModel, cell: int = 60) -> None:
-    "The only function that touches the screen."
-    root = tk.Tk()
-    root.title("ColorBoxes")
-    canvas = tk.Canvas(root, highlightthickness=0,
-                       width=model.size * cell,
-                       height=model.size * cell)
-    canvas.pack()
-
-    def draw(grid: Grid) -> None:
-        for (x, y), color in grid.items():
-            canvas.create_rectangle(
-                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
-                fill=color, outline="white")
-
-    # The observer is the view: repaint when the model changes.
-    class View(Observer):
-        def update(self, observable: Any, grid: Any) -> None:
-            draw(grid)
-
-    model.add_observer(View())
-    canvas.bind("<Button-1>",
-                lambda e: model.click((e.x // cell, e.y // cell)))
-    draw(model.grid)
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    show(BoxModel(8))
