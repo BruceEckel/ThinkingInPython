@@ -72,7 +72,7 @@ print(connect(port=80, host="web.example.com"))  # any order by name
 ```
 
 A default value is evaluated once, when the function is defined, not on each
-call. A *mutable* default is therefore shared across calls, a classic trap:
+call. A *mutable* default is therefore shared across calls:
 
 ```python
 # mutable_default.py
@@ -95,6 +95,7 @@ print(good_append(2))  # [2]
 ```
 
 Thus, a default value creates an implicit global variable.
+This behavior is a common confusion for newcomers to the language.
 
 ## Variable Argument Lists
 
