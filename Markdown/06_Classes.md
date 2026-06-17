@@ -65,30 +65,12 @@ Java, where you often inherit simply to establish a common interface. In
 Python, the only reason you inherit is to inherit an implementation, to
 re-use the code in the base class.
 
-To inherit from a class, you must tell Python to bring that class into your
-new file. Python controls its namespaces as aggressively as Java does, and in
-a similar fashion (albeit with Python's penchant for simplicity). Every time
-you create a file, you implicitly create a module (which is like a package in
-Java) with the same name as that file. Thus, no `package` keyword is needed in
-Python. When you want to use a module, you just say `import` and give the name
-of the module. Python searches the PYTHONPATH in the same way that Java
-searches the CLASSPATH (but for some reason, Python doesn't have the same
-kinds of pitfalls as Java does) and reads in the file. To refer to any of the
-functions or classes within a module, you give the module name, a period, and
-the function or class name. If you don't want the trouble of qualifying the
-name, you can say
-
-```python
-from module import name(s)
-```
-
-Where "name(s)" can be a list of names separated by commas.
-
-You inherit a class (or classes, since Python supports multiple inheritance)
-by listing the name(s) of the class inside parentheses after the name of
-the inheriting class. Note that the `Simple` class, which resides in
-the file (and thus, module) named `simple_class` is brought into this
-new namespace using an `import` statement:
+To inherit, you first import the base class, the same way you import any name
+from another module (see the [Modules and
+Packages](05_Modules_and_Packages.md) chapter). You then inherit by listing the
+class (or classes, since Python supports multiple inheritance) in parentheses
+after the name of the inheriting class. Here `Simple`, from the `simple_class`
+module, is imported and then subclassed:
 
 ```python
 # simple2.py

@@ -230,11 +230,11 @@ for a particular `State` object. Initially, the `next()` methods
 can appear a little strange because of this.
 
 The `StateT` class is an implementation of `State` (so that the same
-`StateMachine` class can be used from the previous example) that adds
-a `Map` and a method to initialize the map from a two-dimensional
-array. The `next()` method has a base-class implementation which must
-be called from the overridden derived class `next()` methods after
-they test for a `null Map` (and initialize it if it's `null`):
+`StateMachine` class can be used from the previous example) that adds a
+`transitions` dict mapping each input to its next state. Its base-class
+`next()` looks the input up in that dict. Each subclass fills its own
+`transitions` lazily, the first time `next()` is called while `transitions`
+is still `None`, then delegates to the base `next()`:
 
 ```python
 # mousetrap2/mouse_trap2.py
