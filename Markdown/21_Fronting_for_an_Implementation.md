@@ -35,20 +35,20 @@ this:
 # Simple demonstration of the Proxy pattern.
 
 class Implementation:
-    def f(self):
+    def f(self) -> None:
         print("Implementation.f()")
-    def g(self):
+    def g(self) -> None:
         print("Implementation.g()")
-    def h(self):
+    def h(self) -> None:
         print("Implementation.h()")
 
 class Proxy:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__implementation = Implementation()
     # Pass method calls to the implementation:
-    def f(self): self.__implementation.f()
-    def g(self): self.__implementation.g()
-    def h(self): self.__implementation.h()
+    def f(self) -> None: self.__implementation.f()
+    def g(self) -> None: self.__implementation.g()
+    def h(self) -> None: self.__implementation.h()
 
 p = Proxy()
 p.f()
@@ -70,19 +70,21 @@ makes the `Proxy` even simpler to implement:
 ```python
 # proxy_demo2.py
 # Simple demonstration of the Proxy pattern.
+from typing import Any
+
 
 class Implementation2:
-    def f(self):
+    def f(self) -> None:
         print("Implementation.f()")
-    def g(self):
+    def g(self) -> None:
         print("Implementation.g()")
-    def h(self):
+    def h(self) -> None:
         print("Implementation.h()")
 
 class Proxy2:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__implementation = Implementation2()
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
 p = Proxy2()
@@ -105,33 +107,35 @@ the surrogate:
 ```python
 # state_demo.py
 # Simple demonstration of the State pattern.
+from typing import Any
+
 
 class StateD:
-    def __init__(self, imp):
+    def __init__(self, imp: Any) -> None:
         self.__implementation = imp
-    def change_imp(self, new_imp):
+    def change_imp(self, new_imp: Any) -> None:
         self.__implementation = new_imp
     # Delegate calls to the implementation:
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
 class Implementation1:
-    def f(self):
+    def f(self) -> None:
         print("Fiddle de dum, Fiddle de dee,")
-    def g(self):
+    def g(self) -> None:
         print("Eric the half a bee.")
-    def h(self):
+    def h(self) -> None:
         print("Ho ho ho, tee hee hee,")
 
 class Implementation2:
-    def f(self):
+    def f(self) -> None:
         print("We're Knights of the Round Table.")
-    def g(self):
+    def g(self) -> None:
         print("We dance whene'er we're able.")
-    def h(self):
+    def h(self) -> None:
         print("We do routines and chorus scenes")
 
-def run(b):
+def run(b: Any) -> None:
     b.f()
     b.g()
     b.h()

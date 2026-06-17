@@ -2,20 +2,20 @@
 # Simple demonstration of the Proxy pattern.
 
 class Implementation:
-    def f(self):
+    def f(self) -> None:
         print("Implementation.f()")
-    def g(self):
+    def g(self) -> None:
         print("Implementation.g()")
-    def h(self):
+    def h(self) -> None:
         print("Implementation.h()")
 
 class Proxy:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__implementation = Implementation()
     # Pass method calls to the implementation:
-    def f(self): self.__implementation.f()
-    def g(self): self.__implementation.g()
-    def h(self): self.__implementation.h()
+    def f(self) -> None: self.__implementation.f()
+    def g(self) -> None: self.__implementation.g()
+    def h(self) -> None: self.__implementation.h()
 
 p = Proxy()
 p.f()
