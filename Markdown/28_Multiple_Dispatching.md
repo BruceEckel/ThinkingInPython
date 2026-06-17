@@ -58,15 +58,17 @@ so each example below shows only its dispatch mechanism:
 # Helpers shared by both versions: generate random pairs of Items, and
 # play one pair off against the other.
 import random
+from collections.abc import Iterator
+from typing import Any
 
 
-def item_pair_gen(base, n):
+def item_pair_gen(base: type, n: int) -> Iterator[tuple[Any, Any]]:
     items = base.__subclasses__()
     for _ in range(n):
         yield random.choice(items)(), random.choice(items)()
 
 
-def match(item1, item2):
+def match(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
@@ -75,53 +77,55 @@ Here's an example of multiple dispatching:
 ```python
 # paper_scissors_rock.py
 # Demonstration of multiple dispatching.
+from typing import Any
+
 from arena import item_pair_gen, match
 from outcome import Outcome
 
 
 class Item:
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
 class Paper(Item):
-    def compete(self, item):
+    def compete(self, item: Any) -> Outcome:
         # First dispatch: self was Paper
         return item.eval_paper(self)
-    def eval_paper(self, item):
+    def eval_paper(self, item: Any) -> Outcome:
         # Item was Paper, we're in Paper
         return Outcome.DRAW
-    def eval_scissors(self, item):
+    def eval_scissors(self, item: Any) -> Outcome:
         # Item was Scissors, we're in Paper
         return Outcome.WIN
-    def eval_rock(self, item):
+    def eval_rock(self, item: Any) -> Outcome:
         # Item was Rock, we're in Paper
         return Outcome.LOSE
 
 class Scissors(Item):
-    def compete(self, item):
+    def compete(self, item: Any) -> Outcome:
         # First dispatch: self was Scissors
         return item.eval_scissors(self)
-    def eval_paper(self, item):
+    def eval_paper(self, item: Any) -> Outcome:
         # Item was Paper, we're in Scissors
         return Outcome.LOSE
-    def eval_scissors(self, item):
+    def eval_scissors(self, item: Any) -> Outcome:
         # Item was Scissors, we're in Scissors
         return Outcome.DRAW
-    def eval_rock(self, item):
+    def eval_rock(self, item: Any) -> Outcome:
         # Item was Rock, we're in Scissors
         return Outcome.WIN
 
 class Rock(Item):
-    def compete(self, item):
+    def compete(self, item: Any) -> Outcome:
         # First dispatch: self was Rock
         return item.eval_rock(self)
-    def eval_paper(self, item):
+    def eval_paper(self, item: Any) -> Outcome:
         # Item was Paper, we're in Rock
         return Outcome.WIN
-    def eval_scissors(self, item):
+    def eval_scissors(self, item: Any) -> Outcome:
         # Item was Scissors, we're in Rock
         return Outcome.LOSE
-    def eval_rock(self, item):
+    def eval_rock(self, item: Any) -> Outcome:
         # Item was Rock, we're in Rock
         return Outcome.DRAW
 
@@ -140,15 +144,17 @@ sensible to make the table explicit, like this:
 ```python
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
+from typing import Any
+
 from arena import item_pair_gen, match
 from outcome import Outcome
 
 
 class Item:
-    def compete(self, item):
+    def compete(self, item: Any) -> Outcome:
         # Use a tuple for table lookup:
         return outcome[self.__class__, item.__class__]
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
 class Paper(Item):
