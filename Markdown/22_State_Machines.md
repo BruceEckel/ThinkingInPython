@@ -132,8 +132,7 @@ clause:
 
 ```python
 # mousetrap1/mouse_trap.py
-# State Machine pattern using 'if' statements
-# to determine the next state.
+# State Machine pattern using match to determine the next state.
 import sys
 
 sys.path += ['..', '../mouse']
@@ -148,40 +147,48 @@ class Waiting(State):
         print("Waiting: Broadcasting cheese smell")
 
     def next(self, input):
-        if input == MouseAction.APPEARS:
-            return MouseTrap.luring
-        return MouseTrap.waiting
+        match input:
+            case MouseAction.APPEARS:
+                return MouseTrap.luring
+            case _:
+                return MouseTrap.waiting
 
 class Luring(State):
     def run(self):
         print("Luring: Presenting Cheese, door open")
 
     def next(self, input):
-        if input == MouseAction.RUNS_AWAY:
-            return MouseTrap.waiting
-        if input == MouseAction.ENTERS:
-            return MouseTrap.trapping
-        return MouseTrap.luring
+        match input:
+            case MouseAction.RUNS_AWAY:
+                return MouseTrap.waiting
+            case MouseAction.ENTERS:
+                return MouseTrap.trapping
+            case _:
+                return MouseTrap.luring
 
 class Trapping(State):
     def run(self):
         print("Trapping: Closing door")
 
     def next(self, input):
-        if input == MouseAction.ESCAPES:
-            return MouseTrap.waiting
-        if input == MouseAction.TRAPPED:
-            return MouseTrap.holding
-        return MouseTrap.trapping
+        match input:
+            case MouseAction.ESCAPES:
+                return MouseTrap.waiting
+            case MouseAction.TRAPPED:
+                return MouseTrap.holding
+            case _:
+                return MouseTrap.trapping
 
 class Holding(State):
     def run(self):
         print("Holding: Mouse caught")
 
     def next(self, input):
-        if input == MouseAction.REMOVED:
-            return MouseTrap.waiting
-        return MouseTrap.holding
+        match input:
+            case MouseAction.REMOVED:
+                return MouseTrap.waiting
+            case _:
+                return MouseTrap.holding
 
 class MouseTrap(StateMachine):
     waiting: State
@@ -209,7 +216,7 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 initial state. The code at the bottom of the file builds a `MouseTrap` and runs
 it through the whole sequence of moves read from the text file.
 
-While the use of `if` statements inside the `next()` methods is
+While the use of `match` inside the `next()` methods is
 perfectly reasonable, managing a large number of these could become
 difficult. Another approach is to create tables inside each `State`
 object defining the various next states based on the input.
@@ -622,7 +629,7 @@ the state machine code for you.
 ## Exercises
 
 The *Proxy* and *State* patterns that several of these exercises build on are
-covered in [Fronting for an Implementation](20_Fronting_for_an_Implementation.md).
+covered in [Fronting for an Implementation](21_Fronting_for_an_Implementation.md).
 
 1.  Create an example of the "virtual proxy."
 2.  Create an example of the "Smart reference" proxy where you keep

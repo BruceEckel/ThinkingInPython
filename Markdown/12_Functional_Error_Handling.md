@@ -83,7 +83,8 @@ The output is:
     error = 'func_a(1)'
     answer = 2
 
-This keeps every result, and `match` tells the two cases apart. But the
+This keeps every result, and `match` (covered in the [Pattern
+Matching](11_Pattern_Matching.md) chapter) tells the two cases apart. But the
 distinction rides on the types `int` and `str`, which is fragile. If a successful
 answer were also a string, the two cases would collide. We need something that
 says "success" or "failure" no matter what types they carry.

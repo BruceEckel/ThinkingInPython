@@ -281,6 +281,6 @@ print(lengths)                                # {'a': 1, 'bb': 2}
 ```
 
 This is such a core idiom that it has its own chapter,
-[Comprehensions](13_Comprehensions.md), which also covers generator expressions
+[Comprehensions](14_Comprehensions.md), which also covers generator expressions
 and the functional tools `map()` and `filter()`.
 

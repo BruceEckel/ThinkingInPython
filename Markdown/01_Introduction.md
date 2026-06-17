@@ -56,8 +56,8 @@ grow stronger as you watch objects used in many different situations here.
 ## How to Read This Book
 
 The early chapters cover language features and idioms: testing, data classes as
-types, functional error handling, decorators, comprehensions, metaprogramming,
-and more. The later chapters work through the
+types, pattern matching, functional error handling, decorators, comprehensions,
+metaprogramming, and more. The later chapters work through the
 design patterns, reframed for Python. You can read straight through, or jump to
 a chapter that matches a problem in front of you, since each one is largely
 self-contained.

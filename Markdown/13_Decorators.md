@@ -267,7 +267,7 @@ if __name__ == "__main__":
     print(sorted(registry))
 ```
 
-The output is `['Espresso', 'Latte']`. The [Metaprogramming](14_Metaprogramming.md)
+The output is `['Espresso', 'Latte']`. The [Metaprogramming](15_Metaprogramming.md)
 chapter shows `__init_subclass__`, which builds a registry like this without a
 decorator.
 

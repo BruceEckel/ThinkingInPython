@@ -295,7 +295,7 @@ The output is:
 Add a `Triangle` to `Shape` and the checker flags `assert_never(shape)`, because
 `shape` could now be a `Triangle` that no `case` handles. A `switch` cannot do
 this; neither can a chain of `if`/`isinstance`. The [Rethinking
-Objects](15_Rethinking_Objects.md) chapter uses exactly this technique to add
+Objects](16_Rethinking_Objects.md) chapter uses exactly this technique to add
 operations to a closed set of types without inheritance.
 
 ## When Not to Match

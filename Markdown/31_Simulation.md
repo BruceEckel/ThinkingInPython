@@ -389,7 +389,7 @@ def item_factory(symbol: str) -> Item:
 `item_factory()` turns a maze character into an `Item`. It searches
 `Item.__subclasses__()` for a matching `symbol`, so adding a new kind of item
 needs no change here: define the subclass with its symbol and the factory finds
-it. This is the registry idea from the [Factory](23_Factory.md) chapter, using
+it. This is the registry idea from the [Factory](24_Factory.md) chapter, using
 the class hierarchy itself as the registry.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.

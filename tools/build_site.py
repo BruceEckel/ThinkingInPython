@@ -168,7 +168,7 @@ def render_chapter(body: str, ch: Chapter,
 PARTS = {
     "02": ("I", "Foundations"),
     "09": ("II", "Techniques"),
-    "16": ("III", "Patterns"),
+    "17": ("III", "Patterns"),
 }
 
 
