@@ -47,7 +47,7 @@ you do not declare them this way in Python. To create an object field, you
 just name it, using `self`, inside one of the methods (usually in the
 constructor, but not always), and space is created when that method is run.
 If you declare fields using the C++/Java
-style, they implicitly become class level fields (similar to the static fields
+style, they implicitly become class level fields (similar to static fields
 in C++/Java).
 
 ## Inheritance
@@ -116,9 +116,7 @@ class is not derived from `Simple`. The `f()` method defined in
 `show()` can be applied to `obj`, and it doesn't have any other
 type requirements. You can see that `f()` can be applied equally to
 an object of a class derived from `Simple` and one that isn't, without
-discrimination. If you're a C++ programmer, you should see that the
-objective of the C++ `template` feature is exactly this: to provide
-dynamic typing in a statically-typed language.
+discrimination.
 
 ## Properties
 

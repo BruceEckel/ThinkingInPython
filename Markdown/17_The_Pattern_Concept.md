@@ -4,8 +4,8 @@
 own failures."^[From Mark Johnson.]
 
 Probably the most important step forward in object-oriented design is the
-"design patterns" movement, chronicled in the book *Design Patterns*^[But be
-warned: the examples are in C++.]. That book shows 23 different solutions to
+"design patterns" movement, chronicled in the book *Design Patterns*.
+That book shows 23 different solutions to
 particular classes of problems. In this book, the basic concepts of design
 patterns will be introduced along with examples.
 
@@ -101,8 +101,7 @@ that can vary). The three purposes are:
 
 The *Design Patterns* book has a section on each of its 23 patterns
 along with one or more examples for each, typically in C++ but sometimes
-in Smalltalk. (You'll find that this doesn't matter too much since you
-can easily translate the concepts from either language into Python.)
+in Smalltalk.
 This book will not repeat all the patterns shown in *Design Patterns*
 since that book stands on its own and should be studied separately.
 Instead, this book will give some examples that should provide you with

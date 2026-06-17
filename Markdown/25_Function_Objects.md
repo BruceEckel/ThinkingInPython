@@ -1,7 +1,7 @@
 # Function Objects
 
 In *Advanced C++: Programming Styles And Idioms* (Addison-Wesley, 1992), Jim
-Coplien coins the term *functor*: an object whose sole purpose is to wrap a
+Coplien uses the term *functor*: an object whose sole purpose is to wrap a
 function (since "functor" has a meaning in mathematics, this book uses the more
 explicit term *function object*). The point is to decouple the choice of
 function to call from the place where it is called.

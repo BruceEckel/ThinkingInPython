@@ -1,5 +1,3 @@
-- Search for "Java" and "C++"
-
 - 27 Observer intro needs a rewrite, right now it's confusing to read.
 
 - Indexing using Leanpub format, before publishing to leanpub
