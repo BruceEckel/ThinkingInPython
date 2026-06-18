@@ -1,13 +1,3 @@
-- Consider TKInter for any example that might benefit from graphics.
-  Maybe it's not perfect but this isn't a book about GUIs, and there's
-  no installation hassle with TKInter.
-  Ideally all functions in the examples should be pure-functional and only produce return values
-  *except* the function that takes the values and displays them; that's all that function should do.
-  First do '### A Visual Example of Observers' in the Observer chapter and let me evaluate the result
-  before doing any other examples.
-
-- Find all the places where it makes sense to use triple quotes and apply them
-
 - Check order of examples in 30_Pattern_Refactoring.md
 
 - Check exercises. Potentially create new exercises.
