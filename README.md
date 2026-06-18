@@ -1,7 +1,9 @@
 Thinking in Python
 ==================
 
-> For tooling, see [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md).
+> For the book examples, clone this directory.
+
+> To test the examples, follow [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md).
 
 I started this book in 2008 and after a few years it kind of drifted to a stop. I think part of the
 problem was that I wanted to move the design patterns work I had done in Java into Python and
@@ -20,4 +22,4 @@ At the moment it is in decent shape and you can read it online:
 https://bruceeckel.github.io/ThinkingInPython/
 
 I'm doing as much as I can using Claude; after that my plan is to do an edit/rewrite pass.
-In the meantime I think it might be useful.
+In the meantime I hope it's useful.
