@@ -68,7 +68,7 @@ The list comprehension is enclosed within a list,
 so it is immediately evident that a list is being produced.
 There is only one function call to `isinstance` and no call to the cryptic `lambda`;
 instead the list comprehension uses a conventional iterator,
-an expression and an if expression for the optional predicate.
+an expression and an `if` expression for the optional predicate.
 
 ## Nested Comprehensions
 

@@ -125,13 +125,13 @@ Its timing is not guaranteed,
 and at interpreter shutdown the globals it refers to may already be gone.
 The Python documentation warns:
 
-> Warning: Due to the precarious circumstances under which __del__()
+> Warning: Due to the precarious circumstances under which `__del__()`
 > methods are invoked, exceptions that occur during their execution are
-> ignored, and a warning is printed to sys.stderr instead. Also, when
-> __del__() is invoked in response to a module being deleted (e.g.,
+> ignored, and a warning is printed to `sys.stderr` instead. Also, when
+> `__del__()` is invoked in response to a module being deleted (e.g.,
 > when execution of the program is done), *other globals referenced by
-> the __del__() method may already have been deleted*. For this
-> reason, __del__() methods should do the absolute minimum needed to
+> the `__del__()` method may already have been deleted*. For this
+> reason, `__del__()` methods should do the absolute minimum needed to
 > maintain external invariants.
 
 The explicit `del x` above forces collection while `Counter` is still intact.

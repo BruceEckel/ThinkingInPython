@@ -212,7 +212,7 @@ No metaclass is involved.
 `__init_subclass__` is implicitly a class method;
 its first argument is the new subclass.
 
-## Learning a Name with __set_name__
+## Learning a Name with `__set_name__`
 
 Another job that once needed a metaclass is letting an attribute object discover the name it was assigned to.
 A *descriptor* with `__set_name__` gets that name when the class is created:

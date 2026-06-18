@@ -46,7 +46,7 @@ whereas they are not necessary in Python (it won't complain if you use them anyw
 The conditional clause ends with a colon,
 and this indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-In this case, there is a "print" statement which sends the result to standard output,
+In this case, there is a `print` statement which sends the result to standard output,
 followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level, just like curly braces in C++ or Java,
