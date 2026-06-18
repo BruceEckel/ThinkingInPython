@@ -13,6 +13,7 @@ The mechanical health of the book is solid. As of this review:
 - **Types and lint are clean.** `ty check ExtractedExamples` and `ruff check ExtractedExamples` both report zero findings. The earlier ~184 advisory `ty` diagnostics are gone; the gate is strict.
 - **No drift.** All 216 tagged file-blocks match the committed `Examples/` tree.
 - **Site builds.** All 31 chapters plus the index render, with no broken image references.
+- **Part dividers are generated, not written.** `build_site.py` injects Part I (Foundations, before chapter `02`), Part II (Techniques, before `09`), and Part III (Patterns, before `17`) into the table of contents through its `PARTS` map, with the Introduction standing alone above Part I. They are intentionally absent as headings in `Markdown/`, so the Introduction's "Part I: Foundations" promise *is* delivered in the built book. Do not add Part headings to the chapters; change `PARTS` instead.
 - **House style holds.** No em-dashes (`—`/`–`) and no `--` used as a dash anywhere in the prose. No real `TODO`/`FIXME` markers remain.
 - **Prose is now one sentence per line** (semantic line breaks), so the edit pass produces sentence-grained diffs. See `tools/reflow_prose.py` (`make reflow`).
 
@@ -24,9 +25,7 @@ The mechanical health of the book is solid. As of this review:
 
 ## High priority (decisions only you can make)
 
-1. **"Part I: Foundations" is promised but never delivered.** The Introduction says "the next section, **Part I: Foundations**, is a fast tour," but there are no part dividers in the book and no "Part II" is ever named. Decide one of two fixes: add real part dividers (Part I: Foundations before `02`, Part II: Patterns before `17`), or soften the Introduction wording to drop the "Part I" label. The part structure would also give the patterns half a proper entry point.
-
-2. **Exercises are present in some chapters and absent in others, with no stated rule.** Chapters with an Exercises section: Testing, Data Classes, Pattern Matching, Functional Error Handling, Decorators, Singleton, Application Frameworks, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Visitor, Pattern Refactoring. Chapters with none: the whole Foundations run `02`-`08`, plus Comprehensions, Metaprogramming (has "Further Reading" instead), Rethinking Objects (has "Guidelines"), The Pattern Concept, Messenger, Fronting, Multiple Dispatching, and Simulation. Decide the policy: exercises everywhere, exercises only in the teaching chapters, or none. This is in your NOTES already ("Check exercises. Potentially create new exercises.").
+1. **Exercises are present in some chapters and absent in others, with no stated rule.** Chapters with an Exercises section: Testing, Data Classes, Pattern Matching, Functional Error Handling, Decorators, Singleton, Application Frameworks, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Visitor, Pattern Refactoring. Chapters with none: the whole Foundations run `02`-`08`, plus Comprehensions, Metaprogramming (has "Further Reading" instead), Rethinking Objects (has "Guidelines"), The Pattern Concept, Messenger, Fronting, Multiple Dispatching, and Simulation. Decide the policy: exercises everywhere, exercises only in the teaching chapters, or none. This is in your NOTES already ("Check exercises. Potentially create new exercises.").
 
 ## Medium priority (structure and balance)
 
@@ -34,7 +33,7 @@ The mechanical health of the book is solid. As of this review:
 
 4. **Heading-level inconsistency for Exercises.** Observer uses `### Exercises` (an h3 under "A Visual Example of Observers"); every other chapter uses `## Exercises` (h2). Promote Observer's to h2 so the section sits at the chapter level, not inside the last subsection.
 
-5. **The patterns half has no on-ramp of its own.** The Pattern Concept (`17`) opens the patterns material, but Rethinking Objects (`16`) is the real pivot from "language" to "patterns." If you add part dividers (item 1), decide whether Rethinking Objects belongs at the end of Foundations or as the opening of the patterns part.
+5. **Rethinking Objects sits just before the Patterns boundary.** The build starts Part III (Patterns) at The Pattern Concept (`17`), so Rethinking Objects (`16`) is the last chapter of Part II (Techniques). It is arguably the real pivot from "language" to "patterns"; consider whether it should open Part III instead, which is a one-line change to the `PARTS` map in `build_site.py`. Editorial only.
 
 ## Low priority (polish)
 
@@ -44,9 +43,9 @@ The mechanical health of the book is solid. As of this review:
 
 ## Suggested sequence for the edit pass
 
-1. **Make the two structural calls first** (items 1 and 2): part dividers yes/no, and the exercises policy. Everything else is easier once these are settled.
+1. **Settle the exercises policy first** (item 1); the rest is easier once that is decided.
 2. **Do the one-voice pass chapter by chapter.** The prose is now one sentence per line, so you can edit and review sentence by sentence. Watch for the passive voice you flagged in NOTES; a scan-and-report pass (your "#3") can feed this.
-3. **Even out pacing** (item 3) only if you decided on part dividers, since the parts make imbalance more visible.
+3. **Even out pacing** (item 3) if you want; the generated Part dividers already make the imbalance visible in the table of contents.
 4. **Fix the small consistency items** (4, 6, 7) last; they are mechanical once the structure is fixed.
 
 ## Note on the publishing plan

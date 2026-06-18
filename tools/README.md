@@ -193,6 +193,13 @@ Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
 Pandoc converts each chapter; the script adds the title page, an ordered
 contents list, a sidebar, previous/next links, and syntax-highlighting CSS.
 
+The book's **Part dividers are generated here, not written in the Markdown.**
+The `PARTS` map names Part I (Foundations, before chapter `02`), Part II
+(Techniques, before `09`), and Part III (Patterns, before `17`); the builder
+emits each heading in the table of contents before its starting chapter, with
+the Introduction standing alone above Part I. So a chapter file with no "Part"
+heading is correct: to move or rename a Part, edit `PARTS`, not the chapters.
+
 Book images are referenced in the Markdown as `_images/<name>` with no
 extension. The builder resolves each to the real file in `resources/images`
 (`decorator` to `decorator.gif`), copies the referenced ones into
