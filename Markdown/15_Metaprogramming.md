@@ -40,7 +40,7 @@ Use a metaclass only when these cannot do the job.
 This chapter shows the simpler tools first,
 then metaclasses for the cases that still need them.
 
-## Generating Classes with type
+## Generating Classes with `type`
 
 Since metaclasses create classes, you can call the metaclass yourself.
 `type` with one argument gives the type of an existing object.
