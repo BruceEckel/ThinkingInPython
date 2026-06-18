@@ -225,7 +225,7 @@ I've had to delay the initialization of the tables until the first time that the
 Initially, the `next()` methods can appear a little strange because of this.
 
 The `StateT` class is an implementation of `State` (so that the same `StateMachine` class can be used from the previous example) that adds a `transitions` dict mapping each input to its next state.
-Its base-class `next()` looks the input up in that dict.
+Its base-class `next()` looks the input up in that `dict`.
 Each subclass fills its own `transitions` lazily,
 the first time `next()` is called while `transitions` is still `None`,
 then delegates to the base `next()`:
@@ -347,7 +347,7 @@ The original Java version of this example needed two extra class hierarchies,
 `Condition` and `Transition`,
 because in Java a method is not a value you can store in a table.
 Python functions are first-class, so those hierarchies vanish:
-a condition is any callable returning a bool, an action is any callable,
+a condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
 
 ![Vending machine state diagram](_images/stateMachine)

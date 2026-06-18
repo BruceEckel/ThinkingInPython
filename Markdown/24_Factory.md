@@ -178,7 +178,7 @@ So the simplest factory is a dictionary that maps names to classes:
     shapes = {"Circle": Circle, "Square": Square}
     shapes[name]()          # construct one
 
-There is no factory method and no factory class; the dict *is* the factory.
+There is no factory method and no factory class; the `dict` *is* the factory.
 You can go one step further so the factory never needs editing when a type is added:
 let each subclass register itself through `__init_subclass__`:
 

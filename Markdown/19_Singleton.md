@@ -23,7 +23,7 @@ Put the state in a module:
 settings: dict[str, str] = {}
 ```
 
-Then every import of `settings`, from anywhere, hands back the same dict.
+Then every import of `settings`, from anywhere, hands back the same `dict`.
 Mutating it through one import is visible through every other:
 
 ```python

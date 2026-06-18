@@ -1,4 +1,4 @@
-- Check for keywords in prose that should be surrounded with backticks (some may currently have regular quotes)
+- Check for keywords in prose that should be surrounded with backticks (some may currently have regular quotes, some may not have anything)
 
 - Look for references to other chapters that don't have links, add the links.
 
