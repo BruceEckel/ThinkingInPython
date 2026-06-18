@@ -14,3 +14,4 @@
 22_State_Machines/tabledriven/vending_view.py
 27_Observer/box_view.py
 31_Simulation/robot_explorer/maze_view.py
+31_Simulation/rats_and_mazes/rats_view.py
