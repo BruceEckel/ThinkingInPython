@@ -1,12 +1,13 @@
+- Is full polymorphism covered? (Not just inheritance-based)
+- Check order of examples in 30_Pattern_Refactoring.md
+
 - "have to", "could" -> "can"
 - which was
 - which will be
 
 - Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Chapter 21: Surrogate?
-- Is full polymorphism covered? (Not just inheritance-based)
 
-- Check order of examples in 30_Pattern_Refactoring.md
 
 - Check exercises. Potentially create new exercises.
 

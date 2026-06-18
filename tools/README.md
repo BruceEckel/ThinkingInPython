@@ -183,7 +183,6 @@ only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
 
 * `EmDash` (error): no `—`, `–`, or `--` used as a dash.
 * `Filler` (warning): throat-clearing phrases ("this is the whole idea", and so on).
-* `SentenceLength` (warning): flags sentences longer than 35 words.
 
 To add the community packages for passive-voice and usage checks, list them in
 `.vale.ini` (`Packages = write-good, proselint`) and run `vale sync` once.
@@ -250,8 +249,8 @@ builds and publishes the site**. The workflow has these jobs:
   codespell spell-checks `Markdown/` (config in `[tool.codespell]`, ignore list
   in `tools/codespell-ignore.txt`) and fails on a spelling error. It then
   installs the Vale binary and runs the house-style rules in `styles/House/`;
-  Vale fails the job on an em-dash (error level) and prints the filler and
-  sentence-length findings as warnings. Shares the gates trigger.
+  Vale fails the job on an em-dash (error level) and prints the filler
+  findings as warnings. Shares the gates trigger.
 
 `deploy` depends only on `site`, not on `gates` or `prose`, so publishing is
 never blocked by the opt-in checks. The trade-off is that a push can publish even if an example

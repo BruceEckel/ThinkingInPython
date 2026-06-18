@@ -148,8 +148,13 @@ jobs:
           curl -fsSL "https://github.com/errata-ai/vale/releases/download/v${version}/vale_${version}_Linux_64-bit.tar.gz" | sudo tar -xz -C /usr/local/bin vale
           vale --version
 
-      # House style: fails on em-dashes (error level); filler and sentence-length
-      # findings are warnings and do not fail the job. Config in .vale.ini.
+      # Download the third-party styles referenced in .vale.ini (write-good,
+      # proselint). They are not committed, so CI fetches them each run.
+      - name: Sync Vale packages
+        run: vale sync
+
+      # House style: fails on em-dashes (error level); filler findings are
+      # warnings and do not fail the job. Config in .vale.ini.
       - name: House-style lint with Vale
         run: vale Markdown
 

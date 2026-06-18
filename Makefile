@@ -10,6 +10,9 @@ RUFF ?= uv run ruff
 SPELL ?= uv run codespell
 VALE ?= vale
 DOCS ?= Markdown
+# Files for spell/prose: all of DOCS, or one chapter via CH= (a number or stem
+# prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
+PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
 .PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check spell prose clean-examples clean-site
 
@@ -30,8 +33,8 @@ help:
 	@echo "  extract   - write ExtractedExamples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
-	@echo "  spell     - spell-check prose and comments with codespell (DOCS=Markdown)"
-	@echo "  prose     - house-style lint with Vale (needs the vale binary; see .vale.ini)"
+	@echo "  spell     - spell-check prose/comments with codespell (CH=29 for one chapter)"
+	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -83,15 +86,16 @@ reflow-check:
 	$(PY) tools/reflow_prose.py $(CH)
 
 # Spell-check the book prose and code comments. codespell config and the
-# ignore list live in pyproject.toml and tools/codespell-ignore.txt. Override
-# the target with DOCS=, e.g. `make spell DOCS=Markdown/02_A_Python_Tour.md`.
+# ignore list live in pyproject.toml and tools/codespell-ignore.txt. Run one
+# chapter with CH= (e.g. `make spell CH=29`) or a path with DOCS=.
 spell:
-	$(SPELL) $(DOCS)
+	$(SPELL) $(PROSE_FILES)
 
-# House-style lint with Vale: no em-dashes, short sentences, no filler phrases.
+# House-style lint with Vale: no em-dashes and no filler phrases. Run one
+# chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.
 # Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
 prose:
-	$(VALE) $(DOCS)
+	$(VALE) $(PROSE_FILES)
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates
