@@ -263,6 +263,119 @@ def test_empty_chain_returns_none() -> None:
     assert solve([0.0], []) is None
 ```
 
+## An Event Bus: Handlers Keyed by Type
+
+Chain of Responsibility kept its handlers in a list and tried them in order.
+Key that structure by type instead of by position and you have an *event bus*:
+a dict from each event type to the functions that care about it.
+The events are plain values,
+written as frozen data classes (see the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter).
+Publishing an event looks up its type and calls every handler registered for it.
+The handlers are ordinary functions,
+so there is no `Handler` interface to implement and no registration ceremony:
+
+```python
+# event_bus.py
+# An event bus is a dict from each event type to the functions that
+# care about it. Events are values; handlers are plain functions.
+# Publishing an event calls every handler for that event's type.
+# No Handler base class, and no registration ceremony.
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True)
+class Deposit:
+    amount: int
+
+
+@dataclass(frozen=True)
+class Withdraw:
+    amount: int
+
+
+@dataclass(frozen=True)
+class Closed:
+    reason: str
+
+
+class EventBus:
+    def __init__(self) -> None:
+        self._handlers: dict[type, list[Callable[[Any], None]]] = {}
+
+    def subscribe[E](self, event_type: type[E],
+                     handler: Callable[[E], None]) -> None:
+        self._handlers.setdefault(event_type, []).append(handler)
+
+    def publish(self, event: object) -> None:
+        for handler in self._handlers.get(type(event), []):
+            handler(event)
+
+
+def on_deposit(event: Deposit) -> None:
+    print(f"+ deposit {event.amount}")
+
+
+def audit(event: Deposit) -> None:
+    print(f"  audit: a deposit of {event.amount}")
+
+
+def on_withdraw(event: Withdraw) -> None:
+    print(f"- withdraw {event.amount}")
+
+
+bus = EventBus()
+bus.subscribe(Deposit, on_deposit)
+bus.subscribe(Deposit, audit)        # two handlers for one event type
+bus.subscribe(Withdraw, on_withdraw)
+
+bus.publish(Deposit(100))
+bus.publish(Withdraw(30))
+bus.publish(Closed("inactivity"))    # no handler: nothing happens
+```
+
+As with the chain, the behavior is what to test:
+every handler registered for a type is called,
+a handler hears only its own event type,
+and an event with no handler is a quiet no-op:
+
+```python
+# test_event_bus.py
+from event_bus import Closed, Deposit, EventBus, Withdraw
+
+
+def test_every_handler_for_the_type_is_called() -> None:
+    seen: list[str] = []
+    bus = EventBus()
+    bus.subscribe(Deposit, lambda e: seen.append(f"a{e.amount}"))
+    bus.subscribe(Deposit, lambda e: seen.append(f"b{e.amount}"))
+    bus.publish(Deposit(5))
+    assert seen == ["a5", "b5"]
+
+
+def test_only_the_matching_type_is_called() -> None:
+    calls: list[str] = []
+    bus = EventBus()
+    bus.subscribe(Deposit, lambda e: calls.append("deposit"))
+    bus.subscribe(Withdraw, lambda e: calls.append("withdraw"))
+    bus.publish(Withdraw(1))
+    assert calls == ["withdraw"]
+
+
+def test_no_handler_is_a_noop() -> None:
+    EventBus().publish(Closed("done"))  # must not raise
+```
+
+This is the *Observer* pattern (see the [Observer](27_Observer.md) chapter) narrowed to a single subject:
+the subscribers are functions,
+and the bus routes each event to them by its type.
+Here a type may have many handlers.
+When instead you want exactly one handler per type,
+chosen by the argument's type and open to new types without editing a central function,
+that is `functools.singledispatch`,
+which the [Visitor](29_Visitor.md) and [Pattern Refactoring](30_Pattern_Refactoring.md) chapters put to work.
+
 ## Exercises
 
 1.  Add an "undo" capability to `command.py`.
