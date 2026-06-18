@@ -1,14 +1,13 @@
 # Messenger
 
-The *Messenger* or *Data Transfer Object* is a way to pass a clump of
-information around. The most typical place for this is in return values
-from functions, where tuples or dictionaries are often used. However,
-those rely on indexing; in the case of tuples this requires the consumer
-to keep track of numerical order, and in the case of a `dict` you must
-use the `d["name"]` syntax which can be slightly less desirable.
+The *Messenger* or *Data Transfer Object* is a way to pass a clump of information around.
+The most typical place for this is in return values from functions,
+where tuples or dictionaries are often used.
+However, those rely on indexing;
+in the case of tuples this requires the consumer to keep track of numerical order,
+and in the case of a `dict` you must use the `d["name"]` syntax which can be slightly less desirable.
 
-A Messenger is simply an object with attributes corresponding to the
-names of the data you want to pass around or return:
+A Messenger is simply an object with attributes corresponding to the names of the data you want to pass around or return:
 
 ```python
 # messenger_idiom.py
@@ -25,8 +24,7 @@ m.more = 11
 print(m.info, m.b, m.more)
 ```
 
-The trick here is that the `__dict__` for the object is just assigned to
-the `dict` that is automatically created by the `**kwargs` argument.
+The trick here is that the `__dict__` for the object is just assigned to the `dict` that is automatically created by the `**kwargs` argument.
 
 You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in-place, wherever you need it,
@@ -35,10 +33,11 @@ usually makes more sense.
 ## The Standard-Library Versions
 
 You rarely need even those few lines, because Python already ships this idiom.
-`types.SimpleNamespace` is exactly a `Messenger`: keyword arguments become
-attributes. When you want the fields named and type-checked, a `@dataclass`
-gives you a typed mutable record with a generated `__init__`, `repr`, and
-equality, and a `NamedTuple` gives you a typed immutable one:
+`types.SimpleNamespace` is exactly a `Messenger`:
+keyword arguments become attributes.
+When you want the fields named and type-checked,
+a `@dataclass` gives you a typed mutable record with a generated `__init__`,
+`repr`, and equality, and a `NamedTuple` gives you a typed immutable one:
 
 ```python
 # messenger_modern.py
@@ -74,16 +73,17 @@ class Color(NamedTuple):
 print(Color(255, 0, 0).r)
 ```
 
-Use `SimpleNamespace` for an ad-hoc bag of attributes, a `@dataclass` for
-a typed mutable record, and a `NamedTuple` for a typed immutable one. Write the
-hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath. To
-make a `@dataclass` guarantee that its values are legal, not merely typed, see
-[Data Classes as Types](10_Data_Classes_as_Types.md).
+Use `SimpleNamespace` for an ad-hoc bag of attributes,
+a `@dataclass` for a typed mutable record,
+and a `NamedTuple` for a typed immutable one.
+Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
+To make a `@dataclass` guarantee that its values are legal, not merely typed,
+see [Data Classes as Types](10_Data_Classes_as_Types.md).
 
-A small test confirms each form behaves as a record: the hand-rolled `Messenger`
-turns keyword arguments into attributes (and takes new ones later), the
-`@dataclass` carries fields and value equality, and the `NamedTuple` is a named
-record you can still treat as a tuple:
+A small test confirms each form behaves as a record:
+the hand-rolled `Messenger` turns keyword arguments into attributes (and takes new ones later),
+the `@dataclass` carries fields and value equality,
+and the `NamedTuple` is a named record you can still treat as a tuple:
 
 ```python
 # test_messenger.py

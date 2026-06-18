@@ -2,31 +2,36 @@
 
 > Decoupling code behavior
 
-The *Observer* pattern is a kind of callback. One object, the *observer*,
-registers interest in another, the *observable*, and is notified whenever the
-observable's state changes. Of the callback patterns it is the most dynamic:
-observers attach and detach at run time, and the observable never needs to know
-their types. It underlies event handling, and the model-view split that keeps a
-display in step with the data behind it.
+The *Observer* pattern is a kind of callback.
+One object, the *observer*, registers interest in another, the *observable*,
+and is notified whenever the observable's state changes.
+Of the callback patterns it is the most dynamic:
+observers attach and detach at run time,
+and the observable never needs to know their types.
+It underlies event handling,
+and the model-view split that keeps a display in step with the data behind it.
 
-The problem it solves is common: a group of objects must update themselves when
-some other object changes state. The classic example is Smalltalk's MVC
-(model-view-controller), or the almost-equivalent Document-View architecture.
-You have some data, the *document*, and more than one view of it, say a plot and
-a table. When the data changes, every view must refresh. The observer pattern
-arranges that, without the data having to know which views exist.
+The problem it solves is common:
+a group of objects must update themselves when some other object changes state.
+The classic example is Smalltalk's MVC (model-view-controller),
+or the almost-equivalent Document-View architecture.
+You have some data, the *document*, and more than one view of it,
+say a plot and a table.
+When the data changes, every view must refresh.
+The observer pattern arranges that,
+without the data having to know which views exist.
 
-Python expresses this with far less machinery than the classic design needs, so
-this chapter shows the Pythonic version first, then the literal translation of
-Java's `Observable` and `Observer` classes for when you actually need it.
+Python expresses this with far less machinery than the classic design needs,
+so this chapter shows the Pythonic version first,
+then the literal translation of Java's `Observable` and `Observer` classes for when you actually need it.
 
 ## The Pythonic Observer: a List of Callables
 
-In Python an *observer* need not be an
-object implementing an `Observer` interface; it is simply a callable. An
-*observable* need not be a base class with a `changed` flag; it is a list of
-callables and a way to notify them. A `@property` setter is a natural place to
-fire the notification when state changes:
+In Python an *observer* need not be an object implementing an `Observer` interface;
+it is simply a callable.
+An *observable* need not be a base class with a `changed` flag;
+it is a list of callables and a way to notify them.
+A `@property` setter is a natural place to fire the notification when state changes:
 
 ```python
 # observers.py
@@ -70,15 +75,16 @@ thermo.celsius = 25
 thermo.celsius = 150
 ```
 
-The observers here are lambdas, but any function or bound method works. There is
-no `Observer` base class to inherit and no `set_changed()`/`notify_observers()`
-protocol: assigning to `celsius` notifies everyone. For event-heavy programs
-there are mature libraries (signal/slot systems, `asyncio` events), but for most
-cases a list of callbacks is all the Observer pattern amounts to.
+The observers here are lambdas, but any function or bound method works.
+There is no `Observer` base class to inherit and no `set_changed()`/`notify_observers()` protocol:
+assigning to `celsius` notifies everyone.
+For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
+but for most cases a list of callbacks is all the Observer pattern amounts to.
 
-A test confirms the two things that matter: every subscriber is called with the
-new value, and a subscriber sees only the changes that happen after it
-subscribes. A list whose `append` is the observer records what arrived:
+A test confirms the two things that matter:
+every subscriber is called with the new value,
+and a subscriber sees only the changes that happen after it subscribes.
+A list whose `append` is the observer records what arrived:
 
 ```python
 # test_observers.py
@@ -117,18 +123,18 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     assert readings == [20.0]
 ```
 
-The rest of this chapter translates Java's `Observable` and `Observer` classes
-directly. That is useful when you are porting Java code or need the exact
-`set_changed()` semantics, but use it only when the simple version above is
-not enough.
+The rest of this chapter translates Java's `Observable` and `Observer` classes directly.
+That is useful when you are porting Java code or need the exact `set_changed()` semantics,
+but use it only when the simple version above is not enough.
 
 ## The Classic Observable and Observer
 
-The classic design, translated from Java's `java.util`, makes the two roles
-explicit base classes. An `Observable` keeps a list of observers and a
-`changed` flag. You call `set_changed()` and then `notify_observers()`, and
-every registered `Observer` has its `update()` called. The flag lets the
-subject decide when a batch of changes is worth announcing.
+The classic design, translated from Java's `java.util`,
+makes the two roles explicit base classes.
+An `Observable` keeps a list of observers and a `changed` flag.
+You call `set_changed()` and then `notify_observers()`,
+and every registered `Observer` has its `update()` called.
+The flag lets the subject decide when a batch of changes is worth announcing.
 
 ```python
 # observer.py
@@ -165,24 +171,30 @@ class Observable:
             observer.update(self, arg)
 ```
 
-A bare `Observable` does nothing on its own: you must subclass it and call
-`set_changed()`, or `notify_observers()` is a no-op. The example below shows
-exactly that, and a test pins down the result.
+A bare `Observable` does nothing on its own:
+you must subclass it and call `set_changed()`,
+or `notify_observers()` is a no-op.
+The example below shows exactly that, and a test pins down the result.
 
 ### A Visual Example of Observers
 
-This is the model-view split from the chapter's opening, made visible with
-`tkinter` (in the standard library, so there is nothing to install), and split
-across two files to make the point. The *model*, `box_observer.py`, is a grid of
-colored boxes and the rule for a click; it holds no display code. The *view*,
-`box_view.py`, is the only file that draws. Click a box and every box touching
-it, diagonals included, repaints to the clicked box's color.
+This is the model-view split from the chapter's opening,
+made visible with `tkinter` (in the standard library, so there is nothing to install),
+and split across two files to make the point.
+The *model*, `box_observer.py`,
+is a grid of colored boxes and the rule for a click; it holds no display code.
+The *view*, `box_view.py`, is the only file that draws.
+Click a box and every box touching it, diagonals included,
+repaints to the clicked box's color.
 
-The model is an `Observable`. Building the grid, testing adjacency, and computing
-the grid that results from a click are plain functions: values in, values out.
-`BoxModel.click()` makes the next grid with `recolored()` and announces it. There
-is no `tkinter` here at all, which is what lets the model be tested with no
-window open. The classic `Observable` comes from `observer.py`:
+The model is an `Observable`.
+Building the grid, testing adjacency,
+and computing the grid that results from a click are plain functions: values in,
+values out.
+`BoxModel.click()` makes the next grid with `recolored()` and announces it.
+There is no `tkinter` here at all,
+which is what lets the model be tested with no window open.
+The classic `Observable` comes from `observer.py`:
 
 ```python
 # box_observer.py
@@ -228,9 +240,9 @@ class BoxModel(Observable):
 ```
 
 Because the model carries no display code, a test drives it with no window open:
-build a model, click a cell, and check that the neighbors took its color and that
-observers were notified with the new grid. This is the model's correctness,
-established apart from how it is shown:
+build a model, click a cell,
+and check that the neighbors took its color and that observers were notified with the new grid.
+This is the model's correctness, established apart from how it is shown:
 
 ```python
 # test_box_observer.py
@@ -277,12 +289,14 @@ def test_model_notifies_with_the_new_grid() -> None:
     assert model.grid[(1, 1)] == model.grid[(2, 2)]
 ```
 
-The view lives in its own file. It is the only `Observer` and the only code that
-touches the screen: `draw()` paints the grid, and `update()` calls `draw()`
-whenever the model changes. A click on the canvas becomes a model `click()`, and
-the resulting notification repaints the view. Run `box_view.py` to play; it opens
-a window, so the example harness does not run it (it is listed in
-`tools/norun.txt`).
+The view lives in its own file.
+It is the only `Observer` and the only code that touches the screen:
+`draw()` paints the grid,
+and `update()` calls `draw()` whenever the model changes.
+A click on the canvas becomes a model `click()`,
+and the resulting notification repaints the view.
+Run `box_view.py` to play; it opens a window,
+so the example harness does not run it (it is listed in `tools/norun.txt`).
 
 ```python
 # box_view.py
@@ -326,28 +340,24 @@ if __name__ == "__main__":
     show(BoxModel(8))
 ```
 
-The model and the view share only the `Observable`/`Observer` contract. That is
-what lets the test exercise the model with no display, and what would let you
-attach a second view to the same model and keep both in step. Showing that the
-model is correct, separately from how it is drawn, is the model-view split made
-concrete.
+The model and the view share only the `Observable`/`Observer` contract.
+That is what lets the test exercise the model with no display,
+and what would let you attach a second view to the same model and keep both in step.
+Showing that the model is correct, separately from how it is drawn,
+is the model-view split made concrete.
 
 
 ### Exercises
 
-1.  Write a class decorator that wraps every method of a class to print when
-    the method is entered and exited, giving an execution trace. (The
-    [Decorators](13_Decorators.md) and [Metaprogramming](15_Metaprogramming.md)
-    chapters show the techniques.)
-2.  Create a minimal Observer-Observable design in two classes. Just
-    create the bare minimum in the two classes, then demonstrate your
-    design by creating one `Observable` and many `Observer`s, and
-    cause the `Observable` to update the `Observer`s.
-3.  Modify `box_observer.py` to turn it into a simple game. If any of
-    the squares surrounding the one you clicked is part of a contiguous
-    patch of the same color, then all the squares in that patch are
-    changed to the color you clicked on. You can configure the game for
-    competition between players or to keep track of the number of clicks
-    that a single player uses to turn the field into a single color. You
-    may also want to restrict a player's color to the first one that was
-    chosen.
+1.  Write a class decorator that wraps every method of a class to print when the method is entered and exited,
+    giving an execution trace.
+    (The [Decorators](13_Decorators.md) and [Metaprogramming](15_Metaprogramming.md) chapters show the techniques.)
+2.  Create a minimal Observer-Observable design in two classes.
+    Just create the bare minimum in the two classes,
+    then demonstrate your design by creating one `Observable` and many `Observer`s,
+    and cause the `Observable` to update the `Observer`s.
+3.  Modify `box_observer.py` to turn it into a simple game.
+    If any of the squares surrounding the one you clicked is part of a contiguous patch of the same color,
+    then all the squares in that patch are changed to the color you clicked on.
+    You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
+    You may also want to restrict a player's color to the first one that was chosen.

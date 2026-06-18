@@ -1,31 +1,29 @@
 # Fronting for an Implementation
 
-Both *Proxy* and *State* provide a surrogate class that you use in your
-code; the real class that does the work is hidden behind this surrogate
-class. When you call a method in the surrogate, it simply turns around
-and calls the method in the implementing class. These two patterns are
-so similar that the *Proxy* is simply a special case of *State*.
+Both *Proxy* and *State* provide a surrogate class that you use in your code;
+the real class that does the work is hidden behind this surrogate class.
+When you call a method in the surrogate,
+it simply turns around and calls the method in the implementing class.
+These two patterns are so similar that the *Proxy* is simply a special case of *State*.
 
-The basic idea is simple: from a base class, the surrogate is derived
-along with the class or classes that provide the actual implementation:
+The basic idea is simple: from a base class,
+the surrogate is derived along with the class or classes that provide the actual implementation:
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
-When a surrogate object is created, it is given an implementation to
-which to send all of the method calls.
+When a surrogate object is created,
+it is given an implementation to which to send all of the method calls.
 
-Structurally, the difference between *Proxy* and *State* is simple: a
-*Proxy* has only one implementation, while *State* has more than one.
-The application of the patterns is considered (in *Design Patterns*) to
-be distinct: *Proxy* is used to control access to its implementation,
+Structurally, the difference between *Proxy* and *State* is simple:
+a *Proxy* has only one implementation, while *State* has more than one.
+The application of the patterns is considered (in *Design Patterns*) to be distinct:
+*Proxy* is used to control access to its implementation,
 while *State* allows you to change the implementation dynamically.
-However, if you expand your notion of "controlling access to
-implementation" then the two fit neatly together.
+However, if you expand your notion of "controlling access to implementation" then the two fit neatly together.
 
 ## Proxy
 
-If we implement *Proxy* by following the above diagram, it looks like
-this:
+If we implement *Proxy* by following the above diagram, it looks like this:
 
 ```python
 # proxy_demo.py
@@ -53,16 +51,12 @@ p.g()
 p.h()
 ```
 
-It isn't necessary that `Implementation` have the same interface as
-`Proxy`; as long as `Proxy` is somehow "speaking for" the class that
-it is referring method calls to then the basic idea is satisfied (note
-that this statement is at odds with the definition for Proxy in GoF).
-However, it is convenient to have a common interface so that
-`Implementation` is forced to fulfill all the methods that `Proxy`
-needs to call.
+It isn't necessary that `Implementation` have the same interface as `Proxy`;
+as long as `Proxy` is somehow "speaking for" the class that it is referring method calls to then the basic idea is satisfied (note that this statement is at odds with the definition for Proxy in GoF).
+However, it is convenient to have a common interface so that `Implementation` is forced to fulfill all the methods that `Proxy` needs to call.
 
-Of course, in Python we have a delegation mechanism built in, so it
-makes the `Proxy` even simpler to implement:
+Of course, in Python we have a delegation mechanism built in,
+so it makes the `Proxy` even simpler to implement:
 
 ```python
 # proxy_demo2.py
@@ -90,14 +84,13 @@ p.g()
 p.h()
 ```
 
-The beauty of using `__getattr__()` is that `Proxy2` is
-completely generic, and not tied to any particular implementation.
+The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
+and not tied to any particular implementation.
 
 ## State
 
-The *State* pattern adds more implementations to *Proxy*, along with a
-way to switch from one implementation to another during the lifetime of
-the surrogate:
+The *State* pattern adds more implementations to *Proxy*,
+along with a way to switch from one implementation to another during the lifetime of the surrogate:
 
 ```python
 # state_demo.py
@@ -142,29 +135,27 @@ b.change_imp(Implementation2())
 run(b)
 ```
 
-You can see that the first implementation is used for a bit, then the
-second implementation is swapped in and that is used.
+You can see that the first implementation is used for a bit,
+then the second implementation is swapped in and that is used.
 
-The difference between *Proxy* and *State* is in the problems that are
-solved. The common uses for *Proxy* as described in *Design Patterns*
-are:
+The difference between *Proxy* and *State* is in the problems that are solved.
+The common uses for *Proxy* as described in *Design Patterns* are:
 
-1.  `Remote proxy`. This proxies for an object in a different address
-    space. A remote proxy is created for you automatically by the RMI
-    compiler `rmic` as it creates stubs and skeletons.
-2.  `Virtual proxy`. This provides "lazy initialization" to create
-    expensive objects on demand.
-3.  `Protection proxy`. Used when you don't want the client programmer
-    to have full access to the proxied object.
-4.  `Smart reference`. To add additional actions when the proxied
-    object is accessed. For example, to keep track of the number of
-    references that are held for a particular object, in order to
-    implement the *copy-on-write* idiom and prevent object aliasing. A
-    simpler example is keeping track of the number of calls to a
-    particular method.
+1.  `Remote proxy`.
+    This proxies for an object in a different address space.
+    A remote proxy is created for you automatically by the RMI compiler `rmic` as it creates stubs and skeletons.
+2.  `Virtual proxy`.
+    This provides "lazy initialization" to create expensive objects on demand.
+3.  `Protection proxy`.
+    Used when you don't want the client programmer to have full access to the proxied object.
+4.  `Smart reference`.
+    To add additional actions when the proxied object is accessed.
+    For example, to keep track of the number of references that are held for a particular object,
+    in order to implement the *copy-on-write* idiom and prevent object aliasing.
+    A simpler example is keeping track of the number of calls to a particular method.
 
-A *Smart reference* proxy adds behavior around each access. With `__getattr__`
-you can wrap every method call, for example to count them:
+A *Smart reference* proxy adds behavior around each access.
+With `__getattr__` you can wrap every method call, for example to count them:
 
 ```python
 # counting_proxy.py
@@ -200,27 +191,28 @@ p.f()
 print("calls:", p.calls)
 ```
 
-Because `__getattr__` intercepts only the lookups not found directly on the
-proxy, one generic proxy can add lazy initialization (a *virtual proxy*), access
-checks (a *protection proxy*), or call tracking (a *smart reference*) to any
-object, with no per-method code.
+Because `__getattr__` intercepts only the lookups not found directly on the proxy,
+one generic proxy can add lazy initialization (a *virtual proxy*),
+access checks (a *protection proxy*),
+or call tracking (a *smart reference*) to any object, with no per-method code.
 
-In *Design Patterns*, *Proxy* and *State* are given different structures and so
-are treated as unrelated. But both are really a *Surrogate*: a front object that
-passes method calls through to an implementation. *Proxy* fronts for one
-implementation to control access to it; *State* swaps among several to change
-behavior over time. In Python both are the same few lines of `__getattr__`
-delegation, with *State* adding a method to change the implementation. The
-separate implementation hierarchy that *Design Patterns* uses is needed only
-when you do not control the implementing code; when you do, the single generic
-surrogate above is simpler and just as flexible.
+In *Design Patterns*,
+*Proxy* and *State* are given different structures and so are treated as unrelated.
+But both are really a *Surrogate*:
+a front object that passes method calls through to an implementation.
+*Proxy* fronts for one implementation to control access to it;
+*State* swaps among several to change behavior over time.
+In Python both are the same few lines of `__getattr__` delegation,
+with *State* adding a method to change the implementation.
+The separate implementation hierarchy that *Design Patterns* uses is needed only when you do not control the implementing code;
+when you do, the single generic surrogate above is simpler and just as flexible.
 
 ## Testing the Surrogates
 
-Because each surrogate wraps any object, a test can hand it a small stand-in with
-real return values and check the delegation directly. For the proxy, that the
-call is forwarded with its result and counted; for the state, that calls reach
-the current implementation and that `change_imp` swaps it:
+Because each surrogate wraps any object,
+a test can hand it a small stand-in with real return values and check the delegation directly.
+For the proxy, that the call is forwarded with its result and counted;
+for the state, that calls reach the current implementation and that `change_imp` swaps it:
 
 ```python
 # test_fronting.py

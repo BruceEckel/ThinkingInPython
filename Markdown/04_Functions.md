@@ -1,7 +1,8 @@
 # Functions
 
-To create a function in Python, you use the `def` keyword, followed by the
-function name and argument list, and a colon to begin the function body:
+To create a function in Python, you use the `def` keyword,
+followed by the function name and argument list,
+and a colon to begin the function body:
 
 ```python
 # a_function.py
@@ -18,11 +19,12 @@ print(a_function("no"))
 print(a_function("yes"))
 ```
 
-Notice there is no type information in the function signature: all it
-specifies is the name of the function and the argument identifiers, but no
-argument types or return types. Python is dynamically typed, which means it
-enforces type constraints at runtime. For example,
-different types can be both passed to and returned from the same function:
+Notice there is no type information in the function signature:
+all it specifies is the name of the function and the argument identifiers,
+but no argument types or return types.
+Python is dynamically typed,
+which means it enforces type constraints at runtime.
+For example, different types can be both passed to and returned from the same function:
 
 ```python
 # different_returns.py
@@ -37,10 +39,9 @@ print(different_returns(1))
 print(different_returns("one"))
 ```
 
-The only constraints on an object that is passed into the function are that
-the function can apply its operations to that object, but other than that, it
-doesn't care. Here, the same function applies the '`+`' operator to integers
-and strings:
+The only constraints on an object that is passed into the function are that the function can apply its operations to that object,
+but other than that, it doesn't care.
+Here, the same function applies the '`+`' operator to integers and strings:
 
 ```python
 # sum.py
@@ -56,8 +57,9 @@ print(sum('spam ', "eggs"))
 
 ## Default and Keyword Arguments
 
-Parameters can have defaults, and callers can pass arguments by name in any
-order. Keyword arguments make a call self-documenting:
+Parameters can have defaults,
+and callers can pass arguments by name in any order.
+Keyword arguments make a call self-documenting:
 
 ```python
 # default_args.py
@@ -70,8 +72,9 @@ print(connect("db.example.com", timeout=5))      # skip to a keyword
 print(connect(port=80, host="web.example.com"))  # any order by name
 ```
 
-A default value is evaluated once, when the function is defined, not on each
-call. A *mutable* default is therefore shared across calls:
+A default value is evaluated once, when the function is defined,
+not on each call.
+A *mutable* default is therefore shared across calls:
 
 ```python
 # mutable_default.py
@@ -99,8 +102,8 @@ This behavior is a common confusion for newcomers to the language.
 
 ## Variable Argument Lists
 
-A `*args` parameter collects extra positional arguments into a tuple, and
-`**kwargs` collects extra keyword arguments into a dictionary:
+A `*args` parameter collects extra positional arguments into a tuple,
+and `**kwargs` collects extra keyword arguments into a dictionary:
 
 ```python
 # var_args.py
@@ -112,15 +115,16 @@ report("nums", 1, 2, 3)                       # nums (1, 2, 3) {}
 report("point", 3, 4, color="red", size=10)   # extras land in options
 ```
 
-The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a
-call site, the mirror image of collecting them.
+The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
+the mirror image of collecting them.
 
 ## Positional-Only and Keyword-Only Parameters
 
-Two markers in a parameter list control how callers may pass arguments. A `/`
-ends the *positional-only* parameters: every parameter before it must be passed
-by position, never by name. A `*` begins the *keyword-only* parameters: every
-parameter after it must be passed by name.
+Two markers in a parameter list control how callers may pass arguments.
+A `/` ends the *positional-only* parameters:
+every parameter before it must be passed by position, never by name.
+A `*` begins the *keyword-only* parameters:
+every parameter after it must be passed by name.
 
 ```python
 # param_markers.py
@@ -139,20 +143,22 @@ print(make_user("Bob"))              # Bob (admin=False)
 print(make_user("Sue", admin=True))  # Sue (admin=True)
 ```
 
-Calling `divide(a=10, b=2)` is an error, because `a` and `b` are positional-only.
+Calling `divide(a=10, b=2)` is an error,
+because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 
-You meet `/` throughout the standard library, where many built-in functions take
-positional-only arguments, such as `dict.get(key, default, /)`. Marking a
-parameter positional-only also keeps its name out of the method's contract. That
-matters when a subclass overrides a method: since the name is not part of the
-interface, the subclass can rename the parameter, and a type checker will not
-object.
+You meet `/` throughout the standard library,
+where many built-in functions take positional-only arguments,
+such as `dict.get(key, default, /)`.
+Marking a parameter positional-only also keeps its name out of the method's contract.
+That matters when a subclass overrides a method:
+since the name is not part of the interface,
+the subclass can rename the parameter, and a type checker will not object.
 
 ## Lambdas
 
-A `lambda` is a small anonymous function written as a single expression. It is
-handy for passing behavior to functions like `sorted()`:
+A `lambda` is a small anonymous function written as a single expression.
+It is handy for passing behavior to functions like `sorted()`:
 
 ```python
 # lambdas.py
@@ -168,8 +174,8 @@ For anything more complicated you are expected to write a separate function.
 
 ## Unpacking Arguments
 
-`*` also works in the other direction: at a call site it *unpacks* a sequence
-into separate positional arguments.
+`*` also works in the other direction:
+at a call site it *unpacks* a sequence into separate positional arguments.
 
 ```python
 # unpacking.py

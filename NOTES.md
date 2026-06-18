@@ -1,8 +1,19 @@
+- Check for keywords in prose that should be surrounded with backticks (some may currently have regular quotes)
+
+- Look for references to other chapters that don't have links, add the links.
+
+- Look for and remove phrases like "of course", "clearly"
+- "have to", "could" -> "can"
+
+- Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
+- Chapter 21: Surrogate?
+- Is full polymorphism covered? (Not just inheritance-based)
+
 - Check order of examples in 30_Pattern_Refactoring.md
 
 - Check exercises. Potentially create new exercises.
 
-- passive voice
+- active voice
 
 - Ask for a good strategy to polish things before my edit/rewrite pass.
 

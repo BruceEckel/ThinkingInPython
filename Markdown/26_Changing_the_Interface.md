@@ -1,17 +1,16 @@
 # Changing the Interface
 
-Sometimes the problem that you're solving is as simple as "I don't have
-the interface that I want." Two of the patterns in *Design Patterns*
-solve this problem: *Adapter* takes one type and produces an interface
-to some other type. *Façade* creates an interface to a set of classes,
-simply to provide a more comfortable way to deal with a library or
-bundle of resources.
+Sometimes the problem that you're solving is as simple as "I don't have the interface that I want."
+Two of the patterns in *Design Patterns* solve this problem:
+*Adapter* takes one type and produces an interface to some other type.
+*Façade* creates an interface to a set of classes,
+simply to provide a more comfortable way to deal with a library or bundle of resources.
 
 ## Adapter
 
-When you've got *this*, and you need *that*, *Adapter* solves the
-problem. The only requirement is to produce a *that*, and there are a
-number of ways you can accomplish this adaptation:
+When you've got *this*, and you need *that*, *Adapter* solves the problem.
+The only requirement is to produce a *that*,
+and there are a number of ways you can accomplish this adaptation:
 
 ```python
 # adapter.py
@@ -78,17 +77,18 @@ what_i_use.op(what_i_have2)
 what_i_use.op(what_i_have3.what_i_want())
 ```
 
-I'm taking liberties with the term "proxy" here, because in *Design
-Patterns* they assert that a proxy must have an identical interface with
-the object that it is a surrogate for.
+I'm taking liberties with the term "proxy" here,
+because in *Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
 
 ### Adapter in Python
 
-The four variations above are Java habits. Python is dynamically typed: `WhatIUse.op()`
-only calls `f()`, so it accepts *any* object that has an `f()`. You do not need a
-shared base class or a declared interface, only the method. The common adapter
-need is "forward most calls unchanged, and add or change a few." `__getattr__`
-does the forwarding, so the adapter stays tiny:
+The four variations above are Java habits.
+Python is dynamically typed: `WhatIUse.op()` only calls `f()`,
+so it accepts *any* object that has an `f()`.
+You do not need a shared base class or a declared interface, only the method.
+The common adapter need is "forward most calls unchanged,
+and add or change a few."
+`__getattr__` does the forwarding, so the adapter stays tiny:
 
 ```python
 # getattr_adapter.py
@@ -119,13 +119,13 @@ print(a.f())   # adapted method
 print(a.g())   # forwarded to the adaptee unchanged
 ```
 
-`__getattr__` runs only for attributes Python does not find normally, so `f()`
-uses the adapter's own version while everything else falls through to the
-adaptee. This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+`__getattr__` runs only for attributes Python does not find normally,
+so `f()` uses the adapter's own version while everything else falls through to the adaptee.
+This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
-A test pins down both halves of that behavior: the new `f()` combines the
-adaptee's methods, and unoverridden calls forward straight through to the wrapped
-object:
+A test pins down both halves of that behavior:
+the new `f()` combines the adaptee's methods,
+and unoverridden calls forward straight through to the wrapped object:
 
 ```python
 # test_adapter.py
@@ -150,17 +150,14 @@ def test_forwarding_targets_the_wrapped_object() -> None:
 
 ## Façade
 
-A general principle that I apply when I'm casting about trying to mold
-requirements into a first-cut object is "If something is ugly, hide it
-inside an object." This is basically what *Façade* accomplishes. If you
-have a rather confusing collection of classes and interactions that the
-client programmer doesn't really need to see, then you can create an
-interface that is useful for the client programmer and that only
-presents what's necessary.
+A general principle that I apply when I'm casting about trying to mold requirements into a first-cut object is "If something is ugly,
+hide it inside an object."
+This is basically what *Façade* accomplishes.
+If you have a rather confusing collection of classes and interactions that the client programmer doesn't really need to see,
+then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
-Façade is often implemented as a singleton abstract factory. Of course,
-you can easily get this effect by creating a class containing `static`
-factory methods:
+Façade is often implemented as a singleton abstract factory.
+Of course, you can easily get this effect by creating a class containing `static` factory methods:
 
 ```python
 # facade.py
@@ -194,15 +191,16 @@ b = Facade.make_b(1)
 c = Facade.make_c(1.0)
 ```
 
-The cleaner Python façade is a *module*. A module already presents a curated set
-of names over whatever tangle of classes lives behind it, and, as [the Singleton chapter](19_Singleton.md)
-notes, it is imported once and shared everywhere. Put the friendly
-functions and the few classes you want to expose at module level, keep the messy
-internals private (a leading underscore, by convention), and the `import` *is*
-the façade. A `Facade` class full of static methods only reproduces, with more
-ceremony, what a module gives you for free.
+The cleaner Python façade is a *module*.
+A module already presents a curated set of names over whatever tangle of classes lives behind it,
+and, as [the Singleton chapter](19_Singleton.md) notes,
+it is imported once and shared everywhere.
+Put the friendly functions and the few classes you want to expose at module level,
+keep the messy internals private (a leading underscore, by convention),
+and the `import` *is* the façade.
+A `Facade` class full of static methods only reproduces, with more ceremony,
+what a module gives you for free.
 
 ## Exercises
 
-1.  Create an adapter class that automatically loads a two-dimensional
-    array of objects into a dictionary as key-value pairs.
+1.  Create an adapter class that automatically loads a two-dimensional array of objects into a dictionary as key-value pairs.

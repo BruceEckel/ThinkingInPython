@@ -2,15 +2,14 @@
 
 ## Built-In Containers
 
-With languages like C++ and Java, containers are add-on libraries and not
-integral to the language. In Python, the essential nature of containers for
-programming is acknowledged by building them into the core of the language:
-both lists and associative arrays (a.k.a. maps, dictionaries, hash tables) are
-fundamental data types.
+With languages like C++ and Java,
+containers are add-on libraries and not integral to the language.
+In Python, the essential nature of containers for programming is acknowledged by building them into the core of the language:
+both lists and associative arrays (a.k.a. maps, dictionaries, hash tables) are fundamental data types.
 
-In addition, the `for` statement automatically iterates through lists rather
-than just counting through a sequence of numbers. Python formalizes this by automatically
-making `for` use an iterator that works through a sequence. Here's an example:
+In addition, the `for` statement automatically iterates through lists rather than just counting through a sequence of numbers.
+Python formalizes this by automatically making `for` use an iterator that works through a sequence.
+Here's an example:
 
 ```python
 # list.py
@@ -23,24 +22,21 @@ for x in list:
 ```
 
 The first line creates a list.
-You can add new elements to lists (here, `append()`
-is used) and they will automatically resize themselves. The `for` statement
-creates an iterator `x` which takes on each value in the list.
+You can add new elements to lists (here, `append()` is used) and they will automatically resize themselves.
+The `for` statement creates an iterator `x` which takes on each value in the list.
 
 
 
-Notice that there aren't any type declarations: the object names simply
-appear, and Python infers their type by the way that you use them. You'll find after you've worked with Python for a short while that
-you've been using up a lot of brain cycles parsing semicolons, curly braces,
-and all sorts of other extra verbiage that was demanded by your non-Python
-programming language but didn't actually describe what your program was
-supposed to do.
+Notice that there aren't any type declarations: the object names simply appear,
+and Python infers their type by the way that you use them.
+You'll find after you've worked with Python for a short while that you've been using up a lot of brain cycles parsing semicolons,
+curly braces, and all sorts of other extra verbiage that was demanded by your non-Python programming language but didn't actually describe what your program was supposed to do.
 
 ### Lists and Slicing
 
-A list holds an ordered, mutable sequence of any objects. Indexing starts at
-zero, and negative indices count from the end. A *slice* `[start:stop:step]`
-copies a subrange, with `stop` excluded:
+A list holds an ordered, mutable sequence of any objects.
+Indexing starts at zero, and negative indices count from the end.
+A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 
 ```python
 # slicing.py
@@ -61,9 +57,9 @@ Slicing works on any sequence, including strings and tuples.
 
 ### Tuples and Unpacking
 
-A *tuple* is an immutable sequence. The comma makes the tuple, not the
-parentheses. Tuples are the natural way to return several values from a function
-and to group values for unpacking:
+A *tuple* is an immutable sequence.
+The comma makes the tuple, not the parentheses.
+Tuples are the natural way to return several values from a function and to group values for unpacking:
 
 ```python
 # tuples.py
@@ -83,7 +79,8 @@ print(low, high)    # 1 9
 
 ### Dictionaries
 
-A dictionary maps keys to values, with fast lookup. Keys must be immutable.
+A dictionary maps keys to values, with fast lookup.
+Keys must be immutable.
 
 ```python
 # dictionaries.py
@@ -101,8 +98,8 @@ Use `dict.get()` to avoid a `KeyError` when a key might be absent.
 
 ### Sets
 
-A set is an unordered collection of unique items, with fast membership tests and
-the usual set algebra:
+A set is an unordered collection of unique items,
+with fast membership tests and the usual set algebra:
 
 ```python
 # sets.py
@@ -118,8 +115,9 @@ print(2 in a)     # True
 
 ## Control Flow
 
-You already saw `if`. Add `elif` for chained tests, and note that Python's
-comparison operators chain the way they do in mathematics:
+You already saw `if`.
+Add `elif` for chained tests,
+and note that Python's comparison operators chain the way they do in mathematics:
 
 ```python
 # control_flow.py
@@ -140,8 +138,8 @@ grade = "pass" if x >= 3 else "fail"  # conditional expression
 print(grade)
 ```
 
-A `while` loop runs until its condition is false. `break` leaves the loop and
-`continue` skips to the next iteration:
+A `while` loop runs until its condition is false.
+`break` leaves the loop and `continue` skips to the next iteration:
 
 ```python
 # while_loop.py
@@ -154,9 +152,9 @@ while n != 1:  # the Collatz sequence
 print(steps, "steps")
 ```
 
-For iteration, `for` walks any sequence directly. Use `range()` for counting,
-`enumerate()` when you also need the index, and `zip()` to walk two sequences
-together:
+For iteration, `for` walks any sequence directly.
+Use `range()` for counting, `enumerate()` when you also need the index,
+and `zip()` to walk two sequences together:
 
 ```python
 # looping.py
@@ -174,9 +172,10 @@ for name, score in zip(names, scores):
 
 ### Pattern Matching
 
-The `match` statement compares a value against structural patterns. It is more
-than a C `switch`: a pattern can destructure a value and bind its parts. (The
-`f"..."` strings below are *f-strings*, covered under Strings.)
+The `match` statement compares a value against structural patterns.
+It is more than a C `switch`:
+a pattern can destructure a value and bind its parts.
+(The `f"..."` strings below are *f-strings*, covered under Strings.)
 
 ```python
 # match_command.py
@@ -197,8 +196,9 @@ print(run("dance"))
 
 ## Errors and Exceptions
 
-Python signals an error by *raising* an exception, which propagates up until a
-`try`/`except` handles it. Catch specific exception types, not everything:
+Python signals an error by *raising* an exception,
+which propagates up until a `try`/`except` handles it.
+Catch specific exception types, not everything:
 
 ```python
 # exceptions.py
@@ -225,17 +225,19 @@ finally:
     print("finally always runs")
 ```
 
-An `except` clause names the exception type. An optional `else` runs when no
-exception was raised, and `finally` always runs, which makes it the place for
-cleanup. Python's culture leans on "easier to ask forgiveness than permission":
-try the operation and handle the exception, rather than checking every
-precondition first.
+An `except` clause names the exception type.
+An optional `else` runs when no exception was raised, and `finally` always runs,
+which makes it the place for cleanup.
+Python's culture leans on "easier to ask forgiveness than permission":
+try the operation and handle the exception,
+rather than checking every precondition first.
 
 ## Context Managers
 
-A `with` block guarantees that setup and cleanup happen as a pair, even if the
-body raises. Opening a file is the canonical case: the file is closed on the way
-out, no matter what:
+A `with` block guarantees that setup and cleanup happen as a pair,
+even if the body raises.
+Opening a file is the canonical case: the file is closed on the way out,
+no matter what:
 
 ```python
 # context_manager.py
@@ -252,15 +254,14 @@ with path.open() as f:
 path.unlink()
 ```
 
-This is the explicit-finalizer approach from the [Initialization and
-Cleanup](07_Initialization_and_Cleanup.md) chapter. Anything that
-acquires a resource (a file, a lock, a network connection) can be a context
-manager.
+This is the explicit-finalizer approach from the [Initialization and Cleanup](07_Initialization_and_Cleanup.md) chapter.
+Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
 
 ## Comprehensions
 
-A *comprehension* builds a list, dictionary, or set from another sequence in one
-expression, replacing a loop that builds up a result:
+A *comprehension* builds a list, dictionary,
+or set from another sequence in one expression,
+replacing a loop that builds up a result:
 
 ```python
 # comprehensions_intro.py
@@ -274,5 +275,5 @@ print(lengths)                                # {'a': 1, 'bb': 2}
 ```
 
 This is such a core idiom that it has its own chapter,
-[Comprehensions](14_Comprehensions.md), which also covers generator expressions
-and the functional tools `map()` and `filter()`.
+[Comprehensions](14_Comprehensions.md),
+which also covers generator expressions and the functional tools `map()` and `filter()`.

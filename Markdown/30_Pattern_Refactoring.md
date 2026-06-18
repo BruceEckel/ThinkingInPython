@@ -1,25 +1,28 @@
 # Pattern Refactoring
 
-This chapter follows one problem through several designs. A first solution
-solves it, then we ask "what will change?" and reshape the design to absorb that
-change cheaply. This is the spirit of Martin Fowler's *Refactoring*, applied at
-the level of patterns rather than single statements.
+This chapter follows one problem through several designs.
+A first solution solves it,
+then we ask "what will change?" and reshape the design to absorb that change cheaply.
+This is the spirit of Martin Fowler's *Refactoring*,
+applied at the level of patterns rather than single statements.
 
-This is also a Python lesson. Several of the patterns that the original
-*Design Patterns* book needed are answers to limitations of statically typed
-languages without multiple dispatch. Python removes some of those limitations,
-so a few common patterns simply dissolve here. We will call that out as it
-happens.
+This is also a Python lesson.
+Several of the patterns that the original *Design Patterns* book needed are answers to limitations of statically typed languages without multiple dispatch.
+Python removes some of those limitations,
+so a few common patterns simply dissolve here.
+We will call that out as it happens.
 
 ## Simulating a Trash Recycler
 
-Trash arrives at the recycling plant mixed together. The program must sort it by
-material and report the total value of each kind. The trash starts out as an undifferentiated
-pile, and the type of each piece must be recovered to sort it.
+Trash arrives at the recycling plant mixed together.
+The program must sort it by material and report the total value of each kind.
+The trash starts out as an undifferentiated pile,
+and the type of each piece must be recovered to sort it.
 
-In the `Trash` hierarchy, each material carries a per-pound `value`. The base class keeps a
-`registry` of its subclasses, filled automatically by `__init_subclass__`, and
-a `create` method builds an instance from a material name (this is a *factory*):
+In the `Trash` hierarchy, each material carries a per-pound `value`.
+The base class keeps a `registry` of its subclasses,
+filled automatically by `__init_subclass__`,
+and a `create` method builds an instance from a material name (this is a *factory*):
 
 ```python
 # trash.py
@@ -67,12 +70,13 @@ def sum_value(items: list[Trash]) -> float:
     return total
 ```
 
-Adding a new recyclable type is now one class definition. It registers itself, and
-`create` can build it. `sum_value` is an ordinary function: it relies on
-polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
+Adding a new recyclable type is now one class definition.
+It registers itself, and `create` can build it.
+`sum_value` is an ordinary function:
+it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
-The trash to process is described in a data file, one `Name:weight` line per
-piece:
+The trash to process is described in a data file,
+one `Name:weight` line per piece:
 
 ```python
 # trash.dat
@@ -100,9 +104,9 @@ Aluminum:81
 Cardboard:12
 ```
 
-Parsing it into `Trash` objects goes through the registry, so the parser never
-mentions a concrete material. Add a new kind of trash and the parser keeps
-working unchanged:
+Parsing it into `Trash` objects goes through the registry,
+so the parser never mentions a concrete material.
+Add a new kind of trash and the parser keeps working unchanged:
 
 ```python
 # parse_trash.py
@@ -159,11 +163,13 @@ if __name__ == "__main__":
     main()
 ```
 
-This satisfies the requirement, but it has a classic flaw: it tests for *every
-type in the system*. When cardboard becomes valuable and you add it, you must
-hunt down this chain of `isinstance` checks, and any you miss will silently drop
-trash on the floor. Testing for one type, or a small subset that needs special
-handling, is fine. Testing for all of them means you are doing polymorphism's job by hand.
+This satisfies the requirement, but it has a classic flaw:
+it tests for *every type in the system*.
+When cardboard becomes valuable and you add it,
+you must hunt down this chain of `isinstance` checks,
+and any you miss will silently drop trash on the floor.
+Testing for one type, or a small subset that needs special handling, is fine.
+Testing for all of them means you are doing polymorphism's job by hand.
 
 ## Let a Dictionary Do the Sorting
 
@@ -193,26 +199,29 @@ if __name__ == "__main__":
     main()
 ```
 
-`type(t)` is the perfect key: it adapts to whatever types show up, even ones
-added at run time. There is no chain to maintain and nothing to forget.
+`type(t)` is the perfect key: it adapts to whatever types show up,
+even ones added at run time.
+There is no chain to maintain and nothing to forget.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far we have changed *types* cheaply. The other axis of change is adding new
-*operations*. Suppose the `Trash` hierarchy is fixed (maybe it ships from a
-vendor) and you want to add new behaviors to it without editing it: price it,
-weigh it, print recycling instructions, and more later.
+So far we have changed *types* cheaply.
+The other axis of change is adding new *operations*.
+Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
+price it, weigh it, print recycling instructions, and more later.
 
-This is exactly the problem the *Visitor* pattern was invented for. Visitor is
-elaborate: a `Visitor` base class with one `visit` overload per material, an
-`accept` method added to every element, and "double dispatch" to route each
-piece to the right `visit`. It exists because languages like Java and C++
-dispatch on only one type at a time and cannot add methods to a class from
-outside. Python has neither limitation; the standard
-library provides `functools.singledispatch` which dispatches on the
-type of its first argument, with new types registered from anywhere.
+This is exactly the problem the *Visitor* pattern was invented for.
+Visitor is elaborate:
+a `Visitor` base class with one `visit` overload per material,
+an `accept` method added to every element,
+and "double dispatch" to route each piece to the right `visit`.
+It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
+Python has neither limitation;
+the standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
+with new types registered from anywhere.
 
-So you do not write Visitor in Python. You write a single-dispatch function:
+So you do not write Visitor in Python.
+You write a single-dispatch function:
 
 ```python
 # visitor_singledispatch.py
@@ -259,29 +268,31 @@ if __name__ == "__main__":
     main()
 ```
 
-`recycling_note` is a new operation defined entirely outside the
-`Trash` hierarchy. `Paper` has no registered
-note, so it falls through to the base function: the default behavior, for free.
-Adding a `price` or `weight` operation means writing another single-dispatch
-function. Adding a `Plastic` material means defining the class and, if it needs
-a special note, registering one line.
+`recycling_note` is a new operation defined entirely outside the `Trash` hierarchy.
+`Paper` has no registered note, so it falls through to the base function:
+the default behavior, for free.
+Adding a `price` or `weight` operation means writing another single-dispatch function.
+Adding a `Plastic` material means defining the class and,
+if it needs a special note, registering one line.
 
-Compare this to a Visitor implementation. There is no `Visitor` class, no
-`accept` method bolted onto every material, and no decorator gymnastics to fake
-overloading.
+Compare this to a Visitor implementation.
+There is no `Visitor` class, no `accept` method bolted onto every material,
+and no decorator gymnastics to fake overloading.
 
-When the operation is the *same* for every type, you do not even need
-single dispatch. `sum_value` earlier was just a function. Use
-`singledispatch` only when the behavior genuinely differs by type. For
-operations that belong on the objects and vary by type, `singledispatchmethod`
-does the same thing as a method.
+When the operation is the *same* for every type,
+you do not even need single dispatch.
+`sum_value` earlier was just a function.
+Use `singledispatch` only when the behavior genuinely differs by type.
+For operations that belong on the objects and vary by type,
+`singledispatchmethod` does the same thing as a method.
 
 ## Testing the Recycler
 
-We want to test the way each subclass registers
-itself, `create()` builds one by name, that the per-pound values are right, and that
-`sum_value` totals weight times value. The parser is tested against a small file
-written on the spot, so it does not depend on `trash.dat`:
+We want to test the way each subclass registers itself,
+`create()` builds one by name, that the per-pound values are right,
+and that `sum_value` totals weight times value.
+The parser is tested against a small file written on the spot,
+so it does not depend on `trash.dat`:
 
 ```python
 # test_trash.py
@@ -332,20 +343,18 @@ Glass:3.0
 ## Summary
 
 Design patterns are about *separating what changes from what stays the same*.
-Polymorphism is one way to do that, but it is not the
-only one. The deeper skill is spotting the "vector of change" in a problem (here,
-new types versus new operations) and choosing the lightest construct that
-isolates it. In Python that construct is often a language feature, not a
-multi-class pattern. The honest measure of a pattern is whether it still earns
-its keep once the language does part of the work for you.
+Polymorphism is one way to do that, but it is not the only one.
+The deeper skill is spotting the "vector of change" in a problem (here, new types versus new operations) and choosing the lightest construct that isolates it.
+In Python that construct is often a language feature, not a multi-class pattern.
+The honest measure of a pattern is whether it still earns its keep once the language does part of the work for you.
 
 ## Exercises
 
-1.  Add a `Plastic` material with a per-pound value. Confirm that
-    `recycle_dict.py` and `parse_trash.py` need no changes, and that only
-    `trash.dat` and (optionally) a one-line `recycling_note` registration do.
-2.  Write a `price` operation as a plain function over a list of `Trash`, and a
-    `heaviest` operation that returns the single heaviest piece. Decide for each
-    whether it needs `singledispatch`.
-3.  Replace the `recycling_note` single-dispatch function with a
-    `singledispatchmethod` on a `Sorter` class, and explain what changed.
+1.  Add a `Plastic` material with a per-pound value.
+    Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
+    and that only `trash.dat` and (optionally) a one-line `recycling_note` registration do.
+2.  Write a `price` operation as a plain function over a list of `Trash`,
+    and a `heaviest` operation that returns the single heaviest piece.
+    Decide for each whether it needs `singledispatch`.
+3.  Replace the `recycling_note` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
+    and explain what changed.

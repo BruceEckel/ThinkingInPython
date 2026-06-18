@@ -1,39 +1,46 @@
 # Simulation
 
-A simulation models a system as a set of objects that act on their own and
-interact through shared state. This chapter works one example from end to end: a
-pack of rats mapping a maze. It puts asyncio tasks, a shared coordination
-object, and structural typing together in one small program.
+A simulation models a system as a set of objects that act on their own and interact through shared state.
+This chapter works one example from end to end: a pack of rats mapping a maze.
+It puts asyncio tasks, a shared coordination object,
+and structural typing together in one small program.
 
 ## Rats & Mazes
 
 The problem has three objects.
 
-A *maze* knows its own layout and little else. Given a coordinate, it reports
-whether each neighboring cell is a wall or an opening, and it can hand out an
-entry point. The maze never decides anything. It only answers questions.
+A *maze* knows its own layout and little else.
+Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
+and it can hand out an entry point.
+The maze never decides anything.
+It only answers questions.
 
-A *blackboard* is the shared surface every rat writes to. The blackboard is a
-classic coordination idea: independent agents read from and write to one common
-data structure instead of talking to each other directly. Here the blackboard
-owns the maze, records which cells have been explored, hands out rat numbers, and
-launches new rats. The rats run as cooperative `asyncio` tasks. They take turns
-instead of running at the same instant, so no lock is needed: a rat is never
-interrupted partway through an update.
+A *blackboard* is the shared surface every rat writes to.
+The blackboard is a classic coordination idea:
+independent agents read from and write to one common data structure instead of talking to each other directly.
+Here the blackboard owns the maze, records which cells have been explored,
+hands out rat numbers, and launches new rats.
+The rats run as cooperative `asyncio` tasks.
+They take turns instead of running at the same instant, so no lock is needed:
+a rat is never interrupted partway through an update.
 
-A *rat* explores. Each rat runs as its own task. From its current cell it looks
-at the four neighbors and tries to claim the open ones. Claiming a cell is how a
-rat both marks it visited and reserves it, so no two rats ever cover the same
-ground. When a rat finds more than one open neighbor, it keeps the first for
-itself and spawns a new rat down each of the others, then yields so its siblings
-can run. When it can claim nothing, it has reached a dead end and its task ends.
+A *rat* explores.
+Each rat runs as its own task.
+From its current cell it looks at the four neighbors and tries to claim the open ones.
+Claiming a cell is how a rat both marks it visited and reserves it,
+so no two rats ever cover the same ground.
+When a rat finds more than one open neighbor,
+it keeps the first for itself and spawns a new rat down each of the others,
+then yields so its siblings can run.
+When it can claim nothing, it has reached a dead end and its task ends.
 When the last rat dies, the maze is fully mapped.
 
-The rat does not import the blackboard. It only needs an object with the right
-methods, so a `Protocol` describes what it expects. This is the structural typing
-from the [Static Type Checking](08_Static_Type_Checking.md) chapter. The rat
-works with anything that can claim a cell, spawn a rat, record a message, and
-hand out a number.
+The rat does not import the blackboard.
+It only needs an object with the right methods,
+so a `Protocol` describes what it expects.
+This is the structural typing from the [Static Type Checking](08_Static_Type_Checking.md) chapter.
+The rat works with anything that can claim a cell, spawn a rat,
+record a message, and hand out a number.
 
 ```python
 # rats_and_mazes/rat.py
@@ -80,7 +87,8 @@ class Rat:
             await asyncio.sleep(0)  # Yield so sibling rats can run.
 ```
 
-The maze is a grid of characters. A `*` is a wall and a space is an opening.
+The maze is a grid of characters.
+A `*` is a wall and a space is an opening.
 Out-of-bounds coordinates count as walls, so the rats stay inside.
 
 ```python
@@ -123,11 +131,12 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
-The blackboard holds everything the rats share. `claim()` is the heart of the
-program. It tests and marks a cell in one step with no `await` in between, so a
-cell is handed to exactly one rat even when several reach it. `explore()` claims
-the entry, releases the first rat, then awaits every task, including the ones
-spawned along the way.
+The blackboard holds everything the rats share.
+`claim()` is the heart of the program.
+It tests and marks a cell in one step with no `await` in between,
+so a cell is handed to exactly one rat even when several reach it.
+`explore()` claims the entry, releases the first rat, then awaits every task,
+including the ones spawned along the way.
 
 ```python
 # rats_and_mazes/blackboard.py
@@ -190,8 +199,9 @@ class Blackboard:
         return "\n".join(lines)
 ```
 
-The maze layout lives in a text file. The loader skips blank lines and the path
-comment, so the file is the maze and nothing else.
+The maze layout lives in a text file.
+The loader skips blank lines and the path comment,
+so the file is the maze and nothing else.
 
 ```text
 # rats_and_mazes/amaze.txt
@@ -238,9 +248,10 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Because claiming is atomic, the rats always cover every cell reachable from the
-entry, no matter how the tasks interleave. A test pins that down by comparing the
-cells the rats visited against a plain flood fill of the same maze.
+Because claiming is atomic,
+the rats always cover every cell reachable from the entry,
+no matter how the tasks interleave.
+A test pins that down by comparing the cells the rats visited against a plain flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_ratsandmazes.py
@@ -279,11 +290,13 @@ def test_rats_map_every_reachable_cell() -> None:
     assert blackboard.visited == flood(maze, maze.entry())
 ```
 
-The same model drives a view. `rats_view.py` runs the exploration to completion,
-records the order the cells were claimed, and replays that order on a `tkinter`
-canvas: walls in gray, then each claimed cell turning green in turn, so you watch
-the pack flood the maze from the entry outward. It only draws, so the harness
-skips it (`tools/norun.txt`):
+The same model drives a view.
+`rats_view.py` runs the exploration to completion,
+records the order the cells were claimed,
+and replays that order on a `tkinter` canvas: walls in gray,
+then each claimed cell turning green in turn,
+so you watch the pack flood the maze from the entry outward.
+It only draws, so the harness skips it (`tools/norun.txt`):
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -355,14 +368,19 @@ The original Java version of this example was written by Jeremy Meyer.
 
 ## A Robot in a Maze
 
-Concurrency is one way to build a simulation. Object-oriented design is another.
-This second example, adapted from my *Atomic Kotlin* book, walks a single robot
-through a maze. Its lesson is how polymorphism removes conditionals: a `Room`
-asks its occupant what to do, and each kind of occupant answers for itself.
+Concurrency is one way to build a simulation.
+Object-oriented design is another.
+This second example, adapted from my *Atomic Kotlin* book,
+walks a single robot through a maze.
+Its lesson is how polymorphism removes conditionals:
+a `Room` asks its occupant what to do,
+and each kind of occupant answers for itself.
 
-The occupants are `Item`s. `Room.enter()` calls `occupant.interact()`, and the
-return value is the room the robot ends up in. A wall keeps the robot where it
-is, food is eaten and the robot moves in, a teleport returns a distant room.
+The occupants are `Item`s.
+`Room.enter()` calls `occupant.interact()`,
+and the return value is the room the robot ends up in.
+A wall keeps the robot where it is, food is eaten and the robot moves in,
+a teleport returns a distant room.
 There is no `if` or `elif` on the type of occupant anywhere:
 
 ```python
@@ -467,15 +485,17 @@ def item_factory(symbol: str) -> Item:
     return Teleport(symbol)  # Anything else is a teleport target.
 ```
 
-`item_factory()` turns a maze character into an `Item`. It searches
-`Item.__subclasses__()` for a matching `symbol`, so adding a new kind of item
-needs no change here: define the subclass with its symbol and the factory finds
-it. This is the registry idea from the [Factory](24_Factory.md) chapter, using
-the class hierarchy itself as the registry.
+`item_factory()` turns a maze character into an `Item`.
+It searches `Item.__subclasses__()` for a matching `symbol`,
+so adding a new kind of item needs no change here:
+define the subclass with its symbol and the factory finds it.
+This is the registry idea from the [Factory](24_Factory.md) chapter,
+using the class hierarchy itself as the registry.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.
-Doors that lead nowhere point at one shared `EDGE` room, the void outside the
-maze, so the robot can try any direction without a special case:
+Doors that lead nowhere point at one shared `EDGE` room,
+the void outside the maze,
+so the robot can try any direction without a special case:
 
 ```python
 # robot_explorer/world.py
@@ -525,10 +545,11 @@ class Doors:
 EDGE = Room(Edge())
 ```
 
-`GameBuilder` assembles the maze in stages: a room for every character, then the
-connections between rooms, then the teleport pairs. Building in stages, instead
-of in one tangled constructor, is the *Builder* pattern. `run()` walks a string
-of moves, and `show_maze()` renders the current state:
+`GameBuilder` assembles the maze in stages: a room for every character,
+then the connections between rooms, then the teleport pairs.
+Building in stages, instead of in one tangled constructor,
+is the *Builder* pattern.
+`run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
 # robot_explorer/game.py
@@ -631,8 +652,9 @@ if __name__ == "__main__":
     print(game.show_maze())
 ```
 
-Running it prints the maze before and after the walk. The robot eats the food
-along its path, takes a teleport, and reaches the `!` that ends the game:
+Running it prints the maze before and after the walk.
+The robot eats the food along its path, takes a teleport,
+and reaches the `!` that ends the game:
 
     start:
     ###############################
@@ -681,10 +703,11 @@ along its path, takes a teleport, and reaches the `!` that ends the game:
     #.#___________#___#_______#___#
     ###############################
 
-The maze rendering, `show_maze()`, returns a string, so the model's correctness
-is something a test can pin down with no window in sight. Build the maze, run the
-solution, and check that the robot finished on the `!` square and that the final
-rendering matches, food eaten and all:
+The maze rendering, `show_maze()`, returns a string,
+so the model's correctness is something a test can pin down with no window in sight.
+Build the maze, run the solution,
+and check that the robot finished on the `!` square and that the final rendering matches,
+food eaten and all:
 
 ```python
 # robot_explorer/test_robot.py
@@ -736,11 +759,12 @@ def test_walls_block_and_food_is_eaten() -> None:
     assert game.robot.room is blocked
 ```
 
-That same model drives a graphical view, in its own file. It imports the maze and
-the moves, draws each room as a colored cell, and steps the robot along the
-solution on a timer. The view is the only part that touches the screen. Run it to
-watch the walk; it opens a window, so the example harness skips it (listed in
-`tools/norun.txt`):
+That same model drives a graphical view, in its own file.
+It imports the maze and the moves, draws each room as a colored cell,
+and steps the robot along the solution on a timer.
+The view is the only part that touches the screen.
+Run it to watch the walk; it opens a window,
+so the example harness skips it (listed in `tools/norun.txt`):
 
 ```python
 # robot_explorer/maze_view.py
@@ -798,8 +822,9 @@ if __name__ == "__main__":
     show()
 ```
 
-Two patterns from earlier chapters carry the design: polymorphism replaces a
-type switch, and a factory builds objects from data. Neither needs concurrency.
+Two patterns from earlier chapters carry the design:
+polymorphism replaces a type switch, and a factory builds objects from data.
+Neither needs concurrency.
 
 ## Other Maze Resources
 
@@ -807,7 +832,6 @@ A discussion of algorithms to create mazes:
 
 <http://www.mazeworks.com/mazegen/mazegen.htm>
 
-A discussion of algorithms for collision detection and steering behavior for
-autonomous moving objects:
+A discussion of algorithms for collision detection and steering behavior for autonomous moving objects:
 
 <http://www.red3d.com/cwr/steer/>

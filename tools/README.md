@@ -122,6 +122,40 @@ future bulk work (e.g. importing a batch of new, not-yet-fixed examples): record
 them with `--write-baseline`, gate only regressions with `--baseline`, then trim
 entries as you repair them.
 
+## reflow_prose.py
+
+Rewrites prose paragraphs in `Markdown/*.md` so each sentence sits on its own
+line ("semantic line breaks"). This keeps edits and their diffs sentence-grained
+instead of reflowing a whole hard-wrapped paragraph on every word change. Code
+fences, indented code, tables, headings, list items, blockquotes, HTML blocks,
+horizontal rules, and YAML front matter are left untouched; inline code spans
+and footnotes are masked so their internal punctuation never triggers a split.
+
+A sentence longer than `--width` (default 80) is broken further at top-level
+clause punctuation (`,`, `;`, `:`), so no line is wide enough to wrap in an
+editor. A greedy fill inserts only the breaks needed, and a minimum-length guard
+keeps a short lead-in clause from being stranded on its own line; if the only
+break points are too early to help, the sentence stays on one line. Punctuation
+inside parentheses, brackets, inline code, or footnotes is never a break point.
+
+A single newline inside a paragraph is a soft break (a space) under the site's
+pandoc reader (`markdown+smart`), so reflowed prose renders identically. The
+tool rewrites a file only when its whitespace-normalized text is unchanged, so
+it can never add, drop, or alter a word; a file that fails that check is left
+alone and reported.
+
+```
+make reflow-check        # report which chapters would change, no write
+make reflow              # rewrite the whole book
+make reflow CH=02        # rewrite one chapter (by number, name part, or path)
+make reflow-check CH=02  # preview one chapter, no write
+uv run python tools/reflow_prose.py --diff Tour   # diff a chapter by name part
+```
+
+A positional argument (or `CH=`) may be a file path or a chapter selector
+matched against `Markdown/`: a number or stem prefix (`02`, `02_A_Python`) or a
+substring (`Tour`). With no argument the whole book is processed.
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).

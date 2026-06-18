@@ -1,26 +1,27 @@
 # Function Objects
 
-In *Advanced C++: Programming Styles And Idioms* (Addison-Wesley, 1992), Jim
-Coplien uses the term *functor*: an object whose sole purpose is to wrap a
-function (since "functor" has a meaning in mathematics, this book uses the more
-explicit term *function object*). The point is to decouple the choice of
-function to call from the place where it is called.
+In *Advanced C++: Programming Styles And Idioms* (Addison-Wesley, 1992),
+Jim Coplien uses the term *functor*:
+an object whose sole purpose is to wrap a function (since "functor" has a meaning in mathematics, this book uses the more explicit term *function object*).
+The point is to decouple the choice of function to call from the place where it is called.
 
-That decoupling is the goal of several patterns: *Command*, *Strategy*, and
-*Chain of Responsibility*. In a language where a function is not a value, you
-need an object to carry the function around, so each of these patterns builds a
-small class hierarchy whose only job is to hold one method.
+That decoupling is the goal of several patterns: *Command*, *Strategy*,
+and *Chain of Responsibility*.
+In a language where a function is not a value,
+you need an object to carry the function around,
+so each of these patterns builds a small class hierarchy whose only job is to hold one method.
 
-In Python a function is already an object. You can name it, store it in a list,
-pass it as an argument, and return it. So these three patterns largely dissolve:
-where the *Design Patterns* book builds a hierarchy, Python uses a function. The
-sections below show the function form first, then the classic object form for
-contrast.
+In Python a function is already an object.
+You can name it, store it in a list, pass it as an argument, and return it.
+So these three patterns largely dissolve:
+where the *Design Patterns* book builds a hierarchy, Python uses a function.
+The sections below show the function form first,
+then the classic object form for contrast.
 
 ## Command: Choosing the Operation at Runtime
 
-A *Command* wraps an action so you can pass it around and run it later. In
-Python the action is just a function, and a "macro" is just a list of them:
+A *Command* wraps an action so you can pass it around and run it later.
+In Python the action is just a function, and a "macro" is just a list of them:
 
 ```python
 # command.py
@@ -45,8 +46,7 @@ for command in macro:
     command()
 ```
 
-The classic object form wraps each action in a `Command` subclass with an
-`execute()` method:
+The classic object form wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
 # command_pattern.py
@@ -83,16 +83,16 @@ macro.add(Afford())
 macro.run()
 ```
 
-Both do the same thing. The class version is four classes and a wrapper to say
-what one list of functions says directly. *Design Patterns* calls commands "an
-object-oriented replacement for callbacks." In Python a callback is just a
-function, so the replacement is unnecessary: the object form earns its keep only
-when a command must also carry state or support extra operations such as undo.
+Both do the same thing.
+The class version is four classes and a wrapper to say what one list of functions says directly.
+*Design Patterns* calls commands "an object-oriented replacement for callbacks."
+In Python a callback is just a function, so the replacement is unnecessary:
+the object form earns its keep only when a command must also carry state or support extra operations such as undo.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
-A *Strategy* is an interchangeable algorithm chosen at run time. Again, the
-algorithm is a function, and you pass it in:
+A *Strategy* is an interchangeable algorithm chosen at run time.
+Again, the algorithm is a function, and you pass it in:
 
 ```python
 # strategy.py
@@ -170,17 +170,18 @@ print(solver.minima(line))
 ```
 
 You use strategies-as-functions constantly in Python without naming the pattern.
-The `key` argument to `sorted()`, `min()`, and `max()` is a strategy: you hand
-in a function that decides how to compare. The object form is worth it only when
-a strategy needs its own configuration or several related methods.
+The `key` argument to `sorted()`, `min()`, and `max()` is a strategy:
+you hand in a function that decides how to compare.
+The object form is worth it only when a strategy needs its own configuration or several related methods.
 
 ## Chain of Responsibility
 
-*Chain of Responsibility* tries a sequence of handlers until one succeeds. The
-*Design Patterns* book implements the chain as a linked list, largely because it
-predates standard list types. As that machinery is an implementation detail, in
-Python the chain is just a list of functions, and the first one to produce a
-result wins:
+*Chain of Responsibility* tries a sequence of handlers until one succeeds.
+The *Design Patterns* book implements the chain as a linked list,
+largely because it predates standard list types.
+As that machinery is an implementation detail,
+in Python the chain is just a list of functions,
+and the first one to produce a result wins:
 
 ```python
 # chain.py
@@ -218,10 +219,11 @@ line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, [least_squares, newtons_method, bisection]))
 ```
 
-Each handler is a *Strategy* function; the chain is the list; success is a
-non-`None` return. There is no `ChainLink` class and no linked list to maintain.
-Adding, removing, or reordering handlers is editing a list. This is the same
-flexibility the pattern promises, with none of the scaffolding.
+Each handler is a *Strategy* function; the chain is the list;
+success is a non-`None` return.
+There is no `ChainLink` class and no linked list to maintain.
+Adding, removing, or reordering handlers is editing a list.
+This is the same flexibility the pattern promises, with none of the scaffolding.
 
 The control flow is what to test: the first handler that returns a result wins,
 order decides the winner, and an exhausted or empty chain returns `None`:
@@ -263,9 +265,11 @@ def test_empty_chain_returns_none() -> None:
 
 ## Exercises
 
-1.  Add an "undo" capability to `command.py`. What do the commands need to
-    become, and is a function still enough, or do you now want an object?
-2.  Rewrite `chain.py` so each handler also reports why it failed, and the
-    solver prints every attempt before returning the winner.
-3.  Use `sorted()` with a `key` function to sort a list of `(name, score)`
-    tuples by score, then by name. Explain why `key` is the *Strategy* pattern.
+1.  Add an "undo" capability to `command.py`.
+    What do the commands need to become, and is a function still enough,
+    or do you now want an object?
+2.  Rewrite `chain.py` so each handler also reports why it failed,
+    and the solver prints every attempt before returning the winner.
+3.  Use `sorted()` with a `key` function to sort a list of `(name, score)` tuples by score,
+    then by name.
+    Explain why `key` is the *Strategy* pattern.

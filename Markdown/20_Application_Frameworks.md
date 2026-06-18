@@ -1,24 +1,26 @@
 # Application Frameworks
 
-An application framework lets you build a new application by reusing existing
-classes and overriding one or more methods to customize the behavior. At the
-heart of a framework is the *Template Method*: a method, defined in the base
-class, that drives the application by calling other base-class methods, some of
-which you override.
+An application framework lets you build a new application by reusing existing classes and overriding one or more methods to customize the behavior.
+At the heart of a framework is the *Template Method*: a method,
+defined in the base class,
+that drives the application by calling other base-class methods,
+some of which you override.
 
-Python's own `unittest` is an application framework of this kind. You subclass
-`TestCase` and supply `setUp()`, your `test_*` methods, and `tearDown()`. The
-framework's runner is the template method: it calls `setUp()`, then your test,
-then `tearDown()`, for each test, and you never call that sequence yourself.
+Python's own `unittest` is an application framework of this kind.
+You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
+and `tearDown()`.
+The framework's runner is the template method: it calls `setUp()`,
+then your test, then `tearDown()`, for each test,
+and you never call that sequence yourself.
 
 ## Template Method
 
-The defining trait of a Template Method is that the *shape* of the algorithm is
-fixed in the base class, while the individual steps are left open for subclasses
-to fill in. In languages with `final`, the template method is locked so a
-subclass cannot change the overall flow. Python has no `final` keyword (the
-Singleton and Metaprogramming chapters show how it is emulated when truly
-needed), so here it is a matter of convention: the base defines the algorithm,
+The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class,
+while the individual steps are left open for subclasses to fill in.
+In languages with `final`,
+the template method is locked so a subclass cannot change the overall flow.
+Python has no `final` keyword (the Singleton and Metaprogramming chapters show how it is emulated when truly needed),
+so here it is a matter of convention: the base defines the algorithm,
 subclasses define the steps.
 
 ```python
@@ -51,15 +53,16 @@ class MyApp(ApplicationFramework):
 MyApp()
 ```
 
-The base-class constructor starts the engine (`run()`), which drives the
-application. The client supplies `customize1()` and `customize2()`, and the
-application runs. In a GUI program that engine would be the main event loop.
+The base-class constructor starts the engine (`run()`),
+which drives the application.
+The client supplies `customize1()` and `customize2()`, and the application runs.
+In a GUI program that engine would be the main event loop.
 
 ## Passing the Steps as Functions
 
-Subclassing is one way to supply the varying steps, but not the only one. Because
-Python functions are first-class, you can pass the steps in directly, with no
-subclass at all:
+Subclassing is one way to supply the varying steps, but not the only one.
+Because Python functions are first-class, you can pass the steps in directly,
+with no subclass at all:
 
 ```python
 # template_function.py
@@ -81,16 +84,18 @@ run_framework(
 )
 ```
 
-Both versions hold the algorithm fixed and let the steps vary, which is the whole
-point of Template Method. Choose based on what the steps need. If they share
-state, build on each other, or come as a coherent group, the subclass is clearer.
-If each step is independent, passing functions is lighter and avoids a class
-hierarchy. This is the same trade-off seen in the Function Objects chapter: a
-hook that holds no state is usually better as a function than as a method to
-override.
+Both versions hold the algorithm fixed and let the steps vary,
+which is the whole point of Template Method.
+Choose based on what the steps need.
+If they share state, build on each other, or come as a coherent group,
+the subclass is clearer.
+If each step is independent,
+passing functions is lighter and avoids a class hierarchy.
+This is the same trade-off seen in the Function Objects chapter:
+a hook that holds no state is usually better as a function than as a method to override.
 
-We want to test that algorithm calls the steps in
-order, twice. Recording steps make that order visible:
+We want to test that algorithm calls the steps in order, twice.
+Recording steps make that order visible:
 
 ```python
 # test_framework.py
@@ -121,10 +126,11 @@ def test_template_function_runs_steps_in_order() -> None:
 
 ## Exercises
 
-1.  Create a framework that takes a list of file names. It opens each file except
-    the last for reading and the last for writing, processes each input file by
-    an undetermined policy, and writes the output to the last file. Customize it
-    two ways, once by subclassing and once by passing a function:
+1.  Create a framework that takes a list of file names.
+    It opens each file except the last for reading and the last for writing,
+    processes each input file by an undetermined policy,
+    and writes the output to the last file.
+    Customize it two ways, once by subclassing and once by passing a function:
 
     > 1.  Convert all the letters in each file to uppercase.
     > 2.  Search the files for words given in the first file.

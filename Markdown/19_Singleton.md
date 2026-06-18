@@ -1,18 +1,21 @@
 # Singleton
 
-A *singleton* is a class with exactly one instance, reachable from a well-known
-place. It is the simplest design pattern, and in Python it is also the one most
-often written with far more machinery than it needs.
+A *singleton* is a class with exactly one instance,
+reachable from a well-known place.
+It is the simplest design pattern,
+and in Python it is also the one most often written with far more machinery than it needs.
 
-Before reaching for any classic implementation, ask the question this part of
-the book keeps asking: does the language already solve this? For the singleton,
-it does.
+Before reaching for any classic implementation,
+ask the question this part of the book keeps asking:
+does the language already solve this?
+For the singleton, it does.
 
 ## A Module Is Already a Singleton
 
-Python imports each module once and caches it in `sys.modules`. Every `import`
-after the first hands back the same module object. So a module *is* a singleton,
-and module-level names are a single, shared, one-and-only-one piece of state.
+Python imports each module once and caches it in `sys.modules`.
+Every `import` after the first hands back the same module object.
+So a module *is* a singleton, and module-level names are a single, shared,
+one-and-only-one piece of state.
 Put the state in a module:
 
 ```python
@@ -36,14 +39,16 @@ print(config.settings)  # {'theme': 'dark'}: the very same dict.
 print(config.settings is settings)  # True
 ```
 
-No class, no ceremony. For the large majority of "I need one shared X" cases,
-the answer is a module with module-level state or functions. This is the
-idiomatic Python singleton, and it is worth trying first.
+No class, no ceremony.
+For the large majority of "I need one shared X" cases,
+the answer is a module with module-level state or functions.
+This is the idiomatic Python singleton, and it is worth trying first.
 
 ## When You Want a Class: Cache the Instance
 
-Sometimes you do want a class, but every construction should return the same
-object. The simplest way is to hide construction behind a cached factory.
+Sometimes you do want a class,
+but every construction should return the same object.
+The simplest way is to hide construction behind a cached factory.
 `functools.cache` makes a zero-argument factory return the one instance forever:
 
 ```python
@@ -70,17 +75,17 @@ a.data["theme"] = "dark"
 print(b.data)
 ```
 
-If you need the class itself to hand back one instance
-from its own constructor, override `__new__`, shown below.
+If you need the class itself to hand back one instance from its own constructor,
+override `__new__`, shown below.
 
 ## The Classic Implementations
 
-The *Design Patterns* book builds the singleton with more apparatus. The
-variations below run from elaborate to simple. They are worth seeing, but notice
-that each does more work than the module or the cached factory above.
+The *Design Patterns* book builds the singleton with more apparatus.
+The variations below run from elaborate to simple.
+They are worth seeing,
+but notice that each does more work than the module or the cached factory above.
 
-The classic approach takes control of creation by delegating to a single
-instance of a private nested class:
+The classic approach takes control of creation by delegating to a single instance of a private nested class:
 
 ```python
 # singleton_pattern.py
@@ -123,16 +128,17 @@ print(repr(y))
 print(repr(z))
 ```
 
-Because the inner class is named with a double underscore, it is private so the
-user cannot directly access it. The outer class controls creation through its
-constructor. The first time you create an `OnlyOne` it initializes `instance`;
-after that it just reuses the one inner object. Access is delegated through
-`__getattr__()`. The distinct `OnlyOne` instances all proxy to the same
-`__OnlyOne` object. This works, but it is a lot of code for what a module does
-on its own.
+Because the inner class is named with a double underscore,
+it is private so the user cannot directly access it.
+The outer class controls creation through its constructor.
+The first time you create an `OnlyOne` it initializes `instance`;
+after that it just reuses the one inner object.
+Access is delegated through `__getattr__()`.
+The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
+This works, but it is a lot of code for what a module does on its own.
 
-A variation uses `__new__`, the method that actually creates an instance, to
-return the same object every time:
+A variation uses `__new__`, the method that actually creates an instance,
+to return the same object every time:
 
 ```python
 # new_singleton.py
@@ -176,12 +182,11 @@ print(y)
 
 ### Borg: Share State Instead of Identity
 
-Alex Martelli [observed](http://www.aleax.it/Python/5ep.html) that what you
-usually want is not one *object* but one shared set of *state*. You can let
-people create as many objects as they like, as long as they all share the same
-data. He called this the *Borg*^[From the television show *Star Trek: The Next
-Generation*. The Borg are a hive-mind collective: "we are all one."], and it
-points every instance's `__dict__` at the same storage:
+Alex Martelli [observed](http://www.aleax.it/Python/5ep.html) that what you usually want is not one *object* but one shared set of *state*.
+You can let people create as many objects as they like,
+as long as they all share the same data.
+He called this the *Borg*^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."],
+and it points every instance's `__dict__` at the same storage:
 
 ```python
 # borg_singleton.py
@@ -218,13 +223,13 @@ print(repr(y))
 print(repr(z))
 ```
 
-This has the same effect as the singleton, but where the singleton wires
-one-instance behavior into each class, *Borg* is reused through inheritance. It
-is a genuinely Pythonic idiom when "shared state, many handles" is what you
-actually want.
+This has the same effect as the singleton,
+but where the singleton wires one-instance behavior into each class,
+*Borg* is reused through inheritance.
+It is a genuinely Pythonic idiom when "shared state,
+many handles" is what you actually want.
 
-A simpler version relies on the fact that a class variable has a single shared
-value:
+A simpler version relies on the fact that a class variable has a single shared value:
 
 ```python
 # class_variable_singleton.py
@@ -246,8 +251,8 @@ class SingleTone:
 
 ### As a Class Decorator
 
-You can wrap a class so that calling it returns a cached instance. This is a
-*class decorator* (see [the Decorators chapter](13_Decorators.md)):
+You can wrap a class so that calling it returns a cached instance.
+This is a *class decorator* (see [the Decorators chapter](13_Decorators.md)):
 
 ```python
 # singleton.py
@@ -282,18 +287,20 @@ print(z.val)
 print(x is y is z)
 ```
 
-Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`, so
-the name `Foo` now refers to the decorated instance rather than to the class.
-Calling `Foo()` returns the cached instance, which is what we want. But the name
-no longer points at a class. `isinstance(x, Foo)` and subclassing `Foo` no longer
-work. The `__new__` and metaclass versions below keep the name pointing at a real
-class, which is the reason to prefer them when you need that.
+Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`,
+so the name `Foo` now refers to the decorated instance rather than to the class.
+Calling `Foo()` returns the cached instance, which is what we want.
+But the name no longer points at a class.
+`isinstance(x, Foo)` and subclassing `Foo` no longer work.
+The `__new__` and metaclass versions below keep the name pointing at a real class,
+which is the reason to prefer them when you need that.
 
 ### As a Metaclass
 
-Finally, a metaclass can intercept construction itself. Metaclasses are covered
-in [the Metaprogramming chapter](15_Metaprogramming.md), where this same singleton appears next to the
-simpler hooks that usually replace them. It is included here for completeness:
+Finally, a metaclass can intercept construction itself.
+Metaclasses are covered in [the Metaprogramming chapter](15_Metaprogramming.md),
+where this same singleton appears next to the simpler hooks that usually replace them.
+It is included here for completeness:
 
 ```python
 # singleton_metaclass.py
@@ -335,9 +342,10 @@ print(x is y is z)
 
 ## Verifying the Invariant
 
-Each version above promises the same thing: you get back one instance (or, for
-*Borg*, one shared set of state). That promise is a single assertion per
-technique, so one test file pins down the whole chapter:
+Each version above promises the same thing:
+you get back one instance (or, for *Borg*, one shared set of state).
+That promise is a single assertion per technique,
+so one test file pins down the whole chapter:
 
 ```python
 # test_singletons.py
@@ -394,25 +402,25 @@ def test_borg_shares_state_but_not_identity() -> None:
 
 Use the lightest tool that fits:
 
-- For almost everything, use a *module* with module-level state. It is the
-  truest Python singleton and needs no class.
-- If you want a class, hide construction behind a cached factory (`@cache`), or
-  override `__new__`.
+- For almost everything, use a *module* with module-level state.
+  It is the truest Python singleton and needs no class.
+- If you want a class, hide construction behind a cached factory (`@cache`),
+  or override `__new__`.
 - If you really want many handles sharing one set of state, use *Borg*.
-- The decorator and metaclass versions work, but they are more machinery than
-  the problem usually justifies.
+- The decorator and metaclass versions work,
+  but they are more machinery than the problem usually justifies.
 
-The elaborate GoF singleton is largely a workaround for languages where a module
-is not a first-class, single-instance namespace. Python has that for free, so
-most of the ceremony falls away.
+The elaborate GoF singleton is largely a workaround for languages where a module is not a first-class,
+single-instance namespace.
+Python has that for free, so most of the ceremony falls away.
 
 ## Exercises
 
 1.  `singleton_pattern.py` always creates an object, even if it's never used.
-    Modify it to use *lazy initialization*, so the singleton object is created
-    only the first time it is needed.
-2.  Using `cache_singleton.py` as a starting point, create a factory that
-    manages a fixed pool of objects (say, database connections) and hands them
-    out, rather than a single instance.
-3.  Rewrite one of the class-based singletons above as a module, and argue which
-    you would use in real code.
+    Modify it to use *lazy initialization*,
+    so the singleton object is created only the first time it is needed.
+2.  Using `cache_singleton.py` as a starting point,
+    create a factory that manages a fixed pool of objects (say, database connections) and hands them out,
+    rather than a single instance.
+3.  Rewrite one of the class-based singletons above as a module,
+    and argue which you would use in real code.

@@ -1,25 +1,22 @@
 # State Machines
 
-While *State* has a way to allow the client programmer to change the
-implementation, *StateMachine* imposes a structure to automatically
-change the implementation from one object to the next. The current
-implementation represents the state that a system is in, and the system
-behaves differently from one state to the next (because it uses
-*State*).
+While *State* has a way to allow the client programmer to change the implementation,
+*StateMachine* imposes a structure to automatically change the implementation from one object to the next.
+The current implementation represents the state that a system is in,
+and the system behaves differently from one state to the next (because it uses *State*).
 
-The code that moves the system from one state to the next is often a
-*Template Method*, as seen in the following framework for a basic state
-machine.
+The code that moves the system from one state to the next is often a *Template Method*,
+as seen in the following framework for a basic state machine.
 
-Each state can be `run()` to perform its behavior, and (in this
-design) you can also pass it an "input" object so it can tell you what
-new state to move to based on that "input". The key distinction between
-this design and the next is that here, each `State` object decides
-what other states it can move to, based on the "input", whereas in the
-subsequent design all of the state transitions are held in a single
-table. Another way to put it is that here, each `State` object has its
-own little `State` table, and in the subsequent design there is a
-single master state transition table for the whole system:
+Each state can be `run()` to perform its behavior,
+and (in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input".
+The key distinction between this design and the next is that here,
+each `State` object decides what other states it can move to,
+based on the "input",
+whereas in the subsequent design all of the state transitions are held in a single table.
+Another way to put it is that here,
+each `State` object has its own little `State` table,
+and in the subsequent design there is a single master state transition table for the whole system:
 
 ```python
 # state.py
@@ -33,22 +30,23 @@ class State:
         raise NotImplementedError("next not implemented")
 ```
 
-This class is clearly unnecessary, but it allows us to say that
-something is a `State` object in code, and provide a slightly
-different error message when all the methods are not implemented. We
-could have gotten basically the same effect by saying:
+This class is clearly unnecessary,
+but it allows us to say that something is a `State` object in code,
+and provide a slightly different error message when all the methods are not implemented.
+We could have gotten basically the same effect by saying:
 
     class State: pass
 
-because we would still get exceptions if `run()` or `next()` were
-called for a derived type, and they hadn't been implemented.
+because we would still get exceptions if `run()` or `next()` were called for a derived type,
+and they hadn't been implemented.
 
-The `StateMachine` keeps track of the current state, which is
-initialized by the constructor. The `run_all()` method takes a list of
-`Input` objects. This method not only moves to the next state, but it
-also calls `run()` for each state object; thus you can see it's an
-expansion of the idea of the `State` pattern, since `run()` does
-something different depending on the state that the system is in:
+The `StateMachine` keeps track of the current state,
+which is initialized by the constructor.
+The `run_all()` method takes a list of `Input` objects.
+This method not only moves to the next state,
+but it also calls `run()` for each state object;
+thus you can see it's an expansion of the idea of the `State` pattern,
+since `run()` does something different depending on the state that the system is in:
 
 ```python
 # state_machine.py
@@ -71,18 +69,16 @@ class StateMachine:
             self.current_state.run()
 ```
 
-I've also treated `run_all()` as a template method. This is typical,
-but certainly not required; you could conceivably want to override it,
-but typically the behavior change will occur in `State`'s `run()`
-instead.
+I've also treated `run_all()` as a template method.
+This is typical, but certainly not required;
+you could conceivably want to override it,
+but typically the behavior change will occur in `State`'s `run()` instead.
 
-At this point the basic framework for this style of *StateMachine* (where each
-state decides the next states) is complete. As an example, I'll use a fancy
-mousetrap that can move through several states in the process of trapping a
-mouse^[No mice were harmed in the creation of this example.]. The mouse
-classes and information are stored in the `mouse` package, including a class
-representing all the possible moves that a mouse can make, which will be the
-inputs to the state machine:
+At this point the basic framework for this style of *StateMachine* (where each state decides the next states) is complete.
+As an example, I'll use a fancy mousetrap that can move through several states in the process of trapping a mouse^[No mice were harmed in the creation of this example.].
+The mouse classes and information are stored in the `mouse` package,
+including a class representing all the possible moves that a mouse can make,
+which will be the inputs to the state machine:
 
 ```python
 # mouse/mouse_action.py
@@ -99,14 +95,13 @@ class MouseAction(StrEnum):
 ```
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration.
-Because it is a `StrEnum`, each member *is* its string value: `str` needs no
-help, and a member even compares equal to its string. The members still hash
-and look up correctly, so they work as dictionary keys, and
-`MouseAction("mouse appears")` returns the matching member, which is how the
-test input below is parsed.
+Because it is a `StrEnum`, each member *is* its string value:
+`str` needs no help, and a member even compares equal to its string.
+The members still hash and look up correctly, so they work as dictionary keys,
+and `MouseAction("mouse appears")` returns the matching member,
+which is how the test input below is parsed.
 
-For creating test code, a sequence of mouse inputs is provided from a
-text file:
+For creating test code, a sequence of mouse inputs is provided from a text file:
 
 ```python
 # mouse/mouse_moves.txt
@@ -127,10 +122,10 @@ mouse trapped
 mouse removed
 ```
 
-With these tools in place, it's now possible to create the first version
-of the mousetrap program. Each `State` subclass defines its `run()`
-behavior, and also establishes its next state with an `if-else`
-clause:
+With these tools in place,
+it's now possible to create the first version of the mousetrap program.
+Each `State` subclass defines its `run()` behavior,
+and also establishes its next state with an `if-else` clause:
 
 ```python
 # mousetrap1/mouse_trap.py
@@ -215,30 +210,25 @@ moves = [line.strip() for line in text.splitlines()
 MouseTrap().run_all([MouseAction(m) for m in moves])
 ```
 
-`MouseTrap` holds all the possible states as class attributes and sets up the
-initial state. The code at the bottom of the file builds a `MouseTrap` and runs
-it through the whole sequence of moves read from the text file.
+`MouseTrap` holds all the possible states as class attributes and sets up the initial state.
+The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
-While the use of `match` inside the `next()` methods is
-perfectly reasonable, managing a large number of these could become
-difficult. Another approach is to create tables inside each `State`
-object defining the various next states based on the input.
+While the use of `match` inside the `next()` methods is perfectly reasonable,
+managing a large number of these could become difficult.
+Another approach is to create tables inside each `State` object defining the various next states based on the input.
 
-Initially, this seems like it ought to be quite simple. You should be
-able to define a static table in each `State` subclass that defines
-the transitions in terms of the other `State` objects. However, it
-turns out that this approach generates cyclic initialization
-dependencies. To solve the problem, I've had to delay the initialization
-of the tables until the first time that the `next()` method is called
-for a particular `State` object. Initially, the `next()` methods
-can appear a little strange because of this.
+Initially, this seems like it ought to be quite simple.
+You should be able to define a static table in each `State` subclass that defines the transitions in terms of the other `State` objects.
+However, it turns out that this approach generates cyclic initialization dependencies.
+To solve the problem,
+I've had to delay the initialization of the tables until the first time that the `next()` method is called for a particular `State` object.
+Initially, the `next()` methods can appear a little strange because of this.
 
-The `StateT` class is an implementation of `State` (so that the same
-`StateMachine` class can be used from the previous example) that adds a
-`transitions` dict mapping each input to its next state. Its base-class
-`next()` looks the input up in that dict. Each subclass fills its own
-`transitions` lazily, the first time `next()` is called while `transitions`
-is still `None`, then delegates to the base `next()`:
+The `StateT` class is an implementation of `State` (so that the same `StateMachine` class can be used from the previous example) that adds a `transitions` dict mapping each input to its next state.
+Its base-class `next()` looks the input up in that dict.
+Each subclass fills its own `transitions` lazily,
+the first time `next()` is called while `transitions` is still `None`,
+then delegates to the base `next()`:
 
 ```python
 # mousetrap2/mouse_trap2.py
@@ -332,40 +322,43 @@ mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)
 ```
 
-The rest of the code is identical; the difference is in the `next()`
-methods and the `StateT` class.
+The rest of the code is identical;
+the difference is in the `next()` methods and the `StateT` class.
 
-If you have to create and maintain a lot of `State` classes, this
-approach is an improvement, since it's easier to quickly read and
-understand the state transitions from looking at the table.
+If you have to create and maintain a lot of `State` classes,
+this approach is an improvement,
+since it's easier to quickly read and understand the state transitions from looking at the table.
 
 ## Table-Driven State Machine
 
-The previous design keeps each state's transitions inside the state class. A
-pure state machine can go further and represent the *entire* machine as a
-single transition table. All the behavior then lives in one place, so you can
-build and maintain it directly from a state-transition diagram.
+The previous design keeps each state's transitions inside the state class.
+A pure state machine can go further and represent the *entire* machine as a single transition table.
+All the behavior then lives in one place,
+so you can build and maintain it directly from a state-transition diagram.
 
 For a given current state and input, a transition row answers three questions:
-is there a condition to check, what action runs during the transition, and what
-state do we move to next. As a table:
+is there a condition to check, what action runs during the transition,
+and what state do we move to next.
+As a table:
 
     {(current_state, InputType): [(condition, action, next_state), ...]}
 
 The original Java version of this example needed two extra class hierarchies,
-`Condition` and `Transition`, because in Java a method is not a value you can
-store in a table. Python functions are first-class, so those hierarchies
-vanish: a condition is any callable returning a bool, an action is any callable,
+`Condition` and `Transition`,
+because in Java a method is not a value you can store in a table.
+Python functions are first-class, so those hierarchies vanish:
+a condition is any callable returning a bool, an action is any callable,
 and the table is an ordinary `dict`.
 
 ![Vending machine state diagram](_images/stateMachine)
 
 ### The Engine
 
-The engine is tiny. For the current state and the type of the incoming event,
-it walks the candidate transitions in order, takes the first whose condition
-passes (or has no condition), runs that transition's action, and moves to the
-next state:
+The engine is tiny.
+For the current state and the type of the incoming event,
+it walks the candidate transitions in order,
+takes the first whose condition passes (or has no condition),
+runs that transition's action, and moves to the next state:
 
 ```python
 # tabledriven/state_machine.py
@@ -405,18 +398,20 @@ class StateMachine:
             f"on {type(event).__name__}")
 ```
 
-Several candidate transitions can share one `(state, input)` key, told apart by
-their conditions. The engine tries them top to bottom, which is how a single
-input can lead to different states depending on a test.
+Several candidate transitions can share one `(state, input)` key,
+told apart by their conditions.
+The engine tries them top to bottom,
+which is how a single input can lead to different states depending on a test.
 
 ### A Vending Machine
 
-The machine is now entirely a table. It collects money, takes a two-digit
-selection, then either dispenses the item, reports it sold out, or clears a
-selection that costs more than the money inserted. The conditions and actions
-are plain methods, stored directly in the table. The states are an `Enum`, so a
-misspelled state name is caught by the type checker instead of failing silently
-at run time:
+The machine is now entirely a table.
+It collects money, takes a two-digit selection, then either dispenses the item,
+reports it sold out,
+or clears a selection that costs more than the money inserted.
+The conditions and actions are plain methods, stored directly in the table.
+The states are an `Enum`,
+so a misspelled state name is caught by the type checker instead of failing silently at run time:
 
 ```python
 # tabledriven/vending_machine.py
@@ -557,14 +552,16 @@ if __name__ == "__main__":
         print(f"{event}: {machine.message}")  # a plain text view
 ```
 
-Adding a state or an input is now a local change: an entry in the table and a
-method or two. There is no `switch`, no reflection, and no `Condition` or
-`Transition` class hierarchy. The language's first-class functions and its
-`dict` supply what those patterns existed to provide.
+Adding a state or an input is now a local change:
+an entry in the table and a method or two.
+There is no `switch`, no reflection,
+and no `Condition` or `Transition` class hierarchy.
+The language's first-class functions and its `dict` supply what those patterns existed to provide.
 
-Because the machine is deterministic, a test can drive it through a sequence of
-events and check where it lands. The cases worth pinning down are a successful
-purchase, the two conditional branches (too expensive and sold out), a refund,
+Because the machine is deterministic,
+a test can drive it through a sequence of events and check where it lands.
+The cases worth pinning down are a successful purchase,
+the two conditional branches (too expensive and sold out), a refund,
 and the error when no transition matches:
 
 ```python
@@ -629,14 +626,15 @@ def test_no_transition_raises() -> None:
         vm.handle(Quit())
 ```
 
-Because the actions set `vm.message` instead of printing, the model never draws
-anything, and the same machine drives more than one view. The text demo in
-`vending_machine.py` reads `message` and prints it; the panel below reads
-`amount`, the stock, and `message` and shows them on screen. `vending_view.py`
-is a `tkinter` front for the machine: the coin and item buttons turn presses
-into events for `handle()`, and a click that the state machine rejects (a
-selection before any money, say) is caught and shown rather than crashing. It is
-the only file that draws, so the harness skips it (`tools/norun.txt`):
+Because the actions set `vm.message` instead of printing,
+the model never draws anything, and the same machine drives more than one view.
+The text demo in `vending_machine.py` reads `message` and prints it;
+the panel below reads `amount`, the stock,
+and `message` and shows them on screen.
+`vending_view.py` is a `tkinter` front for the machine:
+the coin and item buttons turn presses into events for `handle()`,
+and a click that the state machine rejects (a selection before any money, say) is caught and shown rather than crashing.
+It is the only file that draws, so the harness skips it (`tools/norun.txt`):
 
 ```python
 # tabledriven/vending_view.py
@@ -716,43 +714,31 @@ if __name__ == "__main__":
 
 ## Exercises
 
-The *Proxy* and *State* patterns that several of these exercises build on are
-covered in [Fronting for an Implementation](21_Fronting_for_an_Implementation.md).
+The *Proxy* and *State* patterns that several of these exercises build on are covered in [Fronting for an Implementation](21_Fronting_for_an_Implementation.md).
 
 1.  Create an example of the "virtual proxy."
-2.  Create an example of the "Smart reference" proxy where you keep
-    count of the number of method calls to a particular object.
-3.  Create a program similar to certain DBMS systems that only allow a
-    certain number of connections at any time. To implement this, use a
-    singleton-like system that controls the number of "connection"
-    objects that it creates. When a user is finished with a connection,
-    the system must be informed so that it can check that connection
-    back in to be reused. To guarantee this, provide a proxy object
-    instead of a reference to the actual connection, and design the
-    proxy so that it will cause the connection to be released back to
-    the system.
-4.  Using the *State*, make a class called `UnpredictablePerson` which
-    changes the kind of response to its `hello()` method depending on
-    what kind of `Mood` it's in. Add an additional kind of `Mood`
-    called `Prozac`.
+2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.
+3.  Create a program similar to certain DBMS systems that only allow a certain number of connections at any time.
+    To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
+    When a user is finished with a connection,
+    the system must be informed so that it can check that connection back in to be reused.
+    To guarantee this, provide a proxy object instead of a reference to the actual connection,
+    and design the proxy so that it will cause the connection to be released back to the system.
+4.  Using the *State*, make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
+    Add an additional kind of `Mood` called `Prozac`.
 5.  Create a simple copy-on-write implementation.
-6.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py`
-    to a washing-machine problem.
-7.  Create a *StateMachine* system whereby the current state along with the
-    input determines the next state. Each state stores a reference back to the
-    controller object so that it can request the state change. Use a `dict` to
-    map a `str` naming a state to its state object. In each state subclass,
-    override a `next_state()` method that holds its own transition table. The
-    input to `next_state()` is a single word read from a text file containing
-    one word per line.
-8.  Modify the previous exercise so that the state machine can be configured
-    by editing a single transition table.
-9.  Modify the "mood" exercise (exercise 4) so that it becomes a state machine
-    using `state_machine.py`.
+6.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
+7.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
+    Each state stores a reference back to the controller object so that it can request the state change.
+    Use a `dict` to map a `str` naming a state to its state object.
+    In each state subclass,
+    override a `next_state()` method that holds its own transition table.
+    The input to `next_state()` is a single word read from a text file containing one word per line.
+8.  Modify the previous exercise so that the state machine can be configured by editing a single transition table.
+9.  Modify the "mood" exercise (exercise 4) so that it becomes a state machine using `state_machine.py`.
 10. Create an elevator state machine system using state_machine.py
 11. Create a heating/air-conditioning system using state_machine.py
 12. A *generator* produces objects, like a factory but taking no arguments.
-    Write a `mouse_move_generator` (using `yield`) that produces correct
-    `MouseAction` moves in sequence, where each possible move depends on the
-    previous one (it is another state machine). Have it accept an `int` for
-    the number of moves to produce, then stop.
+    Write a `mouse_move_generator` (using `yield`) that produces correct `MouseAction` moves in sequence,
+    where each possible move depends on the previous one (it is another state machine).
+    Have it accept an `int` for the number of moves to produce, then stop.

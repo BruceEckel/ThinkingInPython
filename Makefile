@@ -8,7 +8,7 @@ TY ?= uv run ty
 PYTEST ?= uv run pytest
 RUFF ?= uv run ruff
 
-.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract clean-examples clean-site
+.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -25,6 +25,8 @@ help:
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
 	@echo "  extract   - write ExtractedExamples/ from the Markdown"
+	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
+	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -65,6 +67,15 @@ lint:
 
 extract:
 	$(PY) tools/extract_examples.py --write
+
+# Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
+# headings are left untouched; a file is rewritten only if it round-trips).
+# Target one chapter with CH=, e.g. `make reflow CH=02` or `make reflow CH=Tour`.
+reflow:
+	$(PY) tools/reflow_prose.py --write $(CH)
+
+reflow-check:
+	$(PY) tools/reflow_prose.py $(CH)
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates

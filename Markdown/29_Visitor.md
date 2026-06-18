@@ -1,24 +1,21 @@
 # Visitor
 
-The visitor pattern is implemented using multiple dispatching, but
-people often confuse the two, because they look at the implementation
-rather than the intent.
+The visitor pattern is implemented using multiple dispatching,
+but people often confuse the two,
+because they look at the implementation rather than the intent.
 
 The assumption is that you have a primary class hierarchy that is fixed;
-perhaps it's from another vendor and you can't make changes to that
-hierarchy. However, your intent is that you'd like to add new
-polymorphic methods to that hierarchy, which means that normally you'd
-have to add something to the base class interface. How do you get around this?
+perhaps it's from another vendor and you can't make changes to that hierarchy.
+However, your intent is that you'd like to add new polymorphic methods to that hierarchy,
+which means that normally you'd have to add something to the base class interface.
+How do you get around this?
 
-The design pattern that solves this kind of problem is called a
-"visitor" (the final one in the *Design Patterns* book), and it builds
-on the double dispatching scheme shown in the last section.
+The design pattern that solves this kind of problem is called a "visitor" (the final one in the *Design Patterns* book),
+and it builds on the double dispatching scheme shown in the last section.
 
-The visitor pattern allows you to extend the interface of the primary
-type by creating a separate class hierarchy of type `Visitor` to
-virtualize the operations performed upon the primary type. The objects
-of the primary type simply "accept" the visitor, then call the visitor's
-dynamically-bound method:
+The visitor pattern allows you to extend the interface of the primary type by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
+The objects of the primary type simply "accept" the visitor,
+then call the visitor's dynamically-bound method:
 
 ```python
 # flower_visitors.py
@@ -88,16 +85,18 @@ for flower in flower_gen(10):
     flower.accept(worm)
 ```
 
-The `accept()`/`visit()` pair is *double dispatch*: `accept()` resolves the
-flower's type, then `visit()` resolves the visitor's type.
+The `accept()`/`visit()` pair is *double dispatch*:
+`accept()` resolves the flower's type,
+then `visit()` resolves the visitor's type.
 
 ## The Pythonic Visitor: singledispatch
 
-Python can add a method to a fixed hierarchy from outside, with
-`functools.singledispatch`. It turns a plain function into one that dispatches
-on the type of its first argument, with per-type implementations registered from
-anywhere. That is precisely Visitor's goal, without the `accept()` hook or the
-`Visitor` class hierarchy:
+Python can add a method to a fixed hierarchy from outside,
+with `functools.singledispatch`.
+It turns a plain function into one that dispatches on the type of its first argument,
+with per-type implementations registered from anywhere.
+That is precisely Visitor's goal,
+without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python
 # visit_singledispatch.py
@@ -153,24 +152,28 @@ if __name__ == "__main__":
         print(nectar(f), "| fragrance:", fragrance(f))
 ```
 
-`Flower` is never touched. Each operation is a separate function, and the
-`@singledispatch` default handles any type you have not registered. Adding a new
-operation is a new function; adding a new flower is a class plus, where needed, a
-one-line registration. When the operation should read like a method, use
-`functools.singledispatchmethod` instead.
+`Flower` is never touched.
+Each operation is a separate function,
+and the `@singledispatch` default handles any type you have not registered.
+Adding a new operation is a new function; adding a new flower is a class plus,
+where needed, a one-line registration.
+When the operation should read like a method,
+use `functools.singledispatchmethod` instead.
 
-Visitor still has a place: when you truly cannot define functions over the
-hierarchy, or you need the `accept()` hook for some other reason. But in Python
-that is rare. As with [the Pattern Refactoring chapter](30_Pattern_Refactoring.md)'s price-and-weight
-example, `singledispatch` is the open-method mechanism Visitor was invented to
-fake.
+Visitor still has a place:
+when you truly cannot define functions over the hierarchy,
+or you need the `accept()` hook for some other reason.
+But in Python that is rare.
+As with [the Pattern Refactoring chapter](30_Pattern_Refactoring.md)'s price-and-weight example,
+`singledispatch` is the open-method mechanism Visitor was invented to fake.
 
 ## Verifying the Operations
 
-Because each operation is a plain function, testing is direct: call it with each
-flower type and assert the result. The cases worth covering are the registered
-types, the `@singledispatch` default for an unregistered type, and the fact that
-the two operations dispatch independently:
+Because each operation is a plain function, testing is direct:
+call it with each flower type and assert the result.
+The cases worth covering are the registered types,
+the `@singledispatch` default for an unregistered type,
+and the fact that the two operations dispatch independently:
 
 ```python
 # test_visitor.py
@@ -211,28 +214,22 @@ def test_operations_dispatch_independently() -> None:
 
 ## Exercises
 
-1.  Create a business-modeling environment with three types of
-    `Inhabitant`: `Dwarf` (for engineers), `Elf` (for marketers)
-    and `Troll` (for managers). Now create a class called `Project`
-    that creates the different inhabitants and causes them to
-    `interact()` with each other using multiple dispatching.
+1.  Create a business-modeling environment with three types of `Inhabitant`:
+    `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
+    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using multiple dispatching.
 2.  Modify the above example to make the interactions more detailed.
-    Each `Inhabitant` can randomly produce a `Weapon` using
-    `get_weapon()`: a `Dwarf` uses `Jargon` or `Play`, an
-    `Elf` uses `InventFeature` or `SellImaginaryProduct`, and a
-    `Troll` uses `Edict` and `Schedule`. You must decide which
-    weapons "win" and "lose" in each interaction (as in
-    `paper_scissors_rock.py`). Add a `battle()` method to
-    `Project` that takes two `Inhabitant`s and matches them against
-    each other. Now create a `meeting()` method for
-    `Project` that creates groups of `Dwarf`, `Elf` and `Troll`
-    and battles the groups against each other until only members of one
-    group are left standing. These are the "winners."
-3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a
-    table lookup. The simplest way is a `dict` keyed by a tuple of the two
-    objects' types, looked up as `table[type(o1), type(o2)]` (this is what
-    `paper_scissors_rock2.py` does). When is the table lookup more appropriate
-    than hard-coding the dynamic dispatch? Can you keep the syntactic
-    simplicity of the dispatch while using a table underneath?
-4.  Modify Exercise 2 to use the table lookup technique described in
-    Exercise 3.
+    Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
+    a `Dwarf` uses `Jargon` or `Play`,
+    an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
+    and a `Troll` uses `Edict` and `Schedule`.
+    You must decide which weapons "win" and "lose" in each interaction (as in `paper_scissors_rock.py`).
+    Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
+    Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
+    `Elf` and `Troll` and battles the groups against each other until only members of one group are left standing.
+    These are the "winners."
+3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a table lookup.
+    The simplest way is a `dict` keyed by a tuple of the two objects' types,
+    looked up as `table[type(o1), type(o2)]` (this is what `paper_scissors_rock2.py` does).
+    When is the table lookup more appropriate than hard-coding the dynamic dispatch?
+    Can you keep the syntactic simplicity of the dispatch while using a table underneath?
+4.  Modify Exercise 2 to use the table lookup technique described in Exercise 3.

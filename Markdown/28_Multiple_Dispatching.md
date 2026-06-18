@@ -1,37 +1,39 @@
 # Multiple Dispatching
 
-When dealing with multiple types which are interacting, a program can
-get particularly messy. For example, consider a system that parses and
-executes mathematical expressions. You want to be able to say `Number +
-Number`, `Number \* Number`, etc., where `Number` is the base class
-for a family of numerical objects. But when you say `a + b`, and you
-don't know the exact type of either `a` or `b`, how can you get
-them to interact properly?
+When dealing with multiple types which are interacting,
+a program can get particularly messy.
+For example, consider a system that parses and executes mathematical expressions.
+You want to be able to say `Number + Number`, `Number \* Number`, etc.,
+where `Number` is the base class for a family of numerical objects.
+But when you say `a + b`,
+and you don't know the exact type of either `a` or `b`,
+how can you get them to interact properly?
 
-The answer starts with something you probably don't think about: Python
-performs only single dispatching. That is, if you are performing an
-operation on more than one object whose type is unknown, Python can
-invoke the dynamic binding mechanism on only one of those types. This
-doesn't solve the problem, so you end up detecting some types manually
-and effectively producing your own dynamic binding behavior.
+The answer starts with something you probably don't think about:
+Python performs only single dispatching.
+That is, if you are performing an operation on more than one object whose type is unknown,
+Python can invoke the dynamic binding mechanism on only one of those types.
+This doesn't solve the problem,
+so you end up detecting some types manually and effectively producing your own dynamic binding behavior.
 
-The solution is called *multiple dispatching*. Remember that
-polymorphism can occur only via method calls, so if you want
-double dispatching to occur, there must be two method calls:
-the first to determine the first unknown type, and the second to
-determine the second unknown type. With multiple dispatching, you must
-have a polymorphic method call to determine each of the types.
-The methods in the following example are
-called `compete()` and `eval()`, and are both members of the same
-type. (In this case there will be only two dispatches, which is referred
-to as *double dispatching*). If you are working with two different type
-hierarchies that are interacting, then you'll have to have a polymorphic
-method call in each hierarchy.
+The solution is called *multiple dispatching*.
+Remember that polymorphism can occur only via method calls,
+so if you want double dispatching to occur, there must be two method calls:
+the first to determine the first unknown type,
+and the second to determine the second unknown type.
+With multiple dispatching,
+you must have a polymorphic method call to determine each of the types.
+The methods in the following example are called `compete()` and `eval()`,
+and are both members of the same type.
+(In this case there will be only two dispatches, which is referred to as *double dispatching*).
+If you are working with two different type hierarchies that are interacting,
+then you'll have to have a polymorphic method call in each hierarchy.
 
 Both versions below share one result type: an enumeration of the three outcomes,
-win, lose, and draw. Rather than duplicate it, put it in its own module that both
-examples import. It is a `StrEnum`, so each member is its string value and prints
-as `win`, `lose`, or `draw` with no extra code:
+win, lose, and draw.
+Rather than duplicate it, put it in its own module that both examples import.
+It is a `StrEnum`, so each member is its string value and prints as `win`,
+`lose`, or `draw` with no extra code:
 
 ```python
 # outcome.py
@@ -45,8 +47,10 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-Both versions also share two small helpers: one to generate random pairs of
-items, and one to play a pair off and print the result. Those go in a module too,
+Both versions also share two small helpers:
+one to generate random pairs of items,
+and one to play a pair off and print the result.
+Those go in a module too,
 so each example below shows only its dispatch mechanism:
 
 ```python
@@ -130,12 +134,11 @@ if __name__ == "__main__":
         match(item1, item2)
 ```
 
-One of the things you might notice is that the information about the various
-combinations is encoded into each type of `Item`. It actually ends up
-being a kind of table, except that it is spread out through all the
-classes. This is not very easy to maintain if you expect to modify
-the behavior or to add a new `Item` class. Instead, it can be more
-sensible to make the table explicit, like this:
+One of the things you might notice is that the information about the various combinations is encoded into each type of `Item`.
+It actually ends up being a kind of table,
+except that it is spread out through all the classes.
+This is not very easy to maintain if you expect to modify the behavior or to add a new `Item` class.
+Instead, it can be more sensible to make the table explicit, like this:
 
 ```python
 # paper_scissors_rock2.py
@@ -177,31 +180,33 @@ if __name__ == "__main__":
         match(item1, item2)
 ```
 
-It's a tribute to the flexibility of dictionaries that a tuple can be
-used as a key just as easily as a single object.
+It's a tribute to the flexibility of dictionaries that a tuple can be used as a key just as easily as a single object.
 
 ## One Type or Many
 
-Python dispatches on a single type at a time. For dispatch on *one* argument's
-type, `functools.singledispatch` (see [the Visitor chapter](29_Visitor.md)) gives you open,
-per-type functions. For dispatch on *two or more* types at once, the table above
-is the idiomatic answer: a `dict` keyed by a tuple of types. Adding a new `Item`
-is then a matter of adding rows to the table, with no methods to edit across the
-classes.
+Python dispatches on a single type at a time.
+For dispatch on *one* argument's type,
+`functools.singledispatch` (see [the Visitor chapter](29_Visitor.md)) gives you open,
+per-type functions.
+For dispatch on *two or more* types at once,
+the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
+Adding a new `Item` is then a matter of adding rows to the table,
+with no methods to edit across the classes.
 
 The double-dispatch version, where each class implements `eval_paper`,
-`eval_scissors`, and `eval_rock`, is a workaround for languages that cannot store
-types in a table and look a behavior up by them. Python can, so the table is
-both shorter and easier to maintain. Use the spread-out method version
-only when a combination needs substantial, type-specific code that will not fit
-in a table cell.
+`eval_scissors`, and `eval_rock`,
+is a workaround for languages that cannot store types in a table and look a behavior up by them.
+Python can, so the table is both shorter and easier to maintain.
+Use the spread-out method version only when a combination needs substantial,
+type-specific code that will not fit in a table cell.
 
 ## Verifying the Table
 
-The win/lose/draw result is pure logic, which makes it easy to pin down with a
-test. The strongest check is that the two versions agree: the spread-out method
-version and the table version must return the same `Outcome` for every one of the
-nine combinations. If they ever diverge, one of them has a bug.
+The win/lose/draw result is pure logic,
+which makes it easy to pin down with a test.
+The strongest check is that the two versions agree:
+the spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
+If they ever diverge, one of them has a bug.
 
 ```python
 # test_paper_scissors.py
@@ -254,6 +259,6 @@ def test_outcome_str() -> None:
     assert str(Outcome.DRAW) == "draw"
 ```
 
-Importing both modules works cleanly because each guards its demonstration loop
-with `if __name__ == "__main__"`, so the loop runs only when the file is executed
-directly, not when it is imported for testing.
+Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,
+so the loop runs only when the file is executed directly,
+not when it is imported for testing.

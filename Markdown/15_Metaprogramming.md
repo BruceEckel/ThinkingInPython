@@ -1,7 +1,7 @@
 # Metaprogramming
 
-Objects are created by other objects: special objects called "classes" that we
-set up to produce objects configured to our liking.
+Objects are created by other objects:
+special objects called "classes" that we set up to produce objects configured to our liking.
 
 Classes are just objects, and you can modify them the same way:
 
@@ -15,34 +15,38 @@ Classes are just objects, and you can modify them the same way:
     >>> x.method()
     'Hi!'
 
-A change to a class affects every object of that class, even ones already
-created.
+A change to a class affects every object of that class,
+even ones already created.
 
-What creates these "class" objects? Other special objects, called *metaclasses*.
-The default metaclass is `type`, and in the vast majority of cases it does the
-right thing. Sometimes you want to customize how classes are produced, by
-running extra code or injecting members as the class is built. That is
-metaclass programming.
+What creates these "class" objects?
+Other special objects, called *metaclasses*.
+The default metaclass is `type`,
+and in the vast majority of cases it does the right thing.
+Sometimes you want to customize how classes are produced,
+by running extra code or injecting members as the class is built.
+That is metaclass programming.
 
-It is worth saying plainly: *most of the time you do not need a metaclass.* It
-is a fascinating tool, and the temptation to use it is strong, but Python
-3 added simpler hooks that cover almost every case a metaclass used to handle:
+It is worth saying plainly: *most of the time you do not need a metaclass.*
+It is a fascinating tool, and the temptation to use it is strong,
+but Python 3 added simpler hooks that cover almost every case a metaclass used to handle:
 
-- `__init_subclass__` runs when a subclass is created. It replaces most "do
-  something each time a class is defined" metaclasses.
+- `__init_subclass__` runs when a subclass is created.
+  It replaces most "do something each time a class is defined" metaclasses.
 - `__set_name__` lets a descriptor learn the attribute name it was bound to,
   at class-creation time.
 - *Class decorators* transform a class after it is built.
 
-Use a metaclass only when these cannot do the job. This chapter shows the
-simpler tools first, then metaclasses for the cases that still need them.
+Use a metaclass only when these cannot do the job.
+This chapter shows the simpler tools first,
+then metaclasses for the cases that still need them.
 
 ## Generating Classes with type
 
-Since metaclasses create classes, you can call the metaclass yourself. `type`
-with one argument gives the type of an existing object. `type` with three
-arguments creates a new class: the name, a tuple of base classes, and a
-namespace dictionary of fields and methods. So the equivalent of:
+Since metaclasses create classes, you can call the metaclass yourself.
+`type` with one argument gives the type of an existing object.
+`type` with three arguments creates a new class: the name,
+a tuple of base classes, and a namespace dictionary of fields and methods.
+So the equivalent of:
 
     class C: pass
 
@@ -78,8 +82,8 @@ Howdy, John
 Printing the class of the class produces the metaclass.
 
 Generating classes programmatically with `type` opens up real possibilities.
-Where you might otherwise write many near-identical subclasses by hand, you can
-generate them in a loop:
+Where you might otherwise write many near-identical subclasses by hand,
+you can generate them in a loop:
 
 ```python
 # greenhouse.py
@@ -131,18 +135,19 @@ if __name__ == "__main__":
     Event.run_events()
 ```
 
-`create_mc()` builds each subclass with `type`. `create_exec()` does the same
-thing by running a string of class-definition code with `exec`. The `exec`
-version is easier for most readers to follow, because it looks like ordinary
-class definitions. Use `type` only when the dynamic version is genuinely
-clearer than generated source text.
+`create_mc()` builds each subclass with `type`.
+`create_exec()` does the same thing by running a string of class-definition code with `exec`.
+The `exec` version is easier for most readers to follow,
+because it looks like ordinary class definitions.
+Use `type` only when the dynamic version is genuinely clearer than generated source text.
 
 ## Self-Registration of Subclasses
 
-A common need is for a base class to keep track of its subclasses, so you can
-enumerate them. This is the textbook reason people used to write a metaclass.
-In Python 3 it is a few lines with `__init_subclass__`, which Python calls
-automatically every time a subclass is created:
+A common need is for a base class to keep track of its subclasses,
+so you can enumerate them.
+This is the textbook reason people used to write a metaclass.
+In Python 3 it is a few lines with `__init_subclass__`,
+which Python calls automatically every time a subclass is created:
 
 ```python
 # init_subclass.py
@@ -200,16 +205,17 @@ print(sorted(c.__name__ for c in Shape.registry))
 """
 ```
 
-Each time a subclass is created, `__init_subclass__` adds it to the registry
-and removes its base classes, so only the current leaves remain. No metaclass
-is involved. `__init_subclass__` is implicitly a class method; its first
-argument is the new subclass.
+Each time a subclass is created,
+`__init_subclass__` adds it to the registry and removes its base classes,
+so only the current leaves remain.
+No metaclass is involved.
+`__init_subclass__` is implicitly a class method;
+its first argument is the new subclass.
 
 ## Learning a Name with __set_name__
 
-Another job that once needed a metaclass is letting an attribute object
-discover the name it was assigned to. A *descriptor* with `__set_name__` gets
-that name when the class is created:
+Another job that once needed a metaclass is letting an attribute object discover the name it was assigned to.
+A *descriptor* with `__set_name__` gets that name when the class is created:
 
 ```python
 # set_name.py
@@ -246,15 +252,15 @@ print(p.x, p.y)
 """
 ```
 
-The `Field` descriptors do not know they are called `x` and `y` until Python
-tells them through `__set_name__`. This is metaprogramming, but it needs no
-metaclass.
+The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__`.
+This is metaprogramming, but it needs no metaclass.
 
 ## Writing a Metaclass
 
-When the simpler hooks are not enough, you write a metaclass. A metaclass is a
-subclass of `type`. You attach it with the `metaclass=` keyword in the class
-header. Python then uses your metaclass, instead of `type`, to build the class.
+When the simpler hooks are not enough, you write a metaclass.
+A metaclass is a subclass of `type`.
+You attach it with the `metaclass=` keyword in the class header.
+Python then uses your metaclass, instead of `type`, to build the class.
 
 ```python
 # simple_meta1.py
@@ -287,10 +293,10 @@ Yes!
 """
 ```
 
-By convention the first argument of a metaclass method is `cls` rather than
-`self`, except for `__new__`, which uses `mcl`. The `cls` is the class object
-being built. As with any subclass, call the base-class version first through
-`super()`.
+By convention the first argument of a metaclass method is `cls` rather than `self`,
+except for `__new__`, which uses `mcl`.
+The `cls` is the class object being built.
+As with any subclass, call the base-class version first through `super()`.
 
 > A note on history. Python 2 spelled the hook differently: you set a
 > `__metaclass__` field in the class body, and you could even point it at a
@@ -300,11 +306,13 @@ being built. As with any subclass, call the base-class version first through
 
 ## `__init__` versus `__new__` in a Metaclass
 
-Metaclass examples seem to use `__new__` and `__init__` interchangeably. The
-difference is timing. `__new__` runs *before* the class object exists, so it can
-change the name, bases, and namespace that will be used to build it. `__init__`
-runs *after* the class exists, so changing those arguments has no effect, though
-you can still modify the finished class object:
+Metaclass examples seem to use `__new__` and `__init__` interchangeably.
+The difference is timing.
+`__new__` runs *before* the class object exists, so it can change the name,
+bases, and namespace that will be used to build it.
+`__init__` runs *after* the class exists,
+so changing those arguments has no effect,
+though you can still modify the finished class object:
 
 ```python
 # new_vs_init.py
@@ -349,18 +357,20 @@ patched_in_init present: True
 """
 ```
 
-So override `__new__` when you must change `name`, `bases`, or the namespace
-(including special members like `__slots__`) before the class is built.
-Otherwise prefer `__init__`, which is simpler. When the choice does not matter,
+So override `__new__` when you must change `name`, `bases`,
+or the namespace (including special members like `__slots__`) before the class is built.
+Otherwise prefer `__init__`, which is simpler.
+When the choice does not matter,
 pick `__init__` and reserve `__new__` for when it has a real reason.
 
 ## Intercepting Instance Creation
 
 A method defined on the metaclass becomes a method of the *class object*,
-callable on the class but not on its instances. These are sometimes called
-*metamethods*. One useful metamethod is `__call__`, which runs when you create
-an instance. Overriding it lets a metaclass intercept instance creation, which
-is one way to build a Singleton:
+callable on the class but not on its instances.
+These are sometimes called *metamethods*.
+One useful metamethod is `__call__`, which runs when you create an instance.
+Overriding it lets a metaclass intercept instance creation,
+which is one way to build a Singleton:
 
 ```python
 # singleton.py
@@ -400,11 +410,12 @@ ASingleton BSingleton
 """
 ```
 
-Each class gets its own entry in the `_instances` dictionary, so the singletons
-stay independent.
+Each class gets its own entry in the `_instances` dictionary,
+so the singletons stay independent.
 
-This works, but it is heavier than the problem usually requires. A Singleton is
-often clearer as a class decorator, which needs no metaclass at all:
+This works, but it is heavier than the problem usually requires.
+A Singleton is often clearer as a class decorator,
+which needs no metaclass at all:
 
 ```python
 # singleton_decorator.py
@@ -441,14 +452,16 @@ print(b.items)
 """
 ```
 
-The simplest Python singleton of all is a module: import it anywhere and you get
-the same object. Choose the lightest tool that solves your problem.
+The simplest Python singleton of all is a module:
+import it anywhere and you get the same object.
+Choose the lightest tool that solves your problem.
 
 ## Making a Class Final
 
-It is sometimes useful to forbid inheritance, the way Java's `final` does. The
-older literature claims this *requires* a metaclass, because the check must run
-as each subclass is created. With `__init_subclass__`, it does not:
+It is sometimes useful to forbid inheritance, the way Java's `final` does.
+The older literature claims this *requires* a metaclass,
+because the check must run as each subclass is created.
+With `__init_subclass__`, it does not:
 
 ```python
 # final.py
@@ -482,30 +495,31 @@ B is final; you cannot subclass it
 """
 ```
 
-The check happens at class-creation time, exactly when it must, and `B` itself
-is built normally because `A` does not forbid subclassing.
+The check happens at class-creation time, exactly when it must,
+and `B` itself is built normally because `A` does not forbid subclassing.
 
 ## When You Still Need a Metaclass
 
-After all this, when is a metaclass the right tool? When you need to change the
-class object itself rather than react to its creation: adding methods *to the
-class* (metamethods such as a custom `__iter__` or `__call__` on the class,
-shown above), replacing the namespace mapping with `__prepare__` so the class
-body is built in a custom dictionary, or enforcing an invariant across an entire
-family of classes through their shared metaclass. These are real but uncommon.
-For everything else, `__init_subclass__`, `__set_name__`, and class decorators
-are simpler and easier to read.
+After all this, when is a metaclass the right tool?
+When you need to change the class object itself rather than react to its creation:
+adding methods *to the class* (metamethods such as a custom `__iter__` or `__call__` on the class, shown above),
+replacing the namespace mapping with `__prepare__` so the class body is built in a custom dictionary,
+or enforcing an invariant across an entire family of classes through their shared metaclass.
+These are real but uncommon.
+For everything else, `__init_subclass__`, `__set_name__`,
+and class decorators are simpler and easier to read.
 
-One caution: a class has exactly one metaclass. Multiple inheritance can
-accidentally combine classes with different metaclasses, which raises a
-metaclass conflict you then have to resolve. That is one more reason to avoid
-metaclasses unless you truly need them.
+One caution: a class has exactly one metaclass.
+Multiple inheritance can accidentally combine classes with different metaclasses,
+which raises a metaclass conflict you then have to resolve.
+That is one more reason to avoid metaclasses unless you truly need them.
 
 ## Testing the Hooks
 
-Each hook has a small, definite effect, which makes it easy to test. The
-registry should hold only the leaf classes, the descriptor should learn its name
-and store under it, and a final class should refuse to be subclassed:
+Each hook has a small, definite effect, which makes it easy to test.
+The registry should hold only the leaf classes,
+the descriptor should learn its name and store under it,
+and a final class should refuse to be subclassed:
 
 ```python
 # test_metaprogramming.py

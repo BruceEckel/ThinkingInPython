@@ -1,16 +1,18 @@
 # Comprehensions
 
-A *comprehension* builds one sequence from another in a single expression. The
-idea comes from functional programming, and before that from the set-builder
-notation of mathematics. Haskell had list comprehensions, and Python borrowed
-them.
+A *comprehension* builds one sequence from another in a single expression.
+The idea comes from functional programming,
+and before that from the set-builder notation of mathematics.
+Haskell had list comprehensions, and Python borrowed them.
 
-Comprehensions take a mind shift. With a loop you describe how to build the
-result: make an empty list, walk the input, test each item, and append the ones
-you want. With a comprehension you describe what the result is, as a single
-expression, and let Python build it. A comprehension is shorter, it reads like the definition of the
-result rather than a recipe for it, and one line replaces several lines of
-loop bookkeeping.
+Comprehensions take a mind shift.
+With a loop you describe how to build the result: make an empty list,
+walk the input, test each item, and append the ones you want.
+With a comprehension you describe what the result is, as a single expression,
+and let Python build it.
+A comprehension is shorter,
+it reads like the definition of the result rather than a recipe for it,
+and one line replaces several lines of loop bookkeeping.
 
 
 
@@ -21,11 +23,9 @@ A list comprehension consists of the following parts:
 -   An Input Sequence.
 -   A Variable representing members of the input sequence.
 -   An Optional Predicate expression.
--   An Output Expression producing elements of the output list from
-    members of the Input Sequence that satisfy the predicate.
+-   An Output Expression producing elements of the output list from members of the Input Sequence that satisfy the predicate.
 
-Say we need to obtain a list of all the integers in a sequence and then
-square them:
+Say we need to obtain a list of all the integers in a sequence and then square them:
 
 ```python
 # list_comprehension.py
@@ -39,14 +39,13 @@ print(squared_ints)
 
 The comprehension has three parts:
 
--   The iterator part iterates through each member `e` of the input
-    sequence `a_list`.
+-   The iterator part iterates through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
--   If the member is an integer then it is passed to the output
-    expression, squared, to become a member of the output list.
+-   If the member is an integer then it is passed to the output expression,
+    squared, to become a member of the output list.
 
-Much the same results can be achieved using the built-in functions,
-`map`, `filter` and the anonymous `lambda` function.
+Much the same results can be achieved using the built-in functions, `map`,
+`filter` and the anonymous `lambda` function.
 
 The filter function applies a predicate to a sequence:
 
@@ -61,26 +60,26 @@ The two can be combined:
     map(lambda e: e ** 2, filter(lambda e: isinstance(e, int), a_list))
 
 The above example involves function calls to `map`, `filter`,
-`isinstance` and two calls to `lambda`. Function calls in Python are
-expensive. Furthermore the input sequence is traversed through twice and
-an intermediate list is produced by filter.
+`isinstance` and two calls to `lambda`.
+Function calls in Python are expensive.
+Furthermore the input sequence is traversed through twice and an intermediate list is produced by filter.
 
-The list comprehension is enclosed within a list, so it is immediately
-evident that a list is being produced. There is only one function call
-to `isinstance` and no call to the cryptic `lambda`; instead the list
-comprehension uses a conventional iterator, an expression and an if
-expression for the optional predicate.
+The list comprehension is enclosed within a list,
+so it is immediately evident that a list is being produced.
+There is only one function call to `isinstance` and no call to the cryptic `lambda`;
+instead the list comprehension uses a conventional iterator,
+an expression and an if expression for the optional predicate.
 
 ## Nested Comprehensions
 
-An identity matrix of size n is an n by n square matrix with ones on the
-main diagonal and zeros elsewhere. A 3 by 3 identity matrix is:
+An identity matrix of size n is an n by n square matrix with ones on the main diagonal and zeros elsewhere.
+A 3 by 3 identity matrix is:
 
 ![A 3 by 3 identity matrix](_images/idMatrix)
 
-In Python we can represent such a matrix by a list of lists, where each
-sub-list represents a row. A 3 by 3 matrix would be represented by the
-following list:
+In Python we can represent such a matrix by a list of lists,
+where each sub-list represents a row.
+A 3 by 3 matrix would be represented by the following list:
 
     [ [ 1, 0, 0 ],
       [ 0, 1, 0 ],
@@ -120,16 +119,15 @@ for r in rst_files:
 
 ## Set Comprehensions
 
-Set comprehensions allow sets to be constructed using the same
-principles as list comprehensions. The only difference is that the resulting
-sequence is a set.
+Set comprehensions allow sets to be constructed using the same principles as list comprehensions.
+The only difference is that the resulting sequence is a set.
 
-Say we have a list of names. The list can contain names which only
-differ in the case used to represent them, duplicates and names
-consisting of only one character. We are only interested in names longer
-than one character and wish to represent all names in the same format:
-The first letter should be capitalized; all other characters should be
-lower case.
+Say we have a list of names.
+The list can contain names which only differ in the case used to represent them,
+duplicates and names consisting of only one character.
+We are only interested in names longer than one character and wish to represent all names in the same format:
+The first letter should be capitalized;
+all other characters should be lower case.
 
 Given the list:
 
@@ -144,24 +142,23 @@ The following set comprehension accomplishes this:
     {name[0].upper() + name[1:].lower()
      for name in names if len(name) > 1}
 
-You could get the same result by passing a list comprehension to `set()`. That
-builds a throwaway list first, so the set comprehension is the better choice:
+You could get the same result by passing a list comprehension to `set()`.
+That builds a throwaway list first,
+so the set comprehension is the better choice:
 
     set([name[0].upper() + name[1:].lower()
          for name in names if len(name) > 1])
 
 ## Dictionary Comprehensions
 
-Say we have a dictionary the keys of which are characters and the values
-of which map to the number of times that character appears in some text.
-The dictionary currently distinguishes between upper and lower case
-characters.
+Say we have a dictionary the keys of which are characters and the values of which map to the number of times that character appears in some text.
+The dictionary currently distinguishes between upper and lower case characters.
 
-The following is inefficient: If both a lower case and upper case
-character exists, then the entry in the new dictionary is updated twice.
+The following is inefficient:
+If both a lower case and upper case character exists,
+then the entry in the new dictionary is updated twice.
 
-We require a dictionary in which the occurrences of upper and lower case
-characters are combined:
+We require a dictionary in which the occurrences of upper and lower case characters are combined:
 
     mcase = {'a':10, 'b': 34, 'A': 7, 'Z':3}
 
@@ -174,15 +171,17 @@ characters are combined:
 # mcase_frequency == {'a': 17, 'z': 3, 'b': 34}
 ```
 
-A comprehension is evaluated eagerly. It builds the whole result in memory before
-the next statement runs. For a large input that wastes time and space, especially
-when you consume the result only once. A *generator expression* uses the same
-syntax with parentheses instead of brackets, and produces its values one at a
-time, on demand:
+A comprehension is evaluated eagerly.
+It builds the whole result in memory before the next statement runs.
+For a large input that wastes time and space,
+especially when you consume the result only once.
+A *generator expression* uses the same syntax with parentheses instead of brackets,
+and produces its values one at a time, on demand:
 
     squares = (n ** 2 for n in range(1_000_000))
 
-Nothing is computed until you iterate over `squares`, and only one value exists at
-a time. The [Iterators](23_Iterators.md) chapter covers generators in depth.
+Nothing is computed until you iterate over `squares`,
+and only one value exists at a time.
+The [Iterators](23_Iterators.md) chapter covers generators in depth.
 
 Portions of this chapter were contributed by Michael Charlton.
