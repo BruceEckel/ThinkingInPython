@@ -229,7 +229,7 @@ print(s)
 ```
 
 As you can see in the second case,
-more than one argument is grouped in parentheses as a tuple (covered in the next chapter).
+more than one argument is grouped in parentheses as a tuple (covered in the [next chapter](03_Containers_and_Control_Flow.md)).
 
 All the formatting from `printf()` is available,
 including control over the number of decimal places and alignment.

@@ -82,7 +82,7 @@ Every code block that starts with a filename comment, like `# trace.py`,
 is a complete program.
 These files are extracted from the chapters and live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter, named to match the chapter.
-So a block tagged `# trace.py` in the Decorators chapter is the file `Examples/13_Decorators/trace.py`.
+So a block tagged `# trace.py` in the [Decorators](13_Decorators.md) chapter is the file `Examples/13_Decorators/trace.py`.
 The examples that read a data file, or that span several files,
 keep them together in the same chapter folder.
 

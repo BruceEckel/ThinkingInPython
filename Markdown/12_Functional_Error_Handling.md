@@ -44,7 +44,7 @@ The output is:
 
 `func_a(0)` produced a value, but the exception threw away the whole list.
 The only way to keep the good results would be to wrap each call in its own `try`,
-which is the kind of scattering the previous chapter warned against.
+which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter warned against.
 
 ## Return the Error as a Value
 
