@@ -428,9 +428,9 @@ Here, `GameEnvironment` is not designed to be inherited,
 although it could very possibly make sense to do that.
 
 This also contains examples of *Double Dispatching* and the *Factory Method*,
-both of which will be explained later.
+both of which are explained later.
 
-Of course, the above scaffolding of `Obstacle`,
+The above scaffolding of `Obstacle`,
 `Character` and `GameElementFactory` (which was translated from the Java version of this example) is unnecessary;
 it's only required for languages that have static type checking.
 As long as the concrete Python classes follow the form of the required classes,

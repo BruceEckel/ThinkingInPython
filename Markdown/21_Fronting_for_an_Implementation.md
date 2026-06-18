@@ -55,8 +55,7 @@ It isn't necessary that `Implementation` have the same interface as `Proxy`;
 as long as `Proxy` is somehow "speaking for" the class that it is referring method calls to then the basic idea is satisfied (note that this statement is at odds with the definition for Proxy in GoF).
 However, it is convenient to have a common interface so that `Implementation` is forced to fulfill all the methods that `Proxy` needs to call.
 
-Of course, in Python we have a delegation mechanism built in,
-so it makes the `Proxy` even simpler to implement:
+Python has a built-in delegation mechanism that makes `Proxy` even simpler to implement:
 
 ```python
 # proxy_demo2.py

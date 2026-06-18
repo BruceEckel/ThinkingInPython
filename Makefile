@@ -7,8 +7,11 @@ PY ?= uv run python
 TY ?= uv run ty
 PYTEST ?= uv run pytest
 RUFF ?= uv run ruff
+SPELL ?= uv run codespell
+VALE ?= vale
+DOCS ?= Markdown
 
-.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check clean-examples clean-site
+.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check spell prose clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -27,6 +30,8 @@ help:
 	@echo "  extract   - write ExtractedExamples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
+	@echo "  spell     - spell-check prose and comments with codespell (DOCS=Markdown)"
+	@echo "  prose     - house-style lint with Vale (needs the vale binary; see .vale.ini)"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -76,6 +81,17 @@ reflow:
 
 reflow-check:
 	$(PY) tools/reflow_prose.py $(CH)
+
+# Spell-check the book prose and code comments. codespell config and the
+# ignore list live in pyproject.toml and tools/codespell-ignore.txt. Override
+# the target with DOCS=, e.g. `make spell DOCS=Markdown/02_A_Python_Tour.md`.
+spell:
+	$(SPELL) $(DOCS)
+
+# House-style lint with Vale: no em-dashes, short sentences, no filler phrases.
+# Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
+prose:
+	$(VALE) $(DOCS)
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates

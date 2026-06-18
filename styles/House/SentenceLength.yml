@@ -1,0 +1,7 @@
+extends: occurrence
+message: "Long sentence. Prefer short, single-clause sentences; consider splitting."
+level: warning
+# Count words within each sentence; flag sentences longer than `max` words.
+scope: sentence
+token: "[A-Za-z][A-Za-z'-]*"
+max: 35

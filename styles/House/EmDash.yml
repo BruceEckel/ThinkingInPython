@@ -1,0 +1,9 @@
+extends: existence
+message: "No em-dashes ('%s'). Use a colon, comma, parentheses, or split the sentence."
+level: error
+nonword: true
+tokens:
+  - '—'
+  - '–'
+  - ' -- '
+  - '\S--\S'

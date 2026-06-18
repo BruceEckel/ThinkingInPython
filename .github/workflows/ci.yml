@@ -6,8 +6,9 @@ name: CI
 # local machine before pushing, and GitHub Actions can be slow.
 #
 # The full gates (examples match the Markdown, every example runs clean, pytest
-# passes, ty-clean, ruff-clean) are opt-in. Run them only when you want a
-# second opinion in CI, in either of two ways:
+# passes, ty-clean, ruff-clean) are opt-in, as are the prose checks (codespell
+# spelling and Vale house style). Run them only when you want a second opinion
+# in CI, in either of two ways:
 #   * From the Actions tab, choose this workflow and click "Run workflow"
 #     (the "run_gates" input defaults to true), or run
 #       gh workflow run ci.yml -f run_gates=true
@@ -22,7 +23,7 @@ on:
   workflow_dispatch:
     inputs:
       run_gates:
-        description: "Run the full example/run/test/type/lint gates"
+        description: "Run the full gates plus the spelling/house-style checks"
         type: boolean
         default: true
 
@@ -111,6 +112,46 @@ jobs:
       # per-file-ignores.
       - name: Lint examples with ruff
         run: uv run ruff check ExtractedExamples
+
+  # Prose checks, opt-in only (same trigger as the gates job). codespell fails
+  # on spelling errors; Vale fails on em-dashes (an error-level rule) and prints
+  # the warning-level house-style findings. These also run locally via
+  # `make spell` and `make prose`.
+  prose:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.run_gates) ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[full-ci]'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.14"
+          enable-cache: true
+
+      # Spelling: codespell is a uv-managed dev tool. Config lives in
+      # pyproject [tool.codespell]; the ignore list in tools/codespell-ignore.txt.
+      - name: Install tooling
+        run: uv sync --locked
+
+      - name: Spell-check prose with codespell
+        run: uv run codespell Markdown
+
+      # Vale is a standalone binary, not a Python package. Install the latest
+      # release; pin "version" below if you want fully reproducible runs.
+      - name: Install Vale
+        run: |
+          version=$(curl -fsSL https://api.github.com/repos/errata-ai/vale/releases/latest | grep -oP '"tag_name": "v\K[^"]+')
+          curl -fsSL "https://github.com/errata-ai/vale/releases/download/v${version}/vale_${version}_Linux_64-bit.tar.gz" | sudo tar -xz -C /usr/local/bin vale
+          vale --version
+
+      # House style: fails on em-dashes (error level); filler and sentence-length
+      # findings are warnings and do not fail the job. Config in .vale.ini.
+      - name: House-style lint with Vale
+        run: vale Markdown
 
   # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython)
   # on a push to master. It depends only on the site build, not on the opt-in

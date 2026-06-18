@@ -1,5 +1,8 @@
-- Look for and remove phrases like "of course", "clearly"
+- README: instructions for downloading the examples: "clone the directory"
+
 - "have to", "could" -> "can"
+- which was
+- which will be
 
 - Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Chapter 21: Surrogate?
@@ -14,8 +17,6 @@
 - Ask for a good strategy to polish things before my edit/rewrite pass.
 
 - Indexing using Leanpub format, before publishing to leanpub
-
-- App to turn Markdown into one sentence per line?
 
 ******************
 

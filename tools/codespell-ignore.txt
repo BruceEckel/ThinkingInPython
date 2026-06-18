@@ -1,0 +1,5 @@
+adaptee
+bale
+dum
+reste
+re-use

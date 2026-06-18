@@ -51,6 +51,8 @@ make examples   # extract then run (the full verification pass)
 make test       # run the book's pytest examples
 make ty         # type-check the extracted examples (must be clean)
 make lint       # PEP 8 lint the extracted examples with ruff (must be clean)
+make spell      # spell-check the prose and comments with codespell
+make prose      # house-style lint the prose with Vale (needs the vale binary)
 ```
 
 `make sync-ci` is the everyday command after editing the book: it pushes your
@@ -156,6 +158,32 @@ A positional argument (or `CH=`) may be a file path or a chapter selector
 matched against `Markdown/`: a number or stem prefix (`02`, `02_A_Python`) or a
 substring (`Tour`). With no argument the whole book is processed.
 
+## Spelling and prose style
+
+Two separate layers, both optional and not part of the default CI gate.
+
+**Spelling: codespell (`make spell`).** A uv-managed dev tool, so it runs through
+`uv run`. It matches a curated misspelling dictionary, so it stays low-noise even
+over code comments and examples. Configuration lives in `[tool.codespell]` in
+`pyproject.toml`; words it flags wrongly (design-pattern terms like `adaptee`,
+foreign-language quotes, deliberate code strings) are listed in
+`tools/codespell-ignore.txt`. Scope it with `DOCS=`, for example
+`make spell DOCS=Markdown/02_A_Python_Tour.md`.
+
+**House style: Vale (`make prose`).** Vale is a standalone binary, not a Python
+package, so install it once (`winget install errata-ai.Vale`,
+`brew install vale`, or see <https://vale.sh/docs/install>). Vale parses Markdown
+and checks only text, never code spans or fenced code, so the rules never fire on
+identifiers or examples. Spelling is left to codespell; Vale enforces house style
+only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
+
+* `EmDash` (error): no `—`, `–`, or `--` used as a dash.
+* `Filler` (warning): throat-clearing phrases ("this is the whole idea", and so on).
+* `SentenceLength` (warning): flags sentences longer than 35 words.
+
+To add the community packages for passive-voice and usage checks, list them in
+`.vale.ini` (`Packages = write-good, proselint`) and run `vale sync` once.
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
@@ -201,7 +229,7 @@ the build and publish steps relate to the opt-in test gates.
 `.github/workflows/ci.yml` runs on every push to `master`, every pull request,
 and manual `workflow_dispatch`. The full example/test suite already runs on your
 machine before you push (and Actions can be slow), so **the default CI path only
-builds and publishes the site**. The workflow has two jobs:
+builds and publishes the site**. The workflow has these jobs:
 
 * **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.14,
   cached) and pandoc, runs `uv sync --locked`, and builds the static site. On a
@@ -214,9 +242,15 @@ builds and publishes the site**. The workflow has two jobs:
   zero diagnostics), and the lint (`ruff check ExtractedExamples`, zero
   findings). Deliberate lint exceptions live in
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
+* **`prose` (opt-in only):** the same checks as `make spell` and `make prose`.
+  codespell spell-checks `Markdown/` (config in `[tool.codespell]`, ignore list
+  in `tools/codespell-ignore.txt`) and fails on a spelling error. It then
+  installs the Vale binary and runs the house-style rules in `styles/House/`;
+  Vale fails the job on an em-dash (error level) and prints the filler and
+  sentence-length findings as warnings. Shares the gates trigger.
 
-`deploy` depends only on `site`, not on `gates`, so publishing is never blocked
-by the test suite. The trade-off is that a push can publish even if an example
+`deploy` depends only on `site`, not on `gates` or `prose`, so publishing is
+never blocked by the opt-in checks. The trade-off is that a push can publish even if an example
 would fail a gate, which is why you run `make ci` locally first.
 
 ### Requesting the full gates in CI

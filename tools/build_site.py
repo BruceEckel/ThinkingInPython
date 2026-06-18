@@ -205,7 +205,7 @@ def render_index(chapters: list[Chapter]) -> str:
 {rows}
     </ul>
     <p class="copyright">{COPYRIGHT}</p>
-    <p class="repo-link"><a href="{REPO_URL}" target="_blank" rel="noopener">View the source on GitHub</a></p>
+    <p class="repo-link"><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples on GitHub</a></p>
   </div>
 </body>
 </html>

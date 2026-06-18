@@ -1,0 +1,10 @@
+extends: existence
+message: "Filler/throat-clearing phrase: '%s'. State the point and move on."
+level: warning
+ignorecase: true
+tokens:
+  - "this is the whole idea"
+  - "it'?s that simple"
+  - "and that'?s all there is to it"
+  - "needless to say"
+  - "it goes without saying"

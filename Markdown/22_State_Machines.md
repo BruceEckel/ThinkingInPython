@@ -30,8 +30,8 @@ class State:
         raise NotImplementedError("next not implemented")
 ```
 
-This class is clearly unnecessary,
-but it allows us to say that something is a `State` object in code,
+This class is unnecessary.
+However, it allows us to say that something is a `State` object in code,
 and provide a slightly different error message when all the methods are not implemented.
 We could have gotten basically the same effect by saying:
 

@@ -157,7 +157,7 @@ If you have a rather confusing collection of classes and interactions that the c
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
 Façade is often implemented as a singleton abstract factory.
-Of course, you can easily get this effect by creating a class containing `static` factory methods:
+You can easily get this effect by creating a class containing `static` factory methods:
 
 ```python
 # facade.py
