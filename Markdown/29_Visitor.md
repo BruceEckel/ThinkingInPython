@@ -1,6 +1,6 @@
 # Visitor
 
-The visitor pattern is implemented using multiple dispatching,
+The *Visitor* pattern is implemented using *Multiple Dispatching*,
 but people often confuse the two,
 because they look at the implementation rather than the intent.
 
@@ -10,10 +10,10 @@ However, your intent is that you'd like to add new polymorphic methods to that h
 which means that normally you'd have to add something to the base class interface.
 How do you get around this?
 
-The design pattern that solves this kind of problem is called a "visitor" (the final one in the *Design Patterns* book),
+The design pattern that solves this kind of problem is called *Visitor* (the final one in the *Design Patterns* book),
 and it builds on the double dispatching scheme shown in the last section.
 
-The visitor pattern allows you to extend the interface of the primary type by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
+The *Visitor* pattern allows you to extend the interface of the primary type by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
 The objects of the primary type simply "accept" the visitor,
 then call the visitor's dynamically-bound method:
 
@@ -95,7 +95,7 @@ Python can add a method to a fixed hierarchy from outside,
 with `functools.singledispatch`.
 It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-That is precisely Visitor's goal,
+That is precisely *Visitor*'s goal,
 without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python
@@ -160,12 +160,12 @@ where needed, a one-line registration.
 When the operation should read like a method,
 use `functools.singledispatchmethod` instead.
 
-Visitor still has a place:
+*Visitor* still has a place:
 when you truly cannot define functions over the hierarchy,
 or you need the `accept()` hook for some other reason.
 But in Python that is rare.
 As with [the Pattern Refactoring chapter](30_Pattern_Refactoring.md)'s price-and-weight example,
-`singledispatch` is the open-method mechanism Visitor was invented to fake.
+`singledispatch` is the open-method mechanism *Visitor* was invented to fake.
 
 ## Verifying the Operations
 
@@ -216,7 +216,7 @@ def test_operations_dispatch_independently() -> None:
 
 1.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
-    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using multiple dispatching.
+    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using *Multiple Dispatching*.
 2.  Modify the above example to make the interactions more detailed.
     Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
     a `Dwarf` uses `Jargon` or `Play`,

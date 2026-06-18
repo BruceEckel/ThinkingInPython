@@ -16,12 +16,12 @@ Python can invoke the dynamic binding mechanism on only one of those types.
 This doesn't solve the problem,
 so you end up detecting some types manually and effectively producing your own dynamic binding behavior.
 
-The solution is called *multiple dispatching*.
+The solution is called *Multiple Dispatching*.
 Remember that polymorphism can occur only via method calls,
 so if you want double dispatching to occur, there must be two method calls:
 the first to determine the first unknown type,
 and the second to determine the second unknown type.
-With multiple dispatching,
+With *Multiple Dispatching*,
 you must have a polymorphic method call to determine each of the types.
 The methods in the following example are called `compete()` and `eval()`,
 and are both members of the same type.
@@ -72,7 +72,7 @@ def match(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
-Here's an example of multiple dispatching:
+Here's an example of *Multiple Dispatching*:
 
 ```python
 # paper_scissors_rock.py

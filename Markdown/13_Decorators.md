@@ -287,7 +287,7 @@ The `@` syntax decorates a function or class once, at definition.
 Every call or every instance gets the wrapping.
 Sometimes you want to add responsibilities to one object at runtime,
 and let the caller choose which responsibilities to add.
-That is the object decorator pattern.
+That is the object *Decorator* pattern.
 
 Consider a coffee shop.
 A class for every drink-and-extra combination explodes: espresso,
@@ -410,7 +410,7 @@ def test_decaf_adds_no_cost() -> None:
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object decorator pattern for a pizza shop:
+3.  Implement the object *Decorator* pattern for a pizza shop:
     plain pizzas (Margherita, Hawaiian) and topping decorators (Garlic, Olives, Feta).
     Build a Margherita decorated with Olives and Feta,
     then print its cost and description.

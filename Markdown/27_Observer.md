@@ -18,7 +18,7 @@ or the almost-equivalent Document-View architecture.
 You have some data, the *document*, and more than one view of it,
 say a plot and a table.
 When the data changes, every view must refresh.
-The observer pattern arranges that,
+The *Observer* pattern arranges that,
 without the data having to know which views exist.
 
 Python expresses this with far less machinery than the classic design needs,
@@ -79,7 +79,7 @@ The observers here are lambdas, but any function or bound method works.
 There is no `Observer` base class to inherit and no `set_changed()`/`notify_observers()` protocol:
 assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
-but for most cases a list of callbacks is all the Observer pattern amounts to.
+but for most cases a list of callbacks is all the *Observer* pattern amounts to.
 
 A test confirms the two things that matter:
 every subscriber is called with the new value,
