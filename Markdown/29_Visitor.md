@@ -1,19 +1,17 @@
 # Visitor
 
-The *Visitor* pattern is implemented using *Multiple Dispatching*,
-but people often confuse the two,
-because they look at the implementation rather than the intent.
+The *Visitor* pattern is implemented using *Multiple Dispatching*.
+People can confuse the two by looking at the implementation rather than the intent.
 
-The assumption is that you have a primary class hierarchy that is fixed;
-perhaps it's from another vendor and you can't make changes to that hierarchy.
-However, your intent is that you'd like to add new polymorphic methods to that hierarchy,
-which means that normally you'd have to add something to the base class interface.
+The assumption is that you have a primary class hierarchy that is unchangeable.
+Oerhaps it's from another vendor and you can't make changes to that hierarchy.
+However, you'd like to add new polymorphic methods to that hierarchy.
+Normally you'd have to add something to the base class interface, but that's unchangeable.
 How do you get around this?
 
-The design pattern that solves this kind of problem is called *Visitor* (the final one in the *Design Patterns* book),
-and it builds on the double dispatching scheme shown in the last section.
-
-The *Visitor* pattern allows you to extend the interface of the primary type by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
+*Visitor*, the final pattern in the *Design Patterns* book, solves this kind of problem.
+It allows you to extend the interface of the primary type.
+It does this by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
 The objects of the primary type simply "accept" the visitor,
 then call the visitor's dynamically-bound method:
 
@@ -43,6 +41,7 @@ class Runuculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
+# The companion class accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -95,8 +94,8 @@ Python can add a method to a fixed hierarchy from outside,
 with `functools.singledispatch`.
 It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-That is precisely *Visitor*'s goal,
-without the `accept()` hook or the `Visitor` class hierarchy:
+That is exactly how *Visitor*'s works,
+but without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python
 # visit_singledispatch.py
