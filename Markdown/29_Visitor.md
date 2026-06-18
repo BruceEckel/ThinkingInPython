@@ -1,6 +1,6 @@
 # Visitor
 
-The *Visitor* pattern is implemented using *Multiple Dispatching*.
+The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
 The assumption is that you have a primary class hierarchy that is unchangeable.
@@ -164,7 +164,7 @@ when you truly cannot define functions over the hierarchy,
 or you need the `accept()` hook for some other reason.
 But in Python that is rare.
 As with [the Pattern Refactoring chapter](30_Pattern_Refactoring.md)'s price-and-weight example,
-`singledispatch` is the open-method mechanism *Visitor* was invented to fake.
+`singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 ## Verifying the Operations
 
@@ -224,7 +224,7 @@ def test_operations_dispatch_independently() -> None:
     You must decide which weapons "win" and "lose" in each interaction (as in `paper_scissors_rock.py`).
     Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
-    `Elf` and `Troll` and battles the groups against each other until only members of one group are left standing.
+    `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
     These are the "winners."
 3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a table lookup.
     The simplest way is a `dict` keyed by a tuple of the two objects' types,
