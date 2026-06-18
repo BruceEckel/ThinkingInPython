@@ -163,12 +163,16 @@ substring (`Tour`). With no argument the whole book is processed.
 Two separate layers, both optional and not part of the default CI gate.
 
 **Spelling: codespell (`make spell`).** A uv-managed dev tool, so it runs through
-`uv run`. It matches a curated misspelling dictionary, so it stays low-noise even
-over code comments and examples. Configuration lives in `[tool.codespell]` in
-`pyproject.toml`; words it flags wrongly (design-pattern terms like `adaptee`,
-foreign-language quotes, deliberate code strings) are listed in
-`tools/codespell-ignore.txt`. Scope it with `DOCS=`, for example
-`make spell DOCS=Markdown/02_A_Python_Tour.md`.
+`uv run`. It prints one line per suspected misspelling and exits non-zero if it
+finds any, so **no output means clean** (a silent return to the prompt is a
+pass). It matches a curated misspelling dictionary rather than a full one, so it
+stays low-noise even over code comments and examples, but it will not catch an
+unusual typo that is not on its list or a real word used wrongly ("form" for
+"from"); that deeper checking is what the editor-side LanguageTool/LTeX layer is
+for. Configuration lives in `[tool.codespell]` in `pyproject.toml`; words it
+flags wrongly (design-pattern terms like `adaptee`, foreign-language quotes,
+deliberate code strings) are listed in `tools/codespell-ignore.txt`. Scope it
+with `DOCS=`, for example `make spell DOCS=Markdown/02_A_Python_Tour.md`.
 
 **House style: Vale (`make prose`).** Vale is a standalone binary, not a Python
 package, so install it once (`winget install errata-ai.Vale`,

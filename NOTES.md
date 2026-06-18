@@ -1,5 +1,3 @@
-- README: instructions for downloading the examples: "clone the directory"
-
 - "have to", "could" -> "can"
 - which was
 - which will be
