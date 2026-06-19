@@ -550,7 +550,7 @@ def test_oo_and_match_shapes_agree() -> None:
     assert so.Circle(1.0).area() == sm.area(sm.Circle(1.0))
 ```
 
-## What Objects Are Still Good For
+## OOP is Still Sometimes Useful
 
 None of this means objects are a mistake.
 They improved real things.

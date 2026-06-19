@@ -835,3 +835,25 @@ A discussion of algorithms to create mazes:
 A discussion of algorithms for collision detection and steering behavior for autonomous moving objects:
 
 <http://www.red3d.com/cwr/steer/>
+
+## Exercises
+
+1.  Test a `Rat` with a fake blackboard.
+    Because `Rat` depends only on the `Recorder` `Protocol`, you can drive it with a stand-in.
+    Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it is handed,
+    run one rat with `asyncio.run(rat.run())`,
+    and assert which cell the rat kept for itself and which cells it spawned.
+    No real `Blackboard`, `Maze`, or task scheduling is needed.
+2.  Report the cells the rats never reach.
+    After `explore()` finishes, compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that were never claimed.
+    Build a maze for which that set is not empty, and explain what makes a cell unreachable.
+3.  Break the atomicity of `claim()`.
+    Insert an `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`, then run `test_ratsandmazes.py` several times.
+    What goes wrong when two rats reach the same cell during that gap, and why does the original `claim()`, with no `await` inside it, need no lock?
+4.  Add a new kind of `Item` to the robot maze.
+    Define a `Coin` subclass with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+    Place a few `$` characters in the maze and report how many the robot collects.
+    You should not have to touch `item_factory()`, `Room`, or `GameBuilder`; explain why the factory finds your new item on its own.
+5.  Compute the solution instead of hard-coding it.
+    Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room, the way `flood()` searches maze cells in `test_ratsandmazes.py`.
+    Turn that path into a move string, feed it to `run()`, and assert that the robot finishes on the `!` square, as `test_robot.py` does.
