@@ -23,6 +23,7 @@ class Runuculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
+# The companion class accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
         return self.__class__.__name__
