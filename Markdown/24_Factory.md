@@ -13,7 +13,7 @@ and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects is distributed throughout your application,
 you have the same problem when adding new types.
 You must still chase down all the points of your code where type matters.
-It happens to be the *creation* of the type that matters in this case rather than the *use* of the type (which is taken care of by polymorphism),
+It happens to be the *creation* of the type that matters here rather than the *use* of the type (which is taken care of by polymorphism),
 but the effect is the same: adding a new type can cause problems.
 
 The solution is to force the creation of objects to occur through a common *factory* rather than to allow the creational code to be spread throughout your system.
@@ -21,8 +21,8 @@ If all the code in your program must go through this factory whenever it needs t
 then all you must do when you add a new object is to modify the factory.
 
 Since every object-oriented program creates objects,
-and since it's very likely you will extend your program by adding new types,
-I suspect that factories may be the most universally useful kinds of design patterns.
+and since it's likely you will extend your program by adding new types,
+factories might be the most useful design patterns.
 
 ## Simple Factory Method
 
@@ -72,7 +72,7 @@ for shape in shapes:
 ```
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create;
-it happens to be a string in this case but it could be any set of data.
+it happens to be a string here but it could be any set of data.
 The `factory()` is now the only other code in the system that needs to be changed when a new type of `Shape` is added (the initialization data for the objects will presumably come from somewhere outside the system, and not be a hard-coded array as in the above example).
 
 Note the `@staticmethod` decorator,
@@ -422,10 +422,10 @@ In this environment, `Character` objects interact with `Obstacle` objects,
 but there are different types of Characters and obstacles depending on what kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
-In this example, the setup and play is very simple,
+In this example, the setup and play is simple,
 but those activities (the *initial conditions* and the *state change*) can determine much of the game's outcome.
 Here, `GameEnvironment` is not designed to be inherited,
-although it could very possibly make sense to do that.
+although it might make sense to do that.
 
 This also contains examples of *Double Dispatching* and the *Factory Method*,
 both of which are explained later.

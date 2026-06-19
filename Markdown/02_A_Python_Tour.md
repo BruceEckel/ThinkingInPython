@@ -3,29 +3,26 @@
 This chapter and the several that follow give a programmer's tour of Python:
 syntax and the scalar types here, then containers, control flow, functions,
 modules, classes, and static typing in the chapters after it.
-It assumes you have programmed before and have worked through an introductory Python text such as *Learning Python* by Mark Lutz.
-For the full language reference, see
-<https://docs.python.org/3/>.
+It assumes you have programming experience.
+You can find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
 ## Scripting vs. Programming
+
+The goal of Python is improved productivity.
+The language is designed to aid you as much as possible,
+while hindering you as little as possible with arbitrary rules or requirements that you use a particular set of features.
 
 Python is often referred to as a scripting language,
 but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
-Python, on the other hand,
-is a programming language that also supports scripting.
+Python is a programming language that also supports scripting.
 It *is* marvelous for scripting,
 and you may find yourself replacing all your batch files, shell scripts,
 and simple programs with Python scripts.
 
-The goal of Python is improved productivity.
-This productivity comes in many ways,
-but the language is designed to aid you as much as possible,
-while hindering you as little as possible with arbitrary rules or any requirement that you use a particular set of features.
-
-Python is very clean to write and you will find that it's quite easy to read your own code long after you've written it.
+Python is clean to write; you will find that it's quite easy to read your own code long after you've written it.
 A major factor in code readability is that scoping in Python is determined by indentation.
-For example:
+Here is a script that runs with `python if.py`:
 
 ```python
 # if.py
@@ -40,13 +37,13 @@ print("continuing...")
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
 
-But in a C `if`, you would be required to use parentheses around the conditional,
-whereas they are not necessary in Python (it won't complain if you use them anyway).
+In a C/C++ `if`, you are required to use parentheses around the conditional.
+Parentheses are not necessary in Python, although it won't complain if you use them.
 
-The conditional clause ends with a colon,
-and this indicates that what follows will be a group of indented statements,
+The conditional clause ends with a colon.
+This indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-In this case, there is a `print` statement which sends the result to standard output,
+Here there is a `print` statement which sends the result to standard output,
 followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level, just like curly braces in C++ or Java,
@@ -62,7 +59,7 @@ thus no terminating semicolon is necessary.
 
 A variable in Python is a name bound to an object, not a box that holds a value.
 Assignment binds a name; it does not copy.
-You never declare a variable's type,
+You don't have to declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
 
@@ -186,8 +183,8 @@ not a coerced boolean.
 
 ## Strings
 
-You can use single or double quotes to represent strings,
-which is very nice because if you surround a string with double quotes,
+You can use single or double quotes to represent strings.
+If you surround a string with double quotes,
 you can embed single quotes and vice versa:
 
 ```python

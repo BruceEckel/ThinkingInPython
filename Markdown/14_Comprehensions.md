@@ -79,7 +79,7 @@ A 3 by 3 identity matrix is:
 
 In Python we can represent such a matrix by a list of lists,
 where each sub-list represents a row.
-A 3 by 3 matrix would be represented by the following list:
+A 3 by 3 matrix is represented by the following list:
 
     [ [ 1, 0, 0 ],
       [ 0, 1, 0 ],

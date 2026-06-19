@@ -25,7 +25,7 @@ With *Multiple Dispatching*,
 you must have a polymorphic method call to determine each of the types.
 The methods in the following example are called `compete()` and `eval()`,
 and are both members of the same type.
-(In this case there will be only two dispatches, which is referred to as *double dispatching*).
+(Here there will be only two dispatches, which is referred to as *double dispatching*).
 If you are working with two different type hierarchies that are interacting,
 then you'll have to have a polymorphic method call in each hierarchy.
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 One of the things you might notice is that the information about the various combinations is encoded into each type of `Item`.
 It actually ends up being a kind of table,
 except that it is spread out through all the classes.
-This is not very easy to maintain if you expect to modify the behavior or to add a new `Item` class.
+This is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
 Instead, it can be more sensible to make the table explicit, like this:
 
 ```python

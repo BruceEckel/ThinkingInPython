@@ -43,7 +43,7 @@ The output is:
     Lost everything: func_a(1)
 
 `func_a(0)` produced a value, but the exception threw away the whole list.
-The only way to keep the good results would be to wrap each call in its own `try`,
+The only way to keep the good results is to wrap each call in its own `try`,
 which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter warned against.
 
 ## Return the Error as a Value

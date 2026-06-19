@@ -56,7 +56,7 @@ MyApp()
 The base-class constructor starts the engine (`run()`),
 which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
-In a GUI program that engine would be the main event loop.
+In a GUI program that engine is the main event loop.
 
 ## Passing the Steps as Functions
 

@@ -124,7 +124,7 @@ they tend to be subtle and appear over time.
 
 One of the struggles that I've had with design patterns is their classification.
 I've often found the GoF approach to be too obscure,
-and not always very helpful.
+and not always helpful.
 Certainly, the *Creational* patterns are fairly straightforward:
 how are you going to create your objects?
 This is a question you normally need to ask,
@@ -168,7 +168,7 @@ to apply tests for quality.
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*
 -   *Consistency*.
-    One thing has become very clear to me, especially because of Python:
+    One thing has become clear to me, especially because of Python:
     the more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer can produce.
