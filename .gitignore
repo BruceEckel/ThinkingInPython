@@ -1,7 +1,4 @@
 .DS_Store
-tools/tmp.txt
-temp
-ebook_build
 ExtractedExamples
 build/
 .venv/

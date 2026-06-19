@@ -1,294 +1,68 @@
-# Publishing Plan: *Thinking in Python*
+# Publishing Plan: *Thinking in Python* (project history)
 
-Status document and work-order backlog for taking this book from its current
-partial state to publishable. Each task below is written to be **forked to an
-independent implementer** (including a cheaper LLM) with little or no extra
-context. Read "Shared context" once, then any task is self-contained.
+A historical record of the plan that took this book from a partial, part-Java
+state to its current form. It is no longer an active backlog. For the current
+state of the book and the open editorial questions, see `REVIEW.md`.
 
----
+## What the book is
 
-## Shared context (read once)
+*Thinking in Python: Insights, Idioms and Patterns* by Bruce Eckel. It began as
+a conversion of the abandoned *Python 3 Patterns & Idioms* project, itself
+extracted from the design-patterns material in *Thinking in Java*. Prose lives in
+`Markdown/`, code examples in `Examples/`, and build scripts in `tools/`.
 
-**What this book is.** *Thinking in Python: Insights, Idioms and Patterns* by
-Bruce Eckel. It began as a conversion of the abandoned *Python 3 Patterns &
-Idioms* project, itself extracted from the design-patterns material in *Thinking
-in Java*. Source lives in `Markdown/` (26 chapters, `NN_Name.md`). Code examples
-live in `Examples/`. `residual/` holds out-of-book material. `tools/` holds
-build scripts.
+## Locked decisions
 
-**Locked decisions** (do not relitigate; see `.claude/.../memory/book-publishing-decisions.md`):
-- **Patterns:** Keep the pattern chapters (12–26) but reframe each around the
-  Pythonic idiom that replaces or simplifies the GoF pattern. Be honest where a
+(See also the `book-publishing-decisions` memory.)
+
+- **Patterns:** keep the pattern chapters but reframe each around the Pythonic
+  idiom that replaces or simplifies the GoF pattern, and be honest where a
   pattern is a "language failure" in Python.
-- **Python target:** 3.14+ with type hints throughout. `ty`-clean (use
-  Astral's `ty` type checker, not mypy).
-- **Output:** Clean Markdown/web only for now. Do **not** build print/EPUB
-  tooling yet.
+- **Python target:** 3.14+ with type hints throughout, checked with Astral's
+  `ty` (not mypy).
+- **Output:** clean Markdown/web only for now; no print or EPUB tooling yet.
 
-**House writing style** (applies to all prose, enforced in every task):
-- No em-dashes (neither `--` nor `—`). Use a colon, comma, parentheses, or
-  semicolon, or split the sentence.
-- Short, single-clause sentences. Break up compound/comma-spliced sentences.
-- Italics only to introduce a new term/concept/language element the first time.
-  Never for plain emphasis.
+House style and the code-example conventions are recorded in `CLAUDE.md` and
+`tools/README.md`.
 
-**Code conventions for examples:**
-- Every fenced Python block that is a real file starts with a comment naming its
-  path, e.g. `# Decorator/nodecorators/CoffeeShop.py`. Preserve this convention.
-- Target Python 3.14+. No Python 2 idioms (`has_key`, `print` statement,
-  `xrange`, `iteritems`, `os.popen2`, `<>`, `raw_input`).
-- Add type hints. Code must run and must pass `ty` (Astral's type checker).
+## The phases (all complete)
 
-**How to pick up a task.** Each task has: Goal, Inputs, Steps, Acceptance
-criteria, Dependencies. Do only what the task says. If a task is prose editing,
-do not change code semantics. If a task is code, do not rewrite prose.
+1.  **Infrastructure.** Built the example extractor and runner
+    (`tools/extract_examples.py`, `run_examples.py`), the pandoc static-site
+    build (`build_site.py`), and GitHub Actions CI. The Markdown is the single
+    source of truth for prose and code; examples are extracted, run, and
+    type-checked.
+2.  **Code modernization.** Removed every Python 2 and Java leftover, added type
+    hints, and brought the failing-example count from 67 to 0. Every example now
+    runs and is `ty`-clean, with the book and `Examples/` in sync.
+3.  **Content triage and front matter.** Rewrote the Introduction as real front
+    matter (project and meta content moved to `CONTRIBUTING.md`); resolved the
+    stub chapters (cut Generators and Iterators, Machine Discovery, and
+    Table-Driven Code; reframed Messenger; finished Static Type Checking); and
+    removed the out-of-book material that used to live in `residual/` (since
+    deleted) from the build.
+4.  **Pattern reframe.** Gave each pattern chapter an explicit
+    Python-versus-pattern judgment: the idiom that replaces or shrinks the
+    pattern, or the reason it still earns its keep.
+5.  **Editorial pass.** The mechanical sweep is done (em-dashes removed, dates
+    updated, cross-references resolved). The remaining work is authorial, the
+    final one-voice pass, which `REVIEW.md` seeds.
 
-**Dependency graph (high level):**
-```
-P1 (infrastructure) ──► P2 (code modernization)
-                   └──► P4 (pattern reframe)
-P1 ──► P3 (triage + front matter)   [P3 prose tasks need no code harness]
-P2, P3, P4 ──► P5 (editorial pass, last)
-```
+## Structural evolution
 
----
+The chapter set grew and was renumbered several times as conference talks were
+adapted in:
 
-## Phase 1 — Infrastructure
+- Added *Data Classes as Types* (from PyCon 2022).
+- Added *Functional Error Handling* (from PyCon 2024).
+- Added *Rethinking Objects* (from PyCon 2023), a skeptical look at OOP placed
+  just before the patterns.
+- *Initialization and Cleanup* and *Static Type Checking* were briefly folded
+  into a single "Python for Programmers" chapter, then split back out as
+  standalone chapters.
 
-### TASK P1-1 — Markdown example extractor + runner
-- **Goal:** A tool that extracts every fenced `python` code block whose first
-  line is a `# path/file.py` comment from `Markdown/*.md`, writes each to
-  `Examples/<path>`, then executes each extracted file under Python 3.14 and
-  reports failures.
-- **Inputs:** `Markdown/*.md`; existing dead reference `Examples/CodeManager.py`
-  (RST-era, replace its role, do not reuse its RST regexes).
-- **Steps:**
-  1. Write `tools/extract_examples.py`. Parse fenced blocks ```` ```python ````
-     ... ```` ``` ````. A block is a "file" iff its first content line matches
-     `^#\s*(\S+\.py)\s*$`. Use that path (relative to `Examples/`).
-  2. Write each file, creating parent dirs. Warn on duplicate paths with
-     differing content.
-  3. Write `tools/run_examples.py` that runs every extracted `.py` and collects
-     non-zero exits / exceptions into a report. Some examples need stdin or are
-     demos: support an opt-out marker (a `# noqa: run` style comment) and
-     document it.
-  4. Add a `Makefile` (or `tasks.py`) target `examples` that runs both.
-- **Acceptance:** Running the target extracts all file-blocks and produces a
-  pass/fail list. No crash on the current Markdown. Document usage in
-  `tools/README.md`.
-- **Dependencies:** none. **Do first.**
-
-### TASK P1-2 — Static web build from Markdown
-- **Goal:** One command renders `Markdown/` into a clean, navigable HTML site
-  (ordered TOC, prev/next chapter nav, syntax highlighting).
-- **Inputs:** `Markdown/*.md` (note `00_Front.md` carries pandoc YAML metadata),
-  `resources/static`, `resources/images`.
-- **Steps:** Pick a low-friction static generator (pandoc-per-chapter + a TOC
-  page, or MkDocs). Wire images from `resources/images`. Add `Makefile` target
-  `site`. Output to `build/site/` (git-ignored).
-- **Acceptance:** `make site` produces a browsable site with all 26 chapters in
-  numeric order and working syntax highlighting. Do **not** add PDF/EPUB.
-- **Dependencies:** none (parallel with P1-1).
-
-### TASK P1-3 — CI pipeline
-- **Goal:** On every push, run `examples`, `ty`, and `site` build; fail on any
-  error.
-- **Steps:** Add a CI workflow (GitHub Actions) using Python 3.14. Cache deps.
-- **Acceptance:** Green on a clean checkout once P2 is underway; red when an
-  example breaks or the site fails to build.
-- **Dependencies:** P1-1, P1-2.
-
----
-
-## Phase 2 — Modernize code to typed Python 3.14+
-
-> Partition by directory so tasks fork cleanly. One task per `Examples/`
-> subtree. Each is independent. Template repeated below.
-
-**TASK TEMPLATE P2-*** (instantiate per subtree):
-- **Goal:** Modernize all `.py` under `Examples/<SUBTREE>` to typed 3.14+.
-- **Steps:** (1) Remove Py2 idioms. (2) Add type hints to all functions,
-  methods, and module-level names where non-obvious. (3) Ensure each file runs
-  and is `ty`-clean. (4) If the file's source is an inline block in a
-  `Markdown/*.md` chapter, update the chapter block to match exactly (the
-  extractor in P1-1 is the source of truth for which blocks map where).
-- **Acceptance:** `tools/run_examples.py` passes for the subtree; `ty` clean;
-  no Py2 idioms remain (grep clean); prose blocks and extracted files match.
-- **Dependencies:** P1-1 (harness) and P1-3 (`ty` in CI) preferred but a task
-  can run before CI exists.
-
-Known subtrees (one P2 task each): `AppFrameworks`, `ChangeInterface`,
-`Comprehensions`, `Decorator`, `Factory`, `Fronting`, `FunctionObjects`,
-`InitializationAndCleanup`, `MachineDiscovery`, `Messenger`, `Metaprogramming`,
-`MultipleDispatching`, `Observer`, `PatternRefactoring`, `Projects`, `Py4Prog`,
-`Singleton`, `StateMachine`, `UnitTesting`, `Util`, `Visitor`.
-
-Known offenders to prioritize (contain confirmed Py2 idioms):
-`Factory/shapefact2/ShapeFactory2.py`, `MachineDiscovery/detect_CPUs.py`,
-`PatternRefactoring/dynatrash/DynaTrash.py`, `Py4Prog/utility.py`,
-`StateMachine/mousetrap2/MouseTrap2Test.py`.
-
----
-
-## Phase 3 — Content triage and front matter
-
-### TASK P3-1 — Rewrite the Introduction as real front matter
-- **Goal:** Convert `Markdown/01_Introduction.md` into book front matter: the
-  vision, who the book is for, prerequisites, how to read it.
-- **Steps:** Keep the audience framing (intermediate, not introductory). **Move
-  out** of the book body: "My Motives," Translations, royalties, Launchpad,
-  Contributions/PR mechanics, "The Printed Book." Relocate those to a project
-  `CONTRIBUTING.md` / `docs/`. Apply house style.
-- **Acceptance:** Introduction reads as a finished book intro with zero
-  project-management/meta content. Relocated material preserved elsewhere.
-- **Dependencies:** none.
-
-### TASK P3-2 — Stub chapter decisions
-- **Goal:** Resolve the six stub chapters. **Finish** `04_Static_Type_Checking`
-  and `08_Generators_and_Iterators` (core language material). **Evaluate for cut
-  or merge** `10_Machine_Discovery`, `11_Messenger`, `14_Application_Frameworks`,
-  `21_Table_Driven_Code` unless strong material exists.
-- **Steps:** For finish-chapters, write full content with runnable typed
-  examples (coordinate filenames with P1-1 convention). For cut candidates,
-  propose a recommendation per chapter in this file, then act once confirmed by
-  the author.
-- **Acceptance:** No empty placeholder chapters remain in the build. Each
-  remaining chapter has real content.
-- **Dependencies:** P1-1 for any new examples. **Author sign-off required for
-  cuts.**
-
-#### P3-2 recommendations (awaiting author sign-off)
-
-| Chapter | State | Recommendation |
-|---------|-------|----------------|
-| `04_Static_Type_Checking` | empty stub (3 bullets) | **FINISH.** Core material. Write it around type hints + Astral's `ty` (per the locked decision, not mypy). New authorial content; can be drafted. |
-| `08_Generators_and_Iterators` | empty stub | **CUT (redundant).** The reframed `17_Iterators` now covers the protocol, generators, `__iter__`, laziness, and `itertools` in full. Fold the one unique note (infinite generators) into 17 and drop 08, or move 17's content here and leave 17 a short pattern note. Default: cut 08. |
-| `10_Machine_Discovery` | 1 utility, Py2 | **CUT.** Off-theme for "Insights, Idioms and Patterns," and its only example (`detect_CPUs`) is obsoleted by `os.cpu_count()` / `os.process_cpu_count()`. Move to `residual/` if kept at all. |
-| `11_Messenger` | one small idiom | **KEEP, short, reframed.** The `self.__dict__ = kwargs` idiom is `types.SimpleNamespace`; the modern DTO answers are `SimpleNamespace`, `@dataclass`, and `NamedTuple`. Reframe to say so. Borderline-merge if a "small idioms" chapter is ever created. |
-| `14_Application_Frameworks` | Template Method, working example | **KEEP + P4 reframe.** Real GoF content (Template Method) with a runnable example. Reframe: in Python the customization hooks can be plain functions passed in, not just overridden methods. Not a cut. |
-| `21_Table_Driven_Code` | empty stub | **CUT (redundant).** The table-driven idea is covered by `16_State_Machines` (table-driven machine), `23_Multiple_Dispatching` (dict-of-tuples), and `25_Pattern_Refactoring` (dict dispatch). |
-| `12_The_Pattern_Concept` | ~2300 words | **KEEP.** Substantial conceptual intro; editorial pass only. |
-| `26_Simulation` | ~900 words, 3 examples | **KEEP.** Real content; examples pass. Optional light reframe. |
-
-### TASK P3-3 — Remove non-book material from the build
-- **Goal:** Ensure `residual/` (including "Why This Project Failed") is excluded
-  from the site build and not referenced from book chapters.
-- **Acceptance:** Site contains only book chapters; residual content stays in
-  repo for archival but is not published.
-- **Dependencies:** P1-2.
-
----
-
-## Phase 4 — Pattern reframe (one task per pattern chapter)
-
-**TASK TEMPLATE P4-*** (instantiate per chapter 12–26):
-- **Goal:** Add a Pythonic-idiom reframing to `Markdown/<NN_Chapter>.md`.
-- **Steps:** (1) Open the chapter. (2) Add framing that asks whether Python's
-  language design already solves the problem the pattern addresses. (3) Where it
-  does, show the idiom and say so plainly. (4) Where the pattern still earns its
-  keep, keep it and explain why. (5) Supply or flag missing figures referenced
-  as `_images/...`. (6) Modernize inline code per Phase 2 conventions. (7) Apply
-  house style.
-- **Acceptance:** Chapter opens or closes with an explicit Python-vs-pattern
-  judgment; inline code is typed and runs; no missing-image links left silent
-  (either provided or listed as TODO with a tracking note).
-- **Dependencies:** P1-1 for example verification.
-
-Chapters: `12_The_Pattern_Concept`, `13_The_Singleton`,
-`14_Application_Frameworks`, `15_Fronting_for_an_Implementation`,
-`16_State_Machines`, `17_Iterators`, `18_Factory`, `19_Function_Objects`,
-`20_Changing_the_Interface`, `21_Table_Driven_Code`, `22_Observer`,
-`23_Multiple_Dispatching`, `24_Visitor`, `25_Pattern_Refactoring`,
-`26_Simulation`.
-
----
-
-## Phase 5 — Editorial pass (last)
-
-### TASK P5-1 — Whole-book consistency and style sweep
-- **Goal:** One consistent voice; house style enforced everywhere; ordering and
-  cross-references correct.
-- **Steps:** Enforce no-em-dash and short-sentence rules across all chapters.
-  Verify chapter order and inter-chapter references resolve. Update the
-  `00_Front.md` date (currently 2017). Final proofread.
-- **Acceptance:** Style-linter (or grep for `--`/`—`) clean; all cross-refs
-  resolve; date current.
-- **Dependencies:** P2, P3, P4 complete.
-
----
-
-## Progress tracker
-
-> Note: after the P3-2 cuts the chapters were renumbered contiguously to
-> `00`–`23`. Status entries below name chapters by title; any numbers refer to
-> the current (post-renumber) positions.
->
-> Update: a new chapter `05_Data_Classes_as_Types` was added after Static Type
-> Checking (adapted from the author's PyCon 2022 talk / the DataClassesAsTypes
-> repo: types as sets of values, frozen data classes that validate in
-> `__post_init__`, with rejection demonstrated in pytest). Chapters `05`–`23`
-> shifted to `06`–`24`; cross-reference links were updated.
->
-> Update: a further new chapter `06_Functional_Error_Handling` was added after
-> Data Classes as Types (adapted from the author's PyCon 2024 talk: exceptions
-> discard context, return errors as values, a self-contained generic `Result`
-> with `Success`/`Failure` and `bind`; the `returns` library is referenced, not
-> required). Chapters `06`–`24` shifted to `07`–`25`. The book is now `00`–`25`
-> (26 chapters).
->
-> Update: a new chapter `12_Rethinking_Objects` was added right before The
-> Pattern Concept (adapted from the author's PyCon 2023 talk: a skeptical look at
-> OOP before the patterns section, using immutable data classes, free functions,
-> protocols, composition, and pattern matching instead of encapsulation and
-> inheritance). Chapters `12`–`25` shifted to `13`–`26`. The book is now `00`–`26`
-> (27 chapters). Note: under the chapter-stem example-folder scheme, renumbering
-> now also renames the matching `Examples/NN_*` folders (regenerate the tree).
->
-> Update: `Initialization and Cleanup` and `Static Type Checking` were folded
-> into `02_Python_for_Programmers` (their polished material became sections;
-> the rougher author notes became a "Notes" section). The two standalone
-> chapters were removed and `05`–`26` shifted down to `03`–`24`; their
-> `Examples/NN_*` folders were renamed to match and all cross-references updated
-> (links to the old Static Type Checking chapter now target
-> `02_Python_for_Programmers.md#static-type-checking`). The book is now `00`–`24`
-> (25 chapters).
-
-| Task | Description | Status |
-|------|-------------|--------|
-| P1-1 | Example extractor + runner | DONE (baseline: 55 pass / 67 fail / 2 skip) |
-| P1-2 | Static web build | DONE (`tools/build_site.py`, `make site`) |
-| P1-3 | CI pipeline | DONE (`.github/workflows/ci.yml`; regression-baseline gate) |
-| P2-* | Code modernization (per subtree) | DONE (baseline 67 → 0; every example runs, CI gate is now strict) |
-| P3-1 | Rewrite Introduction | DONE (drafted): meta content relocated to `CONTRIBUTING.md` (revoiced); Introduction is now finished front matter (vision, who it is for, prerequisites, how to read) in the author's voice, with working cross-references. Author review welcome. |
-| P3-2 | Stub chapter decisions | DONE (cut Generators and Iterators, Machine Discovery, Table-Driven Code; Messenger reframed; Static Type Checking written and revoiced; Application Frameworks kept + reframed; Pattern Concept / Simulation kept). No empty stubs remain. |
-| P3-3 | Exclude residual from build | DONE (site builds only from `Markdown/`; no chapter references `residual/`) |
-| P4-* | Pattern reframe (per pattern chapter) | DONE (reframed: Singleton, Application Frameworks, Fronting, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Multiple Dispatching, Visitor, Pattern Refactoring. Table-Driven Code cut. The Pattern Concept is conceptual (editorial only); Simulation kept, not a GoF pattern.) |
-| P5-1 | Editorial sweep | DONE (mechanical): em-dashes removed (prose grep clean); date → 2026; cross-references resolve; deeper proofread done (hyphen-as-dash, typos, dated "Python 2.2" asides, `__future__` relics, dangling Virtual Environments sentence dropped). Remaining is authorial: the final one-voice / short-sentence pass. Note: whole-tree `ty` still reports ~184 diagnostics in older untyped examples, so the `ty` CI step stays advisory; a future typing pass over those examples could promote it to a hard gate. |
-
-### P2 detail: what is done and what remains
-
-The "easy" half of P2 was genuine Python 2 / Java-leftover syntax and is **done**.
-Every example in these subtrees now runs and is `ty`-clean, with the book and
-`Examples/` in sync:
-
-| Subtree | Status |
-|---------|--------|
-| Singleton | DONE |
-| Py4Prog | DONE (kept untyped on purpose: the chapter teaches that Python needs no type declarations) |
-| InitializationAndCleanup | DONE (`weakref.py` renamed `weak_value.py` to stop shadowing stdlib) |
-| Decorator | DONE |
-| Factory | DONE |
-| FunctionObjects | DONE |
-| Messenger | DONE |
-| Util | DONE (Synchronization/Observer cluster) |
-| Observer | DONE (`ObservedFlower.py` typed; `BoxObserver.py` reframed as a headless, self-verifying Observer demo on `Util/Observer`; dead PythonCard GUI version removed) |
-| StateMachine | DONE (mousetrap half typed; table-driven half reframed: a dict-based engine + a vending machine whose conditions/actions are plain first-class methods, replacing the Java Condition/Transition classes) |
-| UnitTesting | DONE (reframed around pytest; Java framework removed; pytest is now a CI hard gate) |
-| Metaprogramming | DONE (Pythonic reframe: leads with `__init_subclass__`, `__set_name__`, class decorators; metaclasses kept only where they earn it; Py2-only examples removed) |
-| PatternRefactoring | DONE (Pythonic reframe: `__init_subclass__` registry factory, `dict` keyed by `type` for sorting, `functools.singledispatch` replacing double-dispatch and Visitor; 23 Java files collapsed to 6. This also covers the chapter's P4 reframe.) |
-| Root scripts | `CodeManager.py` removed with its "A More Complex Example" section; `SanityCheck.py` removed (obsolete, replaced by pytest) |
-
-**Nothing remains in the baseline.** Every extracted example runs (89 pass, 6
-skipped build-tools/GUI), is `ty`-clean or reframed, and the book and `Examples/`
-are in sync. The CI example gate is now strict (`run_examples.py`, no baseline).
-P2 is complete.
+The book is now 31 chapters (`01`-`31`), beginning with the Introduction,
+grouped into three parts that `build_site.py` injects into the table of contents:
+Foundations, Techniques, and Patterns. Because example folders are named for
+their chapter stem, renumbering a chapter also renames its `Examples/NN_*`
+folder.
