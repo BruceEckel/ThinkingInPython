@@ -4,23 +4,22 @@ Every language has habits worth learning and habits worth dropping.
 Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages made necessary.
 Python needs far fewer of these.
-A class whose only job is to hold one method is a function.
+Instead of a class whose only job is to hold one method, Python has the function.
 A *Singleton* is a module.
 A *Visitor* is a function that dispatches on type.
-The recurring theme in this book is to ask, before reaching for structure,
+The recurring theme in this book is to ask, before reaching for idioms or patterns,
 whether the language already solves the problem,
 and to add the structure only when the answer is no.
 
-This is not a catalog of features but the judgment to choose the smallest thing that works.
-The book gathers the insights, idioms, and patterns that judgment rests on.
+This booke is not a catalog of features but the judgment to choose the smallest thing that works.
+That judgement is found through insights, idioms, and patterns.
 It is also honest about design patterns.
 Most were invented to work around the limits of static,
 inheritance-heavy languages,
-and in Python many of them dissolve or shrink to a few lines.
-Where a pattern still earns its keep, it stays.
+and in Python many of them dissolve or shrink.
+If a pattern still earns its keep, it stays.
 
-This is an intermediate book.
-Because it is not introductory, two constraints fall away:
+This is an intermediate book, which removes two constraints:
 
 1.  An introductory book must describe everything in lock step,
     never using an idea before it has been formally introduced.
@@ -38,12 +37,12 @@ idiomatic, and a pleasure to maintain.
 
 You should be comfortable with:
 
-- Functions, classes, and objects, including inheritance and polymorphism.
+- Functions, classes, objects, and inheritance.
 - Containers: lists, dictionaries, tuples, and sets.
 - Running a Python program and installing a package.
 
 You do not need to know design patterns, metaclasses,
-or type checking before you start; we cover that here.
+or type checking; we cover that here.
 The book is about the language, not the tooling around it,
 so it does not explain installing Python, setting up virtual environments,
 or managing packages.
