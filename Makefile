@@ -7,6 +7,9 @@ PY ?= uv run python
 TY ?= uv run ty
 PYTEST ?= uv run pytest
 RUFF ?= uv run ruff
+# Extra pytest args. The suite is tiny, so serial is fastest today; enable
+# xdist as it grows with `make test PYTEST_N="-n auto"`.
+PYTEST_N ?=
 SPELL ?= uv run codespell
 VALE ?= vale
 DOCS ?= Markdown
@@ -65,7 +68,7 @@ run:
 	$(PY) tools/run_examples.py
 
 test:
-	$(PYTEST) ExtractedExamples
+	$(PYTEST) $(PYTEST_N) ExtractedExamples
 
 ty:
 	$(TY) check ExtractedExamples
@@ -106,7 +109,7 @@ ci:
 	$(TY) check ExtractedExamples
 	$(RUFF) check ExtractedExamples
 	$(PY) tools/run_examples.py
-	$(PYTEST) ExtractedExamples
+	$(PYTEST) $(PYTEST_N) ExtractedExamples
 	$(PY) tools/build_site.py
 
 clean-examples:

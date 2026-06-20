@@ -30,9 +30,11 @@ That makes CI green today and red the moment a change breaks something that
 currently works.
 
 Usage:
-    python tools/run_examples.py                 # run everything
+    python tools/run_examples.py                 # run everything (all cores)
     python tools/run_examples.py StateMachine    # only that subtree
     python tools/run_examples.py --timeout 20
+    python tools/run_examples.py -j 1            # run serially
+    python tools/run_examples.py -j 8            # run 8 examples at once
     python tools/run_examples.py --baseline      # fail only on regressions
     python tools/run_examples.py --write-baseline
 """
@@ -40,8 +42,10 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import os
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -96,6 +100,42 @@ def write_baseline(failing: list[str]) -> None:
     BASELINE_FILE.write_text(header + body, encoding="utf-8")
 
 
+def jobs_arg(value: str) -> int:
+    """Parse --jobs: a positive int, or "auto" for all available cores."""
+    if value == "auto":
+        return os.process_cpu_count() or 1
+    try:
+        n = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("jobs must be a positive int or 'auto'")
+    if n < 1:
+        raise argparse.ArgumentTypeError("jobs must be at least 1")
+    return n
+
+
+def run_one(path: Path, rel: str, timeout: float) -> tuple[str, str, str]:
+    """Execute one example as a subprocess. Returns (status, rel, last_stderr).
+
+    status is "passed", "failed", or "timeout". Examples are independent
+    subprocesses with their own cwd, so this is safe to call concurrently.
+    """
+    try:
+        proc = subprocess.run(
+            [sys.executable, path.name],
+            cwd=path.parent,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        return ("timeout", rel, "")
+    if proc.returncode == 0:
+        return ("passed", rel, "")
+    tail = (proc.stderr.strip().splitlines() or ["(no stderr)"])[-1]
+    return ("failed", rel, tail)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -105,6 +145,9 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"root of extracted examples (default: {DEFAULT_TREE.name})")
     ap.add_argument("--timeout", type=float, default=15.0,
                     help="seconds before an example is killed (default: 15)")
+    ap.add_argument("-j", "--jobs", type=jobs_arg, default="auto", metavar="N",
+                    help="examples to run concurrently: an int or 'auto' "
+                         "for all cores (default: auto). Use -j 1 for serial.")
     ap.add_argument("--baseline", action="store_true",
                     help="fail only on examples not already in the baseline")
     ap.add_argument("--write-baseline", action="store_true",
@@ -124,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     unattended: list[str] = []
     timed_out: list[str] = []
 
+    to_run: list[tuple[Path, str]] = []
     for f in py_files:
         rel = f.relative_to(args.tree).as_posix()
         if args.subtree and args.subtree not in rel:
@@ -135,23 +179,28 @@ def main(argv: list[str] | None = None) -> int:
         if is_skipped(rel, text, skips):
             unattended.append(rel)  # GUI/interactive/infinite-loop: norun.txt
             continue
-        try:
-            proc = subprocess.run(
-                [sys.executable, f.name],
-                cwd=f.parent,
-                stdin=subprocess.DEVNULL,
-                capture_output=True,
-                text=True,
-                timeout=args.timeout,
-            )
-        except subprocess.TimeoutExpired:
-            timed_out.append(rel)
-            continue
-        if proc.returncode == 0:
+        to_run.append((f, rel))
+
+    # Each example is its own subprocess, so threads parallelize cleanly: the
+    # work happens in child processes, not under the GIL.
+    jobs = max(1, args.jobs)
+    if jobs == 1:
+        results = [run_one(f, rel, args.timeout) for f, rel in to_run]
+    else:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            results = list(pool.map(
+                lambda fr: run_one(fr[0], fr[1], args.timeout), to_run))
+
+    for status, rel, tail in results:
+        if status == "passed":
             passed.append(rel)
+        elif status == "timeout":
+            timed_out.append(rel)
         else:
-            tail = (proc.stderr.strip().splitlines() or ["(no stderr)"])[-1]
             failed.append((rel, tail))
+    passed.sort()
+    timed_out.sort()
+    failed.sort()
 
     print()
     for label, count in (

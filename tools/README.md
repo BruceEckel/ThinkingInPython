@@ -94,6 +94,10 @@ the Testing chapter.
 
 * Narrow the run: `python tools/run_examples.py 16_State_Machines`
 * Adjust the kill timeout: `--timeout 20` (default 15s)
+* Parallelism: runs on all cores by default (`-j auto`); each example is its
+  own subprocess, so this is safe. Use `-j 1` for serial, or `-j N` for a fixed
+  count. (pytest runs serially by default; enable xdist with
+  `make test PYTEST_N="-n auto"`.)
 
 ### Skipping examples that can't run unattended
 
