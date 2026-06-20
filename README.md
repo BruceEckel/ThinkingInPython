@@ -33,7 +33,7 @@ In the meantime I hope it's useful.
 - [x] 04_Functions.md
 - [x] 05_Modules_and_Packages.md
 - [x] 06_Classes.md
-- [ ] 07_Initialization_and_Cleanup.md
+- [ ] 07_Class_Attributes_and_Cleanup.md
 - [ ] 08_Static_Typing.md
 - [ ] 09_Testing.md
 - [ ] 10_Data_Classes_as_Types.md
