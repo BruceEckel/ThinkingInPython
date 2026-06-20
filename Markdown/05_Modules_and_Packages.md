@@ -1,6 +1,6 @@
 # Modules and Packages
 
-Each Python file is a *module* that you can use inside another Python file by *importing* it.
+Each Python file is a namespaced *module* that you can use inside another Python file by *importing* it.
 If the file is in the same directory, you can use an unqualified `import` statement:
 
 ```python
@@ -25,7 +25,7 @@ This automatically prevents name clashes between the names in the imported modul
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
-The code at the end of the file starts with an `if` clause which checks to see if something called `__name__` is equivalent to `__main__`.
+The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equivalent to `__main__`.
 In Python, any identifier that begins and ends with double underscores is special in some way.
 The reason for the `if` is that any file can also be used as a library module within another program.
 In that case, you just want the classes defined,
@@ -46,9 +46,8 @@ Here is such a program, which does nothing but import it:
 import use_module
 ```
 
-If you run `python import_module.py`,
-you should only see `'module' imported` as the result.
-Importing `use_module` runs its top-level code, including that `print()`,
+If you run `python import_module.py`, you should only see `'module' imported` displayed.
+Importing `use_module` runs its top-level code, including the `print()`,
 but not its `__main__` block.
 
 If you want to bring a name into the current namespace,
@@ -93,12 +92,16 @@ Now we'll add two modules to the package:
 ```python
 # a_package/module1.py
 
+print("importing module1 in a_package")
+
 def function1():
     return "function1 in module1 in a_package"
 ```
 
 ```python
 # a_package/module2.py
+
+print("importing module2 in a_package")
 
 def function2():
     return "function2 in module2 in a_package"
@@ -127,7 +130,7 @@ print(module2.function2())
 
 Here you no longer need to qualify the module with the package name.
 
-Finally, you can bring specific functions into the namespace by naming both the package and the module:
+You can bring specific functions into the namespace by naming both the package and the module:
 
 ```python
 # no_qualification.py
@@ -147,6 +150,8 @@ We can even put a second package underneath the first one:
 ```python
 # a_package/b_package/module3.py
 
+print("importing module3 in b_package")
+
 def function3():
     return "function3 in module3 in b_package"
 ```
@@ -160,8 +165,6 @@ from a_package.b_package import module3
 print(module3.function3())
 ```
 
-
-
 ## `PYTHONPATH`
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
@@ -169,6 +172,5 @@ The original (and now semi-deprecated) solution to this was to set an environmen
 `PYTHONPATH` can take multiple paths,
 and Python will keep searching through those paths until it finds your module or package (or doesn't, and reports an error).
 
-`PYTHONPATH` still works,
-but has been effectively superseded by the *virtual environment*,
+`PYTHONPATH` still works but has been effectively superseded by the *virtual environment*,
 which solves much more than just "where are the modules and packages."

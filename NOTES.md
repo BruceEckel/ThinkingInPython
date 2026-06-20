@@ -6,6 +6,8 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
   the mirror image of collecting them.
   Can you demo this either in the previous example or a new one
 
+- Consistency around function names in prose. `print` vs `prin()`
+
 
 - Is full polymorphism covered? (Not just inheritance-based)
 - Check order of examples in 30_Pattern_Refactoring.md

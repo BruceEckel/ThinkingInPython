@@ -31,7 +31,7 @@ In the meantime I hope it's useful.
 - [x] 02_Tour.md
 - [x] 03_Containers_and_Control_Flow.md
 - [x] 04_Functions.md
-- [ ] 05_Modules_and_Packages.md
+- [x] 05_Modules_and_Packages.md
 - [ ] 06_Classes.md
 - [ ] 07_Initialization_and_Cleanup.md
 - [ ] 08_Static_Typing.md
