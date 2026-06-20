@@ -10,13 +10,13 @@ class Simple2(Simple):  # Simple2 inherits Simple
         # Call the base-class constructor with super():
         super().__init__(str)
     def display(self):
-        self.show_msg("Called from display()")
+        self.show("Called from display()")
     @override
-    def show(self):
+    def show(self, msg=""):
         print("Overridden show() method")
         # Calling the base-class method from inside
         # the overridden method:
-        super().show()
+        super().show(msg)
 
 class Different:
     def show(self):
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     x = Simple2("Simple2 constructor argument")
     x.display()
     x.show()
-    x.show_msg("Inside main")
+    x.show_twice()  # Inherited from Simple
     def f(obj): obj.show() # One-line definition
     f(x)
     f(Different())

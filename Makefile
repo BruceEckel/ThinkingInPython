@@ -17,12 +17,14 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol clean-examples clean-site
+.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol clean-examples clean-site
 
 help:
 	@echo "Targets:"
-	@echo "  sync-ci   - update Examples/ from the Markdown, then run the full CI gate"
+	@echo "  verify    - sync Examples/, then run every gate except the site build"
+	@echo "  sync-ci   - like verify, plus the site build (the full CI gate)"
 	@echo "  ci        - run the full local gate: check, ty, ruff, run, pytest, site"
+	@echo "  gate      - the gate without sync or site (check, ty, ruff, run, pytest)"
 	@echo "  sync      - update the committed Examples/ tree from the Markdown"
 	@echo "  check     - verify book examples match the committed Examples/ tree"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
@@ -43,8 +45,11 @@ help:
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
-# Update the committed Examples/ tree from the Markdown (the source of truth),
-# then run the full local gate. Use this after editing code blocks in Markdown/.
+# Sync Examples/ from the Markdown, then run every gate except the site build.
+# The everyday "is everything still good?" command after editing Markdown/.
+verify: sync gate
+
+# Same as verify, plus the site build at the end.
 sync-ci: sync ci
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
@@ -111,10 +116,9 @@ eol:
 fix-eol:
 	$(PY) tools/check_line_endings.py --fix
 
-# Mirrors the GitHub Actions gates plus a site build, all run locally. The
-# default GitHub Actions path only builds and publishes the site; these gates
-# run in CI only on request (see tools/README.md).
-ci:
+# The local gate without the site build: line endings, drift check, ty, ruff,
+# run, pytest. `verify` runs `sync` before this; `ci` adds the site build after.
+gate:
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
@@ -122,7 +126,11 @@ ci:
 	$(RUFF) check ExtractedExamples
 	$(PY) tools/run_examples.py
 	$(PYTEST) $(PYTEST_N) ExtractedExamples
-	$(PY) tools/build_site.py
+
+# Mirrors the GitHub Actions gates plus a site build, all run locally. The
+# default GitHub Actions path only builds and publishes the site; these gates
+# run in CI only on request (see tools/README.md).
+ci: gate site
 
 clean-examples:
 	$(PY) -c "import shutil; shutil.rmtree('ExtractedExamples', ignore_errors=True)"

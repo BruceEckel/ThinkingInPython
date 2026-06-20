@@ -5,14 +5,18 @@ class Simple:
         print("Inside the Simple constructor")
         self.s = str
     # Two methods:
-    def show(self):
-        print(self.s)
-    def show_msg(self, msg):
-        print(msg + ':',
-        self.show()) # Calling another method
+    def show(self, msg=""):
+        if msg:
+            print(msg + ':', self.s)
+        else:
+            print(self.s)
+    def show_twice(self):
+        self.show()  # Calling another method
+        self.show()
 
 if __name__ == "__main__":
     # Create an object:
-    x = Simple("constructor argument")
+    x = Simple("Constructor argument")
     x.show()
-    x.show_msg("A message")
+    x.show("A message")
+    x.show_twice()

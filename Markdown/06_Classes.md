@@ -2,8 +2,7 @@
 
 Like most things in Python, class definitions use minimal syntax.
 You start with the `class` keyword followed by the class name and a colon.
-Inside the indented class body you use `def` to create methods.
-Here's a simple class:
+Use `def` to create methods inside the indented class body:
 
 ```python
 # simple_class.py
@@ -13,22 +12,26 @@ class Simple:
         print("Inside the Simple constructor")
         self.s = str
     # Two methods:
-    def show(self):
-        print(self.s)
-    def show_msg(self, msg):
-        print(msg + ':',
-        self.show()) # Calling another method
+    def show(self, msg=""):
+        if msg:
+            print(msg + ':', self.s)
+        else:
+            print(self.s)
+    def show_twice(self):
+        self.show()  # Calling another method
+        self.show()
 
 if __name__ == "__main__":
     # Create an object:
-    x = Simple("constructor argument")
+    x = Simple("Constructor argument")
     x.show()
-    x.show_msg("A message")
+    x.show("A message")
+    x.show_twice()
 ```
 
 Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first argument.
-Traditionally, the reference is called `self` but you could use any identifier you want (if you do not use `self` you will probably confuse a lot of people, however).
+Traditionally, the reference is called `self` but you could use any identifier you want (if you do not use `self` you will probably confuse people).
 To refer to fields in the object or other methods in the object,
 you must use `self` in the expression.
 
@@ -36,28 +39,27 @@ When you call a method for an object, as in `x.show()`,
 you do not hand it the reference to the object; that is done for you.
 
 The first method, `__init__()`,
-defines the constructor; the double underscores a.k.a. "dunder" indicate a special name.
+defines the constructor; the double underscores (a.k.a. "dunder") indicate a special name.
 The constructor is automatically called when the object is created.
 At the bottom of the example you can see that the creation of an object looks just like a function call using the class name.
 
 In C++ or Java you declare object level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
 To create an object field, you just name it, using `self`,
-inside one of the methods (usually in the constructor, but not always),
-and space is created when that method is run.
+inside a method (usually in the constructor, but not always).
+This creates space for that field when the method is run.
 If you declare fields using the C++/Java style,
 they implicitly become class level fields (similar to static fields in C++/Java).
 
 ## Inheritance
 
-Because Python is dynamically typed, it doesn't really care about interfaces:
-all it cares about is applying operations to objects.
+Because Python is dynamically typed, it doesn't really care about interfaces.
+All it cares about is applying operations to objects.
 With inheritance in C++ or Java, you often inherit only to establish a common interface.
-Python is different: you only inherit an implementation, to re-use the code in the base class.
+Python is different: you inherit an implementation, to re-use the code from the base class.
 
-To inherit, you first import the base class,
-the same way you import any name from another module (see [Modules and Packages](05_Modules_and_Packages.md)).
-You then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
+First import the base class the same way you import any name from a module (see [Modules and Packages](05_Modules_and_Packages.md)).
+Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
 Here `Simple`, from the `simple_class` module, is imported and then subclassed:
 
 ```python
@@ -73,13 +75,13 @@ class Simple2(Simple):  # Simple2 inherits Simple
         # Call the base-class constructor with super():
         super().__init__(str)
     def display(self):
-        self.show_msg("Called from display()")
+        self.show("Called from display()")
     @override
-    def show(self):
+    def show(self, msg=""):
         print("Overridden show() method")
         # Calling the base-class method from inside
         # the overridden method:
-        super().show()
+        super().show(msg)
 
 class Different:
     def show(self):
@@ -89,7 +91,7 @@ if __name__ == "__main__":
     x = Simple2("Simple2 constructor argument")
     x.display()
     x.show()
-    x.show_msg("Inside main")
+    x.show_twice()  # Inherited from Simple
     def f(obj): obj.show() # One-line definition
     f(x)
     f(Different())
@@ -97,13 +99,13 @@ if __name__ == "__main__":
 
 `Simple2` is inherited from `Simple`, and in the constructor,
 the base-class constructor is called with `super().__init__()`.
-In `display()`, `show_msg()` can be called as a method of `self`.
+In `display()`, `show()` can be called as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 The `@override` decorator on `show()` is explained in the next section.
 
 In `__main__`, you will see (when you run the program) that the base-class constructor is called.
-You can also see that the `show_msg()` method is available in the derived class,
+You can also see that the inherited `show_twice()` method is available in the derived class,
 just as you would expect with inheritance.
 
 The class `Different` also has a method named `show()`,

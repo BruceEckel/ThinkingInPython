@@ -42,8 +42,10 @@ With `make` (targets run through `uv run`); `make help` lists them all, most-use
 first:
 
 ```
-make sync-ci    # update Examples/ from the Markdown, then run the full gate
+make verify     # sync Examples/, then every gate except the site build
+make sync-ci    # like verify, plus the site build (the full gate)
 make ci         # the full local gate: check, run, pytest, ty, ruff, site
+make gate       # the gate without sync or site (check, run, pytest, ty, ruff)
 make sync       # update the committed Examples/ tree from the Markdown
 make check      # do the book's examples match the committed Examples/ tree?
 make site       # render Markdown/ into build/site/
@@ -55,10 +57,11 @@ make spell      # spell-check the prose and comments with codespell
 make prose      # house-style lint the prose with Vale (needs the vale binary)
 ```
 
-`make sync-ci` is the everyday command after editing the book: it pushes your
-Markdown changes out to `Examples/` (so the drift check passes), then runs the
-full gate. `make ci` runs the gate without syncing first, so it still fails on
-drift, the way GitHub Actions does.
+`make verify` is the everyday command after editing the book: it pushes your
+Markdown changes out to `Examples/` (so the drift check passes), then runs every
+gate except the site build. `make sync-ci` does the same and also builds the
+site. `make ci` runs the gate (with site) without syncing first, so it still
+fails on drift, the way GitHub Actions does.
 
 Without `make` (e.g. Windows PowerShell), call the scripts through `uv run`:
 
