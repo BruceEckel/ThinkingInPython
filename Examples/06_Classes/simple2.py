@@ -14,7 +14,7 @@ class Simple2(Simple):  # Simple2 inherits Simple
     @override
     def show(self, msg=""):
         print("Overridden show() method")
-        # Calling the base-class method from inside
+        # Call the base-class method from inside
         # the overridden method:
         super().show(msg)
 
@@ -27,6 +27,6 @@ if __name__ == "__main__":
     x.display()
     x.show()
     x.show_twice()  # Inherited from Simple
-    def f(obj): obj.show() # One-line definition
+    def f(obj): obj.show() # Local/nested function
     f(x)
     f(Different())

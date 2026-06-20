@@ -3,5 +3,11 @@
 class Compose:
     from utility import f
 
+    def __init__(self, name):
+        self.name = name
 
-Compose().f()
+    def __repr__(self):
+        return f"Compose({self.name!r})"
+
+
+Compose("example").f()

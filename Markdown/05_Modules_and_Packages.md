@@ -26,7 +26,10 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equivalent to `__main__`.
-In Python, any identifier that begins and ends with double underscores is special in some way.
+In Python, any identifier that begins and ends with double underscores (commonly called "dunder") is special in some way.
+Methods named with double underscores are *special methods*,
+and they hook your class into the language's operators and built-in functions.
+
 The reason for the `if` is that any file can also be used as a library module within another program.
 In that case, you just want the classes defined,
 but you don't want the code at the bottom of the file to be executed.

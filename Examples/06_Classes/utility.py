@@ -2,4 +2,4 @@
 
 
 def f(self):
-    print("utility.f()!!!")
+    print(f"utility.f() called on {self}")

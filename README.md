@@ -7,7 +7,7 @@ Thinking in Python
 
 I started this book in 2008 and after a few years it kind of drifted to a stop. I think part of the
 problem was that I wanted to move the design patterns work I had done in Java into Python and
-even then I was beginning to become uncertain about OOP (The material is still there, translated, 
+even then I was beginning to become uncertain about OOP (The material is still there, translated,
 but it is preceded by a chapter explaining my OOP misgivings).
 
 I had forgotten about this book but (especially at Pycons) people would occasionally come up to me
@@ -32,7 +32,7 @@ In the meantime I hope it's useful.
 - [x] 03_Containers_and_Control_Flow.md
 - [x] 04_Functions.md
 - [x] 05_Modules_and_Packages.md
-- [ ] 06_Classes.md
+- [x] 06_Classes.md
 - [ ] 07_Initialization_and_Cleanup.md
 - [ ] 08_Static_Typing.md
 - [ ] 09_Testing.md

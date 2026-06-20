@@ -10,4 +10,4 @@ class Circle:
 
 c = Circle(10)
 print(c.radius)  # 10
-print(c.area)    # 314.159: no parentheses, it is a property
+print(c.area)    # 314.159: Properties don't use parentheses
