@@ -17,7 +17,7 @@ taught, not just mentioned.
 ## Clear gaps (used, with no introduction anywhere)
 
 - **`async` / `await` / asyncio** (`asyncio.run`, `create_task`, `gather`, `sleep`). First and only use is Simulation (`31`, the rats). There is no concurrency or async chapter, so the example assumes the reader knows cooperative async tasks.
-- **PEP 695 type parameters** (generic functions and classes: `class Success[A]`, `def bind[B, E]`, and the `[**P, R]` ParamSpec form). First in Functional Error Handling (`12`); also Decorators (`13`, the `[**P, R]` form) and Function Objects (`25`). Static Type Checking (`08`) covers hints and Protocols but never how to declare a type parameter.
+- **PEP 695 type parameters** (generic functions and classes: `class Success[A]`, `def bind[B, E]`, and the `[**P, R]` ParamSpec form). First in Functional Error Handling (`12`); also Decorators (`13`, the `[**P, R]` form) and Function Objects (`25`). Static Typing (`08`) covers hints and Protocols but never how to declare a type parameter.
 - **`type X = ...` alias statement** (PEP 695). First in Pattern Matching (`11`, `type Shape = Circle | Square`); recurs in several chapters (`type Line`, `type Grid`, `type Result`). The `type` statement itself is never explained.
 - **Walrus operator `:=`**. Simulation (`31`, `while pending := [...]`). Not introduced.
 - **`typing.TYPE_CHECKING`** (the import-guard pattern for forward references). Simulation (`31`, `items.py`). Not introduced.
@@ -35,8 +35,8 @@ taught, not just mentioned.
 
 Probably fine for an intermediate reader, listed for completeness.
 
-- **`collections.abc` annotations: `Callable`, `Iterator`, `Iterable`, `Sequence`, `Mapping`**. Used as type hints from Pattern Matching (`11`) onward. Static Type Checking (`08`) covers typing in general but not these names.
-- **`typing.Any`**. Used in roughly 15 chapters. Gradual typing in Static Type Checking (`08`) touches the idea, so `Any` is arguably introduced there.
+- **`collections.abc` annotations: `Callable`, `Iterator`, `Iterable`, `Sequence`, `Mapping`**. Used as type hints from Pattern Matching (`11`) onward. Static Typing (`08`) covers typing in general but not these names.
+- **`typing.Any`**. Used in roughly 15 chapters. Gradual typing in Static Typing (`08`) touches the idea, so `Any` is arguably introduced there.
 - **`pathlib.Path` for reading files** (`Path(...).read_text()`). From Containers (`03`) onward. Never introduced; the book deliberately skips tooling, but reading a file shows up in examples.
 
 ## Checked and confirmed already introduced (not action items)

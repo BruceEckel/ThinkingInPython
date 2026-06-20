@@ -1,4 +1,4 @@
-# Static Type Checking
+# Static Typing
 
 The functions in the earlier chapters declare no types.
 C++ and Java make you declare the type of everything,

@@ -34,7 +34,7 @@ In the meantime I hope it's useful.
 - [ ] 05_Modules_and_Packages.md
 - [ ] 06_Classes.md
 - [ ] 07_Initialization_and_Cleanup.md
-- [ ] 08_Static_Type_Checking.md
+- [ ] 08_Static_Typing.md
 - [ ] 09_Testing.md
 - [ ] 10_Data_Classes_as_Types.md
 - [ ] 11_Pattern_Matching.md

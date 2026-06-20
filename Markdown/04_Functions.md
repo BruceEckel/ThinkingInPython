@@ -1,6 +1,6 @@
 # Functions
 
-To create a function in Python, you use the `def` keyword,
+Functions are defined with the `def` keyword,
 followed by the function name and argument list,
 and a colon to begin the function body:
 
@@ -19,28 +19,24 @@ print(a_function("no"))
 print(a_function("yes"))
 ```
 
-Notice there is no type information in the function signature:
-all it specifies is the name of the function and the argument identifiers,
-but no argument types or return types.
-Python is dynamically typed,
-which means it enforces type constraints at runtime.
-For example, different types can be both passed to and returned from the same function:
+Here the function signature only specifies the name of the function and the argument identifiers,
+but no argument types or return types (these are covered in [Static Typing](08_Static_Typing.md)).
+Python is dynamically typed, so it enforces type constraints at runtime rather than compile time.
+This means that different types can be both passed to and returned from the same function:
 
 ```python
-# different_returns.py
+# flexible_args_and_returns.py
 
-def different_returns(arg):
+def flexible_args_and_returns(arg):
     if arg == 1:
         return "one"
     if arg == "one":
         return True
 
-print(different_returns(1))
-print(different_returns("one"))
+print(flexible_args_and_returns(1))
+print(flexible_args_and_returns("one"))
 ```
 
-The only constraints on an object that is passed into the function are that the function can apply its operations to that object,
-but other than that, it doesn't care.
 Here, the same function applies the '`+`' operator to integers and strings:
 
 ```python
@@ -53,7 +49,7 @@ print(sum(42, 47))
 print(sum('spam ', "eggs"))
 ```
 
-
+The only constraints on an object that is passed into a function are that the function can apply its operations to that object.
 
 ## Default and Keyword Arguments
 

@@ -373,7 +373,7 @@ Each extra wraps the drink inside it and forwards through the same two-property 
 The `Drink` `Protocol` describes that interface.
 Both the plain drinks and the extras satisfy it structurally,
 with no shared base class required.
-This is the structural typing from the [Static Type Checking](08_Static_Type_Checking.md) chapter.
+This is the structural typing from the [Static Typing](08_Static_Typing.md) chapter.
 
 Adding a new extra means adding one class.
 Changing the price of an extra means changing one number, in one place.
