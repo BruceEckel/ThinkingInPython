@@ -26,22 +26,22 @@ if __name__ == "__main__":
     x.show_msg("A message")
 ```
 
-Both methods have `self` as their first argument.
-Python methods also use a reference to the current object,
-but when you are *defining* a method you must explicitly specify the reference as the first argument.
+Python methods require a reference to the current object.
+When you *define* a method you must explicitly specify the reference as the first argument.
 Traditionally, the reference is called `self` but you could use any identifier you want (if you do not use `self` you will probably confuse a lot of people, however).
 To refer to fields in the object or other methods in the object,
 you must use `self` in the expression.
-However, when you call a method for an object as in `x.show()`,
-you do not hand it the reference to the object; *that* is done for you.
+
+When you call a method for an object, as in `x.show()`,
+you do not hand it the reference to the object; that is done for you.
 
 The first method, `__init__()`,
-defines the constructor (again, the double underscores indicate a special name),
-which is automatically called when the object is created.
-However, at the bottom of the example you can see that the creation of an object looks just like a function call using the class name.
+defines the constructor; the double underscores a.k.a. "dunder" indicate a special name.
+The constructor is automatically called when the object is created.
+At the bottom of the example you can see that the creation of an object looks just like a function call using the class name.
 
 In C++ or Java you declare object level fields inside the class body but outside of the methods.
-Something that's a little surprising at first is that you do not declare them this way in Python.
+You do not declare them this way in Python.
 To create an object field, you just name it, using `self`,
 inside one of the methods (usually in the constructor, but not always),
 and space is created when that method is run.
@@ -51,14 +51,12 @@ they implicitly become class level fields (similar to static fields in C++/Java)
 ## Inheritance
 
 Because Python is dynamically typed, it doesn't really care about interfaces:
-all it cares about is applying operations to object.
-This means that inheritance in Python is different from inheritance in C++ or Java,
-where you often inherit only to establish a common interface.
-In Python, the only reason you inherit is to inherit an implementation,
-to re-use the code in the base class.
+all it cares about is applying operations to objects.
+With inheritance in C++ or Java, you often inherit only to establish a common interface.
+Python is different: you only inherit an implementation, to re-use the code in the base class.
 
 To inherit, you first import the base class,
-the same way you import any name from another module (see the [Modules and Packages](05_Modules_and_Packages.md) chapter).
+the same way you import any name from another module (see [Modules and Packages](05_Modules_and_Packages.md)).
 You then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
 Here `Simple`, from the `simple_class` module, is imported and then subclassed:
 
@@ -67,7 +65,7 @@ Here `Simple`, from the `simple_class` module, is imported and then subclassed:
 from simple_class import Simple
 
 
-class Simple2(Simple):
+class Simple2(Simple):  # Simple2 inherits Simple
     def __init__(self, str):
         print("Inside Simple2 constructor")
         # Call the base-class constructor with super():
