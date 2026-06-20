@@ -1,7 +1,7 @@
 # Modules and Packages
 
 Each Python file is a *module* that you can use inside another Python file by *importing* it.
-If the file is in the same directory, you can simply use an `import` statement:
+If the file is in the same directory, you can use an unqualified `import` statement:
 
 ```python
 # module.py
@@ -172,4 +172,3 @@ and Python will keep searching through those paths until it finds your module or
 `PYTHONPATH` still works,
 but has been effectively superseded by the *virtual environment*,
 which solves much more than just "where are the modules and packages."
-

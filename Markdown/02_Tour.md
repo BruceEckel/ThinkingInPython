@@ -1,4 +1,4 @@
-# A Python Tour
+# Tour
 
 This chapter and the several that follow give a programmer's tour of Python:
 syntax and the scalar types here, then containers, control flow, functions,
@@ -94,7 +94,7 @@ first, *rest = [10, 20, 30, 40]
 print(first, rest)  # 10 [20, 30, 40]
 ```
 
-Numbers, strings, and tuples are *immutable*:
+Numbers, strings, and tuples are *immutable*, which means that
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Knowing which is which explains when a change is visible through another name,
@@ -124,6 +124,7 @@ print(total)
 There is no `++` or `--`; use `+= 1` and `-= 1`.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
+
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`,
 which is occasionally handy for counting.
 
@@ -183,7 +184,7 @@ not a coerced boolean.
 
 ## Strings
 
-You can use single or double quotes to represent strings.
+Single or double quotes create strings.
 If you surround a string with double quotes,
 you can embed single quotes and vice versa:
 
@@ -192,16 +193,20 @@ you can embed single quotes and vice versa:
 
 print("That isn't a horse")
 print('You are not a "Viking"')
-print("""You're just pounding two
-coconut halves together.""")
-print('''"Oh no!" He exclaimed.
-"It's the blemange!"''')
+print("""
+You're just pounding two
+coconut halves together.
+""")
+print('''
+"Oh no!" He exclaimed.
+"It's the blemange!"
+''')
 print(r'c:\python\lib\utils')
 ```
 
 Note that Python was not named after the snake,
 but rather the Monty Python comedy troupe,
-and so examples are virtually required to include Python-esque references.
+so examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
 This makes it useful for any block of literal text,
@@ -209,11 +214,10 @@ such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
 The '`r`' right before a string means "raw,"
-which takes the backslashes literally so you don't have to put in an extra backslash in order to insert a literal backslash.
+which takes backslashes literally so you don't have to put in an extra backslash in order to insert a literal backslash.
 
-Substitution in strings is exceptionally easy,
-since Python uses C's `printf()` substitution syntax, but for any string at all.
-You simply follow the string with a '`%`' and the values to substitute:
+Python uses C's `printf()` string substitution syntax, but for any string at all.
+Follow the string with a '`%`' and the values to substitute:
 
 ```python
 # string_formatting.py
@@ -233,8 +237,7 @@ including control over the number of decimal places and alignment.
 
 ### f-Strings
 
-The `%` syntax above still works,
-but the modern way to build strings is the *f-string*:
+The modern way to build strings is using *f-string*s:
 prefix the string with `f` and put expressions in braces.
 It is readable, fast, and preferred:
 
@@ -255,8 +258,9 @@ the same mini-language the older formatting used.
 
 ### Common String Operations
 
-Strings are immutable sequences, so slicing and `in` work on them,
-and the methods return new strings rather than changing the original:
+Strings are immutable sequences.
+You can use slicing and `in`,
+and string methods return new strings rather than changing the original:
 
 ```python
 # string_methods.py
@@ -273,13 +277,12 @@ print(s.strip()[0:5])         # 'Hello': slicing
 
 ## Naming Conventions
 
-Although naming conventions are more detailed than this (you can find them in [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)),
-the basic strategy for naming is to use "snake-case" for identifiers,
+The basic strategy for naming is to use "snake-case" for identifiers,
 functions and file names.
 This means lower case with words separated by underscores,
 as in `this_is_snake_case`.
 
-If something represents a constant, you use all uppercase letters,
+If something represents a constant, use all uppercase letters,
 as in `THIS_IS_A_CONSTANT`.
 
 The one exception is class names, which are "pascal-cased,"
@@ -287,8 +290,27 @@ starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
 
-[PEP 8](https://www.python.org/dev/peps/pep-0008/) covers all manner of style issues.
+[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
 These can be automatically applied to your code (or at least, pointed out) using tools such as [AutoPEP8](https://pypi.python.org/pypi/autopep8) or [YAPF](https://github.com/google/yapf).
 
-**Note**: File names have no relationship to what they contain:
-you can name them whatever makes sense to you.
+### File Names
+
+The name must be a valid identifier: letters, digits, underscores, and cannot start with a digit.
+
+**Modules** (`.py` files): short, all‑lowercase, with underscores between words if that improves
+readability. This is `snake_case`.
+
+- Good: `result.py`, `cache_singleton.py`, `list_comprehension.py`
+- Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase), `cache-singleton.py`
+  (hyphens aren't importable)
+
+**Packages** (directories with `__init__.py`): also short and all‑lowercase, but underscores are
+discouraged; prefer a single run‑together word when you can.
+
+- Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
+
+**Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`). This book uses `test_*.py`,
+  e.g. `test_result.py`.
+
+Don't shadow standard-library modules. A file named `random.py`, `types.py`, or `weakref.py` can hide
+the stdlib one and break imports.

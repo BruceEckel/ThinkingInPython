@@ -401,13 +401,10 @@ because there is no such value to construct.
 You can build `Month` as a data class instead of an enum.
 It works, but it is more code for less safety.
 You have to construct the twelve months yourself and carry them around,
-where the enum simply is that set:
+where the `Enum` *is* that set:
 
 ```python
 # month_dataclass.py
-# Month can also be a data class instead of an Enum. It works, but
-# it is more code for less safety: you have to build and hand around
-# the set of months yourself, where the Enum simply is that set.
 from dataclasses import dataclass, field
 
 from validation import check

@@ -183,7 +183,7 @@ to apply tests for quality.
     This complements Separation, Encapsulation and Variation,
     and is part of the Low-Coupling-High-Cohesion message.
 -   *Managed Coupling*.
-    Simply stating that we should have "low coupling" in a design is usually too vague;
+    Simply declaring that we should have "low coupling" in a design is usually too vague;
     coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
 -   *Subtraction*: a design is finished when you cannot take anything else away^[This idea is generally attributed to Antoine de St. Exupery from *The Little Prince*: "La perfection est atteinte non quand il ne reste rien à ajouter, mais quand il ne reste rien à enlever," or: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].

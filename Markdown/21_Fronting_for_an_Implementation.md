@@ -3,8 +3,8 @@
 Both *Proxy* and *State* provide a surrogate class that you use in your code;
 the real class that does the work is hidden behind this surrogate class.
 When you call a method in the surrogate,
-it simply turns around and calls the method in the implementing class.
-These two patterns are so similar that the *Proxy* is simply a special case of *State*.
+it turns around and calls the method in the implementing class.
+These two patterns are so similar that the *Proxy* is a special case of *State*.
 
 The basic idea is simple: from a base class,
 the surrogate is derived along with the class or classes that provide the actual implementation:

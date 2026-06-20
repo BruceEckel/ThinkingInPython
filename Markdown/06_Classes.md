@@ -53,7 +53,7 @@ they implicitly become class level fields (similar to static fields in C++/Java)
 Because Python is dynamically typed, it doesn't really care about interfaces:
 all it cares about is applying operations to object.
 This means that inheritance in Python is different from inheritance in C++ or Java,
-where you often inherit simply to establish a common interface.
+where you often inherit only to establish a common interface.
 In Python, the only reason you inherit is to inherit an implementation,
 to re-use the code in the base class.
 

@@ -23,3 +23,39 @@ https://bruceeckel.github.io/ThinkingInPython/
 
 I'm doing as much as I can using Claude; after that my plan is to do an edit/rewrite pass.
 In the meantime I hope it's useful.
+
+---
+
+## Edit checklist
+
+- [ ] 01_Introduction.md
+- [x] 02_Tour.md
+- [ ] 03_Containers_and_Control_Flow.md
+- [ ] 04_Functions.md
+- [ ] 05_Modules_and_Packages.md
+- [ ] 06_Classes.md
+- [ ] 07_Initialization_and_Cleanup.md
+- [ ] 08_Static_Type_Checking.md
+- [ ] 09_Testing.md
+- [ ] 10_Data_Classes_as_Types.md
+- [ ] 11_Pattern_Matching.md
+- [ ] 12_Functional_Error_Handling.md
+- [ ] 13_Decorators.md
+- [ ] 14_Comprehensions.md
+- [ ] 15_Metaprogramming.md
+- [ ] 16_Rethinking_Objects.md
+- [ ] 17_The_Pattern_Concept.md
+- [ ] 18_Messenger.md
+- [ ] 19_Singleton.md
+- [ ] 20_Application_Frameworks.md
+- [ ] 21_Fronting_for_an_Implementation.md
+- [ ] 22_State_Machines.md
+- [ ] 23_Iterators.md
+- [ ] 24_Factory.md
+- [ ] 25_Function_Objects.md
+- [ ] 26_Changing_the_Interface.md
+- [ ] 27_Observer.md
+- [ ] 28_Multiple_Dispatching.md
+- [ ] 29_Visitor.md
+- [ ] 30_Pattern_Refactoring.md
+- [ ] 31_Simulation.md

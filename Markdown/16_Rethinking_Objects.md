@@ -291,7 +291,7 @@ if __name__ == "__main__":
 ```
 
 `Point` and `PairCoord` share no base class.
-They simply both have `x` and `y`, which is all `distance` asked for.
+They both have `x` and `y`, which is all `distance` asked for.
 
 ## Compose, Do Not Inherit
 

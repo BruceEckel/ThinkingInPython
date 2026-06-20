@@ -4,7 +4,7 @@ Sometimes the problem that you're solving is as simple as "I don't have the inte
 Two of the patterns in *Design Patterns* solve this problem:
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes,
-simply to provide a more comfortable way to deal with a library or bundle of resources.
+only to provide a more comfortable way to deal with a library or bundle of resources.
 
 ## Adapter
 
