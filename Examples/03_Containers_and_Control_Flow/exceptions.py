@@ -11,12 +11,18 @@ print(parse_int("oops"))  # None
 
 def checked_divide(a, b):
     if b == 0:
-        raise ValueError("cannot divide by zero")
+        raise ValueError("Divide by zero")
     return a / b
 
-try:
-    checked_divide(1, 0)
-except ValueError as e:
-    print("caught:", e)
-finally:
-    print("finally always runs")
+def demo_exceptions(a, b):
+    try:
+        checked_divide(a, b)
+    except ValueError as e:
+        print("caught:", e)
+    else:
+        print("no exception")
+    finally:
+        print("finally always runs")
+
+demo_exceptions(1, 0)
+demo_exceptions(1, 1)

@@ -6,3 +6,5 @@ evens = [n for n in range(10) if n % 2 == 0]  # with a filter
 print(evens)                                  # [0, 2, 4, 6, 8]
 lengths = {w: len(w) for w in ["a", "bb"]}    # dict comprehension
 print(lengths)                                # {'a': 1, 'bb': 2}
+parities = {n % 2 for n in range(10)}         # set comprehension
+print(parities)                               # {0, 1}

@@ -8,6 +8,7 @@
 - Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Chapter 21: Surrogate?
 
+- Capitalize first letter of comments?
 
 - Check exercises. Potentially create new exercises.
 

@@ -19,7 +19,7 @@ PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 help:
 	@echo "Targets:"
 	@echo "  sync-ci   - update Examples/ from the Markdown, then run the full CI gate"
-	@echo "  ci        - run the full local gate: check, run, pytest, ty, ruff, site"
+	@echo "  ci        - run the full local gate: check, ty, ruff, run, pytest, site"
 	@echo "  sync      - update the committed Examples/ tree from the Markdown"
 	@echo "  check     - verify book examples match the committed Examples/ tree"
 	@echo "  site      - render Markdown/ into build/site/ with pandoc"
@@ -103,10 +103,10 @@ prose:
 ci:
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
-	$(PY) tools/run_examples.py
-	$(PYTEST) ExtractedExamples
 	$(TY) check ExtractedExamples
 	$(RUFF) check ExtractedExamples
+	$(PY) tools/run_examples.py
+	$(PYTEST) ExtractedExamples
 	$(PY) tools/build_site.py
 
 clean-examples:

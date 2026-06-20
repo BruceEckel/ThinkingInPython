@@ -134,9 +134,7 @@ print(a.isdisjoint({8, 9}))  # True: no operator form
 
 ## Control Flow
 
-You already saw `if`.
-Add `elif` for chained tests,
-and note that Python's comparison operators chain the way they do in mathematics:
+If you add `elif` to an `if` expression, you can chain multiple tests together.
 
 ```python
 # control_flow.py
@@ -157,6 +155,8 @@ grade = "pass" if x >= 3 else "fail"  # conditional expression
 print(grade)
 ```
 
+Python's comparison operators chain the way they do in mathematics:
+
 A `while` loop runs until its condition is false.
 `break` leaves the loop and `continue` skips to the next iteration:
 
@@ -167,6 +167,7 @@ n = 27
 steps = 0
 while n != 1:  # the Collatz sequence
     n = n // 2 if n % 2 == 0 else 3 * n + 1
+    print(n)
     steps += 1
 print(steps, "steps")
 ```
@@ -189,15 +190,17 @@ for name, score in zip(names, scores):
     print(name, score)
 ```
 
+With `print`, the default `end` (printed after the value) is a newline.
+With multiple values in a `print` call, you can use `sep` to change the separator between values.
+
 ## Pattern Matching
 
 The `match` statement compares a value against structural patterns.
-It is more than a C `switch`:
-a pattern can destructure a value and bind its parts.
-(The `f"..."` strings below are *f-strings*, covered under Strings.)
+It is reminiscent of a C `switch`, but much more powerful.
+A pattern can destructure a value and bind its parts.
 
 ```python
-# match_command.py
+# pattern_matching.py
 
 def run(command):
     match command.split():
@@ -205,7 +208,7 @@ def run(command):
             return f"moving {direction}"
         case ["quit"]:
             return "goodbye"
-        case _:
+        case _:  # default
             return "unknown command"
 
 print(run("go north"))
@@ -215,9 +218,9 @@ print(run("dance"))
 
 ## Errors and Exceptions
 
-Python signals an error by *raising* an exception,
-which propagates up until a `try`/`except` handles it.
-Catch specific exception types, not everything:
+Python signals an error by *raising* an exception.
+Like C++ and Java, an exception propagates up the call stack until they find a handler.
+In Python, handlers are indicated by `except` followed by the exception type it handles:
 
 ```python
 # exceptions.py
@@ -233,22 +236,27 @@ print(parse_int("oops"))  # None
 
 def checked_divide(a, b):
     if b == 0:
-        raise ValueError("cannot divide by zero")
+        raise ValueError("Divide by zero")
     return a / b
 
-try:
-    checked_divide(1, 0)
-except ValueError as e:
-    print("caught:", e)
-finally:
-    print("finally always runs")
+def demo_exceptions(a, b):
+    try:
+        checked_divide(a, b)
+    except ValueError as e:
+        print("caught:", e)
+    else:
+        print("no exception")
+    finally:
+        print("finally always runs")
+
+demo_exceptions(1, 0)
+demo_exceptions(1, 1)
 ```
 
-An `except` clause names the exception type.
-An optional `else` runs when no exception was raised, and `finally` always runs,
+The optional `else` runs when no exception was raised, and `finally` always runs,
 which makes it the place for cleanup.
-Python's culture leans on "easier to ask forgiveness than permission":
-try the operation and handle the exception,
+Python's culture leans on "easier to ask forgiveness than permission."
+This means: try the operation and handle the exception,
 rather than checking every precondition first.
 
 ## Context Managers
@@ -270,11 +278,15 @@ with path.open("w") as f:
 with path.open() as f:
     for line in f:
         print(line.strip())
-path.unlink()
+
+path.unlink()  # delete the file
 ```
 
 This is the explicit-finalizer approach from the [Initialization and Cleanup](07_Initialization_and_Cleanup.md) chapter.
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
+Note that when simply reading or writing to a file, 
+`pathlib` provides convenient utility methods like `read_text()` and `write_text()` 
+that handle opening and closing the file for you.
 
 ## Comprehensions
 
@@ -291,8 +303,9 @@ evens = [n for n in range(10) if n % 2 == 0]  # with a filter
 print(evens)                                  # [0, 2, 4, 6, 8]
 lengths = {w: len(w) for w in ["a", "bb"]}    # dict comprehension
 print(lengths)                                # {'a': 1, 'bb': 2}
+parities = {n % 2 for n in range(10)}         # set comprehension
+print(parities)                               # {0, 1}
 ```
 
-This is such a core idiom that it has its own chapter,
-[Comprehensions](14_Comprehensions.md),
-which also covers generator expressions and the functional tools `map()` and `filter()`.
+The [Comprehensions](14_Comprehensions.md) chapter covers comprehensions in detail,
+as well as generator expressions and the functional tools `map()` and `filter()`.

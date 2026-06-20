@@ -120,7 +120,8 @@ def main(argv: list[str] | None = None) -> int:
     py_files = sorted(args.tree.rglob("*.py"))
     passed: list[str] = []
     failed: list[tuple[str, str]] = []
-    skipped: list[str] = []
+    pytest_files: list[str] = []
+    unattended: list[str] = []
     timed_out: list[str] = []
 
     for f in py_files:
@@ -128,11 +129,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.subtree and args.subtree not in rel:
             continue
         if is_pytest_file(f.name):
-            skipped.append(rel)  # run by `pytest`, not as a script
+            pytest_files.append(rel)  # run by `pytest`, not as a script
             continue
         text = f.read_text(encoding="utf-8", errors="replace")
         if is_skipped(rel, text, skips):
-            skipped.append(rel)
+            unattended.append(rel)  # GUI/interactive/infinite-loop: norun.txt
             continue
         try:
             proc = subprocess.run(
@@ -152,10 +153,15 @@ def main(argv: list[str] | None = None) -> int:
             tail = (proc.stderr.strip().splitlines() or ["(no stderr)"])[-1]
             failed.append((rel, tail))
 
-    print(f"\nPassed:   {len(passed)}")
-    print(f"Skipped:  {len(skipped)}")
-    print(f"Timeout:  {len(timed_out)}")
-    print(f"Failed:   {len(failed)}")
+    print()
+    for label, count in (
+        ("Passed:", len(passed)),
+        ("Tested via pytest:", len(pytest_files)),
+        ("Can't run unattended:", len(unattended)),
+        ("Timeout:", len(timed_out)),
+        ("Failed:", len(failed)),
+    ):
+        print(f"{label:<22}{count}")
     if timed_out:
         print("\nTimed out (consider adding to tools/norun.txt):")
         for rel in timed_out:

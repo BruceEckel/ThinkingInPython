@@ -275,6 +275,31 @@ print("ababab".replace("a", "X"))      # 'XbXbXb'
 print(s.strip()[0:5])         # 'Hello': slicing
 ```
 
+## Functions
+
+Functions are defined with `def`, a name, a parameter list, and a colon.
+The indented block below is the body, the same indentation rule as `if`.
+`return` sends a result back to the caller.
+A function with no `return` yields `None`.
+
+```python
+# functions.py
+
+def greet(name):
+    return f"Hello, {name}"
+
+def banner(text, width=20):  # width has a default value
+    line = "*" * width
+    return f"{line}\n{text}\n{line}"
+
+print(greet("Alice"))         # Hello, Alice
+print(banner("Hi", width=4))  # pass an argument by name
+```
+
+A parameter can have a default, which makes it optional at the call site.
+You can also pass arguments by name, as with `width=4`, in any order.
+The [Functions](04_Functions.md) chapter covers them in detail.
+
 ## Naming Conventions
 
 The basic strategy for naming is to use "snake-case" for identifiers,

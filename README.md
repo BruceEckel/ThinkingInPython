@@ -30,7 +30,7 @@ In the meantime I hope it's useful.
 
 - [ ] 01_Introduction.md
 - [x] 02_Tour.md
-- [ ] 03_Containers_and_Control_Flow.md
+- [x] 03_Containers_and_Control_Flow.md
 - [ ] 04_Functions.md
 - [ ] 05_Modules_and_Packages.md
 - [ ] 06_Classes.md
