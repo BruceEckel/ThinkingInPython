@@ -107,7 +107,7 @@ raising otherwise:
 ```python
 # typed_iterator.py
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, override
 
 
 class TypedIterator(Iterator[Any]):
@@ -115,6 +115,7 @@ class TypedIterator(Iterator[Any]):
         self.imp = it
         self.expected = expected
 
+    @override
     def __next__(self) -> Any:
         obj = next(self.imp)
         if not isinstance(obj, self.expected):

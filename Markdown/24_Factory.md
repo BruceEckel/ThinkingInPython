@@ -35,6 +35,7 @@ One approach is to make the factory a `static` method of the base class:
 # A simple static factory method.
 import random
 from collections.abc import Iterator
+from typing import override
 
 
 class Shape:
@@ -50,11 +51,15 @@ class Shape:
         raise ValueError(f"Bad shape creation: {type}")
 
 class Circle(Shape):
+    @override
     def draw(self) -> None: print("Circle.draw")
+    @override
     def erase(self) -> None: print("Circle.erase")
 
 class Square(Shape):
+    @override
     def draw(self) -> None: print("Square.draw")
+    @override
     def erase(self) -> None: print("Square.erase")
 
 # Generate shape name strings:
@@ -134,6 +139,7 @@ you can nest the classes within the factory method, like this:
 # shapefact1/nested_shape_factory.py
 import random
 from collections.abc import Iterator
+from typing import override
 
 
 class Shape:
@@ -143,11 +149,15 @@ class Shape:
 
 def factory(type: str) -> Shape:
     class Circle(Shape):
+        @override
         def draw(self) -> None: print("Circle.draw")
+        @override
         def erase(self) -> None: print("Circle.erase")
 
     class Square(Shape):
+        @override
         def draw(self) -> None: print("Square.draw")
+        @override
         def erase(self) -> None: print("Square.erase")
 
     if type == "Circle":
@@ -187,6 +197,7 @@ let each subclass register itself through `__init_subclass__`:
 # A class is a first-class object, so a factory is just a dict of
 # classes. __init_subclass__ lets each subclass register itself, so
 # the factory never needs editing when you add a type.
+from typing import override
 
 
 class Shape:
@@ -200,10 +211,12 @@ class Shape:
 
 
 class Circle(Shape):
+    @override
     def draw(self) -> None: print("Circle.draw")
 
 
 class Square(Shape):
+    @override
     def draw(self) -> None: print("Square.draw")
 
 
@@ -227,6 +240,8 @@ Defining a fresh `Shape` inside the test is enough to see it appear in the regis
 
 ```python
 # test_registry.py
+from typing import override
+
 import pytest
 from registry import Circle, Shape, Square, make
 
@@ -243,6 +258,7 @@ def test_make_builds_the_right_type() -> None:
 
 def test_new_subclass_registers_itself() -> None:
     class Triangle(Shape):
+        @override
         def draw(self) -> None: ...
 
     assert Shape.registry["Triangle"] is Triangle
@@ -269,7 +285,7 @@ Notice also that the specific `Shape` classes are dynamically loaded on demand:
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, override
 
 
 class ShapeFactory:
@@ -293,15 +309,19 @@ class Shape:
 
 
 class Circle(Shape):
+    @override
     def draw(self) -> None: print("Circle.draw")
+    @override
     def erase(self) -> None: print("Circle.erase")
     class Factory:
         def create(self) -> Circle: return Circle()
 
 
 class Square(Shape):
+    @override
     def draw(self) -> None:
         print("Square.draw")
+    @override
     def erase(self) -> None:
         print("Square.erase")
     class Factory:
@@ -363,6 +383,8 @@ Here's how it might look using an abstract factory:
 ```python
 # games.py
 # An example of the Abstract Factory pattern.
+from typing import override
+
 
 class Obstacle:
     def action(self) -> None: pass
@@ -371,20 +393,24 @@ class Character:
     def interact_with(self, obstacle: Obstacle) -> None: pass
 
 class Kitty(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Kitty has encountered a",
         obstacle.action())
 
 class KungFuGuy(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("KungFuGuy now battles a",
         obstacle.action())
 
 class Puzzle(Obstacle):
+    @override
     def action(self) -> None:
         print("Puzzle")
 
 class NastyWeapon(Obstacle):
+    @override
     def action(self) -> None:
         print("NastyWeapon")
 
@@ -397,11 +423,15 @@ class GameElementFactory:
 
 # Concrete factories:
 class KittiesAndPuzzles(GameElementFactory):
+    @override
     def make_character(self) -> Character: return Kitty()
+    @override
     def make_obstacle(self) -> Obstacle: return Puzzle()
 
 class KillAndDismember(GameElementFactory):
+    @override
     def make_character(self) -> Character: return KungFuGuy()
+    @override
     def make_obstacle(self) -> Obstacle: return NastyWeapon()
 
 class GameEnvironment:

@@ -306,6 +306,7 @@ It only draws, so the harness skips it (`tools/norun.txt`):
 # itself is checked headlessly in test_ratsandmazes.py.
 import asyncio
 import tkinter as tk
+from typing import override
 
 from blackboard import Blackboard
 from maze import Maze
@@ -319,6 +320,7 @@ class RecordingBlackboard(Blackboard):
         super().__init__(maze)
         self.order: list[tuple[int, int]] = []
 
+    @override
     def claim(self, x: int, y: int) -> bool:
         claimed = super().claim(x, y)
         if claimed:
@@ -390,7 +392,7 @@ There is no `if` or `elif` on the type of occupant anywhere:
 # There is no conditional on the item's type.
 
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 if TYPE_CHECKING:
     from world import Room
@@ -427,6 +429,7 @@ class Robot(Item):
 class Wall(Item):
     symbol = "#"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
         return robot.room  # Cannot pass: stay put.
@@ -435,6 +438,7 @@ class Wall(Item):
 class Food(Item):
     symbol = "."
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         room.occupant = Empty()  # Eaten.
         return room
@@ -447,10 +451,12 @@ class Teleport(Item):
         self.target = target
         self.target_room: Room | None = None
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert self.target_room is not None
         return self.target_room
 
+    @override
     def __str__(self) -> str:
         return self.target
 
@@ -458,6 +464,7 @@ class Teleport(Item):
 class Empty(Item):
     symbol = "_"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return room
 
@@ -465,6 +472,7 @@ class Empty(Item):
 class Edge(Item):
     symbol = "/"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
         return robot.room  # The void outside the maze: stay put.
@@ -473,6 +481,7 @@ class Edge(Item):
 class EndGame(Item):
     symbol = "!"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         print("Game over!")
         return room

@@ -246,7 +246,7 @@ This is the model's correctness, established apart from how it is shown:
 
 ```python
 # test_box_observer.py
-from typing import Any
+from typing import Any, override
 
 from box_observer import BoxModel, adjacent, new_grid, recolored
 from observer import Observer
@@ -280,6 +280,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     seen: list[Any] = []
 
     class Recorder(Observer):
+        @override
         def update(self, observable: Any, grid: Any) -> None:
             seen.append(grid)
 
@@ -304,7 +305,7 @@ so the example harness does not run it (it is listed in `tools/norun.txt`).
 # the only Observer. It repaints whenever the BoxModel announces a
 # change. The model in box_observer.py is what the tests check.
 import tkinter as tk
-from typing import Any
+from typing import Any, override
 
 from box_observer import BoxModel, Grid
 from observer import Observer
@@ -326,6 +327,7 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 fill=color, outline="white")
 
     class View(Observer):  # Repaints on every model change
+        @override
         def update(self, observable: Any, grid: Any) -> None:
             draw(grid)
 

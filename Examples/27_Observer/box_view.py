@@ -3,7 +3,7 @@
 # the only Observer. It repaints whenever the BoxModel announces a
 # change. The model in box_observer.py is what the tests check.
 import tkinter as tk
-from typing import Any
+from typing import Any, override
 
 from box_observer import BoxModel, Grid
 from observer import Observer
@@ -25,6 +25,7 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 fill=color, outline="white")
 
     class View(Observer):  # Repaints on every model change
+        @override
         def update(self, observable: Any, grid: Any) -> None:
             draw(grid)
 

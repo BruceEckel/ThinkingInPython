@@ -1,4 +1,6 @@
 # test_registry.py
+from typing import override
+
 import pytest
 from registry import Circle, Shape, Square, make
 
@@ -15,6 +17,7 @@ def test_make_builds_the_right_type() -> None:
 
 def test_new_subclass_registers_itself() -> None:
     class Triangle(Shape):
+        @override
         def draw(self) -> None: ...
 
     assert Shape.registry["Triangle"] is Triangle

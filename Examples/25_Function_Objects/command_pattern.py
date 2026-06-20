@@ -1,17 +1,22 @@
 # command_pattern.py
+from typing import override
+
 
 class Command:
     def execute(self) -> None: pass
 
 class Loony(Command):
+    @override
     def execute(self) -> None:
         print("You're a loony.")
 
 class NewBrain(Command):
+    @override
     def execute(self) -> None:
         print("You might even need a new brain.")
 
 class Afford(Command):
+    @override
     def execute(self) -> None:
         print("I couldn't afford a whole new brain.")
 

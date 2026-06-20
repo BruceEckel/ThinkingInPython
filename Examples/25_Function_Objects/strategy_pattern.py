@@ -1,4 +1,6 @@
 # strategy_pattern.py
+from typing import override
+
 
 # The strategy interface:
 class FindMinima:
@@ -8,18 +10,22 @@ class FindMinima:
 
 # The various strategies:
 class LeastSquares(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return sum(line) / len(line)  # Mean
 
 class NewtonsMethod(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return min(line)
 
 class Bisection(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return (min(line) + max(line)) / 2  # Midpoint
 
 class ConjugateGradient(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return max(line)
 

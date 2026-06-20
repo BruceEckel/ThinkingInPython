@@ -4,7 +4,7 @@
 # There is no conditional on the item's type.
 
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 if TYPE_CHECKING:
     from world import Room
@@ -41,6 +41,7 @@ class Robot(Item):
 class Wall(Item):
     symbol = "#"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
         return robot.room  # Cannot pass: stay put.
@@ -49,6 +50,7 @@ class Wall(Item):
 class Food(Item):
     symbol = "."
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         room.occupant = Empty()  # Eaten.
         return room
@@ -61,10 +63,12 @@ class Teleport(Item):
         self.target = target
         self.target_room: Room | None = None
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert self.target_room is not None
         return self.target_room
 
+    @override
     def __str__(self) -> str:
         return self.target
 
@@ -72,6 +76,7 @@ class Teleport(Item):
 class Empty(Item):
     symbol = "_"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return room
 
@@ -79,6 +84,7 @@ class Empty(Item):
 class Edge(Item):
     symbol = "/"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
         return robot.room  # The void outside the maze: stay put.
@@ -87,6 +93,7 @@ class Edge(Item):
 class EndGame(Item):
     symbol = "!"
 
+    @override
     def interact(self, robot: Robot, room: Room) -> Room:
         print("Game over!")
         return room

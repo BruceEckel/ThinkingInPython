@@ -1,15 +1,17 @@
 # simple2.py
+from typing import override
+
 from simple_class import Simple
 
 
-class Simple2(Simple):
+class Simple2(Simple):  # Simple2 inherits Simple
     def __init__(self, str):
         print("Inside Simple2 constructor")
         # Call the base-class constructor with super():
         super().__init__(str)
     def display(self):
         self.show_msg("Called from display()")
-    # Overriding a base-class method
+    @override
     def show(self):
         print("Overridden show() method")
         # Calling the base-class method from inside

@@ -1,6 +1,6 @@
 # adapter.py
 # Variations on the Adapter pattern.
-from typing import Any
+from typing import Any, override
 
 
 class WhatIHave:
@@ -14,6 +14,7 @@ class ProxyAdapter(WhatIWant):
     def __init__(self, what_i_have: Any) -> None:
         self.what_i_have = what_i_have
 
+    @override
     def f(self) -> None:
         # Implement behavior using
         # methods in WhatIHave:
@@ -26,11 +27,13 @@ class WhatIUse:
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
+    @override
     def op(self, what_i_have: Any) -> None:
         ProxyAdapter(what_i_have).f()
 
 # Approach 3: build adapter into WhatIHave:
 class WhatIHave2(WhatIHave, WhatIWant):
+    @override
     def f(self) -> None:
         self.g()
         self.h()
@@ -40,6 +43,7 @@ class WhatIHave3(WhatIHave):
     class InnerAdapter(WhatIWant):
         def __init__(self, outer: Any) -> None:
             self.outer = outer
+        @override
         def f(self) -> None:
             self.outer.g()
             self.outer.h()

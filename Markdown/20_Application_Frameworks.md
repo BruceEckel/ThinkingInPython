@@ -26,6 +26,8 @@ subclasses define the steps.
 ```python
 # template_method.py
 # Simple demonstration of Template Method.
+from typing import override
+
 
 class ApplicationFramework:
     def __init__(self) -> None:
@@ -43,9 +45,11 @@ class ApplicationFramework:
 
 # Create an "application" by filling in the steps:
 class MyApp(ApplicationFramework):
+    @override
     def customize1(self) -> None:
         print("Nudge, nudge, wink, wink!")
 
+    @override
     def customize2(self) -> None:
         print("Say no more, say no more!")
 
@@ -99,6 +103,8 @@ Recording steps make that order visible:
 
 ```python
 # test_framework.py
+from typing import override
+
 from template_function import run_framework
 from template_method import ApplicationFramework
 
@@ -107,9 +113,11 @@ def test_template_method_runs_steps_in_order() -> None:
     calls: list[str] = []
 
     class Recorder(ApplicationFramework):
+        @override
         def customize1(self) -> None:
             calls.append("one")
 
+        @override
         def customize2(self) -> None:
             calls.append("two")
 

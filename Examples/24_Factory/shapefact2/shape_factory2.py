@@ -2,7 +2,7 @@
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, override
 
 
 class ShapeFactory:
@@ -26,15 +26,19 @@ class Shape:
 
 
 class Circle(Shape):
+    @override
     def draw(self) -> None: print("Circle.draw")
+    @override
     def erase(self) -> None: print("Circle.erase")
     class Factory:
         def create(self) -> Circle: return Circle()
 
 
 class Square(Shape):
+    @override
     def draw(self) -> None:
         print("Square.draw")
+    @override
     def erase(self) -> None:
         print("Square.erase")
     class Factory:

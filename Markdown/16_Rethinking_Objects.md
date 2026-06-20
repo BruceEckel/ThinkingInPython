@@ -360,6 +360,7 @@ and what you may do with them, its methods:
 # overridden method, dispatched by inheritance.
 import math
 from abc import ABC, abstractmethod
+from typing import override
 
 
 class Shape(ABC):
@@ -372,6 +373,7 @@ class Rectangle(Shape):
         self.length = length
         self.width = width
 
+    @override
     def area(self) -> float:
         return self.length * self.width
 
@@ -380,6 +382,7 @@ class Circle(Shape):
     def __init__(self, radius: float) -> None:
         self.radius = radius
 
+    @override
     def area(self) -> float:
         return math.pi * self.radius**2
 

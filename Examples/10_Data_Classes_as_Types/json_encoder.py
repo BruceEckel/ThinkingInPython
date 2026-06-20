@@ -3,12 +3,13 @@
 # inside other structures, by converting each one to a dict.
 import json
 from dataclasses import asdict, is_dataclass
-from typing import Any
+from typing import Any, override
 
 from person import EmailAddress, FullName, Person
 
 
 class DataClassEncoder(json.JSONEncoder):
+    @override
     def default(self, o: Any) -> Any:
         if is_dataclass(o) and not isinstance(o, type):
             return asdict(o)

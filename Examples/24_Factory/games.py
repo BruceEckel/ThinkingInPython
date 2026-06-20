@@ -1,5 +1,7 @@
 # games.py
 # An example of the Abstract Factory pattern.
+from typing import override
+
 
 class Obstacle:
     def action(self) -> None: pass
@@ -8,20 +10,24 @@ class Character:
     def interact_with(self, obstacle: Obstacle) -> None: pass
 
 class Kitty(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Kitty has encountered a",
         obstacle.action())
 
 class KungFuGuy(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("KungFuGuy now battles a",
         obstacle.action())
 
 class Puzzle(Obstacle):
+    @override
     def action(self) -> None:
         print("Puzzle")
 
 class NastyWeapon(Obstacle):
+    @override
     def action(self) -> None:
         print("NastyWeapon")
 
@@ -34,11 +40,15 @@ class GameElementFactory:
 
 # Concrete factories:
 class KittiesAndPuzzles(GameElementFactory):
+    @override
     def make_character(self) -> Character: return Kitty()
+    @override
     def make_obstacle(self) -> Obstacle: return Puzzle()
 
 class KillAndDismember(GameElementFactory):
+    @override
     def make_character(self) -> Character: return KungFuGuy()
+    @override
     def make_obstacle(self) -> Obstacle: return NastyWeapon()
 
 class GameEnvironment:

@@ -132,6 +132,7 @@ and also establishes its next state with an `if-else` clause:
 # State Machine pattern using match to determine the next state.
 import sys
 from pathlib import Path
+from typing import override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -141,9 +142,11 @@ from state_machine import StateMachine
 # A different subclass for each state:
 
 class Waiting(State):
+    @override
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
+    @override
     def next(self, input: object) -> State:
         match input:
             case MouseAction.APPEARS:
@@ -152,9 +155,11 @@ class Waiting(State):
                 return MouseTrap.waiting
 
 class Luring(State):
+    @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
+    @override
     def next(self, input: object) -> State:
         match input:
             case MouseAction.RUNS_AWAY:
@@ -165,9 +170,11 @@ class Luring(State):
                 return MouseTrap.luring
 
 class Trapping(State):
+    @override
     def run(self) -> None:
         print("Trapping: Closing door")
 
+    @override
     def next(self, input: object) -> State:
         match input:
             case MouseAction.ESCAPES:
@@ -178,9 +185,11 @@ class Trapping(State):
                 return MouseTrap.trapping
 
 class Holding(State):
+    @override
     def run(self) -> None:
         print("Holding: Mouse caught")
 
+    @override
     def next(self, input: object) -> State:
         match input:
             case MouseAction.REMOVED:
@@ -235,7 +244,7 @@ then delegates to the base `next()`:
 # A better mousetrap using tables
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -246,6 +255,7 @@ from state_machine import StateMachine
 class StateT(State):
     def __init__(self) -> None:
         self.transitions: dict[Any, Any] | None = None
+    @override
     def next(self, input: object) -> State:
         assert self.transitions is not None
         if input in self.transitions:
@@ -254,8 +264,10 @@ class StateT(State):
             raise Exception("Input not supported for current state")
 
 class Waiting(StateT):
+    @override
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
+    @override
     def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
@@ -265,8 +277,10 @@ class Waiting(StateT):
         return StateT.next(self, input)
 
 class Luring(StateT):
+    @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
+    @override
     def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
@@ -277,8 +291,10 @@ class Luring(StateT):
         return StateT.next(self, input)
 
 class Trapping(StateT):
+    @override
     def run(self) -> None:
         print("Trapping: Closing door")
+    @override
     def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:
@@ -289,8 +305,10 @@ class Trapping(StateT):
         return StateT.next(self, input)
 
 class Holding(StateT):
+    @override
     def run(self) -> None:
         print("Holding: Mouse caught")
+    @override
     def next(self, input: object) -> State:
         # Lazy initialization:
         if not self.transitions:

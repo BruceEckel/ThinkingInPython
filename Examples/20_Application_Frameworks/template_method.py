@@ -1,5 +1,7 @@
 # template_method.py
 # Simple demonstration of Template Method.
+from typing import override
+
 
 class ApplicationFramework:
     def __init__(self) -> None:
@@ -17,9 +19,11 @@ class ApplicationFramework:
 
 # Create an "application" by filling in the steps:
 class MyApp(ApplicationFramework):
+    @override
     def customize1(self) -> None:
         print("Nudge, nudge, wink, wink!")
 
+    @override
     def customize2(self) -> None:
         print("Say no more, say no more!")
 

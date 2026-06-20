@@ -50,19 +50,24 @@ The classic object form wraps each action in a `Command` subclass with an `execu
 
 ```python
 # command_pattern.py
+from typing import override
+
 
 class Command:
     def execute(self) -> None: pass
 
 class Loony(Command):
+    @override
     def execute(self) -> None:
         print("You're a loony.")
 
 class NewBrain(Command):
+    @override
     def execute(self) -> None:
         print("You might even need a new brain.")
 
 class Afford(Command):
+    @override
     def execute(self) -> None:
         print("I couldn't afford a whole new brain.")
 
@@ -127,6 +132,8 @@ and adds a "Context" object to hold the current strategy:
 
 ```python
 # strategy_pattern.py
+from typing import override
+
 
 # The strategy interface:
 class FindMinima:
@@ -136,18 +143,22 @@ class FindMinima:
 
 # The various strategies:
 class LeastSquares(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return sum(line) / len(line)  # Mean
 
 class NewtonsMethod(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return min(line)
 
 class Bisection(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return (min(line) + max(line)) / 2  # Midpoint
 
 class ConjugateGradient(FindMinima):
+    @override
     def algorithm(self, line: list[float]) -> float:
         return max(line)
 

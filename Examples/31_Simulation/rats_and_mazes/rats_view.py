@@ -5,6 +5,7 @@
 # itself is checked headlessly in test_ratsandmazes.py.
 import asyncio
 import tkinter as tk
+from typing import override
 
 from blackboard import Blackboard
 from maze import Maze
@@ -18,6 +19,7 @@ class RecordingBlackboard(Blackboard):
         super().__init__(maze)
         self.order: list[tuple[int, int]] = []
 
+    @override
     def claim(self, x: int, y: int) -> bool:
         claimed = super().claim(x, y)
         if claimed:

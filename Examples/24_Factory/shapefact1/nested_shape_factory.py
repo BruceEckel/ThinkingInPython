@@ -1,6 +1,7 @@
 # shapefact1/nested_shape_factory.py
 import random
 from collections.abc import Iterator
+from typing import override
 
 
 class Shape:
@@ -10,11 +11,15 @@ class Shape:
 
 def factory(type: str) -> Shape:
     class Circle(Shape):
+        @override
         def draw(self) -> None: print("Circle.draw")
+        @override
         def erase(self) -> None: print("Circle.erase")
 
     class Square(Shape):
+        @override
         def draw(self) -> None: print("Square.draw")
+        @override
         def erase(self) -> None: print("Square.erase")
 
     if type == "Circle":

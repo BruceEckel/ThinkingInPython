@@ -2,6 +2,7 @@
 # A simple static factory method.
 import random
 from collections.abc import Iterator
+from typing import override
 
 
 class Shape:
@@ -17,11 +18,15 @@ class Shape:
         raise ValueError(f"Bad shape creation: {type}")
 
 class Circle(Shape):
+    @override
     def draw(self) -> None: print("Circle.draw")
+    @override
     def erase(self) -> None: print("Circle.erase")
 
 class Square(Shape):
+    @override
     def draw(self) -> None: print("Square.draw")
+    @override
     def erase(self) -> None: print("Square.erase")
 
 # Generate shape name strings:

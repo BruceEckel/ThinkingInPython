@@ -62,6 +62,8 @@ Here `Simple`, from the `simple_class` module, is imported and then subclassed:
 
 ```python
 # simple2.py
+from typing import override
+
 from simple_class import Simple
 
 
@@ -72,7 +74,7 @@ class Simple2(Simple):  # Simple2 inherits Simple
         super().__init__(str)
     def display(self):
         self.show_msg("Called from display()")
-    # Overriding a base-class method
+    @override
     def show(self):
         print("Overridden show() method")
         # Calling the base-class method from inside
@@ -98,6 +100,7 @@ the base-class constructor is called with `super().__init__()`.
 In `display()`, `show_msg()` can be called as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
+The `@override` decorator on `show()` is explained in the next section.
 
 In `__main__`, you will see (when you run the program) that the base-class constructor is called.
 You can also see that the `show_msg()` method is available in the derived class,
@@ -110,6 +113,50 @@ all it cares about is that `show()` can be applied to `obj`,
 and it doesn't have any other type requirements.
 You can see that `f()` can be applied equally to an object of a class derived from `Simple` and one that isn't,
 without discrimination.
+
+## Marking Overrides with `@override`
+
+When you override a method, nothing requires the name to match a method in the base class.
+A typo, or a base method that someone later renames or removes,
+silently produces a *new* method instead of an override.
+The base-class version keeps running, and the bug is easy to miss.
+
+The `@override` decorator from the `typing` module closes that gap.
+It declares that a method is meant to replace one from a base class:
+
+```python
+# override_intro.py
+from typing import override
+
+
+class Base:
+    def show(self):
+        print("Base.show")
+
+
+class Derived(Base):
+    @override
+    def show(self):
+        print("Derived.show")
+
+
+Derived().show()
+```
+
+A type checker now verifies the claim.
+If `Derived.show` does not actually override a method in a base class,
+because the name is misspelled or the base method is gone,
+the checker reports an error.
+This is the same kind of safety that Java's `@Override` annotation provides.
+
+At runtime `@override` does nothing but return the method unchanged,
+so it costs nothing to run.
+The decorator needs no type hints to do its job,
+though it lives in the `typing` module and pairs naturally with them (see [Static Typing](08_Static_Typing.md)).
+
+Apply `@override` to any method that replaces an inherited one.
+Constructors are left undecorated by convention.
+The rest of this book follows that practice.
 
 ## Properties
 

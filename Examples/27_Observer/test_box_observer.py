@@ -1,5 +1,5 @@
 # test_box_observer.py
-from typing import Any
+from typing import Any, override
 
 from box_observer import BoxModel, adjacent, new_grid, recolored
 from observer import Observer
@@ -33,6 +33,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     seen: list[Any] = []
 
     class Recorder(Observer):
+        @override
         def update(self, observable: Any, grid: Any) -> None:
             seen.append(grid)
 
