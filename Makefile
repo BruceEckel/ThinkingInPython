@@ -17,7 +17,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check spell prose clean-examples clean-site
+.PHONY: help sync-ci ci sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -38,6 +38,8 @@ help:
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
 	@echo "  spell     - spell-check prose/comments with codespell (CH=29 for one chapter)"
 	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
+	@echo "  eol       - check tracked text files for CRLF (fails the ci gate)"
+	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -100,10 +102,20 @@ spell:
 prose:
 	$(VALE) $(PROSE_FILES)
 
+# Fail if any tracked text file has CRLF in the working tree. .gitattributes
+# keeps the committed blobs LF; this catches a drifted working copy. Run
+# `$(PY) tools/check_line_endings.py --fix` to convert offenders.
+eol:
+	$(PY) tools/check_line_endings.py
+
+fix-eol:
+	$(PY) tools/check_line_endings.py --fix
+
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates
 # run in CI only on request (see tools/README.md).
 ci:
+	$(PY) tools/check_line_endings.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(TY) check ExtractedExamples

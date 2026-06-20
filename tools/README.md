@@ -191,6 +191,22 @@ only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
 To add the community packages for passive-voice and usage checks, list them in
 `.vale.ini` (`Packages = write-good, proselint`) and run `vale sync` once.
 
+## check_line_endings.py
+
+`.gitattributes` (`* text=auto eol=lf`) already keeps committed blobs LF on
+every platform, so the repo and the Linux CI build are always LF. This tool
+guards the **working tree**: on Windows an editor can write CRLF into a source
+file, which is harmless to git but produces noisy warnings and inconsistent
+local files. `make eol` reads `git ls-files --eol` (so it honors the binary
+markers in `.gitattributes`) and fails if any tracked text file has CRLF or
+mixed endings. It is part of the `make ci` gate. There is no auto-convert in the
+build; run the fixer explicitly when the check flags something:
+
+```
+make eol       # check, exit 1 on CRLF (part of `make ci`)
+make fix-eol   # convert any offenders to LF
+```
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
