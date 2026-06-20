@@ -2,7 +2,7 @@
 
 Like most things in Python, class definitions use minimal syntax.
 You start with the `class` keyword followed by the class name and a colon.
-Inside the (indented) class body you use `def` to create methods.
+Inside the indented class body you use `def` to create methods.
 Here's a simple class:
 
 ```python
