@@ -9,7 +9,7 @@ class FindMinima:
 # The various strategies:
 class LeastSquares(FindMinima):
     def algorithm(self, line: list[float]) -> float:
-        return sum(line) / len(line)  # mean
+        return sum(line) / len(line)  # Mean
 
 class NewtonsMethod(FindMinima):
     def algorithm(self, line: list[float]) -> float:
@@ -17,7 +17,7 @@ class NewtonsMethod(FindMinima):
 
 class Bisection(FindMinima):
     def algorithm(self, line: list[float]) -> float:
-        return (min(line) + max(line)) / 2  # midpoint
+        return (min(line) + max(line)) / 2  # Midpoint
 
 class ConjugateGradient(FindMinima):
     def algorithm(self, line: list[float]) -> float:

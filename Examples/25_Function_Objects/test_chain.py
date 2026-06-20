@@ -13,7 +13,7 @@ def test_first_successful_handler_wins() -> None:
     assert solve(
         [1.0, 2.0, 3.0],
         [least_squares, newtons_method, bisection],
-    ) == [5.5, 6.6]  # bisection
+    ) == [5.5, 6.6]  # Bisection
 
 
 def test_order_decides_the_winner() -> None:

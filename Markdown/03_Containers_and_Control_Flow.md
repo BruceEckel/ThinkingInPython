@@ -58,17 +58,17 @@ Tuples are the natural way to return several values from a function and to group
 # tuples.py
 
 point = (3, 4)
-point = 3, 4        # also a tuple; the comma is what matters
-empty = ()          # empty tuple
-x, y = point        # unpacking
+point = 3, 4        # Also a tuple; the comma is what matters
+empty = ()          # Empty tuple
+x, y = point        # Unpacking
 print(x, y)         # 3 4
-single = (42,)      # a one-element tuple needs the trailing comma
+single = (42,)      # A one-element tuple needs the trailing comma
 print(len(single))  # 1
 tuple([1, 2, 3])    # Converts to (1, 2, 3)  from a list
 tuple("abc")        # ('a', 'b', 'c')
 
 def min_max(values):
-    return min(values), max(values)  # returns a tuple
+    return min(values), max(values)  # Returns a tuple
 
 low, high = min_max([5, 2, 9, 1])
 print(low, high)    # 1 9
@@ -87,7 +87,7 @@ Keys must be immutable.
 
 ages = {"Alice": 30, "Bob": 25}
 print(ages["Alice"])       # 30
-ages["Carol"] = 41         # add or update
+ages["Carol"] = 41         # Add or update
 print("Bob" in ages)       # True: membership tests the keys
 print(ages.get("Dan", 0))  # 0: a default when the key is missing
 for name, age in ages.items():
@@ -104,7 +104,7 @@ with fast membership tests and the usual set algebra:
 ```python
 # sets.py
 
-a = {1, 2, 3, 3}  # duplicates collapse
+a = {1, 2, 3, 3}  # Duplicates collapse
 b = {3, 4, 5}
 print(a)          # {1, 2, 3}
 print(a & b)      # {3}: intersection
@@ -151,7 +151,7 @@ print(classify(-3), classify(0), classify(7))
 
 x = 5
 print(0 < x < 10)  # True: chained comparison
-grade = "pass" if x >= 3 else "fail"  # conditional expression
+grade = "pass" if x >= 3 else "fail"  # Conditional expression
 print(grade)
 ```
 
@@ -165,7 +165,7 @@ A `while` loop runs until its condition is false.
 
 n = 27
 steps = 0
-while n != 1:  # the Collatz sequence
+while n != 1:  # The Collatz sequence
     n = n // 2 if n % 2 == 0 else 3 * n + 1
     print(n)
     steps += 1
@@ -208,7 +208,7 @@ def run(command):
             return f"moving {direction}"
         case ["quit"]:
             return "goodbye"
-        case _:  # default
+        case _:  # Default
             return "unknown command"
 
 print(run("go north"))
@@ -279,7 +279,7 @@ with path.open() as f:
     for line in f:
         print(line.strip())
 
-path.unlink()  # delete the file
+path.unlink()  # Delete the file
 ```
 
 This is the explicit-finalizer approach from the [Initialization and Cleanup](07_Initialization_and_Cleanup.md) chapter.

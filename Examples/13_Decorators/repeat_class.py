@@ -6,7 +6,7 @@ from typing import Any
 
 class repeat:
     def __init__(self, times: int) -> None:
-        self.times = times  # the decoration arguments
+        self.times = times  # The decoration arguments
 
     def __call__(
         self, func: Callable[..., Any]) -> Callable[..., Any]:

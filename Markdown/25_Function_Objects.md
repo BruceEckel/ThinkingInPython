@@ -137,7 +137,7 @@ class FindMinima:
 # The various strategies:
 class LeastSquares(FindMinima):
     def algorithm(self, line: list[float]) -> float:
-        return sum(line) / len(line)  # mean
+        return sum(line) / len(line)  # Mean
 
 class NewtonsMethod(FindMinima):
     def algorithm(self, line: list[float]) -> float:
@@ -145,7 +145,7 @@ class NewtonsMethod(FindMinima):
 
 class Bisection(FindMinima):
     def algorithm(self, line: list[float]) -> float:
-        return (min(line) + max(line)) / 2  # midpoint
+        return (min(line) + max(line)) / 2  # Midpoint
 
 class ConjugateGradient(FindMinima):
     def algorithm(self, line: list[float]) -> float:
@@ -195,15 +195,15 @@ type Result = list[float] | None
 
 
 def least_squares(line: Line) -> Result:
-    return None  # this strategy did not find a solution
+    return None  # This strategy did not find a solution
 
 
 def newtons_method(line: Line) -> Result:
-    return None  # neither did this one
+    return None  # Neither did this one
 
 
 def bisection(line: Line) -> Result:
-    return [5.5, 6.6]  # success
+    return [5.5, 6.6]  # Success
 
 
 def solve(line: Line,
@@ -244,7 +244,7 @@ def test_first_successful_handler_wins() -> None:
     assert solve(
         [1.0, 2.0, 3.0],
         [least_squares, newtons_method, bisection],
-    ) == [5.5, 6.6]  # bisection
+    ) == [5.5, 6.6]  # Bisection
 
 
 def test_order_decides_the_winner() -> None:
@@ -327,12 +327,12 @@ def on_withdraw(event: Withdraw) -> None:
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)
-bus.subscribe(Deposit, audit)        # two handlers for one event type
+bus.subscribe(Deposit, audit)        # Two handlers for one event type
 bus.subscribe(Withdraw, on_withdraw)
 
 bus.publish(Deposit(100))
 bus.publish(Withdraw(30))
-bus.publish(Closed("inactivity"))    # no handler: nothing happens
+bus.publish(Closed("inactivity"))    # No handler: nothing happens
 ```
 
 As with the chain, the behavior is what to test:
@@ -364,7 +364,7 @@ def test_only_the_matching_type_is_called() -> None:
 
 
 def test_no_handler_is_a_noop() -> None:
-    EventBus().publish(Closed("done"))  # must not raise
+    EventBus().publish(Closed("done"))  # Must not raise
 ```
 
 This is the *Observer* pattern (see the [Observer](27_Observer.md) chapter) narrowed to a single subject:

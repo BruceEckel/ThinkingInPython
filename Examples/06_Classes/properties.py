@@ -2,10 +2,10 @@
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # a plain attribute
+        self.radius = radius  # A plain attribute
 
     @property
-    def area(self):           # used like an attribute, not a call
+    def area(self):           # Used like an attribute, not a call
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)

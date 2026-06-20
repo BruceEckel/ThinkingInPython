@@ -1,7 +1,7 @@
 # greenhouse.py
 
 class Event:
-    events: list[Event] = [] # static
+    events: list[Event] = [] # Static
 
     def __init__(self, action: str, time: float) -> None:
         self.action = action

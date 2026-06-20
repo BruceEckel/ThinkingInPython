@@ -67,13 +67,13 @@ This is *dynamic typing*.
 # references.py
 
 x = 10        # x names an int
-x = "ten"     # the same name now binds to a str
+x = "ten"     # The same name now binds to a str
 a = [1, 2, 3]
 b = a         # b binds to the same list, not a copy
 b.append(4)
 print(a)       # [1, 2, 3, 4]: a and b are the same object
 print(a is b)  # True: identical objects
-c = a[:]       # a shallow copy
+c = a[:]       # A shallow copy
 print(a is c, a == c)  # False True: different object, equal value
 ```
 
@@ -88,7 +88,7 @@ which makes it easy to swap without a temporary:
 # multiple_assignment.py
 
 a, b = 1, 2
-a, b = b, a         # swap, no temporary needed
+a, b = b, a         # Swap, no temporary needed
 print(a, b)         # 2 1
 first, *rest = [10, 20, 30, 40]
 print(first, rest)  # 10 [20, 30, 40]
@@ -114,10 +114,10 @@ print(7 / 2)    # 3.5: true division, always a float
 print(7 // 2)   # 3: floor division
 print(7 % 2)    # 1: remainder
 print(2 ** 10)  # 1024: exponentiation
-print(10 ** 30) # a 31-digit int, no overflow
+print(10 ** 30) # A 31-digit int, no overflow
 print(abs(-5), round(3.14159, 2))  # 5 3.14
 total = 0
-total += 5      # augmented assignment, like other languages
+total += 5      # Augmented assignment, like other languages
 print(total)
 ```
 
@@ -134,7 +134,7 @@ each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
 ```python
 # bitwise.py
 # Bitwise and shift operators on integers. Binary literals (0b...)
-# make the bit patterns easy to see.
+# Make the bit patterns easy to see.
 print(0b1100 & 0b1010)  # 8: AND, bits set in both
 print(0b1100 | 0b1010)  # 14: OR, bits set in either
 print(0b1100 ^ 0b1010)  # 6: XOR, bits set in exactly one
@@ -143,7 +143,7 @@ print(1 << 4)           # 16: left shift, same as 1 * 2 ** 4
 print(64 >> 2)          # 16: right shift, same as 64 // 2 ** 2
 
 flags = 0
-flags |= 0b0010         # set bits with the augmented form
+flags |= 0b0010         # Set bits with the augmented form
 flags |= 0b1000
 print(flags)            # 10
 ```
@@ -172,7 +172,7 @@ for value in [0, 1, "", "hi", [], [1], None]:
     print(repr(value), "->", bool(value))
 
 if not []:
-    print("empty")        # an empty list is falsy
+    print("empty")        # An empty list is falsy
 
 name = "" or "default"    # 'or' returns the first truthy operand
 print(name)               # default

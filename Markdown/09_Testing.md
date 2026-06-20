@@ -220,7 +220,7 @@ def test_deposit_on_any_balance(
     start = preloaded.balance
     preloaded.deposit(1)
     assert preloaded.balance == start + 1
-    assert bank_name  # the session fixture is available everywhere
+    assert bank_name  # The session fixture is available everywhere
 ```
 
 Neither fixture is imported.

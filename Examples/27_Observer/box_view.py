@@ -24,7 +24,7 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
                 fill=color, outline="white")
 
-    class View(Observer):  # repaints on every model change
+    class View(Observer):  # Repaints on every model change
         def update(self, observable: Any, grid: Any) -> None:
             draw(grid)
 

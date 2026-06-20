@@ -63,9 +63,9 @@ Keyword arguments make a call self-documenting:
 def connect(host, port=5432, timeout=30):
     return f"{host}:{port} (timeout {timeout}s)"
 
-print(connect("db.example.com"))                 # uses both defaults
-print(connect("db.example.com", timeout=5))      # skip to a keyword
-print(connect(port=80, host="web.example.com"))  # any order by name
+print(connect("db.example.com"))                 # Uses both defaults
+print(connect("db.example.com", timeout=5))      # Skip to a keyword
+print(connect(port=80, host="web.example.com"))  # Any order by name
 ```
 
 A default value is evaluated once, when the function is defined,
@@ -75,7 +75,7 @@ A mutable default is therefore shared across calls:
 ```python
 # mutable_default.py
 
-def bad_append(item, target=[]):  # the same list every call
+def bad_append(item, target=[]):  # The same list every call
     target.append(item)
     return target
 
@@ -84,7 +84,7 @@ print(bad_append(2))  # [1, 2]: surprise, the default kept the 1
 
 def good_append(item, target=None):
     if target is None:
-        target = []               # a fresh list each call
+        target = []               # A fresh list each call
     target.append(item)
     return target
 
@@ -108,7 +108,7 @@ def report(label, *values, **options):
     print(label, values, options)
 
 report("nums", 1, 2, 3)                       # nums (1, 2, 3) {}
-report("point", 3, 4, color="red", size=10)   # extras land in options
+report("point", 3, 4, color="red", size=10)   # Extras land in options
 ```
 
 The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
@@ -176,8 +176,8 @@ It is useful for passing behavior to functions such as `sorted()`:
 # lambdas.py
 
 words = ["banana", "kiwi", "apple", "fig"]
-print(sorted(words, key=lambda w: len(w)))  # sort by length
-square = lambda n: n * n                    # usually prefer def
+print(sorted(words, key=lambda w: len(w)))  # Sort by length
+square = lambda n: n * n                    # Usually prefer def
 print(square(9))                            # 81
 ```
 

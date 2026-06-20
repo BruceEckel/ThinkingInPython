@@ -12,7 +12,7 @@ def test_notify_calls_every_subscriber() -> None:
 
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable().notify("anything")  # must not raise
+    Observable().notify("anything")  # Must not raise
 
 
 def test_thermometer_pushes_new_value_on_set() -> None:
@@ -28,7 +28,7 @@ def test_thermometer_pushes_new_value_on_set() -> None:
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
     thermo = Thermometer()
-    thermo.celsius = 10.0  # no subscriber yet
+    thermo.celsius = 10.0  # No subscriber yet
     thermo.subscribe(readings.append)
     thermo.celsius = 20.0
     assert readings == [20.0]

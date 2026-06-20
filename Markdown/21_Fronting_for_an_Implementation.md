@@ -235,7 +235,7 @@ def test_proxy_counts_only_calls() -> None:
         answer = 42
 
     p = CountingProxy(HasValue())
-    assert p.answer == 42  # non-callable attribute passes through
+    assert p.answer == 42  # Non-callable attribute passes through
     p2 = CountingProxy(Doubler())
     p2.double(1)
     p2.double(1)

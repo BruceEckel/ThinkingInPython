@@ -158,7 +158,7 @@ class Square:
         return "square"
 
 
-def render(shape: Drawable) -> str:   # accepts anything with draw()
+def render(shape: Drawable) -> str:   # Accepts anything with draw()
     return shape.draw()
 
 

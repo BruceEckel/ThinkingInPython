@@ -6,7 +6,7 @@ def run(command):
             return f"moving {direction}"
         case ["quit"]:
             return "goodbye"
-        case _:  # default
+        case _:  # Default
             return "unknown command"
 
 print(run("go north"))

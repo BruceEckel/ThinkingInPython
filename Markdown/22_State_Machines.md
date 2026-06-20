@@ -466,13 +466,13 @@ class ItemSlot:
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
-        self.amount = 0    # money inserted, in cents
-        self.row = 0       # the first selection digit
-        self.message = ""  # last action, for a view to display
+        self.amount = 0    # Money inserted, in cents
+        self.row = 0       # The first selection digit
+        self.message = ""  # Last action, for a view to display
         # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
                       for _ in range(4)]
-        self.items[3][0] = ItemSlot(25, 0)  # one sold-out slot
+        self.items[3][0] = ItemSlot(25, 0)  # One sold-out slot
         table: Table = {
             (State.QUIESCENT, Money):
                 [(None, self.add_money, State.COLLECTING)],
@@ -540,16 +540,16 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),    # buy [0][1]
-        FirstDigit("A", 0), SecondDigit("two", 1),    # buy it again
-        FirstDigit("C", 2), SecondDigit("three", 2),  # too expensive
-        FirstDigit("D", 3), SecondDigit("one", 0),    # sold out
-        Quit(),  # refund and reset
+        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy it again
+        FirstDigit("C", 2), SecondDigit("three", 2),  # Too expensive
+        FirstDigit("D", 3), SecondDigit("one", 0),    # Sold out
+        Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message}")  # a plain text view
+        print(f"{event}: {machine.message}")  # A plain text view
 ```
 
 Adding a state or an input is now a local change:
@@ -585,12 +585,12 @@ def feed(vm: VendingMachine, *events: object) -> None:
 def test_buy_dispenses_and_charges() -> None:
     vm = VendingMachine()
     assert vm.state is State.QUIESCENT
-    # item [0][1], 50c
+    # Item [0][1], 50c
     feed(vm, Money("quarter", 25), Money("quarter", 25),
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0                 # 50 in, 50 spent
-    assert vm.items[0][1].quantity == 4   # one dispensed from five
+    assert vm.items[0][1].quantity == 4   # One dispensed from five
     assert vm.message == "Dispensing; amount remaining 0"
 
 
@@ -600,8 +600,8 @@ def test_too_expensive_clears_back_to_collecting() -> None:
     feed(vm, Money("quarter", 25),
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.COLLECTING
-    assert vm.amount == 25                # money kept
-    assert vm.items[0][1].quantity == 5   # nothing dispensed
+    assert vm.amount == 25                # Money kept
+    assert vm.items[0][1].quantity == 5   # Nothing dispensed
 
 
 def test_sold_out_goes_to_unavailable() -> None:

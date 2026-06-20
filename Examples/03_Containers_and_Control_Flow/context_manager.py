@@ -10,4 +10,4 @@ with path.open() as f:
     for line in f:
         print(line.strip())
 
-path.unlink()  # delete the file
+path.unlink()  # Delete the file

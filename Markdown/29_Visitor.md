@@ -203,7 +203,7 @@ def test_fragrance_registered_and_default() -> None:
 
 
 def test_operations_dispatch_independently() -> None:
-    # nectar knows Gladiolus and Chrysanthemum; fragrance knows
+    # Nectar knows Gladiolus and Chrysanthemum; fragrance knows
     # Runuculus. A Runuculus falls to nectar's default but hits
     # fragrance's registered case.
     runuculus = Runuculus()

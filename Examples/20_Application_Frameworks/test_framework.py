@@ -13,8 +13,8 @@ def test_template_method_runs_steps_in_order() -> None:
         def customize2(self) -> None:
             calls.append("two")
 
-    Recorder()  # constructing it runs the framework
-    assert calls == ["one", "two", "one", "two"]  # loop runs twice
+    Recorder()  # Constructing it runs the framework
+    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
 
 
 def test_template_function_runs_steps_in_order() -> None:

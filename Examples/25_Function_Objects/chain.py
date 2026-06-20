@@ -9,15 +9,15 @@ type Result = list[float] | None
 
 
 def least_squares(line: Line) -> Result:
-    return None  # this strategy did not find a solution
+    return None  # This strategy did not find a solution
 
 
 def newtons_method(line: Line) -> Result:
-    return None  # neither did this one
+    return None  # Neither did this one
 
 
 def bisection(line: Line) -> Result:
-    return [5.5, 6.6]  # success
+    return [5.5, 6.6]  # Success
 
 
 def solve(line: Line,

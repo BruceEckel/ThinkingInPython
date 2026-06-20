@@ -69,7 +69,7 @@ def total(numbers: Iterable[int]) -> int:
 
 print(list(fibonacci(8)))
 print(list(Countdown(5)))
-print(total(fibonacci(8)))   # works on a generator
+print(total(fibonacci(8)))   # Works on a generator
 print(total([1, 2, 3, 4]))   # and on a list
 print(total(Countdown(5)))   # and on a custom iterable
 ```

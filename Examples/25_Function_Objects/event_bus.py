@@ -50,9 +50,9 @@ def on_withdraw(event: Withdraw) -> None:
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)
-bus.subscribe(Deposit, audit)        # two handlers for one event type
+bus.subscribe(Deposit, audit)        # Two handlers for one event type
 bus.subscribe(Withdraw, on_withdraw)
 
 bus.publish(Deposit(100))
 bus.publish(Withdraw(30))
-bus.publish(Closed("inactivity"))    # no handler: nothing happens
+bus.publish(Closed("inactivity"))    # No handler: nothing happens

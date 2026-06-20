@@ -55,7 +55,7 @@ class Food(Item):
 
 
 class Teleport(Item):
-    symbol = ""  # set per target letter
+    symbol = ""  # Set per target letter
 
     def __init__(self, target: str) -> None:
         self.target = target

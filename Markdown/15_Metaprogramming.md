@@ -89,7 +89,7 @@ you can generate them in a loop:
 # greenhouse.py
 
 class Event:
-    events: list[Event] = [] # static
+    events: list[Event] = [] # Static
 
     def __init__(self, action: str, time: float) -> None:
         self.action = action
@@ -161,7 +161,7 @@ class Color:
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
         Color.registry.add(cls)
-        Color.registry -= set(cls.__bases__)  # keep only the leaves
+        Color.registry -= set(cls.__bases__)  # Keep only the leaves
 
 
 class Blue(Color):
@@ -544,7 +544,7 @@ def test_descriptor_learns_its_name() -> None:
     p.x = 3
     p.y = 4
     assert (p.x, p.y) == (3, 4)
-    assert p.__dict__ == {"_x": 3, "_y": 4}  # stored under the names
+    assert p.__dict__ == {"_x": 3, "_y": 4}  # Stored under the names
 
 
 def test_descriptor_on_class_returns_itself() -> None:

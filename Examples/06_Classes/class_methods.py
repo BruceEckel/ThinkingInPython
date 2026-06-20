@@ -5,11 +5,11 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):    # an alternative constructor
+    def from_fahrenheit(cls, f):    # An alternative constructor
         return cls((f - 32) * 5 / 9)
 
     @staticmethod
-    def is_freezing(celsius):        # needs no self or cls
+    def is_freezing(celsius):        # Needs no self or cls
         return celsius <= 0
 
 t = Temperature.from_fahrenheit(212)

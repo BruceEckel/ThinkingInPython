@@ -3,7 +3,7 @@
 
 
 class Trash:
-    value: float = 0.0  # dollars per pound, set by each subclass
+    value: float = 0.0  # Dollars per pound, set by each subclass
     registry: dict[str, type[Trash]] = {}  # name -> subclass
 
     def __init__(self, weight: float) -> None:

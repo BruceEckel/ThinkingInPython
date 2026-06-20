@@ -28,7 +28,7 @@ def test_class_variable_returns_same_instance() -> None:
     a = class_variable_singleton.SingleTone("a")
     b = class_variable_singleton.SingleTone("b")
     assert a is b
-    assert a.val == "b"  # last write wins on the shared instance
+    assert a.val == "b"  # Last write wins on the shared instance
 
 
 def test_decorator_returns_same_instance() -> None:
@@ -43,6 +43,6 @@ def test_metaclass_returns_same_instance() -> None:
 def test_borg_shares_state_but_not_identity() -> None:
     x = borg_singleton.Singleton("first")
     y = borg_singleton.Singleton("second")
-    assert x is not y      # distinct objects...
+    assert x is not y      # Distinct objects...
     assert x.val == y.val  # ...sharing one set of state
     assert x.val == "second"

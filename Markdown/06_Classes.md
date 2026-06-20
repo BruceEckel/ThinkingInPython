@@ -123,10 +123,10 @@ without changing the calling code, using `@property`:
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # a plain attribute
+        self.radius = radius  # A plain attribute
 
     @property
-    def area(self):           # used like an attribute, not a call
+    def area(self):           # Used like an attribute, not a call
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)
@@ -178,11 +178,11 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):    # an alternative constructor
+    def from_fahrenheit(cls, f):    # An alternative constructor
         return cls((f - 32) * 5 / 9)
 
     @staticmethod
-    def is_freezing(celsius):        # needs no self or cls
+    def is_freezing(celsius):        # Needs no self or cls
         return celsius <= 0
 
 t = Temperature.from_fahrenheit(212)

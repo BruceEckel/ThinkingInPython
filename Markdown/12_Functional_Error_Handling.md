@@ -242,7 +242,7 @@ So a `Failure` anywhere in a chain skips the rest of the steps and falls through
 
 ```python
 # composing_with_bind.py
-# bind removes the boilerplate. Chain the steps; a Failure anywhere
+# Bind removes the boilerplate. Chain the steps; a Failure anywhere
 # in the chain short-circuits the rest and is passed through to the
 # end.
 from composing import func_b, func_c

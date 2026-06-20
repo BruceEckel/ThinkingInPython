@@ -71,12 +71,12 @@ from dataclasses import dataclass
 
 class A:
     def __init__(self, x: int = 100) -> None:
-        self.x = x  # an instance variable, one per object
+        self.x = x  # An instance variable, one per object
 
 
 @dataclass
 class B:
-    x: int = 100  # a constructor default, not a shared value
+    x: int = 100  # A constructor default, not a shared value
 
 
 if __name__ == "__main__":
