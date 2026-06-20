@@ -1,15 +1,11 @@
 # Containers and Control Flow
 
-## Built-In Containers
-
-With languages like C++ and Java,
-containers are add-on libraries and not integral to the language.
-In Python, the essential nature of containers for programming is acknowledged by building them into the core of the language:
-both lists and associative arrays (a.k.a. maps, dictionaries, hash tables) are fundamental data types.
+With languages like C++ and Java, containers are add-on libraries.
+In Python, the essential nature of containers for programming is acknowledged by building them into the core of the language.
+Both lists and associative arrays (maps, dictionaries, hash tables) are fundamental data types.
 
 In addition, the `for` statement automatically iterates through lists rather than just counting through a sequence of numbers.
-Python formalizes this by automatically making `for` use an iterator that works through a sequence.
-Here's an example:
+Python's `for` automatically uses an iterator that works through a sequence:
 
 ```python
 # list.py
@@ -21,20 +17,17 @@ for x in list:
     print(x)
 ```
 
-The first line creates a list.
-You can add new elements to lists (here, `append()` is used) and they will automatically resize themselves.
-The `for` statement creates an iterator `x` which takes on each value in the list.
+The first line creates a `list`.
+`append()` adds new elements to a `list`;
+the `list` automatically resizes itself.
+The `for` statement creates an iterator `x` which takes on each value in the `list`.
 
+There are no type declarations in this example;
+Python infers types from the way you use them.
 
+## Lists and Slicing
 
-Notice that there aren't any type declarations: the object names simply appear,
-and Python infers their type by the way that you use them.
-You'll find after you've worked with Python for a short while that you've been using up a lot of brain cycles parsing semicolons,
-curly braces, and all sorts of other extra verbiage that was demanded by your non-Python programming language but didn't actually describe what your program was supposed to do.
-
-### Lists and Slicing
-
-A list holds an ordered, mutable sequence of any objects.
+A `list` holds an ordered, mutable sequence of any objects.
 Indexing starts at zero, and negative indices count from the end.
 A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 
@@ -55,7 +48,7 @@ print(len(xs), 30 in xs)  # 7 True
 
 Slicing works on any sequence, including strings and tuples.
 
-### Tuples and Unpacking
+## Tuples and Unpacking
 
 A *tuple* is an immutable sequence.
 The comma makes the tuple, not the parentheses.
@@ -65,10 +58,14 @@ Tuples are the natural way to return several values from a function and to group
 # tuples.py
 
 point = (3, 4)
+point = 3, 4        # also a tuple; the comma is what matters
+empty = ()          # empty tuple
 x, y = point        # unpacking
 print(x, y)         # 3 4
 single = (42,)      # a one-element tuple needs the trailing comma
 print(len(single))  # 1
+tuple([1, 2, 3])    # Converts to (1, 2, 3)  from a list
+tuple("abc")        # ('a', 'b', 'c')
 
 def min_max(values):
     return min(values), max(values)  # returns a tuple
@@ -77,9 +74,12 @@ low, high = min_max([5, 2, 9, 1])
 print(low, high)    # 1 9
 ```
 
-### Dictionaries
+Tuples are often heterogeneous, with each position a different type.
+They are fixed-length records where each position has a distinct meaning.
 
-A dictionary maps keys to values, with fast lookup.
+## Dictionaries
+
+A dictionary (`dict`) maps keys to values, with fast lookup.
 Keys must be immutable.
 
 ```python
@@ -96,7 +96,7 @@ for name, age in ages.items():
 
 Use `dict.get()` to avoid a `KeyError` when a key might be absent.
 
-### Sets
+## Sets
 
 A set is an unordered collection of unique items,
 with fast membership tests and the usual set algebra:
@@ -111,6 +111,25 @@ print(a & b)      # {3}: intersection
 print(a | b)      # {1, 2, 3, 4, 5}: union
 print(a - b)      # {1, 2}: difference
 print(2 in a)     # True
+```
+
+Every operator above has a named method.
+The methods are a little more flexible: they accept any iterable,
+not just a set, and they take several arguments at once.
+There is also `isdisjoint`, which has no operator form:
+
+```python
+# set_methods.py
+a = {1, 2, 3}
+b = {3, 4, 5}
+
+print(a.intersection(b))  # {3}: same as a & b
+print(a.union(b))  # {1, 2, 3, 4, 5}: same as a | b
+print(a.difference(b))  # {1, 2}: same as a - b
+print(a.symmetric_difference(b))  # {1, 2, 4, 5}: same as a ^ b
+print(a.intersection([2, 3, 9]))  # {2, 3}: arg can be any iterable
+print(a.union(b, [6, 7]))  # {1, 2, 3, 4, 5, 6, 7}: several args
+print(a.isdisjoint({8, 9}))  # True: no operator form
 ```
 
 ## Control Flow
@@ -170,7 +189,7 @@ for name, score in zip(names, scores):
     print(name, score)
 ```
 
-### Pattern Matching
+## Pattern Matching
 
 The `match` statement compares a value against structural patterns.
 It is more than a C `switch`:
@@ -259,7 +278,7 @@ Anything that acquires a resource (a file, a lock, a network connection) can be 
 
 ## Comprehensions
 
-A *comprehension* builds a list, dictionary,
+A *comprehension* builds a `list`, dictionary,
 or set from another sequence in one expression,
 replacing a loop that builds up a result:
 
