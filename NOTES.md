@@ -1,3 +1,12 @@
+- Capitalize first letter of comments?
+  (Do this early so I can check as I edit)
+
+
+in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
+  the mirror image of collecting them.
+  Can you demo this either in the previous example or a new one
+
+
 - Is full polymorphism covered? (Not just inheritance-based)
 - Check order of examples in 30_Pattern_Refactoring.md
 
@@ -8,7 +17,6 @@
 - Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Chapter 21: Surrogate?
 
-- Capitalize first letter of comments?
 
 - Check exercises. Potentially create new exercises.
 

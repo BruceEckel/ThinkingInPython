@@ -125,8 +125,8 @@ There is no `++` or `--`; use `+= 1` and `-= 1`.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
-A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`,
-which is occasionally handy for counting.
+A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
+This can be useful for counting.
 
 Integers also support the bitwise and shift operators,
 each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
@@ -250,7 +250,7 @@ print(f"{name} scored {score}")             # Alice scored 91.5
 print(f"{name} scored {score:.0f}%")        # Alice scored 92%
 print(f"{name!r} has {len(name)} letters")  # 'Alice' has 5 letters
 total = 7
-print(f"{total = }")  # total = 7: handy when debugging
+print(f"{total = }")  # total = 7: useful for debugging
 ```
 
 The format spec after a colon controls width, precision, and alignment,

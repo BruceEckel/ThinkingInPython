@@ -70,7 +70,7 @@ print(connect(port=80, host="web.example.com"))  # any order by name
 
 A default value is evaluated once, when the function is defined,
 not on each call.
-A *mutable* default is therefore shared across calls:
+A mutable default is therefore shared across calls:
 
 ```python
 # mutable_default.py
@@ -143,30 +143,12 @@ Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 
-You meet `/` throughout the standard library,
-where many built-in functions take positional-only arguments,
-such as `dict.get(key, default, /)`.
+In the standard library,
+many built-in functions take positional-only arguments such as `dict.get(key, default, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method:
 since the name is not part of the interface,
 the subclass can rename the parameter, and a type checker will not object.
-
-## Lambdas
-
-A `lambda` is a small anonymous function written as a single expression.
-It is handy for passing behavior to functions like `sorted()`:
-
-```python
-# lambdas.py
-
-words = ["banana", "kiwi", "apple", "fig"]
-print(sorted(words, key=lambda w: len(w)))  # sort by length
-square = lambda n: n * n                    # usually prefer def
-print(square(9))                            # 81
-```
-
-Python's lambdas are rather constrained because they comprise a single expression.
-For anything more complicated you are expected to write a separate function.
 
 ## Unpacking Arguments
 
@@ -179,8 +161,25 @@ at a call site it *unpacks* a sequence into separate positional arguments.
 def f(a: int, b: int, c: int) -> None:
     print(a, b, c)
 
-
 x = [1, 2, 3]
 f(*x)
 f(*(1, 2, 3))
 ```
+
+
+## Lambdas
+
+A `lambda` is a small anonymous function written as a single expression.
+It is useful for passing behavior to functions such as `sorted()`:
+
+```python
+# lambdas.py
+
+words = ["banana", "kiwi", "apple", "fig"]
+print(sorted(words, key=lambda w: len(w)))  # sort by length
+square = lambda n: n * n                    # usually prefer def
+print(square(9))                            # 81
+```
+
+Compared to other languages, Python's lambdas are constrained because they comprise a single expression.
+For anything more complicated you are expected to write a separate function.
