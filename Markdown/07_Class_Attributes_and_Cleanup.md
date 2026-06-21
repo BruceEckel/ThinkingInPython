@@ -190,7 +190,7 @@ Two approaches are more reliable:
    called from a `with` block. This runs even when an error interrupts the code.
 
 2. A weak reference, which tracks an object without keeping it alive.
-   Here a `WeakValueDictionary` counts live instances,
+   Here, a `WeakValueDictionary` counts live instances,
    using `id(self)` as each object's key:
 
 ```python
@@ -219,7 +219,9 @@ class Counter:
             print(self.count, 'Counter objects remaining')
 
 
-x = Counter("First")
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
 ```
 
 The count now falls on its own as objects are collected,

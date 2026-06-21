@@ -23,4 +23,6 @@ class Counter:
             print(self.count, 'Counter objects remaining')
 
 
-x = Counter("First")
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
