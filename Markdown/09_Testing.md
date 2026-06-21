@@ -139,30 +139,17 @@ A passing run is quiet.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
-## Fixtures Replace Setup and Teardown
-
-JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
-`pytest` replaces both with *fixtures*: functions that build what a test needs.
-These fixtures are declared as parameters to the test functions, which tells `pytest` to automatically call the fixture function and pass its result to the test function.
-
-The `funded` function above is a fixture.
-A test that names `funded` as an argument receives the value the fixture returns.
-
-Each test gets its own freshly built `funded` account,
-so tests cannot leak state into each other.
-If a fixture needs cleanup,
-it can `yield` the value and run teardown code after the `yield`.
-
 ## Testing for Exceptions and Floating Point
 
-Two checks come up constantly.
+There are two common special needs in testing, both of which appear in `test_account.py`.
+
 The first is "this call should raise."
 `test_overdraft_raises` uses `pytest.raises` as a context manager;
 the test passes only if the expected exception is raised inside the block.
+
 The second is comparing floating-point numbers, where exact equality is a trap.
 `test_interest_uses_approx` compares with `pytest.approx`,
 which allows a small tolerance.
-Both techniques appear in `test_account.py` above.
 
 ## Parametrizing Tests
 
@@ -171,6 +158,49 @@ Mark it with `parametrize`, as `test_nonpositive_deposit_raises` does,
 and `pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
 and a failure names the exact case that broke.
+
+## Fixtures Replace Setup and Teardown
+
+JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
+`pytest` replaces both with *fixtures*: functions that build what a test needs.
+These fixtures are declared as parameters to the test functions,
+which tells `pytest` to automatically call the fixture function and pass its result to the test function.
+
+The `funded` function above is a fixture.
+A test that names `funded` as an argument receives the value the fixture returns.
+
+Each test gets its own freshly built `funded` account,
+so tests cannot leak state into each other.
+If a fixture needs cleanup,
+it can `yield` the value and run teardown code after the `yield`.
+For example, this fixture builds an account, `yield`s it to the test,
+then runs teardown once the test returns:
+
+```python
+# test_teardown.py
+from collections.abc import Iterator
+
+import pytest
+from account import Account
+
+
+@pytest.fixture
+def open_account() -> Iterator[Account]:
+    account = Account()
+    account.deposit(100)  # Setup, before the yield
+    yield account  # The test runs with this value
+    account.withdraw(account.balance)  # Teardown, after the test
+    assert account.balance == 0
+
+
+def test_spend_some(open_account: Account) -> None:
+    open_account.withdraw(30)
+    assert open_account.balance == 70
+```
+
+Everything before the `yield` is setup.
+Everything after it runs once the test finishes, even if the test failed.
+After the `yield` is the place to close files, release locks, or check a final invariant.
 
 ## Sharing Fixtures with conftest.py
 
@@ -229,11 +259,11 @@ Good tests do not depend on the real filesystem, clock, network, or environment.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
 
-Here is a unit that reads an environment variable and touches files:
+Here is a unit that depends on the filesystem and the environment:
+it reads an environment variable and touches files:
 
 ```python
 # storage.py
-# A unit that depends on the filesystem and the environment.
 import os
 from pathlib import Path
 
@@ -285,9 +315,9 @@ the way a client would.
 In a language with access control, the two are enforced differently.
 Python has no access control.
 Every attribute is reachable,
-and a leading underscore is only a convention that says "this is private,
-do not rely on it."
-So in Python the distinction is one of discipline, not of compiler enforcement.
+and a leading underscore is only a convention that says,
+"this is private, do not rely on it."
+In Python the distinction is one of discipline, not of compiler enforcement.
 
 That makes black-box testing the sensible default.
 Test the public surface, the methods a caller is meant to use,
@@ -302,7 +332,6 @@ The examples in this book are extracted from the chapters and checked automatica
 Plain programs are run, and their failures are reported.
 Files named `test_*.py` and `conftest.py` are handed to `pytest` instead,
 and a failing test fails the build.
-The tests in this chapter run exactly that way.
 
 ## Exercises
 

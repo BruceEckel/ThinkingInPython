@@ -1,5 +1,4 @@
 # storage.py
-# A unit that depends on the filesystem and the environment.
 import os
 from pathlib import Path
 
