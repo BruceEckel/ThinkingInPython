@@ -1,13 +1,13 @@
 # cleanup.py
 class Counter:
-    count: int = 0   # Number of objects of this class
+    count = 0   # Number of objects of this class
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name):
         self.name = name
         print(name, 'created')
         Counter.count += 1
 
-    def __del__(self) -> None:
+    def __del__(self):
         print(self.name, 'deleted')
         Counter.count -= 1
         if Counter.count == 0:

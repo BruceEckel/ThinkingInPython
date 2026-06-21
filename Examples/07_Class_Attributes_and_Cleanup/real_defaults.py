@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 class A:
-    def __init__(self, x: int = 100) -> None:
+    def __init__(self, x=100):
         self.x = x  # An instance variable, one per object
 
 @dataclass

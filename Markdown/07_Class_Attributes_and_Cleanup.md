@@ -66,7 +66,7 @@ from dataclasses import dataclass
 
 
 class A:
-    def __init__(self, x: int = 100) -> None:
+    def __init__(self, x=100):
         self.x = x  # An instance variable, one per object
 
 @dataclass
@@ -95,14 +95,14 @@ This seems like a candidate for releasing resources:
 ```python
 # cleanup.py
 class Counter:
-    count: int = 0   # Number of objects of this class
+    count = 0   # Number of objects of this class
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name):
         self.name = name
         print(name, 'created')
         Counter.count += 1
 
-    def __del__(self) -> None:
+    def __del__(self):
         print(self.name, 'deleted')
         Counter.count -= 1
         if Counter.count == 0:
@@ -199,19 +199,21 @@ from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances: WeakValueDictionary[int, Counter] = (
-        WeakValueDictionary())
+    _instances = WeakValueDictionary()
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name):
         self.name = name
         self._instances[id(self)] = self
 
     @classmethod
-    def live_count(cls) -> int:
+    def live_count(cls):
         return len(cls._instances)
 
 
-counters = [Counter(name) for name in ["First", "Second", "Third"]]
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
+
 print(Counter.live_count())  # 3
 counters.pop()               # Release "Third"
 print(Counter.live_count())  # 2

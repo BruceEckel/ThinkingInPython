@@ -158,7 +158,7 @@ at a call site it *unpacks* a sequence into separate positional arguments.
 ```python
 # unpacking.py
 # Turn a sequence into positional arguments with *.
-def f(a: int, b: int, c: int) -> None:
+def f(a, b, c):
     print(a, b, c)
 
 x = [1, 2, 3]

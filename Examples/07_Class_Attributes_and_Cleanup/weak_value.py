@@ -3,19 +3,21 @@ from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances: WeakValueDictionary[int, Counter] = (
-        WeakValueDictionary())
+    _instances = WeakValueDictionary()
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name):
         self.name = name
         self._instances[id(self)] = self
 
     @classmethod
-    def live_count(cls) -> int:
+    def live_count(cls):
         return len(cls._instances)
 
 
-counters = [Counter(name) for name in ["First", "Second", "Third"]]
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
+
 print(Counter.live_count())  # 3
 counters.pop()               # Release "Third"
 print(Counter.live_count())  # 2
