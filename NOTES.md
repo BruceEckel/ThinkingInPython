@@ -1,3 +1,5 @@
+Don't use types until after 08
+
 Run 'make prose' on each chapter
 
 Potential chapter: Performance

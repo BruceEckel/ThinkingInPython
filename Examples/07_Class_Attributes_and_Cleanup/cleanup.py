@@ -15,6 +15,14 @@ class Counter:
         else:
             print(Counter.count, 'Counter objects remaining')
 
+    def __repr__(self):
+        return f"Counter({self.name!r} {self.count})"
 
-x = Counter("First")
-del x
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
+
+for c in counters:
+    print(c)
+    del c
+print("End of delete loop")

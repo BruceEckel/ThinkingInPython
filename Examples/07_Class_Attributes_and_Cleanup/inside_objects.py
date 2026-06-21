@@ -1,5 +1,4 @@
 # inside_objects.py
-
 class A:
     x = 100  # class attribute
 

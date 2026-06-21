@@ -19,7 +19,6 @@ Here's an example showing why it can be confusing:
 
 ```python
 # class_attribute_confusion.py
-
 class Stars:
     rating = 5  # One value, shared by the whole class.
 
@@ -41,7 +40,6 @@ To show this we can select the class with `vars(A)` and the instance with `vars(
 
 ```python
 # inside_objects.py
-
 class A:
     x = 100  # class attribute
 
@@ -89,10 +87,10 @@ This is detailed in [Data Classes as Types](10_Data_Classes_as_Types.md).
 ## Cleanup
 
 Python manages memory for you, so most objects need no explicit cleanup.
-When an object owns an outside resource (a file, a socket, a lock),
-you still have to release it.
-Python calls an object's `__del__()` method when it collects the object,
-which looks like the place for that work:
+However, when an object owns an outside resource (a file, a socket, a lock),
+you must release it.
+Python garbage collector calls an object's `__del__()` method when it collects that object.
+This seems like a candidate for releasing resources:
 
 ```python
 # cleanup.py
@@ -112,14 +110,63 @@ class Counter:
         else:
             print(Counter.count, 'Counter objects remaining')
 
+    def __repr__(self):
+        return f"Counter({self.name!r} {self.count})"
 
-x = Counter("First")
-del x
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
+
+for c in counters:
+    print(c)
+    del c
+print("End of delete loop")
 ```
 
-This runs, but leaning on `__del__()` is fragile.
-Its timing is not guaranteed,
-and at interpreter shutdown the globals it refers to may already be gone.
+For CPython, the output is:
+
+    First created
+    Second created
+    Third created
+    Counter('First' 3)
+    Counter('Second' 3)
+    Counter('Third' 3)
+    End of delete loop
+    Third deleted
+    2 Counter objects remaining
+    Second deleted
+    1 Counter objects remaining
+    First deleted
+    Last Counter object deleted
+
+`del c` inside the loop does not delete the object.
+It only unbinds the name `c`.
+Each `Counter` is still referenced by the `counters` list,
+so its reference count never reaches zero during the loop.
+That is why no `deleted` lines appear while the loop runs,
+and why every `__repr__()` prints `3`.
+Nothing has been destroyed yet, so the class attribute `count` is still `3` for all three.
+The `End of delete loop` line, printed before any deletion, confirms that the loop destroys nothing.
+
+The objects are destroyed later, at interpreter shutdown,
+when the global `counters` list is torn down.
+That list holds the only remaining references,
+so when it goes, the objects it holds go with it.
+
+The reverse order (`Third`, then `Second`, then `First`) comes from how CPython deallocates a list.
+It releases the items from the last index down to the first,
+so `Third` reaches a reference count of zero first and its `__del__()` runs first,
+followed by `Second` and then `First`.
+The effect is last-in, first-out.
+
+This order, and the fact that `__del__()` runs at exit,
+is a CPython reference-counting detail.
+The language does not promise when, or in what order, `__del__()` runs.
+Another implementation, such as PyPy with a tracing garbage collector,
+could destroy the objects in a different order, or not run the finalizers before exit at all.
+
+Thus, leaning on `__del__()` is fragile because the timing is not guaranteed.
+At interpreter shutdown the globals it refers to may already be gone.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
@@ -131,18 +178,20 @@ The Python documentation warns:
 > reason, `__del__()` methods should do the absolute minimum needed to
 > maintain external invariants.
 
-The explicit `del x` above forces collection while `Counter` is still intact.
-Without it the cleanup fires during shutdown,
-when `Counter` may already be gone.
-So `__del__()` should do the minimum, and you should not depend on it.
-Two approaches are sturdier.
+In this run the deletions happen during shutdown,
+exactly the precarious moment the warning describes.
+`Counter` and `print` were still available, so the output came out cleanly,
+but the teardown order that allowed that is not guaranteed.
+So `__del__()` should do as little as possible, and you should not depend on it.
 
-First, an explicit finalizer such as the `close()` that file objects provide,
-called from a `with` block so it runs even when an error interrupts the code.
+Two approaches are more reliable:
 
-Second, a weak reference, which tracks an object without keeping it alive.
-Here a `WeakValueDictionary` counts live instances,
-using `id(self)` as each object's key:
+1. An explicit finalizer such as the `close()` that file objects provide,
+   called from a `with` block. This runs even when an error interrupts the code.
+
+2. A weak reference, which tracks an object without keeping it alive.
+   Here a `WeakValueDictionary` counts live instances,
+   using `id(self)` as each object's key:
 
 ```python
 # weak_value.py
