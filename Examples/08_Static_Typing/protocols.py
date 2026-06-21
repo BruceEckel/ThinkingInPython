@@ -1,6 +1,4 @@
 # protocols.py
-# A Protocol describes a required shape: any object with that shape
-# qualifies, without inheriting from a base class.
 from typing import Protocol
 
 

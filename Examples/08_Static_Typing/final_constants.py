@@ -1,6 +1,4 @@
 # final_constants.py
-# Final marks a name as a constant. Reassigning it is a type error,
-# caught by the checker before the program runs.
 from typing import Final
 
 MAX_RETRIES: Final = 3
