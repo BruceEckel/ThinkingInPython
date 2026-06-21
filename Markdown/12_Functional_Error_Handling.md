@@ -170,7 +170,7 @@ The output is:
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot ignore that,
 because to get the answer it has to open the `Result`.
-This is the same idea as the [Static Typing](08_Static_Typing.md) chapter:
+This is the same idea as the [Static Typing](07_Static_Typing.md) chapter:
 put the meaning in the type.
 
 ## Composing by Hand

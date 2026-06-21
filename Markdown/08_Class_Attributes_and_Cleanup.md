@@ -56,6 +56,34 @@ So a class attribute seems like a default until someone assigns to an instance v
 Changing the class attribute makes the "default" value of `x` seem different for every object that has not shadowed it.
 This produces bugs that surface far from their cause.
 
+When you genuinely want one shared value, say so with `ClassVar` from `typing`.
+The checker then treats it as class-wide,
+and stops you from accidentally creating an instance variable that shadows it:
+
+```python
+# class_var.py
+from typing import ClassVar
+
+
+class Tally:
+    total: ClassVar[int] = 0  # One shared value, not per-instance
+    label: str  # A normal instance variable
+
+    def __init__(self, label: str) -> None:
+        self.label = label
+        Tally.total += 1
+
+
+a = Tally("a")
+b = Tally("b")
+print(Tally.total)  # 2: shared by the whole class
+# a.total = 99  # ty: cannot assign ClassVar "total" via instance
+```
+
+`ClassVar` is a hint for the checker, not the runtime.
+It records that `total` belongs to the class,
+and it catches the accidental shadowing from the earlier example before it happens.
+
 For real per-object defaults, write a constructor with default arguments,
 or use a `@dataclass`, which turns the class-attribute syntax into instance variable defaults.
 Each object then gets its own storage for instance variables:
@@ -66,7 +94,7 @@ from dataclasses import dataclass
 
 
 class A:
-    def __init__(self, x=100):
+    def __init__(self, x: int = 100) -> None:
         self.x = x  # An instance variable, one per object
 
 @dataclass
@@ -94,15 +122,18 @@ This seems like a candidate for releasing resources:
 
 ```python
 # cleanup.py
-class Counter:
-    count = 0   # Number of objects of this class
+from typing import ClassVar
 
-    def __init__(self, name):
+
+class Counter:
+    count: ClassVar[int] = 0   # Number of objects of this class
+
+    def __init__(self, name: str) -> None:
         self.name = name
         print(name, 'created')
         Counter.count += 1
 
-    def __del__(self):
+    def __del__(self) -> None:
         print(self.name, 'deleted')
         Counter.count -= 1
         if Counter.count == 0:
@@ -110,7 +141,7 @@ class Counter:
         else:
             print(Counter.count, 'Counter objects remaining')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"
 
 counters = []
@@ -195,18 +226,20 @@ Two approaches are more reliable:
 
 ```python
 # weak_value.py
+from typing import ClassVar
 from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances = WeakValueDictionary()
+    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
+        WeakValueDictionary())
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self._instances[id(self)] = self
 
     @classmethod
-    def live_count(cls):
+    def live_count(cls) -> int:
         return len(cls._instances)
 
 

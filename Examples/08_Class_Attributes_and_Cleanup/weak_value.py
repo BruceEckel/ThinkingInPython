@@ -1,16 +1,18 @@
 # weak_value.py
+from typing import ClassVar
 from weakref import WeakValueDictionary
 
 
 class Counter:
-    _instances = WeakValueDictionary()
+    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
+        WeakValueDictionary())
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self._instances[id(self)] = self
 
     @classmethod
-    def live_count(cls):
+    def live_count(cls) -> int:
         return len(cls._instances)
 
 

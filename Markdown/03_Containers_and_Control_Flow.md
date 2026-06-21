@@ -282,7 +282,7 @@ with path.open() as f:
 path.unlink()  # Delete the file
 ```
 
-This is the explicit-finalizer approach from the [Class Attributes and Cleanup](07_Class_Attributes_and_Cleanup.md) chapter.
+This is the explicit-finalizer approach from the [Class Attributes and Cleanup](08_Class_Attributes_and_Cleanup.md) chapter.
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
 Note that when simply reading or writing to a file,
 `pathlib` provides convenient utility methods like `read_text()` and `write_text()`

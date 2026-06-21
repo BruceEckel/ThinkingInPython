@@ -1,13 +1,16 @@
 # cleanup.py
-class Counter:
-    count = 0   # Number of objects of this class
+from typing import ClassVar
 
-    def __init__(self, name):
+
+class Counter:
+    count: ClassVar[int] = 0   # Number of objects of this class
+
+    def __init__(self, name: str) -> None:
         self.name = name
         print(name, 'created')
         Counter.count += 1
 
-    def __del__(self):
+    def __del__(self) -> None:
         print(self.name, 'deleted')
         Counter.count -= 1
         if Counter.count == 0:
@@ -15,7 +18,7 @@ class Counter:
         else:
             print(Counter.count, 'Counter objects remaining')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"
 
 counters = []

@@ -255,7 +255,7 @@ an illegal value never became a `Stars` in the first place.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-The [Static Typing](08_Static_Typing.md) chapter argues for letting the type carry the meaning.
+The [Static Typing](07_Static_Typing.md) chapter argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
 `__post_init__` is one of the hooks the data class machinery generates code around,

@@ -252,7 +252,7 @@ End with `case _: assert_never(value)`.
 The type checker then proves the match is *exhaustive*:
 if you add a type to the union and forget its case,
 it reports the gap before the program runs.
-This is the static-typing payoff from the [Static Typing](08_Static_Typing.md) chapter applied to control flow:
+This is the static-typing payoff from the [Static Typing](07_Static_Typing.md) chapter applied to control flow:
 
 ```python
 # exhaustive.py

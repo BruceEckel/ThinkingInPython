@@ -38,7 +38,7 @@ When the last rat dies, the maze is fully mapped.
 The rat does not import the blackboard.
 It only needs an object with the right methods,
 so a `Protocol` describes what it expects.
-This is the structural typing from the [Static Typing](08_Static_Typing.md) chapter.
+This is the structural typing from the [Static Typing](07_Static_Typing.md) chapter.
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 
