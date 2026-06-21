@@ -8,25 +8,20 @@ It is as if you extend the language:
 the test suite checks not just that the code parses,
 but that it still means what you intended.
 
-Unit testing is not a design pattern but a development practice.
-Its effect on the quality of this book is large enough that tests appear throughout,
-so the practice is introduced here.
-
+Unit testing is a development practice.
 Tests give you a safety net.
-With them you can refactor boldly, change designs, and clean up code,
-because a regression announces itself immediately instead of months later in a bug report.
+With them you can refactor boldly, change designs, and clean up code.
+A failing test announces itself immediately instead of months later in a bug report.
 The cost is small and the payoff compounds.
 
-## Write Tests First
+## Test-Driven Development (TDD)
 
-A common failure is to write the code, get it working,
+A common approach is to write the code, get it working,
 and intend to write the tests later.
 Later rarely comes.
-The tests lose importance and then vanish.
+The tests seem to lose their importance.
 
-The fix, drawn from Extreme Programming,
-is to write the tests *before* the code.
-This seems backwards, but it gives testing enough value to make it essential.
+One solution is to write the tests *before* writing the code.
 When you write the tests first, you:
 
 1.  Describe what the code should do, in concrete and verifiable terms,
@@ -36,7 +31,16 @@ When you write the tests first, you:
 
 Testing then becomes a design tool,
 not a verification step you skip when you happen to feel good about the code you just wrote.
-That feeling is usually wrong.
+
+That said, TDD requires that you know what you are creating.
+The design is there, you are confident it is correct, and it is now a matter of implementation.
+You need that certainty in order to write tests first.
+Often, however, you are not sure what direction a program will take you.
+You are experimenting to see what the right approach is.
+When you are not simply producing code, but discovering your design, TDD is wasteful.
+Writing tests for exploratory programming is not practical.
+With the advent of AI, generating tests once you have found a good path becomes far more viable.
+It also makes it easier to produce a more thorough test suite.
 
 ## pytest
 
@@ -47,12 +51,11 @@ The wider Python world has settled on `pytest`, and so does this book.
 
 `pytest` is built around two ideas that keep tests short.
 A test is just a function whose name starts with `test_`.
-A check is just the `assert` statement.
+A check is just Python's built-in `assert` statement.
 There is no base class to inherit and no special assertion methods to memorize.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-Here is a small unit to test.
-Put it in its own file:
+Here is a small unit to test:
 
 ```python
 # account.py
@@ -83,8 +86,7 @@ class Account:
 ```
 
 By convention tests live in a file whose name starts with `test_`.
-The following file exercises the whole `Account` class,
-and the sections below walk through each technique it uses:
+The following file exercises the whole `Account` class:
 
 ```python
 # test_account.py
@@ -137,21 +139,14 @@ A passing run is quiet.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
-## Fixtures Replace setup and teardown
+## Fixtures Replace Setup and Teardown
 
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
-`pytest` replaces both with *fixtures*: functions that build what a test needs,
-declared as parameters.
+`pytest` replaces both with *fixtures*: functions that build what a test needs.
+These fixtures are declared as parameters to the test functions, which tells `pytest` to automatically call the fixture function and pass its result to the test function.
+
 The `funded` function above is a fixture.
 A test that names `funded` as an argument receives the value the fixture returns.
-
-```python
-@pytest.fixture
-def funded() -> Account:
-    account = Account()
-    account.deposit(100)
-    return account
-```
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
