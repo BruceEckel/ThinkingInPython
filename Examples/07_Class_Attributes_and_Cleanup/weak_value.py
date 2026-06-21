@@ -6,23 +6,20 @@ class Counter:
     _instances: WeakValueDictionary[int, Counter] = (
         WeakValueDictionary())
 
-    @property
-    def count(self) -> int:
-        return len(self._instances)
-
     def __init__(self, name: str) -> None:
         self.name = name
         self._instances[id(self)] = self
-        print(name, 'created')
 
-    def __del__(self) -> None:
-        print(self.name, 'deleted')
-        if self.count == 0:
-            print('Last Counter object deleted')
-        else:
-            print(self.count, 'Counter objects remaining')
+    @classmethod
+    def live_count(cls) -> int:
+        return len(cls._instances)
 
 
-counters = []
-for name in ["First", "Second", "Third"]:
-    counters.append(Counter(name))
+counters = [Counter(name) for name in ["First", "Second", "Third"]]
+print(Counter.live_count())  # 3
+counters.pop()               # Release "Third"
+print(Counter.live_count())  # 2
+counters.pop()               # Release "Second"
+print(Counter.live_count())  # 1
+counters.clear()             # Release "First"
+print(Counter.live_count())  # 0

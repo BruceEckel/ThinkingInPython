@@ -202,27 +202,35 @@ class Counter:
     _instances: WeakValueDictionary[int, Counter] = (
         WeakValueDictionary())
 
-    @property
-    def count(self) -> int:
-        return len(self._instances)
-
     def __init__(self, name: str) -> None:
         self.name = name
         self._instances[id(self)] = self
-        print(name, 'created')
 
-    def __del__(self) -> None:
-        print(self.name, 'deleted')
-        if self.count == 0:
-            print('Last Counter object deleted')
-        else:
-            print(self.count, 'Counter objects remaining')
+    @classmethod
+    def live_count(cls) -> int:
+        return len(cls._instances)
 
 
-counters = []
-for name in ["First", "Second", "Third"]:
-    counters.append(Counter(name))
+counters = [Counter(name) for name in ["First", "Second", "Third"]]
+print(Counter.live_count())  # 3
+counters.pop()               # Release "Third"
+print(Counter.live_count())  # 2
+counters.pop()               # Release "Second"
+print(Counter.live_count())  # 1
+counters.clear()             # Release "First"
+print(Counter.live_count())  # 0
 ```
 
-The count now falls on its own as objects are collected,
-with no explicit `del` required.
+Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.
+`live_count()` is just the size of that registry,
+so it reports how many `Counter` objects currently exist.
+When an instance loses its last ordinary reference, here by leaving the `counters` list,
+it is collected at once, and the dictionary drops its entry on its own.
+So the count falls `3, 2, 1, 0` as the list releases the objects,
+with no `__del__()` and no explicit cleanup call.
+
+A plain `dict` or `list` as the registry would keep every instance alive forever,
+so the count could never fall.
+The weak reference is what lets the registry prune itself.
+Unlike the `__del__()` version, this reads the count during normal execution,
+so it never depends on the unreliable bookkeeping at interpreter shutdown.
