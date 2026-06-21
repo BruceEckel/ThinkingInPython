@@ -153,28 +153,21 @@ print(render(Square()))
 ```
 
 `Circle` and `Square` never mention `Drawable`.
-Both are accepted because each has a `draw()` of the right shape.
-If you pass `render()` an object without a `draw()`, `ty` rejects it.
+Both are accepted because each has a `draw()`, so they are of the right shape.
+If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 Python preserves the flexibility of dynamic typing but gains the early warning of static types.
 
 ## The Hints Are Not Enforced at Run Time
 
-Keep one thing straight: the hints do not change what the program does.
+Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves exactly as it would have with no hints at all.
-Checking is a separate step you run, like the tests.
+Checking is a separate step you run, the same way you check tests separately.
 If you need a guarantee at run time, you still write `isinstance`,
 or use a library built to validate data.
-The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at run time,
-and [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
+The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at run time.
+[Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input comes in.
 The hints themselves are for the tools and for the reader.
-The run-time behavior is unchanged.
 
-## Further Reading
-
-- The official Python tutorial: <https://docs.python.org/3/tutorial/>
-- The Python Programming FAQ:
-  <https://docs.python.org/3/faq/programming.html>
-- Planet Python, an aggregator of Python articles from around the web:
-  <https://planetpython.org/>
+## Type Hint Summary

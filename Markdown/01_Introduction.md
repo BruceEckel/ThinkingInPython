@@ -89,3 +89,10 @@ and the output shown is the output it produces.
 
 If you find a mistake, corrections are welcome;
 see `CONTRIBUTING.md` in the source repository.
+
+## Resources
+
+- [The official Python tutorial](https://docs.python.org/3/tutorial/)
+- [The Python Programming FAQ](https://docs.python.org/3/faq/programming.html)
+- [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
+- [Planet Python](https://planetpython.org/), an aggregator of Python articles from around the web
