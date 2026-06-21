@@ -224,9 +224,9 @@ print(Counter.live_count())  # 0
 ```
 
 Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.
-`live_count()` is just the size of that registry,
+`live_count()` is the size of that registry,
 so it reports how many `Counter` objects currently exist.
-When an instance loses its last ordinary reference, here by leaving the `counters` list,
+When an instance loses its last ordinary reference, here by being popped off the `counters` list,
 it is collected at once, and the dictionary drops its entry on its own.
 So the count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
