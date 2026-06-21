@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
 `replace` returns a copy with some fields changed, leaving the original alone.
 That copy-instead-of-mutate style is the one we want.
-(This is the same `dataclass` the [Messenger](18_Messenger.md) chapter uses for passing bundles of data around.)
+(This is the same `dataclass` the [Data Transfer Objects](18_Data_Transfer_Objects.md) chapter uses for passing bundles of data around.)
 But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
 

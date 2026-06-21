@@ -1,4 +1,4 @@
-# Fronting for an Implementation
+# Surrogate
 
 Both *Proxy* and *State* provide a surrogate class that you use in your code;
 the real class that does the work is hidden behind this surrogate class.

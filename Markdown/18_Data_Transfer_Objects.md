@@ -1,4 +1,4 @@
-# Messenger
+# Data Transfer Objects
 
 The *Messenger* or *Data Transfer Object* is a way to pass a clump of information around.
 The most typical place for this is in return values from functions,

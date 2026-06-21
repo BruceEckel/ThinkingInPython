@@ -732,7 +732,7 @@ if __name__ == "__main__":
 
 ## Exercises
 
-The *Proxy* and *State* patterns that several of these exercises build on are covered in [Fronting for an Implementation](21_Fronting_for_an_Implementation.md).
+The *Proxy* and *State* patterns that several of these exercises build on are covered in [Surrogate](21_Surrogate.md).
 
 1.  Create an example of the "virtual proxy."
 2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.

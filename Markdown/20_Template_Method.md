@@ -1,4 +1,4 @@
-# Application Frameworks
+# Template Method
 
 An application framework lets you build a new application by reusing existing classes and overriding one or more methods to customize the behavior.
 At the heart of a framework is the *Template Method*: a method,

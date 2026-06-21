@@ -44,10 +44,10 @@ In the meantime I hope it's useful.
 - [ ] 15_Metaprogramming.md
 - [ ] 16_Rethinking_Objects.md
 - [ ] 17_The_Pattern_Concept.md
-- [ ] 18_Messenger.md
+- [ ] 18_Data_Transfer_Objects.md
 - [ ] 19_Singleton.md
-- [ ] 20_Application_Frameworks.md
-- [ ] 21_Fronting_for_an_Implementation.md
+- [ ] 20_Template_Method.md
+- [ ] 21_Surrogate.md
 - [ ] 22_State_Machines.md
 - [ ] 23_Iterators.md
 - [ ] 24_Factory.md
