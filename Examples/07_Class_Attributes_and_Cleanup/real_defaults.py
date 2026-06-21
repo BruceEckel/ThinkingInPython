@@ -1,6 +1,4 @@
 # real_defaults.py
-# For per-object defaults, write a constructor, or use a @dataclass,
-# which turns the class-attribute syntax into exactly that.
 from dataclasses import dataclass
 
 
@@ -8,10 +6,9 @@ class A:
     def __init__(self, x: int = 100) -> None:
         self.x = x  # An instance variable, one per object
 
-
 @dataclass
 class B:
-    x: int = 100  # A constructor default, not a shared value
+    x: int = 100  # Constructor default, not class attribute
 
 
 if __name__ == "__main__":

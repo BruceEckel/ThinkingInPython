@@ -1,69 +1,69 @@
 # Class Attributes and Cleanup
 
 Two parts of an object's lifetime surprise programmers coming from C++ or Java:
-how class-level attributes behave, and how and when objects are cleaned up.
+
+- How class-level attributes behave
+- How and when objects are cleaned up.
 
 ## Class Attributes Are Not Default Values
 
 A field declared in the class body, outside any method, is a *class attribute*.
 It is easy to misread one as a per-object default value.
 It is not.
-There is one shared variable for the whole class,
-and an instance variable of the same name *shadows* it.
+A class attribute creates one shared variable across all instances of the class.
+If you then create an instance variable of the same name, that instance variable *shadows* the class attribute.
 This trips up programmers coming from C++ or Java,
 where storage for such a field is allocated per object before the constructor runs.
 
-Simple use looks exactly like a default value, which is the trap:
+Here's an example showing why it can be confusing:
 
 ```python
 # class_attribute_confusion.py
-# A class attribute looks like a per-object default, but it is one
-# shared value, and an instance variable of the same name shadows it.
+
 class Stars:
     rating = 5  # One value, shared by the whole class.
 
 
 a = Stars()
 b = Stars()
-print(a.rating, b.rating)  # 5 5: both read the class attribute
-a.rating = 1  # Assigning makes an instance variable on a.
+print(a.rating, b.rating)  # 5 5: Both read the class attr
+a.rating = 1  # Assigning makes an instance variable on a
 print(a.rating, b.rating)  # 1 5: a shadows it, b sees the class
-Stars.rating = 9  # Now change the shared class attribute.
-print(a.rating, b.rating)  # 1 9: a keeps its own, b follows
+Stars.rating = 9  # Change the shared class attr
+print(a.rating, b.rating)  # 1 9: a instance variable , b class attr
 ```
 
-The reason is that an instance and its class each have their own attribute dictionary.
+An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
 Assigning always writes to the instance,
-creating the variable there the first time:
+creating an instance variable the first time it is referenced.
+To show this we can select the class with `vars(A)` and the instance with `vars(a)`:
 
 ```python
 # inside_objects.py
-# An instance and its class each have their own attribute dictionary.
-# Reading falls back to the class; assigning writes to the instance.
+
 class A:
     x = 100  # class attribute
 
 
 a = A()
-print(vars(A)["x"])  # 100: the attribute lives in the class dict
-print(vars(a))  # {}: the instance has no attributes yet
+print(vars(A)["x"])  # 100: The attribute lives in the class dict
+print(vars(a))  # {}: The instance has no attributes yet
 a.x = 1
-print(vars(a))  # {'x': 1}: assignment created it on the instance
+print(vars(a))  # {'x': 1}: Assignment created it on the instance
+print(vars(A)["x"])  # Still 100
 ```
 
-So a class attribute behaves like a default only until someone assigns to the instance.
-Changing the class attribute then reaches into every object that has not shadowed it yet.
-That produces bugs that surface far from their cause.
+So a class attribute seems like a default until someone assigns to an instance variable of the same name.
+Changing the class attribute makes the "default" value of `x` seem different for every object that has not shadowed it.
+This produces bugs that surface far from their cause.
 
 For real per-object defaults, write a constructor with default arguments,
-or use a `@dataclass`, which turns the class-attribute syntax into exactly that.
-Each object then gets its own storage:
+or use a `@dataclass`, which turns the class-attribute syntax into instance variable defaults.
+Each object then gets its own storage for instance variables:
 
 ```python
 # real_defaults.py
-# For per-object defaults, write a constructor, or use a @dataclass,
-# which turns the class-attribute syntax into exactly that.
 from dataclasses import dataclass
 
 
@@ -71,10 +71,9 @@ class A:
     def __init__(self, x: int = 100) -> None:
         self.x = x  # An instance variable, one per object
 
-
 @dataclass
 class B:
-    x: int = 100  # A constructor default, not a shared value
+    x: int = 100  # Constructor default, not class attribute
 
 
 if __name__ == "__main__":
@@ -84,8 +83,8 @@ if __name__ == "__main__":
     print(B().x, B(7).x)  # 100 7
 ```
 
-The [Data Classes as Types](10_Data_Classes_as_Types.md) chapter builds on this:
-a `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
+A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
+This is detailed in [Data Classes as Types](10_Data_Classes_as_Types.md).
 
 ## Cleanup
 
