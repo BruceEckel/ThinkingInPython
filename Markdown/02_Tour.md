@@ -54,7 +54,6 @@ which is one of the main reasons for Python's consistent readability.
 Python normally has only one statement per line (you can put more by separating them with semicolons),
 thus no terminating semicolon is necessary.
 
-
 ## Variables and References
 
 A variable in Python is a name bound to an object, not a box that holds a value.

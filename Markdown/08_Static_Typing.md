@@ -1,63 +1,55 @@
 # Static Typing
 
-The functions in the earlier chapters declare no types.
 C++ and Java make you declare the type of everything,
 and they check those types before the program runs.
-Python checks types at run time, only when an operation is actually attempted,
-and the book so far has leaned on that freedom.
+Python checks types at run time, only when an operation is actually attempted.
+Up until this chapter, we haven't used type declarations.
 
 On a small program you do not miss the declarations.
-On a large one you start to.
-A type error that a compiler would have caught now waits until the code runs,
-and sometimes that means it waits until a bug report.
-Python's answer keeps the freedom and adds the safety net back on your terms.
-You annotate code with *type hints*,
-and a separate tool reads them and tells you, before you run anything,
-where the types do not line up.
-The hints are optional and the checking is a separate step,
-so you opt in as much as it pays off and no more.
+On a large program, type errors that C++ or Java would catch now appear only when the code runs.
+Sometimes that means it waits until a bug report.
+
+Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
+However, the Python runtime does not care if your type hints are *logically* correct as long as they are structurally and syntactically valid.
+The runtime ignores properly-formed type hints,
+so if you want the equivalent of a compiler in a typed language you must run an additional type checking tool (this book uses Astral's `ty`).
+
+You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
 
 ## Type Hints
 
 A hint annotates a parameter, a return value, or a variable.
-You write a colon for parameters and variables,
-and an arrow for the return type:
+Use a colon for parameters and variables, and an arrow for the return type:
 
 ```python
 # typed_basics.py
-# Hints annotate parameters, returns, and variables. They do not
-# change how the code runs; they let a checker and an editor reason
-# about it.
-
 
 def repeat(text: str, times: int) -> str:
     return text * times
 
+print(repeat("ab", 3))
 
 total: int = 0
 for word in ["a", "bb", "ccc"]:
     total += len(word)
 
-print(repeat("ab", 3))
 print(total)
 ```
 
-The container and optional types read the way you say them: `list[int]`,
+Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
 
 ## Constants with Final
 
-The naming convention earlier used ALL_CAPS to signal a constant,
+The naming convention shown earlier used ALL_CAPS to signal a constant,
 but that is only a hint to human readers.
-`Final` makes it a hint the checker enforces:
-reassign a `Final` name and the checker reports it,
-even though Python itself still allows the assignment at run time.
+`Final` makes it a hint the type checker enforces.
+If you reassign a `Final`, the checker reports it,
+even though the Python runtime allows the assignment.
 
 ```python
 # final_constants.py
-# Final marks a name as a constant. Reassigning it is a type error,
-# caught by the checker before the program runs.
 from typing import Final
 
 MAX_RETRIES: Final = 3
@@ -70,7 +62,7 @@ print(MAX_RETRIES, GREETING)
 
 You can give the type explicitly, as in `Final[str]`,
 or let it be inferred from the value, as with `MAX_RETRIES`.
-Marking the values that are meant to stay fixed turns a class of accidental reassignments into errors you hear about at once.
+Marking values `Final` immediately discovers accidental reassignments.
 
 ## Gradual Typing
 

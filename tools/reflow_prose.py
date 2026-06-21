@@ -17,6 +17,8 @@ Only plain prose paragraphs are touched. Everything else is preserved verbatim:
 fenced code, indented code, tables, headings, list items, blockquotes, HTML
 blocks, horizontal rules, and YAML front matter. Inline code spans and footnotes
 are masked before splitting so their internal punctuation never causes a break.
+The line and inline classification used to tell prose from the rest lives in
+`md_prose.py`, shared with the prose linter.
 
 Safety: a file is rewritten only if its whitespace-normalized text is unchanged.
 The tool only moves newlines; it never adds, drops, or alters a word. If that
@@ -41,6 +43,22 @@ import difflib
 import re
 import sys
 from pathlib import Path
+
+from md_prose import (
+    BLOCKQUOTE,
+    FENCE,
+    HEADING,
+    HR,
+    HTML,
+    LIST,
+    LIST_ITEM,
+    PUA_END,
+    PUA_START,
+    TABLE,
+    is_prose_line,
+    mask,
+    unmask,
+)
 
 # Sentences wider than this are broken at clause punctuation. Roughly the
 # column at which an editor would otherwise soft-wrap the line.
@@ -68,19 +86,11 @@ ABBREV = {
     "co", "jr", "sr", "esp", "ca", "viz", "resp",
 }
 
-# Private-use characters stand in for masked spans (inline code, footnotes) so
-# their internal punctuation is invisible to the splitter.
-_PUA_START = 0xE000
-_PUA_END = 0xF8FF
-
-_FOOTNOTE = re.compile(r"\^\[[^\]]*\]")
-_INLINE_CODE = re.compile(r"``[^`]*``|`[^`]*`")
-
 # Character-class bodies, built with chr()/\u escapes so no literal smart quote
 # or private-use character appears in this source file. A sentence may end with
 # trailing closers (quotes, brackets, masked spans) and the next may begin with
 # an opener, a capital, a digit, or a masked span.
-_PUA_RANGE = chr(_PUA_START) + "-" + chr(_PUA_END)
+_PUA_RANGE = chr(PUA_START) + "-" + chr(PUA_END)
 _CLOSER_BODY = "\"'’”)»*\\]" + _PUA_RANGE
 _OPENER_BODY = "\"'“«([*A-Z0-9" + _PUA_RANGE
 
@@ -89,27 +99,9 @@ _BOUNDARY = re.compile(
 )
 
 
-def _mask(text: str) -> tuple[str, list[str]]:
-    store: list[str] = []
-
-    def repl(m: re.Match[str]) -> str:
-        store.append(m.group(0))
-        return chr(_PUA_START + len(store) - 1)
-
-    text = _FOOTNOTE.sub(repl, text)
-    text = _INLINE_CODE.sub(repl, text)
-    return text, store
-
-
-def _unmask(text: str, store: list[str]) -> str:
-    for i, original in enumerate(store):
-        text = text.replace(chr(_PUA_START + i), original)
-    return text
-
-
 def _disp_len(masked: str, store: list[str]) -> int:
     """Length of `masked` as it renders, with masked spans expanded."""
-    return len(_unmask(masked, store))
+    return len(unmask(masked, store))
 
 
 def _token_before(text: str, dot_index: int) -> str:
@@ -157,8 +149,8 @@ def _split_masked(masked: str) -> list[str]:
 
 def split_sentences(paragraph: str) -> list[str]:
     """Split one logical paragraph (already single-spaced) into sentences."""
-    masked, store = _mask(paragraph)
-    return [_unmask(s, store) for s in _split_masked(masked)]
+    masked, store = mask(paragraph)
+    return [unmask(s, store) for s in _split_masked(masked)]
 
 
 def _clause_segments(masked: str) -> list[str]:
@@ -183,7 +175,7 @@ def _clause_segments(masked: str) -> list[str]:
             # break falls after them: `means "raw,"` | `which ...`.
             j = i + 1
             while j < n and (masked[j] in _CLOSERS_SET
-                             or _PUA_START <= ord(masked[j]) <= _PUA_END):
+                             or PUA_START <= ord(masked[j]) <= PUA_END):
                 j += 1
             if j < n and masked[j] == " ":
                 k = j
@@ -231,40 +223,12 @@ def _wrap_clause(masked_sentence: str, store: list[str], width: int) -> list[str
 
 def _reflow_text(joined: str, width: int) -> list[str]:
     """Reflow one logical block of text into sentence/clause lines."""
-    masked, store = _mask(joined)
+    masked, store = mask(joined)
     result: list[str] = []
     for sentence in _split_masked(masked):
         for clause in _wrap_clause(sentence, store, width):
-            result.append(_unmask(clause, store))
+            result.append(unmask(clause, store))
     return result
-
-
-# --- Block classification ---------------------------------------------------
-
-_FENCE = re.compile(r"^\s*(```+|~~~+)")
-_HEADING = re.compile(r"^\s{0,3}#{1,6}\s")
-_HR = re.compile(r"^\s{0,3}([-*_])(\s*\1){2,}\s*$")
-_LIST = re.compile(r"^\s*([-*+]|\d+[.)])\s")
-# Full match for a list item: leading indent, marker, gap, then the text.
-_LIST_ITEM = re.compile(r"^(\s*)([-*+]|\d+[.)])(\s+)(.*)$")
-_BLOCKQUOTE = re.compile(r"^\s*>")
-_TABLE = re.compile(r"^\s*\|")
-_HTML = re.compile(r"^\s*<")
-_INDENTED_CODE = re.compile(r"^(\t| {4,})")
-
-
-def _is_prose_line(line: str) -> bool:
-    if not line.strip():
-        return False
-    return not (
-        _HEADING.match(line)
-        or _HR.match(line)
-        or _LIST.match(line)
-        or _BLOCKQUOTE.match(line)
-        or _TABLE.match(line)
-        or _HTML.match(line)
-        or _INDENTED_CODE.match(line)
-    )
 
 
 def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
@@ -293,12 +257,12 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
 
         if in_fence:
             out.append(line)
-            if _FENCE.match(line) and line.strip().startswith(fence_marker):
+            if FENCE.match(line) and line.strip().startswith(fence_marker):
                 in_fence = False
             i += 1
             continue
 
-        fence = _FENCE.match(line)
+        fence = FENCE.match(line)
         if fence:
             in_fence = True
             fence_marker = fence.group(1)[0] * 3
@@ -310,7 +274,7 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
         # reflow the combined text with a hanging indent. Without this, a
         # wrapped continuation line is treated as a separate paragraph and
         # de-dented away from its bullet.
-        list_item = _LIST_ITEM.match(line)
+        list_item = LIST_ITEM.match(line)
         if list_item:
             indent, bullet, gap, first_text = list_item.groups()
             content_col = len(indent) + len(bullet) + len(gap)
@@ -319,13 +283,13 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
             while i < n:
                 nxt = lines[i]
                 if (not nxt.strip()
-                        or _FENCE.match(nxt)
-                        or _LIST.match(nxt)
-                        or _HEADING.match(nxt)
-                        or _HR.match(nxt)
-                        or _BLOCKQUOTE.match(nxt)
-                        or _TABLE.match(nxt)
-                        or _HTML.match(nxt)):
+                        or FENCE.match(nxt)
+                        or LIST.match(nxt)
+                        or HEADING.match(nxt)
+                        or HR.match(nxt)
+                        or BLOCKQUOTE.match(nxt)
+                        or TABLE.match(nxt)
+                        or HTML.match(nxt)):
                     break
                 cont.append(nxt)
                 i += 1
@@ -344,7 +308,7 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
             out.extend(block)
             continue
 
-        if not _is_prose_line(line):
+        if not is_prose_line(line):
             out.append(line)
             i += 1
             continue
@@ -352,7 +316,7 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
         # Gather a prose paragraph: consecutive prose lines.
         para_lines = [line]
         i += 1
-        while i < n and _is_prose_line(lines[i]) and not _FENCE.match(lines[i]):
+        while i < n and is_prose_line(lines[i]) and not FENCE.match(lines[i]):
             para_lines.append(lines[i])
             i += 1
 

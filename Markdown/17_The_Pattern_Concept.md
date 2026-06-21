@@ -118,8 +118,6 @@ it's not a good use of your time,
 and you can't force the discovery of patterns that way;
 they tend to be subtle and appear over time.
 
-
-
 ## Design Structures
 
 One of the struggles that I've had with design patterns is their classification.
@@ -137,7 +135,6 @@ so that classification doesn't lead me to a solution (I'll readily admit that I 
 I've labored for a while with this problem,
 first noting that the underlying structure of some of the GoF patterns are similar to each other,
 and trying to develop relationships based on that similarity.
-
 
 To that end, I've begun to try to collect basic design structures,
 and to try to see if there's a way to relate those structures to the various design patterns that appear in well thought-out systems.

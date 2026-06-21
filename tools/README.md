@@ -181,6 +181,17 @@ flags wrongly (design-pattern terms like `adaptee`, foreign-language quotes,
 deliberate code strings) are listed in `tools/codespell-ignore.txt`. Scope it
 with `DOCS=`, for example `make spell DOCS=Markdown/02_A_Python_Tour.md`.
 
+**Mechanical prose: prose_lint (`make spell`).** `tools/prose_lint.py` runs
+alongside codespell and catches small mechanical slips a spell checker ignores:
+more than one space between words, a space before `.`/`,`/`;`/`!`/`?`, more than
+one blank line in a row, a period or comma left outside a closing quote, and
+trailing whitespace (a two-space hard break is allowed). It shares the
+`md_prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
+tables, blockquotes, and HTML are skipped, and inline code spans and footnotes
+are ignored inside a prose line; headings and list-item text are checked but
+their markers are not. It is report-only and exits non-zero on any finding. Run
+it directly with `uv run python tools/prose_lint.py Markdown` (or a single file).
+
 **House style: Vale (`make prose`).** Vale is a standalone binary, not a Python
 package, so install it once (`winget install errata-ai.Vale`,
 `brew install vale`, or see <https://vale.sh/docs/install>). Vale parses Markdown

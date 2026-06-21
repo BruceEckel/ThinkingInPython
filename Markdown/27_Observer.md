@@ -348,7 +348,6 @@ and what would let you attach a second view to the same model and keep both in s
 Showing that the model is correct, separately from how it is drawn,
 is the model-view split made concrete.
 
-
 ### Exercises
 
 1.  Write a class decorator that wraps every method of a class to print when the method is entered and exited,

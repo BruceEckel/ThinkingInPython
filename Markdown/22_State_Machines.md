@@ -9,10 +9,10 @@ The code that moves the system from one state to the next is often a *Template M
 as seen in the following framework for a basic state machine.
 
 Each state can be `run()` to perform its behavior,
-and (in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input".
+and (in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
 The key distinction between this design and the next is that here,
 each `State` object decides what other states it can move to,
-based on the "input",
+based on the "input,"
 whereas in the subsequent design all of the state transitions are held in a single table.
 Another way to put it is that here,
 each `State` object has its own little `State` table,
@@ -727,8 +727,6 @@ def show() -> None:
 if __name__ == "__main__":
     show()
 ```
-
-
 
 ## Exercises
 

@@ -166,7 +166,6 @@ f(*x)
 f(*(1, 2, 3))
 ```
 
-
 ## Lambdas
 
 A `lambda` is a small anonymous function written as a single expression.
