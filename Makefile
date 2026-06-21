@@ -1,7 +1,9 @@
 # Thinking in Python: build and verification targets.
 # Tooling is managed by uv, so targets run through `uv run`. Override with
-# `make PY=python ...` to use a plain interpreter. On Windows without `make`,
-# run the underlying `uv run python ...` commands directly (see tools/README.md).
+# `make PY=python ...` to use a plain interpreter. On Windows the quickest way to
+# get GNU Make is winget (pre-installed on modern Windows):
+#   winget install ezwinports.make
+# Restart the terminal, then `make --version` to confirm.
 
 PY ?= uv run python
 TY ?= uv run ty

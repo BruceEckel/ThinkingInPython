@@ -66,30 +66,25 @@ Marking values `Final` immediately discovers accidental reassignments.
 
 ## Gradual Typing
 
-You do not have to annotate everything, or anything.
-Add hints one function at a time, and the unannotated code keeps working.
+You can add hints one function at a time; the unannotated code keeps working.
 The checker treats whatever it cannot see as the type `Any`,
 which is compatible with everything, so typed and untyped code live together.
 This is *gradual typing*.
-Start untyped, then add hints where they earn their keep: the public interfaces,
+You can slowly add hints where they earn their keep: the public interfaces,
 the tricky data, the code other people depend on.
-Throwaway scripts you leave bare.
-When a value really is dynamic, `Any` is an honest way to say so.
+When a value is truly dynamic, `Any` shows that you mean it to be.
 
-## The Checker: ty
+## The Checker: `ty`
 
 The hints do nothing on their own.
-You need a tool to read them.
-This book uses [`ty`](https://github.com/astral-sh/ty), Astral's fast checker.
-You point it at your code:
+You need a tool to check them.
+This book uses [`ty`](https://github.com/astral-sh/ty), Astral's fast checker:
 
     ty check
 
-It complains where the hints and the code disagree,
-and stays quiet when they agree.
-Every runnable example in this book is checked this way,
-and the build runs `ty` on every change,
-so the code you read here checks as well as runs.
+It complains where the hints and the code disagree, and is quiet when they agree.
+Every runnable example in this book is checked this way.
+The build runs `ty` on every change, so the code you read here checks as well as runs.
 
 ## Catching Mistakes
 
@@ -104,35 +99,34 @@ area("3", 4)   # ty: argument of type "str" is not assignable to "int"
 ```
 
 At run time `area("3", 4)` does not cause an error.
-It returns `"3333"`, because `"3" * 4` is perfectly good string repetition.
-The bug would surface much later, far from the line that caused it.
-The checker discovers the problem right away.
+It returns `"3333"`, because `"3" * 4` is the correct syntax for string repetition.
+Bugs surface later, often far from the line that caused it.
+The checker immediately discovers the problem.
 
 ## Structural Typing with Protocols
 
-This feature fits the way Python already works.
-The earlier chapters relied on *dynamic typing*: a function accepts any object,
+Earlier chapters relied on *dynamic typing*: a function accepts any object,
 and the only requirement is that the object supports the operations performed on it.
 The type is checked at run time, when the operation runs.
-This is often called *duck typing*:
+Dynamic typing is often called *duck typing*:
 if it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
 Rather than wait for run time,
-a type checker verifies ahead of time that an object has the required shape:
-the right methods and attributes, whatever class it was declared as.
+a type checker verifies ahead of time that an object has the required *shape*,
+which means the methods and attributes required by whatever consumes that type.
 Dynamic typing and structural typing are the same idea checked at different moments.
 Dynamic typing trusts the object when the code runs;
 structural typing proves the shape before the code runs.
 
 A *Protocol* expresses that shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
-A `Protocol` asks only that an object have the right shape, with no inheritance:
+A Protocol describes a required shape: any object with that shape
+qualifies, without inheriting from a base class.
+A `Protocol` can be used without inheritance:
 
 ```python
 # protocols.py
-# A Protocol describes a required shape: any object with that shape
-# qualifies, without inheriting from a base class.
 from typing import Protocol
 
 
@@ -158,10 +152,10 @@ print(render(Circle()))
 print(render(Square()))
 ```
 
-`Circle` and `Square` never mention `Drawable`, and both are accepted,
-because each has a `draw()` of the right shape.
-Hand `render()` an object with no `draw()` and `ty` rejects it.
-You keep the flexibility of dynamic typing and gain the early warning of static types.
+`Circle` and `Square` never mention `Drawable`.
+Both are accepted because each has a `draw()` of the right shape.
+If you pass `render()` an object without a `draw()`, `ty` rejects it.
+Python preserves the flexibility of dynamic typing but gains the early warning of static types.
 
 ## The Hints Are Not Enforced at Run Time
 

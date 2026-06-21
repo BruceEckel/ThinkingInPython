@@ -38,6 +38,15 @@ Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
 uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
 ```
 
+To run GNU Make natively on Windows, install it with winget, which ships with
+modern Windows and is the quickest setup. In Command Prompt or PowerShell, run:
+
+```
+winget install ezwinports.make
+```
+
+Restart the terminal to refresh the PATH, then run `make --version` to confirm.
+
 With `make` (targets run through `uv run`); `make help` lists them all, most-used
 first:
 
@@ -62,17 +71,6 @@ Markdown changes out to `Examples/` (so the drift check passes), then runs every
 gate except the site build. `make sync-ci` does the same and also builds the
 site. `make ci` runs the gate (with site) without syncing first, so it still
 fails on drift, the way GitHub Actions does.
-
-Without `make` (e.g. Windows PowerShell), call the scripts through `uv run`:
-
-```
-uv run python tools/extract_examples.py                  # = make check
-uv run python tools/extract_examples.py --write -o Examples  # = make sync
-uv run python tools/extract_examples.py --write          # = make extract
-uv run python tools/run_examples.py                      # = make run
-uv run python tools/build_site.py                        # = make site
-uv run ty check ExtractedExamples                        # = make ty
-```
 
 ## extract_examples.py
 
@@ -325,10 +323,8 @@ Day to day:
 1. Make your changes by editing `Markdown/` (the source of truth for prose and
    code alike).
 2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/`, then
-   runs the full gate (drift, run, pytest, ty, ruff, site). On Windows without
-   `make`, run the equivalent `uv run` commands from "Commands" above (the
-   `make sync` line, then the gate). Use plain `make ci` when you want to
-   confirm there is no drift rather than paper over it.
+   runs the full gate (drift, run, pytest, ty, ruff, site). Use plain `make ci`
+   when you want to confirm there is no drift rather than paper over it.
 3. When it is green, commit and push, including any updated `Examples/` files.
    The default CI path just rebuilds and publishes the site; it does not re-run
    the gates, so the push is fast.
