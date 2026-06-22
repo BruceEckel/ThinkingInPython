@@ -273,8 +273,9 @@ Good tests do not depend on the real filesystem, clock, network, or environment.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
 
-This example depends on the filesystem and the environment because
-it reads an environment variable and touches files:
+### File System & Environment
+
+This example reads an environment variable and touches files:
 
 ```python
 # storage.py
@@ -313,6 +314,8 @@ def test_missing_file_raises(
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")
 ```
+
+### Random Numbers
 
 Randomness is another piece of the world to pin down.
 Code that calls `random` produces a different value each run,
@@ -368,6 +371,52 @@ def test_roll_with_seeded_rng() -> None:
 The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a
 seeded one. The randomness is now an input, not a hidden dependency.
+
+### Reading the Clock
+
+Code that reads `time.time()` gives a different answer every run,
+and `monkeypatch` pins it to a fixed value the same way it did for `randint`:
+
+```python
+# stopwatch.py
+import time
+
+def elapsed(start: float) -> float:
+    return time.time() - start
+```
+
+```python
+# test_stopwatch.py
+import time
+import pytest
+import stopwatch
+
+def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(time, "time", lambda: 100.0)
+    assert stopwatch.elapsed(40.0) == 60.0
+```
+
+And, as with randomness, injecting the clock is cleaner still:
+have the code take a `now` callable, and the test passes a fixed one:
+
+```python
+# clock.py
+from collections.abc import Callable
+
+def stamp(now: Callable[[], float]) -> float:
+    return now()
+```
+
+```python
+# test_clock.py
+import clock
+
+def test_stamp() -> None:
+    assert clock.stamp(lambda: 100.0) == 100.0
+```
+
+`datetime.now()` is harder to patch, because `datetime` is a built-in type,
+so for code that calls it the injection approach is worth the small effort.
 
 ## White-Box and Black-Box Tests
 
