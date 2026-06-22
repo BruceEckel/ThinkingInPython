@@ -36,8 +36,6 @@ A positional argument may be a file path or a chapter selector matched against
 Markdown/: a number or stem prefix ("02", "02_A_Python") or a substring ("Tour").
 """
 
-from __future__ import annotations
-
 import argparse
 import difflib
 import re

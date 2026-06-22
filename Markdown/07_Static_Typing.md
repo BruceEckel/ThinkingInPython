@@ -260,7 +260,6 @@ shapes come from `collections.abc`.
 |-----------|---------|
 | `Self` | The enclosing class type; handy for fluent methods and alternative constructors |
 | `"Name"` | A *forward reference*: a not-yet-defined type, written as a string |
-| `from __future__ import annotations` | Defers evaluating every annotation in the module |
 
 ### Typing decorators and directives
 

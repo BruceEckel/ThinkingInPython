@@ -38,7 +38,6 @@ Usage:
     python tools/run_examples.py --baseline      # fail only on regressions
     python tools/run_examples.py --write-baseline
 """
-from __future__ import annotations
 
 import argparse
 import fnmatch

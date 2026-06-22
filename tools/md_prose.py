@@ -15,8 +15,6 @@ opens or closes a block.
 characters, so their internal punctuation is invisible to text processing.
 """
 
-from __future__ import annotations
-
 import re
 
 # --- Inline masking ---------------------------------------------------------

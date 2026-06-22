@@ -1,0 +1,8 @@
+# Banned phrases for the book. One phrase per line.
+# Blank lines and lines starting with "#" are ignored.
+# tools/banned_phrases.py fails the build if any of these appears in
+# Markdown/ (prose and code alike). Matching is literal and case-sensitive.
+
+# Unnecessary on Python 3.14: PEP 649 deferred annotation evaluation is the
+# default, so forward references work without this import.
+from __future__ import annotations

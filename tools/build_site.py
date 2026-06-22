@@ -15,7 +15,6 @@ Usage:
     python tools/build_site.py            # build into build/site/
     python tools/build_site.py -o DIR     # build somewhere else
 """
-from __future__ import annotations
 
 import argparse
 import re

@@ -9,7 +9,6 @@ Usage:
     python tools/serve.py --open      # serve and open a browser
     python tools/serve.py --port 9000 # serve on another port
 """
-from __future__ import annotations
 
 import argparse
 import contextlib

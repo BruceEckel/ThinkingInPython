@@ -14,7 +14,6 @@ Usage:
     python tools/check_line_endings.py          # check, exit 1 on CRLF
     python tools/check_line_endings.py --fix     # convert offenders to LF
 """
-from __future__ import annotations
 
 import argparse
 import subprocess

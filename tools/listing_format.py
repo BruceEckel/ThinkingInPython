@@ -17,7 +17,6 @@ Default mode reports offending blank lines and exits non-zero, so it works as a
 gate (run by `make listings`, part of the `gate` recipe). Pass --fix to remove
 them (run by `make fix-listings`).
 """
-from __future__ import annotations
 
 import argparse
 import re

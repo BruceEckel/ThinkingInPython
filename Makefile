@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings clean-examples clean-site
+.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -46,6 +46,7 @@ help:
 	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
 	@echo "  listings  - check ```python listings keep blank lines minimal"
 	@echo "  fix-listings - remove the offending blank lines from listings"
+	@echo "  banned    - fail if any tools/banned_phrases.txt phrase is in the book"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -131,11 +132,16 @@ listings:
 fix-listings:
 	$(PY) tools/listing_format.py --fix
 
+# Fail if any phrase in tools/banned_phrases.txt appears anywhere in the book.
+banned:
+	$(PY) tools/banned_phrases.py
+
 # The local gate without the site build: line endings, listing density, drift
 # check, ty, ruff, run, pytest. `verify` runs `sync` first; `ci` adds the site.
 gate:
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/listing_format.py
+	$(PY) tools/banned_phrases.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(TY) check ExtractedExamples

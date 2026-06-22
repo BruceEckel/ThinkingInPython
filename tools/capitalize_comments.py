@@ -19,7 +19,6 @@ Default is a dry run that prints proposed changes. Pass --write to apply.
 After applying, regenerate the Examples/ mirror:
     python tools/extract_examples.py --write -o Examples
 """
-from __future__ import annotations
 
 import argparse
 import re

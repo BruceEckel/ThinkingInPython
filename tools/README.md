@@ -239,6 +239,20 @@ Do not run `ruff format` on the examples: it would re-expand to two blank lines
 between top-level defs and undo the density. The gate runs `ruff check` (the
 linter) only, which is happy with one blank line.
 
+## banned_phrases.py
+
+Fails the build if any phrase listed in `tools/banned_phrases.txt` appears
+anywhere in `Markdown/`, prose and code alike (unlike Vale, which only sees
+prose). Matching is a literal, case-sensitive substring; each occurrence is
+reported as `path:line:col`. Use it to retire a construct book-wide, for example
+`from __future__ import annotations`, which is unnecessary on Python 3.14. Edit
+the phrases file to add or remove entries (blank lines and `#` comments are
+ignored). It is part of the `make ci` gate.
+
+```
+make banned    # fail if any banned phrase is in the book (part of `make ci`)
+```
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).

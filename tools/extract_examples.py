@@ -25,7 +25,6 @@ Usage:
     python tools/extract_examples.py --write        # write ExtractedExamples/
     python tools/extract_examples.py --write -o DIR  # write somewhere else
 """
-from __future__ import annotations
 
 import argparse
 import re

@@ -178,7 +178,7 @@ JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 These fixtures are declared as parameters to the test functions,
 which tells `pytest` to automatically call the fixture function and pass its result to the test function.
 
-The `funded` function above is a fixture.
+The `funded` function in `test_account.py` is a fixture.
 A test that names `funded` as an argument receives the value the fixture returns.
 
 Each test gets its own freshly built `funded` account,
@@ -210,6 +210,14 @@ def test_spend_some(open_account: Account) -> None:
 Everything before the `yield` is setup.
 Everything after it runs once the test finishes, even if the test failed.
 After the `yield` is the place to close files, release locks, or check a final invariant.
+
+You can automatically invoke a fixture for every test (without specifying the fixture in each test)
+by adding the `autouse` flag:
+
+    @pytest.fixture(autouse=True)
+
+Fixtures are powerful and save a lot of redundant code.
+Less code generally makes tests easier to read and verify.
 
 ## Sharing Fixtures with conftest.py
 
