@@ -2,7 +2,6 @@
 # Simple demonstration of the State pattern.
 from typing import Any
 
-
 class StateD:
     def __init__(self, imp: Any) -> None:
         self.__implementation = imp

@@ -12,7 +12,6 @@ def describe(status: int) -> str:
         case _:
             return f"status {status}"
 
-
 print(describe(200))
 print(describe(404))
 print(describe(301))

@@ -2,7 +2,6 @@
 # An example of the Abstract Factory pattern.
 from typing import override
 
-
 class Obstacle:
     def action(self) -> None: pass
 

@@ -4,11 +4,9 @@
 # to the real internals.
 from dataclasses import dataclass
 
-
 @dataclass
 class Bob:
     name: str = "Bob"
-
 
 class Leaky:
     def __init__(self, numbers: list[int]) -> None:
@@ -22,7 +20,6 @@ class Leaky:
     @property
     def bob(self) -> Bob:
         return self._bob
-
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])

@@ -7,21 +7,17 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-
 @dataclass(frozen=True)
 class Deposit:
     amount: int
-
 
 @dataclass(frozen=True)
 class Withdraw:
     amount: int
 
-
 @dataclass(frozen=True)
 class Closed:
     reason: str
-
 
 class EventBus:
     def __init__(self) -> None:
@@ -35,18 +31,14 @@ class EventBus:
         for handler in self._handlers.get(type(event), []):
             handler(event)
 
-
 def on_deposit(event: Deposit) -> None:
     print(f"+ deposit {event.amount}")
-
 
 def audit(event: Deposit) -> None:
     print(f"  audit: a deposit of {event.amount}")
 
-
 def on_withdraw(event: Withdraw) -> None:
     print(f"- withdraw {event.amount}")
-
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)

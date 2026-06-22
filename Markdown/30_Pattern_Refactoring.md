@@ -28,7 +28,6 @@ and a `create` method builds an instance from a material name (this is a *factor
 # trash.py
 # The Trash hierarchy, with self-registration and a per-pound value.
 
-
 class Trash:
     value: float = 0.0  # Dollars per pound, set by each subclass
     registry: dict[str, type[Trash]] = {}  # name -> subclass
@@ -44,22 +43,17 @@ class Trash:
     def create(cls, name: str, weight: float) -> Trash:
         return Trash.registry[name](weight)
 
-
 class Aluminum(Trash):
     value = 1.67
-
 
 class Paper(Trash):
     value = 0.10
 
-
 class Glass(Trash):
     value = 0.23
 
-
 class Cardboard(Trash):
     value = 0.79
-
 
 def sum_value(items: list[Trash]) -> float:
     total = 0.0
@@ -112,9 +106,7 @@ Add a new kind of trash and the parser keeps working unchanged:
 # parse_trash.py
 # Read "Name:weight" lines into Trash objects through the registry.
 from pathlib import Path
-
 from trash import Trash
-
 
 def parse(filename: str) -> list[Trash]:
     items: list[Trash] = []
@@ -138,10 +130,8 @@ The most obvious way to sort is to look at each piece and test what it is using 
 # this code, with no help from the tools if you miss a spot. That is
 # the smell to watch for.
 from collections import defaultdict
-
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
-
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
@@ -157,7 +147,6 @@ def main() -> None:
     for kind, items in bins.items():
         print(f"--- {kind.__name__} ---")
         sum_value(items)
-
 
 if __name__ == "__main__":
     main()
@@ -181,10 +170,8 @@ Group the pieces in a dictionary keyed by their own type:
 # named here, so this code never changes when you add a new kind of
 # Trash.
 from collections import defaultdict
-
 from parse_trash import parse
 from trash import Trash, sum_value
-
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
@@ -193,7 +180,6 @@ def main() -> None:
     for kind, items in bins.items():
         print(f"--- {kind.__name__} ---")
         sum_value(items)
-
 
 if __name__ == "__main__":
     main()
@@ -231,30 +217,24 @@ You write a single-dispatch function:
 # is never touched, new operations are independent functions, and
 # new types just register themselves.
 from functools import singledispatch
-
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash
-
 
 @singledispatch
 def recycling_note(t: Trash) -> str:
     return f"{type(t).__name__}: no special handling"
 
-
 @recycling_note.register
 def _(t: Aluminum) -> str:
     return "Aluminum: crush and bale"
-
 
 @recycling_note.register
 def _(t: Glass) -> str:
     return "Glass: sort by color, then crush"
 
-
 @recycling_note.register
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
-
 
 def main() -> None:
     seen: set[type] = set()
@@ -262,7 +242,6 @@ def main() -> None:
         if type(t) not in seen:
             seen.add(type(t))
             print(recycling_note(t))
-
 
 if __name__ == "__main__":
     main()
@@ -297,22 +276,18 @@ so it does not depend on `trash.dat`:
 ```python
 # test_trash.py
 from pathlib import Path
-
 import pytest
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
-
 
 def test_subclasses_self_register() -> None:
     assert set(Trash.registry) == {
         "Aluminum", "Paper", "Glass", "Cardboard"}
 
-
 def test_create_builds_by_name() -> None:
     t = Trash.create("Aluminum", 2.0)
     assert isinstance(t, Aluminum)
     assert t.weight == 2.0
-
 
 def test_per_pound_values() -> None:
     assert Aluminum.value == 1.67
@@ -320,11 +295,9 @@ def test_per_pound_values() -> None:
     assert Glass.value == 0.23
     assert Cardboard.value == 0.79
 
-
 def test_sum_value_totals_weight_times_value() -> None:
     items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
     assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
-
 
 def test_parse_reads_and_skips_comments(tmp_path: Path) -> None:
     data = tmp_path / "trash.dat"

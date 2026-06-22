@@ -2,12 +2,10 @@
 # A guard adds a condition to a case.
 from dataclasses import dataclass
 
-
 @dataclass
 class Point:
     x: int
     y: int
-
 
 def quadrant(p: Point) -> str:
     match p:
@@ -19,7 +17,6 @@ def quadrant(p: Point) -> str:
             return "second quadrant"
         case _:
             return "somewhere else"
-
 
 print(quadrant(Point(0, 0)))
 print(quadrant(Point(3, 4)))

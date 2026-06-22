@@ -2,7 +2,6 @@
 class A:
     x = 100  # class attribute
 
-
 a = A()
 print(vars(A)["x"])  # 100: The attribute lives in the class dict
 print(vars(a))  # {}: The instance has no attributes yet

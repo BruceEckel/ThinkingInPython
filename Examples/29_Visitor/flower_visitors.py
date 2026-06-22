@@ -4,7 +4,6 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-
 # The Flower hierarchy cannot be changed:
 class Flower:
     def accept(self, visitor: Any) -> None:

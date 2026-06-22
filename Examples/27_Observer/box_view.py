@@ -4,10 +4,8 @@
 # change. The model in box_observer.py is what the tests check.
 import tkinter as tk
 from typing import Any, override
-
 from box_observer import BoxModel, Grid
 from observer import Observer
-
 
 def show(model: BoxModel, cell: int = 60) -> None:
     "Open the window and keep it in step with the model."
@@ -34,7 +32,6 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 lambda e: model.click((e.x // cell, e.y // cell)))
     draw(model.grid)
     root.mainloop()
-
 
 if __name__ == "__main__":
     show(BoxModel(8))

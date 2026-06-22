@@ -2,13 +2,11 @@
 # A data class generates __init__, __repr__, and __eq__ for you.
 from dataclasses import dataclass, replace
 
-
 @dataclass
 class Messenger:
     name: str
     number: int
     depth: float = 0.0  # Default value.
-
 
 if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)

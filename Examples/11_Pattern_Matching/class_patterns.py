@@ -3,12 +3,10 @@
 # supports positional matching out of the box.
 from dataclasses import dataclass
 
-
 @dataclass
 class Point:
     x: int
     y: int
-
 
 def locate(p: Point) -> str:
     match p:
@@ -20,7 +18,6 @@ def locate(p: Point) -> str:
             return f"on the x-axis at x={x}"
         case Point(x, y):
             return f"at ({x}, {y})"
-
 
 print(locate(Point(0, 0)))
 print(locate(Point(0, 5)))

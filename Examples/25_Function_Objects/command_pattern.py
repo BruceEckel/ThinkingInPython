@@ -1,7 +1,6 @@
 # command_pattern.py
 from typing import override
 
-
 class Command:
     def execute(self) -> None: pass
 

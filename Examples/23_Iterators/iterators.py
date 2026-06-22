@@ -2,14 +2,12 @@
 # Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
 
-
 # A generator function is the easy way to produce an iterator:
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
     for _ in range(n):
         yield a
         a, b = b, a + b
-
 
 # A class becomes iterable by implementing __iter__, often as a
 # generator:
@@ -23,12 +21,10 @@ class Countdown:
             yield n
             n -= 1
 
-
 # Any function written against an iterable is decoupled from its
 # source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
-
 
 print(list(fibonacci(8)))
 print(list(Countdown(5)))

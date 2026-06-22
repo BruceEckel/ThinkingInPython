@@ -24,12 +24,10 @@ The successful results computed before the failure are lost with the rest:
 # An exception unwinds the whole computation. Partial results are
 # thrown away: func_a(0) succeeded, but its result is gone.
 
-
 def func_a(i: int) -> int:
     if i == 1:
         raise ValueError(f"func_a({i})")
     return i
-
 
 try:
     results = [func_a(i) for i in range(3)]
@@ -60,12 +58,10 @@ Nothing is thrown away, because the error is just another return value:
 # failure are not clearly distinguished: both are just values you
 # have to tell apart by type.
 
-
 def func_a(i: int) -> int | str:
     if i == 1:
         return f"func_a({i})"  # The error, returned as a value.
     return i
-
 
 outputs = [func_a(i) for i in range(3)]
 print(outputs)
@@ -110,7 +106,6 @@ parameterized over the answer type and the error type:
 from collections.abc import Callable
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Success[A]:
     answer: A
@@ -123,7 +118,6 @@ class Success[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
-
 @dataclass(frozen=True)
 class Failure[E]:
     error: E
@@ -132,7 +126,6 @@ class Failure[E]:
         self, func: Callable[..., Result[B, E]]
     ) -> Failure[E]:
         return self  # Pass the failure forward unchanged.
-
 
 type Result[A, E] = Success[A] | Failure[E]
 ```
@@ -149,12 +142,10 @@ Now the signature tells the whole story:
 # Result[int, str].
 from result import Failure, Result, Success
 
-
 def func_a(i: int) -> Result[int, str]:
     if i == 1:
         return Failure(f"func_a({i})")
     return Success(i)
-
 
 if __name__ == "__main__":
     for i in range(3):
@@ -189,12 +180,10 @@ so the failure becomes data rather than control flow:
 from result import Failure, Result, Success
 from returning_result import func_a
 
-
 def func_b(i: int) -> Result[int, str]:
     if i == 2:
         return Failure(f"func_b({i})")
     return Success(i)
-
 
 def func_c(i: int) -> Result[int, str]:
     try:
@@ -204,7 +193,6 @@ def func_c(i: int) -> Result[int, str]:
         return Failure(f"func_c({i}): {e}")
     return Success(i)
 
-
 def composed(i: int) -> Result[int, str]:
     a = func_a(i)
     if isinstance(a, Failure):
@@ -213,7 +201,6 @@ def composed(i: int) -> Result[int, str]:
     if isinstance(b, Failure):
         return b
     return func_c(b.unwrap())
-
 
 if __name__ == "__main__":
     for i in range(5):
@@ -249,10 +236,8 @@ from composing import func_b, func_c
 from result import Result
 from returning_result import func_a
 
-
 def composed(i: int) -> Result[int, str]:
     return func_a(i).bind(func_b).bind(func_c)
-
 
 if __name__ == "__main__":
     for i in range(5):
@@ -290,17 +275,14 @@ from composing import func_b, func_c
 from result import Result, Success
 from returning_result import func_a
 
-
 def add(a: int, b: int, c: int) -> str:
     return f"add({a} + {b} + {c}): {a + b + c}"
-
 
 def combined(i: int, j: int) -> Result[str, str]:
     return func_a(i).bind(
         lambda a: func_b(j).bind(
             lambda b: func_c(i + j).bind(
                 lambda c: Success(add(a, b, c)))))
-
 
 if __name__ == "__main__":
     for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
@@ -330,9 +312,7 @@ with the exception as the `Failure` value:
 # any other Result.
 from collections.abc import Callable
 from functools import wraps
-
 from result import Failure, Result, Success
-
 
 def safe[A](
     func: Callable[..., A],
@@ -347,11 +327,9 @@ def safe[A](
             return Failure(e)
     return wrapper
 
-
 @safe
 def parse(text: str) -> int:
     return int(text)
-
 
 if __name__ == "__main__":
     for text in ("42", "oops"):
@@ -385,16 +363,13 @@ Each kind of failure gets its own branch:
 from result import Failure, Result, Success
 from safe import safe
 
-
 @safe
 def parse(text: str) -> int:
     return int(text)
 
-
 @safe
 def reciprocal(n: int) -> float:
     return 1 / n
-
 
 def describe(text: str) -> str:
     result: Result[float, Exception] = parse(text).bind(reciprocal)
@@ -407,7 +382,6 @@ def describe(text: str) -> str:
             return f"{text}: cannot divide by zero"
         case Failure(error):
             return f"{text}: {type(error).__name__}"
-
 
 if __name__ == "__main__":
     for text in ("4", "0", "oops"):
@@ -457,24 +431,19 @@ from composing import composed as composed_manual
 from composing_with_bind import composed as composed_bind
 from result import Failure, Success
 
-
 def test_success_unwrap() -> None:
     assert Success(5).unwrap() == 5
 
-
 def test_bind_chains_a_success() -> None:
     assert Success(1).bind(lambda x: Success(x + 1)) == Success(2)
-
 
 def test_bind_short_circuits_a_failure() -> None:
     failure: Failure[str] = Failure("boom")
     assert failure.bind(lambda x: Success(x + 1)) is failure
 
-
 def test_manual_and_bind_agree() -> None:
     for i in range(5):
         assert composed_manual(i) == composed_bind(i)
-
 
 def test_combined() -> None:
     assert combined(7, 5) == Success("add(7 + 5 + 12): 24")
@@ -490,15 +459,12 @@ and a raised exception becomes a `Failure` holding that exception.
 from result import Failure, Success
 from safe import safe
 
-
 @safe
 def parse(text: str) -> int:
     return int(text)
 
-
 def test_safe_wraps_a_success() -> None:
     assert parse("42") == Success(42)
-
 
 def test_safe_captures_the_exception() -> None:
     match parse("oops"):

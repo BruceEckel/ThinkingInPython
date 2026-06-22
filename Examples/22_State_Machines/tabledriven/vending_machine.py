@@ -1,9 +1,7 @@
 # tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
 from enum import Enum, auto
-
 from state_machine import StateMachine, Table
-
 
 class State(Enum):
     QUIESCENT = auto()
@@ -11,7 +9,6 @@ class State(Enum):
     SELECTING = auto()
     UNAVAILABLE = auto()
     WANT_MORE = auto()
-
 
 class Money:
     def __init__(self, name: str, value: int) -> None:
@@ -21,11 +18,9 @@ class Money:
     def __str__(self) -> str:
         return self.name
 
-
 class Quit:
     def __str__(self) -> str:
         return "Quit"
-
 
 class Digit:
     def __init__(self, name: str, value: int) -> None:
@@ -35,18 +30,15 @@ class Digit:
     def __str__(self) -> str:
         return self.name
 
-
 class FirstDigit(Digit):
     pass
 class SecondDigit(Digit):
     pass
 
-
 class ItemSlot:
     def __init__(self, price: int, quantity: int) -> None:
         self.price = price
         self.quantity = quantity
-
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
@@ -118,7 +110,6 @@ class VendingMachine(StateMachine):
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
         self.amount = 0
-
 
 if __name__ == "__main__":
     events = [

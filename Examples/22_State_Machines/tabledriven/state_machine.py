@@ -16,7 +16,6 @@ type Transition = tuple[
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 
-
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial

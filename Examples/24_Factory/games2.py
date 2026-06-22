@@ -2,7 +2,6 @@
 # Simplified Abstract Factory.
 from typing import Any
 
-
 class Kitty:
     def interact_with(self, obstacle: Any) -> None:
         print("Kitty has encountered a",

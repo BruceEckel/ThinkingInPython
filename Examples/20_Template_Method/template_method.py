@@ -2,7 +2,6 @@
 # Simple demonstration of Template Method.
 from typing import override
 
-
 class ApplicationFramework:
     def __init__(self) -> None:
         self.run()
@@ -16,7 +15,6 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
-
 # Create an "application" by filling in the steps:
 class MyApp(ApplicationFramework):
     @override
@@ -26,6 +24,5 @@ class MyApp(ApplicationFramework):
     @override
     def customize2(self) -> None:
         print("Say no more, say no more!")
-
 
 MyApp()

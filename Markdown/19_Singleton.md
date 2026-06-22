@@ -56,17 +56,14 @@ The simplest way is to hide construction behind a cached factory.
 # The simplest class-based singleton: a cached factory.
 from functools import cache
 
-
 class Settings:
     def __init__(self) -> None:
         self.data: dict[str, str] = {}
-
 
 @cache
 def settings() -> Settings:
     "Always returns the same Settings instance."
     return Settings()
-
 
 a = settings()
 b = settings()
@@ -91,7 +88,6 @@ The classic approach takes control of creation by delegating to a single instanc
 # singleton_pattern.py
 from typing import Any
 
-
 class OnlyOne:
     class __OnlyOne:
         def __init__(self, arg: str) -> None:
@@ -113,7 +109,6 @@ class OnlyOne:
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
-
 
 x = OnlyOne('sausage')
 print(x)
@@ -144,7 +139,6 @@ to return the same object every time:
 # new_singleton.py
 from typing import Any
 
-
 class OnlyOne:
     class __OnlyOne:
         def __init__(self) -> None:
@@ -165,7 +159,6 @@ class OnlyOne:
 
     def __setattr__(self, name: str, value: Any) -> None:
         setattr(self.instance, name, value)
-
 
 x = OnlyOne()
 x.val = 'sausage'
@@ -193,13 +186,11 @@ and it points every instance's `__dict__` at the same storage:
 # Alex Martelli's 'Borg'
 from typing import Any
 
-
 class Borg:
     _shared_state: dict[str, Any] = {}
 
     def __init__(self) -> None:
         self.__dict__ = self._shared_state
-
 
 class Singleton(Borg):
     def __init__(self, arg: str) -> None:
@@ -208,7 +199,6 @@ class Singleton(Borg):
 
     def __str__(self) -> str:
         return self.val
-
 
 x = Singleton('sausage')
 print(x)
@@ -235,7 +225,6 @@ A simpler version relies on the fact that a class variable has a single shared v
 # class_variable_singleton.py
 from typing import Any
 
-
 class SingleTone:
     val: Any
     __instance: SingleTone | None = None
@@ -258,7 +247,6 @@ This is a *class decorator* (see [the Decorators chapter](13_Decorators.md)):
 # singleton.py
 from typing import Any
 
-
 class Singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
@@ -269,11 +257,9 @@ class Singleton:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
-
 @Singleton
 class Foo:
     pass
-
 
 x = Foo()
 y = Foo()
@@ -306,7 +292,6 @@ It is included here for completeness:
 # singleton_metaclass.py
 from typing import Any
 
-
 class SingletonMetaClass(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  namespace: dict[str, Any]) -> None:
@@ -322,14 +307,12 @@ class SingletonMetaClass(type):
         klass.instance = None
         klass.__new__ = staticmethod(my_new)
 
-
 class Bar(metaclass=SingletonMetaClass):
     def __init__(self, val: str) -> None:
         self.val = val
 
     def __str__(self) -> str:
         return repr(self) + self.val
-
 
 x = Bar('sausage')
 y = Bar('eggs')
@@ -358,21 +341,17 @@ import shared_config
 import singleton
 import singleton_metaclass
 
-
 def test_module_is_singleton() -> None:
     # shared_config did `from config import settings` and wrote to it,
     # mutating config's own dict.
     assert shared_config.settings is config.settings
     assert config.settings["theme"] == "dark"
 
-
 def test_cache_factory_returns_same_instance() -> None:
     assert cache_singleton.settings() is cache_singleton.settings()
 
-
 def test_new_returns_same_instance() -> None:
     assert new_singleton.OnlyOne() is new_singleton.OnlyOne()
-
 
 def test_class_variable_returns_same_instance() -> None:
     a = class_variable_singleton.SingleTone("a")
@@ -380,15 +359,12 @@ def test_class_variable_returns_same_instance() -> None:
     assert a is b
     assert a.val == "b"  # Last write wins on the shared instance
 
-
 def test_decorator_returns_same_instance() -> None:
     assert singleton.Foo() is singleton.Foo()
-
 
 def test_metaclass_returns_same_instance() -> None:
     assert (singleton_metaclass.Bar("x")
             is singleton_metaclass.Bar("y"))
-
 
 def test_borg_shares_state_but_not_identity() -> None:
     x = borg_singleton.Singleton("first")

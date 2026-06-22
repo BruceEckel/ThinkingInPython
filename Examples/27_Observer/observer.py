@@ -3,11 +3,9 @@
 # java.util, without the thread synchronization.
 from typing import Any
 
-
 class Observer:
     def update(self, observable: Any, arg: Any, /) -> None:
         "Called when the observed object changes."
-
 
 class Observable:
     def __init__(self) -> None:

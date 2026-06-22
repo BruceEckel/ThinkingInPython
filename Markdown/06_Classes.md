@@ -64,9 +64,7 @@ Here, we import and subclass `Simple`, from the `simple_class` module:
 ```python
 # simple2.py
 from typing import override
-
 from simple_class import Simple
-
 
 class Simple2(Simple):  # Simple2 inherits Simple
     def __init__(self, str):
@@ -128,17 +126,14 @@ It declares that a method is meant to replace one from a base class:
 # override_intro.py
 from typing import override
 
-
 class Base:
     def show(self):
         print("Base.show")
-
 
 class Derived(Base):
     @override
     def show(self):
         print("Derived.show")
-
 
 Derived().show()
 ```
@@ -272,7 +267,6 @@ This method can then be reused by multiple classes:
 ```python
 # utility.py
 
-
 def f(self):
     print(f"utility.f() called on {self}")
 ```
@@ -290,7 +284,6 @@ class Compose:
 
     def __repr__(self):
         return f"Compose({self.name!r})"
-
 
 Compose("example").f()
 ```

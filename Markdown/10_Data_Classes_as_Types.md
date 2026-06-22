@@ -24,7 +24,6 @@ We will lean on one tiny helper that raises when a value is not legal:
 class TypeFailure(ValueError):
     "Raised when a value falls outside the set its type allows."
 
-
 def check(condition: bool, message: str, detail: str = "") -> None:
     if not condition:
         raise TypeFailure(f"{message} {detail}".rstrip())
@@ -43,18 +42,15 @@ So every function that takes a rating has to check it:
 # used.
 from validation import check
 
-
 def f1(stars: int) -> int:
     # Check the argument here...
     check(1 <= stars <= 10, f"f1({stars})")
     return stars + 5
 
-
 def f2(stars: int) -> int:
     # ...and again in every other function.
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
-
 
 if __name__ == "__main__":
     rating = 6
@@ -79,7 +75,6 @@ and a method can leave the object in an illegal state between steps:
 # method must re-check it, and the object stays mutable underneath.
 from validation import check
 
-
 class Stars:
     def __init__(self, number: int) -> None:
         self._number = number  # Private by convention.
@@ -100,7 +95,6 @@ class Stars:
         self._number = n + 5
         self._validate()                 # Postcondition.
         return self._number
-
 
 if __name__ == "__main__":
     rating = Stars(4)
@@ -128,13 +122,11 @@ and `__eq__` from the fields you declare:
 # A data class generates __init__, __repr__, and __eq__ for you.
 from dataclasses import dataclass, replace
 
-
 @dataclass
 class Messenger:
     name: str
     number: int
     depth: float = 0.0  # Default value.
-
 
 if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
@@ -170,13 +162,11 @@ so you can use it as a dictionary key or put it in a set:
 # frozen=True makes instances immutable and hashable.
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Messenger:
     name: str
     number: int
     depth: float = 0.0
-
 
 if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
@@ -204,9 +194,7 @@ the hook the data class calls right after it fills in the fields:
 # frozen data class. Every Stars that exists is then guaranteed to
 # be a legal value.
 from dataclasses import dataclass
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class Stars:
@@ -215,14 +203,11 @@ class Stars:
     def __post_init__(self) -> None:
         check(1 <= self.number <= 10, f"Stars({self.number})")
 
-
 def f1(s: Stars) -> Stars:
     return Stars(s.number + 5)
 
-
 def f2(s: Stars) -> Stars:
     return Stars(s.number * 5)
-
 
 if __name__ == "__main__":
     rating = Stars(4)
@@ -273,9 +258,7 @@ with no extra work:
 # Composing a type from other types. Each part validates itself, so
 # a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class FullName:
@@ -285,7 +268,6 @@ class FullName:
         check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
               "needs a first and last name")
 
-
 @dataclass(frozen=True)
 class EmailAddress:
     text: str
@@ -294,12 +276,10 @@ class EmailAddress:
         check("@" in self.text, f"EmailAddress({self.text!r})",
               "needs an @")
 
-
 @dataclass(frozen=True)
 class Person:
     name: FullName
     email: EmailAddress
-
 
 if __name__ == "__main__":
     person = Person(
@@ -327,9 +307,7 @@ A `BirthDate` then validates across its fields: the day must fit the month.
 # validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class Day:
@@ -338,14 +316,12 @@ class Day:
     def __post_init__(self) -> None:
         check(1 <= self.n <= 31, f"Day({self.n})")
 
-
 @dataclass(frozen=True)
 class Year:
     n: int
 
     def __post_init__(self) -> None:
         check(1900 < self.n <= 2026, f"Year({self.n})")
-
 
 class Month(Enum):
     JANUARY = (1, 31)
@@ -377,7 +353,6 @@ class Month(Enum):
     def __repr__(self) -> str:
         return self.name
 
-
 @dataclass(frozen=True)
 class BirthDate:
     month: Month
@@ -386,7 +361,6 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
-
 
 if __name__ == "__main__":
     print(BirthDate(Month.of(7), Day(8), Year(1957)))
@@ -406,9 +380,7 @@ where the `Enum` *is* that set:
 ```python
 # month_dataclass.py
 from dataclasses import dataclass, field
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class Day:
@@ -416,7 +388,6 @@ class Day:
 
     def __post_init__(self) -> None:
         check(1 <= self.n <= 31, f"Day({self.n})")
-
 
 @dataclass(frozen=True)
 class Month:
@@ -433,7 +404,6 @@ class Month:
         check(day.n <= self.max_days,
               f"{self.name} has no day {day.n}")
 
-
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([
         ("January", 31), ("February", 28), ("March", 31),
@@ -442,7 +412,6 @@ def make_months() -> list[Month]:
         ("October", 31), ("November", 30), ("December", 31),
     ], start=1)]
 
-
 @dataclass(frozen=True)
 class Months:
     months: list[Month] = field(default_factory=make_months)
@@ -450,7 +419,6 @@ class Months:
     def of(self, month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return self.months[month_number - 1]
-
 
 if __name__ == "__main__":
     months = Months()
@@ -481,17 +449,14 @@ recursing into nested data classes.
 # KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
-
 @dataclass(frozen=True)
 class Point:
     x: int
     y: int
 
-
 @dataclass(frozen=True)
 class Line:
     points: list[Point]
-
 
 @dataclass
 class Config:
@@ -500,7 +465,6 @@ class Config:
     _: KW_ONLY
     verbose: bool = False
     retries: int = 3
-
 
 if __name__ == "__main__":
     p = Point(10, 20)
@@ -532,13 +496,10 @@ then hand its parts to the constructors.
 # the parsed dict back into a validated object.
 import json
 from dataclasses import asdict
-
 from person import EmailAddress, FullName, Person
-
 
 def to_json(person: Person) -> str:
     return json.dumps(asdict(person), indent=2)
-
 
 def from_json(text: str) -> Person:
     data = json.loads(text)
@@ -546,7 +507,6 @@ def from_json(text: str) -> Person:
         FullName(data["name"]["text"]),
         EmailAddress(data["email"]["text"]),
     )
-
 
 if __name__ == "__main__":
     original = Person(FullName("Bruce Eckel"),
@@ -574,9 +534,7 @@ A custom `JSONEncoder` handles every data class it meets, wherever it appears:
 import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, override
-
 from person import EmailAddress, FullName, Person
-
 
 class DataClassEncoder(json.JSONEncoder):
     @override
@@ -584,7 +542,6 @@ class DataClassEncoder(json.JSONEncoder):
         if is_dataclass(o) and not isinstance(o, type):
             return asdict(o)
         return super().default(o)
-
 
 if __name__ == "__main__":
     people = [
@@ -620,22 +577,18 @@ import pytest
 from stars import Stars, f1, f2
 from validation import TypeFailure
 
-
 def test_legal_stars() -> None:
     assert Stars(1).number == 1
     assert Stars(10).number == 10
-
 
 @pytest.mark.parametrize("n", [0, 11, -1, 100])
 def test_illegal_stars_rejected(n: int) -> None:
     with pytest.raises(TypeFailure):
         Stars(n)
 
-
 def test_transformations_return_legal_values() -> None:
     assert f1(Stars(2)) == Stars(7)
     assert f2(Stars(2)) == Stars(10)
-
 
 def test_transformation_can_produce_illegal_value() -> None:
     # f2 multiplies, so its result can leave the legal set.
@@ -656,11 +609,9 @@ import pytest
 from birth_date import BirthDate, Day, Month, Year
 from validation import TypeFailure
 
-
 def test_valid_date() -> None:
     bd = BirthDate(Month.of(7), Day(8), Year(1957))
     assert bd.month is Month.JULY
-
 
 @pytest.mark.parametrize("month_n, day_n", [
     (2, 31),   # February has 28 days here.
@@ -670,7 +621,6 @@ def test_valid_date() -> None:
 def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
-
 
 @pytest.mark.parametrize("bad", [0, 13])
 def test_bad_month_number(bad: int) -> None:

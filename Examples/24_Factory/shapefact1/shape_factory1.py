@@ -4,7 +4,6 @@ import random
 from collections.abc import Iterator
 from typing import override
 
-
 class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...

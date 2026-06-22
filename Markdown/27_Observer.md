@@ -40,7 +40,6 @@ A `@property` setter is a natural place to fire the notification when state chan
 from collections.abc import Callable
 from typing import Any
 
-
 class Observable:
     def __init__(self) -> None:
         self._observers: list[Callable[[Any], None]] = []
@@ -51,7 +50,6 @@ class Observable:
     def notify(self, data: Any) -> None:
         for observer in self._observers:
             observer(data)
-
 
 class Thermometer(Observable):
     def __init__(self) -> None:
@@ -66,7 +64,6 @@ class Thermometer(Observable):
     def celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)   # State changed; tell the observers
-
 
 thermo = Thermometer()
 thermo.subscribe(lambda c: print(f"display: {c}C"))
@@ -90,7 +87,6 @@ A list whose `append` is the observer records what arrived:
 # test_observers.py
 from observers import Observable, Thermometer
 
-
 def test_notify_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
     obs = Observable()
@@ -99,10 +95,8 @@ def test_notify_calls_every_subscriber() -> None:
     obs.notify(42)
     assert received == [("a", 42), ("b", 42)]
 
-
 def test_no_subscribers_is_a_noop() -> None:
     Observable().notify("anything")  # Must not raise
-
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
@@ -112,7 +106,6 @@ def test_thermometer_pushes_new_value_on_set() -> None:
     thermo.celsius = 150.0
     assert readings == [25.0, 150.0]
     assert thermo.celsius == 150.0
-
 
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
@@ -142,11 +135,9 @@ The flag lets the subject decide when a batch of changes is worth announcing.
 # java.util, without the thread synchronization.
 from typing import Any
 
-
 class Observer:
     def update(self, observable: Any, arg: Any, /) -> None:
         "Called when the observed object changes."
-
 
 class Observable:
     def __init__(self) -> None:
@@ -207,24 +198,20 @@ from observer import Observable
 COLORS = ("skyblue", "palegreen", "khaki")
 type Grid = dict[tuple[int, int], str]   # (column, row) -> color
 
-
 def new_grid(size: int) -> Grid:
     "Build a size x size grid, banded into three colors."
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
-
 def adjacent(a: tuple[int, int], b: tuple[int, int]) -> bool:
     "True if two distinct cells touch, including diagonally."
     return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
-
 
 def recolored(grid: Grid, clicked: tuple[int, int]) -> Grid:
     "Return a new grid: every neighbor of the click takes its color."
     color = grid[clicked]
     return {cell: color if adjacent(cell, clicked) else current
             for cell, current in grid.items()}
-
 
 class BoxModel(Observable):
     "The subject: holds the grid and announces every change."
@@ -247,10 +234,8 @@ This is the model's correctness, established apart from how it is shown:
 ```python
 # test_box_observer.py
 from typing import Any, override
-
 from box_observer import BoxModel, adjacent, new_grid, recolored
 from observer import Observer
-
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
@@ -258,13 +243,11 @@ def test_new_grid_size_and_banding() -> None:
     assert grid[(0, 0)] == "skyblue"     # COLORS[0]
     assert grid[(0, 1)] == grid[(1, 0)]  # Same (x + y) color band
 
-
 def test_adjacent() -> None:
     assert adjacent((1, 1), (2, 2))      # Diagonal
     assert adjacent((1, 1), (1, 2))      # Edge
     assert not adjacent((1, 1), (1, 1))  # not its own neighbor
     assert not adjacent((0, 0), (2, 0))  # Two away
-
 
 def test_recolored_touches_only_neighbors() -> None:
     grid = new_grid(5)
@@ -273,7 +256,6 @@ def test_recolored_touches_only_neighbors() -> None:
     assert out[(2, 3)] == grid[(2, 2)]   # Edge neighbor: changed
     assert out[(0, 0)] == grid[(0, 0)]   # Two away: unchanged
     assert out is not grid               # pure: a new grid
-
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)
@@ -306,10 +288,8 @@ so the example harness does not run it (it is listed in `tools/norun.txt`).
 # change. The model in box_observer.py is what the tests check.
 import tkinter as tk
 from typing import Any, override
-
 from box_observer import BoxModel, Grid
 from observer import Observer
-
 
 def show(model: BoxModel, cell: int = 60) -> None:
     "Open the window and keep it in step with the model."
@@ -336,7 +316,6 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 lambda e: model.click((e.x // cell, e.y // cell)))
     draw(model.grid)
     root.mainloop()
-
 
 if __name__ == "__main__":
     show(BoxModel(8))

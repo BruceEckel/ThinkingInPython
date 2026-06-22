@@ -3,18 +3,15 @@
 # used.
 from validation import check
 
-
 def f1(stars: int) -> int:
     # Check the argument here...
     check(1 <= stars <= 10, f"f1({stars})")
     return stars + 5
 
-
 def f2(stars: int) -> int:
     # ...and again in every other function.
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
-
 
 if __name__ == "__main__":
     rating = 6

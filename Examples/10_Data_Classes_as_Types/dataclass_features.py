@@ -3,17 +3,14 @@
 # KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
-
 @dataclass(frozen=True)
 class Point:
     x: int
     y: int
 
-
 @dataclass(frozen=True)
 class Line:
     points: list[Point]
-
 
 @dataclass
 class Config:
@@ -22,7 +19,6 @@ class Config:
     _: KW_ONLY
     verbose: bool = False
     retries: int = 3
-
 
 if __name__ == "__main__":
     p = Point(10, 20)

@@ -1,7 +1,6 @@
 # class_variable_singleton.py
 from typing import Any
 
-
 class SingleTone:
     val: Any
     __instance: SingleTone | None = None

@@ -54,13 +54,11 @@ from typing import Protocol
 # South, north, west, east.
 DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
-
 class Recorder(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
     def log(self, message: str) -> None: ...
     def next_number(self) -> int: ...
-
 
 class Rat:
     def __init__(self, blackboard: Recorder, x: int, y: int) -> None:
@@ -97,7 +95,6 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 
 from pathlib import Path
 from typing import Self
-
 
 class Maze:
     WALL = "*"
@@ -146,10 +143,8 @@ including the ones spawned along the way.
 
 import asyncio
 import itertools
-
 from maze import Maze
 from rat import Rat
-
 
 class Blackboard:
     def __init__(self, maze: Maze) -> None:
@@ -229,10 +224,8 @@ Running it turns the rats loose and prints what they mapped.
 # Turn a pack of rats loose on the maze and print what they mapped.
 
 import asyncio
-
 from blackboard import Blackboard
 from maze import Maze
-
 
 async def main() -> None:
     maze = Maze.from_file("amaze.txt")
@@ -242,7 +235,6 @@ async def main() -> None:
     print(blackboard.render())
     print(f"{len(blackboard.tasks)} rats mapped "
           f"{len(blackboard.visited)} cells.")
-
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -256,7 +248,6 @@ A test pins that down by comparing the cells the rats visited against a plain fl
 ```python
 # rats_and_mazes/test_ratsandmazes.py
 import asyncio
-
 from blackboard import Blackboard
 from maze import Maze
 
@@ -270,7 +261,6 @@ LAYOUT = """\
 *********
 """
 
-
 def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
     seen: set[tuple[int, int]] = set()
     stack = [start]
@@ -281,7 +271,6 @@ def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
         seen.add((x, y))
         stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
     return seen
-
 
 def test_rats_map_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)
@@ -307,12 +296,10 @@ It only draws, so the harness skips it (`tools/norun.txt`):
 import asyncio
 import tkinter as tk
 from typing import override
-
 from blackboard import Blackboard
 from maze import Maze
 
 CELL = 26
-
 
 class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."
@@ -326,7 +313,6 @@ class RecordingBlackboard(Blackboard):
         if claimed:
             self.order.append((x, y))
         return claimed
-
 
 def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
     "Run the rats, then replay the cells they claimed, in order."
@@ -360,7 +346,6 @@ def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
 
     step()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()
@@ -397,13 +382,11 @@ from typing import TYPE_CHECKING, override
 if TYPE_CHECKING:
     from world import Room
 
-
 class Urge(Enum):
     NORTH = 1
     SOUTH = 2
     EAST = 3
     WEST = 4
-
 
 class Item:
     symbol = ""
@@ -413,7 +396,6 @@ class Item:
 
     def __str__(self) -> str:
         return self.symbol
-
 
 class Robot(Item):
     symbol = "R"
@@ -425,7 +407,6 @@ class Robot(Item):
         assert self.room is not None
         self.room = self.room.doors.open(urge).enter(self)
 
-
 class Wall(Item):
     symbol = "#"
 
@@ -434,7 +415,6 @@ class Wall(Item):
         assert robot.room is not None
         return robot.room  # Cannot pass: stay put.
 
-
 class Food(Item):
     symbol = "."
 
@@ -442,7 +422,6 @@ class Food(Item):
     def interact(self, robot: Robot, room: Room) -> Room:
         room.occupant = Empty()  # Eaten.
         return room
-
 
 class Teleport(Item):
     symbol = ""  # Set per target letter
@@ -460,14 +439,12 @@ class Teleport(Item):
     def __str__(self) -> str:
         return self.target
 
-
 class Empty(Item):
     symbol = "_"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return room
-
 
 class Edge(Item):
     symbol = "/"
@@ -477,7 +454,6 @@ class Edge(Item):
         assert robot.room is not None
         return robot.room  # The void outside the maze: stay put.
 
-
 class EndGame(Item):
     symbol = "!"
 
@@ -485,7 +461,6 @@ class EndGame(Item):
     def interact(self, robot: Robot, room: Room) -> Room:
         print("Game over!")
         return room
-
 
 def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
@@ -513,7 +488,6 @@ so the robot can try any direction without a special case:
 
 from items import Edge, Item, Robot, Urge
 
-
 class Room:
     def __init__(self, occupant: Item) -> None:
         self.occupant = occupant
@@ -524,7 +498,6 @@ class Room:
 
     def __repr__(self) -> str:
         return f"Room({self.occupant})"
-
 
 class Doors:
     def __init__(self) -> None:
@@ -549,7 +522,6 @@ class Doors:
         }[urge]
         return neighbor if neighbor is not None else EDGE
 
-
 # Created once both classes exist; its own doors stay unset.
 EDGE = Room(Edge())
 ```
@@ -566,7 +538,6 @@ is the *Builder* pattern.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room
-
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
@@ -619,7 +590,6 @@ class GameBuilder:
                  "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
             self.robot.move(moves[char])
-
 
 string_maze = """
 ###############################
@@ -747,7 +717,6 @@ FINISHED = """
 ###############################
 """.strip()
 
-
 def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
@@ -755,7 +724,6 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     assert room is not None
     assert isinstance(room.occupant, EndGame)  # Finished on the "!"
     assert game.show_maze() == FINISHED  # Food eaten, robot moved
-
 
 def test_walls_block_and_food_is_eaten() -> None:
     game = GameBuilder("R.#")  # Robot, food, wall in one row
@@ -782,7 +750,6 @@ so the example harness skips it (listed in `tools/norun.txt`):
 # steps the robot through the solution one move at a time. Run it to
 # watch. The same model is checked headlessly in test_robot.py.
 import tkinter as tk
-
 from game import GameBuilder, solution, string_maze
 from items import Urge
 
@@ -791,7 +758,6 @@ FILL = {"#": "dimgray", "!": "tomato", ".": "khaki",
         "_": "white", "R": "royalblue"}
 MOVES = {"n": Urge.NORTH, "s": Urge.SOUTH,
          "e": Urge.EAST, "w": Urge.WEST}
-
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:
@@ -825,7 +791,6 @@ def show(maze: str = string_maze, moves: str = solution,
 
     step()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()

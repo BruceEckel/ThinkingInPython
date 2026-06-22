@@ -62,7 +62,6 @@ Python has a built-in delegation mechanism that makes `Proxy` even simpler to im
 # Simple demonstration of the Proxy pattern.
 from typing import Any
 
-
 class Implementation2:
     def f(self) -> None:
         print("Implementation.f()")
@@ -95,7 +94,6 @@ along with a way to switch from one implementation to another during the lifetim
 # state_demo.py
 # Simple demonstration of the State pattern.
 from typing import Any
-
 
 class StateD:
     def __init__(self, imp: Any) -> None:
@@ -162,11 +160,9 @@ With `__getattr__` you can wrap every method call, for example to count them:
 # access.
 from typing import Any
 
-
 class Implementation:
     def f(self) -> None: print("f()")
     def g(self) -> None: print("g()")
-
 
 class CountingProxy:
     def __init__(self, impl: Any) -> None:
@@ -181,7 +177,6 @@ class CountingProxy:
                 return attr(*args, **kwargs)
             return counted
         return attr
-
 
 p = CountingProxy(Implementation())
 p.f()
@@ -218,17 +213,14 @@ for the state, that calls reach the current implementation and that `change_imp`
 from counting_proxy import CountingProxy
 from state_demo import StateD
 
-
 class Doubler:
     def double(self, n: int) -> int:
         return n * 2
-
 
 def test_proxy_forwards_call_and_result() -> None:
     p = CountingProxy(Doubler())
     assert p.double(5) == 10
     assert p.double(3) == 6
-
 
 def test_proxy_counts_only_calls() -> None:
     class HasValue:
@@ -242,16 +234,13 @@ def test_proxy_counts_only_calls() -> None:
     assert p.calls == 0
     assert p2.calls == 2
 
-
 class StateA:
     def name(self) -> str:
         return "A"
 
-
 class StateB:
     def name(self) -> str:
         return "B"
-
 
 def test_state_delegates_and_change_imp_swaps() -> None:
     s = StateD(StateA())

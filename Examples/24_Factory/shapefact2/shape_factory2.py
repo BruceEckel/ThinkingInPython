@@ -4,7 +4,6 @@ import random
 from collections.abc import Iterator
 from typing import Any, override
 
-
 class ShapeFactory:
     factories: dict[str, Any] = {}
 
@@ -19,11 +18,9 @@ class ShapeFactory:
             ShapeFactory.factories[id] = eval(id + '.Factory()')
         return ShapeFactory.factories[id].create()
 
-
 class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...
-
 
 class Circle(Shape):
     @override
@@ -32,7 +29,6 @@ class Circle(Shape):
     def erase(self) -> None: print("Circle.erase")
     class Factory:
         def create(self) -> Circle: return Circle()
-
 
 class Square(Shape):
     @override
@@ -44,12 +40,10 @@ class Square(Shape):
     class Factory:
         def create(self) -> Square: return Square()
 
-
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
-
 
 shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
 

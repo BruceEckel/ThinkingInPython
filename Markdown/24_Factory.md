@@ -37,7 +37,6 @@ import random
 from collections.abc import Iterator
 from typing import override
 
-
 class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...
@@ -141,7 +140,6 @@ import random
 from collections.abc import Iterator
 from typing import override
 
-
 class Shape:
     types: list[type] = []
     def draw(self) -> None: ...
@@ -199,7 +197,6 @@ let each subclass register itself through `__init_subclass__`:
 # the factory never needs editing when you add a type.
 from typing import override
 
-
 class Shape:
     registry: dict[str, type[Shape]] = {}
 
@@ -209,20 +206,16 @@ class Shape:
 
     def draw(self) -> None: ...
 
-
 class Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
-
 
 class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-
 def make(name: str) -> Shape:
     return Shape.registry[name]()
-
 
 for name in ["Circle", "Square", "Circle"]:
     make(name).draw()
@@ -241,20 +234,16 @@ Defining a fresh `Shape` inside the test is enough to see it appear in the regis
 ```python
 # test_registry.py
 from typing import override
-
 import pytest
 from registry import Circle, Shape, Square, make
-
 
 def test_subclasses_auto_register() -> None:
     assert Shape.registry["Circle"] is Circle
     assert Shape.registry["Square"] is Square
 
-
 def test_make_builds_the_right_type() -> None:
     assert isinstance(make("Circle"), Circle)
     assert isinstance(make("Square"), Square)
-
 
 def test_new_subclass_registers_itself() -> None:
     class Triangle(Shape):
@@ -263,7 +252,6 @@ def test_new_subclass_registers_itself() -> None:
 
     assert Shape.registry["Triangle"] is Triangle
     assert isinstance(make("Triangle"), Triangle)
-
 
 def test_unknown_name_raises() -> None:
     with pytest.raises(KeyError):
@@ -287,7 +275,6 @@ import random
 from collections.abc import Iterator
 from typing import Any, override
 
-
 class ShapeFactory:
     factories: dict[str, Any] = {}
 
@@ -302,11 +289,9 @@ class ShapeFactory:
             ShapeFactory.factories[id] = eval(id + '.Factory()')
         return ShapeFactory.factories[id].create()
 
-
 class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...
-
 
 class Circle(Shape):
     @override
@@ -315,7 +300,6 @@ class Circle(Shape):
     def erase(self) -> None: print("Circle.erase")
     class Factory:
         def create(self) -> Circle: return Circle()
-
 
 class Square(Shape):
     @override
@@ -327,12 +311,10 @@ class Square(Shape):
     class Factory:
         def create(self) -> Square: return Square()
 
-
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for i in range(n):
         yield random.choice(types).__name__
-
 
 shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
 
@@ -384,7 +366,6 @@ Here's how it might look using an abstract factory:
 # games.py
 # An example of the Abstract Factory pattern.
 from typing import override
-
 
 class Obstacle:
     def action(self) -> None: pass
@@ -470,7 +451,6 @@ we don't need any base classes:
 # games2.py
 # Simplified Abstract Factory.
 from typing import Any
-
 
 class Kitty:
     def interact_with(self, obstacle: Any) -> None:

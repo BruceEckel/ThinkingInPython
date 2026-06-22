@@ -3,7 +3,6 @@ from collections.abc import Callable
 from functools import update_wrapper
 from typing import Any
 
-
 class trace:
     def __init__(self, func: Callable[..., Any]) -> None:
         self.func = func
@@ -15,11 +14,9 @@ class trace:
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
         return result
 
-
 @trace
 def add(a: int, b: int) -> int:
     return a + b
-
 
 if __name__ == "__main__":
     add(2, 3)

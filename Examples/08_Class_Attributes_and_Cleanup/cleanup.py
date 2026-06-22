@@ -1,7 +1,6 @@
 # cleanup.py
 from typing import ClassVar
 
-
 class Counter:
     count: ClassVar[int] = 0   # Number of objects of this class
 

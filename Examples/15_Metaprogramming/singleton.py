@@ -2,7 +2,6 @@
 # A Singleton metaclass: intercept instance creation through __call__.
 from typing import Any
 
-
 class Singleton(type):
     _instances: dict[type, Any] = {}
 
@@ -11,14 +10,11 @@ class Singleton(type):
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
 class ASingleton(metaclass=Singleton):
     pass
 
-
 class BSingleton(metaclass=Singleton):
     pass
-
 
 a = ASingleton()
 b = ASingleton()

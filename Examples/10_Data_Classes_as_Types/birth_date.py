@@ -4,9 +4,7 @@
 # validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class Day:
@@ -15,14 +13,12 @@ class Day:
     def __post_init__(self) -> None:
         check(1 <= self.n <= 31, f"Day({self.n})")
 
-
 @dataclass(frozen=True)
 class Year:
     n: int
 
     def __post_init__(self) -> None:
         check(1900 < self.n <= 2026, f"Year({self.n})")
-
 
 class Month(Enum):
     JANUARY = (1, 31)
@@ -54,7 +50,6 @@ class Month(Enum):
     def __repr__(self) -> str:
         return self.name
 
-
 @dataclass(frozen=True)
 class BirthDate:
     month: Month
@@ -63,7 +58,6 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
-
 
 if __name__ == "__main__":
     print(BirthDate(Month.of(7), Day(8), Year(1957)))

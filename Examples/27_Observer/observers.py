@@ -4,7 +4,6 @@
 from collections.abc import Callable
 from typing import Any
 
-
 class Observable:
     def __init__(self) -> None:
         self._observers: list[Callable[[Any], None]] = []
@@ -15,7 +14,6 @@ class Observable:
     def notify(self, data: Any) -> None:
         for observer in self._observers:
             observer(data)
-
 
 class Thermometer(Observable):
     def __init__(self) -> None:
@@ -30,7 +28,6 @@ class Thermometer(Observable):
     def celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)   # State changed; tell the observers
-
 
 thermo = Thermometer()
 thermo.subscribe(lambda c: print(f"display: {c}C"))

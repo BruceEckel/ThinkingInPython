@@ -1,7 +1,6 @@
 # test_event_bus.py
 from event_bus import Closed, Deposit, EventBus, Withdraw
 
-
 def test_every_handler_for_the_type_is_called() -> None:
     seen: list[str] = []
     bus = EventBus()
@@ -10,7 +9,6 @@ def test_every_handler_for_the_type_is_called() -> None:
     bus.publish(Deposit(5))
     assert seen == ["a5", "b5"]
 
-
 def test_only_the_matching_type_is_called() -> None:
     calls: list[str] = []
     bus = EventBus()
@@ -18,7 +16,6 @@ def test_only_the_matching_type_is_called() -> None:
     bus.subscribe(Withdraw, lambda e: calls.append("withdraw"))
     bus.publish(Withdraw(1))
     assert calls == ["withdraw"]
-
 
 def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise

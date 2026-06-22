@@ -3,7 +3,6 @@
 from collections.abc import Callable
 from typing import Any
 
-
 def singleton(klass: type) -> Callable[..., Any]:
     instances: dict[type, Any] = {}
 
@@ -14,12 +13,10 @@ def singleton(klass: type) -> Callable[..., Any]:
 
     return get_instance
 
-
 @singleton
 class Registry:
     def __init__(self) -> None:
         self.items: list[str] = []
-
 
 a = Registry()
 b = Registry()

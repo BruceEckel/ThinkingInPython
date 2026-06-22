@@ -28,7 +28,6 @@ subclasses define the steps.
 # Simple demonstration of Template Method.
 from typing import override
 
-
 class ApplicationFramework:
     def __init__(self) -> None:
         self.run()
@@ -42,7 +41,6 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
-
 # Create an "application" by filling in the steps:
 class MyApp(ApplicationFramework):
     @override
@@ -52,7 +50,6 @@ class MyApp(ApplicationFramework):
     @override
     def customize2(self) -> None:
         print("Say no more, say no more!")
-
 
 MyApp()
 ```
@@ -74,13 +71,11 @@ with no subclass at all:
 # instead of supplied by a subclass.
 from collections.abc import Callable
 
-
 def run_framework(customize1: Callable[[], None],
                   customize2: Callable[[], None]) -> None:
     for _ in range(2):   # The fixed algorithm
         customize1()
         customize2()
-
 
 run_framework(
     lambda: print("Nudge, nudge, wink, wink!"),
@@ -104,10 +99,8 @@ Recording steps make that order visible:
 ```python
 # test_framework.py
 from typing import override
-
 from template_function import run_framework
 from template_method import ApplicationFramework
-
 
 def test_template_method_runs_steps_in_order() -> None:
     calls: list[str] = []
@@ -123,7 +116,6 @@ def test_template_method_runs_steps_in_order() -> None:
 
     Recorder()  # Constructing it runs the framework
     assert calls == ["one", "two", "one", "two"]  # Loop runs twice
-
 
 def test_template_function_runs_steps_in_order() -> None:
     calls: list[str] = []

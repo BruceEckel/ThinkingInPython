@@ -2,10 +2,8 @@
 # Turn a pack of rats loose on the maze and print what they mapped.
 
 import asyncio
-
 from blackboard import Blackboard
 from maze import Maze
-
 
 async def main() -> None:
     maze = Maze.from_file("amaze.txt")
@@ -15,7 +13,6 @@ async def main() -> None:
     print(blackboard.render())
     print(f"{len(blackboard.tasks)} rats mapped "
           f"{len(blackboard.visited)} cells.")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -4,24 +4,20 @@
 # instances compare and hash.
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class Name:
     first: str
     last: str
-
 
 @dataclass(frozen=True)
 class Address:
     city: str
     postal: str
 
-
 @dataclass(frozen=True)
 class Contact:  # A Contact has a Name and an Address.
     name: Name
     address: Address
-
 
 if __name__ == "__main__":
     c = Contact(

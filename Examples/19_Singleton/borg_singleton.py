@@ -2,13 +2,11 @@
 # Alex Martelli's 'Borg'
 from typing import Any
 
-
 class Borg:
     _shared_state: dict[str, Any] = {}
 
     def __init__(self) -> None:
         self.__dict__ = self._shared_state
-
 
 class Singleton(Borg):
     def __init__(self, arg: str) -> None:
@@ -17,7 +15,6 @@ class Singleton(Borg):
 
     def __str__(self) -> str:
         return self.val
-
 
 x = Singleton('sausage')
 print(x)

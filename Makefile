@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol clean-examples clean-site
+.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -44,6 +44,8 @@ help:
 	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
 	@echo "  eol       - check tracked text files for CRLF (fails the ci gate)"
 	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
+	@echo "  listings  - check ```python listings keep blank lines minimal"
+	@echo "  fix-listings - remove the offending blank lines from listings"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -121,10 +123,19 @@ eol:
 fix-eol:
 	$(PY) tools/check_line_endings.py --fix
 
-# The local gate without the site build: line endings, drift check, ty, ruff,
-# run, pytest. `verify` runs `sync` before this; `ci` adds the site build after.
+# Fail if any ```python listing has more than one blank line in a row or a
+# blank line between import groups. Run `make fix-listings` to remove them.
+listings:
+	$(PY) tools/listing_format.py
+
+fix-listings:
+	$(PY) tools/listing_format.py --fix
+
+# The local gate without the site build: line endings, listing density, drift
+# check, ty, ruff, run, pytest. `verify` runs `sync` first; `ci` adds the site.
 gate:
 	$(PY) tools/check_line_endings.py
+	$(PY) tools/listing_format.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(TY) check ExtractedExamples

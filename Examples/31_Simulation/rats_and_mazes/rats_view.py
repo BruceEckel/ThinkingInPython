@@ -6,12 +6,10 @@
 import asyncio
 import tkinter as tk
 from typing import override
-
 from blackboard import Blackboard
 from maze import Maze
 
 CELL = 26
-
 
 class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."
@@ -25,7 +23,6 @@ class RecordingBlackboard(Blackboard):
         if claimed:
             self.order.append((x, y))
         return claimed
-
 
 def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
     "Run the rats, then replay the cells they claimed, in order."
@@ -59,7 +56,6 @@ def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
 
     step()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()

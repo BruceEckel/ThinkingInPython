@@ -2,10 +2,8 @@
 # Preventing inheritance with __init_subclass__, no metaclass
 # required.
 
-
 class A:
     pass
-
 
 class B(A):
     # Make B final: any attempt to subclass it fails at class
@@ -13,7 +11,6 @@ class B(A):
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
             f"{B.__name__} is final; you cannot subclass it")
-
 
 print(B.__bases__)
 

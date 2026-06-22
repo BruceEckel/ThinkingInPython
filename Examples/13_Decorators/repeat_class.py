@@ -3,7 +3,6 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-
 class repeat:
     def __init__(self, times: int) -> None:
         self.times = times  # The decoration arguments
@@ -18,11 +17,9 @@ class repeat:
             return result
         return wrapper
 
-
 @repeat(times=3)
 def greet(name: str) -> None:
     print(f"Hello, {name}")
-
 
 if __name__ == "__main__":
     greet("Bob")

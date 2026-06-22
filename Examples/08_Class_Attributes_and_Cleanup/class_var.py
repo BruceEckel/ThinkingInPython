@@ -1,7 +1,6 @@
 # class_var.py
 from typing import ClassVar
 
-
 class Tally:
     total: ClassVar[int] = 0  # One shared value, not per-instance
     label: str  # A normal instance variable
@@ -9,7 +8,6 @@ class Tally:
     def __init__(self, label: str) -> None:
         self.label = label
         Tally.total += 1
-
 
 a = Tally("a")
 b = Tally("b")

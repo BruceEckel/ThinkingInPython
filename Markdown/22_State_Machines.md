@@ -53,9 +53,7 @@ since `run()` does something different depending on the state that the system is
 # Takes a list of Inputs to move from State to
 # State using a template method.
 from collections.abc import Iterable
-
 from state import State
-
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -83,7 +81,6 @@ which will be the inputs to the state machine:
 ```python
 # mouse/mouse_action.py
 from enum import StrEnum
-
 
 class MouseAction(StrEnum):
     APPEARS = "mouse appears"
@@ -251,7 +248,6 @@ from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
 
-
 class StateT(State):
     def __init__(self) -> None:
         self.transitions: dict[Any, Any] | None = None
@@ -397,7 +393,6 @@ type Transition = tuple[
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 
-
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
@@ -435,9 +430,7 @@ so a misspelled state name is caught by the type checker instead of failing sile
 # tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
 from enum import Enum, auto
-
 from state_machine import StateMachine, Table
-
 
 class State(Enum):
     QUIESCENT = auto()
@@ -445,7 +438,6 @@ class State(Enum):
     SELECTING = auto()
     UNAVAILABLE = auto()
     WANT_MORE = auto()
-
 
 class Money:
     def __init__(self, name: str, value: int) -> None:
@@ -455,11 +447,9 @@ class Money:
     def __str__(self) -> str:
         return self.name
 
-
 class Quit:
     def __str__(self) -> str:
         return "Quit"
-
 
 class Digit:
     def __init__(self, name: str, value: int) -> None:
@@ -469,18 +459,15 @@ class Digit:
     def __str__(self) -> str:
         return self.name
 
-
 class FirstDigit(Digit):
     pass
 class SecondDigit(Digit):
     pass
 
-
 class ItemSlot:
     def __init__(self, price: int, quantity: int) -> None:
         self.price = price
         self.quantity = quantity
-
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
@@ -553,7 +540,6 @@ class VendingMachine(StateMachine):
         self.message = f"Returning {self.amount}"
         self.amount = 0
 
-
 if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
@@ -594,11 +580,9 @@ from vending_machine import (
     VendingMachine,
 )
 
-
 def feed(vm: VendingMachine, *events: object) -> None:
     for event in events:
         vm.handle(event)
-
 
 def test_buy_dispenses_and_charges() -> None:
     vm = VendingMachine()
@@ -611,7 +595,6 @@ def test_buy_dispenses_and_charges() -> None:
     assert vm.items[0][1].quantity == 4   # One dispensed from five
     assert vm.message == "Dispensing; amount remaining 0"
 
-
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
     # 50c item, 25c in
@@ -621,7 +604,6 @@ def test_too_expensive_clears_back_to_collecting() -> None:
     assert vm.amount == 25                # Money kept
     assert vm.items[0][1].quantity == 5   # Nothing dispensed
 
-
 def test_sold_out_goes_to_unavailable() -> None:
     vm = VendingMachine()
     # [3][0] is sold out
@@ -630,13 +612,11 @@ def test_sold_out_goes_to_unavailable() -> None:
     assert vm.state is State.UNAVAILABLE
     assert vm.items[3][0].quantity == 0
 
-
 def test_quit_refunds_and_resets() -> None:
     vm = VendingMachine()
     feed(vm, Money("dollar", 100), Quit())
     assert vm.state is State.QUIESCENT
     assert vm.amount == 0
-
 
 def test_no_transition_raises() -> None:
     vm = VendingMachine()  # QUIESCENT has no transition for Quit
@@ -661,7 +641,6 @@ It is the only file that draws, so the harness skips it (`tools/norun.txt`):
 # logic; this file only draws and turns button presses into events.
 import tkinter as tk
 from functools import partial
-
 from vending_machine import (
     FirstDigit,
     Money,
@@ -669,7 +648,6 @@ from vending_machine import (
     SecondDigit,
     VendingMachine,
 )
-
 
 def show() -> None:
     "Open the vending-machine panel."
@@ -722,7 +700,6 @@ def show() -> None:
 
     render()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()

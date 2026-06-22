@@ -2,7 +2,6 @@
 from collections.abc import Iterator
 from typing import Any, override
 
-
 class TypedIterator(Iterator[Any]):
     def __init__(self, it: Iterator[Any], expected: type) -> None:
         self.imp = it

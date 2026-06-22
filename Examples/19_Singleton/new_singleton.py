@@ -1,7 +1,6 @@
 # new_singleton.py
 from typing import Any
 
-
 class OnlyOne:
     class __OnlyOne:
         def __init__(self) -> None:
@@ -22,7 +21,6 @@ class OnlyOne:
 
     def __setattr__(self, name: str, value: Any) -> None:
         setattr(self.instance, name, value)
-
 
 x = OnlyOne()
 x.val = 'sausage'

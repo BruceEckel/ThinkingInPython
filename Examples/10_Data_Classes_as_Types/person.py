@@ -2,9 +2,7 @@
 # Composing a type from other types. Each part validates itself, so
 # a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class FullName:
@@ -14,7 +12,6 @@ class FullName:
         check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
               "needs a first and last name")
 
-
 @dataclass(frozen=True)
 class EmailAddress:
     text: str
@@ -23,12 +20,10 @@ class EmailAddress:
         check("@" in self.text, f"EmailAddress({self.text!r})",
               "needs an @")
 
-
 @dataclass(frozen=True)
 class Person:
     name: FullName
     email: EmailAddress
-
 
 if __name__ == "__main__":
     person = Person(

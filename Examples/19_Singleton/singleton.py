@@ -1,7 +1,6 @@
 # singleton.py
 from typing import Any
 
-
 class Singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
@@ -12,11 +11,9 @@ class Singleton:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
-
 @Singleton
 class Foo:
     pass
-
 
 x = Foo()
 y = Foo()

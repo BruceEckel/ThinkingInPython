@@ -1,22 +1,20 @@
 # Testing
 
-> Testing is flawed, but not testing is reckless.
-
 One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
-It is as if you extend the language:
-the test suite checks not just that the code parses,
-but that it still means what you intended.
+It is as if you extend the language to determine if the code means what you intended.
 
 Unit testing is a development practice.
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
-A failing test announces itself immediately instead of months later in a bug report.
-The cost is small and the payoff compounds.
+
+Perhaps more importantly, tests tell you immediately if a change you've made causes a failure.
+This can save an enormous amount of time compared to discovering a problem after many more changes to the code,
+at which point you don't have any idea *which* change caused the bug.
 
 ## Test-Driven Development (TDD)
 
-A common approach is to write the code, get it working,
+It seems easy to write the code, get it working,
 and intend to write the tests later.
 Later rarely comes.
 The tests seem to lose their importance.
@@ -33,7 +31,7 @@ Testing then becomes a design tool,
 not a verification step you skip when you happen to feel good about the code you just wrote.
 
 That said, TDD requires that you know what you are creating.
-The design is there, you are confident it is correct, and it is now a matter of implementation.
+You are confident the design is correct, and it is now a matter of implementation.
 You need that certainty in order to write tests first.
 Often, however, you are not sure what direction a program will take you.
 You are experimenting to see what the right approach is.
@@ -55,16 +53,14 @@ A check is just Python's built-in `assert` statement.
 There is no base class to inherit and no special assertion methods to memorize.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-Here is a small unit to test:
+We will test the following:
 
 ```python
 # account.py
-# The unit under test.
-
 
 class InsufficientFunds(Exception):
-    pass
-
+    def __init__(self, balance: float, amount: float) -> None:
+        super().__init__(f"balance {balance} is less than {amount}")
 
 class Account:
     def __init__(self, balance: float = 0.0) -> None:
@@ -77,32 +73,33 @@ class Account:
 
     def withdraw(self, amount: float) -> None:
         if amount > self.balance:
-            raise InsufficientFunds(
-                f"balance {self.balance} is less than {amount}")
+            raise InsufficientFunds(self.balance, amount)
         self.balance -= amount
 
     def add_interest(self, rate: float) -> None:
         self.balance += self.balance * rate
 ```
 
-By convention tests live in a file whose name starts with `test_`.
-The following file exercises the whole `Account` class:
+By convention, tests live in a file whose name starts with `test_`:
 
 ```python
 # test_account.py
 import pytest
 from account import Account, InsufficientFunds
 
-
 def test_new_account_is_empty() -> None:
     assert Account().balance == 0.0
-
 
 def test_deposit_increases_balance() -> None:
     account = Account()
     account.deposit(100)
     assert account.balance == 100
 
+# Make three tests, replacing "bad" with each list value:
+@pytest.mark.parametrize("bad", [0, -1, -100])
+def test_nonpositive_deposit_raises(bad: float) -> None:
+    with pytest.raises(ValueError):
+        Account().deposit(bad)
 
 @pytest.fixture
 def funded() -> Account:
@@ -110,32 +107,22 @@ def funded() -> Account:
     account.deposit(100)
     return account
 
-
 def test_withdraw_reduces_balance(funded: Account) -> None:
     funded.withdraw(40)
     assert funded.balance == 60
-
 
 def test_overdraft_raises(funded: Account) -> None:
     with pytest.raises(InsufficientFunds):
         funded.withdraw(1000)
 
-
 def test_interest_uses_approx(funded: Account) -> None:
     funded.add_interest(0.05)
     assert funded.balance == pytest.approx(105.0)
-
-
-@pytest.mark.parametrize("bad", [0, -1, -100])
-def test_nonpositive_deposit_raises(bad: float) -> None:
-    with pytest.raises(ValueError):
-        Account().deposit(bad)
 ```
 
 Run the test suite by typing `pytest` in the project.
 It discovers every `test_*.py` file, collects every `test_` function, runs them,
-and reports.
-A passing run is quiet.
+and reports success and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
@@ -143,9 +130,9 @@ so you rarely need a debugger to see what went wrong.
 
 There are two common special needs in testing, both of which appear in `test_account.py`.
 
-The first is "this call should raise."
-`test_overdraft_raises` uses `pytest.raises` as a context manager;
-the test passes only if the expected exception is raised inside the block.
+The first is "this call should cause an exception."
+`test_overdraft_raises` uses `pytest.raises` as a context manager.
+The test passes only if the expected exception is raised inside the block.
 
 The second is comparing floating-point numbers, where exact equality is a trap.
 `test_interest_uses_approx` compares with `pytest.approx`,
@@ -157,7 +144,32 @@ When the same logic should run against several inputs, do not copy the test.
 Mark it with `parametrize`, as `test_nonpositive_deposit_raises` does,
 and `pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
-and a failure names the exact case that broke.
+and a failure names the exact case that failed.
+
+You are not limited to one variable;
+you can give `parametrize` several names and a list of tuples, one tuple per case:
+
+```python
+# test_balances.py
+import pytest
+from account import Account
+
+@pytest.mark.parametrize("start, spend, expected", [
+    (100, 40, 60),
+    (50, 50, 0),
+    (200, 1, 199),
+])
+def test_withdraw_leaves_expected_balance(
+    start: float, spend: float, expected: float
+) -> None:
+    account = Account(start)
+    account.withdraw(spend)
+    assert account.balance == expected
+```
+
+Each tuple supplies all three arguments for one run,
+so this produces three independent tests.
+The names in the string line up, in order, with the values in each tuple.
 
 ## Fixtures Replace Setup and Teardown
 
@@ -179,10 +191,8 @@ then runs teardown once the test returns:
 ```python
 # test_teardown.py
 from collections.abc import Iterator
-
 import pytest
 from account import Account
-
 
 @pytest.fixture
 def open_account() -> Iterator[Account]:
@@ -191,7 +201,6 @@ def open_account() -> Iterator[Account]:
     yield account  # The test runs with this value
     account.withdraw(account.balance)  # Teardown, after the test
     assert account.balance == 0
-
 
 def test_spend_some(open_account: Account) -> None:
     open_account.withdraw(30)
@@ -216,12 +225,10 @@ every test that requests the fixture runs once for each parameter value.
 import pytest
 from account import Account
 
-
 @pytest.fixture(scope="session")
 def bank_name() -> str:
     "Built once for the whole test session."
     return "BeanMeUp Savings"
-
 
 @pytest.fixture(params=[0.0, 100.0, 1_000_000.0])
 def preloaded(request: pytest.FixtureRequest) -> Account:
@@ -237,7 +244,6 @@ so a test that uses it is automatically checked at every starting balance:
 ```python
 # test_fixtures.py
 from account import Account
-
 
 def test_deposit_on_any_balance(
     preloaded: Account, bank_name: str
@@ -267,14 +273,11 @@ it reads an environment variable and touches files:
 import os
 from pathlib import Path
 
-
 def data_dir() -> Path:
     return Path(os.environ.get("APP_DATA", "."))
 
-
 def save(name: str, value: str) -> None:
     (data_dir() / name).write_text(value, encoding="utf-8")
-
 
 def load(name: str) -> str:
     return (data_dir() / name).read_text(encoding="utf-8")
@@ -286,10 +289,8 @@ so they never touch real data and never collide with each other:
 ```python
 # test_storage.py
 from pathlib import Path
-
 import pytest
 import storage
-
 
 def test_round_trip(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -297,7 +298,6 @@ def test_round_trip(
     monkeypatch.setenv("APP_DATA", str(tmp_path))
     storage.save("greeting.txt", "hello")
     assert storage.load("greeting.txt") == "hello"
-
 
 def test_missing_file_raises(
         tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

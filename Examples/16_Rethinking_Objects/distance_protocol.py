@@ -8,29 +8,24 @@ from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
 
-
 class Coord(Protocol):
     @property
     def x(self) -> float: ...
     @property
     def y(self) -> float: ...
 
-
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
-
 
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
 
-
 @dataclass(frozen=True)
 class Pair:  # Suppose you are handed this, with no x or y.
     a: float
     b: float
-
 
 @dataclass(frozen=True)
 class PairCoord:  # An adapter built by composition, not inheritance.
@@ -43,7 +38,6 @@ class PairCoord:  # An adapter built by composition, not inheritance.
     @property
     def y(self) -> float:
         return self.pair.b
-
 
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))

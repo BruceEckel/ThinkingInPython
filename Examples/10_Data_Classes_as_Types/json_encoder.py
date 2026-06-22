@@ -4,9 +4,7 @@
 import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, override
-
 from person import EmailAddress, FullName, Person
-
 
 class DataClassEncoder(json.JSONEncoder):
     @override
@@ -14,7 +12,6 @@ class DataClassEncoder(json.JSONEncoder):
         if is_dataclass(o) and not isinstance(o, type):
             return asdict(o)
         return super().default(o)
-
 
 if __name__ == "__main__":
     people = [

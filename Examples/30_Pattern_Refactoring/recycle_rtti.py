@@ -4,10 +4,8 @@
 # this code, with no help from the tools if you miss a spot. That is
 # the smell to watch for.
 from collections import defaultdict
-
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
-
 
 def main() -> None:
     bins: dict[type, list[Trash]] = defaultdict(list)
@@ -23,7 +21,6 @@ def main() -> None:
     for kind, items in bins.items():
         print(f"--- {kind.__name__} ---")
         sum_value(items)
-
 
 if __name__ == "__main__":
     main()

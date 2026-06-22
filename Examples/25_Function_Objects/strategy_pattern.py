@@ -1,7 +1,6 @@
 # strategy_pattern.py
 from typing import override
 
-
 # The strategy interface:
 class FindMinima:
     # Line is a sequence of points:

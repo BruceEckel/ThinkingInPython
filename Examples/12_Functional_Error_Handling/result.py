@@ -8,7 +8,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Success[A]:
     answer: A
@@ -21,7 +20,6 @@ class Success[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
-
 @dataclass(frozen=True)
 class Failure[E]:
     error: E
@@ -30,6 +28,5 @@ class Failure[E]:
         self, func: Callable[..., Result[B, E]]
     ) -> Failure[E]:
         return self  # Pass the failure forward unchanged.
-
 
 type Result[A, E] = Success[A] | Failure[E]

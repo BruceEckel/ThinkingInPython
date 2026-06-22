@@ -8,13 +8,11 @@ from chain import (
     solve,
 )
 
-
 def test_first_successful_handler_wins() -> None:
     assert solve(
         [1.0, 2.0, 3.0],
         [least_squares, newtons_method, bisection],
     ) == [5.5, 6.6]  # Bisection
-
 
 def test_order_decides_the_winner() -> None:
     def always(line: Line) -> Result:
@@ -23,10 +21,8 @@ def test_order_decides_the_winner() -> None:
     # 'always' precedes bisection, so it short-circuits the chain.
     assert solve([0.0], [always, bisection]) == [1.0]
 
-
 def test_no_handler_succeeds_returns_none() -> None:
     assert solve([0.0], [least_squares, newtons_method]) is None
-
 
 def test_empty_chain_returns_none() -> None:
     assert solve([0.0], []) is None

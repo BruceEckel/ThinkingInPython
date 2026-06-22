@@ -10,7 +10,6 @@ def step(command: str) -> str:
         case other:
             return f"unknown command: {other}"
 
-
 print(step("up"))
 print(step("d"))
 print(step("jump"))

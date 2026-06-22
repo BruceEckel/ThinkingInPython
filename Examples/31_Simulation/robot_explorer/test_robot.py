@@ -26,7 +26,6 @@ FINISHED = """
 ###############################
 """.strip()
 
-
 def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
@@ -34,7 +33,6 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     assert room is not None
     assert isinstance(room.occupant, EndGame)  # Finished on the "!"
     assert game.show_maze() == FINISHED  # Food eaten, robot moved
-
 
 def test_walls_block_and_food_is_eaten() -> None:
     game = GameBuilder("R.#")  # Robot, food, wall in one row

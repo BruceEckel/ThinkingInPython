@@ -1,10 +1,8 @@
 # account.py
-# The unit under test.
-
 
 class InsufficientFunds(Exception):
-    pass
-
+    def __init__(self, balance: float, amount: float) -> None:
+        super().__init__(f"balance {balance} is less than {amount}")
 
 class Account:
     def __init__(self, balance: float = 0.0) -> None:
@@ -17,8 +15,7 @@ class Account:
 
     def withdraw(self, amount: float) -> None:
         if amount > self.balance:
-            raise InsufficientFunds(
-                f"balance {self.balance} is less than {amount}")
+            raise InsufficientFunds(self.balance, amount)
         self.balance -= amount
 
     def add_interest(self, rate: float) -> None:

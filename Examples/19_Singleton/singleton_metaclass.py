@@ -1,7 +1,6 @@
 # singleton_metaclass.py
 from typing import Any
 
-
 class SingletonMetaClass(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  namespace: dict[str, Any]) -> None:
@@ -17,14 +16,12 @@ class SingletonMetaClass(type):
         klass.instance = None
         klass.__new__ = staticmethod(my_new)
 
-
 class Bar(metaclass=SingletonMetaClass):
     def __init__(self, val: str) -> None:
         self.val = val
 
     def __str__(self) -> str:
         return repr(self) + self.val
-
 
 x = Bar('sausage')
 y = Bar('eggs')

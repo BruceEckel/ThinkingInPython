@@ -39,14 +39,12 @@ A class becomes iterable by writing `__iter__()` as a generator:
 # Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
 
-
 # A generator function is the easy way to produce an iterator:
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
     for _ in range(n):
         yield a
         a, b = b, a + b
-
 
 # A class becomes iterable by implementing __iter__, often as a
 # generator:
@@ -60,12 +58,10 @@ class Countdown:
             yield n
             n -= 1
 
-
 # Any function written against an iterable is decoupled from its
 # source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
-
 
 print(list(fibonacci(8)))
 print(list(Countdown(5)))
@@ -109,7 +105,6 @@ raising otherwise:
 from collections.abc import Iterator
 from typing import Any, override
 
-
 class TypedIterator(Iterator[Any]):
     def __init__(self, it: Iterator[Any], expected: type) -> None:
         self.imp = it
@@ -135,14 +130,12 @@ A generator wraps an iterator just as well and in fewer lines:
 from collections.abc import Iterable, Iterator
 from typing import Any
 
-
 def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(
                 f"expected {expected}, got {type(obj).__name__}")
         yield obj
-
 
 if __name__ == "__main__":
     print(list(typed([1, 2, 3], int)))
@@ -168,35 +161,29 @@ from iterators import Countdown, fibonacci, total
 from typed_generator import typed
 from typed_iterator import TypedIterator
 
-
 def test_fibonacci_sequence() -> None:
     assert list(fibonacci(8)) == [0, 1, 1, 2, 3, 5, 8, 13]
     assert list(fibonacci(0)) == []
     assert list(fibonacci(1)) == [0]
 
-
 def test_countdown_sequence() -> None:
     assert list(Countdown(5)) == [5, 4, 3, 2, 1]
     assert list(Countdown(0)) == []
-
 
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
     assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
 
-
 def test_total_over_any_iterable() -> None:
     assert total([1, 2, 3, 4]) == 10
     assert total(fibonacci(8)) == 33
     assert total(Countdown(5)) == 15
 
-
 def test_typed_generator_passes_and_rejects() -> None:
     assert list(typed([1, 2, 3], int)) == [1, 2, 3]
     with pytest.raises(TypeError):
         list(typed([1, "two", 3], int))
-
 
 def test_typed_iterator_passes_and_rejects() -> None:
     assert list(TypedIterator(iter([1, 2, 3]), int)) == [1, 2, 3]

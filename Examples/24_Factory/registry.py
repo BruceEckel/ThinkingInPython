@@ -4,7 +4,6 @@
 # the factory never needs editing when you add a type.
 from typing import override
 
-
 class Shape:
     registry: dict[str, type[Shape]] = {}
 
@@ -14,20 +13,16 @@ class Shape:
 
     def draw(self) -> None: ...
 
-
 class Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
-
 
 class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-
 def make(name: str) -> Shape:
     return Shape.registry[name]()
-
 
 for name in ["Circle", "Square", "Circle"]:
     make(name).draw()

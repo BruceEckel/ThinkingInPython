@@ -2,7 +2,6 @@
 # Simple demonstration of the Proxy pattern.
 from typing import Any
 
-
 class Implementation2:
     def f(self) -> None:
         print("Implementation.f()")

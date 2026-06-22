@@ -4,7 +4,6 @@
 
 from items import Edge, Item, Robot, Urge
 
-
 class Room:
     def __init__(self, occupant: Item) -> None:
         self.occupant = occupant
@@ -15,7 +14,6 @@ class Room:
 
     def __repr__(self) -> str:
         return f"Room({self.occupant})"
-
 
 class Doors:
     def __init__(self) -> None:
@@ -39,7 +37,6 @@ class Doors:
             Urge.WEST: self.west,
         }[urge]
         return neighbor if neighbor is not None else EDGE
-
 
 # Created once both classes exist; its own doors stay unset.
 EDGE = Room(Edge())

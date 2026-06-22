@@ -3,7 +3,6 @@
 # method must re-check it, and the object stays mutable underneath.
 from validation import check
 
-
 class Stars:
     def __init__(self, number: int) -> None:
         self._number = number  # Private by convention.
@@ -24,7 +23,6 @@ class Stars:
         self._number = n + 5
         self._validate()                 # Postcondition.
         return self._number
-
 
 if __name__ == "__main__":
     rating = Stars(4)

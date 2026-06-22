@@ -4,7 +4,6 @@
 # logic; this file only draws and turns button presses into events.
 import tkinter as tk
 from functools import partial
-
 from vending_machine import (
     FirstDigit,
     Money,
@@ -12,7 +11,6 @@ from vending_machine import (
     SecondDigit,
     VendingMachine,
 )
-
 
 def show() -> None:
     "Open the vending-machine panel."
@@ -65,7 +63,6 @@ def show() -> None:
 
     render()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()

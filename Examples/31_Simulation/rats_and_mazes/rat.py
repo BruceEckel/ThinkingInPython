@@ -9,13 +9,11 @@ from typing import Protocol
 # South, north, west, east.
 DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
-
 class Recorder(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
     def log(self, message: str) -> None: ...
     def next_number(self) -> int: ...
-
 
 class Rat:
     def __init__(self, blackboard: Recorder, x: int, y: int) -> None:

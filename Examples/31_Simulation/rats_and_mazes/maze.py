@@ -4,7 +4,6 @@
 from pathlib import Path
 from typing import Self
 
-
 class Maze:
     WALL = "*"
     OPEN = " "

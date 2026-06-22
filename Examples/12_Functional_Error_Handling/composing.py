@@ -5,12 +5,10 @@
 from result import Failure, Result, Success
 from returning_result import func_a
 
-
 def func_b(i: int) -> Result[int, str]:
     if i == 2:
         return Failure(f"func_b({i})")
     return Success(i)
-
 
 def func_c(i: int) -> Result[int, str]:
     try:
@@ -20,7 +18,6 @@ def func_c(i: int) -> Result[int, str]:
         return Failure(f"func_c({i}): {e}")
     return Success(i)
 
-
 def composed(i: int) -> Result[int, str]:
     a = func_a(i)
     if isinstance(a, Failure):
@@ -29,7 +26,6 @@ def composed(i: int) -> Result[int, str]:
     if isinstance(b, Failure):
         return b
     return func_c(b.unwrap())
-
 
 if __name__ == "__main__":
     for i in range(5):

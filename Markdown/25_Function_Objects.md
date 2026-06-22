@@ -28,18 +28,14 @@ In Python the action is just a function, and a "macro" is just a list of them:
 # A function is already a command object; a macro is a list of them.
 from collections.abc import Callable
 
-
 def loony() -> None:
     print("You're a loony.")
-
 
 def new_brain() -> None:
     print("You might even need a new brain.")
 
-
 def afford() -> None:
     print("I couldn't afford a whole new brain.")
-
 
 macro: list[Callable[[], None]] = [loony, new_brain, afford]
 for command in macro:
@@ -51,7 +47,6 @@ The classic object form wraps each action in a `Command` subclass with an `execu
 ```python
 # command_pattern.py
 from typing import override
-
 
 class Command:
     def execute(self) -> None: pass
@@ -107,20 +102,16 @@ from collections.abc import Callable
 
 type Line = list[float]
 
-
 def least_squares(line: Line) -> float:
     # A flat least-squares fit minimizes squared error at the mean.
     return sum(line) / len(line)
-
 
 def bisection(line: Line) -> float:
     # Halve the interval: the midpoint of the value range.
     return (min(line) + max(line)) / 2
 
-
 def solve(line: Line, strategy: Callable[[Line], float]) -> float:
     return strategy(line)
-
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, least_squares))
@@ -133,7 +124,6 @@ and adds a "Context" object to hold the current strategy:
 ```python
 # strategy_pattern.py
 from typing import override
-
 
 # The strategy interface:
 class FindMinima:
@@ -204,18 +194,14 @@ from collections.abc import Callable
 type Line = list[float]
 type Result = list[float] | None
 
-
 def least_squares(line: Line) -> Result:
     return None  # This strategy did not find a solution
-
 
 def newtons_method(line: Line) -> Result:
     return None  # Neither did this one
 
-
 def bisection(line: Line) -> Result:
     return [5.5, 6.6]  # Success
-
 
 def solve(line: Line,
           chain: list[Callable[[Line], Result]]) -> Result:
@@ -224,7 +210,6 @@ def solve(line: Line,
         if result is not None:
             return result
     return None
-
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, [least_squares, newtons_method, bisection]))
@@ -250,13 +235,11 @@ from chain import (
     solve,
 )
 
-
 def test_first_successful_handler_wins() -> None:
     assert solve(
         [1.0, 2.0, 3.0],
         [least_squares, newtons_method, bisection],
     ) == [5.5, 6.6]  # Bisection
-
 
 def test_order_decides_the_winner() -> None:
     def always(line: Line) -> Result:
@@ -265,10 +248,8 @@ def test_order_decides_the_winner() -> None:
     # 'always' precedes bisection, so it short-circuits the chain.
     assert solve([0.0], [always, bisection]) == [1.0]
 
-
 def test_no_handler_succeeds_returns_none() -> None:
     assert solve([0.0], [least_squares, newtons_method]) is None
-
 
 def test_empty_chain_returns_none() -> None:
     assert solve([0.0], []) is None
@@ -295,21 +276,17 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-
 @dataclass(frozen=True)
 class Deposit:
     amount: int
-
 
 @dataclass(frozen=True)
 class Withdraw:
     amount: int
 
-
 @dataclass(frozen=True)
 class Closed:
     reason: str
-
 
 class EventBus:
     def __init__(self) -> None:
@@ -323,18 +300,14 @@ class EventBus:
         for handler in self._handlers.get(type(event), []):
             handler(event)
 
-
 def on_deposit(event: Deposit) -> None:
     print(f"+ deposit {event.amount}")
-
 
 def audit(event: Deposit) -> None:
     print(f"  audit: a deposit of {event.amount}")
 
-
 def on_withdraw(event: Withdraw) -> None:
     print(f"- withdraw {event.amount}")
-
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)
@@ -355,7 +328,6 @@ and an event with no handler is a quiet no-op:
 # test_event_bus.py
 from event_bus import Closed, Deposit, EventBus, Withdraw
 
-
 def test_every_handler_for_the_type_is_called() -> None:
     seen: list[str] = []
     bus = EventBus()
@@ -364,7 +336,6 @@ def test_every_handler_for_the_type_is_called() -> None:
     bus.publish(Deposit(5))
     assert seen == ["a5", "b5"]
 
-
 def test_only_the_matching_type_is_called() -> None:
     calls: list[str] = []
     bus = EventBus()
@@ -372,7 +343,6 @@ def test_only_the_matching_type_is_called() -> None:
     bus.subscribe(Withdraw, lambda e: calls.append("withdraw"))
     bus.publish(Withdraw(1))
     assert calls == ["withdraw"]
-
 
 def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise

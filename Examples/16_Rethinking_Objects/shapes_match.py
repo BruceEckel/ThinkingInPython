@@ -6,20 +6,16 @@ import math
 from dataclasses import dataclass
 from typing import assert_never
 
-
 @dataclass(frozen=True)
 class Rectangle:
     length: float
     width: float
 
-
 @dataclass(frozen=True)
 class Circle:
     radius: float
 
-
 type Shape = Rectangle | Circle
-
 
 def area(shape: Shape) -> float:
     match shape:
@@ -29,7 +25,6 @@ def area(shape: Shape) -> float:
             return math.pi * radius**2
         case _:
             assert_never(shape)
-
 
 if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]

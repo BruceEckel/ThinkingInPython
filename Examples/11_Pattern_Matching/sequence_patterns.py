@@ -15,7 +15,6 @@ def summarize(items: list[int]) -> str:
         case _:
             return "unreachable"
 
-
 print(summarize([]))
 print(summarize([5]))
 print(summarize([3, 4]))

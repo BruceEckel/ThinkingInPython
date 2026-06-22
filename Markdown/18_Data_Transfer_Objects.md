@@ -13,11 +13,9 @@ A Messenger is an object with attributes corresponding to the names of the data 
 # messenger_idiom.py
 from typing import Any
 
-
 class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
-
 
 m: Any = Messenger(info="some information", b=['a', 'list'])
 m.more = 11
@@ -52,23 +50,19 @@ m = SimpleNamespace(info="some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
 
-
 # A dataclass is the typed, mutable version:
 @dataclass
 class Point:
     x: float
     y: float
 
-
 print(Point(1.0, 2.0))
-
 
 # A NamedTuple is the typed, immutable version:
 class Color(NamedTuple):
     r: int
     g: int
     b: int
-
 
 print(Color(255, 0, 0).r)
 ```
@@ -88,10 +82,8 @@ and the `NamedTuple` is a named record you can still treat as a tuple:
 ```python
 # test_messenger.py
 from typing import Any
-
 from messenger_idiom import Messenger
 from messenger_modern import Color, Point
-
 
 def test_messenger_exposes_kwargs_as_attributes() -> None:
     m: Any = Messenger(info="hi", count=3)
@@ -100,12 +92,10 @@ def test_messenger_exposes_kwargs_as_attributes() -> None:
     m.added = 9  # Attributes can be added afterward, too
     assert m.added == 9
 
-
 def test_dataclass_point_has_fields_and_equality() -> None:
     assert Point(1.0, 2.0).x == 1.0
     assert Point(1.0, 2.0) == Point(1.0, 2.0)
     assert Point(1.0, 2.0) != Point(1.0, 3.0)
-
 
 def test_namedtuple_color_is_a_named_record() -> None:
     c = Color(255, 0, 0)

@@ -5,10 +5,8 @@
 
 import asyncio
 import itertools
-
 from maze import Maze
 from rat import Rat
-
 
 class Blackboard:
     def __init__(self, maze: Maze) -> None:

@@ -66,11 +66,9 @@ A getter that returns a mutable object hands the caller a reference to the real 
 # to the real internals.
 from dataclasses import dataclass
 
-
 @dataclass
 class Bob:
     name: str = "Bob"
-
 
 class Leaky:
     def __init__(self, numbers: list[int]) -> None:
@@ -84,7 +82,6 @@ class Leaky:
     @property
     def bob(self) -> Bob:
         return self._bob
-
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
@@ -115,11 +112,9 @@ and so does every getter in every subclass, forever:
 from copy import deepcopy
 from dataclasses import dataclass
 
-
 @dataclass
 class Bob:
     name: str = "Bob"
-
 
 class Plugged:
     def __init__(self, numbers: list[int]) -> None:
@@ -133,7 +128,6 @@ class Plugged:
     @property
     def bob(self) -> Bob:
         return deepcopy(self._bob)
-
 
 if __name__ == "__main__":
     plugged = Plugged([1, 2])
@@ -165,17 +159,14 @@ The fields are public, there are no getters, and there are no copies:
 # change.
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Bob:
     name: str = "Bob"
-
 
 @dataclass(frozen=True)
 class Immutable:
     numbers: tuple[int, ...]
     bob: Bob
-
 
 if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
@@ -203,7 +194,6 @@ Compare a method with a plain function that does the same thing:
 from dataclasses import dataclass
 from math import sqrt
 
-
 @dataclass(frozen=True)
 class Point:
     x: float
@@ -212,10 +202,8 @@ class Point:
     def distance_to(self, other: Point) -> float:  # As a method.
         return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
-
 def distance(a: Point, b: Point) -> float:  # As a free function.
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
-
 
 if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle.
@@ -248,29 +236,24 @@ from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
 
-
 class Coord(Protocol):
     @property
     def x(self) -> float: ...
     @property
     def y(self) -> float: ...
 
-
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
-
 
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
 
-
 @dataclass(frozen=True)
 class Pair:  # Suppose you are handed this, with no x or y.
     a: float
     b: float
-
 
 @dataclass(frozen=True)
 class PairCoord:  # An adapter built by composition, not inheritance.
@@ -283,7 +266,6 @@ class PairCoord:  # An adapter built by composition, not inheritance.
     @property
     def y(self) -> float:
         return self.pair.b
-
 
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
@@ -308,24 +290,20 @@ and frozen instances compare by value and can be used as keys:
 # instances compare and hash.
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class Name:
     first: str
     last: str
-
 
 @dataclass(frozen=True)
 class Address:
     city: str
     postal: str
 
-
 @dataclass(frozen=True)
 class Contact:  # A Contact has a Name and an Address.
     name: Name
     address: Address
-
 
 if __name__ == "__main__":
     c = Contact(
@@ -362,11 +340,9 @@ import math
 from abc import ABC, abstractmethod
 from typing import override
 
-
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float: ...
-
 
 class Rectangle(Shape):
     def __init__(self, length: float, width: float) -> None:
@@ -377,7 +353,6 @@ class Rectangle(Shape):
     def area(self) -> float:
         return self.length * self.width
 
-
 class Circle(Shape):
     def __init__(self, radius: float) -> None:
         self.radius = radius
@@ -385,7 +360,6 @@ class Circle(Shape):
     @override
     def area(self) -> float:
         return math.pi * self.radius**2
-
 
 if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
@@ -406,14 +380,12 @@ and validity is checked only at run time, when the call happens:
 from dataclasses import dataclass
 from typing import Any
 
-
 @dataclass(frozen=True)
 class Bicycle:
     id: str
 
     def display(self) -> str:
         return f"Bicycle {self.id}"
-
 
 @dataclass(frozen=True)
 class Glider:
@@ -422,10 +394,8 @@ class Glider:
     def display(self) -> str:
         return f"Glider {self.size}"
 
-
 def show(t: Any) -> str:
     return t.display()
-
 
 if __name__ == "__main__":
     for item in (Bicycle("Bob"), Glider(65)):
@@ -453,20 +423,16 @@ import math
 from dataclasses import dataclass
 from typing import assert_never
 
-
 @dataclass(frozen=True)
 class Rectangle:
     length: float
     width: float
 
-
 @dataclass(frozen=True)
 class Circle:
     radius: float
 
-
 type Shape = Rectangle | Circle
-
 
 def area(shape: Shape) -> float:
     match shape:
@@ -476,7 +442,6 @@ def area(shape: Shape) -> float:
             return math.pi * radius**2
         case _:
             assert_never(shape)
-
 
 if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
@@ -501,24 +466,20 @@ Failures are values here too: a frozen object raises when you try to mutate it.
 ```python
 # test_encapsulation.py
 import dataclasses
-
 import pytest
 from immutable import Bob, Immutable
 from leaky import Leaky
 from plugged import Plugged
-
 
 def test_getter_leaks_internal_state() -> None:
     leaky = Leaky([1, 2])
     leaky.numbers.append(999)  # Reaches the real internal list.
     assert leaky.numbers == [1, 2, 999]
 
-
 def test_defensive_copy_prevents_the_leak() -> None:
     plugged = Plugged([1, 2])
     plugged.numbers.append(999)  # Mutates only a copy.
     assert plugged.numbers == [1, 2]
-
 
 def test_frozen_cannot_be_mutated() -> None:
     immutable = Immutable((1, 2), Bob())
@@ -534,18 +495,15 @@ import shapes_match as sm
 import shapes_oo as so
 from point_distance import Point, distance
 
-
 def test_method_and_function_agree() -> None:
     p1, p2 = Point(3, 0), Point(0, 4)
     assert p1.distance_to(p2) == 5
     assert distance(p1, p2) == 5
 
-
 def test_protocol_and_adapter() -> None:
     assert dp.distance(dp.Point(3, 0), dp.Point(0, 4)) == 5
     assert dp.distance(dp.PairCoord(dp.Pair(3, 0)),
                        dp.PairCoord(dp.Pair(0, 4))) == 5
-
 
 def test_oo_and_match_shapes_agree() -> None:
     assert (so.Rectangle(3.0, 4.0).area()

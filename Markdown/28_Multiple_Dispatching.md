@@ -40,7 +40,6 @@ It is a `StrEnum`, so each member is its string value and prints as `win`,
 # The win/lose/draw result of one Item competing with another.
 from enum import StrEnum
 
-
 class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
@@ -61,12 +60,10 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-
 def item_pair_gen(base: type, n: int) -> Iterator[tuple[Any, Any]]:
     items = base.__subclasses__()
     for _ in range(n):
         yield random.choice(items)(), random.choice(items)()
-
 
 def match(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
@@ -78,10 +75,8 @@ Here's an example of *Multiple Dispatching*:
 # paper_scissors_rock.py
 # Demonstration of multiple dispatching.
 from typing import Any
-
 from arena import item_pair_gen, match
 from outcome import Outcome
-
 
 class Item:
     def __str__(self) -> str:
@@ -144,10 +139,8 @@ Instead, it can be more sensible to make the table explicit, like this:
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
 from typing import Any
-
 from arena import item_pair_gen, match
 from outcome import Outcome
-
 
 class Item:
     def compete(self, item: Any) -> Outcome:
@@ -211,7 +204,6 @@ If they ever diverge, one of them has a bug.
 ```python
 # test_paper_scissors.py
 from typing import Any
-
 import paper_scissors_rock as methods
 import paper_scissors_rock2 as table
 from outcome import Outcome
@@ -229,29 +221,24 @@ EXPECTED = {
     ("Rock", "Rock"): Outcome.DRAW,
 }
 
-
 def compete(module: Any, player: str, opponent: str) -> Outcome:
     result = getattr(module, player)().compete(
         getattr(module, opponent)())
     assert isinstance(result, Outcome)
     return result
 
-
 def test_table_version_matches_expected() -> None:
     for (player, opponent), result in EXPECTED.items():
         assert compete(table, player, opponent) == result
-
 
 def test_method_version_matches_expected() -> None:
     for (player, opponent), result in EXPECTED.items():
         assert compete(methods, player, opponent) == result
 
-
 def test_both_versions_agree() -> None:
     for player, opponent in EXPECTED:
         assert (compete(methods, player, opponent)
                 == compete(table, player, opponent))
-
 
 def test_outcome_str() -> None:
     assert str(Outcome.WIN) == "win"

@@ -2,7 +2,6 @@
 # Variations on the Adapter pattern.
 from typing import Any, override
 
-
 class WhatIHave:
     def g(self) -> None: pass
     def h(self) -> None: pass

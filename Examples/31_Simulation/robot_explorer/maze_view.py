@@ -4,7 +4,6 @@
 # steps the robot through the solution one move at a time. Run it to
 # watch. The same model is checked headlessly in test_robot.py.
 import tkinter as tk
-
 from game import GameBuilder, solution, string_maze
 from items import Urge
 
@@ -13,7 +12,6 @@ FILL = {"#": "dimgray", "!": "tomato", ".": "khaki",
         "_": "white", "R": "royalblue"}
 MOVES = {"n": Urge.NORTH, "s": Urge.SOUTH,
          "e": Urge.EAST, "w": Urge.WEST}
-
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:
@@ -47,7 +45,6 @@ def show(maze: str = string_maze, moves: str = solution,
 
     step()
     root.mainloop()
-
 
 if __name__ == "__main__":
     show()

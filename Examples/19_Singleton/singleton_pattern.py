@@ -1,7 +1,6 @@
 # singleton_pattern.py
 from typing import Any
 
-
 class OnlyOne:
     class __OnlyOne:
         def __init__(self, arg: str) -> None:
@@ -23,7 +22,6 @@ class OnlyOne:
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
-
 
 x = OnlyOne('sausage')
 print(x)

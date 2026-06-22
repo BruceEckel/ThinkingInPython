@@ -154,7 +154,6 @@ which Python calls automatically every time a subclass is created:
 # Track the "leaf" subclasses (those with no subclasses of their own),
 # using __init_subclass__ instead of a metaclass.
 
-
 class Color:
     registry: set[type] = set()
 
@@ -162,7 +161,6 @@ class Color:
         super().__init_subclass__(**kwargs)
         Color.registry.add(cls)
         Color.registry -= set(cls.__bases__)  # Keep only the leaves
-
 
 class Blue(Color):
     pass
@@ -172,13 +170,11 @@ class Green(Color):
     pass
 print(sorted(c.__name__ for c in Color.registry))
 
-
 class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
@@ -188,7 +184,6 @@ class Shape:
         super().__init_subclass__(**kwargs)
         Shape.registry.add(cls)
         Shape.registry -= set(cls.__bases__)
-
 
 class Round(Shape):
     pass
@@ -222,7 +217,6 @@ A *descriptor* with `__set_name__` gets that name when the class is created:
 # A descriptor learns its attribute name at class-creation time.
 from typing import Any
 
-
 class Field:
     def __set_name__(self, owner: type, name: str) -> None:
         self.name = name
@@ -236,11 +230,9 @@ class Field:
     def __set__(self, obj: Any, value: Any) -> None:
         setattr(obj, self.storage, value)
 
-
 class Point:
     x = Field()
     y = Field()
-
 
 p = Point()
 p.x = 3
@@ -267,20 +259,17 @@ Python then uses your metaclass, instead of `type`, to build the class.
 # Writing a metaclass and applying it with the `metaclass=` keyword.
 from typing import Any
 
-
 class SimpleMeta1(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:
         super().__init__(name, bases, nmspc)
         setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
-
 class Simple1(metaclass=SimpleMeta1):
     def foo(self) -> None: pass
 
     @staticmethod
     def bar() -> None: pass
-
 
 simple = Simple1()
 print([m for m in dir(simple) if not m.startswith("__")])
@@ -318,10 +307,8 @@ though you can still modify the finished class object:
 # new_vs_init.py
 from typing import Any
 
-
 class Tag:
     pass
-
 
 class Meta(type):
     def __new__(mcl, name: str, bases: tuple[type, ...],
@@ -339,10 +326,8 @@ class Meta(type):
         # Effect: this modifies the finished class.
         setattr(cls, "patched_in_init", 3.14)
 
-
 class Demo(metaclass=Meta):
     pass
-
 
 print("added_in_new:", Demo.added_in_new)            # type: ignore
 print("has Tag base:", Tag in Demo.__bases__)
@@ -377,7 +362,6 @@ which is one way to build a Singleton:
 # A Singleton metaclass: intercept instance creation through __call__.
 from typing import Any
 
-
 class Singleton(type):
     _instances: dict[type, Any] = {}
 
@@ -386,14 +370,11 @@ class Singleton(type):
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
 class ASingleton(metaclass=Singleton):
     pass
 
-
 class BSingleton(metaclass=Singleton):
     pass
-
 
 a = ASingleton()
 b = ASingleton()
@@ -423,7 +404,6 @@ which needs no metaclass at all:
 from collections.abc import Callable
 from typing import Any
 
-
 def singleton(klass: type) -> Callable[..., Any]:
     instances: dict[type, Any] = {}
 
@@ -434,12 +414,10 @@ def singleton(klass: type) -> Callable[..., Any]:
 
     return get_instance
 
-
 @singleton
 class Registry:
     def __init__(self) -> None:
         self.items: list[str] = []
-
 
 a = Registry()
 b = Registry()
@@ -468,10 +446,8 @@ With `__init_subclass__`, it does not:
 # Preventing inheritance with __init_subclass__, no metaclass
 # required.
 
-
 class A:
     pass
-
 
 class B(A):
     # Make B final: any attempt to subclass it fails at class
@@ -479,7 +455,6 @@ class B(A):
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
             f"{B.__name__} is final; you cannot subclass it")
-
 
 print(B.__bases__)
 
@@ -528,16 +503,13 @@ import init_subclass
 import pytest
 import set_name
 
-
 def test_leaf_registry_tracks_only_leaves() -> None:
     leaves = {c.__name__ for c in init_subclass.Color.registry}
     assert leaves == {"Red", "Green", "PhthaloBlue", "CeruleanBlue"}
 
-
 def test_independent_hierarchies_have_separate_registries() -> None:
     shapes = {c.__name__ for c in init_subclass.Shape.registry}
     assert shapes == {"Square", "Circle"}  # Round is no longer a leaf
-
 
 def test_descriptor_learns_its_name() -> None:
     p = set_name.Point()
@@ -546,16 +518,13 @@ def test_descriptor_learns_its_name() -> None:
     assert (p.x, p.y) == (3, 4)
     assert p.__dict__ == {"_x": 3, "_y": 4}  # Stored under the names
 
-
 def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
-
 
 def test_final_class_cannot_be_subclassed() -> None:
     with pytest.raises(TypeError):
         class Sub(final.B):
             pass
-
 
 def test_non_final_base_can_be_subclassed() -> None:
     class Ok(final.A):

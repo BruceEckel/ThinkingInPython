@@ -4,9 +4,7 @@
 # any other Result.
 from collections.abc import Callable
 from functools import wraps
-
 from result import Failure, Result, Success
-
 
 def safe[A](
     func: Callable[..., A],
@@ -21,11 +19,9 @@ def safe[A](
             return Failure(e)
     return wrapper
 
-
 @safe
 def parse(text: str) -> int:
     return int(text)
-
 
 if __name__ == "__main__":
     for text in ("42", "oops"):

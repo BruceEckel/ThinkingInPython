@@ -1,10 +1,8 @@
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
 from typing import Any
-
 from arena import item_pair_gen, match
 from outcome import Outcome
-
 
 class Item:
     def compete(self, item: Any) -> Outcome:

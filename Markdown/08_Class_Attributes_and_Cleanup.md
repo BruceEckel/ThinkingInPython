@@ -22,7 +22,6 @@ Here's an example showing why it can be confusing:
 class Stars:
     rating = 5  # One value, shared by the whole class.
 
-
 a = Stars()
 b = Stars()
 print(a.rating, b.rating)  # 5 5: Both read the class attr
@@ -42,7 +41,6 @@ To show this we can select the class with `vars(A)` and the instance with `vars(
 # inside_objects.py
 class A:
     x = 100  # class attribute
-
 
 a = A()
 print(vars(A)["x"])  # 100: The attribute lives in the class dict
@@ -64,7 +62,6 @@ and stops you from accidentally creating an instance variable that shadows it:
 # class_var.py
 from typing import ClassVar
 
-
 class Tally:
     total: ClassVar[int] = 0  # One shared value, not per-instance
     label: str  # A normal instance variable
@@ -72,7 +69,6 @@ class Tally:
     def __init__(self, label: str) -> None:
         self.label = label
         Tally.total += 1
-
 
 a = Tally("a")
 b = Tally("b")
@@ -92,7 +88,6 @@ Each object then gets its own storage for instance variables:
 # real_defaults.py
 from dataclasses import dataclass
 
-
 class A:
     def __init__(self, x: int = 100) -> None:
         self.x = x  # An instance variable, one per object
@@ -100,7 +95,6 @@ class A:
 @dataclass
 class B:
     x: int = 100  # Constructor default, not class attribute
-
 
 if __name__ == "__main__":
     a = A()
@@ -123,7 +117,6 @@ This seems like a candidate for releasing resources:
 ```python
 # cleanup.py
 from typing import ClassVar
-
 
 class Counter:
     count: ClassVar[int] = 0   # Number of objects of this class
@@ -229,7 +222,6 @@ Two approaches are more reliable:
 from typing import ClassVar
 from weakref import WeakValueDictionary
 
-
 class Counter:
     _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
         WeakValueDictionary())
@@ -241,7 +233,6 @@ class Counter:
     @classmethod
     def live_count(cls) -> int:
         return len(cls._instances)
-
 
 counters = []
 for name in ["First", "Second", "Third"]:

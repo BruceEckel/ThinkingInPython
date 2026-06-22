@@ -2,7 +2,6 @@
 class Stars:
     rating = 5  # One value, shared by the whole class.
 
-
 a = Stars()
 b = Stars()
 print(a.rating, b.rating)  # 5 5: Both read the class attr

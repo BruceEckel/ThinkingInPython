@@ -1,10 +1,8 @@
 # paper_scissors_rock.py
 # Demonstration of multiple dispatching.
 from typing import Any
-
 from arena import item_pair_gen, match
 from outcome import Outcome
-
 
 class Item:
     def __str__(self) -> str:

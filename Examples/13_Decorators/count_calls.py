@@ -3,7 +3,6 @@ from collections.abc import Callable
 from functools import update_wrapper
 from typing import Any
 
-
 class count_calls:
     def __init__(self, func: Callable[..., Any]) -> None:
         self.func = func
@@ -15,11 +14,9 @@ class count_calls:
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
 
-
 @count_calls
 def hello() -> None:
     print("hello")
-
 
 if __name__ == "__main__":
     hello()

@@ -12,7 +12,6 @@ def handle(event: dict[str, object]) -> str:
         case _:
             return "not an event"
 
-
 print(handle({"type": "click", "x": 10, "y": 20}))
 print(handle({"type": "key", "key": "Enter"}))
 print(handle({"type": "scroll", "delta": 3}))

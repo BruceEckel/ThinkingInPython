@@ -27,7 +27,6 @@ def describe(status: int) -> str:
         case _:
             return f"status {status}"
 
-
 print(describe(200))
 print(describe(404))
 print(describe(301))
@@ -63,7 +62,6 @@ def step(command: str) -> str:
         case other:
             return f"unknown command: {other}"
 
-
 print(step("up"))
 print(step("d"))
 print(step("jump"))
@@ -98,7 +96,6 @@ def summarize(items: list[int]) -> str:
         case _:
             return "unreachable"
 
-
 print(summarize([]))
 print(summarize([5]))
 print(summarize([3, 4]))
@@ -130,12 +127,10 @@ The [Data Classes as Types](10_Data_Classes_as_Types.md) chapter covers data cla
 # supports positional matching out of the box.
 from dataclasses import dataclass
 
-
 @dataclass
 class Point:
     x: int
     y: int
-
 
 def locate(p: Point) -> str:
     match p:
@@ -147,7 +142,6 @@ def locate(p: Point) -> str:
             return f"on the x-axis at x={x}"
         case Point(x, y):
             return f"at ({x}, {y})"
-
 
 print(locate(Point(0, 0)))
 print(locate(Point(0, 5)))
@@ -177,12 +171,10 @@ The case matches only when the pattern fits *and* the guard is true:
 # A guard adds a condition to a case.
 from dataclasses import dataclass
 
-
 @dataclass
 class Point:
     x: int
     y: int
-
 
 def quadrant(p: Point) -> str:
     match p:
@@ -194,7 +186,6 @@ def quadrant(p: Point) -> str:
             return "second quadrant"
         case _:
             return "somewhere else"
-
 
 print(quadrant(Point(0, 0)))
 print(quadrant(Point(3, 4)))
@@ -230,7 +221,6 @@ def handle(event: dict[str, object]) -> str:
         case _:
             return "not an event"
 
-
 print(handle({"type": "click", "x": 10, "y": 20}))
 print(handle({"type": "key", "key": "Enter"}))
 print(handle({"type": "scroll", "delta": 3}))
@@ -262,19 +252,15 @@ from dataclasses import dataclass
 from math import pi
 from typing import assert_never
 
-
 @dataclass(frozen=True)
 class Circle:
     radius: float
-
 
 @dataclass(frozen=True)
 class Square:
     side: float
 
-
 type Shape = Circle | Square
-
 
 def area(shape: Shape) -> float:
     match shape:
@@ -284,7 +270,6 @@ def area(shape: Shape) -> float:
             return side ** 2
         case _:
             assert_never(shape)
-
 
 print(round(area(Circle(1.0)), 4))
 print(area(Square(2.0)))
@@ -312,10 +297,8 @@ For a plain value-to-value lookup, a dictionary is shorter and faster:
 # for patterns that destructure.
 STATUS = {200: "OK", 404: "Not Found", 500: "Server Error"}
 
-
 def describe(status: int) -> str:
     return STATUS.get(status, f"status {status}")
-
 
 print(describe(200))
 print(describe(301))
@@ -344,23 +327,19 @@ from exhaustive import Circle, Square, area
 from mapping_patterns import handle
 from sequence_patterns import summarize
 
-
 def test_sequence_patterns() -> None:
     assert summarize([]) == "empty"
     assert summarize([5]) == "one item: 5"
     assert summarize([1, 2, 3]) == "1, then 2 more"
-
 
 def test_class_patterns() -> None:
     assert locate(Point(0, 0)) == "the origin"
     assert locate(Point(3, 0)) == "on the x-axis at x=3"
     assert locate(Point(3, 4)) == "at (3, 4)"
 
-
 def test_mapping_patterns() -> None:
     assert handle({"type": "key", "key": "Esc"}) == "key Esc"
     assert handle({"nope": 1}) == "not an event"
-
 
 def test_exhaustive_area() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416

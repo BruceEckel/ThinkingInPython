@@ -1,6 +1,5 @@
 # rats_and_mazes/test_ratsandmazes.py
 import asyncio
-
 from blackboard import Blackboard
 from maze import Maze
 
@@ -14,7 +13,6 @@ LAYOUT = """\
 *********
 """
 
-
 def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
     seen: set[tuple[int, int]] = set()
     stack = [start]
@@ -25,7 +23,6 @@ def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
         seen.add((x, y))
         stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
     return seen
-
 
 def test_rats_map_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)

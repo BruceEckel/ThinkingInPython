@@ -5,11 +5,9 @@
 from copy import deepcopy
 from dataclasses import dataclass
 
-
 @dataclass
 class Bob:
     name: str = "Bob"
-
 
 class Plugged:
     def __init__(self, numbers: list[int]) -> None:
@@ -23,7 +21,6 @@ class Plugged:
     @property
     def bob(self) -> Bob:
         return deepcopy(self._bob)
-
 
 if __name__ == "__main__":
     plugged = Plugged([1, 2])

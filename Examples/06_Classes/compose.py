@@ -9,5 +9,4 @@ class Compose:
     def __repr__(self):
         return f"Compose({self.name!r})"
 
-
 Compose("example").f()

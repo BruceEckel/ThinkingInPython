@@ -1,8 +1,6 @@
 # month_dataclass.py
 from dataclasses import dataclass, field
-
 from validation import check
-
 
 @dataclass(frozen=True)
 class Day:
@@ -10,7 +8,6 @@ class Day:
 
     def __post_init__(self) -> None:
         check(1 <= self.n <= 31, f"Day({self.n})")
-
 
 @dataclass(frozen=True)
 class Month:
@@ -27,7 +24,6 @@ class Month:
         check(day.n <= self.max_days,
               f"{self.name} has no day {day.n}")
 
-
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([
         ("January", 31), ("February", 28), ("March", 31),
@@ -36,7 +32,6 @@ def make_months() -> list[Month]:
         ("October", 31), ("November", 30), ("December", 31),
     ], start=1)]
 
-
 @dataclass(frozen=True)
 class Months:
     months: list[Month] = field(default_factory=make_months)
@@ -44,7 +39,6 @@ class Months:
     def of(self, month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return self.months[month_number - 1]
-
 
 if __name__ == "__main__":
     months = Months()

@@ -1,9 +1,7 @@
 # parse_trash.py
 # Read "Name:weight" lines into Trash objects through the registry.
 from pathlib import Path
-
 from trash import Trash
-
 
 def parse(filename: str) -> list[Trash]:
     items: list[Trash] = []

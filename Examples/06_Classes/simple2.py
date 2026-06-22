@@ -1,8 +1,6 @@
 # simple2.py
 from typing import override
-
 from simple_class import Simple
-
 
 class Simple2(Simple):  # Simple2 inherits Simple
     def __init__(self, str):

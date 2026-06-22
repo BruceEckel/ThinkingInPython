@@ -1,10 +1,8 @@
 # new_vs_init.py
 from typing import Any
 
-
 class Tag:
     pass
-
 
 class Meta(type):
     def __new__(mcl, name: str, bases: tuple[type, ...],
@@ -22,10 +20,8 @@ class Meta(type):
         # Effect: this modifies the finished class.
         setattr(cls, "patched_in_init", 3.14)
 
-
 class Demo(metaclass=Meta):
     pass
-
 
 print("added_in_new:", Demo.added_in_new)            # type: ignore
 print("has Tag base:", Tag in Demo.__bases__)

@@ -4,7 +4,6 @@
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room
 
-
 class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: dict[tuple[int, int], Room] = {}
@@ -56,7 +55,6 @@ class GameBuilder:
                  "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
             self.robot.move(moves[char])
-
 
 string_maze = """
 ###############################

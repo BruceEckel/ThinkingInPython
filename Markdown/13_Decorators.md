@@ -23,7 +23,6 @@ Here is a decorator that traces calls:
 from collections.abc import Callable
 from functools import wraps
 
-
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -33,11 +32,9 @@ def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
         return result
     return wrapper
 
-
 @trace
 def add(a: int, b: int) -> int:
     return a + b
-
 
 if __name__ == "__main__":
     add(2, 3)
@@ -69,7 +66,6 @@ A decorator with arguments is a function that returns a decorator:
 from collections.abc import Callable
 from functools import wraps
 
-
 def repeat[**P, R](
         times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
@@ -82,12 +78,10 @@ def repeat[**P, R](
         return wrapper
     return decorate
 
-
 @repeat(times=3)
 def greet(name: str) -> str:
     print(f"Hello, {name}")
     return name
-
 
 if __name__ == "__main__":
     greet("Bob")
@@ -113,7 +107,6 @@ from collections.abc import Callable
 from functools import update_wrapper
 from typing import Any
 
-
 class trace:
     def __init__(self, func: Callable[..., Any]) -> None:
         self.func = func
@@ -125,11 +118,9 @@ class trace:
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
         return result
 
-
 @trace
 def add(a: int, b: int) -> int:
     return a + b
-
 
 if __name__ == "__main__":
     add(2, 3)
@@ -152,7 +143,6 @@ from collections.abc import Callable
 from functools import update_wrapper
 from typing import Any
 
-
 class count_calls:
     def __init__(self, func: Callable[..., Any]) -> None:
         self.func = func
@@ -164,11 +154,9 @@ class count_calls:
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
 
-
 @count_calls
 def hello() -> None:
     print("hello")
-
 
 if __name__ == "__main__":
     hello()
@@ -187,7 +175,6 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-
 class repeat:
     def __init__(self, times: int) -> None:
         self.times = times  # The decoration arguments
@@ -202,11 +189,9 @@ class repeat:
             return result
         return wrapper
 
-
 @repeat(times=3)
 def greet(name: str) -> None:
     print(f"Hello, {name}")
-
 
 if __name__ == "__main__":
     greet("Bob")
@@ -257,21 +242,17 @@ This one records every class it is applied to:
 # register.py
 registry: dict[str, type] = {}
 
-
 def register(cls: type) -> type:
     registry[cls.__name__] = cls
     return cls
-
 
 @register
 class Espresso:
     ...
 
-
 @register
 class Latte:
     ...
-
 
 if __name__ == "__main__":
     print(sorted(registry))
@@ -304,23 +285,19 @@ Because an extra is itself a drink, you can wrap an extra in another extra.
 
 from typing import Protocol
 
-
 class Drink(Protocol):
     @property
     def cost(self) -> float: ...
     @property
     def description(self) -> str: ...
 
-
 class Espresso:
     cost = 1.50
     description = "espresso"
 
-
 class Cappuccino:
     cost = 1.75
     description = "cappuccino"
-
 
 class Extra:
     "Base object decorator: wraps a Drink and adds to it."
@@ -338,21 +315,17 @@ class Extra:
     def description(self) -> str:
         return f"{self.drink.description} + {self.name}"
 
-
 class Whipped(Extra):
     add_cost = 0.50
     name = "whipped cream"
-
 
 class Decaf(Extra):
     add_cost = 0.0
     name = "decaf"
 
-
 class ExtraShot(Extra):
     add_cost = 0.75
     name = "extra shot"
-
 
 if __name__ == "__main__":
     order = Whipped(ExtraShot(Espresso()))
@@ -384,19 +357,16 @@ where a price change touches every class that includes that extra.
 # test_coffee.py
 from coffee import Cappuccino, Decaf, Espresso, ExtraShot, Whipped
 
-
 def test_plain_drink() -> None:
     cap = Cappuccino()
     assert cap.cost == 1.75
     assert cap.description == "cappuccino"
-
 
 def test_stacked_extras() -> None:
     order = Whipped(ExtraShot(Espresso()))
     assert order.cost == 2.75
     assert order.description == (
         "espresso + extra shot + whipped cream")
-
 
 def test_decaf_adds_no_cost() -> None:
     order = Decaf(Espresso())

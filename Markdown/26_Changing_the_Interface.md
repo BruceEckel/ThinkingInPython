@@ -17,7 +17,6 @@ and there are a number of ways you can accomplish this adaptation:
 # Variations on the Adapter pattern.
 from typing import Any, override
 
-
 class WhatIHave:
     def g(self) -> None: pass
     def h(self) -> None: pass
@@ -101,11 +100,9 @@ and add or change a few."
 # wrapper stays small.
 from typing import Any
 
-
 class WhatIHave:
     def g(self) -> str: return "g"
     def h(self) -> str: return "h"
-
 
 class Adapter:
     def __init__(self, adaptee: WhatIHave) -> None:
@@ -116,7 +113,6 @@ class Adapter:
 
     def __getattr__(self, name: str) -> Any:  # Forwards the rest
         return getattr(self._adaptee, name)
-
 
 a = Adapter(WhatIHave())
 print(a.f())   # Adapted method
@@ -135,16 +131,13 @@ and unoverridden calls forward straight through to the wrapped object:
 # test_adapter.py
 from getattr_adapter import Adapter, WhatIHave
 
-
 def test_new_interface_combines_methods() -> None:
     assert Adapter(WhatIHave()).f() == "gh"
-
 
 def test_getattr_forwards_existing_methods_unchanged() -> None:
     a = Adapter(WhatIHave())
     assert a.g() == "g"
     assert a.h() == "h"
-
 
 def test_forwarding_targets_the_wrapped_object() -> None:
     have = WhatIHave()

@@ -2,9 +2,7 @@
 # Takes a list of Inputs to move from State to
 # State using a template method.
 from collections.abc import Iterable
-
 from state import State
-
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:

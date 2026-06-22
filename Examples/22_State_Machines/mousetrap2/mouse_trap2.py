@@ -9,7 +9,6 @@ from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
 
-
 class StateT(State):
     def __init__(self) -> None:
         self.transitions: dict[Any, Any] | None = None

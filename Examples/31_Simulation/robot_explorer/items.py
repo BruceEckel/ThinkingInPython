@@ -9,13 +9,11 @@ from typing import TYPE_CHECKING, override
 if TYPE_CHECKING:
     from world import Room
 
-
 class Urge(Enum):
     NORTH = 1
     SOUTH = 2
     EAST = 3
     WEST = 4
-
 
 class Item:
     symbol = ""
@@ -25,7 +23,6 @@ class Item:
 
     def __str__(self) -> str:
         return self.symbol
-
 
 class Robot(Item):
     symbol = "R"
@@ -37,7 +34,6 @@ class Robot(Item):
         assert self.room is not None
         self.room = self.room.doors.open(urge).enter(self)
 
-
 class Wall(Item):
     symbol = "#"
 
@@ -46,7 +42,6 @@ class Wall(Item):
         assert robot.room is not None
         return robot.room  # Cannot pass: stay put.
 
-
 class Food(Item):
     symbol = "."
 
@@ -54,7 +49,6 @@ class Food(Item):
     def interact(self, robot: Robot, room: Room) -> Room:
         room.occupant = Empty()  # Eaten.
         return room
-
 
 class Teleport(Item):
     symbol = ""  # Set per target letter
@@ -72,14 +66,12 @@ class Teleport(Item):
     def __str__(self) -> str:
         return self.target
 
-
 class Empty(Item):
     symbol = "_"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return room
-
 
 class Edge(Item):
     symbol = "/"
@@ -89,7 +81,6 @@ class Edge(Item):
         assert robot.room is not None
         return robot.room  # The void outside the maze: stay put.
 
-
 class EndGame(Item):
     symbol = "!"
 
@@ -97,7 +88,6 @@ class EndGame(Item):
     def interact(self, robot: Robot, room: Room) -> Room:
         print("Game over!")
         return room
-
 
 def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():

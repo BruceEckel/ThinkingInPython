@@ -2,7 +2,6 @@
 from typing import ClassVar
 from weakref import WeakValueDictionary
 
-
 class Counter:
     _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
         WeakValueDictionary())
@@ -14,7 +13,6 @@ class Counter:
     @classmethod
     def live_count(cls) -> int:
         return len(cls._instances)
-
 
 counters = []
 for name in ["First", "Second", "Third"]:

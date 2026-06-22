@@ -219,6 +219,26 @@ make eol       # check, exit 1 on CRLF (part of `make ci`)
 make fix-eol   # convert any offenders to LF
 ```
 
+## listing_format.py
+
+The book favors dense listings: at most one blank line in a row, and no blank
+line between import groups. Ruff's isort config (`no-lines-before`,
+`lines-after-imports = 1`) enforces the import layout, but only on the extracted
+`.py` files: it cannot rewrite the `Markdown/` source, and it does not check
+blank-line counts between defs at all. This tool closes both gaps by checking
+the Markdown directly. It is string-aware, so blank lines inside triple-quoted
+strings are never touched, and it only looks at ```python blocks. It is part of
+the `make ci` gate; like line endings, there is no auto-fix in the build:
+
+```
+make listings       # check, exit 1 on extra blank lines (part of `make ci`)
+make fix-listings   # remove the offending blank lines
+```
+
+Do not run `ruff format` on the examples: it would re-expand to two blank lines
+between top-level defs and undo the density. The gate runs `ruff check` (the
+linter) only, which is happy with one blank line.
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
