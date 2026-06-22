@@ -38,5 +38,5 @@ class Doors:
         }[urge]
         return neighbor if neighbor is not None else EDGE
 
-# Created once both classes exist; its own doors stay unset.
+# Created once both classes exist; its own doors stay unset
 EDGE = Room(Edge())

@@ -12,7 +12,7 @@ if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
     print(m)
 
-    # m.name = "bar" would raise dataclasses.FrozenInstanceError.
+    # m.name = "bar" would raise dataclasses.FrozenInstanceError
 
-    cache = {m: "value"}  # Frozen instances are hashable.
+    cache = {m: "value"}  # Frozen instances are hashable
     print(cache[m])

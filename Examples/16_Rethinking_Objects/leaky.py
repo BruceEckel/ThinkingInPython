@@ -10,7 +10,7 @@ class Bob:
 
 class Leaky:
     def __init__(self, numbers: list[int]) -> None:
-        self._numbers = numbers  # "Private" by convention.
+        self._numbers = numbers  # "Private" by convention
         self._bob = Bob()
 
     @property

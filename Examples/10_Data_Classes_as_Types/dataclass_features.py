@@ -22,12 +22,12 @@ class Config:
 
 if __name__ == "__main__":
     p = Point(10, 20)
-    print(asdict(p))   # Nested dict.
-    print(astuple(p))  # Nested tuple.
+    print(asdict(p))   # Nested dict
+    print(astuple(p))  # Nested tuple
 
     line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))  # Recurses into the list of Points.
+    print(asdict(line))  # Recurses into the list of Points
 
-    print(replace(p, x=1))  # Copy with one field changed.
+    print(replace(p, x=1))  # Copy with one field changed
 
     print(Config("data.csv", retries=5))

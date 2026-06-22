@@ -1,6 +1,5 @@
 # stars_unchecked.py
-# A bare int for a 1-10 rating must be re-checked everywhere it is
-# used.
+# An int for a 1-10 rating must be re-checked everywhere.
 from validation import check
 
 def f1(stars: int) -> int:
@@ -9,7 +8,7 @@ def f1(stars: int) -> int:
     return stars + 5
 
 def f2(stars: int) -> int:
-    # ...and again in every other function.
+    # ...and again in every other function
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 

@@ -1,12 +1,11 @@
 # messenger.py
-# A data class generates __init__, __repr__, and __eq__ for you.
 from dataclasses import dataclass, replace
 
 @dataclass
 class Messenger:
     name: str
     number: int
-    depth: float = 0.0  # Default value.
+    depth: float = 0.0  # Default value
 
 if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
@@ -17,8 +16,8 @@ if __name__ == "__main__":
     print(Messenger("xx", 1) == Messenger("xx", 1))
     print(Messenger("xx", 1) == Messenger("xx", 2))
 
-    mc = replace(m, depth=9.9)  # Copy with one field changed.
+    mc = replace(m, depth=9.9)  # Copy with one field changed
     print(m, mc)
 
-    m.name = "bar"  # A plain data class is mutable.
+    m.name = "bar"  # A plain data class is mutable
     print(m)

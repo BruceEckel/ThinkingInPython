@@ -19,7 +19,7 @@ class Item:
     symbol = ""
 
     def interact(self, robot: Robot, room: Room) -> Room:
-        return room  # Default: the robot enters the room.
+        return room  # Default: the robot enters the room
 
     def __str__(self) -> str:
         return self.symbol
@@ -40,14 +40,14 @@ class Wall(Item):
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
-        return robot.room  # Cannot pass: stay put.
+        return robot.room  # Cannot pass: stay put
 
 class Food(Item):
     symbol = "."
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        room.occupant = Empty()  # Eaten.
+        room.occupant = Empty()  # Eaten
         return room
 
 class Teleport(Item):
@@ -79,7 +79,7 @@ class Edge(Item):
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
-        return robot.room  # The void outside the maze: stay put.
+        return robot.room  # The void outside the maze: stay put
 
 class EndGame(Item):
     symbol = "!"
@@ -93,4 +93,4 @@ def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
         if symbol == item_type.symbol:
             return item_type()
-    return Teleport(symbol)  # Anything else is a teleport target.
+    return Teleport(symbol)  # Anything else is a teleport target

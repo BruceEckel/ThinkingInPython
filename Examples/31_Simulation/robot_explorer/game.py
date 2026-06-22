@@ -8,7 +8,7 @@ class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: dict[tuple[int, int], Room] = {}
         teleports: list[Room] = []
-        # Stage 1: a Room for every character.
+        # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
                 occupant = item_factory(char)
@@ -21,10 +21,10 @@ class GameBuilder:
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
                     teleports.append(room)
-        # Stage 2: connect each room to its neighbors.
+        # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-        # Stage 3: pair the teleports that share a target letter.
+        # Stage 3: pair the teleports that share a target letter
         def target(room: Room) -> str:
             assert isinstance(room.occupant, Teleport)
             return room.occupant.target

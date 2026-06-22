@@ -51,7 +51,7 @@ record a message, and hand out a number.
 import asyncio
 from typing import Protocol
 
-# South, north, west, east.
+# South, north, west, east
 DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Recorder(Protocol):
@@ -82,7 +82,7 @@ class Rat:
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
-            await asyncio.sleep(0)  # Yield so sibling rats can run.
+            await asyncio.sleep(0)  # Yield so sibling rats can run
 ```
 
 The maze is a grid of characters.
@@ -155,7 +155,7 @@ class Blackboard:
         self._numbers = itertools.count(1)
 
     def claim(self, x: int, y: int) -> bool:
-        # No await between the test and the add, so this is atomic.
+        # No await between the test and the add, so this is atomic
         if self.maze.is_open(x, y) and (x, y) not in self.visited:
             self.visited.add((x, y))
             return True
@@ -175,7 +175,7 @@ class Blackboard:
         start = self.maze.entry()
         self.claim(*start)
         self.spawn(*start)
-        # Wait for every rat, including ones spawned while we wait.
+        # Wait for every rat, including ones spawned while we wait
         while pending := [t for t in self.tasks if not t.done()]:
             await asyncio.gather(*pending)
 
@@ -392,7 +392,7 @@ class Item:
     symbol = ""
 
     def interact(self, robot: Robot, room: Room) -> Room:
-        return room  # Default: the robot enters the room.
+        return room  # Default: the robot enters the room
 
     def __str__(self) -> str:
         return self.symbol
@@ -413,14 +413,14 @@ class Wall(Item):
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
-        return robot.room  # Cannot pass: stay put.
+        return robot.room  # Cannot pass: stay put
 
 class Food(Item):
     symbol = "."
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        room.occupant = Empty()  # Eaten.
+        room.occupant = Empty()  # Eaten
         return room
 
 class Teleport(Item):
@@ -452,7 +452,7 @@ class Edge(Item):
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         assert robot.room is not None
-        return robot.room  # The void outside the maze: stay put.
+        return robot.room  # The void outside the maze: stay put
 
 class EndGame(Item):
     symbol = "!"
@@ -466,7 +466,7 @@ def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
         if symbol == item_type.symbol:
             return item_type()
-    return Teleport(symbol)  # Anything else is a teleport target.
+    return Teleport(symbol)  # Anything else is a teleport target
 ```
 
 `item_factory()` turns a maze character into an `Item`.
@@ -522,7 +522,7 @@ class Doors:
         }[urge]
         return neighbor if neighbor is not None else EDGE
 
-# Created once both classes exist; its own doors stay unset.
+# Created once both classes exist; its own doors stay unset
 EDGE = Room(Edge())
 ```
 
@@ -543,7 +543,7 @@ class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: dict[tuple[int, int], Room] = {}
         teleports: list[Room] = []
-        # Stage 1: a Room for every character.
+        # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
                 occupant = item_factory(char)
@@ -556,10 +556,10 @@ class GameBuilder:
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
                     teleports.append(room)
-        # Stage 2: connect each room to its neighbors.
+        # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-        # Stage 3: pair the teleports that share a target letter.
+        # Stage 3: pair the teleports that share a target letter
         def target(room: Room) -> str:
             assert isinstance(room.occupant, Teleport)
             return room.occupant.target

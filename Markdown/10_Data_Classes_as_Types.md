@@ -17,12 +17,13 @@ Code that receives one never has to check it again.
 This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
-We will lean on one tiny helper that raises when a value is not legal:
+This function will be used throughout the chapter.
+It throws a specialized exception when a value is not legal:
 
 ```python
 # validation.py
 class TypeFailure(ValueError):
-    "Raised when a value falls outside the set its type allows."
+    "A value falls outside the type's allowed set"
 
 def check(condition: bool, message: str, detail: str = "") -> None:
     if not condition:
@@ -38,8 +39,7 @@ So every function that takes a rating has to check it:
 
 ```python
 # stars_unchecked.py
-# A bare int for a 1-10 rating must be re-checked everywhere it is
-# used.
+# An int for a 1-10 rating must be re-checked everywhere.
 from validation import check
 
 def f1(stars: int) -> int:
@@ -48,7 +48,7 @@ def f1(stars: int) -> int:
     return stars + 5
 
 def f2(stars: int) -> int:
-    # ...and again in every other function.
+    # ...and again in every other function
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 
@@ -77,23 +77,23 @@ from validation import check
 
 class Stars:
     def __init__(self, number: int) -> None:
-        self._number = number  # Private by convention.
+        self._number = number  # Private by convention
         self._validate()
 
     def _validate(self) -> None:
         check(1 <= self._number <= 10, f"Stars({self._number})")
 
     @property
-    def number(self) -> int:  # No setter: blocks outside mutation.
+    def number(self) -> int:  # No setter: blocks outside mutation
         return self._number
 
     def __str__(self) -> str:
         return f"Stars({self._number})"
 
     def f1(self, n: int) -> int:
-        check(1 <= n <= 10, f"f1({n})")  # Precondition.
+        check(1 <= n <= 10, f"f1({n})")  # Precondition
         self._number = n + 5
-        self._validate()                 # Postcondition.
+        self._validate()                 # Postcondition
         return self._number
 
 if __name__ == "__main__":
@@ -104,29 +104,27 @@ if __name__ == "__main__":
 
 A read-only property keeps outsiders from assigning to `number`,
 but the class itself still mutates `_number` and has to guard it with a precondition and a postcondition.
-Checking arguments on the way in and results on the way out is the practice known as *Design by Contract*,
-and the trouble is exactly this:
-the contract is spread across every method that touches the value.
+Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
+The problem with DbC is that the contract is spread across every method that touches the value.
 That is the same scattering of checks as before, just moved inside the class.
 The class encapsulates the value.
 It does not pin it down to a set of legal values.
 
 ## Data Classes
 
-A *data class* writes the boilerplate for a class whose job is to hold data.
+A *data class* writes the boilerplate for a class that holds data.
 The `@dataclass` decorator generates `__init__`, `__repr__`,
 and `__eq__` from the fields you declare:
 
 ```python
 # messenger.py
-# A data class generates __init__, __repr__, and __eq__ for you.
 from dataclasses import dataclass, replace
 
 @dataclass
 class Messenger:
     name: str
     number: int
-    depth: float = 0.0  # Default value.
+    depth: float = 0.0  # Default value
 
 if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
@@ -137,16 +135,15 @@ if __name__ == "__main__":
     print(Messenger("xx", 1) == Messenger("xx", 1))
     print(Messenger("xx", 1) == Messenger("xx", 2))
 
-    mc = replace(m, depth=9.9)  # Copy with one field changed.
+    mc = replace(m, depth=9.9)  # Copy with one field changed
     print(m, mc)
 
-    m.name = "bar"  # A plain data class is mutable.
+    m.name = "bar"  # A plain data class is mutable
     print(m)
 ```
 
 `replace` returns a copy with some fields changed, leaving the original alone.
-That copy-instead-of-mutate style is the one we want.
-(This is the same `dataclass` the [Data Transfer Objects](18_Data_Transfer_Objects.md) chapter uses for passing bundles of data around.)
+This copy-instead-of-mutate style reduces errors.
 But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
 
@@ -159,7 +156,6 @@ so you can use it as a dictionary key or put it in a set:
 
 ```python
 # frozen_messenger.py
-# frozen=True makes instances immutable and hashable.
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -172,27 +168,23 @@ if __name__ == "__main__":
     m = Messenger("foo", 12, 3.14)
     print(m)
 
-    # m.name = "bar" would raise dataclasses.FrozenInstanceError.
+    # m.name = "bar" would raise dataclasses.FrozenInstanceError
 
-    cache = {m: "value"}  # Frozen instances are hashable.
+    cache = {m: "value"}  # Frozen instances are hashable
     print(cache[m])
 ```
 
-Immutability is the missing piece.
 If an object cannot change after it is built, then validating it once,
 at construction, is enough for its whole life.
 
 ## A Type Is a Set of Values
 
-Now put the two ideas together.
-Make the rating a frozen data class, and validate it in `__post_init__`,
-the hook the data class calls right after it fills in the fields:
+We can make the `Stars` rating a frozen data class.
+To validate it after the fields are filled in, we call `__post_init__` :
 
 ```python
 # stars.py
-# A type is a set of values. Validate once, at construction, in a
-# frozen data class. Every Stars that exists is then guaranteed to
-# be a legal value.
+# Every Stars is guaranteed to be a legal value
 from dataclasses import dataclass
 from validation import check
 
@@ -216,6 +208,8 @@ if __name__ == "__main__":
     print(f2(Stars(2)))
 ```
 
+`__post_init__` is one of the hooks the `dataclass` machinery generates code around.
+
 `Stars` now names a set of values: the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside the set.
@@ -225,10 +219,11 @@ You know it without looking.
 This changes how the functions are written.
 `f1` and `f2` take a `Stars` and return a `Stars`.
 They do not check their argument, because a `Stars` is already known to be good.
-They do not check their result,
-because building the returned `Stars` runs the check again.
-The validation lives in exactly one place, the constructor,
-and immutability guarantees no one can damage the value after that.
+They do not test their result,
+because building the returned `Stars` runs the check.
+
+The validation lives in exactly one place, the constructor (which makes it easy to change).
+Immutability guarantees no one can damage the value after that.
 Illegal values are unrepresentable.
 
 This is the principle often stated as *parse, don't validate*.
@@ -236,15 +231,12 @@ Instead of checking a loose value over and over and hoping you never miss a spot
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
 The check is not repeated because it cannot fail:
-an illegal value never became a `Stars` in the first place.
+an illegal value can never produce a `Stars` in the first place.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 The [Static Typing](07_Static_Typing.md) chapter argues for letting the type carry the meaning.
 Here the type carries a guarantee.
-
-`__post_init__` is one of the hooks the data class machinery generates code around,
-in the same spirit as the class-creation hooks in the [Metaprogramming](15_Metaprogramming.md) chapter.
 
 ## Composing Types from Types
 
@@ -325,7 +317,7 @@ class Year:
 
 class Month(Enum):
     JANUARY = (1, 31)
-    FEBRUARY = (2, 28)   # Leap years are left as an exercise.
+    FEBRUARY = (2, 28)   # Leap years are left as an exercise
     MARCH = (3, 31)
     APRIL = (4, 30)
     MAY = (5, 31)
@@ -468,13 +460,13 @@ class Config:
 
 if __name__ == "__main__":
     p = Point(10, 20)
-    print(asdict(p))   # Nested dict.
-    print(astuple(p))  # Nested tuple.
+    print(asdict(p))   # Nested dict
+    print(astuple(p))  # Nested tuple
 
     line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))  # Recurses into the list of Points.
+    print(asdict(line))  # Recurses into the list of Points
 
-    print(replace(p, x=1))  # Copy with one field changed.
+    print(replace(p, x=1))  # Copy with one field changed
 
     print(Config("data.csv", retries=5))
 ```
@@ -614,9 +606,9 @@ def test_valid_date() -> None:
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days here.
-    (4, 31),   # April has 30.
-    (9, 31),   # September has 30.
+    (2, 31),   # February has 28 days here
+    (4, 31),   # April has 30
+    (9, 31),   # September has 30
 ])
 def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):

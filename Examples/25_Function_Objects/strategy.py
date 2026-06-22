@@ -6,11 +6,11 @@ from collections.abc import Callable
 type Line = list[float]
 
 def least_squares(line: Line) -> float:
-    # A flat least-squares fit minimizes squared error at the mean.
+    # A flat least-squares fit minimizes squared error at the mean
     return sum(line) / len(line)
 
 def bisection(line: Line) -> float:
-    # Halve the interval: the midpoint of the value range.
+    # Halve the interval: the midpoint of the value range
     return (min(line) + max(line)) / 2
 
 def solve(line: Line, strategy: Callable[[Line], float]) -> float:

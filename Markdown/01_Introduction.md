@@ -4,7 +4,7 @@ Every language has habits worth learning and habits worth dropping.
 Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages made necessary.
 Python needs far fewer of these.
-Instead of a class whose only job is to hold one method, Python has the function.
+Instead of a class that exists only to hold one method, Python has the function.
 A *Singleton* is a module.
 A *Visitor* is a function that dispatches on type.
 The recurring theme in this book is to ask, before reaching for idioms or patterns,

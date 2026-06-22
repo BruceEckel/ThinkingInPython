@@ -22,7 +22,7 @@ class Year:
 
 class Month(Enum):
     JANUARY = (1, 31)
-    FEBRUARY = (2, 28)   # Leap years are left as an exercise.
+    FEBRUARY = (2, 28)   # Leap years are left as an exercise
     MARCH = (3, 31)
     APRIL = (4, 30)
     MAY = (5, 31)

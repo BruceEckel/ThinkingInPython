@@ -208,7 +208,7 @@ import paper_scissors_rock as methods
 import paper_scissors_rock2 as table
 from outcome import Outcome
 
-# (player, opponent): the player's result.
+# (player, opponent): the player's result
 EXPECTED = {
     ("Paper", "Rock"): Outcome.WIN,
     ("Paper", "Scissors"): Outcome.LOSE,

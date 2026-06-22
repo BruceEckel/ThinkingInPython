@@ -1,6 +1,6 @@
 # validation.py
 class TypeFailure(ValueError):
-    "Raised when a value falls outside the set its type allows."
+    "A value falls outside the type's allowed set"
 
 def check(condition: bool, message: str, detail: str = "") -> None:
     if not condition:

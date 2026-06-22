@@ -17,7 +17,7 @@ class Blackboard:
         self._numbers = itertools.count(1)
 
     def claim(self, x: int, y: int) -> bool:
-        # No await between the test and the add, so this is atomic.
+        # No await between the test and the add, so this is atomic
         if self.maze.is_open(x, y) and (x, y) not in self.visited:
             self.visited.add((x, y))
             return True
@@ -37,7 +37,7 @@ class Blackboard:
         start = self.maze.entry()
         self.claim(*start)
         self.spawn(*start)
-        # Wait for every rat, including ones spawned while we wait.
+        # Wait for every rat, including ones spawned while we wait
         while pending := [t for t in self.tasks if not t.done()]:
             await asyncio.gather(*pending)
 

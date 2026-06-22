@@ -6,7 +6,7 @@ from typing import Any
 class trace:
     def __init__(self, func: Callable[..., Any]) -> None:
         self.func = func
-        update_wrapper(self, func)  # Copy __name__, __doc__, etc.
+        update_wrapper(self, func)  # Copy __name__, __doc__, etc
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"-> {self.func.__name__}{args}")  # type: ignore

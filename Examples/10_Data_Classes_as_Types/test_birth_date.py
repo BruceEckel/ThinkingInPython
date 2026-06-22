@@ -8,9 +8,9 @@ def test_valid_date() -> None:
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days here.
-    (4, 31),   # April has 30.
-    (9, 31),   # September has 30.
+    (2, 31),   # February has 28 days here
+    (4, 31),   # April has 30
+    (9, 31),   # September has 30
 ])
 def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):

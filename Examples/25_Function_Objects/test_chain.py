@@ -18,7 +18,7 @@ def test_order_decides_the_winner() -> None:
     def always(line: Line) -> Result:
         return [1.0]
 
-    # 'always' precedes bisection, so it short-circuits the chain.
+    # 'always' precedes bisection, so it short-circuits the chain
     assert solve([0.0], [always, bisection]) == [1.0]
 
 def test_no_handler_succeeds_returns_none() -> None:

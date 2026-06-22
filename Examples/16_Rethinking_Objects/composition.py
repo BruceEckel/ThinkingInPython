@@ -15,7 +15,7 @@ class Address:
     postal: str
 
 @dataclass(frozen=True)
-class Contact:  # A Contact has a Name and an Address.
+class Contact:  # A Contact has a Name and an Address
     name: Name
     address: Address
 
@@ -29,5 +29,5 @@ if __name__ == "__main__":
 
     twin = Contact(
         Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
-    print(c == twin)  # Value equality, field by field.
-    print({c: "value"}[c])  # Hashable, so it works as a dict key.
+    print(c == twin)  # Value equality, field by field
+    print({c: "value"}[c])  # Hashable, so it works as a dict key

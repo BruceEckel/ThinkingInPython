@@ -264,6 +264,20 @@ ignored). It is part of the `make ci` gate.
 make banned    # fail if any banned phrase is in the book (part of `make ci`)
 ```
 
+## comment_periods.py
+
+Enforces the comment-period policy in ```python listings: a one-line comment
+ends without a period; only a multiline comment (two or more consecutive
+full-line `#` comments) reads as sentences and keeps its periods. So it flags a
+trailing period on an inline comment or a lone full-line comment, but leaves
+multiline blocks alone. It is string-aware (a `#` inside a string is not a
+comment) and skips an ellipsis (`...`). It is part of the `make ci` gate.
+
+```
+make comment-periods       # check (part of `make ci`)
+make fix-comment-periods   # strip the trailing periods
+```
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).

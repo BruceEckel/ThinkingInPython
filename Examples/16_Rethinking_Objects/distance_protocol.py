@@ -23,12 +23,12 @@ class Point:
     y: float
 
 @dataclass(frozen=True)
-class Pair:  # Suppose you are handed this, with no x or y.
+class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # An adapter built by composition, not inheritance.
+class PairCoord:  # An adapter built by composition, not inheritance
     pair: Pair
 
     @property

@@ -27,6 +27,6 @@ class Failure[E]:
     def bind[B](
         self, func: Callable[..., Result[B, E]]
     ) -> Failure[E]:
-        return self  # Pass the failure forward unchanged.
+        return self  # Pass the failure forward unchanged
 
 type Result[A, E] = Success[A] | Failure[E]

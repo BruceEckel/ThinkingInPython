@@ -72,7 +72,7 @@ class Bob:
 
 class Leaky:
     def __init__(self, numbers: list[int]) -> None:
-        self._numbers = numbers  # "Private" by convention.
+        self._numbers = numbers  # "Private" by convention
         self._bob = Bob()
 
     @property
@@ -123,7 +123,7 @@ class Plugged:
 
     @property
     def numbers(self) -> list[int]:
-        return self._numbers.copy()  # Hand back a copy, not our list.
+        return self._numbers.copy()  # Hand back a copy, not our list
 
     @property
     def bob(self) -> Bob:
@@ -131,8 +131,8 @@ class Plugged:
 
 if __name__ == "__main__":
     plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates a copy, not ours.
-    plugged.bob.name = "Ralph"   # Ditto.
+    plugged.numbers.append(999)  # Mutates a copy, not ours
+    plugged.bob.name = "Ralph"   # Ditto
     print(plugged.numbers, plugged.bob)
 ```
 
@@ -199,14 +199,14 @@ class Point:
     x: float
     y: float
 
-    def distance_to(self, other: Point) -> float:  # As a method.
+    def distance_to(self, other: Point) -> float:  # As a method
         return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
-def distance(a: Point, b: Point) -> float:  # As a free function.
+def distance(a: Point, b: Point) -> float:  # As a free function
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
 if __name__ == "__main__":
-    p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle.
+    p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
     print(p1.distance_to(p2))
     print(distance(p1, p2))
 ```
@@ -251,12 +251,12 @@ class Point:
     y: float
 
 @dataclass(frozen=True)
-class Pair:  # Suppose you are handed this, with no x or y.
+class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # An adapter built by composition, not inheritance.
+class PairCoord:  # An adapter built by composition, not inheritance
     pair: Pair
 
     @property
@@ -301,7 +301,7 @@ class Address:
     postal: str
 
 @dataclass(frozen=True)
-class Contact:  # A Contact has a Name and an Address.
+class Contact:  # A Contact has a Name and an Address
     name: Name
     address: Address
 
@@ -315,8 +315,8 @@ if __name__ == "__main__":
 
     twin = Contact(
         Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
-    print(c == twin)  # Value equality, field by field.
-    print({c: "value"}[c])  # Hashable, so it works as a dict key.
+    print(c == twin)  # Value equality, field by field
+    print({c: "value"}[c])  # Hashable, so it works as a dict key
 ```
 
 ## Polymorphism Without Inheritance
@@ -473,12 +473,12 @@ from plugged import Plugged
 
 def test_getter_leaks_internal_state() -> None:
     leaky = Leaky([1, 2])
-    leaky.numbers.append(999)  # Reaches the real internal list.
+    leaky.numbers.append(999)  # Reaches the real internal list
     assert leaky.numbers == [1, 2, 999]
 
 def test_defensive_copy_prevents_the_leak() -> None:
     plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates only a copy.
+    plugged.numbers.append(999)  # Mutates only a copy
     assert plugged.numbers == [1, 2]
 
 def test_frozen_cannot_be_mutated() -> None:

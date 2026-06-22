@@ -6,7 +6,7 @@
 import asyncio
 from typing import Protocol
 
-# South, north, west, east.
+# South, north, west, east
 DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Recorder(Protocol):
@@ -37,4 +37,4 @@ class Rat:
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
-            await asyncio.sleep(0)  # Yield so sibling rats can run.
+            await asyncio.sleep(0)  # Yield so sibling rats can run

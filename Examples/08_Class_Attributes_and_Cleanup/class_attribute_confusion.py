@@ -1,6 +1,6 @@
 # class_attribute_confusion.py
 class Stars:
-    rating = 5  # One value, shared by the whole class.
+    rating = 5  # One value, shared by the whole class
 
 a = Stars()
 b = Stars()
