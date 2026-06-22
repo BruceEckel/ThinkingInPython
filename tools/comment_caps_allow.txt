@@ -1,0 +1,13 @@
+# Comment texts that capitalize_comments.py should leave lowercase.
+# One comment per line (the text after the `#`, stripped); `#` starts a file
+# comment. These are heuristic false positives: program output, identifier
+# references, or schematic notation, not prose.
+
+# Output shown next to a print:
+default
+total = 7: useful for debugging
+nums (1, 2, 3) {}
+# Refers to the parameter named width:
+width has a default value
+# Schematic "key -> value" notation:
+name -> subclass

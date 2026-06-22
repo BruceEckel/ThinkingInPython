@@ -278,6 +278,24 @@ make comment-periods       # check (part of `make ci`)
 make fix-comment-periods   # strip the trailing periods
 ```
 
+## capitalize_comments.py
+
+Enforces that a prose comment in a ```python listing starts with a capital. The
+prose-vs-code judgment is a heuristic, so it skips code-identifier first words,
+single letters, and keywords, and continuation lines of a multiline comment. Its
+unavoidable false positives (program output like `# total = 7`, an identifier
+reference like `# n is the counter`, schematic notation like `# name -> subclass`)
+are listed by comment text in `tools/comment_caps_allow.txt` and skipped. It is
+part of the `make ci` gate.
+
+```
+make comment-caps       # check (part of `make ci`)
+make fix-comment-caps   # capitalize the flagged comments
+```
+
+When the checker is wrong, add the comment's text to the allowlist; when it is
+right, capitalize the comment (or run `make fix-comment-caps`).
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).

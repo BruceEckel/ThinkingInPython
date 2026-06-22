@@ -461,7 +461,7 @@ The [Multiple Dispatching](28_Multiple_Dispatching.md) and [Visitor](29_Visitor.
 ## Verifying the Claims
 
 Because these are claims about behavior, they belong in tests.
-Failures are values here too: a frozen object raises when you try to mutate it.
+Failures are values here too: a frozen object raises an exception when you try to mutate it.
 
 ```python
 # test_encapsulation.py

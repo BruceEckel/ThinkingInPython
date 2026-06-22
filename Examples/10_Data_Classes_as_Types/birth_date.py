@@ -1,7 +1,4 @@
 # birth_date.py
-# An Enum is also a type, and is the better choice when the set of
-# values is small and fixed. Each Month knows its length and
-# validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
 from validation import check

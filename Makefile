@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods clean-examples clean-site
+.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -49,6 +49,8 @@ help:
 	@echo "  banned    - fail if any tools/banned_phrases.txt phrase is in the book"
 	@echo "  comment-periods - fail if a one-line listing comment ends with a period"
 	@echo "  fix-comment-periods - remove those trailing periods"
+	@echo "  comment-caps - fail if a prose comment is not capitalized (heuristic)"
+	@echo "  fix-comment-caps - capitalize them"
 	@echo "  clean-examples - remove ExtractedExamples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -147,6 +149,14 @@ comment-periods:
 fix-comment-periods:
 	$(PY) tools/comment_periods.py --fix
 
+# A prose comment starts with a capital. Heuristic, so false positives are
+# listed in tools/comment_caps_allow.txt. Run `make fix-comment-caps` to apply.
+comment-caps:
+	$(PY) tools/capitalize_comments.py
+
+fix-comment-caps:
+	$(PY) tools/capitalize_comments.py --write
+
 # The local gate without the site build: line endings, listing density, drift
 # check, ty, ruff, run, pytest. `verify` runs `sync` first; `ci` adds the site.
 gate:
@@ -154,6 +164,7 @@ gate:
 	$(PY) tools/listing_format.py
 	$(PY) tools/banned_phrases.py
 	$(PY) tools/comment_periods.py
+	$(PY) tools/capitalize_comments.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(TY) check ExtractedExamples

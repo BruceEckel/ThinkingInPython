@@ -16,7 +16,7 @@ This material comes from my PyCon 2024 talk,
 
 ## Exceptions Throw Everything Away
 
-Here a function raises partway through a comprehension.
+Here a function raises an exception partway through a comprehension.
 The successful results computed before the failure are lost with the rest:
 
 ```python
@@ -302,7 +302,7 @@ Only the last input passes all three steps, so only it reaches `add`.
 
 In `composing.py`, `func_c` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
 A decorator captures that pattern once.
-`@safe` takes a function that raises and gives back one that returns a `Result`,
+`@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Failure` value:
 
 ```python

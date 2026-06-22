@@ -1,7 +1,4 @@
 # json_round_trip.py
-# A data class has no built-in JSON support, but asdict() turns one
-# into a dict that json.dumps understands, and the constructors turn
-# the parsed dict back into a validated object.
 import json
 from dataclasses import asdict
 from person import EmailAddress, FullName, Person

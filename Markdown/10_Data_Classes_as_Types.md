@@ -39,7 +39,7 @@ So every function that takes a rating has to check it:
 
 ```python
 # stars_unchecked.py
-# An int for a 1-10 rating must be re-checked everywhere.
+# An int for a 1-10 rating must be re-checked everywhere
 from validation import check
 
 def f1(stars: int) -> int:
@@ -71,8 +71,6 @@ and a method can leave the object in an illegal state between steps:
 
 ```python
 # stars_class.py
-# "A class is not a type." Encapsulation guards the value, but every
-# method must re-check it, and the object stays mutable underneath.
 from validation import check
 
 class Stars:
@@ -179,12 +177,12 @@ at construction, is enough for its whole life.
 
 ## A Type Is a Set of Values
 
-We can make the `Stars` rating a frozen data class.
+We can make `Stars` a frozen data class.
 To validate it after the fields are filled in, we call `__post_init__` :
 
 ```python
 # stars.py
-# Every Stars is guaranteed to be a legal value
+# Every Stars is guaranteed to be legal
 from dataclasses import dataclass
 from validation import check
 
@@ -247,8 +245,6 @@ with no extra work:
 
 ```python
 # person.py
-# Composing a type from other types. Each part validates itself, so
-# a Person built from valid parts is valid by construction.
 from dataclasses import dataclass
 from validation import check
 
@@ -288,15 +284,12 @@ because those values cannot exist.
 ## Enums Are Types Too
 
 When the set of values is small and fixed, an `Enum` is the clearest type.
-There are exactly twelve months, so `Month` is an enum.
+There are exactly twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields: the day must fit the month.
 
 ```python
 # birth_date.py
-# An Enum is also a type, and is the better choice when the set of
-# values is small and fixed. Each Month knows its length and
-# validates a Day against it.
 from dataclasses import dataclass
 from enum import Enum
 from validation import check
@@ -358,16 +351,16 @@ if __name__ == "__main__":
     print(BirthDate(Month.of(7), Day(8), Year(1957)))
 ```
 
-The enum gives you the set of months for free.
+The `Enum` gives you the set of months for free.
 You cannot construct a thirteenth month,
 because there is no such value to construct.
 
 ## When a Data Class Is the Wrong Tool
 
-You can build `Month` as a data class instead of an enum.
+You can build `Month` as a data class instead of an `Enum`.
 It works, but it is more code for less safety.
 You have to construct the twelve months yourself and carry them around,
-where the `Enum` *is* that set:
+whereas the `Enum` *is* that set:
 
 ```python
 # month_dataclass.py
@@ -418,7 +411,7 @@ if __name__ == "__main__":
 ```
 
 Choose the tool that makes the legal set easiest to express.
-For a small fixed set, that is an enum.
+For a small fixed set, that is an `Enum`.
 
 When validation grows complicated, libraries make it lighter.
 The [attrs](https://www.attrs.org) library predates and inspired data classes and offers richer validators and converters.
@@ -437,8 +430,6 @@ recursing into nested data classes.
 
 ```python
 # dataclass_features.py
-# A few data class tools worth knowing: asdict, astuple, replace,
-# KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
 @dataclass(frozen=True)
@@ -483,9 +474,6 @@ then hand its parts to the constructors.
 
 ```python
 # json_round_trip.py
-# A data class has no built-in JSON support, but asdict() turns one
-# into a dict that json.dumps understands, and the constructors turn
-# the parsed dict back into a validated object.
 import json
 from dataclasses import asdict
 from person import EmailAddress, FullName, Person
@@ -517,12 +505,11 @@ The type guards itself, even against data it never saw.
 
 When a data class is buried inside a larger structure you are dumping,
 converting it by hand first is awkward.
-A custom `JSONEncoder` handles every data class it meets, wherever it appears:
+A custom `JSONEncoder` serializes any data class it meets, even nested
+inside other structures, by converting each one to a dict.:
 
 ```python
 # json_encoder.py
-# A custom encoder serializes any data class it meets, even nested
-# inside other structures, by converting each one to a dict.
 import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, override
@@ -555,13 +542,10 @@ For deep or evolving structures,
 [Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
 
-## Proving the Guarantee
+## Testing
 
-The claim is that an illegal value cannot exist.
-That is exactly the kind of claim a test should pin down.
-Using `pytest.raises`,
-you assert that the constructor rejects every value outside the set.
-See the [Testing](09_Testing.md) chapter for pytest in general.
+If an illegal value cannot exist, tests should validate that claim.
+With `pytest.raises`, we assert that the constructor rejects every value outside the set:
 
 ```python
 # test_stars.py
@@ -591,7 +575,7 @@ def test_transformation_can_produce_illegal_value() -> None:
 ```
 
 In the last test, `f2(Stars(4))` would compute twenty,
-which is outside the legal set, so constructing the returned `Stars` raises.
+which is outside the legal set, so constructing the returned `Stars` raises an exception.
 The illegal value never escapes as an object.
 Cross-field rules test the same way:
 
@@ -606,7 +590,7 @@ def test_valid_date() -> None:
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days here
+    (2, 31),   # February has 28 days
     (4, 31),   # April has 30
     (9, 31),   # September has 30
 ])
@@ -630,6 +614,6 @@ def test_bad_month_number(bad: int) -> None:
 3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that returns a new `Stars`,
     and show that the precondition and postcondition disappear.
 4.  Feed `from_json` a JSON string whose email has no `@`,
-    and confirm it raises `TypeFailure`.
+    and confirm that it raises `TypeFailure`.
     The validation you wrote once, in `EmailAddress`,
     now also guards your JSON input.

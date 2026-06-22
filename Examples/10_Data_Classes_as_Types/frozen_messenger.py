@@ -1,5 +1,4 @@
 # frozen_messenger.py
-# frozen=True makes instances immutable and hashable.
 from dataclasses import dataclass
 
 @dataclass(frozen=True)

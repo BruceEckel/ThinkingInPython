@@ -1,6 +1,4 @@
 # json_encoder.py
-# A custom encoder serializes any data class it meets, even nested
-# inside other structures, by converting each one to a dict.
 import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, override

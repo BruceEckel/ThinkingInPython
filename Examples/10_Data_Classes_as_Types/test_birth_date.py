@@ -8,7 +8,7 @@ def test_valid_date() -> None:
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days here
+    (2, 31),   # February has 28 days
     (4, 31),   # April has 30
     (9, 31),   # September has 30
 ])

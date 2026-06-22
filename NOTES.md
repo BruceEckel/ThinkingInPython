@@ -32,6 +32,8 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
 
 - Indexing using Leanpub format, before publishing to leanpub
 
+- Search feature on website?
+
 ******************
 
 - Introductory Python YouTube Playlists:

@@ -1,6 +1,4 @@
 # dataclass_features.py
-# A few data class tools worth knowing: asdict, astuple, replace,
-# KW_ONLY.
 from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
 
 @dataclass(frozen=True)

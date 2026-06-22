@@ -10,13 +10,15 @@ code keyword. Path-marker slugs like ``# trace.py`` are left alone because the
 ``.`` disqualifies them. Mid-sentence continuation lines of a multi-line
 comment are skipped so words are not capitalized mid-thought.
 
-NOT a Makefile target by design: the prose-vs-code call is a heuristic, so a
-run still needs a human to review the diff and revert false positives (literal
-program output, schematic key->value notation, etc.). Use it as an assist, not
-an automated gate.
+The prose-vs-code call is a heuristic, so it has false positives: literal
+program output (`# total = 7`), an identifier reference (`# n is the counter`),
+schematic notation (`# name -> subclass`). Those are listed by their comment
+text in tools/comment_caps_allow.txt and skipped. Add a line there when the
+checker is wrong; capitalize the comment when it is right.
 
-Default is a dry run that prints proposed changes. Pass --write to apply.
-After applying, regenerate the Examples/ mirror:
+Default is a check that lists comments needing capitalization and exits non-zero
+(it is part of the `make ci` gate). Pass --write to apply the changes. After
+applying, regenerate the Examples/ mirror:
     python tools/extract_examples.py --write -o Examples
 """
 
@@ -26,6 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MARKDOWN_DIR = ROOT / "Markdown"
+ALLOWLIST = ROOT / "tools" / "comment_caps_allow.txt"
 
 FENCE = re.compile(r"^```(\w+)?\s*$")
 # Word = leading run of ASCII letters in the comment text.
@@ -41,6 +44,18 @@ CODE_KEYWORDS = {
     "yield", "async", "await", "global", "nonlocal", "assert", "del",
     "pass", "raise", "and", "or", "not", "in", "is", "if",
 }
+
+
+def load_allowlist(path: Path) -> set[str]:
+    """Comment texts (the part after `#`, stripped) to leave lowercase."""
+    if not path.exists():
+        return set()
+    out: set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#"):
+            out.add(stripped)
+    return out
 
 
 def is_full_comment(line: str) -> bool:
@@ -120,7 +135,8 @@ def transform_comment(line: str, hash_i: int) -> str | None:
     return prefix + "#" + new_after
 
 
-def process_file(path: Path, write: bool) -> list[tuple[int, str, str]]:
+def process_file(path: Path, write: bool,
+                 allow: set[str]) -> list[tuple[int, str, str]]:
     lines = path.read_text(encoding="utf-8").splitlines(keepends=False)
     changes: list[tuple[int, str, str]] = []
     in_python = False
@@ -142,7 +158,8 @@ def process_file(path: Path, write: bool) -> list[tuple[int, str, str]]:
             if hash_i != -1 and triple is None:
                 full = is_full_comment(line)
                 continuation = full and prev_comment_open
-                if not continuation:
+                allowed = line[hash_i + 1:].strip() in allow
+                if not continuation and not allowed:
                     new = transform_comment(line, hash_i)
                     if new and new != line:
                         changes.append((idx, line, new))
@@ -172,18 +189,29 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--write", action="store_true", help="apply changes")
+    ap.add_argument("--allow", type=Path, default=ALLOWLIST,
+                    help=f"comment texts to skip (default: {ALLOWLIST.name})")
     args = ap.parse_args(argv)
 
+    allow = load_allowlist(args.allow)
     total = 0
     for md in sorted(MARKDOWN_DIR.glob("*.md")):
-        changes = process_file(md, args.write)
+        changes = process_file(md, args.write, allow)
         if changes:
             print(f"\n{md.name}: {len(changes)} change(s)")
             for ln, old, new in changes:
                 print(f"  {ln}: {old.strip()}")
                 print(f"      -> {new.strip()}")
             total += len(changes)
-    print(f"\n{'Applied' if args.write else 'Proposed'} {total} change(s).")
+
+    if args.write:
+        print(f"\nApplied {total} change(s).")
+        return 0
+    if total:
+        print(f"\n{total} comment(s) need capitalizing. Capitalize them, "
+              "or add the text to tools/comment_caps_allow.txt.")
+        return 1
+    print("\nComment capitalization OK.")
     return 0
 
 
