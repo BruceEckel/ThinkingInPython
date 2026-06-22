@@ -216,7 +216,7 @@ by adding the `autouse` flag:
 
     @pytest.fixture(autouse=True)
 
-Fixtures are powerful and prevent a lot of duplicated code.
+Fixtures remove a lot of duplicated setup.
 Less code generally makes tests easier to read and verify.
 
 ## Sharing Fixtures with conftest.py
@@ -225,7 +225,7 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 This is where shared setup lives.
 
-Parameterization can also be applied to fixtures.
+Fixtures can be parametrized too.
 Every test that requests the fixture runs once for each parameter value:
 
 ```python
@@ -267,13 +267,13 @@ Neither fixture is imported.
 
 ## Isolating Tests from the World
 
-Good tests do not depend on the real filesystem, clock, network, or environment.
+Good tests do not depend on the real filesystem, environment, random number generation, clock, or network.
 `pytest` ships built-in fixtures for this.
 `tmp_path` gives each test a private temporary directory.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
 
-### File System & Environment
+### Filesystem and Environment
 
 This example reads an environment variable and touches files:
 
@@ -371,7 +371,7 @@ The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a
 seeded one. The randomness is now an input, not a hidden dependency.
 
-### Reading the Clock
+### The Clock
 
 Code that reads `time.time()` gives a different answer every run:
 
@@ -407,7 +407,7 @@ def stamp(now: Callable[[], float]) -> float:
     return now()
 ```
 
-In the test we can easily provide a fixed value for `now`:
+In the test we provide a fixed value for `now`:
 
 ```python
 # test_clock.py
@@ -508,14 +508,14 @@ but treat each one as a test that may break when you refactor.
 
 ## How This Book Runs Its Tests
 
-The examples in this book are extracted from the chapters and checked automatically.
+The examples in this book are automatically extracted and checked.
 Plain programs are run, and their failures are reported.
 Files named `test_*.py` and `conftest.py` are handed to `pytest` instead,
 and a failing test fails the build.
 
 ## Exercises
 
-1.  Add a `transfer(other, amount)` method to `Account` and write its tests first:
+1.  Add a `transfer(other: Account, amount)` method to `Account` and write its tests first:
     a successful transfer, and an overdraft that leaves both accounts unchanged.
 2.  Use `parametrize` to test `add_interest` at several rates,
     comparing with `pytest.approx`.
