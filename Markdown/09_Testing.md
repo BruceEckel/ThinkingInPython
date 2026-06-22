@@ -216,7 +216,7 @@ by adding the `autouse` flag:
 
     @pytest.fixture(autouse=True)
 
-Fixtures are powerful and save a lot of redundant code.
+Fixtures are powerful and prevent a lot of duplicated code.
 Less code generally makes tests easier to read and verify.
 
 ## Sharing Fixtures with conftest.py
@@ -225,8 +225,8 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 This is where shared setup lives.
 
-Fixtures can also be *parametrized*, which multiplies coverage for free:
-every test that requests the fixture runs once for each parameter value.
+Parameterization can also be applied to fixtures.
+Every test that requests the fixture runs once for each parameter value:
 
 ```python
 # conftest.py
@@ -236,7 +236,7 @@ from account import Account
 @pytest.fixture(scope="session")
 def bank_name() -> str:
     "Built once for the whole test session."
-    return "BeanMeUp Savings"
+    return "Crunchy Frog Credit Union"
 
 @pytest.fixture(params=[0.0, 100.0, 1_000_000.0])
 def preloaded(request: pytest.FixtureRequest) -> Account:
@@ -273,7 +273,7 @@ Good tests do not depend on the real filesystem, clock, network, or environment.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
 
-Here is a unit that depends on the filesystem and the environment:
+This example depends on the filesystem and the environment because
 it reads an environment variable and touches files:
 
 ```python
@@ -313,6 +313,61 @@ def test_missing_file_raises(
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")
 ```
+
+Randomness is another piece of the world to pin down.
+Code that calls `random` produces a different value each run,
+which a test cannot assert against:
+
+```python
+# dice.py
+import random
+
+def roll() -> int:
+    return random.randint(1, 6)
+```
+
+`monkeypatch` replaces the random call with one that returns a known value,
+so the result is predictable for the duration of the test:
+
+```python
+# test_dice.py
+import dice
+import pytest
+
+def test_roll_returns_known_value(
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(dice.random, "randint", lambda a, b: 4)
+    assert dice.roll() == 4
+```
+
+Patching the function gives you the exact value you want.
+Two alternatives are worth knowing.
+Seeding the generator with `random.seed(0)` makes the sequence repeatable,
+though you must record the values it produces rather than choose them.
+Better still, have the code accept a `random.Random` instance,
+so a test passes a seeded `random.Random(0)` and needs no patching at all:
+
+```python
+# dice_rng.py
+import random
+
+def roll(rng: random.Random) -> int:
+    return rng.randint(1, 6)
+```
+
+```python
+# test_dice_rng.py
+import random
+import dice_rng
+
+def test_roll_with_seeded_rng() -> None:
+    assert dice_rng.roll(random.Random(0)) == 4
+```
+
+The function takes its source of randomness as an argument,
+so production code hands it a fresh `random.Random()` while the test hands it a
+seeded one. The randomness is now an input, not a hidden dependency.
 
 ## White-Box and Black-Box Tests
 
