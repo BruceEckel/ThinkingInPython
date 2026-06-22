@@ -1,10 +1,11 @@
 # Pattern Matching
 
 The `match` statement compares a value against a series of *patterns* and runs the first one that fits.
-The [Containers and Control Flow](03_Containers_and_Control_Flow.md) chapter gave a first taste.
-This chapter covers the whole feature,
-because `match` is far more than a `switch`: a pattern can test a value's shape,
+A `match` is far more than a `switch` because a pattern can test a value's shape,
 look inside it, and pull out the parts you need, all in one step.
+
+[Containers and Control Flow](03_Containers_and_Control_Flow.md) gave a taste.
+This chapter covers the rest.
 
 ## Matching Values
 

@@ -39,7 +39,7 @@ So every function that takes a rating has to check it:
 
 ```python
 # stars_unchecked.py
-# An int for a 1-10 rating must be re-checked everywhere
+# An int as a 1-10 rating must be re-checked everywhere
 from validation import check
 
 def f1(stars: int) -> int:
@@ -272,7 +272,7 @@ class Person:
 if __name__ == "__main__":
     person = Person(
         FullName("Bruce Eckel"),
-        EmailAddress("mindviewinc@gmail.com"),
+        EmailAddress("bruce@example.com"),
     )
     print(person)
 ```
