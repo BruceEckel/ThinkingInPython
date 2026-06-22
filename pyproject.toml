@@ -23,6 +23,8 @@ dev = [
     "pytest-xdist",
     "ruff",
     "codespell>=2.4.2",
+    "time-machine",
+    "pyspellchecker",
 ]
 
 [tool.uv]

@@ -4,7 +4,7 @@ The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
 The assumption is that you have a primary class hierarchy that is unchangeable.
-Oerhaps it's from another vendor and you can't make changes to that hierarchy.
+Perhaps it's from another vendor and you can't make changes to that hierarchy.
 However, you'd like to add new polymorphic methods to that hierarchy.
 Normally you'd have to add something to the base class interface, but that's unchangeable.
 How do you get around this?

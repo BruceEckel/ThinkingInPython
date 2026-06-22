@@ -40,7 +40,7 @@ help:
 	@echo "  extract   - write ExtractedExamples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
-	@echo "  spell     - codespell + prose_lint over the prose (CH=29 for one chapter)"
+	@echo "  spell     - codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)"
 	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
 	@echo "  eol       - check tracked text files for CRLF (fails the ci gate)"
 	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
@@ -100,14 +100,15 @@ reflow:
 reflow-check:
 	$(PY) tools/reflow_prose.py $(CH)
 
-# Spell-check the book prose and code comments, then lint it for small
-# mechanical slips (multiple spaces, stray blank lines, misplaced punctuation).
-# codespell config and the ignore list live in pyproject.toml and
-# tools/codespell-ignore.txt. Run one chapter with CH= (e.g. `make spell CH=29`)
-# or a path with DOCS=.
+# Spell-check the book and lint it for small mechanical slips. codespell
+# catches known misspellings (prose and code comments); prose_lint catches
+# spacing/blank-line/punctuation slips; spellcheck.py is a full-dictionary check
+# of the prose, with accepted terms in tools/wordlist.txt. Run one chapter with
+# CH= (e.g. `make spell CH=29`) or a path with DOCS=.
 spell:
 	$(SPELL) $(PROSE_FILES)
 	$(PY) tools/prose_lint.py $(PROSE_FILES)
+	$(PY) tools/spellcheck.py $(PROSE_FILES)
 
 # House-style lint with Vale: no em-dashes and no filler phrases. Run one
 # chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.

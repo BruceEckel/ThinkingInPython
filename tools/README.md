@@ -165,19 +165,30 @@ substring (`Tour`). With no argument the whole book is processed.
 
 ## Spelling and prose style
 
-Two separate layers, both optional and not part of the default CI gate.
+Several layers, all optional and not part of the default CI gate.
 
 **Spelling: codespell (`make spell`).** A uv-managed dev tool, so it runs through
 `uv run`. It prints one line per suspected misspelling and exits non-zero if it
 finds any, so **no output means clean** (a silent return to the prompt is a
 pass). It matches a curated misspelling dictionary rather than a full one, so it
 stays low-noise even over code comments and examples, but it will not catch an
-unusual typo that is not on its list or a real word used wrongly ("form" for
-"from"); that deeper checking is what the editor-side LanguageTool/LTeX layer is
-for. Configuration lives in `[tool.codespell]` in `pyproject.toml`; words it
-flags wrongly (design-pattern terms like `adaptee`, foreign-language quotes,
-deliberate code strings) are listed in `tools/codespell-ignore.txt`. Scope it
-with `DOCS=`, for example `make spell DOCS=Markdown/02_A_Python_Tour.md`.
+unusual typo that is not on its list ("fixted" for "fixed"); for that there is
+the full-dictionary check below. Configuration lives in `[tool.codespell]` in
+`pyproject.toml`; words it flags wrongly (design-pattern terms like `adaptee`,
+foreign-language quotes, deliberate code strings) are listed in
+`tools/codespell-ignore.txt`. Scope it with `DOCS=`, for example
+`make spell DOCS=Markdown/02_Tour.md`.
+
+**Full-dictionary spelling: spellcheck.py (`make spell`).** Where codespell
+knows only a curated list, `tools/spellcheck.py` (using the uv-managed
+`pyspellchecker`) checks every prose word against a real English dictionary, so
+a novel typo is caught. It checks prose only: code blocks, inline code,
+footnotes, and link URLs are stripped via `md_prose`, so identifiers do not
+flood it. Accepted terms (technical words, names, coined words) live in
+`tools/wordlist.txt`, one lowercase word per line. When it flags a real term,
+add it there; when it flags a typo, fix the prose. Use
+`uv run python tools/spellcheck.py --summary` to see the unique unknowns by
+count, which makes seeding the word list quick.
 
 **Mechanical prose: prose_lint (`make spell`).** `tools/prose_lint.py` runs
 alongside codespell and catches small mechanical slips a spell checker ignores:

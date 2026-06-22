@@ -11,7 +11,7 @@ The recurring theme in this book is to ask, before reaching for idioms or patter
 whether the language already solves the problem,
 and to add the structure only when the answer is no.
 
-This booke is not a catalog of features but the judgment to choose the smallest thing that works.
+This book is not a catalog of features but the judgment to choose the smallest thing that works.
 That judgement is found through insights, idioms, and patterns.
 It is also honest about design patterns.
 Most were invented to work around the limits of static,

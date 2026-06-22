@@ -1,4 +1,4 @@
-Don't use types until after 08
+Check "from collections.abc import Callable"
 
 Run 'make prose' on each chapter
 

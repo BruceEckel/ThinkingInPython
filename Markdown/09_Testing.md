@@ -317,7 +317,6 @@ def test_missing_file_raises(
 
 ### Random Numbers
 
-Randomness is another piece of the world to pin down.
 Code that calls `random` produces a different value each run,
 which a test cannot assert against:
 
@@ -345,7 +344,7 @@ def test_roll_returns_known_value(
 ```
 
 Patching the function gives you the exact value you want.
-Two alternatives are worth knowing.
+
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
 Better still, have the code accept a `random.Random` instance,
@@ -374,8 +373,7 @@ seeded one. The randomness is now an input, not a hidden dependency.
 
 ### Reading the Clock
 
-Code that reads `time.time()` gives a different answer every run,
-and `monkeypatch` pins it to a fixed value the same way it did for `randint`:
+Code that reads `time.time()` gives a different answer every run:
 
 ```python
 # stopwatch.py
@@ -384,6 +382,8 @@ import time
 def elapsed(start: float) -> float:
     return time.time() - start
 ```
+
+`monkeypatch` pins it to a fixed value the same way it did for `randint`:
 
 ```python
 # test_stopwatch.py
@@ -396,8 +396,8 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
     assert stopwatch.elapsed(40.0) == 60.0
 ```
 
-And, as with randomness, injecting the clock is cleaner still:
-have the code take a `now` callable, and the test passes a fixed one:
+As with randomness, injecting the clock is cleaner still.
+The `stamp` function takes a `now` callable:
 
 ```python
 # clock.py
@@ -406,6 +406,8 @@ from collections.abc import Callable
 def stamp(now: Callable[[], float]) -> float:
     return now()
 ```
+
+In the test we can easily provide a fixed value for `now`:
 
 ```python
 # test_clock.py
@@ -416,7 +418,38 @@ def test_stamp() -> None:
 ```
 
 `datetime.now()` is harder to patch, because `datetime` is a built-in type,
-so for code that calls it the injection approach is worth the small effort.
+so the injection approach is worth the small effort.
+
+If you cannot change the code, the library
+[`time-machine`](https://github.com/adamchainz/time-machine) freezes every clock at once,
+including `datetime.now()`, with no monkeypatching on your part:
+
+```python
+# event.py
+from datetime import datetime
+
+def current_year() -> int:
+    return datetime.now().year
+```
+
+```python
+# test_event.py
+import event
+import time_machine
+
+@time_machine.travel("2030-06-15", tick=False)
+def test_current_year_is_frozen() -> None:
+    assert event.current_year() == 2030
+```
+
+`travel` sets the clock to the given moment for the test,
+and `tick=False` holds it there so every reading is identical.
+Unlike the prior tools it is a third-party dependency,
+but it is the standard answer for code already steeped in `datetime`.
+
+### Network Calls
+
+
 
 ## White-Box and Black-Box Tests
 
