@@ -51,8 +51,7 @@ it always matches and binds the value to that name,
 which is the wildcard with a name attached:
 
 ```python
-# move.py
-# `|` lists alternatives in one case. A bare name captures the value.
+# step.py
 
 def step(command: str) -> str:
     match command:
@@ -81,21 +80,19 @@ A starred name, as in `*rest`, captures the remaining elements:
 
 ```python
 # sequence_patterns.py
-# Sequence patterns match by length and position; *rest takes the
-# remainder.
 
 def summarize(items: list[int]) -> str:
     match items:
         case []:
-            return "empty"
+            return "Empty"
         case [only]:
-            return f"one item: {only}"
+            return f"One item: {only}"
         case [first, second]:
-            return f"two items: {first}, {second}"
+            return f"Two items: {first}, {second}"
         case [first, *rest]:
             return f"{first}, then {len(rest)} more"
         case _:
-            return "unreachable"
+            return "Unreachable"
 
 print(summarize([]))
 print(summarize([5]))
@@ -105,27 +102,23 @@ print(summarize([1, 2, 3, 4]))
 
 The output is:
 
-    empty
-    one item: 5
-    two items: 3, 4
+    Empty
+    One item: 5
+    Two items: 3, 4
     1, then 3 more
 
-This is the structural part of "structural pattern matching":
-the pattern `[first, second]` matches only a two-element sequence and pulls both out at once,
-with no indexing and no length check.
+This shows the structural part of "structural pattern matching".
+The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
 ## Class Patterns
 
 A class pattern matches by type and extracts attributes.
 With a data class you can match positionally,
 because `@dataclass` fills in the `__match_args__` the pattern uses,
-or by keyword.
-The [Data Classes as Types](10_Data_Classes_as_Types.md) chapter covers data classes:
+or by keyword:
 
 ```python
 # class_patterns.py
-# A class pattern matches the type and binds attributes. A data class
-# supports positional matching out of the box.
 from dataclasses import dataclass
 
 @dataclass
@@ -136,13 +129,13 @@ class Point:
 def locate(p: Point) -> str:
     match p:
         case Point(0, 0):
-            return "the origin"
+            return "The origin"
         case Point(0, y):
-            return f"on the y-axis at y={y}"
+            return f"On the y-axis at y={y}"
         case Point(x, 0):
-            return f"on the x-axis at x={x}"
+            return f"On the x-axis at x={x}"
         case Point(x, y):
-            return f"at ({x}, {y})"
+            return f"At ({x}, {y})"
 
 print(locate(Point(0, 0)))
 print(locate(Point(0, 5)))
@@ -152,15 +145,14 @@ print(locate(Point(3, 4)))
 
 The output is:
 
-    the origin
-    on the y-axis at y=5
-    on the x-axis at x=3
-    at (3, 4)
+    The origin
+    On the y-axis at y=5
+    On the x-axis at x=3
+    At (3, 4)
 
 `Point(0, 0)` matches a point whose fields are both zero.
 `Point(0, y)` matches when `x` is zero and *captures* `y`.
-The literal and the capture combine in one pattern,
-which is the move that makes `match` worth reaching for.
+The literal and the capture combine in one pattern.
 
 ## Guards
 
@@ -330,14 +322,14 @@ from mapping_patterns import handle
 from sequence_patterns import summarize
 
 def test_sequence_patterns() -> None:
-    assert summarize([]) == "empty"
-    assert summarize([5]) == "one item: 5"
+    assert summarize([]) == "Empty"
+    assert summarize([5]) == "One item: 5"
     assert summarize([1, 2, 3]) == "1, then 2 more"
 
 def test_class_patterns() -> None:
-    assert locate(Point(0, 0)) == "the origin"
-    assert locate(Point(3, 0)) == "on the x-axis at x=3"
-    assert locate(Point(3, 4)) == "at (3, 4)"
+    assert locate(Point(0, 0)) == "The origin"
+    assert locate(Point(3, 0)) == "On the x-axis at x=3"
+    assert locate(Point(3, 4)) == "At (3, 4)"
 
 def test_mapping_patterns() -> None:
     assert handle({"type": "key", "key": "Esc"}) == "key Esc"

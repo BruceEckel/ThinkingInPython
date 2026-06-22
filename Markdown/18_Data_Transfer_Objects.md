@@ -34,8 +34,8 @@ You rarely need even those few lines, because Python already ships this idiom.
 `types.SimpleNamespace` is exactly a `Messenger`:
 keyword arguments become attributes.
 When you want the fields named and type-checked,
-a `@dataclass` gives you a typed mutable record with a generated `__init__`,
-`repr`, and equality, and a `NamedTuple` gives you a typed immutable one:
+a `@dataclass` gives you a typed mutable record with a generated `__init__()`,
+`repr()`, and equality, and a `NamedTuple` gives you a typed immutable one:
 
 ```python
 # messenger_modern.py

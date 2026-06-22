@@ -273,14 +273,14 @@ if __name__ == "__main__":
 ```
 
 `Point` and `PairCoord` share no base class.
-They both have `x` and `y`, which is all `distance` asked for.
+They both have `x` and `y`, which is all `distance()` asked for.
 
 ## Compose, Do Not Inherit
 
 The third promise is reuse through inheritance.
 In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
 The alternative is composition: a type holds other types as fields.
-`dataclasses.replace` gives you the copy-with-changes that immutability needs,
+`dataclasses.replace()` gives you the copy-with-changes that immutability needs,
 and frozen instances compare by value and can be used as keys:
 
 ```python
@@ -402,8 +402,8 @@ if __name__ == "__main__":
         print(show(item))
 ```
 
-`show` accepts anything.
-Pass it something without a `display` method and you find out only when the line runs.
+`show()` accepts anything.
+Pass it something without a `display()` method and you find out only when the line runs.
 The [Static Typing](07_Static_Typing.md) chapter gives this a static form with `Protocol`:
 a structural type describes the required shape,
 and the checker verifies it ahead of time.

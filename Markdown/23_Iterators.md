@@ -79,13 +79,13 @@ and produces one value at a time,
 so it works on streams too large to hold in memory.
 A generator can even be *infinite*: a `while True` loop that yields forever,
 or `itertools.count()`, produces values on demand with no end.
-You take only as many as you need (see `itertools.islice` below),
+You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
 
 ## Reusable Algorithms
 
 Generic iterator algorithms ship in the standard library's `itertools` module:
-`chain`, `islice`, `groupby`, `takewhile`, and more,
+`chain()`, `islice()`, `groupby()`, `takewhile()`, and more,
 each consuming and producing iterators.
 Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
 they let you build pipelines that stay lazy end to end.
@@ -197,4 +197,4 @@ def test_typed_iterator_passes_and_rejects() -> None:
     and confirm `total()` from `iterators.py` sums them without modification.
 2.  Rewrite `Countdown` to also support `len()`,
     then explain why a plain generator cannot.
-3.  Use `itertools.islice` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
+3.  Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.

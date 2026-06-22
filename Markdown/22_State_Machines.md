@@ -732,6 +732,6 @@ The *Proxy* and *State* patterns that several of these exercises build on are co
 10. Create an elevator state machine system using state_machine.py
 11. Create a heating/air-conditioning system using state_machine.py
 12. A *generator* produces objects, like a factory but taking no arguments.
-    Write a `mouse_move_generator` (using `yield`) that produces correct `MouseAction` moves in sequence,
+    Write a `mouse_move_generator()` (using `yield`) that produces correct `MouseAction` moves in sequence,
     where each possible move depends on the previous one (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

@@ -21,8 +21,8 @@ and the type of each piece must be recovered to sort it.
 
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
-filled automatically by `__init_subclass__`,
-and a `create` method builds an instance from a material name (this is a *factory*):
+filled automatically by `__init_subclass__()`,
+and a `create()` method builds an instance from a material name (this is a *factory*):
 
 ```python
 # trash.py
@@ -65,8 +65,8 @@ def sum_value(items: list[Trash]) -> float:
 ```
 
 Adding a new recyclable type is now one class definition.
-It registers itself, and `create` can build it.
-`sum_value` is an ordinary function:
+It registers itself, and `create()` can build it.
+`sum_value()` is an ordinary function:
 it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
 The trash to process is described in a data file,
@@ -121,7 +121,7 @@ def parse(filename: str) -> list[Trash]:
 
 ## The First Cut: Checking Every Type
 
-The most obvious way to sort is to look at each piece and test what it is using `isinstance`:
+The most obvious way to sort is to look at each piece and test what it is using `isinstance()`:
 
 ```python
 # recycle_rtti.py
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 This satisfies the requirement, but it has a classic flaw:
 it tests for *every type in the system*.
 When cardboard becomes valuable and you add it,
-you must hunt down this chain of `isinstance` checks,
+you must hunt down this chain of `isinstance()` checks,
 and any you miss will silently drop trash on the floor.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
@@ -198,9 +198,9 @@ price it, weigh it, print recycling instructions, and more later.
 
 This is exactly the problem the *Visitor* pattern was invented for.
 Visitor is elaborate:
-a `Visitor` base class with one `visit` overload per material,
-an `accept` method added to every element,
-and "double dispatch" to route each piece to the right `visit`.
+a `Visitor` base class with one `visit()` overload per material,
+an `accept()` method added to every element,
+and "double dispatch" to route each piece to the right `visit()`.
 It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation;
 the standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
@@ -247,20 +247,20 @@ if __name__ == "__main__":
     main()
 ```
 
-`recycling_note` is a new operation defined entirely outside the `Trash` hierarchy.
+`recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function:
 the default behavior, for free.
-Adding a `price` or `weight` operation means writing another single-dispatch function.
+Adding a `price()` or `weight` operation means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.
 
 Compare this to a Visitor implementation.
-There is no `Visitor` class, no `accept` method bolted onto every material,
+There is no `Visitor` class, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
 When the operation is the *same* for every type,
 you do not even need single dispatch.
-`sum_value` earlier was just a function.
+`sum_value()` earlier was just a function.
 Use `singledispatch` only when the behavior genuinely differs by type.
 For operations that belong on the objects and vary by type,
 `singledispatchmethod` does the same thing as a method.
@@ -269,7 +269,7 @@ For operations that belong on the objects and vary by type,
 
 We want to test the way each subclass registers itself,
 `create()` builds one by name, that the per-pound values are right,
-and that `sum_value` totals weight times value.
+and that `sum_value()` totals weight times value.
 The parser is tested against a small file written on the spot,
 so it does not depend on `trash.dat`:
 
@@ -325,9 +325,9 @@ The honest measure of a pattern is whether it still earns its keep once the lang
 
 1.  Add a `Plastic` material with a per-pound value.
     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
-    and that only `trash.dat` and (optionally) a one-line `recycling_note` registration do.
-2.  Write a `price` operation as a plain function over a list of `Trash`,
-    and a `heaviest` operation that returns the single heaviest piece.
+    and that only `trash.dat` and (optionally) a one-line `recycling_note()` registration do.
+2.  Write a `price()` operation as a plain function over a list of `Trash`,
+    and a `heaviest()` operation that returns the single heaviest piece.
     Decide for each whether it needs `singledispatch`.
-3.  Replace the `recycling_note` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
+3.  Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
     and explain what changed.

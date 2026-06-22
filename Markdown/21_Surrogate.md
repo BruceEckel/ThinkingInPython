@@ -152,7 +152,7 @@ The common uses for *Proxy* as described in *Design Patterns* are:
     A simpler example is keeping track of the number of calls to a particular method.
 
 A *Smart reference* proxy adds behavior around each access.
-With `__getattr__` you can wrap every method call, for example to count them:
+With `__getattr__()` you can wrap every method call, for example to count them:
 
 ```python
 # counting_proxy.py
@@ -185,7 +185,7 @@ p.f()
 print("calls:", p.calls)
 ```
 
-Because `__getattr__` intercepts only the lookups not found directly on the proxy,
+Because `__getattr__()` intercepts only the lookups not found directly on the proxy,
 one generic proxy can add lazy initialization (a *virtual proxy*),
 access checks (a *protection proxy*),
 or call tracking (a *smart reference*) to any object, with no per-method code.
@@ -196,7 +196,7 @@ But both are really a *Surrogate*:
 a front object that passes method calls through to an implementation.
 *Proxy* fronts for one implementation to control access to it;
 *State* swaps among several to change behavior over time.
-In Python both are the same few lines of `__getattr__` delegation,
+In Python both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
 The separate implementation hierarchy that *Design Patterns* uses is needed only when you do not control the implementing code;
 when you do, the single generic surrogate above is simpler and just as flexible.
@@ -206,7 +206,7 @@ when you do, the single generic surrogate above is simpler and just as flexible.
 Because each surrogate wraps any object,
 a test can hand it a small stand-in with real return values and check the delegation directly.
 For the proxy, that the call is forwarded with its result and counted;
-for the state, that calls reach the current implementation and that `change_imp` swaps it:
+for the state, that calls reach the current implementation and that `change_imp()` swaps it:
 
 ```python
 # test_fronting.py

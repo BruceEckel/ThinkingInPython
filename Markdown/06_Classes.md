@@ -210,8 +210,8 @@ a plain method is a better expression of the intent.
 ## String Representation
 
 Two special methods control the way an object displays.
-`__str__` is the readable form for users,
-and `__repr__` is the unambiguous form for developers:
+`__str__()` is the readable form for users,
+and `__repr__()` is the unambiguous form for developers:
 
 ```python
 # representation.py
@@ -228,7 +228,7 @@ print(p)       # Point(3, 4): falls back to __repr__
 print([p, p])  # [Point(3, 4), Point(3, 4)]
 ```
 
-Define `__repr__` on classes you debug.
+Define `__repr__()` on classes you debug.
 
 ## Static and Class Methods
 
@@ -257,7 +257,7 @@ print(Temperature.is_freezing(-4))  # True
 ```
 
 For classes that are primarily a bundle of typed data,
-the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter shows a much shorter path that writes the constructor and `__repr__` for you.
+the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter shows a much shorter path that writes the constructor and `__repr__()` for you.
 
 ## Composing Methods with `import`
 

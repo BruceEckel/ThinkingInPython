@@ -158,7 +158,7 @@ Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves exactly as it would have with no hints at all.
 Checking is a separate step you run, the same way you check tests separately.
-If you need a guarantee at run time, you still write `isinstance`,
+If you need a guarantee at run time, you still write `isinstance()`,
 or use a library built to validate data.
 The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at run time.
 [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,

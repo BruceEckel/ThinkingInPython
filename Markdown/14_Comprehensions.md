@@ -42,14 +42,14 @@ The comprehension has three parts:
 -   If the member is an integer then it is passed to the output expression,
     squared, to become a member of the output list.
 
-Much the same results can be achieved using the built-in functions, `map`,
-`filter` and the anonymous `lambda` function.
+Much the same results can be achieved using the built-in functions, `map()`,
+`filter()` and the anonymous `lambda` function.
 
 The filter function applies a predicate to a sequence:
 
     filter(lambda e: isinstance(e, int), a_list)
 
-`map` modifies each member of a sequence:
+`map()` modifies each member of a sequence:
 
     map(lambda e: e ** 2, a_list)
 
@@ -57,14 +57,14 @@ The two can be combined:
 
     map(lambda e: e ** 2, filter(lambda e: isinstance(e, int), a_list))
 
-The above example involves function calls to `map`, `filter`,
-`isinstance` and two calls to `lambda`.
+The above example involves function calls to `map()`, `filter()`,
+`isinstance()` and two calls to `lambda`.
 Function calls in Python are expensive.
 Furthermore the input sequence is traversed through twice and an intermediate list is produced by filter.
 
 The list comprehension is enclosed within a list,
 so it is immediately evident that a list is being produced.
-There is only one function call to `isinstance` and no call to the cryptic `lambda`;
+There is only one function call to `isinstance()` and no call to the cryptic `lambda`;
 instead the list comprehension uses a conventional iterator,
 an expression and an `if` expression for the optional predicate.
 

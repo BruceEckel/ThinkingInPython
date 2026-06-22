@@ -5,14 +5,14 @@ from mapping_patterns import handle
 from sequence_patterns import summarize
 
 def test_sequence_patterns() -> None:
-    assert summarize([]) == "empty"
-    assert summarize([5]) == "one item: 5"
+    assert summarize([]) == "Empty"
+    assert summarize([5]) == "One item: 5"
     assert summarize([1, 2, 3]) == "1, then 2 more"
 
 def test_class_patterns() -> None:
-    assert locate(Point(0, 0)) == "the origin"
-    assert locate(Point(3, 0)) == "on the x-axis at x=3"
-    assert locate(Point(3, 4)) == "at (3, 4)"
+    assert locate(Point(0, 0)) == "The origin"
+    assert locate(Point(3, 0)) == "On the x-axis at x=3"
+    assert locate(Point(3, 4)) == "At (3, 4)"
 
 def test_mapping_patterns() -> None:
     assert handle({"type": "key", "key": "Esc"}) == "key Esc"

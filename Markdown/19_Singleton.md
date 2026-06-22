@@ -73,7 +73,7 @@ print(b.data)
 ```
 
 If you need the class itself to hand back one instance from its own constructor,
-override `__new__`, shown below.
+override `__new__()`, shown below.
 
 ## The Classic Implementations
 
@@ -132,7 +132,7 @@ Access is delegated through `__getattr__()`.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 This works, but it is a lot of code for what a module does on its own.
 
-A variation uses `__new__`, the method that actually creates an instance,
+A variation uses `__new__()`, the method that actually creates an instance,
 to return the same object every time:
 
 ```python
@@ -278,7 +278,7 @@ so the name `Foo` now refers to the decorated instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want.
 But the name no longer points at a class.
 `isinstance(x, Foo)` and subclassing `Foo` no longer work.
-The `__new__` and metaclass versions below keep the name pointing at a real class,
+The `__new__()` and metaclass versions below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
 ### As a Metaclass
@@ -381,7 +381,7 @@ Use the lightest tool that fits:
 - For almost everything, use a *module* with module-level state.
   It is the truest Python singleton and needs no class.
 - If you want a class, hide construction behind a cached factory (`@cache`),
-  or override `__new__`.
+  or override `__new__()`.
 - If you really want many handles sharing one set of state, use *Borg*.
 - The decorator and metaclass versions work,
   but they are more machinery than the problem usually justifies.

@@ -130,7 +130,7 @@ class Failure[E]:
 type Result[A, E] = Success[A] | Failure[E]
 ```
 
-Ignore `bind` for the moment.
+Ignore `bind()` for the moment.
 The two data classes and the `Result` alias are enough to report errors.
 A function that might fail returns a `Result`.
 Now the signature tells the whole story:
@@ -221,10 +221,10 @@ go on.
 
 ## Composing With bind
 
-`bind` captures that dance once.
+`bind()` captures that dance once.
 Look again at the method on `Result`.
-On a `Success`, `bind` feeds the answer to the next function.
-On a `Failure`, `bind` ignores the function and returns the failure unchanged.
+On a `Success`, `bind()` feeds the answer to the next function.
+On a `Failure`, `bind()` ignores the function and returns the failure unchanged.
 So a `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
@@ -252,16 +252,16 @@ The output is identical to the hand-written version:
     3 Failure(error='func_c(3): division by zero')
     4 Success(answer=4)
 
-The body is now one line that reads in order: `func_a`, then `func_b`,
-then `func_c`.
+The body is now one line that reads in order: `func_a()`, then `func_b()`,
+then `func_c()`.
 The error checking has not gone away.
-It moved into `bind`, where it is written once.
+It moved into `bind()`, where it is written once.
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
 You do not need the word to use it.
 
 ## Combining Multiple Results
 
-`bind` threads one value through a chain.
+`bind()` threads one value through a chain.
 When you have several independent inputs,
 nest the binds so each answer stays in scope for the next step.
 The first `Failure` still short-circuits the whole thing:
@@ -296,11 +296,11 @@ The output is:
     (2, 1) Failure(error='func_c(3): division by zero')
     (7, 5) Success(answer='add(7 + 5 + 12): 24')
 
-Only the last input passes all three steps, so only it reaches `add`.
+Only the last input passes all three steps, so only it reaches `add()`.
 
 ## Turning Exceptions into Results
 
-In `composing.py`, `func_c` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
+In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
 A decorator captures that pattern once.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Failure` value:
@@ -345,7 +345,7 @@ The output is:
     42: parsed 42
     oops: ValueError
 
-`parse` still reads like a normal function that returns an `int`,
+`parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it has to open the `Result` to reach the number.
@@ -394,7 +394,7 @@ The output is:
     0: cannot divide by zero
     oops: not a number
 
-`parse` and `reciprocal` are both wrapped with `@safe`, so `bind` chains them.
+`parse()` and `reciprocal()` are both wrapped with `@safe`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,
 and the `match` tells them apart.
 
@@ -418,9 +418,9 @@ They are expected, and the type should say so.
 ## Testing the Behavior
 
 Because failures are values, you can assert on them directly,
-without `pytest.raises`.
-The tests below check that `bind` chains a success and short-circuits a failure,
-that the hand-written and `bind` versions agree,
+without `pytest.raises()`.
+The tests below check that `bind()` chains a success and short-circuits a failure,
+that the hand-written and `bind()` versions agree,
 and that combining returns the right value.
 See the [Testing](09_Testing.md) chapter for pytest in general.
 
@@ -476,10 +476,10 @@ def test_safe_captures_the_exception() -> None:
 
 ## Exercises
 
-1.  Add a `func_e` that returns a `Result[int, str]`,
-    and extend the `bind` chain in `composing_with_bind.py` to include it.
-    Confirm a `Failure` from `func_e` still short-circuits.
-2.  Give `Failure` a `map_error` method that transforms the error it holds,
+1.  Add a `func_e()` that returns a `Result[int, str]`,
+    and extend the `bind()` chain in `composing_with_bind.py` to include it.
+    Confirm a `Failure` from `func_e()` still short-circuits.
+2.  Give `Failure` a `map_error()` method that transforms the error it holds,
     leaving a `Success` untouched.
     Use it to add a prefix to every error.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,

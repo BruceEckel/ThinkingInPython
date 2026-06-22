@@ -131,17 +131,17 @@ so you rarely need a debugger to see what went wrong.
 There are two common special needs in testing, both of which appear in `test_account.py`.
 
 The first is "this call should cause an exception."
-`test_overdraft_raises` uses `pytest.raises` as a context manager.
+`test_overdraft_raises()` uses `pytest.raises()` as a context manager.
 The test passes only if the expected exception is raised inside the block.
 
 The second is comparing floating-point numbers, where exact equality is a trap.
-`test_interest_uses_approx` compares with `pytest.approx`,
+`test_interest_uses_approx()` compares with `pytest.approx()`,
 which allows a small tolerance.
 
 ## Parametrizing Tests
 
 When the same logic should run against several inputs, do not copy the test.
-Mark it with `parametrize`, as `test_nonpositive_deposit_raises` does,
+Mark it with `parametrize`, as `test_nonpositive_deposit_raises()` does,
 and `pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
 and a failure names the exact case that failed.
@@ -383,7 +383,7 @@ def elapsed(start: float) -> float:
     return time.time() - start
 ```
 
-`monkeypatch` pins it to a fixed value the same way it did for `randint`:
+`monkeypatch` pins it to a fixed value the same way it did for `randint()`:
 
 ```python
 # test_stopwatch.py
@@ -397,7 +397,7 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock is cleaner still.
-The `stamp` function takes a `now` callable:
+The `stamp()` function takes a `now` callable:
 
 ```python
 # clock.py
@@ -465,7 +465,7 @@ def current_temp(city: str) -> str:
         return response.read().decode()
 ```
 
-The test swaps `urlopen` for a stub that returns bytes from memory,
+The test swaps `urlopen()` for a stub that returns bytes from memory,
 so no request ever leaves the machine:
 
 ```python
@@ -481,7 +481,7 @@ def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
     assert weather.current_temp("denver") == "21C"
 ```
 
-Patch the name where it is used, `weather.urlopen`, rather than the original in
+Patch the name where it is used, `weather.urlopen()`, rather than the original in
 `urllib`, so only this module's lookups are redirected.
 The same approach isolates a database, a message queue, or any other service:
 replace the boundary function with a stand-in and assert against its result.
@@ -517,8 +517,8 @@ and a failing test fails the build.
 
 1.  Add a `transfer(other: Account, amount)` method to `Account` and write its tests first:
     a successful transfer, and an overdraft that leaves both accounts unchanged.
-2.  Use `parametrize` to test `add_interest` at several rates,
-    comparing with `pytest.approx`.
+2.  Use `parametrize` to test `add_interest()` at several rates,
+    comparing with `pytest.approx()`.
 3.  Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
     that the balance is never negative.
     Use it in two tests.

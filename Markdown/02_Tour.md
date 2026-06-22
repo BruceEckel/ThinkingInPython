@@ -43,7 +43,7 @@ Parentheses are not necessary in Python, although it won't complain if you use t
 The conditional clause ends with a colon.
 This indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-Here there is a `print` statement which sends the result to standard output,
+Here there is a `print()` statement which sends the result to standard output,
 followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level, just like curly braces in C++ or Java,

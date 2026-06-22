@@ -45,12 +45,12 @@ The output is:
     -> add(2, 3)
     <- add = 5
 
-The `@trace` above `add` means:
+The `@trace` above `add()` means:
 
     add = trace(add)
 
 `trace` returns `wrapper`, so the name `add` now refers to `wrapper`.
-Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add`,
+Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add()`,
 prints again, and returns the result.
 
 `functools.wraps` copies the original function's name and docstring onto the wrapper,
@@ -94,11 +94,11 @@ The greeting prints three times.
 ### Decorators as Classes
 
 A decorator only has to be a callable that takes a function and returns a callable.
-A class with `__call__` is a callable,
+A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
 when the function is decorated,
-and `__call__` runs on every call to the decorated function.
+and `__call__()` runs on every call to the decorated function.
 Here is the `trace` decorator written as a class:
 
 ```python
@@ -129,8 +129,8 @@ if __name__ == "__main__":
 `@trace` runs `add = trace(add)`,
 so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
-and calling `add(2, 3)` invokes `__call__`.
-`functools.update_wrapper` does for a class instance what `functools.wraps` does for a function:
+and calling `add(2, 3)` invokes `__call__()`.
+`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function:
 it copies the wrapped function's name and docstring across.
 
 Because the instance can hold attributes, state between calls is natural.
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 The class form shifts in an important way when the decorator itself takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the *arguments*,
-and `__call__` receives the function and returns the wrapper:
+and `__call__()` receives the function and returns the wrapper:
 
 ```python
 # repeat_class.py
@@ -202,10 +202,10 @@ Compare the two cases.
 the function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(3)` first, producing an instance,
 then applies that instance to `greet`: the arguments go to the constructor,
-and the function arrives later, at `__call__`.
+and the function arrives later, at `__call__()`.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible:
-the function moves from `__init__` to `__call__` the moment the decorator gains arguments.
+the function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
 
 Which form to use is mostly taste.
 The function form is more compact,
@@ -215,7 +215,7 @@ The class form reads better when the decorator carries state or grows complicate
 because the phases are separate methods instead of nested closures.
 That argument-capturing class decorator scales up to small frameworks:
 a build tool or task runner can offer a `@rule(target, *deps)` decorator whose constructor records the target and dependencies,
-whose `__call__` registers the decorated function in a class-level table with that metadata,
+whose `__call__()` registers the decorated function in a class-level table with that metadata,
 and whose driver later walks the table to run things in order.
 The decorator becomes the registration mechanism for the whole system.
 
@@ -259,7 +259,7 @@ if __name__ == "__main__":
 ```
 
 The output is `['Espresso', 'Latte']`.
-The [Metaprogramming](15_Metaprogramming.md) chapter shows `__init_subclass__`,
+The [Metaprogramming](15_Metaprogramming.md) chapter shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 ## The Decorator Pattern
@@ -378,7 +378,7 @@ def test_decaf_adds_no_cost() -> None:
 
 1.  Add a `Syrup` extra (cost 0.30) and use it to build a decaf latte with syrup.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
-    using `time.perf_counter`.
+    using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
 3.  Implement the object *Decorator* pattern for a pizza shop:
     plain pizzas (Margherita, Hawaiian) and topping decorators (Garlic, Olives, Feta).

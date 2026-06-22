@@ -204,7 +204,7 @@ The Python documentation warns:
 
 In this run the deletions happen during shutdown,
 exactly the precarious moment the warning describes.
-`Counter` and `print` were still available, so the output came out cleanly,
+`Counter` and `print()` were still available, so the output came out cleanly,
 but the teardown order that allowed that is not guaranteed.
 So `__del__()` should do as little as possible, and you should not depend on it.
 

@@ -91,7 +91,7 @@ so it accepts *any* object that has an `f()`.
 You do not need a shared base class or a declared interface, only the method.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
-`__getattr__` does the forwarding, so the adapter stays tiny:
+`__getattr__()` does the forwarding, so the adapter stays tiny:
 
 ```python
 # getattr_adapter.py
@@ -119,7 +119,7 @@ print(a.f())   # Adapted method
 print(a.g())   # Forwarded to the adaptee unchanged
 ```
 
-`__getattr__` runs only for attributes Python does not find normally,
+`__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 

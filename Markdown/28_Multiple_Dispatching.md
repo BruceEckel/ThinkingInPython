@@ -186,8 +186,8 @@ the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` is then a matter of adding rows to the table,
 with no methods to edit across the classes.
 
-The double-dispatch version, where each class implements `eval_paper`,
-`eval_scissors`, and `eval_rock`,
+The double-dispatch version, where each class implements `eval_paper()`,
+`eval_scissors()`, and `eval_rock()`,
 is a workaround for languages that cannot store types in a table and look a behavior up by them.
 Python can, so the table is both shorter and easier to maintain.
 Use the spread-out method version only when a combination needs substantial,

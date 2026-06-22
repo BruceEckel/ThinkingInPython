@@ -116,7 +116,7 @@ print(2 in a)     # True
 Every operator above has a named method.
 The methods are a little more flexible: they accept any iterable,
 not just a set, and they take several arguments at once.
-There is also `isdisjoint`, which has no operator form:
+There is also `isdisjoint()`, which has no operator form:
 
 ```python
 # set_methods.py
@@ -190,8 +190,8 @@ for name, score in zip(names, scores):
     print(name, score)
 ```
 
-With `print`, the default `end` (printed after the value) is a newline.
-With multiple values in a `print` call, you can use `sep` to change the separator between values.
+With `print()`, the default `end` (printed after the value) is a newline.
+With multiple values in a `print()` call, you can use `sep` to change the separator between values.
 
 ## Pattern Matching
 
