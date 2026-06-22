@@ -26,6 +26,6 @@ class Person:
 if __name__ == "__main__":
     person = Person(
         FullName("Bruce Eckel"),
-        EmailAddress("mindviewinc@gmail.com"),
+        EmailAddress("bruce@example.com"),
     )
     print(person)

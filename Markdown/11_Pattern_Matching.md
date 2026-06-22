@@ -15,7 +15,7 @@ Each `case` body runs only when its pattern matches, and the first match wins:
 
 ```python
 # http_status.py
-# Literal patterns match exact values; the _ wildcard is the default.
+# Literal patterns match exact values.
 
 def describe(status: int) -> str:
     match status:
@@ -25,7 +25,7 @@ def describe(status: int) -> str:
             return "Not Found"
         case 500:
             return "Server Error"
-        case _:
+        case _:  # Default
             return f"status {status}"
 
 print(describe(200))
@@ -315,6 +315,7 @@ polymorphism is better than a `match`: each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
 especially when the cases need to look inside the value.
+(Note that `Enum` is also worth considering here).
 
 ## Testing the Matchers
 

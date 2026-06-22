@@ -25,6 +25,7 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
 
 - Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Chapter 21: Surrogate?
+- Consider more specific links, to specific subsections rather than whole chapters.
 
 
 - Check exercises. Potentially create new exercises.

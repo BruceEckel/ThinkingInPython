@@ -111,8 +111,8 @@ It does not pin it down to a set of legal values.
 ## Data Classes
 
 A *data class* writes the boilerplate for a class that holds data.
-The `@dataclass` decorator generates `__init__`, `__repr__`,
-and `__eq__` from the fields you declare:
+The `@dataclass` decorator generates `__init__()`, `__repr__()`,
+and `__eq__()` from the fields you declare:
 
 ```python
 # messenger.py
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     print(m)
 ```
 
-`replace` returns a copy with some fields changed, leaving the original alone.
+`replace()` returns a copy with some fields changed, leaving the original alone.
 This copy-instead-of-mutate style reduces errors.
 But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
@@ -178,7 +178,7 @@ at construction, is enough for its whole life.
 ## A Type Is a Set of Values
 
 We can make `Stars` a frozen data class.
-To validate it after the fields are filled in, we call `__post_init__`:
+To validate it after the fields are filled in, we call `__post_init__()`:
 
 ```python
 # stars.py
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     print(f2(Stars(2)))
 ```
 
-`__post_init__` is one of the hooks the `dataclass` machinery generates code around.
+`__post_init__()` is one of the hooks the `dataclass` machinery generates code around.
 
 `Stars` now names a set of values: the integers one through ten.
 The only way to make a `Stars` is through the constructor,
@@ -215,7 +215,7 @@ So if you are holding a `Stars`, it is legal.
 You know it without looking.
 
 This changes how the functions are written.
-`f1` and `f2` take a `Stars` and return a `Stars`.
+`f1()` and `f2()` take a `Stars` and return a `Stars`.
 They do not check their argument, because a `Stars` is already known to be good.
 They do not test their result,
 because building the returned `Stars` runs the check.
@@ -423,9 +423,9 @@ make the type responsible for guaranteeing its own values.
 ## More Data Class Tools
 
 A few more data class tools are worth knowing.
-`asdict` and `astuple` convert an instance to a dictionary or tuple,
+`asdict()` and `astuple()` convert an instance to a dictionary or tuple,
 recursing into nested data classes.
-`replace` copies with changes.
+`replace()` copies with changes.
 `KW_ONLY` forces the fields after it to be passed by keyword:
 
 ```python
@@ -465,10 +465,10 @@ if __name__ == "__main__":
 ## Serializing to JSON
 
 A data class has no built-in JSON support.
-Hand one to `json.dumps` and it raises `TypeError: Object of type Person is not JSON serializable`.
+Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is not JSON serializable`.
 The fix is small.
-`asdict` turns the object into a nested dictionary,
-and `json.dumps` already knows how to serialize dictionaries.
+`asdict()` turns the object into a nested dictionary,
+and `json.dumps()` already knows how to serialize dictionaries.
 Decoding goes the other way: parse the JSON into a dictionary,
 then hand its parts to the constructors.
 
@@ -532,7 +532,7 @@ if __name__ == "__main__":
     print(json.dumps(people, cls=DataClassEncoder, indent=2))
 ```
 
-`json.dumps` calls `default` for any object it cannot serialize on its own.
+`json.dumps()` calls `default()` for any object it cannot serialize on its own.
 The encoder converts each data class to a dictionary and lets the base encoder take it from there,
 recursing through lists and nested objects.
 
@@ -545,7 +545,7 @@ reconstructing nested types from the parsed JSON and validating as they go.
 ## Testing
 
 If an illegal value cannot exist, tests should validate that claim.
-With `pytest.raises`, we assert that the constructor rejects every value outside the set:
+With `pytest.raises()`, we assert that the constructor rejects every value outside the set:
 
 ```python
 # test_stars.py
@@ -613,7 +613,7 @@ def test_bad_month_number(bad: int) -> None:
     Add tests for the values that should now be rejected.
 3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that returns a new `Stars`,
     and show that the precondition and postcondition disappear.
-4.  Feed `from_json` a JSON string whose email has no `@`,
+4.  Feed `from_json()` a JSON string whose email has no `@`,
     and confirm that it raises `TypeFailure`.
     The validation you wrote once, in `EmailAddress`,
     now also guards your JSON input.
