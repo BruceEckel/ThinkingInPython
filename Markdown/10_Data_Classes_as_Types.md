@@ -18,12 +18,12 @@ This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
 This function will be used throughout the chapter.
-It throws a specialized exception when a value is not legal:
+It raises a specialized exception when a value is not legal:
 
 ```python
 # validation.py
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set"
+    "A value falls outside the type's allowed set."
 
 def check(condition: bool, message: str, detail: str = "") -> None:
     if not condition:
@@ -178,7 +178,7 @@ at construction, is enough for its whole life.
 ## A Type Is a Set of Values
 
 We can make `Stars` a frozen data class.
-To validate it after the fields are filled in, we call `__post_init__` :
+To validate it after the fields are filled in, we call `__post_init__`:
 
 ```python
 # stars.py
@@ -506,7 +506,7 @@ The type guards itself, even against data it never saw.
 When a data class is buried inside a larger structure you are dumping,
 converting it by hand first is awkward.
 A custom `JSONEncoder` serializes any data class it meets, even nested
-inside other structures, by converting each one to a dict.:
+inside other structures, by converting each one to a dict:
 
 ```python
 # json_encoder.py

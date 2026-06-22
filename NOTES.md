@@ -1,3 +1,7 @@
+Before bed: In a loop one chapter at a time, review chapters 02 through 08.
+If you run out of tokens during a chapter, resume when it resets.
+Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
+
 Check "from collections.abc import Callable"
 
 Run 'make prose' on each chapter
@@ -11,7 +15,6 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
   Can you demo this either in the previous example or a new one
 
 - Consistency around function names in prose. `print` vs `print()`
-
 
 - Is full polymorphism covered? (Not just inheritance-based)
 - Check order of examples in 30_Pattern_Refactoring.md
