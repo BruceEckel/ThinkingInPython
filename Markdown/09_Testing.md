@@ -449,7 +449,42 @@ but it is the standard answer for code already steeped in `datetime`.
 
 ### Network Calls
 
+A test must never use a real network.
+The call would be slow, it would fail whenever the service or the connection does,
+and it would tie the test to data you do not control.
+`monkeypatch` replaces the function that fetches data with one that returns a
+canned response, so the test runs offline and gives the same answer every time.
+Here a function reads a URL:
 
+```python
+# weather.py
+from urllib.request import urlopen
+
+def current_temp(city: str) -> str:
+    with urlopen(f"https://example.com/{city}") as response:
+        return response.read().decode()
+```
+
+The test swaps `urlopen` for a stub that returns bytes from memory,
+so no request ever leaves the machine:
+
+```python
+# test_weather.py
+import io
+import pytest
+import weather
+
+def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_urlopen(url: str) -> io.BytesIO:
+        return io.BytesIO(b"21C")
+    monkeypatch.setattr(weather, "urlopen", fake_urlopen)
+    assert weather.current_temp("denver") == "21C"
+```
+
+Patch the name where it is used, `weather.urlopen`, rather than the original in
+`urllib`, so only this module's lookups are redirected.
+The same approach isolates a database, a message queue, or any other service:
+replace the boundary function with a stand-in and assert against its result.
 
 ## White-Box and Black-Box Tests
 
