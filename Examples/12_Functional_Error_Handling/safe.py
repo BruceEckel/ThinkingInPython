@@ -1,7 +1,4 @@
 # safe.py
-# @safe turns a function that raises into one that returns a Result.
-# The exception becomes the Failure value, so a caller handles it like
-# any other Result.
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success

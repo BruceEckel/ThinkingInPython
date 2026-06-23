@@ -1,6 +1,4 @@
 # matching_errors.py
-# Because the error is a value, often an exception, you can match the
-# Result and the exception type together, and handle each kind.
 from result import Failure, Result, Success
 from safe import safe
 
@@ -18,12 +16,12 @@ def describe(text: str) -> str:
         case Success(answer):
             return f"{text}: {answer}"
         case Failure(ValueError()):
-            return f"{text}: not a number"
+            return f"{text}: Not a number"
         case Failure(ZeroDivisionError()):
-            return f"{text}: cannot divide by zero"
+            return f"{text}: Cannot divide by zero"
         case Failure(error):
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":
-    for text in ("4", "0", "oops"):
+    for text in ("4", "0", "OOPS"):
         print(describe(text))

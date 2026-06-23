@@ -302,9 +302,6 @@ with the exception as the `Failure` value:
 
 ```python
 # safe.py
-# @safe turns a function that raises into one that returns a Result.
-# The exception becomes the Failure value, so a caller handles it like
-# any other Result.
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success
@@ -335,7 +332,8 @@ if __name__ == "__main__":
                 print(f"{text}: {type(error).__name__}")
 ```
 
-The output is:
+After decorating `parse()` with `@safe`,
+the output is:
 
     42: parsed 42
     oops: ValueError
@@ -343,7 +341,7 @@ The output is:
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
-because it has to open the `Result` to reach the number.
+because it has to unpack the `Result` to reach the number.
 
 ## Matching on the Error
 
@@ -353,8 +351,6 @@ Each kind of failure gets its own branch:
 
 ```python
 # matching_errors.py
-# Because the error is a value, often an exception, you can match the
-# Result and the exception type together, and handle each kind.
 from result import Failure, Result, Success
 from safe import safe
 
@@ -372,22 +368,22 @@ def describe(text: str) -> str:
         case Success(answer):
             return f"{text}: {answer}"
         case Failure(ValueError()):
-            return f"{text}: not a number"
+            return f"{text}: Not a number"
         case Failure(ZeroDivisionError()):
-            return f"{text}: cannot divide by zero"
+            return f"{text}: Cannot divide by zero"
         case Failure(error):
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":
-    for text in ("4", "0", "oops"):
+    for text in ("4", "0", "OOPS"):
         print(describe(text))
 ```
 
 The output is:
 
     4: 0.25
-    0: cannot divide by zero
-    oops: not a number
+    0: Cannot divide by zero
+    OOPS: Not a number
 
 `parse()` and `reciprocal()` are both wrapped with `@safe`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,
@@ -399,12 +395,13 @@ You do not have to build `Result` yourself.
 The [returns](https://github.com/dry-python/returns) library provides a `Result` type with `Success` and `Failure`,
 the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.
-Building the type here, in a few lines, shows that there is no magic in it.
 
 This style does not replace exceptions everywhere.
 Exceptions are still right for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
+In some languages, these types of errors are categorized as "panic" errors, and separated from regular exceptions.
+
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
 Those are not exceptional.
@@ -416,8 +413,7 @@ Because failures are values, you can assert on them directly,
 without `pytest.raises()`.
 The tests below check that `bind()` chains a success and short-circuits a failure,
 that the hand-written and `bind()` versions agree,
-and that combining returns the right value.
-See the [Testing](09_Testing.md) chapter for pytest in general.
+and that combining returns the right value:
 
 ```python
 # test_result.py
