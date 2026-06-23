@@ -95,7 +95,9 @@ Make success and failure explicit by defining them as types.
 `Success` wraps an answer, `Failure` wraps an error,
 and `Result` is the union of the two.
 Both are frozen data classes,
-parameterized over the answer type and the error type:
+parameterized over the answer type and the error type.
+`A`, `B`, and `E` are type variables, which mean they expect type arguments.
+Here they have no constraints, which allows them to be used in any context:
 
 ```python
 # result.py
@@ -129,13 +131,10 @@ type Result[A, E] = Success[A] | Failure[E]
 Ignore `bind()` for the moment.
 The two data classes and the `Result` alias are enough to report errors.
 A function that might fail returns a `Result`.
-Now the signature tells the whole story:
+The signature tells the story:
 
 ```python
 # returning_result.py
-# A function reports failure by returning Failure, success by
-# returning Success. The return type now says exactly that:
-# Result[int, str].
 from result import Failure, Result, Success
 
 def func_a(i: int) -> Result[int, str]:
@@ -148,16 +147,20 @@ if __name__ == "__main__":
         print(i, func_a(i))
 ```
 
+A function reports failure by returning a `Failure` object, 
+success by returning a `Success` object.
+
 The output is:
 
     0 Success(answer=0)
     1 Failure(error='func_a(1)')
     2 Success(answer=2)
+    3 Success(answer=3)
+    4 Success(answer=4)
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot ignore that,
-because to get the answer it has to open the `Result`.
-This is the same idea as the [Static Typing](07_Static_Typing.md) chapter:
+The caller cannot ignore that, because to get the answer `Result` must be unpacked.
+This is the same idea as in [Static Typing](07_Static_Typing.md):
 put the meaning in the type.
 
 ## Composing by Hand
@@ -170,9 +173,7 @@ so the failure becomes data rather than control flow:
 
 ```python
 # composing.py
-# Composing functions that return Results, by hand. Each step checks
-# for a Failure and returns early. An exception can be turned into a
-# Failure value instead of being raised.
+# Composing functions that return Results, by hand.
 from result import Failure, Result, Success
 from returning_result import func_a
 
@@ -203,6 +204,7 @@ if __name__ == "__main__":
         print(i, composed(i))
 ```
 
+Each step returns early when it encounters a `Failure`.
 The output is:
 
     0 Success(answer=0)
@@ -211,23 +213,20 @@ The output is:
     3 Failure(error='func_c(3): division by zero')
     4 Success(answer=4)
 
-This works, and it keeps errors as values, but the shape is repetitive.
-Every step is the same dance: call, check for `Failure`, return early, unwrap,
+This works, and it keeps errors as values,
+but every step is the same dance: call, check for `Failure`, return early, unwrap,
 go on.
 
 ## Composing With bind
 
-`bind()` captures that dance once.
-Look again at the method on `Result`.
-On a `Success`, `bind()` feeds the answer to the next function.
-On a `Failure`, `bind()` ignores the function and returns the failure unchanged.
+`bind()` captures the dance.
+Look again at the `bind()` method on `Result`.
+On a `Success`, it feeds the answer to the next function.
+On a `Failure`, it ignores the function and returns the failure unchanged.
 So a `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
 # composing_with_bind.py
-# Bind removes the boilerplate. Chain the steps; a Failure anywhere
-# in the chain short-circuits the rest and is passed through to the
-# end.
 from composing import func_b, func_c
 from result import Result
 from returning_result import func_a
@@ -250,23 +249,22 @@ The output is identical to the hand-written version:
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
-The error checking has not gone away.
-It moved into `bind()`, where it is written once.
+Bind removes the boilerplate by chaining the steps.
+The error checking has not gone away;
+it moved into `bind()`, where it is written once.
+A `Failure` anywhere short-circuits the whole thing.
+
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
-You do not need the word to use it.
+You do not need to know that word to use it.
 
 ## Combining Multiple Results
 
 `bind()` threads one value through a chain.
 When you have several independent inputs,
-nest the binds so each answer stays in scope for the next step.
-The first `Failure` still short-circuits the whole thing:
+nest the binds so each answer stays in scope for the next step:
 
 ```python
 # combining.py
-# Combining several Results that come from different inputs. Nested
-# binds carry each answer inward; a Failure anywhere short-circuits
-# to the end.
 from composing import func_b, func_c
 from result import Result, Success
 from returning_result import func_a
@@ -292,12 +290,13 @@ The output is:
     (2, 1) Failure(error='func_c(3): division by zero')
     (7, 5) Success(answer='add(7 + 5 + 12): 24')
 
-Only the last input passes all three steps, so only it reaches `add()`.
+Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
+Only the last input passes all three steps, so it's the only one that reaches `add()`.
 
 ## Turning Exceptions into Results
 
 In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
-A decorator captures that pattern once.
+A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Failure` value:
 

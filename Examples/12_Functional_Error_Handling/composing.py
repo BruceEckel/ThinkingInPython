@@ -1,7 +1,5 @@
 # composing.py
-# Composing functions that return Results, by hand. Each step checks
-# for a Failure and returns early. An exception can be turned into a
-# Failure value instead of being raised.
+# Composing functions that return Results, by hand.
 from result import Failure, Result, Success
 from returning_result import func_a
 
