@@ -8,4 +8,3 @@ build/
 # `vale sync`; only our own House style is committed.
 /styles/*
 !/styles/House/
-/ExtractedExamples
