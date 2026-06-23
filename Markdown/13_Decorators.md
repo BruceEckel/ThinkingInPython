@@ -105,6 +105,29 @@ prints again, and returns the result.
 so the wrapped function still looks like itself when you inspect it.
 This is optional but improves debuggability.
 
+`wraps` keeps the runtime interface; the type parameters keep the static one.
+`trace[**P, R]` declares two of them.
+`R` is the wrapped function's return type.
+`**P` is a *parameter specification* (a `ParamSpec`, from the
+[Static Typing](07_Static_Typing.md) summary).
+It captures the whole parameter list of the wrapped function as a single unit,
+names and types included.
+So `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
+result is `R`," and returning `Callable[P, R]` promises that the wrapper has that
+same signature.
+
+Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
+that captured list: `P.args` is the positional part and `P.kwargs` the keyword
+part.
+They may only be used together, as the `*args` and `**kwargs` of a function typed
+with `P`.
+They bind the wrapper's arguments to exactly the parameters `P` captured,
+so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
+even though `wrapper()` is written to forward anything.
+Without `P` you would fall back to `*args: Any, **kwargs: Any`,
+and the wrapper would swallow any arguments at all,
+discarding the very signature the decorator is meant to preserve.
+
 ### Decorators That Take Arguments
 
 To pass arguments to a decorator, add another layer.
