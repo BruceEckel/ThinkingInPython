@@ -1,22 +1,70 @@
 # Decorators
 
-Python builds decoration into the language.
-You write `@something` above a function or a class, and Python wraps it.
+A decorator is a function that is applied to another function or a class.
+The decorator itself is a callable that takes a function and returns a function.
+It takes the function to be decorated as an argument, does something to that function, then returns the resulting function *and* assigns it to the original function name.
+
+To apply the decorator, you put a `@` before the decorator name:
+
+```python
+# simple_decoration.py
+from collections.abc import Callable
+
+def hijack(func: Callable) -> Callable:
+    def doesnt_matter() -> None:
+        print("Replacement behavior")
+
+    return doesnt_matter
+
+@hijack
+def cheese() -> None:
+    print("Wensleydale")
+
+cheese()
+```
+
+Ordinarily you'd expect to just see "Wensleydale" but `hijack()` replaces the original `cheese()` function
+with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
+
+Note the local function name `doesnt_matter`.
+This name is assigned to `cheese()` during decoration, so the name can be anything.
+The common convention is to name this function `wrapper()`.
+
+A typical decorator function does some work, calls the original function, and does some more work:
+
+```python
+# add_behavior.py
+from collections.abc import Callable
+
+def hijack(func: Callable) -> Callable:
+    def doesnt_matter() -> None:
+        print("Hijacked!")
+        func()
+        print("Hijacking over...")
+
+    return doesnt_matter
+
+@hijack
+def cheese() -> None:
+    print("Wensleydale")
+
+cheese()
+```
+
+The output is:
+
+    Hijacked!
+    Wensleydale
+    Hijacking over...
+
+Decoration is a simple kind of metaprogramming.
 The same idea appears in *Design Patterns* as the *decorator* pattern:
 wrap an object to add responsibilities to it,
 while keeping the wrapped object's interface so the wrapping stays invisible to the code that uses it.
 
-This chapter starts with the language feature,
-because that is where you meet decoration first.
-Then it shows the object-level pattern,
-for when you need to decorate individual objects at runtime.
+## Maintaining the Wrapped Interface
 
-## The `@` Syntax
-
-A *decorator* is a callable that takes a function and returns a function.
-The returned function usually does some work, calls the original,
-and does some more work.
-Here is a decorator that traces calls:
+This decorator traces calls:
 
 ```python
 # trace.py
@@ -49,12 +97,13 @@ The `@trace` above `add()` means:
 
     add = trace(add)
 
-`trace` returns `wrapper`, so the name `add` now refers to `wrapper`.
+`trace` returns `wrapper`, which is assigned to the name `add`, so `add` now refers to `wrapper`.
 Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add()`,
 prints again, and returns the result.
 
 `functools.wraps` copies the original function's name and docstring onto the wrapper,
 so the wrapped function still looks like itself when you inspect it.
+This is optional but improves debuggability.
 
 ### Decorators That Take Arguments
 
