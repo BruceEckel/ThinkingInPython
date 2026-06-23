@@ -2,6 +2,8 @@ Before bed: In a loop one chapter at a time, review chapters 02 through 08.
 If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
 
+11 Pattern matching: ensure there is a comparison to polymorphism at the end
+
 Check "from collections.abc import Callable"
 
 Run 'make prose' on each chapter

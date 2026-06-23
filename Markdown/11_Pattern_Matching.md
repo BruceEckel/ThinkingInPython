@@ -115,16 +115,22 @@ The pattern `[first, second]` matches only a two-element sequence and pulls both
 A class pattern matches by type and extracts attributes.
 With a data class you can match positionally,
 because `@dataclass` fills in the `__match_args__` the pattern uses,
-or by keyword:
+or by keyword.
+Several examples in this chapter match on a `Point`:
 
 ```python
-# class_patterns.py
+# point.py
 from dataclasses import dataclass
 
 @dataclass
 class Point:
     x: int
     y: int
+```
+
+```python
+# class_patterns.py
+from point import Point
 
 def locate(p: Point) -> str:
     match p:
@@ -156,29 +162,23 @@ The literal and the capture combine in one pattern.
 
 ## Guards
 
-A guard is an `if` attached to a `case`.
+A guard is an `if` attached to a `case`; it adds a condition to a case.
 The case matches only when the pattern fits *and* the guard is true:
 
 ```python
 # guards.py
-# A guard adds a condition to a case.
-from dataclasses import dataclass
-
-@dataclass
-class Point:
-    x: int
-    y: int
+from point import Point
 
 def quadrant(p: Point) -> str:
     match p:
         case Point(0, 0):
-            return "origin"
+            return "Origin"
         case Point(x, y) if x > 0 and y > 0:
-            return "first quadrant"
+            return "First quadrant"
         case Point(x, y) if x < 0 and y > 0:
-            return "second quadrant"
+            return "Second quadrant"
         case _:
-            return "somewhere else"
+            return "Somewhere else"
 
 print(quadrant(Point(0, 0)))
 print(quadrant(Point(3, 4)))
@@ -188,10 +188,10 @@ print(quadrant(Point(-1, -1)))
 
 The output is:
 
-    origin
-    first quadrant
-    second quadrant
-    somewhere else
+    Origin
+    First quadrant
+    Second quadrant
+    Somewhere else
 
 ## Mapping Patterns
 
@@ -201,18 +201,17 @@ which makes it a clean way to dispatch on JSON-shaped data:
 
 ```python
 # mapping_patterns.py
-# A mapping pattern matches the keys it names and binds their values.
 
 def handle(event: dict[str, object]) -> str:
     match event:
         case {"type": "click", "x": x, "y": y}:
-            return f"click at ({x}, {y})"
+            return f"Click at ({x}, {y})"
         case {"type": "key", "key": key}:
-            return f"key {key}"
+            return f"Key {key}"
         case {"type": kind}:
-            return f"other event: {kind}"
-        case _:
-            return "not an event"
+            return f"Other event: {kind}"
+        case nonevent:
+            return f"Not an event: {nonevent}"
 
 print(handle({"type": "click", "x": 10, "y": 20}))
 print(handle({"type": "key", "key": "Enter"}))
@@ -222,10 +221,10 @@ print(handle({"button": 1}))
 
 The output is:
 
-    click at (10, 20)
-    key Enter
-    other event: scroll
-    not an event
+    Click at (10, 20)
+    Key Enter
+    Other event: scroll
+    Not an event: {'button': 1}
 
 ## Exhaustive Matching
 
@@ -316,9 +315,10 @@ The cases worth pinning down are the structural ones and the fall-through:
 
 ```python
 # test_pattern_matching.py
-from class_patterns import Point, locate
+from class_patterns import locate
 from exhaustive import Circle, Square, area
 from mapping_patterns import handle
+from point import Point
 from sequence_patterns import summarize
 
 def test_sequence_patterns() -> None:
@@ -332,8 +332,8 @@ def test_class_patterns() -> None:
     assert locate(Point(3, 4)) == "At (3, 4)"
 
 def test_mapping_patterns() -> None:
-    assert handle({"type": "key", "key": "Esc"}) == "key Esc"
-    assert handle({"nope": 1}) == "not an event"
+    assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
+    assert handle({"nope": 1}) == "Not an event: {'nope': 1}"
 
 def test_exhaustive_area() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416

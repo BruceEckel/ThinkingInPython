@@ -1,7 +1,8 @@
 # test_pattern_matching.py
-from class_patterns import Point, locate
+from class_patterns import locate
 from exhaustive import Circle, Square, area
 from mapping_patterns import handle
+from point import Point
 from sequence_patterns import summarize
 
 def test_sequence_patterns() -> None:
@@ -15,8 +16,8 @@ def test_class_patterns() -> None:
     assert locate(Point(3, 4)) == "At (3, 4)"
 
 def test_mapping_patterns() -> None:
-    assert handle({"type": "key", "key": "Esc"}) == "key Esc"
-    assert handle({"nope": 1}) == "not an event"
+    assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
+    assert handle({"nope": 1}) == "Not an event: {'nope': 1}"
 
 def test_exhaustive_area() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416
