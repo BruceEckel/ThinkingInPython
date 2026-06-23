@@ -1,5 +1,4 @@
 .DS_Store
-ExtractedExamples
 build/
 .venv/
 *.pyc

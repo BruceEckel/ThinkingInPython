@@ -17,20 +17,20 @@ This material comes from my PyCon 2024 talk,
 ## Exceptions Throw Everything Away
 
 Here a function raises an exception partway through a comprehension.
-The successful results computed before the failure are lost with the rest:
+An exception discards the whole computation, 
+so the successful results computed before the failure are lost:
 
 ```python
 # exceptions_lose_data.py
-# An exception unwinds the whole computation. Partial results are
-# thrown away: func_a(0) succeeded, but its result is gone.
 
 def func_a(i: int) -> int:
-    if i == 1:
+    print(f"Calculating func_a({i})")
+    if i == 3:
         raise ValueError(f"func_a({i})")
     return i
 
 try:
-    results = [func_a(i) for i in range(3)]
+    results = [func_a(i) for i in range(5)]
     print(results)
 except ValueError as e:
     print(f"Lost everything: {e}")
@@ -38,9 +38,13 @@ except ValueError as e:
 
 The output is:
 
-    Lost everything: func_a(1)
+    Calculating func_a(0)
+    Calculating func_a(1)
+    Calculating func_a(2)
+    Calculating func_a(3)
+    Lost everything: func_a(3)
 
-`func_a(0)` produced a value, but the exception threw away the whole list.
+Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
 which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter warned against.
 
@@ -53,17 +57,13 @@ Nothing is thrown away, because the error is just another return value:
 
 ```python
 # sum_type.py
-# Return the error as a value instead of raising. The return type
-# becomes a union, a "sum type". Nothing is lost, but success and
-# failure are not clearly distinguished: both are just values you
-# have to tell apart by type.
 
 def func_a(i: int) -> int | str:
-    if i == 1:
+    if i == 3:
         return f"func_a({i})"  # The error, returned as a value
     return i
 
-outputs = [func_a(i) for i in range(3)]
+outputs = [func_a(i) for i in range(5)]
 print(outputs)
 
 for r in outputs:
@@ -76,33 +76,31 @@ for r in outputs:
 
 The output is:
 
-    [0, 'func_a(1)', 2]
+    [0, 1, 2, 'func_a(3)', 4]
     answer = 0
-    error = 'func_a(1)'
+    answer = 1
     answer = 2
+    error = 'func_a(3)'
+    answer = 4
 
 This keeps every result,
-and `match` (covered in the [Pattern Matching](11_Pattern_Matching.md) chapter) tells the two cases apart.
+and `match` (covered in [Pattern Matching](11_Pattern_Matching.md)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases would collide.
 We need something that says "success" or "failure" no matter what types they carry.
 
 ## A Result Type
 
-Make the success and failure explicit.
+Make success and failure explicit by defining them as types.
 `Success` wraps an answer, `Failure` wraps an error,
 and `Result` is the union of the two.
 Both are frozen data classes,
-parameterized over the answer type and the error type:
+parameterized over the answer type and the error type.
+`A`, `B`, and `E` are type variables, which mean they expect type arguments.
+Here they have no constraints, which allows them to be used in any context:
 
 ```python
 # result.py
-# A Result is either a Success holding an answer, or a Failure
-# holding an error. Both are frozen, like the types in the Data
-# Classes as Types chapter. bind chains steps: it feeds a Success
-# into the next function, and passes a Failure straight through
-# unchanged.
-
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -133,13 +131,10 @@ type Result[A, E] = Success[A] | Failure[E]
 Ignore `bind()` for the moment.
 The two data classes and the `Result` alias are enough to report errors.
 A function that might fail returns a `Result`.
-Now the signature tells the whole story:
+The signature tells the story:
 
 ```python
 # returning_result.py
-# A function reports failure by returning Failure, success by
-# returning Success. The return type now says exactly that:
-# Result[int, str].
 from result import Failure, Result, Success
 
 def func_a(i: int) -> Result[int, str]:
@@ -148,20 +143,24 @@ def func_a(i: int) -> Result[int, str]:
     return Success(i)
 
 if __name__ == "__main__":
-    for i in range(3):
+    for i in range(5):
         print(i, func_a(i))
 ```
+
+A function reports failure by returning a `Failure` object, 
+success by returning a `Success` object.
 
 The output is:
 
     0 Success(answer=0)
     1 Failure(error='func_a(1)')
     2 Success(answer=2)
+    3 Success(answer=3)
+    4 Success(answer=4)
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot ignore that,
-because to get the answer it has to open the `Result`.
-This is the same idea as the [Static Typing](07_Static_Typing.md) chapter:
+The caller cannot ignore that, because to get the answer `Result` must be unpacked.
+This is the same idea as in [Static Typing](07_Static_Typing.md):
 put the meaning in the type.
 
 ## Composing by Hand
@@ -174,9 +173,7 @@ so the failure becomes data rather than control flow:
 
 ```python
 # composing.py
-# Composing functions that return Results, by hand. Each step checks
-# for a Failure and returns early. An exception can be turned into a
-# Failure value instead of being raised.
+# Composing functions that return Results, by hand.
 from result import Failure, Result, Success
 from returning_result import func_a
 
@@ -207,6 +204,7 @@ if __name__ == "__main__":
         print(i, composed(i))
 ```
 
+Each step returns early when it encounters a `Failure`.
 The output is:
 
     0 Success(answer=0)
@@ -215,23 +213,20 @@ The output is:
     3 Failure(error='func_c(3): division by zero')
     4 Success(answer=4)
 
-This works, and it keeps errors as values, but the shape is repetitive.
-Every step is the same dance: call, check for `Failure`, return early, unwrap,
+This works, and it keeps errors as values,
+but every step is the same dance: call, check for `Failure`, return early, unwrap,
 go on.
 
 ## Composing With bind
 
-`bind()` captures that dance once.
-Look again at the method on `Result`.
-On a `Success`, `bind()` feeds the answer to the next function.
-On a `Failure`, `bind()` ignores the function and returns the failure unchanged.
+`bind()` captures the dance.
+Look again at the `bind()` method on `Result`.
+On a `Success`, it feeds the answer to the next function.
+On a `Failure`, it ignores the function and returns the failure unchanged.
 So a `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
 # composing_with_bind.py
-# Bind removes the boilerplate. Chain the steps; a Failure anywhere
-# in the chain short-circuits the rest and is passed through to the
-# end.
 from composing import func_b, func_c
 from result import Result
 from returning_result import func_a
@@ -254,23 +249,22 @@ The output is identical to the hand-written version:
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
-The error checking has not gone away.
-It moved into `bind()`, where it is written once.
+Bind removes the boilerplate by chaining the steps.
+The error checking has not gone away;
+it moved into `bind()`, where it is written once.
+A `Failure` anywhere short-circuits the whole thing.
+
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
-You do not need the word to use it.
+You do not need to know that word to use it.
 
 ## Combining Multiple Results
 
 `bind()` threads one value through a chain.
 When you have several independent inputs,
-nest the binds so each answer stays in scope for the next step.
-The first `Failure` still short-circuits the whole thing:
+nest the binds so each answer stays in scope for the next step:
 
 ```python
 # combining.py
-# Combining several Results that come from different inputs. Nested
-# binds carry each answer inward; a Failure anywhere short-circuits
-# to the end.
 from composing import func_b, func_c
 from result import Result, Success
 from returning_result import func_a
@@ -296,20 +290,18 @@ The output is:
     (2, 1) Failure(error='func_c(3): division by zero')
     (7, 5) Success(answer='add(7 + 5 + 12): 24')
 
-Only the last input passes all three steps, so only it reaches `add()`.
+Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
+Only the last input passes all three steps, so it's the only one that reaches `add()`.
 
 ## Turning Exceptions into Results
 
 In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
-A decorator captures that pattern once.
+A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Failure` value:
 
 ```python
 # safe.py
-# @safe turns a function that raises into one that returns a Result.
-# The exception becomes the Failure value, so a caller handles it like
-# any other Result.
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success
@@ -340,7 +332,8 @@ if __name__ == "__main__":
                 print(f"{text}: {type(error).__name__}")
 ```
 
-The output is:
+After decorating `parse()` with `@safe`,
+the output is:
 
     42: parsed 42
     oops: ValueError
@@ -348,7 +341,7 @@ The output is:
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
-because it has to open the `Result` to reach the number.
+because it has to unpack the `Result` to reach the number.
 
 ## Matching on the Error
 
@@ -358,8 +351,6 @@ Each kind of failure gets its own branch:
 
 ```python
 # matching_errors.py
-# Because the error is a value, often an exception, you can match the
-# Result and the exception type together, and handle each kind.
 from result import Failure, Result, Success
 from safe import safe
 
@@ -377,22 +368,22 @@ def describe(text: str) -> str:
         case Success(answer):
             return f"{text}: {answer}"
         case Failure(ValueError()):
-            return f"{text}: not a number"
+            return f"{text}: Not a number"
         case Failure(ZeroDivisionError()):
-            return f"{text}: cannot divide by zero"
+            return f"{text}: Cannot divide by zero"
         case Failure(error):
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":
-    for text in ("4", "0", "oops"):
+    for text in ("4", "0", "OOPS"):
         print(describe(text))
 ```
 
 The output is:
 
     4: 0.25
-    0: cannot divide by zero
-    oops: not a number
+    0: Cannot divide by zero
+    OOPS: Not a number
 
 `parse()` and `reciprocal()` are both wrapped with `@safe`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,
@@ -404,12 +395,13 @@ You do not have to build `Result` yourself.
 The [returns](https://github.com/dry-python/returns) library provides a `Result` type with `Success` and `Failure`,
 the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.
-Building the type here, in a few lines, shows that there is no magic in it.
 
 This style does not replace exceptions everywhere.
 Exceptions are still right for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
+In some languages, these types of errors are categorized as "panic" errors, and separated from regular exceptions.
+
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
 Those are not exceptional.
@@ -421,8 +413,7 @@ Because failures are values, you can assert on them directly,
 without `pytest.raises()`.
 The tests below check that `bind()` chains a success and short-circuits a failure,
 that the hand-written and `bind()` versions agree,
-and that combining returns the right value.
-See the [Testing](09_Testing.md) chapter for pytest in general.
+and that combining returns the right value:
 
 ```python
 # test_result.py

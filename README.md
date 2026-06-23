@@ -38,7 +38,7 @@ In the meantime I hope it's useful.
 - [x] 09_Testing.md
 - [x] 10_Data_Classes_as_Types.md
 - [x] 11_Pattern_Matching.md
-- [ ] 12_Functional_Error_Handling.md
+- [x] 12_Functional_Error_Handling.md (edited, not 'reviewed')
 - [ ] 13_Decorators.md
 - [ ] 14_Comprehensions.md
 - [ ] 15_Metaprogramming.md

@@ -5,7 +5,7 @@
 # Common commands:
 #   uv sync                                  # create .venv with the dev tools
 #   uv run python tools/run_examples.py      # run any harness script
-#   uv run ty check ExtractedExamples        # type-check
+#   uv run ty check build/examples           # type-check
 #   make ci                                  # the full local gate (uses uv)
 #
 # pandoc is a system package (see tools/README.md), not a Python dependency.
@@ -36,7 +36,7 @@ package = false
 # live in tools/codespell-ignore.txt. Run with `make spell`.
 [tool.codespell]
 ignore-words = "tools/codespell-ignore.txt"
-skip = "./.git,./.venv,./build,./ExtractedExamples,./resources,./uv.lock,*.gif,*.png"
+skip = "./.git,./.venv,./build,./resources,./uv.lock,*.gif,*.png"
 
 # PEP 8 linting for the examples. line-length is 70 to match the book's HTML
 # listing box, not ruff's default 88. ruff runs as an advisory CI step.

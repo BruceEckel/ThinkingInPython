@@ -22,7 +22,7 @@ trouble (useful in CI). Pass ``--write`` to materialize the tree.
 
 Usage:
     python tools/extract_examples.py                # check vs Examples/
-    python tools/extract_examples.py --write        # write ExtractedExamples/
+    python tools/extract_examples.py --write        # write build/examples/
     python tools/extract_examples.py --write -o DIR  # write somewhere else
 """
 
@@ -35,7 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MARKDOWN_DIR = ROOT / "Markdown"
 COMMITTED_DIR = ROOT / "Examples"
-DEFAULT_OUT = ROOT / "ExtractedExamples"
+DEFAULT_OUT = ROOT / "build" / "examples"
 
 FENCE = re.compile(r"^```(\w+)?\s*$")
 # First content line names a relative path with an extension.
@@ -159,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     if not (missing or changed or result.conflicts):
         print("\nIn sync: every book example matches the committed tree.")
         return 0
-    print("\n(Run with --write to materialize ExtractedExamples/ for running.)")
+    print("\n(Run with --write to materialize build/examples/ for running.)")
     return 1
 
 
