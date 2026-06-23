@@ -1,6 +1,4 @@
 # exhaustive.py
-# A closed union plus assert_never makes match exhaustive: forgetting
-# a case becomes a type error, not a silent fall-through.
 from dataclasses import dataclass
 from math import pi
 from typing import assert_never

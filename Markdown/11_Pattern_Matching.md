@@ -229,17 +229,16 @@ The output is:
 ## Exhaustive Matching
 
 When a value is one of a fixed set of types,
-declare that set as a union with the `type` statement and match on it.
-End with `case _: assert_never(value)`.
-The type checker then proves the match is *exhaustive*:
-if you add a type to the union and forget its case,
-it reports the gap before the program runs.
-This is the static-typing payoff from the [Static Typing](07_Static_Typing.md) chapter applied to control flow:
+define that set as a union using the `type` statement.
+Now you can perform an match on that union.
+When you end with `case _: assert_never(value)`, the type checker will ensure the match is *exhaustive*.
+If you add a type to the union and forget its case,
+the mistake is caught before the program runs.
+Forgetting a case becomes a type error, not a silent fall-through.
+This is the static-typing payoff applied to control flow:
 
 ```python
 # exhaustive.py
-# A closed union plus assert_never makes match exhaustive: forgetting
-# a case becomes a type error, not a silent fall-through.
 from dataclasses import dataclass
 from math import pi
 from typing import assert_never
@@ -272,8 +271,8 @@ The output is:
     3.1416
     4.0
 
-Add a `Triangle` to `Shape` and the checker flags `assert_never(shape)`,
-because `shape` could now be a `Triangle` that no `case` handles.
+Add a `Triangle` to `Shape` without adding the appropriate `case` and the checker flags `assert_never(shape)`.
+A `shape` could now be a `Triangle` that no `case` handles.
 A `switch` cannot do this; neither can a chain of `if`/`isinstance`.
 The [Rethinking Objects](16_Rethinking_Objects.md) chapter uses exactly this technique to add operations to a closed set of types without inheritance.
 
@@ -284,13 +283,12 @@ The [Rethinking Objects](16_Rethinking_Objects.md) chapter uses exactly this tec
 For a plain value-to-value lookup, a dictionary is shorter and faster:
 
 ```python
-# not_match.py
-# A dict is the right tool for a value-to-value lookup; reserve match
-# for patterns that destructure.
+# value_to_value_lookup.py
+
 STATUS = {200: "OK", 404: "Not Found", 500: "Server Error"}
 
 def describe(status: int) -> str:
-    return STATUS.get(status, f"status {status}")
+    return STATUS.get(status, f"Status {status}")
 
 print(describe(200))
 print(describe(301))
@@ -299,9 +297,9 @@ print(describe(301))
 The output is:
 
     OK
-    status 301
+    Status 301
 
-And when the set of types is *open* (anyone can add a new one),
+When the set of types is *open* (anyone can add a new one),
 polymorphism is better than a `match`: each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
@@ -310,7 +308,6 @@ especially when the cases need to look inside the value.
 
 ## Testing the Matchers
 
-Each matcher is an ordinary function, so a test calls it and checks the result.
 The cases worth pinning down are the structural ones and the fall-through:
 
 ```python
