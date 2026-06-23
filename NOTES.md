@@ -4,8 +4,6 @@ Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I ca
 
 11 Pattern matching: ensure there is a comparison to polymorphism at the end
 
-Check "from collections.abc import Callable"
-
 Run 'make prose' on each chapter
 
 Creating your own context managers -- didn't I write about this?

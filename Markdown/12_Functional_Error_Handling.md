@@ -24,12 +24,13 @@ so the successful results computed before the failure are lost:
 # exceptions_lose_data.py
 
 def func_a(i: int) -> int:
-    if i == 1:
+    print(f"Calculating func_a({i})")
+    if i == 3:
         raise ValueError(f"func_a({i})")
     return i
 
 try:
-    results = [func_a(i) for i in range(3)]
+    results = [func_a(i) for i in range(5)]
     print(results)
 except ValueError as e:
     print(f"Lost everything: {e}")
@@ -37,9 +38,13 @@ except ValueError as e:
 
 The output is:
 
-    Lost everything: func_a(1)
+    Calculating func_a(0)
+    Calculating func_a(1)
+    Calculating func_a(2)
+    Calculating func_a(3)
+    Lost everything: func_a(3)
 
-`func_a(0)` produced a value, but the exception threw away the whole list.
+Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
 which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter warned against.
 
@@ -52,17 +57,13 @@ Nothing is thrown away, because the error is just another return value:
 
 ```python
 # sum_type.py
-# Return the error as a value instead of raising. The return type
-# becomes a union, a "sum type". Nothing is lost, but success and
-# failure are not clearly distinguished: both are just values you
-# have to tell apart by type.
 
 def func_a(i: int) -> int | str:
-    if i == 1:
+    if i == 3:
         return f"func_a({i})"  # The error, returned as a value
     return i
 
-outputs = [func_a(i) for i in range(3)]
+outputs = [func_a(i) for i in range(5)]
 print(outputs)
 
 for r in outputs:
@@ -75,20 +76,22 @@ for r in outputs:
 
 The output is:
 
-    [0, 'func_a(1)', 2]
+    [0, 1, 2, 'func_a(3)', 4]
     answer = 0
-    error = 'func_a(1)'
+    answer = 1
     answer = 2
+    error = 'func_a(3)'
+    answer = 4
 
 This keeps every result,
-and `match` (covered in the [Pattern Matching](11_Pattern_Matching.md) chapter) tells the two cases apart.
+and `match` (covered in [Pattern Matching](11_Pattern_Matching.md)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases would collide.
 We need something that says "success" or "failure" no matter what types they carry.
 
 ## A Result Type
 
-Make the success and failure explicit.
+Make success and failure explicit by defining them as types.
 `Success` wraps an answer, `Failure` wraps an error,
 and `Result` is the union of the two.
 Both are frozen data classes,
@@ -96,12 +99,6 @@ parameterized over the answer type and the error type:
 
 ```python
 # result.py
-# A Result is either a Success holding an answer, or a Failure
-# holding an error. Both are frozen, like the types in the Data
-# Classes as Types chapter. bind chains steps: it feeds a Success
-# into the next function, and passes a Failure straight through
-# unchanged.
-
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -147,7 +144,7 @@ def func_a(i: int) -> Result[int, str]:
     return Success(i)
 
 if __name__ == "__main__":
-    for i in range(3):
+    for i in range(5):
         print(i, func_a(i))
 ```
 

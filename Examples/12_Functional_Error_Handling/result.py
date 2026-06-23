@@ -1,10 +1,4 @@
 # result.py
-# A Result is either a Success holding an answer, or a Failure
-# holding an error. Both are frozen, like the types in the Data
-# Classes as Types chapter. bind chains steps: it feeds a Success
-# into the next function, and passes a Failure straight through
-# unchanged.
-
 from collections.abc import Callable
 from dataclasses import dataclass
 
