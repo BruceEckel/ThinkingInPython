@@ -17,7 +17,7 @@ This material comes from my PyCon 2024 talk,
 ## Exceptions Throw Everything Away
 
 Here a function raises an exception partway through a comprehension.
-An exception discards the whole computation, 
+An exception discards the whole computation,
 so the successful results computed before the failure are lost:
 
 ```python
@@ -96,7 +96,8 @@ Make success and failure explicit by defining them as types.
 and `Result` is the union of the two.
 Both are frozen data classes,
 parameterized over the answer type and the error type.
-`A`, `B`, and `E` are type variables, which mean they expect type arguments.
+`A`, `B`, and `E` are type parameters:
+placeholders that are filled in with concrete types when the class is used.
 Here they have no constraints, which allows them to be used in any context:
 
 ```python
@@ -147,7 +148,7 @@ if __name__ == "__main__":
         print(i, func_a(i))
 ```
 
-A function reports failure by returning a `Failure` object, 
+A function reports failure by returning a `Failure` object,
 success by returning a `Success` object.
 
 The output is:
@@ -159,7 +160,7 @@ The output is:
     4 Success(answer=4)
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot ignore that, because to get the answer `Result` must be unpacked.
+The caller cannot pretend the function returns an ordinary value; to get the answer `Result` must be unpacked.
 This is the same idea as in [Static Typing](07_Static_Typing.md):
 put the meaning in the type.
 
