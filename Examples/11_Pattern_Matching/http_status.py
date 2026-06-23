@@ -10,7 +10,7 @@ def describe(status: int) -> str:
         case 500:
             return "Server Error"
         case _:  # Default
-            return f"status {status}"
+            return f"Status {status}"
 
 print(describe(200))
 print(describe(404))

@@ -37,7 +37,7 @@ In the meantime I hope it's useful.
 - [x] 08_Class_Attributes_and_Cleanup.md
 - [x] 09_Testing.md
 - [x] 10_Data_Classes_as_Types.md
-- [ ] 11_Pattern_Matching.md
+- [x] 11_Pattern_Matching.md
 - [ ] 12_Functional_Error_Handling.md
 - [ ] 13_Decorators.md
 - [ ] 14_Comprehensions.md

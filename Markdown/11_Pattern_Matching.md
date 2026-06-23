@@ -26,7 +26,7 @@ def describe(status: int) -> str:
         case 500:
             return "Server Error"
         case _:  # Default
-            return f"status {status}"
+            return f"Status {status}"
 
 print(describe(200))
 print(describe(404))
@@ -37,7 +37,7 @@ The output is:
 
     OK
     Not Found
-    status 301
+    Status 301
 
 For a plain value-to-value lookup like this,
 a dictionary is often shorter (see the end of the chapter).
@@ -107,7 +107,7 @@ The output is:
     Two items: 3, 4
     1, then 3 more
 
-This shows the structural part of "structural pattern matching".
+This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
 ## Class Patterns
@@ -230,11 +230,10 @@ The output is:
 
 When a value is one of a fixed set of types,
 define that set as a union using the `type` statement.
-Now you can perform an match on that union.
+Now you can perform a match on that union.
 When you end with `case _: assert_never(value)`, the type checker will ensure the match is *exhaustive*.
 If you add a type to the union and forget its case,
-the mistake is caught before the program runs.
-Forgetting a case becomes a type error, not a silent fall-through.
+that becomes a type error caught before the program runs, not a silent fall-through.
 This is the static-typing payoff applied to control flow:
 
 ```python
@@ -271,9 +270,9 @@ The output is:
     3.1416
     4.0
 
-Add a `Triangle` to `Shape` without adding the appropriate `case` and the checker flags `assert_never(shape)`.
-A `shape` could now be a `Triangle` that no `case` handles.
-A `switch` cannot do this; neither can a chain of `if`/`isinstance`.
+Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
+`shape` could now be a `Triangle` that no `case` handles.
+A `switch` cannot do this; neither can a chain of `if`/`isinstance()`.
 The [Rethinking Objects](16_Rethinking_Objects.md) chapter uses exactly this technique to add operations to a closed set of types without inheritance.
 
 ## When Not to Match
@@ -344,6 +343,6 @@ def test_exhaustive_area() -> None:
     and `"other"` for anything else.
 2.  Add a `Rectangle` type to `exhaustive.py`'s `Shape` union *without* adding its `case`.
     Run `ty` and read the error it reports at `assert_never`.
-3.  Rewrite `mapping_patterns.handle` to also accept a nested shape,
+3.  Rewrite `mapping_patterns.handle()` to also accept a nested shape,
     such as `{"type": "click", "at": {"x": x, "y": y}}`,
     binding `x` and `y` from the inner dictionary.
