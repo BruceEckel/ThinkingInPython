@@ -101,17 +101,17 @@ jobs:
 
       # Hard gate: the book's pytest examples (test_*.py) must pass.
       - name: Run the book's pytest examples
-        run: uv run pytest ExtractedExamples
+        run: uv run pytest build/examples
 
       # Hard gate: the examples must stay ty-clean (zero diagnostics).
       - name: Type-check examples with ty
-        run: uv run ty check ExtractedExamples
+        run: uv run ty check build/examples
 
       # Hard gate: PEP 8 lint (naming, imports, modernization) must pass.
       # See pyproject [tool.ruff]; deliberate exceptions live in
       # per-file-ignores.
       - name: Lint examples with ruff
-        run: uv run ruff check ExtractedExamples
+        run: uv run ruff check build/examples
 
   # Prose checks, opt-in only (same trigger as the gates job). codespell fails
   # on spelling errors; Vale fails on em-dashes (an error-level rule) and prints

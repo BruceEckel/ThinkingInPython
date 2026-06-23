@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run extracted Python examples and report which ones fail.
 
-Walks a tree of extracted examples (default ``ExtractedExamples/``, written by
+Walks a tree of extracted examples (default ``build/examples/``, written by
 ``extract_examples.py --write``) and executes every ``.py`` file under it with
 the current interpreter. Each file runs with its own directory as the working
 directory, so the relative data paths in the examples (``../mouse/Moves.txt``)
@@ -48,7 +48,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TREE = ROOT / "ExtractedExamples"
+DEFAULT_TREE = ROOT / "build" / "examples"
 NORUN_FILE = ROOT / "tools" / "norun.txt"
 BASELINE_FILE = ROOT / "tools" / "examples_baseline.txt"
 INLINE_MARKER = "# extract: no-run"

@@ -17,12 +17,11 @@ This material comes from my PyCon 2024 talk,
 ## Exceptions Throw Everything Away
 
 Here a function raises an exception partway through a comprehension.
-The successful results computed before the failure are lost with the rest:
+An exception discards the whole computation, 
+so the successful results computed before the failure are lost:
 
 ```python
 # exceptions_lose_data.py
-# An exception unwinds the whole computation. Partial results are
-# thrown away: func_a(0) succeeded, but its result is gone.
 
 def func_a(i: int) -> int:
     if i == 1:

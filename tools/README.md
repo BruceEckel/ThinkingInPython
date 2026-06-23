@@ -27,7 +27,7 @@ example folder to match. Blocks without such a first line are illustrative
 fragments and are ignored. Data files (`.txt`, `.dat`) tagged the same way are
 extracted too, so examples that read them can run.
 
-`Examples/` is the curated copy committed to git. `ExtractedExamples/` is a
+`Examples/` is the curated copy committed to git. `build/examples/` is a
 throwaway tree (git-ignored) regenerated from the Markdown for running.
 
 ## Commands
@@ -81,16 +81,16 @@ Default mode is **check**: nothing is written. It reports
 * conflicting duplicates (the same path tagged twice with different content).
 
 It exits non-zero on any of these, so CI catches prose/code drift. Pass
-`--write` to materialize `ExtractedExamples/` (use `-o DIR` for another target).
+`--write` to materialize `build/examples/` (use `-o DIR` for another target).
 
 ## run_examples.py
 
-Runs every `.py` under `ExtractedExamples/`, each in its own directory so the
+Runs every `.py` under `build/examples/`, each in its own directory so the
 examples' relative data paths resolve. Reports passed / skipped / timed-out /
 failed and exits non-zero if anything fails or times out.
 
 `test_*.py` and `conftest.py` are skipped here: they are pytest files, run by
-`make test` (`uv run pytest ExtractedExamples`), not as standalone scripts. See
+`make test` (`uv run pytest build/examples`), not as standalone scripts. See
 the Testing chapter.
 
 * Narrow the run: `python tools/run_examples.py 16_State_Machines`
@@ -357,8 +357,8 @@ builds and publishes the site**. The workflow has these jobs:
 * **`gates` (opt-in only):** the full suite, the same one `make ci` runs
   locally: the drift check (`extract_examples.py`), the example run
   (`run_examples.py`, all must pass), the pytest examples
-  (`pytest ExtractedExamples`), the type check (`ty check ExtractedExamples`,
-  zero diagnostics), and the lint (`ruff check ExtractedExamples`, zero
+  (`pytest build/examples`), the type check (`ty check build/examples`,
+  zero diagnostics), and the lint (`ruff check build/examples`, zero
   findings). Deliberate lint exceptions live in
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
 * **`prose` (opt-in only):** the same checks as `make spell` and `make prose`.

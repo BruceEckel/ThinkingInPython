@@ -10,7 +10,7 @@ The mechanical health of the book is solid. As of this review:
 
 - **Examples run.** 180 extracted examples pass, 0 fail, 33 skipped (GUI/`tkinter` and build-tool files that cannot run unattended).
 - **Tests pass.** 113 pytest examples pass.
-- **Types and lint are clean.** `ty check ExtractedExamples` and `ruff check ExtractedExamples` both report zero findings. The earlier ~184 advisory `ty` diagnostics are gone; the gate is strict.
+- **Types and lint are clean.** `ty check build/examples` and `ruff check build/examples` both report zero findings. The earlier ~184 advisory `ty` diagnostics are gone; the gate is strict.
 - **No drift.** All 216 tagged file-blocks match the committed `Examples/` tree.
 - **Site builds.** All 31 chapters plus the index render, with no broken image references.
 - **Part dividers are generated, not written.** `build_site.py` injects Part I (Foundations, before chapter `02`), Part II (Techniques, before `09`), and Part III (Patterns, before `17`) into the table of contents through its `PARTS` map, with the Introduction standing alone above Part I. They are intentionally absent as headings in `Markdown/`, so the Introduction's "Part I: Foundations" promise *is* delivered in the built book. Do not add Part headings to the chapters; change `PARTS` instead.

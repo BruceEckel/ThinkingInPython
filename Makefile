@@ -19,13 +19,14 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps clean-examples clean-site
 
 help:
 	@echo "Targets:"
 	@echo "  verify    - sync Examples/, then run every gate except the site build"
 	@echo "  sync-ci   - like verify, plus the site build (the full CI gate)"
 	@echo "  ci        - run the full local gate: check, ty, ruff, run, pytest, site"
+	@echo "  reset     - regenerate build/examples/ from the Markdown (fixes drift)"
 	@echo "  gate      - the gate without sync or site (check, ty, ruff, run, pytest)"
 	@echo "  sync      - update the committed Examples/ tree from the Markdown"
 	@echo "  check     - verify book examples match the committed Examples/ tree"
@@ -37,21 +38,21 @@ help:
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
-	@echo "  extract   - write ExtractedExamples/ from the Markdown"
+	@echo "  extract   - write build/examples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
 	@echo "  spell     - codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)"
 	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
 	@echo "  eol       - check tracked text files for CRLF (fails the ci gate)"
 	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
-	@echo "  listings  - check ```python listings keep blank lines minimal"
+	@echo "  listings  - check python listings keep blank lines minimal"
 	@echo "  fix-listings - remove the offending blank lines from listings"
 	@echo "  banned    - fail if any tools/banned_phrases.txt phrase is in the book"
 	@echo "  comment-periods - fail if a one-line listing comment ends with a period"
 	@echo "  fix-comment-periods - remove those trailing periods"
 	@echo "  comment-caps - fail if a prose comment is not capitalized (heuristic)"
 	@echo "  fix-comment-caps - capitalize them"
-	@echo "  clean-examples - remove ExtractedExamples/"
+	@echo "  clean-examples - remove build/examples/"
 	@echo "  clean-site     - remove build/site/"
 
 # Sync Examples/ from the Markdown, then run every gate except the site build.
@@ -80,17 +81,22 @@ serve:
 
 examples: extract run
 
-run:
+# These all read build/examples/, so each depends on `extract` to rebuild it
+# first. make builds `extract` once per invocation, so depending on it from
+# several targets does not re-extract. This is what stops a stale tree (e.g. a
+# gitignored build/examples/ left over from an older Markdown) from being
+# checked. Use `make reset` to force a clean regeneration.
+run: extract
 	$(PY) tools/run_examples.py
 
-test:
-	$(PYTEST) $(PYTEST_N) ExtractedExamples
+test: extract
+	$(PYTEST) $(PYTEST_N) build/examples
 
-ty:
-	$(TY) check ExtractedExamples
+ty: extract
+	$(TY) check build/examples
 
-lint:
-	$(RUFF) check ExtractedExamples
+lint: extract
+	$(RUFF) check build/examples
 
 extract:
 	$(PY) tools/extract_examples.py --write
@@ -167,18 +173,24 @@ gate:
 	$(PY) tools/capitalize_comments.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
-	$(TY) check ExtractedExamples
-	$(RUFF) check ExtractedExamples
+	$(TY) check build/examples
+	$(RUFF) check build/examples
 	$(PY) tools/run_examples.py
-	$(PYTEST) $(PYTEST_N) ExtractedExamples
+	$(PYTEST) $(PYTEST_N) build/examples
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates
 # run in CI only on request (see tools/README.md).
 ci: gate site
 
+# Throw away build/examples/ and rebuild it from the Markdown. Run this when
+# a check reports drift you cannot explain (a stale tree from an older Markdown,
+# or one carried over from another machine).
+reset: clean-examples extract
+	@echo "build/examples/ regenerated from the Markdown."
+
 clean-examples:
-	$(PY) -c "import shutil; shutil.rmtree('ExtractedExamples', ignore_errors=True)"
+	$(PY) -c "import shutil; shutil.rmtree('build/examples', ignore_errors=True)"
 
 clean-site:
 	$(PY) -c "import shutil; shutil.rmtree('build/site', ignore_errors=True)"
