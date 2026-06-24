@@ -2,7 +2,7 @@
 
 A decorator is a function that is applied to another function or a class.
 The decorator itself is a callable that takes a function and returns a function.
-It takes the function to be decorated as an argument, does something to that function, then returns the resulting function *and* assigns it to the original function name.
+It takes the function to be decorated as an argument, does something to that function, then returns the resulting function and assigns it to the original function name.
 
 To apply the decorator, you put a `@` before the decorator name:
 
@@ -235,7 +235,7 @@ if __name__ == "__main__":
 
 The class form shifts in an important way when the decorator itself takes arguments.
 Without arguments, the constructor receives the function.
-With arguments, the constructor receives the *arguments*,
+With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
 
 ```python
@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
 This is `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
-so a single `greet("Bob")` traces one call whose body runs twice:
+so a single `greet("Bob")` traces one call whose body runs twice.
 
 The output is:
 
@@ -355,7 +355,7 @@ which builds a registry like this without a decorator.
 
 The `@` syntax decorates a function or class once, at definition.
 Every call or every instance gets the wrapping.
-Sometimes you want to add responsibilities to one object *at runtime*,
+Sometimes you want to add responsibilities to one object at runtime,
 and let the caller choose which responsibilities to add.
 That is the object-oriented *Decorator* pattern.
 
