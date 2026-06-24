@@ -159,7 +159,7 @@ Here^[This list includes suggestions by Kevlin Henney, David Scott, and others.]
 
 A list of design principles is at least as important as design structures,
 but for a different reason:
-these allow you to ask questions about your proposed design,
+these ask questions about your proposed design,
 to apply tests for quality.
 
 -   *Principle of least astonishment* (don't be astonishing).

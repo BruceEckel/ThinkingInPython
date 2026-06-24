@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -52,6 +52,7 @@ help:
 	@echo "  fix-comment-periods - remove those trailing periods"
 	@echo "  comment-caps - fail if a prose comment is not capitalized (heuristic)"
 	@echo "  fix-comment-caps - capitalize them"
+	@echo "  anchors   - fail if a heading-anchor link points at no real heading"
 	@echo "  clean-examples - remove build/examples/"
 	@echo "  clean-site     - remove build/site/"
 
@@ -163,6 +164,10 @@ comment-caps:
 fix-comment-caps:
 	$(PY) tools/capitalize_comments.py --write
 
+# Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
+anchors:
+	$(PY) tools/check_anchors.py
+
 # The local gate without the site build: line endings, listing density, drift
 # check, ty, ruff, run, pytest. `verify` runs `sync` first; `ci` adds the site.
 gate:
@@ -171,6 +176,7 @@ gate:
 	$(PY) tools/banned_phrases.py
 	$(PY) tools/comment_periods.py
 	$(PY) tools/capitalize_comments.py
+	$(PY) tools/check_anchors.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(TY) check build/examples

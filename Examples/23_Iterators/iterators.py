@@ -9,8 +9,7 @@ def fibonacci(n: int) -> Iterator[int]:
         yield a
         a, b = b, a + b
 
-# A class becomes iterable by implementing __iter__, often as a
-# generator:
+# __iter__() makes a class iterable. Often a generator:
 class Countdown:
     def __init__(self, start: int) -> None:
         self.start = start
@@ -21,8 +20,7 @@ class Countdown:
             yield n
             n -= 1
 
-# Any function written against an iterable is decoupled from its
-# source:
+# A function using an iterable is decoupled from its source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
 

@@ -177,7 +177,7 @@ You can always add them later when you discover you need the logic.
 
 The default `@property` is *read-only*: it is only a getter.
 Assigning to it raises an `AttributeError`.
-To allow writing, add a *setter*,
+To enable writing, add a *setter*,
 which allows you to validate the value before storing it:
 
 ```python

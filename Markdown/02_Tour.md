@@ -238,7 +238,7 @@ including control over the number of decimal places and alignment.
 ### f-Strings
 
 The modern way to build strings is using *f-string*s:
-prefix the string with `f` and put expressions in braces.
+prefix the string with `f` and put expressions in curly braces.
 It is readable, fast, and preferred:
 
 ```python

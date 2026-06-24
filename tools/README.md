@@ -296,6 +296,24 @@ make fix-comment-caps   # capitalize the flagged comments
 When the checker is wrong, add the comment's text to the allowlist; when it is
 right, capitalize the comment (or run `make fix-comment-caps`).
 
+## check_anchors.py
+
+Verifies that every heading-anchor link resolves to a real heading, so a typo
+does not ship as a dead in-page link. Markdown can link to a heading with
+`[text](#id)` (same file) or `[text](07_Static_Typing.md#id)` (another chapter).
+The tool reproduces pandoc's anchor rule (lowercase, spaces to hyphens,
+punctuation and backticks removed, leading non-letters dropped), honors an
+explicit `{#id}` on a heading, collects every id, and checks each `#anchor`
+link against it. A bad cross-file link also reports a missing target file. It is
+part of the `make ci` gate; there is nothing to auto-fix.
+
+```
+make anchors    # check (part of `make ci`)
+```
+
+To make an anchor stable against rewording, give the target heading an explicit
+id: `## Heading {#stable-id}`, then link `(chapter.md#stable-id)`.
+
 ## build_site.py
 
 Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).

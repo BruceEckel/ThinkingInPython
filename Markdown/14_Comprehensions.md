@@ -169,69 +169,114 @@ for r in rst_files:
 
 ## Set Comprehensions
 
-Set comprehensions allow sets to be constructed using the same principles as list comprehensions.
-The only difference is that the resulting sequence is a set.
+Set comprehensions construct sets using the same principles as list comprehensions.
+Instead of `[]` a set comprehension uses `{}`.
 
-Say we have a list of names.
-The list can contain names which only differ in the case used to represent them,
-duplicates and names consisting of only one character.
+Consider a list of names.
 We are only interested in names longer than one character and wish to represent all names in the same format:
-The first letter should be capitalized;
-all other characters should be lower case.
+The first letter should be capitalized and all other characters should be lower case.
 
-Given the list:
+The following set comprehension normalizes each name (capital first letter, the rest lower
+case), keeps the names longer than one character, and collapses the duplicates
+and case variants:
 
-    names = [ 'Bob', 'JOHN', 'alice', 'bob', 'ALICE', 'J', 'Bob' ]
+```python
+# set_comprehension.py
+names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
-We require the set:
+unique = {name[0].upper() + name[1:].lower()
+          for name in names if len(name) > 1}
+print(sorted(unique))  # Sorted for stable display
+# ['Alice', 'Bob', 'John']
 
-    { 'Bob', 'John', 'Alice' }
-
-The following set comprehension accomplishes this:
-
-    {name[0].upper() + name[1:].lower()
-     for name in names if len(name) > 1}
-
-You could get the same result by passing a list comprehension to `set()`.
-That builds a throwaway list first,
-so the set comprehension is the better choice:
-
-    set([name[0].upper() + name[1:].lower()
-         for name in names if len(name) > 1])
+# set() of a list comprehension gives the same result, but builds a
+# throwaway list first, so the set comprehension is preferred:
+same = set([name[0].upper() + name[1:].lower()
+            for name in names if len(name) > 1])
+print(unique == same)
+# True
+```
 
 ## Dictionary Comprehensions
 
-Say we have a dictionary the keys of which are characters and the values of which map to the number of times that character appears in some text.
-The dictionary currently distinguishes between upper and lower case characters.
-
-The following is inefficient:
+Consider a dictionary with character keys and values that map to the number of times that character appears in some text.
+If the dictionary distinguishes between upper and lower case characters, the following is inefficient:
 If both a lower case and upper case character exists,
 then the entry in the new dictionary is updated twice.
 
-We require a dictionary in which the occurrences of upper and lower case characters are combined:
-
-    mcase = {'a':10, 'b': 34, 'A': 7, 'Z':3}
-
-    mcase_frequency = {
-        k.lower(): mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0)
-        for k in mcase
-    }
+Here's a dictionary that combines the occurrences of upper and lower case characters:
 
 ```python
-# mcase_frequency == {'a': 17, 'z': 3, 'b': 34}
+# dict_comprehension.py
+mcase = {"a": 10, "b": 34, "A": 7, "Z": 3}
+
+mcase_frequency = {
+    k.lower(): mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0)
+    for k in mcase
+}
+print(mcase_frequency)
+# {'a': 17, 'b': 34, 'z': 3}
 ```
+
+## Generator Expressions {#generator-expressions}
 
 A comprehension is evaluated eagerly.
 It builds the whole result in memory before the next statement runs.
-For a large input that wastes time and space,
+For a large data set, that wastes time and space,
 especially when you consume the result only once.
 A *generator expression* uses the same syntax with parentheses instead of brackets,
 and produces its values one at a time, on demand:
 
-    squares = (n ** 2 for n in range(1_000_000))
+```python
+# generator_expression.py
+from itertools import islice
 
-Nothing is computed until you iterate over `squares`,
-and only one value exists at a time.
-The [Iterators](23_Iterators.md) chapter covers generators in depth.
+squares = (n ** 2 for n in range(1_000_000))
+print(next(squares))  # 0
+print(next(squares))  # 1
+print(list(islice(squares, 3)))  # [4, 9, 16]
+```
 
-Portions of this chapter were contributed by Michael Charlton.
+Nothing is computed until you pull a value.
+`next()` produces them one at a time, and `itertools.islice()` takes a few
+without ever building the million-element list.
+
+A generator expression can also feed `set()` and `dict()`:
+
+```python
+# set_dict_from_genexp.py
+words = ["pol", "parrot", "pining", "fjord", "ex"]
+
+lengths = set(len(w) for w in words)
+print(sorted(lengths))
+# [2, 3, 5, 6]
+
+initials = dict((w, w[0]) for w in words)
+print(initials)
+# {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
+```
+
+There is no lazy `set` or `dict`, though.
+Parentheses always build the whole collection at once,
+and `set(...)` or `dict(...)` over a generator does the same,
+since a set or dict has to hold every element.
+So neither saves anything over the set comprehension `{len(w) for w in words}`
+or the dict comprehension `{w: w[0] for w in words}`,
+which read more directly and are preferred.
+
+A generator expression earns its keep when the consumer takes values one at a
+time and never needs them all, such as `sum()`, `any()`, `all()`, `min()`,
+`max()`, or `str.join()`:
+
+```python
+# genexp_consumers.py
+nums = range(1_000_000)
+
+print(sum(n * n for n in nums))  # 333332833333500000
+print(any(n == 12_345 for n in nums))  # True
+print(max(len(str(n)) for n in nums))  # 6
+```
+
+None of these builds an intermediate collection of a million items,
+and `any()` stops as soon as it finds a match.
+Generators are explored further in [Iterators](23_Iterators.md#generators).

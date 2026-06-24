@@ -1,7 +1,5 @@
 # Iterators
 
-> Decoupling Algorithms from Containers
-
 An *iterator* decouples an algorithm from the container it runs on.
 Code written against an iterator does not care whether the data came from a list,
 a file, a database cursor, or a computation: it just asks for the next item.
@@ -26,7 +24,7 @@ The `for` loop calls these for you, so you almost never call them directly.
 Because every container speaks this one protocol,
 a function written against an iterable is automatically decoupled from the container.
 
-## Generators
+## Generators {#generators}
 
 You rarely need to write `__iter__()`/`__next__()` by hand,
 because a *generator* writes them for you.
@@ -46,8 +44,7 @@ def fibonacci(n: int) -> Iterator[int]:
         yield a
         a, b = b, a + b
 
-# A class becomes iterable by implementing __iter__, often as a
-# generator:
+# __iter__() makes a class iterable. Often a generator:
 class Countdown:
     def __init__(self, start: int) -> None:
         self.start = start
@@ -58,8 +55,7 @@ class Countdown:
             yield n
             n -= 1
 
-# Any function written against an iterable is decoupled from its
-# source:
+# A function using an iterable is decoupled from its source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
 

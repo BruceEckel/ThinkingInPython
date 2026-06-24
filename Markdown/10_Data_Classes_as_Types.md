@@ -3,7 +3,7 @@
 A *type* is a set of values.
 The type `int` is the set of whole numbers.
 A type you define, like a rating from one to ten, is a smaller set:
-the values you intend to allow.
+the allowed values.
 We have historically been bad at keeping objects inside that set.
 We let an object be constructed in an illegal state,
 or we let later code mutate it into one,

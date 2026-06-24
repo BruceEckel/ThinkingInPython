@@ -1,6 +1,6 @@
 # State Machines
 
-While *State* has a way to allow the client programmer to change the implementation,
+While *State* allows the client programmer to change the implementation,
 *StateMachine* imposes a structure to automatically change the implementation from one object to the next.
 The current implementation represents the state that a system is in,
 and the system behaves differently from one state to the next (because it uses *State*).
