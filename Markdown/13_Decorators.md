@@ -109,7 +109,7 @@ This is optional but improves debuggability.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
 `**P` is a *parameter specification* (a `ParamSpec`, from the
-[Static Typing](07_Static_Typing.md) summary).
+[Static Typing](07_Static_Typing.md#type-hint-summary) summary).
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
 So `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
@@ -348,7 +348,7 @@ if __name__ == "__main__":
 ```
 
 The output is `['Espresso', 'Latte']`.
-[Metaprogramming](15_Metaprogramming.md) shows `__init_subclass__()`,
+[Metaprogramming](15_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 ## The Decorator Pattern
@@ -434,7 +434,7 @@ Each extra wraps the drink inside it and forwards through the same two-property 
 The `Drink` `Protocol` describes that interface.
 Both the plain drinks and the extras satisfy it structurally,
 with no shared base class required.
-This is the structural typing from the [Static Typing](07_Static_Typing.md) chapter.
+This is the structural typing from the [Static Typing](07_Static_Typing.md#structural-typing-with-protocols) chapter.
 
 Adding a new extra means adding one class.
 Changing the price of an extra means changing one number, in one place.

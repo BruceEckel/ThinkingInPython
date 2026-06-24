@@ -20,7 +20,7 @@ print(a_function("yes"))
 ```
 
 Here the function signature only specifies the name of the function and the argument identifiers,
-but no argument types or return types (these are covered in [Static Typing](07_Static_Typing.md)).
+but no argument types or return types (these are covered in [Static Typing](07_Static_Typing.md#type-hints)).
 Python is dynamically typed, so it enforces type constraints at runtime rather than compile time.
 This means that different types can be both passed to and returned from the same function:
 

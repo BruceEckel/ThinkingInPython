@@ -104,7 +104,7 @@ if __name__ == "__main__":
 ```
 
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
-This is detailed in [Data Classes as Types](10_Data_Classes_as_Types.md).
+This is detailed in [Data Classes as Types](10_Data_Classes_as_Types.md#data-classes).
 
 ## Cleanup
 

@@ -72,7 +72,7 @@ a `@dataclass` for a typed mutable record,
 and a `NamedTuple` for a typed immutable one.
 Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
-see [Data Classes as Types](10_Data_Classes_as_Types.md).
+see [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
 A small test confirms each form behaves as a record:
 the hand-rolled `Messenger` turns keyword arguments into attributes (and takes new ones later),

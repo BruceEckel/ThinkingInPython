@@ -221,7 +221,7 @@ Because the function is free, it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with the right attributes satisfies it,
 with no declared inheritance.
-This is the structural typing from the [Static Typing](07_Static_Typing.md) chapter.
+This is the structural typing from the [Static Typing](07_Static_Typing.md#structural-typing-with-protocols) chapter.
 When you are handed a type that does not fit, you adapt it by composition,
 not inheritance:
 
@@ -404,12 +404,12 @@ if __name__ == "__main__":
 
 `show()` accepts anything.
 Pass it something without a `display()` method and you find out only when the line runs.
-The [Static Typing](07_Static_Typing.md) chapter gives this a static form with `Protocol`:
+The [Static Typing](07_Static_Typing.md#structural-typing-with-protocols) chapter gives this a static form with `Protocol`:
 a structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
-A third answer names a closed set of types as a union and dispatches with `match` (the [Pattern Matching](11_Pattern_Matching.md) chapter).
+A third answer names a closed set of types as a union and dispatches with `match` (the [Pattern Matching](11_Pattern_Matching.md#exhaustive-matching) chapter).
 The shapes become immutable data, and one free function handles each case.
 There is no base class and no overridden method,
 and the type checker confirms the match covers every shape:

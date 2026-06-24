@@ -1,6 +1,6 @@
 # Comprehensions
 
-*Comprehensions* (first introduced in [Containers and Control Flow](03_Containers_and_Control_Flow.md))
+*Comprehensions* (first introduced in [Containers and Control Flow](03_Containers_and_Control_Flow.md#comprehensions))
 build one sequence from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and was incorporated into functional programming.

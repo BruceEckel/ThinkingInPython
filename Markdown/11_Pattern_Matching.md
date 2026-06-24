@@ -4,7 +4,7 @@ The `match` statement compares a value against a series of *patterns* and runs t
 A `match` is far more than a `switch` because a pattern can test a value's shape,
 look inside it, and pull out the parts you need, all in one step.
 
-[Containers and Control Flow](03_Containers_and_Control_Flow.md) gave a taste.
+[Containers and Control Flow](03_Containers_and_Control_Flow.md#pattern-matching) gave a taste.
 This chapter covers the rest.
 
 ## Matching Values
@@ -273,7 +273,7 @@ The output is:
 Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
 A `switch` cannot do this; neither can a chain of `if`/`isinstance()`.
-The [Rethinking Objects](16_Rethinking_Objects.md) chapter uses exactly this technique to add operations to a closed set of types without inheritance.
+The [Rethinking Objects](16_Rethinking_Objects.md#polymorphism-without-inheritance) chapter uses exactly this technique to add operations to a closed set of types without inheritance.
 
 ## When Not to Match
 

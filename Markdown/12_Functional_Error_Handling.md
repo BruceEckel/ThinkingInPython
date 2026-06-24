@@ -46,7 +46,7 @@ The output is:
 
 Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md) chapter warned against.
+which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) chapter warned against.
 
 ## Return the Error as a Value
 

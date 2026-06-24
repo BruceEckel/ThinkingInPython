@@ -266,7 +266,7 @@ shapes come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `@overload` | Several typed signatures for one function |
-| `@override` | Declares a method overrides a base-class method (the [Classes](06_Classes.md) chapter) |
+| `@override` | Declares a method overrides a base-class method (the [Classes](06_Classes.md#marking-overrides-with-override) chapter) |
 | `@final` | A class that must not be subclassed, or a method that must not be overridden |
 | `cast(T, x)` | Tells the checker to treat `x` as `T` |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids |
