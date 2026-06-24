@@ -117,10 +117,8 @@ result is `R`," and returning `Callable[P, R]` promises that the wrapper has tha
 same signature.
 
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
-that captured list: `P.args` is the positional part and `P.kwargs` the keyword
-part.
-They may only be used together, as the `*args` and `**kwargs` of a function typed
-with `P`.
+that captured list: `P.args` is the positional part and `P.kwargs` the keyword part.
+They may only be used together, as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to exactly the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though `wrapper()` is written to forward anything.
