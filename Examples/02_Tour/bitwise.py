@@ -1,6 +1,6 @@
 # bitwise.py
-# Bitwise and shift operators on integers. Binary literals (0b...)
-# Make the bit patterns easy to see.
+# Bitwise and shift operators on integers. Binary literals
+# (starting with 0b) make the bit patterns easy to see.
 print(0b1100 & 0b1010)  # 8: AND, bits set in both
 print(0b1100 | 0b1010)  # 14: OR, bits set in either
 print(0b1100 ^ 0b1010)  # 6: XOR, bits set in exactly one

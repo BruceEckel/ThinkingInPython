@@ -36,6 +36,8 @@ globals
 hashable
 haskell
 hoc
+inlines
+inlining
 iterable
 json
 kotlin

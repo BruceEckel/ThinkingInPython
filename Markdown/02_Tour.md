@@ -9,8 +9,9 @@ You can find supplementary information in [the official language documentation](
 ## Scripting vs. Programming
 
 The goal of Python is improved productivity.
-The language is designed to aid you as much as possible,
-while hindering you as little as possible with arbitrary rules or requirements that you use a particular set of features.
+The language is designed to aid you as much as possible.
+It tries to hinder you as little as possible.
+It does not impose arbitrary rules or force a particular set of features.
 
 Python is often referred to as a scripting language,
 but scripting languages tend to be limiting,
@@ -43,7 +44,7 @@ Parentheses are not necessary in Python, although it won't complain if you use t
 The conditional clause ends with a colon.
 This indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-Here there is a `print()` statement which sends the result to standard output,
+The `print()` statement sends the result to standard output,
 followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level, just like curly braces in C++ or Java,
@@ -132,8 +133,8 @@ each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
 
 ```python
 # bitwise.py
-# Bitwise and shift operators on integers. Binary literals (0b...)
-# Make the bit patterns easy to see.
+# Bitwise and shift operators on integers. Binary literals
+# (starting with 0b) make the bit patterns easy to see.
 print(0b1100 & 0b1010)  # 8: AND, bits set in both
 print(0b1100 | 0b1010)  # 14: OR, bits set in either
 print(0b1100 ^ 0b1010)  # 6: XOR, bits set in exactly one
@@ -301,35 +302,35 @@ The [Functions](04_Functions.md) chapter covers them in detail.
 
 ## Naming Conventions
 
-The basic strategy for naming is to use "snake-case" for identifiers,
-functions and file names.
+The basic strategy for naming is to use `snake_case` for identifiers,
+functions, and file names.
 This means lower case with words separated by underscores,
 as in `this_is_snake_case`.
 
 If something represents a constant, use all uppercase letters,
 as in `THIS_IS_A_CONSTANT`.
 
-The one exception is class names, which are "pascal-cased,"
+The one exception is class names, which are `CapWords` (pascal cased),
 starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
-These can be automatically applied to your code (or at least, pointed out) using tools such as [AutoPEP8](https://pypi.python.org/pypi/autopep8) or [YAPF](https://github.com/google/yapf).
+These can be automatically applied to your code (or at least, pointed out) using tools such as ruff.
 
 ### File Names
 
 The name must be a valid identifier: letters, digits, underscores, and cannot start with a digit.
 
-**Modules** (`.py` files): short, all‑lowercase, with underscores between words if that improves
+**Modules** (`.py` files): short, all-lowercase, with underscores between words if that improves
 readability. This is `snake_case`.
 
 - Good: `result.py`, `cache_singleton.py`, `list_comprehension.py`
 - Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase), `cache-singleton.py`
   (hyphens aren't importable)
 
-**Packages** (directories with `__init__.py`): also short and all‑lowercase, but underscores are
-discouraged; prefer a single run‑together word when you can.
+**Packages** (directories with `__init__.py`): also short and all-lowercase, but underscores are
+discouraged; prefer a single run-together word when you can.
 
 - Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
 

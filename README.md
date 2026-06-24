@@ -25,36 +25,42 @@ In the meantime I hope it's useful.
 
 ---
 
-## Edit checklist -- initial edit pass
+## Edit checklist
 
-- [ ] 01_Introduction.md
-- [x] 02_Tour.md
-- [x] 03_Containers_and_Control_Flow.md
-- [x] 04_Functions.md
-- [x] 05_Modules_and_Packages.md
-- [x] 06_Classes.md
-- [x] 07_Static_Typing.md
-- [x] 08_Class_Attributes_and_Cleanup.md
-- [x] 09_Testing.md
-- [x] 10_Data_Classes_as_Types.md
-- [x] 11_Pattern_Matching.md
-- [x] 12_Functional_Error_Handling.md (edited, not 'reviewed')
-- [ ] 13_Decorators.md
-- [ ] 14_Comprehensions.md
-- [ ] 15_Metaprogramming.md
-- [ ] 16_Rethinking_Objects.md
-- [ ] 17_The_Pattern_Concept.md
-- [ ] 18_Data_Transfer_Objects.md
-- [ ] 19_Singleton.md
-- [ ] 20_Template_Method.md
-- [ ] 21_Surrogate.md
-- [ ] 22_State_Machines.md
-- [ ] 23_Iterators.md
-- [ ] 24_Factory.md
-- [ ] 25_Function_Objects.md
-- [ ] 26_Changing_the_Interface.md
-- [ ] 27_Observer.md
-- [ ] 28_Multiple_Dispatching.md
-- [ ] 29_Visitor.md
-- [ ] 30_Pattern_Refactoring.md
-- [ ] 31_Simulation.md
+Two passes per chapter: my own edit pass (**Edited**), then incorporating
+Claude's review and re-checking (**Reviewed**). The reviews themselves live in the
+`REVIEW_NN.md` files at the repo root. Mark a cell `[x]` when that pass is done.
+
+| Chapter | Edited | Reviewed |
+|---------|:------:|:--------:|
+| 01_Introduction.md                  | [ ] | [ ] |
+| 02_Tour.md                          | [x] | [x] |
+| 03_Containers_and_Control_Flow.md   | [x] | [ ] |
+| 04_Functions.md                     | [x] | [ ] |
+| 05_Modules_and_Packages.md          | [x] | [ ] |
+| 06_Classes.md                       | [x] | [ ] |
+| 07_Static_Typing.md                 | [x] | [ ] |
+| 08_Class_Attributes_and_Cleanup.md  | [x] | [ ] |
+| 09_Testing.md                       | [x] | [ ] |
+| 10_Data_Classes_as_Types.md         | [x] | [ ] |
+| 11_Pattern_Matching.md              | [x] | [ ] |
+| 12_Functional_Error_Handling.md     | [x] | [x] |
+| 13_Decorators.md                    | [x] | [x] |
+| 14_Comprehensions.md                | [ ] | [ ] |
+| 15_Metaprogramming.md               | [ ] | [ ] |
+| 16_Rethinking_Objects.md            | [ ] | [ ] |
+| 17_The_Pattern_Concept.md           | [ ] | [ ] |
+| 18_Data_Transfer_Objects.md         | [ ] | [ ] |
+| 19_Singleton.md                     | [ ] | [ ] |
+| 20_Template_Method.md               | [ ] | [ ] |
+| 21_Surrogate.md                     | [ ] | [ ] |
+| 22_State_Machines.md                | [ ] | [ ] |
+| 23_Iterators.md                     | [ ] | [ ] |
+| 24_Factory.md                       | [ ] | [ ] |
+| 25_Function_Objects.md              | [ ] | [ ] |
+| 26_Changing_the_Interface.md        | [ ] | [ ] |
+| 27_Observer.md                      | [ ] | [ ] |
+| 28_Multiple_Dispatching.md          | [ ] | [ ] |
+| 29_Visitor.md                       | [ ] | [ ] |
+| 30_Pattern_Refactoring.md           | [ ] | [ ] |
+| 31_Simulation.md                    | [ ] | [ ] |

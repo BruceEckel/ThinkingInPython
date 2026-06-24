@@ -4,7 +4,7 @@ A decorator is a function that is applied to another function or a class.
 The decorator itself is a callable that takes a function and returns a function.
 It takes the function to be decorated as an argument, does something to that function, then returns the resulting function and assigns it to the original function name.
 
-To apply the decorator, you put a `@` before the decorator name:
+To apply the decorator, you put a `@` before the decorator name (for simplicity we use an untyped `Callable`; this is expanded later):
 
 ```python
 # simple_decoration.py
@@ -27,7 +27,7 @@ Ordinarily you'd expect to just see "Wensleydale" but `hijack()` replaces the or
 with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.
-This name is assigned to `cheese()` during decoration, so the name can be anything.
+This name is assigned to `cheese` during decoration, so the name can be anything.
 The common convention is to name this function `wrapper()`.
 
 A typical decorator function does some work, calls the original function, and does some more work:
