@@ -31,6 +31,8 @@ Two passes per chapter: my own edit pass (**Edited**), then incorporating
 Claude's review and re-checking (**Reviewed**). The reviews themselves live in the
 `REVIEW_NN.md` files at the repo root. Mark a cell `[x]` when that pass is done.
 
+### Draft 1
+
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|
 | 01_Introduction.md                  |||
