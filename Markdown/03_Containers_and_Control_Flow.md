@@ -307,5 +307,5 @@ parities = {n % 2 for n in range(10)}         # Set comprehension
 print(parities)                               # {0, 1}
 ```
 
-The [Comprehensions](14_Comprehensions.md) chapter covers comprehensions in detail,
+The [Comprehensions](14_Comprehensions.md#list-comprehensions) chapter covers comprehensions in detail,
 as well as generator expressions and the functional tools `map()` and `filter()`.

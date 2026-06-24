@@ -1,6 +1,6 @@
 # Functional Error Handling
 
-The [Data Classes as Types](10_Data_Classes_as_Types.md) chapter made a value carry a guarantee.
+The [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values) chapter made a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
 a function returns its error as an ordinary value,
@@ -84,7 +84,7 @@ The output is:
     answer = 4
 
 This keeps every result,
-and `match` (covered in [Pattern Matching](11_Pattern_Matching.md)) tells the two cases apart.
+and `match` (covered in [Pattern Matching](11_Pattern_Matching.md#matching-values)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases would collide.
 We need something that says "success" or "failure" no matter what types they carry.
@@ -161,7 +161,7 @@ The output is:
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value; to get the answer `Result` must be unpacked.
-This is the same idea as in [Static Typing](07_Static_Typing.md):
+This is the same idea as in [Static Typing](07_Static_Typing.md#type-hints):
 put the meaning in the type.
 
 ## Composing by Hand

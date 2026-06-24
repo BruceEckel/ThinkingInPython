@@ -241,7 +241,7 @@ class SingleTone:
 ### As a Class Decorator
 
 You can wrap a class so that calling it returns a cached instance.
-This is a *class decorator* (see [the Decorators chapter](13_Decorators.md)):
+This is a *class decorator* (see [the Decorators chapter](13_Decorators.md#decorating-classes)):
 
 ```python
 # singleton.py
@@ -284,7 +284,7 @@ which is the reason to prefer them when you need that.
 ### As a Metaclass
 
 Finally, a metaclass can intercept construction itself.
-Metaclasses are covered in [the Metaprogramming chapter](15_Metaprogramming.md),
+Metaclasses are covered in [the Metaprogramming chapter](15_Metaprogramming.md#intercepting-instance-creation),
 where this same singleton appears next to the simpler hooks that usually replace them.
 It is included here for completeness:
 

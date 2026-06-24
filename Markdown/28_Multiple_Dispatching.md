@@ -179,7 +179,7 @@ It's a tribute to the flexibility of dictionaries that a tuple can be used as a 
 
 Python dispatches on a single type at a time.
 For dispatch on *one* argument's type,
-`functools.singledispatch` (see [the Visitor chapter](29_Visitor.md)) gives you open,
+`functools.singledispatch` (see [the Visitor chapter](29_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
 per-type functions.
 For dispatch on *two or more* types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
