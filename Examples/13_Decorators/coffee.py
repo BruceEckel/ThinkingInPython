@@ -1,5 +1,4 @@
 # coffee.py
-
 from typing import Protocol
 
 class Drink(Protocol):
@@ -10,11 +9,11 @@ class Drink(Protocol):
 
 class Espresso:
     cost = 1.50
-    description = "espresso"
+    description = "Espresso"
 
 class Cappuccino:
     cost = 1.75
-    description = "cappuccino"
+    description = "Cappuccino"
 
 class Extra:
     "Base object decorator: wraps a Drink and adds to it."
@@ -34,19 +33,19 @@ class Extra:
 
 class Whipped(Extra):
     add_cost = 0.50
-    name = "whipped cream"
+    name = "Whipped cream"
 
 class Decaf(Extra):
     add_cost = 0.0
-    name = "decaf"
+    name = "Decaf"
 
 class ExtraShot(Extra):
     add_cost = 0.75
-    name = "extra shot"
+    name = "Extra shot"
 
 if __name__ == "__main__":
     order = Whipped(ExtraShot(Espresso()))
     print(f"{order.description}: ${order.cost:.2f}")
 
-    plain = Cappuccino()
-    print(f"{plain.description}: ${plain.cost:.2f}")
+    cap = ExtraShot(Decaf(Cappuccino()))
+    print(f"{cap.description}: ${cap.cost:.2f}")

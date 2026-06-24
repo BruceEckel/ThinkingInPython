@@ -355,9 +355,9 @@ which builds a registry like this without a decorator.
 
 The `@` syntax decorates a function or class once, at definition.
 Every call or every instance gets the wrapping.
-Sometimes you want to add responsibilities to one object at runtime,
+Sometimes you want to add responsibilities to one object *at runtime*,
 and let the caller choose which responsibilities to add.
-That is the object *Decorator* pattern.
+That is the object-oriented *Decorator* pattern.
 
 Consider a coffee shop.
 A class for every drink-and-extra combination explodes: espresso,
@@ -366,12 +366,11 @@ Each new extra doubles the menu.
 
 Instead, model the extras as decorators.
 A plain drink knows its own cost and description.
-An extra wraps a drink, adds to the cost, and adds to the description.
+An extra dynamically wraps a drink, adds to the cost, and adds to the description.
 Because an extra is itself a drink, you can wrap an extra in another extra.
 
 ```python
 # coffee.py
-
 from typing import Protocol
 
 class Drink(Protocol):
@@ -382,11 +381,11 @@ class Drink(Protocol):
 
 class Espresso:
     cost = 1.50
-    description = "espresso"
+    description = "Espresso"
 
 class Cappuccino:
     cost = 1.75
-    description = "cappuccino"
+    description = "Cappuccino"
 
 class Extra:
     "Base object decorator: wraps a Drink and adds to it."
@@ -406,28 +405,28 @@ class Extra:
 
 class Whipped(Extra):
     add_cost = 0.50
-    name = "whipped cream"
+    name = "Whipped cream"
 
 class Decaf(Extra):
     add_cost = 0.0
-    name = "decaf"
+    name = "Decaf"
 
 class ExtraShot(Extra):
     add_cost = 0.75
-    name = "extra shot"
+    name = "Extra shot"
 
 if __name__ == "__main__":
     order = Whipped(ExtraShot(Espresso()))
     print(f"{order.description}: ${order.cost:.2f}")
 
-    plain = Cappuccino()
-    print(f"{plain.description}: ${plain.cost:.2f}")
+    cap = ExtraShot(Decaf(Cappuccino()))
+    print(f"{cap.description}: ${cap.cost:.2f}")
 ```
 
 The output is:
 
-    espresso + extra shot + whipped cream: $2.75
-    cappuccino: $1.75
+    Espresso + Extra shot + Whipped cream: $2.75
+    Cappuccino + Decaf + Extra shot: $2.50
 
 `Whipped(ExtraShot(Espresso()))` is the object version of stacked `@` decorators.
 Each extra wraps the drink inside it and forwards through the same two-property interface,
@@ -449,18 +448,18 @@ from coffee import Cappuccino, Decaf, Espresso, ExtraShot, Whipped
 def test_plain_drink() -> None:
     cap = Cappuccino()
     assert cap.cost == 1.75
-    assert cap.description == "cappuccino"
+    assert cap.description == "Cappuccino"
 
 def test_stacked_extras() -> None:
     order = Whipped(ExtraShot(Espresso()))
     assert order.cost == 2.75
     assert order.description == (
-        "espresso + extra shot + whipped cream")
+        "Espresso + Extra shot + Whipped cream")
 
 def test_decaf_adds_no_cost() -> None:
     order = Decaf(Espresso())
     assert order.cost == 1.50
-    assert order.description == "espresso + decaf"
+    assert order.description == "Espresso + Decaf"
 ```
 
 ## Exercises
