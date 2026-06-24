@@ -75,11 +75,11 @@ Learning to ask those questions is one of the most useful things this book can g
 
 The book targets Python 3.14 and later, uses type hints throughout, and uses `pytest` for testing.
 
-Every code block that begins with a filename comment, like `# trace.py`,
+Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the block tagged `# trace.py` in the [Decorators](13_Decorators.md) chapter is the file `Examples/13_Decorators/trace.py`.
+so the block tagged `# tracer.py` in the [Decorators](13_Decorators.md) chapter is the file `Examples/13_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's tooling extracts the examples,

@@ -1,4 +1,4 @@
-# trace.py
+# tracer.py
 from collections.abc import Callable
 from functools import wraps
 

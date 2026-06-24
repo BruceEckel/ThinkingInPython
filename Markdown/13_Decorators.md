@@ -67,7 +67,7 @@ while keeping the wrapped object's interface so the wrapping stays invisible to 
 This decorator traces calls:
 
 ```python
-# trace.py
+# tracer.py
 from collections.abc import Callable
 from functools import wraps
 
@@ -292,11 +292,32 @@ The decorator becomes the registration mechanism for the whole system.
 You can apply more than one decorator.
 They nest from the bottom up:
 
-    @trace
-    @repeat(times=2)
-    def f() -> None: ...
+```python
+# stacking.py
+from repeat_class import repeat
+from trace_class import trace
 
-This is `f = trace(repeat(2)(f))`.
+@trace
+@repeat(times=2)
+def greet(name: str) -> str:
+    print(f"Hello, {name}")
+    return name
+
+if __name__ == "__main__":
+    greet("Bob")
+```
+
+This is `greet = trace(repeat(times=2)(greet))`.
+`@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
+so a single `greet("Bob")` traces one call whose body runs twice:
+
+The output is:
+
+    -> greet('Bob',)
+    Hello, Bob
+    Hello, Bob
+    <- greet = 'Bob'
+
 Each decorator wraps the result of the one below it.
 That nesting is the transparency the pattern depends on.
 Every layer presents the same interface, so the layers compose.
