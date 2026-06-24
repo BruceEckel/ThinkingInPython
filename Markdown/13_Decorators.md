@@ -175,14 +175,13 @@ Here is the `trace` decorator written as a class:
 # trace_class.py
 from collections.abc import Callable
 from functools import update_wrapper
-from typing import Any
 
-class trace:
-    def __init__(self, func: Callable[..., Any]) -> None:
+class trace[**P, R]:
+    def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         update_wrapper(self, func)  # Copy __name__, __doc__, etc
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         print(f"-> {self.func.__name__}{args}")  # type: ignore
         result = self.func(*args, **kwargs)
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
@@ -202,24 +201,24 @@ The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 `functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function:
 it copies the wrapped function's name and docstring across.
+Like the function form, the class is generic in `**P` and `R`,
+so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
 
 Because the instance can hold attributes, state between calls is natural.
-A class decorator that counts calls keeps the count on the instance,
-with no closure trick:
+A class decorator that counts calls keeps the count on the instance:
 
 ```python
 # count_calls.py
 from collections.abc import Callable
 from functools import update_wrapper
-from typing import Any
 
-class count_calls:
-    def __init__(self, func: Callable[..., Any]) -> None:
+class count_calls[**P, R]:
+    def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         self.count = 0
         update_wrapper(self, func)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         self.count += 1
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
@@ -243,18 +242,17 @@ and `__call__()` receives the function and returns the wrapper:
 # repeat_class.py
 from collections.abc import Callable
 from functools import wraps
-from typing import Any
 
 class repeat:
     def __init__(self, times: int) -> None:
         self.times = times  # The decoration arguments
 
-    def __call__(
-        self, func: Callable[..., Any]) -> Callable[..., Any]:
+    def __call__[**P, R](
+        self, func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            result = None
-            for _ in range(self.times):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            result = func(*args, **kwargs)
+            for _ in range(self.times - 1):
                 result = func(*args, **kwargs)
             return result
         return wrapper
@@ -278,9 +276,9 @@ The class form makes it visible:
 the function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
 
 Which form to use is mostly taste.
-The function form is more compact,
-and with `ParamSpec` it preserves the wrapped function's exact signature for the type checker,
-where the class form erases it to `Callable[..., Any]`.
+Both forms preserve the wrapped function's exact signature for the type checker,
+using the same `**P` and `R` type parameters.
+The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
 That argument-capturing class decorator scales up to small frameworks:
@@ -305,8 +303,8 @@ Every layer presents the same interface, so the layers compose.
 
 ### Decorating Classes
 
-A decorator can take a class instead of a function.
-This one records every class it is applied to:
+A decorator can be applied to a class instead of a function.
+This one registers every class it is applied to, in `registry`:
 
 ```python
 # register.py
@@ -329,7 +327,7 @@ if __name__ == "__main__":
 ```
 
 The output is `['Espresso', 'Latte']`.
-The [Metaprogramming](15_Metaprogramming.md) chapter shows `__init_subclass__()`,
+[Metaprogramming](15_Metaprogramming.md) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 ## The Decorator Pattern

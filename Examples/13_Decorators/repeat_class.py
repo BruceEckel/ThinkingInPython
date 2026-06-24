@@ -1,18 +1,17 @@
 # repeat_class.py
 from collections.abc import Callable
 from functools import wraps
-from typing import Any
 
 class repeat:
     def __init__(self, times: int) -> None:
         self.times = times  # The decoration arguments
 
-    def __call__(
-        self, func: Callable[..., Any]) -> Callable[..., Any]:
+    def __call__[**P, R](
+        self, func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            result = None
-            for _ in range(self.times):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            result = func(*args, **kwargs)
+            for _ in range(self.times - 1):
                 result = func(*args, **kwargs)
             return result
         return wrapper

@@ -1,15 +1,14 @@
 # count_calls.py
 from collections.abc import Callable
 from functools import update_wrapper
-from typing import Any
 
-class count_calls:
-    def __init__(self, func: Callable[..., Any]) -> None:
+class count_calls[**P, R]:
+    def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         self.count = 0
         update_wrapper(self, func)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         self.count += 1
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
