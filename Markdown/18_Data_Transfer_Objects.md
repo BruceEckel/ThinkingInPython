@@ -17,9 +17,10 @@ class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
 
-m: Any = Messenger(info="some information", b=['a', 'list'])
+m: Any = Messenger(info="Some information", b=['a', 'list'])
 m.more = 11
 print(m.info, m.b, m.more)
+## Some information ['a', 'list'] 11
 ```
 
 The trick here is that the `__dict__` for the object is just assigned to the `dict` that is automatically created by the `**kwargs` argument.
@@ -46,7 +47,7 @@ from types import SimpleNamespace
 from typing import NamedTuple
 
 # SimpleNamespace is exactly the Messenger idiom, built in:
-m = SimpleNamespace(info="some information", b=["a", "list"])
+m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
 
@@ -65,6 +66,9 @@ class Color(NamedTuple):
     b: int
 
 print(Color(255, 0, 0).r)
+## Some information ['a', 'list'] 11
+## Point(x=1.0, y=2.0)
+## 255
 ```
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,

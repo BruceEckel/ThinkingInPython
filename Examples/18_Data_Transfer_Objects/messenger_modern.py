@@ -6,7 +6,7 @@ from types import SimpleNamespace
 from typing import NamedTuple
 
 # SimpleNamespace is exactly the Messenger idiom, built in:
-m = SimpleNamespace(info="some information", b=["a", "list"])
+m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
 
@@ -25,3 +25,6 @@ class Color(NamedTuple):
     b: int
 
 print(Color(255, 0, 0).r)
+## Some information ['a', 'list'] 11
+## Point(x=1.0, y=2.0)
+## 255
