@@ -5,6 +5,8 @@ DO make essential changes, and put everything else in the REVIEW files.
 
 Look through the book for the misuse of keywords or reserved words as identifiers
 
+Look through the book for uses of random that need to be seeded (use 47) to produce deterministic outputs
+
 Run 'make prose' on each chapter
 
 Creating your own context managers -- didn't I write about this?
