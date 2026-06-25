@@ -45,12 +45,10 @@ line-length = 70
 target-version = "py314"
 
 [tool.ruff.lint]
-# A001/A002/A006 catch a builtin used as an identifier (variable or function
-# name, argument, or lambda argument), e.g. `list = [...]` or `def sum(...)`.
-# A003 (class attributes/methods) is left out so an idiomatic method like
-# `State.next()` is allowed; A004/A005 are about imports and filenames, not
-# identifiers.
-select = ["E", "W", "F", "N", "I", "UP", "A001", "A002", "A006"]
+# The "A" (flake8-builtins) family flags a builtin used as an identifier: a
+# variable or function name (A001), argument (A002), class attribute (A003),
+# import alias (A004), module/filename (A005), or lambda argument (A006).
+select = ["E", "W", "F", "N", "I", "UP", "A"]
 # N818: exception names need not end in "Error" (author preference).
 ignore = ["N818"]
 
