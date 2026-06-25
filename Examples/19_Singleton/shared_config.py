@@ -6,5 +6,7 @@ import config
 from config import settings
 
 settings["theme"] = "dark"  # Write through the imported name
-print(config.settings)  # {'theme': 'dark'}: the same dict
-print(config.settings is settings)  # True
+print(config.settings)  # The same dict
+## {'theme': 'dark'}
+print(config.settings is settings)
+## True

@@ -7,7 +7,7 @@ class OnlyOne:
             self.val = arg
 
         def __str__(self) -> str:
-            return repr(self) + self.val
+            return self.val
 
     instance: Any = None
 
@@ -25,12 +25,17 @@ class OnlyOne:
 
 x = OnlyOne('sausage')
 print(x)
+## sausage
 y = OnlyOne('eggs')
 print(y)
+## eggs
 z = OnlyOne('spam')
 print(z)
+## spam
 print(x)
+## spam
 print(y)
-print(repr(x))
-print(repr(y))
-print(repr(z))
+## spam
+# Distinct wrappers (x is not y), one shared inner instance:
+print(x is y, x.instance is y.instance is z.instance)
+## False True

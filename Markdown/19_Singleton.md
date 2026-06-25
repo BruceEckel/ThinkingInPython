@@ -35,8 +35,10 @@ import config
 from config import settings
 
 settings["theme"] = "dark"  # Write through the imported name
-print(config.settings)  # {'theme': 'dark'}: the same dict
-print(config.settings is settings)  # True
+print(config.settings)  # The same dict
+## {'theme': 'dark'}
+print(config.settings is settings)
+## True
 ```
 
 No class, no ceremony.
@@ -70,6 +72,7 @@ b = settings()
 assert a is b
 a.data["theme"] = "dark"
 print(b.data)
+## {'theme': 'dark'}
 ```
 
 If you need the class itself to hand back one instance from its own constructor,
@@ -94,7 +97,7 @@ class OnlyOne:
             self.val = arg
 
         def __str__(self) -> str:
-            return repr(self) + self.val
+            return self.val
 
     instance: Any = None
 
@@ -112,15 +115,20 @@ class OnlyOne:
 
 x = OnlyOne('sausage')
 print(x)
+## sausage
 y = OnlyOne('eggs')
 print(y)
+## eggs
 z = OnlyOne('spam')
 print(z)
+## spam
 print(x)
+## spam
 print(y)
-print(repr(x))
-print(repr(y))
-print(repr(z))
+## spam
+# Distinct wrappers (x is not y), one shared inner instance:
+print(x is y, x.instance is y.instance is z.instance)
+## False True
 ```
 
 Because the inner class is named with a double underscore,
@@ -145,7 +153,7 @@ class OnlyOne:
             self.val: str | None = None
 
         def __str__(self) -> str:
-            return repr(self) + str(self.val)
+            return str(self.val)
 
     instance: Any = None
 
@@ -163,14 +171,22 @@ class OnlyOne:
 x = OnlyOne()
 x.val = 'sausage'
 print(x)
+## sausage
 y = OnlyOne()
 y.val = 'eggs'
 print(y)
+## eggs
 z = OnlyOne()
 z.val = 'spam'
 print(z)
+## spam
 print(x)
+## spam
 print(y)
+## spam
+# __new__ returns the one instance every time, so all three are it:
+print(x is y is z)
+## True
 ```
 
 ### Borg: Share State Instead of Identity
@@ -202,15 +218,20 @@ class Singleton(Borg):
 
 x = Singleton('sausage')
 print(x)
+## sausage
 y = Singleton('eggs')
 print(y)
+## eggs
 z = Singleton('spam')
 print(z)
+## spam
 print(x)
+## spam
 print(y)
-print(repr(x))
-print(repr(y))
-print(repr(z))
+## spam
+# Distinct objects (x is not y), but one shared __dict__:
+print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
+## False True
 ```
 
 This has the same effect as the singleton,

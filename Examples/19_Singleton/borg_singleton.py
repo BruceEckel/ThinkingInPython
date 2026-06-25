@@ -18,12 +18,17 @@ class Singleton(Borg):
 
 x = Singleton('sausage')
 print(x)
+## sausage
 y = Singleton('eggs')
 print(y)
+## eggs
 z = Singleton('spam')
 print(z)
+## spam
 print(x)
+## spam
 print(y)
-print(repr(x))
-print(repr(y))
-print(repr(z))
+## spam
+# Distinct objects (x is not y), but one shared __dict__:
+print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
+## False True

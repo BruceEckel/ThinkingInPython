@@ -7,7 +7,7 @@ class OnlyOne:
             self.val: str | None = None
 
         def __str__(self) -> str:
-            return repr(self) + str(self.val)
+            return str(self.val)
 
     instance: Any = None
 
@@ -25,11 +25,19 @@ class OnlyOne:
 x = OnlyOne()
 x.val = 'sausage'
 print(x)
+## sausage
 y = OnlyOne()
 y.val = 'eggs'
 print(y)
+## eggs
 z = OnlyOne()
 z.val = 'spam'
 print(z)
+## spam
 print(x)
+## spam
 print(y)
+## spam
+# __new__ returns the one instance every time, so all three are it:
+print(x is y is z)
+## True

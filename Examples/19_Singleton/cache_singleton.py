@@ -16,3 +16,4 @@ b = settings()
 assert a is b
 a.data["theme"] = "dark"
 print(b.data)
+## {'theme': 'dark'}
