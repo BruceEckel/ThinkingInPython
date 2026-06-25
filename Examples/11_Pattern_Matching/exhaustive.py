@@ -23,4 +23,6 @@ def area(shape: Shape) -> float:
             assert_never(shape)
 
 print(round(area(Circle(1.0)), 4))
+## 3.1416
 print(area(Square(2.0)))
+## 4.0

@@ -10,5 +10,8 @@ def step(command: str) -> str:
             return f"unknown command: {other}"
 
 print(step("up"))
+## y -= 1
 print(step("d"))
+## y += 1
 print(step("jump"))
+## unknown command: jump

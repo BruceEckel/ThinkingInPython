@@ -326,7 +326,7 @@ It is usually taught through inheritance, but that is only one form of it.
 More broadly, polymorphism means a function parameter accepts more than one type.
 The questions are which types it accepts,
 and what the function may do with them.
-This section draws on my talk [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
+This section draws on my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
 
 The classic object-oriented answer uses an abstract base class.
 The base type names both the allowed types, its subclasses,
@@ -334,8 +334,6 @@ and what you may do with them, its methods:
 
 ```python
 # shapes_oo.py
-# The classic object-oriented shapes: an abstract base class with an
-# overridden method, dispatched by inheritance.
 import math
 from abc import ABC, abstractmethod
 from typing import override
@@ -409,7 +407,8 @@ a structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
-A third answer names a closed set of types as a union and dispatches with `match` (the [Pattern Matching](11_Pattern_Matching.md#exhaustive-matching) chapter).
+A third answer names a closed set of types as a union and dispatches with `match`,
+introduced in [Pattern Matching](11_Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles each case.
 There is no base class and no overridden method,
 and the type checker confirms the match covers every shape:
@@ -456,7 +455,7 @@ Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.
 The object-oriented default quietly assumes you will add types more often than operations,
 which is not always true.
-The [Multiple Dispatching](28_Multiple_Dispatching.md#one-type-or-many) and [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) chapters return to this trade-off.
+[Multiple Dispatching](28_Multiple_Dispatching.md#one-type-or-many) and [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
 ## Verifying the Claims
 
@@ -519,7 +518,7 @@ A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and hashing for free.
 Defining a type is itself valuable,
-as the [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values) chapter argues.
+as [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values) argues.
 
 The shift is in the default.
 Start with functions and data.
@@ -542,8 +541,6 @@ Carry these into the chapters that follow:
 
 The rest of this book is about design patterns.
 Many of them were invented to work around limitations of older object-oriented languages.
-Read them with the lens of this chapter.
+Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol already solve the problem.
-The next chapter, [The Pattern Concept](17_The_Pattern_Concept.md),
-begins that examination.

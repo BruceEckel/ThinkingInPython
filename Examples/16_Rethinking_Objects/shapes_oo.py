@@ -1,6 +1,4 @@
 # shapes_oo.py
-# The classic object-oriented shapes: an abstract base class with an
-# overridden method, dispatched by inheritance.
 import math
 from abc import ABC, abstractmethod
 from typing import override

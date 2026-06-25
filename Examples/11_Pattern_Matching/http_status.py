@@ -13,5 +13,8 @@ def describe(status: int) -> str:
             return f"Status {status}"
 
 print(describe(200))
+## OK
 print(describe(404))
+## Not Found
 print(describe(301))
+## Status 301
