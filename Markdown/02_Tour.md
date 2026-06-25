@@ -32,11 +32,19 @@ response = "yes"
 if response == "yes":
     print("affirmative")
     val = 1
+## affirmative
 print("continuing...")
+## continuing...
 ```
 
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
+In this book, the first line of an example will be the name of the file containing that example.
+That file can be found in the chapter's `Examples` subdirectory.
+So the above example can be found in `Examples/02_Tour/if.py`.
+
+The `##` comments are particular to this book: they show the console output for the example.
+The book tooling validates that this output is correct.
 
 In a C/C++ `if`, you are required to use parentheses around the conditional.
 Parentheses are not necessary in Python, although it won't complain if you use them.
@@ -71,10 +79,13 @@ x = "ten"     # The same name now binds to a str
 a = [1, 2, 3]
 b = a         # b binds to the same list, not a copy
 b.append(4)
-print(a)       # [1, 2, 3, 4]: a and b are the same object
-print(a is b)  # True: identical objects
+print(a)       # a and b are the same object
+## [1, 2, 3, 4]
+print(a is b)  # Identical objects
+## True
 c = a[:]       # A shallow copy
-print(a is c, a == c)  # False True: different object, equal value
+print(a is c, a == c)  # Different object, equal value
+## False True
 ```
 
 Use `==` to ask whether two objects have equal values.
@@ -89,9 +100,11 @@ which makes it easy to swap without a temporary:
 
 a, b = 1, 2
 a, b = b, a         # Swap, no temporary needed
-print(a, b)         # 2 1
+print(a, b)
+## 2 1
 first, *rest = [10, 20, 30, 40]
-print(first, rest)  # 10 [20, 30, 40]
+print(first, rest)
+## 10 [20, 30, 40]
 ```
 
 Numbers, strings, and tuples are *immutable*, which means that
@@ -110,15 +123,22 @@ The operators are what you expect, with two worth noting:
 ```python
 # numbers.py
 
-print(7 / 2)    # 3.5: true division, always a float
-print(7 // 2)   # 3: floor division
-print(7 % 2)    # 1: remainder
-print(2 ** 10)  # 1024: exponentiation
+print(7 / 2)    # True division, always a float
+## 3.5
+print(7 // 2)   # Floor division
+## 3
+print(7 % 2)    # Remainder
+## 1
+print(2 ** 10)  # Exponentiation
+## 1024
 print(10 ** 30) # A 31-digit int, no overflow
-print(abs(-5), round(3.14159, 2))  # 5 3.14
+## 1000000000000000000000000000000
+print(abs(-5), round(3.14159, 2))
+## 5 3.14
 total = 0
 total += 5      # Augmented assignment, like other languages
 print(total)
+## 5
 ```
 
 There is no `++` or `--`; use `+= 1` and `-= 1`.
@@ -135,17 +155,24 @@ each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
 # bitwise.py
 # Bitwise and shift operators on integers. Binary literals
 # (starting with 0b) make the bit patterns easy to see.
-print(0b1100 & 0b1010)  # 8: AND, bits set in both
-print(0b1100 | 0b1010)  # 14: OR, bits set in either
-print(0b1100 ^ 0b1010)  # 6: XOR, bits set in exactly one
-print(~0b1100)          # -13: NOT, inverts every bit
-print(1 << 4)           # 16: left shift, same as 1 * 2 ** 4
-print(64 >> 2)          # 16: right shift, same as 64 // 2 ** 2
+print(0b1100 & 0b1010)  # AND, bits set in both
+## 8
+print(0b1100 | 0b1010)  # OR, bits set in either
+## 14
+print(0b1100 ^ 0b1010)  # XOR, bits set in exactly one
+## 6
+print(~0b1100)          # NOT, inverts every bit
+## -13
+print(1 << 4)           # left shift, same as 1 * 2 ** 4
+## 16
+print(64 >> 2)          # right shift, same as 64 // 2 ** 2
+## 16
 
 flags = 0
 flags |= 0b0010         # Set bits with the augmented form
 flags |= 0b1000
-print(flags)            # 10
+print(flags)
+## 10
 ```
 
 Python reserves one further operator, `@` (with `@=` to match),
@@ -170,12 +197,21 @@ and it lets you write `if items:` instead of `if len(items) != 0:`.
 
 for value in [0, 1, "", "hi", [], [1], None]:
     print(repr(value), "->", bool(value))
+## 0 -> False
+## 1 -> True
+## '' -> False
+## 'hi' -> True
+## [] -> False
+## [1] -> True
+## None -> False
 
 if not []:
     print("empty")        # An empty list is falsy
+## empty
 
 name = "" or "default"    # 'or' returns the first truthy operand
 print(name)               # default
+## default
 ```
 
 `and` and `or` short-circuit and return one of their operands,
@@ -202,6 +238,17 @@ print('''
 "It's the blemange!"
 ''')
 print(r'c:\python\lib\utils')
+## That isn't a horse
+## You are not a "Viking"
+##
+## You're just pounding two
+## coconut halves together.
+##
+##
+## "Oh no!" He exclaimed.
+## "It's the blemange!"
+##
+## c:\python\lib\utils
 ```
 
 Note that Python was not named after the snake,
@@ -224,9 +271,11 @@ Follow the string with a '`%`' and the values to substitute:
 
 val = 47
 print("The number is %d" % val)
+## The number is 47
 val2 = 63.4
 s = "val: %d, val2: %f" % (val, val2)
 print(s)
+## val: 47, val2: 63.400000
 ```
 
 As you can see in the second case,
@@ -246,11 +295,15 @@ It is readable, fast, and preferred:
 
 name = "Alice"
 score = 91.5
-print(f"{name} scored {score}")             # Alice scored 91.5
-print(f"{name} scored {score:.0f}%")        # Alice scored 92%
-print(f"{name!r} has {len(name)} letters")  # 'Alice' has 5 letters
+print(f"{name} scored {score}")
+## Alice scored 91.5
+print(f"{name} scored {score:.0f}%")
+## Alice scored 92%
+print(f"{name!r} has {len(name)} letters")
+## 'Alice' has 5 letters
 total = 7
 print(f"{total = }")  # total = 7: useful for debugging
+## total = 7
 ```
 
 The format spec after a colon controls width, precision, and alignment,
@@ -266,13 +319,20 @@ and string methods return new strings rather than changing the original:
 # string_methods.py
 
 s = "  Hello, World  "
-print(s.strip())              # 'Hello, World'
-print(s.strip().lower())      # 'hello, world'
-print("World" in s)           # True
-print("a,b,c".split(","))     # ['a', 'b', 'c']
-print("-".join(["2024", "06", "15"]))  # '2024-06-15'
-print("ababab".replace("a", "X"))      # 'XbXbXb'
-print(s.strip()[0:5])         # 'Hello': slicing
+print(s.strip())
+## Hello, World
+print(s.strip().lower())
+## hello, world
+print("World" in s)
+## True
+print("a,b,c".split(","))
+## ['a', 'b', 'c']
+print("-".join(["2024", "06", "15"]))
+## 2024-06-15
+print("ababab".replace("a", "X"))
+## XbXbXb
+print(s.strip()[0:5])
+## Hello
 ```
 
 ## Functions
@@ -293,7 +353,11 @@ def banner(text, width=20):  # width has a default value
     return f"{line}\n{text}\n{line}"
 
 print(greet("Alice"))         # Hello, Alice
+## Hello, Alice
 print(banner("Hi", width=4))  # pass an argument by name
+## ****
+## Hi
+## ****
 ```
 
 A parameter can have a default, which makes it optional at the call site.
