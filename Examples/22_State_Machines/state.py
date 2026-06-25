@@ -5,5 +5,5 @@
 class State:
     def run(self) -> None:
         raise NotImplementedError("run not implemented")
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         raise NotImplementedError("next not implemented")

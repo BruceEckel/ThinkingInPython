@@ -3,10 +3,10 @@ from typing import override
 from simple_class import Simple
 
 class Simple2(Simple):  # Simple2 inherits Simple
-    def __init__(self, str):
+    def __init__(self, text):
         print("Inside Simple2 constructor")
         # Call the base-class constructor with super():
-        super().__init__(str)
+        super().__init__(text)
     def display(self):
         self.show("Called from display()")
     @override

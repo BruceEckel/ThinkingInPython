@@ -13,10 +13,10 @@ class StateT(State):
     def __init__(self) -> None:
         self.transitions: dict[Any, Any] | None = None
     @override
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         assert self.transitions is not None
-        if input in self.transitions:
-            return self.transitions[input]
+        if event in self.transitions:
+            return self.transitions[event]
         else:
             raise Exception("Input not supported for current state")
 
@@ -25,54 +25,54 @@ class Waiting(StateT):
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
     @override
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.APPEARS : MouseTrap.luring
             }
-        return StateT.next(self, input)
+        return StateT.next(self, event)
 
 class Luring(StateT):
     @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
     @override
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ENTERS : MouseTrap.trapping,
               MouseAction.RUNS_AWAY : MouseTrap.waiting
             }
-        return StateT.next(self, input)
+        return StateT.next(self, event)
 
 class Trapping(StateT):
     @override
     def run(self) -> None:
         print("Trapping: Closing door")
     @override
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ESCAPES : MouseTrap.waiting,
               MouseAction.TRAPPED : MouseTrap.holding
             }
-        return StateT.next(self, input)
+        return StateT.next(self, event)
 
 class Holding(StateT):
     @override
     def run(self) -> None:
         print("Holding: Mouse caught")
     @override
-    def next(self, input: object) -> State:
+    def next(self, event: object) -> State:
         # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.REMOVED : MouseTrap.waiting
             }
-        return StateT.next(self, input)
+        return StateT.next(self, event)
 
 class MouseTrap(StateMachine):
     waiting: State

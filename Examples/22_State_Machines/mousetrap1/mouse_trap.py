@@ -17,8 +17,8 @@ class Waiting(State):
         print("Waiting: Broadcasting cheese smell")
 
     @override
-    def next(self, input: object) -> State:
-        match input:
+    def next(self, event: object) -> State:
+        match event:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
             case _:
@@ -30,8 +30,8 @@ class Luring(State):
         print("Luring: Presenting Cheese, door open")
 
     @override
-    def next(self, input: object) -> State:
-        match input:
+    def next(self, event: object) -> State:
+        match event:
             case MouseAction.RUNS_AWAY:
                 return MouseTrap.waiting
             case MouseAction.ENTERS:
@@ -45,8 +45,8 @@ class Trapping(State):
         print("Trapping: Closing door")
 
     @override
-    def next(self, input: object) -> State:
-        match input:
+    def next(self, event: object) -> State:
+        match event:
             case MouseAction.ESCAPES:
                 return MouseTrap.waiting
             case MouseAction.TRAPPED:
@@ -60,8 +60,8 @@ class Holding(State):
         print("Holding: Mouse caught")
 
     @override
-    def next(self, input: object) -> State:
-        match input:
+    def next(self, event: object) -> State:
+        match event:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
             case _:

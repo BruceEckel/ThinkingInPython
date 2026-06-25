@@ -49,12 +49,12 @@ Here, the same function applies the '`+`' operator to integers and strings:
 ```python
 # sum.py
 
-def sum(arg1, arg2):
+def add(arg1, arg2):
     return arg1 + arg2
 
-print(sum(42, 47))
+print(add(42, 47))
 ## 89
-print(sum('spam ', "eggs"))
+print(add('spam ', "eggs"))
 ## spam eggs
 ```
 
