@@ -24,12 +24,12 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-def main() -> None:
-    seen: set[type] = set()
-    for t in parse("trash.dat"):
-        if type(t) not in seen:
-            seen.add(type(t))
-            print(recycling_note(t))
-
-if __name__ == "__main__":
-    main()
+seen: set[type] = set()
+for t in parse("trash.dat"):
+    if type(t) not in seen:
+        seen.add(type(t))
+        print(recycling_note(t))
+## Glass: sort by color, then crush
+## Paper: no special handling
+## Aluminum: crush and bale
+## Cardboard: flatten and bundle

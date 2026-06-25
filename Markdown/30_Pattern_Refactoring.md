@@ -133,23 +133,49 @@ from collections import defaultdict
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
-def main() -> None:
-    bins: dict[type, list[Trash]] = defaultdict(list)
-    for t in parse("trash.dat"):
-        if isinstance(t, Aluminum):
-            bins[Aluminum].append(t)
-        elif isinstance(t, Paper):
-            bins[Paper].append(t)
-        elif isinstance(t, Glass):
-            bins[Glass].append(t)
-        elif isinstance(t, Cardboard):
-            bins[Cardboard].append(t)
-    for kind, items in bins.items():
-        print(f"--- {kind.__name__} ---")
-        sum_value(items)
-
-if __name__ == "__main__":
-    main()
+bins: dict[type, list[Trash]] = defaultdict(list)
+for t in parse("trash.dat"):
+    if isinstance(t, Aluminum):
+        bins[Aluminum].append(t)
+    elif isinstance(t, Paper):
+        bins[Paper].append(t)
+    elif isinstance(t, Glass):
+        bins[Glass].append(t)
+    elif isinstance(t, Cardboard):
+        bins[Cardboard].append(t)
+for kind, items in bins.items():
+    print(f"--- {kind.__name__} ---")
+    sum_value(items)
+## --- Glass ---
+## weight of Glass = 54.0
+## weight of Glass = 17.0
+## weight of Glass = 11.0
+## weight of Glass = 68.0
+## weight of Glass = 43.0
+## weight of Glass = 63.0
+## weight of Glass = 50.0
+## weight of Glass = 80.0
+## Total value = 88.78
+## --- Paper ---
+## weight of Paper = 22.0
+## weight of Paper = 11.0
+## weight of Paper = 88.0
+## weight of Paper = 91.0
+## Total value = 21.20
+## --- Aluminum ---
+## weight of Aluminum = 89.0
+## weight of Aluminum = 76.0
+## weight of Aluminum = 25.0
+## weight of Aluminum = 34.0
+## weight of Aluminum = 27.0
+## weight of Aluminum = 18.0
+## weight of Aluminum = 81.0
+## Total value = 584.50
+## --- Cardboard ---
+## weight of Cardboard = 96.0
+## weight of Cardboard = 44.0
+## weight of Cardboard = 12.0
+## Total value = 120.08
 ```
 
 This satisfies the requirement, but it has a classic flaw:
@@ -173,16 +199,42 @@ from collections import defaultdict
 from parse_trash import parse
 from trash import Trash, sum_value
 
-def main() -> None:
-    bins: dict[type, list[Trash]] = defaultdict(list)
-    for t in parse("trash.dat"):
-        bins[type(t)].append(t)  # Bin chosen by the piece itself
-    for kind, items in bins.items():
-        print(f"--- {kind.__name__} ---")
-        sum_value(items)
-
-if __name__ == "__main__":
-    main()
+bins: dict[type, list[Trash]] = defaultdict(list)
+for t in parse("trash.dat"):
+    bins[type(t)].append(t)  # Bin chosen by the piece itself
+for kind, items in bins.items():
+    print(f"--- {kind.__name__} ---")
+    sum_value(items)
+## --- Glass ---
+## weight of Glass = 54.0
+## weight of Glass = 17.0
+## weight of Glass = 11.0
+## weight of Glass = 68.0
+## weight of Glass = 43.0
+## weight of Glass = 63.0
+## weight of Glass = 50.0
+## weight of Glass = 80.0
+## Total value = 88.78
+## --- Paper ---
+## weight of Paper = 22.0
+## weight of Paper = 11.0
+## weight of Paper = 88.0
+## weight of Paper = 91.0
+## Total value = 21.20
+## --- Aluminum ---
+## weight of Aluminum = 89.0
+## weight of Aluminum = 76.0
+## weight of Aluminum = 25.0
+## weight of Aluminum = 34.0
+## weight of Aluminum = 27.0
+## weight of Aluminum = 18.0
+## weight of Aluminum = 81.0
+## Total value = 584.50
+## --- Cardboard ---
+## weight of Cardboard = 96.0
+## weight of Cardboard = 44.0
+## weight of Cardboard = 12.0
+## Total value = 120.08
 ```
 
 `type(t)` is the perfect key: it adapts to whatever types show up,
@@ -236,15 +288,15 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-def main() -> None:
-    seen: set[type] = set()
-    for t in parse("trash.dat"):
-        if type(t) not in seen:
-            seen.add(type(t))
-            print(recycling_note(t))
-
-if __name__ == "__main__":
-    main()
+seen: set[type] = set()
+for t in parse("trash.dat"):
+    if type(t) not in seen:
+        seen.add(type(t))
+        print(recycling_note(t))
+## Glass: sort by color, then crush
+## Paper: no special handling
+## Aluminum: crush and bale
+## Cardboard: flatten and bundle
 ```
 
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
