@@ -23,7 +23,4 @@ b = Registry()
 assert a is b
 a.items.append("widget")
 print(b.items)
-
-""" Output:
-['widget']
-"""
+## ['widget']

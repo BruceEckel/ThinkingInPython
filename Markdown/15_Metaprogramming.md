@@ -5,15 +5,20 @@ special objects called "classes" that we set up to produce objects configured to
 
 Classes are just objects, and you can modify them the same way:
 
-    >>> class Foo: pass
-    ...
-    >>> Foo.field = 42
-    >>> x = Foo()
-    >>> x.field
-    42
-    >>> Foo.method = lambda self: "Hi!"
-    >>> x.method()
-    'Hi!'
+```python
+# modify_class.py
+class Foo:
+    pass
+
+Foo.field = 42  # type: ignore
+x = Foo()
+print(x.field)  # type: ignore
+## 42
+
+Foo.method = lambda self: "Hi!"  # type: ignore
+print(x.method())  # type: ignore
+## Hi!
+```
 
 A change to a class affects every object of that class,
 even ones already created.
@@ -46,13 +51,25 @@ Since metaclasses create classes, you can call the metaclass yourself.
 `type` with one argument gives the type of an existing object.
 `type` with three arguments creates a new class: the name,
 a tuple of base classes, and a namespace dictionary of fields and methods.
-So the equivalent of:
+So a plain class definition is shorthand for calling `type` yourself:
 
-    class C: pass
+```python
+# class_via_type.py
+class C:
+    pass
 
-is:
+D = type('D', (), {})  # The same construction, by hand
 
-    C = type('C', (), {})
+# Both are produced by the metaclass type:
+print(type(C), type(D))
+## <class 'type'> <class 'type'>
+# Both inherit object:
+print(C.__bases__, D.__bases__)
+## (<class 'object'>,) (<class 'object'>,)
+# Both make ordinary instances:
+print(isinstance(C(), C), isinstance(D(), D))
+## True True
+```
 
 You can add bases, fields, and methods the same way:
 
@@ -67,16 +84,14 @@ MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
 ml = MyList()
 ml.append("Camembert")
 print(ml)
+## ['Camembert']
 print(ml.x)
+## 42
 ml.howdy("John")
 
 print(ml.__class__.__class__)
-
-""" Output:
-['Camembert']
-42
-Howdy, John
-"""
+## Howdy, John
+## <class 'type'>
 ```
 
 Printing the class of the class produces the metaclass.
@@ -133,6 +148,20 @@ if __name__ == "__main__":
     [create_exec(dsc) for dsc in descriptions]
     exec(initializations, globals())
     Event.run_events()
+## 1.00: Light on [mc]
+## 1.00: Light on [exec]
+## 2.00: Light off [mc]
+## 2.00: Light off [exec]
+## 3.30: Water on [mc]
+## 3.30: Water on [exec]
+## 4.45: Water off [mc]
+## 4.45: Water off [exec]
+## 5.00: Thermostat night [mc]
+## 5.00: Thermostat night [exec]
+## 6.00: Thermostat day [mc]
+## 6.00: Thermostat day [exec]
+## 7.00: Ring bell [mc]
+## 7.00: Ring bell [exec]
 ```
 
 `create_mc()` builds each subclass with `type`.
@@ -192,12 +221,9 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-
-""" Output:
-['Blue', 'Green', 'Red']
-['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
-['Circle', 'Square']
-"""
+## ['Blue', 'Green', 'Red']
+## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
+## ['Circle', 'Square']
 ```
 
 Each time a subclass is created,
@@ -238,10 +264,7 @@ p = Point()
 p.x = 3
 p.y = 4
 print(p.x, p.y)
-
-""" Output:
-3 4
-"""
+## 3 4
 ```
 
 The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__()`.
@@ -273,13 +296,10 @@ class Simple1(metaclass=SimpleMeta1):
 
 simple = Simple1()
 print([m for m in dir(simple) if not m.startswith("__")])
+## ['bar', 'foo', 'uses_metaclass']
 # A method injected by the metaclass:
 print(simple.uses_metaclass())  # type: ignore
-
-""" Output:
-['bar', 'foo', 'uses_metaclass']
-Yes!
-"""
+## Yes!
 ```
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
@@ -287,7 +307,7 @@ except for `__new__()`, which uses `mcl`.
 The `cls` is the class object being built.
 As with any subclass, call the base-class version first through `super()`.
 
-> A note on history. Python 2 spelled the hook differently: you set a
+> Historical note: Python 2 spelled the hook differently: you set a
 > `__metaclass__` field in the class body, and you could even point it at a
 > function or an inline class. Python 3 dropped all of that. There is one way
 > now, the `metaclass=` keyword, and the metaclass must be a real class. This
@@ -330,16 +350,13 @@ class Demo(metaclass=Meta):
     pass
 
 print("added_in_new:", Demo.added_in_new)            # type: ignore
+## added_in_new: 42
 print("has Tag base:", Tag in Demo.__bases__)
+## has Tag base: True
 print("added_in_init present:", hasattr(Demo, "added_in_init"))
+## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
-
-""" Output:
-added_in_new: 42
-has Tag base: True
-added_in_init present: False
-patched_in_init present: True
-"""
+## patched_in_init present: True
 ```
 
 So override `__new__()` when you must change `name`, `bases`,
@@ -385,10 +402,7 @@ d = BSingleton()
 assert c is d
 assert a is not c
 print(a.__class__.__name__, c.__class__.__name__)
-
-""" Output:
-ASingleton BSingleton
-"""
+## ASingleton BSingleton
 ```
 
 Each class gets its own entry in the `_instances` dictionary,
@@ -424,10 +438,7 @@ b = Registry()
 assert a is b
 a.items.append("widget")
 print(b.items)
-
-""" Output:
-['widget']
-"""
+## ['widget']
 ```
 
 The simplest Python singleton of all is a module:
@@ -436,42 +447,62 @@ Choose the lightest tool that solves your problem.
 
 ## Making a Class Final
 
-It is sometimes useful to forbid inheritance, the way Java's `final` does.
-The older literature claims this *requires* a metaclass,
-because the check must run as each subclass is created.
-With `__init_subclass__()`, it does not:
+It is sometimes useful to forbid inheritance.
+The modern way to say so is the `@final` decorator from `typing`:
 
 ```python
 # final.py
-# Preventing inheritance with __init_subclass__, no metaclass
-# required.
+from typing import final
+
+@final
+class B:
+    pass
+
+b = B()
+print(type(b).__name__)
+## B
+
+# A type checker rejects `class C(B): ...`, because it would
+# inherit from a final class.
+```
+
+`@final` is checked statically, by type checkers such as ty, mypy,
+and pyright.
+It states the intent and catches a violation before the code runs.
+It has no runtime effect: the interpreter still lets `class C(B): pass` run.
+
+If you need the interpreter itself to refuse subclassing,
+`__init_subclass__()` can enforce it as each subclass is created.
+The older literature claims this requires a metaclass. It does not:
+
+```python
+# final_runtime.py
+# Runtime finality with __init_subclass__, no metaclass required.
 
 class A:
     pass
 
 class B(A):
-    # Make B final: any attempt to subclass it fails at class
-    # creation.
+    # Any attempt to subclass it fails at class creation:
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
             f"{B.__name__} is final; you cannot subclass it")
 
 print(B.__bases__)
+## (<class '__main__.A'>,)
 
 try:
     class C(B):
         pass
 except TypeError as error:
     print(error)
-
-""" Output:
-(<class '__main__.A'>,)
-B is final; you cannot subclass it
-"""
+## B is final; you cannot subclass it
 ```
 
 The check happens at class-creation time, exactly when it must,
 and `B` itself is built normally because `A` does not forbid subclassing.
+Reach for the runtime version only when `@final` is not enough,
+which is rare.
 
 ## When You Still Need a Metaclass
 
@@ -494,11 +525,13 @@ That is one more reason to avoid metaclasses unless you truly need them.
 Each hook has a small, definite effect, which makes it easy to test.
 The registry should hold only the leaf classes,
 the descriptor should learn its name and store under it,
-and a final class should refuse to be subclassed:
+the `@final` class should carry the final marker,
+and a class made final at runtime should refuse to be subclassed:
 
 ```python
 # test_metaprogramming.py
 import final
+import final_runtime
 import init_subclass
 import pytest
 import set_name
@@ -521,28 +554,18 @@ def test_descriptor_learns_its_name() -> None:
 def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
 
-def test_final_class_cannot_be_subclassed() -> None:
+def test_final_decorator_marks_class() -> None:
+    # @final sets __final__ at runtime; type checkers read it
+    assert final.B.__final__ is True  # type: ignore
+
+def test_runtime_final_cannot_be_subclassed() -> None:
     with pytest.raises(TypeError):
-        class Sub(final.B):
+        class Sub(final_runtime.B):
             pass
 
-def test_non_final_base_can_be_subclassed() -> None:
-    class Ok(final.A):
+def test_runtime_non_final_base_can_be_subclassed() -> None:
+    class Ok(final_runtime.A):
         pass
 
-    assert issubclass(Ok, final.A)
+    assert issubclass(Ok, final_runtime.A)
 ```
-
-## Further Reading
-
-> The `__init_subclass__()` and `__set_name__()` hooks were added in PEP 487:
--   <https://peps.python.org/pep-0487/>
-
-> Python data model reference for class creation, `__set_name__()`,
-> `__init_subclass__()`, `__prepare__()`, and metaclasses:
--   <https://docs.python.org/3/reference/datamodel.html#metaclasses>
-
-> Michele Simionato's articles on the difference between Python 2 and 3
-> metaclasses:
--   <https://www.artima.com/weblogs/viewpost.jsp?thread=236234>
--   <https://www.artima.com/weblogs/viewpost.jsp?thread=236260>

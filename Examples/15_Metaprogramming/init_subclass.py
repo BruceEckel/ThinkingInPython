@@ -40,9 +40,6 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-
-""" Output:
-['Blue', 'Green', 'Red']
-['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
-['Circle', 'Square']
-"""
+## ['Blue', 'Green', 'Red']
+## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
+## ['Circle', 'Square']

@@ -1,5 +1,6 @@
 # test_metaprogramming.py
 import final
+import final_runtime
 import init_subclass
 import pytest
 import set_name
@@ -22,13 +23,17 @@ def test_descriptor_learns_its_name() -> None:
 def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
 
-def test_final_class_cannot_be_subclassed() -> None:
+def test_final_decorator_marks_class() -> None:
+    # @final sets __final__ at runtime; type checkers read it
+    assert final.B.__final__ is True  # type: ignore
+
+def test_runtime_final_cannot_be_subclassed() -> None:
     with pytest.raises(TypeError):
-        class Sub(final.B):
+        class Sub(final_runtime.B):
             pass
 
-def test_non_final_base_can_be_subclassed() -> None:
-    class Ok(final.A):
+def test_runtime_non_final_base_can_be_subclassed() -> None:
+    class Ok(final_runtime.A):
         pass
 
-    assert issubclass(Ok, final.A)
+    assert issubclass(Ok, final_runtime.A)

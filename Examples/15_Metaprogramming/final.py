@@ -1,26 +1,13 @@
 # final.py
-# Preventing inheritance with __init_subclass__, no metaclass
-# required.
+from typing import final
 
-class A:
+@final
+class B:
     pass
 
-class B(A):
-    # Make B final: any attempt to subclass it fails at class
-    # creation.
-    def __init_subclass__(cls, **kwargs: object) -> None:
-        raise TypeError(
-            f"{B.__name__} is final; you cannot subclass it")
+b = B()
+print(type(b).__name__)
+## B
 
-print(B.__bases__)
-
-try:
-    class C(B):
-        pass
-except TypeError as error:
-    print(error)
-
-""" Output:
-(<class '__main__.A'>,)
-B is final; you cannot subclass it
-"""
+# A type checker rejects `class C(B): ...`, because it would
+# inherit from a final class.

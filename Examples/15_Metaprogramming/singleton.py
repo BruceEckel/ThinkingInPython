@@ -25,7 +25,4 @@ d = BSingleton()
 assert c is d
 assert a is not c
 print(a.__class__.__name__, c.__class__.__name__)
-
-""" Output:
-ASingleton BSingleton
-"""
+## ASingleton BSingleton

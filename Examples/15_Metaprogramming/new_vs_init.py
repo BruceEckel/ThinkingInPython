@@ -24,13 +24,10 @@ class Demo(metaclass=Meta):
     pass
 
 print("added_in_new:", Demo.added_in_new)            # type: ignore
+## added_in_new: 42
 print("has Tag base:", Tag in Demo.__bases__)
+## has Tag base: True
 print("added_in_init present:", hasattr(Demo, "added_in_init"))
+## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
-
-""" Output:
-added_in_new: 42
-has Tag base: True
-added_in_init present: False
-patched_in_init present: True
-"""
+## patched_in_init present: True
