@@ -41,7 +41,7 @@ from a_list import a_list
 
 squared_ints = [e ** 2 for e in a_list if isinstance(e, int)]
 print(squared_ints)
-# [1, 81, 0, 16]
+## [1, 81, 0, 16]
 ```
 
 ![Anatomy of a list comprehension](_images/listComprehensions)
@@ -65,7 +65,8 @@ from a_list import a_list
 ints = list(filter(lambda e: isinstance(e, int), a_list))
 
 if __name__ == "__main__":
-    print(ints)  # [1, 9, 0, 4]
+    print(ints)
+## [1, 9, 0, 4]
 ```
 
 `map()` applies a function to each member.
@@ -76,7 +77,7 @@ Squaring needs integers, so it reuses the `ints` from `filtering.py`:
 from filtering import ints
 
 print(list(map(lambda e: e ** 2, ints)))
-# [1, 81, 0, 16]
+## [1, 81, 0, 16]
 ```
 
 The two combine into a single expression:
@@ -87,7 +88,7 @@ from a_list import a_list
 
 print(list(map(lambda e: e ** 2,
                filter(lambda e: isinstance(e, int), a_list))))
-# [1, 81, 0, 16]
+## [1, 81, 0, 16]
 ```
 
 The nested form calls two `lambda`s for every element, and is harder to read.
@@ -116,13 +117,10 @@ matrix = [[1 if col == row else 0 for col in range(3)]
           for row in range(3)]
 for row in matrix:
     print(row)
+## [1, 0, 0]
+## [0, 1, 0]
+## [0, 0, 1]
 ```
-
-The output is:
-
-    [1, 0, 0]
-    [0, 1, 0]
-    [0, 0, 1]
 
 ## Techniques
 
@@ -133,7 +131,7 @@ Use `zip()` to walk two sequences together, taking one element from each:
 names = ["a", "b", "c"]
 values = [1, 2, 3]
 print([f"{n}={v}" for n, v in zip(names, values)])
-# ['a=1', 'b=2', 'c=3']
+## ['a=1', 'b=2', 'c=3']
 ```
 
 Unpack a tuple in the iterator, here a `(name, function)` pair applied to a value:
@@ -149,7 +147,7 @@ print([
     f"{name}({v}) = {f(v)}"
     for (name, f), v in zip(all_slots, values)
 ])
-# ['doubled(10) = 20', 'squared(3) = 9']
+## ['doubled(10) = 20', 'squared(3) = 9']
 ```
 
 A two-level list comprehension using `Path.walk()`:
@@ -187,14 +185,14 @@ names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 unique = {name[0].upper() + name[1:].lower()
           for name in names if len(name) > 1}
 print(sorted(unique))  # Sorted for stable display
-# ['Alice', 'Bob', 'John']
+## ['Alice', 'Bob', 'John']
 
 # set() of a list comprehension gives the same result, but builds a
 # throwaway list first, so the set comprehension is preferred:
 same = set([name[0].upper() + name[1:].lower()
             for name in names if len(name) > 1])
 print(unique == same)
-# True
+## True
 ```
 
 ## Dictionary Comprehensions
@@ -215,7 +213,7 @@ mcase_frequency = {
     for k in mcase
 }
 print(mcase_frequency)
-# {'a': 17, 'b': 34, 'z': 3}
+## {'a': 17, 'b': 34, 'z': 3}
 ```
 
 ## Generator Expressions {#generator-expressions}
@@ -232,9 +230,12 @@ and produces its values one at a time, on demand:
 from itertools import islice
 
 squares = (n ** 2 for n in range(1_000_000))
-print(next(squares))  # 0
-print(next(squares))  # 1
-print(list(islice(squares, 3)))  # [4, 9, 16]
+print(next(squares))
+## 0
+print(next(squares))
+## 1
+print(list(islice(squares, 3)))
+## [4, 9, 16]
 ```
 
 Nothing is computed until you pull a value.
@@ -249,11 +250,11 @@ words = ["pol", "parrot", "pining", "fjord", "ex"]
 
 lengths = set(len(w) for w in words)
 print(sorted(lengths))
-# [2, 3, 5, 6]
+## [2, 3, 5, 6]
 
 initials = dict((w, w[0]) for w in words)
 print(initials)
-# {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
+## {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
 There is no lazy `set` or `dict`, though.
@@ -272,9 +273,12 @@ time and never needs them all, such as `sum()`, `any()`, `all()`, `min()`,
 # genexp_consumers.py
 nums = range(1_000_000)
 
-print(sum(n * n for n in nums))  # 333332833333500000
-print(any(n == 12_345 for n in nums))  # True
-print(max(len(str(n)) for n in nums))  # 6
+print(sum(n * n for n in nums))
+## 333332833333500000
+print(any(n == 12_345 for n in nums))
+## True
+print(max(len(str(n)) for n in nums))
+## 6
 ```
 
 None of these builds an intermediate collection of a million items,
