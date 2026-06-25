@@ -179,7 +179,7 @@ The `bin()` function produces a binary string for `print()`.
 
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
-The built-in numeric types do not implement it;
+The built-in numeric types do not implement it but
 array libraries such as NumPy do.
 
 ## Booleans, None, and Truthiness
@@ -266,7 +266,7 @@ The '`r`' right before a string means "raw,"
 which takes backslashes literally so you don't have to put in an extra backslash in order to insert a literal backslash.
 
 Python uses C's `printf()` string substitution syntax, but for any string at all.
-Follow the string with a '`%`' and the values to substitute:
+After the string, place a '`%`' and the values to substitute:
 
 ```python
 # string_formatting.py
@@ -288,8 +288,8 @@ including control over the number of decimal places and alignment.
 
 ### f-Strings
 
-The modern way to build strings is using *f-string*s:
-prefix the string with `f` and put expressions in curly braces.
+Modern Python  uses *f-string*s.
+Prefix the string with `f` and put expressions in curly braces.
 It is readable, fast, and preferred:
 
 ```python
@@ -304,7 +304,7 @@ print(f"{name} scored {score:.0f}%")
 print(f"{name!r} has {len(name)} letters")
 ## 'Alice' has 5 letters
 total = 7
-print(f"{total = }")  # total = 7: useful for debugging
+print(f"{total = }")  # Useful for debugging
 ## total = 7
 ```
 
@@ -314,8 +314,7 @@ the same mini-language the older formatting used.
 ### Common String Operations
 
 Strings are immutable sequences.
-You can use slicing and `in`,
-and string methods return new strings rather than changing the original:
+You can use slicing to select portions and `in` to test membership:
 
 ```python
 # string_methods.py
@@ -337,6 +336,8 @@ print(s.strip()[0:5])
 ## Hello
 ```
 
+String methods return new strings rather than changing the original.
+
 ## Functions
 
 Functions are defined with `def`, a name, a parameter list, and a colon.
@@ -354,7 +355,7 @@ def banner(text, width=20):  # width has a default value
     line = "*" * width
     return f"{line}\n{text}\n{line}"
 
-print(greet("Alice"))         # Hello, Alice
+print(greet("Alice"))
 ## Hello, Alice
 print(banner("Hi", width=4))  # pass an argument by name
 ## ****
@@ -386,7 +387,8 @@ These can be automatically applied to your code (or at least, pointed out) using
 
 ### File Names
 
-The name must be a valid identifier: letters, digits, underscores, and cannot start with a digit.
+A file name must be a valid identifier containing letters, digits, and underscores.
+It cannot start with a digit.
 
 **Modules** (`.py` files): short, all-lowercase, with underscores between words if that improves
 readability. This is `snake_case`.

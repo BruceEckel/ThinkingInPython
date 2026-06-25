@@ -9,5 +9,5 @@ print(f"{name} scored {score:.0f}%")
 print(f"{name!r} has {len(name)} letters")
 ## 'Alice' has 5 letters
 total = 7
-print(f"{total = }")  # total = 7: useful for debugging
+print(f"{total = }")  # Useful for debugging
 ## total = 7
