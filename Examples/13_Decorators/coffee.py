@@ -49,3 +49,5 @@ if __name__ == "__main__":
 
     cap = ExtraShot(Decaf(Cappuccino()))
     print(f"{cap.description}: ${cap.cost:.2f}")
+## Espresso + Extra shot + Whipped cream: $2.75
+## Cappuccino + Decaf + Extra shot: $2.50

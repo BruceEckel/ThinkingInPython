@@ -22,3 +22,6 @@ def greet(name: str) -> None:
 
 if __name__ == "__main__":
     greet("Bob")
+## Hello, Bob
+## Hello, Bob
+## Hello, Bob

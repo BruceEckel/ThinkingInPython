@@ -21,6 +21,7 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
+## Replacement behavior
 ```
 
 Ordinarily you'd expect to just see "Wensleydale" but `hijack()` replaces the original `cheese()` function
@@ -49,13 +50,10 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
+## Hijacked!
+## Wensleydale
+## Hijacking over...
 ```
-
-The output is:
-
-    Hijacked!
-    Wensleydale
-    Hijacking over...
 
 Decoration is a simple kind of metaprogramming.
 The same idea appears in *Design Patterns* as the *decorator* pattern:
@@ -86,12 +84,9 @@ def add(a: int, b: int) -> int:
 
 if __name__ == "__main__":
     add(2, 3)
+## -> add(2, 3)
+## <- add = 5
 ```
-
-The output is:
-
-    -> add(2, 3)
-    <- add = 5
 
 The `@trace` above `add()` means:
 
@@ -155,11 +150,13 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
+## Hello, Bob
+## Hello, Bob
+## Hello, Bob
 ```
 
 `@repeat(times=3)` calls `repeat(3)`, which returns the real decorator,
 which then wraps `greet`.
-The greeting prints three times.
 
 ### Decorators as Classes
 
@@ -193,6 +190,8 @@ def add(a: int, b: int) -> int:
 
 if __name__ == "__main__":
     add(2, 3)
+## -> add(2, 3)
+## <- add = 5
 ```
 
 `@trace` runs `add = trace(add)`,
@@ -230,7 +229,12 @@ def hello() -> None:
 if __name__ == "__main__":
     hello()
     hello()
-    print(hello.count)  # 2: the state lives on the decorator instance
+    print(hello.count)  # The state lives on the decorator instance
+## call 1 of hello
+## hello
+## call 2 of hello
+## hello
+## 2
 ```
 
 The class form shifts in an important way when the decorator itself takes arguments.
@@ -263,6 +267,9 @@ def greet(name: str) -> None:
 
 if __name__ == "__main__":
     greet("Bob")
+## Hello, Bob
+## Hello, Bob
+## Hello, Bob
 ```
 
 Compare the two cases.
@@ -275,7 +282,7 @@ The function form hides this shift inside an extra nested `def`.
 The class form makes it visible:
 the function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
 
-Which form to use is mostly taste.
+The form you choose is mostly a matter of taste.
 Both forms preserve the wrapped function's exact signature for the type checker,
 using the same `**P` and `R` type parameters.
 The function form is more compact.
@@ -305,19 +312,15 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
+## -> greet('Bob',)
+## Hello, Bob
+## Hello, Bob
+## <- greet = 'Bob'
 ```
 
 This is `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
-
-The output is:
-
-    -> greet('Bob',)
-    Hello, Bob
-    Hello, Bob
-    <- greet = 'Bob'
-
 Each decorator wraps the result of the one below it.
 That nesting is the transparency the pattern depends on.
 Every layer presents the same interface, so the layers compose.
@@ -345,9 +348,9 @@ class Latte:
 
 if __name__ == "__main__":
     print(sorted(registry))
+## ['Espresso', 'Latte']
 ```
 
-The output is `['Espresso', 'Latte']`.
 [Metaprogramming](15_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
@@ -421,12 +424,9 @@ if __name__ == "__main__":
 
     cap = ExtraShot(Decaf(Cappuccino()))
     print(f"{cap.description}: ${cap.cost:.2f}")
+## Espresso + Extra shot + Whipped cream: $2.75
+## Cappuccino + Decaf + Extra shot: $2.50
 ```
-
-The output is:
-
-    Espresso + Extra shot + Whipped cream: $2.75
-    Cappuccino + Decaf + Extra shot: $2.50
 
 `Whipped(ExtraShot(Espresso()))` is the object version of stacked `@` decorators.
 Each extra wraps the drink inside it and forwards through the same two-property interface,
