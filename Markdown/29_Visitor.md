@@ -81,9 +81,15 @@ for flower in flower_gen(10):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
-## Runuculus pollinated by Bee
-## Runuculus pollinated by Fly
-## Runuculus eaten by Worm
+## Gladiolus pollinated by Bee
+## Gladiolus pollinated by Fly
+## Gladiolus eaten by Worm
+## Gladiolus pollinated by Bee
+## Gladiolus pollinated by Fly
+## Gladiolus eaten by Worm
+## Gladiolus pollinated by Bee
+## Gladiolus pollinated by Fly
+## Gladiolus eaten by Worm
 ## Gladiolus pollinated by Bee
 ## Gladiolus pollinated by Fly
 ## Gladiolus eaten by Worm
@@ -102,15 +108,9 @@ for flower in flower_gen(10):
 ## Gladiolus pollinated by Bee
 ## Gladiolus pollinated by Fly
 ## Gladiolus eaten by Worm
-## Runuculus pollinated by Bee
-## Runuculus pollinated by Fly
-## Runuculus eaten by Worm
-## Runuculus pollinated by Bee
-## Runuculus pollinated by Fly
-## Runuculus eaten by Worm
-## Runuculus pollinated by Bee
-## Runuculus pollinated by Fly
-## Runuculus eaten by Worm
+## Chrysanthemum pollinated by Bee
+## Chrysanthemum pollinated by Fly
+## Chrysanthemum eaten by Worm
 ```
 
 The `accept()`/`visit()` pair is *double dispatch*:
