@@ -257,12 +257,25 @@ class SingleTone:
             SingleTone.__instance = instance
         instance.val = val
         return instance
+
+x = SingleTone('sausage')
+print(x.val)
+## sausage
+y = SingleTone('eggs')
+print(y.val)
+## eggs
+z = SingleTone('spam')
+print(z.val)
+## spam
+# Every construction returns the one instance; x.val is now spam:
+print(x.val, x is y is z)
+## spam True
 ```
 
-### As a Class Decorator
+### Singleton Class Decorator
 
 You can wrap a class so that calling it returns a cached instance.
-This is a *class decorator* (see [the Decorators chapter](13_Decorators.md#decorating-classes)):
+This is a *class decorator* (see [Decorators](13_Decorators.md#decorating-classes)):
 
 ```python
 # singleton.py
@@ -289,9 +302,13 @@ x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
 print(x.val)
+## spam
 print(y.val)
+## spam
 print(z.val)
+## spam
 print(x is y is z)
+## True
 ```
 
 Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`,
@@ -302,10 +319,10 @@ But the name no longer points at a class.
 The `__new__()` and metaclass versions below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
-### As a Metaclass
+### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-Metaclasses are covered in [the Metaprogramming chapter](15_Metaprogramming.md#intercepting-instance-creation),
+Metaclasses are covered in [Metaprogramming](15_Metaprogramming.md#intercepting-instance-creation),
 where this same singleton appears next to the simpler hooks that usually replace them.
 It is included here for completeness:
 
@@ -333,23 +350,27 @@ class Bar(metaclass=SingletonMetaClass):
         self.val = val
 
     def __str__(self) -> str:
-        return repr(self) + self.val
+        return self.val
 
 x = Bar('sausage')
 y = Bar('eggs')
 z = Bar('spam')
+# Each Bar(...) reruns __init__ on the one instance, so val is spam:
 print(x)
+## spam
 print(y)
+## spam
 print(z)
+## spam
 print(x is y is z)
+## True
 ```
 
 ## Verifying the Invariant
 
 Each version above promises the same thing:
 you get back one instance (or, for *Borg*, one shared set of state).
-That promise is a single assertion per technique,
-so one test file pins down the whole chapter:
+That promise is a single assertion per technique.
 
 ```python
 # test_singletons.py

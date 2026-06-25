@@ -22,6 +22,10 @@ x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
 print(x.val)
+## spam
 print(y.val)
+## spam
 print(z.val)
+## spam
 print(x is y is z)
+## True

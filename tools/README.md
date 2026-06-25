@@ -333,7 +333,7 @@ extension. The builder resolves each to the real file in `resources/images`
 `build/site/images/`, and warns about any reference with no matching file.
 
 Cross-references between chapters use standard relative Markdown links to the
-target chapter's `.md` file, for example `[the Factory chapter](18_Factory.md)`.
+target chapter's `.md` file, for example `[Factory](18_Factory.md)`.
 These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 `.html` so they also resolve in the site. External links (which carry a scheme)
 are left alone.
