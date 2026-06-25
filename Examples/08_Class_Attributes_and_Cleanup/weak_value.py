@@ -18,10 +18,20 @@ counters = []
 for name in ["First", "Second", "Third"]:
     counters.append(Counter(name))
 
-print(Counter.live_count())  # 3
+print(Counter.live_count())
+## First deleted
+## 2 Counter objects remaining
+## Second deleted
+## 1 Counter objects remaining
+## Third deleted
+## Last Counter object deleted
+## 3
 counters.pop()               # Release "Third"
-print(Counter.live_count())  # 2
+print(Counter.live_count())
+## 2
 counters.pop()               # Release "Second"
-print(Counter.live_count())  # 1
+print(Counter.live_count())
+## 1
 counters.clear()             # Release "First"
-print(Counter.live_count())  # 0
+print(Counter.live_count())
+## 0

@@ -4,8 +4,11 @@ class Stars:
 
 a = Stars()
 b = Stars()
-print(a.rating, b.rating)  # 5 5: Both read the class attr
+print(a.rating, b.rating)  # Both read the class attr
+## 5 5
 a.rating = 1  # Assigning makes an instance variable on a
-print(a.rating, b.rating)  # 1 5: a shadows it, b sees the class
+print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
+## 1 5
 Stars.rating = 9  # Change the shared class attr
-print(a.rating, b.rating)  # 1 9: a instance variable , b class attr
+print(a.rating, b.rating)  # 'a' instance variable, 'b' class attr
+## 1 9

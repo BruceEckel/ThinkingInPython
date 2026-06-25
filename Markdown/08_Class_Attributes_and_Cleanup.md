@@ -24,11 +24,14 @@ class Stars:
 
 a = Stars()
 b = Stars()
-print(a.rating, b.rating)  # 5 5: Both read the class attr
+print(a.rating, b.rating)  # Both read the class attr
+## 5 5
 a.rating = 1  # Assigning makes an instance variable on a
-print(a.rating, b.rating)  # 1 5: a shadows it, b sees the class
+print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
+## 1 5
 Stars.rating = 9  # Change the shared class attr
-print(a.rating, b.rating)  # 1 9: a instance variable , b class attr
+print(a.rating, b.rating)  # 'a' instance variable, 'b' class attr
+## 1 9
 ```
 
 An instance and its class each have their own attribute dictionary.
@@ -43,11 +46,15 @@ class A:
     x = 100  # class attribute
 
 a = A()
-print(vars(A)["x"])  # 100: The attribute lives in the class dict
-print(vars(a))  # {}: The instance has no attributes yet
+print(vars(A)["x"])  # The attribute lives in the class dict
+## 100
+print(vars(a))  # The instance has no attributes yet
+## {}
 a.x = 1
-print(vars(a))  # {'x': 1}: Assignment created it on the instance
-print(vars(A)["x"])  # Still 100
+print(vars(a))  # Assignment created it on the instance
+## {'x': 1}
+print(vars(A)["x"])
+## 100
 ```
 
 So a class attribute seems like a default until someone assigns to an instance variable of the same name.
@@ -72,7 +79,8 @@ class Tally:
 
 a = Tally("a")
 b = Tally("b")
-print(Tally.total)  # 2: shared by the whole class
+print(Tally.total)  # Shared by the whole class
+## 2
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
 
@@ -96,11 +104,12 @@ class A:
 class B:
     x: int = 100  # Constructor default, not class attribute
 
-if __name__ == "__main__":
-    a = A()
-    a.x = -1
-    print(a.x, A().x)  # -1 100: a's change does not leak
-    print(B().x, B(7).x)  # 100 7
+a = A()
+a.x = -1
+print(a.x, A().x)  # The change in a does not leak
+## -1 100
+print(B().x, B(7).x)
+## 100 7
 ```
 
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
@@ -145,23 +154,14 @@ for c in counters:
     print(c)
     del c
 print("End of delete loop")
+## First created
+## Second created
+## Third created
+## Counter('First' 3)
+## Counter('Second' 3)
+## Counter('Third' 3)
+## End of delete loop
 ```
-
-For CPython, the output is:
-
-    First created
-    Second created
-    Third created
-    Counter('First' 3)
-    Counter('Second' 3)
-    Counter('Third' 3)
-    End of delete loop
-    Third deleted
-    2 Counter objects remaining
-    Second deleted
-    1 Counter objects remaining
-    First deleted
-    Last Counter object deleted
 
 `del c` inside the loop does not delete the object.
 It only unbinds the name `c`.
@@ -238,13 +238,23 @@ counters = []
 for name in ["First", "Second", "Third"]:
     counters.append(Counter(name))
 
-print(Counter.live_count())  # 3
+print(Counter.live_count())
+## First deleted
+## 2 Counter objects remaining
+## Second deleted
+## 1 Counter objects remaining
+## Third deleted
+## Last Counter object deleted
+## 3
 counters.pop()               # Release "Third"
-print(Counter.live_count())  # 2
+print(Counter.live_count())
+## 2
 counters.pop()               # Release "Second"
-print(Counter.live_count())  # 1
+print(Counter.live_count())
+## 1
 counters.clear()             # Release "First"
-print(Counter.live_count())  # 0
+print(Counter.live_count())
+## 0
 ```
 
 Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.

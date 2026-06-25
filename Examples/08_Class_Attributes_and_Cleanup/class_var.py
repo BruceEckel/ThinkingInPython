@@ -11,5 +11,6 @@ class Tally:
 
 a = Tally("a")
 b = Tally("b")
-print(Tally.total)  # 2: shared by the whole class
+print(Tally.total)  # Shared by the whole class
+## 2
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
