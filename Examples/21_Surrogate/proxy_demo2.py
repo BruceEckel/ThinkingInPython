@@ -18,5 +18,8 @@ class Proxy2:
 
 p = Proxy2()
 p.f()
+## Implementation.f()
 p.g()
+## Implementation.g()
 p.h()
+## Implementation.h()

@@ -1,6 +1,4 @@
 # counting_proxy.py
-# A "smart reference" proxy: count calls by intercepting attribute
-# access.
 from typing import Any
 
 class Implementation:
@@ -23,6 +21,10 @@ class CountingProxy:
 
 p = CountingProxy(Implementation())
 p.f()
+## f()
 p.g()
+## g()
 p.f()
+## f()
 print("calls:", p.calls)
+## calls: 3
