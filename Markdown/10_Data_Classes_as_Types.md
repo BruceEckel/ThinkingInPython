@@ -52,11 +52,13 @@ def f2(stars: int) -> int:
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 
-if __name__ == "__main__":
-    rating = 6
-    print(rating)
-    print(f1(rating))
-    print(f2(rating))
+rating = 6
+print(rating)
+## 6
+print(f1(rating))
+## 11
+print(f2(rating))
+## 30
 ```
 
 The check is duplicated, it is easy to forget, and the type system is no help.
@@ -93,11 +95,17 @@ class Stars:
         self._number = n + 5
         self._validate()                 # Postcondition
         return self._number
+```
 
-if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
-    print(rating.f1(3))
+```python
+# demo_stars_class.py
+from stars_class import Stars
+
+rating = Stars(4)
+print(rating)
+## Stars(4)
+print(rating.f1(3))
+## 8
 ```
 
 A read-only property keeps outsiders from assigning to `number`,
@@ -124,20 +132,27 @@ class Messenger:
     number: int
     depth: float = 0.0  # Default value
 
-if __name__ == "__main__":
-    m = Messenger("foo", 12, 3.14)
-    print(m)
-    print(m.name, m.number, m.depth)
+m = Messenger("foo", 12, 3.14)
+print(m)
+## Messenger(name='foo', number=12, depth=3.14)
+print(m.name, m.number, m.depth)
+## foo 12 3.14
 
-    # __eq__ is generated, so equal fields compare equal:
-    print(Messenger("xx", 1) == Messenger("xx", 1))
-    print(Messenger("xx", 1) == Messenger("xx", 2))
+# __eq__ is generated, so equal fields compare equal:
+print(Messenger("xx", 1) == Messenger("xx", 1))
+## True
+print(Messenger("xx", 1) == Messenger("xx", 2))
+## False
 
-    mc = replace(m, depth=9.9)  # Copy with one field changed
-    print(m, mc)
+mc = replace(m, depth=9.9)  # Copy with one field changed
+print(m)
+## Messenger(name='foo', number=12, depth=3.14)
+print(mc)
+## Messenger(name='foo', number=12, depth=9.9)
 
-    m.name = "bar"  # A plain data class is mutable
-    print(m)
+m.name = "bar"  # A plain data class is mutable
+print(m)
+## Messenger(name='bar', number=12, depth=3.14)
 ```
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
@@ -162,14 +177,15 @@ class Messenger:
     number: int
     depth: float = 0.0
 
-if __name__ == "__main__":
-    m = Messenger("foo", 12, 3.14)
-    print(m)
+m = Messenger("foo", 12, 3.14)
+print(m)
+## Messenger(name='foo', number=12, depth=3.14)
 
-    # m.name = "bar" would raise dataclasses.FrozenInstanceError
+# m.name = "bar" raises dataclasses.FrozenInstanceError
 
-    cache = {m: "value"}  # Frozen instances are hashable
-    print(cache[m])
+cache = {m: "value"}  # Frozen instances are hashable
+print(cache[m])
+## value
 ```
 
 If an object cannot change after it is built, then validating it once,
@@ -198,12 +214,19 @@ def f1(s: Stars) -> Stars:
 
 def f2(s: Stars) -> Stars:
     return Stars(s.number * 5)
+```
 
-if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
-    print(f1(Stars(2)))
-    print(f2(Stars(2)))
+```python
+# demo_stars.py
+from stars import Stars, f1, f2
+
+rating = Stars(4)
+print(rating)
+## Stars(number=4)
+print(f1(Stars(2)))
+## Stars(number=7)
+print(f2(Stars(2)))
+## Stars(number=10)
 ```
 
 `__post_init__()` is one of the hooks the `dataclass` machinery generates code around.
@@ -268,13 +291,20 @@ class EmailAddress:
 class Person:
     name: FullName
     email: EmailAddress
+```
 
-if __name__ == "__main__":
-    person = Person(
-        FullName("Bruce Eckel"),
-        EmailAddress("bruce@example.com"),
-    )
-    print(person)
+```python
+# demo_person.py
+from person import EmailAddress, FullName, Person
+
+person = Person(
+    FullName("Bruce Eckel"),
+    EmailAddress("bruce@example.com"),
+)
+print(person.name)
+## FullName(text='Bruce Eckel')
+print(person.email)
+## EmailAddress(text='bruce@example.com')
 ```
 
 `Person` declares no checks of its own.
@@ -346,12 +376,17 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
-
-if __name__ == "__main__":
-    print(BirthDate(Month.of(7), Day(8), Year(1957)))
 ```
 
-The `Enum` gives you the set of months for free.
+```python
+# demo_birth_date.py
+from birth_date import BirthDate, Day, Month, Year
+
+print(BirthDate(Month.of(7), Day(8), Year(1957)))
+## BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))
+```
+
+The `Enum` creates the constrained set of `Month`s.
 You cannot construct a thirteenth month,
 because there is no such value to construct.
 
@@ -404,10 +439,15 @@ class Months:
     def of(self, month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return self.months[month_number - 1]
+```
 
-if __name__ == "__main__":
-    months = Months()
-    print(months.of(7))
+```python
+# demo_month_dataclass.py
+from month_dataclass import Months
+
+months = Months()
+print(months.of(7))
+## Month(name='July', n=7, max_days=31)
 ```
 
 Choose the tool that makes the legal set easiest to express.
@@ -422,7 +462,6 @@ make the type responsible for guaranteeing its own values.
 
 ## More Data Class Tools
 
-A few more data class tools are worth knowing.
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,
 recursing into nested data classes.
 `replace()` copies with changes.
@@ -449,17 +488,18 @@ class Config:
     verbose: bool = False
     retries: int = 3
 
-if __name__ == "__main__":
-    p = Point(10, 20)
-    print(asdict(p))   # Nested dict
-    print(astuple(p))  # Nested tuple
-
-    line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))  # Recurses into the list of Points
-
-    print(replace(p, x=1))  # Copy with one field changed
-
-    print(Config("data.csv", retries=5))
+p = Point(10, 20)
+print(asdict(p))   # Nested dict
+## {'x': 10, 'y': 20}
+print(astuple(p))  # Nested tuple
+## (10, 20)
+line = Line([Point(2, 7), Point(10, 4)])
+print(asdict(line))  # Recurses into the list of Points
+## {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
+print(replace(p, x=1))  # Copy with one field changed
+## Point(x=1, y=20)
+print(Config("data.csv", retries=5))
+## Config(source='data.csv', verbose=False, retries=5)
 ```
 
 ## Serializing to JSON
@@ -488,12 +528,20 @@ def from_json(text: str) -> Person:
         EmailAddress(data["email"]["text"]),
     )
 
-if __name__ == "__main__":
-    original = Person(FullName("Bruce Eckel"),
-                      EmailAddress("bruce@example.com"))
-    text = to_json(original)
-    print(text)
-    print(from_json(text) == original)  # True: it round-trips
+original = Person(FullName("Bruce Eckel"),
+                    EmailAddress("bruce@example.com"))
+text = to_json(original)
+print(text)
+## {
+##   "name": {
+##     "text": "Bruce Eckel"
+##   },
+##   "email": {
+##     "text": "bruce@example.com"
+##   }
+## }
+print(from_json(text) == original)  # It round-trips
+## True
 ```
 
 The decode step is where this chapter's idea pays off again.
@@ -522,14 +570,31 @@ class DataClassEncoder(json.JSONEncoder):
             return asdict(o)
         return super().default(o)
 
-if __name__ == "__main__":
-    people = [
-        Person(FullName("Bruce Eckel"),
-               EmailAddress("bruce@example.com")),
-        Person(FullName("Ada Lovelace"),
-               EmailAddress("ada@example.com")),
-    ]
-    print(json.dumps(people, cls=DataClassEncoder, indent=2))
+people = [
+    Person(FullName("Bruce Eckel"),
+            EmailAddress("bruce@example.com")),
+    Person(FullName("Ada Lovelace"),
+            EmailAddress("ada@example.com")),
+]
+print(json.dumps(people, cls=DataClassEncoder, indent=2))
+## [
+##   {
+##     "name": {
+##       "text": "Bruce Eckel"
+##     },
+##     "email": {
+##       "text": "bruce@example.com"
+##     }
+##   },
+##   {
+##     "name": {
+##       "text": "Ada Lovelace"
+##     },
+##     "email": {
+##       "text": "ada@example.com"
+##     }
+##   }
+## ]
 ```
 
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.

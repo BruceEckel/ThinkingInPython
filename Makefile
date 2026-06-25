@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -40,6 +40,7 @@ help:
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
+	@echo "  fix-imports - organize imports in the listings (ruff I rule), in the Markdown"
 	@echo "  extract   - write build/examples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
@@ -110,6 +111,12 @@ ty: extract
 
 lint: extract
 	$(RUFF) check build/examples
+
+# Organize imports in the book's python listings (ruff's I rule), writing the
+# result back into the Markdown. Depends on extract so ruff sees each listing's
+# siblings and classifies imports the way the lint gate does.
+fix-imports: extract
+	$(PY) tools/fix_imports.py --fix
 
 extract:
 	$(PY) tools/extract_examples.py --write

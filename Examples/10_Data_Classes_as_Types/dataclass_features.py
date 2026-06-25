@@ -18,14 +18,15 @@ class Config:
     verbose: bool = False
     retries: int = 3
 
-if __name__ == "__main__":
-    p = Point(10, 20)
-    print(asdict(p))   # Nested dict
-    print(astuple(p))  # Nested tuple
-
-    line = Line([Point(2, 7), Point(10, 4)])
-    print(asdict(line))  # Recurses into the list of Points
-
-    print(replace(p, x=1))  # Copy with one field changed
-
-    print(Config("data.csv", retries=5))
+p = Point(10, 20)
+print(asdict(p))   # Nested dict
+## {'x': 10, 'y': 20}
+print(astuple(p))  # Nested tuple
+## (10, 20)
+line = Line([Point(2, 7), Point(10, 4)])
+print(asdict(line))  # Recurses into the list of Points
+## {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
+print(replace(p, x=1))  # Copy with one field changed
+## Point(x=1, y=20)
+print(Config("data.csv", retries=5))
+## Config(source='data.csv', verbose=False, retries=5)

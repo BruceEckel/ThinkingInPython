@@ -22,10 +22,3 @@ class EmailAddress:
 class Person:
     name: FullName
     email: EmailAddress
-
-if __name__ == "__main__":
-    person = Person(
-        FullName("Bruce Eckel"),
-        EmailAddress("bruce@example.com"),
-    )
-    print(person)

@@ -12,8 +12,10 @@ def f2(stars: int) -> int:
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 
-if __name__ == "__main__":
-    rating = 6
-    print(rating)
-    print(f1(rating))
-    print(f2(rating))
+rating = 6
+print(rating)
+## 6
+print(f1(rating))
+## 11
+print(f2(rating))
+## 30

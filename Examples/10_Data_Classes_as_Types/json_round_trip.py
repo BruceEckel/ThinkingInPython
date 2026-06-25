@@ -13,9 +13,17 @@ def from_json(text: str) -> Person:
         EmailAddress(data["email"]["text"]),
     )
 
-if __name__ == "__main__":
-    original = Person(FullName("Bruce Eckel"),
-                      EmailAddress("bruce@example.com"))
-    text = to_json(original)
-    print(text)
-    print(from_json(text) == original)  # True: it round-trips
+original = Person(FullName("Bruce Eckel"),
+                    EmailAddress("bruce@example.com"))
+text = to_json(original)
+print(text)
+## {
+##   "name": {
+##     "text": "Bruce Eckel"
+##   },
+##   "email": {
+##     "text": "bruce@example.com"
+##   }
+## }
+print(from_json(text) == original)  # It round-trips
+## True

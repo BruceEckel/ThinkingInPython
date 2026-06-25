@@ -21,8 +21,3 @@ class Stars:
         self._number = n + 5
         self._validate()                 # Postcondition
         return self._number
-
-if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
-    print(rating.f1(3))

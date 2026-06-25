@@ -11,11 +11,28 @@ class DataClassEncoder(json.JSONEncoder):
             return asdict(o)
         return super().default(o)
 
-if __name__ == "__main__":
-    people = [
-        Person(FullName("Bruce Eckel"),
-               EmailAddress("bruce@example.com")),
-        Person(FullName("Ada Lovelace"),
-               EmailAddress("ada@example.com")),
-    ]
-    print(json.dumps(people, cls=DataClassEncoder, indent=2))
+people = [
+    Person(FullName("Bruce Eckel"),
+            EmailAddress("bruce@example.com")),
+    Person(FullName("Ada Lovelace"),
+            EmailAddress("ada@example.com")),
+]
+print(json.dumps(people, cls=DataClassEncoder, indent=2))
+## [
+##   {
+##     "name": {
+##       "text": "Bruce Eckel"
+##     },
+##     "email": {
+##       "text": "bruce@example.com"
+##     }
+##   },
+##   {
+##     "name": {
+##       "text": "Ada Lovelace"
+##     },
+##     "email": {
+##       "text": "ada@example.com"
+##     }
+##   }
+## ]
