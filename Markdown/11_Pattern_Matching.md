@@ -252,7 +252,7 @@ print(area(Square(2.0)))
 Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
 A `switch` cannot do this; neither can a chain of `if`/`isinstance()`.
-[Rethinking Objects](16_Rethinking_Objects.md#polymorphism-without-inheritance) uses exactly this technique to add operations to a closed set of types without inheritance.
+[Rethinking Objects](17_Rethinking_Objects.md#polymorphism-without-inheritance) uses exactly this technique to add operations to a closed set of types without inheritance.
 
 ## When Not to Match
 

@@ -463,7 +463,7 @@ Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.
 The object-oriented default quietly assumes you will add types more often than operations,
 which is not always true.
-[Multiple Dispatching](28_Multiple_Dispatching.md#one-type-or-many) and [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
+[Multiple Dispatching](29_Multiple_Dispatching.md#one-type-or-many) and [Visitor](30_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
 ## Verifying the Claims
 

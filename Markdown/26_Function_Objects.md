@@ -362,14 +362,14 @@ def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise
 ```
 
-This is the *Observer* pattern (see [Observer](27_Observer.md#the-pythonic-observer-a-list-of-callables)) narrowed to a single subject:
+This is the *Observer* pattern (see [Observer](28_Observer.md#the-pythonic-observer-a-list-of-callables)) narrowed to a single subject:
 the subscribers are functions,
 and the bus routes each event to them by its type.
 Here a type may have many handlers.
 When instead you want exactly one handler per type,
 chosen by the argument's type and open to new types without editing a central function,
 that is `functools.singledispatch`,
-which [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](30_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it) put to work.
+which [Visitor](30_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](31_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it) put to work.
 
 ## Exercises
 

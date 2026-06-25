@@ -7,8 +7,6 @@ Run 'make prose' on each chapter
 
 Creating your own context managers -- didn't I write about this?
 
-Potential chapter: Performance
-
 in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
   the mirror image of collecting them.
   Can you demo this either in the previous example or a new one
