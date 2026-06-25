@@ -13,5 +13,7 @@ class Temperature:
         return celsius <= 0
 
 t = Temperature.from_fahrenheit(212)
-print(round(t.celsius))             # 100
-print(Temperature.is_freezing(-4))  # True
+print(round(t.celsius))
+## 100
+print(Temperature.is_freezing(-4))
+## True

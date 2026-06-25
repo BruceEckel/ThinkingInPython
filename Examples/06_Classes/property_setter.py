@@ -16,4 +16,5 @@ class Circle:
 
 c = Circle(10)
 c.radius = 5      # The setter validates, then stores
-print(c.radius)   # 5
+print(c.radius)
+## 5

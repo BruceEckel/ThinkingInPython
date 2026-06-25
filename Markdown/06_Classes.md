@@ -20,13 +20,21 @@ class Simple:
     def show_twice(self):
         self.show()  # Calling another method
         self.show()
+```
 
-if __name__ == "__main__":
-    # Create an object:
-    x = Simple("Constructor argument")
-    x.show()
-    x.show("A message")
-    x.show_twice()
+```python
+# demo_simple_class.py
+from simple_class import Simple
+
+x = Simple("Constructor argument")  # Create an object
+## Inside the Simple constructor
+x.show()
+## Constructor argument
+x.show("A message")
+## A message: Constructor argument
+x.show_twice()
+## Constructor argument
+## Constructor argument
 ```
 
 Python methods require a reference to the current object.
@@ -83,15 +91,32 @@ class Simple2(Simple):  # Simple2 inherits Simple
 class Different:
     def show(self):
         print("Not derived from Simple")
+```
 
-if __name__ == "__main__":
-    x = Simple2("Simple2 constructor argument")
-    x.display()
-    x.show()
-    x.show_twice()  # Inherited from Simple
-    def f(obj): obj.show() # Local/nested function
-    f(x)
-    f(Different())
+```python
+# demo_simple2.py
+from simple2 import Different, Simple2
+
+x = Simple2("Simple2 constructor argument")
+## Inside Simple2 constructor
+## Inside the Simple constructor
+x.display()
+## Overridden show() method
+## Called from display(): Simple2 constructor argument
+x.show()
+## Overridden show() method
+## Simple2 constructor argument
+x.show_twice()  # Inherited from Simple
+## Overridden show() method
+## Simple2 constructor argument
+## Overridden show() method
+## Simple2 constructor argument
+def f(obj): obj.show() # Local/nested function
+f(x)
+## Overridden show() method
+## Simple2 constructor argument
+f(Different())
+## Not derived from Simple
 ```
 
 `Simple2` inherits from `Simple`.
@@ -136,19 +161,19 @@ class Derived(Base):
         print("Derived.show")
 
 Derived().show()
+## Derived.show
 ```
 
 A type checker now verifies the claim.
 If `Derived.show` does not actually override a method in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
-This is the same kind of safety that Java's `@Override` annotation provides.
 
 At runtime `@override` does nothing but return the method unchanged,
 so it provides a free validation that you've overridden the method correctly.
 
 Apply `@override` to any method that replaces an inherited method,
-except constructors which are undecorated by convention.
+except constructors, which are undecorated by convention.
 
 ## Properties
 
@@ -167,8 +192,10 @@ class Circle:
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)
-print(c.radius)  # 10
-print(c.area)    # 314.159: Properties don't use parentheses
+print(c.radius)
+## 10
+print(c.area)  # Properties don't use parentheses
+## 314.159
 ```
 
 Because the change is invisible at the call site,
@@ -199,7 +226,8 @@ class Circle:
 
 c = Circle(10)
 c.radius = 5      # The setter validates, then stores
-print(c.radius)   # 5
+print(c.radius)
+## 5
 ```
 
 The getter and setter are independent,
@@ -224,8 +252,10 @@ class Point:
         return f"Point({self.x}, {self.y})"
 
 p = Point(3, 4)
-print(p)       # Point(3, 4): falls back to __repr__
-print([p, p])  # [Point(3, 4), Point(3, 4)]
+print(p)       # Falls back to __repr__
+## Point(3, 4)
+print([p, p])
+## [Point(3, 4), Point(3, 4)]
 ```
 
 Define `__repr__()` on classes you debug.
@@ -252,12 +282,14 @@ class Temperature:
         return celsius <= 0
 
 t = Temperature.from_fahrenheit(212)
-print(round(t.celsius))             # 100
-print(Temperature.is_freezing(-4))  # True
+print(round(t.celsius))
+## 100
+print(Temperature.is_freezing(-4))
+## True
 ```
 
 For classes that are primarily a bundle of typed data,
-the [Data Classes as Types](10_Data_Classes_as_Types.md#data-classes) chapter shows a much shorter path that writes the constructor and `__repr__()` for you.
+[Data Classes as Types](10_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
 
 ## Composing Methods with `import`
 
@@ -286,10 +318,8 @@ class Compose:
         return f"Compose({self.name!r})"
 
 Compose("example").f()
+## utility.f() called on Compose('example')
 ```
 
 Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
-The output shows it displaying that object:
-
-    utility.f() called on Compose('example')

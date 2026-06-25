@@ -8,5 +8,7 @@ class Point:
         return f"Point({self.x}, {self.y})"
 
 p = Point(3, 4)
-print(p)       # Point(3, 4): falls back to __repr__
-print([p, p])  # [Point(3, 4), Point(3, 4)]
+print(p)       # Falls back to __repr__
+## Point(3, 4)
+print([p, p])
+## [Point(3, 4), Point(3, 4)]

@@ -13,10 +13,3 @@ class Simple:
     def show_twice(self):
         self.show()  # Calling another method
         self.show()
-
-if __name__ == "__main__":
-    # Create an object:
-    x = Simple("Constructor argument")
-    x.show()
-    x.show("A message")
-    x.show_twice()
