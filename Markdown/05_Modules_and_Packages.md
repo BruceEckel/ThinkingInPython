@@ -121,6 +121,7 @@ To import a module from a package, you must qualify it with the package name:
 # using_packages.py
 import a_package.module1
 import a_package.module2
+
 ## importing module1 in a_package
 ## importing module2 in a_package
 print(a_package.module1.function1())
@@ -134,6 +135,7 @@ You can also name the package with `from`:
 ```python
 # from_packages.py
 from a_package import module1, module2
+
 ## importing module1 in a_package
 ## importing module2 in a_package
 print(module1.function1())
@@ -150,6 +152,7 @@ You can bring specific functions into the namespace by naming both the package a
 # no_qualification.py
 from a_package.module1 import function1
 from a_package.module2 import function2
+
 ## importing module1 in a_package
 ## importing module2 in a_package
 print(function1())
@@ -178,6 +181,7 @@ To import `module3` we must specify both packages:
 ```python
 # two_levels.py
 from a_package.b_package import module3
+
 ## importing module3 in b_package
 print(module3.function3())
 ## function3 in module3 in b_package

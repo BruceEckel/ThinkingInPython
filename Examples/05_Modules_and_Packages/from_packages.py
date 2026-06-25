@@ -1,5 +1,6 @@
 # from_packages.py
 from a_package import module1, module2
+
 ## importing module1 in a_package
 ## importing module2 in a_package
 print(module1.function1())
