@@ -69,7 +69,11 @@ thermo = Thermometer()
 thermo.subscribe(lambda c: print(f"display: {c}C"))
 thermo.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
 thermo.celsius = 25
+## display: 25C
+## ok
 thermo.celsius = 150
+## display: 150C
+## alarm!
 ```
 
 The observers here are lambdas, but any function or bound method works.
