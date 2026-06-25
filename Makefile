@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -35,6 +35,8 @@ help:
 	@echo "  serve     - serve build/site/ at http://localhost:8000"
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  run       - run every extracted .py and report failures"
+	@echo "  output    - update the ## output markers in the book's listings"
+	@echo "  output-check - verify the ## output markers without rewriting"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
@@ -89,6 +91,16 @@ examples: extract run
 # checked. Use `make reset` to force a clean regeneration.
 run: extract
 	$(PY) tools/run_examples.py
+
+# Rewrite the ## output markers inside the Markdown's ```python listings to the
+# stdout each listing actually produces. Depends on extract so each listing runs
+# from build/examples/<chapter>/, where its sibling imports and data files live.
+output: extract
+	$(PY) tools/validate_output.py --update Markdown
+
+# Same, but report mismatches instead of rewriting (a gate-friendly check).
+output-check: extract
+	$(PY) tools/validate_output.py Markdown
 
 test: extract
 	$(PYTEST) $(PYTEST_N) build/examples
