@@ -21,8 +21,11 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-def make(name: str) -> Shape:
-    return Shape.registry[name]()
+def make(kind: str) -> Shape:
+    return Shape.registry[kind]()
 
-for name in ["Circle", "Square", "Circle"]:
-    make(name).draw()
+for kind in ["Circle", "Square", "Circle"]:
+    make(kind).draw()
+## Circle.draw
+## Square.draw
+## Circle.draw

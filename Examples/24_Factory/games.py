@@ -3,32 +3,31 @@
 from typing import override
 
 class Obstacle:
-    def action(self) -> None: pass
+    def action(self) -> str:
+        raise NotImplementedError
 
 class Character:
-    def interact_with(self, obstacle: Obstacle) -> None: pass
+    def interact_with(self, obstacle: Obstacle) -> None: ...
 
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-        obstacle.action())
+        print("Kitty has encountered a", obstacle.action())
 
-class KungFuGuy(Character):
+class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("KungFuGuy now battles a",
-        obstacle.action())
+        print("Warrior now battles a", obstacle.action())
 
 class Puzzle(Obstacle):
     @override
-    def action(self) -> None:
-        print("Puzzle")
+    def action(self) -> str:
+        return "Puzzle"
 
 class NastyWeapon(Obstacle):
     @override
-    def action(self) -> None:
-        print("NastyWeapon")
+    def action(self) -> str:
+        return "NastyWeapon"
 
 # The Abstract Factory:
 class GameElementFactory:
@@ -44,9 +43,9 @@ class KittiesAndPuzzles(GameElementFactory):
     @override
     def make_obstacle(self) -> Obstacle: return Puzzle()
 
-class KillAndDismember(GameElementFactory):
+class WarriorsAndWeapons(GameElementFactory):
     @override
-    def make_character(self) -> Character: return KungFuGuy()
+    def make_character(self) -> Character: return Warrior()
     @override
     def make_obstacle(self) -> Obstacle: return NastyWeapon()
 
@@ -59,6 +58,8 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
-g2 = GameEnvironment(KillAndDismember())
+g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
+## Kitty has encountered a Puzzle
 g2.play()
+## Warrior now battles a NastyWeapon

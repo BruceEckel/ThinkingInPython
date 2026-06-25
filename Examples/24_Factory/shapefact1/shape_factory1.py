@@ -9,12 +9,12 @@ class Shape:
     def erase(self) -> None: ...
     # Create based on class name:
     @staticmethod
-    def factory(type: str) -> Shape:
-        if type == "Circle":
+    def factory(kind: str) -> Shape:
+        if kind == "Circle":
             return Circle()
-        if type == "Square":
+        if kind == "Square":
             return Square()
-        raise ValueError(f"Bad shape creation: {type}")
+        raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -34,9 +34,23 @@ def shape_name_gen(n: int) -> Iterator[str]:
     for i in range(n):
         yield random.choice(types).__name__
 
-shapes = \
-  [ Shape.factory(i) for i in shape_name_gen(7)]
-
-for shape in shapes:
-    shape.draw()
-    shape.erase()
+if __name__ == "__main__":
+    random.seed(47)  # Reproducible shape sequence
+    shapes = [Shape.factory(i) for i in shape_name_gen(7)]
+    for shape in shapes:
+        shape.draw()
+        shape.erase()
+## Square.draw
+## Square.erase
+## Circle.draw
+## Circle.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase

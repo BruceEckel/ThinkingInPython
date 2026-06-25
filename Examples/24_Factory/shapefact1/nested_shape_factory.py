@@ -8,7 +8,7 @@ class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...
 
-def factory(type: str) -> Shape:
+def factory(kind: str) -> Shape:
     class Circle(Shape):
         @override
         def draw(self) -> None: print("Circle.draw")
@@ -21,18 +21,33 @@ def factory(type: str) -> Shape:
         @override
         def erase(self) -> None: print("Square.erase")
 
-    if type == "Circle":
+    if kind == "Circle":
         return Circle()
-    if type == "Square":
+    if kind == "Square":
         return Square()
-    raise ValueError(f"Bad shape creation: {type}")
+    raise ValueError(f"Bad shape creation: {kind}")
 
 def shape_name_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
-# Circle() # Not defined
-
-for shape in shape_name_gen(7):
-    shape.draw()
-    shape.erase()
+if __name__ == "__main__":
+    random.seed(47)  # Reproducible shape sequence
+    # Circle()  # Not defined outside factory()
+    for shape in shape_name_gen(7):
+        shape.draw()
+        shape.erase()
+## Square.draw
+## Square.erase
+## Circle.draw
+## Circle.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase

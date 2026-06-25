@@ -1,6 +1,9 @@
 Before bed: In a loop, one chapter at a time, review chapters 02 through 08.
 If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
+DO make essential changes, and put everything else in the REVIEW files.
+
+Look through the book for the misuse of keywords or reserved words as identifiers
 
 Run 'make prose' on each chapter
 

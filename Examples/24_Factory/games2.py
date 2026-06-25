@@ -4,27 +4,25 @@ from typing import Any
 
 class Kitty:
     def interact_with(self, obstacle: Any) -> None:
-        print("Kitty has encountered a",
-        obstacle.action())
+        print("Kitty has encountered a", obstacle.action())
 
-class KungFuGuy:
+class Warrior:
     def interact_with(self, obstacle: Any) -> None:
-        print("KungFuGuy now battles a",
-        obstacle.action())
+        print("Warrior now battles a", obstacle.action())
 
 class Puzzle:
-    def action(self) -> None: print("Puzzle")
+    def action(self) -> str: return "Puzzle"
 
 class NastyWeapon:
-    def action(self) -> None: print("NastyWeapon")
+    def action(self) -> str: return "NastyWeapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:
     def make_character(self) -> Kitty: return Kitty()
     def make_obstacle(self) -> Puzzle: return Puzzle()
 
-class KillAndDismember:
-    def make_character(self) -> KungFuGuy: return KungFuGuy()
+class WarriorsAndWeapons:
+    def make_character(self) -> Warrior: return Warrior()
     def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
 
 class GameEnvironment:
@@ -36,6 +34,8 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
-g2 = GameEnvironment(KillAndDismember())
+g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
+## Kitty has encountered a Puzzle
 g2.play()
+## Warrior now battles a NastyWeapon

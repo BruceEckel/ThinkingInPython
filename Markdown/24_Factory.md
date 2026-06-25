@@ -42,12 +42,12 @@ class Shape:
     def erase(self) -> None: ...
     # Create based on class name:
     @staticmethod
-    def factory(type: str) -> Shape:
-        if type == "Circle":
+    def factory(kind: str) -> Shape:
+        if kind == "Circle":
             return Circle()
-        if type == "Square":
+        if kind == "Square":
             return Square()
-        raise ValueError(f"Bad shape creation: {type}")
+        raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -67,12 +67,26 @@ def shape_name_gen(n: int) -> Iterator[str]:
     for i in range(n):
         yield random.choice(types).__name__
 
-shapes = \
-  [ Shape.factory(i) for i in shape_name_gen(7)]
-
-for shape in shapes:
-    shape.draw()
-    shape.erase()
+if __name__ == "__main__":
+    random.seed(47)  # Reproducible shape sequence
+    shapes = [Shape.factory(i) for i in shape_name_gen(7)]
+    for shape in shapes:
+        shape.draw()
+        shape.erase()
+## Square.draw
+## Square.erase
+## Circle.draw
+## Circle.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
 ```
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create;
@@ -93,7 +107,7 @@ Now, this may not look consistent with the code you see above:
 
     for i in shape_name_gen(7)
 
-looks like there's an initialization taking place.
+It looks like there's an initialization taking place.
 This is where a generator is a bit strange:
 when you call a function that contains a `yield` statement (`yield` is what makes a function a generator),
 that function actually returns a generator object that has an iterator.
@@ -105,8 +119,21 @@ Thus, the code that you write is actually a kind of factory,
 that creates the generator objects that do the actual generation.
 You can use the generator explicitly if you want, for example:
 
-    gen = shape_name_gen(7)
-    print(next(gen))
+```python
+# explicit_generator.py
+# A generator-factory can be driven by hand: next() pulls the next
+# object from it. shape_name_gen is reused from shape_factory1.
+import random
+from shapefact1.shape_factory1 import shape_name_gen
+
+random.seed(47)  # Make the random choices reproducible
+
+gen = shape_name_gen(7)
+print(next(gen))
+## Square
+print(next(gen))
+## Circle
+```
 
 So `next(gen)` produces the next object from the generator.
 `shape_name_gen()` is the factory, and `gen` is the generator.
@@ -145,7 +172,7 @@ class Shape:
     def draw(self) -> None: ...
     def erase(self) -> None: ...
 
-def factory(type: str) -> Shape:
+def factory(kind: str) -> Shape:
     class Circle(Shape):
         @override
         def draw(self) -> None: print("Circle.draw")
@@ -158,21 +185,36 @@ def factory(type: str) -> Shape:
         @override
         def erase(self) -> None: print("Square.erase")
 
-    if type == "Circle":
+    if kind == "Circle":
         return Circle()
-    if type == "Square":
+    if kind == "Square":
         return Square()
-    raise ValueError(f"Bad shape creation: {type}")
+    raise ValueError(f"Bad shape creation: {kind}")
 
 def shape_name_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
-# Circle() # Not defined
-
-for shape in shape_name_gen(7):
-    shape.draw()
-    shape.erase()
+if __name__ == "__main__":
+    random.seed(47)  # Reproducible shape sequence
+    # Circle()  # Not defined outside factory()
+    for shape in shape_name_gen(7):
+        shape.draw()
+        shape.erase()
+## Square.draw
+## Square.erase
+## Circle.draw
+## Circle.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
 ```
 
 ## The Pythonic Factory: a Dictionary
@@ -181,14 +223,11 @@ A factory exists to turn data, such as a name,
 into an object without scattering constructors through your code.
 In Python a class is itself a first-class object:
 you can store it in a variable and call it to make an instance.
-So the simplest factory is a dictionary that maps names to classes:
 
-    shapes = {"Circle": Circle, "Square": Square}
-    shapes[name]()          # construct one
-
+Thus, the simplest factory is a dictionary that maps names to classes.
 There is no factory method and no factory class; the `dict` *is* the factory.
-You can go one step further so the factory never needs editing when a type is added:
-let each subclass register itself through `__init_subclass__()`:
+You can go one step further so the factory never needs editing when a type is added,
+by letting each subclass register itself through `__init_subclass__()`:
 
 ```python
 # registry.py
@@ -214,11 +253,14 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-def make(name: str) -> Shape:
-    return Shape.registry[name]()
+def make(kind: str) -> Shape:
+    return Shape.registry[kind]()
 
-for name in ["Circle", "Square", "Circle"]:
-    make(name).draw()
+for kind in ["Circle", "Square", "Circle"]:
+    make(kind).draw()
+## Circle.draw
+## Square.draw
+## Circle.draw
 ```
 
 Adding a `Triangle` is now a single class definition: it registers itself,
@@ -279,15 +321,15 @@ class ShapeFactory:
     factories: dict[str, Any] = {}
 
     @staticmethod
-    def add_factory(id: str, shape_factory: Any) -> None:
-        ShapeFactory.factories[id] = shape_factory
+    def add_factory(kind: str, shape_factory: Any) -> None:
+        ShapeFactory.factories[kind] = shape_factory
 
     # A Template Method:
     @staticmethod
-    def create_shape(id: str) -> Shape:
-        if id not in ShapeFactory.factories:
-            ShapeFactory.factories[id] = eval(id + '.Factory()')
-        return ShapeFactory.factories[id].create()
+    def create_shape(kind: str) -> Shape:
+        if kind not in ShapeFactory.factories:
+            ShapeFactory.factories[kind] = eval(kind + '.Factory()')
+        return ShapeFactory.factories[kind].create()
 
 class Shape:
     def draw(self) -> None: ...
@@ -316,11 +358,26 @@ def shape_name_gen(n: int) -> Iterator[str]:
     for i in range(n):
         yield random.choice(types).__name__
 
-shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
-
-for shape in shapes:
-    shape.draw()
-    shape.erase()
+if __name__ == "__main__":
+    random.seed(47)  # Reproducible shape sequence
+    shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
+    for shape in shapes:
+        shape.draw()
+        shape.erase()
+## Square.draw
+## Square.erase
+## Circle.draw
+## Circle.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
+## Square.draw
+## Square.erase
 ```
 
 Now the factory method appears in its own class, `ShapeFactory`,
@@ -368,32 +425,31 @@ Here's how it might look using an abstract factory:
 from typing import override
 
 class Obstacle:
-    def action(self) -> None: pass
+    def action(self) -> str:
+        raise NotImplementedError
 
 class Character:
-    def interact_with(self, obstacle: Obstacle) -> None: pass
+    def interact_with(self, obstacle: Obstacle) -> None: ...
 
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-        obstacle.action())
+        print("Kitty has encountered a", obstacle.action())
 
-class KungFuGuy(Character):
+class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("KungFuGuy now battles a",
-        obstacle.action())
+        print("Warrior now battles a", obstacle.action())
 
 class Puzzle(Obstacle):
     @override
-    def action(self) -> None:
-        print("Puzzle")
+    def action(self) -> str:
+        return "Puzzle"
 
 class NastyWeapon(Obstacle):
     @override
-    def action(self) -> None:
-        print("NastyWeapon")
+    def action(self) -> str:
+        return "NastyWeapon"
 
 # The Abstract Factory:
 class GameElementFactory:
@@ -409,9 +465,9 @@ class KittiesAndPuzzles(GameElementFactory):
     @override
     def make_obstacle(self) -> Obstacle: return Puzzle()
 
-class KillAndDismember(GameElementFactory):
+class WarriorsAndWeapons(GameElementFactory):
     @override
-    def make_character(self) -> Character: return KungFuGuy()
+    def make_character(self) -> Character: return Warrior()
     @override
     def make_obstacle(self) -> Obstacle: return NastyWeapon()
 
@@ -424,9 +480,11 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
-g2 = GameEnvironment(KillAndDismember())
+g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
+## Kitty has encountered a Puzzle
 g2.play()
+## Warrior now battles a NastyWeapon
 ```
 
 In this environment, `Character` objects interact with `Obstacle` objects,
@@ -454,27 +512,25 @@ from typing import Any
 
 class Kitty:
     def interact_with(self, obstacle: Any) -> None:
-        print("Kitty has encountered a",
-        obstacle.action())
+        print("Kitty has encountered a", obstacle.action())
 
-class KungFuGuy:
+class Warrior:
     def interact_with(self, obstacle: Any) -> None:
-        print("KungFuGuy now battles a",
-        obstacle.action())
+        print("Warrior now battles a", obstacle.action())
 
 class Puzzle:
-    def action(self) -> None: print("Puzzle")
+    def action(self) -> str: return "Puzzle"
 
 class NastyWeapon:
-    def action(self) -> None: print("NastyWeapon")
+    def action(self) -> str: return "NastyWeapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:
     def make_character(self) -> Kitty: return Kitty()
     def make_obstacle(self) -> Puzzle: return Puzzle()
 
-class KillAndDismember:
-    def make_character(self) -> KungFuGuy: return KungFuGuy()
+class WarriorsAndWeapons:
+    def make_character(self) -> Warrior: return Warrior()
     def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
 
 class GameEnvironment:
@@ -486,9 +542,11 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
-g2 = GameEnvironment(KillAndDismember())
+g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
+## Kitty has encountered a Puzzle
 g2.play()
+## Warrior now battles a NastyWeapon
 ```
 
 Another way to put this is that all inheritance in Python is implementation inheritance;
