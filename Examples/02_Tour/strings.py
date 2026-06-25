@@ -11,3 +11,14 @@ print('''
 "It's the blemange!"
 ''')
 print(r'c:\python\lib\utils')
+## That isn't a horse
+## You are not a "Viking"
+##
+## You're just pounding two
+## coconut halves together.
+##
+##
+## "Oh no!" He exclaimed.
+## "It's the blemange!"
+##
+## c:\python\lib\utils

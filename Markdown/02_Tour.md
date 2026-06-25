@@ -79,7 +79,7 @@ x = "ten"     # The same name now binds to a str
 a = [1, 2, 3]
 b = a         # b binds to the same list, not a copy
 b.append(4)
-print(a)       # a and b are the same object
+print(a)       # The same object: a and b
 ## [1, 2, 3, 4]
 print(a is b)  # Identical objects
 ## True
@@ -163,9 +163,9 @@ print(0b1100 ^ 0b1010)  # XOR, bits set in exactly one
 ## 6
 print(~0b1100)          # NOT, inverts every bit
 ## -13
-print(1 << 4)           # left shift, same as 1 * 2 ** 4
+print(1 << 4)           # Left shift, same as 1 * 2 ** 4
 ## 16
-print(64 >> 2)          # right shift, same as 64 // 2 ** 2
+print(64 >> 2)          # Right shift, same as 64 // 2 ** 2
 ## 16
 
 flags = 0

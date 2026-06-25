@@ -1,12 +1,19 @@
 # slicing.py
 
 xs = [10, 20, 30, 40, 50]
-print(xs[0], xs[-1])  # 10 50: first and last
-print(xs[1:3])        # [20, 30]: the stop index is excluded
-print(xs[:2])         # [10, 20]: from the start
-print(xs[2:])         # [30, 40, 50]: to the end
-print(xs[::2])        # [10, 30, 50]: every second item
-print(xs[::-1])       # [50, 40, 30, 20, 10]: reversed
+print(xs[0], xs[-1])  # First and last
+## 10 50
+print(xs[1:3])  # The stop index is excluded
+## [20, 30]
+print(xs[:2])  # From the start
+## [10, 20]
+print(xs[2:])  # To the end
+## [30, 40, 50]
+print(xs[::2])  # Every second item
+## [10, 30, 50]
+print(xs[::-1])  # Reversed
+## [50, 40, 30, 20, 10]
 xs.append(60)
 xs.insert(0, 5)
-print(len(xs), 30 in xs)  # 7 True
+print(len(xs), 30 in xs)
+## 7 True

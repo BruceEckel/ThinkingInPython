@@ -12,9 +12,17 @@ Python's `for` automatically uses an iterator that works through a sequence:
 
 list = [ 1, 3, 5, 7, 9, 11 ]
 print(list)
+## [1, 3, 5, 7, 9, 11]
 list.append(13)
 for x in list:
     print(x)
+## 1
+## 3
+## 5
+## 7
+## 9
+## 11
+## 13
 ```
 
 The first line creates a `list`.
@@ -35,15 +43,22 @@ A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 # slicing.py
 
 xs = [10, 20, 30, 40, 50]
-print(xs[0], xs[-1])  # 10 50: first and last
-print(xs[1:3])        # [20, 30]: the stop index is excluded
-print(xs[:2])         # [10, 20]: from the start
-print(xs[2:])         # [30, 40, 50]: to the end
-print(xs[::2])        # [10, 30, 50]: every second item
-print(xs[::-1])       # [50, 40, 30, 20, 10]: reversed
+print(xs[0], xs[-1])  # First and last
+## 10 50
+print(xs[1:3])  # The stop index is excluded
+## [20, 30]
+print(xs[:2])  # From the start
+## [10, 20]
+print(xs[2:])  # To the end
+## [30, 40, 50]
+print(xs[::2])  # Every second item
+## [10, 30, 50]
+print(xs[::-1])  # Reversed
+## [50, 40, 30, 20, 10]
 xs.append(60)
 xs.insert(0, 5)
-print(len(xs), 30 in xs)  # 7 True
+print(len(xs), 30 in xs)
+## 7 True
 ```
 
 Slicing works on any sequence, including strings and tuples.
@@ -61,17 +76,22 @@ point = (3, 4)
 point = 3, 4        # Also a tuple; the comma is what matters
 empty = ()          # Empty tuple
 x, y = point        # Unpacking
-print(x, y)         # 3 4
+print(x, y)
+## 3 4
 single = (42,)      # A one-element tuple needs the trailing comma
-print(len(single))  # 1
-tuple([1, 2, 3])    # Converts to (1, 2, 3)  from a list
-tuple("abc")        # ('a', 'b', 'c')
+print(len(single))
+## 1
+print(tuple([1, 2, 3]))    # Converts to (1, 2, 3)  from a list
+## (1, 2, 3)
+print(tuple("abc"))
+## ('a', 'b', 'c')
 
 def min_max(values):
     return min(values), max(values)  # Returns a tuple
 
 low, high = min_max([5, 2, 9, 1])
-print(low, high)    # 1 9
+print(low, high)
+## 1 9
 ```
 
 Tuples are often heterogeneous, with each position a different type.
@@ -86,12 +106,18 @@ Keys must be immutable.
 # dictionaries.py
 
 ages = {"Alice": 30, "Bob": 25}
-print(ages["Alice"])       # 30
+print(ages["Alice"])
+## 30
 ages["Carol"] = 41         # Add or update
-print("Bob" in ages)       # True: membership tests the keys
-print(ages.get("Dan", 0))  # 0: a default when the key is missing
+print("Bob" in ages)       # Membership tests the keys
+## True
+print(ages.get("Dan", 0))  # A default when the key is missing
+## 0
 for name, age in ages.items():
     print(name, age)
+## Alice 30
+## Bob 25
+## Carol 41
 ```
 
 Use `dict.get()` to avoid a `KeyError` when a key might be absent.
@@ -106,11 +132,16 @@ with fast membership tests and the usual set algebra:
 
 a = {1, 2, 3, 3}  # Duplicates collapse
 b = {3, 4, 5}
-print(a)          # {1, 2, 3}
-print(a & b)      # {3}: intersection
-print(a | b)      # {1, 2, 3, 4, 5}: union
-print(a - b)      # {1, 2}: difference
-print(2 in a)     # True
+print(a)
+## {1, 2, 3}
+print(a & b)      # Intersection
+## {3}
+print(a | b)      # Union
+## {1, 2, 3, 4, 5}
+print(a - b)      # Difference
+## {1, 2}
+print(2 in a)
+## True
 ```
 
 Every operator above has a named method.
@@ -123,13 +154,20 @@ There is also `isdisjoint()`, which has no operator form:
 a = {1, 2, 3}
 b = {3, 4, 5}
 
-print(a.intersection(b))  # {3}: same as a & b
-print(a.union(b))  # {1, 2, 3, 4, 5}: same as a | b
-print(a.difference(b))  # {1, 2}: same as a - b
-print(a.symmetric_difference(b))  # {1, 2, 4, 5}: same as a ^ b
-print(a.intersection([2, 3, 9]))  # {2, 3}: arg can be any iterable
-print(a.union(b, [6, 7]))  # {1, 2, 3, 4, 5, 6, 7}: several args
-print(a.isdisjoint({8, 9}))  # True: no operator form
+print(a.intersection(b))  # Same as a & b
+## {3}
+print(a.union(b))  # Same as a | b
+## {1, 2, 3, 4, 5}
+print(a.difference(b))  # Same as a - b
+## {1, 2}
+print(a.symmetric_difference(b))  # Same as a ^ b
+## {1, 2, 4, 5}
+print(a.intersection([2, 3, 9]))  # Arg can be any iterable
+## {2, 3}
+print(a.union(b, [6, 7]))  # Several args
+## {1, 2, 3, 4, 5, 6, 7}
+print(a.isdisjoint({8, 9}))  # No operator form
+## True
 ```
 
 ## Control Flow
@@ -148,11 +186,14 @@ def classify(n):
         return "positive"
 
 print(classify(-3), classify(0), classify(7))
+## negative zero positive
 
 x = 5
-print(0 < x < 10)  # True: chained comparison
+print(0 < x < 10)  # Chained comparison
+## True
 grade = "pass" if x >= 3 else "fail"  # Conditional expression
 print(grade)
+## pass
 ```
 
 Python's comparison operators chain the way they do in mathematics:
@@ -169,6 +210,7 @@ while n != 1:  # The Collatz sequence
     n = n // 2 if n % 2 == 0 else 3 * n + 1
     print(n)
     steps += 1
+
 print(steps, "steps")
 ```
 
@@ -179,15 +221,22 @@ and `zip()` to walk two sequences together:
 ```python
 # looping.py
 
-for i in range(3):  # 0, 1, 2
+for i in range(3):
     print(i, end=" ")
 print()
+## 0 1 2
 names = ["Alice", "Bob", "Carol"]
 for index, name in enumerate(names):
     print(index, name)
+## 0 Alice
+## 1 Bob
+## 2 Carol
 scores = [88, 91, 79]
 for name, score in zip(names, scores):
     print(name, score)
+## Alice 88
+## Bob 91
+## Carol 79
 ```
 
 With `print()`, the default `end` (printed after the value) is a newline.
@@ -212,8 +261,11 @@ def run(command):
             return "unknown command"
 
 print(run("go north"))
+## moving north
 print(run("quit"))
+## goodbye
 print(run("dance"))
+## unknown command
 ```
 
 ## Errors and Exceptions
@@ -231,8 +283,10 @@ def parse_int(text):
     except ValueError:
         return None
 
-print(parse_int("42"))    # 42
-print(parse_int("oops"))  # None
+print(parse_int("42"))
+## 42
+print(parse_int("oops"))
+## None
 
 def checked_divide(a, b):
     if b == 0:
@@ -250,7 +304,11 @@ def demo_exceptions(a, b):
         print("finally always runs")
 
 demo_exceptions(1, 0)
+## caught: Divide by zero
+## finally always runs
 demo_exceptions(1, 1)
+## no exception
+## finally always runs
 ```
 
 The optional `else` runs when no exception was raised, and `finally` always runs,
@@ -278,6 +336,8 @@ with path.open("w") as f:
 with path.open() as f:
     for line in f:
         print(line.strip())
+## one
+## two
 
 path.unlink()  # Delete the file
 ```
@@ -298,13 +358,17 @@ replacing a loop that builds up a result:
 # comprehensions_intro.py
 
 squares = [n * n for n in range(5)]           # List comprehension
-print(squares)                                # [0, 1, 4, 9, 16]
-evens = [n for n in range(10) if n % 2 == 0]  # with a filter
-print(evens)                                  # [0, 2, 4, 6, 8]
+print(squares)
+## [0, 1, 4, 9, 16]
+evens = [n for n in range(10) if n % 2 == 0]  # With a filter
+print(evens)
+## [0, 2, 4, 6, 8]
 lengths = {w: len(w) for w in ["a", "bb"]}    # Dict comprehension
-print(lengths)                                # {'a': 1, 'bb': 2}
+print(lengths)
+## {'a': 1, 'bb': 2}
 parities = {n % 2 for n in range(10)}         # Set comprehension
-print(parities)                               # {0, 1}
+print(parities)
+## {0, 1}
 ```
 
 The [Comprehensions](14_Comprehensions.md#list-comprehensions) chapter covers comprehensions in detail,

@@ -10,5 +10,8 @@ def run(command):
             return "unknown command"
 
 print(run("go north"))
+## moving north
 print(run("quit"))
+## goodbye
 print(run("dance"))
+## unknown command

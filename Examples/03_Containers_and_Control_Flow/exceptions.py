@@ -6,8 +6,10 @@ def parse_int(text):
     except ValueError:
         return None
 
-print(parse_int("42"))    # 42
-print(parse_int("oops"))  # None
+print(parse_int("42"))
+## 42
+print(parse_int("oops"))
+## None
 
 def checked_divide(a, b):
     if b == 0:
@@ -25,4 +27,8 @@ def demo_exceptions(a, b):
         print("finally always runs")
 
 demo_exceptions(1, 0)
+## caught: Divide by zero
+## finally always runs
 demo_exceptions(1, 1)
+## no exception
+## finally always runs
