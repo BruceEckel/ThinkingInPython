@@ -95,3 +95,34 @@ moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith('#')]
 mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)
+## Waiting: Broadcasting cheese smell
+## mouse appears
+## Luring: Presenting Cheese, door open
+## mouse runs away
+## Waiting: Broadcasting cheese smell
+## mouse appears
+## Luring: Presenting Cheese, door open
+## mouse enters trap
+## Trapping: Closing door
+## mouse escapes
+## Waiting: Broadcasting cheese smell
+## mouse appears
+## Luring: Presenting Cheese, door open
+## mouse enters trap
+## Trapping: Closing door
+## mouse trapped
+## Holding: Mouse caught
+## mouse removed
+## Waiting: Broadcasting cheese smell
+## mouse appears
+## Luring: Presenting Cheese, door open
+## mouse runs away
+## Waiting: Broadcasting cheese smell
+## mouse appears
+## Luring: Presenting Cheese, door open
+## mouse enters trap
+## Trapping: Closing door
+## mouse trapped
+## Holding: Mouse caught
+## mouse removed
+## Waiting: Broadcasting cheese smell

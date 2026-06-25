@@ -125,3 +125,15 @@ if __name__ == "__main__":
     for event in events:
         machine.handle(event)
         print(f"{event}: {machine.message}")  # A plain text view
+## quarter: Total = 25
+## quarter: Total = 50
+## dollar: Total = 150
+## A: Row A
+## two: Dispensing; amount remaining 100
+## A: Row A
+## two: Dispensing; amount remaining 50
+## C: Row C
+## three: Clearing selection: costs 75, quantity 5
+## D: Row D
+## one: Clearing selection: costs 25, quantity 0
+## Quit: Returning 50
