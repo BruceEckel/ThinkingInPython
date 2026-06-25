@@ -362,7 +362,7 @@ print(banner("Hi", width=4))  # pass an argument by name
 
 A parameter can have a default, which makes it optional at the call site.
 You can also pass arguments by name, as with `width=4`, in any order.
-The [Functions](04_Functions.md#default-and-keyword-arguments) chapter covers them in detail.
+[Functions](04_Functions.md#default-and-keyword-arguments) covers them in detail.
 
 ## Naming Conventions
 

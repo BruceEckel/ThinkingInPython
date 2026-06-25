@@ -19,7 +19,7 @@ The defining trait of a Template Method is that the *shape* of the algorithm is 
 while the individual steps are left open for subclasses to fill in.
 In languages with `final`,
 the template method is locked so a subclass cannot change the overall flow.
-Python has no `final` keyword (the [Singleton](19_Singleton.md) and [Metaprogramming](15_Metaprogramming.md#making-a-class-final) chapters show how it is emulated when truly needed),
+Python has no `final` keyword ([Singleton](19_Singleton.md) and [Metaprogramming](15_Metaprogramming.md#making-a-class-final) show how it is emulated when truly needed),
 so here it is a matter of convention: the base defines the algorithm,
 subclasses define the steps.
 
@@ -90,7 +90,7 @@ If they share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
-This is the same trade-off seen in the [Function Objects](25_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) chapter:
+This is the same trade-off seen in [Function Objects](25_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
 a hook that holds no state is usually better as a function than as a method to override.
 
 We want to test that algorithm calls the steps in order, twice.

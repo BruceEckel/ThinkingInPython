@@ -19,3 +19,4 @@ if __name__ == "__main__":
     print(immutable)
     # immutable.numbers is a tuple, so it has no append.
     # immutable.bob.name = "Ralph" raises FrozenInstanceError.
+## Immutable(numbers=(1, 2), bob=Bob(name='Bob'))

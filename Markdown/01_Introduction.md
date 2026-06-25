@@ -79,7 +79,7 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the block tagged `# tracer.py` in the [Decorators](13_Decorators.md#maintaining-the-wrapped-interface) chapter is the file `Examples/13_Decorators/tracer.py`.
+so the block tagged `# tracer.py` in [Decorators](13_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/13_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's tooling extracts the examples,

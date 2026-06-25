@@ -25,3 +25,5 @@ def show(t: Any) -> str:
 if __name__ == "__main__":
     for item in (Bicycle("Bob"), Glider(65)):
         print(show(item))
+## Bicycle Bob
+## Glider 65

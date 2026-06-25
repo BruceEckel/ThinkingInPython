@@ -1,6 +1,6 @@
 # Functional Error Handling
 
-The [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values) chapter made a value carry a guarantee.
+[Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values) made a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
 a function returns its error as an ordinary value,
@@ -43,7 +43,7 @@ except ValueError as e:
 
 Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering the [Data Classes as Types](10_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) chapter warned against.
+which is the kind of scattering [Data Classes as Types](10_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) warns against.
 
 ## Return the Error as a Value
 

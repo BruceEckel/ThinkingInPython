@@ -256,7 +256,7 @@ an illegal value can never produce a `Stars` in the first place.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-The [Static Typing](07_Static_Typing.md#type-hints) chapter argues for letting the type carry the meaning.
+[Static Typing](07_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
 ## Composing Types from Types

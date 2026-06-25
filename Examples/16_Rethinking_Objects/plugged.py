@@ -27,3 +27,4 @@ if __name__ == "__main__":
     plugged.numbers.append(999)  # Mutates a copy, not ours
     plugged.bob.name = "Ralph"   # Ditto
     print(plugged.numbers, plugged.bob)
+## [1, 2] Bob(name='Bob')

@@ -42,3 +42,5 @@ class PairCoord:  # An adapter built by composition, not inheritance
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
     print(distance(PairCoord(Pair(3, 0)), PairCoord(Pair(0, 4))))
+## 5.0
+## 5.0

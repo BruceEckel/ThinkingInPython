@@ -89,12 +89,10 @@ if __name__ == "__main__":
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
+## [1, 2, 999] Bob(name='Ralph')
 ```
 
-The output shows the internals changed from outside:
-
-    [1, 2, 999] Bob(name='Ralph')
-
+The output shows that the internals changed from outside.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
 
@@ -134,13 +132,10 @@ if __name__ == "__main__":
     plugged.numbers.append(999)  # Mutates a copy, not ours
     plugged.bob.name = "Ralph"   # Ditto
     print(plugged.numbers, plugged.bob)
+## [1, 2] Bob(name='Bob')
 ```
 
-Now the internals are safe:
-
-    [1, 2] Bob(name='Bob')
-
-But look at what we are doing.
+Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
 
@@ -173,9 +168,10 @@ if __name__ == "__main__":
     print(immutable)
     # immutable.numbers is a tuple, so it has no append.
     # immutable.bob.name = "Ralph" raises FrozenInstanceError.
+## Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
-The [Data Classes as Types](10_Data_Classes_as_Types.md#freezing) chapter makes the fuller case for frozen data classes.
+[Data Classes as Types](10_Data_Classes_as_Types.md#freezing) makes the fuller case for frozen data classes.
 Here the point is narrower:
 most encapsulation is work you only do because you allowed mutation in the first place.
 
@@ -209,9 +205,10 @@ if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
     print(p1.distance_to(p2))
     print(distance(p1, p2))
+## 5.0
+## 5.0
 ```
 
-Both print `5.0`.
 The function is not worse.
 And it has an advantage: it does not have to live inside `Point`.
 
@@ -221,7 +218,7 @@ Because the function is free, it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with the right attributes satisfies it,
 with no declared inheritance.
-This is the structural typing from the [Static Typing](07_Static_Typing.md#structural-typing-with-protocols) chapter.
+This is the structural typing from [Static Typing](07_Static_Typing.md#structural-typing-with-protocols).
 When you are handed a type that does not fit, you adapt it by composition,
 not inheritance:
 
@@ -270,6 +267,8 @@ class PairCoord:  # An adapter built by composition, not inheritance
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
     print(distance(PairCoord(Pair(3, 0)), PairCoord(Pair(0, 4))))
+## 5.0
+## 5.0
 ```
 
 `Point` and `PairCoord` share no base class.
@@ -305,18 +304,24 @@ class Contact:  # A Contact has a Name and an Address
     name: Name
     address: Address
 
-if __name__ == "__main__":
-    c = Contact(
-        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
-    print(c)
+c = Contact(
+    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+print(c.name)
+## Name(first='Bruce', last='Eckel')
+print(c.address)
+## Address(city='Crested Butte', postal='81224')
 
-    moved = replace(c, address=replace(c.address, city="Carbondale"))
-    print(moved)
+# A copy with one nested field changed leaves c intact
+moved = replace(c, address=replace(c.address, city="Carbondale"))
+print(c.address.city, "->", moved.address.city)
+## Crested Butte -> Carbondale
 
-    twin = Contact(
-        Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
-    print(c == twin)  # Value equality, field by field
-    print({c: "value"}[c])  # Hashable, so it works as a dict key
+twin = Contact(
+    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+print(c == twin)  # Value equality, field by field
+## True
+print({c: "value"}[c])  # Hashable, so it works as a dict key
+## value
 ```
 
 ## Polymorphism Without Inheritance
@@ -398,11 +403,13 @@ def show(t: Any) -> str:
 if __name__ == "__main__":
     for item in (Bicycle("Bob"), Glider(65)):
         print(show(item))
+## Bicycle Bob
+## Glider 65
 ```
 
 `show()` accepts anything.
 Pass it something without a `display()` method and you find out only when the line runs.
-The [Static Typing](07_Static_Typing.md#structural-typing-with-protocols) chapter gives this a static form with `Protocol`:
+[Static Typing](07_Static_Typing.md#structural-typing-with-protocols) gives this a static form with `Protocol`:
 a structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
@@ -446,10 +453,11 @@ if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
     for shape in shapes:
         print(round(area(shape), 4))
+## 3.1416
+## 12.0
 ```
 
-Both print the same areas.
-Which one is better depends on how the code will grow.
+Which approach is better depends on how the code will grow.
 Adding a new *shape* is easier in the object version: write one class.
 Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.

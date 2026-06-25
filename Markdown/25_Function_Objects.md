@@ -261,7 +261,7 @@ Chain of Responsibility kept its handlers in a list and tried them in order.
 Key that structure by type instead of by position and you have an *event bus*:
 a `dict` from each event type to the functions that care about it.
 The events are plain values,
-written as frozen data classes (see the [Data Classes as Types](10_Data_Classes_as_Types.md#freezing) chapter).
+written as frozen data classes (see [Data Classes as Types](10_Data_Classes_as_Types.md#freezing)).
 Publishing an event looks up its type and calls every handler registered for it.
 The handlers are ordinary functions,
 so there is no `Handler` interface to implement and no registration ceremony:
@@ -348,14 +348,14 @@ def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise
 ```
 
-This is the *Observer* pattern (see the [Observer](27_Observer.md#the-pythonic-observer-a-list-of-callables) chapter) narrowed to a single subject:
+This is the *Observer* pattern (see [Observer](27_Observer.md#the-pythonic-observer-a-list-of-callables)) narrowed to a single subject:
 the subscribers are functions,
 and the bus routes each event to them by its type.
 Here a type may have many handlers.
 When instead you want exactly one handler per type,
 chosen by the argument's type and open to new types without editing a central function,
 that is `functools.singledispatch`,
-which the [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](30_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it) chapters put to work.
+which [Visitor](29_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](30_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it) put to work.
 
 ## Exercises
 
