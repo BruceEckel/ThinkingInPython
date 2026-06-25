@@ -16,4 +16,6 @@ def render(shape: Drawable) -> str:   # Accepts anything with draw()
     return shape.draw()
 
 print(render(Circle()))
+## circle
 print(render(Square()))
+## square
