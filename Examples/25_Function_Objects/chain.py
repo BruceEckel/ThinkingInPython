@@ -26,3 +26,4 @@ def solve(line: Line,
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, [least_squares, newtons_method, bisection]))
+## [5.5, 6.6]

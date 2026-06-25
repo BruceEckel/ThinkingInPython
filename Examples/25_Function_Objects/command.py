@@ -14,3 +14,6 @@ def afford() -> None:
 macro: list[Callable[[], None]] = [loony, new_brain, afford]
 for command in macro:
     command()
+## You're a loony.
+## You might even need a new brain.
+## I couldn't afford a whole new brain.

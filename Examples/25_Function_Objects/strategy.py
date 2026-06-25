@@ -18,4 +18,6 @@ def solve(line: Line, strategy: Callable[[Line], float]) -> float:
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, least_squares))
+## 2.3333333333333335
 print(solve(line, bisection))
+## 2.0
