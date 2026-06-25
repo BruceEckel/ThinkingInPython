@@ -60,10 +60,15 @@ def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
 
 print(list(fibonacci(8)))
+## [0, 1, 1, 2, 3, 5, 8, 13]
 print(list(Countdown(5)))
+## [5, 4, 3, 2, 1]
 print(total(fibonacci(8)))   # Works on a generator
+## 33
 print(total([1, 2, 3, 4]))   # and on a list
+## 10
 print(total(Countdown(5)))   # and on a custom iterable
+## 15
 ```
 
 `total()` is the decoupled algorithm Stepanov was after:
@@ -135,6 +140,7 @@ def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
 
 if __name__ == "__main__":
     print(list(typed([1, 2, 3], int)))
+## [1, 2, 3]
 ```
 
 Use the class when the wrapper needs its own state or extra methods;
