@@ -9,4 +9,9 @@ def a_function(response):
     return val
 
 print(a_function("no"))
+## continuing...
+## 0
 print(a_function("yes"))
+## affirmative
+## continuing...
+## 1

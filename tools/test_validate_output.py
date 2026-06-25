@@ -17,6 +17,7 @@ from validate_output import (
     process_block,
     process_file,
     process_markdown,
+    strip_trailing,
 )
 
 
@@ -171,6 +172,25 @@ def test_encode_output_empty_line_in_middle() -> None:
 
 def test_encode_output_bare_newline() -> None:
     assert encode_output("\n") == ["##\n"]
+
+def test_encode_output_strips_trailing_space() -> None:
+    # print(i, end=" ") output: no trailing space in the marker line.
+    assert encode_output("0 1 2 \n") == ["## 0 1 2\n"]
+
+def test_encode_output_preserves_leading_space() -> None:
+    assert encode_output("  indented\n") == ["##   indented\n"]
+
+
+# ── strip_trailing ────────────────────────────────────────────────────────────
+
+def test_strip_trailing_per_line() -> None:
+    assert strip_trailing("a \nb  \n") == "a\nb\n"
+
+def test_strip_trailing_keeps_leading() -> None:
+    assert strip_trailing("  a \n") == "  a\n"
+
+def test_strip_trailing_empty() -> None:
+    assert strip_trailing("") == ""
 
 def test_encode_output_trailing_blank_line_preserved() -> None:
     # removesuffix('\n') strips exactly one newline, so a trailing
@@ -607,6 +627,29 @@ def test_markdown_norun_inline_marker_skips(tmp_path: Path) -> None:
 def test_markdown_exec_error_fails(tmp_path: Path) -> None:
     p = write(tmp_path, "ch.md", "```python\n1 / 0\n## x\n```\n")
     assert process_markdown(p, update=False) is False
+
+def test_markdown_trailing_space_marker_has_none(tmp_path: Path) -> None:
+    # print(end=" ") output must not leave a trailing space in the marker.
+    src = (
+        "```python\nfor i in range(3):\n"
+        "    print(i, end=' ')\nprint()\n##\n```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    process_markdown(p, update=True)
+    text = p.read_text(encoding="utf-8")
+    assert "## 0 1 2\n" in text
+    assert "## 0 1 2 \n" not in text
+
+def test_markdown_clean_marker_with_trailing_output_passes(
+    tmp_path: Path,
+) -> None:
+    # A clean ## marker validates against output that has a trailing space.
+    src = (
+        "```python\nfor i in range(3):\n"
+        "    print(i, end=' ')\nprint()\n## 0 1 2\n```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    assert process_markdown(p, update=False) is True
 
 def test_markdown_block_runs_from_tree_dir(tmp_path: Path) -> None:
     # A block importing a sibling resolves it from build/examples/<chapter>/.

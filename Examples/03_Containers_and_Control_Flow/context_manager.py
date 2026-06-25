@@ -11,5 +11,4 @@ with path.open() as f:
         print(line.strip())
 ## one
 ## two
-
 path.unlink()  # Delete the file

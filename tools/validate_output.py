@@ -80,13 +80,24 @@ def decode_output(lines: list[str], indices: list[int]) -> str:
     return '\n'.join(parts) + '\n' if parts else ''
 
 
+def strip_trailing(output: str) -> str:
+    """Drop trailing whitespace from each line.
+
+    Trailing spaces (from ``print(end=" ")`` loops, ``ljust`` padding, and the
+    like) are invisible in the rendered book, and they would leave trailing
+    whitespace in the ## marker lines that ruff rejects. So they are ignored
+    both when markers are written and when they are compared.
+    """
+    return '\n'.join(line.rstrip() for line in output.split('\n'))
+
+
 def encode_output(output: str) -> list[str]:
-    """Convert an output string to ## lines."""
+    """Convert an output string to ## lines (trailing whitespace dropped)."""
     if not output:
         return []
     # removesuffix strips exactly one trailing newline, preserving
     # any intentional trailing blank lines the program produced.
-    content = output.removesuffix('\n').split('\n')
+    content = strip_trailing(output).removesuffix('\n').split('\n')
     return [f'## {ln}\n' if ln else '##\n' for ln in content]
 
 
@@ -153,20 +164,23 @@ def process_block(
             new_lines.extend(chunk_lines)
 
         else:  # output marker block
-            expected = decode_output(lines, indices)
             actual = pending if pending is not None else ''
+            # Canonical form has trailing whitespace stripped, so a marker is
+            # correct only when it already matches it. That keeps the markers
+            # clean for ruff and lets update rewrite stale trailing spaces.
+            canonical = encode_output(actual)
 
-            if actual == expected:
+            if chunk_lines == canonical:
                 new_lines.extend(chunk_lines)
             elif update and not had_error:
-                new_lines.extend(encode_output(actual))
+                new_lines.extend(canonical)
                 changed = True
             else:
                 new_lines.extend(chunk_lines)
                 if not had_error:
                     print(f"  line {lineno}:")
-                    print(f"    expected: {expected!r}")
-                    print(f"    actual:   {actual!r}")
+                    print(f"    have: {''.join(chunk_lines)!r}")
+                    print(f"    want: {''.join(canonical)!r}")
                     ok = False
 
             pending = None
@@ -193,7 +207,10 @@ def process_file(path: Path, *, update: bool) -> bool | None:
     )
 
     if update and changed:
-        path.write_text(''.join(new_lines), encoding='utf-8')
+        # newline="\n" keeps LF on Windows; the gate rejects CRLF.
+        path.write_text(
+            ''.join(new_lines), encoding='utf-8', newline='\n'
+        )
 
     return ok
 
@@ -303,7 +320,8 @@ def process_markdown(
     if not any_markers:
         return None
     if update and changed:
-        path.write_text(''.join(out), encoding='utf-8')
+        # newline="\n" keeps LF on Windows; the gate rejects CRLF.
+        path.write_text(''.join(out), encoding='utf-8', newline='\n')
     return ok
 
 

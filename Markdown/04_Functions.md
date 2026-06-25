@@ -16,7 +16,12 @@ def a_function(response):
     return val
 
 print(a_function("no"))
+## continuing...
+## 0
 print(a_function("yes"))
+## affirmative
+## continuing...
+## 1
 ```
 
 Here the function signature only specifies the name of the function and the argument identifiers,
@@ -34,7 +39,9 @@ def flexible_args_and_returns(arg):
         return True
 
 print(flexible_args_and_returns(1))
+## one
 print(flexible_args_and_returns("one"))
+## True
 ```
 
 Here, the same function applies the '`+`' operator to integers and strings:
@@ -46,7 +53,9 @@ def sum(arg1, arg2):
     return arg1 + arg2
 
 print(sum(42, 47))
+## 89
 print(sum('spam ', "eggs"))
+## spam eggs
 ```
 
 The only constraints on an object that is passed into a function are that the function can apply its operations to that object.
@@ -64,8 +73,11 @@ def connect(host, port=5432, timeout=30):
     return f"{host}:{port} (timeout {timeout}s)"
 
 print(connect("db.example.com"))                 # Uses both defaults
+## db.example.com:5432 (timeout 30s)
 print(connect("db.example.com", timeout=5))      # Skip to a keyword
+## db.example.com:5432 (timeout 5s)
 print(connect(port=80, host="web.example.com"))  # Any order by name
+## web.example.com:80 (timeout 30s)
 ```
 
 A default value is evaluated once, when the function is defined,
@@ -79,17 +91,21 @@ def bad_append(item, target=[]):  # The same list every call
     target.append(item)
     return target
 
-print(bad_append(1))  # [1]
-print(bad_append(2))  # [1, 2]: Surprise, the default kept the 1
+print(bad_append(1))
+## [1]
+print(bad_append(2))  # Surprise, the default kept the 1
+## [1, 2]
 
 def good_append(item, target=None):
     if target is None:
-        target = []               # A fresh list each call
+        target = []    # A fresh list each call
     target.append(item)
     return target
 
-print(good_append(1))  # [1]
-print(good_append(2))  # [2]
+print(good_append(1))
+## [1]
+print(good_append(2))
+## [2]
 ```
 
 Thus a mutable default persists between calls: it is created once,
@@ -107,8 +123,10 @@ and `**kwargs` collects extra keyword arguments into a dictionary:
 def report(label, *values, **options):
     print(label, values, options)
 
-report("nums", 1, 2, 3)                       # nums (1, 2, 3) {}
+report("nums", 1, 2, 3)
+## nums (1, 2, 3) {}
 report("point", 3, 4, color="red", size=10)   # Extras land in options
+## point (3, 4) {'color': 'red', 'size': 10}
 ```
 
 The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
@@ -130,13 +148,16 @@ every parameter after it must be passed by name.
 def divide(a, b, /):
     return a / b
 
-print(divide(10, 2))  # 5.0
+print(divide(10, 2))
+## 5.0
 
 def make_user(name, *, admin=False):
     return f"{name} (admin={admin})"
 
-print(make_user("Bob"))              # Bob (admin=False)
-print(make_user("Sue", admin=True))  # Sue (admin=True)
+print(make_user("Bob"))
+## Bob (admin=False)
+print(make_user("Sue", admin=True))
+## Sue (admin=True)
 ```
 
 Calling `divide(a=10, b=2)` is an error,
@@ -163,7 +184,9 @@ def f(a, b, c):
 
 x = [1, 2, 3]
 f(*x)
+## 1 2 3
 f(*(1, 2, 3))
+## 1 2 3
 ```
 
 ## Lambdas
@@ -176,8 +199,10 @@ It is useful for passing behavior to functions such as `sorted()`:
 
 words = ["banana", "kiwi", "apple", "fig"]
 print(sorted(words, key=lambda w: len(w)))  # Sort by length
+## ['fig', 'kiwi', 'apple', 'banana']
 square = lambda n: n * n                    # Usually prefer def
-print(square(9))                            # 81
+print(square(9))
+## 81
 ```
 
 Compared to other languages, Python's lambdas are constrained because they comprise a single expression.
