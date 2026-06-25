@@ -1,10 +1,12 @@
 # Containers and Control Flow
 
 With languages like C++ and Java, containers are add-on libraries.
-In Python, the essential nature of containers for programming is acknowledged by building them into the core of the language.
-Both lists and associative arrays (maps, dictionaries, hash tables) are fundamental data types.
+In Python, the essential nature of containers is acknowledged by building them into the core of the language.
+Both lists and associative arrays (dictionaries and sets) are fundamental data types.
 
-In addition, the `for` statement automatically iterates through lists rather than just counting through a sequence of numbers.
+## Lists and Iteration
+
+The `for` statement automatically iterates through lists rather than just counting through a sequence of numbers.
 Python's `for` automatically uses an iterator that works through a sequence:
 
 ```python
@@ -45,13 +47,13 @@ A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 xs = [10, 20, 30, 40, 50]
 print(xs[0], xs[-1])  # First and last
 ## 10 50
-print(xs[1:3])  # The stop index is excluded
+print(xs[1:3])   # The stop index is excluded
 ## [20, 30]
-print(xs[:2])  # From the start
+print(xs[:2])    # From the start
 ## [10, 20]
-print(xs[2:])  # To the end
+print(xs[2:])    # To the end
 ## [30, 40, 50]
-print(xs[::2])  # Every second item
+print(xs[::2])   # Every second item
 ## [10, 30, 50]
 print(xs[::-1])  # Reversed
 ## [50, 40, 30, 20, 10]
@@ -106,6 +108,8 @@ Keys must be immutable.
 # dictionaries.py
 
 ages = {"Alice": 30, "Bob": 25}
+print(ages)
+## {'Alice': 30, 'Bob': 25}
 print(ages["Alice"])
 ## 30
 ages["Carol"] = 41         # Add or update
@@ -238,6 +242,9 @@ for name, score in zip(names, scores):
 ## Bob 91
 ## Carol 79
 ```
+
+`enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
+`zip()` walks several sequences at once, producing one item from each and stopping when the shortest runs out.
 
 With `print()`, the default `end` (printed after the value) is a newline.
 With multiple values in a `print()` call, you can use `sep` to change the separator between values.
