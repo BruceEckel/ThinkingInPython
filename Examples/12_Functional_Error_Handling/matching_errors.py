@@ -25,3 +25,6 @@ def describe(text: str) -> str:
 if __name__ == "__main__":
     for text in ("4", "0", "OOPS"):
         print(describe(text))
+## 4: 0.25
+## 0: Cannot divide by zero
+## OOPS: Not a number

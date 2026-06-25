@@ -15,3 +15,7 @@ def combined(i: int, j: int) -> Result[str, str]:
 if __name__ == "__main__":
     for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
         print(args, combined(*args))
+## (1, 5) Failure(error='func_a(1)')
+## (7, 2) Failure(error='func_b(2)')
+## (2, 1) Failure(error='func_c(3): division by zero')
+## (7, 5) Success(answer='add(7 + 5 + 12): 24')

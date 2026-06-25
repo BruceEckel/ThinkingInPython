@@ -7,6 +7,7 @@ def func_a(i: int) -> int | str:
 
 outputs = [func_a(i) for i in range(5)]
 print(outputs)
+## [0, 1, 2, 'func_a(3)', 4]
 
 for r in outputs:
     match r:
@@ -14,3 +15,8 @@ for r in outputs:
             print(f"answer = {answer}")
         case str(error):
             print(f"error = {error!r}")
+## answer = 0
+## answer = 1
+## answer = 2
+## error = 'func_a(3)'
+## answer = 4

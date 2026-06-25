@@ -34,15 +34,12 @@ try:
     print(results)
 except ValueError as e:
     print(f"Lost everything: {e}")
+## Calculating func_a(0)
+## Calculating func_a(1)
+## Calculating func_a(2)
+## Calculating func_a(3)
+## Lost everything: func_a(3)
 ```
-
-The output is:
-
-    Calculating func_a(0)
-    Calculating func_a(1)
-    Calculating func_a(2)
-    Calculating func_a(3)
-    Lost everything: func_a(3)
 
 Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
@@ -65,6 +62,7 @@ def func_a(i: int) -> int | str:
 
 outputs = [func_a(i) for i in range(5)]
 print(outputs)
+## [0, 1, 2, 'func_a(3)', 4]
 
 for r in outputs:
     match r:
@@ -72,16 +70,12 @@ for r in outputs:
             print(f"answer = {answer}")
         case str(error):
             print(f"error = {error!r}")
+## answer = 0
+## answer = 1
+## answer = 2
+## error = 'func_a(3)'
+## answer = 4
 ```
-
-The output is:
-
-    [0, 1, 2, 'func_a(3)', 4]
-    answer = 0
-    answer = 1
-    answer = 2
-    error = 'func_a(3)'
-    answer = 4
 
 This keeps every result,
 and `match` (covered in [Pattern Matching](11_Pattern_Matching.md#matching-values)) tells the two cases apart.
@@ -146,18 +140,15 @@ def func_a(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, func_a(i))
+## 0 Success(answer=0)
+## 1 Failure(error='func_a(1)')
+## 2 Success(answer=2)
+## 3 Success(answer=3)
+## 4 Success(answer=4)
 ```
 
 A function reports failure by returning a `Failure` object,
 success by returning a `Success` object.
-
-The output is:
-
-    0 Success(answer=0)
-    1 Failure(error='func_a(1)')
-    2 Success(answer=2)
-    3 Success(answer=3)
-    4 Success(answer=4)
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value; to get the answer `Result` must be unpacked.
@@ -203,17 +194,14 @@ def composed(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, composed(i))
+## 0 Success(answer=0)
+## 1 Failure(error='func_a(1)')
+## 2 Failure(error='func_b(2)')
+## 3 Failure(error='func_c(3): division by zero')
+## 4 Success(answer=4)
 ```
 
 Each step returns early when it encounters a `Failure`.
-The output is:
-
-    0 Success(answer=0)
-    1 Failure(error='func_a(1)')
-    2 Failure(error='func_b(2)')
-    3 Failure(error='func_c(3): division by zero')
-    4 Success(answer=4)
-
 This works, and it keeps errors as values,
 but every step is the same dance: call, check for `Failure`, return early, unwrap,
 go on.
@@ -238,15 +226,12 @@ def composed(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, composed(i))
+## 0 Success(answer=0)
+## 1 Failure(error='func_a(1)')
+## 2 Failure(error='func_b(2)')
+## 3 Failure(error='func_c(3): division by zero')
+## 4 Success(answer=4)
 ```
-
-The output is identical to the hand-written version:
-
-    0 Success(answer=0)
-    1 Failure(error='func_a(1)')
-    2 Failure(error='func_b(2)')
-    3 Failure(error='func_c(3): division by zero')
-    4 Success(answer=4)
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
@@ -282,14 +267,11 @@ def combined(i: int, j: int) -> Result[str, str]:
 if __name__ == "__main__":
     for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
         print(args, combined(*args))
+## (1, 5) Failure(error='func_a(1)')
+## (7, 2) Failure(error='func_b(2)')
+## (2, 1) Failure(error='func_c(3): division by zero')
+## (7, 5) Success(answer='add(7 + 5 + 12): 24')
 ```
-
-The output is:
-
-    (1, 5) Failure(error='func_a(1)')
-    (7, 2) Failure(error='func_b(2)')
-    (2, 1) Failure(error='func_c(3): division by zero')
-    (7, 5) Success(answer='add(7 + 5 + 12): 24')
 
 Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
 Only the last input passes all three steps, so it's the only one that reaches `add()`.
@@ -331,13 +313,9 @@ if __name__ == "__main__":
                 print(f"{text}: parsed {answer}")
             case Failure(error):
                 print(f"{text}: {type(error).__name__}")
+## 42: parsed 42
+## oops: ValueError
 ```
-
-After decorating `parse()` with `@safe`,
-the output is:
-
-    42: parsed 42
-    oops: ValueError
 
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its type to `Result[int, Exception]`.
@@ -378,13 +356,10 @@ def describe(text: str) -> str:
 if __name__ == "__main__":
     for text in ("4", "0", "OOPS"):
         print(describe(text))
+## 4: 0.25
+## 0: Cannot divide by zero
+## OOPS: Not a number
 ```
-
-The output is:
-
-    4: 0.25
-    0: Cannot divide by zero
-    OOPS: Not a number
 
 `parse()` and `reciprocal()` are both wrapped with `@safe`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,

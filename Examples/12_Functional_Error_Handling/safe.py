@@ -27,3 +27,5 @@ if __name__ == "__main__":
                 print(f"{text}: parsed {answer}")
             case Failure(error):
                 print(f"{text}: {type(error).__name__}")
+## 42: parsed 42
+## oops: ValueError
