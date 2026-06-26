@@ -4,7 +4,7 @@ from display import display_object
 
 @dataclass
 class Fraggle:
-    x: int = 11
+    x: int
     y: float = 1.14659
     z: str = "blivet"
 
@@ -14,22 +14,23 @@ class Fraggle:
     def h(self, s: str)-> str:
         return f"h({s})"
 
-display_object(Fraggle)
-## === type ===
+display_object(Fraggle)  # Display the class
+## === Fraggle ===
 ## [Attributes]
-##   • x: 11
-##   • y: 1.14659
-##   • z: 'blivet'
+##   • y: float = 1.14659
+##   • z: str = 'blivet'
 ## [Methods]
 ##   • f(self) -> None
 ##   • g(self, x: int) -> float
 ##   • h(self, s: str) -> str
-display_object(Fraggle(9, 2.3, 'zingo'))
+
+# Display a specific instance:
+display_object(Fraggle(9, 2.3))
 ## === Fraggle ===
 ## [Attributes]
-##   • x: 9
-##   • y: 2.3
-##   • z: 'zingo'
+##   • x: int = 9
+##   • y: float = 2.3
+##   • z: str = 'blivet'
 ## [Methods]
 ##   • f(self) -> None
 ##   • g(self, x: int) -> float

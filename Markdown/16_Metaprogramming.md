@@ -361,8 +361,8 @@ print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 display_object(Demo(), dunder=["__new__", "__init__"])
 ## === Demo ===
 ## [Attributes]
-##   • added_in_new: 42
-##   • patched_in_init: 3.14
+##   • added_in_new = 42
+##   • patched_in_init = 3.14
 ## [Methods]
 ##   • __init__(self, /, *args, **kwargs)
 ##   • __new__(*args, **kwargs)
@@ -587,27 +587,81 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
 ## The 'inspect' Module
 
-Python provides another way for a program to look at itself: the `inspect` module.
-[[Overview of 'inspect']]
+Up to now we've been modifying classes: `type` builds them, and metaclasses
+and `__init_subclass__()` run code as they are created.
+The `inspect` module is the other half of metaprogramming: reading the structure
+of live objects.
+It answers questions like which members an object has, what a function's
+signature is, and what its docstring says, without you knowing the answers
+in advance.
 
-As an example, it is useful to be able to easily show the layout of an object
+`inspect` works on any live object: modules, classes, functions, methods, and
+instances.
+A few functions cover most needs:
+
+- `inspect.signature(callable)` returns a `Signature` object describing the
+  parameters, their annotations, and their defaults.
+- `inspect.getdoc(obj)` returns the cleaned-up docstring.
+- `inspect.getmembers(obj)` and `inspect.getmembers_static(obj)` return an
+  object's `(name, value)` pairs.
+- Predicates such as `inspect.isclass()`, `inspect.isfunction()`, and
+  `inspect.ismethod()` classify what you find.
+
+```python
+# inspect_tour.py
+import inspect
+
+def greet(name: str, loud: bool = False) -> str:
+    "Return a greeting."
+    text = f"Hello, {name}"
+    return text.upper() if loud else text
+
+print(inspect.signature(greet))
+## (name: str, loud: bool = False) -> str
+print(inspect.getdoc(greet))
+## Return a greeting.
+print(inspect.isfunction(greet), inspect.isclass(greet))
+## True False
+print(list(inspect.signature(greet).parameters))
+## ['name', 'loud']
+```
+
+`signature()` recovers the full call interface, annotations and defaults
+included, as a structured object rather than a string.
+
+Earlier, `new_vs_init.py` called `display_object()` to show the layout of an
+object.
+That tool is a helper used throughout the book, so it lives at the root of the
+examples and any chapter can import it:
 
 ```python
 # display.py
 import inspect
 from collections.abc import Sequence
 
+def _annotations(cls: type) -> dict[str, object]:
+    # Annotations declared on the class or any of its bases:
+    merged: dict[str, object] = {}
+    for base in reversed(cls.__mro__):
+        merged.update(inspect.get_annotations(base))
+    return merged
+
+def _type_name(annotation: object) -> str:
+    # A readable name for a type annotation, keeping any [parameters]:
+    if isinstance(annotation, type):
+        return annotation.__name__
+    return str(annotation)
+
 def display_object(
     obj: object, dunder: Sequence[str] = (), max_width: int = 65
 ) -> None:
-    """Print a compact, readable view of an object or class.
-
-    Standard dunder members are hidden; name any to keep in `dunder`.
-    """
-    print(f"=== {type(obj).__name__} ===")
+    # For a class, the class itself; for an instance, its class:
+    cls = obj if inspect.isclass(obj) else type(obj)
+    print(f"=== {cls.__name__} ===")
+    annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
-    # Read members statically, without triggering dynamic descriptors
+    # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         is_dunder = name.startswith("__") and name.endswith("__")
         if is_dunder and name not in dunder:
@@ -619,15 +673,39 @@ def display_object(
                 sig = "(...)"
             methods.append(f"  • {name}{sig}")
         else:
+            label = name
+            if name in annotations:
+                label = f"{name}: {_type_name(annotations[name])}"
             val_str = repr(value)
-            if len(val_str) > max_width - len(name) - 6:
-                val_str = val_str[:max_width - len(name) - 9] + "..."
-            attributes.append(f"  • {name}: {val_str}")
+            # Trim the value to keep the line within max_width:
+            budget = max_width - len(label) - 7
+            if len(val_str) > budget:
+                val_str = val_str[:budget - 3] + "..."
+            attributes.append(f"  • {label} = {val_str}")
     print("[Attributes]")
     print("\n".join(attributes) or "  None")
     print("[Methods]")
     print("\n".join(methods) or "  None")
 ```
+
+`display_object()` walks every member that `inspect.getmembers_static()`
+returns.
+The static variant reads members from the object and its classes directly,
+without invoking descriptors, properties, or `__getattr__()`.
+Inspecting an object therefore never runs its code or triggers a side effect,
+which matters when you point this tool at something unfamiliar.
+Each member is sorted into one of two lists.
+Callables become methods, printed with the signature `inspect.signature()`
+reports, or `(...)` when a built-in has no inspectable signature.
+Everything else becomes an attribute, printed as `name: type = value`.
+The declared type comes from the class annotations, gathered across the whole
+inheritance chain with `inspect.get_annotations()`; an attribute with no
+annotation, such as one assigned dynamically, prints as `name = value`.
+The value is the member's `repr()`, truncated to keep the line within
+`max_width`.
+Standard dunder members are hidden by default.
+Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
+show `__new__` and `__init__`.
 
 ```python
 # demo_display_object.py
@@ -636,7 +714,7 @@ from display import display_object
 
 @dataclass
 class Fraggle:
-    x: int = 11
+    x: int
     y: float = 1.14659
     z: str = "blivet"
 
@@ -646,26 +724,36 @@ class Fraggle:
     def h(self, s: str)-> str:
         return f"h({s})"
 
-display_object(Fraggle)
-## === type ===
+display_object(Fraggle)  # Display the class
+## === Fraggle ===
 ## [Attributes]
-##   • x: 11
-##   • y: 1.14659
-##   • z: 'blivet'
+##   • y: float = 1.14659
+##   • z: str = 'blivet'
 ## [Methods]
 ##   • f(self) -> None
 ##   • g(self, x: int) -> float
 ##   • h(self, s: str) -> str
-display_object(Fraggle(9, 2.3, 'zingo'))
+
+# Display a specific instance:
+display_object(Fraggle(9, 2.3))
 ## === Fraggle ===
 ## [Attributes]
-##   • x: 9
-##   • y: 2.3
-##   • z: 'zingo'
+##   • x: int = 9
+##   • y: float = 2.3
+##   • z: str = 'blivet'
 ## [Methods]
 ##   • f(self) -> None
 ##   • g(self, x: int) -> float
 ##   • h(self, s: str) -> str
 ```
 
-This is used in `new_vs_init.py`.
+The two calls show the same class from two angles.
+`display_object(Fraggle)` inspects the class object itself.
+It lists `y` and `z`, the fields with defaults; `x` is declared as `x: int`
+with no default, so on the class it is only an annotation, not a bound
+attribute, and `getmembers_static()` does not return it.
+`display_object(Fraggle(9, 2.3))` inspects an instance, whose attributes hold
+its field values, so `x` now appears beside `y` and `z`.
+Both headers read `=== Fraggle ===`: for a class `display_object()` prints the
+class's own name, and for an instance the name of the instance's class.
+The method list is the same either way, because methods live on the class.

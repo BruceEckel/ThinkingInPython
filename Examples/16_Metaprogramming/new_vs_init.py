@@ -35,8 +35,8 @@ print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 display_object(Demo(), dunder=["__new__", "__init__"])
 ## === Demo ===
 ## [Attributes]
-##   • added_in_new: 42
-##   • patched_in_init: 3.14
+##   • added_in_new = 42
+##   • patched_in_init = 3.14
 ## [Methods]
 ##   • __init__(self, /, *args, **kwargs)
 ##   • __new__(*args, **kwargs)
