@@ -4,6 +4,7 @@ Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I ca
 DO make essential changes, and put everything else in the REVIEW files.
 
 /loop through chapters looking for examples that (after the dataclass chapter) could work better as dataclasses, and convert them.
+Look for chapters that have class variables (after that topic was introduced) and make sure they use ClassVar
 Also make sure the syntax and type annotations are modernized (after type annotations have been introduced)
 
 Review chapter 14. Make obious changes and put everything I need to look at first in REVIEW_14.md

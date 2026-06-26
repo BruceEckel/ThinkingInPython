@@ -185,9 +185,10 @@ which Python calls automatically every time a subclass is created:
 # init_subclass.py
 # Track the "leaf" subclasses (those with no subclasses of their own),
 # using __init_subclass__ instead of a metaclass.
+from typing import ClassVar
 
 class Color:
-    registry: set[type] = set()
+    registry: ClassVar[set[type]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -201,16 +202,18 @@ class Red(Color):
 class Green(Color):
     pass
 print(sorted(c.__name__ for c in Color.registry))
+## ['Blue', 'Green', 'Red']
 
 class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
 print(sorted(c.__name__ for c in Color.registry))
+## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
-    registry: set[type] = set()
+    registry: ClassVar[set[type]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -224,14 +227,14 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-## ['Blue', 'Green', 'Red']
-## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 ## ['Circle', 'Square']
 ```
 
 Each time a subclass is created,
 `__init_subclass__()` adds it to the registry and removes its base classes,
 so only the current leaves remain.
+That is why `Blue` is absent from the second `Color` print: creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
+For the same reason `Round` is missing from the `Shape` registry: creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
 No metaclass is involved.
 `__init_subclass__()` is implicitly a class method;
 its first argument is the new subclass.
@@ -275,7 +278,7 @@ This is metaprogramming, but it needs no metaclass.
 
 ## Writing a Metaclass
 
-When the simpler hooks are not enough, you write a metaclass.
+When the simpler hooks are not enough, write a metaclass.
 A metaclass is a subclass of `type`.
 You attach it with the `metaclass=` keyword in the class header.
 Python then uses your metaclass, instead of `type`, to build the class.
@@ -306,15 +309,9 @@ print(simple.uses_metaclass())  # type: ignore
 ```
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
-except for `__new__()`, which uses `mcl`.
+except for `__new__()`, which uses `mcl` (metaclass).
 The `cls` is the class object being built.
 As with any subclass, call the base-class version first through `super()`.
-
-> Historical note: Python 2 spelled the hook differently: you set a
-> `__metaclass__` field in the class body, and you could even point it at a
-> function or an inline class. Python 3 dropped all of that. There is one way
-> now, the `metaclass=` keyword, and the metaclass must be a real class. This
-> is simpler and more consistent, so the Python 2 forms are not shown here.
 
 ## `__init__()` versus `__new__()` in a Metaclass
 
@@ -380,10 +377,10 @@ which is one way to build a Singleton:
 ```python
 # singleton.py
 # A Singleton metaclass: intercept instance creation through __call__.
-from typing import Any
+from typing import Any, ClassVar
 
 class Singleton(type):
-    _instances: dict[type, Any] = {}
+    _instances: ClassVar[dict[type, Any]] = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:

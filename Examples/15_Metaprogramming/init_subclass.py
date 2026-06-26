@@ -1,9 +1,10 @@
 # init_subclass.py
 # Track the "leaf" subclasses (those with no subclasses of their own),
 # using __init_subclass__ instead of a metaclass.
+from typing import ClassVar
 
 class Color:
-    registry: set[type] = set()
+    registry: ClassVar[set[type]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -17,16 +18,18 @@ class Red(Color):
 class Green(Color):
     pass
 print(sorted(c.__name__ for c in Color.registry))
+## ['Blue', 'Green', 'Red']
 
 class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
 print(sorted(c.__name__ for c in Color.registry))
+## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
-    registry: set[type] = set()
+    registry: ClassVar[set[type]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -40,6 +43,4 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-## ['Blue', 'Green', 'Red']
-## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 ## ['Circle', 'Square']
