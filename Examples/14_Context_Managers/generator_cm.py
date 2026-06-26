@@ -1,6 +1,4 @@
 # generator_cm.py
-# A one-yield generator becomes a context manager. Before yield is
-# setup; after yield is teardown.
 from collections.abc import Iterator
 from contextlib import contextmanager
 

@@ -160,6 +160,35 @@ This copy-instead-of-mutate style reduces errors.
 But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
 
+A data class is a type defined by its fields. `display_object()`, the
+inspection helper from [Metaprogramming](16_Metaprogramming.md#the-inspect-module),
+shows those fields with the types they were declared with:
+
+```python
+# display_messenger.py
+from dataclasses import dataclass
+from display import display_object
+
+@dataclass
+class Messenger:
+    name: str
+    number: int
+    depth: float = 0.0
+
+display_object(Messenger("foo", 12, 3.14))
+## === Messenger ===
+## [Attributes]
+##   • depth: float = 3.14
+##   • name: str = 'foo'
+##   • number: int = 12
+## [Methods]
+##   None
+```
+
+The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders, so they
+stay out of the listing. What remains is the record itself: three named, typed
+fields.
+
 ## Freezing
 
 Pass `frozen=True` and the data class becomes immutable.

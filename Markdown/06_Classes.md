@@ -58,6 +58,30 @@ This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,
 they implicitly become class level fields (similar to static fields in C++/Java).
 
+You can see the shape of an object with `display_object()`, a small inspection
+helper built in [Metaprogramming](16_Metaprogramming.md#the-inspect-module).
+It prints an object's attributes and methods:
+
+```python
+# display_simple.py
+from display import display_object
+from simple_class import Simple
+
+x = Simple("Constructor argument")
+## Inside the Simple constructor
+display_object(x)
+## === Simple ===
+## [Attributes]
+##   • s = 'Constructor argument'
+## [Methods]
+##   • show(self, msg='')
+##   • show_twice(self)
+```
+
+The instance carries one attribute, `s`, while the two methods belong to the
+class. The constructor `__init__()` is a dunder, so `display_object()` hides it
+by default.
+
 ## Inheritance
 
 Because Python is dynamically typed, it doesn't really care about interfaces.

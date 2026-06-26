@@ -78,6 +78,26 @@ Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works under
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
+`display_object()` makes the "bag of named attributes" concrete.
+A `SimpleNamespace` keeps each keyword argument as an attribute:
+
+```python
+# display_namespace.py
+from types import SimpleNamespace
+from display import display_object
+
+m = SimpleNamespace(info="Some information", b=["a", "list"])
+m.more = 11
+display_object(m)
+## === SimpleNamespace ===
+## [Attributes]
+##   • b = ['a', 'list']
+##   • info = 'Some information'
+##   • more = 11
+## [Methods]
+##   None
+```
+
 A small test confirms each form behaves as a record:
 the hand-rolled `Messenger` turns keyword arguments into attributes (and takes new ones later),
 the `@dataclass` carries fields and value equality,
