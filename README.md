@@ -49,7 +49,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 11_Pattern_Matching.md              |X| |
 | 12_Functional_Error_Handling.md     |X|X|
 | 13_Decorators.md                    |X|X|
-| 14_Comprehensions.md                | | |
+| 14_Comprehensions.md                |X| |
 | 15_Metaprogramming.md               | | |
 | 16_Performance.md                   | | |
 | 17_Rethinking_Objects.md            | | |

@@ -24,16 +24,15 @@ A list comprehension consists of:
 -   An Optional Predicate expression.
 -   An Output Expression producing elements of the output list from members of the Input Sequence that satisfy the predicate.
 
-Say we need to obtain a list of all the integers in a sequence and then square them.
-Several examples in this chapter use the same input list, so it lives in its own
-importable module:
+Let's take a list of integers and square them.
+Several examples in this chapter use the same input list:
 
 ```python
 # a_list.py
 a_list = [1, "4", 9, "a", 0, 4]
 ```
 
-The list comprehension keeps the integers and squares them:
+The list comprehension selects integers from the list and squares them:
 
 ```python
 # list_comprehension.py
@@ -50,12 +49,11 @@ The comprehension has three parts:
 
 -   The iterator part iterates through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
--   If the member is an integer then it is passed to the output expression,
-    squared, to become a member of the output list.
+-   If the member is an integer then it is passed to the output expression which squares it and appends it to the output list.
 
 The same results can be achieved using the built-in functions `map()` and
 `filter()` with an anonymous `lambda`.
-`filter()` applies a predicate to a sequence and keeps the members that pass.
+`filter()` applies a predicate to a sequence and retains the members that satisfy the predicate.
 It produces a lazy iterator which can be turned into a `list` using `list()`:
 
 ```python
@@ -70,7 +68,7 @@ if __name__ == "__main__":
 ```
 
 `map()` applies a function to each member.
-Squaring needs integers, so it reuses the `ints` from `filtering.py`:
+We reuse the `ints` from `filtering.py`:
 
 ```python
 # mapping.py
@@ -96,9 +94,9 @@ The comprehension inlines the test and the expression.
 
 The list comprehension is enclosed within a list,
 so it is immediately evident that a list is being produced.
-There is only one function call to `isinstance()` and no call to the cryptic `lambda`;
-instead the list comprehension uses a conventional iterator,
-an expression and an `if` expression for the optional predicate.
+There is only one function call to `isinstance()` and no call to the cryptic `lambda`.
+Instead, the list comprehension uses a conventional iterator,
+an expression, and an `if` expression for the optional predicate.
 
 ## Nested Comprehensions
 
@@ -150,7 +148,7 @@ print([
 ## ['doubled(10) = 20', 'squared(3) = 9']
 ```
 
-A two-level list comprehension using `Path.walk()`:
+Here's a two-level list comprehension using `Path.walk()`:
 
 ```python
 # os_walk_comprehension.py
@@ -197,7 +195,7 @@ print(unique == same)
 
 ## Dictionary Comprehensions
 
-Consider a dictionary with character keys and values that map to the number of times that character appears in some text.
+Consider a dictionary with character keys and integer values that represent the number of times that character appears in some text.
 If the dictionary distinguishes between upper and lower case characters, the following is inefficient:
 If both a lower case and upper case character exists,
 then the entry in the new dictionary is updated twice.
@@ -218,10 +216,10 @@ print(mcase_frequency)
 
 ## Generator Expressions {#generator-expressions}
 
-A comprehension is evaluated eagerly.
-It builds the whole result in memory before the next statement runs.
+A comprehension is evaluated eagerly,
+which means it builds the whole result in memory right away.
 For a large data set, that wastes time and space,
-especially when you consume the result only once.
+especially if you consume the result only once.
 A *generator expression* uses the same syntax with parentheses instead of brackets,
 and produces its values one at a time, on demand:
 

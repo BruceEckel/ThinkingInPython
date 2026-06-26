@@ -3,9 +3,6 @@ If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
 DO make essential changes, and put everything else in the REVIEW files.
 
-/loop through the chapters in the book looking for features or functions that have been used before they were introduced.
-Add a brief introduction the first time they are used. Add a cross-link to a place in the book with more information if that exists.
-
 Run 'make prose' on each chapter
 
 Creating your own context managers -- didn't I write about this?
