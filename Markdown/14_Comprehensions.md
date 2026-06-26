@@ -19,10 +19,10 @@ and one line replaces several lines of loop bookkeeping.
 
 A list comprehension consists of:
 
--   An Input Sequence.
--   A Variable representing members of the input sequence.
--   An Optional Predicate expression.
--   An Output Expression producing elements of the output list from members of the Input Sequence that satisfy the predicate.
+-   An input sequence.
+-   A variable representing members of the input sequence.
+-   An optional predicate expression.
+-   An output expression producing elements of the output list from members of the input sequence that satisfy the predicate.
 
 Let's take a list of integers and square them.
 Several examples in this chapter use the same input list:
@@ -152,21 +152,33 @@ Here's a two-level list comprehension using `Path.walk()`:
 
 ```python
 # os_walk_comprehension.py
+import tempfile
 from pathlib import Path
 
-rst_files = [
-    dirpath / f
-    for dirpath, _, files in Path(".").walk()
-    for f in files if f.endswith(".rst")
-]
-for r in rst_files:
-    print(r)
+# Build a small tree to walk: two .py files and one to skip
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "pkg").mkdir()
+    for name in ("main.py", "pkg/util.py", "pkg/notes.txt"):
+        (root / name).write_text("")
+    py_paths = [
+        (dirpath / f).relative_to(root).as_posix()
+        for dirpath, _, files in root.walk()
+        for f in files if f.endswith(".py")
+    ]
+
+for path in sorted(py_paths):  # Sorted for stable output
+    print(path)
+## main.py
+## pkg/util.py
 ```
+
+The outer `for` walks the directories and the inner `for` walks the files in each, flattening the tree into one list of paths.
 
 ## Set Comprehensions
 
 Set comprehensions construct sets using the same principles as list comprehensions.
-Instead of `[]` a set comprehension uses `{}`.
+Instead of `[]`, a set comprehension uses `{}`.
 
 Consider a list of names.
 We are only interested in names longer than one character and wish to represent all names in the same format:
@@ -195,12 +207,9 @@ print(unique == same)
 
 ## Dictionary Comprehensions
 
-Consider a dictionary with character keys and integer values that represent the number of times that character appears in some text.
-If the dictionary distinguishes between upper and lower case characters, the following is inefficient:
-If both a lower case and upper case character exists,
-then the entry in the new dictionary is updated twice.
-
-Here's a dictionary that combines the occurrences of upper and lower case characters:
+Consider a dictionary whose keys are single characters and whose values count how often each appears, with upper and lower case counted separately.
+To merge them into a case-insensitive count, the comprehension below sums the upper- and lower-case tallies under one lower-case key.
+It does some redundant work: a letter present in both cases (such as `a` and `A`) has the same combined count computed twice, once for each case.
 
 ```python
 # dict_comprehension.py

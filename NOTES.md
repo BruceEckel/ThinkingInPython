@@ -3,6 +3,13 @@ If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
 DO make essential changes, and put everything else in the REVIEW files.
 
+/loop through chapters looking for examples that (after the dataclass chapter) could work better as dataclasses, and convert them.
+Also make sure the syntax and type annotations are modernized (after type annotations have been introduced)
+
+Review chapter 14. Make obious changes and put everything I need to look at first in REVIEW_14.md
+
+Functional programming in Python (chapter). Have Claude draft it to see what it thinks it is.
+
 Run 'make prose' on each chapter
 
 Creating your own context managers -- didn't I write about this?

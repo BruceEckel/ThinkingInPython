@@ -3,7 +3,7 @@
 Objects are created by other objects:
 special objects called "classes" that we set up to produce objects configured to our liking.
 
-Classes are just objects, and you can modify them the same way:
+Classes are just objects, and we can modify objects:
 
 ```python
 # modify_class.py
@@ -31,7 +31,7 @@ Sometimes you want to customize how classes are produced,
 by running extra code or injecting members as the class is built.
 That is metaclass programming.
 
-It is worth saying plainly: *most of the time you do not need a metaclass.*
+*Most of the time you do not need a metaclass.*
 It is a fascinating tool, and the temptation to use it is strong,
 but Python 3 added simpler hooks that cover almost every case a metaclass used to handle:
 
@@ -43,7 +43,7 @@ but Python 3 added simpler hooks that cover almost every case a metaclass used t
 
 Use a metaclass only when these cannot do the job.
 This chapter shows the simpler tools first,
-then metaclasses for the cases that still need them.
+then metaclasses for situations that still need them.
 
 ## Generating Classes with `type`
 
@@ -96,19 +96,22 @@ print(ml.__class__.__class__)
 
 Printing the class of the class produces the metaclass.
 
-Generating classes programmatically with `type` opens up real possibilities.
+Generating classes programmatically with `type` opens up possibilities.
 Where you might otherwise write many near-identical subclasses by hand,
 you can generate them in a loop:
 
 ```python
 # greenhouse.py
+from dataclasses import dataclass
+from typing import ClassVar
 
+@dataclass
 class Event:
-    events: list[Event] = [] # Static
+    events: ClassVar[list[Event]] = []  # Registry of all Events
+    action: str
+    time: float
 
-    def __init__(self, action: str, time: float) -> None:
-        self.action = action
-        self.time = time
+    def __post_init__(self) -> None:
         Event.events.append(self)
 
     def run(self) -> None:

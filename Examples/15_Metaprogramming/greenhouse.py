@@ -1,11 +1,14 @@
 # greenhouse.py
+from dataclasses import dataclass
+from typing import ClassVar
 
+@dataclass
 class Event:
-    events: list[Event] = [] # Static
+    events: ClassVar[list[Event]] = []  # Registry of all Events
+    action: str
+    time: float
 
-    def __init__(self, action: str, time: float) -> None:
-        self.action = action
-        self.time = time
+    def __post_init__(self) -> None:
         Event.events.append(self)
 
     def run(self) -> None:
