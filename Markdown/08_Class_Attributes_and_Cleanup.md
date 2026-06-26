@@ -177,14 +177,14 @@ when the global `counters` list is torn down.
 That list holds the only remaining references,
 so when it goes, the objects it holds go with it.
 
-The reverse order (`Third`, then `Second`, then `First`) comes from how CPython deallocates a list.
-It releases the items from the last index down to the first,
-so `Third` reaches a reference count of zero first and its `__del__()` runs first,
-followed by `Second` and then `First`.
-The effect is last-in, first-out.
+This is why the `deleted` lines are missing from the output above.
+The listing ends at `End of delete loop` because that is the program's last statement.
+Each `__del__()` runs only afterward, at interpreter shutdown, so the lines it prints come after the captured output rather than inside it.
+Run `python cleanup.py` directly to see them appear after `End of delete loop`.
 
-This order, and the fact that `__del__()` runs at exit,
-is a CPython reference-counting detail.
+The order in which the three finalizers run is an unstable implementation detail.
+It depends on how the interpreter tears down the `counters` list at shutdown, and it can differ from one CPython build to the next.
+Even the fact that `__del__()` runs before the program exits is a reference-counting detail, not a guarantee.
 The language does not promise when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order, or not run the finalizers before exit at all.

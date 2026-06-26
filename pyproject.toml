@@ -42,7 +42,7 @@ skip = "./.git,./.venv,./build,./resources,./uv.lock,*.gif,*.png"
 # listing box, not ruff's default 88. ruff runs as an advisory CI step.
 [tool.ruff]
 line-length = 70
-target-version = "py314"
+# target-version is inferred from requires-python (>=3.14); don't duplicate it.
 
 [tool.ruff.lint]
 # The "A" (flake8-builtins) family flags a builtin used as an identifier: a

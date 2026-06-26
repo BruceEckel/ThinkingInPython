@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -27,6 +27,7 @@ help:
 	@echo "  sync-ci   - like verify, plus the site build (the full CI gate)"
 	@echo "  ci        - run the full local gate: check, ty, ruff, run, pytest, site"
 	@echo "  reset     - regenerate build/examples/ from the Markdown (fixes drift)"
+	@echo "  upgrade-python - upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify"
 	@echo "  gate      - the gate without sync or site (check, ty, ruff, run, pytest)"
 	@echo "  sync      - update the committed Examples/ tree from the Markdown"
 	@echo "  check     - verify book examples match the committed Examples/ tree"
@@ -207,6 +208,16 @@ gate:
 # default GitHub Actions path only builds and publishes the site; these gates
 # run in CI only on request (see tools/README.md).
 ci: gate site
+
+# Upgrade the development Python and re-check the book against it.
+# `make upgrade-python` pulls the latest patch of the pinned minor (from
+# .python-version); `make upgrade-python TO=3.15` repins to a new minor first
+# (rewriting .python-version and the requires-python floor). Both resync the
+# venv and run the gate. Run through `uv run --no-project` so the orchestrating
+# interpreter is not the venv that `uv sync` rebuilds.
+upgrade-python:
+	uv run --no-project python tools/upgrade_python.py $(TO)
+	$(MAKE) verify
 
 # Throw away build/examples/ and rebuild it from the Markdown. Run this when
 # a check reports drift you cannot explain (a stale tree from an older Markdown,
