@@ -28,7 +28,6 @@ Usage:
 
 import argparse
 import re
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -40,6 +39,11 @@ DEFAULT_OUT = ROOT / "build" / "examples"
 FENCE = re.compile(r"^```(\w+)?\s*$")
 # First content line names a relative path with an extension.
 PATH_LINE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")
+
+# Helpers shared across chapters are written to the tree root rather than a
+# chapter dir, so any example can import them (the example tooling puts the
+# root on the path). Add future shared modules to this set.
+SHARED = {"display.py"}
 
 
 @dataclass
@@ -85,7 +89,8 @@ def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
             if not pm:
                 result.fragments += 1
                 continue
-            rel = f"{md.stem}/" + pm.group(1).replace("\\", "/")
+            slug = pm.group(1).replace("\\", "/")
+            rel = slug if slug in SHARED else f"{md.stem}/{slug}"
             content = "\n".join(block).rstrip("\n") + "\n"
             existing = result.examples.get(rel)
             if existing and existing.content != content:

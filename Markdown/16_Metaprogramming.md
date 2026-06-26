@@ -326,6 +326,7 @@ though you can still modify the finished class object:
 ```python
 # new_vs_init.py
 from typing import Any
+from display import display_object
 
 class Tag:
     pass
@@ -357,7 +358,14 @@ print("added_in_init present:", hasattr(Demo, "added_in_init"))
 ## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 ## patched_in_init present: True
-# help(Demo)  # Builtin function
+display_object(Demo(), dunder=["__new__", "__init__"])
+## === Demo ===
+## [Attributes]
+##   • added_in_new: 42
+##   • patched_in_init: 3.14
+## [Methods]
+##   • __init__(self, /, *args, **kwargs)
+##   • __new__(*args, **kwargs)
 ```
 
 Override `__new__()` when you must change `name`, `bases`,
@@ -576,3 +584,88 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
     assert issubclass(Ok, final_runtime.A)
 ```
+
+## The 'inspect' Module
+
+Python provides another way for a program to look at itself: the `inspect` module.
+[[Overview of 'inspect']]
+
+As an example, it is useful to be able to easily show the layout of an object
+
+```python
+# display.py
+import inspect
+from collections.abc import Sequence
+
+def display_object(
+    obj: object, dunder: Sequence[str] = (), max_width: int = 65
+) -> None:
+    """Print a compact, readable view of an object or class.
+
+    Standard dunder members are hidden; name any to keep in `dunder`.
+    """
+    print(f"=== {type(obj).__name__} ===")
+    attributes: list[str] = []
+    methods: list[str] = []
+    # Read members statically, without triggering dynamic descriptors
+    for name, value in inspect.getmembers_static(obj):
+        is_dunder = name.startswith("__") and name.endswith("__")
+        if is_dunder and name not in dunder:
+            continue  # Skip standard dunder clutter
+        if callable(value):
+            try:
+                sig = str(inspect.signature(value))
+            except (ValueError, TypeError):
+                sig = "(...)"
+            methods.append(f"  • {name}{sig}")
+        else:
+            val_str = repr(value)
+            if len(val_str) > max_width - len(name) - 6:
+                val_str = val_str[:max_width - len(name) - 9] + "..."
+            attributes.append(f"  • {name}: {val_str}")
+    print("[Attributes]")
+    print("\n".join(attributes) or "  None")
+    print("[Methods]")
+    print("\n".join(methods) or "  None")
+```
+
+```python
+# demo_display_object.py
+from dataclasses import dataclass
+from display import display_object
+
+@dataclass
+class Fraggle:
+    x: int = 11
+    y: float = 1.14659
+    z: str = "blivet"
+
+    def f(self, )-> None: ...
+    def g(self, x: int)-> float:
+        return 0.001
+    def h(self, s: str)-> str:
+        return f"h({s})"
+
+display_object(Fraggle)
+## === type ===
+## [Attributes]
+##   • x: 11
+##   • y: 1.14659
+##   • z: 'blivet'
+## [Methods]
+##   • f(self) -> None
+##   • g(self, x: int) -> float
+##   • h(self, s: str) -> str
+display_object(Fraggle(9, 2.3, 'zingo'))
+## === Fraggle ===
+## [Attributes]
+##   • x: 9
+##   • y: 2.3
+##   • z: 'zingo'
+## [Methods]
+##   • f(self) -> None
+##   • g(self, x: int) -> float
+##   • h(self, s: str) -> str
+```
+
+This is used in `new_vs_init.py`.

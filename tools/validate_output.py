@@ -237,12 +237,14 @@ def block_slug(block: list[str]) -> str | None:
 
 
 @contextlib.contextmanager
-def run_location(rundir: Path | None):
+def run_location(rundir: Path | None, root: Path | None = None):
     """Run a block from ``rundir`` (cwd + sys.path), leaving no trace.
 
     Imports of sibling extracted files and relative data paths resolve as they
-    do under run_examples. sys.path and any modules imported by the block are
-    restored afterward so one block cannot leak into the next.
+    do under run_examples. The tree root is also placed on sys.path so a block
+    can import shared helpers (such as display.py) kept there. sys.path and any
+    modules imported by the block are restored afterward so one block cannot
+    leak into the next.
     """
     if rundir is None or not rundir.exists():
         yield
@@ -250,6 +252,8 @@ def run_location(rundir: Path | None):
     old_cwd = Path.cwd()
     saved_path = list(sys.path)
     saved_modules = set(sys.modules)
+    if root is not None:
+        sys.path.insert(0, str(root))
     sys.path.insert(0, str(rundir))
     os.chdir(rundir)
     try:
@@ -363,7 +367,7 @@ def process_md_block(
     }
     label = f'{path}:{rel}' if rel else str(path)
 
-    with run_location(rundir):
+    with run_location(rundir, tree):
         new_lines, ok, changed = process_block(
             block, label, update=update,
             namespace=namespace, line_offset=block_start,

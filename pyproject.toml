@@ -73,3 +73,8 @@ lines-after-imports = 1
 "**/import_module.py" = ["F401"]
 # This example deliberately demonstrates assigning a lambda to a name.
 "**/lambdas.py" = ["E731"]
+
+# Examples run with cwd set to their chapter dir; adding the tree root to the
+# import path lets test files import shared helpers (display.py) kept there.
+[tool.pytest.ini_options]
+pythonpath = ["build/examples"]

@@ -1,5 +1,6 @@
 # new_vs_init.py
 from typing import Any
+from display import display_object
 
 class Tag:
     pass
@@ -31,4 +32,11 @@ print("added_in_init present:", hasattr(Demo, "added_in_init"))
 ## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 ## patched_in_init present: True
-# help(Demo)  # Builtin function
+display_object(Demo(), dunder=["__new__", "__init__"])
+## === Demo ===
+## [Attributes]
+##   • added_in_new: 42
+##   • patched_in_init: 3.14
+## [Methods]
+##   • __init__(self, /, *args, **kwargs)
+##   • __new__(*args, **kwargs)
