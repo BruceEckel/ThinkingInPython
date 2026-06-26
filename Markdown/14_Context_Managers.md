@@ -9,6 +9,9 @@ which runs at the start of the block, and `__exit__()`, which runs at the end.
 The `with` statement calls them for you and guarantees that `__exit__()` runs
 no matter how the block finishes.
 
+Thus, the context manager introduces a scope that determines when initialization and cleanup happens.
+This is far more reliable than using `__del__()`, as we saw in [Class Attributes and Cleanup](08_Class_Attributes_and_Cleanup.md#cleanup)
+
 ## The Protocol
 
 `with cm as name:` calls `cm.__enter__()`, binds its return value to `name`,
@@ -44,7 +47,7 @@ if __name__ == "__main__":
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block reads like a guarantee: whatever happens inside, the exit code runs.
 
-## Cleanup Happens Even on Errors
+## Cleanup is Guaranteed
 
 The point of a context manager is the guarantee, not the brevity.
 `__exit__()` runs when the block raises, before the exception propagates:
@@ -107,7 +110,7 @@ The `1 / 0` raises, `__exit__()` returns `True`, and the `with` statement
 absorbs the error so `survived` still prints.
 The standard library ships this as `contextlib.suppress`, so you rarely write it.
 
-## Writing One as a Generator
+## Context Managers as Generators
 
 Most context managers are simpler to write as a generator.
 `contextlib.contextmanager` turns a function with a single `yield` into a
@@ -117,8 +120,6 @@ Put the cleanup in a `finally` so it runs even when the block raises:
 
 ```python
 # generator_cm.py
-# A one-yield generator becomes a context manager. Before yield is
-# setup; after yield is teardown.
 from collections.abc import Iterator
 from contextlib import contextmanager
 
@@ -138,8 +139,9 @@ with tag("p") as t:
 ```
 
 This is the same setup-then-teardown shape as a `pytest` fixture that
-[`yield`s its value](09_Testing.md#fixtures-replace-setup-and-teardown), and it relies on the generator and
-decorator machinery from [Decorators](13_Decorators.md) and [Iterators](25_Iterators.md#generators).
+[`yield`s its value](09_Testing.md#fixtures-replace-setup-and-teardown).
+It relies on the generator and decorator machinery from [Decorators](13_Decorators.md)
+and [Iterators](25_Iterators.md#generators).
 The generator form is usually the clearest choice; reach for a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 

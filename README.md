@@ -51,7 +51,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 13_Decorators.md                    |X|X|
 | 14_Context_Managers.md              | | |
 | 15_Comprehensions.md                |X| |
-| 16_Metaprogramming.md               | | |
+| 16_Metaprogramming.md               |X| |
 | 17_Performance.md                   | | |
 | 18_Rethinking_Objects.md            | | |
 | 19_The_Pattern_Concept.md           | | |

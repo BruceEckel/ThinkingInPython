@@ -228,6 +228,11 @@ c = Circle(10)
 c.radius = 5      # The setter validates, then stores
 print(c.radius)
 ## 5
+try:
+    Circle(-1)
+except ValueError as e:
+    print(f"Failed: {e}")
+## Failed: radius cannot be negative
 ```
 
 The getter and setter are independent,

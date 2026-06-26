@@ -21,12 +21,6 @@ class Registry:
 
 a = Registry()
 b = Registry()
-display_object(a)
-## === Registry ===
-## [Attributes]
-##   • items = []
-## [Methods]
-##   None
 assert a is b
 a.items.append("widget")
 display_object(a)
