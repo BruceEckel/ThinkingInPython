@@ -322,6 +322,8 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it has to unpack the `Result` to reach the number.
 
+The [Decorators](13_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
+
 ## Matching on the Error
 
 Because the error is a value, and is often an exception,

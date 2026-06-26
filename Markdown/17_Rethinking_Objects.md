@@ -370,6 +370,8 @@ if __name__ == "__main__":
         print(round(shape.area(), 4))
 ```
 
+Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated, and `@abstractmethod` forces every subclass to define `area()`.
+
 Dynamic typing gives a different answer:
 any type works as long as it has the method the function calls.
 There is no shared base class and no declared set of types,

@@ -275,6 +275,8 @@ print(run("dance"))
 ## unknown command
 ```
 
+The [Pattern Matching](11_Pattern_Matching.md) chapter covers `match` in detail, including class patterns, guards, and nested destructuring.
+
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.

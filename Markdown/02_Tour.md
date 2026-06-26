@@ -216,6 +216,8 @@ print(name)               # default
 ## default
 ```
 
+`repr()` returns a value's unambiguous representation, so the empty string shows as `''` and not as blank.
+
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean.
 `x or default` is a common way to supply a fallback.
@@ -288,7 +290,7 @@ including control over the number of decimal places and alignment.
 
 ### f-Strings
 
-Modern Python  uses *f-string*s.
+Modern Python uses *f-string*s.
 Prefix the string with `f` and put expressions in curly braces.
 It is readable, fast, and preferred:
 
