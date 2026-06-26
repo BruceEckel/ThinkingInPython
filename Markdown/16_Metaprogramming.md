@@ -315,7 +315,7 @@ As with any subclass, call the base-class version first through `super()`.
 
 ## `__init__()` versus `__new__()` in a Metaclass
 
-Metaclass examples seem to use `__new__()` and `__init__()` interchangeably.
+Metaclass examples appear to use `__new__()` and `__init__()` interchangeably.
 The difference is timing.
 `__new__()` runs *before* the class object exists, so it can change the name,
 bases, and namespace that will be used to build it.
@@ -357,13 +357,14 @@ print("added_in_init present:", hasattr(Demo, "added_in_init"))
 ## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 ## patched_in_init present: True
+# help(Demo)  # Builtin function
 ```
 
-So override `__new__()` when you must change `name`, `bases`,
+Override `__new__()` when you must change `name`, `bases`,
 or the namespace (including special members like `__slots__`) before the class is built.
-Otherwise prefer `__init__()`, which is simpler.
+Otherwise, prefer `__init__()`, which is simpler.
 When the choice does not matter,
-pick `__init__()` and reserve `__new__()` for when it has a real reason.
+pick `__init__()` and reserve `__new__()` for a genuine need.
 
 ## Intercepting Instance Creation
 
@@ -372,11 +373,11 @@ callable on the class but not on its instances.
 These are sometimes called *metamethods*.
 One useful metamethod is `__call__()`, which runs when you create an instance.
 Overriding it lets a metaclass intercept instance creation,
-which is one way to build a Singleton:
+which is one way to build a [Singleton](21_Singleton.md):
 
 ```python
 # singleton.py
-# A Singleton metaclass: intercept instance creation through __call__.
+# Singleton metaclass intercepts instance creation through __call__.
 from typing import Any, ClassVar
 
 class Singleton(type):
@@ -414,8 +415,9 @@ which needs no metaclass at all:
 
 ```python
 # singleton_decorator.py
-# The same idea as a class decorator. Simpler than a metaclass.
+# Singleton as a class decorator; simpler than a metaclass.
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any
 
 def singleton(klass: type) -> Callable[..., Any]:
@@ -429,12 +431,17 @@ def singleton(klass: type) -> Callable[..., Any]:
     return get_instance
 
 @singleton
+@dataclass
 class Registry:
     def __init__(self) -> None:
         self.items: list[str] = []
 
 a = Registry()
 b = Registry()
+print(a)
+## Registry()
+print(b)
+## Registry()
 assert a is b
 a.items.append("widget")
 print(b.items)

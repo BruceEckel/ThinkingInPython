@@ -1,5 +1,5 @@
 # singleton.py
-# A Singleton metaclass: intercept instance creation through __call__.
+# Singleton metaclass intercepts instance creation through __call__.
 from typing import Any, ClassVar
 
 class Singleton(type):

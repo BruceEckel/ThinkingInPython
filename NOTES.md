@@ -1,3 +1,8 @@
+I'd like to produce a nice readable layout of both classes and objects, to use in the book to show people what the
+  class or object looks like. I tried the builtin help() but it was not as compact as I'd like and produced output that
+  was too wide. I wonder if there might be third-party libraries to do this, but it could also be a supplemental
+  utility (perhaps stored in 'tools'?) custom written for the book.
+
 Before bed: In a loop, one chapter at a time, review chapters 02 through 08.
 If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
@@ -6,6 +11,8 @@ DO make essential changes, and put everything else in the REVIEW files.
 /loop through chapters looking for examples that (after the dataclass chapter) could work better as dataclasses, and convert them.
 Look for chapters that have class variables (after that topic was introduced) and make sure they use ClassVar
 Also make sure the syntax and type annotations are modernized (after type annotations have been introduced)
+
+Look for duplication on Singleton between Metaprogramming and Singleton chapters.
 
 Review chapter 14. Make obious changes and put everything I need to look at first in REVIEW_14.md
 

@@ -41,7 +41,7 @@ help:
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
-	@echo "  fix-imports - organize imports in the listings (ruff I rule), in the Markdown"
+	@echo "  fix-imports - sort imports and drop unused ones in the listings (ruff I,F401), in the Markdown"
 	@echo "  extract   - write build/examples/ from the Markdown"
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"

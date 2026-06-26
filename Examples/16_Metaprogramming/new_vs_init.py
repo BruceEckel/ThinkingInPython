@@ -31,3 +31,4 @@ print("added_in_init present:", hasattr(Demo, "added_in_init"))
 ## added_in_init present: False
 print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
 ## patched_in_init present: True
+# help(Demo)  # Builtin function

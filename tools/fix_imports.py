@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""Organize imports in the book's python listings, writing back to Markdown.
+"""Tidy imports in the book's python listings, writing back to Markdown.
 
-ruff's import rule (``select = ["I"]``) is part of the lint gate, but the gate
-runs on the extracted tree (``build/examples/``), which is regenerated from the
-Markdown. So an automatic fix has to land in the Markdown source.
+ruff's import rules are part of the lint gate, but the gate runs on the
+extracted tree (``build/examples/``), which is regenerated from the Markdown.
+So an automatic fix has to land in the Markdown source.
 
 Running ruff on the real extracted files (rather than each block in isolation)
 matters: ruff's isort classifies a listing's sibling imports as first-party only
 when it can see those files on disk, so an in-place fix on the tree sorts the way
 the gate expects. This extracts nothing itself; run it after the tree is built
 (``make fix-imports`` depends on ``extract``). For each ```python block that
-names an extractable file, it runs ``ruff check --fix-only --select I`` over the
-tree, then splices each fixed file back into the block it came from.
+names an extractable file, it runs ``ruff check --fix-only --select I,F401``
+over the tree (sort the import block and drop unused imports, leaving
+deliberately-unused ones that per-file-ignores exempt), then splices each fixed
+file back into the block it came from.
 
 Usage:
     python tools/fix_imports.py          # report listings to organize (exit 1)
@@ -22,7 +24,6 @@ Usage:
 import argparse
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -53,9 +54,14 @@ def find_ruff() -> list[str]:
 
 
 def ruff_fix_tree(tree: Path, ruff: list[str]) -> None:
-    """Sort imports in place across the extracted tree (ruff's I rule)."""
+    """Tidy imports in place across the extracted tree.
+
+    I organizes the import block; F401 drops unused imports. ruff's autofix
+    honors per-file-ignores, so a deliberately unused import (such as the one
+    in import_module.py) is left alone.
+    """
     subprocess.run(
-        ruff + ['check', '--fix-only', '--select', 'I', str(tree)],
+        ruff + ['check', '--fix-only', '--select', 'I,F401', str(tree)],
         check=False,
     )
 
@@ -91,8 +97,9 @@ def splice_markdown(
             i += 1
 
         slug = block_slug(block)
-        fixed = fixed_for(slug) if slug else None
-        if fixed is not None and fixed != ''.join(block):
+        fixed = fixed_for(slug) if slug is not None else None
+        if (slug is not None and fixed is not None
+                and fixed != ''.join(block)):
             out.extend(fixed.splitlines(keepends=True))
             changed.append(slug)
         else:
