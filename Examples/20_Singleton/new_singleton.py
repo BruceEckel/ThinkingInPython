@@ -1,5 +1,5 @@
 # new_singleton.py
-from typing import Any
+from typing import Any, ClassVar
 
 class OnlyOne:
     class __OnlyOne:
@@ -9,7 +9,7 @@ class OnlyOne:
         def __str__(self) -> str:
             return str(self.val)
 
-    instance: Any = None
+    instance: ClassVar[Any] = None
 
     def __new__(cls) -> Any:  # __new__ is always a classmethod
         if not OnlyOne.instance:

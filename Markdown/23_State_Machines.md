@@ -490,6 +490,7 @@ so a misspelled state name is caught by the type checker instead of failing sile
 ```python
 # tabledriven/vending_machine.py
 # A vending machine expressed entirely as a transition table.
+from dataclasses import dataclass
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
@@ -500,10 +501,10 @@ class State(Enum):
     UNAVAILABLE = auto()
     WANT_MORE = auto()
 
+@dataclass
 class Money:
-    def __init__(self, name: str, value: int) -> None:
-        self.name = name
-        self.value = value
+    name: str
+    value: int
 
     def __str__(self) -> str:
         return self.name
@@ -512,10 +513,10 @@ class Quit:
     def __str__(self) -> str:
         return "Quit"
 
+@dataclass
 class Digit:
-    def __init__(self, name: str, value: int) -> None:
-        self.name = name
-        self.value = value
+    name: str
+    value: int
 
     def __str__(self) -> str:
         return self.name
@@ -525,10 +526,10 @@ class FirstDigit(Digit):
 class SecondDigit(Digit):
     pass
 
+@dataclass
 class ItemSlot:
-    def __init__(self, price: int, quantity: int) -> None:
-        self.price = price
-        self.quantity = quantity
+    price: int
+    quantity: int
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:

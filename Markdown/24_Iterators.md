@@ -36,6 +36,7 @@ A class becomes iterable by writing `__iter__()` as a generator:
 # iterators.py
 # Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
 
 # A generator function is the easy way to produce an iterator:
 def fibonacci(n: int) -> Iterator[int]:
@@ -45,9 +46,9 @@ def fibonacci(n: int) -> Iterator[int]:
         a, b = b, a + b
 
 # __iter__() makes a class iterable. Often a generator:
+@dataclass
 class Countdown:
-    def __init__(self, start: int) -> None:
-        self.start = start
+    start: int
 
     def __iter__(self) -> Iterator[int]:
         n = self.start

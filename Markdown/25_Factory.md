@@ -168,7 +168,6 @@ from collections.abc import Iterator
 from typing import override
 
 class Shape:
-    types: list[type] = []
     def draw(self) -> None: ...
     def erase(self) -> None: ...
 
@@ -234,10 +233,10 @@ by letting each subclass register itself through `__init_subclass__()`:
 # A class is a first-class object, so a factory is just a dict of
 # classes. __init_subclass__ lets each subclass register itself, so
 # the factory never needs editing when you add a type.
-from typing import override
+from typing import ClassVar, override
 
 class Shape:
-    registry: dict[str, type[Shape]] = {}
+    registry: ClassVar[dict[str, type[Shape]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -315,10 +314,10 @@ Notice also that the specific `Shape` classes are dynamically loaded on demand:
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import Any, override
+from typing import Any, ClassVar, override
 
 class ShapeFactory:
-    factories: dict[str, Any] = {}
+    factories: ClassVar[dict[str, Any]] = {}
 
     @staticmethod
     def add_factory(kind: str, shape_factory: Any) -> None:

@@ -1,9 +1,10 @@
 # trash.py
 # The Trash hierarchy, with self-registration and a per-pound value.
+from typing import ClassVar
 
 class Trash:
-    value: float = 0.0  # Dollars per pound, set by each subclass
-    registry: dict[str, type[Trash]] = {}  # name -> subclass
+    value: ClassVar[float] = 0.0  # Dollars per pound (per subclass)
+    registry: ClassVar[dict[str, type[Trash]]] = {}
 
     def __init__(self, weight: float) -> None:
         self.weight = weight

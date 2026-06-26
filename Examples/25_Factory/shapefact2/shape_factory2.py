@@ -2,10 +2,10 @@
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import Any, override
+from typing import Any, ClassVar, override
 
 class ShapeFactory:
-    factories: dict[str, Any] = {}
+    factories: ClassVar[dict[str, Any]] = {}
 
     @staticmethod
     def add_factory(kind: str, shape_factory: Any) -> None:

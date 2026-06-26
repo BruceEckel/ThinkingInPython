@@ -4,7 +4,6 @@ from collections.abc import Iterator
 from typing import override
 
 class Shape:
-    types: list[type] = []
     def draw(self) -> None: ...
     def erase(self) -> None: ...
 

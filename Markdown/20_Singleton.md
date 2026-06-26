@@ -89,7 +89,7 @@ The classic approach takes control of creation by delegating to a single instanc
 
 ```python
 # singleton_pattern.py
-from typing import Any
+from typing import Any, ClassVar
 
 class OnlyOne:
     class __OnlyOne:
@@ -99,7 +99,7 @@ class OnlyOne:
         def __str__(self) -> str:
             return self.val
 
-    instance: Any = None
+    instance: ClassVar[Any] = None
 
     def __init__(self, arg: str) -> None:
         if not OnlyOne.instance:
@@ -145,7 +145,7 @@ to return the same object every time:
 
 ```python
 # new_singleton.py
-from typing import Any
+from typing import Any, ClassVar
 
 class OnlyOne:
     class __OnlyOne:
@@ -155,7 +155,7 @@ class OnlyOne:
         def __str__(self) -> str:
             return str(self.val)
 
-    instance: Any = None
+    instance: ClassVar[Any] = None
 
     def __new__(cls) -> Any:  # __new__ is always a classmethod
         if not OnlyOne.instance:
@@ -200,10 +200,10 @@ and it points every instance's `__dict__` at the same storage:
 ```python
 # borg_singleton.py
 # Alex Martelli's 'Borg'
-from typing import Any
+from typing import Any, ClassVar
 
 class Borg:
-    _shared_state: dict[str, Any] = {}
+    _shared_state: ClassVar[dict[str, Any]] = {}
 
     def __init__(self) -> None:
         self.__dict__ = self._shared_state
@@ -244,11 +244,11 @@ A simpler version relies on the fact that a class variable has a single shared v
 
 ```python
 # class_variable_singleton.py
-from typing import Any
+from typing import Any, ClassVar
 
 class SingleTone:
     val: Any
-    __instance: SingleTone | None = None
+    __instance: ClassVar[SingleTone | None] = None
 
     def __new__(cls, val: Any) -> SingleTone:
         instance = SingleTone.__instance

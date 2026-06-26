@@ -2,10 +2,10 @@
 # A class is a first-class object, so a factory is just a dict of
 # classes. __init_subclass__ lets each subclass register itself, so
 # the factory never needs editing when you add a type.
-from typing import override
+from typing import ClassVar, override
 
 class Shape:
-    registry: dict[str, type[Shape]] = {}
+    registry: ClassVar[dict[str, type[Shape]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)

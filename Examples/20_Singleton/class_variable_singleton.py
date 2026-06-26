@@ -1,9 +1,9 @@
 # class_variable_singleton.py
-from typing import Any
+from typing import Any, ClassVar
 
 class SingleTone:
     val: Any
-    __instance: SingleTone | None = None
+    __instance: ClassVar[SingleTone | None] = None
 
     def __new__(cls, val: Any) -> SingleTone:
         instance = SingleTone.__instance

@@ -1,9 +1,9 @@
 # borg_singleton.py
 # Alex Martelli's 'Borg'
-from typing import Any
+from typing import Any, ClassVar
 
 class Borg:
-    _shared_state: dict[str, Any] = {}
+    _shared_state: ClassVar[dict[str, Any]] = {}
 
     def __init__(self) -> None:
         self.__dict__ = self._shared_state

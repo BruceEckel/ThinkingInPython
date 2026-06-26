@@ -1,5 +1,5 @@
 # singleton_pattern.py
-from typing import Any
+from typing import Any, ClassVar
 
 class OnlyOne:
     class __OnlyOne:
@@ -9,7 +9,7 @@ class OnlyOne:
         def __str__(self) -> str:
             return self.val
 
-    instance: Any = None
+    instance: ClassVar[Any] = None
 
     def __init__(self, arg: str) -> None:
         if not OnlyOne.instance:
