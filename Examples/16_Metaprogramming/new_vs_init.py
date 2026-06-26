@@ -24,14 +24,6 @@ class Meta(type):
 class Demo(metaclass=Meta):
     pass
 
-print("added_in_new:", Demo.added_in_new)            # type: ignore
-## added_in_new: 42
-print("has Tag base:", Tag in Demo.__bases__)
-## has Tag base: True
-print("added_in_init present:", hasattr(Demo, "added_in_init"))
-## added_in_init present: False
-print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
-## patched_in_init present: True
 display_object(Demo(), dunder=["__new__", "__init__"])
 ## === Demo ===
 ## [Attributes]
@@ -40,3 +32,6 @@ display_object(Demo(), dunder=["__new__", "__init__"])
 ## [Methods]
 ##   • __init__(self, /, *args, **kwargs)
 ##   • __new__(*args, **kwargs)
+
+print("has Tag base:", Tag in Demo.__bases__)
+## has Tag base: True

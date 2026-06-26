@@ -1,8 +1,8 @@
 # singleton_decorator.py
 # Singleton as a class decorator; simpler than a metaclass.
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any
+from display import display_object
 
 def singleton(klass: type) -> Callable[..., Any]:
     instances: dict[type, Any] = {}
@@ -15,18 +15,29 @@ def singleton(klass: type) -> Callable[..., Any]:
     return get_instance
 
 @singleton
-@dataclass
 class Registry:
     def __init__(self) -> None:
         self.items: list[str] = []
 
 a = Registry()
 b = Registry()
-print(a)
-## Registry()
-print(b)
-## Registry()
+display_object(a)
+## === Registry ===
+## [Attributes]
+##   • items = []
+## [Methods]
+##   None
 assert a is b
 a.items.append("widget")
-print(b.items)
-## ['widget']
+display_object(a)
+## === Registry ===
+## [Attributes]
+##   • items = ['widget']
+## [Methods]
+##   None
+display_object(b)
+## === Registry ===
+## [Attributes]
+##   • items = ['widget']
+## [Methods]
+##   None

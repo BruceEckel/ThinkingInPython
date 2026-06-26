@@ -350,14 +350,6 @@ class Meta(type):
 class Demo(metaclass=Meta):
     pass
 
-print("added_in_new:", Demo.added_in_new)            # type: ignore
-## added_in_new: 42
-print("has Tag base:", Tag in Demo.__bases__)
-## has Tag base: True
-print("added_in_init present:", hasattr(Demo, "added_in_init"))
-## added_in_init present: False
-print("patched_in_init present:", hasattr(Demo, "patched_in_init"))
-## patched_in_init present: True
 display_object(Demo(), dunder=["__new__", "__init__"])
 ## === Demo ===
 ## [Attributes]
@@ -366,6 +358,9 @@ display_object(Demo(), dunder=["__new__", "__init__"])
 ## [Methods]
 ##   • __init__(self, /, *args, **kwargs)
 ##   • __new__(*args, **kwargs)
+
+print("has Tag base:", Tag in Demo.__bases__)
+## has Tag base: True
 ```
 
 Override `__new__()` when you must change `name`, `bases`,
@@ -425,8 +420,8 @@ which needs no metaclass at all:
 # singleton_decorator.py
 # Singleton as a class decorator; simpler than a metaclass.
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any
+from display import display_object
 
 def singleton(klass: type) -> Callable[..., Any]:
     instances: dict[type, Any] = {}
@@ -439,21 +434,26 @@ def singleton(klass: type) -> Callable[..., Any]:
     return get_instance
 
 @singleton
-@dataclass
 class Registry:
     def __init__(self) -> None:
         self.items: list[str] = []
 
 a = Registry()
 b = Registry()
-print(a)
-## Registry()
-print(b)
-## Registry()
 assert a is b
 a.items.append("widget")
-print(b.items)
-## ['widget']
+display_object(a)
+## === Registry ===
+## [Attributes]
+##   • items = ['widget']
+## [Methods]
+##   None
+display_object(b)
+## === Registry ===
+## [Attributes]
+##   • items = ['widget']
+## [Methods]
+##   None
 ```
 
 The simplest Python singleton of all is a module:
@@ -477,8 +477,8 @@ b = B()
 print(type(b).__name__)
 ## B
 
-# A type checker rejects `class C(B): ...`, because it would
-# inherit from a final class.
+# The type checker rejects `class C(B): ...`,
+# because it would inherit from a final class.
 ```
 
 `@final` is checked statically, by type checkers such as ty, mypy,
@@ -488,7 +488,7 @@ It has no runtime effect: the interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter itself to refuse subclassing,
 `__init_subclass__()` can enforce it as each subclass is created.
-The older literature claims this requires a metaclass. It does not:
+Older literature claims this requires a metaclass. It does not:
 
 ```python
 # final_runtime.py
@@ -535,9 +535,8 @@ Multiple inheritance can accidentally combine classes with different metaclasses
 which raises a metaclass conflict you then have to resolve.
 That is one more reason to avoid metaclasses unless you truly need them.
 
-## Testing the Hooks
+## Testing
 
-Each hook has a small, definite effect, which makes it easy to test.
 The registry should hold only the leaf classes,
 the descriptor should learn its name and store under it,
 the `@final` class should carry the final marker,
