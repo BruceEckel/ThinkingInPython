@@ -322,7 +322,7 @@ which is the reason to prefer them when you need that.
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-Metaclasses are covered in [Metaprogramming](15_Metaprogramming.md#intercepting-instance-creation),
+Metaclasses are covered in [Metaprogramming](16_Metaprogramming.md#intercepting-instance-creation),
 where this same singleton appears next to the simpler hooks that usually replace them.
 It is included here for completeness:
 

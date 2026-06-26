@@ -49,22 +49,23 @@ Delete the review file and mark a cell `X` when that item is done.
 | 11_Pattern_Matching.md              |X| |
 | 12_Functional_Error_Handling.md     |X|X|
 | 13_Decorators.md                    |X|X|
-| 14_Comprehensions.md                |X| |
-| 15_Metaprogramming.md               | | |
-| 16_Performance.md                   | | |
-| 17_Rethinking_Objects.md            | | |
-| 18_The_Pattern_Concept.md           | | |
-| 19_Data_Transfer_Objects.md         | | |
-| 20_Singleton.md                     | | |
-| 21_Template_Method.md               | | |
-| 22_Surrogate.md                     | | |
-| 23_State_Machines.md                | | |
-| 24_Iterators.md                     | | |
-| 25_Factory.md                       | | |
-| 26_Function_Objects.md              | | |
-| 27_Changing_the_Interface.md        | | |
-| 28_Observer.md                      | | |
-| 29_Multiple_Dispatching.md          | | |
-| 30_Visitor.md                       | | |
-| 31_Pattern_Refactoring.md           | | |
-| 32_Simulation.md                    | | |
+| 14_Context_Managers.md              | | |
+| 15_Comprehensions.md                |X| |
+| 16_Metaprogramming.md               | | |
+| 17_Performance.md                   | | |
+| 18_Rethinking_Objects.md            | | |
+| 19_The_Pattern_Concept.md           | | |
+| 20_Data_Transfer_Objects.md         | | |
+| 21_Singleton.md                     | | |
+| 22_Template_Method.md               | | |
+| 23_Surrogate.md                     | | |
+| 24_State_Machines.md                | | |
+| 25_Iterators.md                     | | |
+| 26_Factory.md                       | | |
+| 27_Function_Objects.md              | | |
+| 28_Changing_the_Interface.md        | | |
+| 29_Observer.md                      | | |
+| 30_Multiple_Dispatching.md          | | |
+| 31_Visitor.md                       | | |
+| 32_Pattern_Refactoring.md           | | |
+| 33_Simulation.md                    | | |

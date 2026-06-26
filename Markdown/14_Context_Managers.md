@@ -1,0 +1,213 @@
+# Context Managers
+
+The `with` statement, introduced in [Containers and Control Flow](03_Containers_and_Control_Flow.md#context-managers),
+runs setup before a block and cleanup after it, even when the block raises.
+This chapter shows what `with` actually does and how to write your own context managers.
+
+A *context manager* is any object that implements two methods: `__enter__()`,
+which runs at the start of the block, and `__exit__()`, which runs at the end.
+The `with` statement calls them for you and guarantees that `__exit__()` runs
+no matter how the block finishes.
+
+## The Protocol
+
+`with cm as name:` calls `cm.__enter__()`, binds its return value to `name`,
+runs the block, then calls `cm.__exit__()`:
+
+```python
+# trace_cm.py
+# __enter__ runs at the start of the block and its result is bound by
+# `as`; __exit__ runs at the end.
+from typing import Self
+
+class Trace:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __enter__(self) -> Self:
+        print(f"enter {self.name}")
+        return self
+
+    def __exit__(self, exc_type: object,
+                 exc: object, tb: object) -> None:
+        print(f"exit {self.name}")
+
+if __name__ == "__main__":
+    with Trace("A") as t:
+        print(f"inside {t.name}")
+## enter A
+## inside A
+## exit A
+```
+
+`__enter__()` returns the object that `as` binds, often `self`.
+`__exit__()` takes three arguments describing any exception (covered below).
+A `with` block reads like a guarantee: whatever happens inside, the exit code runs.
+
+## Cleanup Happens Even on Errors
+
+The point of a context manager is the guarantee, not the brevity.
+`__exit__()` runs when the block raises, before the exception propagates:
+
+```python
+# exit_on_error.py
+# __exit__ runs even when the body raises, before it propagates.
+from trace_cm import Trace
+
+try:
+    with Trace("A"):
+        raise ValueError("boom")
+except ValueError as error:
+    print("caught:", error)
+## enter A
+## exit A
+## caught: boom
+```
+
+`exit A` prints before `caught`, so the cleanup happened on the way out.
+This is the same guarantee a `try`/`finally` gives, packaged as a reusable object.
+
+## The `__exit__()` Arguments
+
+`__exit__(self, exc_type, exc_value, traceback)` receives the details of an
+exception raised in the block.
+When the block finishes normally, all three are `None`.
+When it raises, they hold the exception's type, value, and traceback.
+
+The return value decides what happens to that exception.
+A false value (including `None`) lets it propagate.
+A true value *suppresses* it: the `with` statement swallows the exception and
+execution continues after the block.
+
+```python
+# suppress_cm.py
+# Returning True from __exit__ swallows a matching exception.
+class Ignore:
+    def __init__(self, *types: type[BaseException]) -> None:
+        self.types = types
+
+    def __enter__(self) -> None:
+        return None
+
+    def __exit__(self, exc_type: type[BaseException] | None,
+                 exc: BaseException | None, tb: object) -> bool:
+        return (exc_type is not None
+                and issubclass(exc_type, self.types))
+
+with Ignore(ZeroDivisionError):
+    print("before")
+    1 / 0
+    print("after")  # Never runs: the error jumps straight to __exit__
+print("survived")
+## before
+## survived
+```
+
+The `1 / 0` raises, `__exit__()` returns `True`, and the `with` statement
+absorbs the error so `survived` still prints.
+The standard library ships this as `contextlib.suppress`, so you rarely write it.
+
+## Writing One as a Generator
+
+Most context managers are simpler to write as a generator.
+`contextlib.contextmanager` turns a function with a single `yield` into a
+context manager: the code before `yield` is the setup, the yielded value is
+what `as` binds, and the code after `yield` is the cleanup.
+Put the cleanup in a `finally` so it runs even when the block raises:
+
+```python
+# generator_cm.py
+# A one-yield generator becomes a context manager. Before yield is
+# setup; after yield is teardown.
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def tag(name: str) -> Iterator[str]:
+    print(f"<{name}>")
+    try:
+        yield name
+    finally:
+        print(f"</{name}>")
+
+with tag("p") as t:
+    print(f"  text in {t}")
+## <p>
+##   text in p
+## </p>
+```
+
+This is the same setup-then-teardown shape as a `pytest` fixture that
+[`yield`s its value](09_Testing.md#fixtures-replace-setup-and-teardown), and it relies on the generator and
+decorator machinery from [Decorators](13_Decorators.md) and [Iterators](25_Iterators.md#generators).
+The generator form is usually the clearest choice; reach for a class when the
+manager needs to hold methods or state beyond a single setup and teardown.
+
+## Combining Context Managers
+
+A single `with` can drive several managers, separated by commas.
+They enter left to right and exit in reverse:
+
+```python
+# multiple.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def tag(name: str) -> Iterator[str]:
+    print(f"<{name}>")
+    try:
+        yield name
+    finally:
+        print(f"</{name}>")
+
+with tag("ul") as outer, tag("li") as inner:
+    print(f"  {outer} then {inner}")
+## <ul>
+## <li>
+##   ul then li
+## </li>
+## </ul>
+```
+
+When the number of managers is not known until run time, `contextlib.ExitStack`
+holds a dynamic set and unwinds them in reverse on the way out:
+
+```python
+# exit_stack.py
+from collections.abc import Iterator
+from contextlib import ExitStack, contextmanager
+
+@contextmanager
+def tag(name: str) -> Iterator[str]:
+    print(f"open {name}")
+    try:
+        yield name
+    finally:
+        print(f"close {name}")
+
+with ExitStack() as stack:
+    names = [stack.enter_context(tag(n)) for n in ("a", "b", "c")]
+    print("using", names)
+## open a
+## open b
+## open c
+## using ['a', 'b', 'c']
+## close c
+## close b
+## close a
+```
+
+## The `contextlib` Toolkit
+
+The `contextlib` module provides ready-made managers so you write fewer:
+
+- `suppress(*exceptions)` ignores the listed exceptions, replacing the `Ignore`
+  class above.
+- `closing(obj)` calls `obj.close()` on exit, for objects that have `close()`
+  but are not context managers themselves.
+- `nullcontext(value)` is a do-nothing manager that yields `value`, useful when
+  a `with` is optional and you want one code path.
+- `ExitStack` manages a dynamic or conditional set of managers, as shown above.
+
+Reach for these before writing `__enter__()` and `__exit__()` by hand.

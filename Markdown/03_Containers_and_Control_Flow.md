@@ -352,6 +352,7 @@ path.unlink()  # Delete the file
 
 This is the explicit-finalizer approach from [Class Attributes and Cleanup](08_Class_Attributes_and_Cleanup.md#cleanup).
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
+[Context Managers](14_Context_Managers.md) shows how to write your own.
 Note that when simply reading or writing to a file,
 `pathlib` provides convenient utility methods like `read_text()` and `write_text()`
 that handle opening and closing the file for you.
@@ -379,5 +380,5 @@ print(parities)
 ## {0, 1}
 ```
 
-[Comprehensions](14_Comprehensions.md#list-comprehensions) covers comprehensions in detail,
+[Comprehensions](15_Comprehensions.md#list-comprehensions) covers comprehensions in detail,
 as well as generator expressions and the functional tools `map()` and `filter()`.
