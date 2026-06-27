@@ -195,7 +195,7 @@ if __name__ == "__main__":
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
-[Data Classes as Types](10_Data_Classes_as_Types.md#freezing) makes the fuller case for frozen data classes.
+[Data Classes as Types](10_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
 Here the point is narrower:
 most encapsulation is work you only do because you allowed mutation in the first place.
 

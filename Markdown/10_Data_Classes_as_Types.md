@@ -18,7 +18,7 @@ This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
 This function will be used throughout the chapter.
-It raises a specialized exception when a value is not legal:
+It raises a custom exception when a value is not legal:
 
 ```python
 # validation.py
@@ -95,16 +95,12 @@ class Stars:
         self._number = n + 5
         self._validate()                 # Postcondition
         return self._number
-```
 
-```python
-# demo_stars_class.py
-from stars_class import Stars
-
-rating = Stars(4)
-print(rating)
+if __name__ == "__main__":
+    rating = Stars(4)
+    print(rating)
+    print(rating.f1(3))
 #: Stars(4)
-print(rating.f1(3))
 #: 8
 ```
 
@@ -114,7 +110,7 @@ Checking arguments on the way in and results on the way out is the practice know
 The problem with DbC is that the contract is spread across every method that touches the value.
 That is the same scattering of checks as before, just moved inside the class.
 The class encapsulates the value.
-It does not pin it down to a set of legal values.
+It does not constrain it to a set of legal values.
 
 ## Data Classes
 
@@ -166,16 +162,17 @@ shows those fields with the types they were declared with:
 
 ```python
 # display_messenger.py
-from dataclasses import dataclass
 from display import display_object
-
-@dataclass
-class Messenger:
-    name: str
-    number: int
-    depth: float = 0.0
+from messenger import Messenger
 
 display_object(Messenger("foo", 12, 3.14))
+#: Messenger(name='foo', number=12, depth=3.14)
+#: foo 12 3.14
+#: True
+#: False
+#: Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='foo', number=12, depth=9.9)
+#: Messenger(name='bar', number=12, depth=3.14)
 #: === Messenger ===
 #: [Attributes]
 #:   • depth: float = 3.14
@@ -185,14 +182,14 @@ display_object(Messenger("foo", 12, 3.14))
 #:   None
 ```
 
-The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders, so they
-stay out of the listing. What remains is the record itself: three named, typed
-fields.
+The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders,
+which are not shown by the default `display_object()`.
+What remains is the record itself: three named, typed fields.
 
-## Freezing
+## Immutability
 
-Pass `frozen=True` and the data class becomes immutable.
-Assigning to a field raises `FrozenInstanceError`.
+Passing `frozen=True` makes the data class immutable.
+Attempting to assign to a field raises `FrozenInstanceError`.
 As a bonus, a frozen instance is hashable,
 so you can use it as a dictionary key or put it in a set:
 
@@ -210,7 +207,11 @@ m = Messenger("foo", 12, 3.14)
 print(m)
 #: Messenger(name='foo', number=12, depth=3.14)
 
-# m.name = "bar" raises dataclasses.FrozenInstanceError
+try:
+    setattr(m, "name", "bar")
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: FrozenInstanceError: cannot assign to field 'name'
 
 cache = {m: "value"}  # Frozen instances are hashable
 print(cache[m])
@@ -222,12 +223,13 @@ at construction, is enough for its whole life.
 
 ## A Type Is a Set of Values
 
-We can make `Stars` a frozen data class.
-To validate it after the fields are filled in, we call `__post_init__()`:
+If we make `Stars` a frozen data class,
+we can guarantee that every `Stars` object is legal.
+To validate it after the fields are filled in, we call `__post_init__()`,
+which is one of the hooks the `dataclass` machinery generates code around:
 
 ```python
 # stars.py
-# Every Stars is guaranteed to be legal
 from dataclasses import dataclass
 from validation import check
 
@@ -243,52 +245,46 @@ def f1(s: Stars) -> Stars:
 
 def f2(s: Stars) -> Stars:
     return Stars(s.number * 5)
-```
 
-```python
-# demo_stars.py
-from stars import Stars, f1, f2
-
-rating = Stars(4)
-print(rating)
+if __name__ == "__main__":
+    rating = Stars(4)
+    print(rating)
+    print(f1(Stars(2)))
+    print(f2(Stars(2)))
 #: Stars(number=4)
-print(f1(Stars(2)))
 #: Stars(number=7)
-print(f2(Stars(2)))
 #: Stars(number=10)
 ```
-
-`__post_init__()` is one of the hooks the `dataclass` machinery generates code around.
 
 `Stars` now names a set of values: the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside the set.
 So if you are holding a `Stars`, it is legal.
-You know it without looking.
+You know it without checking.
 
 This changes how the functions are written.
 `f1()` and `f2()` take a `Stars` and return a `Stars`.
 They do not check their argument, because a `Stars` is already known to be good.
-They do not test their result,
-because building the returned `Stars` runs the check.
+They do not test their result, because building the returned `Stars` runs the check.
 
 The validation lives in exactly one place, the constructor (which makes it easy to change).
 Immutability guarantees no one can damage the value after that.
-Illegal values are unrepresentable.
 
-This is the principle often stated as *parse, don't validate*.
-Instead of checking a loose value over and over and hoping you never miss a spot,
+This principle is often stated as *parse, don't validate*.
+Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
 The check is not repeated because it cannot fail:
 an illegal value can never produce a `Stars` in the first place.
+Illegal values are unrepresentable.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Typing](07_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
-If an illegal value cannot exist, tests should validate that claim. With `pytest.raises()`, we assert that the constructor rejects every value outside the set:
+Testing validates the claim that illegal values cannot exist.
+`pytest.raises()` ensures that the constructor rejects every value outside the set:
 
 ```python
 # test_stars.py
@@ -310,21 +306,17 @@ def test_transformations_return_legal_values() -> None:
     assert f2(Stars(2)) == Stars(10)
 
 def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can leave the legal set.
+    # f2 multiplies, so its result can be outside the legal set.
     # Construction of the returned Stars catches it: no illegal
     # Stars can ever exist.
     with pytest.raises(TypeFailure):
         f2(Stars(4))  # 4 * 5 = 20
 ```
 
-In the last test, `f2(Stars(4))` would compute twenty,
-which is outside the legal set, so constructing the returned `Stars` raises an exception.
-The illegal value never escapes as an object.
-
 ## Composing Types from Types
 
 Once each small type guarantees its own values,
-you build larger types out of them.
+you can safely build larger types out of them.
 A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction,
 with no extra work:
 
@@ -353,19 +345,15 @@ class EmailAddress:
 class Person:
     name: FullName
     email: EmailAddress
-```
 
-```python
-# demo_person.py
-from person import EmailAddress, FullName, Person
-
-person = Person(
-    FullName("Bruce Eckel"),
-    EmailAddress("bruce@example.com"),
-)
-print(person.name)
+if __name__ == "__main__":
+    person = Person(
+        FullName("Bruce Eckel"),
+        EmailAddress("bruce@example.com"),
+    )
+    print(person.name)
+    print(person.email)
 #: FullName(text='Bruce Eckel')
-print(person.email)
 #: EmailAddress(text='bruce@example.com')
 ```
 
@@ -438,13 +426,9 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
-```
 
-```python
-# demo_birth_date.py
-from birth_date import BirthDate, Day, Month, Year
-
-print(BirthDate(Month.of(7), Day(8), Year(1957)))
+if __name__ == "__main__":
+    print(BirthDate(Month.of(7), Day(8), Year(1957)))
 #: BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))
 ```
 
@@ -528,14 +512,10 @@ class Months:
     def of(self, month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return self.months[month_number - 1]
-```
 
-```python
-# demo_month_dataclass.py
-from month_dataclass import Months
-
-months = Months()
-print(months.of(7))
+if __name__ == "__main__":
+    months = Months()
+    print(months.of(7))
 #: Month(name='July', n=7, max_days=31)
 ```
 

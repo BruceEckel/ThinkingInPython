@@ -55,3 +55,7 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
+
+if __name__ == "__main__":
+    print(BirthDate(Month.of(7), Day(8), Year(1957)))
+#: BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))

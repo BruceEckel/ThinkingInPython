@@ -11,7 +11,11 @@ m = Messenger("foo", 12, 3.14)
 print(m)
 #: Messenger(name='foo', number=12, depth=3.14)
 
-# m.name = "bar" raises dataclasses.FrozenInstanceError
+try:
+    setattr(m, "name", "bar")
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: FrozenInstanceError: cannot assign to field 'name'
 
 cache = {m: "value"}  # Frozen instances are hashable
 print(cache[m])

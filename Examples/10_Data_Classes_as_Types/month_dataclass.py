@@ -39,3 +39,8 @@ class Months:
     def of(self, month_number: int) -> Month:
         check(1 <= month_number <= 12, f"Month({month_number})")
         return self.months[month_number - 1]
+
+if __name__ == "__main__":
+    months = Months()
+    print(months.of(7))
+#: Month(name='July', n=7, max_days=31)

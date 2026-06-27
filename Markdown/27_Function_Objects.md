@@ -272,7 +272,7 @@ Chain of Responsibility kept its handlers in a list and tried them in order.
 Key that structure by type instead of by position and you have an *event bus*:
 a `dict` from each event type to the functions that care about it.
 The events are plain values,
-written as frozen data classes (see [Data Classes as Types](10_Data_Classes_as_Types.md#freezing)).
+written as frozen data classes (see [Data Classes as Types](10_Data_Classes_as_Types.md#immutability)).
 Publishing an event looks up its type and calls every handler registered for it.
 The handlers are ordinary functions,
 so there is no `Handler` interface to implement and no registration ceremony:
