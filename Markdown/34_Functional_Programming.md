@@ -575,4 +575,61 @@ The [Comprehensions](15_Comprehensions.md) chapter explores this notation on its
 
 The compelling part is that declarative code says less and means more. By naming the result instead of the steps, you hand the reader your intent directly, and you give the runtime freedom to choose how to deliver it. That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
 
-This is the throughline of the chapter. Pure functions, immutable values, and the tools built on them all push toward code you can read as a statement of what is true, and that both people and machines can reason about. That, more than the presence of functions, is the "functionality" the introduction set out to find.
+## An Assurance Spectrum
+
+The chapter opened by asking whether programming can make the kind of provable claims a science makes. Functional programming's honest answer is not one guarantee but a spectrum. The properties built up here, purity, immutability, and referential transparency, buy assurance at every level. You decide how far up to climb.
+
+1. The cheapest rung is local reasoning. Pure functions and immutable values let you understand one piece at a time, with no hidden state to carry in your head. Most code never needs more.
+2. Next is type checking. A type signature is a small theorem, and the function body is its proof. This is the *Curry-Howard correspondence*: types are propositions and programs are their proofs. Running `ty` over the examples in this book discharges that proof for a useful class of mistakes.
+3. Above that is *property-based testing*. You state a law the code must obey, then check it against many generated inputs. It does not prove the law. It works to falsify it, which is the falsifiability the chapter's opening called for.
+4. At the top is formal proof. Dependently-typed languages such as Lean, Idris, and Rocq prove a program correct for every possible input, checked by machine. This is real, and rare outside specialized work.
+
+The middle rung is the one most worth adopting now. You can write a property check by hand, looping over random inputs and asserting the law. A tool like *Hypothesis* does the same thing with sharper inputs, and shrinks any failure to a minimal counterexample:
+
+```python
+# property_check.py
+import random
+
+def encode(text: str) -> str:
+    # A trivial reversible transform:
+    return text[::-1]
+
+def decode(text: str) -> str:
+    return text[::-1]
+
+# State a law, then check it on many random inputs the way
+# a property-based tool such as Hypothesis would:
+alphabet = "abcde"
+for _ in range(1000):
+    size = random.randint(0, 8)
+    sample = "".join(random.choice(alphabet) for _ in range(size))
+    assert decode(encode(sample)) == sample
+print("1000 random cases passed")
+## 1000 random cases passed
+```
+
+The law is "decoding an encoding returns the original," and it holds for every input the loop tries. A property test states what must always be true and lets the machine search for a counterexample, instead of you writing one example at a time.
+
+Hypothesis turns that loop into a declaration. You describe the inputs with a *strategy* and state the law once, as a normal `test_` function. The framework supplies the cases, including awkward ones a handwritten loop would miss, such as the empty string and unusual Unicode:
+
+```python
+# test_property.py
+from hypothesis import given
+from hypothesis import strategies as st
+
+def encode(text: str) -> str:
+    return text[::-1]
+
+def decode(text: str) -> str:
+    return text[::-1]
+
+@given(st.text())
+def test_roundtrip(sample: str) -> None:
+    assert decode(encode(sample)) == sample
+```
+
+`@given(st.text())` feeds `test_roundtrip()` a stream of generated strings. When a law fails, Hypothesis does not only report the failing input. It shrinks it to the smallest example that still fails, so the bug surfaces as the clearest case rather than a random one. That is the falsification machinery the chapter's opening called for, automated.
+
+Two caveats keep this honest. First, proof is not exclusive to functional code. Hoare logic and tools like Dafny verify imperative programs too. What purity changes is the cost: with no mutable state to track, each step of the reasoning is shorter. Functional programming does not make correctness provable so much as it makes the proof affordable. Second, most functional code stops well below the top rung. Haskell programmers rarely prove a program correct. They lean on types and on reasoning by substitution, and save full proof for the few places that earn it.
+
+So the thread running through this chapter is not that functions are special. It is that purity, immutability, and referential transparency shrink the distance between "I believe this is correct" and "I can show why." Proof is the far end of that distance. The everyday win is everything below it: code you can read, check, and test as statements about what is true. That, more than the presence of functions, is the "functionality" the introduction set out to find.

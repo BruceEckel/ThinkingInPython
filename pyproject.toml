@@ -25,6 +25,7 @@ dev = [
     "codespell>=2.4.2",
     "time-machine",
     "pyspellchecker",
+    "hypothesis>=6.155.7",
 ]
 
 [tool.uv]
