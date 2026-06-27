@@ -361,9 +361,29 @@ if __name__ == "__main__":
 It cannot be built from an illegal name or an illegal email,
 because those values cannot exist.
 
+The tests confirm that an illegal `FullName` or `EmailAddress` is rejected at construction:
+
+```python
+# test_person.py
+import pytest
+from person import EmailAddress, FullName
+from validation import TypeFailure
+
+@pytest.mark.parametrize("bad", ["Bruce", "", "   "])
+def test_full_name_needs_two_parts(bad: str) -> None:
+    with pytest.raises(TypeFailure):
+        FullName(bad)
+
+@pytest.mark.parametrize("bad", ["bruce", "example.com", ""])
+def test_email_needs_at_sign(bad: str) -> None:
+    with pytest.raises(TypeFailure):
+        EmailAddress(bad)
+```
+
 ## Enums Are Types Too
 
 When the set of values is small and fixed, an `Enum` is the clearest type.
+As an example, we'll create a `BirthDate` containing a month, day, and year.
 There are exactly twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields: the day must fit the month.
@@ -436,8 +456,6 @@ The `Enum` creates the constrained set of `Month`s.
 You cannot construct a thirteenth month,
 because there is no such value to construct.
 
-Cross-field rules, like a day that must be valid for its month, test the same way:
-
 ```python
 # test_birth_date.py
 import pytest
@@ -467,7 +485,7 @@ def test_bad_month_number(bad: int) -> None:
 
 You can build `Month` as a data class instead of an `Enum`.
 It works, but it is more code for less safety.
-You have to construct the twelve months yourself and carry them around,
+You must construct the twelve months yourself and carry them around,
 whereas the `Enum` *is* that set:
 
 ```python

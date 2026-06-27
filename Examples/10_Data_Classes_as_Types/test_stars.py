@@ -17,7 +17,7 @@ def test_transformations_return_legal_values() -> None:
     assert f2(Stars(2)) == Stars(10)
 
 def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can leave the legal set.
+    # f2 multiplies, so its result can be outside the legal set.
     # Construction of the returned Stars catches it: no illegal
     # Stars can ever exist.
     with pytest.raises(TypeFailure):

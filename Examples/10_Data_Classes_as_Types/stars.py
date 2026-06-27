@@ -1,5 +1,4 @@
 # stars.py
-# Every Stars is guaranteed to be legal
 from dataclasses import dataclass
 from validation import check
 
