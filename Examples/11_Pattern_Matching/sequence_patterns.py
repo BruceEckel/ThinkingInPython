@@ -21,8 +21,3 @@ print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
 #: 1, then 3 more
-
-def test_sequence_patterns() -> None:
-    assert summarize([]) == "Empty"
-    assert summarize([5]) == "One item: 5"
-    assert summarize([1, 2, 3]) == "1, then 2 more"

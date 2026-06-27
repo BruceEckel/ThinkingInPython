@@ -19,7 +19,3 @@ print(handle({"type": "scroll", "delta": 3}))
 #: Other event: scroll
 print(handle({"button": 1}))
 #: Not an event: {'button': 1}
-
-def test_mapping_patterns() -> None:
-    assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle({"nope": 1}) == "Not an event: {'nope': 1}"

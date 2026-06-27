@@ -288,6 +288,39 @@ you transform one legal value into a new legal value.
 [Static Typing](07_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
+If an illegal value cannot exist, tests should validate that claim. With `pytest.raises()`, we assert that the constructor rejects every value outside the set:
+
+```python
+# test_stars.py
+import pytest
+from stars import Stars, f1, f2
+from validation import TypeFailure
+
+def test_legal_stars() -> None:
+    assert Stars(1).number == 1
+    assert Stars(10).number == 10
+
+@pytest.mark.parametrize("n", [0, 11, -1, 100])
+def test_illegal_stars_rejected(n: int) -> None:
+    with pytest.raises(TypeFailure):
+        Stars(n)
+
+def test_transformations_return_legal_values() -> None:
+    assert f1(Stars(2)) == Stars(7)
+    assert f2(Stars(2)) == Stars(10)
+
+def test_transformation_can_produce_illegal_value() -> None:
+    # f2 multiplies, so its result can leave the legal set.
+    # Construction of the returned Stars catches it: no illegal
+    # Stars can ever exist.
+    with pytest.raises(TypeFailure):
+        f2(Stars(4))  # 4 * 5 = 20
+```
+
+In the last test, `f2(Stars(4))` would compute twenty,
+which is outside the legal set, so constructing the returned `Stars` raises an exception.
+The illegal value never escapes as an object.
+
 ## Composing Types from Types
 
 Once each small type guarantees its own values,
@@ -418,6 +451,33 @@ print(BirthDate(Month.of(7), Day(8), Year(1957)))
 The `Enum` creates the constrained set of `Month`s.
 You cannot construct a thirteenth month,
 because there is no such value to construct.
+
+Cross-field rules, like a day that must be valid for its month, test the same way:
+
+```python
+# test_birth_date.py
+import pytest
+from birth_date import BirthDate, Day, Month, Year
+from validation import TypeFailure
+
+def test_valid_date() -> None:
+    bd = BirthDate(Month.of(7), Day(8), Year(1957))
+    assert bd.month is Month.JULY
+
+@pytest.mark.parametrize("month_n, day_n", [
+    (2, 31),   # February has 28 days
+    (4, 31),   # April has 30
+    (9, 31),   # September has 30
+])
+def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
+    with pytest.raises(TypeFailure):
+        BirthDate(Month.of(month_n), Day(day_n), Year(2020))
+
+@pytest.mark.parametrize("bad", [0, 13])
+def test_bad_month_number(bad: int) -> None:
+    with pytest.raises(TypeFailure):
+        Month.of(bad)
+```
 
 ## When a Data Class Is the Wrong Tool
 
@@ -635,68 +695,6 @@ and that is the part the standard library leaves to you.
 For deep or evolving structures,
 [Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
-
-## Testing
-
-If an illegal value cannot exist, tests should validate that claim.
-With `pytest.raises()`, we assert that the constructor rejects every value outside the set:
-
-```python
-# test_stars.py
-import pytest
-from stars import Stars, f1, f2
-from validation import TypeFailure
-
-def test_legal_stars() -> None:
-    assert Stars(1).number == 1
-    assert Stars(10).number == 10
-
-@pytest.mark.parametrize("n", [0, 11, -1, 100])
-def test_illegal_stars_rejected(n: int) -> None:
-    with pytest.raises(TypeFailure):
-        Stars(n)
-
-def test_transformations_return_legal_values() -> None:
-    assert f1(Stars(2)) == Stars(7)
-    assert f2(Stars(2)) == Stars(10)
-
-def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can leave the legal set.
-    # Construction of the returned Stars catches it: no illegal
-    # Stars can ever exist.
-    with pytest.raises(TypeFailure):
-        f2(Stars(4))  # 4 * 5 = 20
-```
-
-In the last test, `f2(Stars(4))` would compute twenty,
-which is outside the legal set, so constructing the returned `Stars` raises an exception.
-The illegal value never escapes as an object.
-Cross-field rules test the same way:
-
-```python
-# test_birth_date.py
-import pytest
-from birth_date import BirthDate, Day, Month, Year
-from validation import TypeFailure
-
-def test_valid_date() -> None:
-    bd = BirthDate(Month.of(7), Day(8), Year(1957))
-    assert bd.month is Month.JULY
-
-@pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days
-    (4, 31),   # April has 30
-    (9, 31),   # September has 30
-])
-def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
-    with pytest.raises(TypeFailure):
-        BirthDate(Month.of(month_n), Day(day_n), Year(2020))
-
-@pytest.mark.parametrize("bad", [0, 13])
-def test_bad_month_number(bad: int) -> None:
-    with pytest.raises(TypeFailure):
-        Month.of(bad)
-```
 
 ## Exercises
 

@@ -149,6 +149,27 @@ run(b)
 You can see that the first implementation is used for a bit,
 then the second implementation is swapped in and that is used.
 
+A test hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_imp()` swaps it:
+
+```python
+# test_state.py
+from state_demo import StateD
+
+class StateA:
+    def name(self) -> str:
+        return "A"
+
+class StateB:
+    def name(self) -> str:
+        return "B"
+
+def test_state_delegates_and_change_imp_swaps() -> None:
+    s = StateD(StateA())
+    assert s.name() == "A"
+    s.change_imp(StateB())
+    assert s.name() == "B"
+```
+
 The difference between *Proxy* and *State* is in the problems that are solved.
 The common uses for *Proxy* as described in *Design Patterns* are:
 
@@ -217,17 +238,11 @@ with *State* adding a method to change the implementation.
 The separate implementation hierarchy that *Design Patterns* uses is needed only when you do not control the implementing code;
 when you do, the single generic surrogate above is simpler and just as flexible.
 
-## Testing the Surrogates
-
-Because each surrogate wraps any object,
-a test can hand it a small stand-in with real return values and check the delegation directly.
-For the proxy, that the call is forwarded with its result and counted;
-for the state, that calls reach the current implementation and that `change_imp()` swaps it:
+A test hands the counting proxy a small stand-in and confirms the call is forwarded with its result, and that only callable accesses are counted:
 
 ```python
-# test_fronting.py
+# test_counting_proxy.py
 from counting_proxy import CountingProxy
-from state_demo import StateD
 
 class Doubler:
     def double(self, n: int) -> int:
@@ -249,18 +264,4 @@ def test_proxy_counts_only_calls() -> None:
     p2.double(1)
     assert p.calls == 0
     assert p2.calls == 2
-
-class StateA:
-    def name(self) -> str:
-        return "A"
-
-class StateB:
-    def name(self) -> str:
-        return "B"
-
-def test_state_delegates_and_change_imp_swaps() -> None:
-    s = StateD(StateA())
-    assert s.name() == "A"
-    s.change_imp(StateB())
-    assert s.name() == "B"
 ```

@@ -1,6 +1,5 @@
-# test_fronting.py
+# test_counting_proxy.py
 from counting_proxy import CountingProxy
-from state_demo import StateD
 
 class Doubler:
     def double(self, n: int) -> int:
@@ -22,17 +21,3 @@ def test_proxy_counts_only_calls() -> None:
     p2.double(1)
     assert p.calls == 0
     assert p2.calls == 2
-
-class StateA:
-    def name(self) -> str:
-        return "A"
-
-class StateB:
-    def name(self) -> str:
-        return "B"
-
-def test_state_delegates_and_change_imp_swaps() -> None:
-    s = StateD(StateA())
-    assert s.name() == "A"
-    s.change_imp(StateB())
-    assert s.name() == "B"

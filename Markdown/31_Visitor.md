@@ -191,8 +191,6 @@ But in Python that is rare.
 As with [Pattern Refactoring](32_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s price-and-weight example,
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
-## Verifying the Operations
-
 Because each operation is a plain function, testing is direct:
 call it with each flower type and assert the result.
 The cases worth covering are the registered types,

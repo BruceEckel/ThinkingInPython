@@ -236,8 +236,6 @@ Python can, so the table is both shorter and easier to maintain.
 Use the spread-out method version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
 
-## Verifying the Table
-
 The win/lose/draw result is pure logic,
 which makes it easy to pin down with a test.
 The strongest check is that the two versions agree:

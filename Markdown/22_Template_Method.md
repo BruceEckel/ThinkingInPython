@@ -62,6 +62,29 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
+A test records the steps to confirm the algorithm calls them in order, twice:
+
+```python
+# test_template_method.py
+from typing import override
+from template_method import ApplicationFramework
+
+def test_template_method_runs_steps_in_order() -> None:
+    calls: list[str] = []
+
+    class Recorder(ApplicationFramework):
+        @override
+        def customize1(self) -> None:
+            calls.append("one")
+
+        @override
+        def customize2(self) -> None:
+            calls.append("two")
+
+    Recorder()  # Constructing it runs the framework
+    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
+```
+
 ## Passing the Steps as Functions
 
 Subclassing is one way to supply the varying steps, but not the only one.
@@ -100,29 +123,11 @@ passing functions is lighter and avoids a class hierarchy.
 This is the same trade-off seen in [Function Objects](27_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
 a hook that holds no state is usually better as a function than as a method to override.
 
-We want to test that algorithm calls the steps in order, twice.
-Recording steps make that order visible:
+The function version is checked the same way, recording the order the passed-in steps run:
 
 ```python
-# test_framework.py
-from typing import override
+# test_template_function.py
 from template_function import run_framework
-from template_method import ApplicationFramework
-
-def test_template_method_runs_steps_in_order() -> None:
-    calls: list[str] = []
-
-    class Recorder(ApplicationFramework):
-        @override
-        def customize1(self) -> None:
-            calls.append("one")
-
-        @override
-        def customize2(self) -> None:
-            calls.append("two")
-
-    Recorder()  # Constructing it runs the framework
-    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
 
 def test_template_function_runs_steps_in_order() -> None:
     calls: list[str] = []

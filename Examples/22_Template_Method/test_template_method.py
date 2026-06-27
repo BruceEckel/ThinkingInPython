@@ -1,6 +1,5 @@
-# test_framework.py
+# test_template_method.py
 from typing import override
-from template_function import run_framework
 from template_method import ApplicationFramework
 
 def test_template_method_runs_steps_in_order() -> None:
@@ -17,9 +16,3 @@ def test_template_method_runs_steps_in_order() -> None:
 
     Recorder()  # Constructing it runs the framework
     assert calls == ["one", "two", "one", "two"]  # Loop runs twice
-
-def test_template_function_runs_steps_in_order() -> None:
-    calls: list[str] = []
-    run_framework(
-        lambda: calls.append("a"), lambda: calls.append("b"))
-    assert calls == ["a", "b", "a", "b"]

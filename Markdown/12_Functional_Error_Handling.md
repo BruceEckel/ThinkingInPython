@@ -155,6 +155,23 @@ The caller cannot pretend the function returns an ordinary value; to get the ans
 This is the same idea as in [Static Typing](07_Static_Typing.md#type-hints):
 put the meaning in the type.
 
+Because failures are values, you can assert on them directly, with no `pytest.raises()`. These check `unwrap()` and that `bind()` chains a success and short-circuits a failure:
+
+```python
+# test_result.py
+from result import Failure, Success
+
+def test_success_unwrap() -> None:
+    assert Success(5).unwrap() == 5
+
+def test_bind_chains_a_success() -> None:
+    assert Success(1).bind(lambda x: Success(x + 1)) == Success(2)
+
+def test_bind_short_circuits_a_failure() -> None:
+    failure: Failure[str] = Failure("boom")
+    assert failure.bind(lambda x: Success(x + 1)) is failure
+```
+
 ## Composing by Hand
 
 Real programs chain steps.
@@ -243,6 +260,18 @@ A `Failure` anywhere short-circuits the whole thing.
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
 You do not need to know that word to use it.
 
+A test confirms the hand-written and `bind()` versions agree on every input:
+
+```python
+# test_composing.py
+from composing import composed as composed_manual
+from composing_with_bind import composed as composed_bind
+
+def test_manual_and_bind_agree() -> None:
+    for i in range(5):
+        assert composed_manual(i) == composed_bind(i)
+```
+
 ## Combining Multiple Results
 
 `bind()` threads one value through a chain.
@@ -275,6 +304,19 @@ if __name__ == "__main__":
 
 Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
 Only the last input passes all three steps, so it's the only one that reaches `add()`.
+
+A test confirms combining returns the right value, or the first failure in the chain:
+
+```python
+# test_combining.py
+from combining import combined
+from result import Failure, Success
+
+def test_combined() -> None:
+    assert combined(7, 5) == Success("add(7 + 5 + 12): 24")
+    assert combined(1, 5) == Failure("func_a(1)")
+    assert combined(2, 1) == Failure("func_c(3): division by zero")
+```
 
 ## Turning Exceptions into Results
 
@@ -323,6 +365,28 @@ The caller cannot ignore the failure,
 because it has to unpack the `Result` to reach the number.
 
 The [Decorators](13_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
+
+`@safe` deserves its own check: a good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
+
+```python
+# test_safe.py
+from result import Failure, Success
+from safe import safe
+
+@safe
+def parse(text: str) -> int:
+    return int(text)
+
+def test_safe_wraps_a_success() -> None:
+    assert parse("42") == Success(42)
+
+def test_safe_captures_the_exception() -> None:
+    match parse("oops"):
+        case Failure(error):
+            assert isinstance(error, ValueError)
+        case _:
+            raise AssertionError("expected a Failure")
+```
 
 ## Matching on the Error
 
@@ -384,64 +448,6 @@ Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
 Those are not exceptional.
 They are expected, and the type should say so.
-
-## Testing the Behavior
-
-Because failures are values, you can assert on them directly,
-without `pytest.raises()`.
-The tests below check that `bind()` chains a success and short-circuits a failure,
-that the hand-written and `bind()` versions agree,
-and that combining returns the right value:
-
-```python
-# test_result.py
-from combining import combined
-from composing import composed as composed_manual
-from composing_with_bind import composed as composed_bind
-from result import Failure, Success
-
-def test_success_unwrap() -> None:
-    assert Success(5).unwrap() == 5
-
-def test_bind_chains_a_success() -> None:
-    assert Success(1).bind(lambda x: Success(x + 1)) == Success(2)
-
-def test_bind_short_circuits_a_failure() -> None:
-    failure: Failure[str] = Failure("boom")
-    assert failure.bind(lambda x: Success(x + 1)) is failure
-
-def test_manual_and_bind_agree() -> None:
-    for i in range(5):
-        assert composed_manual(i) == composed_bind(i)
-
-def test_combined() -> None:
-    assert combined(7, 5) == Success("add(7 + 5 + 12): 24")
-    assert combined(1, 5) == Failure("func_a(1)")
-    assert combined(2, 1) == Failure("func_c(3): division by zero")
-```
-
-`@safe` deserves its own check: a good input becomes a `Success`,
-and a raised exception becomes a `Failure` holding that exception.
-
-```python
-# test_safe.py
-from result import Failure, Success
-from safe import safe
-
-@safe
-def parse(text: str) -> int:
-    return int(text)
-
-def test_safe_wraps_a_success() -> None:
-    assert parse("42") == Success(42)
-
-def test_safe_captures_the_exception() -> None:
-    match parse("oops"):
-        case Failure(error):
-            assert isinstance(error, ValueError)
-        case _:
-            raise AssertionError("expected a Failure")
-```
 
 ## Exercises
 

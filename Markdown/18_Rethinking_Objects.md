@@ -96,6 +96,18 @@ The output shows that the internals changed from outside.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
 
+A test shows the leak: mutating the returned list reaches the real internal state:
+
+```python
+# test_leaky.py
+from leaky import Leaky
+
+def test_getter_leaks_internal_state() -> None:
+    leaky = Leaky([1, 2])
+    leaky.numbers.append(999)  # Reaches the real internal list
+    assert leaky.numbers == [1, 2, 999]
+```
+
 ## Plugging the Leaks Is Tedious
 
 You can stop the leak by copying everything a getter returns.
@@ -139,6 +151,18 @@ Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
 
+A test confirms the defensive copy holds: mutating the returned list leaves the original untouched:
+
+```python
+# test_plugged.py
+from plugged import Plugged
+
+def test_defensive_copy_prevents_the_leak() -> None:
+    plugged = Plugged([1, 2])
+    plugged.numbers.append(999)  # Mutates only a copy
+    assert plugged.numbers == [1, 2]
+```
+
 ## Immutability Dissolves It
 
 Encapsulation is only needed because of mutability.
@@ -174,6 +198,21 @@ if __name__ == "__main__":
 [Data Classes as Types](10_Data_Classes_as_Types.md#freezing) makes the fuller case for frozen data classes.
 Here the point is narrower:
 most encapsulation is work you only do because you allowed mutation in the first place.
+
+A test confirms a frozen object refuses mutation:
+
+```python
+# test_immutable.py
+import dataclasses
+import pytest
+from immutable import Bob, Immutable
+
+def test_frozen_cannot_be_mutated() -> None:
+    immutable = Immutable((1, 2), Bob())
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        # Frozen, so the assignment fails:
+        setattr(immutable.bob, "name", "Ralph")
+```
 
 ## Methods or Functions?
 
@@ -211,6 +250,18 @@ if __name__ == "__main__":
 
 The function is not worse.
 And it has an advantage: it does not have to live inside `Point`.
+
+A test confirms the method and the free function agree:
+
+```python
+# test_point_distance.py
+from point_distance import Point, distance
+
+def test_method_and_function_agree() -> None:
+    p1, p2 = Point(3, 0), Point(0, 4)
+    assert p1.distance_to(p2) == 5
+    assert distance(p1, p2) == 5
+```
 
 ## Protocols Generalize, Composition Adapts
 
@@ -273,6 +324,18 @@ if __name__ == "__main__":
 
 `Point` and `PairCoord` share no base class.
 They both have `x` and `y`, which is all `distance()` asked for.
+
+A test confirms `distance()` works on both a `Point` and an adapted `Pair`:
+
+```python
+# test_distance_protocol.py
+import distance_protocol as dp
+
+def test_protocol_and_adapter() -> None:
+    assert dp.distance(dp.Point(3, 0), dp.Point(0, 4)) == 5
+    assert dp.distance(dp.PairCoord(dp.Pair(3, 0)),
+                       dp.PairCoord(dp.Pair(0, 4))) == 5
+```
 
 ## Compose, Do Not Inherit
 
@@ -467,52 +530,12 @@ The object-oriented default quietly assumes you will add types more often than o
 which is not always true.
 [Multiple Dispatching](30_Multiple_Dispatching.md#one-type-or-many) and [Visitor](31_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
-## Verifying the Claims
-
-Because these are claims about behavior, they belong in tests.
-Failures are values here too: a frozen object raises an exception when you try to mutate it.
+A test confirms the object-oriented and `match` versions compute the same areas:
 
 ```python
-# test_encapsulation.py
-import dataclasses
-import pytest
-from immutable import Bob, Immutable
-from leaky import Leaky
-from plugged import Plugged
-
-def test_getter_leaks_internal_state() -> None:
-    leaky = Leaky([1, 2])
-    leaky.numbers.append(999)  # Reaches the real internal list
-    assert leaky.numbers == [1, 2, 999]
-
-def test_defensive_copy_prevents_the_leak() -> None:
-    plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates only a copy
-    assert plugged.numbers == [1, 2]
-
-def test_frozen_cannot_be_mutated() -> None:
-    immutable = Immutable((1, 2), Bob())
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        # Frozen, so the assignment fails:
-        setattr(immutable.bob, "name", "Ralph")
-```
-
-```python
-# test_rethinking.py
-import distance_protocol as dp
+# test_shapes.py
 import shapes_match as sm
 import shapes_oo as so
-from point_distance import Point, distance
-
-def test_method_and_function_agree() -> None:
-    p1, p2 = Point(3, 0), Point(0, 4)
-    assert p1.distance_to(p2) == 5
-    assert distance(p1, p2) == 5
-
-def test_protocol_and_adapter() -> None:
-    assert dp.distance(dp.Point(3, 0), dp.Point(0, 4)) == 5
-    assert dp.distance(dp.PairCoord(dp.Pair(3, 0)),
-                       dp.PairCoord(dp.Pair(0, 4))) == 5
 
 def test_oo_and_match_shapes_agree() -> None:
     assert (so.Rectangle(3.0, 4.0).area()
