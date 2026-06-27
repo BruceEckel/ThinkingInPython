@@ -96,22 +96,16 @@ print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
 #: 1, then 3 more
-```
-
-This shows the structural part of "structural pattern matching."
-The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-
-A test checks the structural cases and the empty fall-through:
-
-```python
-# test_sequence_patterns.py
-from sequence_patterns import summarize
 
 def test_sequence_patterns() -> None:
     assert summarize([]) == "Empty"
     assert summarize([5]) == "One item: 5"
     assert summarize([1, 2, 3]) == "1, then 2 more"
 ```
+
+This shows the structural part of "structural pattern matching."
+The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
+`test_sequence_patterns()` checks the structural cases and the empty fall-through using `pytest`.
 
 ## Class Patterns
 
@@ -154,24 +148,17 @@ print(locate(Point(3, 0)))
 #: On the x-axis at x=3
 print(locate(Point(3, 4)))
 #: At (3, 4)
-```
-
-`Point(0, 0)` matches a point whose fields are both zero.
-`Point(0, y)` matches when `x` is zero and *captures* `y`.
-The literal and the capture combine in one pattern.
-
-We test the origin, the axis case, and a general point:
-
-```python
-# test_class_patterns.py
-from class_patterns import locate
-from point import Point
 
 def test_class_patterns() -> None:
     assert locate(Point(0, 0)) == "The origin"
     assert locate(Point(3, 0)) == "On the x-axis at x=3"
     assert locate(Point(3, 4)) == "At (3, 4)"
 ```
+
+`Point(0, 0)` matches a point whose fields are both zero.
+`Point(0, y)` matches when `x` is zero and *captures* `y`.
+The literal and the capture combine in one pattern.
+`test_class_patterns()` tests the origin, the axis case, and a general point.
 
 ## Guards
 
@@ -231,18 +218,13 @@ print(handle({"type": "scroll", "delta": 3}))
 #: Other event: scroll
 print(handle({"button": 1}))
 #: Not an event: {'button': 1}
-```
-
-The test verifies a matched event and the fall-through:
-
-```python
-# test_mapping_patterns.py
-from mapping_patterns import handle
 
 def test_mapping_patterns() -> None:
     assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
     assert handle({"nope": 1}) == "Not an event: {'nope': 1}"
 ```
+
+`test_mapping_patterns()` verifies a matched event and the fall-through.
 
 ## Exhaustive Matching
 
@@ -283,23 +265,17 @@ print(round(area(Circle(1.0)), 4))
 #: 3.1416
 print(area(Square(2.0)))
 #: 4.0
+
+def test_exhaustive_area() -> None:
+    assert round(area(Circle(1.0)), 4) == 3.1416
+    assert area(Square(2.0)) == 4.0
 ```
 
 Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
 A `switch` cannot do this; neither can a chain of `if`/`isinstance()`.
 [Rethinking Objects](18_Rethinking_Objects.md#polymorphism-without-inheritance) uses exactly this technique to add operations to a closed set of types without inheritance.
-
-This tests the area of each shape:
-
-```python
-# test_exhaustive.py
-from exhaustive import Circle, Square, area
-
-def test_exhaustive_area() -> None:
-    assert round(area(Circle(1.0)), 4) == 3.1416
-    assert area(Square(2.0)) == 4.0
-```
+`test_exhaustive_area()` tests the area of each shape.
 
 ## When Not to Match
 

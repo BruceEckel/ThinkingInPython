@@ -26,3 +26,7 @@ print(round(area(Circle(1.0)), 4))
 #: 3.1416
 print(area(Square(2.0)))
 #: 4.0
+
+def test_exhaustive_area() -> None:
+    assert round(area(Circle(1.0)), 4) == 3.1416
+    assert area(Square(2.0)) == 4.0
