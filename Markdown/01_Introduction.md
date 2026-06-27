@@ -61,14 +61,14 @@ Claude allowed me to create tooling for the book that I had imagined but never f
 Every perfectionistic whim was easily realized.
 
 This book never would have happened without the help of Claude, which gave me tremendous support throughout the process.
-That said, it is still my work.
-It is adapted from my existing work, and I've gone over every sentence multiple times, editing, rewriting, and adding.
-The process of creating this book has been deeply satisfying.
+That said, it is still my work, derived from existing work, designed by me, checked and rewritten by me.
+It has my voice, and I've gone over every sentence multiple times, editing, rewriting, and adding.
 
 I know some people don't like AI.
 Without it, this book wouldn't exist.
 And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore it.
 
+The process of creating this book has been deeply satisfying.
 I don't actually know what the future of books is.
 The internet and eBooks have certainly impacted the print book industry.
 But with AI, how many people -- especially in the computer profession -- will keep reading books?
