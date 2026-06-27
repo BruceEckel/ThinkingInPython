@@ -10,4 +10,4 @@ def total(values: Sequence[int]) -> int:
     return sum(values)
 
 print(MAX_SIZE, total([1, 2, 3]))
-## 100 6
+#: 100 6

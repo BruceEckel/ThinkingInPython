@@ -17,5 +17,5 @@ with Ignore(ZeroDivisionError):
     1 / 0
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
-## before
-## survived
+#: before
+#: survived

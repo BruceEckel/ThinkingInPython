@@ -14,6 +14,6 @@ class Temperature:
 
 t = Temperature.from_fahrenheit(212)
 print(round(t.celsius))
-## 100
+#: 100
 print(Temperature.is_freezing(-4))
-## True
+#: True

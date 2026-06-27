@@ -13,10 +13,10 @@ def locate(p: Point) -> str:
             return f"At ({x}, {y})"
 
 print(locate(Point(0, 0)))
-## The origin
+#: The origin
 print(locate(Point(0, 5)))
-## On the y-axis at y=5
+#: On the y-axis at y=5
 print(locate(Point(3, 0)))
-## On the x-axis at x=3
+#: On the x-axis at x=3
 print(locate(Point(3, 4)))
-## At (3, 4)
+#: At (3, 4)

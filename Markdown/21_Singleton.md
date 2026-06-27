@@ -36,9 +36,9 @@ from config import settings
 
 settings["theme"] = "dark"  # Write through the imported name
 print(config.settings)  # The same dict
-## {'theme': 'dark'}
+#: {'theme': 'dark'}
 print(config.settings is settings)
-## True
+#: True
 ```
 
 No class, no ceremony.
@@ -72,7 +72,7 @@ b = settings()
 assert a is b
 a.data["theme"] = "dark"
 print(b.data)
-## {'theme': 'dark'}
+#: {'theme': 'dark'}
 ```
 
 If you need the class itself to hand back one instance from its own constructor,
@@ -115,20 +115,20 @@ class OnlyOne:
 
 x = OnlyOne('sausage')
 print(x)
-## sausage
+#: sausage
 y = OnlyOne('eggs')
 print(y)
-## eggs
+#: eggs
 z = OnlyOne('spam')
 print(z)
-## spam
+#: spam
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
-## False True
+#: False True
 ```
 
 Because the inner class is named with a double underscore,
@@ -171,22 +171,22 @@ class OnlyOne:
 x = OnlyOne()
 x.val = 'sausage'
 print(x)
-## sausage
+#: sausage
 y = OnlyOne()
 y.val = 'eggs'
 print(y)
-## eggs
+#: eggs
 z = OnlyOne()
 z.val = 'spam'
 print(z)
-## spam
+#: spam
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 # __new__ returns the one instance every time, so all three are it:
 print(x is y is z)
-## True
+#: True
 ```
 
 ### Borg: Share State Instead of Identity
@@ -218,20 +218,20 @@ class Singleton(Borg):
 
 x = Singleton('sausage')
 print(x)
-## sausage
+#: sausage
 y = Singleton('eggs')
 print(y)
-## eggs
+#: eggs
 z = Singleton('spam')
 print(z)
-## spam
+#: spam
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 # Distinct objects (x is not y), but one shared __dict__:
 print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
-## False True
+#: False True
 ```
 
 This has the same effect as the singleton,
@@ -260,16 +260,16 @@ class SingleTone:
 
 x = SingleTone('sausage')
 print(x.val)
-## sausage
+#: sausage
 y = SingleTone('eggs')
 print(y.val)
-## eggs
+#: eggs
 z = SingleTone('spam')
 print(z.val)
-## spam
+#: spam
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
-## spam True
+#: spam True
 ```
 
 ### Singleton Class Decorator
@@ -302,13 +302,13 @@ x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
 print(x.val)
-## spam
+#: spam
 print(y.val)
-## spam
+#: spam
 print(z.val)
-## spam
+#: spam
 print(x is y is z)
-## True
+#: True
 ```
 
 Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`,
@@ -357,13 +357,13 @@ y = Bar('eggs')
 z = Bar('spam')
 # Each Bar(...) reruns __init__ on the one instance, so val is spam:
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 print(z)
-## spam
+#: spam
 print(x is y is z)
-## True
+#: True
 ```
 
 ## Verifying the Invariant

@@ -29,7 +29,7 @@ for t in parse("trash.dat"):
     if type(t) not in seen:
         seen.add(type(t))
         print(recycling_note(t))
-## Glass: sort by color, then crush
-## Paper: no special handling
-## Aluminum: crush and bale
-## Cardboard: flatten and bundle
+#: Glass: sort by color, then crush
+#: Paper: no special handling
+#: Aluminum: crush and bale
+#: Cardboard: flatten and bundle

@@ -27,14 +27,14 @@ class Simple:
 from simple_class import Simple
 
 x = Simple("Constructor argument")  # Create an object
-## Inside the Simple constructor
+#: Inside the Simple constructor
 x.show()
-## Constructor argument
+#: Constructor argument
 x.show("A message")
-## A message: Constructor argument
+#: A message: Constructor argument
 x.show_twice()
-## Constructor argument
-## Constructor argument
+#: Constructor argument
+#: Constructor argument
 ```
 
 Python methods require a reference to the current object.
@@ -68,14 +68,14 @@ from display import display_object
 from simple_class import Simple
 
 x = Simple("Constructor argument")
-## Inside the Simple constructor
+#: Inside the Simple constructor
 display_object(x)
-## === Simple ===
-## [Attributes]
-##   • s = 'Constructor argument'
-## [Methods]
-##   • show(self, msg='')
-##   • show_twice(self)
+#: === Simple ===
+#: [Attributes]
+#:   • s = 'Constructor argument'
+#: [Methods]
+#:   • show(self, msg='')
+#:   • show_twice(self)
 ```
 
 The instance carries one attribute, `s`, while the two methods belong to the
@@ -122,25 +122,25 @@ class Different:
 from simple2 import Different, Simple2
 
 x = Simple2("Simple2 constructor argument")
-## Inside Simple2 constructor
-## Inside the Simple constructor
+#: Inside Simple2 constructor
+#: Inside the Simple constructor
 x.display()
-## Overridden show() method
-## Called from display(): Simple2 constructor argument
+#: Overridden show() method
+#: Called from display(): Simple2 constructor argument
 x.show()
-## Overridden show() method
-## Simple2 constructor argument
+#: Overridden show() method
+#: Simple2 constructor argument
 x.show_twice()  # Inherited from Simple
-## Overridden show() method
-## Simple2 constructor argument
-## Overridden show() method
-## Simple2 constructor argument
+#: Overridden show() method
+#: Simple2 constructor argument
+#: Overridden show() method
+#: Simple2 constructor argument
 def f(obj): obj.show() # Local/nested function
 f(x)
-## Overridden show() method
-## Simple2 constructor argument
+#: Overridden show() method
+#: Simple2 constructor argument
 f(Different())
-## Not derived from Simple
+#: Not derived from Simple
 ```
 
 `Simple2` inherits from `Simple`.
@@ -185,7 +185,7 @@ class Derived(Base):
         print("Derived.show")
 
 Derived().show()
-## Derived.show
+#: Derived.show
 ```
 
 A type checker now verifies the claim.
@@ -217,9 +217,9 @@ class Circle:
 
 c = Circle(10)
 print(c.radius)
-## 10
+#: 10
 print(c.area)  # Properties don't use parentheses
-## 314.159
+#: 314.159
 ```
 
 Because the change is invisible at the call site,
@@ -251,12 +251,12 @@ class Circle:
 c = Circle(10)
 c.radius = 5      # The setter validates, then stores
 print(c.radius)
-## 5
+#: 5
 try:
     Circle(-1)
 except ValueError as e:
     print(f"Failed: {e}")
-## Failed: radius cannot be negative
+#: Failed: radius cannot be negative
 ```
 
 The getter and setter are independent,
@@ -282,9 +282,9 @@ class Point:
 
 p = Point(3, 4)
 print(p)       # Falls back to __repr__
-## Point(3, 4)
+#: Point(3, 4)
 print([p, p])
-## [Point(3, 4), Point(3, 4)]
+#: [Point(3, 4), Point(3, 4)]
 ```
 
 Define `__repr__()` on classes you debug.
@@ -312,9 +312,9 @@ class Temperature:
 
 t = Temperature.from_fahrenheit(212)
 print(round(t.celsius))
-## 100
+#: 100
 print(Temperature.is_freezing(-4))
-## True
+#: True
 ```
 
 For classes that are primarily a bundle of typed data,
@@ -347,7 +347,7 @@ class Compose:
         return f"Compose({self.name!r})"
 
 Compose("example").f()
-## utility.f() called on Compose('example')
+#: utility.f() called on Compose('example')
 ```
 
 Because `f` is now an ordinary method, its first parameter is `self`,

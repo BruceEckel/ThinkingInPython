@@ -5,9 +5,9 @@ def bad_append(item, target=[]):  # The same list every call
     return target
 
 print(bad_append(1))
-## [1]
+#: [1]
 print(bad_append(2))  # Surprise, the default kept the 1
-## [1, 2]
+#: [1, 2]
 
 def good_append(item, target=None):
     if target is None:
@@ -16,6 +16,6 @@ def good_append(item, target=None):
     return target
 
 print(good_append(1))
-## [1]
+#: [1]
 print(good_append(2))
-## [2]
+#: [2]

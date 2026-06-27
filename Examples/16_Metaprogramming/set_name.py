@@ -23,4 +23,4 @@ p = Point()
 p.x = 3
 p.y = 4
 print(p.x, p.y)
-## 3 4
+#: 3 4

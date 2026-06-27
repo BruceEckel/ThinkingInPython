@@ -6,6 +6,6 @@ person = Person(
     EmailAddress("bruce@example.com"),
 )
 print(person.name)
-## FullName(text='Bruce Eckel')
+#: FullName(text='Bruce Eckel')
 print(person.email)
-## EmailAddress(text='bruce@example.com')
+#: EmailAddress(text='bruce@example.com')

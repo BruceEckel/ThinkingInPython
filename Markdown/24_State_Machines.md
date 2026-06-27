@@ -214,37 +214,37 @@ text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith('#')]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse escapes
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse escapes
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
@@ -365,37 +365,37 @@ moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith('#')]
 mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse escapes
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse escapes
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell
 ```
 
 The rest of the code is identical;
@@ -616,18 +616,18 @@ if __name__ == "__main__":
     for event in events:
         machine.handle(event)
         print(f"{event}: {machine.message}")  # A plain text view
-## quarter: Total = 25
-## quarter: Total = 50
-## dollar: Total = 150
-## A: Row A
-## two: Dispensing; amount remaining 100
-## A: Row A
-## two: Dispensing; amount remaining 50
-## C: Row C
-## three: Clearing selection: costs 75, quantity 5
-## D: Row D
-## one: Clearing selection: costs 25, quantity 0
-## Quit: Returning 50
+#: quarter: Total = 25
+#: quarter: Total = 50
+#: dollar: Total = 150
+#: A: Row A
+#: two: Dispensing; amount remaining 100
+#: A: Row A
+#: two: Dispensing; amount remaining 50
+#: C: Row C
+#: three: Clearing selection: costs 75, quantity 5
+#: D: Row D
+#: one: Clearing selection: costs 25, quantity 0
+#: Quit: Returning 50
 ```
 
 Adding a state or an input is now a local change:

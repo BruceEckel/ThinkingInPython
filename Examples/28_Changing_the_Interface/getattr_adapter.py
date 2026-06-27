@@ -20,6 +20,6 @@ class Adapter:
 
 a = Adapter(WhatIHave())
 print(a.f())   # Adapted method
-## gh
+#: gh
 print(a.g())   # Forwarded to the adaptee unchanged
-## g
+#: g

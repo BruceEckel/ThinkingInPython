@@ -10,4 +10,4 @@ class Compose:
         return f"Compose({self.name!r})"
 
 Compose("example").f()
-## utility.f() called on Compose('example')
+#: utility.f() called on Compose('example')

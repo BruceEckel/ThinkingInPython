@@ -25,7 +25,7 @@ class MyApp(ApplicationFramework):
         print("Say no more, say no more!")
 
 MyApp()
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!

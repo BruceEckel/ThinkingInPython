@@ -11,7 +11,7 @@ Look for duplication on Singleton between Metaprogramming and Singleton chapters
 
 Review chapter XX. Make obious changes and put everything I need to look at first in REVIEW_XX.md
 
-Functional programming in Python (chapter). Have Claude draft it to see what it thinks it is.
+Distribute tests so that the test for an example is in the same section as that example, rather than clumping them at the end of the chapter.
 
 Run 'make prose' on each chapter
 

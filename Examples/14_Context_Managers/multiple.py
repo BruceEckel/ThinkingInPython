@@ -12,8 +12,8 @@ def tag(name: str) -> Iterator[str]:
 
 with tag("ul") as outer, tag("li") as inner:
     print(f"  {outer} then {inner}")
-## <ul>
-## <li>
-##   ul then li
-## </li>
-## </ul>
+#: <ul>
+#: <li>
+#:   ul then li
+#: </li>
+#: </ul>

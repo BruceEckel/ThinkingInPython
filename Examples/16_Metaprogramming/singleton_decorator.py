@@ -24,14 +24,14 @@ b = Registry()
 assert a is b
 a.items.append("widget")
 display_object(a)
-## === Registry ===
-## [Attributes]
-##   • items = ['widget']
-## [Methods]
-##   None
+#: === Registry ===
+#: [Attributes]
+#:   • items = ['widget']
+#: [Methods]
+#:   None
 display_object(b)
-## === Registry ===
-## [Attributes]
-##   • items = ['widget']
-## [Methods]
-##   None
+#: === Registry ===
+#: [Attributes]
+#:   • items = ['widget']
+#: [Methods]
+#:   None

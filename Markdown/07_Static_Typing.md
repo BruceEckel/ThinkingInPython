@@ -28,14 +28,14 @@ def repeat(text: str, times: int) -> str:
     return text * times
 
 print(repeat("ab", 3))
-## ababab
+#: ababab
 
 total: int = 0
 for word in ["a", "bb", "ccc"]:
     total += len(word)
 
 print(total)
-## 6
+#: 6
 ```
 
 Containers and optional types read the way you say them: `list[int]`,
@@ -60,7 +60,7 @@ GREETING: Final[str] = "hello"
 # MAX_RETRIES = 5  # ty: cannot assign to final name "MAX_RETRIES"
 
 print(MAX_RETRIES, GREETING)
-## 3 hello
+#: 3 hello
 ```
 
 You can give the type explicitly, as in `Final[str]`,
@@ -147,9 +147,9 @@ def render(shape: Drawable) -> str:   # Accepts anything with draw()
     return shape.draw()
 
 print(render(Circle()))
-## circle
+#: circle
 print(render(Square()))
-## square
+#: square
 ```
 
 `Circle` and `Square` never mention `Drawable`.

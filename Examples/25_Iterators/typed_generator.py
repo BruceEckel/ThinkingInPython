@@ -12,4 +12,4 @@ def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
 
 if __name__ == "__main__":
     print(list(typed([1, 2, 3], int)))
-## [1, 2, 3]
+#: [1, 2, 3]

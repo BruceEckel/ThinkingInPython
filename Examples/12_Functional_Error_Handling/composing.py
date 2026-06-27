@@ -28,8 +28,8 @@ def composed(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, composed(i))
-## 0 Success(answer=0)
-## 1 Failure(error='func_a(1)')
-## 2 Failure(error='func_b(2)')
-## 3 Failure(error='func_c(3): division by zero')
-## 4 Success(answer=4)
+#: 0 Success(answer=0)
+#: 1 Failure(error='func_a(1)')
+#: 2 Failure(error='func_b(2)')
+#: 3 Failure(error='func_c(3): division by zero')
+#: 4 Success(answer=4)

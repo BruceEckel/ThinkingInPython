@@ -8,6 +8,6 @@ random.seed(47)  # Make the random choices reproducible
 
 gen = shape_name_gen(7)
 print(next(gen))
-## Square
+#: Square
 print(next(gen))
-## Circle
+#: Circle

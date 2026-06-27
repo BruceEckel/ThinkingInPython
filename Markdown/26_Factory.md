@@ -73,20 +73,20 @@ if __name__ == "__main__":
     for shape in shapes:
         shape.draw()
         shape.erase()
-## Square.draw
-## Square.erase
-## Circle.draw
-## Circle.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
+#: Square.draw
+#: Square.erase
+#: Circle.draw
+#: Circle.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
 ```
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create;
@@ -130,9 +130,9 @@ random.seed(47)  # Make the random choices reproducible
 
 gen = shape_name_gen(7)
 print(next(gen))
-## Square
+#: Square
 print(next(gen))
-## Circle
+#: Circle
 ```
 
 So `next(gen)` produces the next object from the generator.
@@ -200,20 +200,20 @@ if __name__ == "__main__":
     for shape in shape_name_gen(7):
         shape.draw()
         shape.erase()
-## Square.draw
-## Square.erase
-## Circle.draw
-## Circle.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
+#: Square.draw
+#: Square.erase
+#: Circle.draw
+#: Circle.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
 ```
 
 ## The Pythonic Factory: a Dictionary
@@ -257,9 +257,9 @@ def make(kind: str) -> Shape:
 
 for kind in ["Circle", "Square", "Circle"]:
     make(kind).draw()
-## Circle.draw
-## Square.draw
-## Circle.draw
+#: Circle.draw
+#: Square.draw
+#: Circle.draw
 ```
 
 Adding a `Triangle` is now a single class definition: it registers itself,
@@ -363,20 +363,20 @@ if __name__ == "__main__":
     for shape in shapes:
         shape.draw()
         shape.erase()
-## Square.draw
-## Square.erase
-## Circle.draw
-## Circle.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
+#: Square.draw
+#: Square.erase
+#: Circle.draw
+#: Circle.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
 ```
 
 Now the factory method appears in its own class, `ShapeFactory`,
@@ -481,9 +481,9 @@ class GameEnvironment:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
-## Kitty has encountered a Puzzle
+#: Kitty has encountered a Puzzle
 g2.play()
-## Warrior now battles a NastyWeapon
+#: Warrior now battles a NastyWeapon
 ```
 
 In this environment, `Character` objects interact with `Obstacle` objects,
@@ -543,9 +543,9 @@ class GameEnvironment:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
-## Kitty has encountered a Puzzle
+#: Kitty has encountered a Puzzle
 g2.play()
-## Warrior now battles a NastyWeapon
+#: Warrior now battles a NastyWeapon
 ```
 
 Another way to put this is that all inheritance in Python is implementation inheritance;

@@ -12,4 +12,4 @@ operations: dict[str, Callable[[int, int], int]] = {
     "-": sub,
 }
 print(operations["+"](6, 4), operations["-"](6, 4))
-## 10 2
+#: 10 2

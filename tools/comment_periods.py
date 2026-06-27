@@ -47,8 +47,8 @@ def _strip_targets(block: list[str]) -> dict[int, str]:
         hash_i = starts[i]
         if hash_i == -1:
             continue
-        if line[hash_i:hash_i + 2] == "##":
-            continue  # `## ...` is a captured-output marker, not a comment
+        if line[hash_i:hash_i + 2] == "#:":
+            continue  # `#: ...` is a captured-output marker, not a comment
         if full_line_comment(i):
             prev_c = i > 0 and full_line_comment(i - 1)
             next_c = i + 1 < len(block) and full_line_comment(i + 1)

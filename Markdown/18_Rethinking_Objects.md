@@ -89,7 +89,7 @@ if __name__ == "__main__":
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
-## [1, 2, 999] Bob(name='Ralph')
+#: [1, 2, 999] Bob(name='Ralph')
 ```
 
 The output shows that the internals changed from outside.
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     plugged.numbers.append(999)  # Mutates a copy, not ours
     plugged.bob.name = "Ralph"   # Ditto
     print(plugged.numbers, plugged.bob)
-## [1, 2] Bob(name='Bob')
+#: [1, 2] Bob(name='Bob')
 ```
 
 Now the internals are safe, but look at what we are doing.
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     print(immutable)
     # immutable.numbers is a tuple, so it has no append.
     # immutable.bob.name = "Ralph" raises FrozenInstanceError.
-## Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
+#: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
 [Data Classes as Types](10_Data_Classes_as_Types.md#freezing) makes the fuller case for frozen data classes.
@@ -205,8 +205,8 @@ if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
     print(p1.distance_to(p2))
     print(distance(p1, p2))
-## 5.0
-## 5.0
+#: 5.0
+#: 5.0
 ```
 
 The function is not worse.
@@ -267,8 +267,8 @@ class PairCoord:  # An adapter built by composition, not inheritance
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
     print(distance(PairCoord(Pair(3, 0)), PairCoord(Pair(0, 4))))
-## 5.0
-## 5.0
+#: 5.0
+#: 5.0
 ```
 
 `Point` and `PairCoord` share no base class.
@@ -307,21 +307,21 @@ class Contact:  # A Contact has a Name and an Address
 c = Contact(
     Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
 print(c.name)
-## Name(first='Bruce', last='Eckel')
+#: Name(first='Bruce', last='Eckel')
 print(c.address)
-## Address(city='Crested Butte', postal='81224')
+#: Address(city='Crested Butte', postal='81224')
 
 # A copy with one nested field changed leaves c intact
 moved = replace(c, address=replace(c.address, city="Carbondale"))
 print(c.address.city, "->", moved.address.city)
-## Crested Butte -> Carbondale
+#: Crested Butte -> Carbondale
 
 twin = Contact(
     Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
 print(c == twin)  # Value equality, field by field
-## True
+#: True
 print({c: "value"}[c])  # Hashable, so it works as a dict key
-## value
+#: value
 ```
 
 ## Polymorphism Without Inheritance
@@ -405,8 +405,8 @@ def show(t: Any) -> str:
 if __name__ == "__main__":
     for item in (Bicycle("Bob"), Glider(65)):
         print(show(item))
-## Bicycle Bob
-## Glider 65
+#: Bicycle Bob
+#: Glider 65
 ```
 
 `show()` accepts anything.
@@ -455,8 +455,8 @@ if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
     for shape in shapes:
         print(round(area(shape), 4))
-## 3.1416
-## 12.0
+#: 3.1416
+#: 12.0
 ```
 
 Which approach is better depends on how the code will grow.

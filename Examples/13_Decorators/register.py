@@ -15,4 +15,4 @@ class Latte:
 
 if __name__ == "__main__":
     print(sorted(registry))
-## ['Espresso', 'Latte']
+#: ['Espresso', 'Latte']

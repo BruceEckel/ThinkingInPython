@@ -8,8 +8,8 @@ def banner(text, width=20):  # width has a default value
     return f"{line}\n{text}\n{line}"
 
 print(greet("Alice"))
-## Hello, Alice
+#: Hello, Alice
 print(banner("Hi", width=4))  # pass an argument by name
-## ****
-## Hi
-## ****
+#: ****
+#: Hi
+#: ****

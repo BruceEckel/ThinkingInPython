@@ -40,9 +40,9 @@ def afford() -> None:
 macro: list[Callable[[], None]] = [loony, new_brain, afford]
 for command in macro:
     command()
-## You're a loony.
-## You might even need a new brain.
-## I couldn't afford a whole new brain.
+#: You're a loony.
+#: You might even need a new brain.
+#: I couldn't afford a whole new brain.
 ```
 
 The classic object form wraps each action in a `Command` subclass with an `execute()` method:
@@ -84,9 +84,9 @@ macro.add(Loony())
 macro.add(NewBrain())
 macro.add(Afford())
 macro.run()
-## You're a loony.
-## You might even need a new brain.
-## I couldn't afford a whole new brain.
+#: You're a loony.
+#: You might even need a new brain.
+#: I couldn't afford a whole new brain.
 ```
 
 Both do the same thing.
@@ -121,9 +121,9 @@ def solve(line: Line, strategy: Callable[[Line], float]) -> float:
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, least_squares))
-## 2.3333333333333335
+#: 2.3333333333333335
 print(solve(line, bisection))
-## 2.0
+#: 2.0
 ```
 
 The classic form makes each algorithm a class deriving from a common interface,
@@ -174,10 +174,10 @@ class MinimaSolver:
 solver = MinimaSolver(LeastSquares())
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solver.minima(line))
-## 2.3333333333333335
+#: 2.3333333333333335
 solver.change_algorithm(Bisection())
 print(solver.minima(line))
-## 2.0
+#: 2.0
 ```
 
 You use strategies-as-functions constantly in Python without naming the pattern.
@@ -223,7 +223,7 @@ def solve(line: Line,
 
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, [least_squares, newtons_method, bisection]))
-## [5.5, 6.6]
+#: [5.5, 6.6]
 ```
 
 Each handler is a *Strategy* function; the chain is the list;
@@ -326,10 +326,10 @@ bus.subscribe(Deposit, audit)        # Two handlers for one event type
 bus.subscribe(Withdraw, on_withdraw)
 
 bus.publish(Deposit(100))
-## + deposit 100
-##   audit: a deposit of 100
+#: + deposit 100
+#:   audit: a deposit of 100
 bus.publish(Withdraw(30))
-## - withdraw 30
+#: - withdraw 30
 bus.publish(Closed("inactivity"))    # No handler: nothing happens
 ```
 

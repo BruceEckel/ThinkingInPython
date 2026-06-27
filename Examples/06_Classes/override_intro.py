@@ -11,4 +11,4 @@ class Derived(Base):
         print("Derived.show")
 
 Derived().show()
-## Derived.show
+#: Derived.show

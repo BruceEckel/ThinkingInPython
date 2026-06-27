@@ -18,14 +18,14 @@ class Red(Color):
 class Green(Color):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-## ['Blue', 'Green', 'Red']
+#: ['Blue', 'Green', 'Red']
 
 class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
+#: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
@@ -43,4 +43,4 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-## ['Circle', 'Square']
+#: ['Circle', 'Square']

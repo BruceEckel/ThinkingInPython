@@ -16,7 +16,7 @@ class Simple1(metaclass=SimpleMeta1):
 
 simple = Simple1()
 print([m for m in dir(simple) if not m.startswith("__")])
-## ['bar', 'foo', 'uses_metaclass']
+#: ['bar', 'foo', 'uses_metaclass']
 # A method injected by the metaclass:
 print(simple.uses_metaclass())  # type: ignore
-## Yes!
+#: Yes!

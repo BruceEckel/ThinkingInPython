@@ -13,10 +13,10 @@ def tag(name: str) -> Iterator[str]:
 with ExitStack() as stack:
     names = [stack.enter_context(tag(n)) for n in ("a", "b", "c")]
     print("using", names)
-## open a
-## open b
-## open c
-## using ['a', 'b', 'c']
-## close c
-## close b
-## close a
+#: open a
+#: open b
+#: open c
+#: using ['a', 'b', 'c']
+#: close c
+#: close b
+#: close a

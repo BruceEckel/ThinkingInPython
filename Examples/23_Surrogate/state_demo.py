@@ -35,13 +35,13 @@ def run(b: Any) -> None:
 
 b = StateD(Implementation1())
 run(b)
-## Fiddle de dum, Fiddle de dee,
-## Eric the half a bee.
-## Ho ho ho, tee hee hee,
-## Eric the half a bee.
+#: Fiddle de dum, Fiddle de dee,
+#: Eric the half a bee.
+#: Ho ho ho, tee hee hee,
+#: Eric the half a bee.
 b.change_imp(Implementation2())
 run(b)
-## We're Knights of the Round Table.
-## We dance whene'er we're able.
-## We do routines and chorus scenes
-## We dance whene'er we're able.
+#: We're Knights of the Round Table.
+#: We dance whene'er we're able.
+#: We do routines and chorus scenes
+#: We dance whene'er we're able.

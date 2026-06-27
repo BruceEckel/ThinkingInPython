@@ -25,13 +25,13 @@ class Stars:
 a = Stars()
 b = Stars()
 print(a.rating, b.rating)  # Both read the class attr
-## 5 5
+#: 5 5
 a.rating = 1  # Assigning makes an instance variable on a
 print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
-## 1 5
+#: 1 5
 Stars.rating = 9  # Change the shared class attr
 print(a.rating, b.rating)  # 'a' instance variable, 'b' class attr
-## 1 9
+#: 1 9
 ```
 
 An instance and its class each have their own attribute dictionary.
@@ -47,14 +47,14 @@ class A:
 
 a = A()
 print(vars(A)["x"])  # The attribute lives in the class dict
-## 100
+#: 100
 print(vars(a))  # The instance has no attributes yet
-## {}
+#: {}
 a.x = 1
 print(vars(a))  # Assignment created it on the instance
-## {'x': 1}
+#: {'x': 1}
 print(vars(A)["x"])
-## 100
+#: 100
 ```
 
 So a class attribute seems like a default until someone assigns to an instance variable of the same name.
@@ -80,7 +80,7 @@ class Tally:
 a = Tally("a")
 b = Tally("b")
 print(Tally.total)  # Shared by the whole class
-## 2
+#: 2
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
 
@@ -107,9 +107,9 @@ class B:
 a = A()
 a.x = -1
 print(a.x, A().x)  # The change in a does not leak
-## -1 100
+#: -1 100
 print(B().x, B(7).x)
-## 100 7
+#: 100 7
 ```
 
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
@@ -154,13 +154,13 @@ for c in counters:
     print(c)
     del c
 print("End of delete loop")
-## First created
-## Second created
-## Third created
-## Counter('First' 3)
-## Counter('Second' 3)
-## Counter('Third' 3)
-## End of delete loop
+#: First created
+#: Second created
+#: Third created
+#: Counter('First' 3)
+#: Counter('Second' 3)
+#: Counter('Third' 3)
+#: End of delete loop
 ```
 
 `del c` inside the loop does not delete the object.
@@ -240,22 +240,22 @@ for name in ["First", "Second", "Third"]:
     counters.append(Counter(name))
 
 print(Counter.live_count())
-## First deleted
-## 2 Counter objects remaining
-## Second deleted
-## 1 Counter objects remaining
-## Third deleted
-## Last Counter object deleted
-## 3
+#: First deleted
+#: 2 Counter objects remaining
+#: Second deleted
+#: 1 Counter objects remaining
+#: Third deleted
+#: Last Counter object deleted
+#: 3
 counters.pop()               # Release "Third"
 print(Counter.live_count())
-## 2
+#: 2
 counters.pop()               # Release "Second"
 print(Counter.live_count())
-## 1
+#: 1
 counters.clear()             # Release "First"
 print(Counter.live_count())
-## 0
+#: 0
 ```
 
 Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.

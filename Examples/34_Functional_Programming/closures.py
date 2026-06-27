@@ -10,4 +10,4 @@ def multiplier(factor: int) -> Callable[[int], int]:
 double = multiplier(2)
 triple = multiplier(3)
 print(double(10), triple(10))
-## 20 30
+#: 20 30

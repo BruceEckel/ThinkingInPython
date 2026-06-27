@@ -18,8 +18,8 @@ print("'module' imported")
 
 if __name__ == "__main__":
     print(module.useful_function())
-## 'module' imported
-## Use this elsewhere!
+#: 'module' imported
+#: Use this elsewhere!
 ```
 
 When you import a module, it creates a *namespace* within the importing file.
@@ -49,7 +49,7 @@ Here is such a program, which does nothing but import it:
 ```python
 # import_module.py
 import use_module
-## 'module' imported
+#: 'module' imported
 ```
 
 If you run `python import_module.py`, you should only see `'module' imported` displayed.
@@ -65,7 +65,7 @@ from module import useful_function
 
 if __name__ == "__main__":
     print(useful_function())
-## Use this elsewhere!
+#: Use this elsewhere!
 ```
 
 You can change the namespace of a module during an import using the `as` keyword:
@@ -76,7 +76,7 @@ import module as m
 
 if __name__ == "__main__":
     print(m.useful_function())
-## Use this elsewhere!
+#: Use this elsewhere!
 ```
 
 ## Packages
@@ -122,12 +122,12 @@ To import a module from a package, you must qualify it with the package name:
 import a_package.module1
 import a_package.module2
 
-## importing module1 in a_package
-## importing module2 in a_package
+#: importing module1 in a_package
+#: importing module2 in a_package
 print(a_package.module1.function1())
-## function1 in module1 in a_package
+#: function1 in module1 in a_package
 print(a_package.module2.function2())
-## function2 in module2 in a_package
+#: function2 in module2 in a_package
 ```
 
 You can also name the package with `from`:
@@ -136,12 +136,12 @@ You can also name the package with `from`:
 # from_packages.py
 from a_package import module1, module2
 
-## importing module1 in a_package
-## importing module2 in a_package
+#: importing module1 in a_package
+#: importing module2 in a_package
 print(module1.function1())
-## function1 in module1 in a_package
+#: function1 in module1 in a_package
 print(module2.function2())
-## function2 in module2 in a_package
+#: function2 in module2 in a_package
 ```
 
 Here you no longer need to qualify the module with the package name.
@@ -153,12 +153,12 @@ You can bring specific functions into the namespace by naming both the package a
 from a_package.module1 import function1
 from a_package.module2 import function2
 
-## importing module1 in a_package
-## importing module2 in a_package
+#: importing module1 in a_package
+#: importing module2 in a_package
 print(function1())
-## function1 in module1 in a_package
+#: function1 in module1 in a_package
 print(function2())
-## function2 in module2 in a_package
+#: function2 in module2 in a_package
 ```
 
 We can even put a second package underneath the first one:
@@ -182,9 +182,9 @@ To import `module3` we must specify both packages:
 # two_levels.py
 from a_package.b_package import module3
 
-## importing module3 in b_package
+#: importing module3 in b_package
 print(module3.function3())
-## function3 in module3 in b_package
+#: function3 in module3 in b_package
 ```
 
 ## `PYTHONPATH`

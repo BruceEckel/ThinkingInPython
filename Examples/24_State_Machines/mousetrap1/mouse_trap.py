@@ -87,34 +87,34 @@ text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith('#')]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse escapes
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse runs away
-## Waiting: Broadcasting cheese smell
-## mouse appears
-## Luring: Presenting Cheese, door open
-## mouse enters trap
-## Trapping: Closing door
-## mouse trapped
-## Holding: Mouse caught
-## mouse removed
-## Waiting: Broadcasting cheese smell
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse escapes
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse runs away
+#: Waiting: Broadcasting cheese smell
+#: mouse appears
+#: Luring: Presenting Cheese, door open
+#: mouse enters trap
+#: Trapping: Closing door
+#: mouse trapped
+#: Holding: Mouse caught
+#: mouse removed
+#: Waiting: Broadcasting cheese smell

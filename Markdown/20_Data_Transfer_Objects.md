@@ -20,7 +20,7 @@ class Messenger:
 m: Any = Messenger(info="Some information", b=['a', 'list'])
 m.more = 11
 print(m.info, m.b, m.more)
-## Some information ['a', 'list'] 11
+#: Some information ['a', 'list'] 11
 ```
 
 The trick here is that the `__dict__` for the object is just assigned to the `dict` that is automatically created by the `**kwargs` argument.
@@ -66,9 +66,9 @@ class Color(NamedTuple):
     b: int
 
 print(Color(255, 0, 0).r)
-## Some information ['a', 'list'] 11
-## Point(x=1.0, y=2.0)
-## 255
+#: Some information ['a', 'list'] 11
+#: Point(x=1.0, y=2.0)
+#: 255
 ```
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
@@ -89,13 +89,13 @@ from display import display_object
 m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 display_object(m)
-## === SimpleNamespace ===
-## [Attributes]
-##   • b = ['a', 'list']
-##   • info = 'Some information'
-##   • more = 11
-## [Methods]
-##   None
+#: === SimpleNamespace ===
+#: [Attributes]
+#:   • b = ['a', 'list']
+#:   • info = 'Some information'
+#:   • more = 11
+#: [Methods]
+#:   None
 ```
 
 A small test confirms each form behaves as a record:

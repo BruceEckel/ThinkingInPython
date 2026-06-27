@@ -130,26 +130,26 @@ class Rock(Item):
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
         match(item1, item2)
-## Scissors <--> Paper : win
-## Scissors <--> Rock : lose
-## Scissors <--> Rock : lose
-## Scissors <--> Scissors : draw
-## Rock <--> Scissors : win
-## Scissors <--> Rock : lose
-## Paper <--> Scissors : lose
-## Rock <--> Paper : lose
-## Paper <--> Paper : draw
-## Scissors <--> Scissors : draw
-## Rock <--> Rock : draw
-## Paper <--> Scissors : lose
-## Rock <--> Scissors : win
-## Paper <--> Paper : draw
-## Rock <--> Rock : draw
-## Scissors <--> Scissors : draw
-## Paper <--> Paper : draw
-## Rock <--> Scissors : win
-## Rock <--> Rock : draw
-## Scissors <--> Rock : lose
+#: Scissors <--> Paper : win
+#: Scissors <--> Rock : lose
+#: Scissors <--> Rock : lose
+#: Scissors <--> Scissors : draw
+#: Rock <--> Scissors : win
+#: Scissors <--> Rock : lose
+#: Paper <--> Scissors : lose
+#: Rock <--> Paper : lose
+#: Paper <--> Paper : draw
+#: Scissors <--> Scissors : draw
+#: Rock <--> Rock : draw
+#: Paper <--> Scissors : lose
+#: Rock <--> Scissors : win
+#: Paper <--> Paper : draw
+#: Rock <--> Rock : draw
+#: Scissors <--> Scissors : draw
+#: Paper <--> Paper : draw
+#: Rock <--> Scissors : win
+#: Rock <--> Rock : draw
+#: Scissors <--> Rock : lose
 ```
 
 One of the things you might notice is that the information about the various combinations is encoded into each type of `Item`.
@@ -194,26 +194,26 @@ outcome: dict[tuple[type, type], Outcome] = {
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
         match(item1, item2)
-## Scissors <--> Paper : win
-## Scissors <--> Rock : lose
-## Scissors <--> Rock : lose
-## Scissors <--> Scissors : draw
-## Rock <--> Scissors : win
-## Scissors <--> Rock : lose
-## Paper <--> Scissors : lose
-## Rock <--> Paper : lose
-## Paper <--> Paper : draw
-## Scissors <--> Scissors : draw
-## Rock <--> Rock : draw
-## Paper <--> Scissors : lose
-## Rock <--> Scissors : win
-## Paper <--> Paper : draw
-## Rock <--> Rock : draw
-## Scissors <--> Scissors : draw
-## Paper <--> Paper : draw
-## Rock <--> Scissors : win
-## Rock <--> Rock : draw
-## Scissors <--> Rock : lose
+#: Scissors <--> Paper : win
+#: Scissors <--> Rock : lose
+#: Scissors <--> Rock : lose
+#: Scissors <--> Scissors : draw
+#: Rock <--> Scissors : win
+#: Scissors <--> Rock : lose
+#: Paper <--> Scissors : lose
+#: Rock <--> Paper : lose
+#: Paper <--> Paper : draw
+#: Scissors <--> Scissors : draw
+#: Rock <--> Rock : draw
+#: Paper <--> Scissors : lose
+#: Rock <--> Scissors : win
+#: Paper <--> Paper : draw
+#: Rock <--> Rock : draw
+#: Scissors <--> Scissors : draw
+#: Paper <--> Paper : draw
+#: Rock <--> Scissors : win
+#: Rock <--> Rock : draw
+#: Scissors <--> Rock : lose
 ```
 
 Notice the flexibility of dictionaries: a tuple can be used as a key just as easily as a single object.

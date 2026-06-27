@@ -9,10 +9,10 @@ class Messenger:
 
 m = Messenger("foo", 12, 3.14)
 print(m)
-## Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='foo', number=12, depth=3.14)
 
 # m.name = "bar" raises dataclasses.FrozenInstanceError
 
 cache = {m: "value"}  # Frozen instances are hashable
 print(cache[m])
-## value
+#: value

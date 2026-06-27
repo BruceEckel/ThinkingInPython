@@ -9,8 +9,8 @@ def func_a(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, func_a(i))
-## 0 Success(answer=0)
-## 1 Failure(error='func_a(1)')
-## 2 Success(answer=2)
-## 3 Success(answer=3)
-## 4 Success(answer=4)
+#: 0 Success(answer=0)
+#: 1 Failure(error='func_a(1)')
+#: 2 Success(answer=2)
+#: 3 Success(answer=3)
+#: 4 Success(answer=4)

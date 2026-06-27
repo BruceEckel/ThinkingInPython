@@ -8,4 +8,4 @@ print([
     f"{name}({v}) = {f(v)}"
     for (name, f), v in zip(all_slots, values)
 ])
-## ['doubled(10) = 20', 'squared(3) = 9']
+#: ['doubled(10) = 20', 'squared(3) = 9']

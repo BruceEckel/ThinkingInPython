@@ -116,9 +116,9 @@ class Adapter:
 
 a = Adapter(WhatIHave())
 print(a.f())   # Adapted method
-## gh
+#: gh
 print(a.g())   # Forwarded to the adaptee unchanged
-## g
+#: g
 ```
 
 `__getattr__()` runs only for attributes Python does not find normally,

@@ -13,7 +13,7 @@ run_framework(
     lambda: print("Nudge, nudge, wink, wink!"),
     lambda: print("Say no more, say no more!"),
 )
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!

@@ -42,7 +42,7 @@ class MinimaSolver:
 solver = MinimaSolver(LeastSquares())
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solver.minima(line))
-## 2.3333333333333335
+#: 2.3333333333333335
 solver.change_algorithm(Bisection())
 print(solver.minima(line))
-## 2.0
+#: 2.0

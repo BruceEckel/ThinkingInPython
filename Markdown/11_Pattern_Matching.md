@@ -29,11 +29,11 @@ def describe(status: int) -> str:
             return f"Status {status}"
 
 print(describe(200))
-## OK
+#: OK
 print(describe(404))
-## Not Found
+#: Not Found
 print(describe(301))
-## Status 301
+#: Status 301
 ```
 
 For a plain value-to-value lookup like this,
@@ -60,11 +60,11 @@ def step(command: str) -> str:
             return f"unknown command: {other}"
 
 print(step("up"))
-## y -= 1
+#: y -= 1
 print(step("d"))
-## y += 1
+#: y += 1
 print(step("jump"))
-## unknown command: jump
+#: unknown command: jump
 ```
 
 ## Sequence Patterns
@@ -89,13 +89,13 @@ def summarize(items: list[int]) -> str:
             return "Unreachable"
 
 print(summarize([]))
-## Empty
+#: Empty
 print(summarize([5]))
-## One item: 5
+#: One item: 5
 print(summarize([3, 4]))
-## Two items: 3, 4
+#: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
-## 1, then 3 more
+#: 1, then 3 more
 ```
 
 This shows the structural part of "structural pattern matching."
@@ -135,13 +135,13 @@ def locate(p: Point) -> str:
             return f"At ({x}, {y})"
 
 print(locate(Point(0, 0)))
-## The origin
+#: The origin
 print(locate(Point(0, 5)))
-## On the y-axis at y=5
+#: On the y-axis at y=5
 print(locate(Point(3, 0)))
-## On the x-axis at x=3
+#: On the x-axis at x=3
 print(locate(Point(3, 4)))
-## At (3, 4)
+#: At (3, 4)
 ```
 
 `Point(0, 0)` matches a point whose fields are both zero.
@@ -169,13 +169,13 @@ def quadrant(p: Point) -> str:
             return "Somewhere else"
 
 print(quadrant(Point(0, 0)))
-## Origin
+#: Origin
 print(quadrant(Point(3, 4)))
-## First quadrant
+#: First quadrant
 print(quadrant(Point(-3, 4)))
-## Second quadrant
+#: Second quadrant
 print(quadrant(Point(-1, -1)))
-## Somewhere else
+#: Somewhere else
 ```
 
 ## Mapping Patterns
@@ -199,13 +199,13 @@ def handle(event: dict[str, object]) -> str:
             return f"Not an event: {nonevent}"
 
 print(handle({"type": "click", "x": 10, "y": 20}))
-## Click at (10, 20)
+#: Click at (10, 20)
 print(handle({"type": "key", "key": "Enter"}))
-## Key Enter
+#: Key Enter
 print(handle({"type": "scroll", "delta": 3}))
-## Other event: scroll
+#: Other event: scroll
 print(handle({"button": 1}))
-## Not an event: {'button': 1}
+#: Not an event: {'button': 1}
 ```
 
 ## Exhaustive Matching
@@ -244,9 +244,9 @@ def area(shape: Shape) -> float:
             assert_never(shape)
 
 print(round(area(Circle(1.0)), 4))
-## 3.1416
+#: 3.1416
 print(area(Square(2.0)))
-## 4.0
+#: 4.0
 ```
 
 Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
@@ -269,9 +269,9 @@ def describe(status: int) -> str:
     return STATUS.get(status, f"Status {status}")
 
 print(describe(200))
-## OK
+#: OK
 print(describe(301))
-## Status 301
+#: Status 301
 ```
 
 When the set of types is *open* (anyone can add a new one),

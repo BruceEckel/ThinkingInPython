@@ -10,4 +10,4 @@ def squares() -> Iterator[int]:
 # count() is infinite; islice() pulls only what we ask for:
 first_five = list(islice(squares(), 5))
 print(first_five)
-## [1, 4, 9, 16, 25]
+#: [1, 4, 9, 16, 25]

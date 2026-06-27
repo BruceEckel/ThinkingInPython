@@ -18,21 +18,21 @@ people = [
             EmailAddress("ada@example.com")),
 ]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
-## [
-##   {
-##     "name": {
-##       "text": "Bruce Eckel"
-##     },
-##     "email": {
-##       "text": "bruce@example.com"
-##     }
-##   },
-##   {
-##     "name": {
-##       "text": "Ada Lovelace"
-##     },
-##     "email": {
-##       "text": "ada@example.com"
-##     }
-##   }
-## ]
+#: [
+#:   {
+#:     "name": {
+#:       "text": "Bruce Eckel"
+#:     },
+#:     "email": {
+#:       "text": "bruce@example.com"
+#:     }
+#:   },
+#:   {
+#:     "name": {
+#:       "text": "Ada Lovelace"
+#:     },
+#:     "email": {
+#:       "text": "ada@example.com"
+#:     }
+#:   }
+#: ]

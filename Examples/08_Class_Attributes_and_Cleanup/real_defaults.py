@@ -12,6 +12,6 @@ class B:
 a = A()
 a.x = -1
 print(a.x, A().x)  # The change in a does not leak
-## -1 100
+#: -1 100
 print(B().x, B(7).x)
-## 100 7
+#: 100 7

@@ -26,6 +26,6 @@ def make(kind: str) -> Shape:
 
 for kind in ["Circle", "Square", "Circle"]:
     make(kind).draw()
-## Circle.draw
-## Square.draw
-## Circle.draw
+#: Circle.draw
+#: Square.draw
+#: Circle.draw

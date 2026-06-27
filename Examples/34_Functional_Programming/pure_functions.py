@@ -11,6 +11,6 @@ def withdraw(amount: int) -> int:
     return balance
 
 print(double(5), double(5))
-## 10 10
+#: 10 10
 print(withdraw(30), withdraw(30))
-## 70 40
+#: 70 40

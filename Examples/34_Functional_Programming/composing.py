@@ -16,4 +16,4 @@ def double(n: int) -> int:
 
 increment_then_double = compose(double, increment)
 print(increment_then_double(10))
-## 22
+#: 22

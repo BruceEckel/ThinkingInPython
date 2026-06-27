@@ -2,11 +2,11 @@
 from simple_class import Simple
 
 x = Simple("Constructor argument")  # Create an object
-## Inside the Simple constructor
+#: Inside the Simple constructor
 x.show()
-## Constructor argument
+#: Constructor argument
 x.show("A message")
-## A message: Constructor argument
+#: A message: Constructor argument
 x.show_twice()
-## Constructor argument
-## Constructor argument
+#: Constructor argument
+#: Constructor argument

@@ -25,17 +25,17 @@ class OnlyOne:
 
 x = OnlyOne('sausage')
 print(x)
-## sausage
+#: sausage
 y = OnlyOne('eggs')
 print(y)
-## eggs
+#: eggs
 z = OnlyOne('spam')
 print(z)
-## spam
+#: spam
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
-## False True
+#: False True

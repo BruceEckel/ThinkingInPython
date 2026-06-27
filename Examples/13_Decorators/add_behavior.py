@@ -14,6 +14,6 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-## Hijacked!
-## Wensleydale
-## Hijacking over...
+#: Hijacked!
+#: Wensleydale
+#: Hijacking over...

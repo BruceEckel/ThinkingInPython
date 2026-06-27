@@ -21,7 +21,7 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-## Replacement behavior
+#: Replacement behavior
 ```
 
 Ordinarily you'd expect to just see "Wensleydale" but `hijack()` replaces the original `cheese()` function
@@ -50,9 +50,9 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-## Hijacked!
-## Wensleydale
-## Hijacking over...
+#: Hijacked!
+#: Wensleydale
+#: Hijacking over...
 ```
 
 Decoration is a simple kind of metaprogramming.
@@ -84,8 +84,8 @@ def add(a: int, b: int) -> int:
 
 if __name__ == "__main__":
     add(2, 3)
-## -> add(2, 3)
-## <- add = 5
+#: -> add(2, 3)
+#: <- add = 5
 ```
 
 The `@trace` above `add()` means:
@@ -150,9 +150,9 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
-## Hello, Bob
-## Hello, Bob
-## Hello, Bob
+#: Hello, Bob
+#: Hello, Bob
+#: Hello, Bob
 ```
 
 `@repeat(times=3)` calls `repeat(3)`, which returns the real decorator,
@@ -190,8 +190,8 @@ def add(a: int, b: int) -> int:
 
 if __name__ == "__main__":
     add(2, 3)
-## -> add(2, 3)
-## <- add = 5
+#: -> add(2, 3)
+#: <- add = 5
 ```
 
 `@trace` runs `add = trace(add)`,
@@ -230,11 +230,11 @@ if __name__ == "__main__":
     hello()
     hello()
     print(hello.count)  # The state lives on the decorator instance
-## call 1 of hello
-## hello
-## call 2 of hello
-## hello
-## 2
+#: call 1 of hello
+#: hello
+#: call 2 of hello
+#: hello
+#: 2
 ```
 
 The class form shifts in an important way when the decorator itself takes arguments.
@@ -267,9 +267,9 @@ def greet(name: str) -> None:
 
 if __name__ == "__main__":
     greet("Bob")
-## Hello, Bob
-## Hello, Bob
-## Hello, Bob
+#: Hello, Bob
+#: Hello, Bob
+#: Hello, Bob
 ```
 
 Compare the two cases.
@@ -312,10 +312,10 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
-## -> greet('Bob',)
-## Hello, Bob
-## Hello, Bob
-## <- greet = 'Bob'
+#: -> greet('Bob',)
+#: Hello, Bob
+#: Hello, Bob
+#: <- greet = 'Bob'
 ```
 
 This is `greet = trace(repeat(times=2)(greet))`.
@@ -348,7 +348,7 @@ class Latte:
 
 if __name__ == "__main__":
     print(sorted(registry))
-## ['Espresso', 'Latte']
+#: ['Espresso', 'Latte']
 ```
 
 [Metaprogramming](16_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
@@ -424,8 +424,8 @@ if __name__ == "__main__":
 
     cap = ExtraShot(Decaf(Cappuccino()))
     print(f"{cap.description}: ${cap.cost:.2f}")
-## Espresso + Extra shot + Whipped cream: $2.75
-## Cappuccino + Decaf + Extra shot: $2.50
+#: Espresso + Extra shot + Whipped cream: $2.75
+#: Cappuccino + Decaf + Extra shot: $2.50
 ```
 
 `Whipped(ExtraShot(Espresso()))` is the object version of stacked `@` decorators.

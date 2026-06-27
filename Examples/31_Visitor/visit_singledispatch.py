@@ -41,6 +41,6 @@ if __name__ == "__main__":
         Gladiolus(), Runuculus(), Chrysanthemum()]
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
-## Gladiolus: abundant nectar | fragrance: faint
-## Runuculus: no nectar | fragrance: strong
-## Chrysanthemum: a little nectar | fragrance: faint
+#: Gladiolus: abundant nectar | fragrance: faint
+#: Runuculus: no nectar | fragrance: strong
+#: Chrysanthemum: a little nectar | fragrance: faint

@@ -6,6 +6,6 @@ def describe(status: int) -> str:
     return STATUS.get(status, f"Status {status}")
 
 print(describe(200))
-## OK
+#: OK
 print(describe(301))
-## Status 301
+#: Status 301

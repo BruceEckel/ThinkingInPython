@@ -28,10 +28,10 @@ y = Bar('eggs')
 z = Bar('spam')
 # Each Bar(...) reruns __init__ on the one instance, so val is spam:
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 print(z)
-## spam
+#: spam
 print(x is y is z)
-## True
+#: True

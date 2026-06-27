@@ -25,6 +25,6 @@ class Color(NamedTuple):
     b: int
 
 print(Color(255, 0, 0).r)
-## Some information ['a', 'list'] 11
-## Point(x=1.0, y=2.0)
-## 255
+#: Some information ['a', 'list'] 11
+#: Point(x=1.0, y=2.0)
+#: 255

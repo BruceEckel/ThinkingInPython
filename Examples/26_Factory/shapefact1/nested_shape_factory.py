@@ -36,17 +36,17 @@ if __name__ == "__main__":
     for shape in shape_name_gen(7):
         shape.draw()
         shape.erase()
-## Square.draw
-## Square.erase
-## Circle.draw
-## Circle.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
-## Square.draw
-## Square.erase
+#: Square.draw
+#: Square.erase
+#: Circle.draw
+#: Circle.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase
+#: Square.draw
+#: Square.erase

@@ -16,4 +16,4 @@ for _ in range(1000):
     sample = "".join(random.choice(alphabet) for _ in range(size))
     assert decode(encode(sample)) == sample
 print("1000 random cases passed")
-## 1000 random cases passed
+#: 1000 random cases passed

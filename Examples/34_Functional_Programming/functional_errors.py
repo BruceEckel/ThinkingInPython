@@ -11,5 +11,5 @@ for divisor in (2, 0):
             print("undefined")
         case value:
             print(value)
-## 5.0
-## undefined
+#: 5.0
+#: undefined

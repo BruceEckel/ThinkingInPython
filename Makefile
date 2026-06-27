@@ -36,8 +36,8 @@ help:
 	@echo "  serve     - serve build/site/ at http://localhost:8000"
 	@echo "  examples  - extract then run (the full verification pass)"
 	@echo "  run       - run every extracted .py and report failures"
-	@echo "  output    - update the ## output markers in the book's listings"
-	@echo "  output-check - verify the ## output markers without rewriting"
+	@echo "  output    - update the #: output markers in the book's listings"
+	@echo "  output-check - verify the #: output markers without rewriting"
 	@echo "  test      - run the book's pytest examples (test_*.py)"
 	@echo "  ty        - type-check the extracted examples (must be clean)"
 	@echo "  lint      - PEP8-lint the extracted examples with ruff (must be clean)"
@@ -94,7 +94,7 @@ examples: extract run
 run: extract
 	$(PY) tools/run_examples.py
 
-# Rewrite the ## output markers inside the Markdown's ```python listings to the
+# Rewrite the #: output markers inside the Markdown's ```python listings to the
 # stdout each listing actually produces. Depends on extract so each listing runs
 # from build/examples/<chapter>/, where its sibling imports and data files live.
 output: extract

@@ -12,10 +12,10 @@ def handle(event: dict[str, object]) -> str:
             return f"Not an event: {nonevent}"
 
 print(handle({"type": "click", "x": 10, "y": 20}))
-## Click at (10, 20)
+#: Click at (10, 20)
 print(handle({"type": "key", "key": "Enter"}))
-## Key Enter
+#: Key Enter
 print(handle({"type": "scroll", "delta": 3}))
-## Other event: scroll
+#: Other event: scroll
 print(handle({"button": 1}))
-## Not an event: {'button': 1}
+#: Not an event: {'button': 1}

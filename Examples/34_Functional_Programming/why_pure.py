@@ -6,4 +6,4 @@ def slope(rise: int, run: int) -> float:
 assert slope(10, 2) == 5.0
 assert slope(9, 3) == 3.0
 print("ok")
-## ok
+#: ok

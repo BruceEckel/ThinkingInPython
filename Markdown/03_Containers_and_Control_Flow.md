@@ -14,17 +14,17 @@ Python's `for` automatically uses an iterator that works through a sequence:
 
 odds = [ 1, 3, 5, 7, 9, 11 ]
 print(odds)
-## [1, 3, 5, 7, 9, 11]
+#: [1, 3, 5, 7, 9, 11]
 odds.append(13)
 for x in odds:
     print(x)
-## 1
-## 3
-## 5
-## 7
-## 9
-## 11
-## 13
+#: 1
+#: 3
+#: 5
+#: 7
+#: 9
+#: 11
+#: 13
 ```
 
 The first line creates a `list`.
@@ -46,21 +46,21 @@ A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 
 xs = [10, 20, 30, 40, 50]
 print(xs[0], xs[-1])  # First and last
-## 10 50
+#: 10 50
 print(xs[1:3])   # The stop index is excluded
-## [20, 30]
+#: [20, 30]
 print(xs[:2])    # From the start
-## [10, 20]
+#: [10, 20]
 print(xs[2:])    # To the end
-## [30, 40, 50]
+#: [30, 40, 50]
 print(xs[::2])   # Every second item
-## [10, 30, 50]
+#: [10, 30, 50]
 print(xs[::-1])  # Reversed
-## [50, 40, 30, 20, 10]
+#: [50, 40, 30, 20, 10]
 xs.append(60)
 xs.insert(0, 5)
 print(len(xs), 30 in xs)
-## 7 True
+#: 7 True
 ```
 
 Slicing works on any sequence, including strings and tuples.
@@ -79,21 +79,21 @@ point = 3, 4        # Also a tuple; the comma is what matters
 empty = ()          # Empty tuple
 x, y = point        # Unpacking
 print(x, y)
-## 3 4
+#: 3 4
 single = (42,)      # A one-element tuple needs the trailing comma
 print(len(single))
-## 1
+#: 1
 print(tuple([1, 2, 3]))    # Converts to (1, 2, 3)  from a list
-## (1, 2, 3)
+#: (1, 2, 3)
 print(tuple("abc"))
-## ('a', 'b', 'c')
+#: ('a', 'b', 'c')
 
 def min_max(values):
     return min(values), max(values)  # Returns a tuple
 
 low, high = min_max([5, 2, 9, 1])
 print(low, high)
-## 1 9
+#: 1 9
 ```
 
 Tuples are often heterogeneous, with each position a different type.
@@ -109,19 +109,19 @@ Keys must be immutable.
 
 ages = {"Alice": 30, "Bob": 25}
 print(ages)
-## {'Alice': 30, 'Bob': 25}
+#: {'Alice': 30, 'Bob': 25}
 print(ages["Alice"])
-## 30
+#: 30
 ages["Carol"] = 41         # Add or update
 print("Bob" in ages)       # Membership tests the keys
-## True
+#: True
 print(ages.get("Dan", 0))  # A default when the key is missing
-## 0
+#: 0
 for name, age in ages.items():
     print(name, age)
-## Alice 30
-## Bob 25
-## Carol 41
+#: Alice 30
+#: Bob 25
+#: Carol 41
 ```
 
 Use `dict.get()` to avoid a `KeyError` when a key might be absent.
@@ -137,15 +137,15 @@ with fast membership tests and the usual set algebra:
 a = {1, 2, 3, 3}  # Duplicates collapse
 b = {3, 4, 5}
 print(a)
-## {1, 2, 3}
+#: {1, 2, 3}
 print(a & b)      # Intersection
-## {3}
+#: {3}
 print(a | b)      # Union
-## {1, 2, 3, 4, 5}
+#: {1, 2, 3, 4, 5}
 print(a - b)      # Difference
-## {1, 2}
+#: {1, 2}
 print(2 in a)
-## True
+#: True
 ```
 
 Every operator above has a named method.
@@ -159,19 +159,19 @@ a = {1, 2, 3}
 b = {3, 4, 5}
 
 print(a.intersection(b))  # Same as a & b
-## {3}
+#: {3}
 print(a.union(b))  # Same as a | b
-## {1, 2, 3, 4, 5}
+#: {1, 2, 3, 4, 5}
 print(a.difference(b))  # Same as a - b
-## {1, 2}
+#: {1, 2}
 print(a.symmetric_difference(b))  # Same as a ^ b
-## {1, 2, 4, 5}
+#: {1, 2, 4, 5}
 print(a.intersection([2, 3, 9]))  # Arg can be any iterable
-## {2, 3}
+#: {2, 3}
 print(a.union(b, [6, 7]))  # Several args
-## {1, 2, 3, 4, 5, 6, 7}
+#: {1, 2, 3, 4, 5, 6, 7}
 print(a.isdisjoint({8, 9}))  # No operator form
-## True
+#: True
 ```
 
 ## Control Flow
@@ -190,14 +190,14 @@ def classify(n):
         return "positive"
 
 print(classify(-3), classify(0), classify(7))
-## negative zero positive
+#: negative zero positive
 
 x = 5
 print(0 < x < 10)  # Chained comparison
-## True
+#: True
 grade = "pass" if x >= 3 else "fail"  # Conditional expression
 print(grade)
-## pass
+#: pass
 ```
 
 Python's comparison operators chain the way they do in mathematics:
@@ -228,19 +228,19 @@ and `zip()` to walk two sequences together:
 for i in range(3):
     print(i, end=" ")
 print()
-## 0 1 2
+#: 0 1 2
 names = ["Alice", "Bob", "Carol"]
 for index, name in enumerate(names):
     print(index, name)
-## 0 Alice
-## 1 Bob
-## 2 Carol
+#: 0 Alice
+#: 1 Bob
+#: 2 Carol
 scores = [88, 91, 79]
 for name, score in zip(names, scores):
     print(name, score)
-## Alice 88
-## Bob 91
-## Carol 79
+#: Alice 88
+#: Bob 91
+#: Carol 79
 ```
 
 `enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
@@ -268,11 +268,11 @@ def run(command):
             return "unknown command"
 
 print(run("go north"))
-## moving north
+#: moving north
 print(run("quit"))
-## goodbye
+#: goodbye
 print(run("dance"))
-## unknown command
+#: unknown command
 ```
 
 The [Pattern Matching](11_Pattern_Matching.md) chapter covers `match` in detail, including class patterns, guards, and nested destructuring.
@@ -293,9 +293,9 @@ def parse_int(text):
         return None
 
 print(parse_int("42"))
-## 42
+#: 42
 print(parse_int("oops"))
-## None
+#: None
 
 def checked_divide(a, b):
     if b == 0:
@@ -313,11 +313,11 @@ def demo_exceptions(a, b):
         print("finally always runs")
 
 demo_exceptions(1, 0)
-## caught: Divide by zero
-## finally always runs
+#: caught: Divide by zero
+#: finally always runs
 demo_exceptions(1, 1)
-## no exception
-## finally always runs
+#: no exception
+#: finally always runs
 ```
 
 The optional `else` runs when no exception was raised, and `finally` always runs,
@@ -345,8 +345,8 @@ with path.open("w") as f:
 with path.open() as f:
     for line in f:
         print(line.strip())
-## one
-## two
+#: one
+#: two
 path.unlink()  # Delete the file
 ```
 
@@ -368,16 +368,16 @@ replacing a loop that builds up a result:
 
 squares = [n * n for n in range(5)]           # List comprehension
 print(squares)
-## [0, 1, 4, 9, 16]
+#: [0, 1, 4, 9, 16]
 evens = [n for n in range(10) if n % 2 == 0]  # With a filter
 print(evens)
-## [0, 2, 4, 6, 8]
+#: [0, 2, 4, 6, 8]
 lengths = {w: len(w) for w in ["a", "bb"]}    # Dict comprehension
 print(lengths)
-## {'a': 1, 'bb': 2}
+#: {'a': 1, 'bb': 2}
 parities = {n % 2 for n in range(10)}         # Set comprehension
 print(parities)
-## {0, 1}
+#: {0, 1}
 ```
 
 [Comprehensions](15_Comprehensions.md#list-comprehensions) covers comprehensions in detail,

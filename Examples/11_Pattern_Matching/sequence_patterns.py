@@ -14,10 +14,10 @@ def summarize(items: list[int]) -> str:
             return "Unreachable"
 
 print(summarize([]))
-## Empty
+#: Empty
 print(summarize([5]))
-## One item: 5
+#: One item: 5
 print(summarize([3, 4]))
-## Two items: 3, 4
+#: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
-## 1, then 3 more
+#: 1, then 3 more

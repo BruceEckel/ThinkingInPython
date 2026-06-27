@@ -21,8 +21,8 @@ if __name__ == "__main__":
     hello()
     hello()
     print(hello.count)  # The state lives on the decorator instance
-## call 1 of hello
-## hello
-## call 2 of hello
-## hello
-## 2
+#: call 1 of hello
+#: hello
+#: call 2 of hello
+#: hello
+#: 2

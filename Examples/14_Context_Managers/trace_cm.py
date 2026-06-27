@@ -1,6 +1,4 @@
 # trace_cm.py
-# __enter__ runs at the start of the block and its result is bound by
-# `as`; __exit__ runs at the end.
 from typing import Self
 
 class Trace:
@@ -18,6 +16,6 @@ class Trace:
 if __name__ == "__main__":
     with Trace("A") as t:
         print(f"inside {t.name}")
-## enter A
-## inside A
-## exit A
+#: enter A
+#: inside A
+#: exit A

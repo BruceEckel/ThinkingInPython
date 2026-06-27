@@ -9,7 +9,7 @@ def factorial(n: int) -> int:
     return n * factorial(n - 1)
 
 print(factorial(5))
-## 120
+#: 120
 # Python caps how deep recursion can go:
 print(sys.getrecursionlimit())
-## 1000
+#: 1000

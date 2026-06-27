@@ -32,9 +32,9 @@ response = "yes"
 if response == "yes":
     print("affirmative")
     val = 1
-## affirmative
+#: affirmative
 print("continuing...")
-## continuing...
+#: continuing...
 ```
 
 The '`#`' denotes a comment that goes until the end of the line,
@@ -80,12 +80,12 @@ a = [1, 2, 3]
 b = a         # b binds to the same list, not a copy
 b.append(4)
 print(a)       # The same object: a and b
-## [1, 2, 3, 4]
+#: [1, 2, 3, 4]
 print(a is b)  # Identical objects
-## True
+#: True
 c = a[:]       # A shallow copy
 print(a is c, a == c)  # Different object, equal value
-## False True
+#: False True
 ```
 
 Use `==` to ask whether two objects have equal values.
@@ -101,10 +101,10 @@ which makes it easy to swap without a temporary:
 a, b = 1, 2
 a, b = b, a         # Swap, no temporary needed
 print(a, b)
-## 2 1
+#: 2 1
 first, *rest = [10, 20, 30, 40]
 print(first, rest)
-## 10 [20, 30, 40]
+#: 10 [20, 30, 40]
 ```
 
 Numbers, strings, and tuples are *immutable*, which means that
@@ -124,21 +124,21 @@ The operators are what you expect, with two worth noting:
 # numbers.py
 
 print(7 / 2)    # True division, always a float
-## 3.5
+#: 3.5
 print(7 // 2)   # Floor division
-## 3
+#: 3
 print(7 % 2)    # Remainder
-## 1
+#: 1
 print(2 ** 10)  # Exponentiation
-## 1024
+#: 1024
 print(10 ** 30) # A 31-digit int, no overflow
-## 1000000000000000000000000000000
+#: 1000000000000000000000000000000
 print(abs(-5), round(3.14159, 2))
-## 5 3.14
+#: 5 3.14
 total = 0
 total += 5      # Augmented assignment, like other languages
 print(total)
-## 5
+#: 5
 ```
 
 There is no `++` or `--`; use `+= 1` and `-= 1`.
@@ -156,23 +156,23 @@ each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
 # Bitwise and shift operators on integers. Binary literals
 # (starting with 0b) make the bit patterns easy to see.
 print(bin(0b1100 & 0b1010))  # AND, bits set in both
-## 0b1000
+#: 0b1000
 print(bin(0b1100 | 0b1010))  # OR, bits set in either
-## 0b1110
+#: 0b1110
 print(bin(0b1100 ^ 0b1010))  # XOR, bits set in exactly one
-## 0b110
+#: 0b110
 print(bin(~0b1100))          # NOT, inverts every bit
-## -0b1101
+#: -0b1101
 print(bin(1 << 4))           # Left shift, same as 1 * 2 ** 4
-## 0b10000
+#: 0b10000
 print(bin(64 >> 2))          # Right shift, same as 64 // 2 ** 2
-## 0b10000
+#: 0b10000
 
 flags = 0
 flags |= 0b0010         # Set bits with the augmented form
 flags |= 0b1000
 print(bin(flags))
-## 0b1010
+#: 0b1010
 ```
 
 The `bin()` function produces a binary string for `print()`.
@@ -199,21 +199,21 @@ and it lets you write `if items:` instead of `if len(items) != 0:`.
 
 for value in [0, 1, "", "hi", [], [1], None]:
     print(repr(value), "->", bool(value))
-## 0 -> False
-## 1 -> True
-## '' -> False
-## 'hi' -> True
-## [] -> False
-## [1] -> True
-## None -> False
+#: 0 -> False
+#: 1 -> True
+#: '' -> False
+#: 'hi' -> True
+#: [] -> False
+#: [1] -> True
+#: None -> False
 
 if not []:
     print("empty")        # An empty list is falsy
-## empty
+#: empty
 
 name = "" or "default"    # 'or' returns the first truthy operand
 print(name)               # default
-## default
+#: default
 ```
 
 `repr()` returns a value's unambiguous representation, so the empty string shows as `''` and not as blank.
@@ -242,17 +242,17 @@ print('''
 "It's the blemange!"
 ''')
 print(r'c:\python\lib\utils')
-## That isn't a horse
-## You are not a "Viking"
-##
-## You're just pounding two
-## coconut halves together.
-##
-##
-## "Oh no!" He exclaimed.
-## "It's the blemange!"
-##
-## c:\python\lib\utils
+#: That isn't a horse
+#: You are not a "Viking"
+#:
+#: You're just pounding two
+#: coconut halves together.
+#:
+#:
+#: "Oh no!" He exclaimed.
+#: "It's the blemange!"
+#:
+#: c:\python\lib\utils
 ```
 
 Note that Python was not named after the snake,
@@ -275,11 +275,11 @@ After the string, place a '`%`' and the values to substitute:
 
 val = 47
 print("The number is %d" % val)
-## The number is 47
+#: The number is 47
 val2 = 63.4
 s = "val: %d, val2: %f" % (val, val2)
 print(s)
-## val: 47, val2: 63.400000
+#: val: 47, val2: 63.400000
 ```
 
 As you can see in the second case,
@@ -300,14 +300,14 @@ It is readable, fast, and preferred:
 name = "Alice"
 score = 91.5
 print(f"{name} scored {score}")
-## Alice scored 91.5
+#: Alice scored 91.5
 print(f"{name} scored {score:.0f}%")
-## Alice scored 92%
+#: Alice scored 92%
 print(f"{name!r} has {len(name)} letters")
-## 'Alice' has 5 letters
+#: 'Alice' has 5 letters
 total = 7
 print(f"{total = }")  # Useful for debugging
-## total = 7
+#: total = 7
 ```
 
 The format spec after a colon controls width, precision, and alignment,
@@ -323,19 +323,19 @@ You can use slicing to select portions and `in` to test membership:
 
 s = "  Hello, World  "
 print(s.strip())
-## Hello, World
+#: Hello, World
 print(s.strip().lower())
-## hello, world
+#: hello, world
 print("World" in s)
-## True
+#: True
 print("a,b,c".split(","))
-## ['a', 'b', 'c']
+#: ['a', 'b', 'c']
 print("-".join(["2024", "06", "15"]))
-## 2024-06-15
+#: 2024-06-15
 print("ababab".replace("a", "X"))
-## XbXbXb
+#: XbXbXb
 print(s.strip()[0:5])
-## Hello
+#: Hello
 ```
 
 String methods return new strings rather than changing the original.
@@ -358,11 +358,11 @@ def banner(text, width=20):  # width has a default value
     return f"{line}\n{text}\n{line}"
 
 print(greet("Alice"))
-## Hello, Alice
+#: Hello, Alice
 print(banner("Hi", width=4))  # pass an argument by name
-## ****
-## Hi
-## ****
+#: ****
+#: Hi
+#: ****
 ```
 
 A parameter can have a default, which makes it optional at the call site.
@@ -385,14 +385,14 @@ def divide(a, b):
     return a / b
 
 print(divide(10, 2))
-## 5.0
+#: 5.0
 try:
     print(divide(10, 0))
 except ZeroDivisionError as error:
     print("Cannot divide by zero:", error)
 print("The program keeps running")
-## Cannot divide by zero: division by zero
-## The program keeps running
+#: Cannot divide by zero: division by zero
+#: The program keeps running
 ```
 
 The `try` block runs until an exception occurs.
@@ -418,8 +418,8 @@ except ValueError as error:
     print("Rejected:", error)
 finally:
     print("Validation done")
-## Rejected: age cannot be negative: -1
-## Validation done
+#: Rejected: age cannot be negative: -1
+#: Validation done
 ```
 
 [Functional Error Handling](12_Functional_Error_Handling.md) presents an

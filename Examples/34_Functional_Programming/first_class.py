@@ -5,8 +5,8 @@ def shout(text: str) -> str:
 # A function is an object you can bind to another name:
 loud = shout
 print(loud("hello"))
-## HELLO!
+#: HELLO!
 # Functions can live in a data structure:
 table = {"upper": str.upper, "title": str.title}
 print(table["title"]("functional python"))
-## Functional Python
+#: Functional Python

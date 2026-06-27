@@ -25,13 +25,13 @@ class Demo(metaclass=Meta):
     pass
 
 display_object(Demo(), dunder=["__new__", "__init__"])
-## === Demo ===
-## [Attributes]
-##   • added_in_new = 42
-##   • patched_in_init = 3.14
-## [Methods]
-##   • __init__(self, /, *args, **kwargs)
-##   • __new__(*args, **kwargs)
+#: === Demo ===
+#: [Attributes]
+#:   • added_in_new = 42
+#:   • patched_in_init = 3.14
+#: [Methods]
+#:   • __init__(self, /, *args, **kwargs)
+#:   • __new__(*args, **kwargs)
 
 print("has Tag base:", Tag in Demo.__bases__)
-## has Tag base: True
+#: has Tag base: True

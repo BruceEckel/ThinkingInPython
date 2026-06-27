@@ -11,11 +11,11 @@ class B(A):
             f"{B.__name__} is final; you cannot subclass it")
 
 print(B.__bases__)
-## (<class '__main__.A'>,)
+#: (<class '__main__.A'>,)
 
 try:
     class C(B):
         pass
 except TypeError as error:
     print(error)
-## B is final; you cannot subclass it
+#: B is final; you cannot subclass it

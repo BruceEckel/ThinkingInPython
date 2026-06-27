@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Validate and update ## output markers in Python example files.
+"""Validate and update #: output markers in Python example files.
 
-Lines starting with ## at column 0 mark expected stdout output.
-Each ## block is compared to the stdout produced by the
-top-level code above it (since the previous ## block):
+Lines starting with #: at column 0 mark expected stdout output.
+Each #: block is compared to the stdout produced by the
+top-level code above it (since the previous #: block):
 
     print("Hello")
-    ## Hello
+    #: Hello
     print("world")
-    ## world
+    #: world
 
 The same markers can be validated and updated directly inside the book's
 Markdown. Each ```python fenced block is treated as one program: its code is
-run and the ## lines inside the block are rewritten in place. A block is run
+run and the #: lines inside the block are rewritten in place. A block is run
 from its extracted chapter directory (build/examples/<chapter>/), so imports of
 sibling files and relative data paths resolve the way the book assumes. Run
 `tools/extract_examples.py --write` first so that tree exists.
@@ -39,8 +39,8 @@ DEFAULT_TREE = ROOT / "build" / "examples"
 NORUN_FILE = ROOT / "tools" / "norun.txt"
 INLINE_NORUN = "# extract: no-run"
 
-# Matches ## or ## <content> at column 0 only.
-MARKER_RE = re.compile(r'^##(?: (.*))?$')
+# Matches #: or #: <content> at column 0 only.
+MARKER_RE = re.compile(r'^#:(?: (.*))?$')
 # A python fenced block, e.g. ```python or ```py.
 FENCE_RE = re.compile(r'^```(\w+)?\s*$')
 # First content line of a block naming its relative path, e.g. "# trace.py".
@@ -69,11 +69,11 @@ def parse_chunks(
 
 
 def decode_output(lines: list[str], indices: list[int]) -> str:
-    """Convert ## lines to the output string they represent."""
+    """Convert #: lines to the output string they represent."""
     parts = []
     for idx in indices:
         m = MARKER_RE.match(lines[idx].rstrip('\n\r'))
-        # group(1) is None for bare ##, '' would be empty content
+        # group(1) is None for bare #:, '' would be empty content
         parts.append(
             m.group(1) if (m and m.group(1) is not None) else ''
         )
@@ -85,20 +85,20 @@ def strip_trailing(output: str) -> str:
 
     Trailing spaces (from ``print(end=" ")`` loops, ``ljust`` padding, and the
     like) are invisible in the rendered book, and they would leave trailing
-    whitespace in the ## marker lines that ruff rejects. So they are ignored
+    whitespace in the #: marker lines that ruff rejects. So they are ignored
     both when markers are written and when they are compared.
     """
     return '\n'.join(line.rstrip() for line in output.split('\n'))
 
 
 def encode_output(output: str) -> list[str]:
-    """Convert an output string to ## lines (trailing whitespace dropped)."""
+    """Convert an output string to #: lines (trailing whitespace dropped)."""
     if not output:
         return []
     # removesuffix strips exactly one trailing newline, preserving
     # any intentional trailing blank lines the program produced.
     content = strip_trailing(output).removesuffix('\n').split('\n')
-    return [f'## {ln}\n' if ln else '##\n' for ln in content]
+    return [f'#: {ln}\n' if ln else '#:\n' for ln in content]
 
 
 def exec_capture(
@@ -125,9 +125,9 @@ def process_block(
     namespace: dict | None = None,
     line_offset: int = 0,
 ) -> tuple[list[str], bool, bool]:
-    """Run one code/output sequence and check or rewrite its ## markers.
+    """Run one code/output sequence and check or rewrite its #: markers.
 
-    ``lines`` is the code (with ## markers); ``filename`` labels it for
+    ``lines`` is the code (with #: markers); ``filename`` labels it for
     compile() and diagnostics; ``line_offset`` shifts reported line numbers so
     they point at the right line of an enclosing file. Returns
     ``(new_lines, ok, changed)``.
@@ -191,7 +191,7 @@ def process_block(
 def process_file(path: Path, *, update: bool) -> bool | None:
     """Check or update one .py file.
 
-    Returns None  - no ## markers found (file skipped)
+    Returns None  - no #: markers found (file skipped)
             True  - all markers match (or file was updated successfully)
             False - mismatch or execution error
     """
@@ -272,9 +272,9 @@ def process_markdown(
     tree: Path = DEFAULT_TREE,
     skips: list[str] | None = None,
 ) -> bool | None:
-    """Check or update the ## markers in a Markdown file's python listings.
+    """Check or update the #: markers in a Markdown file's python listings.
 
-    Returns None  - no python block carries ## markers (file skipped)
+    Returns None  - no python block carries #: markers (file skipped)
             True  - every marked block matches (or was updated)
             False - a mismatch or execution error in some block
     """
@@ -348,7 +348,7 @@ def process_md_block(
     skips: list[str],
     update: bool,
 ) -> BlockResult:
-    """Run one ```python block and check or rewrite its ## markers."""
+    """Run one ```python block and check or rewrite its #: markers."""
     slug = block_slug(block)
     rel = f'{chapter}/{slug}' if slug else None
     text = ''.join(block)
@@ -401,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument(
         '--update', action='store_true',
-        help='rewrite ## lines with actual output (default: check)',
+        help='rewrite #: lines with actual output (default: check)',
     )
     ap.add_argument(
         '--tree', type=Path, default=DEFAULT_TREE,

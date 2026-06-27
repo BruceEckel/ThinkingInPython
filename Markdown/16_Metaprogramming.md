@@ -13,11 +13,11 @@ class Foo:
 Foo.field = 42  # type: ignore
 x = Foo()
 print(x.field)  # type: ignore
-## 42
+#: 42
 
 Foo.method = lambda self: "Hi!"  # type: ignore
 print(x.method())  # type: ignore
-## Hi!
+#: Hi!
 ```
 
 A change to a class affects every object of that class,
@@ -62,13 +62,13 @@ D = type('D', (), {})  # The same construction, by hand
 
 # Both are produced by the metaclass type:
 print(type(C), type(D))
-## <class 'type'> <class 'type'>
+#: <class 'type'> <class 'type'>
 # Both inherit object:
 print(C.__bases__, D.__bases__)
-## (<class 'object'>,) (<class 'object'>,)
+#: (<class 'object'>,) (<class 'object'>,)
 # Both make ordinary instances:
 print(isinstance(C(), C), isinstance(D(), D))
-## True True
+#: True True
 ```
 
 You can add bases, fields, and methods the same way:
@@ -84,14 +84,14 @@ MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
 ml = MyList()
 ml.append("Camembert")
 print(ml)
-## ['Camembert']
+#: ['Camembert']
 print(ml.x)
-## 42
+#: 42
 ml.howdy("John")
 
 print(ml.__class__.__class__)
-## Howdy, John
-## <class 'type'>
+#: Howdy, John
+#: <class 'type'>
 ```
 
 Printing the class of the class produces the metaclass.
@@ -151,20 +151,20 @@ if __name__ == "__main__":
     [create_exec(dsc) for dsc in descriptions]
     exec(initializations, globals())
     Event.run_events()
-## 1.00: Light on [mc]
-## 1.00: Light on [exec]
-## 2.00: Light off [mc]
-## 2.00: Light off [exec]
-## 3.30: Water on [mc]
-## 3.30: Water on [exec]
-## 4.45: Water off [mc]
-## 4.45: Water off [exec]
-## 5.00: Thermostat night [mc]
-## 5.00: Thermostat night [exec]
-## 6.00: Thermostat day [mc]
-## 6.00: Thermostat day [exec]
-## 7.00: Ring bell [mc]
-## 7.00: Ring bell [exec]
+#: 1.00: Light on [mc]
+#: 1.00: Light on [exec]
+#: 2.00: Light off [mc]
+#: 2.00: Light off [exec]
+#: 3.30: Water on [mc]
+#: 3.30: Water on [exec]
+#: 4.45: Water off [mc]
+#: 4.45: Water off [exec]
+#: 5.00: Thermostat night [mc]
+#: 5.00: Thermostat night [exec]
+#: 6.00: Thermostat day [mc]
+#: 6.00: Thermostat day [exec]
+#: 7.00: Ring bell [mc]
+#: 7.00: Ring bell [exec]
 ```
 
 `create_mc()` builds each subclass with `type`.
@@ -202,14 +202,14 @@ class Red(Color):
 class Green(Color):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-## ['Blue', 'Green', 'Red']
+#: ['Blue', 'Green', 'Red']
 
 class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-## ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
+#: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
@@ -227,7 +227,7 @@ class Square(Shape):
 class Circle(Round):
     pass
 print(sorted(c.__name__ for c in Shape.registry))
-## ['Circle', 'Square']
+#: ['Circle', 'Square']
 ```
 
 Each time a subclass is created,
@@ -270,7 +270,7 @@ p = Point()
 p.x = 3
 p.y = 4
 print(p.x, p.y)
-## 3 4
+#: 3 4
 ```
 
 The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__()`.
@@ -302,10 +302,10 @@ class Simple1(metaclass=SimpleMeta1):
 
 simple = Simple1()
 print([m for m in dir(simple) if not m.startswith("__")])
-## ['bar', 'foo', 'uses_metaclass']
+#: ['bar', 'foo', 'uses_metaclass']
 # A method injected by the metaclass:
 print(simple.uses_metaclass())  # type: ignore
-## Yes!
+#: Yes!
 ```
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
@@ -351,16 +351,16 @@ class Demo(metaclass=Meta):
     pass
 
 display_object(Demo(), dunder=["__new__", "__init__"])
-## === Demo ===
-## [Attributes]
-##   • added_in_new = 42
-##   • patched_in_init = 3.14
-## [Methods]
-##   • __init__(self, /, *args, **kwargs)
-##   • __new__(*args, **kwargs)
+#: === Demo ===
+#: [Attributes]
+#:   • added_in_new = 42
+#:   • patched_in_init = 3.14
+#: [Methods]
+#:   • __init__(self, /, *args, **kwargs)
+#:   • __new__(*args, **kwargs)
 
 print("has Tag base:", Tag in Demo.__bases__)
-## has Tag base: True
+#: has Tag base: True
 ```
 
 Override `__new__()` when you must change `name`, `bases`,
@@ -406,7 +406,7 @@ d = BSingleton()
 assert c is d
 assert a is not c
 print(a.__class__.__name__, c.__class__.__name__)
-## ASingleton BSingleton
+#: ASingleton BSingleton
 ```
 
 Each class gets its own entry in the `_instances` dictionary,
@@ -443,17 +443,17 @@ b = Registry()
 assert a is b
 a.items.append("widget")
 display_object(a)
-## === Registry ===
-## [Attributes]
-##   • items = ['widget']
-## [Methods]
-##   None
+#: === Registry ===
+#: [Attributes]
+#:   • items = ['widget']
+#: [Methods]
+#:   None
 display_object(b)
-## === Registry ===
-## [Attributes]
-##   • items = ['widget']
-## [Methods]
-##   None
+#: === Registry ===
+#: [Attributes]
+#:   • items = ['widget']
+#: [Methods]
+#:   None
 ```
 
 The simplest Python singleton of all is a module:
@@ -475,7 +475,7 @@ class B:
 
 b = B()
 print(type(b).__name__)
-## B
+#: B
 
 # The type checker rejects `class C(B): ...`,
 # because it would inherit from a final class.
@@ -504,14 +504,14 @@ class B(A):
             f"{B.__name__} is final; you cannot subclass it")
 
 print(B.__bases__)
-## (<class '__main__.A'>,)
+#: (<class '__main__.A'>,)
 
 try:
     class C(B):
         pass
 except TypeError as error:
     print(error)
-## B is final; you cannot subclass it
+#: B is final; you cannot subclass it
 ```
 
 The check happens at class-creation time, exactly when it must,
@@ -616,13 +616,13 @@ def greet(name: str, loud: bool = False) -> str:
     return text.upper() if loud else text
 
 print(inspect.signature(greet))
-## (name: str, loud: bool = False) -> str
+#: (name: str, loud: bool = False) -> str
 print(inspect.getdoc(greet))
-## Return a greeting.
+#: Return a greeting.
 print(inspect.isfunction(greet), inspect.isclass(greet))
-## True False
+#: True False
 print(list(inspect.signature(greet).parameters))
-## ['name', 'loud']
+#: ['name', 'loud']
 ```
 
 `signature()` recovers the full call interface, annotations and defaults
@@ -724,26 +724,26 @@ class Fraggle:
         return f"h({s})"
 
 display_object(Fraggle)  # Display the class
-## === Fraggle ===
-## [Attributes]
-##   • y: float = 1.14659
-##   • z: str = 'blivet'
-## [Methods]
-##   • f(self) -> None
-##   • g(self, x: int) -> float
-##   • h(self, s: str) -> str
+#: === Fraggle ===
+#: [Attributes]
+#:   • y: float = 1.14659
+#:   • z: str = 'blivet'
+#: [Methods]
+#:   • f(self) -> None
+#:   • g(self, x: int) -> float
+#:   • h(self, s: str) -> str
 
 # Display a specific instance:
 display_object(Fraggle(9, 2.3))
-## === Fraggle ===
-## [Attributes]
-##   • x: int = 9
-##   • y: float = 2.3
-##   • z: str = 'blivet'
-## [Methods]
-##   • f(self) -> None
-##   • g(self, x: int) -> float
-##   • h(self, s: str) -> str
+#: === Fraggle ===
+#: [Attributes]
+#:   • x: int = 9
+#:   • y: float = 2.3
+#:   • z: str = 'blivet'
+#: [Methods]
+#:   • f(self) -> None
+#:   • g(self, x: int) -> float
+#:   • h(self, s: str) -> str
 ```
 
 The two calls show the same class from two angles.

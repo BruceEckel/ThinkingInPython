@@ -10,6 +10,6 @@ class Circle:
 
 c = Circle(10)
 print(c.radius)
-## 10
+#: 10
 print(c.area)  # Properties don't use parentheses
-## 314.159
+#: 314.159

@@ -13,10 +13,10 @@ def quadrant(p: Point) -> str:
             return "Somewhere else"
 
 print(quadrant(Point(0, 0)))
-## Origin
+#: Origin
 print(quadrant(Point(3, 4)))
-## First quadrant
+#: First quadrant
 print(quadrant(Point(-3, 4)))
-## Second quadrant
+#: Second quadrant
 print(quadrant(Point(-1, -1)))
-## Somewhere else
+#: Somewhere else

@@ -36,9 +36,9 @@ def withdraw(amount: int) -> int:
     return balance
 
 print(double(5), double(5))
-## 10 10
+#: 10 10
 print(withdraw(30), withdraw(30))
-## 70 40
+#: 70 40
 ```
 
 `double()` returns the same answer every time.
@@ -56,7 +56,7 @@ def slope(rise: int, run: int) -> float:
 assert slope(10, 2) == 5.0
 assert slope(9, 3) == 3.0
 print("ok")
-## ok
+#: ok
 ```
 
 Every later feature in this chapter is, in part, a way to keep more of your code pure.
@@ -83,11 +83,11 @@ try:
     setattr(p, "x", 5)  # A frozen instance rejects assignment
 except AttributeError as e:
     print(e)
-## cannot assign to field 'x'
+#: cannot assign to field 'x'
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
 print(moved)
-## Point(x=11, y=2)
+#: Point(x=11, y=2)
 ```
 
 The original `p` is untouched.
@@ -111,7 +111,7 @@ def total(values: Sequence[int]) -> int:
     return sum(values)
 
 print(MAX_SIZE, total([1, 2, 3]))
-## 100 6
+#: 100 6
 ```
 
 The annotation is a promise the checker keeps for you, even when the value passed in is a mutable `list`.
@@ -131,13 +131,13 @@ class Point:
 # A frozen value is hashable, so it can key a dict:
 distances = {Point(0, 0): 0.0, Point(3, 4): 5.0}
 print(distances[Point(3, 4)])
-## 5.0
+#: 5.0
 # A list has no stable hash, so it cannot be a key:
 try:
     hash([3, 4])
 except TypeError as e:
     print(e)
-## unhashable type: 'list'
+#: unhashable type: 'list'
 ```
 
 These abilities are why the standard library reaches for tuples and frozen dataclasses whenever a value must be a key, cached, or shared across threads.
@@ -156,11 +156,11 @@ def shout(text: str) -> str:
 # A function is an object you can bind to another name:
 loud = shout
 print(loud("hello"))
-## HELLO!
+#: HELLO!
 # Functions can live in a data structure:
 table = {"upper": str.upper, "title": str.title}
 print(table["title"]("functional python"))
-## Functional Python
+#: Functional Python
 ```
 
 The dictionary holds functions as values, so a lookup yields a function you can immediately call.
@@ -183,7 +183,7 @@ operations: dict[str, Callable[[int, int], int]] = {
     "-": sub,
 }
 print(operations["+"](6, 4), operations["-"](6, 4))
-## 10 2
+#: 10 2
 ```
 
 Supporting a new operator means adding a row to the table. The dispatch code never changes. This is the structure behind dispatch tables and the plugin registries that let a program grow without editing its core.
@@ -202,15 +202,15 @@ numbers = [1, 2, 3, 4, 5]
 # map() applies a function to each element:
 squares = list(map(lambda n: n * n, numbers))
 print(squares)
-## [1, 4, 9, 16, 25]
+#: [1, 4, 9, 16, 25]
 # filter keeps the elements a predicate accepts:
 evens = list(filter(lambda n: n % 2 == 0, numbers))
 print(evens)
-## [2, 4]
+#: [2, 4]
 # sorted takes a function as its key argument:
 words = ["banana", "pie", "kiwi", "watermelon"]
 print(sorted(words, key=len))
-## ['pie', 'kiwi', 'banana', 'watermelon']
+#: ['pie', 'kiwi', 'banana', 'watermelon']
 ```
 
 Each call hands a function to another function and lets it do the looping.
@@ -228,16 +228,16 @@ The examples above already used lambdas as inline arguments, which is where they
 # lambdas.py
 # A lambda is an unnamed function written as one expression:
 print((lambda n: n * n)(6))
-## 36
+#: 36
 # Most often a lambda is an inline argument:
 pairs = [(3, "c"), (1, "a"), (2, "b")]
 pairs.sort(key=lambda pair: pair[0])
 print(pairs)
-## [(1, 'a'), (2, 'b'), (3, 'c')]
+#: [(1, 'a'), (2, 'b'), (3, 'c')]
 # Binding a lambda to a name works, but a def is clearer:
 square = lambda n: n * n
 print(square(5))
-## 25
+#: 25
 ```
 
 A lambda is best when the function is small and used right where it is written.
@@ -265,7 +265,7 @@ def multiplier(factor: int) -> Callable[[int], int]:
 double = multiplier(2)
 triple = multiplier(3)
 print(double(10), triple(10))
-## 20 30
+#: 20 30
 ```
 
 `multiplier()` returns `multiply()`, and each returned function remembers its own `factor`.
@@ -288,7 +288,7 @@ def make_counter() -> Callable[[], int]:
 
 tally = make_counter()
 print(tally(), tally(), tally())
-## 1 2 3
+#: 1 2 3
 ```
 
 Each call to `make_counter()` builds an independent counter with its own hidden `count`. Nothing outside `increment()` can reach that state, so it cannot be corrupted by accident.
@@ -309,7 +309,7 @@ def power(base: int, exponent: int) -> int:
 square = partial(power, exponent=2)
 cube = partial(power, exponent=3)
 print(square(5), cube(5))
-## 25 125
+#: 25 125
 ```
 
 `square` and `cube` are specializations of `power`, each with one argument already supplied.
@@ -341,7 +341,7 @@ def double(n: int) -> int:
 
 increment_then_double = compose(double, increment)
 print(increment_then_double(10))
-## 22
+#: 22
 ```
 
 `compose(double, increment)` returns a function that increments first, then doubles.
@@ -364,17 +364,17 @@ from operator import add
 
 # reduce() folds a sequence down to a single value:
 print(reduce(add, [1, 2, 3, 4]))
-## 10
+#: 10
 # lru_cache remembers results so repeats are free:
 @lru_cache
 def fib(n: int) -> int:
     return n if n < 2 else fib(n - 1) + fib(n - 2)
 print(fib(30))
-## 832040
+#: 832040
 # itertools builds lazy iterators:
 running = itertools.accumulate([1, 2, 3, 4])
 print(list(running))
-## [1, 3, 6, 10]
+#: [1, 3, 6, 10]
 ```
 
 `lru_cache` is only correct because `fib()` is pure: caching a function with side effects would skip the effects.
@@ -399,10 +399,10 @@ def factorial(n: int) -> int:
     return n * factorial(n - 1)
 
 print(factorial(5))
-## 120
+#: 120
 # Python caps how deep recursion can go:
 print(sys.getrecursionlimit())
-## 1000
+#: 1000
 ```
 
 Recursion suits problems that are naturally self-similar, such as walking a tree.
@@ -425,7 +425,7 @@ def deep_sum(items: list[Nested]) -> int:
     return total
 
 print(deep_sum([1, [2, [3, 4], 5], 6]))
-## 21
+#: 21
 ```
 
 `deep_sum()` states what to do with one element and delegates the nesting to itself. An iterative version would have to maintain its own stack to remember where it was, reintroducing by hand the bookkeeping recursion gives you for free.
@@ -449,7 +449,7 @@ def squares() -> Iterator[int]:
 # count() is infinite; islice() pulls only what we ask for:
 first_five = list(islice(squares(), 5))
 print(first_five)
-## [1, 4, 9, 16, 25]
+#: [1, 4, 9, 16, 25]
 ```
 
 `squares()` never finishes on its own, yet the program terminates because `islice()` requests exactly five values.
@@ -479,13 +479,13 @@ def describe(value: object) -> str:
             return "something else"
 
 print(describe(0))
-## zero
+#: zero
 print(describe([42]))
-## one item: 42
+#: one item: 42
 print(describe([1, 2]))
-## two items: 1, 2
+#: two items: 1, 2
 print(describe({"name": "Ada"}))
-## named Ada
+#: named Ada
 ```
 
 Each `case` is a pattern, and a match both tests the shape and pulls out the parts in one step.
@@ -513,8 +513,8 @@ for divisor in (2, 0):
             print("undefined")
         case value:
             print(value)
-## 5.0
-## undefined
+#: 5.0
+#: undefined
 ```
 
 The return type `float | None` tells the caller, and the type checker, that failure is possible.
@@ -538,7 +538,7 @@ def add(a: int, b: int) -> int:
 x = add(2, 3) + add(2, 3)
 y = 5 + 5
 print(x, y, x == y)
-## 10 10 True
+#: 10 10 True
 ```
 
 Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call, evaluate it in any order, or skip a repeat.
@@ -562,10 +562,10 @@ for n in numbers:
     if n % 2 == 0:
         result.append(n * n)
 print(result)
-## [4, 16, 36]
+#: [4, 16, 36]
 # Declarative: state the what, as a comprehension:
 print([n * n for n in numbers if n % 2 == 0])
-## [4, 16, 36]
+#: [4, 16, 36]
 ```
 
 Both produce the same list.
@@ -605,7 +605,7 @@ for _ in range(1000):
     sample = "".join(random.choice(alphabet) for _ in range(size))
     assert decode(encode(sample)) == sample
 print("1000 random cases passed")
-## 1000 random cases passed
+#: 1000 random cases passed
 ```
 
 The law is "decoding an encoding returns the original," and it holds for every input the loop tries. A property test states what must always be true and lets the machine search for a counterexample, instead of you writing one example at a time.

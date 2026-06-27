@@ -9,6 +9,6 @@ with path.open("w") as f:
 with path.open() as f:
     for line in f:
         print(line.strip())
-## one
-## two
+#: one
+#: two
 path.unlink()  # Delete the file

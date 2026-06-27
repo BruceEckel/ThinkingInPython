@@ -12,4 +12,4 @@ def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-## Replacement behavior
+#: Replacement behavior

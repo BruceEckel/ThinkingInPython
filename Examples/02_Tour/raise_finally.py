@@ -10,5 +10,5 @@ except ValueError as error:
     print("Rejected:", error)
 finally:
     print("Validation done")
-## Rejected: age cannot be negative: -1
-## Validation done
+#: Rejected: age cannot be negative: -1
+#: Validation done

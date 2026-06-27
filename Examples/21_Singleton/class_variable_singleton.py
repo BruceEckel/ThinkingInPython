@@ -15,13 +15,13 @@ class SingleTone:
 
 x = SingleTone('sausage')
 print(x.val)
-## sausage
+#: sausage
 y = SingleTone('eggs')
 print(y.val)
-## eggs
+#: eggs
 z = SingleTone('spam')
 print(z.val)
-## spam
+#: spam
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
-## spam True
+#: spam True

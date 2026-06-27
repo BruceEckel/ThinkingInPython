@@ -12,6 +12,6 @@ def tag(name: str) -> Iterator[str]:
 
 with tag("p") as t:
     print(f"  text in {t}")
-## <p>
-##   text in p
-## </p>
+#: <p>
+#:   text in p
+#: </p>

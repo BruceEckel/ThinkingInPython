@@ -14,8 +14,8 @@ def f2(stars: int) -> int:
 
 rating = 6
 print(rating)
-## 6
+#: 6
 print(f1(rating))
-## 11
+#: 11
 print(f2(rating))
-## 30
+#: 30

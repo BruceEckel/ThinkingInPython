@@ -9,6 +9,6 @@ class Point:
 
 p = Point(3, 4)
 print(p)       # Falls back to __repr__
-## Point(3, 4)
+#: Point(3, 4)
 print([p, p])
-## [Point(3, 4), Point(3, 4)]
+#: [Point(3, 4), Point(3, 4)]

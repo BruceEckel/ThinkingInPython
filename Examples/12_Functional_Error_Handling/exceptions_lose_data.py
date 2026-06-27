@@ -11,8 +11,8 @@ try:
     print(results)
 except ValueError as e:
     print(f"Lost everything: {e}")
-## Calculating func_a(0)
-## Calculating func_a(1)
-## Calculating func_a(2)
-## Calculating func_a(3)
-## Lost everything: func_a(3)
+#: Calculating func_a(0)
+#: Calculating func_a(1)
+#: Calculating func_a(2)
+#: Calculating func_a(3)
+#: Lost everything: func_a(3)

@@ -27,4 +27,4 @@ if __name__ == "__main__":
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
-## [1, 2, 999] Bob(name='Ralph')
+#: [1, 2, 999] Bob(name='Ralph')

@@ -7,6 +7,6 @@ def flexible_args_and_returns(arg):
         return True
 
 print(flexible_args_and_returns(1))
-## one
+#: one
 print(flexible_args_and_returns("one"))
-## True
+#: True

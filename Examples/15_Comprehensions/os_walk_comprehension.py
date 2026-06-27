@@ -16,5 +16,5 @@ with tempfile.TemporaryDirectory() as tmp:
 
 for path in sorted(py_paths):  # Sorted for stable output
     print(path)
-## main.py
-## pkg/util.py
+#: main.py
+#: pkg/util.py

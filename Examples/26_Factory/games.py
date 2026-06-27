@@ -60,6 +60,6 @@ class GameEnvironment:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
-## Kitty has encountered a Puzzle
+#: Kitty has encountered a Puzzle
 g2.play()
-## Warrior now battles a NastyWeapon
+#: Warrior now battles a NastyWeapon

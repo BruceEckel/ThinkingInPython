@@ -19,8 +19,6 @@ runs the block, then calls `cm.__exit__()`:
 
 ```python
 # trace_cm.py
-# __enter__ runs at the start of the block and its result is bound by
-# `as`; __exit__ runs at the end.
 from typing import Self
 
 class Trace:
@@ -38,9 +36,9 @@ class Trace:
 if __name__ == "__main__":
     with Trace("A") as t:
         print(f"inside {t.name}")
-## enter A
-## inside A
-## exit A
+#: enter A
+#: inside A
+#: exit A
 ```
 
 `__enter__()` returns the object that `as` binds, often `self`.
@@ -49,12 +47,11 @@ A `with` block reads like a guarantee: whatever happens inside, the exit code ru
 
 ## Cleanup is Guaranteed
 
-The point of a context manager is the guarantee, not the brevity.
-`__exit__()` runs when the block raises, before the exception propagates:
+Although context managers introduce a nice brevity to your code, the point is the guarantee.
+Here, `__exit__()` runs when the block raises, before the exception propagates:
 
 ```python
 # exit_on_error.py
-# __exit__ runs even when the body raises, before it propagates.
 from trace_cm import Trace
 
 try:
@@ -62,12 +59,12 @@ try:
         raise ValueError("boom")
 except ValueError as error:
     print("caught:", error)
-## enter A
-## exit A
-## caught: boom
+#: enter A
+#: exit A
+#: caught: boom
 ```
 
-`exit A` prints before `caught`, so the cleanup happened on the way out.
+`exit A` prints before `caught`, so the cleanup happens on the way out.
 This is the same guarantee a `try`/`finally` gives, packaged as a reusable object.
 
 ## The `__exit__()` Arguments
@@ -78,9 +75,10 @@ When the block finishes normally, all three are `None`.
 When it raises, they hold the exception's type, value, and traceback.
 
 The return value decides what happens to that exception.
-A false value (including `None`) lets it propagate.
-A true value *suppresses* it: the `with` statement swallows the exception and
-execution continues after the block.
+A `False` value (including `None`) lets it propagate.
+A `True` value *suppresses* it.
+The `with` statement swallows the exception and
+execution continues after the block:
 
 ```python
 # suppress_cm.py
@@ -102,8 +100,8 @@ with Ignore(ZeroDivisionError):
     1 / 0
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
-## before
-## survived
+#: before
+#: survived
 ```
 
 The `1 / 0` raises, `__exit__()` returns `True`, and the `with` statement
@@ -133,9 +131,9 @@ def tag(name: str) -> Iterator[str]:
 
 with tag("p") as t:
     print(f"  text in {t}")
-## <p>
-##   text in p
-## </p>
+#: <p>
+#:   text in p
+#: </p>
 ```
 
 This is the same setup-then-teardown shape as a `pytest` fixture that
@@ -165,11 +163,11 @@ def tag(name: str) -> Iterator[str]:
 
 with tag("ul") as outer, tag("li") as inner:
     print(f"  {outer} then {inner}")
-## <ul>
-## <li>
-##   ul then li
-## </li>
-## </ul>
+#: <ul>
+#: <li>
+#:   ul then li
+#: </li>
+#: </ul>
 ```
 
 When the number of managers is not known until run time, `contextlib.ExitStack`
@@ -191,13 +189,13 @@ def tag(name: str) -> Iterator[str]:
 with ExitStack() as stack:
     names = [stack.enter_context(tag(n)) for n in ("a", "b", "c")]
     print("using", names)
-## open a
-## open b
-## open c
-## using ['a', 'b', 'c']
-## close c
-## close b
-## close a
+#: open a
+#: open b
+#: open c
+#: using ['a', 'b', 'c']
+#: close c
+#: close b
+#: close a
 ```
 
 ## The `contextlib` Toolkit

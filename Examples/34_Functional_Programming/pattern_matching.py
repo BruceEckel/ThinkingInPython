@@ -13,10 +13,10 @@ def describe(value: object) -> str:
             return "something else"
 
 print(describe(0))
-## zero
+#: zero
 print(describe([42]))
-## one item: 42
+#: one item: 42
 print(describe([1, 2]))
-## two items: 1, 2
+#: two items: 1, 2
 print(describe({"name": "Ada"}))
-## named Ada
+#: named Ada

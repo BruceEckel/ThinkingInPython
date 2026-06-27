@@ -47,11 +47,11 @@ class Proxy:
 
 p = Proxy()
 p.f()
-## Implementation.f()
+#: Implementation.f()
 p.g()
-## Implementation.g()
+#: Implementation.g()
 p.h()
-## Implementation.h()
+#: Implementation.h()
 ```
 
 It isn't necessary that `Implementation` have the same interface as `Proxy`;
@@ -81,11 +81,11 @@ class Proxy2:
 
 p = Proxy2()
 p.f()
-## Implementation.f()
+#: Implementation.f()
 p.g()
-## Implementation.g()
+#: Implementation.g()
 p.h()
-## Implementation.h()
+#: Implementation.h()
 ```
 
 The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
@@ -134,16 +134,16 @@ def run(b: Any) -> None:
 
 b = StateD(Implementation1())
 run(b)
-## Fiddle de dum, Fiddle de dee,
-## Eric the half a bee.
-## Ho ho ho, tee hee hee,
-## Eric the half a bee.
+#: Fiddle de dum, Fiddle de dee,
+#: Eric the half a bee.
+#: Ho ho ho, tee hee hee,
+#: Eric the half a bee.
 b.change_imp(Implementation2())
 run(b)
-## We're Knights of the Round Table.
-## We dance whene'er we're able.
-## We do routines and chorus scenes
-## We dance whene'er we're able.
+#: We're Knights of the Round Table.
+#: We dance whene'er we're able.
+#: We do routines and chorus scenes
+#: We dance whene'er we're able.
 ```
 
 You can see that the first implementation is used for a bit,
@@ -192,13 +192,13 @@ class CountingProxy:
 
 p = CountingProxy(Implementation())
 p.f()
-## f()
+#: f()
 p.g()
-## g()
+#: g()
 p.f()
-## f()
+#: f()
 print("calls:", p.calls)
-## calls: 3
+#: calls: 3
 ```
 
 Because `__getattr__()` intercepts only the lookups not found directly on the proxy,

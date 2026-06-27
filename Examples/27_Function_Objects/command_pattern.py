@@ -34,6 +34,6 @@ macro.add(Loony())
 macro.add(NewBrain())
 macro.add(Afford())
 macro.run()
-## You're a loony.
-## You might even need a new brain.
-## I couldn't afford a whole new brain.
+#: You're a loony.
+#: You might even need a new brain.
+#: I couldn't afford a whole new brain.

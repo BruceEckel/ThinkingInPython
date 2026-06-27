@@ -8,11 +8,11 @@ MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
 ml = MyList()
 ml.append("Camembert")
 print(ml)
-## ['Camembert']
+#: ['Camembert']
 print(ml.x)
-## 42
+#: 42
 ml.howdy("John")
 
 print(ml.__class__.__class__)
-## Howdy, John
-## <class 'type'>
+#: Howdy, John
+#: <class 'type'>

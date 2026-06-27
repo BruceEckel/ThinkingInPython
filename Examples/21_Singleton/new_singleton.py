@@ -25,19 +25,19 @@ class OnlyOne:
 x = OnlyOne()
 x.val = 'sausage'
 print(x)
-## sausage
+#: sausage
 y = OnlyOne()
 y.val = 'eggs'
 print(y)
-## eggs
+#: eggs
 z = OnlyOne()
 z.val = 'spam'
 print(z)
-## spam
+#: spam
 print(x)
-## spam
+#: spam
 print(y)
-## spam
+#: spam
 # __new__ returns the one instance every time, so all three are it:
 print(x is y is z)
-## True
+#: True

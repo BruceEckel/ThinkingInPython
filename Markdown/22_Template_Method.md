@@ -51,10 +51,10 @@ class MyApp(ApplicationFramework):
         print("Say no more, say no more!")
 
 MyApp()
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
 ```
 
 The base-class constructor starts the engine (`run()`),
@@ -84,10 +84,10 @@ run_framework(
     lambda: print("Nudge, nudge, wink, wink!"),
     lambda: print("Say no more, say no more!"),
 )
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
-## Nudge, nudge, wink, wink!
-## Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
 ```
 
 Both versions hold the algorithm fixed and let the steps vary,
