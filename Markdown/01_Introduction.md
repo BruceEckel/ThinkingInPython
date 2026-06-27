@@ -49,6 +49,33 @@ or managing packages.
 I assume you know about those or are comfortable learning about them,
 starting with the official Python documentation.
 
+## AI Trigger Warning
+
+I started this book in 2008, with the idea of taking the design patterns work I had done in Java and translating it to Python.
+In 2011 I abandoned the project with many of the design patterns still in Java.
+Eventually I even wrote a message confirming I was not going to complete it.
+
+In June of 2026, after having people mention it to me at recent Pycons, I decided to see what the AI Claude could do with it.
+The experience was amazing, and I began adding material from talks, writing, and presentations (mostly at Pycon).
+Claude allowed me to create tooling for the book that I had imagined but never fully realized.
+Every perfectionistic whim was easily realized.
+
+This book never would have happened without the help of Claude, which gave me tremendous support throughout the process.
+That said, it is still my work.
+It is adapted from my existing work, and I've gone over every sentence multiple times, editing, rewriting, and adding.
+The process of creating this book has been deeply satisfying.
+
+I know some people don't like AI.
+Without it, this book wouldn't exist.
+And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore it.
+
+I don't actually know what the future of books is.
+The internet and eBooks have certainly impacted the print book industry.
+But with AI, how many people -- especially in the computer profession -- will keep reading books?
+I hardly do. If I need something I ask AI.
+So my only hope is that this book will be engaging to read,
+and that you will have some of the same satisfaction that I've had while writing it.
+
 ## How the Book Is Organized
 
 Each chapter is largely self-contained, so you can read straight through,
