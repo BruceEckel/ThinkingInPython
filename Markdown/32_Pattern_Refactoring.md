@@ -70,6 +70,33 @@ It registers itself, and `create()` can build it.
 `sum_value()` is an ordinary function:
 it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
+These tests confirm each subclass registers itself, `create()` builds one by name, the per-pound values are right, and `sum_value()` totals weight times value:
+
+```python
+# test_trash.py
+import pytest
+from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
+
+def test_subclasses_self_register() -> None:
+    assert set(Trash.registry) == {
+        "Aluminum", "Paper", "Glass", "Cardboard"}
+
+def test_create_builds_by_name() -> None:
+    t = Trash.create("Aluminum", 2.0)
+    assert isinstance(t, Aluminum)
+    assert t.weight == 2.0
+
+def test_per_pound_values() -> None:
+    assert Aluminum.value == 1.67
+    assert Paper.value == 0.10
+    assert Glass.value == 0.23
+    assert Cardboard.value == 0.79
+
+def test_sum_value_totals_weight_times_value() -> None:
+    items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
+    assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
+```
+
 The trash to process is described in a data file,
 one `Name:weight` line per piece:
 
@@ -118,6 +145,27 @@ def parse(filename: str) -> list[Trash]:
         name, weight = line.split(":")
         items.append(Trash.create(name.strip(), float(weight)))
     return items
+```
+
+A test parses a small file written on the spot, so it does not depend on `trash.dat`:
+
+```python
+# test_parse_trash.py
+from pathlib import Path
+from parse_trash import parse
+
+def test_parse_reads_and_skips_comments(tmp_path: Path) -> None:
+    data = tmp_path / "trash.dat"
+    data.write_text("""\
+# header
+Aluminum:2.0
+
+Glass:3.0
+""")
+    items = parse(str(data))
+    assert [type(t).__name__ for t in items] == ["Aluminum", "Glass"]
+    assert items[0].weight == 2.0
+    assert items[1].weight == 3.0
 ```
 
 ## The First Cut: Checking Every Type
@@ -317,54 +365,6 @@ you do not even need single dispatch.
 Use `singledispatch` only when the behavior genuinely differs by type.
 For operations that belong on the objects and vary by type,
 `singledispatchmethod` does the same thing as a method.
-
-## Testing the Recycler
-
-We want to test the way each subclass registers itself,
-`create()` builds one by name, that the per-pound values are right,
-and that `sum_value()` totals weight times value.
-The parser is tested against a small file written on the spot,
-so it does not depend on `trash.dat`:
-
-```python
-# test_trash.py
-from pathlib import Path
-import pytest
-from parse_trash import parse
-from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
-
-def test_subclasses_self_register() -> None:
-    assert set(Trash.registry) == {
-        "Aluminum", "Paper", "Glass", "Cardboard"}
-
-def test_create_builds_by_name() -> None:
-    t = Trash.create("Aluminum", 2.0)
-    assert isinstance(t, Aluminum)
-    assert t.weight == 2.0
-
-def test_per_pound_values() -> None:
-    assert Aluminum.value == 1.67
-    assert Paper.value == 0.10
-    assert Glass.value == 0.23
-    assert Cardboard.value == 0.79
-
-def test_sum_value_totals_weight_times_value() -> None:
-    items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
-    assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
-
-def test_parse_reads_and_skips_comments(tmp_path: Path) -> None:
-    data = tmp_path / "trash.dat"
-    data.write_text("""\
-# header
-Aluminum:2.0
-
-Glass:3.0
-""")
-    items = parse(str(data))
-    assert [type(t).__name__ for t in items] == ["Aluminum", "Glass"]
-    assert items[0].weight == 2.0
-    assert items[1].weight == 3.0
-```
 
 ## Summary
 

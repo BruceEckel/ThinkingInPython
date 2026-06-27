@@ -239,6 +239,21 @@ No metaclass is involved.
 `__init_subclass__()` is implicitly a class method;
 its first argument is the new subclass.
 
+A test checks that each registry holds only its current leaf classes:
+
+```python
+# test_init_subclass.py
+import init_subclass
+
+def test_leaf_registry_tracks_only_leaves() -> None:
+    leaves = {c.__name__ for c in init_subclass.Color.registry}
+    assert leaves == {"Red", "Green", "PhthaloBlue", "CeruleanBlue"}
+
+def test_independent_hierarchies_have_separate_registries() -> None:
+    shapes = {c.__name__ for c in init_subclass.Shape.registry}
+    assert shapes == {"Square", "Circle"}  # Round is no longer a leaf
+```
+
 ## Learning a Name with `__set_name__()`
 
 Another job that once needed a metaclass is letting an attribute object discover the name it was assigned to.
@@ -275,6 +290,23 @@ print(p.x, p.y)
 
 The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__()`.
 This is metaprogramming, but it needs no metaclass.
+
+A test confirms the descriptor learns its name and stores under it, and returns itself when accessed on the class:
+
+```python
+# test_set_name.py
+import set_name
+
+def test_descriptor_learns_its_name() -> None:
+    p = set_name.Point()
+    p.x = 3
+    p.y = 4
+    assert (p.x, p.y) == (3, 4)
+    assert p.__dict__ == {"_x": 3, "_y": 4}  # Stored under the names
+
+def test_descriptor_on_class_returns_itself() -> None:
+    assert isinstance(set_name.Point.x, set_name.Field)
+```
 
 ## Writing a Metaclass
 
@@ -519,54 +551,13 @@ and `B` itself is built normally because `A` does not forbid subclassing.
 Reach for the runtime version only when `@final` is not enough,
 which is rare.
 
-## When You Still Need a Metaclass
-
-After all this, when is a metaclass the right tool?
-When you need to change the class object itself rather than react to its creation:
-adding methods *to the class* (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
-replacing the namespace mapping with `__prepare__()` so the class body is built in a custom dictionary,
-or enforcing an invariant across an entire family of classes through their shared metaclass.
-These are real but uncommon.
-For everything else, `__init_subclass__()`, `__set_name__()`,
-and class decorators are simpler and easier to read.
-
-One caution: a class has exactly one metaclass.
-Multiple inheritance can accidentally combine classes with different metaclasses,
-which raises a metaclass conflict you then have to resolve.
-That is one more reason to avoid metaclasses unless you truly need them.
-
-## Testing
-
-The registry should hold only the leaf classes,
-the descriptor should learn its name and store under it,
-the `@final` class should carry the final marker,
-and a class made final at runtime should refuse to be subclassed:
+Tests confirm the `@final` marker is set, the runtime-final class refuses subclassing, and its non-final base still allows it:
 
 ```python
-# test_metaprogramming.py
+# test_final.py
 import final
 import final_runtime
-import init_subclass
 import pytest
-import set_name
-
-def test_leaf_registry_tracks_only_leaves() -> None:
-    leaves = {c.__name__ for c in init_subclass.Color.registry}
-    assert leaves == {"Red", "Green", "PhthaloBlue", "CeruleanBlue"}
-
-def test_independent_hierarchies_have_separate_registries() -> None:
-    shapes = {c.__name__ for c in init_subclass.Shape.registry}
-    assert shapes == {"Square", "Circle"}  # Round is no longer a leaf
-
-def test_descriptor_learns_its_name() -> None:
-    p = set_name.Point()
-    p.x = 3
-    p.y = 4
-    assert (p.x, p.y) == (3, 4)
-    assert p.__dict__ == {"_x": 3, "_y": 4}  # Stored under the names
-
-def test_descriptor_on_class_returns_itself() -> None:
-    assert isinstance(set_name.Point.x, set_name.Field)
 
 def test_final_decorator_marks_class() -> None:
     # @final sets __final__ at runtime; type checkers read it
@@ -583,6 +574,22 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
     assert issubclass(Ok, final_runtime.A)
 ```
+
+## When You Still Need a Metaclass
+
+After all this, when is a metaclass the right tool?
+When you need to change the class object itself rather than react to its creation:
+adding methods *to the class* (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
+replacing the namespace mapping with `__prepare__()` so the class body is built in a custom dictionary,
+or enforcing an invariant across an entire family of classes through their shared metaclass.
+These are real but uncommon.
+For everything else, `__init_subclass__()`, `__set_name__()`,
+and class decorators are simpler and easier to read.
+
+One caution: a class has exactly one metaclass.
+Multiple inheritance can accidentally combine classes with different metaclasses,
+which raises a metaclass conflict you then have to resolve.
+That is one more reason to avoid metaclasses unless you truly need them.
 
 ## The 'inspect' Module
 

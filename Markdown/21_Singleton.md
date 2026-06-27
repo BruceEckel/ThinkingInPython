@@ -46,6 +46,20 @@ For the large majority of "I need one shared X" cases,
 the answer is a module with module-level state or functions.
 This is the idiomatic Python singleton, and it is worth trying first.
 
+A test confirms the imported `settings` is `config`'s own dict:
+
+```python
+# test_module.py
+import config
+import shared_config
+
+def test_module_is_singleton() -> None:
+    # shared_config did `from config import settings` and wrote to it,
+    # mutating config's own dict.
+    assert shared_config.settings is config.settings
+    assert config.settings["theme"] == "dark"
+```
+
 ## When You Want a Class: Cache the Instance
 
 Sometimes you do want a class,
@@ -77,6 +91,16 @@ print(b.data)
 
 If you need the class itself to hand back one instance from its own constructor,
 override `__new__()`, shown below.
+
+A test confirms the cached factory returns the one instance:
+
+```python
+# test_cache.py
+import cache_singleton
+
+def test_cache_factory_returns_same_instance() -> None:
+    assert cache_singleton.settings() is cache_singleton.settings()
+```
 
 ## The Classic Implementations
 
@@ -189,6 +213,16 @@ print(x is y is z)
 #: True
 ```
 
+A test confirms `__new__()` hands back the one instance:
+
+```python
+# test_new.py
+import new_singleton
+
+def test_new_returns_same_instance() -> None:
+    assert new_singleton.OnlyOne() is new_singleton.OnlyOne()
+```
+
 ### Borg: Share State Instead of Identity
 
 Alex Martelli [observed](http://www.aleax.it/Python/5ep.html) that what you usually want is not one *object* but one shared set of *state*.
@@ -240,6 +274,20 @@ but where the singleton wires one-instance behavior into each class,
 It is a genuinely Pythonic idiom when "shared state,
 many handles" is what you actually want.
 
+A test confirms the objects differ but share one set of state:
+
+```python
+# test_borg.py
+import borg_singleton
+
+def test_borg_shares_state_but_not_identity() -> None:
+    x = borg_singleton.Singleton("first")
+    y = borg_singleton.Singleton("second")
+    assert x is not y      # Distinct objects...
+    assert x.val == y.val  # ...sharing one set of state
+    assert x.val == "second"
+```
+
 A simpler version relies on the fact that a class variable has a single shared value:
 
 ```python
@@ -270,6 +318,19 @@ print(z.val)
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
+```
+
+A test confirms every construction returns the one instance:
+
+```python
+# test_class_variable.py
+import class_variable_singleton
+
+def test_class_variable_returns_same_instance() -> None:
+    a = class_variable_singleton.SingleTone("a")
+    b = class_variable_singleton.SingleTone("b")
+    assert a is b
+    assert a.val == "b"  # Last write wins on the shared instance
 ```
 
 ### Singleton Class Decorator
@@ -319,6 +380,16 @@ But the name no longer points at a class.
 The `__new__()` and metaclass versions below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
+A test confirms the decorated class returns its cached instance:
+
+```python
+# test_decorator.py
+import singleton
+
+def test_decorator_returns_same_instance() -> None:
+    assert singleton.Foo() is singleton.Foo()
+```
+
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
@@ -366,54 +437,15 @@ print(x is y is z)
 #: True
 ```
 
-## Verifying the Invariant
-
-Each version above promises the same thing:
-you get back one instance (or, for *Borg*, one shared set of state).
-That promise is a single assertion per technique.
+A test confirms the metaclass returns the one instance:
 
 ```python
-# test_singletons.py
-import borg_singleton
-import cache_singleton
-import class_variable_singleton
-import config
-import new_singleton
-import shared_config
-import singleton
+# test_metaclass.py
 import singleton_metaclass
-
-def test_module_is_singleton() -> None:
-    # shared_config did `from config import settings` and wrote to it,
-    # mutating config's own dict.
-    assert shared_config.settings is config.settings
-    assert config.settings["theme"] == "dark"
-
-def test_cache_factory_returns_same_instance() -> None:
-    assert cache_singleton.settings() is cache_singleton.settings()
-
-def test_new_returns_same_instance() -> None:
-    assert new_singleton.OnlyOne() is new_singleton.OnlyOne()
-
-def test_class_variable_returns_same_instance() -> None:
-    a = class_variable_singleton.SingleTone("a")
-    b = class_variable_singleton.SingleTone("b")
-    assert a is b
-    assert a.val == "b"  # Last write wins on the shared instance
-
-def test_decorator_returns_same_instance() -> None:
-    assert singleton.Foo() is singleton.Foo()
 
 def test_metaclass_returns_same_instance() -> None:
     assert (singleton_metaclass.Bar("x")
             is singleton_metaclass.Bar("y"))
-
-def test_borg_shares_state_but_not_identity() -> None:
-    x = borg_singleton.Singleton("first")
-    y = borg_singleton.Singleton("second")
-    assert x is not y      # Distinct objects...
-    assert x.val == y.val  # ...sharing one set of state
-    assert x.val == "second"
 ```
 
 ## Which Should You Use?

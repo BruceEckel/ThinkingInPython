@@ -125,7 +125,7 @@ print(a.g())   # Forwarded to the adaptee unchanged
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
-A test pins down both halves of that behavior:
+A test verifies both halves of that behavior:
 the new `f()` combines the adaptee's methods,
 and unoverridden calls forward straight through to the wrapped object:
 

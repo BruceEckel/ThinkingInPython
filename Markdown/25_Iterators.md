@@ -84,6 +84,32 @@ or `itertools.count()`, produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
 
+These tests collect each iterator into a list and compare, covering the sequences and their empty edge cases, confirming a custom iterable can be re-iterated, and that `total()` works on every source:
+
+```python
+# test_iterators.py
+from iterators import Countdown, fibonacci, total
+
+def test_fibonacci_sequence() -> None:
+    assert list(fibonacci(8)) == [0, 1, 1, 2, 3, 5, 8, 13]
+    assert list(fibonacci(0)) == []
+    assert list(fibonacci(1)) == [0]
+
+def test_countdown_sequence() -> None:
+    assert list(Countdown(5)) == [5, 4, 3, 2, 1]
+    assert list(Countdown(0)) == []
+
+def test_countdown_is_reiterable() -> None:
+    c = Countdown(3)
+    assert list(c) == [3, 2, 1]
+    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
+
+def test_total_over_any_iterable() -> None:
+    assert total([1, 2, 3, 4]) == 10
+    assert total(fibonacci(8)) == 33
+    assert total(Countdown(5)) == 15
+```
+
 ## Reusable Algorithms
 
 Generic iterator algorithms ship in the standard library's `itertools` module:
@@ -149,39 +175,13 @@ use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because they all speak the same protocol.
 
-## Testing Iterators
-
-Iterators are easy to test by collecting them into a list and comparing.
-Worth covering: the generated sequences, the empty edge cases,
-that a custom iterable can be iterated more than once,
-that a function written against `Iterable` works on every source,
-and that the type-checking wrappers raise on a mismatch.
+Both wrappers should pass matching items and raise on a mismatch:
 
 ```python
-# test_iterators.py
+# test_typed.py
 import pytest
-from iterators import Countdown, fibonacci, total
 from typed_generator import typed
 from typed_iterator import TypedIterator
-
-def test_fibonacci_sequence() -> None:
-    assert list(fibonacci(8)) == [0, 1, 1, 2, 3, 5, 8, 13]
-    assert list(fibonacci(0)) == []
-    assert list(fibonacci(1)) == [0]
-
-def test_countdown_sequence() -> None:
-    assert list(Countdown(5)) == [5, 4, 3, 2, 1]
-    assert list(Countdown(0)) == []
-
-def test_countdown_is_reiterable() -> None:
-    c = Countdown(3)
-    assert list(c) == [3, 2, 1]
-    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
-
-def test_total_over_any_iterable() -> None:
-    assert total([1, 2, 3, 4]) == 10
-    assert total(fibonacci(8)) == 33
-    assert total(Countdown(5)) == 15
 
 def test_typed_generator_passes_and_rejects() -> None:
     assert list(typed([1, 2, 3], int)) == [1, 2, 3]

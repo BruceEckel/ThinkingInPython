@@ -169,7 +169,6 @@ class Observable:
 A bare `Observable` does nothing on its own:
 you must subclass it and call `set_changed()`,
 or `notify_observers()` is a no-op.
-The example below shows exactly that, and a test pins down the result.
 
 ### A Visual Example of Observers
 

@@ -3,15 +3,12 @@ If you run out of tokens during a chapter, resume when it resets.
 Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
 DO make essential changes, and put everything else in the REVIEW files.
 
-When default arguments are introduced do we talk about using an immutable default e.g.:
-dunder: Sequence[str] = ()
-Should immutability in general be discussed as a topic somewhere? (Probably)
-
-Look for duplication on Singleton between Metaprogramming and Singleton chapters.
-
 Review chapter XX. Make obious changes and put everything I need to look at first in REVIEW_XX.md
 
-Distribute tests so that the test for an example is in the same section as that example, rather than clumping them at the end of the chapter.
+When default arguments are introduced do we talk about using an immutable default e.g.:
+dunder: Sequence[str] = ()
+
+Look for duplication on Singleton between Metaprogramming and Singleton chapters.
 
 Run 'make prose' on each chapter
 
@@ -23,6 +20,7 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
 
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
+-
 - Check order of examples in 30_Pattern_Refactoring.md
 
 - "have to", "could" -> "can"
@@ -33,6 +31,7 @@ in 04, the statement: The same `*` and `**` *unpack* a sequence or dictionary ba
 - Consider more specific links, to specific subsections rather than whole chapters.
 
 - Check exercises. Potentially create new exercises.
+- Explain exercises in intro
 
 - active voice
 

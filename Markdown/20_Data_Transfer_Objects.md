@@ -29,6 +29,21 @@ You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in-place, wherever you need it,
 usually makes more sense.
 
+A test confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
+
+```python
+# test_messenger_idiom.py
+from typing import Any
+from messenger_idiom import Messenger
+
+def test_messenger_exposes_kwargs_as_attributes() -> None:
+    m: Any = Messenger(info="hi", count=3)
+    assert m.info == "hi"
+    assert m.count == 3
+    m.added = 9  # Attributes can be added afterward, too
+    assert m.added == 9
+```
+
 ## The Standard-Library Versions
 
 You rarely need even those few lines, because Python already ships this idiom.
@@ -78,6 +93,23 @@ Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works under
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](10_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
+Tests confirm the `@dataclass` carries fields and value equality, and the `NamedTuple` is a named record you can still treat as a tuple:
+
+```python
+# test_messenger_modern.py
+from messenger_modern import Color, Point
+
+def test_dataclass_point_has_fields_and_equality() -> None:
+    assert Point(1.0, 2.0).x == 1.0
+    assert Point(1.0, 2.0) == Point(1.0, 2.0)
+    assert Point(1.0, 2.0) != Point(1.0, 3.0)
+
+def test_namedtuple_color_is_a_named_record() -> None:
+    c = Color(255, 0, 0)
+    assert c.r == 255
+    assert (c.r, c.g, c.b) == tuple(c)
+```
+
 `display_object()` makes the "bag of named attributes" concrete.
 A `SimpleNamespace` keeps each keyword argument as an attribute:
 
@@ -96,33 +128,4 @@ display_object(m)
 #:   • more = 11
 #: [Methods]
 #:   None
-```
-
-A small test confirms each form behaves as a record:
-the hand-rolled `Messenger` turns keyword arguments into attributes (and takes new ones later),
-the `@dataclass` carries fields and value equality,
-and the `NamedTuple` is a named record you can still treat as a tuple:
-
-```python
-# test_messenger.py
-from typing import Any
-from messenger_idiom import Messenger
-from messenger_modern import Color, Point
-
-def test_messenger_exposes_kwargs_as_attributes() -> None:
-    m: Any = Messenger(info="hi", count=3)
-    assert m.info == "hi"
-    assert m.count == 3
-    m.added = 9  # Attributes can be added afterward, too
-    assert m.added == 9
-
-def test_dataclass_point_has_fields_and_equality() -> None:
-    assert Point(1.0, 2.0).x == 1.0
-    assert Point(1.0, 2.0) == Point(1.0, 2.0)
-    assert Point(1.0, 2.0) != Point(1.0, 3.0)
-
-def test_namedtuple_color_is_a_named_record() -> None:
-    c = Color(255, 0, 0)
-    assert c.r == 255
-    assert (c.r, c.g, c.b) == tuple(c)
 ```
