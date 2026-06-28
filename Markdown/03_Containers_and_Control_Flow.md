@@ -98,7 +98,20 @@ print(low, high)
 
 Tuples are often heterogeneous, with each position a different type:
 
-[[Example here]]
+```python
+# heterogeneous.py
+
+person = ("Alice", 30, 1.65)  # Name, age, height
+name, age, height = person
+print(name, age, height)
+#: Alice 30 1.65
+print(person[0], type(person[0]).__name__)
+#: Alice str
+print(person[1], type(person[1]).__name__)
+#: 30 int
+print(person[2], type(person[2]).__name__)
+#: 1.65 float
+```
 
 Tuples are fixed-length immutable records where each position has a distinct meaning.
 
@@ -210,12 +223,12 @@ print(config["level"])
 
 # Mutating any of them is an error:
 try:
-    primes.add(11)
+    primes.add(11)  # type: ignore
 except AttributeError as e:
     print(type(e).__name__)
 #: AttributeError
 try:
-    config["level"] = 9
+    config["level"] = 9  # type: ignore
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError

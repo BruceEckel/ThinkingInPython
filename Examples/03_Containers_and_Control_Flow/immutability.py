@@ -22,12 +22,12 @@ print(config["level"])
 
 # Mutating any of them is an error:
 try:
-    primes.add(11)
+    primes.add(11)  # type: ignore
 except AttributeError as e:
     print(type(e).__name__)
 #: AttributeError
 try:
-    config["level"] = 9
+    config["level"] = 9  # type: ignore
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
