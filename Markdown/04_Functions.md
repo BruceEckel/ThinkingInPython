@@ -135,7 +135,7 @@ and `**` unpacks a dictionary into keyword arguments.
 
 ```python
 # unpacking.py
-# Turn a sequence into positional arguments with *.
+
 def f(a, b, c):
     print(a, b, c)
 
@@ -149,8 +149,6 @@ d = {"a": 10, "b": 20, "c": 30}
 f(**d)
 #: 10 20 30
 
-# Collecting and unpacking are inverses, so you can collect
-# arguments in one function and forward them unchanged:
 def report(label, *values, **options):
     print(label, values, options)
 
@@ -162,7 +160,7 @@ report("point", *nums, **opts)
 
 Because collecting and unpacking are inverses,
 a function can gather arguments with `*args` and `**kwargs`,
-then pass them on unchanged.
+then pass them on unchanged, as seen in `report()`.
 This is the standard way to write a wrapper around another function.
 
 ## Positional-Only and Keyword-Only Parameters
