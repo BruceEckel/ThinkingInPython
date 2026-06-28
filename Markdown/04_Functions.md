@@ -26,7 +26,7 @@ print(a_function("yes"))
 
 Here the function signature only specifies the name of the function and the argument identifiers,
 but no argument types or return types (these are covered in [Static Typing](07_Static_Typing.md#type-hints)).
-Python is dynamically typed, so it enforces type constraints at runtime rather than compile time.
+Python is dynamically typed, so type errors surface at runtime rather than at compile time.
 This means that different types can be both passed to and returned from the same function:
 
 ```python
@@ -47,14 +47,14 @@ print(flexible_args_and_returns("one"))
 Here, the same function applies the '`+`' operator to integers and strings:
 
 ```python
-# sum.py
+# add.py
 
 def add(arg1, arg2):
     return arg1 + arg2
 
 print(add(42, 47))
 #: 89
-print(add('spam ', "eggs"))
+print(add("spam ", "eggs"))
 #: spam eggs
 ```
 
@@ -80,9 +80,8 @@ print(connect(port=80, host="web.example.com"))  # Any order by name
 #: web.example.com:80 (timeout 30s)
 ```
 
-A default value is evaluated once, when the function is defined,
-not on each call.
-A mutable default is therefore shared across calls:
+A default value is evaluated once, when the function is defined.
+This means a mutable default is shared across calls:
 
 ```python
 # mutable_default.py
@@ -108,8 +107,7 @@ print(good_append(2))
 #: [2]
 ```
 
-Thus a mutable default persists between calls: it is created once,
-at definition time, and lives on the function, not recreated on each call.
+Thus a mutable default persists, and lives on the function, not recreated on each call.
 This behavior is a common confusion for newcomers to the language.
 
 ## Variable Argument Lists
@@ -205,5 +203,6 @@ print(square(9))
 #: 81
 ```
 
-Compared to other languages, Python's lambdas are constrained because they comprise a single expression.
+Compared to other languages,
+Python's lambdas are constrained because they are limited to a single expression.
 For anything more complicated you are expected to write a separate function.
