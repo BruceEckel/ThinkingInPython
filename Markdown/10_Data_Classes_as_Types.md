@@ -120,13 +120,19 @@ and `__eq__()` from the fields you declare:
 
 ```python
 # messenger.py
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
 @dataclass
 class Messenger:
     name: str
     number: int
     depth: float = 0.0  # Default value
+```
+
+```python
+# demo_messenger.py
+from dataclasses import replace
+from messenger import Messenger
 
 m = Messenger("foo", 12, 3.14)
 print(m)
@@ -166,13 +172,6 @@ from display import display_object
 from messenger import Messenger
 
 display_object(Messenger("foo", 12, 3.14))
-#: Messenger(name='foo', number=12, depth=3.14)
-#: foo 12 3.14
-#: True
-#: False
-#: Messenger(name='foo', number=12, depth=3.14)
-#: Messenger(name='foo', number=12, depth=9.9)
-#: Messenger(name='bar', number=12, depth=3.14)
 #: === Messenger ===
 #: [Attributes]
 #:   • depth: float = 3.14
