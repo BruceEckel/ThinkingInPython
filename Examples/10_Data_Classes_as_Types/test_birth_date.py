@@ -16,7 +16,7 @@ def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
 
-@pytest.mark.parametrize("bad", [0, 13])
+@pytest.mark.parametrize("bad", [0, 13, -1])
 def test_bad_month_number(bad: int) -> None:
     with pytest.raises(TypeFailure):
         Month.of(bad)

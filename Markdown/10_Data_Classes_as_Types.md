@@ -183,7 +183,6 @@ display_object(Messenger("foo", 12, 3.14))
 
 The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders,
 which are not shown by the default `display_object()`.
-What remains is the record itself: three named, typed fields.
 
 ## Immutability
 
@@ -246,8 +245,7 @@ def f2(s: Stars) -> Stars:
     return Stars(s.number * 5)
 
 if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
+    print(Stars(4))
     print(f1(Stars(2)))
     print(f2(Stars(2)))
 #: Stars(number=4)
@@ -452,8 +450,7 @@ if __name__ == "__main__":
 ```
 
 The `Enum` creates the constrained set of `Month`s.
-You cannot construct a thirteenth month,
-because there is no such value to construct.
+There cannot be a thirteenth month because that value doesn't exist.
 
 ```python
 # test_birth_date.py
@@ -474,7 +471,7 @@ def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
 
-@pytest.mark.parametrize("bad", [0, 13])
+@pytest.mark.parametrize("bad", [0, 13, -1])
 def test_bad_month_number(bad: int) -> None:
     with pytest.raises(TypeFailure):
         Month.of(bad)
@@ -591,7 +588,7 @@ A data class has no built-in JSON support.
 Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is not JSON serializable`.
 
 `asdict()` turns the object into a nested dictionary,
-and `json.dumps()` already knows how to serialize dictionaries.
+and `json.dumps()` knows how to serialize dictionaries.
 Decoding goes the other way: parse the JSON into a dictionary,
 then hand its parts to the constructors.
 
