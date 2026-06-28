@@ -1,5 +1,5 @@
 # unpacking.py
-# Turn a sequence into positional arguments with *.
+
 def f(a, b, c):
     print(a, b, c)
 
@@ -13,8 +13,6 @@ d = {"a": 10, "b": 20, "c": 30}
 f(**d)
 #: 10 20 30
 
-# Collecting and unpacking are inverses, so you can collect
-# arguments in one function and forward them unchanged:
 def report(label, *values, **options):
     print(label, values, options)
 

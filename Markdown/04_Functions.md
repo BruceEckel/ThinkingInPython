@@ -110,6 +110,30 @@ print(good_append(2))
 Thus a mutable default persists, and lives on the function, not recreated on each call.
 This behavior is a common confusion for newcomers to the language.
 
+The `None` sentinel is only needed when the function modifies the argument.
+If the parameter is only read, for example iterated over,
+use an immutable default such as an empty tuple.
+It is still shared across calls, but sharing is harmless because it cannot change:
+
+```python
+# immutable_default.py
+
+def show(items=()):  # An empty tuple is safe: it can't be mutated
+    for item in items:
+        print(item)
+    print(f"({len(items)} items)")
+
+show()
+#: (0 items)
+show(["a", "b"])
+#: a
+#: b
+#: (2 items)
+```
+
+With the type hints from [Static Typing](07_Static_Typing.md#type-hints),
+such a parameter reads `items: Sequence[str] = ()`.
+
 ## Variable Argument Lists
 
 A `*args` parameter collects extra positional arguments into a tuple,
