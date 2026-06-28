@@ -27,14 +27,6 @@ The mechanical health of the book is solid. As of this review:
 
 1. **Exercises are present in some chapters and absent in others, with no stated rule.** Chapters with an Exercises section: Testing, Data Classes, Pattern Matching, Functional Error Handling, Decorators, Singleton, Application Frameworks, State Machines, Iterators, Factory, Function Objects, Changing the Interface, Observer, Visitor, Pattern Refactoring. Chapters with none: the whole Foundations run `02`-`08`, plus Comprehensions, Metaprogramming (has "Further Reading" instead), Rethinking Objects (has "Guidelines"), The Pattern Concept, Messenger, Fronting, Multiple Dispatching, and Simulation. Decide the policy: exercises everywhere, exercises only in the teaching chapters, or none. This is in your NOTES already ("Check exercises. Potentially create new exercises.").
 
-## Medium priority (structure and balance)
-
-3. **Chapter length is lopsided, and it is worth a deliberate look.** Largest: Simulation (799), State Machines (698), Data Classes as Types (652), Rethinking Objects (545), Metaprogramming (544). Smallest: Messenger (101), Application Frameworks (119), Modules and Packages (164), Comprehensions (169). The big chapters are large mostly because of the GUI examples, which is defensible. The small ones are complete idioms. No change is required, but if you want even pacing, Simulation and State Machines are the candidates to split or tighten, and Messenger could fold into a neighbor.
-
-4. **Heading-level inconsistency for Exercises.** Observer uses `### Exercises` (an h3 under "A Visual Example of Observers"); every other chapter uses `## Exercises` (h2). Promote Observer's to h2 so the section sits at the chapter level, not inside the last subsection.
-
-5. **Rethinking Objects sits just before the Patterns boundary.** The build starts Part III (Patterns) at The Pattern Concept (`17`), so Rethinking Objects (`16`) is the last chapter of Part II (Techniques). It is arguably the real pivot from "language" to "patterns"; consider whether it should open Part III instead, which is a one-line change to the `PARTS` map in `build_site.py`. Editorial only.
-
 ## Low priority (polish)
 
 6. **A couple of pattern chapters break the sibling shape.** Multiple Dispatching (`28`) has no "Pythonic ..." reframe heading (it uses "One Type or Many") and no Exercises, where its neighbors have both. Messenger (`18`) is a single idiom with no section structure. Both read fine; flagged only so the choice is deliberate.

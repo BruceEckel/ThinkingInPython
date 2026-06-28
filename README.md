@@ -38,7 +38,7 @@ Delete the review file and mark a cell `X` when that item is done.
 |---------|:------:|:--------:|
 | 01_Introduction.md                  | | |
 | 02_Tour.md                          |X|X|
-| 03_Containers_and_Control_Flow.md   |X| |
+| 03_Containers_and_Control_Flow.md   |X|X|
 | 04_Functions.md                     |X| |
 | 05_Modules_and_Packages.md          |X| |
 | 06_Classes.md                       |X| |

@@ -1,6 +1,6 @@
 # list.py
 
-odds = [ 1, 3, 5, 7, 9, 11 ]
+odds = [1, 3, 5, 7, 9, 11]
 print(odds)
 #: [1, 3, 5, 7, 9, 11]
 odds.append(13)

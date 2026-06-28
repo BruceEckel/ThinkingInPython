@@ -12,7 +12,7 @@ Python's `for` automatically uses an iterator that works through a sequence:
 ```python
 # list.py
 
-odds = [ 1, 3, 5, 7, 9, 11 ]
+odds = [1, 3, 5, 7, 9, 11]
 print(odds)
 #: [1, 3, 5, 7, 9, 11]
 odds.append(13)
@@ -30,7 +30,7 @@ for x in odds:
 The first line creates a `list`.
 `append()` adds new elements to a `list`;
 the `list` automatically resizes itself.
-The `for` statement creates an iterator `x` which takes on each value in the `list`.
+The `for` statement iterates through `odds`, so `x` takes on each value in the `list`.
 
 There are no type declarations in this example;
 Python infers types from the way you use them.
@@ -176,7 +176,7 @@ print(a.isdisjoint({8, 9}))  # No operator form
 
 ## Control Flow
 
-If you add `elif` to an `if` expression, you can chain multiple tests together.
+If you add `elif` to an `if` statement, you can chain multiple tests together.
 
 ```python
 # control_flow.py
@@ -200,7 +200,7 @@ print(grade)
 #: pass
 ```
 
-Python's comparison operators chain the way they do in mathematics:
+Python's comparison operators chain the way they do in mathematics.
 
 A `while` loop runs until its condition is false.
 `break` leaves the loop and `continue` skips to the next iteration:
@@ -280,7 +280,7 @@ The [Pattern Matching](11_Pattern_Matching.md) chapter covers `match` in detail,
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.
-Like C++ and Java, an exception propagates up the call stack until they find a handler.
+Like C++ and Java, an exception propagates up the call stack until it finds a handler.
 In Python, handlers are indicated by `except` followed by the exception type it handles:
 
 ```python
