@@ -1,3 +1,7 @@
+Markdown\03_Containers_and_Control_Flow.md should be split into 03_Containers.md and 04_Control_Flow.md,
+shifting the current 04 forward to fit in the new chapter.
+I'm not so concerned about chapter length or balancing chapter sizes; this just seems clearer.
+
 On website: Chapter TOC floating on the left or below the "contents" link.
 
 Before bed: In a loop, one chapter at a time, review chapters 02 through 08.

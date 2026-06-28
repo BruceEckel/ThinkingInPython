@@ -58,12 +58,12 @@ print(add("spam ", "eggs"))
 #: spam eggs
 ```
 
-The only constraints on an object that is passed into a function are that the function can apply its operations to that object.
+The only constraint on a function argument is that the function can apply its operations to that object.
 
 ## Default and Keyword Arguments
 
-Parameters can have defaults,
-and callers can pass arguments by name in any order.
+Parameters can have default values.
+Keyword arguments let callers pass arguments by name, in any order.
 Keyword arguments make a call self-documenting:
 
 ```python
@@ -111,8 +111,7 @@ Thus a mutable default persists, and lives on the function, not recreated on eac
 This behavior is a common confusion for newcomers to the language.
 
 The `None` sentinel is only needed when the function modifies the argument.
-If the parameter is only read, for example iterated over,
-use an immutable default such as an empty tuple.
+If the parameter is read only, use an immutable default such as an empty tuple.
 It is still shared across calls, but sharing is harmless because it cannot change:
 
 ```python

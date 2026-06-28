@@ -96,8 +96,11 @@ print(low, high)
 #: 1 9
 ```
 
-Tuples are often heterogeneous, with each position a different type.
-They are fixed-length records where each position has a distinct meaning.
+Tuples are often heterogeneous, with each position a different type:
+
+[[Example here]]
+
+Tuples are fixed-length immutable records where each position has a distinct meaning.
 
 ## Dictionaries
 
@@ -173,6 +176,61 @@ print(a.union(b, [6, 7]))  # Several args
 print(a.isdisjoint({8, 9}))  # No operator form
 #: True
 ```
+
+## Immutability
+
+Each mutable container has an immutable counterpart.
+A `tuple` is an immutable `list`.
+A `frozenset` is an immutable `set`.
+A `dict` has no frozen form until version 3.15 of the language,
+but `MappingProxyType` from the `types` module wraps one in a read-only view:
+
+```python
+# immutability.py
+from types import MappingProxyType
+
+# A tuple is an immutable list, and a frozenset is an immutable set:
+nums = (1, 2, 3)
+primes = frozenset({2, 3, 5, 7})
+print(5 in primes)
+#: True
+
+# Immutable containers are hashable, so they can be set members
+# or dictionary keys. A plain list or set cannot:
+groups = {frozenset({1, 2}), frozenset({3, 4})}
+print(frozenset({1, 2}) in groups)
+#: True
+
+# A dict has no frozen form, but MappingProxyType wraps one
+# in a read-only view:
+settings = {"debug": False, "level": 3}
+config = MappingProxyType(settings)
+print(config["level"])
+#: 3
+
+# Mutating any of them is an error:
+try:
+    primes.add(11)
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
+try:
+    config["level"] = 9
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+Reach for the immutable form whenever a container should not change after you build it.
+The benefits compound.
+An immutable container cannot be modified by accident, by you or by code you pass it to,
+so you never need a defensive copy before sharing it.
+It is safe to use as a default argument, unlike the mutable default shown in [Functions](04_Functions.md#default-and-keyword-arguments).
+Because it cannot change, it is hashable, so it can serve as a dictionary key or a set member.
+This is also why dictionary keys must be immutable.
+A `MappingProxyType` is the one exception to watch:
+it blocks writes through the view, but it is a window onto the original `dict`,
+so changes to that underlying `dict` still show through.
 
 ## Control Flow
 
