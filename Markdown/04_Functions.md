@@ -127,8 +127,43 @@ report("point", 3, 4, color="red", size=10)   # Extras land in options
 #: point (3, 4) {'color': 'red', 'size': 10}
 ```
 
-The same `*` and `**` *unpack* a sequence or dictionary back into arguments at a call site,
-the mirror image of collecting them.
+## Unpacking Arguments
+
+`*` and `**` also work in the other direction.
+At a call site, `*` unpacks a sequence into separate positional arguments,
+and `**` unpacks a dictionary into keyword arguments.
+
+```python
+# unpacking.py
+# Turn a sequence into positional arguments with *.
+def f(a, b, c):
+    print(a, b, c)
+
+x = [1, 2, 3]
+f(*x)
+#: 1 2 3
+f(*(1, 2, 3))
+#: 1 2 3
+# ** unpacks a dictionary into keyword arguments:
+d = {"a": 10, "b": 20, "c": 30}
+f(**d)
+#: 10 20 30
+
+# Collecting and unpacking are inverses, so you can collect
+# arguments in one function and forward them unchanged:
+def report(label, *values, **options):
+    print(label, values, options)
+
+nums = (1, 2, 3)
+opts = {"color": "red", "size": 10}
+report("point", *nums, **opts)
+#: point (1, 2, 3) {'color': 'red', 'size': 10}
+```
+
+Because collecting and unpacking are inverses,
+a function can gather arguments with `*args` and `**kwargs`,
+then pass them on unchanged.
+This is the standard way to write a wrapper around another function.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -168,24 +203,6 @@ Marking a parameter positional-only also keeps its name out of the method's cont
 That matters when a subclass overrides a method:
 since the name is not part of the interface,
 the subclass can rename the parameter, and a type checker will not object.
-
-## Unpacking Arguments
-
-`*` also works in the other direction:
-at a call site it *unpacks* a sequence into separate positional arguments.
-
-```python
-# unpacking.py
-# Turn a sequence into positional arguments with *.
-def f(a, b, c):
-    print(a, b, c)
-
-x = [1, 2, 3]
-f(*x)
-#: 1 2 3
-f(*(1, 2, 3))
-#: 1 2 3
-```
 
 ## Lambdas
 
