@@ -83,6 +83,40 @@
       margin: 1.5rem 0 2.5rem;
     }
 
+    /* Per-chapter table of contents (experimental, behind --chapter-toc) */
+    .chapter-toc {
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: rgba(0,0,0,0.015);
+      padding: 1.25rem 1.5rem;
+      margin: 0 0 2.5rem;
+    }
+    .chapter-toc-title {
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+    .chapter-toc ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+    }
+    .chapter-toc ul ul {
+      padding-left: 1.2rem;
+      margin: 0.2rem 0 0;
+    }
+    .chapter-toc li { margin-bottom: 0.25rem; }
+    .chapter-toc a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+      border: none;
+    }
+    .chapter-toc a:hover { color: var(--accent); }
+
     h2 {
       font-family: '$heading-font$', sans-serif;
       font-weight: 600;
@@ -251,6 +285,12 @@
     $endif$
     <h1>$title$</h1>
     <div class="title-rule"></div>
+    $if(toc)$
+    <nav class="chapter-toc" aria-label="Chapter contents">
+      <p class="chapter-toc-title">In This Chapter</p>
+      $table-of-contents$
+    </nav>
+    $endif$
     $body$
     <nav class="chapter-nav">
       $if(prev-url)$<a href="$prev-url$">← $prev-title$</a>$else$<span></span>$endif$

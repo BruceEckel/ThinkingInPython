@@ -14,6 +14,11 @@ rewritten to `.html` so cross-references resolve in the site.
 Usage:
     python tools/build_site.py            # build into build/site/
     python tools/build_site.py -o DIR     # build somewhere else
+    python tools/build_site.py --chapter-toc   # add a per-chapter TOC
+
+Set CHAPTER_TOC below (or pass --chapter-toc / --no-chapter-toc) to give each
+chapter page its own table of contents listing that chapter's sections. The
+floating "Contents" link to the index is unaffected.
 """
 
 import argparse
@@ -30,6 +35,13 @@ IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
 DEFAULT_OUT = ROOT / "build" / "site"
+
+# Experimental: give each chapter page its own table of contents (its own
+# sections). Flip this default, or override per-build with --chapter-toc /
+# --no-chapter-toc. CHAPTER_TOC_DEPTH controls how deep the list goes
+# (2 = top-level "##" sections only; 3 also includes "###" subsections).
+CHAPTER_TOC = True
+CHAPTER_TOC_DEPTH = 2
 
 FRONT_STEM = "00_Front"
 BOOK_TITLE = "Thinking in Python"
@@ -135,7 +147,8 @@ def check_pandoc() -> None:
 
 
 def render_chapter(body: str, ch: Chapter,
-                   prev: Chapter | None, nxt: Chapter | None) -> str:
+                   prev: Chapter | None, nxt: Chapter | None,
+                   chapter_toc: bool = False) -> str:
     variables = [
         f"--variable=title:{ch.title}",
         f"--variable=chapter-label:{ch.label}",
@@ -149,9 +162,10 @@ def render_chapter(body: str, ch: Chapter,
     if nxt is not None:
         variables += [f"--variable=next-url:{nxt.out_name}",
                       f"--variable=next-title:{nxt.title}"]
+    toc_opts = ["--toc", f"--toc-depth={CHAPTER_TOC_DEPTH}"] if chapter_toc else []
     proc = subprocess.run(
         ["pandoc", "--template", str(TEMPLATE), "--from", "markdown+smart",
-         "--highlight-style", "pygments", *variables],
+         "--highlight-style", "pygments", *toc_opts, *variables],
         input=body, capture_output=True, text=True, encoding="utf-8",
     )
     if proc.returncode != 0:
@@ -256,7 +270,7 @@ body {{ background: var(--paper); color: var(--ink);
 # --------------------------------------------------------------------------- #
 # Driver
 # --------------------------------------------------------------------------- #
-def build(out_dir: Path) -> int:
+def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
     check_pandoc()
     if not TEMPLATE.exists():
         sys.exit(f"error: template not found at {TEMPLATE}")
@@ -279,7 +293,7 @@ def build(out_dir: Path) -> int:
             used_images.add(m.group(2))
         body = rewrite_images(body, img_map, missing)
         body = rewrite_md_links(body)
-        page = render_chapter(body, ch, prev, nxt)
+        page = render_chapter(body, ch, prev, nxt, chapter_toc)
         (out_dir / ch.out_name).write_text(page, encoding="utf-8")
 
     (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
@@ -310,8 +324,12 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
                     help=f"output directory (default: {DEFAULT_OUT})")
+    ap.add_argument("--chapter-toc", action=argparse.BooleanOptionalAction,
+                    default=CHAPTER_TOC,
+                    help="add a per-chapter table of contents to each page "
+                         f"(default: {CHAPTER_TOC})")
     args = ap.parse_args(argv)
-    return build(args.out)
+    return build(args.out, args.chapter_toc)
 
 
 if __name__ == "__main__":
