@@ -1,5 +1,5 @@
 # dataclass_features.py
-from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
+from dataclasses import KW_ONLY, asdict, astuple, dataclass
 
 @dataclass(frozen=True)
 class Point:
@@ -26,7 +26,5 @@ print(astuple(p))  # Nested tuple
 line = Line([Point(2, 7), Point(10, 4)])
 print(asdict(line))  # Recurses into the list of Points
 #: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
-print(replace(p, x=1))  # Copy with one field changed
-#: Point(x=1, y=20)
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)

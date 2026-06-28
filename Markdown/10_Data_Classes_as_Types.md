@@ -551,12 +551,11 @@ make the type responsible for guaranteeing its own values.
 
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,
 recursing into nested data classes.
-`replace()` copies with changes.
 `KW_ONLY` forces the fields after it to be passed by keyword:
 
 ```python
 # dataclass_features.py
-from dataclasses import KW_ONLY, asdict, astuple, dataclass, replace
+from dataclasses import KW_ONLY, asdict, astuple, dataclass
 
 @dataclass(frozen=True)
 class Point:
@@ -583,8 +582,6 @@ print(astuple(p))  # Nested tuple
 line = Line([Point(2, 7), Point(10, 4)])
 print(asdict(line))  # Recurses into the list of Points
 #: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
-print(replace(p, x=1))  # Copy with one field changed
-#: Point(x=1, y=20)
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
@@ -593,7 +590,7 @@ print(Config("data.csv", retries=5))
 
 A data class has no built-in JSON support.
 Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is not JSON serializable`.
-The fix is small.
+
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` already knows how to serialize dictionaries.
 Decoding goes the other way: parse the JSON into a dictionary,
@@ -627,16 +624,15 @@ print(text)
 #:     "text": "bruce@example.com"
 #:   }
 #: }
-print(from_json(text) == original)  # It round-trips
+print(from_json(text) == original)  # Round-trip
 #: True
 ```
 
-The decode step is where this chapter's idea pays off again.
-JSON usually arrives from outside the program, untrusted.
+JSON data typically arrives from outside the program, untrusted.
 Rebuilding the value through `Person`, `FullName`,
 and `EmailAddress` runs each constructor's validation,
 so malformed JSON is rejected at the boundary instead of leaking a bad object into the rest of the code.
-The type guards itself, even against data it never saw.
+The type guards itself.
 
 When a data class is buried inside a larger structure you are dumping,
 converting it by hand first is awkward.
@@ -658,27 +654,27 @@ class DataClassEncoder(json.JSONEncoder):
         return super().default(o)
 
 people = [
-    Person(FullName("Bruce Eckel"),
-            EmailAddress("bruce@example.com")),
     Person(FullName("Ada Lovelace"),
             EmailAddress("ada@example.com")),
+    Person(FullName("Alan Turing"),
+            EmailAddress("alan@example.com")),
 ]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #: [
-#:   {
-#:     "name": {
-#:       "text": "Bruce Eckel"
-#:     },
-#:     "email": {
-#:       "text": "bruce@example.com"
-#:     }
-#:   },
 #:   {
 #:     "name": {
 #:       "text": "Ada Lovelace"
 #:     },
 #:     "email": {
 #:       "text": "ada@example.com"
+#:     }
+#:   },
+#:   {
+#:     "name": {
+#:       "text": "Alan Turing"
+#:     },
+#:     "email": {
+#:       "text": "alan@example.com"
 #:     }
 #:   }
 #: ]
@@ -688,7 +684,7 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 The encoder converts each data class to a dictionary and lets the base encoder take it from there,
 recursing through lists and nested objects.
 
-Encoding is mechanical, but decoding has to know which type to rebuild,
+Encoding is mechanical, but decoding must know which type to rebuild,
 and that is the part the standard library leaves to you.
 For deep or evolving structures,
 [Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,

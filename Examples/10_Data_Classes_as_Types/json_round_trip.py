@@ -25,5 +25,5 @@ print(text)
 #:     "text": "bruce@example.com"
 #:   }
 #: }
-print(from_json(text) == original)  # It round-trips
+print(from_json(text) == original)  # Round-trip
 #: True
