@@ -21,7 +21,7 @@ then the classic object form for contrast.
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
-In Python the action is just a function, and a "macro" is just a list of them:
+In Python the action is just a function, and a "macro" is just a list of actions:
 
 ```python
 # command.py
@@ -191,7 +191,7 @@ The object form is worth it only when a strategy needs its own configuration or 
 The *Design Patterns* book implements the chain as a linked list,
 largely because it predates standard list types.
 As that machinery is an implementation detail,
-in Python the chain is just a list of functions,
+in Python the chain is a list of functions,
 and the first one to produce a result wins:
 
 ```python

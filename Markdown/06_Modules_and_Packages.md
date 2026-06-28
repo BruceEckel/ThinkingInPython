@@ -33,7 +33,7 @@ Methods named with double underscores are *special methods*,
 and they hook your class into the language's operators and built-in functions.
 
 The reason for the `if` is that any file can also be used as a library module within another program.
-In that case, you just want the classes defined,
+In that case, you only want the classes defined,
 but you don't want the code at the bottom of the file to be executed.
 This particular `if` statement is only true when you are running this file directly.
 That is, `__name__` is `__main__` when you use the command line:
@@ -195,4 +195,4 @@ The original (and now semi-deprecated) solution to this was to set an environmen
 and Python will keep searching through those paths until it finds your module or package (or doesn't, and reports an error).
 
 `PYTHONPATH` still works but has been effectively superseded by the *virtual environment*,
-which solves much more than just "where are the modules and packages."
+which solves much more than only "where are the modules and packages."

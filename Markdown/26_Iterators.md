@@ -2,7 +2,7 @@
 
 An *iterator* decouples an algorithm from the container it runs on.
 Code written against an iterator does not care whether the data came from a list,
-a file, a database cursor, or a computation: it just asks for the next item.
+a file, a database cursor, or a computation: it only asks for the next item.
 Alexander Stepanov, who designed the C++ STL,
 put iterators at the center of generic programming for exactly this reason.
 

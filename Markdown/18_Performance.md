@@ -19,7 +19,7 @@ Python can be surprising.
 A program coded in the most straightforward way, without concern for performance,
 can often run fast enough for your needs.
 Do not automatically assume that a simply-written program will be too slow.
-Try it out first. It could be just fine.
+Try it out first. It might be fine.
 
 If it is too slow, use Occam's Razor: try the simplest approach first.
 That might be enough, and if it is, you might save a lot of time and money.

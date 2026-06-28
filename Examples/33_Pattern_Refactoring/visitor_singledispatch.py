@@ -3,7 +3,7 @@
 # outside it. functools.singledispatch does that directly: a
 # polymorphic function whose behavior is registered per type. Trash
 # is never touched, new operations are independent functions, and
-# new types just register themselves.
+# new types register themselves.
 from functools import singledispatch
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash

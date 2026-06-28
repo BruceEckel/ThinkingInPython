@@ -108,7 +108,7 @@ A read-only property keeps outsiders from assigning to `number`,
 but the class itself still mutates `_number` and has to guard it with a precondition and a postcondition.
 Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
 The problem with DbC is that the contract is spread across every method that touches the value.
-That is the same scattering of checks as before, just moved inside the class.
+That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value.
 It does not constrain it to a set of legal values.
 

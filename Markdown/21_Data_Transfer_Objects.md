@@ -23,7 +23,7 @@ print(m.info, m.b, m.more)
 #: Some information ['a', 'list'] 11
 ```
 
-The trick here is that the `__dict__` for the object is just assigned to the `dict` that is automatically created by the `**kwargs` argument.
+The trick here is that the `__dict__` for the object is assigned to the `dict` that is automatically created by the `**kwargs` argument.
 
 You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in-place, wherever you need it,

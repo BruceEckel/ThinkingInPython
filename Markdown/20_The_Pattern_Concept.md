@@ -97,7 +97,7 @@ This book will attempt to present the patterns based on their structure instead 
 ## Pattern Taxonomy
 
 One of the events that's occurred with the rise of design patterns is what could be thought of as the "pollution" of the term:
-people have begun to use the term to mean just about anything synonymous with "good."
+people have begun to use the term to mean anything synonymous with "good."
 After some pondering,
 I've come up with a sort of hierarchy describing a succession of different types of categories:
 
@@ -187,7 +187,7 @@ to apply tests for quality.
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they are designed to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,
-    misused or just not useful.
+    misused or not useful.
     However, most developers work on specific systems,
     and the quest for generality does not always serve them well.
     The best route to generality is through understanding well-defined specific examples.

@@ -68,6 +68,14 @@ I know some people don't like AI.
 Without it, this book wouldn't exist.
 And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore it.
 
+Using Claude made me realize how many compromises I've made on books in the past.
+I would have a good idea about something (example: automatically interleaving commented output in the examples),
+but I was either unable to implement it or it just seemed too hard so I didn't do it.
+But with AI I've been able to explore and often implement every whim.
+From things as seemingly straightforward as inserting a new chapter to as daunting as the aforementioned commented output system.
+The result is much better than I've been able to achieve in the past.
+I'm able to keep going until I've tweaked everything that occurs to me.
+
 The process of creating this book has been deeply satisfying.
 I don't actually know what the future of books is.
 The internet and eBooks have certainly impacted the print book industry.

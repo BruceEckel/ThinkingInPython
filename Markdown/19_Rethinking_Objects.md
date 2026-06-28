@@ -217,7 +217,7 @@ def test_frozen_cannot_be_mutated() -> None:
 ## Methods or Functions?
 
 The second promise is that behavior belongs inside the object, as methods.
-But a method is just a function whose first argument is the object.
+But a method is only a function whose first argument is the object.
 Compare a method with a plain function that does the same thing:
 
 ```python

@@ -6,7 +6,7 @@ Both lists and associative arrays (dictionaries and sets) are fundamental data t
 
 ## Lists and Iteration
 
-The `for` statement automatically iterates through lists rather than just counting through a sequence of numbers.
+The `for` statement automatically iterates through lists rather than counting through a sequence of numbers.
 Python's `for` automatically uses an iterator that works through a sequence:
 
 ```python
@@ -28,8 +28,8 @@ for x in odds:
 ```
 
 The first line creates a `list`.
-`append()` adds new elements to a `list`;
-the `list` automatically resizes itself.
+`append()` adds new elements to `odds`.
+The `list` automatically resizes itself.
 The `for` statement iterates through `odds`, so `x` takes on each value in the `list`.
 
 There are no type declarations in this example;
@@ -58,8 +58,12 @@ print(xs[::2])   # Every second item
 print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
 xs.append(60)
-xs.insert(0, 5)
-print(len(xs), 30 in xs)
+print(xs)
+#: [10, 20, 30, 40, 50, 60]
+xs.insert(3, 5)
+print(xs)
+#: [10, 20, 30, 5, 40, 50, 60]
+print(len(xs), 5 in xs)
 #: 7 True
 ```
 
@@ -166,7 +170,7 @@ print(2 in a)
 
 Every operator above has a named method.
 The methods are a little more flexible: they accept any iterable,
-not just a set, and they take several arguments at once.
+not only a set, and they take several arguments at once.
 There is also `isdisjoint()`, which has no operator form:
 
 ```python

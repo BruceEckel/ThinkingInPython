@@ -48,11 +48,11 @@ When you call a method for an object, as in `x.show()`, the object reference is 
 The first method, `__init__()`,
 defines the constructor; the double underscores (a.k.a. "dunder") indicate a special name.
 The constructor is automatically called during object creation.
-At the bottom of the example you can see that the creation of an object looks just like a function call using the class name.
+At the bottom of the example you can see that the creation of an object looks like a function call, but using the class name.
 
 In C++ or Java you declare object level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
-To create an object field, you just name it, using `self`,
+To create an object field, you name it, using `self`,
 inside a method (typically in the constructor, but not always).
 This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,

@@ -159,7 +159,7 @@ Because the inner class is named with a double underscore,
 it is private so the user cannot directly access it.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`;
-after that it just reuses the one inner object.
+after that it reuses the one inner object.
 Access is delegated through `__getattr__()`.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 This works, but it is a lot of code for what a module does on its own.

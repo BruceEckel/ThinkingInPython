@@ -305,7 +305,7 @@ The static `factory()` method in the previous example forces all the creation op
 so that's the only place you need to change the code.
 However, the *Design Patterns* book emphasizes that the reason for the *Factory Method* pattern is so that different types of factories can be subclassed from the basic factory (the above design is mentioned as a special case).
 However, the book does not provide an example,
-but instead just repeats the example used for the *Abstract Factory* (you'll see an example of this in the next section).
+but instead repeats the example used for the *Abstract Factory* (you'll see an example of this in the next section).
 Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
 Notice also that the specific `Shape` classes are dynamically loaded on demand:
 

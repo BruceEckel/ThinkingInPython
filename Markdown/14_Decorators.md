@@ -24,7 +24,7 @@ cheese()
 #: Replacement behavior
 ```
 
-Ordinarily you'd expect to just see "Wensleydale" but `hijack()` replaces the original `cheese()` function
+Ordinarily you'd expect to see "Wensleydale" but `hijack()` replaces the original `cheese()` function
 with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.

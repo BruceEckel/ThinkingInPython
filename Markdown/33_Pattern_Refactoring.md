@@ -316,7 +316,7 @@ You write a single-dispatch function:
 # outside it. functools.singledispatch does that directly: a
 # polymorphic function whose behavior is registered per type. Trash
 # is never touched, new operations are independent functions, and
-# new types just register themselves.
+# new types register themselves.
 from functools import singledispatch
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash
@@ -361,7 +361,7 @@ and no decorator gymnastics to fake overloading.
 
 When the operation is the *same* for every type,
 you do not even need single dispatch.
-`sum_value()` earlier was just a function.
+`sum_value()` earlier was a function.
 Use `singledispatch` only when the behavior genuinely differs by type.
 For operations that belong on the objects and vary by type,
 `singledispatchmethod` does the same thing as a method.
