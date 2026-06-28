@@ -336,7 +336,7 @@ def test_class_variable_returns_same_instance() -> None:
 ### Singleton Class Decorator
 
 You can wrap a class so that calling it returns a cached instance.
-This is a *class decorator* (see [Decorators](13_Decorators.md#decorating-classes)):
+This is a *class decorator* (see [Decorators](14_Decorators.md#decorating-classes)):
 
 ```python
 # singleton.py
@@ -393,7 +393,7 @@ def test_decorator_returns_same_instance() -> None:
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-Metaclasses are covered in [Metaprogramming](16_Metaprogramming.md#intercepting-instance-creation),
+Metaclasses are covered in [Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation),
 where this same singleton appears next to the simpler hooks that usually replace them.
 It is included here for completeness:
 

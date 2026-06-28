@@ -408,7 +408,7 @@ callable on the class but not on its instances.
 These are sometimes called *metamethods*.
 One useful metamethod is `__call__()`, which runs when you create an instance.
 Overriding it lets a metaclass intercept instance creation,
-which is one way to build a [Singleton](21_Singleton.md):
+which is one way to build a [Singleton](22_Singleton.md):
 
 ```python
 # singleton.py

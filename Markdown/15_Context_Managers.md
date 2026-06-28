@@ -1,6 +1,6 @@
 # Context Managers
 
-The `with` statement, introduced in [Containers and Control Flow](03_Containers_and_Control_Flow.md#context-managers),
+The `with` statement, introduced in [Containers and Control Flow](04_Control_Flow.md#context-managers),
 runs setup before a block and cleanup after it, even when the block raises.
 This chapter shows what `with` actually does and how to write your own context managers.
 
@@ -10,7 +10,7 @@ The `with` statement calls them for you and guarantees that `__exit__()` runs
 no matter how the block finishes.
 
 Thus, the context manager introduces a scope that determines when initialization and cleanup happens.
-This is far more reliable than using `__del__()`, as we saw in [Class Attributes and Cleanup](08_Class_Attributes_and_Cleanup.md#cleanup)
+This is far more reliable than using `__del__()`, as we saw in [Class Attributes and Cleanup](09_Class_Attributes_and_Cleanup.md#cleanup)
 
 ## The Protocol
 
@@ -137,9 +137,9 @@ with tag("p") as t:
 ```
 
 This is the same setup-then-teardown shape as a `pytest` fixture that
-[`yield`s its value](09_Testing.md#fixtures-replace-setup-and-teardown).
-It relies on the generator and decorator machinery from [Decorators](13_Decorators.md)
-and [Iterators](25_Iterators.md#generators).
+[`yield`s its value](10_Testing.md#fixtures-replace-setup-and-teardown).
+It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
+and [Iterators](26_Iterators.md#generators).
 The generator form is usually the clearest choice; reach for a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 

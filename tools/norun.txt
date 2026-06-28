@@ -11,7 +11,7 @@
 # A "# extract: no-run" line inside a file does the same job inline.
 
 # Tkinter views (the model + tests run and are checked headlessly).
-24_State_Machines/tabledriven/vending_view.py
-29_Observer/box_view.py
-33_Simulation/robot_explorer/maze_view.py
-33_Simulation/rats_and_mazes/rats_view.py
+25_State_Machines/tabledriven/vending_view.py
+30_Observer/box_view.py
+34_Simulation/robot_explorer/maze_view.py
+34_Simulation/rats_and_mazes/rats_view.py

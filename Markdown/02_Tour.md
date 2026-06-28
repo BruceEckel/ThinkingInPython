@@ -283,7 +283,7 @@ print(s)
 ```
 
 As you can see in the second case,
-more than one argument is grouped in parentheses as a tuple (covered in the [next chapter](03_Containers_and_Control_Flow.md#tuples-and-unpacking)).
+more than one argument is grouped in parentheses as a tuple (covered in the [next chapter](03_Containers.md#tuples-and-unpacking)).
 
 All the formatting from `printf()` is available,
 including control over the number of decimal places and alignment.
@@ -367,7 +367,7 @@ print(banner("Hi", width=4))  # pass an argument by name
 
 A parameter can have a default, which makes it optional at the call site.
 You can also pass arguments by name, as with `width=4`, in any order.
-[Functions](04_Functions.md#default-and-keyword-arguments) covers them in detail.
+[Functions](05_Functions.md#default-and-keyword-arguments) covers them in detail.
 
 ## Handling Errors
 
@@ -422,7 +422,7 @@ finally:
 #: Validation done
 ```
 
-[Functional Error Handling](12_Functional_Error_Handling.md) presents an
+[Functional Error Handling](13_Functional_Error_Handling.md) presents an
 alternative that returns errors as values instead of raising exceptions.
 
 ## Naming Conventions

@@ -59,7 +59,7 @@ If you declare fields using the C++/Java style,
 they implicitly become class level fields (similar to static fields in C++/Java).
 
 You can see the shape of an object with `display_object()`, a small inspection
-helper built in [Metaprogramming](16_Metaprogramming.md#the-inspect-module).
+helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
 It prints an object's attributes and methods:
 
 ```python
@@ -89,7 +89,7 @@ All it cares about is applying operations to objects.
 With inheritance in C++ or Java, you often inherit only to establish a common interface.
 Python is different: you inherit an implementation, to re-use the code from the base class.
 
-First import the base class the same way you import any name from a module (see [Modules and Packages](05_Modules_and_Packages.md)).
+First import the base class the same way you import any name from a module (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
 Here, we import and subclass `Simple`, from the `simple_class` module:
 
@@ -318,7 +318,7 @@ print(Temperature.is_freezing(-4))
 ```
 
 For classes that are primarily a bundle of typed data,
-[Data Classes as Types](10_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
+[Data Classes as Types](11_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
 
 ## Composing Methods with `import`
 

@@ -38,7 +38,7 @@ When the last rat dies, the maze is fully mapped.
 The rat does not import the blackboard.
 It only needs an object with the right methods,
 so a `Protocol` describes what it expects.
-This is the structural typing from [Static Typing](07_Static_Typing.md#structural-typing-with-protocols).
+This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 
@@ -489,7 +489,7 @@ def item_factory(symbol: str) -> Item:
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so adding a new kind of item needs no change here:
 define the subclass with its symbol and the factory finds it.
-This is the registry idea from [Factory](26_Factory.md#the-pythonic-factory-a-dictionary),
+This is the registry idea from [Factory](27_Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy itself as the registry.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.

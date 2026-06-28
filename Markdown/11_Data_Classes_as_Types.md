@@ -163,7 +163,7 @@ But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
 
 A data class is a type defined by its fields. `display_object()`, the
-inspection helper from [Metaprogramming](16_Metaprogramming.md#the-inspect-module),
+inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module),
 shows those fields with the types they were declared with:
 
 ```python
@@ -277,7 +277,7 @@ Illegal values are unrepresentable.
 
 The style here is functional: instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-[Static Typing](07_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
+[Static Typing](08_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
 Testing validates the claim that illegal values cannot exist.

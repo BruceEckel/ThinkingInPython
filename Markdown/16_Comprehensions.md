@@ -1,6 +1,6 @@
 # Comprehensions
 
-*Comprehensions* (first introduced in [Containers and Control Flow](03_Containers_and_Control_Flow.md#comprehensions))
+*Comprehensions* (first introduced in [Containers and Control Flow](04_Control_Flow.md#comprehensions))
 build one sequence from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and was incorporated into functional programming.
@@ -290,4 +290,4 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops as soon as it finds a match.
-Generators are explored further in [Iterators](25_Iterators.md#generators).
+Generators are explored further in [Iterators](26_Iterators.md#generators).
