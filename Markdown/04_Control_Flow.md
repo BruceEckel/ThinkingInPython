@@ -5,10 +5,23 @@ This chapter covers conditionals, loops, pattern matching, exceptions, the `with
 
 ## Conditionals and Loops
 
-If you add `elif` to an `if` statement, you can chain multiple tests together.
+Python's comparison operators chain the way they do in mathematics:
 
 ```python
-# control_flow.py
+# chaining.py
+
+x = 5
+print(0 < x < 10)  # Chained comparison
+#: True
+grade = "pass" if x >= 3 else "fail"  # Conditional expression
+print(grade)
+#: pass
+```
+
+Adding `elif` to an `if` statement chains multiple tests:
+
+```python
+# if_elif.py
 
 def classify(n):
     if n < 0:
@@ -20,16 +33,7 @@ def classify(n):
 
 print(classify(-3), classify(0), classify(7))
 #: negative zero positive
-
-x = 5
-print(0 < x < 10)  # Chained comparison
-#: True
-grade = "pass" if x >= 3 else "fail"  # Conditional expression
-print(grade)
-#: pass
 ```
-
-Python's comparison operators chain the way they do in mathematics.
 
 A `while` loop runs until its condition is false.
 `break` leaves the loop and `continue` skips to the next iteration:
@@ -37,17 +41,25 @@ A `while` loop runs until its condition is false.
 ```python
 # while_loop.py
 
-n = 27
-steps = 0
-while n != 1:  # The Collatz sequence
-    n = n // 2 if n % 2 == 0 else 3 * n + 1
-    print(n)
-    steps += 1
+def collatz_sequence(n):
+    steps = 0
+    while n != 1:
+        n = n // 2 if n % 2 == 0 else 3 * n + 1
+        print(n)
+        steps += 1
+    return steps
 
-print(steps, "steps")
+print(collatz_sequence(10), "steps")
+#: 5
+#: 16
+#: 8
+#: 4
+#: 2
+#: 1
+#: 6 steps
 ```
 
-For iteration, `for` walks any sequence directly.
+When iterating, `for` walks any sequence directly.
 Use `range()` for counting, `enumerate()` when you also need the index,
 and `zip()` to walk two sequences together:
 

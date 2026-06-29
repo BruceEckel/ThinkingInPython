@@ -327,7 +327,7 @@ prefer a data class (see [Data Classes as Types](11_Data_Classes_as_Types.md#dat
 Each mutable container has an immutable counterpart.
 A `tuple` is an immutable `list`.
 A `frozenset` is an immutable `set`.
-A `dict` has no frozen form until version 3.15 of the language,
+A `dict` has no frozen form until Python 3.15,
 but `MappingProxyType` from the `types` module wraps one in a read-only view:
 
 ```python
