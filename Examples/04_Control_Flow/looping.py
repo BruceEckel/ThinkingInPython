@@ -10,7 +10,7 @@ for index, name in enumerate(names):
 #: 0 Alice
 #: 1 Bob
 #: 2 Carol
-scores = [88, 91, 79]
+scores = [88, 91, 79, 54, 99]  # Last two unused
 for name, score in zip(names, scores):
     print(name, score)
 #: Alice 88

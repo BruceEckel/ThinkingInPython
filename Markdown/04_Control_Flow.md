@@ -35,8 +35,7 @@ print(classify(-3), classify(0), classify(7))
 #: negative zero positive
 ```
 
-A `while` loop runs until its condition is false.
-`break` leaves the loop and `continue` skips to the next iteration:
+A `while` loop runs until its condition is false:
 
 ```python
 # while_loop.py
@@ -59,6 +58,23 @@ print(collatz_sequence(10), "steps")
 #: 6 steps
 ```
 
+`break` leaves a loop and `continue` skips to the next iteration:
+
+```python
+# break_continue.py
+
+for n in range(10):
+    if n == 3:
+        continue   # Skip the rest of this iteration
+    if n == 6:
+        break      # Leave the loop entirely
+    print(n, end=" ")
+#: 0 1 2 4 5
+```
+
+The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
+then stops at `6` with `break`, so `6` through `9` never print.
+
 When iterating, `for` walks any sequence directly.
 Use `range()` for counting, `enumerate()` when you also need the index,
 and `zip()` to walk two sequences together:
@@ -76,7 +92,7 @@ for index, name in enumerate(names):
 #: 0 Alice
 #: 1 Bob
 #: 2 Carol
-scores = [88, 91, 79]
+scores = [88, 91, 79, 54, 99]  # Last two unused
 for name, score in zip(names, scores):
     print(name, score)
 #: Alice 88
@@ -88,7 +104,7 @@ for name, score in zip(names, scores):
 `zip()` walks several sequences at once, producing one item from each and stopping when the shortest runs out.
 
 With `print()`, the default `end` (printed after the value) is a newline.
-With multiple values in a `print()` call, you can use `sep` to change the separator between values.
+You can use `sep` to change the separator between values.
 
 ## Pattern Matching
 
@@ -116,13 +132,15 @@ print(run("dance"))
 #: unknown command
 ```
 
-The [Pattern Matching](12_Pattern_Matching.md) chapter covers `match` in detail, including class patterns, guards, and nested destructuring.
+[Pattern Matching](12_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.
 Like C++ and Java, an exception propagates up the call stack until it finds a handler.
-In Python, handlers are indicated by `except` followed by the exception type it handles:
+In Python, handlers are indicated by `except` followed by the exception type it handles.
+You can give only the type, or add an `as` to capture the exception object,
+seen here in `except ValueError as e`:
 
 ```python
 # exceptions.py
@@ -163,16 +181,16 @@ demo_exceptions(1, 1)
 
 The optional `else` runs when no exception was raised, and `finally` always runs,
 which makes it the place for cleanup.
+
 Python's culture leans on "easier to ask forgiveness than permission."
-This means: try the operation and handle the exception,
+Try the operation and handle the exception,
 rather than checking every precondition first.
 
 ## Context Managers
 
 A `with` block guarantees that setup and cleanup happen as a pair,
 even if the body raises an exception.
-Opening a file is the canonical case: the file is closed on the way out,
-no matter what:
+Opening a file is the canonical case; the file is always closed on the way out:
 
 ```python
 # context_manager.py
