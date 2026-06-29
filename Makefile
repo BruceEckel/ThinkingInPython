@@ -23,7 +23,7 @@ PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
 help:
 	@echo "Targets:"
-	@echo "  verify    - sync Examples/, then run every gate except the site build"
+	@echo "  verify    - fix line endings, sync Examples/, then run every gate except the site build"
 	@echo "  sync-ci   - like verify, plus the site build (the full CI gate)"
 	@echo "  ci        - run the full local gate: check, ty, ruff, run, pytest, site"
 	@echo "  reset     - regenerate build/examples/ from the Markdown (fixes drift)"
@@ -60,9 +60,11 @@ help:
 	@echo "  clean-examples - remove build/examples/"
 	@echo "  clean-site     - remove build/site/"
 
-# Sync Examples/ from the Markdown, then run every gate except the site build.
-# The everyday "is everything still good?" command after editing Markdown/.
-verify: sync gate
+# Fix any CRLF in the working tree, sync Examples/ from the Markdown, then run
+# every gate except the site build. The everyday "is everything still good?"
+# command after editing Markdown/. fix-eol runs first so the eol check inside
+# gate sees an already-clean tree.
+verify: fix-eol sync gate
 
 # Same as verify, plus the site build at the end.
 sync-ci: sync ci

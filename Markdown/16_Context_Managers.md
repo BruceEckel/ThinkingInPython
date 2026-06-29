@@ -226,14 +226,51 @@ with ExitStack() as stack:
 
 ## The `contextlib` Toolkit
 
-The `contextlib` module provides ready-made managers:
+The `contextlib` module provides ready-made managers.
+Reach for these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions, replacing the `Ignore`
   class above.
 - `closing(obj)` calls `obj.close()` on exit, for objects that have `close()`
   but are not context managers themselves.
+- `ExitStack` manages a dynamic or conditional set of managers, as shown above.
 - `nullcontext(value)` is a do-nothing manager that yields `value`, useful when
   a `with` is optional and you want one code path.
-- `ExitStack` manages a dynamic or conditional set of managers, as shown above.
 
-Reach for these before writing `__enter__()` and `__exit__()` by hand.
+`nullcontext` earns its keep when only some runs have a resource to manage.
+A function might take an optional file to write to, defaulting to standard output.
+The default must stay open, so wrapping `sys.stdout` in `nullcontext` lets a single
+`with` block serve both cases:
+
+```python
+# nullcontext_demo.py
+import sys
+from contextlib import nullcontext
+from io import StringIO
+
+def emit(lines: list[str], out: StringIO | None = None) -> None:
+    manager = out if out is not None else nullcontext(sys.stdout)
+    with manager as stream:
+        for line in lines:
+            print(line, file=stream)
+
+emit(["alpha", "beta"])   # Defaults to stdout, left open
+#: alpha
+#: beta
+buffer = StringIO()
+emit(["gamma"], buffer)   # A managed resource, closed on exit
+try:
+    print(buffer.read())
+except ValueError as e:
+    print("ValueError:", e)
+#: ValueError: I/O operation on closed file
+print(buffer.closed)
+#: True
+```
+
+A real file should close on the way out; `stdout` should not.
+`nullcontext(sys.stdout)` yields `stdout` but does nothing on exit,
+so one `with` block serves both cases.
+With a real resource the `with` closes it, shown by `buffer.closed`.
+With the default, `nullcontext` hands back `sys.stdout` and does nothing on exit,
+so the stream stays open.
