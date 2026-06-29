@@ -214,6 +214,114 @@ They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`, and `symmetric_difference_update()` methods.
 
+## Specialized Containers
+
+The `collections` module in the standard library includes container types built for specific jobs.
+Three of these are used consistently: `Counter`, `defaultdict` and `deque`.
+
+### `Counter`
+
+A `Counter` tallies the frequency of each item:
+
+```python
+# counter.py
+from collections import Counter
+
+words = "the cat sat on the mat the cat".split()
+counts = Counter(words)
+print(counts)
+#: Counter({'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1})
+print(counts["the"])
+#: 3
+print(counts["dog"])  # A missing key counts as zero
+#: 0
+print(counts.most_common(2))  # The two highest counts
+#: [('the', 3), ('cat', 2)]
+```
+
+A missing key counts as zero rather than raising `KeyError`, and `most_common()` returns the highest counts first.
+
+### `defaultdict`
+
+A `defaultdict` supplies a value the first time you touch a missing key,
+which removes the setup-on-first-use boilerplate:
+
+```python
+# defaultdict.py
+from collections import defaultdict
+
+pets = [("dog", "Rex"), ("cat", "Felix"), ("dog", "Fido")]
+# With a plain dict you must create each list before appending:
+plain = {}
+for kind, name in pets:
+    if kind not in plain:
+        plain[kind] = []
+    plain[kind].append(name)
+print(plain["dog"])
+#: ['Rex', 'Fido']
+# A defaultdict creates the missing list for you:
+by_kind = defaultdict(list)
+for kind, name in pets:
+    by_kind[kind].append(name)
+print(by_kind["dog"])
+#: ['Rex', 'Fido']
+print(by_kind["fish"])  # A missing key gets a fresh empty list
+#: []
+```
+
+The argument is a *factory*: a callable that builds the default.
+Here, the `list` argument is a factory that produces a fresh empty list for each new key.
+
+### `deque`
+
+A `deque` (double-ended queue) adds and removes items at either end in constant time,
+where a `list` is fast only at its right end:
+
+```python
+# deque.py
+from collections import deque
+
+queue = deque([1, 2, 3])
+queue.append(4)         # Add on the right
+queue.appendleft(0)     # Add on the left
+print(queue)
+#: deque([0, 1, 2, 3, 4])
+print(queue.popleft())  # Remove from the left
+#: 0
+print(queue.pop())      # Remove from the right
+#: 4
+print(queue)
+#: deque([1, 2, 3])
+```
+
+Use a `deque` whenever you need a queue.
+
+### `namedtuple`
+
+A `namedtuple` builds a tuple subclass whose positions also have names:
+
+```python
+# named_tuple.py
+from collections import namedtuple
+
+Person = namedtuple("Person", ["name", "age", "height"])
+alice = Person("Alice", 30, 1.65)
+print(alice)
+#: Person(name='Alice', age=30, height=1.65)
+print(alice.name, alice.age)  # Access by name
+#: Alice 30
+print(alice[0])               # Still indexable like a tuple
+#: Alice
+name, age, height = alice     # And unpackable
+print(height)
+#: 1.65
+```
+
+A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
+but its fields are self-documenting as you see from the first `print()` statement.
+For records with defaults, methods, or type annotations,
+prefer a data class (see [Data Classes as Types](11_Data_Classes_as_Types.md#data-classes)).
+
 ## Immutability
 
 Each mutable container has an immutable counterpart.
