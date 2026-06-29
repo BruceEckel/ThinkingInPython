@@ -122,7 +122,7 @@ Tuples are fixed-length immutable records where each position has a distinct mea
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-Keys must be immutable.
+The lookup hash value is computed from the Keys, so they must be immutable.
 
 ```python
 # dictionaries.py
@@ -144,26 +144,35 @@ for name, age in ages.items():
 #: Carol 41
 ```
 
-Use `dict.get()` to avoid a `KeyError` when a key might be absent.
+Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
 ## Sets
 
-A set is an unordered collection of unique items,
-with fast membership tests and the usual set algebra:
+A set ensures only one of each item is contained in the set.
+It is an unordered collection of unique items.
+Like the `dict`, it has fast membership tests.
+Sets also provide the expected set algebra:
 
 ```python
 # sets.py
 
 a = {1, 2, 3, 3}  # Duplicates collapse
-b = {3, 4, 5}
 print(a)
 #: {1, 2, 3}
+b = {3, 4, 5}
 print(a & b)      # Intersection
 #: {3}
 print(a | b)      # Union
 #: {1, 2, 3, 4, 5}
 print(a - b)      # Difference
 #: {1, 2}
+print(a ^ b)      # Symmetric difference
+#: {1, 2, 4, 5}
+c = {1, 2}
+print(c <= a)     # Subset
+#: True
+print(a >= c)     # Superset
+#: True
 print(2 in a)
 #: True
 ```
@@ -190,9 +199,20 @@ print(a.intersection([2, 3, 9]))  # Arg can be any iterable
 #: {2, 3}
 print(a.union(b, [6, 7]))  # Several args
 #: {1, 2, 3, 4, 5, 6, 7}
+c = {1, 2}
+print(c.issubset(a))  # Same as c <= a
+#: True
+print(a.issuperset(c))  # Same as a >= c
+#: True
 print(a.isdisjoint({8, 9}))  # No operator form
 #: True
 ```
+
+A few operators are left out above.
+`<` and `>` test *proper* subset and superset.
+They behave like `<=` and `>=` but also require the two sets to differ.
+The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
+They match the `update()`, `intersection_update()`, `difference_update()`, and `symmetric_difference_update()` methods.
 
 ## Immutability
 
@@ -238,7 +258,7 @@ except TypeError as e:
 #: TypeError
 ```
 
-Reach for the immutable form whenever a container should not change after you build it.
+Use the immutable form whenever a container should not change after you build it.
 The benefits compound.
 An immutable container cannot be modified by accident, by you or by code you pass it to,
 so you never need a defensive copy before sharing it.

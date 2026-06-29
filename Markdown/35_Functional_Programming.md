@@ -214,9 +214,16 @@ print(sorted(words, key=len))
 ```
 
 Each call hands a function to another function and lets it do the looping.
-Returning a function is the other half of the definition, covered under Closures below.
+Returning a function is the other half of the definition, covered under [Closures](#closures) below.
 
-The reason to reach for them is separation of concerns. The loop that walks the data is written once, inside `map()`, `filter()`, or `sorted()`, and you supply only the part that differs from one use to the next. You stop rewriting the same iteration scaffold, along with the off-by-one and accumulator-initialization mistakes that scaffold invites. The idea runs the other direction too: a function that takes a function can wrap it with timing, retries, or logging, which is what a decorator does in [Decorators](14_Decorators.md).
+Higher-order functions provide separation of concerns.
+The loop that walks the data is written once, inside `map()`, `filter()`, or `sorted()`,
+and you supply only the part that differs from one use to the next.
+You stop rewriting the same iteration scaffold,
+along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
+The idea runs the other direction, too:
+a function that takes a function can wrap it with operations like timing, retries, or logging.
+This is what a decorator does in [Decorators](14_Decorators.md).
 
 ## Lambdas
 
