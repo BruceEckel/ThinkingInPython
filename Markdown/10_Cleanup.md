@@ -3,7 +3,7 @@
 Python manages memory for you, so most objects need no explicit cleanup.
 However, when an object owns an outside resource (a file, a socket, a lock),
 you must release it.
-Python garbage collector calls an object's `__del__()` method when it collects that object.
+The Python garbage collector calls an object's `__del__()` method when it collects that object.
 This seems like a candidate for releasing resources:
 
 ```python
@@ -151,6 +151,6 @@ with no `__del__()` and no explicit cleanup call.
 
 A plain `dict` or `list` as the registry would keep every instance alive forever,
 so the count could never fall.
-The weak reference is what lets the registry prune itself.
+The weak reference allows the registry to prune itself.
 Unlike the `__del__()` version, this reads the count during normal execution,
 so it never depends on the unreliable bookkeeping at interpreter shutdown.
