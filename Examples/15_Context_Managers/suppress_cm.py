@@ -1,5 +1,4 @@
 # suppress_cm.py
-# Returning True from __exit__ swallows a matching exception.
 class Ignore:
     def __init__(self, *types: type[BaseException]) -> None:
         self.types = types

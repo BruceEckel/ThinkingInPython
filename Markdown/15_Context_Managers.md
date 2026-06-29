@@ -82,7 +82,6 @@ execution continues after the block:
 
 ```python
 # suppress_cm.py
-# Returning True from __exit__ swallows a matching exception.
 class Ignore:
     def __init__(self, *types: type[BaseException]) -> None:
         self.types = types
@@ -106,7 +105,6 @@ print("survived")
 
 The `1 / 0` raises an exception, `__exit__()` returns `True`, and the `with` statement
 absorbs the error so `survived` still prints.
-The standard library ships this as `contextlib.suppress`, so you rarely write it.
 
 The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
 which means the exception *class* itself, such as `ZeroDivisionError`, not an instance of it.
@@ -116,6 +114,22 @@ collects the exception classes you hand it into the `types` tuple.
 the class of the exception that was raised, or `None` when the block finished cleanly.
 That class is what `issubclass(exc_type, self.types)` checks against the classes you
 chose to suppress.
+
+The standard library has included its version of `Ignore` as `contextlib.suppress`.
+The above demonstration would instead be:
+
+```python
+# suppress_exceptions.py
+from contextlib import suppress
+
+with suppress(ZeroDivisionError):
+    print("before")
+    1 / 0
+    print("after")  # Never runs
+print("survived")
+#: before
+#: survived
+```
 
 ## Context Managers as Generators
 
