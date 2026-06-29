@@ -214,7 +214,7 @@ print(sorted(words, key=len))
 ```
 
 Each call hands a function to another function and lets it do the looping.
-Returning a function is the other half of the definition, covered under [Closures](#closures) below.
+Returning a function is the other half of the definition, covered under [Closures](#closures), below.
 
 Higher-order functions provide separation of concerns.
 The loop that walks the data is written once, inside `map()`, `filter()`, or `sorted()`,

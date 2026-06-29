@@ -140,7 +140,7 @@ This is the same setup-then-teardown shape as a `pytest` fixture that
 [`yield`s its value](10_Testing.md#fixtures-replace-setup-and-teardown).
 It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
 and [Iterators](26_Iterators.md#generators).
-The generator form is usually the clearest choice; reach for a class when the
+The generator form is usually the clearest choice; use a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Combining Context Managers
