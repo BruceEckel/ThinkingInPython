@@ -202,7 +202,7 @@ from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")
 type Coord = tuple[int, int]             # (column, row)
-type Grid = dict[Coord, str]             # cell -> color
+type Grid = dict[Coord, str]             # Cell -> color
 
 def new_grid(size: int) -> Grid:
     "Build a size x size grid, banded into three colors."
