@@ -50,7 +50,63 @@ If you can narrow the problem down to a particular function, there may be techni
 
 ## Choose Better Algorithms and Data Structures
 
-[[Usually the largest win: a better Big-O, and the right container for the job, such as `set` or `dict` for membership and lookup, `deque` for queues, and `bisect` or `heapq` for ordered data]]
+The biggest speedups usually come from a better algorithm, not faster code.
+A lower Big-O complexity beats micro-optimizing a slow one.
+Often this just means choosing the right container.
+Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
+Use a `deque` (see [Containers](03_Containers.md#deque)) when you add and remove at both ends.
+
+For data kept in sorted order, the `bisect` module finds the insertion point with binary search:
+
+```python
+# bisect_search.py
+import bisect
+
+scores = [60, 70, 75, 90]      # Must stay sorted
+i = bisect.bisect(scores, 78)  # Where 78 would go
+print(i)
+#: 3
+bisect.insort(scores, 78)      # Insert and keep it sorted
+print(scores)
+#: [60, 70, 75, 78, 90]
+
+def grade(score):
+    # Map a score to a letter through its cutoff boundaries:
+    cutoffs = [60, 70, 80, 90]
+    letters = "FDCBA"
+    return letters[bisect.bisect(cutoffs, score)]
+
+print([grade(s) for s in (55, 65, 85, 95)])
+#: ['F', 'D', 'B', 'A']
+```
+
+Because `scores` stays sorted, `bisect` locates a position in O(log n)
+instead of the O(n) scan a `list` would need.
+
+When you repeatedly need the smallest item, a *heap* keeps that item reachable in O(log n).
+The `heapq` module treats a plain `list` as a binary heap:
+
+```python
+# heap_queue.py
+import heapq
+
+nums = [5, 1, 8, 3, 2]
+heapq.heapify(nums)         # Rearrange into a heap in place
+print(nums[0])              # The smallest stays at the front
+#: 1
+heapq.heappush(nums, 0)
+print(heapq.heappop(nums))  # Remove and return the smallest
+#: 0
+print(heapq.nsmallest(3, [5, 1, 8, 3, 2]))
+#: [1, 2, 3]
+print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
+#: [8, 5]
+```
+
+After `heapify()` the smallest element stays at index 0,
+and `nsmallest()` and `nlargest()` answer top-N questions directly.
+For a priority queue shared across threads, `queue.PriorityQueue` wraps `heapq` with locking,
+covered with concurrency below.
 
 ## Write Idiomatic Python
 
@@ -64,7 +120,77 @@ If you can narrow the problem down to a particular function, there may be techni
 
 ## Reduce Memory Overhead
 
-[[`__slots__` shrinks each instance and speeds attribute access; `array` and `memoryview` hold large homogeneous data compactly]]
+When you hold millions of objects, their per-object overhead dominates.
+Three tools cut it down.
+
+By default each instance stores its attributes in a `__dict__`.
+Declaring `__slots__` replaces that dict with a fixed set of fields,
+which shrinks each instance and speeds attribute access:
+
+```python
+# slots.py
+class Point:
+    __slots__ = ("x", "y")  # No per-instance __dict__
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p = Point(1, 2)
+print(p.x, p.y)
+#: 1 2
+try:
+    # z is not one of the declared slots:
+    p.z = 3  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
+```
+
+The tradeoff is that instances can no longer grow attributes outside the declared set.
+
+A `list` of numbers stores full Python objects, each with its own header.
+The `array` module packs numbers into a single block of C values instead:
+
+```python
+# array_basics.py
+from array import array
+
+a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
+a.append(4.0)
+print(a)
+#: array('d', [1.0, 2.0, 3.0, 4.0])
+print(a[1], a.typecode, a.itemsize)
+#: 2.0 d 8
+try:
+    # The value must match the type code:
+    a.append("x")  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+Every element shares one type, given by the type code,
+so `array` stores them compactly and rejects values of the wrong type.
+
+A `memoryview` exposes another object's memory without copying it.
+Slicing a large `bytes` or `bytearray` through a view avoids duplicating the data:
+
+```python
+# memory_view.py
+data = bytearray(b"ABCDEF")
+view = memoryview(data)  # No copy of the underlying bytes
+chunk = view[1:4]
+print(bytes(chunk))
+#: b'BCD'
+view[0] = ord("z")       # Writes through to the original
+print(data)
+#: bytearray(b'zBCDEF')
+print(view.nbytes)
+#: 6
+```
+
+The view shares storage with `data`,
+so writing through it changes the original and no bytes are copied.
 
 ## Vectorize with NumPy
 

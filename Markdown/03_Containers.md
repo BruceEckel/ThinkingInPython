@@ -322,6 +322,10 @@ but its fields are self-documenting as you see from the first `print()` statemen
 For records with defaults, methods, or type annotations,
 prefer a data class (see [Data Classes as Types](11_Data_Classes_as_Types.md#data-classes)).
 
+The standard library has more specialized containers.
+For compact homogeneous storage (`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
+see [Performance](18_Performance.md).
+
 ## Immutability
 
 Each mutable container has an immutable counterpart.
