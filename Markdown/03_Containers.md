@@ -259,7 +259,6 @@ except TypeError as e:
 ```
 
 Use the immutable form whenever a container should not change after you build it.
-The benefits compound.
 An immutable container cannot be modified by accident, by you or by code you pass it to,
 so you never need a defensive copy before sharing it.
 It is safe to use as a default argument, unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
