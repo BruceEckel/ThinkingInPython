@@ -6,7 +6,7 @@ The *Observer* pattern is a kind of callback.
 One object, the *observer*, registers interest in another, the *observable*,
 and is notified whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
-observers attach and detach at run time,
+observers attach and detach at runtime,
 and the observable never needs to know their types.
 It underlies event handling,
 and the model-view split that keeps a display in step with the data behind it.

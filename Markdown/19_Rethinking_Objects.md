@@ -438,13 +438,13 @@ Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated, and `@a
 Dynamic typing gives a different answer:
 any type works as long as it has the method the function calls.
 There is no shared base class and no declared set of types,
-and validity is checked only at run time, when the call happens:
+and validity is checked only at runtime, when the call happens:
 
 ```python
 # dynamic_typing.py
 # Dynamic typing: any type works as long as it has the method that
 # gets called. There is no base class and no type union. The check
-# happens only at run time, when the method is called.
+# happens only at runtime, when the method is called.
 from dataclasses import dataclass
 from typing import Any
 

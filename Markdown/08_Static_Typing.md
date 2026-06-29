@@ -2,7 +2,7 @@
 
 C++ and Java make you declare the type of everything,
 and they check those types before the program runs.
-Python checks types at run time, only when an operation is actually attempted.
+Python checks types at runtime, only when an operation is actually attempted.
 Up until this chapter, we haven't used type declarations.
 
 On a small program you do not miss the declarations.
@@ -101,7 +101,7 @@ def area(width: int, height: int) -> int:
 area("3", 4)   # ty: argument of type "str" is not assignable to "int"
 ```
 
-At run time `area("3", 4)` does not cause an error.
+At runtime `area("3", 4)` does not cause an error.
 It returns `"3333"`, because `"3" * 4` is the correct syntax for string repetition.
 Bugs surface later, often far from the line that caused it.
 The checker immediately discovers the problem.
@@ -110,12 +110,12 @@ The checker immediately discovers the problem.
 
 Earlier chapters relied on *dynamic typing*: a function accepts any object,
 and the only requirement is that the object supports the operations performed on it.
-The type is checked at run time, when the operation runs.
+The type is checked at runtime, when the operation runs.
 Dynamic typing is often called *duck typing*:
 if it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
-Rather than wait for run time,
+Rather than waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*,
 which means the methods and attributes required by whatever consumes that type.
 Dynamic typing and structural typing are the same idea checked at different moments.
@@ -194,9 +194,8 @@ Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves exactly as it would have with no hints at all.
 Checking is a separate step you run, the same way you check tests separately.
-If you need a guarantee at run time, you still write `isinstance()`,
-or use a library built to validate data.
-The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at run time.
+If you need a runtime guarantee, use `isinstance()` or a library built to validate data.
+The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input comes in.
 The hints themselves are for the tools and for the reader.
@@ -248,7 +247,7 @@ shapes come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `type Name = ...` | A *type alias* for a longer type, e.g. `type Grid = dict[tuple[int, int], str]` |
-| `NewType("Id", int)` | A distinct type that is `int` at run time but separate to the checker |
+| `NewType("Id", int)` | A distinct type that is `int` at runtime but separate to the checker |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
 ### Constants and class variables

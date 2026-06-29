@@ -287,7 +287,7 @@ for kind, items in bins.items():
 ```
 
 `type(t)` is the perfect key: it adapts to whatever types show up,
-even ones added at run time.
+even ones added at runtime.
 There is no chain to maintain and nothing to forget.
 
 ## Adding Operations: Visitor, and Why Python Skips It

@@ -485,7 +485,7 @@ reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are plain methods, stored directly in the table.
 The states are an `Enum`,
-so a misspelled state name is caught by the type checker instead of failing silently at run time:
+so a misspelled state name is caught by the type checker instead of failing silently at runtime:
 
 ```python
 # tabledriven/vending_machine.py

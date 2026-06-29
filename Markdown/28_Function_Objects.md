@@ -97,7 +97,7 @@ the object form earns its keep only when a command must also carry state or supp
 
 ## Strategy: Choosing the Algorithm at Runtime
 
-A *Strategy* is an interchangeable algorithm chosen at run time.
+A *Strategy* is an interchangeable algorithm chosen at runtime.
 Again, the algorithm is a function, and you pass it in:
 
 ```python

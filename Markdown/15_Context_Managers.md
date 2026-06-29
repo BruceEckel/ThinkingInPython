@@ -140,7 +140,7 @@ Most context managers are simpler to write as a generator.
 `contextlib.contextmanager` turns a function with a single `yield` into a
 context manager: the code before `yield` is the setup, the yielded value is
 what `as` binds, and the code after `yield` is the cleanup.
-Put the cleanup in a `finally` so it runs even when the block raises an exception:
+Put the cleanup in a `finally` so it runs even if the block raises an exception:
 
 ```python
 # generator_cm.py
@@ -196,8 +196,8 @@ with tag("ul") as outer, tag("li") as inner:
 #: </ul>
 ```
 
-When the number of managers is not known until run time, `contextlib.ExitStack`
-holds a dynamic set and unwinds them in reverse on the way out:
+When the number of managers is not known until runtime, `contextlib.ExitStack`
+holds a dynamic set of managers and unwinds them in reverse on the way out:
 
 ```python
 # exit_stack.py
