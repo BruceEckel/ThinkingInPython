@@ -1,7 +1,7 @@
 # Context Managers
 
 The `with` statement, introduced in [Containers and Control Flow](04_Control_Flow.md#context-managers),
-runs setup before a block and cleanup after it, even when the block raises.
+runs setup before a block and cleanup after it, even if the block raises an exception.
 This chapter shows what `with` actually does and how to write your own context managers.
 
 A *context manager* is any object that implements two methods: `__enter__()`,
@@ -29,7 +29,7 @@ class Trace:
         print(f"enter {self.name}")
         return self
 
-    def __exit__(self, exc_type: object,
+    def __exit__(self, exc_type: type[BaseException] | None,
                  exc: object, tb: object) -> None:
         print(f"exit {self.name}")
 
@@ -43,12 +43,12 @@ if __name__ == "__main__":
 
 `__enter__()` returns the object that `as` binds, often `self`.
 `__exit__()` takes three arguments describing any exception (covered below).
-A `with` block reads like a guarantee: whatever happens inside, the exit code runs.
+A `with` block provides a guarantee that the exit code always runs at the end of the scope.
 
 ## Cleanup is Guaranteed
 
 Although context managers introduce a nice brevity to your code, the point is the guarantee.
-Here, `__exit__()` runs when the block raises, before the exception propagates:
+Here, `__exit__()` runs when the block raises an exception, but before the exception propagates:
 
 ```python
 # exit_on_error.py
@@ -72,7 +72,7 @@ This is the same guarantee a `try`/`finally` gives, packaged as a reusable objec
 `__exit__(self, exc_type, exc_value, traceback)` receives the details of an
 exception raised in the block.
 When the block finishes normally, all three are `None`.
-When it raises, they hold the exception's type, value, and traceback.
+When it raises an exception, they hold the exception's type, value, and traceback.
 
 The return value decides what happens to that exception.
 A `False` value (including `None`) lets it propagate.
@@ -104,9 +104,18 @@ print("survived")
 #: survived
 ```
 
-The `1 / 0` raises, `__exit__()` returns `True`, and the `with` statement
+The `1 / 0` raises an exception, `__exit__()` returns `True`, and the `with` statement
 absorbs the error so `survived` still prints.
 The standard library ships this as `contextlib.suppress`, so you rarely write it.
+
+The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
+which means the exception *class* itself, such as `ZeroDivisionError`, not an instance of it.
+`__init__()` takes `*types: type[BaseException]`, so `Ignore(ZeroDivisionError)`
+collects the exception classes you hand it into the `types` tuple.
+`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it
+the class of the exception that was raised, or `None` when the block finished cleanly.
+That class is what `issubclass(exc_type, self.types)` checks against the classes you
+chose to suppress.
 
 ## Context Managers as Generators
 
@@ -114,7 +123,7 @@ Most context managers are simpler to write as a generator.
 `contextlib.contextmanager` turns a function with a single `yield` into a
 context manager: the code before `yield` is the setup, the yielded value is
 what `as` binds, and the code after `yield` is the cleanup.
-Put the cleanup in a `finally` so it runs even when the block raises:
+Put the cleanup in a `finally` so it runs even when the block raises an exception:
 
 ```python
 # generator_cm.py
@@ -145,7 +154,7 @@ manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Combining Context Managers
 
-A single `with` can drive several managers, separated by commas.
+A single `with` can include several managers, separated by commas.
 They enter left to right and exit in reverse:
 
 ```python
@@ -200,7 +209,7 @@ with ExitStack() as stack:
 
 ## The `contextlib` Toolkit
 
-The `contextlib` module provides ready-made managers so you write fewer:
+The `contextlib` module provides ready-made managers:
 
 - `suppress(*exceptions)` ignores the listed exceptions, replacing the `Ignore`
   class above.

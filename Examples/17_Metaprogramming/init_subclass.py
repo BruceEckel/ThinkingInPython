@@ -4,7 +4,7 @@
 from typing import ClassVar
 
 class Color:
-    registry: ClassVar[set[type]] = set()
+    registry: ClassVar[set[type[Color]]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -29,7 +29,7 @@ print(sorted(c.__name__ for c in Color.registry))
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
-    registry: ClassVar[set[type]] = set()
+    registry: ClassVar[set[type[Shape]]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)

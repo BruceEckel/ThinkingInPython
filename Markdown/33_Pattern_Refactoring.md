@@ -182,7 +182,7 @@ from collections import defaultdict
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
-bins: dict[type, list[Trash]] = defaultdict(list)
+bins: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in parse("trash.dat"):
     if isinstance(t, Aluminum):
         bins[Aluminum].append(t)
@@ -248,7 +248,7 @@ from collections import defaultdict
 from parse_trash import parse
 from trash import Trash, sum_value
 
-bins: dict[type, list[Trash]] = defaultdict(list)
+bins: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in parse("trash.dat"):
     bins[type(t)].append(t)  # Bin chosen by the piece itself
 for kind, items in bins.items():
@@ -337,7 +337,7 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-seen: set[type] = set()
+seen: set[type[Trash]] = set()
 for t in parse("trash.dat"):
     if type(t) not in seen:
         seen.add(type(t))

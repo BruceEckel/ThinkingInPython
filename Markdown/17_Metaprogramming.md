@@ -188,7 +188,7 @@ which Python calls automatically every time a subclass is created:
 from typing import ClassVar
 
 class Color:
-    registry: ClassVar[set[type]] = set()
+    registry: ClassVar[set[type[Color]]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -213,7 +213,7 @@ print(sorted(c.__name__ for c in Color.registry))
 
 # A second, independent hierarchy keeps its own registry:
 class Shape:
-    registry: ClassVar[set[type]] = set()
+    registry: ClassVar[set[type[Shape]]] = set()
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -588,7 +588,7 @@ and class decorators are simpler and easier to read.
 
 One caution: a class has exactly one metaclass.
 Multiple inheritance can accidentally combine classes with different metaclasses,
-which raises a metaclass conflict you then have to resolve.
+which creates a metaclass conflict you then have to resolve.
 That is one more reason to avoid metaclasses unless you truly need them.
 
 ## The 'inspect' Module

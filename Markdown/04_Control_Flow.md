@@ -114,7 +114,7 @@ A `while` loop can use `else` the same way.
 
 When iterating, `for` walks any sequence directly.
 Use `range()` for counting, `enumerate()` when you also need the index,
-and `zip()` to walk two sequences together:
+and `zip()` to combine each corresponding pair of two sequences:
 
 ```python
 # looping.py
@@ -123,22 +123,24 @@ for i in range(3):
     print(i, end=" ")
 print()
 #: 0 1 2
-names = ["Alice", "Bob", "Carol"]
+names = ["Alice", "Bob", "Carol", "Ted"]
 for index, name in enumerate(names):
     print(index, name)
 #: 0 Alice
 #: 1 Bob
 #: 2 Carol
-scores = [88, 91, 79, 54, 99]  # Last two unused
-for name, score in zip(names, scores):
-    print(name, score)
-#: Alice 88
-#: Bob 91
-#: Carol 79
+#: 3 Ted
+scores = [88, 91, 79, 54, 99]  # Last one unused
+for i, name, score in zip(range(10), names, scores):
+    print(i, name, score)
+#: 0 Alice 88
+#: 1 Bob 91
+#: 2 Carol 79
+#: 3 Ted 54
 ```
 
 `enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
-`zip()` walks several sequences at once, producing one item from each and stopping when the shortest runs out.
+`zip()` traverses several sequences at once, producing one item from each and stopping when the shortest runs out.
 
 The *walrus operator* `:=` assigns a value as part of an expression,
 so you can compute, name, and test a value in one place:
@@ -158,7 +160,7 @@ if (n := len(text)) > 3:
 #: 5 characters
 ```
 
-It is especially handy in `while` conditions and comprehensions,
+This is especially handy in `while` conditions and comprehensions,
 where it avoids repeating a computation.
 
 With `print()`, the default `end` (printed after the value) is a newline.
@@ -167,8 +169,7 @@ You can use `sep` to change the separator between values.
 ## Pattern Matching
 
 The `match` statement compares a value against structural patterns.
-It is reminiscent of a C `switch`, but much more powerful.
-A pattern can destructure a value and bind its parts.
+It is reminiscent of a C `switch`, but is much more powerful:
 
 ```python
 # pattern_matching.py
@@ -190,6 +191,7 @@ print(run("dance"))
 #: unknown command
 ```
 
+A pattern can also destructure a value and bind its parts.
 [Pattern Matching](12_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
@@ -237,8 +239,8 @@ demo_exceptions(1, 1)
 #: finally always runs
 ```
 
-The optional `else` runs when no exception was raised, and `finally` always runs,
-which makes it the place for cleanup.
+The optional `else` runs when no exception was raised.
+The optional `finally` always runs, which makes it the place for cleanup.
 
 Python's culture leans on "easier to ask forgiveness than permission."
 Try the operation and handle the exception,

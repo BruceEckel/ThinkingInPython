@@ -9,7 +9,7 @@ class Trace:
         print(f"enter {self.name}")
         return self
 
-    def __exit__(self, exc_type: object,
+    def __exit__(self, exc_type: type[BaseException] | None,
                  exc: object, tb: object) -> None:
         print(f"exit {self.name}")
 

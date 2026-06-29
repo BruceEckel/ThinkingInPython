@@ -7,7 +7,7 @@ from collections import defaultdict
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
-bins: dict[type, list[Trash]] = defaultdict(list)
+bins: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in parse("trash.dat"):
     if isinstance(t, Aluminum):
         bins[Aluminum].append(t)

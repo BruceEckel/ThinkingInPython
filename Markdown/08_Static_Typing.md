@@ -157,6 +157,37 @@ Both are accepted because each has a `draw()`, so they are of the right shape.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 Python preserves the flexibility of dynamic typing but gains the early warning of static types.
 
+## Classes as Values: `type[...]` {#classes-as-values-type}
+
+A class is itself a value.
+You can pass it to a function, store it in a variable, and call it to make an instance.
+So an annotation needs a way to distinguish the class from an instance of that class.
+A plain `SomeType` annotation means an *instance* of `SomeType`.
+The form `type[SomeType]` means the class object itself, or any subclass of it.
+So `type[C]` annotates the class, not an instance:
+
+```python
+# class_values.py
+
+class Shape:
+    pass
+
+class Circle(Shape):
+    pass
+
+def make(kind: type[Shape]) -> Shape:
+    return kind()
+
+shape = make(Circle)
+print(type(shape).__name__)
+#: Circle
+```
+
+`make()` takes the class, not an instance, so the argument is annotated with `type[Shape]`.
+Passing `Circle` is allowed because `Circle` is a subclass of `Shape`.
+Calling `kind()` then produces an instance.
+This is the construct functions like `issubclass()` work with, since they compare classes rather than instances.
+
 ## The Hints Are Not Enforced at Run Time
 
 Type hints do not change what the program does.

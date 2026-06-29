@@ -24,7 +24,7 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-seen: set[type] = set()
+seen: set[type[Trash]] = set()
 for t in parse("trash.dat"):
     if type(t) not in seen:
         seen.add(type(t))
