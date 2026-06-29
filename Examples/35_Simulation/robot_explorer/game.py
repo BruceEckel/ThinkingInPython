@@ -2,11 +2,11 @@
 # The Builder pattern: build the maze in stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
-from world import Room
+from world import Coord, Room
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
-        self.rooms: dict[tuple[int, int], Room] = {}
+        self.rooms: dict[Coord, Room] = {}
         teleports: list[Room] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):

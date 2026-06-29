@@ -96,6 +96,8 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 from pathlib import Path
 from typing import Self
 
+type Coord = tuple[int, int]   # (column, row)
+
 class Maze:
     WALL = "*"
     OPEN = " "
@@ -120,7 +122,7 @@ class Maze:
         return (0 <= y < self.height and 0 <= x < self.width
                 and self.rows[y][x] == self.OPEN)
 
-    def entry(self) -> tuple[int, int]:
+    def entry(self) -> Coord:
         for y in range(self.height):
             for x in range(self.width):
                 if self.is_open(x, y):
@@ -143,13 +145,13 @@ including the ones spawned along the way.
 
 import asyncio
 import itertools
-from maze import Maze
+from maze import Coord, Maze
 from rat import Rat
 
 class Blackboard:
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
-        self.visited: set[tuple[int, int]] = set()
+        self.visited: set[Coord] = set()
         self.tasks: list[asyncio.Task[None]] = []
         self.messages: list[str] = []
         self._numbers = itertools.count(1)
@@ -265,7 +267,7 @@ A test pins that down by comparing the cells the rats visited against a plain fl
 # rats_and_mazes/test_ratsandmazes.py
 import asyncio
 from blackboard import Blackboard
-from maze import Maze
+from maze import Coord, Maze
 
 LAYOUT = """\
 *********
@@ -277,8 +279,8 @@ LAYOUT = """\
 *********
 """
 
-def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
-    seen: set[tuple[int, int]] = set()
+def flood(maze: Maze, start: Coord) -> set[Coord]:
+    seen: set[Coord] = set()
     stack = [start]
     while stack:
         x, y = stack.pop()
@@ -313,7 +315,7 @@ import asyncio
 import tkinter as tk
 from typing import override
 from blackboard import Blackboard
-from maze import Maze
+from maze import Coord, Maze
 
 CELL = 26
 
@@ -321,7 +323,7 @@ class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
-        self.order: list[tuple[int, int]] = []
+        self.order: list[Coord] = []
 
     @override
     def claim(self, x: int, y: int) -> bool:
@@ -504,6 +506,8 @@ so the robot can try any direction without a special case:
 
 from items import Edge, Item, Robot, Urge
 
+type Coord = tuple[int, int]   # (row, col)
+
 class Room:
     def __init__(self, occupant: Item) -> None:
         self.occupant = occupant
@@ -523,7 +527,7 @@ class Doors:
         self.west: Room | None = None
 
     def connect(self, row: int, col: int,
-                rooms: dict[tuple[int, int], Room]) -> None:
+                rooms: dict[Coord, Room]) -> None:
         self.north = rooms.get((row - 1, col))
         self.south = rooms.get((row + 1, col))
         self.east = rooms.get((row, col + 1))
@@ -553,11 +557,11 @@ is the *Builder* pattern.
 # The Builder pattern: build the maze in stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
-from world import Room
+from world import Coord, Room
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
-        self.rooms: dict[tuple[int, int], Room] = {}
+        self.rooms: dict[Coord, Room] = {}
         teleports: list[Room] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):

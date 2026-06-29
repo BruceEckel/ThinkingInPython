@@ -4,6 +4,8 @@
 
 from items import Edge, Item, Robot, Urge
 
+type Coord = tuple[int, int]   # (row, col)
+
 class Room:
     def __init__(self, occupant: Item) -> None:
         self.occupant = occupant
@@ -23,7 +25,7 @@ class Doors:
         self.west: Room | None = None
 
     def connect(self, row: int, col: int,
-                rooms: dict[tuple[int, int], Room]) -> None:
+                rooms: dict[Coord, Room]) -> None:
         self.north = rooms.get((row - 1, col))
         self.south = rooms.get((row + 1, col))
         self.east = rooms.get((row, col + 1))

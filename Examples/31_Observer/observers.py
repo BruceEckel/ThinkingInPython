@@ -4,11 +4,13 @@
 from collections.abc import Callable
 from typing import Any
 
+type Observer = Callable[[Any], None]
+
 class Observable:
     def __init__(self) -> None:
-        self._observers: list[Callable[[Any], None]] = []
+        self._observers: list[Observer] = []
 
-    def subscribe(self, observer: Callable[[Any], None]) -> None:
+    def subscribe(self, observer: Observer) -> None:
         self._observers.append(observer)
 
     def notify(self, data: Any) -> None:

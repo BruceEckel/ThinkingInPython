@@ -287,6 +287,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+type Handler = Callable[[Any], None]
+
 @dataclass(frozen=True)
 class Deposit:
     amount: int
@@ -301,7 +303,7 @@ class Closed:
 
 class EventBus:
     def __init__(self) -> None:
-        self._handlers: dict[type, list[Callable[[Any], None]]] = {}
+        self._handlers: dict[type, list[Handler]] = {}
 
     def subscribe[E](self, event_type: type[E],
                      handler: Callable[[E], None]) -> None:

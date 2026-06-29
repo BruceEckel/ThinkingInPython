@@ -40,11 +40,13 @@ A `@property` setter is a natural place to fire the notification when state chan
 from collections.abc import Callable
 from typing import Any
 
+type Observer = Callable[[Any], None]
+
 class Observable:
     def __init__(self) -> None:
-        self._observers: list[Callable[[Any], None]] = []
+        self._observers: list[Observer] = []
 
-    def subscribe(self, observer: Callable[[Any], None]) -> None:
+    def subscribe(self, observer: Observer) -> None:
         self._observers.append(observer)
 
     def notify(self, data: Any) -> None:
@@ -199,18 +201,19 @@ The classic `Observable` comes from `observer.py`:
 from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")
-type Grid = dict[tuple[int, int], str]   # (column, row) -> color
+type Coord = tuple[int, int]             # (column, row)
+type Grid = dict[Coord, str]             # cell -> color
 
 def new_grid(size: int) -> Grid:
     "Build a size x size grid, banded into three colors."
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
-def adjacent(a: tuple[int, int], b: tuple[int, int]) -> bool:
+def adjacent(a: Coord, b: Coord) -> bool:
     "True if two distinct cells touch, including diagonally."
     return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
 
-def recolored(grid: Grid, clicked: tuple[int, int]) -> Grid:
+def recolored(grid: Grid, clicked: Coord) -> Grid:
     "Return a new grid: every neighbor of the click takes its color."
     color = grid[clicked]
     return {cell: color if adjacent(cell, clicked) else current
@@ -223,7 +226,7 @@ class BoxModel(Observable):
         self.size = size
         self.grid = new_grid(size)
 
-    def click(self, cell: tuple[int, int]) -> None:
+    def click(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
         self.set_changed()
         self.notify_observers(self.grid)

@@ -1,7 +1,7 @@
 # rats_and_mazes/test_ratsandmazes.py
 import asyncio
 from blackboard import Blackboard
-from maze import Maze
+from maze import Coord, Maze
 
 LAYOUT = """\
 *********
@@ -13,8 +13,8 @@ LAYOUT = """\
 *********
 """
 
-def flood(maze: Maze, start: tuple[int, int]) -> set[tuple[int, int]]:
-    seen: set[tuple[int, int]] = set()
+def flood(maze: Maze, start: Coord) -> set[Coord]:
+    seen: set[Coord] = set()
     stack = [start]
     while stack:
         x, y = stack.pop()

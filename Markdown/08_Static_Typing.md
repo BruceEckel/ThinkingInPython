@@ -176,7 +176,7 @@ class Circle(Shape):
     pass
 
 def make(kind: type[Shape]) -> Shape:
-    return kind()
+    return kind()  # Instantiate the class
 
 shape = make(Circle)
 print(type(shape).__name__)
@@ -188,7 +188,7 @@ Passing `Circle` is allowed because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
 This is the construct functions like `issubclass()` work with, since they compare classes rather than instances.
 
-## The Hints Are Not Enforced at Run Time
+## Hints Are Not Enforced at Run Time
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.

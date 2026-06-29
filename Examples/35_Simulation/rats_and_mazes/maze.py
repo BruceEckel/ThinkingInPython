@@ -4,6 +4,8 @@
 from pathlib import Path
 from typing import Self
 
+type Coord = tuple[int, int]   # (column, row)
+
 class Maze:
     WALL = "*"
     OPEN = " "
@@ -28,7 +30,7 @@ class Maze:
         return (0 <= y < self.height and 0 <= x < self.width
                 and self.rows[y][x] == self.OPEN)
 
-    def entry(self) -> tuple[int, int]:
+    def entry(self) -> Coord:
         for y in range(self.height):
             for x in range(self.width):
                 if self.is_open(x, y):

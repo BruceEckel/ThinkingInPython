@@ -5,13 +5,13 @@
 
 import asyncio
 import itertools
-from maze import Maze
+from maze import Coord, Maze
 from rat import Rat
 
 class Blackboard:
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
-        self.visited: set[tuple[int, int]] = set()
+        self.visited: set[Coord] = set()
         self.tasks: list[asyncio.Task[None]] = []
         self.messages: list[str] = []
         self._numbers = itertools.count(1)

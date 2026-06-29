@@ -7,7 +7,7 @@ import asyncio
 import tkinter as tk
 from typing import override
 from blackboard import Blackboard
-from maze import Maze
+from maze import Coord, Maze
 
 CELL = 26
 
@@ -15,7 +15,7 @@ class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
-        self.order: list[tuple[int, int]] = []
+        self.order: list[Coord] = []
 
     @override
     def claim(self, x: int, y: int) -> bool:
