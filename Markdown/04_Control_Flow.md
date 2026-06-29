@@ -192,7 +192,7 @@ print(run("dance"))
 ```
 
 A pattern can also destructure a value and bind its parts.
-[Pattern Matching](12_Pattern_Matching.md) covers `match` in detail.
+[Pattern Matching](13_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
 
@@ -269,9 +269,9 @@ with path.open() as f:
 path.unlink()  # Delete the file
 ```
 
-This is the explicit-finalizer approach from [Class Attributes and Cleanup](09_Class_Attributes_and_Cleanup.md#cleanup).
+This is the explicit-finalizer approach from [Cleanup](10_Cleanup.md).
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
-[Context Managers](15_Context_Managers.md) shows how to write your own.
+[Context Managers](16_Context_Managers.md) shows how to write your own.
 Note that when simply reading or writing to a file,
 `pathlib` provides convenient utility methods like `read_text()` and `write_text()`
 that handle opening and closing the file for you.
@@ -299,5 +299,5 @@ print(parities)
 #: {0, 1}
 ```
 
-[Comprehensions](16_Comprehensions.md#list-comprehensions) covers comprehensions in detail,
+[Comprehensions](17_Comprehensions.md#list-comprehensions) covers comprehensions in detail,
 as well as generator expressions and the functional tools `map()` and `filter()`.

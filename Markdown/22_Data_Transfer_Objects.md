@@ -91,7 +91,7 @@ a `@dataclass` for a typed mutable record,
 and a `NamedTuple` for a typed immutable one.
 Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
-see [Data Classes as Types](11_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
+see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
 Tests confirm the `@dataclass` carries fields and value equality, and the `NamedTuple` is a named record you can still treat as a tuple:
 

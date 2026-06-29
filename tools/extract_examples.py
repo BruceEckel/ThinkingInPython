@@ -20,6 +20,12 @@ Default mode is ``check``: nothing is written, drift between the Markdown and
 the committed ``Examples/`` tree is reported, and a non-zero exit signals
 trouble (useful in CI). Pass ``--write`` to materialize the tree.
 
+Writing to the default ``build/examples`` (or any path under ``build/``) wipes
+the directory first, so a regenerated tree never carries orphaned files left by
+a renamed or deleted example. Writing to any other ``-o`` target keeps the
+non-destructive incremental write, since trees like the committed ``Examples/``
+hold files that are not generated from the book.
+
 Usage:
     python tools/extract_examples.py                # check vs Examples/
     python tools/extract_examples.py --write        # write build/examples/
@@ -28,12 +34,14 @@ Usage:
 
 import argparse
 import re
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MARKDOWN_DIR = ROOT / "Markdown"
 COMMITTED_DIR = ROOT / "Examples"
+BUILD_DIR = ROOT / "build"
 DEFAULT_OUT = ROOT / "build" / "examples"
 
 FENCE = re.compile(r"^```(\w+)?\s*$")
@@ -100,6 +108,22 @@ def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
     return result
 
 
+def is_derived(out_dir: Path) -> bool:
+    """True if out_dir lives under build/, so it is safe to wipe and rebuild.
+
+    The default output (build/examples) is gitignored and fully regenerated
+    from the Markdown, so cleaning it each run is safe and avoids leaving
+    orphaned files behind after a rename or deletion. Any other target (such as
+    the committed Examples/ tree, which holds files not generated from the book)
+    keeps the non-destructive incremental write.
+    """
+    try:
+        out_dir.resolve().relative_to(BUILD_DIR.resolve())
+        return True
+    except ValueError:
+        return False
+
+
 def write_tree(result: ExtractResult, out_dir: Path) -> int:
     written = 0
     for ex in result.examples.values():
@@ -145,8 +169,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  ! {path}  ({a} vs {b})")
 
     if args.write:
+        print()
+        if is_derived(args.out) and args.out.exists():
+            shutil.rmtree(args.out)
+            print(f"Cleaned {args.out}.")
         written = write_tree(result, args.out)
-        print(f"\nWrote {written} changed file(s) to {args.out}.")
+        print(f"Wrote {written} changed file(s) to {args.out}.")
         return 1 if result.conflicts else 0
 
     # Default: check mode against the committed Examples/ tree.

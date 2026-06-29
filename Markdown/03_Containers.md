@@ -320,11 +320,11 @@ print(height)
 A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
 but its fields are self-documenting as you see from the first `print()` statement.
 For records with defaults, methods, or type annotations,
-prefer a data class (see [Data Classes as Types](11_Data_Classes_as_Types.md#data-classes)).
+prefer a data class (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 
 The standard library has more specialized containers.
 For compact homogeneous storage (`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
-see [Performance](18_Performance.md).
+see [Performance](19_Performance.md).
 
 ## Immutability
 

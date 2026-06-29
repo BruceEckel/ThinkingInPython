@@ -1,6 +1,6 @@
 # Functional Error Handling
 
-[Data Classes as Types](11_Data_Classes_as_Types.md#a-type-is-a-set-of-values) made a value carry a guarantee.
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values) made a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
 a function returns its error as an ordinary value,
@@ -43,7 +43,7 @@ except ValueError as e:
 
 Function calls 0-2 produced values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering [Data Classes as Types](11_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) warns against.
+which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) warns against.
 
 ## Return the Error as a Value
 
@@ -78,7 +78,7 @@ for r in outputs:
 ```
 
 This keeps every result,
-and `match` (covered in [Pattern Matching](12_Pattern_Matching.md#matching-values)) tells the two cases apart.
+and `match` (covered in [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases would collide.
 We need something that says "success" or "failure" no matter what types they carry.
@@ -364,7 +364,7 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it has to unpack the `Result` to reach the number.
 
-The [Decorators](14_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
+The [Decorators](15_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
 
 `@safe` deserves its own check: a good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
 

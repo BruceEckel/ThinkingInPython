@@ -36,37 +36,39 @@ Delete the review file and mark a cell `X` when that item is done.
 
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|
-| 01_Introduction.md                  | | |
-| 02_Tour.md                          |X|X|
-| 03_Containers.md                    |X| |
-| 04_Control_Flow.md                  |X| |
-| 05_Functions.md                     |X|X|
-| 06_Modules_and_Packages.md          |X| |
-| 07_Classes.md                       |X| |
-| 08_Static_Typing.md                 |X| |
-| 09_Class_Attributes_and_Cleanup.md  |X| |
-| 10_Testing.md                       |X| |
-| 11_Data_Classes_as_Types.md         |X| |
-| 12_Pattern_Matching.md              |X| |
-| 13_Functional_Error_Handling.md     |X|X|
-| 14_Decorators.md                    |X|X|
-| 15_Context_Managers.md              |X| |
-| 16_Comprehensions.md                |X| |
-| 17_Metaprogramming.md               |X| |
-| 18_Performance.md                   | | |
-| 19_Rethinking_Objects.md            | | |
-| 20_The_Pattern_Concept.md           | | |
-| 21_Data_Transfer_Objects.md         | | |
-| 22_Singleton.md                     | | |
-| 23_Template_Method.md               | | |
-| 24_Surrogate.md                     | | |
-| 25_State_Machines.md                | | |
-| 26_Iterators.md                     | | |
-| 27_Factory.md                       | | |
-| 28_Function_Objects.md              | | |
-| 29_Changing_the_Interface.md        | | |
-| 30_Observer.md                      | | |
-| 31_Multiple_Dispatching.md          | | |
-| 32_Visitor.md                       | | |
-| 33_Pattern_Refactoring.md           | | |
-| 34_Simulation.md                    | | |
+| 01_Introduction.md              | | |
+| 02_Tour.md                      |X|X|
+| 03_Containers.md                |X| |
+| 04_Control_Flow.md              |X| |
+| 05_Functions.md                 |X|X|
+| 06_Modules_and_Packages.md      |X| |
+| 07_Classes.md                   |X| |
+| 08_Static_Typing.md             |X| |
+| 09_Class_Attributes.md          |X| |
+| 10_Cleanup.md                   |X| |
+| 11_Testing.md                   |X| |
+| 12_Data_Classes_as_Types.md     |X| |
+| 13_Pattern_Matching.md          |X| |
+| 14_Functional_Error_Handling.md |X|X|
+| 15_Decorators.md                |X|X|
+| 16_Context_Managers.md          |X| |
+| 17_Comprehensions.md            |X| |
+| 18_Metaprogramming.md           |X| |
+| 19_Performance.md               | | |
+| 20_Rethinking_Objects.md        | | |
+| 21_The_Pattern_Concept.md       | | |
+| 22_Data_Transfer_Objects.md     | | |
+| 23_Singleton.md                 | | |
+| 24_Template_Method.md           | | |
+| 25_Surrogate.md                 | | |
+| 26_State_Machines.md            | | |
+| 27_Iterators.md                 | | |
+| 28_Factory.md                   | | |
+| 29_Function_Objects.md          | | |
+| 30_Changing_the_Interface.md    | | |
+| 31_Observer.md                  | | |
+| 32_Multiple_Dispatching.md      | | |
+| 33_Visitor.md                   | | |
+| 34_Pattern_Refactoring.md       | | |
+| 35_Simulation.md                | | |
+| 36_Functional_Programming.md    | | |

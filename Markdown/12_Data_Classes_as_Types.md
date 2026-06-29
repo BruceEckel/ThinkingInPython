@@ -163,7 +163,7 @@ But notice the last two lines: a plain data class is still mutable,
 so `m.name = "bar"` works.
 
 A data class is a type defined by its fields. `display_object()`, the
-inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module),
+inspection helper from [Metaprogramming](18_Metaprogramming.md#the-inspect-module),
 shows those fields with the types they were declared with:
 
 ```python

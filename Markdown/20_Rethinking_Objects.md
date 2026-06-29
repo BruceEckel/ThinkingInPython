@@ -195,7 +195,7 @@ if __name__ == "__main__":
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
-[Data Classes as Types](11_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
+[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
 Here the point is narrower:
 most encapsulation is work you only do because you allowed mutation in the first place.
 
@@ -480,7 +480,7 @@ and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
 A third answer names a closed set of types as a union and dispatches with `match`,
-introduced in [Pattern Matching](12_Pattern_Matching.md#exhaustive-matching).
+introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles each case.
 There is no base class and no overridden method,
 and the type checker confirms the match covers every shape:
@@ -528,7 +528,7 @@ Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.
 The object-oriented default quietly assumes you will add types more often than operations,
 which is not always true.
-[Multiple Dispatching](31_Multiple_Dispatching.md#one-type-or-many) and [Visitor](32_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
 A test confirms the object-oriented and `match` versions compute the same areas:
 
@@ -551,7 +551,7 @@ A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and hashing for free.
 Defining a type is itself valuable,
-as [Data Classes as Types](11_Data_Classes_as_Types.md#a-type-is-a-set-of-values) argues.
+as [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values) argues.
 
 The shift is in the default.
 Start with functions and data.

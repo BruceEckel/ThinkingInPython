@@ -422,7 +422,7 @@ finally:
 #: Validation done
 ```
 
-[Functional Error Handling](13_Functional_Error_Handling.md) presents an
+[Functional Error Handling](14_Functional_Error_Handling.md) presents an
 alternative that returns errors as values instead of raising exceptions.
 
 ## Naming Conventions

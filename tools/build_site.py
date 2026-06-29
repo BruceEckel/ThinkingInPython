@@ -180,8 +180,8 @@ def render_chapter(body: str, ch: Chapter,
 # Introduction (01) stands alone above Part I.
 PARTS = {
     "02": ("I", "Foundations"),
-    "10": ("II", "Techniques"),
-    "19": ("III", "Patterns"),
+    "11": ("II", "Techniques"),
+    "20": ("III", "Patterns"),
 }
 
 

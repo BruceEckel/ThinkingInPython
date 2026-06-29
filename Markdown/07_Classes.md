@@ -59,7 +59,7 @@ If you declare fields using the C++/Java style,
 they implicitly become class level fields (similar to static fields in C++/Java).
 
 You can see the shape of an object with `display_object()`, a small inspection
-helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
+helper built in [Metaprogramming](18_Metaprogramming.md#the-inspect-module).
 It prints an object's attributes and methods:
 
 ```python
@@ -318,7 +318,7 @@ print(Temperature.is_freezing(-4))
 ```
 
 For classes that are primarily a bundle of typed data,
-[Data Classes as Types](11_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
+[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
 
 ## Composing Methods with `import`
 

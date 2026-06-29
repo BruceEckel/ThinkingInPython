@@ -164,7 +164,7 @@ print(table["title"]("functional python"))
 ```
 
 The dictionary holds functions as values, so a lookup yields a function you can immediately call.
-The [Function Objects](28_Function_Objects.md) chapter approaches the same capability from the pattern side.
+The [Function Objects](29_Function_Objects.md) chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow. A dictionary of functions replaces a long `if`/`elif` chain: you select the behavior by looking it up:
 
@@ -223,7 +223,7 @@ You stop rewriting the same iteration scaffold,
 along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
 The idea runs the other direction, too:
 a function that takes a function can wrap it with operations like timing, retries, or logging.
-This is what a decorator does in [Decorators](14_Decorators.md).
+This is what a decorator does in [Decorators](15_Decorators.md).
 
 ## Lambdas
 
@@ -461,7 +461,7 @@ print(first_five)
 
 `squares()` never finishes on its own, yet the program terminates because `islice()` requests exactly five values.
 Nothing beyond those five is ever computed.
-The [Performance](18_Performance.md) chapter looks at laziness from the angle of memory and speed.
+The [Performance](19_Performance.md) chapter looks at laziness from the angle of memory and speed.
 
 Laziness is compelling at scale. A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time, so memory stays flat no matter how large the source grows. Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches is never done at all.
 
@@ -496,7 +496,7 @@ print(describe({"name": "Ada"}))
 ```
 
 Each `case` is a pattern, and a match both tests the shape and pulls out the parts in one step.
-The [Pattern Matching](12_Pattern_Matching.md) chapter covers the full syntax.
+The [Pattern Matching](13_Pattern_Matching.md) chapter covers the full syntax.
 Here it earns its place as a declarative tool for taking data apart.
 
 The motivation is that one `match` collapses a stack of `isinstance()` tests, length checks, and key or index lookups into a single readable description of each shape. The test and the extraction happen together, so there is no gap where you have confirmed the shape but not yet pulled out its parts. This pays off most on shaped data, such as parsed JSON, an abstract syntax tree, or the messages of a protocol, where the alternative is a thicket of nested conditionals.
@@ -526,7 +526,7 @@ for divisor in (2, 0):
 
 The return type `float | None` tells the caller, and the type checker, that failure is possible.
 A richer version returns a dedicated result object carrying either a value or an error.
-The [Functional Error Handling](13_Functional_Error_Handling.md) chapter develops that approach in full.
+The [Functional Error Handling](14_Functional_Error_Handling.md) chapter develops that approach in full.
 
 Returning failure as a value is compelling because it makes failure visible. The possibility appears in the return type, so the type checker reminds every caller to handle it and a reviewer sees it without reading the body. Control flow stays local, with no exception leaping past intermediate frames to a distant handler. You do pay by handling the failure at each step, but that is the same discipline that stops an unhandled error from escaping unnoticed.
 
@@ -578,7 +578,7 @@ print([n * n for n in numbers if n % 2 == 0])
 Both produce the same list.
 The comprehension says "the squares of the even numbers" and leaves the looping to Python.
 This is the broader "functionality" the introduction points toward: describe the result, and let the machine arrange the steps.
-The [Comprehensions](16_Comprehensions.md) chapter explores this notation on its own.
+The [Comprehensions](17_Comprehensions.md) chapter explores this notation on its own.
 
 The compelling part is that declarative code says less and means more. By naming the result instead of the steps, you hand the reader your intent directly, and you give the runtime freedom to choose how to deliver it. That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
 

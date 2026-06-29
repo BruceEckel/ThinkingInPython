@@ -334,7 +334,7 @@ is the model-view split made concrete.
 
 1.  Write a class decorator that wraps every method of a class to print when the method is entered and exited,
     giving an execution trace.
-    ([Decorators](14_Decorators.md#decorating-classes) and [Metaprogramming](17_Metaprogramming.md#writing-a-metaclass) show the techniques.)
+    ([Decorators](15_Decorators.md#decorating-classes) and [Metaprogramming](18_Metaprogramming.md#writing-a-metaclass) show the techniques.)
 2.  Create a minimal Observer-Observable design in two classes.
     Just create the bare minimum in the two classes,
     then demonstrate your design by creating one `Observable` and many `Observer`s,
