@@ -222,7 +222,7 @@ so the file is the maze and nothing else.
 Running it turns the rats loose and prints what they mapped.
 
 ```python
-# rats_and_mazes/ratsandmazes.py
+# rats_and_mazes/rats_and_mazes.py
 # Turn a pack of rats loose on the maze and print what they mapped.
 
 import asyncio
@@ -264,7 +264,7 @@ no matter how the tasks interleave.
 A test pins that down by comparing the cells the rats visited against a plain flood fill of the same maze.
 
 ```python
-# rats_and_mazes/test_ratsandmazes.py
+# rats_and_mazes/test_rats_and_mazes.py
 import asyncio
 from blackboard import Blackboard
 from maze import Coord, Maze
@@ -310,7 +310,7 @@ It only draws, so the harness skips it (`tools/norun.txt`):
 # A tkinter view of the rats mapping the maze. The model (maze.py,
 # blackboard.py, rat.py) does the exploring. This file runs it and
 # replays the order the cells were claimed as an animation. The model
-# itself is checked headlessly in test_ratsandmazes.py.
+# itself is checked headlessly in test_rats_and_mazes.py.
 import asyncio
 import tkinter as tk
 from typing import override
@@ -844,7 +844,7 @@ A discussion of algorithms for collision detection and steering behavior for aut
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.
     Insert an `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`,
-    then run `test_ratsandmazes.py` several times.
+    then run `test_rats_and_mazes.py` several times.
     What goes wrong when two rats reach the same cell during that gap,
     and why does the original `claim()`, with no `await` inside it,
     need no lock?
@@ -855,7 +855,7 @@ A discussion of algorithms for collision detection and steering behavior for aut
     explain why the factory finds your new item on its own.
 5.  Compute the solution instead of hard-coding it.
     Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,
-    the way `flood()` searches maze cells in `test_ratsandmazes.py`.
+    the way `flood()` searches maze cells in `test_rats_and_mazes.py`.
     Turn that path into a move string, feed it to `run()`,
     and assert that the robot finishes on the `!` square,
     as `test_robot.py` does.
