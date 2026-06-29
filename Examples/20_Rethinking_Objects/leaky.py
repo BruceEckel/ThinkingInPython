@@ -1,7 +1,4 @@
 # leaky.py
-# Encapsulation with private fields and getters still leaks. A
-# getter that returns a mutable object hands the caller a reference
-# to the real internals.
 from dataclasses import dataclass
 
 @dataclass

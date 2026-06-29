@@ -1,8 +1,4 @@
 # immutable.py
-# Encapsulation is only needed because of mutability. Freeze the
-# data and the problem dissolves: the fields are public, there are
-# no getters and no copies, and nothing can leak because nothing can
-# change.
 from dataclasses import dataclass
 
 @dataclass(frozen=True)

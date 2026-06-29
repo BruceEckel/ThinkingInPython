@@ -267,7 +267,7 @@ print(initials)
 There is no lazy `set` or `dict`, though.
 Parentheses always build the whole collection at once,
 and `set(...)` or `dict(...)` over a generator does the same,
-since a set or dict has to hold every element.
+since a set or dict must hold every element.
 So neither saves anything over the set comprehension `{len(w) for w in words}`
 or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are preferred.

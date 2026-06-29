@@ -13,7 +13,7 @@ Before we start, I want to question how much of that machinery we actually need.
 This chapter is adapted from my PyCon 2023 talk,
 [Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects).
 
-## It Is Evolution
+## Evolution
 
 Languages evolve to fit their environment.
 A feature that looks strange now usually made sense for the problem,
@@ -24,13 +24,13 @@ It helps to look at where objects came from.
 a system is a set of things that interact.
 Notably, not everything was an object.
 Simula still had standalone functions.
-It was a compiled, statically typed language,
-so the idea that a subtype should be substitutable for its base type,
-the Liskov substitution principle, fit naturally.
+It was a compiled, statically typed language.
+The Liskov substitution principle:
+a subtype should be substitutable for its base type, fit naturally.
 
 *Smalltalk* took the other road: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
-It was a gloriously dynamic,
+It was an emphatically dynamic,
 run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
 That is the opposite of Liskov substitution.
 
@@ -43,13 +43,14 @@ Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
 which pulls in the other direction.
 
-Then the newer languages backed away.
-Rust, Swift, Go, and Kotlin lean on data structures rather than objects.
-They make data immutable by default,
-they compose data structures instead of inheriting implementation,
+Newer languages backed away from inheritance.
+Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
+They favor immutability.
+Rust makes bindings immutable by default; Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
+They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
-The industry has been quietly walking away from "everything is an object" and from implementation inheritance.
-The rest of this chapter shows why, in Python.
+The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
+The rest of this chapter shows why.
 
 ## Encapsulation Leaks
 
@@ -61,9 +62,6 @@ A getter that returns a mutable object hands the caller a reference to the real 
 
 ```python
 # leaky.py
-# Encapsulation with private fields and getters still leaks. A
-# getter that returns a mutable object hands the caller a reference
-# to the real internals.
 from dataclasses import dataclass
 
 @dataclass
@@ -92,11 +90,13 @@ if __name__ == "__main__":
 #: [1, 2, 999] Bob(name='Ralph')
 ```
 
+Encapsulation with private fields and getters still leaks.
+A getter that returns a mutable object hands the caller a reference to the real internals.
 The output shows that the internals changed from outside.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
 
-A test shows the leak: mutating the returned list reaches the real internal state:
+A test shows the leak:
 
 ```python
 # test_leaky.py
@@ -108,17 +108,16 @@ def test_getter_leaks_internal_state() -> None:
     assert leaky.numbers == [1, 2, 999]
 ```
 
+Mutating the returned list reaches the real internal state.
+
 ## Plugging the Leaks Is Tedious
 
 You can stop the leak by copying everything a getter returns.
-It works, but every getter has to remember to do it,
+It works, but every getter must remember to do it,
 and so does every getter in every subclass, forever:
 
 ```python
 # plugged.py
-# Plugging the leaks means defensively copying everything a getter
-# returns. It works, but every getter has to remember to do it,
-# forever.
 from copy import deepcopy
 from dataclasses import dataclass
 
@@ -172,10 +171,6 @@ The fields are public, there are no getters, and there are no copies:
 
 ```python
 # immutable.py
-# Encapsulation is only needed because of mutability. Freeze the
-# data and the problem dissolves: the fields are public, there are
-# no getters and no copies, and nothing can leak because nothing can
-# change.
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -195,11 +190,7 @@ if __name__ == "__main__":
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
-[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
-Here the point is narrower:
-most encapsulation is work you only do because you allowed mutation in the first place.
-
-A test confirms a frozen object refuses mutation:
+The frozen object refuses mutation:
 
 ```python
 # test_immutable.py
@@ -214,6 +205,9 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
+[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
+Here, the point that most encapsulation is work you only do because you allowed mutation in the first place.
+
 ## Methods or Functions?
 
 The second promise is that behavior belongs inside the object, as methods.
@@ -222,10 +216,6 @@ Compare a method with a plain function that does the same thing:
 
 ```python
 # point_distance.py
-# A method bound to the class, versus a plain function. The function
-# reads the same and computes the same. The class does not need to
-# own it.
-
 from dataclasses import dataclass
 from math import sqrt
 
@@ -248,8 +238,9 @@ if __name__ == "__main__":
 #: 5.0
 ```
 
-The function is not worse.
-And it has an advantage: it does not have to live inside `Point`.
+The function reads the same and computes the same.
+The class does not need to own it.
+The function is not worse, and it has an advantage: it does not have to live inside `Point`.
 
 A test confirms the method and the free function agree:
 
@@ -265,7 +256,7 @@ def test_method_and_function_agree() -> None:
 
 ## Protocols Generalize, Composition Adapts
 
-Because the function is free, it can work on anything shaped like a point.
+Because the function is not attached to a class, it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with the right attributes satisfies it,
 with no declared inheritance.
@@ -275,11 +266,6 @@ not inheritance:
 
 ```python
 # distance_protocol.py
-# The free function generalizes to anything with x and y, described
-# by a Protocol. That is the structural typing from the Static Type
-# Checking chapter. A class that lacks x and y can be adapted by
-# composition, with no inheritance.
-
 from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol

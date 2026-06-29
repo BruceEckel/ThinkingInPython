@@ -1,8 +1,4 @@
 # point_distance.py
-# A method bound to the class, versus a plain function. The function
-# reads the same and computes the same. The class does not need to
-# own it.
-
 from dataclasses import dataclass
 from math import sqrt
 

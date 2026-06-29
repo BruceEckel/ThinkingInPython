@@ -176,7 +176,7 @@ def test_bind_short_circuits_a_failure() -> None:
 
 Real programs chain steps.
 With a `Result`, each step can fail,
-so each call has to be checked before the next one runs.
+so each call must be checked before the next one runs.
 An exception from existing code can be caught and turned into a `Failure`,
 so the failure becomes data rather than control flow:
 
@@ -362,7 +362,7 @@ if __name__ == "__main__":
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
-because it has to unpack the `Result` to reach the number.
+because it must unpack the `Result` to reach the number.
 
 The [Decorators](15_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
 

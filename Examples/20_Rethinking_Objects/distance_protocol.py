@@ -1,9 +1,4 @@
 # distance_protocol.py
-# The free function generalizes to anything with x and y, described
-# by a Protocol. That is the structural typing from the Static Type
-# Checking chapter. A class that lacks x and y can be adapted by
-# composition, with no inheritance.
-
 from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol

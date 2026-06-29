@@ -35,7 +35,7 @@ def check(condition: bool, message: str, detail: str = "") -> None:
 Suppose a rating is an integer from one to ten.
 If you represent it as a plain `int`,
 nothing stops a caller from passing eleven, or minus one.
-So every function that takes a rating has to check it:
+So every function that takes a rating must check it:
 
 ```python
 # stars_unchecked.py
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 ```
 
 A read-only property keeps outsiders from assigning to `number`,
-but the class itself still mutates `_number` and has to guard it with a precondition and a postcondition.
+but the class itself still mutates `_number` and must guard it with a precondition and a postcondition.
 Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
 The problem with DbC is that the contract is spread across every method that touches the value.
 That is the same scattering of checks as before, but moved inside the class.
