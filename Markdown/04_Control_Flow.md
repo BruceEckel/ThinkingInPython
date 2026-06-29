@@ -35,6 +35,19 @@ print(classify(-3), classify(0), classify(7))
 #: negative zero positive
 ```
 
+The `pass` statement does nothing.
+Use it where Python's syntax requires a statement but you have none to run yet:
+
+```python
+# pass_statement.py
+
+def not_implemented():
+    pass  # Fill in later
+
+print(not_implemented())
+#: None
+```
+
 A `while` loop runs until its condition is false:
 
 ```python
@@ -75,6 +88,30 @@ for n in range(10):
 The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
 
+A loop may have an `else` clause.
+It runs only if the loop finished without hitting `break`,
+which makes it natural for search loops:
+
+```python
+# loop_else.py
+
+def find_factor(n):
+    for d in range(2, n):
+        if n % d == 0:
+            print(f"{n} = {d} * {n // d}")
+            break
+    else:
+        print(f"{n} is prime")  # No break means no factor found
+
+find_factor(15)
+#: 15 = 3 * 5
+find_factor(13)
+#: 13 is prime
+```
+
+The `else` belongs to the `for`, not the `if`.
+A `while` loop can use `else` the same way.
+
 When iterating, `for` walks any sequence directly.
 Use `range()` for counting, `enumerate()` when you also need the index,
 and `zip()` to walk two sequences together:
@@ -102,6 +139,27 @@ for name, score in zip(names, scores):
 
 `enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
 `zip()` walks several sequences at once, producing one item from each and stopping when the shortest runs out.
+
+The *walrus operator* `:=` assigns a value as part of an expression,
+so you can compute, name, and test a value in one place:
+
+```python
+# walrus.py
+
+text = "hello"
+# Without it, you assign first and then test:
+length = len(text)
+if length > 3:
+    print(f"{length} characters")
+#: 5 characters
+# The walrus assigns inside the condition:
+if (n := len(text)) > 3:
+    print(f"{n} characters")
+#: 5 characters
+```
+
+It is especially handy in `while` conditions and comprehensions,
+where it avoids repeating a computation.
 
 With `print()`, the default `end` (printed after the value) is a newline.
 You can use `sep` to change the separator between values.
