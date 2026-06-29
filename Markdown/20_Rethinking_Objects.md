@@ -3,7 +3,7 @@
 I spent much of my career promoting objects.
 I wrote *Thinking in C++* and *Thinking in Java*,
 served on the C++ Standards Committee for its first eight years,
-and toured the world giving object-oriented programming talks.
+and toured the world giving object-oriented programming (OOP) presentations.
 So when I say I have come to doubt that objects should be the default,
 it is not an outsider's complaint.
 
@@ -11,7 +11,8 @@ We are about to spend the rest of this book on design patterns,
 and most of them assume objects and inheritance.
 Before we start, I want to question how much of that machinery we actually need.
 This chapter is adapted from my PyCon 2023 talk,
-[Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects).
+[Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects),
+and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
 
 ## Evolution
 
@@ -54,7 +55,7 @@ The rest of this chapter shows why.
 
 ## Encapsulation Leaks
 
-The first promise of objects is encapsulation: hide the data,
+The first OOP promise is encapsulation: hide the data,
 expose it only through methods you control.
 In Python the usual move is a leading underscore and a read-only property.
 It does not work as well as it looks.
@@ -210,7 +211,7 @@ Here, the point that most encapsulation is work you only do because you allowed 
 
 ## Methods or Functions?
 
-The second promise is that behavior belongs inside the object, as methods.
+The second OOP promise is that behavior belongs inside the object, as methods.
 But a method is only a function whose first argument is the object.
 Compare a method with a plain function that does the same thing:
 
@@ -325,7 +326,7 @@ def test_protocol_and_adapter() -> None:
 
 ## Compose, Do Not Inherit
 
-The third promise is reuse through inheritance.
+The third OOP promise is reuse through inheritance.
 In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
 The alternative is composition: a type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
@@ -333,9 +334,6 @@ and frozen instances compare by value and can be used as keys:
 
 ```python
 # composition.py
-# Build new types by composing data, not by inheriting
-# implementation. replace() copies with changes, and frozen
-# instances compare and hash.
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
@@ -375,12 +373,11 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 
 ## Polymorphism Without Inheritance
 
-The fourth promise is polymorphism.
-It is usually taught through inheritance, but that is only one form of it.
+The fourth OOP promise is polymorphism.
+This is usually taught through inheritance, but that is only one form.
 More broadly, polymorphism means a function parameter accepts more than one type.
 The questions are which types it accepts,
 and what the function may do with them.
-This section draws on my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
 
 The classic object-oriented answer uses an abstract base class.
 The base type names both the allowed types, its subclasses,
@@ -419,18 +416,16 @@ if __name__ == "__main__":
         print(round(shape.area(), 4))
 ```
 
-Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated, and `@abstractmethod` forces every subclass to define `area()`.
+Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated,
+and `@abstractmethod` forces every subclass to define `area()`.
 
-Dynamic typing gives a different answer:
+Dynamic typing produces a different approach:
 any type works as long as it has the method the function calls.
 There is no shared base class and no declared set of types,
 and validity is checked only at runtime, when the call happens:
 
 ```python
 # dynamic_typing.py
-# Dynamic typing: any type works as long as it has the method that
-# gets called. There is no base class and no type union. The check
-# happens only at runtime, when the method is called.
 from dataclasses import dataclass
 from typing import Any
 
@@ -468,14 +463,11 @@ Dynamic typing and protocols are the same idea, checked at different times.
 A third answer names a closed set of types as a union and dispatches with `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles each case.
-There is no base class and no overridden method,
-and the type checker confirms the match covers every shape:
+There is no base class and no overridden method.
+The type checker confirms the match covers every shape:
 
 ```python
 # shapes_match.py
-# The same shapes as immutable data, with one free function that
-# dispatches by pattern matching. No base class and no overridden
-# methods.
 import math
 from dataclasses import dataclass
 from typing import assert_never
@@ -508,12 +500,12 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Which approach is better depends on how the code will grow.
+The approach to choose depends on how the code will grow.
 Adding a new *shape* is easier in the object version: write one class.
 Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.
-The object-oriented default quietly assumes you will add types more often than operations,
-which is not always true.
+The object-oriented default assumes you will add types more often than operations,
+which is often not true.
 [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
 A test confirms the object-oriented and `match` versions compute the same areas:
@@ -536,10 +528,11 @@ They improved real things.
 A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and hashing for free.
-Defining a type is itself valuable,
-as [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values) argues.
 
-The shift is in the default.
+They normalized the very important idea of types, as seen in
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
+If you simply avoid implementation inheritance, the payoff for using types is tremendous.
+
 Start with functions and data.
 When a program truly wants an object, it tells you:
 you find yourself passing the same data into every function,
@@ -548,8 +541,6 @@ Objects are useful sometimes.
 They do not need to be everywhere, all the time.
 
 ## Guidelines
-
-Carry these into the chapters that follow:
 
 - Prefer immutable data structures over encapsulation.
 - Prefer functions over methods.

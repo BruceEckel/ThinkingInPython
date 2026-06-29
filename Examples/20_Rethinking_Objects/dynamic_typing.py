@@ -1,7 +1,4 @@
 # dynamic_typing.py
-# Dynamic typing: any type works as long as it has the method that
-# gets called. There is no base class and no type union. The check
-# happens only at runtime, when the method is called.
 from dataclasses import dataclass
 from typing import Any
 

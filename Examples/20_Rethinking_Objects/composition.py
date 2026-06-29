@@ -1,7 +1,4 @@
 # composition.py
-# Build new types by composing data, not by inheriting
-# implementation. replace() copies with changes, and frozen
-# instances compare and hash.
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)

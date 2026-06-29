@@ -1,7 +1,4 @@
 # shapes_match.py
-# The same shapes as immutable data, with one free function that
-# dispatches by pattern matching. No base class and no overridden
-# methods.
 import math
 from dataclasses import dataclass
 from typing import assert_never
