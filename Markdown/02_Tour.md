@@ -435,10 +435,17 @@ as in `this_is_snake_case`.
 If something represents a constant, use all uppercase letters,
 as in `THIS_IS_A_CONSTANT`.
 
-The one exception is class names, which are `CapWords` (pascal cased),
+The one exception is class names, which are `CapWords` (Pascal cased),
 starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
+
+A class may instead use `snake_case` when it is documented and used primarily as a
+callable, the way a function is.
+The standard library does this for `contextlib.suppress` and `contextlib.contextmanager`,
+and for builtins like `property` and `staticmethod`.
+Reserve it for classes that behave like a function to their users.
+The default for a class is still `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
 These can be automatically applied to your code (or at least, pointed out) using tools such as ruff.

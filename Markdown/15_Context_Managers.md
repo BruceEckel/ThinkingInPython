@@ -131,6 +131,9 @@ print("survived")
 #: survived
 ```
 
+`suppress` is a class, but it is named like a function because you use it like one.
+See [Naming Conventions](02_Tour.md#naming-conventions) for when a class departs from `CapWords`.
+
 ## Context Managers as Generators
 
 Most context managers are simpler to write as a generator.
