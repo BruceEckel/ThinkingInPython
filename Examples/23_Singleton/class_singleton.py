@@ -21,11 +21,6 @@ z = Foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
-print(x.val)
-#: spam
-print(y.val)
-#: spam
-print(z.val)
-#: spam
-print(x is y is z)
-#: True
+# One cached instance, so x.val is now spam:
+print(x.val, x is y is z)
+#: spam True

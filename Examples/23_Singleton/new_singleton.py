@@ -16,20 +16,10 @@ class OnlyOne:
 
 x = OnlyOne()
 x.val = 'sausage'
-print(x.val)
-#: sausage
 y = OnlyOne()
 y.val = 'eggs'
-print(y.val)
-#: eggs
 z = OnlyOne()
 z.val = 'spam'
-print(z.val)
-#: spam
-print(x.val)
-#: spam
-print(y.val)
-#: spam
-# __new__ returns the one instance every time, so all three are it:
-print(x is y is z)
-#: True
+# __new__ returns the one instance every time, so x.val is now spam:
+print(x.val, x is y is z)
+#: spam True

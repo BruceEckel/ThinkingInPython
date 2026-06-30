@@ -1,4 +1,4 @@
-# test_metaclass.py
+# test_singleton_metaclass.py
 import singleton_metaclass
 
 def test_metaclass_returns_same_instance() -> None:

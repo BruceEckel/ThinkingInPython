@@ -75,6 +75,9 @@ def test_cache_factory_returns_same_instance() -> None:
 If you need the class itself to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
+Modules and cached factories should provide your singleton needs.
+The rest of this chapter is only included because it demonstrates interesting techniques and insights.
+
 ## The Classic Implementations
 
 *GoF Design Patterns* builds the singleton with more apparatus,
@@ -116,11 +119,6 @@ print(y.val)
 #: ['sausage', 'eggs']
 z = OnlyOne('spam')
 print(z.val)
-#: ['sausage', 'eggs', 'spam']
-# Every wrapper sees the one shared list:
-print(x.val)
-#: ['sausage', 'eggs', 'spam']
-print(y.val)
 #: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
@@ -164,14 +162,10 @@ class OnlyOne:
         return getattr(self.instance, name)
 
 x = OnlyOne('sausage')
-print(x.val)
-#: ['sausage']
 y = OnlyOne('eggs')
-print(y.val)
-#: ['sausage', 'eggs']
-# Distinct wrappers (x is not y), one shared inner instance:
-print(x is y, x.instance is y.instance)
-#: False True
+# Distinct wrappers (x is not y), one shared inner list:
+print(x.val, x is y, x.instance is y.instance)
+#: ['sausage', 'eggs'] False True
 ```
 
 The bare `__OnlyOne()` works because the nested class is already defined at that
@@ -213,32 +207,14 @@ class OnlyOne:
 
 x = OnlyOne()
 x.val = 'sausage'
-print(x.val)
-#: sausage
 y = OnlyOne()
 y.val = 'eggs'
-print(y.val)
-#: eggs
 z = OnlyOne()
 z.val = 'spam'
-print(z.val)
-#: spam
-print(x.val)
-#: spam
-print(y.val)
-#: spam
-# __new__ returns the one instance every time, so all three are it:
-print(x is y is z)
-#: True
+# __new__ returns the one instance every time, so x.val is now spam:
+print(x.val, x is y is z)
+#: spam True
 ```
-
-Because `__new__()` returns the inner `__OnlyOne` object,
-that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
-not a wrapper around it.
-There are no delegating `__getattr__()` or `__setattr__()` methods here:
-attribute access goes straight to the one object.
-
-A test confirms `__new__()` hands back the one instance:
 
 ```python
 # test_new.py
@@ -247,6 +223,12 @@ import new_singleton
 def test_new_returns_same_instance() -> None:
     assert new_singleton.OnlyOne() is new_singleton.OnlyOne()
 ```
+
+Because `__new__()` returns the inner `__OnlyOne` object,
+that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
+not a wrapper around it.
+There are no delegating `__getattr__()` or `__setattr__()` methods here:
+attribute access goes straight to the one object.
 
 ### Borg: Share State Instead of Identity
 
@@ -276,21 +258,11 @@ class Singleton(Borg):
         return self.val
 
 x = Singleton('sausage')
-print(x)
-#: sausage
 y = Singleton('eggs')
-print(y)
-#: eggs
 z = Singleton('spam')
-print(z)
-#: spam
-print(x)
-#: spam
-print(y)
-#: spam
-# Distinct objects (x is not y), but one shared __dict__:
-print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
-#: False True
+# Last write wins on the shared state; distinct objects, one __dict__:
+print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
+#: spam False True
 ```
 
 This has the same effect as the singleton,
@@ -307,7 +279,7 @@ does not help either: it runs after the fields are assigned, so it discards
 them. The hand-written `__init__` is what makes the shared state work,
 and a silent loss of sharing is worse than a version that simply does not run.
 
-A test confirms the objects differ but share one set of state:
+Testing confirms the objects differ but share one set of state:
 
 ```python
 # test_borg.py
@@ -340,20 +312,12 @@ class SingleTone:
         return instance
 
 x = SingleTone('sausage')
-print(x.val)
-#: sausage
 y = SingleTone('eggs')
-print(y.val)
-#: eggs
 z = SingleTone('spam')
-print(z.val)
-#: spam
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
 ```
-
-A test confirms every construction returns the one instance:
 
 ```python
 # test_class_variable.py
@@ -395,14 +359,17 @@ z = Foo()
 x.val = 'sausage'
 y.val = 'eggs'
 z.val = 'spam'
-print(x.val)
-#: spam
-print(y.val)
-#: spam
-print(z.val)
-#: spam
-print(x is y is z)
-#: True
+# One cached instance, so x.val is now spam:
+print(x.val, x is y is z)
+#: spam True
+```
+
+```python
+# test_decorator.py
+import class_singleton
+
+def test_decorator_returns_same_instance() -> None:
+    assert class_singleton.Foo() is class_singleton.Foo()
 ```
 
 Applying `@ClassSingleton` to `Foo` runs `Foo = ClassSingleton(Foo)`,
@@ -413,21 +380,10 @@ But the name no longer points at a class.
 The `__new__()` and metaclass versions below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
-A test confirms the decorated class returns its cached instance:
-
-```python
-# test_decorator.py
-import class_singleton
-
-def test_decorator_returns_same_instance() -> None:
-    assert class_singleton.Foo() is class_singleton.Foo()
-```
-
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-Metaclasses are covered in [Metaprogramming](18_Metaprogramming.md#intercepting-instance-creation),
-where this same singleton appears next to the simpler hooks that usually replace them.
+[Here](18_Metaprogramming.md#intercepting-instance-creation), this same singleton appears next to the simpler hooks that usually replace them.
 It is included here for completeness:
 
 ```python
@@ -460,20 +416,12 @@ x = Bar('sausage')
 y = Bar('eggs')
 z = Bar('spam')
 # Each Bar(...) reruns __init__ on the one instance, so val is spam:
-print(x)
-#: spam
-print(y)
-#: spam
-print(z)
-#: spam
-print(x is y is z)
-#: True
+print(x, x is y is z)
+#: spam True
 ```
 
-A test confirms the metaclass returns the one instance:
-
 ```python
-# test_metaclass.py
+# test_singleton_metaclass.py
 import singleton_metaclass
 
 def test_metaclass_returns_same_instance() -> None:
@@ -486,7 +434,7 @@ def test_metaclass_returns_same_instance() -> None:
 Use the lightest tool that fits:
 
 - For almost everything, use a *module* with module-level state.
-  It is the truest Python singleton and needs no class.
+  It is the default Python singleton and needs no class.
 - If you want a class, hide construction behind a cached factory (`@cache`),
   or override `__new__()`.
 - If you really want many handles sharing one set of state, use *Borg*.

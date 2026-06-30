@@ -26,11 +26,6 @@ print(y.val)
 z = OnlyOne('spam')
 print(z.val)
 #: ['sausage', 'eggs', 'spam']
-# Every wrapper sees the one shared list:
-print(x.val)
-#: ['sausage', 'eggs', 'spam']
-print(y.val)
-#: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
 #: False True

@@ -17,11 +17,7 @@ class OnlyOne:
         return getattr(self.instance, name)
 
 x = OnlyOne('sausage')
-print(x.val)
-#: ['sausage']
 y = OnlyOne('eggs')
-print(y.val)
-#: ['sausage', 'eggs']
-# Distinct wrappers (x is not y), one shared inner instance:
-print(x is y, x.instance is y.instance)
-#: False True
+# Distinct wrappers (x is not y), one shared inner list:
+print(x.val, x is y, x.instance is y.instance)
+#: ['sausage', 'eggs'] False True

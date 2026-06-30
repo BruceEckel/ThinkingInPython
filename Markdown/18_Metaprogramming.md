@@ -345,6 +345,19 @@ except for `__new__()`, which uses `mcl` (metaclass).
 The `cls` is the class object being built.
 As with any subclass, call the base-class version first through `super()`.
 
+Metaprogramming and static typing pull against each other.
+A type describes a fixed set of attributes and signatures,
+but a metaclass changes that structure at runtime,
+adding attributes the class never declared and replacing methods like `__new__()`.
+The checker cannot follow those changes, so it reports the dynamic lines as errors.
+There are three ways to quiet it, from narrowest to broadest:
+`setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
+a localized `# type: ignore` silences one line, as on `simple.uses_metaclass()` above;
+and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
+The [singleton metaclass](23_Singleton.md#singleton-using-metaclasses) uses that last form,
+`klass: Any = cls`, to add an `instance` attribute and swap `__new__()`.
+Prefer the narrowest escape that fits, because a broad `Any` also hides genuine mistakes.
+
 ## `__init__()` versus `__new__()` in a Metaclass
 
 Metaclass examples appear to use `__new__()` and `__init__()` interchangeably.

@@ -17,18 +17,8 @@ class Singleton(Borg):
         return self.val
 
 x = Singleton('sausage')
-print(x)
-#: sausage
 y = Singleton('eggs')
-print(y)
-#: eggs
 z = Singleton('spam')
-print(z)
-#: spam
-print(x)
-#: spam
-print(y)
-#: spam
-# Distinct objects (x is not y), but one shared __dict__:
-print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
-#: False True
+# Last write wins on the shared state; distinct objects, one __dict__:
+print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
+#: spam False True
