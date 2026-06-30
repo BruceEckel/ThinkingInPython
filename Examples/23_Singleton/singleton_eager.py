@@ -1,4 +1,4 @@
-# singleton_pattern.py
+# singleton_eager.py
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
@@ -7,11 +7,10 @@ class OnlyOne:
     class __OnlyOne:
         val: list[str] = field(default_factory=list)
 
-    instance: ClassVar[Any] = None
+    # Created once, when the class is defined:
+    instance: ClassVar[Any] = __OnlyOne()
 
     def __init__(self, arg: str) -> None:
-        if OnlyOne.instance is None:
-            OnlyOne.instance = OnlyOne.__OnlyOne()
         OnlyOne.instance.val.append(arg)
 
     def __getattr__(self, name: str) -> Any:
@@ -23,14 +22,6 @@ print(x.val)
 y = OnlyOne('eggs')
 print(y.val)
 #: ['sausage', 'eggs']
-z = OnlyOne('spam')
-print(z.val)
-#: ['sausage', 'eggs', 'spam']
-# Every wrapper sees the one shared list:
-print(x.val)
-#: ['sausage', 'eggs', 'spam']
-print(y.val)
-#: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
-print(x is y, x.instance is y.instance is z.instance)
+print(x is y, x.instance is y.instance)
 #: False True

@@ -1,19 +1,14 @@
 # Singleton
 
-A *singleton* is a class with exactly one instance,
-reachable from a well-known place.
-It is the simplest design pattern,
-and in Python it is also the one most often written with far more machinery than it needs.
-
-Before reaching for any classic implementation,
-ask the question this part of the book keeps asking:
-does the language already solve this?
-For the singleton, it does.
+A *singleton* is the simplest design pattern: a class with exactly one instance.
+Before using a classic implementation,
+ask whether the language already provides a solution.
+For the singleton, Python does.
 
 ## A Module Is Already a Singleton
 
 Python imports each module once and caches it in `sys.modules`.
-Every `import` after the first hands back the same module object.
+Every `import` after the first produces the same module object.
 So a module *is* a singleton, and module-level names are a single, shared,
 one-and-only-one piece of state.
 Put the state in a module:
@@ -28,37 +23,17 @@ Mutating it through one import is visible through every other:
 
 ```python
 # shared_config.py
-# A module is imported once and cached in sys.modules, so its globals
-# are shared. The settings you import is config's own dict, the same
-# object everywhere it is imported.
-import config
+# A module's globals are shared.
 from config import settings
 
-settings["theme"] = "dark"  # Write through the imported name
-print(config.settings)  # The same dict
+settings["theme"] = "dark"
+print(settings)
 #: {'theme': 'dark'}
-print(config.settings is settings)
-#: True
 ```
 
 No class, no ceremony.
-For the large majority of "I need one shared X" cases,
-the answer is a module with module-level state or functions.
-This is the idiomatic Python singleton, and it is worth trying first.
-
-A test confirms the imported `settings` is `config`'s own dict:
-
-```python
-# test_module.py
-import config
-import shared_config
-
-def test_module_is_singleton() -> None:
-    # shared_config did `from config import settings` and wrote to it,
-    # mutating config's own dict.
-    assert shared_config.settings is config.settings
-    assert config.settings["theme"] == "dark"
-```
+For the large majority of singleton needs, the module approach solves the problem.
+The idiomatic Python singleton is worth trying first.
 
 ## When You Want a Class: Cache the Instance
 
@@ -68,8 +43,7 @@ The simplest way is to hide construction behind a cached factory.
 `functools.cache` makes a zero-argument factory return the one instance forever:
 
 ```python
-# cache_singleton.py
-# The simplest class-based singleton: a cached factory.
+# cached_factory_singleton.py
 from functools import cache
 
 class Settings:
@@ -89,129 +63,180 @@ print(b.data)
 #: {'theme': 'dark'}
 ```
 
+```python
+# test_cache.py
+import cached_factory_singleton
+
+def test_cache_factory_returns_same_instance() -> None:
+    assert (cached_factory_singleton.settings() is
+        cached_factory_singleton.settings())
+```
+
 If you need the class itself to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
-A test confirms the cached factory returns the one instance:
-
-```python
-# test_cache.py
-import cache_singleton
-
-def test_cache_factory_returns_same_instance() -> None:
-    assert cache_singleton.settings() is cache_singleton.settings()
-```
-
 ## The Classic Implementations
 
-*GoF Design Patterns* builds the singleton with more apparatus.
-The variations below run from elaborate to simple.
-They are worth seeing,
+*GoF Design Patterns* builds the singleton with more apparatus,
+because it addresses languages like C++ and Java.
+The variations shown here are worth understanding,
 but notice that each does more work than the module or the cached factory above.
 
-The classic approach takes control of creation by delegating to a single instance of a private nested class:
+The classic approach takes control of creation by delegating to a single instance of a private nested class.
+
+### Lazy Creation
+
+This version builds the inner instance on the first call:
 
 ```python
 # singleton_pattern.py
+from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
 class OnlyOne:
+    @dataclass
     class __OnlyOne:
-        def __init__(self, arg: str) -> None:
-            self.val = arg
-
-        def __str__(self) -> str:
-            return self.val
+        val: list[str] = field(default_factory=list)
 
     instance: ClassVar[Any] = None
 
     def __init__(self, arg: str) -> None:
-        if not OnlyOne.instance:
-            OnlyOne.instance = OnlyOne.__OnlyOne(arg)
-        else:
-            OnlyOne.instance.val = arg
-
-    def __str__(self) -> str:
-        return str(self.instance)
+        if OnlyOne.instance is None:
+            OnlyOne.instance = OnlyOne.__OnlyOne()
+        OnlyOne.instance.val.append(arg)
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
 
 x = OnlyOne('sausage')
-print(x)
-#: sausage
+print(x.val)
+#: ['sausage']
 y = OnlyOne('eggs')
-print(y)
-#: eggs
+print(y.val)
+#: ['sausage', 'eggs']
 z = OnlyOne('spam')
-print(z)
-#: spam
-print(x)
-#: spam
-print(y)
-#: spam
+print(z.val)
+#: ['sausage', 'eggs', 'spam']
+# Every wrapper sees the one shared list:
+print(x.val)
+#: ['sausage', 'eggs', 'spam']
+print(y.val)
+#: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
 #: False True
 ```
 
 Because the inner class is named with a double underscore,
-it is private so the user cannot directly access it.
+it is private so an attempt to directly access produce a type-checking error.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`;
-after that it reuses the one inner object.
+after that it reuses the one inner object,
+and each construction appends its argument to that object's shared list.
 Access is delegated through `__getattr__()`.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
-This works, but it is a lot of code for what a module does on its own.
+It is *lazy*: it builds the inner object on the first call,
+which is why it needs the `None` sentinel and the `if` guard.
+
+### Eager Creation
+
+When the object needs nothing from that first call,
+you can create the inner instance *eagerly* in the class body instead,
+which removes the sentinel and the guard:
+
+```python
+# singleton_eager.py
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
+
+class OnlyOne:
+    @dataclass
+    class __OnlyOne:
+        val: list[str] = field(default_factory=list)
+
+    # Created once, when the class is defined:
+    instance: ClassVar[Any] = __OnlyOne()
+
+    def __init__(self, arg: str) -> None:
+        OnlyOne.instance.val.append(arg)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.instance, name)
+
+x = OnlyOne('sausage')
+print(x.val)
+#: ['sausage']
+y = OnlyOne('eggs')
+print(y.val)
+#: ['sausage', 'eggs']
+# Distinct wrappers (x is not y), one shared inner instance:
+print(x is y, x.instance is y.instance)
+#: False True
+```
+
+The bare `__OnlyOne()` works because the nested class is already defined at that
+point in the body. The qualified `OnlyOne.__OnlyOne()` would fail, because the name
+`OnlyOne` is not bound until its own class body finishes running.
+
+The two differ only in *when* the inner object is created.
+The lazy form defers it to the first `OnlyOne(...)` call,
+so it can wait for data not available at import time,
+but it carries the sentinel and the guard,
+and two threads racing on that first call can both see `None`.
+The eager form creates the object once, when the module is imported:
+no sentinel, no guard, and no race,
+at the cost of building it whether or not anything uses it.
+
+Either way, this is a lot of code for what a module does on its own.
+
+### Overriding `__new__()`
 
 A variation uses `__new__()`, the method that actually creates an instance,
 to return the same object every time:
 
 ```python
 # new_singleton.py
+from dataclasses import dataclass
 from typing import Any, ClassVar
 
 class OnlyOne:
+    @dataclass
     class __OnlyOne:
-        def __init__(self) -> None:
-            self.val: str | None = None
-
-        def __str__(self) -> str:
-            return str(self.val)
+        val: str | None = None
 
     instance: ClassVar[Any] = None
 
     def __new__(cls) -> Any:  # __new__ is always a classmethod
-        if not OnlyOne.instance:
+        if OnlyOne.instance is None:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
 
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.instance, name)
-
-    def __setattr__(self, name: str, value: Any) -> None:
-        setattr(self.instance, name, value)
-
 x = OnlyOne()
 x.val = 'sausage'
-print(x)
+print(x.val)
 #: sausage
 y = OnlyOne()
 y.val = 'eggs'
-print(y)
+print(y.val)
 #: eggs
 z = OnlyOne()
 z.val = 'spam'
-print(z)
+print(z.val)
 #: spam
-print(x)
+print(x.val)
 #: spam
-print(y)
+print(y.val)
 #: spam
 # __new__ returns the one instance every time, so all three are it:
 print(x is y is z)
 #: True
 ```
+
+Because `__new__()` returns the inner `__OnlyOne` object,
+that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
+not a wrapper around it.
+There are no delegating `__getattr__()` or `__setattr__()` methods here:
+attribute access goes straight to the one object.
 
 A test confirms `__new__()` hands back the one instance:
 
@@ -225,7 +250,7 @@ def test_new_returns_same_instance() -> None:
 
 ### Borg: Share State Instead of Identity
 
-Alex Martelli [observed](http://www.aleax.it/Python/5ep.html) that what you usually want is not one *object* but one shared set of *state*.
+[Alex Martelli observes](http://www.aleax.it/Python/5ep.html) that what you usually want is not one *object* but one shared set of *state*.
 You can let people create as many objects as they like,
 as long as they all share the same data.
 He called this the *Borg*^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."],
@@ -271,8 +296,16 @@ print(x is y, x.__dict__ is y.__dict__ is z.__dict__)
 This has the same effect as the singleton,
 but where the singleton wires one-instance behavior into each class,
 *Borg* is reused through inheritance.
-It is a genuinely Pythonic idiom when "shared state,
-many handles" is what you actually want.
+
+Unlike the nested-class examples above, `Singleton` should not be a `@dataclass`.
+Making it one still runs, but it quietly stops being a `Borg`.
+The shared state depends on `Borg.__init__` rebinding `self.__dict__` to
+`_shared_state`. A dataclass generates its own `__init__` that assigns the
+fields and [never calls the base `__init__`](12_Data_Classes_as_Types.md#dataclass-inheritance),
+so `self.__dict__` is never rebound and each instance keeps its own state. Moving the rebinding into `__post_init__`
+does not help either: it runs after the fields are assigned, so it discards
+them. The hand-written `__init__` is what makes the shared state work,
+and a silent loss of sharing is worse than a version that simply does not run.
 
 A test confirms the objects differ but share one set of state:
 
@@ -469,7 +502,7 @@ Python has that for free, so most of the ceremony falls away.
 1.  `singleton_pattern.py` always creates an object, even if it's never used.
     Modify it to use *lazy initialization*,
     so the singleton object is created only the first time it is needed.
-2.  Using `cache_singleton.py` as a starting point,
+2.  Using `cached_factory_singleton.py` as a starting point,
     create a factory that manages a fixed pool of objects (say, database connections) and hands them out,
     rather than a single instance.
 3.  Rewrite one of the class-based singletons above as a module,

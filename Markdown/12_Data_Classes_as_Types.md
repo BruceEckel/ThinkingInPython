@@ -543,6 +543,86 @@ which is especially useful at the edges of a program where untrusted data comes 
 The principle is the same:
 make the type responsible for guaranteeing its own values.
 
+## Inheritance and the Generated `__init__` {#dataclass-inheritance}
+
+A data class builds its `__init__` from its fields and assigns them directly.
+It does not call the base class `__init__`.
+If you inherit from an ordinary class that does setup in its own constructor,
+that setup is silently skipped:
+
+```python
+# dataclass_inherits_plain.py
+from dataclasses import dataclass
+
+class Connection:
+    def __init__(self) -> None:
+        self.open = True   # Setup the subclass needs
+
+@dataclass
+class Logged(Connection):
+    name: str
+
+c = Logged("db")
+print(c.name)
+#: db
+# Connection.__init__ never ran, so 'open' was never set:
+print(hasattr(c, "open"))
+#: False
+```
+
+The generated `__init__` assigned `name` and stopped.
+Nothing called `Connection.__init__`, so `open` does not exist.
+This is easy to miss because the class still constructs without an error.
+
+To run the base initializer, call it yourself from `__post_init__()`,
+which runs after the generated `__init__` assigns the fields:
+
+```python
+# dataclass_super_init.py
+from dataclasses import dataclass
+
+class Connection:
+    def __init__(self) -> None:
+        self.open = True
+
+@dataclass
+class Logged(Connection):
+    name: str
+
+    def __post_init__(self) -> None:
+        super().__init__()   # Run the base initializer explicitly
+
+c = Logged("db")
+print(c.name, c.open)
+#: db True
+```
+
+When the base class is itself a data class, you do not need this.
+The subclass generates one `__init__` covering the inherited fields and the new ones, in order:
+
+```python
+# dataclass_inherits_dataclass.py
+from dataclasses import dataclass
+
+@dataclass
+class Connection:
+    host: str
+
+@dataclass
+class Logged(Connection):
+    name: str
+
+c = Logged("localhost", "db")
+print(c.host, c.name)
+#: localhost db
+```
+
+The reason is that a data class assembles its `__init__` from a field list:
+its own fields plus any inherited from data class bases.
+It builds the body by assigning those fields, not by chaining to the base.
+It has no way to know what arguments a non-data-class base constructor expects,
+so it does not call it.
+
 ## More Data Class Tools
 
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,

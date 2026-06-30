@@ -1,5 +1,6 @@
 # test_cache.py
-import cache_singleton
+import cached_factory_singleton
 
 def test_cache_factory_returns_same_instance() -> None:
-    assert cache_singleton.settings() is cache_singleton.settings()
+    assert (cached_factory_singleton.settings() is
+        cached_factory_singleton.settings())

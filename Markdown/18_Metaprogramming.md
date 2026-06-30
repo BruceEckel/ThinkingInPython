@@ -548,7 +548,7 @@ except TypeError as error:
 
 The check happens at class-creation time, exactly when it must,
 and `B` itself is built normally because `A` does not forbid subclassing.
-Reach for the runtime version only when `@final` is not enough,
+Use the runtime version only when `@final` is not enough,
 which is rare.
 
 Tests confirm the `@final` marker is set, the runtime-final class refuses subclassing, and its non-final base still allows it:

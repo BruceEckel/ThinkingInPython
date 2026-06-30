@@ -140,7 +140,7 @@ except TypeError as e:
 #: unhashable type: 'list'
 ```
 
-These abilities are why the standard library reaches for tuples and frozen dataclasses whenever a value must be a key, cached, or shared across threads.
+These abilities are why the standard library uses tuples and frozen dataclasses whenever a value must be a key, cached, or shared across threads.
 
 ## Functions as First-Class Objects
 

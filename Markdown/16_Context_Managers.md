@@ -227,7 +227,7 @@ with ExitStack() as stack:
 ## The `contextlib` Toolkit
 
 The `contextlib` module provides ready-made managers.
-Reach for these before writing `__enter__()` and `__exit__()` by hand.
+Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions, replacing the `Ignore`
   class above.
