@@ -57,7 +57,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 19_Performance.md               | | |
 | 20_Rethinking_Objects.md        |X| |
 | 21_The_Pattern_Concept.md       |X| |
-| 22_Data_Transfer_Objects.md     | | |
+| 22_Data_Transfer_Objects.md     |X| |
 | 23_Singleton.md                 | | |
 | 24_Template_Method.md           | | |
 | 25_Surrogate.md                 | | |

@@ -90,7 +90,7 @@ Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works under
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
-Tests confirm the `@dataclass` carries fields and value equality,
+This verifies that the `@dataclass` carries fields and value equality,
 and the `NamedTuple` is a named record you can still treat as a tuple:
 
 ```python
@@ -108,8 +108,7 @@ def test_namedtuple_color_is_a_named_record() -> None:
     assert (c.r, c.g, c.b) == tuple(c)
 ```
 
-`display_object()` makes the "bag of named attributes" concrete.
-A `SimpleNamespace` keeps each keyword argument as an attribute:
+`display_object()` shows that a `SimpleNamespace` keeps each keyword argument as an attribute:
 
 ```python
 # display_namespace.py
