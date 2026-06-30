@@ -1,15 +1,11 @@
 # tabledriven/state_machine.py
 # A generic table-driven state machine.
-#
-# The whole machine is one transition table. Because Python
-# functions are first-class, a transition's condition and action are
-# just callables.
 from collections.abc import Callable
 from enum import Enum
 from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
-# A state is any Enum member, so a misspelled state is a type error
+# A state is an Enum member, so a misspelled state is a type error
 # rather than a silent dead end.
 type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum

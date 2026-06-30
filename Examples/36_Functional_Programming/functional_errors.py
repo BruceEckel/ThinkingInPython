@@ -1,6 +1,5 @@
 # functional_errors.py
 def safe_divide(a: int, b: int) -> float | None:
-    # Return None instead of raising on bad input:
     if b == 0:
         return None
     return a / b

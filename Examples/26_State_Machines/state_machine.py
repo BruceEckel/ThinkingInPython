@@ -1,6 +1,4 @@
 # state_machine.py
-# Takes a list of Inputs to move from State to
-# State using a template method.
 from collections.abc import Iterable
 from state import State
 

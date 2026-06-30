@@ -1,15 +1,12 @@
 # mousetrap1/mouse_trap.py
-# State Machine pattern using match to determine the next state.
 import sys
 from pathlib import Path
-from typing import override
+from typing import ClassVar, override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-
-# A different subclass for each state:
 
 class Waiting(State):
     @override
@@ -68,20 +65,13 @@ class Holding(State):
                 return MouseTrap.holding
 
 class MouseTrap(StateMachine):
-    waiting: State
-    luring: State
-    trapping: State
-    holding: State
+    waiting: ClassVar[State] = Waiting()
+    luring: ClassVar[State] = Luring()
+    trapping: ClassVar[State] = Trapping()
+    holding: ClassVar[State] = Holding()
 
     def __init__(self) -> None:
-        # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
-
-# Static variable initialization:
-MouseTrap.waiting = Waiting()
-MouseTrap.luring = Luring()
-MouseTrap.trapping = Trapping()
-MouseTrap.holding = Holding()
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()

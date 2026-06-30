@@ -56,8 +56,7 @@ If you run `python import_module.py`, you should only see `'module' imported` di
 Importing `use_module` runs its top-level code, including the `print()`,
 but not its `__main__` block.
 
-If you want to bring a name into the current namespace,
-you can do so using the `from` keyword:
+To bring a name into the current namespace, use the `from` keyword:
 
 ```python
 # using_from.py
@@ -81,7 +80,7 @@ if __name__ == "__main__":
 
 ## Packages
 
-As your programs get larger you'll want to further organize your code into *packages*.
+As your programs get larger you'll further organize your code into *packages*.
 A package is a directory (and its own namespace, which has the name of that directory) that can contain multiple modules.
 
 To make something a package,

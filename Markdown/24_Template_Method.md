@@ -68,7 +68,7 @@ a subclass must be usable wherever its base class is expected.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
 An override that breaks that trust, doing nothing the flow relies on,
-or raising where the base would not, corrupts the fixed algorithm
+or raising an exception where the base would not, corrupts the fixed algorithm
 even though the code still type-checks.
 The Template Method works only when every subclass is a faithful substitute for its base.
 

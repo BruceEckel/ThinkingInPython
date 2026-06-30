@@ -122,11 +122,9 @@ available out of the box.
 
 ## A Type-Checking Iterator
 
-Sometimes you want to wrap an existing iterator and change its behavior.
-That is the *Decorator* pattern:
-produce a new iterator with the same interface but added behavior.
-Here is one that enforces that every item is of an expected type,
-raising otherwise:
+That is the *Decorator* pattern wraps an existing iterator and changes its behavior.
+This produces a new iterator with the same interface but added behavior.
+Here, we force every item to be of an expected type:
 
 ```python
 # typed_iterator.py

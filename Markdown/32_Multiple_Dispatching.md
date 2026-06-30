@@ -3,7 +3,7 @@
 When dealing with multiple types which are interacting,
 a program can get particularly messy.
 For example, consider a system that parses and executes mathematical expressions.
-You want to be able to say `Number + Number`, `Number \* Number`, etc.,
+You want to  say `Number + Number`, `Number \* Number`, etc.,
 where `Number` is the base class for a family of numerical objects.
 But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,

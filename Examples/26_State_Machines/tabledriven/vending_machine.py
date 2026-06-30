@@ -1,5 +1,4 @@
 # tabledriven/vending_machine.py
-# A vending machine expressed entirely as a transition table.
 from dataclasses import dataclass
 from enum import Enum, auto
 from state_machine import StateMachine, Table
@@ -106,7 +105,7 @@ class VendingMachine(StateMachine):
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        self.message = f"Dispensing; amount remaining {self.amount}"
+        self.message = f"Dispensing; remaining {self.amount}"
 
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
@@ -130,9 +129,9 @@ if __name__ == "__main__":
 #: quarter: Total = 50
 #: dollar: Total = 150
 #: A: Row A
-#: two: Dispensing; amount remaining 100
+#: two: Dispensing; remaining 100
 #: A: Row A
-#: two: Dispensing; amount remaining 50
+#: two: Dispensing; remaining 50
 #: C: Row C
 #: three: Clearing selection: costs 75, quantity 5
 #: D: Row D

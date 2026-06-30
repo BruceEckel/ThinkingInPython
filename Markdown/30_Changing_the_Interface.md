@@ -194,8 +194,8 @@ The cleaner Python façade is a *module*.
 A module already presents a curated set of names over whatever tangle of classes lives behind it,
 and, as [Singleton](23_Singleton.md#a-module-is-already-a-singleton) notes,
 it is imported once and shared everywhere.
-Put the friendly functions and the few classes you want to expose at module level,
-keep the messy internals private (a leading underscore, by convention),
+At module level, put the friendly functions and the few classes to expose.
+Keep the messy internals private (using a leading underscore, by convention),
 and the `import` *is* the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module gives you for free.

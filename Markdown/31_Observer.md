@@ -346,4 +346,4 @@ is the model-view split made concrete.
     If any of the squares surrounding the one you clicked is part of a contiguous patch of the same color,
     then all the squares in that patch are changed to the color you clicked on.
     You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
-    You may also want to restrict a player's color to the first one that was chosen.
+    You may also restrict a player's color to the first one that was chosen.

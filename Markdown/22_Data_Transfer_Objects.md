@@ -7,7 +7,7 @@ However, those rely on indexing;
 in the case of tuples this requires the consumer to keep track of numerical order,
 and in the case of a `dict` you must use the `d["name"]` syntax which can be slightly less desirable.
 
-A Messenger is an object with attributes corresponding to the names of the data you want to pass around or return:
+A Messenger is an object with attributes corresponding to the names of the data you pass or return:
 
 ```python
 # messenger_idiom.py

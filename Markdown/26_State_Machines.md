@@ -7,7 +7,6 @@ and the system behaves differently from one state to the next (because it uses *
 
 The code that moves the system from one state to the next is often a *Template Method*,
 as seen in the following framework for a basic state machine.
-
 Each state can be `run()` to perform its behavior,
 and (in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
 The key distinction between this design and the next is that here,
@@ -37,7 +36,7 @@ We could have gotten basically the same effect by saying:
 
     class State: pass
 
-because we would still get exceptions if `run()` or `next()` were called for a derived type,
+because we would still get exceptions if `run()` or `next()` were called for a derived type
 and they hadn't been implemented.
 
 The `StateMachine` keeps track of the current state,
@@ -50,8 +49,6 @@ since `run()` does something different depending on the state that the system is
 
 ```python
 # state_machine.py
-# Takes a list of Inputs to move from State to
-# State using a template method.
 from collections.abc import Iterable
 from state import State
 
@@ -67,15 +64,13 @@ class StateMachine:
             self.current_state.run()
 ```
 
-I've also treated `run_all()` as a template method.
-This is typical, but certainly not required;
-you could conceivably want to override it,
-but typically the behavior change will occur in `State`'s `run()` instead.
+Treating `run_all()` as a template method is typical, but certainly not required.
+You could override it, but the behavior change usually occurs in `State`'s `run()`.
 
-At this point the basic framework for this style of *StateMachine* (where each state decides the next states) is complete.
-As an example, I'll use a fancy mousetrap that can move through several states in the process of trapping a mouse^[No mice were harmed in the creation of this example.].
+In this style of *StateMachine*, each state decides the next state.
+As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
 The mouse classes and information are stored in the `mouse` package,
-including a class representing all the possible moves that a mouse can make,
+including a class representing all possible moves a mouse can make,
 which will be the inputs to the state machine:
 
 ```python
@@ -93,7 +88,7 @@ class MouseAction(StrEnum):
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration.
 Because it is a `StrEnum`, each member *is* its string value:
-`str` needs no help, and a member even compares equal to its string.
+Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
 which is how the test input below is parsed.
@@ -119,24 +114,20 @@ mouse trapped
 mouse removed
 ```
 
-With these tools in place,
-it's now possible to create the first version of the mousetrap program.
+Here's the first version of the mousetrap program.
 Each `State` subclass defines its `run()` behavior,
 and also establishes its next state with an `if-else` clause:
 
 ```python
 # mousetrap1/mouse_trap.py
-# State Machine pattern using match to determine the next state.
 import sys
 from pathlib import Path
-from typing import override
+from typing import ClassVar, override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
-
-# A different subclass for each state:
 
 class Waiting(State):
     @override
@@ -195,20 +186,13 @@ class Holding(State):
                 return MouseTrap.holding
 
 class MouseTrap(StateMachine):
-    waiting: State
-    luring: State
-    trapping: State
-    holding: State
+    waiting: ClassVar[State] = Waiting()
+    luring: ClassVar[State] = Luring()
+    trapping: ClassVar[State] = Trapping()
+    holding: ClassVar[State] = Holding()
 
     def __init__(self) -> None:
-        # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
-
-# Static variable initialization:
-MouseTrap.waiting = Waiting()
-MouseTrap.luring = Luring()
-MouseTrap.trapping = Trapping()
-MouseTrap.holding = Holding()
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
@@ -253,9 +237,8 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
-
 Initially, this seems like it ought to be quite simple.
-You should be able to define a static table in each `State` subclass that defines the transitions in terms of the other `State` objects.
+Define a static table in each `State` subclass that defines the transitions in terms of the other `State` objects.
 However, it turns out that this approach generates cyclic initialization dependencies.
 To solve the problem,
 I've had to delay the initialization of the tables until the first time that the `next()` method is called for a particular `State` object.
@@ -272,7 +255,7 @@ then delegates to the base `next()`:
 # A better mousetrap using tables
 import sys
 from pathlib import Path
-from typing import Any, override
+from typing import Any, ClassVar, override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -309,7 +292,6 @@ class Luring(StateT):
         print("Luring: Presenting Cheese, door open")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ENTERS : MouseTrap.trapping,
@@ -323,7 +305,6 @@ class Trapping(StateT):
         print("Trapping: Closing door")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ESCAPES : MouseTrap.waiting,
@@ -337,7 +318,6 @@ class Holding(StateT):
         print("Holding: Mouse caught")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.REMOVED : MouseTrap.waiting
@@ -345,20 +325,13 @@ class Holding(StateT):
         return StateT.next(self, event)
 
 class MouseTrap(StateMachine):
-    waiting: State
-    luring: State
-    trapping: State
-    holding: State
+    waiting: ClassVar[State] = Waiting()
+    luring: ClassVar[State] = Luring()
+    trapping: ClassVar[State] = Trapping()
+    holding: ClassVar[State] = Holding()
 
     def __init__(self) -> None:
-        # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
-
-# Static variable initialization:
-MouseTrap.waiting = Waiting()
-MouseTrap.luring = Luring()
-MouseTrap.trapping = Trapping()
-MouseTrap.holding = Holding()
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
@@ -438,16 +411,12 @@ runs that transition's action, and moves to the next state:
 ```python
 # tabledriven/state_machine.py
 # A generic table-driven state machine.
-#
-# The whole machine is one transition table. Because Python
-# functions are first-class, a transition's condition and action are
-# just callables.
 from collections.abc import Callable
 from enum import Enum
 from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
-# A state is any Enum member, so a misspelled state is a type error
+# A state is an Enum member, so a misspelled state is a type error
 # rather than a silent dead end.
 type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
@@ -479,7 +448,7 @@ which is how a single input can lead to different states depending on a test.
 
 ### A Vending Machine
 
-The machine is now entirely a table.
+The machine is now completely defined by a table.
 It collects money, takes a two-digit selection, then either dispenses the item,
 reports it sold out,
 or clears a selection that costs more than the money inserted.
@@ -489,7 +458,6 @@ so a misspelled state name is caught by the type checker instead of failing sile
 
 ```python
 # tabledriven/vending_machine.py
-# A vending machine expressed entirely as a transition table.
 from dataclasses import dataclass
 from enum import Enum, auto
 from state_machine import StateMachine, Table
@@ -596,7 +564,7 @@ class VendingMachine(StateMachine):
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        self.message = f"Dispensing; amount remaining {self.amount}"
+        self.message = f"Dispensing; remaining {self.amount}"
 
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
@@ -620,9 +588,9 @@ if __name__ == "__main__":
 #: quarter: Total = 50
 #: dollar: Total = 150
 #: A: Row A
-#: two: Dispensing; amount remaining 100
+#: two: Dispensing; remaining 100
 #: A: Row A
-#: two: Dispensing; amount remaining 50
+#: two: Dispensing; remaining 50
 #: C: Row C
 #: three: Clearing selection: costs 75, quantity 5
 #: D: Row D
@@ -667,7 +635,7 @@ def test_buy_dispenses_and_charges() -> None:
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0                 # 50 in, 50 spent
     assert vm.items[0][1].quantity == 4   # One dispensed from five
-    assert vm.message == "Dispensing; amount remaining 0"
+    assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
@@ -699,14 +667,15 @@ def test_no_transition_raises() -> None:
 ```
 
 Because the actions set `vm.message` instead of printing,
-the model never draws anything, and the same machine drives more than one view.
-The text demo in `vending_machine.py` reads `message` and prints it;
-the panel below reads `amount`, the stock,
+the model never draws anything, and the same machine can drive more than one view.
+The text demo in `vending_machine.py` reads `message` and prints it.
+
+Using 'tkinter' we can create a GUI representation of the vending maching.
+The panel reads `amount`, the stock,
 and `message` and shows them on screen.
-`vending_view.py` is a `tkinter` front for the machine:
-the coin and item buttons turn presses into events for `handle()`,
+The coin and item buttons turn presses into events for `handle()`,
 and a click that the state machine rejects (a selection before any money, say) is caught and shown rather than crashing.
-It is the only file that draws, so the harness skips it (`tools/norun.txt`):
+Because it requires user interaction the harness skips it (`tools/norun.txt`):
 
 ```python
 # tabledriven/vending_view.py

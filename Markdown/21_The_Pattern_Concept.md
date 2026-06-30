@@ -32,7 +32,7 @@ adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
 Once you find some part of your program that's likely to change for one reason or another,
-you want to prevent those changes from propagating other changes throughout your code.
+you prevent those changes from propagating other changes throughout your code.
 Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
@@ -91,8 +91,7 @@ The three purposes are:
 2.  **Structural**: designing objects to satisfy particular project constraints.
     These work with the way objects are connected with other objects to ensure that changes in the system don't require changes to those connections.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
-    These encapsulate processes that you want to perform,
-    such as interpreting a language, fulfilling a request,
+    These encapsulate processes such as interpreting a language, fulfilling a request,
     moving through a sequence (as in an iterator), or implementing an algorithm.
     This book contains multiple examples including [Observer](31_Observer.md),
     [State Machines](26_State_Machines.md) and [Visitor](33_Visitor.md).

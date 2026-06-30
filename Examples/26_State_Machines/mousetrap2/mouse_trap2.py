@@ -2,7 +2,7 @@
 # A better mousetrap using tables
 import sys
 from pathlib import Path
-from typing import Any, override
+from typing import Any, ClassVar, override
 
 sys.path += ['..', '../mouse']
 from mouse_action import MouseAction  # type: ignore
@@ -39,7 +39,6 @@ class Luring(StateT):
         print("Luring: Presenting Cheese, door open")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ENTERS : MouseTrap.trapping,
@@ -53,7 +52,6 @@ class Trapping(StateT):
         print("Trapping: Closing door")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.ESCAPES : MouseTrap.waiting,
@@ -67,7 +65,6 @@ class Holding(StateT):
         print("Holding: Mouse caught")
     @override
     def next(self, event: object) -> State:
-        # Lazy initialization:
         if not self.transitions:
             self.transitions = {
               MouseAction.REMOVED : MouseTrap.waiting
@@ -75,20 +72,13 @@ class Holding(StateT):
         return StateT.next(self, event)
 
 class MouseTrap(StateMachine):
-    waiting: State
-    luring: State
-    trapping: State
-    holding: State
+    waiting: ClassVar[State] = Waiting()
+    luring: ClassVar[State] = Luring()
+    trapping: ClassVar[State] = Trapping()
+    holding: ClassVar[State] = Holding()
 
     def __init__(self) -> None:
-        # Initial state
         StateMachine.__init__(self, MouseTrap.waiting)
-
-# Static variable initialization:
-MouseTrap.waiting = Waiting()
-MouseTrap.luring = Luring()
-MouseTrap.trapping = Trapping()
-MouseTrap.holding = Holding()
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()

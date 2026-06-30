@@ -358,7 +358,7 @@ which builds a registry like this without a decorator.
 
 The `@` syntax decorates a function or class once, at definition.
 Every call or every instance gets the wrapping.
-Sometimes you want to add responsibilities to one object at runtime,
+You can add responsibilities to one object at runtime,
 and let the caller choose which responsibilities to add.
 That is the object-oriented *Decorator* pattern.
 

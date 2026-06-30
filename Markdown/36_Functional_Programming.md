@@ -248,7 +248,7 @@ print(square(5))
 ```
 
 A lambda is best when the function is small and used right where it is written.
-Once you want to give it a name, write a `def` instead.
+To give it a name, write a `def` instead.
 A named `def` carries a docstring, a readable name in tracebacks, and room to grow.
 
 The motivation for a lambda is locality. When a transformation is one short expression, a lambda keeps it at the call site, where the reader already is, instead of sending them to a named function defined elsewhere. `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens. Naming that one-liner would cost a line, a name to invent, and a definition to look up, with nothing gained in clarity.
@@ -509,7 +509,6 @@ The functional alternative is to return a value that represents the failure, so 
 ```python
 # functional_errors.py
 def safe_divide(a: int, b: int) -> float | None:
-    # Return None instead of raising on bad input:
     if b == 0:
         return None
     return a / b

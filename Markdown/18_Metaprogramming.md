@@ -27,8 +27,7 @@ What creates these "class" objects?
 Other special objects, called *metaclasses*.
 The default metaclass is `type`,
 and in the vast majority of cases it does the right thing.
-Sometimes you want to customize how classes are produced,
-by running extra code or injecting members as the class is built.
+You can customize how classes are produced by running extra code or injecting members as the class is built.
 That is metaclass programming.
 
 *Most of the time you do not need a metaclass.*
