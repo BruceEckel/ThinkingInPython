@@ -1,5 +1,5 @@
 # test_state.py
-from state_demo import StateD
+from state import StateD
 
 class StateA:
     def name(self) -> str:
@@ -9,8 +9,8 @@ class StateB:
     def name(self) -> str:
         return "B"
 
-def test_state_delegates_and_change_imp_swaps() -> None:
+def test_state_delegates_and_change_swaps() -> None:
     s = StateD(StateA())
     assert s.name() == "A"
-    s.change_imp(StateB())
+    s.change_to(StateB())
     assert s.name() == "B"

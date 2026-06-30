@@ -11,8 +11,8 @@ the surrogate is derived along with the class or classes that provide the actual
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
-When a surrogate object is created,
-it is given an implementation to which to send all of the method calls.
+When you create a surrogate object, you give it an implementation.
+All method calls to the surrogate are forwarded to that implementation.
 
 Structurally, the difference between *Proxy* and *State* is simple:
 a *Proxy* has only one implementation, while *State* has more than one.
@@ -26,8 +26,7 @@ However, if you expand your notion of "controlling access to implementation" the
 If we implement *Proxy* by following the above diagram, it looks like this:
 
 ```python
-# proxy_demo.py
-# Simple demonstration of the Proxy pattern.
+# proxy_1.py
 
 class Implementation:
     def f(self) -> None:
@@ -55,14 +54,81 @@ p.h()
 ```
 
 It isn't necessary that `Implementation` have the same interface as `Proxy`;
-as long as `Proxy` is somehow "speaking for" the class that it is referring method calls to then the basic idea is satisfied (note that this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
+as long as `Proxy` is somehow "speaking for" the class that it is referring method calls to then the basic idea is satisfied
+(this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
 However, it is convenient to have a common interface so that `Implementation` is forced to fulfill all the methods that `Proxy` needs to call.
+An abstract base class is one way to express that interface.
+Each method the `Proxy` delegates to is an `@abstractmethod`,
+so any implementation that omits one cannot be instantiated:
+
+```python
+# proxy_interface.py
+from abc import ABC, abstractmethod
+
+class Service(ABC):
+    @abstractmethod
+    def f(self) -> None: ...
+    @abstractmethod
+    def g(self) -> None: ...
+
+class Complete(Service):
+    def f(self) -> None: print("Complete.f()")
+    def g(self) -> None: print("Complete.g()")
+
+class Partial(Service):  # Missing g()
+    def f(self) -> None: print("Partial.f()")
+
+Complete().f()
+#: Complete.f()
+try:
+    Partial()
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+`Complete` implements both methods and works.
+`Partial` omits `g()`, so constructing it raises `TypeError` at once,
+instead of failing later when the `Proxy` tries to delegate a call it cannot.
+
+A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols) is the
+structural alternative. The implementation needs no base class:
+conformance is checked by shape, statically by the type checker,
+and, with `@runtime_checkable`, by `isinstance()`:
+
+```python
+# proxy_protocol.py
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable  # Allows isinstance() against a Protocol
+class Service(Protocol):
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+
+class Complete:          # Conforms without inheriting Service
+    def f(self) -> None: print("Complete.f()")
+    def g(self) -> None: print("Complete.g()")
+
+class Partial:           # Missing g()
+    def f(self) -> None: print("Partial.f()")
+
+print(isinstance(Complete(), Service))
+#: True
+print(isinstance(Partial(), Service))
+#: False
+```
+
+The abstract base class forces completeness at construction, through inheritance.
+A `Protocol` instead reports the mismatch where an object is used as a `Service`,
+and needs no common base.
+One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only
+that the methods exist, not that their signatures match.
+The static checker verifies signatures.
 
 Python has a built-in delegation mechanism that makes `Proxy` even simpler to implement:
 
 ```python
-# proxy_demo2.py
-# Simple demonstration of the Proxy pattern.
+# proxy_2.py
 from typing import Any
 
 class Implementation2:
@@ -97,15 +163,14 @@ The *State* pattern adds more implementations to *Proxy*,
 along with a way to switch from one implementation to another during the lifetime of the surrogate:
 
 ```python
-# state_demo.py
-# Simple demonstration of the State pattern.
+# state.py
 from typing import Any
 
 class StateD:
-    def __init__(self, imp: Any) -> None:
-        self.__implementation = imp
-    def change_imp(self, new_imp: Any) -> None:
-        self.__implementation = new_imp
+    def __init__(self, implementation: Any) -> None:
+        self.__implementation = implementation
+    def change_to(self, new_implementation: Any) -> None:
+        self.__implementation = new_implementation
     # Delegate calls to the implementation:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
@@ -138,7 +203,7 @@ run(b)
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
-b.change_imp(Implementation2())
+b.change_to(Implementation2())
 run(b)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
@@ -146,14 +211,14 @@ run(b)
 #: We dance whene'er we're able.
 ```
 
-You can see that the first implementation is used for a bit,
+The first implementation is used for awhile,
 then the second implementation is swapped in and that is used.
 
-A test hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_imp()` swaps it:
+A test hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_to()` swaps it:
 
 ```python
 # test_state.py
-from state_demo import StateD
+from state import StateD
 
 class StateA:
     def name(self) -> str:
@@ -163,10 +228,10 @@ class StateB:
     def name(self) -> str:
         return "B"
 
-def test_state_delegates_and_change_imp_swaps() -> None:
+def test_state_delegates_and_change_swaps() -> None:
     s = StateD(StateA())
     assert s.name() == "A"
-    s.change_imp(StateB())
+    s.change_to(StateB())
     assert s.name() == "B"
 ```
 
