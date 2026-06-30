@@ -20,14 +20,11 @@ I began going back through my Pycon presentations and blog posts and adding thos
 At the moment it is in decent shape and you can read it online:
 https://bruceeckel.github.io/ThinkingInPython/
 
-I'm doing as much as I can using Claude; after that my plan is to do an edit/rewrite pass.
-In the meantime I hope it's useful.
-
 ---
 
 ## Edit checklist
 
-Two passes per chapter: my own edit pass (**Edited**), then incorporating
+Two passes per draft: my own edit pass (**Edited**), then incorporating
 Claude's review and re-checking (**Reviewed**). Incomplete reviews live in the
 `REVIEW_NN.md` files at the repo root.
 Delete the review file and mark a cell `X` when that item is done.
