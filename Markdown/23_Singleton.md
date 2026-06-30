@@ -366,16 +366,16 @@ def test_class_variable_returns_same_instance() -> None:
     assert a.val == "b"  # Last write wins on the shared instance
 ```
 
-### Singleton Class Decorator
+### Singleton Classes
 
 You can wrap a class so that calling it returns a cached instance.
 This is a *class decorator* (see [Decorators](15_Decorators.md#decorating-classes)):
 
 ```python
-# singleton.py
+# class_singleton.py
 from typing import Any
 
-class Singleton:
+class ClassSingleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
@@ -385,7 +385,7 @@ class Singleton:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
-@Singleton
+@ClassSingleton
 class Foo:
     pass
 
@@ -405,7 +405,7 @@ print(x is y is z)
 #: True
 ```
 
-Applying `@Singleton` to `Foo` runs `Foo = Singleton(Foo)`,
+Applying `@ClassSingleton` to `Foo` runs `Foo = ClassSingleton(Foo)`,
 so the name `Foo` now refers to the decorated instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want.
 But the name no longer points at a class.
@@ -417,10 +417,10 @@ A test confirms the decorated class returns its cached instance:
 
 ```python
 # test_decorator.py
-import singleton
+import class_singleton
 
 def test_decorator_returns_same_instance() -> None:
-    assert singleton.Foo() is singleton.Foo()
+    assert class_singleton.Foo() is class_singleton.Foo()
 ```
 
 ### Singleton Using Metaclasses

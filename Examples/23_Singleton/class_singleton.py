@@ -1,7 +1,7 @@
-# singleton.py
+# class_singleton.py
 from typing import Any
 
-class Singleton:
+class ClassSingleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
@@ -11,7 +11,7 @@ class Singleton:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
-@Singleton
+@ClassSingleton
 class Foo:
     pass
 

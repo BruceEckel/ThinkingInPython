@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 class Connection:
     def __init__(self) -> None:
-        self.open = True   # Setup the subclass relies on
+        self.open = True   # Setup the subclass needs
 
 @dataclass
 class Logged(Connection):
