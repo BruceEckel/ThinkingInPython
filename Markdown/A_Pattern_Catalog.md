@@ -1,4 +1,4 @@
-# A Catalog of Patterns
+# Pattern Catalog
 
 This appendix gathers patterns that are widely documented across the literature,
 not only the original *Design Patterns* (GoF) set.

@@ -1,6 +1,4 @@
 # messenger_modern.py
-# The standard library already provides this idiom and its typed
-# cousins.
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import NamedTuple
@@ -9,6 +7,7 @@ from typing import NamedTuple
 m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
+#: Some information ['a', 'list'] 11
 
 # A dataclass is the typed, mutable version:
 @dataclass
@@ -17,6 +16,7 @@ class Point:
     y: float
 
 print(Point(1.0, 2.0))
+#: Point(x=1.0, y=2.0)
 
 # A NamedTuple is the typed, immutable version:
 class Color(NamedTuple):
@@ -24,7 +24,5 @@ class Color(NamedTuple):
     g: int
     b: int
 
-print(Color(255, 0, 0).r)
-#: Some information ['a', 'list'] 11
-#: Point(x=1.0, y=2.0)
-#: 255
+print(Color(255, 0, 0))
+#: Color(r=255, g=0, b=0)

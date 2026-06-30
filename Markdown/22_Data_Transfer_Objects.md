@@ -46,17 +46,14 @@ def test_messenger_exposes_kwargs_as_attributes() -> None:
 
 ## The Standard-Library Versions
 
-You rarely need even those few lines, because Python already ships this idiom.
-`types.SimpleNamespace` is exactly a `Messenger`:
-keyword arguments become attributes.
+Python already ships this idiom.
+`types.SimpleNamespace` is exactly a `Messenger`, with keyword arguments becoming attributes.
 When you want the fields named and type-checked,
 a `@dataclass` gives you a typed mutable record with a generated `__init__()`,
 `repr()`, and equality, and a `NamedTuple` gives you a typed immutable one:
 
 ```python
 # messenger_modern.py
-# The standard library already provides this idiom and its typed
-# cousins.
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import NamedTuple
@@ -65,6 +62,7 @@ from typing import NamedTuple
 m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
+#: Some information ['a', 'list'] 11
 
 # A dataclass is the typed, mutable version:
 @dataclass
@@ -73,6 +71,7 @@ class Point:
     y: float
 
 print(Point(1.0, 2.0))
+#: Point(x=1.0, y=2.0)
 
 # A NamedTuple is the typed, immutable version:
 class Color(NamedTuple):
@@ -80,10 +79,8 @@ class Color(NamedTuple):
     g: int
     b: int
 
-print(Color(255, 0, 0).r)
-#: Some information ['a', 'list'] 11
-#: Point(x=1.0, y=2.0)
-#: 255
+print(Color(255, 0, 0))
+#: Color(r=255, g=0, b=0)
 ```
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
@@ -93,7 +90,8 @@ Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works under
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
-Tests confirm the `@dataclass` carries fields and value equality, and the `NamedTuple` is a named record you can still treat as a tuple:
+Tests confirm the `@dataclass` carries fields and value equality,
+and the `NamedTuple` is a named record you can still treat as a tuple:
 
 ```python
 # test_messenger_modern.py
