@@ -460,7 +460,7 @@ Use the lightest tool that fits:
 - The decorator and metaclass versions work,
   but they are more machinery than the problem usually justifies.
 
-The elaborate GoF singleton is largely a workaround for languages where a module is not a first-class,
+The elaborate *GoF Design Patterns* singleton is largely a workaround for languages where a module is not a first-class,
 single-instance namespace.
 Python has that for free, so most of the ceremony falls away.
 

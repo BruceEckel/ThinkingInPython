@@ -16,7 +16,7 @@ extracted from the design-patterns material in *Thinking in Java*. Prose lives i
 (See also the `book-publishing-decisions` memory.)
 
 - **Patterns:** keep the pattern chapters but reframe each around the Pythonic
-  idiom that replaces or simplifies the GoF pattern, and be honest where a
+  idiom that replaces or simplifies the *GoF Design Patterns* pattern, and be honest where a
   pattern is a "language failure" in Python.
 - **Python target:** 3.14+ with type hints throughout, checked with Astral's
   `ty` (not mypy).

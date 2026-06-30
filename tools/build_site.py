@@ -103,7 +103,14 @@ def discover() -> list[Chapter]:
     for md in sorted(MARKDOWN_DIR.glob("*.md")):
         title, _ = load_chapter(md)
         number = md.stem.split("_", 1)[0]
-        label = "Front Matter" if number == "00" else f"Chapter {int(number)}"
+        # A numeric prefix is a chapter; a letter prefix (e.g. A_, B_) is an
+        # appendix, which sorts after the numbered chapters.
+        if number == "00":
+            label = "Front Matter"
+        elif number.isdigit():
+            label = f"Chapter {int(number)}"
+        else:
+            label = f"Appendix {number}"
         chapters.append(Chapter(md, f"{md.stem}.html", number, title, label))
     return chapters
 

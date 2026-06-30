@@ -19,7 +19,7 @@ The mechanical health of the book is solid. As of this review:
 
 ## Strengths worth preserving
 
-- **The reframing is consistent.** Each pattern chapter asks whether Python's design already dissolves the GoF problem and says so plainly. The thesis stated in the Introduction is carried through.
+- **The reframing is consistent.** Each pattern chapter asks whether Python's design already dissolves the *GoF Design Patterns* problem and says so plainly. The thesis stated in the Introduction is carried through.
 - **Example discipline is excellent.** Every tagged listing is extracted, run, and type-checked, and the output shown is real.
 - **The two-part arc works.** Foundations (`02`-`16`) build the idioms; the pattern chapters (`17`-`31`) then lean on them. GUI examples are split cleanly into a headless, tested model plus a thin `tkinter` view (State Machines, Observer, Simulation).
 

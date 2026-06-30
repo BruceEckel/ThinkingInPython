@@ -1,6 +1,7 @@
-Markdown\03_Containers_and_Control_Flow.md should be split into 03_Containers.md and 04_Control_Flow.md,
-shifting the current 04 forward to fit in the new chapter.
-I'm not so concerned about chapter length or balancing chapter sizes; this just seems clearer.
+Are there any other GoF design patterns that should be included here?
+Also, prototypes seem to have disappeared.
+Make a list of the patterns we've covered and compare that with a list of known patterns.
+(Appendix is the list of known patterns?)
 
 On website: Chapter TOC floating on the left or below the "contents" link.
 

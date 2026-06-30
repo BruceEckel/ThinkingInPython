@@ -12,6 +12,11 @@ Python removes some of those limitations,
 so a few common patterns simply dissolve here.
 We will call that out as it happens.
 
+This chapter contains an example of the design evolution process,
+starting with an initial solution and moving through the logic and process of evolving the solution to more appropriate designs.
+The program shown (a trash sorting simulation) has evolved over time,
+and you can look at that evolution as a prototype for the way your own design can start as an adequate solution to a particular problem and evolve into a flexible approach to a class of problems.
+
 ## Simulating a Trash Recycler
 
 Trash arrives at the recycling plant mixed together.

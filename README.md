@@ -56,7 +56,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 18_Metaprogramming.md           |X| |
 | 19_Performance.md               | | |
 | 20_Rethinking_Objects.md        |X| |
-| 21_The_Pattern_Concept.md       | | |
+| 21_The_Pattern_Concept.md       |X| |
 | 22_Data_Transfer_Objects.md     | | |
 | 23_Singleton.md                 | | |
 | 24_Template_Method.md           | | |
@@ -72,3 +72,4 @@ Delete the review file and mark a cell `X` when that item is done.
 | 34_Pattern_Refactoring.md       | | |
 | 35_Simulation.md                | | |
 | 36_Functional_Programming.md    | | |
+| A_Pattern_Catalog.md            |X| |
