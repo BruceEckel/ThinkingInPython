@@ -1,7 +1,7 @@
 # Changing the Interface
 
 Sometimes the problem that you're solving is as simple as "I don't have the interface that I want."
-Two of the patterns in *Design Patterns* solve this problem:
+Two of the patterns in *GoF Design Patterns* solve this problem:
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes,
 only to provide a more comfortable way to deal with a library or bundle of resources.
@@ -81,7 +81,7 @@ what_i_use.op(what_i_have3.what_i_want())
 ```
 
 I'm taking liberties with the term "proxy" here,
-because in *Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
+because in *GoF Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
 
 ### Adapter in Python
 

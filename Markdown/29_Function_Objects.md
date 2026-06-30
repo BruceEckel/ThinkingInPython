@@ -14,7 +14,7 @@ so each of these patterns builds a small class hierarchy whose only job is to ho
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 So these three patterns largely dissolve:
-where the *Design Patterns* book builds a hierarchy, Python uses a function.
+where *GoF Design Patterns* builds a hierarchy, Python uses a function.
 The sections below show the function form first,
 then the classic object form for contrast.
 
@@ -91,7 +91,7 @@ macro.run()
 
 Both do the same thing.
 The class version is four classes and a wrapper to say what one list of functions says directly.
-*Design Patterns* calls commands "an object-oriented replacement for callbacks."
+*GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 In Python a callback is just a function, so the replacement is unnecessary:
 the object form earns its keep only when a command must also carry state or support extra operations such as undo.
 
@@ -188,7 +188,7 @@ The object form is worth it only when a strategy needs its own configuration or 
 ## Chain of Responsibility
 
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
-The *Design Patterns* book implements the chain as a linked list,
+*GoF Design Patterns* implements the chain as a linked list,
 largely because it predates standard list types.
 As that machinery is an implementation detail,
 in Python the chain is a list of functions,

@@ -2,9 +2,12 @@
 
 "Design patterns help you learn from others' successes instead of your own failures."^[From Mark Johnson.]
 
-Probably the most important step forward in object-oriented design is the "design patterns" movement,
-chronicled in the book *Design Patterns*.
-That book shows 23 different solutions to particular classes of problems.
+An important step forward in object-oriented design was the "design patterns" movement,
+chronicled in the 1994 book *Design Patterns* by by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides.
+They became known as the "Gang of Four"^[A reference to some Chinese politics ... it made sense at the time.].
+I will refer to that book as *GoF Design Patterns* and simply *design patterns* for the concept.
+
+The *GoF Design Patterns* shows 23 different solutions to particular classes of problems.
 In this book, the basic concepts of design patterns will be introduced along with examples.
 
 The latter part of this book contains an example of the design evolution process,
@@ -53,7 +56,7 @@ Composition can also be considered a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
-Another pattern that appears in *Design Patterns* is the *iterator*,
+Another pattern that appears in *GoF Design Patterns* is the *iterator*,
 which has been implicitly available in `for` loops from the beginning of the language,
 and was introduced as an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through and selecting the elements one by one.
@@ -62,7 +65,7 @@ Thus your generic code can be used with any object that can produce an iterator.
 
 ## Classifying Patterns
 
-The *Design Patterns* book discusses 23 different patterns,
+*GoF Design Patterns* discusses 23 different patterns,
 classified under three purposes (all of which revolve around the particular aspect that can vary).
 The three purposes are:
 
@@ -78,21 +81,21 @@ The three purposes are:
     moving through a sequence (as in an iterator), or implementing an algorithm.
     This book contains examples of the *Observer* and the *Visitor* patterns.
 
-The *Design Patterns* book has a section on each of its 23 patterns along with one or more examples for each,
+*GoF Design Patterns* has a section on each of its 23 patterns along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
-This book will not repeat all the patterns shown in *Design Patterns* since that book stands on its own and should be studied separately.
+This book will not repeat all the patterns shown in *GoF Design Patterns* since that book stands on its own and should be studied separately.
 Instead, this book will give some examples that should provide you with a decent feel for what patterns are about and why they are so important.
 
 After years of looking at these things,
 it began to occur to me that the patterns themselves use basic principles of organization,
-other than (and more fundamental than) those described in *Design Patterns*.
+other than (and more fundamental than) those described in *GoF Design Patterns*.
 These principles are based on the structure of the implementations,
-which is where I have seen great similarities between patterns (more than those expressed in *Design Patterns*).
+which is where I have seen great similarities between patterns (more than those expressed in *GoF Design Patterns*).
 Although we generally try to avoid implementation in favor of interface,
 I have found that it's often easier to think about,
 and especially to learn about,
 the patterns in terms of these structural principles.
-This book will attempt to present the patterns based on their structure instead of the categories presented in *Design Patterns*.
+This book will attempt to present the patterns based on their structure instead of the categories presented in *GoF Design Patterns*.
 
 ## Pattern Taxonomy
 

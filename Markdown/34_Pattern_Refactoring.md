@@ -7,7 +7,7 @@ This is the spirit of Martin Fowler's *Refactoring*,
 applied at the level of patterns rather than single statements.
 
 This is also a Python lesson.
-Several of the patterns that the original *Design Patterns* book needed are answers to limitations of statically typed languages without multiple dispatch.
+Several of the patterns that *GoF Design Patterns* needed are answers to limitations of statically typed languages without multiple dispatch.
 Python removes some of those limitations,
 so a few common patterns simply dissolve here.
 We will call that out as it happens.

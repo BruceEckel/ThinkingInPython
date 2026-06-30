@@ -56,7 +56,7 @@ cheese()
 ```
 
 Decoration is a simple kind of metaprogramming.
-The same idea appears in *Design Patterns* as the *decorator* pattern:
+The same idea appears in design patterns as the *decorator* pattern:
 wrap an object to add responsibilities to it,
 while keeping the wrapped object's interface so the wrapping stays invisible to the code that uses it.
 

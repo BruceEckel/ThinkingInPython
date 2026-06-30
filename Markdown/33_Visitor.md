@@ -9,7 +9,7 @@ However, you'd like to add new polymorphic methods to that hierarchy.
 Normally you'd have to add something to the base class interface, but that's unchangeable.
 How do you get around this?
 
-*Visitor*, the final pattern in the *Design Patterns* book, solves this kind of problem.
+*Visitor*, the final pattern in *GoF Design Patterns*, solves this kind of problem.
 It allows you to extend the interface of the primary type.
 It does this by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
 The objects of the primary type simply "accept" the visitor,

@@ -104,7 +104,7 @@ def test_cache_factory_returns_same_instance() -> None:
 
 ## The Classic Implementations
 
-The *Design Patterns* book builds the singleton with more apparatus.
+*GoF Design Patterns* builds the singleton with more apparatus.
 The variations below run from elaborate to simple.
 They are worth seeing,
 but notice that each does more work than the module or the cached factory above.

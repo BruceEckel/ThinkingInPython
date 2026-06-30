@@ -16,7 +16,7 @@ it is given an implementation to which to send all of the method calls.
 
 Structurally, the difference between *Proxy* and *State* is simple:
 a *Proxy* has only one implementation, while *State* has more than one.
-The application of the patterns is considered (in *Design Patterns*) to be distinct:
+The application of the patterns is considered (in *GoF Design Patterns*) to be distinct:
 *Proxy* is used to control access to its implementation,
 while *State* allows you to change the implementation dynamically.
 However, if you expand your notion of "controlling access to implementation" then the two fit neatly together.
@@ -171,7 +171,7 @@ def test_state_delegates_and_change_imp_swaps() -> None:
 ```
 
 The difference between *Proxy* and *State* is in the problems that are solved.
-The common uses for *Proxy* as described in *Design Patterns* are:
+The common uses for *Proxy* as described in *GoF Design Patterns* are:
 
 1.  `Remote proxy`.
     This proxies for an object in a different address space.
@@ -227,7 +227,7 @@ one generic proxy can add lazy initialization (a *virtual proxy*),
 access checks (a *protection proxy*),
 or call tracking (a *smart reference*) to any object, with no per-method code.
 
-In *Design Patterns*,
+In *GoF Design Patterns*,
 *Proxy* and *State* are given different structures and so are treated as unrelated.
 But both are really a *Surrogate*:
 a front object that passes method calls through to an implementation.
@@ -235,7 +235,7 @@ a front object that passes method calls through to an implementation.
 *State* swaps among several to change behavior over time.
 In Python both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
-The separate implementation hierarchy that *Design Patterns* uses is needed only when you do not control the implementing code;
+The separate implementation hierarchy that *GoF Design Patterns* uses is needed only when you do not control the implementing code;
 when you do, the single generic surrogate above is simpler and just as flexible.
 
 A test hands the counting proxy a small stand-in and confirms the call is forwarded with its result, and that only callable accesses are counted:

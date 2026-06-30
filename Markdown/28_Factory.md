@@ -303,7 +303,7 @@ def test_unknown_name_raises() -> None:
 
 The static `factory()` method in the previous example forces all the creation operations to be focused in one spot,
 so that's the only place you need to change the code.
-However, the *Design Patterns* book emphasizes that the reason for the *Factory Method* pattern is so that different types of factories can be subclassed from the basic factory (the above design is mentioned as a special case).
+However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that different types of factories can be subclassed from the basic factory (the above design is mentioned as a special case).
 However, the book does not provide an example,
 but instead repeats the example used for the *Abstract Factory* (you'll see an example of this in the next section).
 Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
@@ -408,7 +408,7 @@ with not one but several factory methods.
 Each of the factory methods creates a different kind of object.
 The idea is that at the point of creation of the factory object,
 you decide how all the objects created by that factory will be used.
-The example given in *Design Patterns* implements portability across various graphical user interfaces (GUIs):
+The example given in *GoF Design Patterns* implements portability across various graphical user interfaces (GUIs):
 you create a factory object appropriate to the GUI that you're working with,
 and from then on when you ask it for a menu, button, slider,
 etc. it will automatically create the appropriate version of that item for the GUI.
