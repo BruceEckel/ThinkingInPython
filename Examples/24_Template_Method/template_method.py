@@ -1,11 +1,12 @@
 # template_method.py
-from typing import override
+from typing import final, override
 
 class ApplicationFramework:
     def __init__(self) -> None:
         self.run()
 
     # The fixed algorithm. Subclasses supply the steps, not the flow:
+    @final
     def run(self) -> None:
         for _ in range(2):
             self.customize1()

@@ -1,6 +1,4 @@
 # template_function.py
-# The same Template Method, with the varying steps passed as functions
-# instead of supplied by a subclass.
 from collections.abc import Callable
 
 def run_framework(customize1: Callable[[], None],

@@ -1,6 +1,7 @@
 # Template Method
 
-An application framework lets you build a new application by reusing existing classes and overriding one or more methods to customize the behavior.
+With an application framework,
+you build a new application by reusing existing classes and overriding one or more methods to customize the behavior.
 At the heart of a framework is the *Template Method*: a method,
 defined in the base class,
 that drives the application by calling other base-class methods,
@@ -15,23 +16,23 @@ and you never call that sequence yourself.
 
 ## Template Method
 
-The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class,
-while the individual steps are left open for subclasses to fill in.
-In languages with `final`,
-the template method is locked so a subclass cannot change the overall flow.
-Python has no `final` keyword ([Singleton](23_Singleton.md) and [Metaprogramming](18_Metaprogramming.md#making-a-class-final) show how it is emulated when truly needed),
-so here it is a matter of convention: the base defines the algorithm,
-subclasses define the steps.
+The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class.
+Subclasses complete the individual steps.
+The `@final` decorator from `typing`  locks the template method so a subclass cannot change the overall flow
+(see [Making a Class Final](18_Metaprogramming.md#making-a-class-final)).
+Here, `run()` is marked with `@final` so the checker rejects any subclass that overrides it,
+while leaving the step methods open:
 
 ```python
 # template_method.py
-from typing import override
+from typing import final, override
 
 class ApplicationFramework:
     def __init__(self) -> None:
         self.run()
 
     # The fixed algorithm. Subclasses supply the steps, not the flow:
+    @final
     def run(self) -> None:
         for _ in range(2):
             self.customize1()
@@ -62,7 +63,7 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
-This pattern leans on the *Liskov Substitution Principle*:
+This pattern leans on the [The Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution):
 a subclass must be usable wherever its base class is expected.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
@@ -70,9 +71,8 @@ An override that breaks that trust, doing nothing the flow relies on,
 or raising where the base would not, corrupts the fixed algorithm
 even though the code still type-checks.
 The Template Method works only when every subclass is a faithful substitute for its base.
-See [The Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution) for the definition.
 
-A test records the steps to confirm the algorithm calls them in order, twice:
+Here's a second implementation of `ApplicationFramework`:
 
 ```python
 # test_template_method.py
@@ -99,12 +99,10 @@ def test_template_method_runs_steps_in_order() -> None:
 
 Subclassing is one way to supply the varying steps, but not the only one.
 Because Python functions are first-class, you can pass the steps in directly,
-with no subclass at all:
+without using a subclass:
 
 ```python
 # template_function.py
-# The same Template Method, with the varying steps passed as functions
-# instead of supplied by a subclass.
 from collections.abc import Callable
 
 def run_framework(customize1: Callable[[], None],
@@ -123,18 +121,6 @@ run_framework(
 #: Say no more, say no more!
 ```
 
-Both versions hold the algorithm fixed and let the steps vary,
-which is the whole point of Template Method.
-Choose based on what the steps need.
-If they share state, build on each other, or come as a coherent group,
-the subclass is clearer.
-If each step is independent,
-passing functions is lighter and avoids a class hierarchy.
-This is the same trade-off seen in [Function Objects](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
-a hook that holds no state is usually better as a function than as a method to override.
-
-The function version is checked the same way, recording the order the passed-in steps run:
-
 ```python
 # test_template_function.py
 from template_function import run_framework
@@ -145,6 +131,16 @@ def test_template_function_runs_steps_in_order() -> None:
         lambda: calls.append("a"), lambda: calls.append("b"))
     assert calls == ["a", "b", "a", "b"]
 ```
+
+Both the Template Method and Template Function have a fixed algorithm and varying steps.
+If they share state, build on each other, or come as a coherent group,
+the subclass is clearer.
+If each step is independent,
+passing functions is lighter and avoids a class hierarchy.
+This is the same trade-off seen in [Function Objects](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
+a hook that holds no state is usually better as a function than as a method to override.
+
+
 
 ## Exercises
 

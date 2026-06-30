@@ -19,8 +19,6 @@ Look for duplication on Singleton between Metaprogramming and Singleton chapters
 
 Run 'make prose' on each chapter
 
-Creating your own context managers -- didn't I write about this?
-
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
 -
