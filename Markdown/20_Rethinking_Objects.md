@@ -25,9 +25,8 @@ It helps to look at where objects came from.
 a system is a set of things that interact.
 Notably, not everything was an object.
 Simula still had standalone functions.
-It was a compiled, statically typed language.
-The Liskov substitution principle:
-a subtype should be substitutable for its base type, fit naturally.
+It was a compiled, statically typed language,
+so the Liskov substitution principle fit naturally.
 
 *Smalltalk* took the other road: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
@@ -51,6 +50,17 @@ Rust makes bindings immutable by default; Swift and Kotlin encourage it through 
 They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
+
+## The Liskov Substitution Principle {#liskov-substitution}
+
+The *Liskov Substitution Principle* (LSP) says that an object of a subtype must
+be usable anywhere an object of its base type is expected, without breaking the
+program. A subclass may add behavior, but it must honor the base class's
+contract: it accepts the same arguments, returns the same kinds of results, and
+raises no surprising exceptions. When subclasses obey it, code written against
+the base class works unchanged on any of them. This is the guarantee that makes
+polymorphism, and patterns like the [Template Method](24_Template_Method.md),
+safe: the base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 
 ## Encapsulation Leaks

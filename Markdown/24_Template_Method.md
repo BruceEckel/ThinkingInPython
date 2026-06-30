@@ -62,6 +62,16 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
+This pattern leans on the *Liskov Substitution Principle*:
+a subclass must be usable wherever its base class is expected.
+The base `run()` calls `customize1()` and `customize2()` through `self`,
+trusting that whatever a subclass supplies still fits the algorithm's shape.
+An override that breaks that trust, doing nothing the flow relies on,
+or raising where the base would not, corrupts the fixed algorithm
+even though the code still type-checks.
+The Template Method works only when every subclass is a faithful substitute for its base.
+See [The Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution) for the definition.
+
 A test records the steps to confirm the algorithm calls them in order, twice:
 
 ```python
