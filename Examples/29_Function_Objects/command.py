@@ -1,5 +1,4 @@
 # command.py
-# A function is already a command object; a macro is a list of them.
 from collections.abc import Callable
 
 def loony() -> None:

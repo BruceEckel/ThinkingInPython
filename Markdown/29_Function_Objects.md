@@ -102,9 +102,15 @@ def least_squares(line: Line) -> float:
     # A flat least-squares fit minimizes squared error at the mean
     return sum(line) / len(line)
 
+def newtons_method(line: Line) -> float:
+    return min(line)
+
 def bisection(line: Line) -> float:
     # Halve the interval: the midpoint of the value range
     return (min(line) + max(line)) / 2
+
+def conjugate_gradient(line: Line) -> float:
+    return max(line)
 
 def solve(line: Line, strategy: Callable[[Line], float]) -> float:
     return strategy(line)
@@ -112,8 +118,12 @@ def solve(line: Line, strategy: Callable[[Line], float]) -> float:
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solve(line, least_squares))
 #: 2.3333333333333335
+print(solve(line, newtons_method))
+#: -1.0
 print(solve(line, bisection))
 #: 2.0
+print(solve(line, conjugate_gradient))
+#: 5.0
 ```
 
 The classic form makes each algorithm a class deriving from a common interface,
@@ -165,9 +175,15 @@ solver = MinimaSolver(LeastSquares())
 line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
 print(solver.minima(line))
 #: 2.3333333333333335
+solver.change_algorithm(NewtonsMethod())
+print(solver.minima(line))
+#: -1.0
 solver.change_algorithm(Bisection())
 print(solver.minima(line))
 #: 2.0
+solver.change_algorithm(ConjugateGradient())
+print(solver.minima(line))
+#: 5.0
 ```
 
 You use strategies-as-functions constantly in Python without naming the pattern.
