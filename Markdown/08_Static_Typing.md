@@ -115,7 +115,7 @@ Dynamic typing is often called *duck typing*:
 if it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
-Rather than waiting until the program is running,
+Instead of waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*,
 which means the methods and attributes required by whatever consumes that type.
 Dynamic typing and structural typing are the same idea checked at different moments.

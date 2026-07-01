@@ -214,7 +214,7 @@ run(b)
 The first implementation is used for awhile,
 then the second implementation is swapped in and that is used.
 
-A test hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_to()` swaps it:
+Testing hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_to()` swaps it:
 
 ```python
 # test_state.py
@@ -303,7 +303,7 @@ with *State* adding a method to change the implementation.
 The separate implementation hierarchy that *GoF Design Patterns* uses is needed only when you do not control the implementing code;
 when you do, the single generic surrogate above is simpler and just as flexible.
 
-A test hands the counting proxy a small stand-in and confirms the call is forwarded with its result, and that only callable accesses are counted:
+Testing hands the counting proxy a small stand-in and confirms the call is forwarded with its result, and that only callable accesses are counted:
 
 ```python
 # test_counting_proxy.py

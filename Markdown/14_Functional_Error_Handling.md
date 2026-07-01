@@ -260,7 +260,7 @@ A `Failure` anywhere short-circuits the whole thing.
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
 You do not need to know that word to use it.
 
-A test confirms the hand-written and `bind()` versions agree on every input:
+Testing confirms the hand-written and `bind()` versions agree on every input:
 
 ```python
 # test_composing.py
@@ -305,7 +305,7 @@ if __name__ == "__main__":
 Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
 Only the last input passes all three steps, so it's the only one that reaches `add()`.
 
-A test confirms combining returns the right value, or the first failure in the chain:
+Testing confirms combining returns the right value, or the first failure in the chain:
 
 ```python
 # test_combining.py

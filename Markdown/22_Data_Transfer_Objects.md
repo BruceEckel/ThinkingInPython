@@ -29,7 +29,7 @@ You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in-place, wherever you need it,
 usually makes more sense.
 
-A test confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
+Testing confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
 
 ```python
 # test_messenger_idiom.py

@@ -82,7 +82,7 @@ assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases a list of callbacks is all the *Observer* pattern amounts to.
 
-A test confirms the two things that matter:
+Testing confirms the two things that matter:
 every subscriber is called with the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 A list whose `append` is the observer records what arrived:

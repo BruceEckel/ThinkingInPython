@@ -254,7 +254,7 @@ asyncio.run(main())
 Because claiming is atomic,
 the rats always cover every cell reachable from the entry,
 no matter how the tasks interleave.
-A test pins that down by comparing the cells the rats visited against a plain flood fill of the same maze.
+Testing pins that down by comparing the cells the rats visited against a plain flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py

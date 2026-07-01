@@ -152,7 +152,7 @@ def parse(filename: str) -> list[Trash]:
     return items
 ```
 
-A test parses a small file written on the spot, so it does not depend on `trash.dat`:
+Testing parses a small file written on the spot, so it does not depend on `trash.dat`:
 
 ```python
 # test_parse_trash.py

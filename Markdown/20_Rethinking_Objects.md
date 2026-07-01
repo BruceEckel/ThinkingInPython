@@ -107,7 +107,7 @@ The output shows that the internals changed from outside.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
 
-A test shows the leak:
+Testing shows the leak:
 
 ```python
 # test_leaky.py
@@ -161,7 +161,7 @@ Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
 
-A test confirms the defensive copy holds: mutating the returned list leaves the original untouched:
+Testing confirms the defensive copy holds: mutating the returned list leaves the original untouched:
 
 ```python
 # test_plugged.py
@@ -253,7 +253,7 @@ The function reads the same and computes the same.
 The class does not need to own it.
 The function is not worse, and it has an advantage: it does not have to live inside `Point`.
 
-A test confirms the method and the free function agree:
+Testing confirms the method and the free function agree:
 
 ```python
 # test_point_distance.py
@@ -322,7 +322,7 @@ if __name__ == "__main__":
 `Point` and `PairCoord` share no base class.
 They both have `x` and `y`, which is all `distance()` asked for.
 
-A test confirms `distance()` works on both a `Point` and an adapted `Pair`:
+Testing confirms `distance()` works on both a `Point` and an adapted `Pair`:
 
 ```python
 # test_distance_protocol.py
@@ -518,7 +518,7 @@ The object-oriented default assumes you will add types more often than operation
 which is often not true.
 [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
-A test confirms the object-oriented and `match` versions compute the same areas:
+Testing confirms the object-oriented and `match` versions compute the same areas:
 
 ```python
 # test_shapes.py

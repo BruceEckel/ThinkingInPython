@@ -31,7 +31,7 @@ then you'll have to have a polymorphic method call in each hierarchy.
 
 Both versions below share one result type: an enumeration of the three outcomes,
 win, lose, and draw.
-Rather than duplicate it, put it in its own module that both examples import.
+Rather than duplicate it, put it in its own module for import.
 It is a `StrEnum`, so each member is its string value and prints as `win`,
 `lose`, or `draw` with no extra code:
 

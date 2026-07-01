@@ -320,9 +320,13 @@ print(square(5), cube(5))
 ```
 
 `square` and `cube` are specializations of `power`, each with one argument already supplied.
-Partial application turns a general function into the specific one a caller needs, which is handy when a higher-order function wants a single-argument callable.
+Partial application turns a general function into the specific one a caller needs,
+which is handy when a higher-order function wants a single-argument callable.
 
-Partial application earns its place when an API expects a function of one argument and you have a function of several. Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in. Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`, and it binds their values at the moment you build it, which avoids the late-binding surprise a lambda created in a loop can produce.
+Partial application earns its place when an API expects a function of one argument and you have a function of several.
+Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in.
+Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`,
+and it binds their values at the moment you build it, which avoids the late-binding surprise a lambda created in a loop can produce.
 
 ## Composing Functions
 

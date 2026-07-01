@@ -238,7 +238,7 @@ No metaclass is involved.
 `__init_subclass__()` is implicitly a class method;
 its first argument is the new subclass.
 
-A test checks that each registry holds only its current leaf classes:
+Testing checks that each registry holds only its current leaf classes:
 
 ```python
 # test_init_subclass.py
@@ -290,7 +290,7 @@ print(p.x, p.y)
 The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__()`.
 This is metaprogramming, but it needs no metaclass.
 
-A test confirms the descriptor learns its name and stores under it, and returns itself when accessed on the class:
+Testing confirms the descriptor learns its name and stores under it, and returns itself when accessed on the class:
 
 ```python
 # test_set_name.py

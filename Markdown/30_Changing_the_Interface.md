@@ -1,16 +1,16 @@
 # Changing the Interface
 
-Sometimes the problem that you're solving is as simple as "I don't have the interface that I want."
+Sometimes the problem you're solving is as simple as "I don't have the interface that I want."
 Two of the patterns in *GoF Design Patterns* solve this problem:
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes,
-only to provide a more comfortable way to deal with a library or bundle of resources.
+providing a more comfortable way to deal with a library or bundle of resources.
 
 ## Adapter
 
 When you've got *this*, and you need *that*, *Adapter* solves the problem.
 The only requirement is to produce a *that*,
-and there are a number of ways you can accomplish this adaptation:
+and there are a number of ways to accomplish this adaptation:
 
 ```python
 # adapter.py
@@ -80,7 +80,7 @@ what_i_use.op(what_i_have2)
 what_i_use.op(what_i_have3.what_i_want())
 ```
 
-I'm taking liberties with the term "proxy" here,
+This takes liberty with the term "proxy",
 because in *GoF Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
 
 ### Adapter in Python
@@ -91,7 +91,7 @@ so it accepts *any* object that has an `f()`.
 You do not need a shared base class or a declared interface, only the method.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
-`__getattr__()` does the forwarding, so the adapter stays tiny:
+`__getattr__()` does the forwarding, so the adapter is tiny:
 
 ```python
 # getattr_adapter.py
@@ -122,9 +122,9 @@ print(a.g())   # Forwarded to the adaptee unchanged
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
-A test verifies both halves of that behavior:
+Testing verifies both halves of that behavior:
 the new `f()` combines the adaptee's methods,
-and unoverridden calls forward straight through to the wrapped object:
+and un-overridden calls forward through to the wrapped object:
 
 ```python
 # test_adapter.py
@@ -146,10 +146,10 @@ def test_forwarding_targets_the_wrapped_object() -> None:
 
 ## Façade
 
-A general principle that I apply when I'm casting about trying to mold requirements into a first-cut object is "If something is ugly,
-hide it inside an object."
+> If something is ugly, hide it inside an object.
+
 This is basically what *Façade* accomplishes.
-If you have a rather confusing collection of classes and interactions that the client programmer doesn't really need to see,
+If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
 Façade is often implemented as a singleton abstract factory.

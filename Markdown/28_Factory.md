@@ -246,7 +246,7 @@ This is the same self-registration used in [Pattern Refactoring](34_Pattern_Refa
 and it is the most common form of factory in idiomatic Python.
 The sections below show the classic object-oriented factories for contrast.
 
-A test confirms the two behaviors that matter: every subclass registers itself,
+Testing confirms the two behaviors that matter: every subclass registers itself,
 and a new subclass needs no change to `make()`.
 Defining a fresh `Shape` inside the test is enough to see it appear in the registry:
 
