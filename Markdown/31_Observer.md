@@ -1,18 +1,17 @@
 # Observer
 
-> Decoupling code behavior
-
-The *Observer* pattern is a kind of callback.
+The *Observer* pattern decouples code behavior and is a kind of callback.
 One object, the *observer*, registers interest in another, the *observable*,
 and is notified whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
-observers attach and detach at runtime,
-and the observable never needs to know their types.
+
+- Observers attach and detach at runtime
+- The observable never needs to know their types
+
 It underlies event handling,
 and the model-view split that keeps a display in step with the data behind it.
 
-The problem it solves is common:
-a group of objects must update themselves when some other object changes state.
+Use *Observer* if a group of objects must update themselves when some other object changes state.
 The classic example is Smalltalk's MVC (model-view-controller),
 or the almost-equivalent Document-View architecture.
 You have some data, the *document*, and more than one view of it,
@@ -21,7 +20,7 @@ When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
 without the data having to know which views exist.
 
-Python expresses this with far less machinery than the classic design needs.
+Python expresses this with far less machinery than the classic design.
 This chapter shows the Pythonic version first,
 then extends it to async for I/O-bound observers.
 It ends with the literal translation of Java's `Observable` and `Observer` classes, for when you actually need it.
