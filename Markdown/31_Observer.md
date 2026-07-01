@@ -23,7 +23,7 @@ without the data having to know which views exist.
 Python expresses this with far less machinery than the classic design.
 This chapter shows the Pythonic version first,
 then extends it to async for I/O-bound observers.
-It ends with the literal translation of Java's `Observable` and `Observer` classes, for when you actually need it.
+It ends with the literal translation of Java's `Observable` and `Observer` classes, for comparison.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -65,25 +65,24 @@ class Thermometer(Observable):
         self._celsius = value
         self.notify(value)   # State changed; tell the observers
 
-thermo = Thermometer()
-thermo.subscribe(lambda c: print(f"display: {c}C"))
-thermo.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
-thermo.celsius = 25
+t = Thermometer()
+t.subscribe(lambda c: print(f"display: {c}C"))
+t.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
+t.celsius = 25
 #: display: 25C
 #: ok
-thermo.celsius = 150
+t.celsius = 150
 #: display: 150C
 #: alarm!
 ```
 
 The observers here are lambdas, but any function or bound method works.
-There is no `Observer` base class to inherit and no `set_changed()`/`notify_observers()` protocol:
-assigning to `celsius` notifies everyone.
+There is no `Observer` base class to inherit and no `set_changed()`/`notify_observers()` protocol.
+Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases a list of callbacks is all the *Observer* pattern amounts to.
 
-Testing confirms the two things that matter:
-every subscriber is called with the new value,
+Testing confirms that every subscriber is called with the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 A list whose `append` is the observer records what arrived:
 
@@ -104,40 +103,38 @@ def test_no_subscribers_is_a_noop() -> None:
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
-    thermo = Thermometer()
-    thermo.subscribe(readings.append)
-    thermo.celsius = 25.0
-    thermo.celsius = 150.0
+    t = Thermometer()
+    t.subscribe(readings.append)
+    t.celsius = 25.0
+    t.celsius = 150.0
     assert readings == [25.0, 150.0]
-    assert thermo.celsius == 150.0
+    assert t.celsius == 150.0
 
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
-    thermo = Thermometer()
-    thermo.celsius = 10.0  # No subscriber yet
-    thermo.subscribe(readings.append)
-    thermo.celsius = 20.0
+    t = Thermometer()
+    t.celsius = 10.0  # No subscriber yet
+    t.subscribe(readings.append)
+    t.celsius = 20.0
     assert readings == [20.0]
 ```
 
 ## Observer and I/O
 
-The observers so far do no I/O.
-They print or append to a list, then return at once.
-When an observer instead calls a network service or writes to a database,
-notifying observers one at a time blocks on each in turn.
+The observers so far print or append to a list, then return.
+If an observer calls a network service or writes to a database,
+notifying observers one at a time blocks on each.
 The list of callbacks becomes a line of waits.
 
-Make the observers coroutines and the fan-out overlaps.
+If the observers are coroutines,
 `notify` awaits them together with `asyncio.gather`,
-so one state change reaches every observer at once,
-and a slow observer no longer holds up the others.
+so one state change reaches every observer at once.
+A slow observer no longer holds up the others.
 `gather` still waits for all of them, so the change is finished only when every observer is.
-One cost comes with this.
-A `@property` setter cannot be a coroutine, and an assignment cannot be awaited.
-The state change moves from `thermo.celsius = value` to an awaitable method.
-The asyncio mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](35_Simulation.md);
-this section needs only that a coroutine can pause at `await` while others run:
+There is a cost: a `@property` setter cannot be a coroutine, and an assignment cannot be awaited.
+The state change moves from `t.celsius = value` to an awaitable method.
+The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](35_Simulation.md).
+For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python
 # async_observers.py
@@ -181,11 +178,11 @@ async def log_reading(celsius: float) -> None:
     print(f"logged: {celsius}C")
 
 async def main() -> None:
-    thermo = Thermometer()
-    thermo.subscribe(alarm)
-    thermo.subscribe(log_reading)
-    await thermo.set_celsius(20)   # Below the alarm threshold
-    await thermo.set_celsius(150)   # Triggers the alarm too
+    t = Thermometer()
+    t.subscribe(alarm)
+    t.subscribe(log_reading)
+    await t.set_celsius(20)   # Below the alarm threshold
+    await t.set_celsius(150)   # Triggers the alarm too
 
 asyncio.run(main())
 #: logged: 20C

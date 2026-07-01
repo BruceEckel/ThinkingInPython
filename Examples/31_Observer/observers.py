@@ -29,12 +29,12 @@ class Thermometer(Observable):
         self._celsius = value
         self.notify(value)   # State changed; tell the observers
 
-thermo = Thermometer()
-thermo.subscribe(lambda c: print(f"display: {c}C"))
-thermo.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
-thermo.celsius = 25
+t = Thermometer()
+t.subscribe(lambda c: print(f"display: {c}C"))
+t.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
+t.celsius = 25
 #: display: 25C
 #: ok
-thermo.celsius = 150
+t.celsius = 150
 #: display: 150C
 #: alarm!

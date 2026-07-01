@@ -14,17 +14,17 @@ def test_no_subscribers_is_a_noop() -> None:
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
-    thermo = Thermometer()
-    thermo.subscribe(readings.append)
-    thermo.celsius = 25.0
-    thermo.celsius = 150.0
+    t = Thermometer()
+    t.subscribe(readings.append)
+    t.celsius = 25.0
+    t.celsius = 150.0
     assert readings == [25.0, 150.0]
-    assert thermo.celsius == 150.0
+    assert t.celsius == 150.0
 
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
-    thermo = Thermometer()
-    thermo.celsius = 10.0  # No subscriber yet
-    thermo.subscribe(readings.append)
-    thermo.celsius = 20.0
+    t = Thermometer()
+    t.celsius = 10.0  # No subscriber yet
+    t.subscribe(readings.append)
+    t.celsius = 20.0
     assert readings == [20.0]

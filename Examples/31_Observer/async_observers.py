@@ -39,11 +39,11 @@ async def log_reading(celsius: float) -> None:
     print(f"logged: {celsius}C")
 
 async def main() -> None:
-    thermo = Thermometer()
-    thermo.subscribe(alarm)
-    thermo.subscribe(log_reading)
-    await thermo.set_celsius(20)   # Below the alarm threshold
-    await thermo.set_celsius(150)   # Triggers the alarm too
+    t = Thermometer()
+    t.subscribe(alarm)
+    t.subscribe(log_reading)
+    await t.set_celsius(20)   # Below the alarm threshold
+    await t.set_celsius(150)   # Triggers the alarm too
 
 asyncio.run(main())
 #: logged: 20C
