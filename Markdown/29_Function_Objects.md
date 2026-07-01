@@ -1,15 +1,8 @@
 # Function Objects
 
-In *Advanced C++: Programming Styles And Idioms* (Addison-Wesley, 1992),
-Jim Coplien uses the term *functor*:
-an object whose sole purpose is to wrap a function (since "functor" has a meaning in mathematics, this book uses the more explicit term *function object*).
-The point is to decouple the choice of function to call from the place where it is called.
-
+A *function object* decouples the choice of function to call from the place where it is called.
 That decoupling is the goal of several patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-In a language where a function is not a value,
-you need an object to carry the function around,
-so each of these patterns builds a small class hierarchy whose only job is to hold one method.
 
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
@@ -25,7 +18,6 @@ In Python the action is just a function, and a "macro" is just a list of actions
 
 ```python
 # command.py
-# A function is already a command object; a macro is a list of them.
 from collections.abc import Callable
 
 def loony() -> None:
@@ -102,8 +94,6 @@ Again, the algorithm is a function, and you pass it in:
 
 ```python
 # strategy.py
-# A strategy is a function you pass in. No class hierarchy, no
-# Context object.
 from collections.abc import Callable
 
 type Line = list[float]
