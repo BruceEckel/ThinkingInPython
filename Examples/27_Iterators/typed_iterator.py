@@ -1,14 +1,15 @@
 # typed_iterator.py
 from collections.abc import Iterator
-from typing import Any, override
+from typing import override
 
-class TypedIterator(Iterator[Any]):
-    def __init__(self, it: Iterator[Any], expected: type) -> None:
+class TypedIterator[T](Iterator[T]):
+    def __init__(self, it: Iterator[object],
+                 expected: type[T]) -> None:
         self.imp = it
         self.expected = expected
 
     @override
-    def __next__(self) -> Any:
+    def __next__(self) -> T:
         obj = next(self.imp)
         if not isinstance(obj, self.expected):
             raise TypeError(

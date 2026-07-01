@@ -108,29 +108,51 @@ def test_total_over_any_iterable() -> None:
 
 ## Reusable Algorithms
 
-The standard library's `itertools` module constains the generic iterator algorithms `chain()`,
+The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
 `islice()`, `groupby()`, `takewhile()`, and more, each consuming and producing iterators.
 Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
+This pipeline draws from an infinite source but computes only what is consumed.
+Each stage pulls one item at a time, so an infinite source is fine as long as something downstream stops it:
+
+```python
+# reusable_algorithms.py
+from itertools import count, islice, takewhile
+
+numbers = count(1)  # Infinite: 1, 2, 3, ...
+# Square the odd numbers, lazily, then take just the first five:
+odd_squares = (n * n for n in numbers if n % 2)
+print(list(islice(odd_squares, 5)))
+#: [1, 9, 25, 49, 81]
+
+# takewhile() stops as soon as its condition fails:
+print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
+#: [1, 4, 9, 16, 25, 36, 49]
+```
+
+Nothing runs until `list()` pulls values through,
+and `islice()` and `takewhile()` decide when to stop,
+so the infinite `count(1)` never runs away.
 
 ## A Type-Checking Iterator
 
-That is the *Decorator* pattern wraps an existing iterator and changes its behavior.
+The *Decorator Pattern* wraps an existing iterator and changes its behavior.
 This produces a new iterator with the same interface but added behavior.
 Here, we force every item to be of an expected type:
 
 ```python
 # typed_iterator.py
 from collections.abc import Iterator
-from typing import Any, override
+from typing import override
 
-class TypedIterator(Iterator[Any]):
-    def __init__(self, it: Iterator[Any], expected: type) -> None:
+class TypedIterator[T](Iterator[T]):
+    def __init__(self, it: Iterator[object],
+                 expected: type[T]) -> None:
         self.imp = it
         self.expected = expected
 
     @override
-    def __next__(self) -> Any:
+    def __next__(self) -> T:
         obj = next(self.imp)
         if not isinstance(obj, self.expected):
             raise TypeError(
@@ -145,11 +167,10 @@ A generator wraps an iterator just as well and in fewer lines:
 
 ```python
 # typed_generator.py
-# A generator that type-checks each item as it passes through.
+# A generator that type-checks each item.
 from collections.abc import Iterable, Iterator
-from typing import Any
 
-def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
+def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(
@@ -165,6 +186,8 @@ Use the class when the wrapper needs its own state or extra methods;
 use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because they all speak the same protocol.
+Both take `expected: type[T]`, so the checker carries the element type through:
+`typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 Both wrappers should pass matching items and raise on a mismatch:
 

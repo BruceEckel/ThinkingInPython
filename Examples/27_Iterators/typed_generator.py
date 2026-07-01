@@ -1,9 +1,8 @@
 # typed_generator.py
-# A generator that type-checks each item as it passes through.
+# A generator that type-checks each item.
 from collections.abc import Iterable, Iterator
-from typing import Any
 
-def typed(it: Iterable[Any], expected: type) -> Iterator[Any]:
+def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(

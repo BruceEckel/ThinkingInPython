@@ -1,9 +1,8 @@
 # iterators.py
-# Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 
-# A generator function is the easy way to produce an iterator:
+# Generator function
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
     for _ in range(n):
