@@ -1,18 +1,13 @@
 # Iterators
 
-An *iterator* decouples an algorithm from the container it runs on.
+An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
 a file, a database cursor, or a computation: it only asks for the next item.
-Alexander Stepanov, who designed the C++ STL,
-put iterators at the center of generic programming for exactly this reason.
 
-In many languages this is a pattern you assemble by hand,
-with an `Iterator` interface and classes that implement it.
-In Python it is built into the language.
+In Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
 comprehensions, `sum()`, `sorted()`, unpacking,
 and every function that takes an iterable.
-The pattern is the language.
 
 ## Iteration Is Built In
 
@@ -26,7 +21,7 @@ a function written against an iterable is automatically decoupled from the conta
 
 ## Generators {#generators}
 
-You rarely need to write `__iter__()`/`__next__()` by hand,
+You rarely write `__iter__()`/`__next__()` by hand,
 because a *generator* writes them for you.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
@@ -34,11 +29,10 @@ A class becomes iterable by writing `__iter__()` as a generator:
 
 ```python
 # iterators.py
-# Iterators and generators are built into Python.
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 
-# A generator function is the easy way to produce an iterator:
+# Generator function
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
     for _ in range(n):
@@ -72,8 +66,7 @@ print(total(Countdown(5)))   # and on a custom iterable
 #: 15
 ```
 
-`total()` is the decoupled algorithm Stepanov was after:
-it works on the generator, the list,
+`total()` works on the generator, the list,
 and the custom `Countdown` without knowing or caring which.
 Generators are also lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
@@ -84,7 +77,10 @@ or `itertools.count()`, produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
 
-These tests collect each iterator into a list and compare, covering the sequences and their empty edge cases, confirming a custom iterable can be re-iterated, and that `total()` works on every source:
+These tests collect each iterator into a list and compare,
+covering the sequences and their empty edge cases,
+confirming a custom iterable can be re-iterated,
+and that `total()` works on every source:
 
 ```python
 # test_iterators.py
@@ -112,13 +108,10 @@ def test_total_over_any_iterable() -> None:
 
 ## Reusable Algorithms
 
-Generic iterator algorithms ship in the standard library's `itertools` module:
-`chain()`, `islice()`, `groupby()`, `takewhile()`, and more,
-each consuming and producing iterators.
+The standard library's `itertools` module constains the generic iterator algorithms `chain()`,
+`islice()`, `groupby()`, `takewhile()`, and more, each consuming and producing iterators.
 Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
-they let you build pipelines that stay lazy end to end.
-This is the "say what, not how" style the STL aimed for,
-available out of the box.
+you can build pipelines that stay lazy end to end.
 
 ## A Type-Checking Iterator
 
