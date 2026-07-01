@@ -1,11 +1,14 @@
 # Performance
 
+[[Use new profiling features in Python 3.15]]
+[[May need some kind of profiling test rig to demonstrate speedups. If this takes too long for a normal 'make verify', might need to separate and create 'make profile" or something]]
+
 Performance means at least two things when it comes to computing:
 
 1. The speed at which an application is developed.
 2. The speed at which that application executes.
 
-Python addresses the first issue through its clear syntax and extensive power and flexibility.
+Python addresses the first issue with clear syntax and extensive power and flexibility.
 As to the second issue, Python is commonly considered to be slow.
 
 ## Is it Actually Too Slow?
@@ -108,6 +111,8 @@ and `nsmallest()` and `nlargest()` answer top-N questions directly.
 For a priority queue shared across threads, `queue.PriorityQueue` wraps `heapq` with locking,
 covered with concurrency below.
 
+[[Frozen data structures: tuples instead of lists, and frozenset and frozendict -- shouldn't these speed up lookup?]]
+
 ## Write Idiomatic Python
 
 [[Let the interpreter do the work: built-in functions and comprehensions instead of hand-written loops, the C-implemented standard library (`itertools`, `collections`, `functools`), `str.join` instead of `+=` in a loop, and hoisting repeated attribute or global lookups into locals]]
@@ -117,6 +122,8 @@ covered with concurrency below.
 [[Stream values with generators and `itertools` instead of building large intermediate lists, so work happens on demand and memory stays flat]]
 
 ## Caching
+
+[[Demonstrate @cache speedup]]
 
 ## Reduce Memory Overhead
 
@@ -145,6 +152,8 @@ except AttributeError as e:
     print(type(e).__name__)
 #: AttributeError
 ```
+
+[[Can you make a dataclass that has slots? Would that be better here?]]
 
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
@@ -214,7 +223,7 @@ The processor is busy from start to finish.
 That boundary decides the tool.
 Waiting can overlap on a single thread: while one task waits, the thread runs another.
 Computing cannot: one core runs one stream of instructions at a time.
-So I/O-bound work wants `asyncio`, and CPU-bound work wants separate processes.
+So I/O-bound work needs `asyncio`, and CPU-bound work needs separate processes.
 
 The next two sections run one task both ways.
 The task returns `order * 10` for an order number.

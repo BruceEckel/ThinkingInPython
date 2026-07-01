@@ -1,7 +1,5 @@
 # test_box_observer.py
-from typing import Any, override
-from box_observer import BoxModel, adjacent, new_grid, recolored
-from observer import Observer
+from box_observer import BoxModel, Grid, adjacent, new_grid, recolored
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
@@ -25,14 +23,8 @@ def test_recolored_touches_only_neighbors() -> None:
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)
-    seen: list[Any] = []
-
-    class Recorder(Observer):
-        @override
-        def update(self, observable: Any, grid: Any) -> None:
-            seen.append(grid)
-
-    model.add_observer(Recorder())
+    seen: list[Grid] = []
+    model.subscribe(seen.append)         # The observer is a callable
     model.click((2, 2))
     assert seen[-1] is model.grid        # Observer got the new grid
     assert model.grid[(1, 1)] == model.grid[(2, 2)]

@@ -544,7 +544,7 @@ They normalized the very important idea of types, as seen in
 If you simply avoid implementation inheritance, the payoff for using types is tremendous.
 
 Start with functions and data.
-When a program truly wants an object, it tells you:
+When a program truly needs an object, it tells you:
 you find yourself passing the same data into every function,
 or you need to bundle behavior with state.
 Objects are useful sometimes.

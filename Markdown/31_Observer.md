@@ -23,7 +23,7 @@ without the data having to know which views exist.
 Python expresses this with far less machinery than the classic design.
 This chapter shows the Pythonic version first,
 then extends it to async for I/O-bound observers.
-It ends with the literal translation of Java's `Observable` and `Observer` classes, for comparison.
+It closes with a visual model-view example built on the same callable observers.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -67,6 +67,13 @@ class Thermometer(Observable):
     def celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)   # State changed; tell the observers
+```
+
+Using it, subscribed callables react to every temperature change:
+
+```python
+# thermometer.py
+from observers import Thermometer
 
 t = Thermometer()
 t.subscribe(lambda c: print(f"display: {c}C"))
@@ -80,7 +87,7 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
-There is no `Observer` base class to inherit and no `set_changed()`/`notify_observers()` protocol.
+There is no `Observer` base class to inherit and no notification protocol to implement.
 Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases a list of callbacks is all the *Observer* pattern amounts to.
@@ -222,55 +229,7 @@ Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
 The type-keyed [event bus](29_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
 
-The rest of this chapter translates Java's `Observable` and `Observer` classes directly.
-That is useful when you are porting Java code or need the exact `set_changed()` semantics,
-but use it only when the simple versions shown so far are not enough.
-
-## The Classic Observable and Observer
-
-The classic design, translated from Java's `java.util` but without its thread synchronization,
-makes the two roles explicit base classes.
-An `Observable` keeps a list of observers and a `changed` flag.
-You call `set_changed()` and then `notify_observers()`,
-and every registered `Observer` has its `update()` called.
-The flag lets the subject decide when a batch of changes is worth announcing.
-
-```python
-# observer.py
-from typing import Any
-
-class Observer:
-    def update(self, observable: Any, arg: Any, /) -> None:
-        "Called when the observed object changes."
-
-class Observable:
-    def __init__(self) -> None:
-        self.observers: list[Observer] = []
-        self.changed = False
-
-    def add_observer(self, observer: Observer) -> None:
-        if observer not in self.observers:
-            self.observers.append(observer)
-
-    def delete_observer(self, observer: Observer) -> None:
-        self.observers.remove(observer)
-
-    def set_changed(self) -> None:
-        self.changed = True
-
-    def notify_observers(self, arg: Any = None) -> None:
-        if not self.changed:
-            return
-        self.changed = False
-        for observer in list(self.observers):
-            observer.update(self, arg)
-```
-
-A bare `Observable` does nothing on its own:
-you must subclass it and call `set_changed()`,
-or `notify_observers()` is a no-op.
-
-### A Visual Example of Observers
+## A Visual Example of Observers
 
 This is the model-view split from the chapter's opening,
 made visible with `tkinter` (in the standard library, so there is nothing to install),
@@ -285,15 +244,15 @@ The model is an `Observable`.
 Building the grid, testing adjacency,
 and computing the grid that results from a click are plain functions: values in,
 values out.
-`BoxModel.click()` makes the next grid with `recolored()` and announces it.
+`BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
 There is no `tkinter` here at all,
 which is what lets the model be tested with no window open.
-The classic `Observable` comes from `observer.py`:
+It reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python
 # box_observer.py
 from typing import Final
-from observer import Observable
+from observers import Observable
 
 COLORS: Final[tuple[str, str, str]] = (
     "skyblue", "palegreen", "khaki")
@@ -324,8 +283,7 @@ class BoxModel(Observable):
 
     def click(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
-        self.set_changed()
-        self.notify_observers(self.grid)
+        self.notify(self.grid)
 ```
 
 Because the model carries no display code, a test drives it with no window open:
@@ -335,9 +293,7 @@ This is the model's correctness, established apart from how it is shown:
 
 ```python
 # test_box_observer.py
-from typing import Any, override
-from box_observer import BoxModel, adjacent, new_grid, recolored
-from observer import Observer
+from box_observer import BoxModel, Grid, adjacent, new_grid, recolored
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
@@ -361,23 +317,16 @@ def test_recolored_touches_only_neighbors() -> None:
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)
-    seen: list[Any] = []
-
-    class Recorder(Observer):
-        @override
-        def update(self, observable: Any, grid: Any) -> None:
-            seen.append(grid)
-
-    model.add_observer(Recorder())
+    seen: list[Grid] = []
+    model.subscribe(seen.append)         # The observer is a callable
     model.click((2, 2))
     assert seen[-1] is model.grid        # Observer got the new grid
     assert model.grid[(1, 1)] == model.grid[(2, 2)]
 ```
 
 The view lives in its own file.
-It is the only `Observer` and the only code that touches the screen:
-`draw()` paints the grid,
-and `update()` calls `draw()` whenever the model changes.
+It is the only code that touches the screen.
+`draw()` paints the grid, and the view subscribes it, so every change repaints.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 Run `box_view.py` to play; it opens a window,
@@ -386,9 +335,7 @@ so the example harness does not run it (it is listed in `tools/norun.txt`).
 ```python
 # box_view.py
 import tkinter as tk
-from typing import Any, override
 from box_observer import BoxModel, Grid
-from observer import Observer
 
 def show(model: BoxModel, cell: int = 60) -> None:
     "Open the window and keep it in step with the model."
@@ -405,12 +352,7 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
                 fill=color, outline="white")
 
-    class View(Observer):  # Repaints on every model change
-        @override
-        def update(self, observable: Any, grid: Any) -> None:
-            draw(grid)
-
-    model.add_observer(View())
+    model.subscribe(draw)   # Repaint on every model change
     canvas.bind("<Button-1>",
                 lambda e: model.click((e.x // cell, e.y // cell)))
     draw(model.grid)
@@ -420,7 +362,7 @@ if __name__ == "__main__":
     show(BoxModel(8))
 ```
 
-The model and the view share only the `Observable`/`Observer` contract.
+The model and the view share only the subscribe-and-notify contract.
 That is what lets the test exercise the model with no display,
 and what would let you attach a second view to the same model and keep both in step.
 Showing that the model is correct, separately from how it is drawn,

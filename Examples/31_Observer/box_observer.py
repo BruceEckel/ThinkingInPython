@@ -1,6 +1,6 @@
 # box_observer.py
 from typing import Final
-from observer import Observable
+from observers import Observable
 
 COLORS: Final[tuple[str, str, str]] = (
     "skyblue", "palegreen", "khaki")
@@ -31,5 +31,4 @@ class BoxModel(Observable):
 
     def click(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
-        self.set_changed()
-        self.notify_observers(self.grid)
+        self.notify(self.grid)

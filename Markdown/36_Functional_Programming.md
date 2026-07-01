@@ -321,7 +321,7 @@ print(square(5), cube(5))
 
 `square` and `cube` are specializations of `power`, each with one argument already supplied.
 Partial application turns a general function into the specific one a caller needs,
-which is handy when a higher-order function wants a single-argument callable.
+which is handy when a higher-order function needs a single-argument callable.
 
 Partial application earns its place when an API expects a function of one argument and you have a function of several.
 Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in.
