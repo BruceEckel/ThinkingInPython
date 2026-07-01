@@ -21,9 +21,10 @@ When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
 without the data having to know which views exist.
 
-Python expresses this with far less machinery than the classic design needs,
-so this chapter shows the Pythonic version first,
-then the literal translation of Java's `Observable` and `Observer` classes for when you actually need it.
+Python expresses this with far less machinery than the classic design needs.
+This chapter shows the Pythonic version first,
+then extends it to async for I/O-bound observers.
+It ends with the literal translation of Java's `Observable` and `Observer` classes, for when you actually need it.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -119,6 +120,90 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     thermo.celsius = 20.0
     assert readings == [20.0]
 ```
+
+## Observer and I/O
+
+The observers so far do no I/O.
+They print or append to a list, then return at once.
+When an observer instead calls a network service or writes to a database,
+notifying observers one at a time blocks on each in turn.
+The list of callbacks becomes a line of waits.
+
+Make the observers coroutines and the fan-out overlaps.
+`notify` awaits them together with `asyncio.gather`,
+so one state change reaches every observer at once,
+and a slow observer no longer holds up the others.
+`gather` still waits for all of them, so the change is finished only when every observer is.
+One cost comes with this.
+A `@property` setter cannot be a coroutine, and an assignment cannot be awaited.
+The state change moves from `thermo.celsius = value` to an awaitable method.
+The asyncio mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](35_Simulation.md);
+this section needs only that a coroutine can pause at `await` while others run:
+
+```python
+# async_observers.py
+import asyncio
+from collections.abc import Awaitable, Callable
+
+type AsyncObserver = Callable[[float], Awaitable[None]]
+
+class Observable:
+    def __init__(self) -> None:
+        self._observers: list[AsyncObserver] = []
+
+    def subscribe(self, observer: AsyncObserver) -> None:
+        self._observers.append(observer)
+
+    async def notify(self, data: float) -> None:
+        # Fan out to every observer at once, then wait for all
+        await asyncio.gather(*(obs(data) for obs in self._observers))
+
+class Thermometer(Observable):
+    def __init__(self) -> None:
+        super().__init__()
+        self._celsius = 0.0
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    async def set_celsius(self, value: float) -> None:
+        # A property setter cannot be awaited, so this is a method
+        self._celsius = value
+        await self.notify(value)
+
+async def alarm(celsius: float) -> None:
+    if celsius > 100:
+        await asyncio.sleep(0.02)   # Slow network alert
+        print(f"alarm sent: {celsius}C")
+
+async def log_reading(celsius: float) -> None:
+    await asyncio.sleep(0.01)   # Faster local write
+    print(f"logged: {celsius}C")
+
+async def main() -> None:
+    thermo = Thermometer()
+    thermo.subscribe(alarm)
+    thermo.subscribe(log_reading)
+    await thermo.set_celsius(20)   # Below the alarm threshold
+    await thermo.set_celsius(150)   # Triggers the alarm too
+
+asyncio.run(main())
+#: logged: 20C
+#: logged: 150C
+#: alarm sent: 150C
+```
+
+The `alarm` is slower than the log, yet the log prints first.
+Awaiting the observers in sequence would print in subscribe order, alarm first.
+Concurrent fan-out lets each finish on its own schedule,
+so the faster observer reports first.
+The alarm also shows an observer that can decline to act:
+below its threshold it returns without sending anything.
+
+Use this only when the observers are I/O-bound.
+For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
+The type-keyed [event bus](29_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
 
 The rest of this chapter translates Java's `Observable` and `Observer` classes directly.
 That is useful when you are porting Java code or need the exact `set_changed()` semantics,

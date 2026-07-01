@@ -6,3 +6,7 @@
 # Unnecessary on Python 3.14: PEP 649 deferred annotation evaluation is the
 # default, so forward references work without this import.
 from __future__ import annotations
+
+# Weak filler for "use"/"choose". Both cases, since matching is case-sensitive.
+reach for
+Reach for
