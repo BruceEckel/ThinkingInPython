@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Reminder: run /capture to save durable knowledge (CLAUDE.md/memory) before context is compacted.\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}
