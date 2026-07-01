@@ -762,7 +762,7 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 ```
 
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
-The encoder converts each data class to a dictionary and lets the base encoder take it from there,
+The encoder converts each data class to a dictionary and the base encoder handles it from there,
 recursing through lists and nested objects.
 
 Encoding is mechanical, but decoding must know which type to rebuild,

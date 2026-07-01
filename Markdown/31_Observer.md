@@ -245,8 +245,7 @@ Building the grid, testing adjacency,
 and computing the grid that results from a click are plain functions: values in,
 values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
-There is no `tkinter` here at all,
-which is what lets the model be tested with no window open.
+There is no `tkinter` here, so we can test the model without a GUI.
 It reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python
@@ -286,10 +285,9 @@ class BoxModel(Observable):
         self.notify(self.grid)
 ```
 
-Because the model carries no display code, a test drives it with no window open:
-build a model, click a cell,
-and check that the neighbors took its color and that observers were notified with the new grid.
-This is the model's correctness, established apart from how it is shown:
+Because the model carries no display code, a test drives it without a GUI.
+Build a model, click a cell,
+and check that the neighbors took its color and that observers were notified with the new grid:
 
 ```python
 # test_box_observer.py
@@ -362,9 +360,9 @@ if __name__ == "__main__":
     show(BoxModel(8))
 ```
 
-The model and the view share only the subscribe-and-notify contract.
-That is what lets the test exercise the model with no display,
-and what would let you attach a second view to the same model and keep both in step.
+The model and the view share only the subscribe-and-notify contract,
+so the test can exercise the model without a display.
+You can also attach a second view to the same model and keep both in step.
 Showing that the model is correct, separately from how it is drawn,
 is the model-view split made concrete.
 

@@ -201,7 +201,7 @@ except constructors, which are undecorated by convention.
 
 ## Properties
 
-Python lets you expose a plain attribute and convert it to a computed one later,
+You can expose a plain attribute and convert it to a computed one later,
 without changing the calling code, using `@property`:
 
 ```python

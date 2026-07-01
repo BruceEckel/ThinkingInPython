@@ -192,7 +192,7 @@ Numbers are false when zero, containers are false when empty,
 and `None` is always false.
 Everything else is true.
 This is *truthiness*,
-and it lets you write `if items:` instead of `if len(items) != 0:`.
+and it allows `if items:` instead of `if len(items) != 0:`.
 
 ```python
 # truthiness.py

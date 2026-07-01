@@ -331,7 +331,7 @@ and it binds their values at the moment you build it, which avoids the late-bind
 ## Composing Functions
 
 *Composition* builds a new function by feeding one function's output straight into the next.
-It lets you assemble behavior from small pieces, the way a pipeline reads as a sequence of steps:
+You can assemble behavior from small pieces, the way a pipeline reads as a sequence of steps:
 
 ```python
 # composing.py
@@ -445,7 +445,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 
 *Lazy evaluation* computes a value only when it is needed.
 A generator is the everyday example: it yields one value at a time instead of building a whole list up front.
-Combined with `itertools`, this lets you describe an infinite sequence and take only the part you use:
+Combined with `itertools`, you can describe an infinite sequence and take only the part you use:
 
 ```python
 # lazy.py
@@ -618,9 +618,14 @@ print("1000 random cases passed")
 #: 1000 random cases passed
 ```
 
-The law is "decoding an encoding returns the original," and it holds for every input the loop tries. A property test states what must always be true and lets the machine search for a counterexample, instead of you writing one example at a time.
+The law is "decoding an encoding returns the original," and it holds for every input the loop tries.
+A property test states what must always be true.
+The machine searches for a counterexample, instead of forcing you to write one example at a time.
 
-Hypothesis turns that loop into a declaration. You describe the inputs with a *strategy* and state the law once, as a normal `test_` function. The framework supplies the cases, including awkward ones a handwritten loop would miss, such as the empty string and unusual Unicode:
+Hypothesis turns that loop into a declaration.
+You describe the inputs with a *strategy* and state the law once, as a normal `test_` function.
+The framework supplies the cases, including awkward ones a handwritten loop would miss,
+such as the empty string and unusual Unicode:
 
 ```python
 # test_property.py
