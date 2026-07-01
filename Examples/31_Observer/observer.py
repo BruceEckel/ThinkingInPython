@@ -1,6 +1,4 @@
 # observer.py
-# The classic Observable/Observer base classes, in the style of Java's
-# java.util, without the thread synchronization.
 from typing import Any
 
 class Observer:

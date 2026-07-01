@@ -1,8 +1,4 @@
 # rats_and_mazes/rats_view.py
-# A tkinter view of the rats mapping the maze. The model (maze.py,
-# blackboard.py, rat.py) does the exploring. This file runs it and
-# replays the order the cells were claimed as an animation. The model
-# itself is checked headlessly in test_rats_and_mazes.py.
 import asyncio
 import tkinter as tk
 from typing import override

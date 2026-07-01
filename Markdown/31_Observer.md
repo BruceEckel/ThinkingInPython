@@ -35,8 +35,6 @@ A `@property` setter is a natural place to fire the notification when state chan
 
 ```python
 # observers.py
-# An observer is a callable; an observable is a list of them.
-# No Observer interface and no Observable base class to inherit.
 from collections.abc import Callable
 from typing import Any
 
@@ -128,7 +126,7 @@ but use it only when the simple version above is not enough.
 
 ## The Classic Observable and Observer
 
-The classic design, translated from Java's `java.util`,
+The classic design, translated from Java's `java.util` but without its thread synchronization,
 makes the two roles explicit base classes.
 An `Observable` keeps a list of observers and a `changed` flag.
 You call `set_changed()` and then `notify_observers()`,
@@ -137,8 +135,6 @@ The flag lets the subject decide when a batch of changes is worth announcing.
 
 ```python
 # observer.py
-# The classic Observable/Observer base classes, in the style of Java's
-# java.util, without the thread synchronization.
 from typing import Any
 
 class Observer:
@@ -194,10 +190,6 @@ The classic `Observable` comes from `observer.py`:
 
 ```python
 # box_observer.py
-# The model for the ColorBoxes example: a grid of colors and the rule
-# for a click, wired as a classic Observable. No display code lives
-# here, so the model runs and is tested with no window open. The view
-# is box_view.py.
 from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")
@@ -289,9 +281,6 @@ so the example harness does not run it (it is listed in `tools/norun.txt`).
 
 ```python
 # box_view.py
-# The view for the ColorBoxes example: the only file that draws, and
-# the only Observer. It repaints whenever the BoxModel announces a
-# change. The model in box_observer.py is what the tests check.
 import tkinter as tk
 from typing import Any, override
 from box_observer import BoxModel, Grid

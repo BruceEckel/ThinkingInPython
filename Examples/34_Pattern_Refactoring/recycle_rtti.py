@@ -1,8 +1,4 @@
 # recycle_rtti.py
-# First cut: sort by testing each type. It works, but it checks for
-# EVERY type. Add a new kind of Trash and you must find and edit
-# this code, with no help from the tools if you miss a spot. That is
-# the smell to watch for.
 from collections import defaultdict
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value

@@ -44,10 +44,6 @@ record a message, and hand out a number.
 
 ```python
 # rats_and_mazes/rat.py
-# A rat explores the maze as its own task, spawning a new rat at every
-# branch. It talks to a blackboard but never imports one: any object
-# with the four methods below will do.
-
 import asyncio
 from typing import Protocol
 
@@ -139,10 +135,6 @@ including the ones spawned along the way.
 
 ```python
 # rats_and_mazes/blackboard.py
-# The shared surface the rats write to. It owns the maze, records
-# visited cells, hands out rat numbers, and launches rats. Cooperative
-# async has no preemption, so no lock is needed.
-
 import asyncio
 import itertools
 from maze import Coord, Maze
@@ -307,10 +299,6 @@ It only draws, so the harness skips it (`tools/norun.txt`):
 
 ```python
 # rats_and_mazes/rats_view.py
-# A tkinter view of the rats mapping the maze. The model (maze.py,
-# blackboard.py, rat.py) does the exploring. This file runs it and
-# replays the order the cells were claimed as an animation. The model
-# itself is checked headlessly in test_rats_and_mazes.py.
 import asyncio
 import tkinter as tk
 from typing import override
@@ -390,10 +378,6 @@ There is no `if` or `elif` on the type of occupant anywhere:
 
 ```python
 # robot_explorer/items.py
-# The things that can occupy a room. Room.enter() calls
-# occupant.interact(), and each Item subclass decides what happens.
-# There is no conditional on the item's type.
-
 from enum import Enum
 from typing import TYPE_CHECKING, override
 
@@ -501,9 +485,6 @@ so the robot can try any direction without a special case:
 
 ```python
 # robot_explorer/world.py
-# A Room holds one Item and connects to neighbors through its Doors.
-# Unset doors point at the shared EDGE room outside the maze.
-
 from items import Edge, Item, Robot, Urge
 
 type Coord = tuple[int, int]   # (row, col)
@@ -763,10 +744,6 @@ so the example harness skips it (listed in `tools/norun.txt`):
 
 ```python
 # robot_explorer/maze_view.py
-# A tkinter view of the robot maze. The model (items.py, world.py,
-# game.py) holds the maze and the rules; this file only draws, and
-# steps the robot through the solution one move at a time. Run it to
-# watch. The same model is checked headlessly in test_robot.py.
 import tkinter as tk
 from game import GameBuilder, solution, string_maze
 from items import Urge

@@ -1,3 +1,5 @@
+Use const whenever possible after it is introduced
+
 Are there any other GoF design patterns that should be included here?
 Also, prototypes seem to have disappeared.
 Make a list of the patterns we've covered and compare that with a list of known patterns.

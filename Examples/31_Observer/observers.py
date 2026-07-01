@@ -1,6 +1,4 @@
 # observers.py
-# An observer is a callable; an observable is a list of them.
-# No Observer interface and no Observable base class to inherit.
 from collections.abc import Callable
 from typing import Any
 

@@ -90,18 +90,15 @@ the object form earns its keep only when a command must also carry state or supp
 ## Strategy: Choosing the Algorithm at Runtime
 
 A *Strategy* is an interchangeable algorithm chosen at runtime.
-As a running example, here are three real algorithms that find a *root* of a
+For the following examples we will use three real algorithms that find a *root* of a
 function `f`, a value where `f(x)` is zero.
 Each takes the function and two hints and returns the root,
 or `None` when it cannot find one.
-They share one signature, so they are interchangeable.
-Collect them in their own module, reused by the examples that follow:
+The hints are a bracket for bisection and two starting points for the open methods.
+They share one signature, so they are interchangeable:
 
 ```python
 # algorithms.py
-# Root finders for f(x) = 0. Each takes the function and two hints
-# (a bracket for bisection, two starts for the open methods) and
-# returns the root, or None if it fails to converge.
 from collections.abc import Callable
 
 type Fn = Callable[[float], float]
@@ -245,8 +242,6 @@ Bisection needs the interval to bracket a root; the open methods do not:
 
 ```python
 # chain.py
-# Try each root finder in order; the first to converge wins. A method
-# that cannot find a root returns None, so the chain moves on.
 from algorithms import Fn, RootFinder, bisection, newton, secant
 
 def solve(f: Fn, a: float, b: float,
@@ -322,10 +317,6 @@ so there is no `Handler` interface to implement and no registration ceremony:
 
 ```python
 # event_bus.py
-# An event bus is a dict from each event type to the functions that
-# care about it. Events are values; handlers are plain functions.
-# Publishing an event calls every handler for that event's type.
-# No Handler base class, and no registration ceremony.
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any

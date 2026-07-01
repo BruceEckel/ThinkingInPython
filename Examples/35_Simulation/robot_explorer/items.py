@@ -1,8 +1,4 @@
 # robot_explorer/items.py
-# The things that can occupy a room. Room.enter() calls
-# occupant.interact(), and each Item subclass decides what happens.
-# There is no conditional on the item's type.
-
 from enum import Enum
 from typing import TYPE_CHECKING, override
 

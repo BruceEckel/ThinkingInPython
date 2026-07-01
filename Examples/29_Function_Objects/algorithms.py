@@ -1,7 +1,4 @@
 # algorithms.py
-# Root finders for f(x) = 0. Each takes the function and two hints
-# (a bracket for bisection, two starts for the open methods) and
-# returns the root, or None if it fails to converge.
 from collections.abc import Callable
 
 type Fn = Callable[[float], float]

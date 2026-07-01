@@ -179,10 +179,6 @@ The most obvious way to sort is to look at each piece and test what it is using 
 
 ```python
 # recycle_rtti.py
-# First cut: sort by testing each type. It works, but it checks for
-# EVERY type. Add a new kind of Trash and you must find and edit
-# this code, with no help from the tools if you miss a spot. That is
-# the smell to watch for.
 from collections import defaultdict
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
@@ -246,9 +242,6 @@ Group the pieces in a dictionary keyed by their own type:
 
 ```python
 # recycle_dict.py
-# The Pythonic sort: the object's own type is the key. No type is
-# named here, so this code never changes when you add a new kind of
-# Trash.
 from collections import defaultdict
 from parse_trash import parse
 from trash import Trash, sum_value
@@ -317,11 +310,6 @@ You write a single-dispatch function:
 
 ```python
 # visitor_singledispatch.py
-# Visitor's goal is to add operations to a fixed hierarchy from
-# outside it. functools.singledispatch does that directly: a
-# polymorphic function whose behavior is registered per type. Trash
-# is never touched, new operations are independent functions, and
-# new types register themselves.
 from functools import singledispatch
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash

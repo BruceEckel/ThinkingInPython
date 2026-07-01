@@ -54,8 +54,6 @@ so each example below shows only its dispatch mechanism:
 
 ```python
 # arena.py
-# Helpers shared by both versions: generate random pairs of Items, and
-# play one pair off against the other.
 import random
 from collections.abc import Iterator
 from typing import Any

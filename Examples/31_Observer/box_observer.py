@@ -1,8 +1,4 @@
 # box_observer.py
-# The model for the ColorBoxes example: a grid of colors and the rule
-# for a click, wired as a classic Observable. No display code lives
-# here, so the model runs and is tested with no window open. The view
-# is box_view.py.
 from observer import Observable
 
 COLORS = ("skyblue", "palegreen", "khaki")

@@ -1,8 +1,4 @@
 # event_bus.py
-# An event bus is a dict from each event type to the functions that
-# care about it. Events are values; handlers are plain functions.
-# Publishing an event calls every handler for that event's type.
-# No Handler base class, and no registration ceremony.
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any

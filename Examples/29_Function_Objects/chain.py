@@ -1,6 +1,4 @@
 # chain.py
-# Try each root finder in order; the first to converge wins. A method
-# that cannot find a root returns None, so the chain moves on.
 from algorithms import Fn, RootFinder, bisection, newton, secant
 
 def solve(f: Fn, a: float, b: float,

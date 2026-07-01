@@ -1,7 +1,4 @@
 # getattr_adapter.py
-# The usual adapter need: forward most calls, change a few.
-# __getattr__ delegates everything you do not override, so the
-# wrapper stays small.
 from typing import Any
 
 class WhatIHave:

@@ -1,8 +1,4 @@
 # robot_explorer/maze_view.py
-# A tkinter view of the robot maze. The model (items.py, world.py,
-# game.py) holds the maze and the rules; this file only draws, and
-# steps the robot through the solution one move at a time. Run it to
-# watch. The same model is checked headlessly in test_robot.py.
 import tkinter as tk
 from game import GameBuilder, solution, string_maze
 from items import Urge

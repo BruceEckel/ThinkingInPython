@@ -1,7 +1,4 @@
 # box_view.py
-# The view for the ColorBoxes example: the only file that draws, and
-# the only Observer. It repaints whenever the BoxModel announces a
-# change. The model in box_observer.py is what the tests check.
 import tkinter as tk
 from typing import Any, override
 from box_observer import BoxModel, Grid

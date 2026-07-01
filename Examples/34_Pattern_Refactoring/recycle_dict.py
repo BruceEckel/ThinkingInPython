@@ -1,7 +1,4 @@
 # recycle_dict.py
-# The Pythonic sort: the object's own type is the key. No type is
-# named here, so this code never changes when you add a new kind of
-# Trash.
 from collections import defaultdict
 from parse_trash import parse
 from trash import Trash, sum_value
