@@ -82,6 +82,9 @@ Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases a list of callbacks is all the *Observer* pattern amounts to.
 
+An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
+Collecting a value from each observer is a different pattern, such as [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
+
 Testing confirms that every subscriber is called with the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 A list whose `append` is the observer records what arrived:
