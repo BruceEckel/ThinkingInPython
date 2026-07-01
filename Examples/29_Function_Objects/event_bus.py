@@ -3,7 +3,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-type Handler = Callable[[Any], None]
+type Handler[E] = Callable[[E], None]
 
 @dataclass(frozen=True)
 class Deposit:
@@ -19,10 +19,10 @@ class Closed:
 
 class EventBus:
     def __init__(self) -> None:
-        self._handlers: dict[type, list[Handler]] = {}
+        self._handlers: dict[type, list[Handler[Any]]] = {}
 
     def subscribe[E](self, event_type: type[E],
-                     handler: Callable[[E], None]) -> None:
+                     handler: Handler[E]) -> None:
         self._handlers.setdefault(event_type, []).append(handler)
 
     def publish(self, event: object) -> None:

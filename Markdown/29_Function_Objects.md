@@ -149,7 +149,7 @@ def newton(f: Fn, a: float, b: float) -> float | None:
 ```
 
 Because each finder is a function with the same signature,
-a *Strategy* is simply the one you pass in:
+a *Strategy* is achieved by stepping through the algorithms:
 
 ```python
 # strategy.py
@@ -225,9 +225,9 @@ for algorithm in (Bisection(), Newton(), Secant()):
 #: 1.414214
 ```
 
-You use strategies-as-functions constantly in Python without naming the pattern.
+We use strategies-as-functions constantly in Python without naming it as a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy:
-you hand in a function that decides how to compare.
+you provide a function that decides how to compare.
 The object form is worth it only when a strategy needs its own configuration or several related methods.
 
 ## Chain of Responsibility
@@ -236,9 +236,6 @@ The object form is worth it only when a strategy needs its own configuration or 
 *GoF Design Patterns* implements the chain as a linked list,
 largely because it predates standard list types.
 In Python the chain is a list of functions.
-Here the handlers are the root finders from `algorithms.py`,
-which suits the pattern well: they succeed on different inputs,
-so the chain tries each until one converges.
 Bisection needs the interval to bracket a root; the open methods do not:
 
 ```python
@@ -267,14 +264,13 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 #: 1.414214
 ```
 
-Each handler is a *Strategy* function; the chain is the list;
+Each handler is a *Strategy* function, the chain is the list,
 success is a non-`None` return.
-There is no `ChainLink` class and no linked list to maintain.
-Adding, removing, or reordering handlers is editing a list.
-The fallthrough is real: when bisection cannot bracket a root it returns `None`,
-and the chain moves on to a method that can.
+Adding, removing, or reordering handlers means editing a list.
+We see the fallthrough when bisection cannot bracket a root.
+It returns `None`, and the chain continues looking for a method that can.
 
-The control flow is what to test: the first finder that converges wins,
+We test that the first finder that converges wins,
 a later finder rescues one that fails, and an empty chain returns `None`:
 
 ```python
@@ -308,10 +304,10 @@ def test_all_fail_returns_none() -> None:
 ## An Event Bus: Handlers Keyed by Type
 
 Chain of Responsibility kept its handlers in a list and tried them in order.
-Key that structure by type instead of by position and you have an *event bus*:
-a `dict` from each event type to the functions that care about it.
+If you key that structure by type instead of by position, you have an *event bus*.
+This is a `dict` from each event type to the functions that care about it.
 The events are plain values,
-written as frozen data classes (see [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)).
+written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.
 The handlers are ordinary functions,
 so there is no `Handler` interface to implement and no registration ceremony:
@@ -322,7 +318,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-type Handler = Callable[[Any], None]
+type Handler[E] = Callable[[E], None]
 
 @dataclass(frozen=True)
 class Deposit:
@@ -338,10 +334,10 @@ class Closed:
 
 class EventBus:
     def __init__(self) -> None:
-        self._handlers: dict[type, list[Handler]] = {}
+        self._handlers: dict[type, list[Handler[Any]]] = {}
 
     def subscribe[E](self, event_type: type[E],
-                     handler: Callable[[E], None]) -> None:
+                     handler: Handler[E]) -> None:
         self._handlers.setdefault(event_type, []).append(handler)
 
     def publish(self, event: object) -> None:
@@ -370,8 +366,15 @@ bus.publish(Withdraw(30))
 bus.publish(Closed("inactivity"))    # No handler: nothing happens
 ```
 
-For testing,
-every handler registered for a type is called,
+`subscribe` is generic on the event type `E`.
+The checker reads `E` from the first argument and requires the handler to accept that exact type,
+so `subscribe(Deposit, on_withdraw)` is a type error.
+The safety is checked once, at registration.
+The stored `dict`, though, mixes handlers for every event type in one structure.
+Its lists cannot name a single event class, so the element type erases the parameter to `Handler[Any]`.
+The generic guards the boundary; the `Any` covers the heterogeneous storage behind it.
+
+For testing, every handler registered for a type is called,
 a handler hears only its own event type,
 and an event with no handler is a quiet no-op:
 
@@ -399,14 +402,14 @@ def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise
 ```
 
-This is the *Observer* pattern (see [Observer](31_Observer.md#the-pythonic-observer-a-list-of-callables)) narrowed to a single subject:
-the subscribers are functions,
-and the bus routes each event to them by its type.
+This is the [Observer](31_Observer.md#the-pythonic-observer-a-list-of-callables),
+narrowed to a single subject.
+The subscribers are functions, and the bus routes each event to them by its type.
 Here a type may have many handlers.
-When instead you want exactly one handler per type,
+If you instead want exactly one handler per type,
 chosen by the argument's type and open to new types without editing a central function,
 that is `functools.singledispatch`,
-which [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](34_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it) put to work.
+used by [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](34_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it).
 
 ## Exercises
 
