@@ -1,29 +1,25 @@
 # chain.py
-# Try each handler in order; the first to return a result wins. The
-# "chain" is an ordinary list of functions, not a hand-built linked
-# list.
-from collections.abc import Callable
+# Try each root finder in order; the first to converge wins. A method
+# that cannot find a root returns None, so the chain moves on.
+from algorithms import Fn, RootFinder, bisection, newton, secant
 
-type Line = list[float]
-type Result = list[float] | None
-
-def least_squares(line: Line) -> Result:
-    return None  # This strategy did not find a solution
-
-def newtons_method(line: Line) -> Result:
-    return None  # Neither did this one
-
-def bisection(line: Line) -> Result:
-    return [5.5, 6.6]  # Success
-
-def solve(line: Line,
-          chain: list[Callable[[Line], Result]]) -> Result:
-    for strategy in chain:
-        result = strategy(line)
-        if result is not None:
-            return result
+def solve(f: Fn, a: float, b: float,
+          chain: list[RootFinder]) -> float | None:
+    for finder in chain:
+        root = finder(f, a, b)
+        if root is not None:
+            return root
     return None
 
-line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
-print(solve(line, [least_squares, newtons_method, bisection]))
-#: [5.5, 6.6]
+def f(x: float) -> float:
+    return x * x - 2   # Root at the square root of 2
+
+chain: list[RootFinder] = [bisection, secant, newton]
+# [0, 2] brackets the root, so bisection succeeds first:
+r1 = solve(f, 0.0, 2.0, chain)
+print(f"{r1:.6f}" if r1 is not None else "no root")
+#: 1.414214
+# [1.0, 1.3] does not bracket it; bisection fails, secant finds it:
+r2 = solve(f, 1.0, 1.3, chain)
+print(f"{r2:.6f}" if r2 is not None else "no root")
+#: 1.414214

@@ -1,28 +1,25 @@
 # test_chain.py
-from chain import (
-    Line,
-    Result,
-    bisection,
-    least_squares,
-    newtons_method,
-    solve,
-)
+from algorithms import bisection, newton, secant
+from chain import solve
 
-def test_first_successful_handler_wins() -> None:
-    assert solve(
-        [1.0, 2.0, 3.0],
-        [least_squares, newtons_method, bisection],
-    ) == [5.5, 6.6]  # Bisection
+def f(x: float) -> float:
+    return x * x - 2   # Root at the square root of 2
 
-def test_order_decides_the_winner() -> None:
-    def always(line: Line) -> Result:
-        return [1.0]
+def test_first_successful_finder_wins() -> None:
+    root = solve(f, 0.0, 2.0, [bisection, secant, newton])
+    assert root is not None
+    assert abs(root - 2 ** 0.5) < 1e-6
 
-    # 'always' precedes bisection, so it short-circuits the chain
-    assert solve([0.0], [always, bisection]) == [1.0]
-
-def test_no_handler_succeeds_returns_none() -> None:
-    assert solve([0.0], [least_squares, newtons_method]) is None
+def test_chain_falls_through_to_a_later_method() -> None:
+    # [1.0, 1.3] does not bracket the root: bisection fails
+    root = solve(f, 1.0, 1.3, [bisection, secant, newton])
+    assert root is not None
+    assert abs(root - 2 ** 0.5) < 1e-6
 
 def test_empty_chain_returns_none() -> None:
-    assert solve([0.0], []) is None
+    assert solve(f, 0.0, 2.0, []) is None
+
+def test_all_fail_returns_none() -> None:
+    def g(x: float) -> float:
+        return x * x + 1   # No real root
+    assert solve(g, 0.0, 2.0, [bisection]) is None

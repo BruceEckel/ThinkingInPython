@@ -90,40 +90,87 @@ the object form earns its keep only when a command must also carry state or supp
 ## Strategy: Choosing the Algorithm at Runtime
 
 A *Strategy* is an interchangeable algorithm chosen at runtime.
-Again, the algorithm is a function, and you pass it in:
+As a running example, here are three real algorithms that find a *root* of a
+function `f`, a value where `f(x)` is zero.
+Each takes the function and two hints and returns the root,
+or `None` when it cannot find one.
+They share one signature, so they are interchangeable.
+Collect them in their own module, reused by the examples that follow:
+
+```python
+# algorithms.py
+# Root finders for f(x) = 0. Each takes the function and two hints
+# (a bracket for bisection, two starts for the open methods) and
+# returns the root, or None if it fails to converge.
+from collections.abc import Callable
+
+type Fn = Callable[[float], float]
+type RootFinder = Callable[[Fn, float, float], float | None]
+
+TOLERANCE = 1e-12
+MAX_ITER = 200
+
+def bisection(f: Fn, a: float, b: float) -> float | None:
+    if f(a) * f(b) > 0:   # Endpoints must bracket a root
+        return None
+    for _ in range(MAX_ITER):
+        mid = (a + b) / 2
+        if abs(f(mid)) < TOLERANCE:
+            return mid
+        if f(a) * f(mid) < 0:
+            b = mid
+        else:
+            a = mid
+    return mid
+
+def secant(f: Fn, a: float, b: float) -> float | None:
+    x0, x1 = a, b
+    for _ in range(MAX_ITER):
+        f0, f1 = f(x0), f(x1)
+        if f1 == f0:   # Flat step: cannot continue
+            return None
+        x2 = x1 - f1 * (x1 - x0) / (f1 - f0)
+        if abs(x2 - x1) < TOLERANCE:
+            return x2
+        x0, x1 = x1, x2
+    return None
+
+def newton(f: Fn, a: float, b: float) -> float | None:
+    x = (a + b) / 2   # Start between the hints
+    h = 1e-7
+    for _ in range(MAX_ITER):
+        # Approximate the derivative with a central difference:
+        slope = (f(x + h) - f(x - h)) / (2 * h)
+        if slope == 0:
+            return None
+        step = f(x) / slope
+        x -= step
+        if abs(step) < TOLERANCE:
+            return x
+    return None
+```
+
+Because each finder is a function with the same signature,
+a *Strategy* is simply the one you pass in:
 
 ```python
 # strategy.py
-from collections.abc import Callable
+from algorithms import Fn, RootFinder, bisection, newton, secant
 
-type Line = list[float]
+def solve(f: Fn, a: float, b: float,
+          finder: RootFinder) -> float | None:
+    return finder(f, a, b)
 
-def least_squares(line: Line) -> float:
-    # A flat least-squares fit minimizes squared error at the mean
-    return sum(line) / len(line)
+def f(x: float) -> float:
+    return x * x - 2   # Root at the square root of 2
 
-def newtons_method(line: Line) -> float:
-    return min(line)
-
-def bisection(line: Line) -> float:
-    # Halve the interval: the midpoint of the value range
-    return (min(line) + max(line)) / 2
-
-def conjugate_gradient(line: Line) -> float:
-    return max(line)
-
-def solve(line: Line, strategy: Callable[[Line], float]) -> float:
-    return strategy(line)
-
-line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
-print(solve(line, least_squares))
-#: 2.3333333333333335
-print(solve(line, newtons_method))
-#: -1.0
-print(solve(line, bisection))
-#: 2.0
-print(solve(line, conjugate_gradient))
-#: 5.0
+for finder in (bisection, newton, secant):
+    root = solve(f, 0.0, 2.0, finder)
+    assert root is not None
+    print(f"{root:.6f}")
+#: 1.414214
+#: 1.414214
+#: 1.414214
 ```
 
 The classic form makes each algorithm a class deriving from a common interface,
@@ -132,58 +179,52 @@ and adds a "Context" object to hold the current strategy:
 ```python
 # strategy_pattern.py
 from typing import override
+from algorithms import Fn, bisection, newton, secant
 
 # The strategy interface:
-class FindMinima:
-    # Line is a sequence of points:
-    def algorithm(self, line: list[float]) -> float:
+class FindRoot:
+    def find(self, f: Fn, a: float, b: float) -> float | None:
         raise NotImplementedError
 
-# The various strategies:
-class LeastSquares(FindMinima):
+# Each strategy wraps one algorithm from algorithms.py:
+class Bisection(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return sum(line) / len(line)  # Mean
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return bisection(f, a, b)
 
-class NewtonsMethod(FindMinima):
+class Newton(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return min(line)
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return newton(f, a, b)
 
-class Bisection(FindMinima):
+class Secant(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return (min(line) + max(line)) / 2  # Midpoint
-
-class ConjugateGradient(FindMinima):
-    @override
-    def algorithm(self, line: list[float]) -> float:
-        return max(line)
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return secant(f, a, b)
 
 # The "Context" controls the strategy:
-class MinimaSolver:
-    def __init__(self, strategy: FindMinima) -> None:
+class RootSolver:
+    def __init__(self, strategy: FindRoot) -> None:
         self.strategy = strategy
 
-    def minima(self, line: list[float]) -> float:
-        return self.strategy.algorithm(line)
+    def solve(self, f: Fn, a: float, b: float) -> float | None:
+        return self.strategy.find(f, a, b)
 
-    def change_algorithm(self, new_algorithm: FindMinima) -> None:
+    def change_algorithm(self, new_algorithm: FindRoot) -> None:
         self.strategy = new_algorithm
 
-solver = MinimaSolver(LeastSquares())
-line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
-print(solver.minima(line))
-#: 2.3333333333333335
-solver.change_algorithm(NewtonsMethod())
-print(solver.minima(line))
-#: -1.0
-solver.change_algorithm(Bisection())
-print(solver.minima(line))
-#: 2.0
-solver.change_algorithm(ConjugateGradient())
-print(solver.minima(line))
-#: 5.0
+def f(x: float) -> float:
+    return x * x - 2
+
+solver = RootSolver(Bisection())
+for algorithm in (Bisection(), Newton(), Secant()):
+    solver.change_algorithm(algorithm)
+    root = solver.solve(f, 0.0, 2.0)
+    assert root is not None
+    print(f"{root:.6f}")
+#: 1.414214
+#: 1.414214
+#: 1.414214
 ```
 
 You use strategies-as-functions constantly in Python without naming the pattern.
@@ -196,80 +237,76 @@ The object form is worth it only when a strategy needs its own configuration or 
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked list,
 largely because it predates standard list types.
-As that machinery is an implementation detail,
-in Python the chain is a list of functions,
-and the first one to produce a result wins:
+In Python the chain is a list of functions.
+Here the handlers are the root finders from `algorithms.py`,
+which suits the pattern well: they succeed on different inputs,
+so the chain tries each until one converges.
+Bisection needs the interval to bracket a root; the open methods do not:
 
 ```python
 # chain.py
-# Try each handler in order; the first to return a result wins. The
-# "chain" is an ordinary list of functions, not a hand-built linked
-# list.
-from collections.abc import Callable
+# Try each root finder in order; the first to converge wins. A method
+# that cannot find a root returns None, so the chain moves on.
+from algorithms import Fn, RootFinder, bisection, newton, secant
 
-type Line = list[float]
-type Result = list[float] | None
-
-def least_squares(line: Line) -> Result:
-    return None  # This strategy did not find a solution
-
-def newtons_method(line: Line) -> Result:
-    return None  # Neither did this one
-
-def bisection(line: Line) -> Result:
-    return [5.5, 6.6]  # Success
-
-def solve(line: Line,
-          chain: list[Callable[[Line], Result]]) -> Result:
-    for strategy in chain:
-        result = strategy(line)
-        if result is not None:
-            return result
+def solve(f: Fn, a: float, b: float,
+          chain: list[RootFinder]) -> float | None:
+    for finder in chain:
+        root = finder(f, a, b)
+        if root is not None:
+            return root
     return None
 
-line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
-print(solve(line, [least_squares, newtons_method, bisection]))
-#: [5.5, 6.6]
+def f(x: float) -> float:
+    return x * x - 2   # Root at the square root of 2
+
+chain: list[RootFinder] = [bisection, secant, newton]
+# [0, 2] brackets the root, so bisection succeeds first:
+r1 = solve(f, 0.0, 2.0, chain)
+print(f"{r1:.6f}" if r1 is not None else "no root")
+#: 1.414214
+# [1.0, 1.3] does not bracket it; bisection fails, secant finds it:
+r2 = solve(f, 1.0, 1.3, chain)
+print(f"{r2:.6f}" if r2 is not None else "no root")
+#: 1.414214
 ```
 
 Each handler is a *Strategy* function; the chain is the list;
 success is a non-`None` return.
 There is no `ChainLink` class and no linked list to maintain.
 Adding, removing, or reordering handlers is editing a list.
-This is the same flexibility the pattern promises, with none of the scaffolding.
+The fallthrough is real: when bisection cannot bracket a root it returns `None`,
+and the chain moves on to a method that can.
 
-The control flow is what to test: the first handler that returns a result wins,
-order decides the winner, and an exhausted or empty chain returns `None`:
+The control flow is what to test: the first finder that converges wins,
+a later finder rescues one that fails, and an empty chain returns `None`:
 
 ```python
 # test_chain.py
-from chain import (
-    Line,
-    Result,
-    bisection,
-    least_squares,
-    newtons_method,
-    solve,
-)
+from algorithms import bisection, newton, secant
+from chain import solve
 
-def test_first_successful_handler_wins() -> None:
-    assert solve(
-        [1.0, 2.0, 3.0],
-        [least_squares, newtons_method, bisection],
-    ) == [5.5, 6.6]  # Bisection
+def f(x: float) -> float:
+    return x * x - 2   # Root at the square root of 2
 
-def test_order_decides_the_winner() -> None:
-    def always(line: Line) -> Result:
-        return [1.0]
+def test_first_successful_finder_wins() -> None:
+    root = solve(f, 0.0, 2.0, [bisection, secant, newton])
+    assert root is not None
+    assert abs(root - 2 ** 0.5) < 1e-6
 
-    # 'always' precedes bisection, so it short-circuits the chain
-    assert solve([0.0], [always, bisection]) == [1.0]
-
-def test_no_handler_succeeds_returns_none() -> None:
-    assert solve([0.0], [least_squares, newtons_method]) is None
+def test_chain_falls_through_to_a_later_method() -> None:
+    # [1.0, 1.3] does not bracket the root: bisection fails
+    root = solve(f, 1.0, 1.3, [bisection, secant, newton])
+    assert root is not None
+    assert abs(root - 2 ** 0.5) < 1e-6
 
 def test_empty_chain_returns_none() -> None:
-    assert solve([0.0], []) is None
+    assert solve(f, 0.0, 2.0, []) is None
+
+def test_all_fail_returns_none() -> None:
+    def g(x: float) -> float:
+        return x * x + 1   # No real root
+    assert solve(g, 0.0, 2.0, [bisection]) is None
 ```
 
 ## An Event Bus: Handlers Keyed by Type
@@ -341,7 +378,7 @@ bus.publish(Withdraw(30))
 bus.publish(Closed("inactivity"))    # No handler: nothing happens
 ```
 
-As with the chain, the behavior is what to test:
+For testing,
 every handler registered for a type is called,
 a handler hears only its own event type,
 and an event with no handler is a quiet no-op:

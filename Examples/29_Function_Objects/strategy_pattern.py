@@ -1,54 +1,48 @@
 # strategy_pattern.py
 from typing import override
+from algorithms import Fn, bisection, newton, secant
 
 # The strategy interface:
-class FindMinima:
-    # Line is a sequence of points:
-    def algorithm(self, line: list[float]) -> float:
+class FindRoot:
+    def find(self, f: Fn, a: float, b: float) -> float | None:
         raise NotImplementedError
 
-# The various strategies:
-class LeastSquares(FindMinima):
+# Each strategy wraps one algorithm from algorithms.py:
+class Bisection(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return sum(line) / len(line)  # Mean
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return bisection(f, a, b)
 
-class NewtonsMethod(FindMinima):
+class Newton(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return min(line)
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return newton(f, a, b)
 
-class Bisection(FindMinima):
+class Secant(FindRoot):
     @override
-    def algorithm(self, line: list[float]) -> float:
-        return (min(line) + max(line)) / 2  # Midpoint
-
-class ConjugateGradient(FindMinima):
-    @override
-    def algorithm(self, line: list[float]) -> float:
-        return max(line)
+    def find(self, f: Fn, a: float, b: float) -> float | None:
+        return secant(f, a, b)
 
 # The "Context" controls the strategy:
-class MinimaSolver:
-    def __init__(self, strategy: FindMinima) -> None:
+class RootSolver:
+    def __init__(self, strategy: FindRoot) -> None:
         self.strategy = strategy
 
-    def minima(self, line: list[float]) -> float:
-        return self.strategy.algorithm(line)
+    def solve(self, f: Fn, a: float, b: float) -> float | None:
+        return self.strategy.find(f, a, b)
 
-    def change_algorithm(self, new_algorithm: FindMinima) -> None:
+    def change_algorithm(self, new_algorithm: FindRoot) -> None:
         self.strategy = new_algorithm
 
-solver = MinimaSolver(LeastSquares())
-line = [1.0, 2.0, 1.0, 2.0, -1.0, 3.0, 4.0, 5.0, 4.0]
-print(solver.minima(line))
-#: 2.3333333333333335
-solver.change_algorithm(NewtonsMethod())
-print(solver.minima(line))
-#: -1.0
-solver.change_algorithm(Bisection())
-print(solver.minima(line))
-#: 2.0
-solver.change_algorithm(ConjugateGradient())
-print(solver.minima(line))
-#: 5.0
+def f(x: float) -> float:
+    return x * x - 2
+
+solver = RootSolver(Bisection())
+for algorithm in (Bisection(), Newton(), Secant()):
+    solver.change_algorithm(algorithm)
+    root = solver.solve(f, 0.0, 2.0)
+    assert root is not None
+    print(f"{root:.6f}")
+#: 1.414214
+#: 1.414214
+#: 1.414214
