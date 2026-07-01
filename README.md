@@ -63,7 +63,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 28_Factory.md                   |X| |
 | 29_Function_Objects.md          |X| |
 | 30_Changing_the_Interface.md    |X| |
-| 31_Observer.md                  | | |
+| 31_Observer.md                  |X| |
 | 32_Multiple_Dispatching.md      | | |
 | 33_Visitor.md                   | | |
 | 34_Pattern_Refactoring.md       | | |
