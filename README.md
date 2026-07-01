@@ -60,7 +60,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 25_Surrogate.md                 |X| |
 | 26_State_Machines.md            |X| |
 | 27_Iterators.md                 |X| |
-| 28_Factory.md                   | | |
+| 28_Factory.md                   |X| |
 | 29_Function_Objects.md          | | |
 | 30_Changing_the_Interface.md    | | |
 | 31_Observer.md                  | | |

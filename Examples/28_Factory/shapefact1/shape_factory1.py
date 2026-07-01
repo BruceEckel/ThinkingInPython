@@ -1,5 +1,4 @@
 # shapefact1/shape_factory1.py
-# A simple static factory method.
 import random
 from collections.abc import Iterator
 from typing import override
@@ -10,11 +9,13 @@ class Shape:
     # Create based on class name:
     @staticmethod
     def factory(kind: str) -> Shape:
-        if kind == "Circle":
-            return Circle()
-        if kind == "Square":
-            return Square()
-        raise ValueError(f"Bad shape creation: {kind}")
+        match kind:
+            case "Circle":
+                return Circle()
+            case "Square":
+                return Square()
+            case _:
+                raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -28,29 +29,21 @@ class Square(Shape):
     @override
     def erase(self) -> None: print("Square.erase")
 
-# Generate shape name strings:
 def shape_name_gen(n: int) -> Iterator[str]:
-    types = Shape.__subclasses__()
     for i in range(n):
-        yield random.choice(types).__name__
+        yield random.choice(Shape.__subclasses__()).__name__
 
 if __name__ == "__main__":
-    random.seed(47)  # Reproducible shape sequence
-    shapes = [Shape.factory(i) for i in shape_name_gen(7)]
+    random.seed(4)  # Reproducible shape sequence
+    shapes = [Shape.factory(i) for i in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
-#: Square.draw
-#: Square.erase
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
 #: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
+#: Circle.draw
+#: Circle.erase
 #: Square.draw
 #: Square.erase

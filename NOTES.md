@@ -3,6 +3,8 @@ Also, prototypes seem to have disappeared.
 Make a list of the patterns we've covered and compare that with a list of known patterns.
 (Appendix is the list of known patterns?)
 
+What about chain of responsibility and prototype? I know I created examples of those.
+
 On website: Chapter TOC floating on the left or below the "contents" link.
 
 Before bed: In a loop, one chapter at a time, review chapters 02 through 08.

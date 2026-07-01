@@ -1,7 +1,5 @@
 # Factory
 
-> Encapsulating Object Creation
-
 When you discover that you need to add new types to a system,
 the most sensible first step is to use polymorphism to create a common interface to those new types.
 This separates the rest of the code in your system from the knowledge of the specific types that you are adding.
@@ -13,26 +11,25 @@ and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects is distributed throughout your application,
 you have the same problem when adding new types.
 You must still chase down all the points of your code where type matters.
-It happens to be the *creation* of the type that matters here rather than the *use* of the type (which is taken care of by polymorphism),
-but the effect is the same: adding a new type can cause problems.
+It happens to be the *creation* of the type that matters here rather than the *use* of the type (which is taken care of by polymorphism).
+The effect is the same: adding a new type can cause problems.
 
-The solution is to force the creation of objects to occur through a common *factory* rather than to allow the creational code to be spread throughout your system.
-If all the code in your program must go through this factory whenever it needs to create one of your objects,
+The solution is to encapsulate object creation.
+We force the creation of objects to occur through a common *factory* rather than to allow the creational code to be spread throughout the system.
+If your program must go through this factory whenever it needs to create one of your objects,
 then all you must do when you add a new object is to modify the factory.
 
 Since every object-oriented program creates objects,
 and since it's likely you will extend your program by adding new types,
-factories might be the most useful design patterns.
+factories might be the most common design patterns.
 
 ## Simple Factory Method
 
 As an example, let's revisit the `Shape` system.
-
-One approach is to make the factory a `static` method of the base class:
+We can make the factory a `static` method of the base class:
 
 ```python
 # shapefact1/shape_factory1.py
-# A simple static factory method.
 import random
 from collections.abc import Iterator
 from typing import override
@@ -43,11 +40,13 @@ class Shape:
     # Create based on class name:
     @staticmethod
     def factory(kind: str) -> Shape:
-        if kind == "Circle":
-            return Circle()
-        if kind == "Square":
-            return Square()
-        raise ValueError(f"Bad shape creation: {kind}")
+        match kind:
+            case "Circle":
+                return Circle()
+            case "Square":
+                return Square()
+            case _:
+                raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -61,51 +60,40 @@ class Square(Shape):
     @override
     def erase(self) -> None: print("Square.erase")
 
-# Generate shape name strings:
 def shape_name_gen(n: int) -> Iterator[str]:
-    types = Shape.__subclasses__()
     for i in range(n):
-        yield random.choice(types).__name__
+        yield random.choice(Shape.__subclasses__()).__name__
 
 if __name__ == "__main__":
-    random.seed(47)  # Reproducible shape sequence
-    shapes = [Shape.factory(i) for i in shape_name_gen(7)]
+    random.seed(4)  # Reproducible shape sequence
+    shapes = [Shape.factory(i) for i in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
+#: Circle.draw
+#: Circle.erase
 #: Square.draw
 #: Square.erase
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
 #: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
 ```
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create;
 it happens to be a string here but it could be any set of data.
-The `factory()` is now the only other code in the system that needs to be changed when a new type of `Shape` is added (the initialization data for the objects will presumably come from somewhere outside the system, and not be a hard-coded array as in the above example).
-
-Note the `@staticmethod` decorator,
-which marks a method that takes no `self` and so can be called on the class itself.
+The `factory()` is now the only other code in the system that needs to be changed when a new type of `Shape` is added
+(the initialization data for the objects will presumably come from somewhere outside the system, and not be a hard-coded array as in the above example).
 
 I have also used a *generator*.
-A generator is a special case of a factory:
-it's a factory that takes no arguments in order to create a new object.
-Normally you hand some information to a factory in order to tell it what kind of object to create and how to create it,
-but a generator has some kind of internal algorithm that tells it what and how to build.
-It "generates out of thin air" rather than being told what to create.
+A generator is a special case of a factory,
+because it takes no arguments in order to create a new object.
+Normally you hand some information to a factory in order to tell it what to create,
+but a generator has an internal algorithm that tells it what to build.
 
-Now, this may not look consistent with the code you see above:
+This may not seem consistent with the code you see above:
 
-    for i in shape_name_gen(7)
+    for i in shape_name_gen(4)
 
 It looks like there's an initialization taking place.
 This is where a generator is a bit strange:
@@ -115,18 +103,32 @@ This iterator is implicitly used in the `for` statement above,
 so it appears that you are iterating through the generator function,
 not what it returns.
 
-Thus, the code that you write is actually a kind of factory,
+Inside `shape_name_gen()` you see a call to `Shape.__subclasses__()`,
+which produces a list of references to each of the subclasses of `Shape`.
+You should be aware, however,
+that this only works for the first level of inheritance from `Shape`,
+so if you were to inherit a new class from `Circle`,
+it wouldn't show up in the list generated by `Shape.__subclasses__()`.
+If you need to create a deeper hierarchy this way,
+you must recurse the `Shape.__subclasses__()` list.
+
+Also note that `Shape.__subclasses__()` is only executed when the generator object is produced;
+each time the `next()` method of this generator object is called (which, as noted above, may happen implicitly),
+only the code in the `for` loop will be executed,
+so you don't have wasteful execution (as you would if this were an ordinary function).
+
+The `@staticmethod` decorator marks a method that takes no `self` and so can be called on the class itself.
+
+The code that you write is actually a kind of factory
 that creates the generator objects that do the actual generation.
-You can use the generator explicitly if you want, for example:
+You can drive the generator by hand, for example:
 
 ```python
 # explicit_generator.py
-# A generator-factory can be driven by hand: next() pulls the next
-# object from it. shape_name_gen is reused from shape_factory1.
 import random
 from shapefact1.shape_factory1 import shape_name_gen
 
-random.seed(47)  # Make the random choices reproducible
+random.seed(47)
 
 gen = shape_name_gen(7)
 print(next(gen))
@@ -135,26 +137,8 @@ print(next(gen))
 #: Circle
 ```
 
-So `next(gen)` produces the next object from the generator.
+`next(gen)` produces the next object from the generator.
 `shape_name_gen()` is the factory, and `gen` is the generator.
-
-Inside the generator-factory, you can see the call to `__subclasses__()`,
-which produces a list of references to each of the subclasses of `Shape`.
-You should be aware, however,
-that this only works for the first level of inheritance from `Shape`,
-so if you were to inherit a new class from `Circle`,
-it wouldn't show up in the list generated by `__subclasses__()`.
-If you need to create a deeper hierarchy this way,
-you must recurse the `__subclasses__()` list.
-
-Also note that in `shape_name_gen()` the statement:
-
-    types = Shape.__subclasses__()
-
-is only executed when the generator object is produced;
-each time the `next()` method of this generator object is called (which, as noted above, may happen implicitly),
-only the code in the `for` loop will be executed,
-so you don't have wasteful execution (as you would if this were an ordinary function).
 
 ### Preventing direct creation
 
@@ -184,34 +168,30 @@ def factory(kind: str) -> Shape:
         @override
         def erase(self) -> None: print("Square.erase")
 
-    if kind == "Circle":
-        return Circle()
-    if kind == "Square":
-        return Square()
-    raise ValueError(f"Bad shape creation: {kind}")
+    match kind:
+        case "Circle":
+            return Circle()
+        case "Square":
+            return Square()
+        case _:
+            raise ValueError(f"Bad shape creation: {kind}")
 
 def shape_name_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 if __name__ == "__main__":
-    random.seed(47)  # Reproducible shape sequence
+    random.seed(4)
     # Circle()  # Not defined outside factory()
-    for shape in shape_name_gen(7):
+    for shape in shape_name_gen(4):
         shape.draw()
         shape.erase()
-#: Square.draw
-#: Square.erase
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
 #: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
+#: Circle.draw
+#: Circle.erase
 #: Square.draw
 #: Square.erase
 ```
@@ -226,13 +206,11 @@ you can store it in a variable and call it to make an instance.
 Thus, the simplest factory is a dictionary that maps names to classes.
 There is no factory method and no factory class; the `dict` *is* the factory.
 You can go one step further so the factory never needs editing when a type is added,
-by letting each subclass register itself through `__init_subclass__()`:
+by letting each subclass register itself through `__init_subclass__()`.
+Then the factory never needs editing when you add a type:
 
 ```python
 # registry.py
-# A class is a first-class object, so a factory is just a dict of
-# classes. __init_subclass__ lets each subclass register itself, so
-# the factory never needs editing when you add a type.
 from typing import ClassVar, override
 
 class Shape:
@@ -303,9 +281,10 @@ def test_unknown_name_raises() -> None:
 
 The static `factory()` method in the previous example forces all the creation operations to be focused in one spot,
 so that's the only place you need to change the code.
-However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that different types of factories can be subclassed from the basic factory (the above design is mentioned as a special case).
-However, the book does not provide an example,
-but instead repeats the example used for the *Abstract Factory* (you'll see an example of this in the next section).
+However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that different types of factories can be subclassed from the basic factory
+(the above design is a special case).
+However, *GoF Design Patterns* does not provide an example,
+but instead repeats the example used for the *Abstract Factory* (you'll see this in the next section).
 Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
 Notice also that the specific `Shape` classes are dynamically loaded on demand:
 
@@ -319,16 +298,16 @@ from typing import Any, ClassVar, override
 class ShapeFactory:
     factories: ClassVar[dict[str, Any]] = {}
 
-    @staticmethod
-    def add_factory(kind: str, shape_factory: Any) -> None:
-        ShapeFactory.factories[kind] = shape_factory
+    @classmethod
+    def add_factory(cls, kind: str, shape_factory: Any) -> None:
+        cls.factories[kind] = shape_factory
 
     # A Template Method:
-    @staticmethod
-    def create_shape(kind: str) -> Shape:
-        if kind not in ShapeFactory.factories:
-            ShapeFactory.factories[kind] = eval(kind + '.Factory()')
-        return ShapeFactory.factories[kind].create()
+    @classmethod
+    def create_shape(cls, kind: str) -> Shape:
+        if kind not in cls.factories:
+            cls.factories[kind] = eval(kind + '.Factory()')
+        return cls.factories[kind].create()
 
 class Shape:
     def draw(self) -> None: ...
@@ -358,32 +337,25 @@ def shape_name_gen(n: int) -> Iterator[str]:
         yield random.choice(types).__name__
 
 if __name__ == "__main__":
-    random.seed(47)  # Reproducible shape sequence
-    shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(7)]
+    random.seed(4)
+    shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
+#: Circle.draw
+#: Circle.erase
 #: Square.draw
 #: Square.erase
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
 #: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
-#: Square.draw
-#: Square.erase
 ```
 
-Now the factory method appears in its own class, `ShapeFactory`,
-as the `create()` method.
-The different types of shapes must each create their own factory with a `create()` method to create an object of their own type.
+Now the factory method appears in its own class, `ShapeFactory`, as the `create()` method.
+The different types of shapes must each create their own `Factory` class with a `create()` method to create an object of their own type.
 The actual creation of shapes is performed by calling `ShapeFactory.create_shape()`,
-which is a static method that uses the dictionary in `ShapeFactory` to find the appropriate factory object based on an identifier that you pass it.
+which is a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,
 but you could imagine a more complex problem where the appropriate factory object is returned and then used by the caller to create an object in a more sophisticated way.
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
@@ -405,8 +377,8 @@ such as pooling, caching, or consulting external configuration.
 
 The *Abstract Factory* pattern looks like the factory objects we've seen previously,
 with not one but several factory methods.
-Each of the factory methods creates a different kind of object.
-The idea is that at the point of creation of the factory object,
+Each factory method creates a different kind of object.
+At the point of creation of the factory object,
 you decide how all the objects created by that factory will be used.
 The example given in *GoF Design Patterns* implements portability across various graphical user interfaces (GUIs):
 you create a factory object appropriate to the GUI that you're working with,
@@ -420,7 +392,6 @@ Here's how it might look using an abstract factory:
 
 ```python
 # games.py
-# An example of the Abstract Factory pattern.
 from typing import override
 
 class Obstacle:
@@ -495,26 +466,35 @@ but those activities (the *initial conditions* and the *state change*) can deter
 Here, `GameEnvironment` is not designed to be inherited,
 although it might make sense to do that.
 
-This also contains examples of *Double Dispatching* and the *Factory Method*,
-both of which are explained later.
+This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md).
 
-The above scaffolding of `Obstacle`,
-`Character` and `GameElementFactory` (which was translated from the Java version of this example) is unnecessary;
-it's only required for languages that have static type checking.
-As long as the concrete Python classes follow the form of the required classes,
-we don't need any base classes:
+The base classes `Obstacle`, `Character`, and `GameElementFactory`
+(translated from the Java version) force every concrete class to inherit from them.
+Python does not need that inheritance to keep the same checking.
+A *Protocol* describes the required shape, and any class with that shape conforms,
+with no base class to derive from while still type checking:
 
 ```python
 # games2.py
 # Simplified Abstract Factory.
-from typing import Any
+from typing import Protocol
+
+class Obstacle(Protocol):
+    def action(self) -> str: ...
+
+class Character(Protocol):
+    def interact_with(self, obstacle: Obstacle) -> None: ...
+
+class GameElementFactory(Protocol):
+    def make_character(self) -> Character: ...
+    def make_obstacle(self) -> Obstacle: ...
 
 class Kitty:
-    def interact_with(self, obstacle: Any) -> None:
+    def interact_with(self, obstacle: Obstacle) -> None:
         print("Kitty has encountered a", obstacle.action())
 
 class Warrior:
-    def interact_with(self, obstacle: Any) -> None:
+    def interact_with(self, obstacle: Obstacle) -> None:
         print("Warrior now battles a", obstacle.action())
 
 class Puzzle:
@@ -533,7 +513,7 @@ class WarriorsAndWeapons:
     def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
 
 class GameEnvironment:
-    def __init__(self, factory: Any) -> None:
+    def __init__(self, factory: GameElementFactory) -> None:
         self.factory = factory
         self.p = factory.make_character()
         self.ob = factory.make_obstacle()
@@ -548,18 +528,13 @@ g2.play()
 #: Warrior now battles a NastyWeapon
 ```
 
-Another way to put this is that all inheritance in Python is implementation inheritance;
-since Python does its type-checking at runtime,
-there's no need to use interface inheritance so that you can upcast to the base type.
-
-Does the first one add enough useful information about the pattern that it's worth keeping some aspect of it?
-Perhaps all you need is "tagging classes" like this:
-
-    class Obstacle: pass
-    class Character: pass
-    class GameElementFactory: pass
-
-Then the inheritance serves only to indicate the type of the derived classes.
+The concrete classes inherit nothing, but the type checker still verifies that each one fits
+the appropriate `Protocol`: a `GameElementFactory` must supply `make_character()`
+and `make_obstacle()`, a `Character` must supply `interact_with()`,
+and an `Obstacle` must supply `action()`.
+This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+It preserves the benefits of the interfaces were for without the coupling a shared base class imposes.
+Python's version of interface inheritance is a `Protocol`, not a shared base class.
 
 ## Exercises
 

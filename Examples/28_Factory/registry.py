@@ -1,7 +1,4 @@
 # registry.py
-# A class is a first-class object, so a factory is just a dict of
-# classes. __init_subclass__ lets each subclass register itself, so
-# the factory never needs editing when you add a type.
 from typing import ClassVar, override
 
 class Shape:

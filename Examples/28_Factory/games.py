@@ -1,5 +1,4 @@
 # games.py
-# An example of the Abstract Factory pattern.
 from typing import override
 
 class Obstacle:
