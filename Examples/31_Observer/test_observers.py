@@ -12,6 +12,16 @@ def test_notify_calls_every_subscriber() -> None:
 def test_no_subscribers_is_a_noop() -> None:
     Observable().notify("anything")  # Must not raise
 
+def test_unsubscribe_stops_delivery() -> None:
+    received: list[object] = []
+    obs = Observable()
+    record = received.append   # Named so it can be removed
+    obs.subscribe(record)
+    obs.notify(1)
+    obs.unsubscribe(record)
+    obs.notify(2)
+    assert received == [1]
+
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer()

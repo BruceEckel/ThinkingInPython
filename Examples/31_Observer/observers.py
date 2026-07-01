@@ -11,6 +11,9 @@ class Observable:
     def subscribe(self, observer: Observer) -> None:
         self._observers.append(observer)
 
+    def unsubscribe(self, observer: Observer) -> None:
+        self._observers.remove(observer)
+
     def notify(self, data: Any) -> None:
         for observer in self._observers:
             observer(data)

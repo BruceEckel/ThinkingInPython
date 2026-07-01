@@ -47,6 +47,9 @@ class Observable:
     def subscribe(self, observer: Observer) -> None:
         self._observers.append(observer)
 
+    def unsubscribe(self, observer: Observer) -> None:
+        self._observers.remove(observer)
+
     def notify(self, data: Any) -> None:
         for observer in self._observers:
             observer(data)
@@ -83,10 +86,13 @@ For event-heavy programs there are mature libraries (signal/slot systems, `async
 but for most cases a list of callbacks is all the *Observer* pattern amounts to.
 
 An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
-Collecting a value from each observer is a different pattern, such as [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
+Collecting a value from each observer is a different pattern,
+such as [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
 
 Testing confirms that every subscriber is called with the new value,
 and a subscriber sees only the changes that happen after it subscribes.
+It also verifies that an unsubscribed observer stops hearing changes.
+Removal is by identity, so a detachable observer needs a named reference, not an inline lambda.
 A list whose `append` is the observer records what arrived:
 
 ```python
@@ -103,6 +109,16 @@ def test_notify_calls_every_subscriber() -> None:
 
 def test_no_subscribers_is_a_noop() -> None:
     Observable().notify("anything")  # Must not raise
+
+def test_unsubscribe_stops_delivery() -> None:
+    received: list[object] = []
+    obs = Observable()
+    record = received.append   # Named so it can be removed
+    obs.subscribe(record)
+    obs.notify(1)
+    obs.unsubscribe(record)
+    obs.notify(2)
+    assert received == [1]
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
@@ -124,17 +140,17 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 
 ## Observer and I/O
 
-The observers so far print or append to a list, then return.
+So far, an observer only prints or appends to a list, then returns.
 If an observer calls a network service or writes to a database,
 notifying observers one at a time blocks on each.
 The list of callbacks becomes a line of waits.
 
-If the observers are coroutines,
+If observers are coroutines,
 `notify` awaits them together with `asyncio.gather`,
 so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
-`gather` still waits for all of them, so the change is finished only when every observer is.
-There is a cost: a `@property` setter cannot be a coroutine, and an assignment cannot be awaited.
+`gather` still waits for all of them, so the change is finished only after every observer is successfully notified.
+There is a limitation: a `@property` setter cannot be a coroutine so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
 The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](35_Simulation.md).
 For this example, we only need a coroutine to pause at `await` while others run:
@@ -167,7 +183,7 @@ class Thermometer(Observable):
         return self._celsius
 
     async def set_celsius(self, value: float) -> None:
-        # A property setter cannot be awaited, so this is a method
+        # A property setter cannot be awaited
         self._celsius = value
         await self.notify(value)
 
@@ -193,6 +209,8 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
+Note that the definition of `AsyncObserver` guarantees that only `async` functions can be used as observers.
+
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscribe order, alarm first.
 Concurrent fan-out lets each finish on its own schedule,
@@ -206,7 +224,7 @@ The type-keyed [event bus](29_Function_Objects.md#an-event-bus-handlers-keyed-by
 
 The rest of this chapter translates Java's `Observable` and `Observer` classes directly.
 That is useful when you are porting Java code or need the exact `set_changed()` semantics,
-but use it only when the simple version above is not enough.
+but use it only when the simple versions shown so far are not enough.
 
 ## The Classic Observable and Observer
 
