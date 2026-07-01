@@ -1,9 +1,10 @@
 # rats_and_mazes/rat.py
 import asyncio
-from typing import Protocol
+from typing import Final, Protocol
 
 # South, north, west, east
-DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Recorder(Protocol):
     def claim(self, x: int, y: int) -> bool: ...

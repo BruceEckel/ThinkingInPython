@@ -1,4 +1,5 @@
 # robot_explorer/world.py
+from typing import Final
 from items import Edge, Item, Robot, Urge
 
 type Coord = tuple[int, int]   # (row, col)
@@ -38,4 +39,4 @@ class Doors:
         return neighbor if neighbor is not None else EDGE
 
 # Created once both classes exist; its own doors stay unset
-EDGE = Room(Edge())
+EDGE: Final[Room] = Room(Edge())

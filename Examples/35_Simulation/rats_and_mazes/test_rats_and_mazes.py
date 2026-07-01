@@ -1,9 +1,10 @@
 # rats_and_mazes/test_rats_and_mazes.py
 import asyncio
+from typing import Final
 from blackboard import Blackboard
 from maze import Coord, Maze
 
-LAYOUT = """\
+LAYOUT: Final[str] = """\
 *********
 *       *
 *** *** *

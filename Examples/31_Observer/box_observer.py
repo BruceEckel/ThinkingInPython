@@ -1,7 +1,9 @@
 # box_observer.py
+from typing import Final
 from observer import Observable
 
-COLORS = ("skyblue", "palegreen", "khaki")
+COLORS: Final[tuple[str, str, str]] = (
+    "skyblue", "palegreen", "khaki")
 type Coord = tuple[int, int]             # (column, row)
 type Grid = dict[Coord, str]             # Cell -> color
 

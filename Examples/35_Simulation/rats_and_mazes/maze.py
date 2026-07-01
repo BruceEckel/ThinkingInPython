@@ -2,13 +2,13 @@
 # Reads a maze layout and reports walls, openings, and an entry point.
 
 from pathlib import Path
-from typing import Self
+from typing import Final, Self
 
 type Coord = tuple[int, int]   # (column, row)
 
 class Maze:
-    WALL = "*"
-    OPEN = " "
+    WALL: Final[str] = "*"
+    OPEN: Final[str] = " "
 
     def __init__(self, rows: list[str]) -> None:
         self.height = len(rows)

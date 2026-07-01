@@ -1,11 +1,12 @@
 # algorithms.py
 from collections.abc import Callable
+from typing import Final
 
 type Fn = Callable[[float], float]
 type RootFinder = Callable[[Fn, float, float], float | None]
 
-TOLERANCE = 1e-12
-MAX_ITER = 200
+TOLERANCE: Final[float] = 1e-12
+MAX_ITER: Final[int] = 200
 
 def bisection(f: Fn, a: float, b: float) -> float | None:
     if f(a) * f(b) > 0:   # Endpoints must bracket a root

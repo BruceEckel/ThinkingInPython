@@ -45,10 +45,11 @@ record a message, and hand out a number.
 ```python
 # rats_and_mazes/rat.py
 import asyncio
-from typing import Protocol
+from typing import Final, Protocol
 
 # South, north, west, east
-DIRECTIONS = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Recorder(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
@@ -90,13 +91,13 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 # Reads a maze layout and reports walls, openings, and an entry point.
 
 from pathlib import Path
-from typing import Self
+from typing import Final, Self
 
 type Coord = tuple[int, int]   # (column, row)
 
 class Maze:
-    WALL = "*"
-    OPEN = " "
+    WALL: Final[str] = "*"
+    OPEN: Final[str] = " "
 
     def __init__(self, rows: list[str]) -> None:
         self.height = len(rows)
@@ -258,10 +259,11 @@ A test pins that down by comparing the cells the rats visited against a plain fl
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
 import asyncio
+from typing import Final
 from blackboard import Blackboard
 from maze import Coord, Maze
 
-LAYOUT = """\
+LAYOUT: Final[str] = """\
 *********
 *       *
 *** *** *
@@ -301,11 +303,11 @@ It only draws, so the harness skips it (`tools/norun.txt`):
 # rats_and_mazes/rats_view.py
 import asyncio
 import tkinter as tk
-from typing import override
+from typing import Final, override
 from blackboard import Blackboard
 from maze import Coord, Maze
 
-CELL = 26
+CELL: Final[int] = 26
 
 class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."
@@ -485,6 +487,7 @@ so the robot can try any direction without a special case:
 
 ```python
 # robot_explorer/world.py
+from typing import Final
 from items import Edge, Item, Robot, Urge
 
 type Coord = tuple[int, int]   # (row, col)
@@ -524,7 +527,7 @@ class Doors:
         return neighbor if neighbor is not None else EDGE
 
 # Created once both classes exist; its own doors stay unset
-EDGE = Room(Edge())
+EDGE: Final[Room] = Room(Edge())
 ```
 
 `GameBuilder` assembles the maze in stages: a room for every character,
@@ -689,10 +692,11 @@ food eaten and all:
 
 ```python
 # robot_explorer/test_robot.py
+from typing import Final
 from game import GameBuilder, solution, string_maze
 from items import EndGame
 
-FINISHED = """
+FINISHED: Final[str] = """
 ###############################
 #_#.____#_____#_______#_______#
 #_###_#_###_#_#_#_#####_#####_#
@@ -745,14 +749,17 @@ so the example harness skips it (listed in `tools/norun.txt`):
 ```python
 # robot_explorer/maze_view.py
 import tkinter as tk
+from typing import Final
 from game import GameBuilder, solution, string_maze
 from items import Urge
 
-CELL = 20
-FILL = {"#": "dimgray", "!": "tomato", ".": "khaki",
-        "_": "white", "R": "royalblue"}
-MOVES = {"n": Urge.NORTH, "s": Urge.SOUTH,
-         "e": Urge.EAST, "w": Urge.WEST}
+CELL: Final[int] = 20
+FILL: Final[dict[str, str]] = {
+    "#": "dimgray", "!": "tomato", ".": "khaki",
+    "_": "white", "R": "royalblue"}
+MOVES: Final[dict[str, Urge]] = {
+    "n": Urge.NORTH, "s": Urge.SOUTH,
+    "e": Urge.EAST, "w": Urge.WEST}
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:

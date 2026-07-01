@@ -1,11 +1,11 @@
 # rats_and_mazes/rats_view.py
 import asyncio
 import tkinter as tk
-from typing import override
+from typing import Final, override
 from blackboard import Blackboard
 from maze import Coord, Maze
 
-CELL = 26
+CELL: Final[int] = 26
 
 class RecordingBlackboard(Blackboard):
     "A blackboard that also remembers the order cells were claimed."

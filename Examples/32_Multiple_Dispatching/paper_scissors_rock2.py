@@ -1,13 +1,13 @@
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
-from typing import Any
+from typing import Any, Final
 from arena import item_pair_gen, match
 from outcome import Outcome
 
 class Item:
     def compete(self, item: Any) -> Outcome:
         # Use a tuple for table lookup:
-        return outcome[self.__class__, item.__class__]
+        return OUTCOME[self.__class__, item.__class__]
     def __str__(self) -> str:
         return self.__class__.__name__
 
@@ -18,7 +18,7 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-outcome: dict[tuple[type, type], Outcome] = {
+OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,

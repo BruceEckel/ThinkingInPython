@@ -1,11 +1,11 @@
 # test_paper_scissors.py
-from typing import Any
+from typing import Any, Final
 import paper_scissors_rock as methods
 import paper_scissors_rock2 as table
 from outcome import Outcome
 
 # (player, opponent): the player's result
-EXPECTED = {
+EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Paper", "Rock"): Outcome.WIN,
     ("Paper", "Scissors"): Outcome.LOSE,
     ("Paper", "Paper"): Outcome.DRAW,

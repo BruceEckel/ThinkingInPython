@@ -1,8 +1,9 @@
 # robot_explorer/test_robot.py
+from typing import Final
 from game import GameBuilder, solution, string_maze
 from items import EndGame
 
-FINISHED = """
+FINISHED: Final[str] = """
 ###############################
 #_#.____#_____#_______#_______#
 #_###_#_###_#_#_#_#####_#####_#

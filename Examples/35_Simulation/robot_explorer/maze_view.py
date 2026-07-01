@@ -1,13 +1,16 @@
 # robot_explorer/maze_view.py
 import tkinter as tk
+from typing import Final
 from game import GameBuilder, solution, string_maze
 from items import Urge
 
-CELL = 20
-FILL = {"#": "dimgray", "!": "tomato", ".": "khaki",
-        "_": "white", "R": "royalblue"}
-MOVES = {"n": Urge.NORTH, "s": Urge.SOUTH,
-         "e": Urge.EAST, "w": Urge.WEST}
+CELL: Final[int] = 20
+FILL: Final[dict[str, str]] = {
+    "#": "dimgray", "!": "tomato", ".": "khaki",
+    "_": "white", "R": "royalblue"}
+MOVES: Final[dict[str, Urge]] = {
+    "n": Urge.NORTH, "s": Urge.SOUTH,
+    "e": Urge.EAST, "w": Urge.WEST}
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:
