@@ -14,7 +14,7 @@ The framework's runner is the template method: it calls `setUp()`,
 then your test, then `tearDown()`, for each test,
 and you never call that sequence yourself.
 
-## Template Method
+## The Fixed Algorithm
 
 The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class.
 Subclasses complete the individual steps.

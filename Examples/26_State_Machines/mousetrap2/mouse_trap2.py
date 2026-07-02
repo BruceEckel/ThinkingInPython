@@ -11,14 +11,14 @@ from state_machine import StateMachine
 
 class StateT(State):
     def __init__(self) -> None:
-        self.transitions: dict[Any, Any] | None = None
+        self.transitions: dict[Any, Any] = {}
     @override
     def next(self, event: object) -> State:
-        assert self.transitions is not None
         if event in self.transitions:
             return self.transitions[event]
         else:
-            raise Exception("Input not supported for current state")
+            raise RuntimeError(
+                "Input not supported for current state")
 
 class Waiting(StateT):
     @override

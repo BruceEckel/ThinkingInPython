@@ -16,7 +16,7 @@ class Flower:
 
 class Gladiolus(Flower):
     pass
-class Runuculus(Flower):
+class Ranunculus(Flower):
     pass
 class Chrysanthemum(Flower):
     pass
@@ -62,15 +62,15 @@ for flower in flower_gen(4):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
+#: Ranunculus pollinated by Bee
+#: Ranunculus pollinated by Fly
+#: Ranunculus eaten by Worm
 #: Gladiolus pollinated by Bee
 #: Gladiolus pollinated by Fly
 #: Gladiolus eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
+#: Ranunculus pollinated by Bee
+#: Ranunculus pollinated by Fly
+#: Ranunculus eaten by Worm
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
 #: Chrysanthemum eaten by Worm

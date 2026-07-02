@@ -180,10 +180,6 @@ The outer `for` walks the directories and the inner `for` walks the files in eac
 Set comprehensions construct sets using the same principles as list comprehensions.
 Instead of `[]`, a set comprehension uses `{}`.
 
-Consider a list of names.
-We are only interested in names longer than one character and wish to represent all names in the same format:
-the first letter should be capitalized and all other characters should be lower case.
-
 The following set comprehension normalizes each name (capital first letter, the rest lower
 case), keeps the names longer than one character, and collapses the duplicates
 and case variants:

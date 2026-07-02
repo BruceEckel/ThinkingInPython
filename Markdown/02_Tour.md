@@ -55,9 +55,9 @@ which are the "then" part of the `if` statement.
 The `print()` statement sends the result to standard output,
 followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
-Indenting can nest to any level, just like curly braces in C++ or Java,
-but unlike those languages there is no option (and no argument) about where the braces are placed;
-the compiler forces everyone's code to be formatted the same way,
+Indenting can nest to any level.
+Unlike the brace-placement debates of C++ or Java, there are no options with Python formatting.
+The language forces everyone's code to be indented the same way,
 which is one of the main reasons for Python's consistent readability.
 
 Python normally has only one statement per line (you can put more by separating them with semicolons),

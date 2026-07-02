@@ -28,14 +28,14 @@ def factory(kind: str) -> Shape:
         case _:
             raise ValueError(f"Bad shape creation: {kind}")
 
-def shape_name_gen(n: int) -> Iterator[Shape]:
+def shape_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 if __name__ == "__main__":
     random.seed(4)
     # Circle()  # Not defined outside factory()
-    for shape in shape_name_gen(4):
+    for shape in shape_gen(4):
         shape.draw()
         shape.erase()
 #: Circle.draw

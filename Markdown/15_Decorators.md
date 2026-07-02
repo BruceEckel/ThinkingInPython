@@ -24,7 +24,7 @@ cheese()
 #: Replacement behavior
 ```
 
-Ordinarily you'd expect to see "Wensleydale", but `hijack()` replaces the original `cheese()` function
+Ordinarily you'd expect to see "Wensleydale," but `hijack()` replaces the original `cheese()` function
 with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.
@@ -312,6 +312,12 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
+#: First deleted
+#: 2 Counter objects remaining
+#: Second deleted
+#: 1 Counter objects remaining
+#: Third deleted
+#: Last Counter object deleted
 #: -> greet('Bob',)
 #: Hello, Bob
 #: Hello, Bob

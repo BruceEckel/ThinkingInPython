@@ -36,7 +36,7 @@ class Flower:
 
 class Gladiolus(Flower):
     pass
-class Runuculus(Flower):
+class Ranunculus(Flower):
     pass
 class Chrysanthemum(Flower):
     pass
@@ -82,15 +82,15 @@ for flower in flower_gen(4):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
+#: Ranunculus pollinated by Bee
+#: Ranunculus pollinated by Fly
+#: Ranunculus eaten by Worm
 #: Gladiolus pollinated by Bee
 #: Gladiolus pollinated by Fly
 #: Gladiolus eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
+#: Ranunculus pollinated by Bee
+#: Ranunculus pollinated by Fly
+#: Ranunculus eaten by Worm
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
 #: Chrysanthemum eaten by Worm
@@ -118,7 +118,7 @@ class Flower:
 
 class Gladiolus(Flower):
     pass
-class Runuculus(Flower):
+class Ranunculus(Flower):
     pass
 class Chrysanthemum(Flower):
     pass
@@ -142,16 +142,16 @@ def fragrance(flower: Flower) -> str:
     return "faint"
 
 @fragrance.register
-def _(flower: Runuculus) -> str:
+def _(flower: Ranunculus) -> str:
     return "strong"
 
 if __name__ == "__main__":
     flowers: list[Flower] = [
-        Gladiolus(), Runuculus(), Chrysanthemum()]
+        Gladiolus(), Ranunculus(), Chrysanthemum()]
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
 #: Gladiolus: abundant nectar | fragrance: faint
-#: Runuculus: no nectar | fragrance: strong
+#: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
 ```
 
@@ -182,7 +182,7 @@ from visitor_singledispatch import (
     Chrysanthemum,
     Flower,
     Gladiolus,
-    Runuculus,
+    Ranunculus,
     fragrance,
     nectar,
 )
@@ -192,20 +192,20 @@ def test_nectar_registered_types() -> None:
     assert nectar(Chrysanthemum()) == "Chrysanthemum: a little nectar"
 
 def test_nectar_default_for_unregistered() -> None:
-    assert nectar(Runuculus()) == "Runuculus: no nectar"
+    assert nectar(Ranunculus()) == "Ranunculus: no nectar"
     assert nectar(Flower()) == "Flower: no nectar"
 
 def test_fragrance_registered_and_default() -> None:
-    assert fragrance(Runuculus()) == "strong"
+    assert fragrance(Ranunculus()) == "strong"
     assert fragrance(Gladiolus()) == "faint"
     assert fragrance(Chrysanthemum()) == "faint"
 
 def test_operations_dispatch_independently() -> None:
     # Nectar knows Gladiolus and Chrysanthemum; fragrance knows
-    # Runuculus. A Runuculus falls to nectar's default but hits
+    # Ranunculus. A Ranunculus falls to nectar's default but hits
     # fragrance's registered case.
-    runuculus = Runuculus()
-    assert nectar(runuculus) == "Runuculus: no nectar"
+    runuculus = Ranunculus()
+    assert nectar(runuculus) == "Ranunculus: no nectar"
     assert fragrance(runuculus) == "strong"
 ```
 
@@ -224,9 +224,7 @@ def test_operations_dispatch_independently() -> None:
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
     `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
     These are the "winners."
-3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a table lookup.
-    The simplest way is a `dict` keyed by a tuple of the two objects' types,
-    looked up as `table[type(o1), type(o2)]` (this is what `paper_scissors_rock_table.py` does).
+3.  [Multiple Dispatching](32_Multiple_Dispatching.md) replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
     When is the table lookup more appropriate than hard-coding the dynamic dispatch?
     Can you keep the syntactic simplicity of the dispatch while using a table underneath?
-4.  Modify Exercise 2 to use the table lookup technique described in Exercise 3.
+4.  Modify Exercise 2 to use the table lookup technique of `paper_scissors_rock_table.py`.

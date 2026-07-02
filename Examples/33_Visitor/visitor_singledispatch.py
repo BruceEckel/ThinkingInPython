@@ -7,7 +7,7 @@ class Flower:
 
 class Gladiolus(Flower):
     pass
-class Runuculus(Flower):
+class Ranunculus(Flower):
     pass
 class Chrysanthemum(Flower):
     pass
@@ -31,14 +31,14 @@ def fragrance(flower: Flower) -> str:
     return "faint"
 
 @fragrance.register
-def _(flower: Runuculus) -> str:
+def _(flower: Ranunculus) -> str:
     return "strong"
 
 if __name__ == "__main__":
     flowers: list[Flower] = [
-        Gladiolus(), Runuculus(), Chrysanthemum()]
+        Gladiolus(), Ranunculus(), Chrysanthemum()]
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
 #: Gladiolus: abundant nectar | fragrance: faint
-#: Runuculus: no nectar | fragrance: strong
+#: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint

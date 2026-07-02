@@ -87,6 +87,9 @@ To make something a package,
 you put a special file named `__init__.py` in that directory.
 Except in special cases, this file is empty;
 it is only there to flag the directory as a package.^[People are often confused by the name `__init__.py`. In hindsight, it might have been better to have named the file `__package__.py`.]
+A directory without `__init__.py` can still be imported as a *namespace package*,
+but an explicit `__init__.py` makes the package's identity and boundary clear,
+so this book always uses one.
 
 To demonstrate, we'll create a directory called `a_package` and give it an `__init__.py` containing nothing but a comment:
 
@@ -189,9 +192,10 @@ print(module3.function3())
 ## `PYTHONPATH`
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
-The original (and now semi-deprecated) solution to this was to set an environment variable called `PYTHONPATH` which tells Python where to look for modules and packages.
+The original solution to this was to set an environment variable called `PYTHONPATH`, which tells Python where to look for modules and packages.
 `PYTHONPATH` can take multiple paths,
 and Python will keep searching through those paths until it finds your module or package (or doesn't, and reports an error).
 
-`PYTHONPATH` still works but has been effectively superseded by the *virtual environment*,
-which solves much more than only "where are the modules and packages."
+`PYTHONPATH` still works,
+but the modern practice is to install your package into the environment you are working in,
+which puts it on the search path without any environment variable.

@@ -183,12 +183,7 @@ Note that some of these only apply to OOP.
 -   *Once and once only*:
     Avoid duplication of logic and structure where the duplication is not accidental,
     i.e., where both pieces of code express the same intent for the same reason.
-    *Make things as immutable as possible* as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
-    *Make functions pure whenever you can*
+-   *Make things as immutable as possible*, as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
+-   *Make functions pure whenever you can*.
 
 This is a small handful of fundamental ideas that can be held in your head while walking through and analyzing your design.
-
-## Further Reading
-
-- Alex Martelli's Video Lectures on Design Patterns in Python:
-<http://www.catonmat.net/blog/learning-python-design-patterns-through-video-lectures/>

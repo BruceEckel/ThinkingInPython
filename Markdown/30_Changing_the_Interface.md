@@ -124,7 +124,7 @@ This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
 Testing verifies both halves of that behavior:
 the new `f()` combines the adaptee's methods,
-and un-overridden calls forward through to the wrapped object:
+and calls to methods it doesn't override forward through to the wrapped object:
 
 ```python
 # test_adapter.py

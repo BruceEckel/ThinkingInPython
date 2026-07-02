@@ -836,7 +836,7 @@ Neither needs concurrency.
 
 A discussion of algorithms to create mazes:
 
-<http://www.mazeworks.com/mazegen/mazegen.htm>
+<https://en.wikipedia.org/wiki/Maze_generation_algorithm>
 
 A discussion of algorithms for collision detection and steering behavior for autonomous moving objects:
 

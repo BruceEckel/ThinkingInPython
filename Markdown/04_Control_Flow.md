@@ -18,6 +18,8 @@ print(grade)
 #: pass
 ```
 
+The example also shows a *conditional expression*: a one-line `if`/`else` that produces a value.
+
 Adding `elif` to an `if` statement chains multiple tests:
 
 ```python
@@ -142,6 +144,9 @@ for i, name, score in zip(range(10), names, scores):
 `enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
 `zip()` traverses several sequences at once, producing one item from each and stopping when the shortest runs out.
 
+With `print()`, the default `end` (printed after the value) is a newline.
+You can use `sep` to change the separator between values.
+
 The *walrus operator* `:=` assigns a value as part of an expression,
 so you can compute, name, and test a value in one place:
 
@@ -162,9 +167,6 @@ if (n := len(text)) > 3:
 
 This is especially handy in `while` conditions and comprehensions,
 where it avoids repeating a computation.
-
-With `print()`, the default `end` (printed after the value) is a newline.
-You can use `sep` to change the separator between values.
 
 ## Pattern Matching
 

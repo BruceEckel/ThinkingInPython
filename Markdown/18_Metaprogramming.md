@@ -145,9 +145,11 @@ if __name__ == "__main__":
     initializations = "ThermostatNight(5.00); LightOff(2.00); \
         WaterOn(3.30); WaterOff(4.45); LightOn(1.00); \
         RingBell(7.00); ThermostatDay(6.00)"
-    [create_mc(dsc) for dsc in descriptions]
+    for dsc in descriptions:
+        create_mc(dsc)
     exec(initializations, globals())
-    [create_exec(dsc) for dsc in descriptions]
+    for dsc in descriptions:
+        create_exec(dsc)
     exec(initializations, globals())
     Event.run_events()
 #: 1.00: Light on [mc]

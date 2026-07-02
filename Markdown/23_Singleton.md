@@ -299,21 +299,21 @@ A simpler version relies on the fact that a class variable has a single shared v
 # class_variable_singleton.py
 from typing import Any, ClassVar
 
-class SingleTone:
+class CVSingleton:
     val: Any
-    __instance: ClassVar[SingleTone | None] = None
+    __instance: ClassVar[CVSingleton | None] = None
 
-    def __new__(cls, val: Any) -> SingleTone:
-        instance = SingleTone.__instance
+    def __new__(cls, val: Any) -> CVSingleton:
+        instance = CVSingleton.__instance
         if instance is None:
             instance = object.__new__(cls)
-            SingleTone.__instance = instance
+            CVSingleton.__instance = instance
         instance.val = val
         return instance
 
-x = SingleTone("sausage")
-y = SingleTone("eggs")
-z = SingleTone("spam")
+x = CVSingleton("sausage")
+y = CVSingleton("eggs")
+z = CVSingleton("spam")
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
@@ -324,8 +324,8 @@ print(x.val, x is y is z)
 import class_variable_singleton
 
 def test_class_variable_returns_same_instance() -> None:
-    a = class_variable_singleton.SingleTone("a")
-    b = class_variable_singleton.SingleTone("b")
+    a = class_variable_singleton.CVSingleton("a")
+    b = class_variable_singleton.CVSingleton("b")
     assert a is b
     assert a.val == "b"  # Last write wins on the shared instance
 ```
@@ -447,9 +447,9 @@ Python has that for free, so most of the ceremony falls away.
 
 ## Exercises
 
-1.  `singleton_pattern.py` always creates an object, even if it's never used.
+1.  `singleton_eager.py` always creates its inner object, even if it is never used.
     Modify it to use *lazy initialization*,
-    so the singleton object is created only the first time it is needed.
+    then compare your result with `singleton_pattern.py`.
 2.  Using `cached_factory_singleton.py` as a starting point,
     create a factory that manages a fixed pool of objects (say, database connections) and hands them out,
     rather than a single instance.

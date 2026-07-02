@@ -102,7 +102,6 @@ if __name__ == "__main__":
 ```
 
 Encapsulation with private fields and getters still leaks.
-A getter that returns a mutable object hands the caller a reference to the real internals.
 The output shows that the internals changed from outside.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.

@@ -285,7 +285,9 @@ print(area(Square(2.0)))
 
 Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
-A `switch` cannot do this; neither can a chain of `if`/`isinstance()`.
+A `switch` in other languages cannot do this.
+An `if`/`isinstance()` chain can, but only if you remember to end it with `assert_never()`.
+A `match` makes the shape of the dispatch explicit.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) uses exactly this technique to add operations to a closed set of types without inheritance.
 `test_exhaustive_area()` tests the area of each shape:
 

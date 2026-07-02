@@ -2,12 +2,11 @@
 
 With languages like C++ and Java, containers are add-on libraries.
 In Python, the essential nature of containers is acknowledged by building them into the core of the language.
-Both lists and associative arrays (dictionaries and sets) are fundamental data types.
+Lists, dictionaries, and sets are fundamental data types.
 
 ## Lists and Iteration
 
-The `for` statement automatically iterates through lists rather than counting through a sequence of numbers.
-Python's `for` automatically uses an iterator that works through a sequence:
+The `for` statement iterates through a list directly rather than counting through a sequence of numbers:
 
 ```python
 # list.py
@@ -32,8 +31,8 @@ The first line creates a `list`.
 The `list` automatically resizes itself.
 The `for` statement iterates through `odds`, so `x` takes on each value in the `list`.
 
-There are no type declarations in this example;
-Python infers types from the way you use them.
+There are no type declarations in this example.
+Each object carries its own type.
 
 ## Lists and Slicing
 
@@ -148,8 +147,7 @@ Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absen
 
 ## Sets
 
-A set ensures only one of each item is contained in the set.
-It is an unordered collection of unique items.
+A set is an unordered collection of unique items.
 Like the `dict`, it has fast membership tests.
 Sets also provide the expected set algebra:
 

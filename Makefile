@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
 
 help:
 	@echo "Targets:"
@@ -46,6 +46,7 @@ help:
 	@echo "  reflow    - rewrite prose to one sentence per line (CH=02 for one chapter)"
 	@echo "  reflow-check - report which chapters would reflow, no write (CH=02 for one)"
 	@echo "  spell     - codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)"
+	@echo "  spell-add - accept every spellcheck-unknown word into tools/wordlist.txt, sorted (review the diff!)"
 	@echo "  prose     - house-style lint with Vale (CH=29 for one chapter; needs vale binary)"
 	@echo "  eol       - check tracked text files for CRLF (fails the ci gate)"
 	@echo "  fix-eol   - convert any CRLF in tracked text files to LF"
@@ -142,6 +143,13 @@ spell:
 	$(SPELL) $(PROSE_FILES)
 	$(PY) tools/prose_lint.py $(PROSE_FILES)
 	$(PY) tools/spellcheck.py $(PROSE_FILES)
+
+# Accept every word spellcheck.py doesn't recognize into tools/wordlist.txt
+# (sorted, deduplicated) instead of failing. It cannot tell a real term from
+# a typo, so always review the diff before committing; a real typo belongs
+# in the prose, not the wordlist.
+spell-add:
+	$(PY) tools/spellcheck.py $(PROSE_FILES) --add
 
 # House-style lint with Vale: no em-dashes and no filler phrases. Run one
 # chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.

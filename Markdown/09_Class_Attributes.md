@@ -9,8 +9,8 @@ It is easy to misread one as a per-object default value.
 It is not.
 A class attribute creates one shared variable across all instances of the class.
 If you then create an instance variable of the same name, that instance variable *shadows* the class attribute.
-This trips up programmers coming from C++ or Java,
-where storage for such a field is allocated per object before the constructor runs.
+In C++ or Java, storage for such a field is allocated per object before the constructor runs,
+which makes this behavior a surprise.
 
 Here's an example showing why it can be confusing:
 

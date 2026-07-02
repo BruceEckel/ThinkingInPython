@@ -247,7 +247,7 @@ Initially, the `next()` methods can appear a little strange because of this.
 The `StateT` class is an implementation of `State` (so that the same `StateMachine` class can be used from the previous example) that adds a `transitions` dict mapping each input to its next state.
 Its base-class `next()` looks the input up in that `dict`.
 Each subclass fills its own `transitions` lazily,
-the first time `next()` is called while `transitions` is still `None`,
+the first time `next()` is called while `transitions` is still empty,
 then delegates to the base `next()`:
 
 ```python
@@ -264,14 +264,14 @@ from state_machine import StateMachine
 
 class StateT(State):
     def __init__(self) -> None:
-        self.transitions: dict[Any, Any] | None = None
+        self.transitions: dict[Any, Any] = {}
     @override
     def next(self, event: object) -> State:
-        assert self.transitions is not None
         if event in self.transitions:
             return self.transitions[event]
         else:
-            raise Exception("Input not supported for current state")
+            raise RuntimeError(
+                "Input not supported for current state")
 
 class Waiting(StateT):
     @override

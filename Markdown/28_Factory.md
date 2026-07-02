@@ -117,8 +117,6 @@ each time `next()` is called on this generator object (which, as noted above, ma
 only the code in the `for` loop will be executed,
 so you don't have wasteful execution (as you would if this were an ordinary function).
 
-The `@staticmethod` decorator marks a method that takes no `self` and so can be called on the class itself.
-
 The code that you write is actually a kind of factory
 that creates the generator objects that do the actual generation.
 You can drive the generator by hand, for example:
@@ -176,14 +174,14 @@ def factory(kind: str) -> Shape:
         case _:
             raise ValueError(f"Bad shape creation: {kind}")
 
-def shape_name_gen(n: int) -> Iterator[Shape]:
+def shape_gen(n: int) -> Iterator[Shape]:
     for i in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 if __name__ == "__main__":
     random.seed(4)
     # Circle()  # Not defined outside factory()
-    for shape in shape_name_gen(4):
+    for shape in shape_gen(4):
         shape.draw()
         shape.erase()
 #: Circle.draw
