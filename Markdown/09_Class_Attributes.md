@@ -1,6 +1,6 @@
 # Class Attributes
 
-How class-level attributes behave surprises programmers coming from C++ or Java.
+Class-level attributes behave in ways that surprise programmers coming from C++ or Java.
 
 ## Class Attributes Are Not Default Values
 
@@ -55,7 +55,7 @@ print(vars(A)["x"])
 ```
 
 So a class attribute seems like a default until someone assigns to an instance variable of the same name.
-Changing the class attribute makes the "default" value of `x` seem different for every object that has not shadowed it.
+Changing the class attribute makes the "default" value seem different for every object that has not shadowed it.
 This produces bugs that surface far from their cause.
 
 When you genuinely want one shared value, say so with `ClassVar` from `typing`.

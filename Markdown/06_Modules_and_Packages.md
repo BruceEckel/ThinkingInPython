@@ -28,22 +28,21 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equal to the string `"__main__"`.
-In Python, any identifier that begins and ends with double underscores (commonly called "dunder") is special in some way.
-Methods named with double underscores are *special methods*,
+In Python, any identifier that begins and ends with double underscores (commonly called "dunder") is special in some way,
 and they hook your class into the language's operators and built-in functions.
 
 The reason for the `if` is that any file can also be used as a library module within another program.
 In that case, you only want its definitions,
 but you don't want the code at the bottom of the file to be executed.
 This particular `if` statement is only true when you are running this file directly.
-That is, `__name__` is `__main__` when you use the command line:
+That is, `__name__` is `"__main__"` when you use the command line:
 
 ```
 python use_module.py
 ```
 
 However, if `use_module.py` is imported as a module into another program,
-`__name__` will not be `__main__`, so its `__main__` code is not executed.
+`__name__` will not be `"__main__"`, so its `"__main__"` code is not executed.
 Here is such a program, which does nothing but import it:
 
 ```python
@@ -54,7 +53,7 @@ import use_module
 
 If you run `python import_module.py`, you should only see `'module' imported` displayed.
 Importing `use_module` runs its top-level code, including the `print()`,
-but not its `__main__` block.
+but not its `"__main__"` block.
 
 To bring a name into the current namespace, use the `from` keyword:
 
@@ -85,8 +84,8 @@ A package is a directory (and its own namespace, which has the name of that dire
 
 To make something a package,
 you put a special file named `__init__.py` in that directory.
-Except in special cases, this file is empty;
-it is only there to flag the directory as a package.^[People are often confused by the name `__init__.py`. In hindsight, it might have been better to have named the file `__package__.py`.]
+Typically, there's no executable code in `__init__.py`.
+It is only there to flag the directory as a package.^[People are often confused by the name `__init__.py`. In hindsight, it might have been better to have named the file `__package__.py`.]
 A directory without `__init__.py` can still be imported as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book always uses one.

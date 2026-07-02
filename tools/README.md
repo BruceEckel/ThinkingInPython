@@ -2,8 +2,7 @@
 
 Scripts that keep the book honest: extract every code example from the
 Markdown and run it, render the Markdown into a static HTML site, and gate
-both in CI. `PUBLISHING_PLAN.md` records the (now-complete) project history
-behind this tooling.
+both in CI.
 
 ## The idea
 

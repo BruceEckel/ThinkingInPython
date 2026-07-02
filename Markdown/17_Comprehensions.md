@@ -1,7 +1,7 @@
 # Comprehensions
 
 *Comprehensions* (first introduced in [Control Flow](04_Control_Flow.md#comprehensions))
-build one sequence from another in a single expression.
+build one collection from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and was incorporated into functional programming.
 Haskell had list comprehensions, and Python borrowed them.
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 ```
 
 `map()` applies a function to each member.
-We reuse the `ints` from `filtering.py`:
+We reuse `ints` from `filtering.py`:
 
 ```python
 # mapping.py
@@ -92,7 +92,7 @@ print(list(map(lambda e: e ** 2,
 The nested form funnels every element through `lambda` calls, and is harder to read.
 The comprehension inlines the test and the expression.
 
-The list comprehension is enclosed within list brackets,
+The list comprehension is enclosed within list brackets (`[]`),
 so it is immediately evident that a list is being produced.
 There is only one function call to `isinstance()` and no call to the cryptic `lambda`.
 Instead, the list comprehension uses a conventional iterator,

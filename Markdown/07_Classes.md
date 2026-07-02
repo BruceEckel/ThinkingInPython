@@ -39,14 +39,19 @@ x.show_twice()
 
 Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first parameter.
-Traditionally, the reference is called `self` but you can use any identifier you want (if you do not use `self` you will probably confuse people).
+Traditionally, the reference is called `self` but you can use any identifier
+(however, anything other than `self` will probably confuse people).
 To refer to fields in the object or other methods in the object,
 you must use `self` in the expression.
 
 When you call a method for an object, as in `x.show()`, the object reference is passed automatically.
 
-The first method, `__init__()`,
-defines the constructor; the double underscores (a.k.a. "dunder") indicate a special name.
+The first method, `__init__()`, is the *initializer*.
+The double underscores (a.k.a. "dunder") indicate a special name.
+The `__new__()` method is the *constructor*, but we hardly ever use that.
+It has become common practice to call `__init__()` the constructor, as it is called the same way as constructors in other OOP languages.
+We follow that practice in this book.
+
 The constructor is automatically called during object creation.
 At the bottom of the example you can see that the creation of an object looks like a function call, but using the class name.
 
@@ -135,7 +140,8 @@ x.show_twice()  # Inherited from Simple
 #: Simple2 constructor argument
 #: Overridden show() method
 #: Simple2 constructor argument
-def f(obj): obj.show()  # Any object with a show()
+def f(obj):  # Works on any obj with a show()
+    obj.show()
 f(x)
 #: Overridden show() method
 #: Simple2 constructor argument

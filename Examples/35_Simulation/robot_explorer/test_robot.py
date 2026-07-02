@@ -38,7 +38,7 @@ def test_solution_walks_the_robot_to_the_end() -> None:
 def test_walls_block_and_food_is_eaten() -> None:
     game = GameBuilder("R.#")  # Robot, food, wall in one row
     start = game.robot.room
-    game.run("e")  # east: eat the food and move in
+    game.run("e")  # East: eat the food and move in
     assert "." not in game.show_maze()  # Food gone
     assert game.robot.room is not start
     blocked = game.robot.room

@@ -10,8 +10,7 @@ On a large program, type errors that C++ or Java would catch now appear only whe
 Sometimes the error waits until a bug report.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
-However, the Python runtime does not care if your type hints are logically correct as long as they are structurally and syntactically valid.
-The runtime ignores properly formed type hints,
+The Python runtime ignores properly formed type hints,
 so if you want the equivalent of a compiler in a typed language you must run an additional type checking tool (this book uses Astral's `ty`).
 
 You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
@@ -95,16 +94,22 @@ The goal is to discover mistakes before the program runs.
 Consider:
 
 ```python
+# area.py
 def area(width: int, height: int) -> int:
     return width * height
 
-area("3", 4)   # ty: argument of type "str" is not assignable to "int"
+# ty: argument of type "str" is not assignable to "int":
+print(area("3", 4))  # type: ignore
+#: 3333
 ```
 
 At runtime `area("3", 4)` does not cause an error.
 It returns `"3333"`, because `"3" * 4` is the correct syntax for string repetition.
 The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
+
+The `# type: ignore` comment tells the type checker to skip this line,
+which allows the build to complete successfully.
 
 ## Structural Typing with Protocols
 

@@ -5,12 +5,6 @@ If an issue has a suggested fix you need me to review, put a checkbox next to it
 If I check the box, I will later have you go through ISSUES.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
-# rats_and_mazes/rat.py
-class Directions2(Enum):
-    SOUTH = (0, 1)
-    NORTH = (0, -1)
-    WEST = (-1, 0)
-    EAST = (1, 0)
 
 
 Note we can have race conditions with both asynch and parallelism
