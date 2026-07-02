@@ -1,9 +1,26 @@
 Thinking in Python
 ==================
 
-> For the book examples, clone this directory.
+## Setup
 
-> To test the examples, follow [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md).
+1. Clone this repository.
+2. You need a `make` command. This is preinstalled on Linux and macOS
+   (macOS: install Xcode Command Line Tools if it's missing).
+   For Windows: `winget install ezwinports.make`
+3. Install [uv](https://docs.astral.sh/uv/).
+4. Run `uv sync` once. This creates `.venv` and installs the pinned
+   Python (3.14+) and dev tools automatically. No manual Python install is needed.
+
+Type `make` to see the options.
+
+`make site`, `make local`, and `make serve` also need `pandoc` on PATH;
+`make prose` needs the standalone `vale` binary. See
+[tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
+for details and install links.
+
+---
+
+## History
 
 I started this book in 2008 and after a few years it kind of drifted to a stop. I think part of the
 problem was that I wanted to move the design patterns work I had done in Java into Python and
