@@ -1,9 +1,9 @@
 # Book tooling
 
-Scripts that keep the book honest. They implement tasks **P1-1** (extract every
-code example from the Markdown, run it, report failures), **P1-2** (render the
-Markdown into a static HTML site), and **P1-3** (the CI gate that ties them
-together) in `PUBLISHING_PLAN.md`.
+Scripts that keep the book honest: extract every code example from the
+Markdown and run it, render the Markdown into a static HTML site, and gate
+both in CI. `PUBLISHING_PLAN.md` records the (now-complete) project history
+behind this tooling.
 
 ## The idea
 
@@ -52,8 +52,8 @@ winget install ezwinports.make
 
 Restart the terminal to refresh the PATH, then run `make --version` to confirm.
 
-With `make` (targets run through `uv run`); `make help` lists them all, most-used
-first:
+Run targets with `make` (they go through `uv run`); `make help` lists them all,
+most-used first:
 
 ```
 make verify     # sync Examples/, then every gate except the site build
@@ -106,6 +106,39 @@ make check-tools        # uv, ty, ruff, pytest (make/git checked, assumed)
 make check-tools-full   # the above, plus pandoc and vale
 ```
 
+## upgrade_tools.py
+
+Updates the project's tools to their latest versions. `uv self update`
+updates uv itself (a no-op with its own message if uv was installed via
+pipx, Homebrew, or winget rather than its standalone installer). `uv lock
+--upgrade` then `uv sync` upgrade every uv-managed dev tool (`ty`, `ruff`,
+`pytest`, `codespell`, ...) to the latest version `pyproject.toml` allows,
+rewriting `uv.lock`; review `git diff uv.lock` before committing. `pandoc`
+and `vale` are standalone binaries uv does not manage, so this is
+best-effort: it tries winget (Windows) or Homebrew, whichever is on PATH,
+and falls back to printing the install link if neither works. `make` and
+`git` are left alone, same as `check_tools.py`. For the pinned Python
+version itself, use `upgrade_python.py` below instead.
+
+```
+make upgrade-tools   # update uv, ty/ruff/pytest/..., and (best-effort) pandoc/vale
+```
+
+## upgrade_python.py
+
+Upgrades the pinned development Python and resyncs the environment. With no
+argument, `make upgrade-python` fetches the latest patch of the minor pinned
+in `.python-version` (e.g. the newest 3.14.x). With `TO=3.15`, it first
+repins: rewrites `.python-version` and the `requires-python` floor in
+`pyproject.toml`, then syncs. Either way it finishes by running `make
+verify`. It runs through `uv run --no-project` so the orchestrating
+interpreter is never the venv that `uv sync` is about to rebuild.
+
+```
+make upgrade-python           # latest patch of the pinned minor, then verify
+make upgrade-python TO=3.15   # repin to a new minor, then verify
+```
+
 ## extract_examples.py
 
 Default mode is **check**: nothing is written. It reports
@@ -142,15 +175,16 @@ them two ways:
 * an inline `# extract: no-run` line in the file, or
 * a glob pattern in `tools/norun.txt`.
 
-Only skip examples that cannot run even when correct. Examples that fail today
-because of Python 2 syntax are **Phase 2 fixes** and should stay visible as
-failures, not be skipped.
+Only skip examples that cannot run even when correct, such as ones needing a
+GUI or user input. A newly broken example should stay visible as a failure,
+not be skipped.
 
 ### Regression baseline
 
-Most examples fail today (Phase 2 backlog), so a runner that is red on every
-one of them gates nothing. `tools/examples_baseline.txt` records the set of
-currently-failing examples. Two modes use it:
+Most examples failed during the Phase 2 modernization, so a runner that was
+red on every one of them would have gated nothing.
+`tools/examples_baseline.txt` records the set of then-failing examples. Two
+modes use it:
 
 ```
 python tools/run_examples.py --baseline        # fail only on NEW breakage
@@ -210,8 +244,8 @@ unusual typo that is not on its list ("fixted" for "fixed"); for that there is
 the full-dictionary check below. Configuration lives in `[tool.codespell]` in
 `pyproject.toml`; words it flags wrongly (design-pattern terms like `adaptee`,
 foreign-language quotes, deliberate code strings) are listed in
-`tools/codespell-ignore.txt`. Scope it with `DOCS=`, for example
-`make spell DOCS=Markdown/02_Tour.md`.
+`tools/codespell-ignore.txt`. Scope it with `CH=`, for example
+`make spell CH=02`.
 
 **Full-dictionary spelling: spellcheck.py (`make spell`).** Where codespell
 knows only a curated list, `tools/spellcheck.py` (using the uv-managed
@@ -222,7 +256,10 @@ flood it. Accepted terms (technical words, names, coined words) live in
 `tools/wordlist.txt`, one lowercase word per line. When it flags a real term,
 add it there; when it flags a typo, fix the prose. Use
 `uv run python tools/spellcheck.py --summary` to see the unique unknowns by
-count, which makes seeding the word list quick.
+count, which makes seeding the word list quick. `make spell-add` automates the
+"add it there" step: it accepts every unknown word into the wordlist, sorted
+and deduplicated. It cannot tell a real term from a typo, so always review
+`git diff tools/wordlist.txt` before committing.
 
 **Mechanical prose: prose_lint (`make spell`).** `tools/prose_lint.py` runs
 alongside codespell and catches small mechanical slips a spell checker ignores:
@@ -460,14 +497,3 @@ Day to day:
 4. Only when you want CI to re-check the suite itself (an environment-specific
    change, say, or a release) request the gates: add `[full-ci]` to the push
    commit message, or trigger the workflow manually as shown above.
-
-## Current baseline
-
-The first full run establishes the modernization backlog for Phase 2, captured
-in `tools/examples_baseline.txt`: 55 examples pass, 67 fail or time out. The
-failures are overwhelmingly Python 2 syntax (`print` statements, `has_key`),
-Java leftovers (`0.75f` float literals, dangling `+` line continuations), and
-Python 2 implicit relative imports (`from State import ...`). Each is a Phase 2
-work item. Drift the checker found between the book and `Examples/`:
-`Py4Prog/using_from.py` (tagged twice with different content),
-`InitializationAndCleanup/cleanup.py`, and `InitializationAndCleanup/weakref.py`.
