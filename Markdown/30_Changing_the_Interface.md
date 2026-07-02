@@ -80,7 +80,7 @@ what_i_use.op(what_i_have2)
 what_i_use.op(what_i_have3.what_i_want())
 ```
 
-This takes liberty with the term "proxy",
+This takes liberty with the term "proxy,"
 because in *GoF Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
 
 ### Adapter in Python

@@ -1,5 +1,6 @@
 # rats_and_mazes/rat.py
 import asyncio
+from dataclasses import dataclass, field
 from typing import Final, Protocol
 
 # South, north, west, east
@@ -12,13 +13,17 @@ class Recorder(Protocol):
     def log(self, message: str) -> None: ...
     def next_number(self) -> int: ...
 
+@dataclass
 class Rat:
-    def __init__(self, blackboard: Recorder, x: int, y: int) -> None:
-        self.blackboard = blackboard
-        self.x = x
-        self.y = y
-        self.number = blackboard.next_number()
-        blackboard.log(f"Rat {self.number} starts at {(x, y)}.")
+    blackboard: Recorder
+    x: int
+    y: int
+    number: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.number = self.blackboard.next_number()
+        self.blackboard.log(
+            f"Rat {self.number} starts at {(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:

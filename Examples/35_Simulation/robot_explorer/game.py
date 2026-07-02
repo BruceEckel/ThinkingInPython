@@ -1,5 +1,5 @@
 # robot_explorer/game.py
-# The Builder pattern: build the maze in stages, then run it.
+# Build the maze in three stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Coord, Room
@@ -113,6 +113,8 @@ print(game.show_maze())
 #: #.#___________#___#____.__#___#
 #: ###############################
 game.run(solution)
+if game.robot.finished:
+    print("Game over!")
 print("\nfinal:")
 print(game.show_maze())
 #: Game over!

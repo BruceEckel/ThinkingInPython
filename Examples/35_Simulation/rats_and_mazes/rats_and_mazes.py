@@ -1,6 +1,4 @@
 # rats_and_mazes/rats_and_mazes.py
-# Turn a pack of rats loose on the maze and print what they mapped.
-
 import asyncio
 from blackboard import Blackboard
 from maze import Maze

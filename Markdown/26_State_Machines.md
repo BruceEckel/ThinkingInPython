@@ -670,7 +670,7 @@ Because the actions set `vm.message` instead of printing,
 the model never draws anything, and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 
-Using 'tkinter' we can create a GUI representation of the vending maching.
+Using 'tkinter' we can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock,
 and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,

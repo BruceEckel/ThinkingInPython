@@ -1,18 +1,18 @@
 # robot_explorer/items.py
-from enum import Enum
-from typing import TYPE_CHECKING, override
+from enum import Enum, auto
+from typing import TYPE_CHECKING, ClassVar, override
 
 if TYPE_CHECKING:
     from world import Room
 
 class Urge(Enum):
-    NORTH = 1
-    SOUTH = 2
-    EAST = 3
-    WEST = 4
+    NORTH = auto()
+    SOUTH = auto()
+    EAST = auto()
+    WEST = auto()
 
 class Item:
-    symbol = ""
+    symbol: ClassVar[str] = ""
 
     def interact(self, robot: Robot, room: Room) -> Room:
         return room  # Default: the robot enters the room
@@ -22,12 +22,12 @@ class Item:
 
 class Robot(Item):
     symbol = "R"
+    room: Room  # Set by the builder when the robot is placed
 
     def __init__(self) -> None:
-        self.room: Room | None = None
+        self.finished = False  # Set when the robot reaches the end
 
     def move(self, urge: Urge) -> None:
-        assert self.room is not None
         self.room = self.room.doors.open(urge).enter(self)
 
 class Wall(Item):
@@ -35,7 +35,6 @@ class Wall(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert robot.room is not None
         return robot.room  # Cannot pass: stay put
 
 class Food(Item):
@@ -48,14 +47,13 @@ class Food(Item):
 
 class Teleport(Item):
     symbol = ""  # Set per target letter
+    target_room: Room  # Paired up by the builder
 
     def __init__(self, target: str) -> None:
         self.target = target
-        self.target_room: Room | None = None
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert self.target_room is not None
         return self.target_room
 
     @override
@@ -74,7 +72,6 @@ class Edge(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert robot.room is not None
         return robot.room  # The void outside the maze: stay put
 
 class EndGame(Item):
@@ -82,7 +79,7 @@ class EndGame(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        print("Game over!")
+        robot.finished = True  # Recorded, not printed
         return room
 
 def item_factory(symbol: str) -> Item:

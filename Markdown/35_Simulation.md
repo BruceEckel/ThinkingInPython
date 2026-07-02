@@ -1,13 +1,13 @@
 # Simulation
 
-A simulation models a system as a set of objects that act on their own and interact through shared state.
+A simulation models a set of objects that act on their own and interact through shared state.
 This chapter works one example from end to end: a pack of rats mapping a maze.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 
 ## Rats & Mazes
 
-The problem has three objects.
+The problem has three types.
 
 A *maze* knows its own layout and little else.
 Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
@@ -15,8 +15,8 @@ and it can hand out an entry point.
 The maze never decides anything.
 It only answers questions.
 
-A *blackboard* is the shared surface every rat writes to.
-The blackboard is a classic coordination idea:
+A *blackboard* is the shared surface every rat writes on.
+The blackboard is a classic coordination technique:
 independent agents read from and write to one common data structure instead of talking to each other directly.
 Here the blackboard owns the maze, records which cells have been explored,
 hands out rat numbers, and launches new rats.
@@ -38,13 +38,14 @@ When the last rat dies, the maze is fully mapped.
 The rat does not import the blackboard.
 It only needs an object with the right methods,
 so a `Protocol` describes what it expects.
-This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 
 ```python
 # rats_and_mazes/rat.py
 import asyncio
+from dataclasses import dataclass, field
 from typing import Final, Protocol
 
 # South, north, west, east
@@ -57,13 +58,17 @@ class Recorder(Protocol):
     def log(self, message: str) -> None: ...
     def next_number(self) -> int: ...
 
+@dataclass
 class Rat:
-    def __init__(self, blackboard: Recorder, x: int, y: int) -> None:
-        self.blackboard = blackboard
-        self.x = x
-        self.y = y
-        self.number = blackboard.next_number()
-        blackboard.log(f"Rat {self.number} starts at {(x, y)}.")
+    blackboard: Recorder
+    x: int
+    y: int
+    number: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.number = self.blackboard.next_number()
+        self.blackboard.log(
+            f"Rat {self.number} starts at {(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:
@@ -81,6 +86,12 @@ class Rat:
             self.x, self.y = moves[0]
             await asyncio.sleep(0)  # Yield so sibling rats can run
 ```
+`number` must be initialized by calling `blackboard.next_number()`,
+a side-effecting method, not a static default.
+Marking it `field(init=False)` leaves it out of the generated `__init__`,
+and `__post_init__` runs right after that `__init__` finishes,
+so it can fill in `number` and log the rat's start, once `blackboard`, `x`,
+and `y` already hold their values.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -88,21 +99,22 @@ Out-of-bounds coordinates count as walls, so the rats stay inside.
 
 ```python
 # rats_and_mazes/maze.py
-# Reads a maze layout and reports walls, openings, and an entry point.
-
+from enum import StrEnum
 from pathlib import Path
-from typing import Final, Self
+from typing import Self
 
 type Coord = tuple[int, int]   # (column, row)
 
 class Maze:
-    WALL: Final[str] = "*"
-    OPEN: Final[str] = " "
+    class Cell(StrEnum):
+        WALL = "*"
+        OPEN = " "
 
     def __init__(self, rows: list[str]) -> None:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
-        self.rows = [r.ljust(self.width, self.WALL) for r in rows]
+        self.rows = [
+            r.ljust(self.width, self.Cell.WALL) for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
@@ -117,7 +129,7 @@ class Maze:
 
     def is_open(self, x: int, y: int) -> bool:
         return (0 <= y < self.height and 0 <= x < self.width
-                and self.rows[y][x] == self.OPEN)
+                and self.rows[y][x] == self.Cell.OPEN)
 
     def entry(self) -> Coord:
         for y in range(self.height):
@@ -127,12 +139,19 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
+`Cell` is nested in `Maze` because it only names concepts `Maze` uses,
+and it is a `StrEnum` rather than a plain `Enum` so its members keep
+acting like real strings.
+`WALL` still works as the fill character for `ljust()`,
+and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
+because a `StrEnum` member *is* its string value.
+
 The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a cell is handed to exactly one rat even when several reach it.
 `explore()` claims the entry, releases the first rat, then awaits every task,
-including the ones spawned along the way.
+including the ones spawned along the way:
 
 ```python
 # rats_and_mazes/blackboard.py
@@ -216,8 +235,6 @@ Running it turns the rats loose and prints what they mapped.
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
-# Turn a pack of rats loose on the maze and print what they mapped.
-
 import asyncio
 from blackboard import Blackboard
 from maze import Maze
@@ -254,7 +271,7 @@ asyncio.run(main())
 Because claiming is atomic,
 the rats always cover every cell reachable from the entry,
 no matter how the tasks interleave.
-Testing pins that down by comparing the cells the rats visited against a plain flood fill of the same maze.
+Testing verifies this by comparing the cells the rats visited against a plain flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -291,13 +308,12 @@ def test_rats_map_every_reachable_cell() -> None:
     assert blackboard.visited == flood(maze, maze.entry())
 ```
 
-The same model drives a view.
+We can create a GUI demonstration using the same model.
 `rats_view.py` runs the exploration to completion,
 records the order the cells were claimed,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green in turn,
-so you watch the pack flood the maze from the entry outward.
-It only draws, so the harness skips it (`tools/norun.txt`):
+so you watch the pack move through the maze from the entry outward:
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -367,9 +383,9 @@ Concurrency is one way to build a simulation.
 Object-oriented design is another.
 This second example, adapted from my *Atomic Kotlin* book,
 walks a single robot through a maze.
-Its lesson is how polymorphism removes conditionals:
-a `Room` asks its occupant what to do,
-and each kind of occupant answers for itself.
+It shows how polymorphism removes conditionals.
+A `Room` asks its occupant what to do,
+and each type of occupant answers for itself.
 
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
@@ -380,20 +396,20 @@ There is no `if` or `elif` on the type of occupant anywhere:
 
 ```python
 # robot_explorer/items.py
-from enum import Enum
-from typing import TYPE_CHECKING, override
+from enum import Enum, auto
+from typing import TYPE_CHECKING, ClassVar, override
 
 if TYPE_CHECKING:
     from world import Room
 
 class Urge(Enum):
-    NORTH = 1
-    SOUTH = 2
-    EAST = 3
-    WEST = 4
+    NORTH = auto()
+    SOUTH = auto()
+    EAST = auto()
+    WEST = auto()
 
 class Item:
-    symbol = ""
+    symbol: ClassVar[str] = ""
 
     def interact(self, robot: Robot, room: Room) -> Room:
         return room  # Default: the robot enters the room
@@ -403,12 +419,12 @@ class Item:
 
 class Robot(Item):
     symbol = "R"
+    room: Room  # Set by the builder when the robot is placed
 
     def __init__(self) -> None:
-        self.room: Room | None = None
+        self.finished = False  # Set when the robot reaches the end
 
     def move(self, urge: Urge) -> None:
-        assert self.room is not None
         self.room = self.room.doors.open(urge).enter(self)
 
 class Wall(Item):
@@ -416,7 +432,6 @@ class Wall(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert robot.room is not None
         return robot.room  # Cannot pass: stay put
 
 class Food(Item):
@@ -429,14 +444,13 @@ class Food(Item):
 
 class Teleport(Item):
     symbol = ""  # Set per target letter
+    target_room: Room  # Paired up by the builder
 
     def __init__(self, target: str) -> None:
         self.target = target
-        self.target_room: Room | None = None
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert self.target_room is not None
         return self.target_room
 
     @override
@@ -455,7 +469,6 @@ class Edge(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        assert robot.room is not None
         return robot.room  # The void outside the maze: stay put
 
 class EndGame(Item):
@@ -463,7 +476,7 @@ class EndGame(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        print("Game over!")
+        robot.finished = True  # Recorded, not printed
         return room
 
 def item_factory(symbol: str) -> Item:
@@ -472,6 +485,27 @@ def item_factory(symbol: str) -> Item:
             return item_type()
     return Teleport(symbol)  # Anything else is a teleport target
 ```
+
+`world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
+so a plain `from world import Room` here would be circular.
+`if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
+and no cycle forms.
+It is `True` only for a type checker reading the file,
+which is all `Room` is needed for: every use below is an annotation
+(`room: Room`, `-> Room`), never a runtime lookup.
+
+`Robot` holds its two pieces of state in different ways.
+`finished` is assigned in `__init__`, so each robot owns its own flag
+from the start.
+`room` is only declared, written as `room: Room` with no value.
+That line stores nothing, not even `None`.
+It is a declaration, not a placeholder.
+It promises the type checker that a `Room` will be there,
+which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
+The attribute does not exist until then, so reading it earlier would
+raise `AttributeError`, and the builder runs first so that never happens.
+Declaring it this way keeps the type `Room` instead of `Room | None`,
+so no code that reads `room` has to check for `None`.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
@@ -505,40 +539,35 @@ class Room:
 
 class Doors:
     def __init__(self) -> None:
-        self.north: Room | None = None
-        self.south: Room | None = None
-        self.east: Room | None = None
-        self.west: Room | None = None
+        self.neighbors: dict[Urge, Room] = {}
 
     def connect(self, row: int, col: int,
                 rooms: dict[Coord, Room]) -> None:
-        self.north = rooms.get((row - 1, col))
-        self.south = rooms.get((row + 1, col))
-        self.east = rooms.get((row, col + 1))
-        self.west = rooms.get((row, col - 1))
+        for urge, coord in {
+            Urge.NORTH: (row - 1, col),
+            Urge.SOUTH: (row + 1, col),
+            Urge.EAST: (row, col + 1),
+            Urge.WEST: (row, col - 1),
+        }.items():
+            if coord in rooms:
+                self.neighbors[urge] = rooms[coord]
 
     def open(self, urge: Urge) -> Room:
-        neighbor = {
-            Urge.NORTH: self.north,
-            Urge.SOUTH: self.south,
-            Urge.EAST: self.east,
-            Urge.WEST: self.west,
-        }[urge]
-        return neighbor if neighbor is not None else EDGE
+        return self.neighbors.get(urge, EDGE)
 
 # Created once both classes exist; its own doors stay unset
 EDGE: Final[Room] = Room(Edge())
 ```
 
-`GameBuilder` assembles the maze in stages: a room for every character,
-then the connections between rooms, then the teleport pairs.
-Building in stages, instead of in one tangled constructor,
-is the *Builder* pattern.
+`GameBuilder` assembles the maze in three stages: a room for every
+character, then the connections between rooms, then the teleport pairs.
+Each stage depends on the one before it, so splitting them into labeled
+passes keeps the construction readable instead of tangling it into one loop.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
 # robot_explorer/game.py
-# The Builder pattern: build the maze in stages, then run it.
+# Build the maze in three stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Coord, Room
@@ -652,6 +681,8 @@ print(game.show_maze())
 #: #.#___________#___#____.__#___#
 #: ###############################
 game.run(solution)
+if game.robot.finished:
+    print("Game over!")
 print("\nfinal:")
 print(game.show_maze())
 #: Game over!
@@ -724,8 +755,8 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
     room = game.robot.room
-    assert room is not None
     assert isinstance(room.occupant, EndGame)  # Finished on the "!"
+    assert game.robot.finished  # And the model recorded it
     assert game.show_maze() == FINISHED  # Food eaten, robot moved
 
 def test_walls_block_and_food_is_eaten() -> None:
@@ -743,8 +774,6 @@ That same model drives a graphical view.
 `maze_view.py` imports the maze and the moves, draws each room as a colored cell,
 and steps the robot along the solution on a timer.
 The view is the only part that touches the screen.
-Run it to watch the walk; it opens a window,
-so the example harness skips it (listed in `tools/norun.txt`):
 
 ```python
 # robot_explorer/maze_view.py

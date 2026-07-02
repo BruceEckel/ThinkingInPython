@@ -72,12 +72,18 @@ It runs once per subclass, right after that subclass is created, so each one can
 Each subclass's `value = ...` line creates its own class attribute, separate from `Trash.value`.
 The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance; it doesn't share storage across subclasses.
 
+None of the subclasses redeclare `value: ClassVar[float]`.
+They don't need to because the checker resolves `value` through the MRO and finds it already declared `ClassVar[float]` on `Trash`.
+It treats each subclass's assignment as filling in that same classvar rather than introducing a new one.
+
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` can build it.
 `sum_value()` is an ordinary function:
 it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
-These tests confirm each subclass registers itself, `create()` builds one by name, the per-pound values are right, and `sum_value()` totals weight times value:
+We test that each subclass registers itself,
+`create()` builds one by name, the per-pound values are right,
+and `sum_value()` totals weight times value:
 
 ```python
 # test_trash.py
@@ -177,7 +183,7 @@ Glass:3.0
 
 ## The First Cut: Checking Every Type
 
-The most obvious way to sort is to look at each piece and test what it is using `isinstance()`:
+The most obvious way to sort is to look at each piece and discover its type using `match`:
 
 ```python
 # recycle_rtti.py
@@ -187,14 +193,15 @@ from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
 bins: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in parse("trash.dat"):
-    if isinstance(t, Aluminum):
-        bins[Aluminum].append(t)
-    elif isinstance(t, Paper):
-        bins[Paper].append(t)
-    elif isinstance(t, Glass):
-        bins[Glass].append(t)
-    elif isinstance(t, Cardboard):
-        bins[Cardboard].append(t)
+    match t:
+        case Aluminum():
+            bins[Aluminum].append(t)
+        case Paper():
+            bins[Paper].append(t)
+        case Glass():
+            bins[Glass].append(t)
+        case Cardboard():
+            bins[Cardboard].append(t)
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
@@ -233,14 +240,14 @@ for kind, items in bins.items():
 This satisfies the requirement, but it has a classic flaw:
 it tests for *every type in the system*.
 When cardboard becomes valuable and you add it,
-you must hunt down this chain of `isinstance()` checks,
-and any you miss will silently drop trash on the floor.
+you must find any `case` statements that look for specific types.
+Any you miss will silently drop trash on the floor.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
 
 ## Let a Dictionary Do the Sorting
 
-Group the pieces in a dictionary keyed by their own type:
+We can use a dictionary keyed by type:
 
 ```python
 # recycle_dict.py
@@ -249,8 +256,10 @@ from parse_trash import parse
 from trash import Trash, sum_value
 
 bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+
 for t in parse("trash.dat"):
-    bins[type(t)].append(t)  # Bin chosen by the piece itself
+    bins[type(t)].append(t)  # Bin chosen by the trash piece
+
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
@@ -286,9 +295,9 @@ for kind, items in bins.items():
 #: Total value = 120.08
 ```
 
-`type(t)` is the perfect key: it adapts to whatever types show up,
+`type(t)` is the perfect key because it adapts to new types,
 even ones added at runtime.
-There is no chain to maintain and nothing to forget.
+There is nothing to maintain or forget.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
@@ -297,18 +306,17 @@ The other axis of change is adding new *operations*.
 Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
 
-This is exactly the problem the *Visitor* pattern was invented for.
+This is exactly the problem that [Visitor](33_Visitor.md) solves.
 Visitor is elaborate:
 a `Visitor` base class with one `visit()` overload per material,
 an `accept()` method added to every element,
-and "double dispatch" to route each piece to the right `visit()`.
+and *double dispatch* to route each piece to the right `visit()`.
 It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
-Python has neither limitation;
-the standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
+Python has neither limitation.
+The standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
 with new types registered from anywhere.
 
-So you do not write Visitor in Python.
-You write a single-dispatch function:
+In Python, *Visitor* is implemented with a single-dispatch function:
 
 ```python
 # visitor_singledispatch.py
@@ -344,8 +352,7 @@ for t in parse("trash.dat"):
 ```
 
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
-`Paper` has no registered note, so it falls through to the base function:
-the default behavior, for free.
+`Paper` has no registered note, so it falls through to the base function and performs the default behavior.
 Adding a `price()` or `weight` operation means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.
@@ -363,9 +370,9 @@ For operations that belong on the objects and vary by type,
 
 ## Summary
 
-Design patterns are about *separating what changes from what stays the same*.
+Design patterns are about *separating things that change from things that stay the same*.
 Polymorphism is one way to do that, but it is not the only one.
-The deeper skill is spotting the "vector of change" in a problem (here, new types versus new operations) and choosing the lightest construct that isolates it.
+The deeper skill is spotting the *vector of change* in a problem (here, new types versus new operations) and choosing the lightest construct that isolates it.
 In Python that construct is often a language feature, not a multi-class pattern.
 The honest measure of a pattern is whether it still earns its keep once the language does part of the work for you.
 

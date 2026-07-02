@@ -66,7 +66,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 31_Observer.md                  |X| |
 | 32_Multiple_Dispatching.md      |X| |
 | 33_Visitor.md                   |X| |
-| 34_Pattern_Refactoring.md       | | |
+| 34_Pattern_Refactoring.md       |X| |
 | 35_Simulation.md                | | |
 | 36_Functional_Programming.md    | | |
 | A_Pattern_Catalog.md            |X| |

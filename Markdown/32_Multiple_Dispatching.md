@@ -2,7 +2,7 @@
 
 Dealing with multiple interacting types can get messy.
 Consider a system that parses and executes mathematical expressions.
-You want to  say `Number + Number`, `Number * Number`, etc.,
+You want to say `Number + Number`, `Number * Number`, etc.,
 where `Number` is the base class for a family of numerical objects.
 But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,

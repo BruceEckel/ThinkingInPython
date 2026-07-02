@@ -17,26 +17,21 @@ class Room:
 
 class Doors:
     def __init__(self) -> None:
-        self.north: Room | None = None
-        self.south: Room | None = None
-        self.east: Room | None = None
-        self.west: Room | None = None
+        self.neighbors: dict[Urge, Room] = {}
 
     def connect(self, row: int, col: int,
                 rooms: dict[Coord, Room]) -> None:
-        self.north = rooms.get((row - 1, col))
-        self.south = rooms.get((row + 1, col))
-        self.east = rooms.get((row, col + 1))
-        self.west = rooms.get((row, col - 1))
+        for urge, coord in {
+            Urge.NORTH: (row - 1, col),
+            Urge.SOUTH: (row + 1, col),
+            Urge.EAST: (row, col + 1),
+            Urge.WEST: (row, col - 1),
+        }.items():
+            if coord in rooms:
+                self.neighbors[urge] = rooms[coord]
 
     def open(self, urge: Urge) -> Room:
-        neighbor = {
-            Urge.NORTH: self.north,
-            Urge.SOUTH: self.south,
-            Urge.EAST: self.east,
-            Urge.WEST: self.west,
-        }[urge]
-        return neighbor if neighbor is not None else EDGE
+        return self.neighbors.get(urge, EDGE)
 
 # Created once both classes exist; its own doors stay unset
 EDGE: Final[Room] = Room(Edge())

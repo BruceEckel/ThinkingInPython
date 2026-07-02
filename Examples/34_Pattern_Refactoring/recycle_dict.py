@@ -4,8 +4,10 @@ from parse_trash import parse
 from trash import Trash, sum_value
 
 bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+
 for t in parse("trash.dat"):
-    bins[type(t)].append(t)  # Bin chosen by the piece itself
+    bins[type(t)].append(t)  # Bin chosen by the trash piece
+
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)

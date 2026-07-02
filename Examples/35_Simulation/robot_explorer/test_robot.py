@@ -31,8 +31,8 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
     room = game.robot.room
-    assert room is not None
     assert isinstance(room.occupant, EndGame)  # Finished on the "!"
+    assert game.robot.finished  # And the model recorded it
     assert game.show_maze() == FINISHED  # Food eaten, robot moved
 
 def test_walls_block_and_food_is_eaten() -> None:

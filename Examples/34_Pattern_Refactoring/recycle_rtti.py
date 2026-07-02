@@ -5,14 +5,15 @@ from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
 
 bins: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in parse("trash.dat"):
-    if isinstance(t, Aluminum):
-        bins[Aluminum].append(t)
-    elif isinstance(t, Paper):
-        bins[Paper].append(t)
-    elif isinstance(t, Glass):
-        bins[Glass].append(t)
-    elif isinstance(t, Cardboard):
-        bins[Cardboard].append(t)
+    match t:
+        case Aluminum():
+            bins[Aluminum].append(t)
+        case Paper():
+            bins[Paper].append(t)
+        case Glass():
+            bins[Glass].append(t)
+        case Cardboard():
+            bins[Cardboard].append(t)
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)

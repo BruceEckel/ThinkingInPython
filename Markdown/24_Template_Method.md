@@ -18,7 +18,7 @@ and you never call that sequence yourself.
 
 The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class.
 Subclasses complete the individual steps.
-The `@final` decorator from `typing`  locks the template method so a subclass cannot change the overall flow
+The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
 (see [Making a Class Final](18_Metaprogramming.md#making-a-class-final)).
 Here, `run()` is marked with `@final` so the checker rejects any subclass that overrides it,
 while leaving the step methods open:
@@ -139,8 +139,6 @@ If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 This is the same trade-off seen in [Function Objects](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
 a hook that holds no state is usually better as a function than as a method to override.
-
-
 
 ## Exercises
 

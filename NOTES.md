@@ -5,6 +5,8 @@ If an issue has a suggested fix you need me to review, put some kind of checkbox
 If I check the box, I will later have you go through ISSUES.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
+Note we can have race conditions with both asynch and parallelism
+
 Are there any other design patterns (see Appendix A) that should be included in the book?
 
 On website: Chapter TOC floating on the left or below the "contents" link.

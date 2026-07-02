@@ -387,7 +387,7 @@ etc. it will automatically create the appropriate version of that item for the G
 Thus you're able to isolate, in one place,
 the effect of changing from one GUI to another.
 
-As another example, suppose you are creating a general-purpose gaming environment that  supports different types of games.
+As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
 
 ```python
