@@ -9,7 +9,7 @@ def banner(text, width=20):  # width has a default value
 
 print(greet("Alice"))
 #: Hello, Alice
-print(banner("Hi", width=4))  # pass an argument by name
+print(banner("Hi", width=4))  # Pass an argument by name
 #: ****
 #: Hi
 #: ****

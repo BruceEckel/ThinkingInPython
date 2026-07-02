@@ -87,7 +87,7 @@ print(x, y)
 single = (42,)      # A one-element tuple needs the trailing comma
 print(len(single))
 #: 1
-print(tuple([1, 2, 3]))    # Converts to (1, 2, 3)  from a list
+print(tuple([1, 2, 3]))    # Converts a list to a tuple
 #: (1, 2, 3)
 print(tuple("abc"))
 #: ('a', 'b', 'c')
@@ -122,7 +122,7 @@ Tuples are fixed-length immutable records where each position has a distinct mea
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-The lookup hash value is computed from the Keys, so they must be immutable.
+The lookup hash value is computed from the keys, so they must be immutable.
 
 ```python
 # dictionaries.py
@@ -217,7 +217,7 @@ They match the `update()`, `intersection_update()`, `difference_update()`, and `
 ## Specialized Containers
 
 The `collections` module in the standard library includes container types built for specific jobs.
-Three of these are used consistently: `Counter`, `defaultdict` and `deque`.
+Four of these are used consistently: `Counter`, `defaultdict`, `deque`, and `namedtuple`.
 
 ### `Counter`
 

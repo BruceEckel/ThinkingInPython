@@ -86,6 +86,7 @@ class Rat:
             self.x, self.y = moves[0]
             await asyncio.sleep(0)  # Yield so sibling rats can run
 ```
+
 `number` must be initialized by calling `blackboard.next_number()`,
 a side-effecting method, not a static default.
 Marking it `field(init=False)` leaves it out of the generated `__init__`,

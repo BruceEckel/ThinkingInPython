@@ -3,9 +3,9 @@
 The *Messenger* or *Data Transfer Object* is a way to pass a clump of information around.
 The most typical place for this is in return values from functions,
 where tuples or dictionaries are often used.
-However, those rely on indexing;
-in the case of tuples this requires the consumer to keep track of numerical order,
-and in the case of a `dict` you must use the `d["name"]` syntax which can be slightly less desirable.
+However, those rely on indexing.
+A tuple requires the consumer to keep track of numerical order.
+A `dict` requires the clumsier `d["name"]` syntax.
 
 A Messenger is an object with attributes corresponding to the names of the data you pass or return:
 
@@ -17,7 +17,7 @@ class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
 
-m: Any = Messenger(info="Some information", b=['a', 'list'])
+m: Any = Messenger(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)
 #: Some information ['a', 'list'] 11
@@ -26,7 +26,7 @@ print(m.info, m.b, m.more)
 The trick here is that the `__dict__` for the object is assigned to the `dict` that is automatically created by the `**kwargs` argument.
 
 You could create a `Messenger` class and put it in a library to import.
-But it takes so few lines that defining it in-place, wherever you need it,
+But it takes so few lines that defining it in place, wherever you need it,
 usually makes more sense.
 
 Testing confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
@@ -50,7 +50,7 @@ Python already ships this idiom.
 `types.SimpleNamespace` is exactly a `Messenger`, with keyword arguments becoming attributes.
 When you want the fields named and type-checked,
 a `@dataclass` gives you a typed mutable record with a generated `__init__()`,
-`repr()`, and equality, and a `NamedTuple` gives you a typed immutable one:
+`__repr__()`, and equality, and a `NamedTuple` gives you a typed immutable one:
 
 ```python
 # messenger_modern.py

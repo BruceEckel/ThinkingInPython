@@ -27,8 +27,8 @@ That is why one method call can resolve only one unknown type.
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Each unknown type needs its own dispatching method call.
-The methods in the following example are called `compete()` and `eval()`,
-and are both members of the same type.
+The methods in the following example are called `compete()` and `eval_*()`,
+and all belong to the same hierarchy.
 Here there will be only two dispatches, which is called *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
 then you'll need a dispatching method call for each hierarchy.
@@ -153,7 +153,7 @@ from outcome import Outcome
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        # Use a tuple to index into the StrEnum:
+        # Use a tuple of types to index into the table:
         return OUTCOME[self.__class__, item.__class__]
     def __str__(self) -> str:
         return self.__class__.__name__

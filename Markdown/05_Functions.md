@@ -1,7 +1,7 @@
 # Functions
 
 Functions are defined with the `def` keyword,
-followed by the function name and argument list,
+followed by the function name and parameter list,
 and a colon to begin the function body:
 
 ```python
@@ -24,7 +24,7 @@ print(a_function("yes"))
 #: 1
 ```
 
-Here the function signature only specifies the name of the function and the argument identifiers,
+Here the function signature only specifies the name of the function and the parameter names,
 but no argument types or return types (these are covered in [Static Typing](08_Static_Typing.md#type-hints)).
 Python is dynamically typed, so type errors surface at runtime rather than at compile time.
 This means that different types can be both passed to and returned from the same function:
@@ -107,11 +107,11 @@ print(good_append(2))
 #: [2]
 ```
 
-Thus a mutable default persists, and lives on the function, not recreated on each call.
+A mutable default persists because it lives on the function object and is not recreated on each call.
 This behavior is a common confusion for newcomers to the language.
 
 The `None` sentinel is only needed when the function modifies the argument.
-If the parameter is read only, use an immutable default such as an empty tuple.
+If the function only reads the parameter, use an immutable default such as an empty tuple.
 It is still shared across calls, but sharing is harmless because it cannot change:
 
 ```python
@@ -219,7 +219,7 @@ because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 
 In the standard library,
-many built-in functions take positional-only arguments such as `dict.get(key, default, /)`.
+many built-in functions and methods take positional-only parameters, such as `dict.get(key, default, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method:
 since the name is not part of the interface,

@@ -4,7 +4,7 @@ An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
 a file, a database cursor, or a computation: it only asks for the next item.
 
-In Python builds iterators into the language.
+Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
 comprehensions, `sum()`, `sorted()`, unpacking,
 and every function that takes an iterable.

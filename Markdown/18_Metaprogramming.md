@@ -30,7 +30,7 @@ and in the vast majority of cases it does the right thing.
 You can customize how classes are produced by running extra code or injecting members as the class is built.
 That is metaclass programming.
 
-*Most of the time you do not need a metaclass.*
+Most of the time you do not need a metaclass.
 It is a fascinating tool, and the temptation to use it is strong,
 but Python 3 added simpler hooks that cover almost every case a metaclass used to handle:
 
@@ -57,7 +57,7 @@ So a plain class definition is shorthand for calling `type` yourself:
 class C:
     pass
 
-D = type('D', (), {})  # The same construction, by hand
+D = type("D", (), {})  # The same construction, by hand
 
 # Both are produced by the metaclass type:
 print(type(C), type(D))
@@ -78,7 +78,7 @@ You can add bases, fields, and methods the same way:
 def howdy(self, you: str) -> None:
     print("Howdy, " + you)
 
-MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
+MyList = type("MyList", (list,), dict(x=42, howdy=howdy))
 
 ml = MyList()
 ml.append("Camembert")
@@ -603,7 +603,7 @@ Multiple inheritance can accidentally combine classes with different metaclasses
 which creates a metaclass conflict you then have to resolve.
 That is one more reason to avoid metaclasses unless you truly need them.
 
-## The 'inspect' Module
+## The `inspect` Module
 
 Up to now we've been modifying classes: `type` builds them, and metaclasses
 and `__init_subclass__()` run code as they are created.
@@ -736,10 +736,10 @@ class Fraggle:
     y: float = 1.14659
     z: str = "blivet"
 
-    def f(self, )-> None: ...
-    def g(self, x: int)-> float:
+    def f(self) -> None: ...
+    def g(self, x: int) -> float:
         return 0.001
-    def h(self, s: str)-> str:
+    def h(self, s: str) -> str:
         return f"h({s})"
 
 display_object(Fraggle)  # Display the class

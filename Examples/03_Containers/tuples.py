@@ -9,7 +9,7 @@ print(x, y)
 single = (42,)      # A one-element tuple needs the trailing comma
 print(len(single))
 #: 1
-print(tuple([1, 2, 3]))    # Converts to (1, 2, 3)  from a list
+print(tuple([1, 2, 3]))    # Converts a list to a tuple
 #: (1, 2, 3)
 print(tuple("abc"))
 #: ('a', 'b', 'c')

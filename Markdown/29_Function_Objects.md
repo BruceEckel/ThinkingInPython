@@ -44,7 +44,7 @@ The classic object form wraps each action in a `Command` subclass with an `execu
 from typing import override
 
 class Command:
-    def execute(self) -> None: pass
+    def execute(self) -> None: ...
 
 class Loony(Command):
     @override
@@ -265,9 +265,9 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 ```
 
 Each handler is a *Strategy* function, the chain is the list,
-success is a non-`None` return.
+and success is a non-`None` return.
 Adding, removing, or reordering handlers means editing a list.
-We see the fallthrough when bisection cannot bracket a root.
+We see the fall-through when bisection cannot bracket a root.
 It returns `None`, and the chain continues looking for a method that can.
 
 We test that the first finder that converges wins,

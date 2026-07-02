@@ -23,9 +23,9 @@ class Bar(metaclass=SingletonMetaClass):
     def __str__(self) -> str:
         return self.val
 
-x = Bar('sausage')
-y = Bar('eggs')
-z = Bar('spam')
+x = Bar("sausage")
+y = Bar("eggs")
+z = Bar("spam")
 # Each Bar(...) reruns __init__ on the one instance, so val is spam:
 print(x, x is y is z)
 #: spam True

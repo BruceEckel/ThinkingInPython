@@ -18,11 +18,11 @@ and there are a number of ways to accomplish this adaptation:
 from typing import Any, override
 
 class WhatIHave:
-    def g(self) -> None: pass
-    def h(self) -> None: pass
+    def g(self) -> None: ...
+    def h(self) -> None: ...
 
 class WhatIWant:
-    def f(self) -> None: pass
+    def f(self) -> None: ...
 
 class ProxyAdapter(WhatIWant):
     def __init__(self, what_i_have: Any) -> None:
@@ -153,7 +153,7 @@ If you have a confusing collection of classes and interactions that the client p
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
 Façade is often implemented as a singleton abstract factory.
-You can easily get this effect by creating a class containing `static` factory methods:
+You can easily get this effect by creating a class containing static factory methods:
 
 ```python
 # facade.py

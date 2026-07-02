@@ -7,11 +7,11 @@ Up until this chapter, we haven't used type declarations.
 
 On a small program you do not miss the declarations.
 On a large program, type errors that C++ or Java would catch now appear only when the code runs.
-Sometimes that means it waits until a bug report.
+Sometimes the error waits until a bug report.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
-However, the Python runtime does not care if your type hints are *logically* correct as long as they are structurally and syntactically valid.
-The runtime ignores properly-formed type hints,
+However, the Python runtime does not care if your type hints are logically correct as long as they are structurally and syntactically valid.
+The runtime ignores properly formed type hints,
 so if you want the equivalent of a compiler in a typed language you must run an additional type checking tool (this book uses Astral's `ty`).
 
 You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
@@ -65,7 +65,7 @@ print(MAX_RETRIES, GREETING)
 
 You can give the type explicitly, as in `Final[str]`,
 or let it be inferred from the value, as with `MAX_RETRIES`.
-Marking values `Final` immediately discovers accidental reassignments.
+Marking values `Final` catches accidental reassignments immediately.
 
 ## Gradual Typing
 
@@ -103,7 +103,7 @@ area("3", 4)   # ty: argument of type "str" is not assignable to "int"
 
 At runtime `area("3", 4)` does not cause an error.
 It returns `"3333"`, because `"3" * 4` is the correct syntax for string repetition.
-Bugs surface later, often far from the line that caused it.
+The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
 
 ## Structural Typing with Protocols
@@ -124,9 +124,8 @@ structural typing proves the shape before the code runs.
 
 A *Protocol* expresses that shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
-A Protocol describes a required shape: any object with that shape
-qualifies, without inheriting from a base class.
-A `Protocol` can be used without inheritance:
+A `Protocol` instead describes a required shape.
+Any object with that shape qualifies, without inheriting from a base class:
 
 ```python
 # protocols.py
@@ -193,7 +192,7 @@ This is the construct functions like `issubclass()` work with, since they compar
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves exactly as it would have with no hints at all.
-Checking is a separate step you run, the same way you check tests separately.
+Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee, use `isinstance()` or a library built to validate data.
 The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,

@@ -223,8 +223,8 @@ at construction, is enough for its whole life.
 
 If we make `Stars` a frozen data class,
 we can guarantee that every `Stars` object is legal.
-To validate it after the fields are filled in, we call `__post_init__()`,
-which is one of the hooks the `dataclass` machinery generates code around:
+To validate it after the fields are filled in, we define `__post_init__()`,
+a hook that the generated `__init__()` calls automatically:
 
 ```python
 # stars.py

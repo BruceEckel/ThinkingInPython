@@ -5,7 +5,7 @@ from outcome import Outcome
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        # Use a tuple to index into the StrEnum:
+        # Use a tuple of types to index into the table:
         return OUTCOME[self.__class__, item.__class__]
     def __str__(self) -> str:
         return self.__class__.__name__

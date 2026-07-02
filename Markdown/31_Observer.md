@@ -157,7 +157,7 @@ If observers are coroutines,
 so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
 `gather` still waits for all of them, so the change is finished only after every observer is successfully notified.
-There is a limitation: a `@property` setter cannot be a coroutine so an assignment cannot be awaited.
+There is a limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
 The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](35_Simulation.md).
 For this example, we only need a coroutine to pause at `await` while others run:
@@ -302,7 +302,7 @@ def test_new_grid_size_and_banding() -> None:
 def test_adjacent() -> None:
     assert adjacent((1, 1), (2, 2))      # Diagonal
     assert adjacent((1, 1), (1, 2))      # Edge
-    assert not adjacent((1, 1), (1, 1))  # not its own neighbor
+    assert not adjacent((1, 1), (1, 1))  # Not its own neighbor
     assert not adjacent((0, 0), (2, 0))  # Two away
 
 def test_recolored_touches_only_neighbors() -> None:
@@ -311,7 +311,7 @@ def test_recolored_touches_only_neighbors() -> None:
     assert out[(1, 1)] == grid[(2, 2)]   # Diagonal neighbor: changed
     assert out[(2, 3)] == grid[(2, 2)]   # Edge neighbor: changed
     assert out[(0, 0)] == grid[(0, 0)]   # Two away: unchanged
-    assert out is not grid               # pure: a new grid
+    assert out is not grid               # Pure: a new grid
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)

@@ -15,7 +15,7 @@ x.show_twice()  # Inherited from Simple
 #: Simple2 constructor argument
 #: Overridden show() method
 #: Simple2 constructor argument
-def f(obj): obj.show() # Local/nested function
+def f(obj): obj.show()  # Any object with a show()
 f(x)
 #: Overridden show() method
 #: Simple2 constructor argument

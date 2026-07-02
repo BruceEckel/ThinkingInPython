@@ -15,11 +15,11 @@ class OnlyOne:
         return OnlyOne.instance
 
 x = OnlyOne()
-x.val = 'sausage'
+x.val = "sausage"
 y = OnlyOne()
-y.val = 'eggs'
+y.val = "eggs"
 z = OnlyOne()
-z.val = 'spam'
+z.val = "spam"
 # __new__ returns the one instance every time, so x.val is now spam:
 print(x.val, x is y is z)
 #: spam True

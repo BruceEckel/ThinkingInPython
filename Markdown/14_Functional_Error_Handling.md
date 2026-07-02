@@ -151,11 +151,12 @@ A function reports failure by returning a `Failure` object,
 success by returning a `Success` object.
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot pretend the function returns an ordinary value; to get the answer `Result` must be unpacked.
+The caller cannot pretend the function returns an ordinary value. To get the answer, the `Result` must be unpacked.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 
-Because failures are values, you can assert on them directly, with no `pytest.raises()`. These check `unwrap()` and that `bind()` chains a success and short-circuits a failure:
+Because failures are values, you can assert on them directly, with no `pytest.raises()`.
+The tests check `unwrap()`, and that `bind()` chains a success and short-circuits a failure:
 
 ```python
 # test_result.py
@@ -442,7 +443,7 @@ This style does not replace exceptions everywhere.
 Exceptions are still right for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
-In some languages, these types of errors are categorized as "panic" errors, and separated from regular exceptions.
+In some languages, these errors are called "panics" and are separated from regular exceptions.
 
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.

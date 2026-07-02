@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from typing import ClassVar, override
 
-sys.path += ['..', '../mouse']
+sys.path += ["..", "../mouse"]
 from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
@@ -75,7 +75,7 @@ class MouseTrap(StateMachine):
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith('#')]
+         if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
 #: mouse appears

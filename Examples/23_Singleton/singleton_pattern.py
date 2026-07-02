@@ -17,13 +17,13 @@ class OnlyOne:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
 
-x = OnlyOne('sausage')
+x = OnlyOne("sausage")
 print(x.val)
 #: ['sausage']
-y = OnlyOne('eggs')
+y = OnlyOne("eggs")
 print(y.val)
 #: ['sausage', 'eggs']
-z = OnlyOne('spam')
+z = OnlyOne("spam")
 print(z.val)
 #: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:

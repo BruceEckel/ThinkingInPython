@@ -41,7 +41,7 @@ and they hadn't been implemented.
 
 The `StateMachine` keeps track of the current state,
 which is initialized by the constructor.
-The `run_all()` method takes a list of `Input` objects.
+The `run_all()` method takes a sequence of input objects.
 This method not only moves to the next state,
 but it also calls `run()` for each state object;
 thus you can see it's an expansion of the idea of the `State` pattern,
@@ -87,7 +87,7 @@ class MouseAction(StrEnum):
 ```
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration.
-Because it is a `StrEnum`, each member *is* its string value:
+Because it is a `StrEnum`, each member *is* its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
@@ -124,7 +124,7 @@ import sys
 from pathlib import Path
 from typing import ClassVar, override
 
-sys.path += ['..', '../mouse']
+sys.path += ["..", "../mouse"]
 from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
@@ -196,7 +196,7 @@ class MouseTrap(StateMachine):
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith('#')]
+         if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
 #: mouse appears
@@ -257,7 +257,7 @@ import sys
 from pathlib import Path
 from typing import Any, ClassVar, override
 
-sys.path += ['..', '../mouse']
+sys.path += ["..", "../mouse"]
 from mouse_action import MouseAction  # type: ignore
 from state import State
 from state_machine import StateMachine
@@ -335,7 +335,7 @@ class MouseTrap(StateMachine):
 
 text = Path("../mouse/mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith('#')]
+         if line.strip() and not line.startswith("#")]
 mouse_moves = [MouseAction(m) for m in moves]
 MouseTrap().run_all(mouse_moves)
 #: Waiting: Broadcasting cheese smell
@@ -670,7 +670,7 @@ Because the actions set `vm.message` instead of printing,
 the model never draws anything, and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 
-Using 'tkinter' we can create a GUI representation of the vending machine.
+Using `tkinter` we can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock,
 and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
@@ -772,8 +772,8 @@ The *Proxy* and *State* patterns that several of these exercises build on are co
     The input to `next_state()` is a single word read from a text file containing one word per line.
 8.  Modify the previous exercise so that the state machine can be configured by editing a single transition table.
 9.  Modify the "mood" exercise (exercise 4) so that it becomes a state machine using `state_machine.py`.
-10. Create an elevator state machine system using state_machine.py
-11. Create a heating/air-conditioning system using state_machine.py
+10. Create an elevator state machine system using `state_machine.py`.
+11. Create a heating/air-conditioning system using `state_machine.py`.
 12. A *generator* produces objects, like a factory but taking no arguments.
     Write a `mouse_move_generator()` (using `yield`) that produces correct `MouseAction` moves in sequence,
     where each possible move depends on the previous one (it is another state machine).

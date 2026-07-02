@@ -11,7 +11,7 @@ Performance means at least two things when it comes to computing:
 Python addresses the first issue with clear syntax and extensive power and flexibility.
 As to the second issue, Python is commonly considered to be slow.
 
-## Is it Actually Too Slow?
+## Is It Actually Too Slow?
 
 Computer programming projects have a long history of *premature optimization*,
 when the designers decide ahead of time, based on their biases,
@@ -21,7 +21,7 @@ This results in elaborate designs that generate excessive costs.
 Python can be surprising.
 A program coded in the most straightforward way, without concern for performance,
 can often run fast enough for your needs.
-Do not automatically assume that a simply-written program will be too slow.
+Do not automatically assume that a simply written program will be too slow.
 Try it out first. It might be fine.
 
 If it is too slow, use Occam's Razor: try the simplest approach first.
@@ -32,7 +32,7 @@ starting with the simplest techniques and getting successively more complex.
 
 ## Try a Faster Platform
 
-There are alternative interpreters for Python, notably PyPy which boasts a 4x to 10x speedup.
+There are alternative interpreters for Python, notably PyPy, which boasts a 4x to 10x speedup.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, then buying new hardware might be a quick win.
@@ -231,7 +231,7 @@ In the I/O version the time goes to a wait, outside the processor.
 In the CPU version the identical result comes from computing, inside the processor.
 Only that boundary changes, and it decides which tool overlaps the work.
 
-## ASYNCIO
+## `asyncio`
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
 When a task awaits something outside the processor, the loop runs another task in the meantime.

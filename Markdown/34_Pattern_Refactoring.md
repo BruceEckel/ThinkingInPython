@@ -353,7 +353,7 @@ for t in parse("trash.dat"):
 
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function and performs the default behavior.
-Adding a `price()` or `weight` operation means writing another single-dispatch function.
+Adding a `price()` or `weight()` operation means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.
 

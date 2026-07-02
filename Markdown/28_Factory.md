@@ -83,7 +83,7 @@ if __name__ == "__main__":
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create;
 it happens to be a string here but it could be any set of data.
 The `factory()` is now the only other code in the system that needs to be changed when a new type of `Shape` is added
-(the initialization data for the objects will presumably come from somewhere outside the system, and not be a hard-coded array as in the above example).
+(the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
 
 I have also used a *generator*.
 A generator is a special case of a factory,
@@ -113,7 +113,7 @@ If you need to create a deeper hierarchy this way,
 you must recurse the `Shape.__subclasses__()` list.
 
 Also note that `Shape.__subclasses__()` is only executed when the generator object is produced;
-each time the `next()` method of this generator object is called (which, as noted above, may happen implicitly),
+each time `next()` is called on this generator object (which, as noted above, may happen implicitly),
 only the code in the `for` loop will be executed,
 so you don't have wasteful execution (as you would if this were an ordinary function).
 
@@ -140,7 +140,7 @@ print(next(gen))
 `next(gen)` produces the next object from the generator.
 `shape_name_gen()` is the factory, and `gen` is the generator.
 
-### Preventing direct creation
+### Preventing Direct Creation
 
 To disallow direct access to the classes,
 you can nest the classes within the factory method, like this:
@@ -205,9 +205,8 @@ you can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
 There is no factory method and no factory class; the `dict` *is* the factory.
-You can go one step further so the factory never needs editing when a type is added,
-by letting each subclass register itself through `__init_subclass__()`.
-Then the factory never needs editing when you add a type:
+You can go one step further, so the factory never needs editing when a type is added,
+by letting each subclass register itself through `__init_subclass__()`:
 
 ```python
 # registry.py
@@ -306,7 +305,7 @@ class ShapeFactory:
     @classmethod
     def create_shape(cls, kind: str) -> Shape:
         if kind not in cls.factories:
-            cls.factories[kind] = eval(kind + '.Factory()')
+            cls.factories[kind] = eval(kind + ".Factory()")
         return cls.factories[kind].create()
 
 class Shape:
@@ -361,8 +360,8 @@ but you could imagine a more complex problem where the appropriate factory objec
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`) will work fine.
 
-Notice that the `ShapeFactory` must be initialized by loading its dictionary with factory objects,
-which takes place in the static initialization clause of each of the shape implementations.
+Notice that `ShapeFactory` fills its dictionary lazily:
+the first request for a kind builds that kind's factory object (via `eval()`) and caches it for later requests.
 
 This version leans on `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
@@ -533,7 +532,7 @@ the appropriate `Protocol`: a `GameElementFactory` must supply `make_character()
 and `make_obstacle()`, a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `action()`.
 This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
-It preserves the benefits of the interfaces were for without the coupling a shared base class imposes.
+It preserves what the interfaces were for, without the coupling a shared base class imposes.
 Python's version of interface inheritance is a `Protocol`, not a shared base class.
 
 ## Prototype
@@ -641,7 +640,7 @@ def test_prototype_untouched() -> None:
 
 ## Exercises
 
-1.  Add a class `Triangle` to `shape_factory1.py`
-2.  Add a class `Triangle` to `shape_factory2.py`
-3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to `games.py`
+1.  Add a class `Triangle` to `shape_factory1.py`.
+2.  Add a class `Triangle` to `shape_factory2.py`.
+3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to `games.py`.
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).

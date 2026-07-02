@@ -3,11 +3,11 @@
 from typing import Any, override
 
 class WhatIHave:
-    def g(self) -> None: pass
-    def h(self) -> None: pass
+    def g(self) -> None: ...
+    def h(self) -> None: ...
 
 class WhatIWant:
-    def f(self) -> None: pass
+    def f(self) -> None: ...
 
 class ProxyAdapter(WhatIWant):
     def __init__(self, what_i_have: Any) -> None:

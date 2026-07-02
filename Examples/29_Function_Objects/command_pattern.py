@@ -2,7 +2,7 @@
 from typing import override
 
 class Command:
-    def execute(self) -> None: pass
+    def execute(self) -> None: ...
 
 class Loony(Command):
     @override

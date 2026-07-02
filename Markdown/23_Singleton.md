@@ -75,7 +75,7 @@ def test_cache_factory_returns_same_instance() -> None:
 If you need the class itself to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
-Modules and cached factories should provide your singleton needs.
+Modules and cached factories should cover your singleton needs.
 The rest of this chapter is only included because it demonstrates interesting techniques and insights.
 
 ## The Classic Implementations
@@ -111,13 +111,13 @@ class OnlyOne:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
 
-x = OnlyOne('sausage')
+x = OnlyOne("sausage")
 print(x.val)
 #: ['sausage']
-y = OnlyOne('eggs')
+y = OnlyOne("eggs")
 print(y.val)
 #: ['sausage', 'eggs']
-z = OnlyOne('spam')
+z = OnlyOne("spam")
 print(z.val)
 #: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
@@ -126,7 +126,7 @@ print(x is y, x.instance is y.instance is z.instance)
 ```
 
 Because the inner class is named with a double underscore,
-it is private so an attempt to directly access produce a type-checking error.
+it is private, so an attempt to access it directly produces a type-checking error.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`;
 after that it reuses the one inner object,
@@ -161,8 +161,8 @@ class OnlyOne:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
 
-x = OnlyOne('sausage')
-y = OnlyOne('eggs')
+x = OnlyOne("sausage")
+y = OnlyOne("eggs")
 # Distinct wrappers (x is not y), one shared inner list:
 print(x.val, x is y, x.instance is y.instance)
 #: ['sausage', 'eggs'] False True
@@ -206,11 +206,11 @@ class OnlyOne:
         return OnlyOne.instance
 
 x = OnlyOne()
-x.val = 'sausage'
+x.val = "sausage"
 y = OnlyOne()
-y.val = 'eggs'
+y.val = "eggs"
 z = OnlyOne()
-z.val = 'spam'
+z.val = "spam"
 # __new__ returns the one instance every time, so x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
@@ -257,9 +257,9 @@ class Singleton(Borg):
     def __str__(self) -> str:
         return self.val
 
-x = Singleton('sausage')
-y = Singleton('eggs')
-z = Singleton('spam')
+x = Singleton("sausage")
+y = Singleton("eggs")
+z = Singleton("spam")
 # Last write wins on the shared state; distinct objects, one __dict__:
 print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
@@ -311,9 +311,9 @@ class SingleTone:
         instance.val = val
         return instance
 
-x = SingleTone('sausage')
-y = SingleTone('eggs')
-z = SingleTone('spam')
+x = SingleTone("sausage")
+y = SingleTone("eggs")
+z = SingleTone("spam")
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
@@ -356,9 +356,9 @@ class Foo:
 x = Foo()
 y = Foo()
 z = Foo()
-x.val = 'sausage'
-y.val = 'eggs'
-z.val = 'spam'
+x.val = "sausage"
+y.val = "eggs"
+z.val = "spam"
 # One cached instance, so x.val is now spam:
 print(x.val, x is y is z)
 #: spam True
@@ -383,7 +383,7 @@ which is the reason to prefer them when you need that.
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-[Here](18_Metaprogramming.md#intercepting-instance-creation), this same singleton appears next to the simpler hooks that usually replace them.
+[Here](18_Metaprogramming.md#intercepting-instance-creation), a similar metaclass singleton appears next to the simpler hooks that usually replace it.
 It is included here for completeness:
 
 ```python
@@ -412,9 +412,9 @@ class Bar(metaclass=SingletonMetaClass):
     def __str__(self) -> str:
         return self.val
 
-x = Bar('sausage')
-y = Bar('eggs')
-z = Bar('spam')
+x = Bar("sausage")
+y = Bar("eggs")
+z = Bar("spam")
 # Each Bar(...) reruns __init__ on the one instance, so val is spam:
 print(x, x is y is z)
 #: spam True

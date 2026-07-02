@@ -18,9 +18,9 @@ class Foo:
 x = Foo()
 y = Foo()
 z = Foo()
-x.val = 'sausage'
-y.val = 'eggs'
-z.val = 'spam'
+x.val = "sausage"
+y.val = "eggs"
+z.val = "spam"
 # One cached instance, so x.val is now spam:
 print(x.val, x is y is z)
 #: spam True

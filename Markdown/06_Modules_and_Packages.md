@@ -27,13 +27,13 @@ This automatically prevents name clashes between the names in the imported modul
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
-The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equivalent to `__main__`.
+The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equal to the string `"__main__"`.
 In Python, any identifier that begins and ends with double underscores (commonly called "dunder") is special in some way.
 Methods named with double underscores are *special methods*,
 and they hook your class into the language's operators and built-in functions.
 
 The reason for the `if` is that any file can also be used as a library module within another program.
-In that case, you only want the classes defined,
+In that case, you only want its definitions,
 but you don't want the code at the bottom of the file to be executed.
 This particular `if` statement is only true when you are running this file directly.
 That is, `__name__` is `__main__` when you use the command line:

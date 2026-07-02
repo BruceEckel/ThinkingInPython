@@ -14,7 +14,7 @@ class Simple:
     # Two methods:
     def show(self, msg=""):
         if msg:
-            print(msg + ':', self.s)
+            print(msg + ":", self.s)
         else:
             print(self.s)
     def show_twice(self):
@@ -38,7 +38,7 @@ x.show_twice()
 ```
 
 Python methods require a reference to the current object.
-When you *define* a method you must explicitly specify the reference as the first argument.
+When you *define* a method you must explicitly specify the reference as the first parameter.
 Traditionally, the reference is called `self` but you can use any identifier you want (if you do not use `self` you will probably confuse people).
 To refer to fields in the object or other methods in the object,
 you must use `self` in the expression.
@@ -50,13 +50,13 @@ defines the constructor; the double underscores (a.k.a. "dunder") indicate a spe
 The constructor is automatically called during object creation.
 At the bottom of the example you can see that the creation of an object looks like a function call, but using the class name.
 
-In C++ or Java you declare object level fields inside the class body but outside of the methods.
+In C++ or Java you declare object-level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
 To create an object field, you name it, using `self`,
 inside a method (typically in the constructor, but not always).
 This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,
-they implicitly become class level fields (similar to static fields in C++/Java).
+they implicitly become class-level fields (similar to static fields in C++/Java).
 
 You can see the shape of an object with `display_object()`, a small inspection
 helper built in [Metaprogramming](18_Metaprogramming.md#the-inspect-module).
@@ -87,7 +87,7 @@ by default.
 Because Python is dynamically typed, it doesn't really care about interfaces.
 All it cares about is applying operations to objects.
 With inheritance in C++ or Java, you often inherit only to establish a common interface.
-Python is different: you inherit an implementation, to re-use the code from the base class.
+Python is different: you inherit an implementation, to reuse the code from the base class.
 
 First import the base class the same way you import any name from a module (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
@@ -135,7 +135,7 @@ x.show_twice()  # Inherited from Simple
 #: Simple2 constructor argument
 #: Overridden show() method
 #: Simple2 constructor argument
-def f(obj): obj.show() # Local/nested function
+def f(obj): obj.show()  # Any object with a show()
 f(x)
 #: Overridden show() method
 #: Simple2 constructor argument
@@ -150,12 +150,12 @@ When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 The `@override` decorator on `show()` is explained in the next section.
 
-`__main__` demonstrates that the base-class constructor is called.
+The demo shows that the base-class constructor is called.
 You can also see that the inherited `show_twice()` method is available in the derived class.
 
 The class `Different` also has a method named `show()`,
 but this class is not derived from `Simple`.
-The `f()` method defined in `__main__` demonstrates dynamic typing:
+The `f()` function in the demo demonstrates dynamic typing:
 all it cares about is that `show()` can be applied to `obj`,
 with no other type requirements.
 Thus, `f()` can be applied equally to an object of a class derived from `Simple` and one that isn't,
@@ -223,7 +223,7 @@ print(c.area)  # Properties don't use parentheses
 ```
 
 Because the change is invisible at the call site,
-do not preemptively add getters and setters in advance.
+do not preemptively add getters and setters.
 You can always add them later when you discover you need the logic.
 
 The default `@property` is *read-only*: it is only a getter.
@@ -322,8 +322,8 @@ For classes that are primarily a bundle of typed data,
 
 ## Composing Methods with `import`
 
-You can compose classes using `import`.
-This method can then be reused by multiple classes:
+You can compose methods into a class using `import`.
+A method defined this way can be reused by multiple classes:
 
 ```python
 # utility.py

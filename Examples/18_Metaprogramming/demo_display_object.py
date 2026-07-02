@@ -8,10 +8,10 @@ class Fraggle:
     y: float = 1.14659
     z: str = "blivet"
 
-    def f(self, )-> None: ...
-    def g(self, x: int)-> float:
+    def f(self) -> None: ...
+    def g(self, x: int) -> float:
         return 0.001
-    def h(self, s: str)-> str:
+    def h(self, s: str) -> str:
         return f"h({s})"
 
 display_object(Fraggle)  # Display the class

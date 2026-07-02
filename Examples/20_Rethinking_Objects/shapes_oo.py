@@ -28,3 +28,5 @@ if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
     for shape in shapes:
         print(round(shape.area(), 4))
+#: 3.1416
+#: 12.0

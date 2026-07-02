@@ -1,16 +1,16 @@
 # The Pattern Concept
 
 An important step forward in object-oriented design was the "design patterns" movement,
-chronicled in the 1994 book *Design Patterns* by by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides.
+chronicled in the 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides.
 They became known as the "Gang of Four"^[A reference to Chinese politics ... it made sense at the time.].
-I will refer to that book as *GoF Design Patterns* and simply *design patterns* for the concept.
+I will refer to that book as *GoF Design Patterns*, and use *design patterns* for the concept.
 
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
 along with one or more examples for each, typically in C++ but sometimes in Smalltalk.
 A significant portion of those examples provide inspiration for much of the remainder of this book.
 I will introduce the basic concepts of design patterns, along with examples.
 
-## What is a Pattern?
+## What Is a Pattern?
 
 Initially, you can think of a pattern as an especially clever and insightful way of solving a particular class of problems.
 It looks like a lot of people have worked out all the angles of a problem and have come up with the most general,
@@ -86,7 +86,7 @@ The three purposes are:
 1.  **Creational**: how an object can be created.
     By isolating the details of object creation,
     your code isn't dependent on what types of objects there are and thus doesn't have to be changed when you add a new type of object.
-    The aforementioned *Singleton* is classified as a creational pattern,
+    [Singleton](23_Singleton.md) is classified as a creational pattern,
     and later in this book you'll see examples of [Factories](28_Factory.md).
 2.  **Structural**: designing objects to satisfy particular project constraints.
     These work with the way objects are connected with other objects to ensure that changes in the system don't require changes to those connections.
@@ -94,7 +94,7 @@ The three purposes are:
     These encapsulate processes such as interpreting a language, fulfilling a request,
     moving through a sequence (as in an iterator), or implementing an algorithm.
     This book contains multiple examples including [Observer](31_Observer.md),
-    [State Machines](26_State_Machines.md) and [Visitor](33_Visitor.md).
+    [State Machines](26_State_Machines.md), and [Visitor](33_Visitor.md).
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
@@ -148,7 +148,7 @@ to apply tests for quality.
 Note that some of these only apply to OOP.
 
 -   *Principle of least astonishment* (don't be astonishing).
--   *Make common things easy, and rare things possible*
+-   *Make common things easy, and rare things possible*.
 -   *Consistency*.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
@@ -167,7 +167,7 @@ Note that some of these only apply to OOP.
     Simply declaring that we should have "low coupling" in a design is usually too vague;
     coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
--   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de St. Exupery from *The Little Prince*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].
+-   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de Saint-Exupéry, from *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they are designed to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,

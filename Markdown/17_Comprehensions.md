@@ -1,6 +1,6 @@
 # Comprehensions
 
-*Comprehensions* (first introduced in [Containers and Control Flow](04_Control_Flow.md#comprehensions))
+*Comprehensions* (first introduced in [Control Flow](04_Control_Flow.md#comprehensions))
 build one sequence from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and was incorporated into functional programming.
@@ -89,14 +89,14 @@ print(list(map(lambda e: e ** 2,
 #: [1, 81, 0, 16]
 ```
 
-The nested form calls two `lambda`s for every element, and is harder to read.
+The nested form funnels every element through `lambda` calls, and is harder to read.
 The comprehension inlines the test and the expression.
 
-The list comprehension is enclosed within a list,
+The list comprehension is enclosed within list brackets,
 so it is immediately evident that a list is being produced.
 There is only one function call to `isinstance()` and no call to the cryptic `lambda`.
 Instead, the list comprehension uses a conventional iterator,
-an expression, and an `if` expression for the optional predicate.
+an expression, and an `if` clause for the optional predicate.
 
 ## Nested Comprehensions
 
@@ -182,7 +182,7 @@ Instead of `[]`, a set comprehension uses `{}`.
 
 Consider a list of names.
 We are only interested in names longer than one character and wish to represent all names in the same format:
-The first letter should be capitalized and all other characters should be lower case.
+the first letter should be capitalized and all other characters should be lower case.
 
 The following set comprehension normalizes each name (capital first letter, the rest lower
 case), keeps the names longer than one character, and collapses the duplicates
@@ -265,9 +265,8 @@ print(initials)
 ```
 
 There is no lazy `set` or `dict`, though.
-Parentheses always build the whole collection at once,
-and `set(...)` or `dict(...)` over a generator does the same,
-since a set or dict must hold every element.
+A set or dict must hold every element,
+so `set(...)` or `dict(...)` consumes the whole generator immediately.
 So neither saves anything over the set comprehension `{len(w) for w in words}`
 or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are preferred.

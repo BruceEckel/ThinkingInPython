@@ -120,7 +120,7 @@ def test_interest_uses_approx(funded: Account) -> None:
     assert funded.balance == pytest.approx(105.0)
 ```
 
-Run the test suite by typing `pytest` in the project.
+Run the test suite by typing `pytest` in the project directory.
 It discovers every `test_*.py` file, collects every `test_` function, runs them,
 and reports success and failures.
 A failing `assert` prints the expression and the actual values,
@@ -292,7 +292,7 @@ def load(name: str) -> str:
     return (data_dir() / name).read_text(encoding="utf-8")
 ```
 
-The tests redirect it at a throwaway directory,
+The tests point it at a throwaway directory,
 so they never touch real data and never collide with each other:
 
 ```python
@@ -309,7 +309,8 @@ def test_round_trip(
     assert storage.load("greeting.txt") == "hello"
 
 def test_missing_file_raises(
-        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("APP_DATA", str(tmp_path))
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")
@@ -515,7 +516,7 @@ and a failing test fails the build.
 
 ## Exercises
 
-1.  Add a `transfer(other: Account, amount)` method to `Account` and write its tests first:
+1.  Add a `transfer(other: Account, amount: float)` method to `Account` and write its tests first:
     a successful transfer, and an overdraft that leaves both accounts unchanged.
 2.  Use `parametrize` to test `add_interest()` at several rates,
     comparing with `pytest.approx()`.

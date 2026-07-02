@@ -1,4 +1,4 @@
-/loop through the chapters and look for issues.
+/loop through chapters 02-35 and look for issues.
 Fix any obvious issues, and put all the rest in ISSUES.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.
 If an issue has a suggested fix you need me to review, put some kind of checkbox next to it.

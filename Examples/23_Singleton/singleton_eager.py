@@ -16,8 +16,8 @@ class OnlyOne:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.instance, name)
 
-x = OnlyOne('sausage')
-y = OnlyOne('eggs')
+x = OnlyOne("sausage")
+y = OnlyOne("eggs")
 # Distinct wrappers (x is not y), one shared inner list:
 print(x.val, x is y, x.instance is y.instance)
 #: ['sausage', 'eggs'] False True

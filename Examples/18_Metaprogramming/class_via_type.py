@@ -2,7 +2,7 @@
 class C:
     pass
 
-D = type('D', (), {})  # The same construction, by hand
+D = type("D", (), {})  # The same construction, by hand
 
 # Both are produced by the metaclass type:
 print(type(C), type(D))

@@ -1,6 +1,6 @@
 # inside_objects.py
 class A:
-    x = 100  # class attribute
+    x = 100  # Class attribute
 
 a = A()
 print(vars(A)["x"])  # The attribute lives in the class dict

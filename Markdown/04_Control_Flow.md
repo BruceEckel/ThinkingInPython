@@ -114,7 +114,7 @@ A `while` loop can use `else` the same way.
 
 When iterating, `for` walks any sequence directly.
 Use `range()` for counting, `enumerate()` when you also need the index,
-and `zip()` to combine each corresponding pair of two sequences:
+and `zip()` to combine corresponding items from several sequences:
 
 ```python
 # looping.py
@@ -198,7 +198,7 @@ A pattern can also destructure a value and bind its parts.
 
 Python signals an error by *raising* an exception.
 Like C++ and Java, an exception propagates up the call stack until it finds a handler.
-In Python, handlers are indicated by `except` followed by the exception type it handles.
+In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
 seen here in `except ValueError as e`:
 

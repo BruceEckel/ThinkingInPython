@@ -15,7 +15,7 @@ It requires that the primary class hierarchy have a method,
 typically called `accept()`, which takes an object of a secondary class hierarchy called `Visitor`.
 This virtualizes the operations performed upon the primary hierarchy.
 The objects of the primary hierarchy simply `accept()` the `Visitor`,
-then call the `Visitor`'s dynamically-bound method:
+then call the `Visitor`'s dynamically bound method:
 
 ```python
 # flower_visitors.py
@@ -105,7 +105,7 @@ then `visit()` resolves the visitor's type.
 Python can add a method to a fixed hierarchy from outside, using `functools.singledispatch`.
 This turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-That is exactly how *Visitor*'s works,
+That is exactly how *Visitor* works,
 but without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python
@@ -226,7 +226,7 @@ def test_operations_dispatch_independently() -> None:
     These are the "winners."
 3.  Modify `paper_scissors_rock.py` to replace the double dispatching with a table lookup.
     The simplest way is a `dict` keyed by a tuple of the two objects' types,
-    looked up as `table[type(o1), type(o2)]` (this is what `paper_scissors_rock2.py` does).
+    looked up as `table[type(o1), type(o2)]` (this is what `paper_scissors_rock_table.py` does).
     When is the table lookup more appropriate than hard-coding the dynamic dispatch?
     Can you keep the syntactic simplicity of the dispatch while using a table underneath?
 4.  Modify Exercise 2 to use the table lookup technique described in Exercise 3.

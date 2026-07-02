@@ -3,7 +3,7 @@
 def howdy(self, you: str) -> None:
     print("Howdy, " + you)
 
-MyList = type('MyList', (list,), dict(x=42, howdy=howdy))
+MyList = type("MyList", (list,), dict(x=42, howdy=howdy))
 
 ml = MyList()
 ml.append("Camembert")

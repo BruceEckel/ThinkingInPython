@@ -13,9 +13,9 @@ class SingleTone:
         instance.val = val
         return instance
 
-x = SingleTone('sausage')
-y = SingleTone('eggs')
-z = SingleTone('spam')
+x = SingleTone("sausage")
+y = SingleTone("eggs")
+z = SingleTone("spam")
 # Every construction returns the one instance; x.val is now spam:
 print(x.val, x is y is z)
 #: spam True

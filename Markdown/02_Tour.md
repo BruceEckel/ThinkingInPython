@@ -43,7 +43,7 @@ In this book, the first line of an example will be the name of the file containi
 That file can be found in the chapter's `Examples` subdirectory.
 So the above example can be found in `Examples/02_Tour/if.py`.
 
-The `##` comments are particular to this book: they show the console output for the example.
+The `#:` comments are particular to this book: they show the console output for the example.
 The book tooling validates that this output is correct.
 
 In a C/C++ `if`, you are required to use parentheses around the conditional.
@@ -239,7 +239,7 @@ coconut halves together.
 """)
 print('''
 "Oh no!" He exclaimed.
-"It's the blemange!"
+"It's the blancmange!"
 ''')
 print(r'c:\python\lib\utils')
 #: That isn't a horse
@@ -250,7 +250,7 @@ print(r'c:\python\lib\utils')
 #:
 #:
 #: "Oh no!" He exclaimed.
-#: "It's the blemange!"
+#: "It's the blancmange!"
 #:
 #: c:\python\lib\utils
 ```
@@ -345,7 +345,7 @@ String methods return new strings rather than changing the original.
 Functions are defined with `def`, a name, a parameter list, and a colon.
 The indented block below is the body, the same indentation rule as `if`.
 `return` sends a result back to the caller.
-A function with no `return` yields `None`.
+A function with no `return` produces `None`.
 
 ```python
 # functions.py
@@ -359,7 +359,7 @@ def banner(text, width=20):  # width has a default value
 
 print(greet("Alice"))
 #: Hello, Alice
-print(banner("Hi", width=4))  # pass an argument by name
+print(banner("Hi", width=4))  # Pass an argument by name
 #: ****
 #: Hi
 #: ****

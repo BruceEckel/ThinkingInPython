@@ -1,6 +1,6 @@
 # Context Managers
 
-The `with` statement, introduced in [Containers and Control Flow](04_Control_Flow.md#context-managers),
+The `with` statement, introduced in [Control Flow](04_Control_Flow.md#context-managers),
 runs setup before a block and cleanup after it, even if the block raises an exception.
 This chapter shows what `with` actually does and how to write your own context managers.
 
@@ -9,8 +9,8 @@ which runs at the start of the block, and `__exit__()`, which runs at the end.
 The `with` statement calls them for you and guarantees that `__exit__()` runs
 no matter how the block finishes.
 
-Thus, the context manager introduces a scope that determines when initialization and cleanup happens.
-This is far more reliable than using `__del__()`, as we saw in [Cleanup](10_Cleanup.md)
+Thus, the context manager introduces a scope that determines when initialization and cleanup happen.
+This is far more reliable than using `__del__()`, as we saw in [Cleanup](10_Cleanup.md).
 
 ## The Protocol
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block provides a guarantee that the exit code always runs at the end of the scope.
 
-## Cleanup is Guaranteed
+## Cleanup Is Guaranteed
 
 Although context managers introduce a nice brevity to your code, the point is the guarantee.
 Here, `__exit__()` runs when the block raises an exception, but before the exception propagates:
@@ -115,7 +115,7 @@ the class of the exception that was raised, or `None` when the block finished cl
 That class is what `issubclass(exc_type, self.types)` checks against the classes you
 chose to suppress.
 
-The standard library has included its version of `Ignore` as `contextlib.suppress`.
+The standard library includes its own version of `Ignore` as `contextlib.suppress`.
 The above demonstration would instead be:
 
 ```python

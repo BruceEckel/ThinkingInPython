@@ -217,7 +217,7 @@ def test_frozen_cannot_be_mutated() -> None:
 ```
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
-Here, the point that most encapsulation is work you only do because you allowed mutation in the first place.
+Here, the point is that most encapsulation is work you only do because you allowed mutation in the first place.
 
 ## Methods or Functions?
 
@@ -424,6 +424,8 @@ if __name__ == "__main__":
     shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
     for shape in shapes:
         print(round(shape.area(), 4))
+#: 3.1416
+#: 12.0
 ```
 
 Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated,
@@ -531,7 +533,7 @@ def test_oo_and_match_shapes_agree() -> None:
     assert so.Circle(1.0).area() == sm.area(sm.Circle(1.0))
 ```
 
-## OOP is Still Sometimes Useful
+## OOP Is Still Sometimes Useful
 
 None of this means objects are a mistake.
 They improved real things.

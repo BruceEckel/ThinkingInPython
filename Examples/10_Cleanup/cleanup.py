@@ -6,16 +6,16 @@ class Counter:
 
     def __init__(self, name: str) -> None:
         self.name = name
-        print(name, 'created')
+        print(name, "created")
         Counter.count += 1
 
     def __del__(self) -> None:
-        print(self.name, 'deleted')
+        print(self.name, "deleted")
         Counter.count -= 1
         if Counter.count == 0:
-            print('Last Counter object deleted')
+            print("Last Counter object deleted")
         else:
-            print(Counter.count, 'Counter objects remaining')
+            print(Counter.count, "Counter objects remaining")
 
     def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"

@@ -4,7 +4,7 @@ The `match` statement compares a value against a series of *patterns* and runs t
 A `match` is far more than a `switch` because a pattern can test a value's shape,
 look inside it, and pull out the parts you need, all in one step.
 
-[Containers and Control Flow](04_Control_Flow.md#pattern-matching) gave a taste.
+[Control Flow](04_Control_Flow.md#pattern-matching) gave a taste.
 This chapter covers the rest.
 
 ## Matching Values
@@ -100,7 +100,7 @@ print(summarize([1, 2, 3, 4]))
 
 This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-`test_sequence_patterns()` checks the structural cases and the empty fall-through using `pytest`:
+`test_sequence_patterns()` checks the empty, single-item, and starred cases using `pytest`:
 
 ```python
 # test_sequence_patterns.py
@@ -173,7 +173,7 @@ def test_class_patterns() -> None:
 
 ## Guards
 
-A guard is an `if` attached to a `case`; it adds a condition to a case.
+A guard is an `if` attached to a `case`.
 The case matches only when the pattern fits *and* the guard is true:
 
 ```python
@@ -325,7 +325,7 @@ polymorphism is better than a `match`: each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
 especially when the cases need to look inside the value.
-(Note that `Enum` is also worth considering here).
+(Note that `Enum` is also worth considering here.)
 
 ## Exercises
 

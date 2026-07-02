@@ -34,13 +34,13 @@ print(a.rating, b.rating)  # 'a' instance variable, 'b' class attr
 An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
 Assigning always writes to the instance,
-creating an instance variable the first time it is referenced.
-To show this we can select the class with `vars(A)` and the instance with `vars(a)`:
+creating the instance variable on first assignment.
+To show this we can inspect the class with `vars(A)` and the instance with `vars(a)`:
 
 ```python
 # inside_objects.py
 class A:
-    x = 100  # class attribute
+    x = 100  # Class attribute
 
 a = A()
 print(vars(A)["x"])  # The attribute lives in the class dict

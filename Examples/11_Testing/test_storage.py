@@ -11,7 +11,8 @@ def test_round_trip(
     assert storage.load("greeting.txt") == "hello"
 
 def test_missing_file_raises(
-        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("APP_DATA", str(tmp_path))
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")

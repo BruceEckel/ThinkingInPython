@@ -53,8 +53,9 @@ p.h()
 #: Implementation.h()
 ```
 
-It isn't necessary that `Implementation` have the same interface as `Proxy`;
-as long as `Proxy` is somehow "speaking for" the class that it is referring method calls to then the basic idea is satisfied
+It isn't necessary that `Implementation` have the same interface as `Proxy`.
+As long as `Proxy` is somehow "speaking for" the class it forwards method calls to,
+the basic idea is satisfied
 (this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
 However, it is convenient to have a common interface so that `Implementation` is forced to fulfill all the methods that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
@@ -211,7 +212,7 @@ run(b)
 #: We dance whene'er we're able.
 ```
 
-The first implementation is used for awhile,
+The first implementation is used for a while,
 then the second implementation is swapped in and that is used.
 
 Testing hands the State surrogate a small stand-in and confirms calls reach the current implementation, and that `change_to()` swaps it:
@@ -238,14 +239,14 @@ def test_state_delegates_and_change_swaps() -> None:
 The difference between *Proxy* and *State* is in the problems that are solved.
 The common uses for *Proxy* as described in *GoF Design Patterns* are:
 
-1.  `Remote proxy`.
+1.  *Remote proxy*.
     This proxies for an object in a different address space.
     A remote proxy is created for you automatically by the RMI compiler `rmic` as it creates stubs and skeletons.
-2.  `Virtual proxy`.
+2.  *Virtual proxy*.
     This provides "lazy initialization" to create expensive objects on demand.
-3.  `Protection proxy`.
+3.  *Protection proxy*.
     Used when you don't want the client programmer to have full access to the proxied object.
-4.  `Smart reference`.
+4.  *Smart reference*.
     To add additional actions when the proxied object is accessed.
     For example, to keep track of the number of references that are held for a particular object,
     in order to implement the *copy-on-write* idiom and prevent object aliasing.

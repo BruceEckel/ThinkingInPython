@@ -8,7 +8,7 @@ coconut halves together.
 """)
 print('''
 "Oh no!" He exclaimed.
-"It's the blemange!"
+"It's the blancmange!"
 ''')
 print(r'c:\python\lib\utils')
 #: That isn't a horse
@@ -19,6 +19,6 @@ print(r'c:\python\lib\utils')
 #:
 #:
 #: "Oh no!" He exclaimed.
-#: "It's the blemange!"
+#: "It's the blancmange!"
 #:
 #: c:\python\lib\utils
