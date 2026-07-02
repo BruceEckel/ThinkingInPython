@@ -38,6 +38,11 @@ Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
 uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
 ```
 
+Run `make check-tools` afterward to confirm everything resolved (`uv`, `ty`,
+`ruff`, `pytest`); `make check-tools-full` also checks `pandoc` and `vale`,
+needed only for `make site`/`make local` and `make prose`. See
+[check_tools.py](#check_tools.py) below.
+
 To run GNU Make natively on Windows, install it with winget, which ships with
 modern Windows and is the quickest setup. In Command Prompt or PowerShell, run:
 
@@ -83,6 +88,22 @@ POSIX toolchain being on PATH: every other target already requires Python
 
 ```
 make help   # categorized list of every documented target
+```
+
+## check_tools.py
+
+Checks that the tools this project needs are actually installed and prints
+a version line or a MISSING install hint for each. The basic tier is what a
+reader needs for the everyday commands: `uv` itself, plus the uv-managed
+dev tools (`ty`, `ruff`, `pytest`) that `uv run` resolves from `uv.lock`.
+`make` and `git` are checked too but marked "assumed" (you already needed
+both to get this far), so their absence doesn't fail the exit code. `--full`
+adds the tools a book maintainer needs for the rest of `make help`: `pandoc`
+(`make site`, `make local`) and the standalone `vale` binary (`make prose`).
+
+```
+make check-tools        # uv, ty, ruff, pytest (make/git checked, assumed)
+make check-tools-full   # the above, plus pandoc and vale
 ```
 
 ## extract_examples.py

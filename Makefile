@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full upgrade-tools
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -29,6 +29,29 @@ PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 # on a POSIX toolchain being on PATH (every other target already needs Python).
 help:  ## Show this help
 	$(PY) tools/make_help.py
+
+##@ Setup
+
+# What a reader needs for the everyday commands below: uv, plus the
+# uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
+# assumed present, since you needed both to get this far.
+check-tools:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
+	$(PY) tools/check_tools.py
+
+# Adds the tools a book maintainer needs for the rest of `make help`:
+# pandoc (site/local) and the standalone vale binary (prose).
+check-tools-full:  ## Check every tool, including pandoc and vale (site/prose)
+	$(PY) tools/check_tools.py --full
+
+# Updates uv itself (when it was installed via its standalone installer),
+# then upgrades every uv-managed dev tool (ty, ruff, pytest, ...) to the
+# latest version pyproject.toml allows, rewriting uv.lock. pandoc and vale
+# are updated best-effort through winget or Homebrew, whichever is on PATH.
+# make/git are left alone. Review `git diff uv.lock` before committing.
+# For the pinned Python version itself, use `make upgrade-python`.
+upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) pandoc/vale
+	$(PY) tools/upgrade_tools.py
+	$(MAKE) check-tools-full
 
 ##@ Everyday
 

@@ -1,6 +1,9 @@
 Thinking in Python
 ==================
 
+An intermediate-level book for experienced programmers.
+Includes a fast introduction for programmers from other languages.
+
 ## Setup
 
 1. Clone this repository.
@@ -10,6 +13,7 @@ Thinking in Python
 3. Install [uv](https://docs.astral.sh/uv/).
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
    Python (3.14+) and dev tools automatically. No manual Python install is needed.
+5. Run `make check-tools` to verify that all the tools are available.
 
 Type `make` to see the options.
 

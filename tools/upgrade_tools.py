@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+"""Update this project's tools to their latest versions.
+
+Two things are fully automated:
+
+- `uv self update` -- updates the uv binary itself. This only works
+  when uv was installed via its standalone installer; if it was
+  installed through pipx, Homebrew, winget, etc., uv prints its own
+  message telling you to upgrade it that way instead, and this script
+  moves on regardless.
+- `uv lock --upgrade` then `uv sync` -- upgrades every uv-managed dev
+  tool (`ty`, `ruff`, `pytest`, `codespell`, ...) to the latest version
+  `pyproject.toml`'s constraints allow, and installs the result into
+  `.venv`. This rewrites `uv.lock`; review `git diff uv.lock` before
+  committing.
+
+`pandoc` and `vale` are standalone binaries uv does not manage, so
+there is no single command that works on every machine. This tries the
+package manager actually on PATH (winget on Windows, Homebrew
+elsewhere) and falls back to printing the install/upgrade link if
+neither is present or the attempt fails.
+
+`make` and `git` are left alone: they are outside this project's
+control, and `make check-tools` already treats them as assumed.
+
+For the pinned Python version itself, use `make upgrade-python`
+instead; this script only touches package versions, not the
+interpreter.
+
+Usage:
+    python tools/upgrade_tools.py
+"""
+import shutil
+import subprocess
+
+# name -> (winget package id, Homebrew formula, fallback install link)
+EXTERNAL: dict[str, tuple[str, str, str]] = {
+    "pandoc": ("JGM.Pandoc", "pandoc",
+               "https://pandoc.org/installing.html"),
+    "vale": ("errata-ai.Vale", "vale", "https://vale.sh/docs/install"),
+}
+
+
+def run(cmd: list[str]) -> bool:
+    print(f"$ {' '.join(cmd)}")
+    try:
+        return subprocess.run(cmd).returncode == 0
+    except OSError:
+        return False
+
+
+def update_external(
+    name: str, winget_id: str, brew_formula: str, link: str
+) -> None:
+    if shutil.which("winget") and run(
+            ["winget", "upgrade", "--id", winget_id, "--silent"]):
+        return
+    if shutil.which("brew") and run(["brew", "upgrade", brew_formula]):
+        return
+    print(f"Could not auto-update {name}. "
+          f"Install or upgrade it yourself: {link}")
+
+
+def main() -> int:
+    run(["uv", "self", "update"])
+
+    if not run(["uv", "lock", "--upgrade"]):
+        print("`uv lock --upgrade` failed; see the error above.")
+        return 1
+    if not run(["uv", "sync"]):
+        print("`uv sync` failed; see the error above.")
+        return 1
+
+    for name, (winget_id, brew_formula, link) in EXTERNAL.items():
+        update_external(name, winget_id, brew_formula, link)
+
+    print("\nuv.lock was rewritten. "
+          "Review `git diff uv.lock` before committing.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
