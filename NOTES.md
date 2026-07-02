@@ -1,11 +1,6 @@
-Use const whenever possible after it is introduced
+Look for keywords that are used as identifiers or function names
 
-Are there any other GoF design patterns that should be included here?
-Also, prototypes seem to have disappeared.
-Make a list of the patterns we've covered and compare that with a list of known patterns.
-(Appendix is the list of known patterns?)
-
-What about chain of responsibility and prototype? I know I created examples of those.
+Are there any other design patterns (see Appendix A) that should be included in the book?
 
 On website: Chapter TOC floating on the left or below the "contents" link.
 

@@ -13,7 +13,7 @@ The language is designed to aid you as much as possible.
 It tries to hinder you as little as possible.
 It does not impose arbitrary rules or force a particular set of features.
 
-Python is often referred to as a scripting language,
+Python is often called a scripting language,
 but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
 Python is a programming language that also supports scripting.

@@ -1,43 +1,46 @@
 # Multiple Dispatching
 
-When dealing with multiple types which are interacting,
-a program can get particularly messy.
-For example, consider a system that parses and executes mathematical expressions.
-You want to  say `Number + Number`, `Number \* Number`, etc.,
+Dealing with multiple interacting types can get messy.
+Consider a system that parses and executes mathematical expressions.
+You want to  say `Number + Number`, `Number * Number`, etc.,
 where `Number` is the base class for a family of numerical objects.
 But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
 The answer starts with something you probably don't think about:
-Python performs only single dispatching.
+Python only performs single dispatching.
 That is, if you are performing an operation on more than one object whose type is unknown,
 Python can invoke the dynamic binding mechanism on only one of those types.
-This doesn't solve the problem,
-so you end up detecting some types manually and effectively producing your own dynamic binding behavior.
+You end up detecting some types manually and effectively producing your own dynamic binding behavior.
 
-The solution is called *Multiple Dispatching*.
-Remember that polymorphism can occur only via method calls,
-so if you want double dispatching to occur, there must be two method calls:
-the first to determine the first unknown type,
-and the second to determine the second unknown type.
-With *Multiple Dispatching*,
-you must have a polymorphic method call to determine each of the types.
+The solution is *Multiple Dispatching*.
+Polymorphism broadly means that a function accepts arguments of more than one type
+(see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
+It takes several forms.
+Function overloading in C++ picks a function from the argument types.
+Generics write one body that works across many types.
+The form at work in this chapter is the runtime dispatch that inheritance provides,
+which resolves on the type of one object, the one receiving the method call.
+That is why one method call can resolve only one unknown type.
+
+To dispatch on two unknown types, you need two method calls.
+The first resolves the first type, and the second resolves the second.
+Each unknown type needs its own dispatching method call.
 The methods in the following example are called `compete()` and `eval()`,
 and are both members of the same type.
-(Here there will be only two dispatches, which is referred to as *double dispatching*).
+Here there will be only two dispatches, which is called *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
-then you'll have to have a polymorphic method call in each hierarchy.
+then you'll need a dispatching method call for each hierarchy.
 
-Both versions below share one result type: an enumeration of the three outcomes,
-win, lose, and draw.
-Rather than duplicate it, put it in its own module for import.
-It is a `StrEnum`, so each member is its string value and prints as `win`,
-`lose`, or `draw` with no extra code:
+Both versions below share one result type, an enumeration called `Outcome`:
+either `WIN`, `LOSE`, or `DRAW`.
+`Outcome` is a `StrEnum`, so each member is its string value and prints as `win`,
+`lose`, or `draw`:
 
 ```python
 # outcome.py
-# The win/lose/draw result of one Item competing with another.
+# The result of one Item competing with another.
 from enum import StrEnum
 
 class Outcome(StrEnum):
@@ -46,11 +49,9 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-Both versions also share two small helpers:
+We also need two small helper functions,
 one to generate random pairs of items,
-and one to play a pair off and print the result.
-Those go in a module too,
-so each example below shows only its dispatch mechanism:
+and one to play a pair off and print the result:
 
 ```python
 # arena.py
@@ -58,7 +59,7 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-# Seed once so the matchups are reproducible across the chapter
+# Seed for reproducibility
 random.seed(47)
 
 def item_pair_gen(base: type, n: int) -> Iterator[tuple[Any, Any]]:
@@ -66,17 +67,16 @@ def item_pair_gen(base: type, n: int) -> Iterator[tuple[Any, Any]]:
     for _ in range(n):
         yield random.choice(items)(), random.choice(items)()
 
-def match(item1: Any, item2: Any) -> None:
+def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
-Here's an example of *Multiple Dispatching*:
+Here we demonstrate *Multiple Dispatching*:
 
 ```python
 # paper_scissors_rock.py
-# Demonstration of multiple dispatching.
 from typing import Any
-from arena import item_pair_gen, match
+from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -127,7 +127,7 @@ class Rock(Item):
 
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
-        match(item1, item2)
+        duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
 #: Scissors <--> Rock : lose
@@ -160,7 +160,7 @@ Instead, it can be more sensible to make the table explicit, like this:
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
 from typing import Any, Final
-from arena import item_pair_gen, match
+from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -191,7 +191,7 @@ OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
 
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
-        match(item1, item2)
+        duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
 #: Scissors <--> Rock : lose

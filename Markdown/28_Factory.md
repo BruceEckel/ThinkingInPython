@@ -536,6 +536,110 @@ This is structural typing from [Static Typing](08_Static_Typing.md#structural-ty
 It preserves the benefits of the interfaces were for without the coupling a shared base class imposes.
 Python's version of interface inheritance is a `Protocol`, not a shared base class.
 
+## Prototype
+
+The factories so far build each object from a class and some arguments.
+*Prototype* takes a different route.
+It keeps one fully configured instance and makes new objects by copying it.
+Use it when a ready-made instance is easier to clone than to rebuild,
+or when construction is expensive and most of the setup is shared.
+
+Python builds the copy for you.
+The `copy` module clones any object.
+`copy.deepcopy()` follows every reference,
+so the clone shares no mutable state with the original:
+
+```python
+# prototype.py
+import copy
+from dataclasses import dataclass, field
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+
+    def clone(self) -> Monster:
+        return copy.deepcopy(self)
+
+goblin = Monster("Goblin", hp=10, powers=["bite"])
+# Build a variant by cloning and adjusting, not rebuilding:
+captain = goblin.clone()
+captain.name = "Goblin Captain"
+captain.hp = 20
+captain.powers.append("rally")
+print(goblin)
+#: Monster(name='Goblin', hp=10, powers=['bite'])
+print(captain)
+#: Monster(name='Goblin Captain', hp=20, powers=['bite', 'rally'])
+```
+
+The deep copy is the part that matters.
+`captain` gets its own `powers` list,
+so appending to it leaves `goblin.powers` unchanged.
+A shallow copy would share that list, and editing one monster would corrupt the other.
+The `clone()` method only wraps `copy.deepcopy()`, so you can drop it and copy directly.
+
+Prototype combines with the registry idea from earlier.
+Instead of a registry of classes, keep a registry of prototypical instances and clone the chosen one:
+
+```python
+# prototype_registry.py
+import copy
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+
+PROTOTYPES: Final[dict[str, Monster]] = {
+    "goblin": Monster("Goblin", hp=10, powers=["bite"]),
+    "troll": Monster("Troll", hp=40, powers=["smash", "regenerate"]),
+}
+
+def spawn(kind: str) -> Monster:
+    return copy.deepcopy(PROTOTYPES[kind])
+
+a = spawn("goblin")
+b = spawn("goblin")
+b.hp = 5
+print(a.hp, b.hp)  # The copies are independent
+#: 10 5
+print(spawn("troll"))
+#: Monster(name='Troll', hp=40, powers=['smash', 'regenerate'])
+```
+
+`spawn()` returns an independent object every time,
+so callers can modify their copy without touching the prototype.
+Compare this with `make()` in `registry.py`.
+There the table holds classes and calls a constructor.
+Here it holds instances and copies them.
+Use the prototype form when the interesting part of an object is its configured state rather than its type.
+
+Testing shows that Prototypes are safe because each spawn is independent,
+and the stored prototype never changes:
+
+```python
+# test_prototype.py
+from prototype_registry import PROTOTYPES, spawn
+
+def test_clone_is_independent() -> None:
+    a = spawn("goblin")
+    b = spawn("goblin")
+    b.powers.append("curse")
+    assert a.powers == ["bite"]
+    assert b.powers == ["bite", "curse"]
+
+def test_prototype_untouched() -> None:
+    spawned = spawn("troll")
+    spawned.hp = 1
+    assert PROTOTYPES["troll"].hp == 40
+```
+
 ## Exercises
 
 1.  Add a class `Triangle` to `shape_factory1.py`

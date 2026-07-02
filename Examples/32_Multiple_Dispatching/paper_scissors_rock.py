@@ -1,7 +1,6 @@
 # paper_scissors_rock.py
-# Demonstration of multiple dispatching.
 from typing import Any
-from arena import item_pair_gen, match
+from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -52,7 +51,7 @@ class Rock(Item):
 
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
-        match(item1, item2)
+        duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
 #: Scissors <--> Rock : lose

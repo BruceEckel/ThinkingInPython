@@ -47,6 +47,11 @@ Prose-only edits still need `check_anchors.py` (cross-references) and
 - **`build/` is derived and gitignored.** `extract_examples.py --write` now wipes
   the target under `build/` first, so a fresh sync is the fix for weird drift or a
   stale tree. A stale `build/examples/` was behind "phantom" timeouts/import errors.
+- **Windows dir-lock on the wipe.** If the persistent shell's cwd sits inside
+  `build/examples/<chapter>`, that open handle blocks the rmtree and
+  `extract_examples.py --write` dies with `PermissionError [WinError 32]`. Keep the
+  shell at the repo root and run chapter-dir commands in a subshell, e.g.
+  `(cd build/examples && ty check NN_Chapter)`.
 - **`run_examples.py`: never pass a relative `--tree`.** It goes on `PYTHONPATH`
   and breaks once an example changes cwd. GUI/interactive examples are skipped via
   `tools/norun.txt` (keep those paths current when chapters are renumbered).

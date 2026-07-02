@@ -1,7 +1,7 @@
 # paper_scissors_rock2.py
 # Multiple dispatching using a table
 from typing import Any, Final
-from arena import item_pair_gen, match
+from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -32,7 +32,7 @@ OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
 
 if __name__ == "__main__":
     for item1, item2 in item_pair_gen(Item, 20):
-        match(item1, item2)
+        duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
 #: Scissors <--> Rock : lose
