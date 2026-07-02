@@ -42,6 +42,10 @@ Prose-only edits still need `check_anchors.py` (cross-references) and
   temp file.
 - **Run `ty`/`ruff`/`pytest` against `build/examples/`** (via `uv run`), never a
   loose scratch file, or config/imports resolve differently.
+- **`tools/*.py` is not linted by any gate.** Only `build/examples` is checked by
+  `make lint`/`make ci`, so a `tools/` script can exceed the 70-char limit with
+  nothing catching it (several already do). `ty` still matters there; run it
+  directly, e.g. `uv run ty check tools/whatever.py`.
 - **`#:` output markers must equal stdout exactly.** For nondeterministic output,
   round floats (`f"{x:.6f}"`) or print `type(e).__name__` instead of a message.
 - **`build/` is derived and gitignored.** `extract_examples.py --write` now wipes
