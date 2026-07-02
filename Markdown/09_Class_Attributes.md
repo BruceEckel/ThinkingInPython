@@ -85,6 +85,44 @@ print(Tally.total)  # Shared by the whole class
 It records that `total` belongs to the class,
 and it catches the accidental shadowing from the earlier example before it happens.
 
+## ClassVar and Inheritance
+
+A `ClassVar` declared on a base class is inherited like any other class
+attribute: a subclass that doesn't declare its own copy reads straight
+through to the base's value, via the normal method resolution order.
+A subclass that assigns its own value creates a separate class attribute,
+independent of the base and of sibling subclasses:
+
+```python
+# class_var_inheritance.py
+from typing import ClassVar
+
+class Base:
+    shared: ClassVar[int] = 0
+
+class Left(Base):
+    pass
+
+class Right(Base):
+    shared = 100  # Its own class attr, separate from Base's
+
+print(Left.shared, Right.shared)
+#: 0 100
+Base.shared = 9  # Only affects subclasses that haven't overridden
+print(Left.shared, Right.shared)
+#: 9 100
+Left.shared = 5  # Creates Left's own attribute, doesn't touch Base
+print(Base.shared, Left.shared, Right.shared)
+#: 9 5 100
+```
+
+`Left` has no `shared` of its own, so it tracks `Base.shared` until the
+moment something assigns to `Left.shared` directly.
+`Right` overrode `shared` at class-definition time, so it never sees
+changes made through `Base`.
+`ClassVar` doesn't change any of this: it only tells the checker that
+`shared` belongs to the class, not that subclasses share storage.
+
 For real per-object defaults, write a constructor with default arguments,
 or use a `@dataclass`, which turns the class-attribute syntax into instance variable defaults.
 Each object then gets its own storage for instance variables:

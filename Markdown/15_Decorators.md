@@ -312,6 +312,12 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
+#: First deleted
+#: 2 Counter objects remaining
+#: Second deleted
+#: 1 Counter objects remaining
+#: Third deleted
+#: Last Counter object deleted
 #: -> greet('Bob',)
 #: Hello, Bob
 #: Hello, Bob

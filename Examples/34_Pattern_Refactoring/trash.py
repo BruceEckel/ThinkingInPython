@@ -1,5 +1,4 @@
 # trash.py
-# The Trash hierarchy, with self-registration and a per-pound value.
 from typing import ClassVar
 
 class Trash:

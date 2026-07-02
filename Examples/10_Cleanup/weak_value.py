@@ -19,12 +19,6 @@ for name in ["First", "Second", "Third"]:
     counters.append(Counter(name))
 
 print(Counter.live_count())
-#: First deleted
-#: 2 Counter objects remaining
-#: Second deleted
-#: 1 Counter objects remaining
-#: Third deleted
-#: Last Counter object deleted
 #: 3
 counters.pop()               # Release "Third"
 print(Counter.live_count())

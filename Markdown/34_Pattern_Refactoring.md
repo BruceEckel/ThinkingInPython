@@ -1,21 +1,18 @@
 # Pattern Refactoring
 
 This chapter follows one problem through several designs.
-A first solution solves it,
-then we ask "what will change?" and reshape the design to absorb that change cheaply.
-This is the spirit of Martin Fowler's *Refactoring*,
-applied at the level of patterns rather than single statements.
+A first solution solves it, then we ask "what will change?" and reshape the design to absorb that change cheaply.
+This is the spirit of Martin Fowler's *Refactoring*, applied to patterns rather than single statements.
 
-This is also a Python lesson.
-Several of the patterns that *GoF Design Patterns* needed are answers to limitations of statically typed languages without multiple dispatch.
-Python removes some of those limitations,
-so a few common patterns simply dissolve here.
-We will call that out as it happens.
+It is also a Python lesson.
+Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages without multiple dispatch.
+Python lacks those limitations, so some of those patterns become unnecessary.
+We will point that out as it happens.
 
-This chapter contains an example of the design evolution process,
-starting with an initial solution and moving through the logic and process of evolving the solution to more appropriate designs.
-The program shown (a trash sorting simulation) has evolved over time,
-and you can look at that evolution as a prototype for the way your own design can start as an adequate solution to a particular problem and evolve into a flexible approach to a class of problems.
+The example is a trash sorting simulation, and it evolves across the chapter:
+an initial solution, then successive redesigns as new requirements appear.
+Read that evolution as a template for your own designs,
+which can start as an adequate fit for one problem and grow into a flexible fit for a class of problems.
 
 ## Simulating a Trash Recycler
 
@@ -31,7 +28,6 @@ and a `create()` method builds an instance from a material name (this is a *fact
 
 ```python
 # trash.py
-# The Trash hierarchy, with self-registration and a per-pound value.
 from typing import ClassVar
 
 class Trash:
@@ -70,7 +66,13 @@ def sum_value(items: list[Trash]) -> float:
     return total
 ```
 
-Adding a new recyclable type is now one class definition.
+Python implicitly makes `__init_subclass__` a classmethod, so `cls` doesn't need an `@classmethod` decorator.
+It runs once per subclass, right after that subclass is created, so each one can register itself in `Trash.registry` automatically.
+
+Each subclass's `value = ...` line creates its own class attribute, separate from `Trash.value`.
+The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance; it doesn't share storage across subclasses.
+
+Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` can build it.
 `sum_value()` is an ordinary function:
 it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
