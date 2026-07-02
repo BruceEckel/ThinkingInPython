@@ -72,6 +72,19 @@ gate except the site build. `make sync-ci` does the same and also builds the
 site. `make ci` runs the gate (with site) without syncing first, so it still
 fails on drift, the way GitHub Actions does.
 
+## make_help.py
+
+Prints the categorized `make help` listing. In the Makefile, a target line
+ending with a `## text` comment becomes one entry; a `##@ Name` comment
+line starts a new category heading above the entries that follow it. It
+replaces a `grep | awk` one-liner so `make help` has no dependency on a
+POSIX toolchain being on PATH: every other target already requires Python
+(via `uv run`), and this keeps `help` consistent with that.
+
+```
+make help   # categorized list of every documented target
+```
+
 ## extract_examples.py
 
 Default mode is **check**: nothing is written. It reports
