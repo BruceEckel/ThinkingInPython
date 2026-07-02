@@ -50,7 +50,7 @@ class Rock(Item):
         return Outcome.DRAW
 
 if __name__ == "__main__":
-    for item1, item2 in item_pair_gen(Item, 20):
+    for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
@@ -62,13 +62,3 @@ if __name__ == "__main__":
 #: Rock <--> Paper : lose
 #: Paper <--> Paper : draw
 #: Scissors <--> Scissors : draw
-#: Rock <--> Rock : draw
-#: Paper <--> Scissors : lose
-#: Rock <--> Scissors : win
-#: Paper <--> Paper : draw
-#: Rock <--> Rock : draw
-#: Scissors <--> Scissors : draw
-#: Paper <--> Paper : draw
-#: Rock <--> Scissors : win
-#: Rock <--> Rock : draw
-#: Scissors <--> Rock : lose

@@ -1,5 +1,3 @@
-Look for keywords that are used as identifiers or function names
-
 Are there any other design patterns (see Appendix A) that should be included in the book?
 
 On website: Chapter TOC floating on the left or below the "contents" link.

@@ -126,7 +126,7 @@ class Rock(Item):
         return Outcome.DRAW
 
 if __name__ == "__main__":
-    for item1, item2 in item_pair_gen(Item, 20):
+    for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
@@ -138,34 +138,22 @@ if __name__ == "__main__":
 #: Rock <--> Paper : lose
 #: Paper <--> Paper : draw
 #: Scissors <--> Scissors : draw
-#: Rock <--> Rock : draw
-#: Paper <--> Scissors : lose
-#: Rock <--> Scissors : win
-#: Paper <--> Paper : draw
-#: Rock <--> Rock : draw
-#: Scissors <--> Scissors : draw
-#: Paper <--> Paper : draw
-#: Rock <--> Scissors : win
-#: Rock <--> Rock : draw
-#: Scissors <--> Rock : lose
 ```
 
-One of the things you might notice is that the information about the various combinations is encoded into each type of `Item`.
-It actually ends up being a kind of table,
-except that it is spread out through all the classes.
-This is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
-Instead, it can be more sensible to make the table explicit, like this:
+The information about the various combinations is encoded into each type of `Item`.
+This is a kind of table, spread across the classes.
+It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
+It can be more sensible to make the table explicit, like this:
 
 ```python
-# paper_scissors_rock2.py
-# Multiple dispatching using a table
+# paper_scissors_rock_table.py
 from typing import Any, Final
 from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        # Use a tuple for table lookup:
+        # Use a tuple to index into the StrEnum:
         return OUTCOME[self.__class__, item.__class__]
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -190,7 +178,7 @@ OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
 }
 
 if __name__ == "__main__":
-    for item1, item2 in item_pair_gen(Item, 20):
+    for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win
 #: Scissors <--> Rock : lose
@@ -202,16 +190,6 @@ if __name__ == "__main__":
 #: Rock <--> Paper : lose
 #: Paper <--> Paper : draw
 #: Scissors <--> Scissors : draw
-#: Rock <--> Rock : draw
-#: Paper <--> Scissors : lose
-#: Rock <--> Scissors : win
-#: Paper <--> Paper : draw
-#: Rock <--> Rock : draw
-#: Scissors <--> Scissors : draw
-#: Paper <--> Paper : draw
-#: Rock <--> Scissors : win
-#: Rock <--> Rock : draw
-#: Scissors <--> Rock : lose
 ```
 
 Notice the flexibility of dictionaries: a tuple can be used as a key just as easily as a single object.
@@ -235,16 +213,15 @@ Use the spread-out method version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
 
 The win/lose/draw result is pure logic,
-which makes it easy to pin down with a test.
-The strongest check is that the two versions agree:
-the spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
-If they ever diverge, one of them has a bug.
+which makes it easy to validate through testing.
+The spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
+If they diverge, one of them has a bug.
 
 ```python
 # test_paper_scissors.py
 from typing import Any, Final
 import paper_scissors_rock as methods
-import paper_scissors_rock2 as table
+import paper_scissors_rock_table as table
 from outcome import Outcome
 
 # (player, opponent): the player's result

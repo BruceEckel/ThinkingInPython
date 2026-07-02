@@ -1,7 +1,7 @@
 # test_paper_scissors.py
 from typing import Any, Final
 import paper_scissors_rock as methods
-import paper_scissors_rock2 as table
+import paper_scissors_rock_table as table
 from outcome import Outcome
 
 # (player, opponent): the player's result

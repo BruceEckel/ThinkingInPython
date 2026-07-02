@@ -544,7 +544,6 @@ It keeps one fully configured instance and makes new objects by copying it.
 Use it when a ready-made instance is easier to clone than to rebuild,
 or when construction is expensive and most of the setup is shared.
 
-Python builds the copy for you.
 The `copy` module clones any object.
 `copy.deepcopy()` follows every reference,
 so the clone shares no mutable state with the original:
@@ -579,9 +578,9 @@ The deep copy is the part that matters.
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
 A shallow copy would share that list, and editing one monster would corrupt the other.
-The `clone()` method only wraps `copy.deepcopy()`, so you can drop it and copy directly.
+The `clone()` method simply wraps `copy.deepcopy()`.
 
-Prototype combines with the registry idea from earlier.
+We can combine prototype with a registry.
 Instead of a registry of classes, keep a registry of prototypical instances and clone the chosen one:
 
 ```python
@@ -620,7 +619,7 @@ There the table holds classes and calls a constructor.
 Here it holds instances and copies them.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
-Testing shows that Prototypes are safe because each spawn is independent,
+These tests show that Prototypes are safe because each spawn is independent,
 and the stored prototype never changes:
 
 ```python
