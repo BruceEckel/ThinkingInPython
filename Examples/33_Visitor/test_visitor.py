@@ -1,5 +1,5 @@
 # test_visitor.py
-from visit_singledispatch import (
+from visitor_singledispatch import (
     Chrysanthemum,
     Flower,
     Gladiolus,

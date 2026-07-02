@@ -1,18 +1,15 @@
+/loop through the chapters and look for issues.
+Fix any obvious issues, and put all the rest in ISSUES.md, demarking each chapter in the file.
+Do not give overviews or summaries or anything other than issues.
+If an issue has a suggested fix you need me to review, put some kind of checkbox next to it.
+If I check the box, I will later have you go through ISSUES.md and fix the ones I have checked.
+If you run out of tokens during a chapter, resume when it resets.
+
 Are there any other design patterns (see Appendix A) that should be included in the book?
 
 On website: Chapter TOC floating on the left or below the "contents" link.
 
-Before bed: In a loop, one chapter at a time, review chapters 02 through 08.
-If you run out of tokens during a chapter, resume when it resets.
-Put each chapter review in a file named REVIEW_02.md, REVIEW_03.md, etc. so I can go over them at my leisure.
-DO make essential changes, and put everything else in the REVIEW files.
-
-Review chapter XX. Make obious changes and put everything I need to look at first in REVIEW_XX.md
-
-When default arguments are introduced do we talk about using an immutable default e.g.:
-dunder: Sequence[str] = ()
-
-Look for duplication on Singleton between Metaprogramming and Singleton chapters.
+Look for duplication of Singleton between Metaprogramming and Singleton chapters.
 
 Run 'make prose' on each chapter
 
@@ -25,7 +22,6 @@ Run 'make prose' on each chapter
 - which was
 - which will be
 
-- Consider using "*GoF Design Patterns*" to specify the book vs the concept. Also search for "the book" phrase
 - Consider more specific links, to specific subsections rather than whole chapters.
 
 - Check exercises. Potentially create new exercises.

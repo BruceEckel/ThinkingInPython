@@ -3,21 +3,22 @@
 The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
-The assumption is that you have a primary class hierarchy that is unchangeable.
+The *Visitor* assumption is that you have a primary class hierarchy that is unchangeable.
 Perhaps it's from another vendor and you can't make changes to that hierarchy.
 However, you'd like to add new polymorphic methods to that hierarchy.
 Normally you'd have to add something to the base class interface, but that's unchangeable.
 How do you get around this?
 
 *Visitor*, the final pattern in *GoF Design Patterns*, solves this kind of problem.
-It allows you to extend the interface of the primary type.
-It does this by creating a separate class hierarchy of type `Visitor` to virtualize the operations performed upon the primary type.
-The objects of the primary type simply "accept" the visitor,
-then call the visitor's dynamically-bound method:
+It allows you to extend the interface of the primary class hierarchy.
+It requires that the primary class hierarchy have a method,
+typically called `accept()`, which takes an object of a secondary class hierarchy called `Visitor`.
+This virtualizes the operations performed upon the primary hierarchy.
+The objects of the primary hierarchy simply `accept()` the `Visitor`,
+then call the `Visitor`'s dynamically-bound method:
 
 ```python
 # flower_visitors.py
-# Demonstration of "visitor" pattern.
 import random
 from collections.abc import Iterator
 from typing import Any
@@ -40,7 +41,7 @@ class Runuculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
-# The companion class accepted by Flower:
+# The secondary hierarchy accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -72,13 +73,12 @@ def flower_gen(n: int) -> Iterator[Flower]:
     for i in range(n):
         yield random.choice(flwrs)()
 
-# It's almost as if I had a method to Perform
-# various "Bug" operations on all Flowers:
+# Now we can perform Bug operations on Flowers:
 bee = Bee()
 fly = Fly()
 worm = Worm()
 random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(10):
+for flower in flower_gen(4):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
@@ -94,41 +94,22 @@ for flower in flower_gen(10):
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
 #: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Chrysanthemum pollinated by Bee
-#: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Chrysanthemum pollinated by Bee
-#: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
 ```
 
-The `accept()`/`visit()` pair is *double dispatch*:
+The `accept()`/`visit()` pair is the *double dispatch*:
 `accept()` resolves the flower's type,
 then `visit()` resolves the visitor's type.
 
 ## The Pythonic Visitor: singledispatch
 
-Python can add a method to a fixed hierarchy from outside,
-with `functools.singledispatch`.
-It turns a plain function into one that dispatches on the type of its first argument,
+Python can add a method to a fixed hierarchy from outside, using `functools.singledispatch`.
+This turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
 That is exactly how *Visitor*'s works,
 but without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python
-# visit_singledispatch.py
+# visitor_singledispatch.py
 from functools import singledispatch
 
 class Flower:
@@ -177,7 +158,7 @@ if __name__ == "__main__":
 `Flower` is never touched.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
-Adding a new operation is a new function; adding a new flower is a class plus,
+Adding a new operation is a new function; adding a new flower is a class and,
 where needed, a one-line registration.
 When the operation should read like a method,
 use `functools.singledispatchmethod` instead.
@@ -197,7 +178,7 @@ and the fact that the two operations dispatch independently:
 
 ```python
 # test_visitor.py
-from visit_singledispatch import (
+from visitor_singledispatch import (
     Chrysanthemum,
     Flower,
     Gladiolus,

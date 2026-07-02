@@ -1,5 +1,4 @@
 # flower_visitors.py
-# Demonstration of "visitor" pattern.
 import random
 from collections.abc import Iterator
 from typing import Any
@@ -22,7 +21,7 @@ class Runuculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
-# The companion class accepted by Flower:
+# The secondary hierarchy accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -54,13 +53,12 @@ def flower_gen(n: int) -> Iterator[Flower]:
     for i in range(n):
         yield random.choice(flwrs)()
 
-# It's almost as if I had a method to Perform
-# various "Bug" operations on all Flowers:
+# Now we can perform Bug operations on Flowers:
 bee = Bee()
 fly = Fly()
 worm = Worm()
 random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(10):
+for flower in flower_gen(4):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
@@ -76,21 +74,3 @@ for flower in flower_gen(10):
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
 #: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Chrysanthemum pollinated by Bee
-#: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
-#: Chrysanthemum pollinated by Bee
-#: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
-#: Runuculus pollinated by Bee
-#: Runuculus pollinated by Fly
-#: Runuculus eaten by Worm
