@@ -32,7 +32,9 @@ site build). When iterating on one chapter, the manual sequence is:
 8. `python tools/run_examples.py NN_Chapter`                # runs scripts, honors norun.txt
 
 Prose-only edits still need `check_anchors.py` (cross-references) and
-`banned_phrases.py`; both are in `make verify`.
+`banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
+runs `validate_output.py` over all of `Markdown/` now, so a `#:` mismatch
+anywhere fails `make verify` even if you only touched one chapter.
 
 ## Traps (learned the hard way)
 
@@ -48,6 +50,18 @@ Prose-only edits still need `check_anchors.py` (cross-references) and
   directly, e.g. `uv run ty check tools/whatever.py`.
 - **`#:` output markers must equal stdout exactly.** For nondeterministic output,
   round floats (`f"{x:.6f}"`) or print `type(e).__name__` instead of a message.
+- **`validate_output.py` on the whole tree can leak `__del__` output between
+  chapters.** It `exec()`s every block's code against a fresh `namespace` dict
+  reused as that block's globals. A class defined there forms a reference
+  cycle with its own globals (`SomeClass.method.__globals__ is namespace`),
+  so plain refcounting never frees it; CPython's cyclic collector runs on its
+  own schedule and can finalize it while a *different*, later block's stdout
+  is being captured, corrupting that block's output. The fix lives in
+  `validate_output.py` itself: drop the last reference to a block's
+  `namespace` and call `gc.collect()` (see `collect_now()`) right after the
+  block finishes, before moving on. Chapter 10 (Cleanup)'s `cleanup.py` is
+  the example that demonstrates this (it deliberately relies on `__del__`
+  timing being unpredictable), so it is the usual trigger if this regresses.
 - **`build/` is derived and gitignored.** `extract_examples.py --write` now wipes
   the target under `build/` first, so a fresh sync is the fix for weird drift or a
   stale tree. A stale `build/examples/` was behind "phantom" timeouts/import errors.

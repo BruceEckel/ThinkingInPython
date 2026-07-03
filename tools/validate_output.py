@@ -28,6 +28,7 @@ Usage:
 import argparse
 import contextlib
 import fnmatch
+import gc
 import io
 import os
 import re
@@ -115,6 +116,21 @@ def exec_capture(
         return buf.getvalue(), exc
     finally:
         sys.stdout = old_stdout
+
+
+def collect_now() -> None:
+    """Force cyclic garbage from the just-finished block to finalize now.
+
+    A class defined in a block's globals refers back to that dict through
+    ``SomeClass.some_method.__globals__``, so the dict and the class form a
+    reference cycle that plain refcounting can never free. Left alone, it
+    waits for gc's next pass, which can land arbitrarily later, while some
+    unrelated block's stdout is captured. The caller must drop its own
+    last reference (``del namespace``) before calling this, so the cycle
+    is truly unreachable and collects here, with real stdout in place,
+    instead of leaking a stray ``__del__`` print into the next block.
+    """
+    gc.collect()
 
 
 def process_block(
@@ -205,6 +221,8 @@ def process_file(path: Path, *, update: bool) -> bool | None:
     new_lines, ok, changed = process_block(
         lines, str(path), update=update, namespace=namespace
     )
+    del namespace
+    collect_now()
 
     if update and changed:
         # newline="\n" keeps LF on Windows; the gate rejects CRLF.
@@ -372,6 +390,8 @@ def process_md_block(
             block, label, update=update,
             namespace=namespace, line_offset=block_start,
         )
+    del namespace
+    collect_now()
     return BlockResult(new_lines, ok, changed)
 
 

@@ -86,7 +86,8 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each possible move by a mouse is a member of the `MouseAction` enumeration.
+Each possible move by a mouse is a member of the `MouseAction` enumeration
+(`Enum` is introduced in [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too)).
 Because it is a `StrEnum`, each member is its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,

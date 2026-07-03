@@ -42,6 +42,9 @@ if __name__ == "__main__":
 ```
 
 `__enter__()` returns the object that `as` binds, often `self`.
+The return annotation `Self`
+(introduced in [Static Typing](08_Static_Typing.md#the-self-type))
+declares exactly that: an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block guarantees that the exit code runs at the end of the scope.
 

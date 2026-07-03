@@ -193,6 +193,129 @@ Passing `Circle` is allowed because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
 This is the construct functions like `issubclass()` work with, since they compare classes rather than instances.
 
+## Naming Types: The `type` Statement {#the-type-statement}
+
+An annotation can grow until it obscures what it means.
+`dict[tuple[int, int], str]` is precise, but it does not say what it is for.
+The *type statement* gives the annotation a name:
+
+```python
+# type_aliases.py
+type Coord = tuple[int, int]
+type Grid = dict[Coord, str]
+
+def paint(grid: Grid, cell: Coord, color: str) -> None:
+    grid[cell] = color
+
+grid: Grid = {}
+paint(grid, (2, 3), "red")
+print(grid)
+#: {(2, 3): 'red'}
+```
+
+A `type` alias is a new name, not a new type.
+`Coord` and `tuple[int, int]` are interchangeable,
+so any pair of ints is accepted as a `Coord`.
+(To create a distinct type the checker keeps separate,
+use `NewType`, listed in the summary below.)
+An alias can also name a union.
+[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) writes
+`type Shape = Circle | Square` to define a closed set of alternatives
+that a `match` can check exhaustively.
+
+## Generic Functions and Classes {#generic-functions-and-classes}
+
+A function that returns the first element of a list works for any element type.
+The type that goes in is the type that comes out.
+An annotation of `Any` would accept everything but lose that connection.
+A *type parameter* keeps it.
+Declare the parameter in square brackets after the function name:
+
+```python
+# generics.py
+
+def first[T](items: list[T]) -> T:
+    return items[0]
+
+n = first([10, 20, 30])  # Here T is int
+print(n + 1)
+#: 11
+s = first(["a", "b"])    # Here T is str
+print(s.upper())
+#: A
+```
+
+`T` is a placeholder, filled in separately at each call.
+The checker infers `T` from the argument and then knows the return type.
+That is why both `n + 1` and `s.upper()` check, while `n.upper()` would be flagged.
+
+A class declares type parameters the same way:
+
+```python
+# generic_box.py
+
+class Box[T]:
+    def __init__(self, content: T) -> None:
+        self.content = content
+
+    def get(self) -> T:
+        return self.content
+
+box = Box("gift")  # A Box[str]
+print(box.get().upper())
+#: GIFT
+```
+
+Constructing `Box("gift")` fixes `T` to `str` for that instance,
+so `get()` returns a `str` and the call to `upper()` checks.
+A bound constrains the parameter:
+`class Box[T: Shape]` accepts only `Shape` and its subclasses.
+Before Python 3.12 type parameters were written with `TypeVar` and `Generic`,
+which you will still see in older code.
+A special form, `**P`, captures a whole parameter list.
+[Decorators](15_Decorators.md#maintaining-the-wrapped-interface) uses it
+to give a wrapper the same signature as the function it wraps.
+
+## The `Self` Return Type {#the-self-type}
+
+A method that returns its own instance lets calls chain.
+What should its return annotation be?
+Naming the enclosing class works until someone inherits from it.
+`Self` means "an instance of the class this method was called on,"
+so it follows subclasses:
+
+```python
+# self_type.py
+from typing import Self
+
+class Tally:
+    def __init__(self) -> None:
+        self.count = 0
+
+    def bump(self) -> Self:
+        self.count += 1
+        return self
+
+class NamedTally(Tally):
+    def __init__(self, name: str) -> None:
+        super().__init__()
+        self.name = name
+
+    def report(self) -> str:
+        return f"{self.name}: {self.count}"
+
+t = NamedTally("clicks")
+print(t.bump().bump().report())
+#: clicks: 2
+```
+
+`t.bump()` is called on a `NamedTally`, so `Self` is `NamedTally`,
+and `report()` is available on the result.
+Had `bump()` been annotated `-> Tally`, the checker would reject `report()`,
+which `Tally` does not have.
+Alternative constructors benefit the same way:
+a `@classmethod` that ends with `return cls(...)` returns `Self`.
+
 ## Hints Are Not Enforced at Run Time
 
 Type hints do not change what the program does.

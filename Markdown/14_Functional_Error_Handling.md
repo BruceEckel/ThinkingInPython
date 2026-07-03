@@ -90,7 +90,8 @@ Make success and failure explicit by defining them as types.
 and `Result` is the union of the two.
 Both are frozen data classes,
 parameterized over the answer type and the error type.
-`A`, `B`, and `E` are type parameters:
+`A`, `B`, and `E` are type parameters
+(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that are filled in with concrete types when the class is used.
 Here they have no constraints, which allows them to be used in any context:
 

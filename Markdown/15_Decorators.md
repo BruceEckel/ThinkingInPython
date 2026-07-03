@@ -100,11 +100,12 @@ prints again, and returns the result.
 so the wrapped function still looks like itself when you inspect it.
 This is optional but improves debuggability.
 
-`wraps` keeps the runtime interface; the type parameters keep the static one.
+`wraps` keeps the runtime interface; the type parameters
+(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
+keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
-`**P` is a *parameter specification* (a `ParamSpec`, from the
-[Static Typing](08_Static_Typing.md#type-hint-summary) summary).
+`**P` is a *parameter specification* (a `ParamSpec`).
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
 So `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
@@ -313,12 +314,6 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
-#: First deleted
-#: 2 Counter objects remaining
-#: Second deleted
-#: 1 Counter objects remaining
-#: Third deleted
-#: Last Counter object deleted
 #: -> greet('Bob',)
 #: Hello, Bob
 #: Hello, Bob

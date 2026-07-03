@@ -533,6 +533,13 @@ if __name__ == "__main__":
 #: Month(name='July', n=7, max_days=31)
 ```
 
+The `months` field needs a default value, but its default is a list.
+A single default object would be shared by every instance,
+the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments),
+so data classes reject mutable defaults outright.
+`field(default_factory=make_months)` supplies a function instead of a value.
+Each new `Months` calls `make_months()` and gets its own fresh list.
+
 Choose the tool that makes the legal set easiest to express.
 For a small fixed set, that is an `Enum`.
 

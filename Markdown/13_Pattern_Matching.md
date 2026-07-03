@@ -245,7 +245,8 @@ def test_mapping_patterns() -> None:
 ## Exhaustive Matching
 
 When a value is one of a fixed set of types,
-define that set as a union using the `type` statement.
+define that set as a union using the `type` statement
+(introduced in [Static Typing](08_Static_Typing.md#the-type-statement)).
 Now you can perform a match on that union.
 When you end with `case _: assert_never(value)`, the type checker will ensure the match is *exhaustive*.
 If you add a type to the union and forget its case,
