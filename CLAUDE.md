@@ -33,8 +33,14 @@ site build). When iterating on one chapter, the manual sequence is:
 
 Prose-only edits still need `check_anchors.py` (cross-references) and
 `banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
-runs `validate_output.py` over all of `Markdown/` now, so a `#:` mismatch
-anywhere fails `make verify` even if you only touched one chapter.
+runs `validate_output.py --update` over all of `Markdown/` now, so a stale
+`#:` marker anywhere self-heals (rewriting `Markdown/`) instead of failing
+the build, the same way `fix-eol`/`sync` already self-heal other drift.
+Check `git diff Markdown/` afterward: a chapter you did not touch can
+still land in the diff if its output actually changed. An exception
+raised where none is expected still fails the gate; only marker text is
+auto-corrected. A lone bare `#: ` with nothing after it is always treated
+as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
 ## Traps (learned the hard way)
 
@@ -50,6 +56,13 @@ anywhere fails `make verify` even if you only touched one chapter.
   directly, e.g. `uv run ty check tools/whatever.py`.
 - **`#:` output markers must equal stdout exactly.** For nondeterministic output,
   round floats (`f"{x:.6f}"`) or print `type(e).__name__` instead of a message.
+  Since the gate now runs `validate_output.py --update`, a genuinely
+  nondeterministic listing no longer fails the gate: it silently rewrites the
+  marker to whatever this run happened to produce, and can thrash between
+  values across runs with nothing to flag it. Don't assume a marker mismatch
+  is repo drift; run the extracted script directly first
+  (`build/examples/<chapter>/<file>.py`) to check whether the value is
+  actually stable before accepting an auto-fix.
 - **`validate_output.py` on the whole tree can leak `__del__` output between
   chapters.** It `exec()`s every block's code against a fresh `namespace` dict
   reused as that block's globals. A class defined there forms a reference
