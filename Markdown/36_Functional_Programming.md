@@ -1,7 +1,5 @@
 # Functional Programming
 
-[[Note: this chapter is currently an experiment which is why I've put it at the end. If I decide to include it, it will probably be placed after "Rethinking Objects"]]
-
 Functional programming is usually introduced as "programming with functions," and functions are indeed a central part of the practice.
 But after (slowly) studying it for over ten years, I have started to wonder whether it's actually more about "functionality."
 One definition for science is "science is what works."
@@ -330,7 +328,7 @@ and it binds their values at the moment you build it, which avoids the late-bind
 
 ## Composing Functions
 
-*Composition* builds a new function by feeding one function's output straight into the next.
+*Function composition* builds a new function by feeding one function's output straight into the next.
 You can assemble behavior from small pieces, the way a pipeline reads as a sequence of steps:
 
 ```python
@@ -444,7 +442,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 ## Lazy Evaluation
 
 *Lazy evaluation* computes a value only when it is needed.
-A generator is the everyday example: it yields one value at a time instead of building a whole list up front.
+A generator is the canonical example: it yields one value at a time instead of building a whole list up front.
 Combined with `itertools`, you can describe an infinite sequence and take only the part you use:
 
 ```python
@@ -503,7 +501,9 @@ Each `case` is a pattern, and a match both tests the shape and pulls out the par
 The [Pattern Matching](13_Pattern_Matching.md) chapter covers the full syntax.
 Here it earns its place as a declarative tool for taking data apart.
 
-The motivation is that one `match` collapses a stack of `isinstance()` tests, length checks, and key or index lookups into a single readable description of each shape. The test and the extraction happen together, so there is no gap where you have confirmed the shape but not yet pulled out its parts. This pays off most on shaped data, such as parsed JSON, an abstract syntax tree, or the messages of a protocol, where the alternative is a thicket of nested conditionals.
+The motivation is that one `match` collapses a stack of `isinstance()` tests, length checks, and key or index lookups into a single readable description of each shape.
+The test and the extraction happen together, so there is no gap where you have confirmed the shape but not yet pulled out its parts.
+This pays off most on shaped data, such as parsed JSON, an abstract syntax tree, or the messages of a protocol, where the alternative is a thicket of nested conditionals.
 
 ## Functional Error Handling
 
@@ -555,25 +555,28 @@ Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call, 
 You can also reason about the code by substitution, the same move you make in algebra.
 This is the property that lets parts of a program be checked, and sometimes proved correct, and it connects back to this chapter's opening question about what counts as "what works."
 
-This property is also the quiet reason the `lru_cache` from earlier is safe. A memoizer may hand back a stored result only because the call is interchangeable with its value. Every optimization that skips or reuses work, from a cache to a database query planner, is cashing in referential transparency. The more of your program holds this property, the more of it a machine, or a proof, can reason about.
+This property is also the quiet reason the `lru_cache` from earlier is safe.
+A memoizer may hand back a stored result only because the call is interchangeable with its value.
+Every optimization that skips or reuses work, from a cache to a database query planner, is cashing in referential transparency.
+The more of your program holds this property, the more of it a machine, or a proof, can reason about.
 
 ## Declarative Style
 
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
-The functional tools in this chapter push code toward the declarative end:
+The functional tools in this chapter emphasize declarative style:
 
 ```python
 # declarative.py
+# Imperative spells out every step of the 'how':
 numbers = [1, 2, 3, 4, 5, 6]
-# Imperative: spell out every step of the how:
 result = []
 for n in numbers:
     if n % 2 == 0:
         result.append(n * n)
 print(result)
 #: [4, 16, 36]
-# Declarative: state the what, as a comprehension:
+# Declarative states the 'what', as a comprehension:
 print([n * n for n in numbers if n % 2 == 0])
 #: [4, 16, 36]
 ```
@@ -583,18 +586,31 @@ The comprehension says "the squares of the even numbers" and leaves the looping 
 This is the broader "functionality" the introduction points toward: describe the result, and let the machine arrange the steps.
 The [Comprehensions](17_Comprehensions.md) chapter explores this notation on its own.
 
-The compelling part is that declarative code says less and means more. By naming the result instead of the steps, you hand the reader your intent directly, and you give the runtime freedom to choose how to deliver it. That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
+Declarative code says less and means more.
+By naming the result instead of the steps, you hand the reader your intent and give the runtime freedom to choose how to deliver it.
+That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
 
 ## An Assurance Spectrum
 
-The chapter opened by asking whether programming can make the kind of provable claims a science makes. Functional programming's honest answer is not one guarantee but a spectrum. The properties built up here, purity, immutability, and referential transparency, buy assurance at every level. You decide how far up to climb.
+The chapter opened by asking whether programming can make the kind of provable claims a science makes.
+Functional programming's honest answer is not one guarantee but a spectrum.
+The properties built up here, purity, immutability, and referential transparency, buy assurance at every level.
+You decide how far to take it.
 
 1. The cheapest rung is local reasoning. Pure functions and immutable values let you understand one piece at a time, with no hidden state to carry in your head. Most code never needs more.
-2. Next is type checking. A type signature is a small theorem, and the function body is its proof. This is the *Curry-Howard correspondence*: types are propositions and programs are their proofs. Running `ty` over the examples in this book discharges that proof for a useful class of mistakes.
-3. Above that is *property-based testing*. You state a law the code must obey, then check it against many generated inputs. It does not prove the law. It works to falsify it, which is the falsifiability the chapter's opening called for.
-4. At the top is formal proof. Dependently-typed languages such as Lean, Idris, and Rocq prove a program correct for every possible input, checked by machine. This is real, and rare outside specialized work.
+2. Next is type checking. A type signature is a small theorem, and the function body is its proof.
+   This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence): types are propositions and programs are their proofs.
+   Running `ty` over the examples in this book discharges that proof for a useful class of mistakes.
+3. Above that is *property-based testing*. You state a law the code must obey, then check it against many generated inputs. It does not prove the law.
+   It works to falsify it, which is the falsifiability the chapter's opening requests.
+4. At the top is formal proof.
+   Dependently-typed languages such as Lean, Idris, and Rocq prove a program correct for every possible input, checked by machine.
+   This is real, but rare outside specialized work.
 
-The middle rung is the one most worth adopting now. You can write a property check by hand, looping over random inputs and asserting the law. A tool like *Hypothesis* does the same thing with sharper inputs, and shrinks any failure to a minimal counterexample:
+The middle rung is the one most worth adopting now.
+You can write a property check by hand, looping over random inputs and asserting the law.
+A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) does the same thing with sharper inputs,
+and shrinks any failure to a minimal counterexample:
 
 ```python
 # property_check.py
@@ -607,8 +623,6 @@ def encode(text: str) -> str:
 def decode(text: str) -> str:
     return text[::-1]
 
-# State a law, then check it on many random inputs the way
-# a property-based tool such as Hypothesis would:
 alphabet = "abcde"
 for _ in range(1000):
     size = random.randint(0, 8)
@@ -623,7 +637,7 @@ A property test states what must always be true.
 The machine searches for a counterexample, instead of forcing you to write one example at a time.
 
 Hypothesis turns that loop into a declaration.
-You describe the inputs with a *strategy* and state the law once, as a normal `test_` function.
+You describe the inputs with a *Strategy* and state the law once, as a normal `test_` function.
 The framework supplies the cases, including awkward ones a handwritten loop would miss,
 such as the empty string and unusual Unicode:
 
@@ -643,8 +657,22 @@ def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample
 ```
 
-`@given(st.text())` feeds `test_roundtrip()` a stream of generated strings. When a law fails, Hypothesis does not only report the failing input. It shrinks it to the smallest example that still fails, so the bug surfaces as the clearest case rather than a random one. That is the falsification machinery the chapter's opening called for, automated.
+`@given(st.text())` feeds `test_roundtrip()` a stream of generated strings.
+When a law fails, Hypothesis does not only report the failing input.
+It shrinks it to the smallest example that still fails, so the bug surfaces as the clearest case rather than a random one.
+That is the falsification machinery the chapter's opening called for, automated.
 
-Two caveats keep this honest. First, proof is not exclusive to functional code. Hoare logic and tools like Dafny verify imperative programs too. What purity changes is the cost: with no mutable state to track, each step of the reasoning is shorter. Functional programming does not make correctness provable so much as it makes the proof affordable. Second, most functional code stops well below the top rung. Haskell programmers rarely prove a program correct. They lean on types and on reasoning by substitution, and save full proof for the few places that earn it.
+Two caveats keep this honest.
+First, proof is not exclusive to functional code.
+Hoare logic and tools like Dafny verify imperative programs too.
+What purity changes is the cost: with no mutable state to track, each step of the reasoning is shorter.
+Functional programming does not make correctness provable so much as it makes the proof affordable.
+Second, most functional code stops well below the top rung.
+Haskell programmers rarely prove a program correct.
+They lean on types and on reasoning by substitution, and save full proof for the few places that earn it.
 
-So the thread running through this chapter is not that functions are special. It is that purity, immutability, and referential transparency shrink the distance between "I believe this is correct" and "I can show why." Proof is the far end of that distance. The everyday win is everything below it: code you can read, check, and test as statements about what is true. That, more than the presence of functions, is the "functionality" the introduction set out to find.
+So the thread running through this chapter is not that functions are special.
+It is that purity, immutability, and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
+Proof is the far end of that distance.
+The everyday win is everything below it: code you can read, check, and test as statements about what is true.
+That, more than the presence of functions, is the "functionality" the introduction set out to find.
