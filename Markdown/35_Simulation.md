@@ -145,7 +145,7 @@ and it is a `StrEnum` rather than a plain `Enum` so its members keep
 acting like real strings.
 `WALL` still works as the fill character for `ljust()`,
 and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
-because a `StrEnum` member *is* its string value.
+because a `StrEnum` member is its string value.
 
 The blackboard holds everything the rats share.
 `claim()` is the heart of the program.

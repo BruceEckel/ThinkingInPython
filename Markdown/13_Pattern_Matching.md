@@ -174,7 +174,7 @@ def test_class_patterns() -> None:
 ## Guards
 
 A guard is an `if` attached to a `case`.
-The case matches only when the pattern fits *and* the guard is true:
+The case matches only when the pattern fits and the guard is true:
 
 ```python
 # guards.py

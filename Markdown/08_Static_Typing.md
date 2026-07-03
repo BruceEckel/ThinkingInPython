@@ -10,8 +10,9 @@ On a large program, type errors that C++ or Java would catch now appear only whe
 Sometimes the error waits until a bug report.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
-The Python runtime ignores properly formed type hints,
-so if you want the equivalent of a compiler in a typed language you must run an additional type checking tool (this book uses Astral's `ty`).
+The Python runtime ignores properly formed type hints.
+If you want the equivalent of a compiler in a typed language,
+you must run a separate type-checking tool (this book uses Astral's `ty`).
 
 You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
 

@@ -289,9 +289,10 @@ The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
 That argument-capturing class decorator scales up to small frameworks:
-a build tool or task runner can offer a `@rule(target, *deps)` decorator whose constructor records the target and dependencies,
-whose `__call__()` registers the decorated function in a class-level table with that metadata,
-and whose driver later walks the table to run things in order.
+a build tool or task runner can offer a `@rule(target, *deps)` decorator.
+Its constructor records the target and dependencies.
+Its `__call__()` registers the decorated function in a class-level table with that metadata.
+A driver later walks the table to run things in order.
 The decorator becomes the registration mechanism for the whole system.
 
 ### Stacking Decorators

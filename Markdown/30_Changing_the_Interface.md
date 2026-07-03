@@ -87,7 +87,7 @@ because in *GoF Design Patterns* they assert that a proxy must have an identical
 
 The four variations above are Java habits.
 Python is dynamically typed: `WhatIUse.op()` only calls `f()`,
-so it accepts *any* object that has an `f()`.
+so it accepts any object that has an `f()`.
 You do not need a shared base class or a declared interface, only the method.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
@@ -148,7 +148,7 @@ def test_forwarding_targets_the_wrapped_object() -> None:
 
 > If something is ugly, hide it inside an object.
 
-This is basically what *Façade* accomplishes.
+That is what *Façade* accomplishes.
 If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
@@ -193,7 +193,7 @@ and, as [Singleton](23_Singleton.md#a-module-is-already-a-singleton) notes,
 it is imported once and shared everywhere.
 At module level, put the friendly functions and the few classes to expose.
 Keep the messy internals private (using a leading underscore, by convention),
-and the `import` *is* the façade.
+and the `import` is the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module gives you for free.
 

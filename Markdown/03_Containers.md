@@ -1,7 +1,7 @@
 # Containers
 
 With languages like C++ and Java, containers are add-on libraries.
-In Python, the essential nature of containers is acknowledged by building them into the core of the language.
+Python acknowledges the essential nature of containers by building them into the core of the language.
 Lists, dictionaries, and sets are fundamental data types.
 
 ## Lists and Iteration
@@ -316,7 +316,7 @@ print(height)
 ```
 
 A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
-but its fields are self-documenting as you see from the first `print()` statement.
+but its fields are self-documenting, as the first `print()` shows.
 For records with defaults, methods, or type annotations,
 prefer a data class (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 

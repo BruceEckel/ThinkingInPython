@@ -9,7 +9,7 @@ For the singleton, Python does.
 
 Python imports each module once and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
-So a module *is* a singleton, and module-level names are a single, shared,
+So a module is a singleton, and module-level names are a single, shared,
 one-and-only-one piece of state.
 Put the state in a module:
 
@@ -293,7 +293,7 @@ def test_borg_shares_state_but_not_identity() -> None:
     assert x.val == "second"
 ```
 
-A simpler version relies on the fact that a class variable has a single shared value:
+A simpler version relies on a class variable holding a single shared value:
 
 ```python
 # class_variable_singleton.py

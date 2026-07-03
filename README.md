@@ -17,7 +17,8 @@ Includes a fast introduction for programmers from other languages.
 
 Type `make` to see the options.
 
-`make site`, `make local`, and `make serve` also need `pandoc` on PATH;
+These are optional, but if you want to run them
+`make site`, `make local`, and `make serve` also need `pandoc` on your PATH;
 `make prose` needs the standalone `vale` binary. See
 [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.

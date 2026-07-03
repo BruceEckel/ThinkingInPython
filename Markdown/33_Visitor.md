@@ -174,7 +174,7 @@ Because each operation is a plain function, testing is direct:
 call it with each flower type and assert the result.
 The cases worth covering are the registered types,
 the `@singledispatch` default for an unregistered type,
-and the fact that the two operations dispatch independently:
+and that the two operations dispatch independently:
 
 ```python
 # test_visitor.py

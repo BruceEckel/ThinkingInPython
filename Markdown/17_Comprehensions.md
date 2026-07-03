@@ -49,12 +49,12 @@ The comprehension has three parts:
 
 -   The iterator part iterates through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
--   If the member is an integer then it is passed to the output expression which squares it and appends it to the output list.
+-   If the member is an integer, the output expression squares it and appends it to the output list.
 
-The same results can be achieved using the built-in functions `map()` and
+You can achieve the same results using the built-in functions `map()` and
 `filter()` with an anonymous `lambda`.
 `filter()` applies a predicate to a sequence and retains the members that satisfy the predicate.
-It produces a lazy iterator which can be turned into a `list` using `list()`:
+It produces a lazy iterator, which `list()` turns into a `list`:
 
 ```python
 # filtering.py

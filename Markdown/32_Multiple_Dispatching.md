@@ -197,10 +197,10 @@ Notice the flexibility of dictionaries: a tuple can be used as a key just as eas
 ## One Type or Many
 
 Python dispatches on a single type at a time.
-For dispatch on *one* argument's type,
+For dispatch on one argument's type,
 `functools.singledispatch` (see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
 per-type functions.
-For dispatch on *two or more* types at once,
+For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` is then a matter of adding rows to the table,
 with no methods to edit across the classes.

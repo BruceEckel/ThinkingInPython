@@ -361,7 +361,7 @@ Compare this to a Visitor implementation.
 There is no `Visitor` class, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
-When the operation is the *same* for every type,
+When the operation is the same for every type,
 you do not even need single dispatch.
 `sum_value()` earlier was a function.
 Use `singledispatch` only when the behavior genuinely differs by type.

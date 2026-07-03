@@ -202,7 +202,7 @@ Python signals an error by *raising* an exception.
 Like C++ and Java, an exception propagates up the call stack until it finds a handler.
 In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
-seen here in `except ValueError as e`:
+as in `except ValueError as e`:
 
 ```python
 # exceptions.py
@@ -274,9 +274,9 @@ path.unlink()  # Delete the file
 This is the explicit-finalizer approach from [Cleanup](10_Cleanup.md).
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
 [Context Managers](16_Context_Managers.md) shows how to write your own.
-Note that when simply reading or writing to a file,
-`pathlib` provides convenient utility methods like `read_text()` and `write_text()`
-that handle opening and closing the file for you.
+When simply reading or writing a file,
+`pathlib` provides utility methods like `read_text()` and `write_text()`
+that open and close the file for you.
 
 ## Comprehensions
 

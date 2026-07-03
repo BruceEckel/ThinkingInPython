@@ -2,15 +2,16 @@
 
 One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
-It is as if you extend the language to determine if the code means what you intended.
+Tests extend the language: they state what the code is supposed to do, and check it.
 
 Unit testing is a development practice.
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
 
 Perhaps more importantly, tests tell you immediately if a change you've made causes a failure.
-This can save an enormous amount of time compared to discovering a problem after many more changes to the code,
-at which point you don't have any idea *which* change caused the bug.
+This can save an enormous amount of time.
+If the problem surfaces only after many more changes,
+you have no idea which change caused the bug.
 
 ## Test-Driven Development (TDD)
 
@@ -19,7 +20,7 @@ and intend to write the tests later.
 Later rarely comes.
 The tests seem to lose their importance.
 
-One solution is to write the tests *before* writing the code.
+One solution is to write the tests before writing the code.
 When you write the tests first, you:
 
 1.  Describe what the code should do, in concrete and verifiable terms,
@@ -32,13 +33,13 @@ not a verification step you skip when you happen to feel good about the code you
 
 That said, TDD requires that you know what you are creating.
 You are confident the design is correct, and it is now a matter of implementation.
-You need that certainty in order to write tests first.
+You need that certainty to write tests first.
 Often, however, you are not sure what direction a program will take you.
 You are experimenting to see what the right approach is.
 When you are not simply producing code, but discovering your design, TDD is wasteful.
 Writing tests for exploratory programming is not practical.
 With the advent of AI, generating tests once you have found a good path becomes far more viable.
-It also makes it easier to produce a more thorough test suite.
+AI also makes a thorough test suite easier to produce.
 
 ## pytest
 
@@ -128,7 +129,7 @@ so you rarely need a debugger to see what went wrong.
 
 ## Testing for Exceptions and Floating Point
 
-There are two common special needs in testing, both of which appear in `test_account.py`.
+Two situations come up repeatedly in testing, and both appear in `test_account.py`.
 
 The first is "this call should cause an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.

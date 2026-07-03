@@ -27,7 +27,7 @@ print(a_function("yes"))
 Here the function signature only specifies the name of the function and the parameter names,
 but no argument types or return types (these are covered in [Static Typing](08_Static_Typing.md#type-hints)).
 Python is dynamically typed, so type errors surface at runtime rather than at compile time.
-This means that different types can be both passed to and returned from the same function:
+This means the same function can accept and return different types:
 
 ```python
 # flexible_args_and_returns.py
@@ -108,7 +108,7 @@ print(good_append(2))
 ```
 
 A mutable default persists because it lives on the function object and is not recreated on each call.
-This behavior is a common confusion for newcomers to the language.
+This behavior commonly confuses newcomers to the language.
 
 The `None` sentinel is only needed when the function modifies the argument.
 If the function only reads the parameter, use an immutable default such as an empty tuple.
@@ -242,5 +242,5 @@ print(square(9))
 ```
 
 Compared to other languages,
-Python's lambdas are constrained because they are limited to a single expression.
-For anything more complicated you are expected to write a separate function.
+Python's lambdas are limited to a single expression.
+For anything more complicated, write a separate function.

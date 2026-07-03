@@ -216,7 +216,7 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-Note that the definition of `AsyncObserver` guarantees that only `async` functions can be used as observers.
+The definition of `AsyncObserver` guarantees that only `async` functions can be used as observers.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscribe order, alarm first.

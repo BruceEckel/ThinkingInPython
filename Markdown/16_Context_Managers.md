@@ -43,11 +43,11 @@ if __name__ == "__main__":
 
 `__enter__()` returns the object that `as` binds, often `self`.
 `__exit__()` takes three arguments describing any exception (covered below).
-A `with` block provides a guarantee that the exit code always runs at the end of the scope.
+A `with` block guarantees that the exit code runs at the end of the scope.
 
 ## Cleanup Is Guaranteed
 
-Although context managers introduce a nice brevity to your code, the point is the guarantee.
+Context managers make code shorter, but the point is the guarantee.
 Here, `__exit__()` runs when the block raises an exception, but before the exception propagates:
 
 ```python

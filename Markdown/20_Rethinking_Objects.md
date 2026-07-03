@@ -540,7 +540,7 @@ A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and hashing for free.
 
-They normalized the very important idea of types, as seen in
+They normalized the crucial idea of types, as seen in
 [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 If you simply avoid implementation inheritance, the payoff for using types is tremendous.
 

@@ -17,11 +17,12 @@ Python is often called a scripting language,
 but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
 Python is a programming language that also supports scripting.
-It *is* marvelous for scripting,
+It is marvelous for scripting,
 and you may find yourself replacing all your batch files, shell scripts,
 and simple programs with Python scripts.
 
-Python is clean to write; you will find that it's quite easy to read your own code long after you've written it.
+Python is clean to write.
+You will find it easy to read your own code long after you've written it.
 A major factor in code readability is that scoping in Python is determined by indentation.
 Here is a script that runs with `python if.py`:
 
@@ -40,8 +41,8 @@ print("continuing...")
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
 In this book, the first line of an example will be the name of the file containing that example.
-That file can be found in the chapter's `Examples` subdirectory.
-So the above example can be found in `Examples/02_Tour/if.py`.
+That file lives in the chapter's `Examples` subdirectory,
+so the above example is `Examples/02_Tour/if.py`.
 
 The `#:` comments are particular to this book: they show the console output for the example.
 The book tooling validates that this output is correct.
@@ -60,8 +61,8 @@ Unlike the brace-placement debates of C++ or Java, there are no options with Pyt
 The language forces everyone's code to be indented the same way,
 which is one of the main reasons for Python's consistent readability.
 
-Python normally has only one statement per line (you can put more by separating them with semicolons),
-thus no terminating semicolon is necessary.
+Python normally has only one statement per line, so no terminating semicolon is necessary.
+(You can put more than one statement on a line by separating them with semicolons.)
 
 ## Variables and References
 
@@ -89,7 +90,7 @@ print(a is c, a == c)  # Different object, equal value
 ```
 
 Use `==` to ask whether two objects have equal values.
-Use `is` to ask whether two names refer to the *same* object.
+Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
 
 You can assign several names at once,
@@ -255,7 +256,7 @@ print(r'c:\python\lib\utils')
 #: c:\python\lib\utils
 ```
 
-Note that Python was not named after the snake,
+Python was not named after the snake,
 but rather the Monty Python comedy troupe,
 so examples often include Python-esque references.
 
@@ -264,8 +265,8 @@ This makes it useful for any block of literal text,
 such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
-The '`r`' right before a string means "raw,"
-which takes backslashes literally so you don't have to put in an extra backslash in order to insert a literal backslash.
+The '`r`' right before a string means "raw":
+backslashes are taken literally, so you don't need to double them.
 
 Python uses C's `printf()` string substitution syntax, but for any string at all.
 After the string, place a '`%`' and the values to substitute:
@@ -282,7 +283,7 @@ print(s)
 #: val: 47, val2: 63.400000
 ```
 
-As you can see in the second case,
+In the second case,
 more than one argument is grouped in parentheses as a tuple (covered in the [next chapter](03_Containers.md#tuples-and-unpacking)).
 
 All the formatting from `printf()` is available,

@@ -1,5 +1,12 @@
 # Introduction
 
+This book is about cultivating the judgment to choose the smallest thing that works.
+That judgement is found through insights, idioms, and patterns.
+It is also honest about design patterns.
+Most were invented to work around the limits of static,
+inheritance-heavy languages, and in Python many of them diminish or dissolve.
+If an idiom or pattern still earns its keep, it stays.
+
 Every language has habits worth learning and habits worth dropping.
 Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages made necessary.
@@ -7,16 +14,9 @@ Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
 A *Singleton* is a module.
 A *Visitor* is a function that dispatches on type.
-The recurring theme in this book is to ask, before reaching for idioms or patterns,
+This book asks, before reaching for idioms or patterns,
 whether the language already solves the problem,
-and to add the structure only when the answer is no.
-
-This book is about cultivating the judgment to choose the smallest thing that works.
-That judgement is found through insights, idioms, and patterns.
-It is also honest about design patterns.
-Most were invented to work around the limits of static,
-inheritance-heavy languages, and in Python many of them shrink or dissolve.
-If a pattern still earns its keep, it stays.
+and to add the complexity only when the answer is no.
 
 ## AI Trigger Warning
 
@@ -25,7 +25,7 @@ In 2011 I abandoned the project with many of the design patterns still in Java.
 Eventually I even wrote a message confirming I was not going to complete it.
 
 In June of 2026, after having people mention the online book to me at recent Pycons,
-I decided to see what the AI Claude could do with it.
+I decided to see what the Claude AI could do with it.
 The experience was amazing, and I began adding material from talks, writing, and presentations (mostly at Pycon).
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
 Every perfectionistic whim was easily realized.
@@ -48,10 +48,10 @@ I'm able to keep going until I've tweaked everything that occurs to me.
 
 I can't predict the future of books.
 The internet and eBooks have certainly impacted the print book industry.
-But with AI, how many people--especially in the computer profession--will keep reading books?
-I hardly do. If I need something I ask AI.
-So my only hope is that this book will be engaging to read,
-and that you will have some of the same satisfaction that I've had while writing it.
+But with AI, how many people will keep reading computer programming books?
+I hardly do. If I need something, I ask AI.
+Ny only hope is that this book will be engaging to read,
+and that you will experience some of the same satisfaction that I've had while writing it.
 
 ## Who This Book Is For
 
@@ -73,15 +73,14 @@ You should be comfortable with:
 
 - Functions, classes, objects, and inheritance.
 - Containers: lists, dictionaries, tuples, and sets.
-- Running a Python program and installing a package.
 
 You do not need to know design patterns, metaclasses,
 or type checking; we cover that here.
-The book is about the language, not the tooling around it,
-so it does not explain installing Python, setting up virtual environments,
-or managing packages.
-I assume you know about those or are comfortable learning about them,
-starting with the official Python documentation.
+The book is about the language, not the tooling around it.
+Fortunately, `uv` and other tools greatly simplify this process,
+so you don't need to spend time thinking about that.
+The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
+gives detailed setup instructions.
 
 ## How the Book Is Organized
 
@@ -113,10 +112,10 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the block tagged `# tracer.py` in [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/14_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/14_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
-The book's tooling extracts the examples,
+The tooling extracts the book examples,
 then type-checks (with Astral's `ty`), runs, and tests them.
 The code you read is the code that runs,
 and the output shown is the output it produces.

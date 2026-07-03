@@ -482,7 +482,7 @@ def test_bad_month_number(bad: int) -> None:
 You can build `Month` as a data class instead of an `Enum`.
 It works, but it is more code for less safety.
 You must construct the twelve months yourself and carry them around,
-whereas the `Enum` *is* that set:
+whereas the `Enum` is that set:
 
 ```python
 # month_dataclass.py

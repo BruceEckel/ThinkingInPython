@@ -24,8 +24,8 @@ A pattern seems to stand apart from the traditional way of thinking about analys
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program,
 and thus it can sometimes appear at the analysis phase or high-level design phase.
-This is interesting because a pattern has a direct implementation in code and so you might not expect it to show up before low-level design or implementation
-(you might not realize that you need a particular pattern until you get to those phases).
+This is interesting because a pattern has a direct implementation in code,
+so you might not expect it to show up before low-level design or implementation.
 
 The basic concept of a pattern can also be seen as the basic concept of program design:
 adding a layer of abstraction.
@@ -145,7 +145,7 @@ Design principles are at least as important as design structures,
 but for a different reason:
 principles ask questions about your proposed design,
 to apply tests for quality.
-Note that some of these only apply to OOP.
+Some of these only apply to OOP.
 
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*.
@@ -176,7 +176,7 @@ Note that some of these only apply to OOP.
     and the quest for generality does not always serve them well.
     The best route to generality is through understanding well-defined specific examples.
     This principle acts as the tie breaker between otherwise equally viable design alternatives.
-    Of course, it is entirely possible that the simpler solution is the more general one.
+    The simpler solution may also turn out to be the more general one.
 -   *Reflexivity*.
     One abstraction per class, one class per abstraction.
     Might also be called Isomorphism.

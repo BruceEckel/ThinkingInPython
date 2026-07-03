@@ -23,13 +23,13 @@ if __name__ == "__main__":
 ```
 
 When you import a module, it creates a *namespace* within the importing file.
-This automatically prevents name clashes between the names in the imported module and the local names.
+This automatically prevents name clashes between the imported module's names and the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
-The code at the end of the file starts with an `if` clause which checks to see if the standard variable `__name__` is equal to the string `"__main__"`.
-In Python, any identifier that begins and ends with double underscores (commonly called "dunder") is special in some way,
-and they hook your class into the language's operators and built-in functions.
+The code at the end of the file starts with an `if` clause which checks whether the standard variable `__name__` is equal to the string `"__main__"`.
+In Python, any identifier that begins and ends with double underscores (commonly called a "dunder") is special in some way.
+Dunder methods, for example, hook your class into the language's operators and built-in functions.
 
 The reason for the `if` is that any file can also be used as a library module within another program.
 In that case, you only want its definitions,
@@ -51,7 +51,7 @@ import use_module
 #: 'module' imported
 ```
 
-If you run `python import_module.py`, you should only see `'module' imported` displayed.
+If you run `python import_module.py`, you should only see `'module' imported`.
 Importing `use_module` runs its top-level code, including the `print()`,
 but not its `"__main__"` block.
 
@@ -79,8 +79,9 @@ if __name__ == "__main__":
 
 ## Packages
 
-As your programs get larger you'll further organize your code into *packages*.
-A package is a directory (and its own namespace, which has the name of that directory) that can contain multiple modules.
+As your programs get larger, you'll further organize your code into *packages*.
+A package is a directory that contains multiple modules,
+and it forms its own namespace with the name of that directory.
 
 To make something a package,
 you put a special file named `__init__.py` in that directory.

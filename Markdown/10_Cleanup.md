@@ -59,15 +59,14 @@ The objects are destroyed later, at interpreter shutdown,
 when the global `counters` list is torn down.
 That list holds the only remaining references,
 so when it goes, the objects it holds go with it.
-
-This is why the `deleted` lines are missing from the output above.
-The listing ends at `End of delete loop` because that is the program's last statement.
-Each `__del__()` runs only afterward, at interpreter shutdown, so the lines it prints come after the captured output rather than inside it.
-Run `python cleanup.py` directly to see them appear after `End of delete loop`.
+That is why the `deleted` lines are missing from the output above:
+the listing ends at `End of delete loop`, the program's last statement,
+and each `__del__()` prints only afterward.
+Run `python cleanup.py` directly to see those lines appear.
 
 The order in which the three finalizers run is an unstable implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown, and it can differ from one CPython build to the next.
-Even the fact that `__del__()` runs before the program exits is a reference-counting detail, not a guarantee.
+That `__del__()` runs before the program exits at all is a reference-counting detail, not a guarantee.
 The language does not promise when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order, or not run the finalizers before exit at all.

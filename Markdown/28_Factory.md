@@ -87,8 +87,8 @@ The `factory()` is now the only other code in the system that needs to be change
 
 I have also used a *generator*.
 A generator is a special case of a factory,
-because it takes no arguments in order to create a new object.
-Normally you hand some information to a factory in order to tell it what to create,
+because it takes no arguments to create a new object.
+Normally you hand some information to a factory to tell it what to create,
 but a generator has an internal algorithm that tells it what to build.
 
 This may not seem consistent with the code you see above:
@@ -117,8 +117,8 @@ each time `next()` is called on this generator object (which, as noted above, ma
 only the code in the `for` loop will be executed,
 so you don't have wasteful execution (as you would if this were an ordinary function).
 
-The code that you write is actually a kind of factory
-that creates the generator objects that do the actual generation.
+The code that you write is itself a kind of factory,
+one that creates the generator objects that do the actual generation.
 You can drive the generator by hand, for example:
 
 ```python
@@ -202,7 +202,7 @@ In Python a class is itself a first-class object:
 you can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
-There is no factory method and no factory class; the `dict` *is* the factory.
+There is no factory method and no factory class; the `dict` is the factory.
 You can go one step further, so the factory never needs editing when a type is added,
 by letting each subclass register itself through `__init_subclass__()`:
 
@@ -358,7 +358,7 @@ but you could imagine a more complex problem where the appropriate factory objec
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`) will work fine.
 
-Notice that `ShapeFactory` fills its dictionary lazily:
+`ShapeFactory` fills its dictionary lazily:
 the first request for a kind builds that kind's factory object (via `eval()`) and caches it for later requests.
 
 This version leans on `eval()` and a `Factory` class nested in every shape,

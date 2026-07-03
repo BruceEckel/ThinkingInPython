@@ -32,7 +32,7 @@ class State:
 This class is unnecessary.
 However, it allows us to say that something is a `State` object in code,
 and provide a slightly different error message when all the methods are not implemented.
-We could have gotten basically the same effect by saying:
+We could have gotten nearly the same effect by saying:
 
     class State: pass
 
@@ -87,7 +87,7 @@ class MouseAction(StrEnum):
 ```
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration.
-Because it is a `StrEnum`, each member *is* its string value.
+Because it is a `StrEnum`, each member is its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
@@ -237,9 +237,9 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
-Initially, this seems like it ought to be quite simple.
+Initially, this seems simple.
 Define a static table in each `State` subclass that defines the transitions in terms of the other `State` objects.
-However, it turns out that this approach generates cyclic initialization dependencies.
+However, this approach generates cyclic initialization dependencies.
 To solve the problem,
 I've had to delay the initialization of the tables until the first time that the `next()` method is called for a particular `State` object.
 Initially, the `next()` methods can appear a little strange because of this.
