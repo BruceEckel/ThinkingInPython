@@ -2,7 +2,7 @@
 
 Functional programming is usually introduced as "programming with functions," and functions are indeed a central part of the practice.
 But after (slowly) studying it for over ten years, I have started to wonder whether it's actually more about "functionality."
-One definition for science is "science is what works."
+One definition of science is "what works."
 Science has theories that fit the data, are predictive, and are falsifiable.
 If "computer science" is to live up to its name, there should be some ideas and practices that fit that definition, and perhaps even some aspects that are mathematically provable.
 This seems to me to be the broader challenge that functional programming takes on, and what I explore in this chapter.
@@ -43,7 +43,12 @@ print(withdraw(30), withdraw(30))
 `withdraw()` does not, because each call changes `balance` and the next call sees the new value.
 You cannot understand a single `withdraw()` call without tracking the history of every call before it.
 
-The payoff is trust. A pure function is the most reliable code you can write, because its behavior is fully described by its inputs. You test it with a single assertion and no fixture, since there is nothing to set up or restore. You can call it from many threads at once, because it shares no state to corrupt. A cache can store its results, knowing the answer will never go stale:
+The payoff is trust.
+A pure function is the most reliable code you can write, because its behavior is fully described by its inputs.
+You test it with a single assertion and no fixture, since there is nothing to set up or restore.
+You can call it from many threads at once, because it shares no state to corrupt.
+[Parallelism for Free](#parallelism-for-free) turns that safety into speed.
+A cache can store its results, knowing the answer will never go stale:
 
 ```python
 # why_pure.py
@@ -115,7 +120,11 @@ print(MAX_SIZE, total([1, 2, 3]))
 The annotation is a promise the checker keeps for you, even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`, is a type error caught before the program runs.
 
-Immutability also unlocks abilities a mutable value lacks. An immutable object can be *hashable*: it can promise a stable hash for its whole life, so it can serve as a dictionary key or a set member. It can also be shared without a defensive copy, because no recipient can change it out from under you. A `list` can do neither:
+Immutability also unlocks abilities a mutable value lacks.
+An immutable object can be *hashable*.
+It can promise a stable hash for its whole life, so it can serve as a dictionary key or a set member.
+It can also be shared without a defensive copy, because no recipient can change it out from under you.
+A `list` can do neither:
 
 ```python
 # hashable.py
@@ -164,7 +173,8 @@ print(table["title"]("functional python"))
 The dictionary holds functions as values, so a lookup yields a function you can immediately call.
 The [Function Objects](29_Function_Objects.md) chapter approaches the same capability from the pattern side.
 
-Treating functions as values lets data drive control flow. A dictionary of functions replaces a long `if`/`elif` chain: you select the behavior by looking it up:
+Treating functions as values lets data drive control flow.
+A dictionary of functions replaces a long `if`/`elif` chain, because you select the behavior by looking it up:
 
 ```python
 # dispatch.py
@@ -184,7 +194,9 @@ print(operations["+"](6, 4), operations["-"](6, 4))
 #: 10 2
 ```
 
-Supporting a new operator means adding a row to the table. The dispatch code never changes. This is the structure behind dispatch tables and the plugin registries that let a program grow without editing its core.
+Supporting a new operator means adding a row to the table.
+The dispatch code never changes.
+This is the structure behind dispatch tables and the plugin registries that let a program grow without editing its core.
 
 ## Higher-Order Functions
 
@@ -201,11 +213,11 @@ numbers = [1, 2, 3, 4, 5]
 squares = list(map(lambda n: n * n, numbers))
 print(squares)
 #: [1, 4, 9, 16, 25]
-# filter keeps the elements a predicate accepts:
+# filter() keeps the elements a predicate accepts:
 evens = list(filter(lambda n: n % 2 == 0, numbers))
 print(evens)
 #: [2, 4]
-# sorted takes a function as its key argument:
+# sorted() takes a function as its key argument:
 words = ["banana", "pie", "kiwi", "watermelon"]
 print(sorted(words, key=len))
 #: ['pie', 'kiwi', 'banana', 'watermelon']
@@ -249,7 +261,10 @@ A lambda is best when the function is small and used right where it is written.
 To give it a name, write a `def` instead.
 A named `def` carries a docstring, a readable name in tracebacks, and room to grow.
 
-The motivation for a lambda is locality. When a transformation is one short expression, a lambda keeps it at the call site, where the reader already is, instead of sending them to a named function defined elsewhere. `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens. Naming that one-liner would cost a line, a name to invent, and a definition to look up, with nothing gained in clarity.
+The motivation for a lambda is locality.
+When a transformation is one short expression, a lambda keeps it at the call site, where the reader already is, instead of sending them to a named function defined elsewhere.
+`sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
+Naming that one-liner would cost a line, a name to invent, and a definition to look up, with nothing gained in clarity.
 
 ## Closures
 
@@ -277,7 +292,9 @@ print(double(10), triple(10))
 `double` and `triple` are the same code with different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
-Closures are compelling when you want behavior configured once and then reused, with its configuration kept private. The captured variable is reachable only through the returned function, so no other code can read or overwrite it. That gives you encapsulation without declaring a class:
+A closure fits when you want behavior configured once and then reused, with its configuration kept private.
+The captured variable is reachable only through the returned function, so no other code can read or overwrite it.
+That gives you encapsulation without declaring a class:
 
 ```python
 # counter.py
@@ -296,7 +313,8 @@ print(tally(), tally(), tally())
 #: 1 2 3
 ```
 
-Each call to `make_counter()` builds an independent counter with its own hidden `count`. Nothing outside `increment()` can reach that state, so it cannot be corrupted by accident.
+Each call to `make_counter()` builds an independent counter with its own hidden `count`.
+Nothing outside `increment()` can reach that state, so it cannot be corrupted by accident.
 
 ## Partial Application
 
@@ -356,7 +374,10 @@ print(increment_then_double(10))
 `compose(double, increment)` returns a function that increments first, then doubles.
 Each piece stays small and pure, and you combine them without touching their internals.
 
-Composition is compelling because it scales by addition. Each stage stays small, pure, and testable on its own, and you build larger behavior by naming a new composition rather than writing new logic. Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs. When a requirement changes, you insert or swap a single stage and leave every other one untouched.
+Composition scales by addition.
+Each stage stays small, pure, and testable on its own, and you build larger behavior by naming a new composition rather than writing new logic.
+Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs.
+When a requirement changes, you insert or swap a single stage and leave every other one untouched.
 
 ## The `functools` and `itertools` Toolkits
 
@@ -374,7 +395,7 @@ from operator import add
 # reduce() folds a sequence down to a single value:
 print(reduce(add, [1, 2, 3, 4]))
 #: 10
-# lru_cache remembers results so repeats are free:
+# lru_cache remembers results, so repeats are free:
 @lru_cache
 def fib(n: int) -> int:
     return n if n < 2 else fib(n - 1) + fib(n - 2)
@@ -389,7 +410,9 @@ print(list(running))
 `lru_cache` is only correct because `fib()` is pure: caching a function with side effects would skip the effects.
 The toolkits reward you for writing pure functions in the first place.
 
-The reason to look here before writing your own version is that these tools are already written, already correct, and implemented in C. An accumulation, a grouping, a sliding window, or a memoized cache is one call, not a loop you have to debug. Assembling a solution from vetted parts is faster to write and harder to get wrong, and it keeps the code declarative, naming the operation instead of spelling out its mechanics.
+The reason to look here before writing your own version is that these tools are already written, already correct, and implemented in C.
+An accumulation, a grouping, a sliding window, or a memoized cache is one call, not a loop you have to debug.
+Assembling a solution from vetted parts is faster to write and harder to get wrong, and it keeps the code declarative, naming the operation instead of spelling out its mechanics.
 
 ## Recursion
 
@@ -418,7 +441,9 @@ Recursion suits problems that are naturally self-similar, such as walking a tree
 Python does not optimize tail calls and limits the call stack, so very deep recursion will raise `RecursionError`.
 For long flat sequences, a loop or one of the `itertools` tools is the better choice.
 
-Recursion is compelling when the data is itself recursive. Code that walks a tree, nested data, or a directory reads most clearly when its shape matches the data's shape. The function handles one node and trusts itself for the rest:
+Recursion pays off when the data is itself recursive.
+Code that walks a tree, nested data, or a directory reads most clearly when its shape matches the data's shape.
+The function handles one node and trusts itself for the rest:
 
 ```python
 # nested_sum.py
@@ -437,7 +462,8 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 #: 21
 ```
 
-`deep_sum()` states what to do with one element and delegates the nesting to itself. An iterative version would have to maintain its own stack to remember where it was, reintroducing by hand the bookkeeping recursion gives you for free.
+`deep_sum()` states what to do with one element and delegates the nesting to itself.
+An iterative version would have to maintain its own stack to remember where it was, reintroducing by hand the bookkeeping recursion gives you for free.
 
 ## Lazy Evaluation
 
@@ -465,7 +491,9 @@ print(first_five)
 Nothing beyond those five is ever computed.
 The [Performance](19_Performance.md) chapter looks at laziness from the angle of memory and speed.
 
-Laziness is compelling at scale. A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time, so memory stays flat no matter how large the source grows. Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches is never done at all.
+Laziness matters most at scale.
+A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time, so memory stays flat no matter how large the source grows.
+Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches is never done at all.
 
 ## Pattern Matching as Destructuring
 
@@ -531,7 +559,10 @@ The return type `float | None` tells the caller, and the type checker, that fail
 A richer version returns a dedicated result object carrying either a value or an error.
 The [Functional Error Handling](14_Functional_Error_Handling.md) chapter develops that approach in full.
 
-Returning failure as a value is compelling because it makes failure visible. The possibility appears in the return type, so the type checker reminds every caller to handle it and a reviewer sees it without reading the body. Control flow stays local, with no exception leaping past intermediate frames to a distant handler. You do pay by handling the failure at each step, but that is the same discipline that stops an unhandled error from escaping unnoticed.
+Returning failure as a value makes failure visible.
+The possibility appears in the return type, so the type checker reminds every caller to handle it and a reviewer sees it without reading the body.
+Control flow stays local, with no exception leaping past intermediate frames to a distant handler.
+You do pay by handling the failure at each step, but that is the same discipline that stops an unhandled error from escaping unnoticed.
 
 ## Referential Transparency
 
@@ -589,6 +620,56 @@ The [Comprehensions](17_Comprehensions.md) chapter explores this notation on its
 Declarative code says less and means more.
 By naming the result instead of the steps, you hand the reader your intent and give the runtime freedom to choose how to deliver it.
 That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
+
+## Parallelism for Free
+
+The previous section ended with engines that parallelize behind your back.
+Purity lets you claim that freedom in the open.
+A pure function is automatically parallelizable.
+Each call depends only on its arguments, so no call can affect another.
+The calls can run in any order, on any schedule, on any number of cores, and the answers do not change.
+
+Impure code has no such freedom.
+Recall `withdraw()` from the start of this chapter.
+Two parallel calls could both read `balance` before either writes it back, and one withdrawal would vanish.
+Making that safe means adding a lock, and the lock serializes the very work you wanted to overlap.
+Purity removes the problem instead of managing it.
+Nothing is shared, so there is nothing to lock.
+
+`count_primes()` is pure, and each call does enough work to be worth spreading across cores:
+
+```python
+# parallel_pure.py
+# A pure function runs in parallel without modification.
+from concurrent.futures import ProcessPoolExecutor
+
+def count_primes(limit: int) -> int:
+    count = 0
+    for n in range(2, limit):
+        if all(n % d for d in range(2, int(n ** 0.5) + 1)):
+            count += 1
+    return count
+
+def main() -> None:
+    limits = [10_000, 20_000, 30_000, 40_000]
+    serial = list(map(count_primes, limits))
+    with ProcessPoolExecutor() as pool:
+        parallel = list(pool.map(count_primes, limits))
+    assert parallel == serial
+    print(parallel)
+
+if __name__ == "__main__":
+    main()
+```
+
+`map()` runs the four calls one at a time, on one core.
+`pool.map()` sends the same calls to worker processes, which the operating system places on separate cores.
+Run as a script, this prints `[1229, 2262, 3245, 4203]`.
+The `assert` passes on every run, because a pure call returns the same answer no matter which process ran it, or when.
+Notice what is missing: no locks, no queues, no shared state, and no changes to `count_primes()` itself.
+The function did not have to be prepared for parallel execution.
+It was ready the day it was written, because it was pure.
+`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Performance](19_Performance.md#parallelism).
 
 ## An Assurance Spectrum
 
