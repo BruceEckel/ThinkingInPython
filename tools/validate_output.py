@@ -10,6 +10,12 @@ top-level code above it (since the previous #: block):
     print("world")
     #: world
 
+A lone bare "#:" (no text after it) is a not-yet-filled-in placeholder. It
+is always filled in with the actual output, even without --update, so you
+can write a listing, leave "#:" under it, and run the checker to fill it
+in. A bare "#:" that sits alongside other #: lines is instead a literal
+blank line within a multi-line output, and is checked normally.
+
 The same markers can be validated and updated directly inside the book's
 Markdown. Each ```python fenced block is treated as one program: its code is
 run and the #: lines inside the block are rewritten in place. A block is run
@@ -185,12 +191,23 @@ def process_block(
             # correct only when it already matches it. That keeps the markers
             # clean for ruff and lets update rewrite stale trailing spaces.
             canonical = encode_output(actual)
+            # A lone bare "#:" is a not-yet-filled-in placeholder (not a
+            # claim that the output is empty), so it is always filled in,
+            # even outside --update. A bare "#:" alongside other marker
+            # lines is a literal blank output line instead, and is checked
+            # normally.
+            placeholder = (
+                len(chunk_lines) == 1
+                and chunk_lines[0].rstrip('\n\r') == '#:'
+            )
 
             if chunk_lines == canonical:
                 new_lines.extend(chunk_lines)
-            elif update and not had_error:
+            elif (update or placeholder) and not had_error:
                 new_lines.extend(canonical)
                 changed = True
+                if placeholder and not update:
+                    print(f"  line {lineno}: filled in placeholder '#:'")
             else:
                 new_lines.extend(chunk_lines)
                 if not had_error:
@@ -224,7 +241,9 @@ def process_file(path: Path, *, update: bool) -> bool | None:
     del namespace
     collect_now()
 
-    if update and changed:
+    # changed can be True here with update=False only via the placeholder
+    # fill-in above, which should persist regardless of --update.
+    if changed:
         # newline="\n" keeps LF on Windows; the gate rejects CRLF.
         path.write_text(
             ''.join(new_lines), encoding='utf-8', newline='\n'
@@ -341,7 +360,9 @@ def process_markdown(
 
     if not any_markers:
         return None
-    if update and changed:
+    # changed can be True here with update=False only via a placeholder
+    # fill-in, which should persist regardless of --update.
+    if changed:
         # newline="\n" keeps LF on Windows; the gate rejects CRLF.
         path.write_text(''.join(out), encoding='utf-8', newline='\n')
     return ok

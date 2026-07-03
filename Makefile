@@ -66,7 +66,10 @@ sync-ci: sync ci  ## Like verify, plus the site build (the full CI gate)
 
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest. `verify` runs `sync` first;
-# `ci` adds the site.
+# `ci` adds the site. validate_output.py runs with --update: a stale #: marker
+# self-heals (rewriting Markdown/) the same way fix-eol/sync already do,
+# rather than failing the build. A raised exception where none is expected
+# still fails the gate; only marker text is self-corrected.
 gate:  ## The gate without sync or site (check, output, ty, ruff, run, pytest)
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/listing_format.py
@@ -76,7 +79,7 @@ gate:  ## The gate without sync or site (check, output, ty, ruff, run, pytest)
 	$(PY) tools/check_anchors.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
-	$(PY) tools/validate_output.py Markdown
+	$(PY) tools/validate_output.py --update Markdown
 	$(TY) check build/examples
 	$(RUFF) check build/examples
 	$(PY) tools/run_examples.py
