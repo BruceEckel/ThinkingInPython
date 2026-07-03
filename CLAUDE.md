@@ -71,6 +71,9 @@ Prose-only edits still need `check_anchors.py` (cross-references) and
   heading) or it will not appear in `make help`. Parsed by `tools/make_help.py`,
   deliberately not `grep`/`awk`, since GNU Make on Windows can fall back to
   `cmd.exe` as `SHELL` when no POSIX shell is on PATH.
+  `tools/README.md`'s own "Commands" section deliberately does not re-list every
+  target either (it did once, and went stale); it shows only the everyday few and
+  points to `make help` for the rest. Don't re-expand it into a full manual copy.
 - **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
