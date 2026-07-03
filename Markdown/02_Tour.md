@@ -257,8 +257,8 @@ print(r'c:\python\lib\utils')
 ```
 
 Python was not named after the snake,
-but rather the Monty Python comedy troupe,
-so examples often include Python-esque references.
+but rather the Monty Python comedy troupe, as the language creator Guido van Rossum is a fan.
+Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
 This makes it useful for any block of literal text,

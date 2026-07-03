@@ -156,6 +156,8 @@
       border-radius: 2px;
     }
 
+    img { max-width: 100%; height: auto; }
+
     pre {
       background: var(--paper);
       border: 1px solid var(--rule);
@@ -199,6 +201,9 @@
 
     a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
     a:hover { border-color: var(--accent); }
+    /* A bare URL (pandoc's a.uri) has no spaces to wrap at; break it
+       anywhere rather than widen the page. */
+    a.uri { overflow-wrap: anywhere; }
 
     table { border-collapse: collapse; width: 100%; margin: 1.75rem 0; }
     th, td {
@@ -208,6 +213,12 @@
       border-bottom: 1px solid var(--rule);
     }
     thead th { border-bottom-color: var(--accent); }
+    /* On narrow screens a wide table scrolls in place instead of
+       stretching the page (which drags the fixed Contents link
+       off-screen). */
+    @media (max-width: 720px) {
+      table { display: block; overflow-x: auto; }
+    }
 
     hr {
       border: none;

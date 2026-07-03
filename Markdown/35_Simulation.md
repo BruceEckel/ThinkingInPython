@@ -834,13 +834,9 @@ Neither needs concurrency.
 
 ## Other Maze Resources
 
-A discussion of algorithms to create mazes:
+A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
 
-<https://en.wikipedia.org/wiki/Maze_generation_algorithm>
-
-A discussion of algorithms for collision detection and steering behavior for autonomous moving objects:
-
-<http://www.red3d.com/cwr/steer/>
+A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/steer/) and steering behavior for autonomous moving objects:
 
 ## Exercises
 
