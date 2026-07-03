@@ -55,7 +55,7 @@ Delete the review file and mark a cell `X` when that item is done.
 
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|
-| 01_Introduction.md              | | |
+| 01_Introduction.md              |X|X|
 | 02_Tour.md                      |X|X|
 | 03_Containers.md                |X|X|
 | 04_Control_Flow.md              |X|X|
@@ -73,7 +73,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 16_Context_Managers.md          |X|X|
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
-| 19_Performance.md               | | |
+| 19_Performance.md (unfinished)  | | |
 | 20_Rethinking_Objects.md        |X|X|
 | 21_The_Pattern_Concept.md       |X|X|
 | 22_Data_Transfer_Objects.md     |X|X|
@@ -90,5 +90,5 @@ Delete the review file and mark a cell `X` when that item is done.
 | 33_Visitor.md                   |X|X|
 | 34_Pattern_Refactoring.md       |X|X|
 | 35_Simulation.md                | | |
-| 36_Functional_Programming.md    | | |
+| 36_Functional_Programming.md (unfinished)   | | |
 | A_Pattern_Catalog.md            |X|X|

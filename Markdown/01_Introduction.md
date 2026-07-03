@@ -1,7 +1,7 @@
 # Introduction
 
 This book is about cultivating the judgment to choose the smallest thing that works.
-That judgement is found through insights, idioms, and patterns.
+You build that judgment through insights, idioms, and patterns.
 It is also honest about design patterns.
 Most were invented to work around the limits of static,
 inheritance-heavy languages, and in Python many of them diminish or dissolve.
@@ -14,9 +14,9 @@ Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
 A *Singleton* is a module.
 A *Visitor* is a function that dispatches on type.
-This book asks, before reaching for idioms or patterns,
-whether the language already solves the problem,
-and to add the complexity only when the answer is no.
+Before using an idiom or pattern,
+this book asks whether the language already solves the problem,
+and adds the complexity only when the answer is no.
 
 ## AI Trigger Warning
 
@@ -24,11 +24,10 @@ I started this book in 2008, with the idea of taking the design patterns work I 
 In 2011 I abandoned the project with many of the design patterns still in Java.
 Eventually I even wrote a message confirming I was not going to complete it.
 
-In June of 2026, after having people mention the online book to me at recent Pycons,
+In June of 2026, after having people mention the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
-The experience was amazing, and I began adding material from talks, writing, and presentations (mostly at Pycon).
+The experience was amazing, and I began adding material from talks, writing, and presentations (mostly at PyCon).
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
-Every perfectionistic whim was easily realized.
 
 This book never would have happened without the help of Claude, which gave me tremendous support throughout the process.
 That said, it is still my work, derived from existing work, designed by me, checked and rewritten by me.
@@ -36,21 +35,23 @@ It has my voice, and I've gone over every sentence multiple times, editing, rewr
 
 I know some people don't like AI.
 Without it, this book wouldn't exist.
-And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore it.
+And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore this book.
 
 Using Claude made me realize how many compromises I've made on books in the past.
-I would have a good idea about something (example: automatically interleaving commented output in the examples),
+I would have a good idea about something (for example, automatically interleaving commented output in the listings),
 but I was either unable to implement it or it just seemed too hard so I didn't do it.
-But with AI I've been able to explore and often implement every whim.
-From things as seemingly straightforward as inserting a new chapter to as daunting as the aforementioned commented output system.
+But with AI I've been able to explore and often implement every whim,
+from things as seemingly straightforward as inserting a new chapter
+to ones as daunting as that commented-output system.
 The result is much better than I've been able to achieve in the past.
 I'm able to keep going until I've tweaked everything that occurs to me.
 
 I can't predict the future of books.
-The internet and eBooks have certainly impacted the print book industry.
+The internet and eBooks have already changed the print book industry.
 But with AI, how many people will keep reading computer programming books?
-I hardly do. If I need something, I ask AI.
-Ny only hope is that this book will be engaging to read,
+I hardly do.
+If I need something, I ask AI.
+My only hope is that this book will be engaging to read,
 and that you will experience some of the same satisfaction that I've had while writing it.
 
 ## Who This Book Is For
@@ -75,10 +76,10 @@ You should be comfortable with:
 - Containers: lists, dictionaries, tuples, and sets.
 
 You do not need to know design patterns, metaclasses,
-or type checking; we cover that here.
+or type checking; we cover them here.
 The book is about the language, not the tooling around it.
-Fortunately, `uv` and other tools greatly simplify this process,
-so you don't need to spend time thinking about that.
+Fortunately, `uv` and other tools greatly simplify setup,
+so you don't need to spend time on it.
 The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
 gives detailed setup instructions.
 
@@ -89,7 +90,7 @@ or jump to a chapter that interests you.
 
 *Foundations* is a fast tour of the language: its syntax, containers, functions,
 classes, and static typing.
-This section is for programmers coming to Python from another language.
+This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know, or skip it altogether.
 
 *Techniques* covers the idioms and tools that give Python its character:
@@ -97,22 +98,22 @@ testing, data classes as types, pattern matching, functional error handling,
 decorators, comprehensions, and metaprogramming.
 At the end of this part, a chapter steps back to question object orientation itself,
 because several of the patterns that follow exist to manage problems that objects create.
-Many of these chapters came from various presentations I've given, mostly at Pycon.
+Many of these chapters came from presentations I've given, mostly at PyCon.
 
 *Patterns* works through the classic design patterns,
 each reframed for Python and weighed against the language.
-I consistently ask what problem we are solving and whether the language already supports a particular pattern.
+I consistently ask what problem we are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 
 ## The Examples
 
-The book targets Python 3.14 and later, uses type hints throughout, and uses `pytest` for testing.
+The book targets Python 3.14 and later, uses type hints throughout, and tests with `pytest`.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/14_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/15_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The tooling extracts the book examples,
