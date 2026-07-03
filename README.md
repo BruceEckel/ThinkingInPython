@@ -73,7 +73,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 16_Context_Managers.md          |X|X|
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
-| 19_Performance.md 🔴            | Unfinished |
+| 19_Performance.md 🔴 Unfinished |_|_|
 | 20_Rethinking_Objects.md        |X|X|
 | 21_The_Pattern_Concept.md       |X|X|
 | 22_Data_Transfer_Objects.md     |X|X|
@@ -90,5 +90,5 @@ Delete the review file and mark a cell `X` when that item is done.
 | 33_Visitor.md                   |X|X|
 | 34_Pattern_Refactoring.md       |X|X|
 | 35_Simulation.md                | | |
-| 36_Functional_Programming.md 🔴 (unfinished) | | |
+| 36_Functional_Programming.md 🔴 Unfinished |_|_|
 | A_Pattern_Catalog.md            |X|X|
