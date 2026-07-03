@@ -51,23 +51,14 @@ winget install ezwinports.make
 
 Restart the terminal to refresh the PATH, then run `make --version` to confirm.
 
-Run targets with `make` (they go through `uv run`); `make help` lists them all,
-most-used first:
+Run targets with `make` (they go through `uv run`); `make help` prints the
+complete, categorized list, generated from the Makefile itself so it never
+drifts out of date (see [make_help.py](#make_help.py) below). The everyday ones:
 
 ```
 make verify     # sync Examples/, then every gate except the site build
 make sync-ci    # like verify, plus the site build (the full gate)
-make ci         # the full local gate: check, run, pytest, ty, ruff, site
-make gate       # the gate without sync or site (check, run, pytest, ty, ruff)
-make sync       # update the committed Examples/ tree from the Markdown
-make check      # do the book's examples match the committed Examples/ tree?
-make site       # render Markdown/ into build/site/
-make examples   # extract then run (the full verification pass)
-make test       # run the book's pytest examples
-make ty         # type-check the extracted examples (must be clean)
-make lint       # PEP 8 lint the extracted examples with ruff (must be clean)
-make spell      # spell-check the prose and comments with codespell
-make prose      # house-style lint the prose with Vale (needs the vale binary)
+make ci         # the full local gate: check, ty, ruff, run, pytest, site
 ```
 
 `make verify` is the everyday command after editing the book: it pushes your
