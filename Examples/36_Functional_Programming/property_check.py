@@ -8,8 +8,6 @@ def encode(text: str) -> str:
 def decode(text: str) -> str:
     return text[::-1]
 
-# State a law, then check it on many random inputs the way
-# a property-based tool such as Hypothesis would:
 alphabet = "abcde"
 for _ in range(1000):
     size = random.randint(0, 8)

@@ -52,7 +52,7 @@ Composition can also be considered a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
-Another pattern that appears in *GoF Design Patterns* is the *iterator*,
+Another pattern that appears in *GoF Design Patterns* is the [Iterator](27_Iterators.md),
 which has been implicitly available in `for` loops from the beginning of the language,
 and was introduced as an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through.
@@ -137,7 +137,7 @@ Here^[This list includes suggestions by Kevlin Henney, David Scott, and others.]
 -   **Notification**
 -   **Transaction**
 -   **Mirror**: "the ability to keep a parallel universe(s) in step with the golden world"
--   **Shadow**: "follows your movement and does something different in a different medium" (May be a variation on Proxy).
+-   **Shadow**: "follows your movement and does something different in a different medium" (May be a variation on [Proxy](25_Surrogate.md#proxy)).
 
 ## Design Principles
 

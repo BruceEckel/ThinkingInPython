@@ -80,8 +80,8 @@ what_i_use.op(what_i_have2)
 what_i_use.op(what_i_have3.what_i_want())
 ```
 
-This takes liberty with the term "proxy,"
-because in *GoF Design Patterns* they assert that a proxy must have an identical interface with the object that it is a surrogate for.
+This takes liberty with the term "[Proxy](25_Surrogate.md#proxy),"
+because in *GoF Design Patterns* they assert that a Proxy must have an identical interface with the object that it is a surrogate for.
 
 ### Adapter in Python
 
@@ -152,7 +152,7 @@ That is what *Façade* accomplishes.
 If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
-Façade is often implemented as a singleton abstract factory.
+Façade is often implemented as a [Singleton](23_Singleton.md) [Abstract Factory](28_Factory.md#abstract-factories).
 You can easily get this effect by creating a class containing static factory methods:
 
 ```python

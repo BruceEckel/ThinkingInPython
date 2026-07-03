@@ -751,7 +751,7 @@ if __name__ == "__main__":
 
 ## Exercises
 
-The *Proxy* and *State* patterns that several of these exercises build on are covered in [Surrogate](25_Surrogate.md).
+The [Proxy](25_Surrogate.md#proxy) and [State](25_Surrogate.md#state) patterns that several of these exercises build on are covered in [Surrogate](25_Surrogate.md).
 
 1.  Create an example of the "virtual proxy."
 2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.
@@ -761,7 +761,7 @@ The *Proxy* and *State* patterns that several of these exercises build on are co
     the system must be informed so that it can check that connection back in to be reused.
     To guarantee this, provide a proxy object instead of a reference to the actual connection,
     and design the proxy so that it will cause the connection to be released back to the system.
-4.  Using the *State*, make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
+4.  Using [State](25_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
     Add an additional kind of `Mood` called `Prozac`.
 5.  Create a simple copy-on-write implementation.
 6.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.

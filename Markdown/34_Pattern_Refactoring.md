@@ -24,7 +24,7 @@ and the type of each piece must be recovered to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
-and a `create()` method builds an instance from a material name (this is a *factory*):
+and a `create()` method builds an instance from a material name (this is a [Factory](28_Factory.md)):
 
 ```python
 # trash.py

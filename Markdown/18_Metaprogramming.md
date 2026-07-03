@@ -459,7 +459,7 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons stay independent.
 
 This works, but it is heavier than the problem usually requires.
-A Singleton is often clearer as a class decorator,
+A [Singleton](23_Singleton.md) is often clearer as a class decorator,
 which needs no metaclass at all:
 
 ```python
@@ -502,7 +502,7 @@ display_object(b)
 #:   None
 ```
 
-The simplest Python singleton of all is a module:
+The simplest Python [Singleton](23_Singleton.md#a-module-is-already-a-singleton) of all is a module:
 import it anywhere and you get the same object.
 Choose the lightest tool that solves your problem.
 
