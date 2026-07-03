@@ -13,12 +13,12 @@ Includes a fast introduction for programmers from other languages.
 3. Install [uv](https://docs.astral.sh/uv/).
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
    Python (3.14+) and dev tools automatically. No manual Python install is needed.
-5. Run `make check-tools` to verify that all the tools are available.
+5. Run `make check-tools` to verify that the essential tools are available.
 
 Type `make` to see the options.
 
-These are optional, but if you want to run them
-`make site`, `make local`, and `make serve` also need `pandoc` on your PATH;
+These are optional, but if you want to run
+`make site`, `make local`, and `make serve`, you also need `pandoc` on your PATH.
 `make prose` needs the standalone `vale` binary. See
 [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.
