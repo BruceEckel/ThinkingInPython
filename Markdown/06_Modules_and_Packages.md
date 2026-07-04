@@ -189,6 +189,29 @@ print(module3.function3())
 #: function3 in module3 in b_package
 ```
 
+## File Names
+
+A file name must be a valid identifier containing letters, digits, and underscores.
+It cannot start with a digit.
+
+**Modules** (`.py` files): short, all-lowercase, with underscores between words if that improves
+readability. This is `snake_case`.
+
+- Good: `result.py`, `cache_singleton.py`, `list_comprehension.py`
+- Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase), `cache-singleton.py`
+  (hyphens aren't importable)
+
+**Packages** (directories with `__init__.py`): also short and all-lowercase, but underscores are
+discouraged; prefer a single run-together word when you can.
+
+- Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
+
+**Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`). This book uses `test_*.py`,
+  e.g. `test_result.py`.
+
+Don't shadow standard-library modules. A file named `random.py`, `types.py`, or `weakref.py` can hide
+the stdlib one and break imports.
+
 ## `PYTHONPATH`
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?

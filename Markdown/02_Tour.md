@@ -268,27 +268,6 @@ which you can write out in full without escaping line breaks.
 The '`r`' right before a string means "raw":
 backslashes are taken literally, so you don't need to double them.
 
-Python uses C's `printf()` string substitution syntax, but for any string at all.
-After the string, place a '`%`' and the values to substitute:
-
-```python
-# string_formatting.py
-
-val = 47
-print("The number is %d" % val)
-#: The number is 47
-val2 = 63.4
-s = "val: %d, val2: %f" % (val, val2)
-print(s)
-#: val: 47, val2: 63.400000
-```
-
-In the second case,
-more than one argument is grouped in parentheses as a tuple (covered in the [next chapter](03_Containers.md#tuples-and-unpacking)).
-
-All the formatting from `printf()` is available,
-including control over the number of decimal places and alignment.
-
 ### f-Strings
 
 Modern Python uses *f-string*s.
@@ -311,8 +290,13 @@ print(f"{total = }")  # Useful for debugging
 #: total = 7
 ```
 
-The format spec after a colon controls width, precision, and alignment,
-the same mini-language the older formatting used.
+The format spec after a colon controls width, precision, and alignment.
+
+You will also see two older styles in existing code:
+C's `printf()` syntax, as in `"val: %d" % val`,
+and the `str.format()` method, as in `"val: {}".format(val)`.
+Both still work, and both use the same format mini-language;
+f-strings replaced them, so this book does not use them.
 
 ### Common String Operations
 
@@ -365,26 +349,3 @@ The default for a class is still `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
 These can be automatically applied to your code (or at least, pointed out) using tools such as ruff.
-
-### File Names
-
-A file name must be a valid identifier containing letters, digits, and underscores.
-It cannot start with a digit.
-
-**Modules** (`.py` files): short, all-lowercase, with underscores between words if that improves
-readability. This is `snake_case`.
-
-- Good: `result.py`, `cache_singleton.py`, `list_comprehension.py`
-- Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase), `cache-singleton.py`
-  (hyphens aren't importable)
-
-**Packages** (directories with `__init__.py`): also short and all-lowercase, but underscores are
-discouraged; prefer a single run-together word when you can.
-
-- Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
-
-**Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`). This book uses `test_*.py`,
-  e.g. `test_result.py`.
-
-Don't shadow standard-library modules. A file named `random.py`, `types.py`, or `weakref.py` can hide
-the stdlib one and break imports.
