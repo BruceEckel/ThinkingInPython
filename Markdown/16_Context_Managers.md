@@ -277,3 +277,122 @@ so one `with` block serves both cases.
 With a real resource the `with` closes it, shown by `buffer.closed`.
 With the default, `nullcontext` hands back `sys.stdout` and does nothing on exit,
 so the stream stays open.
+
+## An Object Pool
+
+Some objects are expensive to create or rationed by the outside world:
+database connections, worker processes, licensed sessions.
+The *Object Pool* pattern creates a fixed set up front and lends them out.
+Lending is the dangerous half.
+Every borrower must return the object on every path out of their code,
+including the exception path,
+or the pool slowly drains until the program starves.
+"Must happen on every path out" is precisely what a context manager guarantees,
+so in Python a pool is a queue plus one `@contextmanager` method:
+
+```python
+# object_pool.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass
+from queue import Queue
+
+@dataclass(frozen=True)
+class Connection:
+    number: int
+
+    def query(self, sql: str) -> str:
+        return f"connection {self.number}: {sql}"
+
+class Pool[R]:
+    def __init__(self, *items: R) -> None:
+        self._available: Queue[R] = Queue()
+        for item in items:
+            self._available.put(item)
+
+    @contextmanager
+    def lease(self) -> Iterator[R]:
+        item = self._available.get()
+        try:
+            yield item
+        finally:
+            self._available.put(item)
+
+    def available(self) -> int:
+        return self._available.qsize()
+
+if __name__ == "__main__":
+    pool = Pool(Connection(1), Connection(2))
+    with pool.lease() as conn:
+        print(conn.query("SELECT name FROM users"))
+        print("available during lease:", pool.available())
+    print("available after lease:", pool.available())
+    try:
+        with pool.lease() as conn:
+            raise RuntimeError("crash during query")
+    except RuntimeError:
+        pass
+    print("available after crash:", pool.available())
+#: connection 1: SELECT name FROM users
+#: available during lease: 1
+#: available after lease: 2
+#: available after crash: 2
+```
+
+`lease()` takes an item out of the queue, yields it to the `with` block,
+and the `finally` puts it back.
+The `finally` is the entire pattern:
+the crash inside the second `with` block still returns the connection,
+so the count is back to two.
+`Pool` is generic over the pooled type,
+and it never creates or destroys anything.
+It only tracks custody.
+
+The queue does more than store the idle items.
+`Queue` is thread-safe, and `get()` blocks while the pool is empty,
+so a borrower waits until someone else's `with` block ends and
+a return makes an item available.
+Handing the same pool to several threads therefore just works:
+the pool becomes the throttle that limits concurrent use,
+which is how real database connection pools behave.
+
+This differs from [Flyweight](35_Flyweight.md), its nearest neighbor.
+A flyweight is immutable and shared by everyone at once.
+A pooled object is usually mutable or stateful,
+so the pool lends it to one borrower at a time,
+and the lease exists to take it back:
+
+```python
+# test_object_pool.py
+import pytest
+from object_pool import Connection, Pool
+
+def test_lease_removes_then_returns() -> None:
+    pool = Pool(Connection(1), Connection(2))
+    with pool.lease():
+        assert pool.available() == 1
+    assert pool.available() == 2
+
+def test_returned_on_exception() -> None:
+    pool = Pool(Connection(1))
+    with pytest.raises(RuntimeError):
+        with pool.lease():
+            raise RuntimeError("boom")
+    assert pool.available() == 1
+
+def test_objects_reused_not_recreated() -> None:
+    pool = Pool(Connection(1))
+    with pool.lease() as first:
+        pass
+    with pool.lease() as second:
+        assert second is first
+```
+
+The last test states the pattern's purpose:
+the second lease hands back the very same object,
+not a new one.
+A production pool adds refinements on this skeleton,
+such as creating items lazily on first demand,
+validating an item before lending it out,
+and a timeout on `get()` so a starved borrower fails loudly
+instead of waiting forever.

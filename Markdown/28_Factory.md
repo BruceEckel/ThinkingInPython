@@ -636,9 +636,153 @@ def test_prototype_untouched() -> None:
     assert PROTOTYPES["troll"].hp == 40
 ```
 
+## Builder
+
+The remaining creational pattern in *GoF Design Patterns* is *Builder*:
+separate the construction of a complex object from its representation,
+assembling it in steps.
+In Java and C++ it earns its keep by curing the *telescoping constructor*.
+A class with many optional settings needs a constructor for every
+useful combination, because those languages have no keyword arguments.
+The workaround is a companion class that collects settings one
+method call at a time.
+Translated directly into Python, it looks like this:
+
+```python
+# pizza_builder.py
+from dataclasses import dataclass
+from typing import Self
+
+@dataclass(frozen=True)
+class Pizza:
+    size: int
+    cheese: bool
+    toppings: tuple[str, ...]
+
+class PizzaBuilder:
+    def __init__(self) -> None:
+        self._size = 12
+        self._cheese = True
+        self._toppings: list[str] = []
+
+    def size(self, inches: int) -> Self:
+        self._size = inches
+        return self
+
+    def no_cheese(self) -> Self:
+        self._cheese = False
+        return self
+
+    def topping(self, name: str) -> Self:
+        self._toppings.append(name)
+        return self
+
+    def build(self) -> Pizza:
+        return Pizza(
+            self._size, self._cheese, tuple(self._toppings))
+
+if __name__ == "__main__":
+    pizza = (PizzaBuilder()
+             .size(16)
+             .topping("basil")
+             .topping("olives")
+             .build())
+    print(pizza)
+#: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
+```
+
+Each setter returns `self`,
+annotated with `Self` from
+[Static Typing](08_Static_Typing.md#the-self-type),
+so the calls chain.
+`build()` freezes the accumulated settings into an immutable `Pizza`.
+The class works, and it reads well.
+It also solves a problem Python does not have.
+Keyword arguments with defaults are the built-in builder:
+
+```python
+# pizza_direct.py
+from dataclasses import dataclass, replace
+
+@dataclass(frozen=True)
+class Pizza:
+    size: int = 12
+    cheese: bool = True
+    toppings: tuple[str, ...] = ()
+
+if __name__ == "__main__":
+    pizza = Pizza(size=16, toppings=("basil", "olives"))
+    print(pizza)
+    family = replace(pizza, size=20)
+    print(family)
+#: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
+#: Pizza(size=20, cheese=True, toppings=('basil', 'olives'))
+```
+
+Every combination of settings is a single call,
+the call site names each option just as the chain did,
+and the defaults live on the fields instead of inside a second class.
+`dataclasses.replace()` covers the other thing builder chains are
+used for: starting from an existing configuration and varying it.
+For a frozen data class,
+`replace()` is Prototype and Builder rolled into one function,
+copying the configured state and changing chosen fields on the way.
+A test confirms the two forms produce the same pizza:
+
+```python
+# test_pizza.py
+from dataclasses import replace
+import pizza_builder as pb
+import pizza_direct as pd
+
+def test_builder_and_keywords_agree() -> None:
+    built = (pb.PizzaBuilder()
+             .size(16).topping("basil").build())
+    direct = pd.Pizza(size=16, toppings=("basil",))
+    assert (built.size, built.cheese, built.toppings) == (
+        direct.size, direct.cheese, direct.toppings)
+
+def test_replace_varies_one_field() -> None:
+    base = pd.Pizza()
+    variant = replace(base, size=18)
+    assert base.size == 12 and variant.size == 18
+    assert variant.toppings == base.toppings
+```
+
+So when does Builder survive in Python?
+When construction genuinely is a process:
+the steps must happen in an order,
+later steps depend on earlier ones,
+and rules span the steps.
+`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze)
+is the real thing.
+It assembles a maze in three stages,
+creating rooms, connecting doors, then placing the robot,
+and each stage relies on what the previous stage established.
+No single constructor call can express that.
+The standard library's `argparse.ArgumentParser` has the same shape:
+`add_argument()` calls accumulate a specification,
+and `parse_args()` is the `build()`.
+
+The humblest builder in Python hides in plain sight.
+Appending parts to a list and finishing with `"".join(parts)`
+builds an immutable product, a string,
+through a mutable intermediate, which is Builder's essence.
+`PizzaBuilder` collecting toppings in a list and freezing them
+into a tuple at `build()` is the same move.
+Reserve the pattern, and the name,
+for construction that is a process with intermediate state and
+rules of its own.
+When the "steps" are just optional values,
+keyword arguments and a data class already are the builder.
+
 ## Exercises
 
 1.  Add a class `Triangle` to `shape_factory1.py`.
 2.  Add a class `Triangle` to `shape_factory2.py`.
 3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to `games.py`.
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
+5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
+    In `pizza_direct.py`, enforce it with `__post_init__()`;
+    in `pizza_builder.py`, decide whether it belongs in `topping()` or `build()`.
+    In which version can an invalid pizza exist, even momentarily?
