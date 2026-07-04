@@ -215,8 +215,8 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the fuller case for frozen data classes.
-Here, the point is that most encapsulation is work you only do because you allowed mutation in the first place.
+[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the case for frozen data classes.
+Most encapsulation is only necessary because you allowed mutation in the first place.
 
 ## Methods or Functions?
 
@@ -420,8 +420,7 @@ class Circle(Shape):
         return math.pi * self.radius**2
 
 if __name__ == "__main__":
-    shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
-    for shape in shapes:
+    for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
         print(round(shape.area(), 4))
 #: 3.1416
 #: 12.0
