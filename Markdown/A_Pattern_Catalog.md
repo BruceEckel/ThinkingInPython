@@ -12,44 +12,46 @@ find it elsewhere. Listing a pattern here is not a recommendation.
 Many overlap, some compete, and several exist only to work around limits of a
 particular language.
 The body of this book argues that a number of them are unnecessary in Python.
+When this book covers a pattern, its name links to that coverage.
+An unlinked name means the pattern appears only in this catalog.
 
 ## Creational (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| Abstract Factory | Create families of related objects without naming concrete classes. |
-| Builder | Separate constructing a complex object from its representation, building it in steps. |
-| Factory Method | Defer instantiation to a method so subclasses choose the concrete type. |
-| Prototype | Create new objects by cloning an existing instance. |
-| Singleton | Ensure a class has one instance with a single point of access. |
+| [Abstract Factory](28_Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
+| [Builder](28_Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
+| [Factory Method](28_Factory.md) | Defer instantiation to a method so subclasses choose the concrete type. |
+| [Prototype](28_Factory.md#prototype) | Create new objects by cloning an existing instance. |
+| [Singleton](23_Singleton.md) | Ensure a class has one instance with a single point of access. |
 
 ## Structural (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| Adapter | Convert one interface into another a client expects. |
+| [Adapter](30_Changing_the_Interface.md#adapter) | Convert one interface into another a client expects. |
 | Bridge | Separate an abstraction from its implementation so both vary independently. |
-| Composite | Treat individual objects and compositions of them uniformly through a tree. |
-| Decorator | Attach responsibilities to an object dynamically by wrapping it. |
-| Facade | Provide one simplified interface to a subsystem. |
-| Flyweight | Share fine-grained objects to support large numbers of them efficiently. |
-| Proxy | Provide a surrogate that controls access to another object. |
+| [Composite](34_Composite_and_Interpreter.md) | Treat individual objects and compositions of them uniformly through a tree. |
+| [Decorator](15_Decorators.md#the-decorator-pattern) | Attach responsibilities to an object dynamically by wrapping it. |
+| [Facade](30_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
+| [Flyweight](35_Flyweight.md) | Share fine-grained objects to support large numbers of them efficiently. |
+| [Proxy](25_Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
 
 ## Behavioral (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| Chain of Responsibility | Pass a request along a chain until a handler processes it. |
-| Command | Encapsulate a request as an object, enabling queues, logging, and undo. |
-| Interpreter | Represent a grammar and evaluate sentences written in it. |
-| Iterator | Access the elements of a collection in order without exposing its structure. |
+| [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) | Pass a request along a chain until a handler processes it. |
+| [Command](29_Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
+| [Interpreter](34_Composite_and_Interpreter.md#interpreter) | Represent a grammar and evaluate sentences written in it. |
+| [Iterator](27_Iterators.md) | Access the elements of a collection in order without exposing its structure. |
 | Mediator | Route communication between objects through one place to reduce coupling. |
-| Memento | Capture and restore an object's state without breaking encapsulation. |
-| Observer | Notify dependents automatically when an object changes state. |
-| State | Change an object's behavior when its internal state changes. |
-| Strategy | Make a family of algorithms interchangeable at runtime. |
-| Template Method | Define an algorithm's skeleton, letting subclasses fill in steps. |
-| Visitor | Add operations to an object structure without changing its classes. |
+| [Memento](36_Memento.md) | Capture and restore an object's state without breaking encapsulation. |
+| [Observer](31_Observer.md) | Notify dependents automatically when an object changes state. |
+| [State](25_Surrogate.md#state) | Change an object's behavior when its internal state changes. |
+| [Strategy](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
+| [Template Method](24_Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
+| [Visitor](33_Visitor.md) | Add operations to an object structure without changing its classes. |
 
 ## Concurrency (POSA and others)
 
@@ -76,7 +78,7 @@ The body of this book argues that a number of them are unnecessary in Python.
 |---------|--------|
 | Layers | Stack responsibilities so each layer uses only the one beneath it. |
 | Pipes and Filters | Process a stream through a chain of independent transforms. |
-| Blackboard | Let independent components cooperate through a shared data store. |
+| [Blackboard](38_Simulation.md) | Let independent components cooperate through a shared data store. |
 | Broker | Coordinate requests and replies between distributed components. |
 | Model-View-Controller | Separate data, presentation, and input handling. |
 | Presentation-Abstraction-Control | Build interactive systems from cooperating agents, each split three ways. |
@@ -96,14 +98,14 @@ The body of this book argues that a number of them are unnecessary in Python.
 | Unit of Work | Track changes in a transaction and commit them together. |
 | Identity Map | Load each object only once per session. |
 | Lazy Load | Defer loading data until it is actually needed. |
-| Data Transfer Object | Carry data between processes in one batched object. |
+| [Data Transfer Object](22_Data_Transfer_Objects.md) | Carry data between processes in one batched object. |
 | Value Object | A small immutable object compared by value, not identity. |
 | Service Layer | Define an application boundary as a set of operations. |
 | Gateway | Wrap access to an external system behind a simple interface. |
 | Front Controller | Funnel all requests through a single handler. |
 | Money | Represent monetary amounts together with their currency. |
 | Special Case | Supply a subclass for a special case instead of scattering null checks. |
-| Registry | A well-known object others use to find services or data. |
+| [Registry](28_Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
 | Plugin | Choose behavior with classes named at configuration time. |
 
 ## Integration and Messaging (Hohpe and Woolf)
@@ -143,21 +145,21 @@ The body of this book argues that a number of them are unnecessary in Python.
 
 | Pattern | Intent |
 |---------|--------|
-| Null Object | Use an object with neutral behavior in place of null. |
-| Object Pool | Reuse expensive objects from a managed pool. |
+| [Null Object](20_Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
+| [Object Pool](16_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | Multiton | Manage a fixed set of named singletons. |
 | Dependency Injection | Supply an object's collaborators from outside it. |
 | Inversion of Control | Let a framework call your code rather than the reverse. |
 | Service Locator | Look up dependencies through a central registry. |
-| Resource Acquisition Is Initialization | Tie a resource's lifetime to an object's scope. |
+| [Resource Acquisition Is Initialization](16_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
 | Fluent Interface | Chain method calls that return the receiver for readable APIs. |
 | Mixin | Add reusable behavior through multiple inheritance. |
-| Monad | Sequence computations inside a context such as optionality, error, or async. |
-| Function Object | An object whose sole purpose is to wrap a single function. |
-| Memoization | Cache a function's results keyed by its arguments. |
-| Lazy Initialization | Create a value on first use. |
+| [Monad](14_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
+| [Function Object](29_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
+| [Memoization](39_Functional_Programming.md#the-functools-and-itertools-toolkits) | Cache a function's results keyed by its arguments. |
+| [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
 | Curiously Recurring Template Pattern | A class inherits from a base parameterized by the class itself. |
 | Pointer to Implementation | Hide a class's implementation behind an indirection to cut compile coupling. |
