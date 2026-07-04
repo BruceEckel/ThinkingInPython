@@ -270,6 +270,46 @@ so you choose the access you want by defining one or both.
 A write-only property is possible but rare:
 a plain method is a better expression of the intent.
 
+A `@property` reruns its code on every access.
+When the computation is expensive and the answer cannot change,
+`functools.cached_property` runs it once,
+on first access, and stores the result:
+
+```python
+# cached_property_demo.py
+from functools import cached_property
+
+class Numbers:
+    def __init__(self, values):
+        self.values = values
+
+    @cached_property
+    def total(self):
+        print("summing", len(self.values), "values")
+        return sum(self.values)
+
+n = Numbers([5, 10, 15])
+print(n.total)
+#: summing 3 values
+#: 30
+print(n.total)  # Second access: stored value, no recomputation
+#: 30
+```
+
+The first access runs the method; the second answers silently
+from the stored value.
+The attribute is *lazy*, created on first use,
+so an instance that never asks never pays.
+Pattern catalogs call this *Lazy Initialization*,
+and in Python it is one decorator.
+The stored value lives on the instance:
+`del n.total` discards it, and the next access recomputes.
+That is also the caution.
+`cached_property` trades freshness for speed,
+so if `n.values` changed, `total` would be stale.
+A plain `@property` recomputes every time and is never wrong;
+cache only what cannot change.
+
 ## String Representation
 
 Two special methods control the way an object displays.
