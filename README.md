@@ -74,24 +74,25 @@ Delete the review file and mark a cell `X` when that item is done.
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
 | 19_Performance.md 🔴 Unfinished |_|_|
-| 20_Rethinking_Objects.md        |X|X|
-| 21_The_Pattern_Concept.md       |X|X|
-| 22_Data_Transfer_Objects.md     |X|X|
-| 23_Singleton.md                 |X|X|
-| 24_Template_Method.md           |X|X|
-| 25_Surrogate.md                 |X|X|
-| 26_State_Machines.md            |X|X|
-| 27_Iterators.md                 |X|X|
-| 28_Factory.md                   |X|X|
-| 29_Function_Objects.md          |X|X|
-| 30_Changing_the_Interface.md    |X|X|
-| 31_Observer.md                  |X|X|
-| 32_Multiple_Dispatching.md      |X|X|
-| 33_Visitor.md                   |X|X|
-| 34_Composite_and_Interpreter.md | | |
-| 35_Flyweight.md                 | | |
-| 36_Memento.md                   | | |
-| 37_Pattern_Refactoring.md       |X|X|
-| 38_Simulation.md                | | |
-| 39_Functional_Programming.md 🔴 Unfinished |_|_|
+| 20_Concurrency.md 🔴 Unfinished |_|_|
+| 21_Rethinking_Objects.md        |X|X|
+| 22_The_Pattern_Concept.md       |X|X|
+| 23_Data_Transfer_Objects.md     |X|X|
+| 24_Singleton.md                 |X|X|
+| 25_Template_Method.md           |X|X|
+| 26_Surrogate.md                 |X|X|
+| 27_State_Machines.md            |X|X|
+| 28_Iterators.md                 |X|X|
+| 29_Factory.md                   |X|X|
+| 30_Function_Objects.md          |X|X|
+| 31_Changing_the_Interface.md    |X|X|
+| 32_Observer.md                  |X|X|
+| 33_Multiple_Dispatching.md      |X|X|
+| 34_Visitor.md                   |X|X|
+| 35_Composite_and_Interpreter.md | | |
+| 36_Flyweight.md                 | | |
+| 37_Memento.md                   | | |
+| 38_Pattern_Refactoring.md       |X|X|
+| 39_Simulation.md                | | |
+| 40_Functional_Programming.md 🔴 Unfinished |_|_|
 | A_Pattern_Catalog.md            |X|X|

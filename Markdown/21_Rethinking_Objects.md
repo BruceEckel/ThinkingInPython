@@ -59,7 +59,7 @@ program. A subclass may add behavior, but it must honor the base class's
 contract: it accepts the same arguments, returns the same kinds of results, and
 raises no surprising exceptions. When subclasses obey it, code written against
 the base class works unchanged on any of them. This is the guarantee that makes
-polymorphism, and patterns like the [Template Method](24_Template_Method.md),
+polymorphism, and patterns like the [Template Method](25_Template_Method.md),
 safe: the base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 
@@ -517,7 +517,7 @@ Adding a new *operation* over all shapes is easier in the data version:
 write one function, and the type checker tells you if you missed a case.
 The object-oriented default assumes you will add types more often than operations,
 which is often not true.
-[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
+[Multiple Dispatching](33_Multiple_Dispatching.md#one-type-or-many) and [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
 
 Testing confirms the object-oriented and `match` versions compute the same areas:
 
@@ -625,7 +625,7 @@ serves the whole program,
 and it is safe as a default argument value.
 The standard library ships this exact object as
 `logging.NullHandler`,
-and the maze in [Simulation](38_Simulation.md) points every
+and the maze in [Simulation](39_Simulation.md) points every
 doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 

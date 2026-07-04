@@ -168,7 +168,7 @@ with tag("p") as t:
 This is the same setup-then-teardown shape as a `pytest` fixture that
 [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
 It relies on the generator and decorator machinery from [Decorators](15_Decorators.md)
-and [Iterators](27_Iterators.md#generators).
+and [Iterators](28_Iterators.md#generators).
 The generator form is usually the clearest choice; use a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 
@@ -356,7 +356,7 @@ Handing the same pool to several threads therefore just works:
 the pool becomes the throttle that limits concurrent use,
 which is how real database connection pools behave.
 
-This differs from [Flyweight](35_Flyweight.md), its nearest neighbor.
+This differs from [Flyweight](36_Flyweight.md), its nearest neighbor.
 A flyweight is immutable and shared by everyone at once.
 A pooled object is usually mutable or stateful,
 so the pool lends it to one borrower at a time,

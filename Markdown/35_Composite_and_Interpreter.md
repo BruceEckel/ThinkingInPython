@@ -67,7 +67,7 @@ The same call works on the whole tree, on a subtree, and on a single file.
 The weakness appears when you add operations.
 Counting files, finding an entry by name,
 and printing the tree each require a new method in every class.
-That is the problem [Visitor](33_Visitor.md) exists to work around.
+That is the problem [Visitor](34_Visitor.md) exists to work around.
 
 ## A Composite of Data Classes
 
@@ -135,7 +135,7 @@ What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
 This is the same trade explored in
-[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
+[Rethinking Objects](21_Rethinking_Objects.md#polymorphism-without-inheritance):
 a closed set of types, with operations gathered in one place each.
 The `assert_never()` in each `case _` makes the closure pay off.
 Add a `Symlink` class to the `Entry` union and the type checker
@@ -144,12 +144,12 @@ points at every operation that does not yet handle it.
 `walk()` is a generator, so a composite is also iterable.
 The `yield from` flattens the recursion into a single stream of paths,
 and any consumer of that stream is decoupled from the tree structure,
-as in [Iterators](27_Iterators.md#generators).
+as in [Iterators](28_Iterators.md#generators).
 
 The `entries` field is a tuple of `Entry`, so the whole tree is immutable.
 The demo builds `src` first, then places it inside `root`.
 Nothing can modify `src` afterward, so sharing subtrees is safe
-(see [Functional Programming](39_Functional_Programming.md#immutability)).
+(see [Functional Programming](40_Functional_Programming.md#immutability)).
 
 ```python
 # test_filesystem.py
@@ -361,7 +361,7 @@ if __name__ == "__main__":
 #: ((x + 1) * (x + 2))
 ```
 
-This is the ability [Visitor](33_Visitor.md) fights to provide:
+This is the ability [Visitor](34_Visitor.md) fights to provide:
 new operations over a fixed hierarchy, defined outside it.
 The `match` version needs no `accept()` hook and no visitor classes,
 and unlike `singledispatch` it looks inside the nodes,

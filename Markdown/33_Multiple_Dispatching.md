@@ -16,7 +16,7 @@ You end up detecting some types manually and effectively producing your own dyna
 
 The solution is *Multiple Dispatching*.
 Polymorphism broadly means that a function accepts arguments of more than one type
-(see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
+(see [Rethinking Objects](21_Rethinking_Objects.md#polymorphism-without-inheritance)).
 It takes several forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
@@ -198,7 +198,7 @@ Notice the flexibility of dictionaries: a tuple can be used as a key just as eas
 
 Python dispatches on a single type at a time.
 For dispatch on one argument's type,
-`functools.singledispatch` (see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
+`functools.singledispatch` (see [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
 per-type functions.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.

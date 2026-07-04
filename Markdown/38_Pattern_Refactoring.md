@@ -24,7 +24,7 @@ and the type of each piece must be recovered to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
-and a `create()` method builds an instance from a material name (this is a [Factory](28_Factory.md)):
+and a `create()` method builds an instance from a material name (this is a [Factory](29_Factory.md)):
 
 ```python
 # trash.py
@@ -306,7 +306,7 @@ The other axis of change is adding new *operations*.
 Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
 
-This is exactly the problem that [Visitor](33_Visitor.md) solves.
+This is exactly the problem that [Visitor](34_Visitor.md) solves.
 Visitor is elaborate:
 a `Visitor` base class with one `visit()` overload per material,
 an `accept()` method added to every element,

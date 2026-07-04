@@ -355,7 +355,7 @@ There are three ways to quiet it, from narrowest to broadest:
 `setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
 a localized `# type: ignore` silences one line, as on `simple.uses_metaclass()` above;
 and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
-The [singleton metaclass](23_Singleton.md#singleton-using-metaclasses) uses that last form,
+The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses) uses that last form,
 `klass: Any = cls`, to add an `instance` attribute and swap `__new__()`.
 Prefer the narrowest escape that fits, because a broad `Any` also hides genuine mistakes.
 
@@ -422,7 +422,7 @@ callable on the class but not on its instances.
 These are sometimes called *metamethods*.
 One useful metamethod is `__call__()`, which runs when you create an instance.
 Overriding it lets a metaclass intercept instance creation,
-which is one way to build a [Singleton](23_Singleton.md):
+which is one way to build a [Singleton](24_Singleton.md):
 
 ```python
 # singleton.py
@@ -459,7 +459,7 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons stay independent.
 
 This works, but it is heavier than the problem usually requires.
-A [Singleton](23_Singleton.md) is often clearer as a class decorator,
+A [Singleton](24_Singleton.md) is often clearer as a class decorator,
 which needs no metaclass at all:
 
 ```python
@@ -502,7 +502,7 @@ display_object(b)
 #:   None
 ```
 
-The simplest Python [Singleton](23_Singleton.md#a-module-is-already-a-singleton) of all is a module:
+The simplest Python [Singleton](24_Singleton.md#a-module-is-already-a-singleton) of all is a module:
 import it anywhere and you get the same object.
 Choose the lightest tool that solves your problem.
 

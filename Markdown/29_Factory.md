@@ -239,7 +239,7 @@ for kind in ["Circle", "Square", "Circle"]:
 
 Adding a `Triangle` is now a single class definition: it registers itself,
 and `make()` builds it with no change to the factory.
-This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler),
+This is the same self-registration used in [Pattern Refactoring](38_Pattern_Refactoring.md#simulating-a-trash-recycler),
 and it is the most common form of factory in idiomatic Python.
 The sections below show the classic object-oriented factories for contrast.
 
@@ -463,7 +463,7 @@ but those activities (the *initial conditions* and the *state change*) can deter
 Here, `GameEnvironment` is not designed to be inherited,
 although it might make sense to do that.
 
-This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md).
+This also contains examples of [Multiple Dispatching](33_Multiple_Dispatching.md).
 
 The base classes `Obstacle`, `Character`, and `GameElementFactory`
 (translated from the Java version) force every concrete class to inherit from them.
@@ -754,7 +754,7 @@ When construction genuinely is a process:
 the steps must happen in an order,
 later steps depend on earlier ones,
 and rules span the steps.
-`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze)
+`GameBuilder` in [Simulation](39_Simulation.md#a-robot-in-a-maze)
 is the real thing.
 It assembles a maze in three stages,
 creating rooms, connecting doors, then placing the robot,

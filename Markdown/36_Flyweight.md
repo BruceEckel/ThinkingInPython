@@ -17,7 +17,7 @@ Second, route construction through a factory that returns
 the already-existing instance for a given value.
 Handing out one object under many names is only safe when nobody
 can change it, so a flyweight must be immutable.
-[Rethinking Objects](20_Rethinking_Objects.md#immutability-dissolves-it)
+[Rethinking Objects](21_Rethinking_Objects.md#immutability-dissolves-it)
 develops that argument;
 this chapter is what the argument buys you.
 
@@ -66,7 +66,7 @@ it is the cell's coordinates in the grid,
 so the `Tile` object never stores it.
 The factory is `functools.cache` on a constructor function,
 the cached factory from
-[Singleton](23_Singleton.md#when-you-want-a-class-cache-the-instance)
+[Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)
 with arguments: one instance per distinct key.
 
 ```python
@@ -152,7 +152,7 @@ The factory function is one honest extra name.
 If you want callers to keep writing `Color(...)`,
 move the pool into `__new__`,
 the same maneuver the
-[Singleton](23_Singleton.md#the-classic-implementations)
+[Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses, but keyed by the constructor arguments:
 
 ```python
@@ -312,7 +312,7 @@ and protection against inventing a tile kind that does not exist.
 The trade is fixedness: `tile()` could load `SPECS` from a file,
 while `Tile.GRASS` is source code.
 The table-driven state machine in
-[State Machines](26_State_Machines.md#table-driven-state-machine)
+[State Machines](27_State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
 
 ## Flyweights in the Wild

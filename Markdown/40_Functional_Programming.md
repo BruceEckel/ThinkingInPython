@@ -171,7 +171,7 @@ print(table["title"]("functional python"))
 ```
 
 The dictionary holds functions as values, so a lookup yields a function you can immediately call.
-The [Function Objects](29_Function_Objects.md) chapter approaches the same capability from the pattern side.
+The [Function Objects](30_Function_Objects.md) chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow.
 A dictionary of functions replaces a long `if`/`elif` chain, because you select the behavior by looking it up:
@@ -669,7 +669,7 @@ The `assert` passes on every run, because a pure call returns the same answer no
 Notice what is missing: no locks, no queues, no shared state, and no changes to `count_primes()` itself.
 The function did not have to be prepared for parallel execution.
 It was ready the day it was written, because it was pure.
-`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Performance](19_Performance.md#parallelism).
+`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](20_Concurrency.md#parallelism).
 
 ## An Assurance Spectrum
 
