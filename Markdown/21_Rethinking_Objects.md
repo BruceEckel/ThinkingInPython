@@ -466,7 +466,40 @@ if __name__ == "__main__":
 `show()` accepts anything.
 Pass it something without a `display()` method and you find out only when the line runs.
 [Static Typing](08_Static_Typing.md#structural-typing-with-protocols) gives this a static form with `Protocol`:
-a structural type describes the required shape,
+
+```python
+# protocols_typed.py
+from dataclasses import dataclass
+from typing import Protocol
+
+class Displayable(Protocol):
+    def display(self) -> str: ...
+
+@dataclass(frozen=True)
+class Bicycle:
+    id: str
+
+    def display(self) -> str:
+        return f"Bicycle {self.id}"
+
+@dataclass(frozen=True)
+class Glider:
+    size: int
+
+    def display(self) -> str:
+        return f"Glider {self.size}"
+
+def show(t: Displayable) -> str:
+    return t.display()
+
+if __name__ == "__main__":
+    for item in (Bicycle("Bob"), Glider(65)):
+        print(show(item))
+#: Bicycle Bob
+#: Glider 65
+```
+
+A structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
@@ -510,13 +543,13 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-The approach to choose depends on how the code will grow.
-Adding a new *shape* is easier in the object version: write one class.
-Adding a new *operation* over all shapes is easier in the data version:
-write one function, and the type checker tells you if you missed a case.
-The object-oriented default assumes you will add types more often than operations,
+Choose the approach depending on how the code will grow.
+Adding a new *shape* is easier in the object version because you write one class.
+Adding a new *operation* over all shapes is easier in the data version.
+You write one function, and the type checker tells you if you missed a case.
+The OOP approach assumes you add types more often than operations,
 which is often not true.
-[Multiple Dispatching](33_Multiple_Dispatching.md#one-type-or-many) and [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) return to this trade-off.
+[Multiple Dispatching](33_Multiple_Dispatching.md#one-type-or-many) and [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) explore this trade-off.
 
 Testing confirms the object-oriented and `match` versions compute the same areas:
 
