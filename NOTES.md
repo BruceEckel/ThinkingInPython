@@ -1,10 +1,3 @@
-/loop through chapters 02-18 and 20-35 and look for issues.
-Fix any obvious issues, and put all the rest in ISSUES.md, demarking each chapter in the file.
-Do not give overviews or summaries or anything other than issues.
-If an issue has a suggested fix you need me to review, put a checkbox next to it.
-If I check the box, I will later have you go through ISSUES.md and fix the ones I have checked.
-If you run out of tokens during a chapter, resume when it resets.
-
 /loop through chapters 02-18 and 20-35 and look for style and voice issues.
 Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.
@@ -18,8 +11,6 @@ Exercise solutions
 
 Note we can have race conditions with both asynch and parallelism
 
-Look for duplication of Singleton between Metaprogramming and Singleton chapters.
-
 Run 'make prose' on each chapter
 
 - Is full polymorphism covered? (Not just inheritance-based)
@@ -30,8 +21,6 @@ Run 'make prose' on each chapter
 - "have to", "could" -> "can"
 - which was
 - which will be
-
-- Consider more specific links, to specific subsections rather than whole chapters.
 
 - Check exercises. Potentially create new exercises.
 - Explain exercises in intro
