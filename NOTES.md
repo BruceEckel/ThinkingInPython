@@ -15,6 +15,7 @@ If you run out of tokens during a chapter, resume when it resets.
 When referring to design patterns we capitalize: e.g. Template Method.
 When design pattern is named, if that pattern is in the book it should be linked to the chapter (and section if available)
 
+Exercise solutions
 
 Note we can have race conditions with both asynch and parallelism
 
@@ -25,7 +26,7 @@ Run 'make prose' on each chapter
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
 -
-- Check order of examples in 30_Pattern_Refactoring.md
+- Check order of examples in 38_Pattern_Refactoring.md
 
 - "have to", "could" -> "can"
 - which was

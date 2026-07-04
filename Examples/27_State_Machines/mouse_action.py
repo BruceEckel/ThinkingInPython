@@ -1,4 +1,4 @@
-# mouse/mouse_action.py
+# mouse_action.py
 from enum import StrEnum
 
 class MouseAction(StrEnum):

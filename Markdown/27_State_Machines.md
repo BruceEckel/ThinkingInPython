@@ -69,12 +69,11 @@ You could override it, but the behavior change usually occurs in `State`'s `run(
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
-The mouse classes and information are stored in the `mouse` package,
-including a class representing all possible moves a mouse can make,
-which will be the inputs to the state machine:
+The possible moves a mouse can make are the inputs
+to the state machine:
 
 ```python
-# mouse/mouse_action.py
+# mouse_action.py
 from enum import StrEnum
 
 class MouseAction(StrEnum):
@@ -97,7 +96,7 @@ which is how the test input below is parsed.
 For creating test code, a sequence of mouse inputs is provided from a text file:
 
 ```python
-# mouse/mouse_moves.txt
+# mouse_moves.txt
 mouse appears
 mouse runs away
 mouse appears
@@ -120,13 +119,10 @@ Each `State` subclass defines its `run()` behavior,
 and also establishes its next state with an `if-else` clause:
 
 ```python
-# mousetrap1/mouse_trap.py
-import sys
+# mouse_trap.py
 from pathlib import Path
 from typing import ClassVar, override
-
-sys.path += ["..", "../mouse"]
-from mouse_action import MouseAction  # type: ignore
+from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
@@ -195,7 +191,7 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         StateMachine.__init__(self, MouseTrap.waiting)
 
-text = Path("../mouse/mouse_moves.txt").read_text()
+text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
@@ -238,107 +234,89 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
-Initially, this seems simple.
-Define a static table in each `State` subclass that defines the transitions in terms of the other `State` objects.
-However, this approach generates cyclic initialization dependencies.
-To solve the problem,
-I've had to delay the initialization of the tables until the first time that the `next()` method is called for a particular `State` object.
-Initially, the `next()` methods can appear a little strange because of this.
+A table cannot be written inside its class,
+because its entries name the *other* states,
+which do not all exist until every class is defined.
+In Python that is no obstacle:
+define the classes first,
+then fill in the tables at module level,
+after all the state objects exist.
 
 The `StateT` class is an implementation of `State` (so that the same `StateMachine` class can be used from the previous example) that adds a `transitions` dict mapping each input to its next state.
-Its base-class `next()` looks the input up in that `dict`.
-Each subclass fills its own `transitions` lazily,
-the first time `next()` is called while `transitions` is still empty,
-then delegates to the base `next()`:
+Its `next()` looks the input up in that `dict`.
+The subclasses now define only their `run()` behavior;
+the transitions live in the tables filled in at the bottom of the file:
 
 ```python
-# mousetrap2/mouse_trap2.py
+# mouse_trap2.py
 # A better mousetrap using tables
-import sys
 from pathlib import Path
-from typing import Any, ClassVar, override
-
-sys.path += ["..", "../mouse"]
-from mouse_action import MouseAction  # type: ignore
+from typing import ClassVar, override
+from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
 class StateT(State):
     def __init__(self) -> None:
-        self.transitions: dict[Any, Any] = {}
+        self.transitions: dict[object, State] = {}
+
     @override
     def next(self, event: object) -> State:
         if event in self.transitions:
             return self.transitions[event]
-        else:
-            raise RuntimeError(
-                "Input not supported for current state")
+        raise RuntimeError(
+            "Input not supported for current state")
 
 class Waiting(StateT):
     @override
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
-    @override
-    def next(self, event: object) -> State:
-        # Lazy initialization:
-        if not self.transitions:
-            self.transitions = {
-              MouseAction.APPEARS : MouseTrap.luring
-            }
-        return StateT.next(self, event)
 
 class Luring(StateT):
     @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
-    @override
-    def next(self, event: object) -> State:
-        if not self.transitions:
-            self.transitions = {
-              MouseAction.ENTERS : MouseTrap.trapping,
-              MouseAction.RUNS_AWAY : MouseTrap.waiting
-            }
-        return StateT.next(self, event)
 
 class Trapping(StateT):
     @override
     def run(self) -> None:
         print("Trapping: Closing door")
-    @override
-    def next(self, event: object) -> State:
-        if not self.transitions:
-            self.transitions = {
-              MouseAction.ESCAPES : MouseTrap.waiting,
-              MouseAction.TRAPPED : MouseTrap.holding
-            }
-        return StateT.next(self, event)
 
 class Holding(StateT):
     @override
     def run(self) -> None:
         print("Holding: Mouse caught")
-    @override
-    def next(self, event: object) -> State:
-        if not self.transitions:
-            self.transitions = {
-              MouseAction.REMOVED : MouseTrap.waiting
-            }
-        return StateT.next(self, event)
 
 class MouseTrap(StateMachine):
-    waiting: ClassVar[State] = Waiting()
-    luring: ClassVar[State] = Luring()
-    trapping: ClassVar[State] = Trapping()
-    holding: ClassVar[State] = Holding()
+    waiting: ClassVar[StateT] = Waiting()
+    luring: ClassVar[StateT] = Luring()
+    trapping: ClassVar[StateT] = Trapping()
+    holding: ClassVar[StateT] = Holding()
 
     def __init__(self) -> None:
         StateMachine.__init__(self, MouseTrap.waiting)
 
-text = Path("../mouse/mouse_moves.txt").read_text()
+# Every state object now exists, so each table can name
+# its next states directly:
+MouseTrap.waiting.transitions = {
+    MouseAction.APPEARS: MouseTrap.luring,
+}
+MouseTrap.luring.transitions = {
+    MouseAction.RUNS_AWAY: MouseTrap.waiting,
+    MouseAction.ENTERS: MouseTrap.trapping,
+}
+MouseTrap.trapping.transitions = {
+    MouseAction.ESCAPES: MouseTrap.waiting,
+    MouseAction.TRAPPED: MouseTrap.holding,
+}
+MouseTrap.holding.transitions = {
+    MouseAction.REMOVED: MouseTrap.waiting,
+}
+
+text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
-mouse_moves = [MouseAction(m) for m in moves]
-MouseTrap().run_all(mouse_moves)
+MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
 #: Waiting: Broadcasting cheese smell
 #: mouse appears
 #: Luring: Presenting Cheese, door open
@@ -358,22 +336,12 @@ MouseTrap().run_all(mouse_moves)
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse enters trap
-#: Trapping: Closing door
-#: mouse trapped
-#: Holding: Mouse caught
-#: mouse removed
-#: Waiting: Broadcasting cheese smell
 ```
 
-The rest of the code is identical;
-the difference is in the `next()` methods and the `StateT` class.
+The demonstration stops after the first nine moves,
+which between them exercise every transition in the trap.
+The rest of the input file only repeats them,
+so the output continues exactly as in the first version.
 
 If you have to create and maintain a lot of `State` classes,
 this approach is an improvement,
@@ -751,31 +719,26 @@ if __name__ == "__main__":
 
 ## Exercises
 
-The [Proxy](26_Surrogate.md#proxy) and [State](26_Surrogate.md#state) patterns that several of these exercises build on are covered in [Surrogate](26_Surrogate.md).
-
-1.  Create an example of the "virtual proxy."
-2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.
-3.  Create a program similar to certain DBMS systems that only allow a certain number of connections at any time.
+1.  Create a program similar to certain DBMS systems that only allow a certain number of connections at any time.
     To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
     When a user is finished with a connection,
     the system must be informed so that it can check that connection back in to be reused.
-    To guarantee this, provide a proxy object instead of a reference to the actual connection,
+    To guarantee this, provide a [proxy](26_Surrogate.md#proxy) object instead of a reference to the actual connection,
     and design the proxy so that it will cause the connection to be released back to the system.
-4.  Using [State](26_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
+2.  Using [State](26_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
     Add an additional kind of `Mood` called `Prozac`.
-5.  Create a simple copy-on-write implementation.
-6.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
-7.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
+3.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
+4.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
     Each state stores a reference back to the controller object so that it can request the state change.
     Use a `dict` to map a `str` naming a state to its state object.
     In each state subclass,
     override a `next_state()` method that holds its own transition table.
     The input to `next_state()` is a single word read from a text file containing one word per line.
-8.  Modify the previous exercise so that the state machine can be configured by editing a single transition table.
-9.  Modify the "mood" exercise (exercise 4) so that it becomes a state machine using `state_machine.py`.
-10. Create an elevator state machine system using `state_machine.py`.
-11. Create a heating/air-conditioning system using `state_machine.py`.
-12. A *generator* produces objects, like a factory but taking no arguments.
+5.  Modify the previous exercise so that the state machine can be configured by editing a single transition table.
+6.  Modify the "mood" exercise (exercise 2) so that it becomes a state machine using `state_machine.py`.
+7.  Create an elevator state machine system using `state_machine.py`.
+8.  Create a heating/air-conditioning system using `state_machine.py`.
+9.  A *generator* produces objects, like a factory but taking no arguments.
     Write a `mouse_move_generator()` (using `yield`) that produces correct `MouseAction` moves in sequence,
     where each possible move depends on the previous one (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

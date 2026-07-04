@@ -1,4 +1,4 @@
-# mouse/mouse_moves.txt
+# mouse_moves.txt
 mouse appears
 mouse runs away
 mouse appears

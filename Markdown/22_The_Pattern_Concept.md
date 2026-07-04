@@ -107,37 +107,14 @@ I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
 so that classification doesn't lead me to a solution (I'll readily admit that I may be missing something here).
 
-I think the patterns themselves use basic principles of organization,
-other than (and more fundamental than) those described in *GoF Design Patterns*.
-These principles are based on the structure of the implementations,
-which is where I have seen great similarities between patterns (more than those expressed in *GoF Design Patterns*).
-Although we generally try to avoid implementation in favor of interface,
-I have found that it's often easier to think about,
-and especially to learn about,
-the patterns in terms of these structural principles.
-This book attempts to present the patterns based on their structure instead of the categories presented in *GoF Design Patterns*.
-
-I've labored for a while with this problem,
-first noting that the underlying structure of some of the *GoF Design Patterns* are similar to each other,
-and trying to develop relationships based on that similarity.
-I've collected some basic design structures,
-to see if there's a way to relate those structures to the various design patterns that appear in well thought-out systems.
-
-Here^[This list includes suggestions by Kevlin Henney, David Scott, and others.] is a list of candidates:
-
--   **Encapsulation**: self containment and embodying a model of usage
--   **Gathering**
--   **Localization**
--   **Separation**
--   **Hiding**
--   **Guarding**
--   **Connector**
--   **Barrier/fence**
--   **Variation in behavior**
--   **Notification**
--   **Transaction**
--   **Mirror**: "the ability to keep a parallel universe(s) in step with the golden world"
--   **Shadow**: "follows your movement and does something different in a different medium" (May be a variation on [Proxy](26_Surrogate.md#proxy)).
+Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
+and that is how this book groups them.
+[Surrogate](26_Surrogate.md) treats *Proxy* and *State* as one front-object structure.
+[Function Objects](30_Function_Objects.md) treats *Command*, *Strategy*,
+and *Chain of Responsibility* as one function-passing structure.
+[Composite and Interpreter](35_Composite_and_Interpreter.md) treats both of its patterns as one recursive-data structure.
+When two patterns share a structure, learning one teaches you most of the other,
+and the remaining difference is intent.
 
 ## Design Principles
 

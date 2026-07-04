@@ -332,3 +332,9 @@ def test_proxy_counts_only_calls() -> None:
     assert p.calls == 0
     assert p2.calls == 2
 ```
+
+## Exercises
+
+1.  Create an example of the "virtual proxy."
+2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.
+3.  Create a simple copy-on-write implementation.
