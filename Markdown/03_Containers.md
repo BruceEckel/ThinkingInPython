@@ -255,9 +255,9 @@ print(counts)
 #: Counter({'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1})
 print(counts["the"])
 #: 3
-print(counts["dog"])  # A missing key counts as zero
+print(counts["dog"])
 #: 0
-print(counts.most_common(2))  # The two highest counts
+print(counts.most_common(2))
 #: [('the', 3), ('cat', 2)]
 ```
 
@@ -291,31 +291,69 @@ print(by_kind["fish"])  # A missing key gets a fresh empty list
 #: []
 ```
 
-The argument is a *factory*: a callable that builds the default.
+The `defaultdict` constructor argument is a *factory*, a callable that builds the default.
 Here, the `list` argument is a factory that produces a fresh empty list for each new key.
 
 ### `deque`
 
-A `deque` (double-ended queue) adds and removes items at either end in constant time,
-where a `list` is fast only at its right end:
+A `deque` (double-ended queue) adds and removes items at either end in constant time.
+A `list` is fast only at its right end:
 
 ```python
 # deque.py
 from collections import deque
+from timeit import timeit
 
-queue = deque([1, 2, 3])
-queue.append(4)         # Add on the right
-queue.appendleft(0)     # Add on the left
-print(queue)
+dq = deque([1, 2, 3])
+dq.append(4)         # Add on the right
+dq.appendleft(0)     # Add on the left
+print(dq)
 #: deque([0, 1, 2, 3, 4])
-print(queue.popleft())  # Remove from the left
+print(dq.popleft())  # Remove from the left
 #: 0
-print(queue.pop())      # Remove from the right
+print(dq.pop())      # Remove from the right
 #: 4
-print(queue)
+print(dq)
 #: deque([1, 2, 3])
+
+# A plain list can act as a double-ended queue too:
+lst = [1, 2, 3]
+lst.append(4)        # Add on the right
+lst.insert(0, 0)     # Add on the left
+print(lst)
+#: [0, 1, 2, 3, 4]
+print(lst.pop(0))    # Remove from the left
+#: 0
+print(lst.pop())     # Remove from the right
+#: 4
+print(lst)
+#: [1, 2, 3]
+
+# Time it to see the difference:
+n = 20_000
+
+def list_left_ops():
+    items = []
+    for i in range(n):
+        items.insert(0, i)
+    while items:
+        items.pop(0)
+
+def deque_left_ops():
+    items = deque()
+    for i in range(n):
+        items.appendleft(i)
+    while items:
+        items.popleft()
+
+list_time = timeit(list_left_ops, number=1)
+deque_time = timeit(deque_left_ops, number=1)
+print(deque_time < list_time)
+#: True
 ```
 
+A `list` can stand in for a `deque`, but `insert(0, x)` and `pop(0)`
+must shift every remaining element, so both are O(n) instead of O(1).
 Use a `deque` whenever you need a queue.
 
 ### `namedtuple`
@@ -340,7 +378,7 @@ print(height)
 ```
 
 A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
-but its fields are self-documenting, as the first `print()` shows.
+but its fields are self-documenting.
 For records with defaults, methods, or type annotations,
 prefer a data class (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 
