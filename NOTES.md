@@ -12,8 +12,7 @@ If an issue has a suggested fix you need me to review, put a checkbox next to it
 If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
-When referring to design patterns we capitalize: e.g. Template Method.
-When design pattern is named, if that pattern is in the book it should be linked to the chapter (and section if available)
+Look for colons
 
 Exercise solutions
 

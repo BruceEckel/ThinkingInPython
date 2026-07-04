@@ -36,7 +36,7 @@ Each object carries its own type.
 
 ## Lists and Slicing
 
-A `list` holds an ordered, mutable sequence of any objects.
+A `list` holds objects, of any kind, in an ordered, mutable sequence.
 Indexing starts at zero, and negative indices count from the end.
 A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 
@@ -67,6 +67,30 @@ print(len(xs), 5 in xs)
 ```
 
 Slicing works on any sequence, including strings and tuples.
+
+A `list` is not restricted to one type of element.
+Since each slot just holds a reference to whatever object was put there,
+the same `list` can mix strings, numbers, `None`, and other containers:
+
+```python
+# mixed_types.py
+
+mixed = [1, "two", 3.0, True, None, [5, 6]]
+for item in mixed:
+    print(item, type(item).__name__)
+#: 1 int
+#: two str
+#: 3.0 float
+#: True bool
+#: None NoneType
+#: [5, 6] list
+```
+
+This flexibility is convenient but easy to overuse.
+A `list` of mixed types usually means each element needs different handling,
+which is often better expressed with a `tuple`,
+a [data class](12_Data_Classes_as_Types.md#data-classes),
+or distinct lists, each holding a single type.
 
 ## Tuples and Unpacking
 
@@ -176,7 +200,7 @@ print(2 in a)
 ```
 
 Every operator above has a named method.
-The methods are a little more flexible: they accept any iterable,
+The methods are a little more flexible because they accept any iterable,
 not only a set, and they take several arguments at once.
 There is also `isdisjoint()`, which has no operator form:
 
