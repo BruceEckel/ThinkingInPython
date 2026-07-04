@@ -1,4 +1,4 @@
-# visitor_singledispatch.py
+# recycling_note.py
 from functools import singledispatch
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash

@@ -1,5 +1,6 @@
 # birth_date.py
 from dataclasses import dataclass
+from datetime import date
 from enum import Enum
 from validation import check
 
@@ -15,7 +16,7 @@ class Year:
     n: int
 
     def __post_init__(self) -> None:
-        check(1900 < self.n <= 2026, f"Year({self.n})")
+        check(1900 < self.n <= date.today().year, f"Year({self.n})")
 
 class Month(Enum):
     JANUARY = (1, 31)

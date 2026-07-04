@@ -222,3 +222,6 @@ and Python will keep searching through those paths until it finds your module or
 `PYTHONPATH` still works,
 but the modern practice is to install your package into the environment you are working in,
 which puts it on the search path without any environment variable.
+Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
+or `uv pip install -e .` for an editable install:
+the package resolves by name from anywhere, and edits to its source take effect immediately, without reinstalling.

@@ -96,11 +96,11 @@ If you already know Python, you can skim for topics you don't know, or skip it a
 *Techniques* covers the idioms and tools that give Python its character:
 testing, data classes as types, pattern matching, functional error handling,
 decorators, comprehensions, and metaprogramming.
-At the end of this part, a chapter steps back to question object orientation itself,
-because several of the patterns that follow exist to manage problems that objects create.
 Many of these chapters came from presentations I've given, mostly at PyCon.
 
-*Patterns* works through the classic design patterns,
+*Patterns* opens by stepping back to question object orientation itself,
+because several of the patterns that follow exist to manage problems that objects create.
+The part then works through the classic design patterns,
 each reframed for Python and weighed against the language.
 I consistently ask what problem we are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
@@ -108,6 +108,7 @@ Learning to ask those questions is one of the most useful things this book can g
 ## The Examples
 
 The book targets Python 3.14 and later, uses type hints throughout, and tests with `pytest`.
+Early chapters omit hints deliberately, introducing them once [Static Typing](08_Static_Typing.md) covers the syntax; every chapter from there on uses them.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.

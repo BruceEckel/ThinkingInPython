@@ -95,7 +95,7 @@ which is how the test input below is parsed.
 
 For creating test code, a sequence of mouse inputs is provided from a text file:
 
-```python
+```text
 # mouse_moves.txt
 mouse appears
 mouse runs away

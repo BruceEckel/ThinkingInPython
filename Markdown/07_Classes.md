@@ -398,3 +398,7 @@ Compose("example").f()
 
 Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
+This is a curiosity more than a technique:
+it works because `import` inside a class body binds like any other assignment,
+but composition, mixins, or a plain module-level function are almost always the clearer choice.
+You will rarely, if ever, want this in your own code.

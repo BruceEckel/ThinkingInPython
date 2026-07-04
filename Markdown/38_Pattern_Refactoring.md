@@ -113,7 +113,7 @@ def test_sum_value_totals_weight_times_value() -> None:
 The trash to process is described in a data file,
 one `Name:weight` line per piece:
 
-```python
+```text
 # trash.dat
 Glass:54
 Paper:22
@@ -319,7 +319,7 @@ with new types registered from anywhere.
 In Python, *Visitor* is implemented with a single-dispatch function:
 
 ```python
-# visitor_singledispatch.py
+# recycling_note.py
 from functools import singledispatch
 from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash
