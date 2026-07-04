@@ -237,34 +237,19 @@ This is what a decorator does in [Decorators](15_Decorators.md).
 
 ## Lambdas
 
-A *lambda* is an unnamed function written as a single expression.
-It has no statements and no `return`: the expression's value is what it returns.
-The examples above already used lambdas as inline arguments, which is where they fit best:
-
-```python
-# lambdas.py
-# A lambda is an unnamed function written as one expression:
-print((lambda n: n * n)(6))
-#: 36
-# Most often a lambda is an inline argument:
-pairs = [(3, "c"), (1, "a"), (2, "b")]
-pairs.sort(key=lambda pair: pair[0])
-print(pairs)
-#: [(1, 'a'), (2, 'b'), (3, 'c')]
-# Binding a lambda to a name works, but a def is clearer:
-square = lambda n: n * n
-print(square(5))
-#: 25
-```
-
-A lambda is best when the function is small and used right where it is written.
-To give it a name, write a `def` instead.
-A named `def` carries a docstring, a readable name in tracebacks, and room to grow.
-
-The motivation for a lambda is locality.
-When a transformation is one short expression, a lambda keeps it at the call site, where the reader already is, instead of sending them to a named function defined elsewhere.
+A *lambda* is an unnamed function written as a single expression,
+introduced in [Functions](05_Functions.md#lambdas).
+The examples above already used lambdas as inline arguments, which is where they fit best.
+Their value is locality.
+When a transformation is one short expression,
+a lambda keeps it at the call site, where the reader already is,
+instead of sending them to a named function defined elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
-Naming that one-liner would cost a line, a name to invent, and a definition to look up, with nothing gained in clarity.
+Naming that one-liner would cost a line, a name to invent,
+and a definition to look up, with nothing gained in clarity.
+For anything larger, write a `def`:
+a named function carries a docstring, a readable name in tracebacks,
+and room to grow.
 
 ## Closures
 
@@ -497,72 +482,32 @@ Stages chain together without building intermediate lists between them, and a co
 
 ## Pattern Matching as Destructuring
 
-The `match` statement reads a value apart by its shape rather than by hand.
-You describe the structures you expect, and Python binds the pieces for you:
-
-```python
-# pattern_matching.py
-def describe(value: object) -> str:
-    match value:
-        case 0:
-            return "zero"
-        case [x]:
-            return f"one item: {x}"
-        case [x, y]:
-            return f"two items: {x}, {y}"
-        case {"name": name}:
-            return f"named {name}"
-        case _:
-            return "something else"
-
-print(describe(0))
-#: zero
-print(describe([42]))
-#: one item: 42
-print(describe([1, 2]))
-#: two items: 1, 2
-print(describe({"name": "Ada"}))
-#: named Ada
-```
-
-Each `case` is a pattern, and a match both tests the shape and pulls out the parts in one step.
-The [Pattern Matching](13_Pattern_Matching.md) chapter covers the full syntax.
-Here it earns its place as a declarative tool for taking data apart.
-
-The motivation is that one `match` collapses a stack of `isinstance()` tests, length checks, and key or index lookups into a single readable description of each shape.
-The test and the extraction happen together, so there is no gap where you have confirmed the shape but not yet pulled out its parts.
-This pays off most on shaped data, such as parsed JSON, an abstract syntax tree, or the messages of a protocol, where the alternative is a thicket of nested conditionals.
+The `match` statement, covered in [Pattern Matching](13_Pattern_Matching.md),
+earns its place in this chapter as a declarative tool for taking data apart.
+You describe the structures you expect, and Python binds the pieces for you.
+One `match` collapses a stack of `isinstance()` tests, length checks,
+and key or index lookups into a single readable description of each shape.
+The test and the extraction happen together,
+so there is no gap where you have confirmed the shape but not yet pulled out its parts.
+This pays off most on shaped data, such as parsed JSON,
+an abstract syntax tree, or the messages of a protocol,
+where the alternative is a thicket of nested conditionals.
 
 ## Functional Error Handling
 
 Raising an exception is one way to report failure.
-The functional alternative is to return a value that represents the failure, so the caller must handle it in the open instead of through a separate control path:
-
-```python
-# functional_errors.py
-def safe_divide(a: int, b: int) -> float | None:
-    if b == 0:
-        return None
-    return a / b
-
-for divisor in (2, 0):
-    match safe_divide(10, divisor):
-        case None:
-            print("undefined")
-        case value:
-            print(value)
-#: 5.0
-#: undefined
-```
-
-The return type `float | None` tells the caller, and the type checker, that failure is possible.
-A richer version returns a dedicated result object carrying either a value or an error.
-The [Functional Error Handling](14_Functional_Error_Handling.md) chapter develops that approach in full.
-
-Returning failure as a value makes failure visible.
-The possibility appears in the return type, so the type checker reminds every caller to handle it and a reviewer sees it without reading the body.
-Control flow stays local, with no exception leaping past intermediate frames to a distant handler.
-You do pay by handling the failure at each step, but that is the same discipline that stops an unhandled error from escaping unnoticed.
+The functional alternative returns a value that represents the failure,
+so the caller must handle it in the open instead of through a separate control path.
+[Functional Error Handling](14_Functional_Error_Handling.md) develops the approach in full,
+from a return type of `float | None` up to a `Result` type that carries either an answer or an error.
+The point for this chapter is what the style buys.
+Failure appears in the return type,
+so the type checker reminds every caller to handle it,
+and a reviewer sees it without reading the body.
+Control flow stays local,
+with no exception leaping past intermediate frames to a distant handler.
+You do pay by handling the failure at each step,
+but that is the same discipline that stops an unhandled error from escaping unnoticed.
 
 ## Referential Transparency
 
@@ -595,31 +540,18 @@ The more of your program holds this property, the more of it a machine, or a pro
 
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
-The functional tools in this chapter emphasize declarative style:
-
-```python
-# declarative.py
-# Imperative spells out every step of the 'how':
-numbers = [1, 2, 3, 4, 5, 6]
-result = []
-for n in numbers:
-    if n % 2 == 0:
-        result.append(n * n)
-print(result)
-#: [4, 16, 36]
-# Declarative states the 'what', as a comprehension:
-print([n * n for n in numbers if n % 2 == 0])
-#: [4, 16, 36]
-```
-
-Both produce the same list.
-The comprehension says "the squares of the even numbers" and leaves the looping to Python.
-This is the broader "functionality" the introduction points toward: describe the result, and let the machine arrange the steps.
-The [Comprehensions](17_Comprehensions.md) chapter explores this notation on its own.
-
+A comprehension is the everyday example (see [Comprehensions](17_Comprehensions.md)).
+The loop that filters and appends says *how*;
+`[n * n for n in numbers if n % 2 == 0]` says *what*,
+"the squares of the even numbers," and leaves the looping to Python.
+This is the broader "functionality" the introduction points toward:
+describe the result, and let the machine arrange the steps.
 Declarative code says less and means more.
-By naming the result instead of the steps, you hand the reader your intent and give the runtime freedom to choose how to deliver it.
-That freedom is why a SQL query, a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see: you described the what, not a fixed sequence of moves.
+By naming the result instead of the steps,
+you hand the reader your intent and give the runtime freedom to choose how to deliver it.
+That freedom is why a SQL query, a NumPy expression,
+or a dataframe operation can run on an optimized or parallel engine you never see:
+you described the what, not a fixed sequence of moves.
 
 ## Parallelism for Free
 

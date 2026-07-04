@@ -459,51 +459,8 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons stay independent.
 
 This works, but it is heavier than the problem usually requires.
-A [Singleton](24_Singleton.md) is often clearer as a class decorator,
-which needs no metaclass at all:
-
-```python
-# singleton_decorator.py
-# Singleton as a class decorator; simpler than a metaclass.
-from collections.abc import Callable
-from typing import Any
-from display import display_object
-
-def singleton(klass: type) -> Callable[..., Any]:
-    instances: dict[type, Any] = {}
-
-    def get_instance(*args: Any, **kwargs: Any) -> Any:
-        if klass not in instances:
-            instances[klass] = klass(*args, **kwargs)
-        return instances[klass]
-
-    return get_instance
-
-@singleton
-class Registry:
-    def __init__(self) -> None:
-        self.items: list[str] = []
-
-a = Registry()
-b = Registry()
-assert a is b
-a.items.append("widget")
-display_object(a)
-#: === Registry ===
-#: [Attributes]
-#:   • items = ['widget']
-#: [Methods]
-#:   None
-display_object(b)
-#: === Registry ===
-#: [Attributes]
-#:   • items = ['widget']
-#: [Methods]
-#:   None
-```
-
-The simplest Python [Singleton](24_Singleton.md#a-module-is-already-a-singleton) of all is a module:
-import it anywhere and you get the same object.
+[Singleton](24_Singleton.md) covers the lighter alternatives,
+from a class decorator down to a plain module.
 Choose the lightest tool that solves your problem.
 
 ## Making a Class Final
