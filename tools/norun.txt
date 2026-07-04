@@ -13,5 +13,5 @@
 # Tkinter views (the model + tests run and are checked headlessly).
 26_State_Machines/tabledriven/vending_view.py
 31_Observer/box_view.py
-36_Simulation/robot_explorer/maze_view.py
-36_Simulation/rats_and_mazes/rats_view.py
+38_Simulation/robot_explorer/maze_view.py
+38_Simulation/rats_and_mazes/rats_view.py

@@ -532,6 +532,133 @@ def test_oo_and_match_shapes_agree() -> None:
     assert so.Circle(1.0).area() == sm.area(sm.Circle(1.0))
 ```
 
+## Null Object
+
+Polymorphism also dissolves the most common conditional there is:
+the `None` check.
+A parameter typed `T | None` makes every use a branch.
+Here a logger is optional, so the function guards each logging call:
+
+```python
+# optional_logger.py
+
+class ListLogger:
+    def __init__(self) -> None:
+        self.lines: list[str] = []
+
+    def log(self, message: str) -> None:
+        self.lines.append(message)
+
+def total(prices: list[float],
+          logger: ListLogger | None = None) -> float:
+    result = 0.0
+    for price in prices:
+        result += price
+        if logger is not None:
+            logger.log(f"added {price}, total {result}")
+    return result
+
+if __name__ == "__main__":
+    print(total([1.5, 2.5]))
+    logger = ListLogger()
+    print(total([1.5, 2.5], logger), len(logger.lines))
+#: 4.0
+#: 4.0 2
+```
+
+The checker insists on the guard, and it is right to insist:
+without it, a `None` eventually meets `.log()` and the call fails.
+But look at what the `None` branch does: nothing.
+Doing nothing is behavior, and behavior belongs in an object.
+
+The *Null Object* pattern replaces "absent" with an object whose
+behavior is neutral.
+Give the do-nothing case a class,
+and the optional parameter becomes an ordinary required one with a
+default:
+
+```python
+# null_logger.py
+from typing import Final, Protocol
+
+class Logs(Protocol):
+    def log(self, message: str) -> None: ...
+
+class NullLogger:
+    def log(self, message: str) -> None:
+        pass
+
+SILENT: Final[NullLogger] = NullLogger()
+
+class ListLogger:
+    def __init__(self) -> None:
+        self.lines: list[str] = []
+
+    def log(self, message: str) -> None:
+        self.lines.append(message)
+
+def total(prices: list[float],
+          logger: Logs = SILENT) -> float:
+    result = 0.0
+    for price in prices:
+        result += price
+        logger.log(f"added {price}, total {result}")
+    return result
+
+if __name__ == "__main__":
+    print(total([1.5, 2.5]))
+    logger = ListLogger()
+    print(total([1.5, 2.5], logger), len(logger.lines))
+#: 4.0
+#: 4.0 2
+```
+
+The output is identical and the branches are gone.
+`total()` decides nothing about logging;
+what silence looks like was decided once, inside `NullLogger`,
+instead of at every call site.
+The parameter's type improved too:
+`Logs` is a protocol, so any logger fits,
+and no caller ever sees a `| None`.
+Because `NullLogger` is stateless, one shared `SILENT` instance
+serves the whole program,
+and it is safe as a default argument value.
+The standard library ships this exact object as
+`logging.NullHandler`,
+and the maze in [Simulation](38_Simulation.md) points every
+doorless direction at one shared `EDGE` room,
+so movement code never checks for `None`.
+
+```python
+# test_null_logger.py
+import null_logger as nl
+import optional_logger as ol
+
+def test_versions_agree() -> None:
+    prices = [1.0, 2.0, 3.5]
+    assert ol.total(prices) == nl.total(prices) == 6.5
+
+def test_list_logger_records_each_step() -> None:
+    logger = nl.ListLogger()
+    nl.total([1.0, 2.0], logger)
+    assert logger.lines == [
+        "added 1.0, total 1.0", "added 2.0, total 3.0"]
+```
+
+Null objects stand in for "nothing to do," not "nothing there."
+When a caller must notice absence,
+a lookup that can fail or a required value that may be missing,
+a silent stand-in buries the problem.
+Keep `T | None` there,
+or return the `Result` of
+[Functional Error Handling](14_Functional_Error_Handling.md#a-result-type),
+so the type forces callers to face the missing case.
+The test is what callers would write:
+if every one of them would handle absence with the same neutral
+behavior, centralize that behavior in a null object.
+If any caller would branch differently,
+absence is information, and it belongs in the type.
+
 ## OOP Is Still Sometimes Useful
 
 None of this means objects are a mistake.

@@ -298,7 +298,7 @@ The I/O tasks each reach their `await` and suspend, so all five are in flight at
 The CPU tasks never `await`, so each runs to the end before the next starts: peak 1.
 The event loop overlaps waiting, not computing.
 Async did not fail. It overlapped the part that runs outside the processor, which for `cpu_price` is nothing.
-The `asyncio` mechanics (`async def`, `await`, `gather`, `run`) are covered in [Simulation](36_Simulation.md).
+The `asyncio` mechanics (`async def`, `await`, `gather`, `run`) are covered in [Simulation](38_Simulation.md).
 
 ## Parallelism
 

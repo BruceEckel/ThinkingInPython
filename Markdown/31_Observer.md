@@ -159,7 +159,7 @@ A slow observer no longer holds up the others.
 `gather` still waits for all of them, so the change is finished only after every observer is successfully notified.
 There is a limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
-The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](36_Simulation.md).
+The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Simulation](38_Simulation.md).
 For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python

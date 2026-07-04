@@ -149,7 +149,7 @@ as in [Iterators](27_Iterators.md#generators).
 The `entries` field is a tuple of `Entry`, so the whole tree is immutable.
 The demo builds `src` first, then places it inside `root`.
 Nothing can modify `src` afterward, so sharing subtrees is safe
-(see [Functional Programming](37_Functional_Programming.md#immutability)).
+(see [Functional Programming](39_Functional_Programming.md#immutability)).
 
 ```python
 # test_filesystem.py

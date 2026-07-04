@@ -1,0 +1,353 @@
+# Flyweight
+
+Some programs need enormous numbers of fine-grained objects:
+the characters in a document, the tiles in a game map,
+the strings in a compiler's symbol table.
+The *Flyweight* pattern supports them by sharing.
+Instead of a million objects, you keep one object per distinct value
+and reference it a million times.
+
+Two ideas make sharing work.
+First, split each object's state in two.
+*Intrinsic state* belongs to the value itself and is identical
+across every use, so it can live in the shared object.
+*Extrinsic state* varies per use, so it must live outside,
+supplied by the context.
+Second, route construction through a factory that returns
+the already-existing instance for a given value.
+Handing out one object under many names is only safe when nobody
+can change it, so a flyweight must be immutable.
+[Rethinking Objects](20_Rethinking_Objects.md#immutability-dissolves-it)
+develops that argument;
+this chapter is what the argument buys you.
+
+## Python Already Does It
+
+CPython flyweights its most common values.
+Small integers (-5 through 256) are created once and shared,
+and string *interning* keeps one copy of identifier-like strings.
+`sys.intern()` gives you the string pool directly:
+
+```python
+# already_shared.py
+from sys import intern
+
+low, low2 = int("256"), int("256")
+high, high2 = int("257"), int("257")
+print(low is low2, high is high2)
+#: True False
+joined = "".join(["fly", "weight"])
+joined2 = "".join(["fly", "weight"])
+print(joined == joined2, joined is joined2)
+#: True False
+print(intern(joined) is intern(joined2))
+#: True
+```
+
+Both `int("256")` calls return the same cached object,
+while each `int("257")` call builds a fresh one.
+The two `join()` calls build equal but distinct strings,
+and `intern()` maps both to one shared copy.
+(The small-integer cache and interning are CPython implementation
+details, not language guarantees. Do not write code that depends
+on them; do notice the technique.)
+Interned strings make comparison cheap:
+equal means identical, so `==` collapses to a pointer check.
+
+## Intrinsic and Extrinsic State
+
+A game map is the pattern's natural habitat.
+A map can hold millions of cells, but only a handful of
+tile kinds: grass, water, rock.
+The tile's symbol, name, and walkability are intrinsic,
+so they go in a frozen data class.
+The tile's position is extrinsic:
+it is the cell's coordinates in the grid,
+so the `Tile` object never stores it.
+The factory is `functools.cache` on a constructor function,
+the cached factory from
+[Singleton](23_Singleton.md#when-you-want-a-class-cache-the-instance)
+with arguments: one instance per distinct key.
+
+```python
+# tile_map.py
+from dataclasses import dataclass
+from functools import cache
+from typing import Final
+
+@dataclass(frozen=True)
+class Tile:
+    symbol: str
+    name: str
+    walkable: bool
+
+SPECS: Final[dict[str, tuple[str, bool]]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "#": ("rock", False),
+}
+
+@cache
+def tile(symbol: str) -> Tile:
+    name, walkable = SPECS[symbol]
+    return Tile(symbol, name, walkable)
+
+def parse_map(text: str) -> list[list[Tile]]:
+    return [[tile(s) for s in line]
+            for line in text.split()]
+
+if __name__ == "__main__":
+    field = parse_map("""
+        ..~~..
+        ..~~.#
+        ......
+        ##..~~
+    """)
+    cells = [t for row in field for t in row]
+    print(len(cells), len({id(t) for t in cells}))
+    print(field[0][2] is field[3][5])
+#: 24 3
+#: True
+```
+
+Twenty-four cells, three objects.
+The grid can grow to any size and the object count stays at the
+number of tile kinds, because `@cache` returns the same `Tile`
+for the same symbol every time.
+A cell's position never needs storing:
+asking "is the cell at row 1, column 5 walkable?" is
+`field[1][5].walkable`, with the coordinates supplied by the asker.
+That is the intrinsic/extrinsic split doing its work.
+
+```python
+# test_tile_map.py
+import pytest
+from tile_map import parse_map, tile
+
+def test_same_symbol_same_object() -> None:
+    assert tile(".") is tile(".")
+    assert tile(".") is not tile("#")
+
+def test_map_shares_tiles() -> None:
+    field = parse_map("..\n~~")
+    assert field[0][0] is field[0][1]
+    assert field[1][0] is field[1][1]
+    assert not field[1][0].walkable
+
+def test_unknown_symbol_raises() -> None:
+    with pytest.raises(KeyError):
+        tile("?")
+```
+
+Because `Tile` is frozen, sharing is invisible to clients.
+Nothing they can do to one cell's tile affects another,
+because nothing they can do affects the tile at all.
+Remove `frozen=True` and the pattern turns on you:
+mutate the grass tile in one cell and every grass cell
+in the map changes.
+
+## Interning in the Constructor
+
+The factory function is one honest extra name.
+If you want callers to keep writing `Color(...)`,
+move the pool into `__new__`,
+the same maneuver the
+[Singleton](23_Singleton.md#the-classic-implementations)
+chapter uses, but keyed by the constructor arguments:
+
+```python
+# interned_color.py
+from typing import ClassVar
+
+class Color:
+    _pool: ClassVar[dict[tuple[int, int, int], Color]] = {}
+    red: int
+    green: int
+    blue: int
+
+    def __new__(cls, red: int, green: int, blue: int) -> Color:
+        key = (red, green, blue)
+        cached = cls._pool.get(key)
+        if cached is not None:
+            return cached
+        self = super().__new__(cls)
+        self.red, self.green, self.blue = red, green, blue
+        cls._pool[key] = self
+        return self
+
+if __name__ == "__main__":
+    crimson = Color(220, 20, 60)
+    print(crimson is Color(220, 20, 60))
+    print(len(Color._pool))
+#: True
+#: 1
+```
+
+Construction syntax is unchanged and callers cannot tell they
+received a shared object.
+This is exactly what CPython's small-integer cache does.
+The cost is bookkeeping by hand: no data class, and no `__init__()`.
+Python calls `__init__()` on whatever `__new__()` returns,
+so an `__init__()` here would re-run on the cached instance
+at every construction.
+Unless you need the constructor syntax,
+the `@cache` factory does the same job with less machinery.
+
+## A Pool That Does Not Leak
+
+Both pools so far hold their objects forever.
+`@cache` keeps strong references to every argument and result,
+and `Color._pool` never shrinks.
+For tile kinds and colors that is fine, since the universe of
+values is small.
+When the universe is unbounded, such as symbols in a long-running
+parser, the pool itself becomes a memory leak.
+`weakref.WeakValueDictionary` fixes this:
+it holds its values weakly,
+so an entry disappears as soon as no one else uses the object:
+
+```python
+# weak_pool.py
+from dataclasses import dataclass
+from typing import Final
+from weakref import WeakValueDictionary
+
+@dataclass(frozen=True)
+class Symbol:
+    name: str
+
+_pool: Final[WeakValueDictionary[str, Symbol]] = (
+    WeakValueDictionary())
+
+def symbol(name: str) -> Symbol:
+    found = _pool.get(name)
+    if found is None:
+        found = Symbol(name)
+        _pool[name] = found
+    return found
+
+if __name__ == "__main__":
+    alpha = symbol("alpha")
+    alias = symbol("alpha")
+    print(alpha is alias, len(_pool))
+    del alpha, alias
+    print(len(_pool))
+#: True 1
+#: 0
+```
+
+While any reference to the `Symbol` survives, every call to
+`symbol("alpha")` returns that same object.
+When the last reference dies, CPython's reference counting frees
+the object and the pool entry evaporates with it.
+The pool guarantees sharing without extending lifetimes,
+which is the same design as `sys.intern()`.
+If you want bounded memory with fixed construction cost instead,
+`functools.lru_cache(maxsize=n)` gives the factory an eviction
+policy, at the price of keeping the most recent `n` alive.
+
+```python
+# test_weak_pool.py
+from weak_pool import _pool, symbol
+
+def test_symbols_are_shared() -> None:
+    keep = symbol("x")
+    assert symbol("x") is keep
+    assert symbol("y") is not keep
+
+def test_pool_releases_unused() -> None:
+    temp = symbol("temp")
+    assert "temp" in _pool
+    del temp
+    assert "temp" not in _pool
+```
+
+## A Fixed Set: Enum
+
+When the full set of shared values is known when you write the
+program, you do not need a pool at runtime.
+An `Enum` (introduced in
+[Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too))
+is a flyweight pool the language maintains for you:
+each member is constructed once, at class creation,
+and every mention anywhere in the program is that one object.
+
+```python
+# tile_enum.py
+from enum import Enum
+
+class Tile(Enum):
+    GRASS = (".", True)
+    WATER = ("~", False)
+    ROCK = ("#", False)
+
+    walkable: bool
+
+    def __new__(cls, symbol: str, walkable: bool) -> Tile:
+        member = object.__new__(cls)
+        member._value_ = symbol
+        member.walkable = walkable
+        return member
+
+if __name__ == "__main__":
+    print(Tile.GRASS is Tile["GRASS"] is Tile("."))
+    print(Tile.WATER.value, Tile.WATER.walkable)
+    print([t.value for t in Tile])
+#: True
+#: ~ False
+#: ['.', '~', '#']
+```
+
+Each member's tuple is passed to `__new__()`,
+which stores the walkability and assigns `_value_`,
+so the member's value is its map symbol rather than the tuple.
+The customization must happen in `__new__()`:
+the lookup table behind `Tile(".")` is keyed by the value
+`__new__()` establishes, so setting `_value_` later,
+in `__init__()`, would leave that table keyed by the tuples.
+With it, `Tile(".")` is a lookup: name, symbol, and attribute access
+all land on the same shared member.
+The enum version also brings iteration, exhaustive `match`,
+and protection against inventing a tile kind that does not exist.
+The trade is fixedness: `tile()` could load `SPECS` from a file,
+while `Tile.GRASS` is source code.
+The table-driven state machine in
+[State Machines](26_State_Machines.md#table-driven-state-machine)
+exploits the same property, using members as shared, comparable states.
+
+## Flyweights in the Wild
+
+The pattern is easy to spot once you know its shape.
+Compilers and interpreters intern identifiers so that scope lookups
+compare pointers instead of characters.
+Column stores such as pandas and Polars offer categorical types:
+a column of a million country names stores small integer codes into
+a pool of distinct strings.
+Text systems share one glyph object per character and font,
+with each occurrence supplying its own position.
+In every case the win is the same:
+memory proportional to the number of distinct values,
+not the number of uses,
+and equality checks that collapse to identity.
+
+## Exercises
+
+1.  Add door (`+`, walkable) and tree (`T`, not walkable) kinds to
+    `tile_map.py`, then write `walkable_neighbors(field, row, col)`
+    returning the count of adjacent walkable cells.
+    Confirm the tile pool size still equals the number of kinds,
+    however large the map.
+2.  Use `tracemalloc` to compare `parse_map()` on a large map
+    against a version whose `tile()` has no `@cache`.
+    How does the ratio change as the map grows?
+3.  Remove `frozen=True` from `Tile` and set
+    `field[0][0].walkable = False` on a parsed map.
+    Write a test that exposes the resulting bug,
+    then restore `frozen=True`.
+4.  Model chess: a frozen `Piece` (color, kind) and a board that is
+    a `dict` mapping squares to pieces.
+    A full opening position holds thirty-two piece references.
+    How many `Piece` objects exist? How do you capture and promote?
+5.  Rewrite `interned_color.py` to use the weak pool technique from
+    `weak_pool.py`, and show that building and dropping a palette of
+    colors leaves the pool empty.

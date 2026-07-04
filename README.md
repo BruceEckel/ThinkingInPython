@@ -89,7 +89,9 @@ Delete the review file and mark a cell `X` when that item is done.
 | 32_Multiple_Dispatching.md      |X|X|
 | 33_Visitor.md                   |X|X|
 | 34_Composite_and_Interpreter.md | | |
-| 35_Pattern_Refactoring.md       |X|X|
-| 36_Simulation.md                | | |
-| 37_Functional_Programming.md 🔴 Unfinished |_|_|
+| 35_Flyweight.md                 | | |
+| 36_Memento.md                   | | |
+| 37_Pattern_Refactoring.md       |X|X|
+| 38_Simulation.md                | | |
+| 39_Functional_Programming.md 🔴 Unfinished |_|_|
 | A_Pattern_Catalog.md            |X|X|

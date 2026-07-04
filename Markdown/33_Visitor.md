@@ -167,7 +167,7 @@ use `functools.singledispatchmethod` instead.
 when you truly cannot define functions over the hierarchy,
 or you need the `accept()` hook for some other reason.
 But in Python that is rare.
-As with [Pattern Refactoring](35_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s price-and-weight example,
+As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s price-and-weight example,
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 Because each operation is a plain function, testing is direct:
