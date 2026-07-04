@@ -13,7 +13,7 @@ The pattern exists because of mutation.
 An object that changes in place destroys its own past,
 so the past must be copied out and guarded.
 Python offers the classic form when you need it,
-and dissolves the pattern entirely when state is immutable.
+and obviates the pattern when state is immutable.
 
 ## A Snapshot Is Not a Reference
 
@@ -131,7 +131,7 @@ if `restore()` handed the memento's data back by reference,
 drawing afterward would corrupt the snapshot.
 Both `save()` and `restore()` must copy.
 
-## Immutability Dissolves It
+## Immutability
 
 All of that copying defends against mutation.
 Remove the mutation and there is nothing to defend against.
@@ -175,9 +175,8 @@ There is no `Memento` class, no `save()`, and no `restore()`,
 and nothing was copied to protect the past:
 `after` shares the two original stroke strings with `before`.
 This is the argument of
-[Rethinking Objects](21_Rethinking_Objects.md#immutability-dissolves-it)
-paying off for a third time:
-[Flyweight](36_Flyweight.md) shares immutable values across space,
+[Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
+as [Flyweight](36_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
 ```python

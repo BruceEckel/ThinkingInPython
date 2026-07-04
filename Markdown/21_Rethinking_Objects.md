@@ -172,7 +172,7 @@ def test_defensive_copy_prevents_the_leak() -> None:
     assert plugged.numbers == [1, 2]
 ```
 
-## Immutability Dissolves It
+## The Immutability Solution
 
 Encapsulation is only needed because of mutability.
 If the data cannot change, there is nothing to protect.
@@ -534,8 +534,7 @@ def test_oo_and_match_shapes_agree() -> None:
 
 ## Null Object
 
-Polymorphism also dissolves the most common conditional there is:
-the `None` check.
+Polymorphism also removes the most common conditional, the `None` check.
 A parameter typed `T | None` makes every use a branch.
 Here a logger is optional, so the function guards each logging call:
 

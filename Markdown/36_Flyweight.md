@@ -17,7 +17,7 @@ Second, route construction through a factory that returns
 the already-existing instance for a given value.
 Handing out one object under many names is only safe when nobody
 can change it, so a flyweight must be immutable.
-[Rethinking Objects](21_Rethinking_Objects.md#immutability-dissolves-it)
+[Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution)
 develops that argument;
 this chapter is what the argument buys you.
 
