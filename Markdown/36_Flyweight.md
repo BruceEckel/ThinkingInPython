@@ -305,7 +305,7 @@ The customization must happen in `__new__()`.
 The lookup table behind `Tile(".")` keys on the value
 `__new__()` establishes, so setting `_value_` later,
 in `__init__()`, would leave that table keyed by the tuples.
-With it, `Tile(".")` is a lookup. Name, symbol, and attribute access
+With `_value_` set in `__new__()`, `Tile(".")` is a lookup. Name, symbol, and attribute access
 all land on the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.

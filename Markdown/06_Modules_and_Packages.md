@@ -22,12 +22,12 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
-When you import a module, it creates a *namespace* within the importing file.
+Importing a module creates a *namespace* within the importing file.
 This automatically prevents name clashes between the imported module's names and the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
-The code at the end of the file starts with an `if` clause which checks whether the standard variable `__name__` is equal to the string `"__main__"`.
+The code at the end of the file starts with an `if` clause that checks whether the standard variable `__name__` is equal to the string `"__main__"`.
 In Python, any identifier that begins and ends with double underscores (commonly called a "dunder") is special in some way.
 Dunder methods, for example, hook your class into the language's operators and built-in functions.
 
@@ -43,7 +43,7 @@ python use_module.py
 
 However, if another program imports `use_module.py` as a module,
 `__name__` will not be `"__main__"`, so its `"__main__"` code does not run.
-Here is such a program, which does nothing but import it:
+Here is such a program, which does nothing but import `use_module`:
 
 ```python
 # import_module.py
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
-You can change the namespace of a module during an import using the `as` keyword:
+You can rename a module's namespace during an import using the `as` keyword:
 
 ```python
 # using_as.py

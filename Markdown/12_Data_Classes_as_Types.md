@@ -61,7 +61,7 @@ print(f2(rating))
 #: 30
 ```
 
-Each function duplicates the check, it is easy to forget, and the type system is no help.
+Each function duplicates the check, the check is easy to forget, and the type system is no help.
 The `int` annotation says "any integer," which is not what we mean.
 
 ## A Class Is Not a Type

@@ -241,7 +241,8 @@ Define the classes first,
 then fill in the tables at module level,
 after all the state objects exist.
 
-The `StateT` class is an implementation of `State` (so the same `StateMachine` class from the previous example still serves) that adds a `transitions` dict mapping each input to its next state.
+The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
+(so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
 The subclasses now define only their `run()` behavior;
 the transitions live in the tables filled in at the bottom of the file:

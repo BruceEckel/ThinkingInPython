@@ -53,8 +53,8 @@ Parentheses are not necessary in Python, although it won't complain if you use t
 The conditional clause ends with a colon.
 This indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-The `print()` statement sends the result to standard output,
-followed by an assignment to a variable named `val`.
+The `print()` statement sends the result to standard output.
+The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level.
 Unlike the brace-placement debates of C++ or Java, there are no options with Python formatting.
@@ -176,7 +176,7 @@ print(bin(flags))
 #: 0b1010
 ```
 
-The `bin()` function produces a binary string for `print()`.
+The `bin()` function converts an integer to a binary string for display.
 
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.

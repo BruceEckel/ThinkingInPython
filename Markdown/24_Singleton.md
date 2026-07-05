@@ -280,7 +280,7 @@ The shared state depends on `Borg.__init__` rebinding `self.__dict__` to
 fields and [never calls the base `__init__`](12_Data_Classes_as_Types.md#dataclass-inheritance),
 so `self.__dict__` is never rebound and each instance keeps its own state. Moving the rebinding into `__post_init__`
 does not help either. It runs after `__init__` assigns the fields, so it discards them. The hand-written `__init__` is what makes the shared state work,
-and a silent loss of sharing is worse than a version that simply does not run.
+and silently losing the sharing is worse than failing outright.
 
 Testing confirms the objects differ but share one set of state:
 

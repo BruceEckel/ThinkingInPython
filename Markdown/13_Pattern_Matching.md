@@ -45,7 +45,7 @@ a dictionary is often shorter (see the end of this chapter).
 Combine several patterns in one `case` with `|`.
 A bare name is a *capture pattern*.
 It always matches and binds the value to that name,
-which is the wildcard with a name attached:
+making it a wildcard with a name attached:
 
 ```python
 # step.py

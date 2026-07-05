@@ -15,13 +15,13 @@ It happens to be the *creation* of the type that matters here rather than the *u
 The effect is the same. Adding a new type can cause problems.
 
 The solution is to encapsulate object creation.
-We force the creation of objects to occur through a common *factory* rather than to allow the creational code to be spread throughout the system.
+We force the creation of objects to go through a common *factory* rather than spreading creational code throughout the system.
 If your program must go through this factory whenever it needs to create one of your objects,
 then all you must do when you add a new object is to modify the factory.
 
 Since every object-oriented program creates objects,
 and since it's likely you will extend your program by adding new types,
-factories might be the most common design patterns.
+Factory might be the most common design pattern.
 
 ## Simple Factory Method
 
@@ -280,8 +280,8 @@ The static `factory()` method in the previous example forces all the creation op
 so that's the only place you need to change the code.
 However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that you can subclass different types of factories from the basic factory
 (the above design is a special case).
-However, *GoF Design Patterns* does not provide an example,
-but instead repeats the example used for the *Abstract Factory* (you'll see this in the next section).
+*GoF Design Patterns* provides no example of this,
+instead repeating the example used for the *Abstract Factory* (you'll see this in the next section).
 Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
 Notice also that the code loads the specific `Shape` classes dynamically, on demand:
 
@@ -351,8 +351,8 @@ if __name__ == "__main__":
 
 Now the factory method appears in its own class, `ShapeFactory`, as the `create()` method.
 The different types of shapes must each create their own `Factory` class with a `create()` method to create an object of their own type.
-Calling `ShapeFactory.create_shape()` performs the actual creation of shapes,
-which is a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
+The actual creation of shapes happens in `ShapeFactory.create_shape()`,
+a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,
 but you could imagine a more complex problem where the caller receives the appropriate factory object and then uses it to create an object in a more sophisticated way.
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,

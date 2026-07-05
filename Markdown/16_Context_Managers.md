@@ -271,8 +271,6 @@ print(buffer.closed)
 ```
 
 A real file should close on the way out; `stdout` should not.
-`nullcontext(sys.stdout)` yields `stdout` but does nothing on exit,
-so one `with` block serves both cases.
 With a real resource the `with` closes it, shown by `buffer.closed`.
 With the default, `nullcontext` hands back `sys.stdout` and does nothing on exit,
 so the stream stays open.

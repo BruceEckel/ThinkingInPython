@@ -2,7 +2,7 @@
 
 This book is about cultivating the judgment to choose the smallest thing that works.
 You build that judgment through insights, idioms, and patterns.
-It is also honest about design patterns.
+The book is also honest about design patterns.
 Most arose to work around the limits of static,
 inheritance-heavy languages, and in Python many of them diminish or dissolve.
 If an idiom or pattern still earns its keep, it stays.
@@ -39,7 +39,7 @@ And it's free, so if AI bothers you more than the resulting product might benefi
 
 Using Claude made me realize how many compromises I've made on books in the past.
 I would have a good idea about something (for example, automatically interleaving commented output in the listings),
-but I was either unable to implement it or it just seemed too hard so I didn't do it.
+but I was either unable to implement it or it just seemed too hard, so I didn't do it.
 But with AI I've been able to explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter
 to ones as daunting as that commented-output system.
@@ -60,7 +60,7 @@ I am writing for the programmer who already knows how to program, either in anot
 The goal is to move from writing Python that works to writing Python that is clear,
 idiomatic, and a pleasure to maintain.
 
-This is an intermediate book, which removes two constraints:
+This is an intermediate book, which removes two constraints that introductory books carry:
 
 1.  An introductory book must describe everything in lock step,
     never using an idea before it has been formally introduced.

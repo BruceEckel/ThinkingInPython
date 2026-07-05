@@ -201,7 +201,7 @@ print(2 in a)
 
 Every operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
-not only a set, and they take several arguments at once.
+not only a set, and they can take several arguments at once.
 There is also `isdisjoint()`, which has no operator form:
 
 ```python
@@ -450,8 +450,8 @@ Use the immutable form whenever a container should not change after you build it
 Neither you nor code you pass it to can modify an immutable container by accident,
 so you never need a defensive copy before sharing it.
 It is safe to use as a default argument, unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
-Because it cannot change, it is hashable, so it can serve as a dictionary key or a set member.
-This is also why dictionary keys must be immutable.
+Because it cannot change, it is hashable and can thus serve as a dictionary key or a set member;
+this is also why dictionary keys must be immutable.
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through.

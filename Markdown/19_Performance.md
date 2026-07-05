@@ -13,8 +13,7 @@ As to the second issue, Python is commonly considered to be slow.
 
 ## Is It Actually Too Slow?
 
-Computer programming projects have a long history of *premature optimization*,
-when the designers decide ahead of time, based on their biases,
+Computer programming projects have a long history of *premature optimization*, in which designers decide ahead of time, based on their biases,
 that runtime performance will be insufficient.
 This results in elaborate designs that generate excessive costs.
 

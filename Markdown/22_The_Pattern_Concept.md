@@ -72,7 +72,7 @@ Your generic code works with any object that produces an iterator.
     This usually only appears after applying a standard design a number of times,
     and then seeing a common pattern throughout these applications.
 
-This doesn't say that one is better than another.
+This progression doesn't say that one stage is better than another.
 It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
 That's not a good use of your time, and you can't force the discovery of patterns that way.
 They tend to be subtle and appear over time.

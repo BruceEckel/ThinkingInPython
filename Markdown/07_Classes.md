@@ -41,8 +41,8 @@ Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`, but you can use any identifier
 (however, anything other than `self` will probably confuse people).
-To refer to fields in the object or other methods in the object,
-you must use `self` in the expression.
+To refer to the object's fields or its other methods,
+you must go through `self`.
 
 When you call a method for an object, as in `x.show()`, Python passes the object reference automatically.
 

@@ -24,7 +24,7 @@ print(a_function("yes"))
 #: 1
 ```
 
-Here the function signature only specifies the name of the function and the parameter names,
+Here the function signature specifies only the function name and the parameter names,
 but no argument types or return types ([Static Typing](08_Static_Typing.md#type-hints) covers these).
 Python is dynamically typed, so type errors surface at runtime rather than at compile time.
 This means the same function can accept and return different types:

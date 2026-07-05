@@ -1,8 +1,9 @@
 # Decorators
 
 A decorator is a function that you apply to another function or a class.
-The decorator itself is a callable that takes a function and returns a function.
-It takes the function to decorate as an argument, does something to that function, then returns the resulting function, which Python assigns to the original function name.
+The decorator itself is a callable that takes the function to decorate,
+does something with it, then returns the resulting function,
+which Python assigns to the original function name.
 
 To apply the decorator, you put a `@` before the decorator name (for simplicity we use an untyped `Callable`; a later section expands this):
 
@@ -25,7 +26,7 @@ cheese()
 ```
 
 Ordinarily you'd expect to see "Wensleydale," but `hijack()` replaces the original `cheese()` function
-with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
+with the decorated one, which in this case never calls `func`, so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.
 Decoration binds this function to the name `cheese`, so the local name can be anything.

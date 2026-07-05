@@ -110,7 +110,7 @@ The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
 
 The `# type: ignore` comment tells the type checker to skip this line,
-which allows the build to complete successfully.
+which allows this book's build to complete successfully.
 
 ## Structural Typing with Protocols
 

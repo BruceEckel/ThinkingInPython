@@ -72,7 +72,7 @@ Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order, or not run the finalizers before exit at all.
 
 Thus, leaning on `__del__()` is fragile because Python does not guarantee the timing.
-At interpreter shutdown the globals it refers to may already be gone.
+At interpreter shutdown, the globals a `__del__()` method refers to may already be gone.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`

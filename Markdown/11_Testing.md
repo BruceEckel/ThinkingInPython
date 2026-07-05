@@ -32,7 +32,7 @@ Testing then becomes a design tool,
 not a verification step you skip when you happen to feel good about the code you just wrote.
 
 That said, TDD requires that you know what you are creating.
-You are confident the design is correct, and it is now a matter of implementation.
+It assumes you are confident the design is correct, so that only implementation remains.
 You need that certainty to write tests first.
 Often, however, you are not sure what direction a program will take you.
 You are experimenting to see what the right approach is.

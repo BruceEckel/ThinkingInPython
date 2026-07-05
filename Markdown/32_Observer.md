@@ -1,6 +1,6 @@
 # Observer
 
-The *Observer* pattern decouples code behavior and is a kind of callback.
+The *Observer* pattern, a kind of callback, decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
 and receives a notification whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
