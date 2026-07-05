@@ -1,1 +1,5 @@
-3.15+gil
+3.15
+# +gil dropped as a workaround for https://github.com/astral-sh/uv/issues/17437
+# (uv can't resolve/download a +gil-suffixed request). Restore "3.15+gil" once
+# that's fixed upstream; plain "3.15" already resolves to the standard
+# (non-free-threaded) build by default.
