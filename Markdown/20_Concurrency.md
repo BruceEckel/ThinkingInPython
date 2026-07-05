@@ -163,11 +163,65 @@ printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price` as before.
 Only its home changed, from one shared interpreter to several.
 With enough cores the wall-clock time falls toward the time of a single task, not their sum.
-Threads would not have helped. CPython runs only one thread of Python at a time,
-which the next section explains.
+
+`ProcessPoolExecutor` is not the only way to get separate processes.
+The `multiprocessing` module underneath it exposes the raw pieces:
+a `Process` you start and `join()`,
+and a `Queue` to carry results back,
+since a process cannot return a value the way a function call does:
+
+```python
+# multiprocessing_raw.py
+import multiprocessing as mp
+
+def cpu_price(order: int, results: mp.Queue) -> None:
+    total = 0
+    for _ in range(1_000_000):  # Working inside the processor
+        total += 1
+    results.put((order, order * 10))
+
+def main() -> None:
+    orders = [1, 2, 3, 4, 5]
+    results: mp.Queue = mp.Queue()
+    workers = [
+        mp.Process(target=cpu_price, args=(o, results))
+        for o in orders
+    ]
+    for w in workers:
+        w.start()
+    for w in workers:
+        w.join()
+    pairs = sorted(results.get() for _ in workers)
+    print([price for _, price in pairs])
+
+if __name__ == "__main__":
+    main()
+```
+
+This prints the same `[10, 20, 30, 40, 50]`,
+but everything `pool.map` did for free is now explicit:
+starting each worker, waiting for it to finish,
+and reassembling results that can arrive in any order
+(`sorted()` restores the input order,
+since each result is tagged with its `order`).
+`ProcessPoolExecutor` is built on `multiprocessing`.
+It reuses a pool of workers instead of spawning one process per call,
+returns ordered results without manual bookkeeping,
+and shares its `submit()`/`map()`/`Future` interface with
+`ThreadPoolExecutor`,
+so switching between processes and threads,
+as the next section does,
+is a one-line change.
+Drop to `multiprocessing` directly for a job that is not one call
+returning one value: a worker that runs continuously and
+communicates over its own `Queue`,
+or state shared between processes through a
+`multiprocessing.Manager`, `Value`, or `Array`.
+`ProcessPoolExecutor` does not expose any of those.
 
 ## The GIL and Free Threading
 
+Threads would not have helped in the previous section.
 The standard CPython build has a *Global Interpreter Lock* (GIL):
 only one thread runs Python bytecode at a time, no matter how many
 cores sit idle. A thread releases the GIL while it waits on I/O,
@@ -236,8 +290,10 @@ The number is one machine's actual output.)
 
 ## Subinterpreters
 
-A process gets parallelism by giving each task its own interpreter,
-with its own GIL, at the cost of its own operating-system process.
+Each worker in a process pool gets its own interpreter,
+and so its own GIL.
+That is where the parallelism comes from.
+The cost is a whole operating-system process per task.
 Since 3.12, CPython can create additional interpreters
 inside the same process ([PEP 684](https://peps.python.org/pep-0684/)),
 each with its own GIL.
