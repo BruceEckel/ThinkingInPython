@@ -257,7 +257,7 @@ use, at the `json.dumps` and `Path(...)` calls.
 You can watch the deferral by importing a module whose body prints when it runs:
 
 ```python
-# noisy is a module whose top-level body prints when it executes
+# 'noisy' is a module whose top-level body prints when it executes
 lazy import noisy
 
 print("before first use")
