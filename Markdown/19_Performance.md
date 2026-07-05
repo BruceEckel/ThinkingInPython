@@ -51,9 +51,16 @@ sometimes enough to distort the very behavior you are measuring:
 Python 3.15 adds a *sampling* profiler,
 `profiling.sampling` ([PEP 799](https://peps.python.org/pep-0799/)).
 Instead of tracing every call, it takes periodic snapshots of the call stack,
-so the overhead is near zero and the program runs at full speed while you watch.
-It can also attach to a process that is already running,
-which makes it the tool for a slowdown you can only reproduce live.
+so the overhead is near zero and the program runs at full speed while you watch:
+
+    python -m profiling.sampling run my_program.py
+
+It can also attach to a process that is already running, by process ID,
+which makes it the tool for a slowdown you can only reproduce live:
+
+    python -m profiling.sampling attach 12345
+
+Either form ends with a table of hot functions ranked by sample count.
 
 Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
 separates Python time from native time and profiles memory line by line.
@@ -298,8 +305,7 @@ The cached version runs thousands of times faster,
 and the gap grows with `n`.
 
 `cache` holds every result forever,
-but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the
-least recently used entry.
+but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
 Arguments must be hashable,
 which is another reason to prefer immutable containers.
 For an expensive attribute computed once per object,
@@ -312,7 +318,7 @@ and caching a function that reads outside state can replay a stale answer.
 
 ## Reduce Memory Overhead
 
-With millions of objects, per-object overhead dominates.
+With millions of objects, per-object overhead can dominate performance.
 Three tools reduce that overhead.
 
 ### Slots
@@ -347,6 +353,7 @@ and still writes `__init__()`, `__repr__()`, and `__eq__()`:
 
 ```python
 # slots_dataclass.py
+import sys
 from dataclasses import dataclass
 
 @dataclass(slots=True)
@@ -363,12 +370,47 @@ try:
 except AttributeError as e:
     print(type(e).__name__)
 #: AttributeError
+
+@dataclass(frozen=True)
+class FrozenPoint:
+    x: int
+    y: int
+
+@dataclass(frozen=True, slots=True)
+class FrozenSlottedPoint:
+    x: int
+    y: int
+
+fp = FrozenPoint(1, 2)
+try:
+    # frozen blocks new attributes too, not just reassignment:
+    fp.z = 3  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: FrozenInstanceError
+
+frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
+slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
+print(f"frozen only:  {frozen_bytes} bytes")
+#: frozen only:  344 bytes
+print(f"frozen+slots: {slotted_bytes} bytes")
+#: frozen+slots: 48 bytes
 ```
 
 If a class can be a data class,
-prefer `slots=True` over a hand-written `__slots__`.
+prefer `slots=True` over a hand-written class with `__slots__`.
 This produces both memory savings and generated methods.
 The tradeoff is that instances can no longer grow attributes outside the declared set.
+
+`frozen=True` does not imply `slots=True`.
+Frozen blocks every attribute assignment, not just reassignment,
+so it already stops an instance from growing new fields,
+the same restriction `slots` gives you.
+But frozen enforces this by overriding `__setattr__()`;
+the instance still keeps a `__dict__` underneath.
+`slots=True` removes that `__dict__`,
+so pairing it with `frozen=True` is the natural default, giving you
+the same immutability at roughly a seven-to-one smaller instance.
 
 ### Array Instead of List
 
@@ -468,13 +510,14 @@ but as one compiled pass over contiguous memory
 instead of a million individual Python-level steps.
 NumPy is a fast library you call,
 not a compiled extension you write.
-The win survives only while the data stays inside NumPy.
+The benefit only occurs if the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back,
-hands the overhead right back.
+reproduces the overhead.
 This is the declarative trade from
 [Functional Programming](40_Functional_Programming.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
+
 (NumPy is a third-party dependency,
 and the book's Python 3.15 target has no NumPy release yet,
 so unlike the rest of the book's listings,
@@ -523,6 +566,7 @@ The first call pays a compilation delay,
 and code that leans on arbitrary Python objects will not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
+
 (Numba is also a third-party dependency,
 and it does not yet support the book's Python 3.15 target,
 so like the NumPy example above,
@@ -530,24 +574,82 @@ the build does not run this snippet.
 The comment above shows one machine's actual output;
 expect a different, but still large, multiple on yours.)
 
+## Combine NumPy and Numba
+
+NumPy and Numba solve different halves of the same problem,
+and a single function often uses both.
+NumPy gives you a compact array;
+`@njit` compiles a loop that walks it,
+for the case where the loop cannot become one vectorized expression,
+because the amount of work per element depends on the element's value.
+The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture)
+is such a case: from `n`, halve an even value or triple-and-increment
+an odd one, and repeat until you reach 1.
+The number of steps differs for every starting value,
+so no single array expression produces it:
+
+    import timeit
+    import numpy as np
+    from numba import njit
+
+    def collatz_lengths(values: np.ndarray) -> np.ndarray:
+        lengths = np.empty(len(values), dtype=np.int64)
+        for i in range(len(values)):
+            n = int(values[i])
+            steps = 0
+            while n != 1:
+                n = n // 2 if n % 2 == 0 else 3 * n + 1
+                steps += 1
+            lengths[i] = steps
+        return lengths
+
+    fast_collatz_lengths = njit(collatz_lengths)
+
+    values = np.arange(1, 50_000, dtype=np.int64)
+    fast_collatz_lengths(values[:1])  # Compile once, off the clock
+
+    t_python = timeit.timeit(
+        lambda: collatz_lengths(values), number=1
+    )
+    t_numba = timeit.timeit(
+        lambda: fast_collatz_lengths(values), number=1
+    )
+    print(f"Numba speedup: {t_python / t_numba:.1f}x")
+    # Sample run: Numba speedup: 54.4x
+
+`collatz_lengths()` takes a NumPy array and returns one,
+so it composes with vectorized NumPy code on either side.
+Compiling changes only what happens inside the loop:
+the same Python source runs as machine code
+instead of as bytecode over boxed `int` objects.
+This is the pattern in practice:
+use a vectorized NumPy expression wherever the shape of the
+computation allows it,
+and drop to a `@njit` loop for the steps that resist vectorizing,
+keeping the array as the shared data structure throughout.
+
+(Like the two examples above, this one needs both NumPy and Numba,
+so the build does not run it.
+The comment shows one machine's actual output;
+expect a different, but still large, multiple on yours.)
+
 ## Concurrency
 
-When the time goes to waiting on the outside world,
-or the work could make use of more than one core,
-the fix is not a faster function but a different architecture:
-overlapping tasks with `asyncio`,
-or spreading them across processes.
+Sometimes the fix is not a faster function but a different architecture.
+When the time goes to waiting on the outside world, use `asyncio`.
+If the work can be done in parallel (pure functions can do this seamlessly),
+you can spread it across multiple cores or multiple processes.
 That is a design decision with its own chapter, [Concurrency](20_Concurrency.md).
 
 ## Converting a Slow Function to Rust
 
 One very effective technique is to move the hot function into a compiled language.
-Rust is the current favorite because its tooling makes the bridge nearly painless.
+Rust is excellent for this because its tooling makes the bridge nearly painless.
 More importantly, you can pass the hot Python function to your AI for conversion to Rust.
-You AI can also walk you through the process.
+Your AI can also walk you through the process.
 Once you're done, you import a module that looks from the outside like any other Python module.
 It just runs faster.
-In addition, you can do things with Rust that might be much more difficult in Python.
+In addition, you can do things in Rust that might be much more difficult in Python.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
 and [maturin](https://www.maturin.rs) builds and installs the result
@@ -590,9 +692,8 @@ Python sees a normal module:
     fastcount.count_primes(100_000)
 
 Keep the interface coarse.
-One call that does a lot of work wins;
-a million calls that each do a little lose the gain due to
-boundary-crossing overhead.
+One call that does a lot of work wins.
+A million calls that each do a little lose the gain due to boundary-crossing overhead.
 So does shipping millions of small Python objects across the boundary.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The cost of this technique is a second language and a build toolchain in your project.

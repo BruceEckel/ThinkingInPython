@@ -73,7 +73,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 16_Context_Managers.md          |X|X|
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
-| 19_Performance.md 🔴 Unfinished |_|_|
+| 19_Performance.md               |X|X|
 | 20_Concurrency.md 🔴 Unfinished |_|_|
 | 21_Rethinking_Objects.md        |X|X|
 | 22_The_Pattern_Concept.md       |X|X|

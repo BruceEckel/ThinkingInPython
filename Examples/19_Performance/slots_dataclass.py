@@ -1,4 +1,5 @@
 # slots_dataclass.py
+import sys
 from dataclasses import dataclass
 
 @dataclass(slots=True)
@@ -15,3 +16,28 @@ try:
 except AttributeError as e:
     print(type(e).__name__)
 #: AttributeError
+
+@dataclass(frozen=True)
+class FrozenPoint:
+    x: int
+    y: int
+
+@dataclass(frozen=True, slots=True)
+class FrozenSlottedPoint:
+    x: int
+    y: int
+
+fp = FrozenPoint(1, 2)
+try:
+    # frozen blocks new attributes too, not just reassignment:
+    fp.z = 3  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: FrozenInstanceError
+
+frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
+slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
+print(f"frozen only:  {frozen_bytes} bytes")
+#: frozen only:  344 bytes
+print(f"frozen+slots: {slotted_bytes} bytes")
+#: frozen+slots: 48 bytes
