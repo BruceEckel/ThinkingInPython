@@ -18,13 +18,13 @@ The maze never decides anything.
 It only answers questions.
 
 A *blackboard* is the shared surface every rat writes on.
-The blackboard is a classic coordination technique:
-independent agents read from and write to one common data structure instead of talking to each other directly.
+The blackboard is a classic coordination technique.
+Independent agents read from and write to one common data structure instead of talking to each other directly.
 Here the blackboard owns the maze, records which cells have been explored,
 hands out rat numbers, and launches new rats.
 The rats run as cooperative `asyncio` tasks.
-They take turns instead of running at the same instant, so no lock is needed:
-a rat is never interrupted partway through an update.
+They take turns instead of running at the same instant, so no lock is needed.
+A rat is never interrupted partway through an update.
 
 A *rat* explores.
 Each rat runs as its own task.
@@ -494,7 +494,7 @@ so a plain `from world import Room` here would be circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,
-which is all `Room` is needed for: every use below is an annotation
+which is all `Room` is needed for. Every use below is an annotation
 (`room: Room`, `-> Room`), never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
@@ -512,8 +512,8 @@ so no code that reads `room` has to check for `None`.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
-so adding a new kind of item needs no change here:
-define the subclass with its symbol and the factory finds it.
+so adding a new kind of item needs no change here.
+Define the subclass with its symbol and the factory finds it.
 This is the registry idea from [Factory](29_Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy itself as the registry.
 
@@ -830,8 +830,8 @@ if __name__ == "__main__":
     show()
 ```
 
-Two patterns from earlier chapters carry the design:
-polymorphism replaces a type switch, and a factory builds objects from data.
+Two patterns from earlier chapters carry the design.
+Polymorphism replaces a type switch, and a factory builds objects from data.
 Neither needs concurrency.
 
 ## Other Maze Resources

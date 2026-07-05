@@ -88,7 +88,7 @@ and it catches the accidental shadowing from the earlier example before it happe
 ## ClassVar and Inheritance
 
 A `ClassVar` declared on a base class is inherited like any other class
-attribute: a subclass that doesn't declare its own copy reads straight
+attribute. A subclass that doesn't declare its own copy reads straight
 through to the base's value, via the normal method resolution order.
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
@@ -120,7 +120,7 @@ print(Base.shared, Left.shared, Right.shared)
 moment something assigns to `Left.shared` directly.
 `Right` overrode `shared` at class-definition time, so it never sees
 changes made through `Base`.
-`ClassVar` doesn't change any of this: it only tells the checker that
+`ClassVar` doesn't change any of this. It only tells the checker that
 `shared` belongs to the class, not that subclasses share storage.
 
 For real per-object defaults, write a constructor with default arguments,

@@ -223,8 +223,8 @@ and Python will keep searching through those paths until it finds your module or
 but the modern practice is to install your package into the environment you are working in,
 which puts it on the search path without any environment variable.
 Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
-or `uv pip install -e .` for an editable install:
-the package resolves by name from anywhere, and edits to its source take effect immediately, without reinstalling.
+or `uv pip install -e .` for an editable install.
+The package resolves by name from anywhere, and edits to its source take effect immediately, without reinstalling.
 
 ## Lazy Imports
 
@@ -271,8 +271,8 @@ It runs at `noisy.announce()`, the first access, so the output is
 If a lazily imported module is missing or broken, the error surfaces at that
 first use rather than at the import line.
 
-`lazy` works with both `import` and `from ... import`, but only at module scope:
-using it inside a function, a class body, or a `try` block is a `SyntaxError`,
+`lazy` works with both `import` and `from ... import`, but only at module scope.
+Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and neither `lazy from module import *` nor a `lazy from __future__` import is
 allowed.
 To make every import lazy without editing source, use the `-X lazy_imports`

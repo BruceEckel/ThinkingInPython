@@ -141,7 +141,7 @@ See [Naming Conventions](02_Tour.md#naming-conventions) for when a class departs
 
 Most context managers are simpler to write as a generator.
 `contextlib.contextmanager` turns a function with a single `yield` into a
-context manager: the code before `yield` is the setup, the yielded value is
+context manager. The code before `yield` is the setup, the yielded value is
 what `as` binds, and the code after `yield` is the cleanup.
 Put the cleanup in a `finally` so it runs even if the block raises an exception:
 
@@ -341,8 +341,8 @@ if __name__ == "__main__":
 
 `lease()` takes an item out of the queue, yields it to the `with` block,
 and the `finally` puts it back.
-The `finally` is the entire pattern:
-the crash inside the second `with` block still returns the connection,
+The `finally` is the entire pattern.
+The crash inside the second `with` block still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
 and it never creates or destroys anything.
@@ -352,8 +352,8 @@ The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and
 a return makes an item available.
-Handing the same pool to several threads therefore just works:
-the pool becomes the throttle that limits concurrent use,
+Handing the same pool to several threads therefore just works.
+The pool becomes the throttle that limits concurrent use,
 which is how real database connection pools behave.
 
 This differs from [Flyweight](36_Flyweight.md), its nearest neighbor.
@@ -388,8 +388,8 @@ def test_objects_reused_not_recreated() -> None:
         assert second is first
 ```
 
-The last test states the pattern's purpose:
-the second lease hands back the very same object,
+The last test states the pattern's purpose.
+The second lease hands back the very same object,
 not a new one.
 A production pool adds refinements on this skeleton,
 such as creating items lazily on first demand,

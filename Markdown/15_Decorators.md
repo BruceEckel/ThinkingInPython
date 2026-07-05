@@ -113,7 +113,7 @@ result is `R`," and returning `Callable[P, R]` promises that the wrapper has tha
 same signature.
 
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
-that captured list: `P.args` is the positional part and `P.kwargs` the keyword part.
+that captured list. `P.args` is the positional part and `P.kwargs` the keyword part.
 They may only be used together, as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to exactly the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
@@ -164,7 +164,7 @@ which then wraps `greet`.
 A decorator only has to be a callable that takes a function and returns a callable.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
-The class form separates the two phases cleanly: the constructor runs once,
+The class form separates the two phases cleanly. The constructor runs once,
 when the function is decorated,
 and `__call__()` runs on every call to the decorated function.
 Here is the `trace` decorator written as a class:
@@ -199,8 +199,8 @@ if __name__ == "__main__":
 so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
-`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function:
-it copies the wrapped function's name and docstring across.
+`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function.
+It copies the wrapped function's name and docstring across.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
 
@@ -274,14 +274,14 @@ if __name__ == "__main__":
 ```
 
 Compare the two cases.
-`@trace` with no arguments calls `trace(add)`:
-the function goes straight to the constructor.
+`@trace` with no arguments calls `trace(add)`.
+The function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(3)` first, producing an instance,
-then applies that instance to `greet`: the arguments go to the constructor,
+then applies that instance to `greet`. The arguments go to the constructor,
 and the function arrives later, at `__call__()`.
 The function form hides this shift inside an extra nested `def`.
-The class form makes it visible:
-the function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
+The class form makes it visible.
+The function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
 
 The form you choose is mostly a matter of taste.
 Both forms preserve the wrapped function's exact signature for the type checker,
@@ -289,8 +289,8 @@ using the same `**P` and `R` type parameters.
 The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
-That argument-capturing class decorator scales up to small frameworks:
-a build tool or task runner can offer a `@rule(target, *deps)` decorator.
+That argument-capturing class decorator scales up to small frameworks.
+A build tool or task runner can offer a `@rule(target, *deps)` decorator.
 Its constructor records the target and dependencies.
 Its `__call__()` registers the decorated function in a class-level table with that metadata.
 A driver later walks the table to run things in order.

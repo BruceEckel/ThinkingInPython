@@ -222,8 +222,8 @@ The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscribe order, alarm first.
 Concurrent fan-out lets each finish on its own schedule,
 so the faster observer reports first.
-The alarm also shows an observer that can decline to act:
-below its threshold it returns without sending anything.
+The alarm also shows an observer that can decline to act.
+Below its threshold it returns without sending anything.
 
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.

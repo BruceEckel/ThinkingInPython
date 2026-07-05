@@ -10,7 +10,7 @@ some of which you override.
 Python's own `unittest` is an application framework of this kind.
 You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
-The framework's runner is the template method: it calls `setUp()`,
+The framework's runner is the template method. It calls `setUp()`,
 then your test, then `tearDown()`, for each test,
 and you never call that sequence yourself.
 
@@ -63,8 +63,8 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
-This pattern leans on the [Liskov Substitution Principle](21_Rethinking_Objects.md#liskov-substitution):
-a subclass must be usable wherever its base class is expected.
+This pattern leans on the [Liskov Substitution Principle](21_Rethinking_Objects.md#liskov-substitution).
+A subclass must be usable wherever its base class is expected.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
 An override that breaks that trust, doing nothing the flow relies on,
@@ -137,8 +137,8 @@ If they share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
-This is the same trade-off seen in [Function Objects](30_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime):
-a hook that holds no state is usually better as a function than as a method to override.
+This is the same trade-off seen in [Function Objects](30_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+A hook that holds no state is usually better as a function than as a method to override.
 
 ## Exercises
 

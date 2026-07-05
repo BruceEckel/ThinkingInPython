@@ -12,7 +12,7 @@ Thus, if the code that creates objects is distributed throughout your applicatio
 you have the same problem when adding new types.
 You must still chase down all the points of your code where type matters.
 It happens to be the *creation* of the type that matters here rather than the *use* of the type (which is taken care of by polymorphism).
-The effect is the same: adding a new type can cause problems.
+The effect is the same. Adding a new type can cause problems.
 
 The solution is to encapsulate object creation.
 We force the creation of objects to occur through a common *factory* rather than to allow the creational code to be spread throughout the system.
@@ -96,8 +96,8 @@ This may not seem consistent with the code you see above:
     for i in shape_name_gen(4)
 
 It looks like there's an initialization taking place.
-This is where a generator is a bit strange:
-when you call a function that contains a `yield` statement (`yield` is what makes a function a generator),
+This is where a generator is a bit strange.
+When you call a function that contains a `yield` statement (`yield` is what makes a function a generator),
 that function actually returns a generator object that has an iterator.
 This iterator is implicitly used in the `for` statement above,
 so it appears that you are iterating through the generator function,
@@ -198,8 +198,8 @@ if __name__ == "__main__":
 
 A factory exists to turn data, such as a name,
 into an object without scattering constructors through your code.
-In Python a class is itself a first-class object:
-you can store it in a variable and call it to make an instance.
+In Python a class is itself a first-class object.
+You can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
 There is no factory method and no factory class; the `dict` is the factory.
@@ -237,7 +237,7 @@ for kind in ["Circle", "Square", "Circle"]:
 #: Circle.draw
 ```
 
-Adding a `Triangle` is now a single class definition: it registers itself,
+Adding a `Triangle` is now a single class definition. It registers itself,
 and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](38_Pattern_Refactoring.md#simulating-a-trash-recycler),
 and it is the most common form of factory in idiomatic Python.
@@ -358,14 +358,14 @@ but you could imagine a more complex problem where the appropriate factory objec
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`) will work fine.
 
-`ShapeFactory` fills its dictionary lazily:
-the first request for a kind builds that kind's factory object (via `eval()`) and caches it for later requests.
+`ShapeFactory` fills its dictionary lazily.
+The first request for a kind builds that kind's factory object (via `eval()`) and caches it for later requests.
 
 This version leans on `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
 Because classes are already first-class objects,
-the registry shown above does the same job:
-it maps a name straight to a class and constructs it.
+the registry shown above does the same job.
+It maps a name straight to a class and constructs it.
 Prefer that.
 A separate factory *class* earns its keep only when creating an object takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
@@ -377,8 +377,8 @@ with not one but several factory methods.
 Each factory method creates a different kind of object.
 At the point of creation of the factory object,
 you decide how all the objects created by that factory will be used.
-The example given in *GoF Design Patterns* implements portability across various graphical user interfaces (GUIs):
-you create a factory object appropriate to the GUI that you're working with,
+The example given in *GoF Design Patterns* implements portability across various graphical user interfaces (GUIs).
+You create a factory object appropriate to the GUI that you're working with,
 and from then on when you ask it for a menu, button, slider,
 etc. it will automatically create the appropriate version of that item for the GUI.
 Thus you're able to isolate, in one place,
@@ -526,7 +526,7 @@ g2.play()
 ```
 
 The concrete classes inherit nothing, but the type checker still verifies that each one fits
-the appropriate `Protocol`: a `GameElementFactory` must supply `make_character()`
+the appropriate `Protocol`. A `GameElementFactory` must supply `make_character()`
 and `make_obstacle()`, a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `action()`.
 This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
@@ -750,8 +750,8 @@ def test_replace_varies_one_field() -> None:
 ```
 
 So when does Builder survive in Python?
-When construction genuinely is a process:
-the steps must happen in an order,
+When construction genuinely is a process.
+The steps must happen in an order,
 later steps depend on earlier ones,
 and rules span the steps.
 `GameBuilder` in [Simulation](39_Simulation.md#a-robot-in-a-maze)
@@ -760,7 +760,7 @@ It assembles a maze in three stages,
 creating rooms, connecting doors, then placing the robot,
 and each stage relies on what the previous stage established.
 No single constructor call can express that.
-The standard library's `argparse.ArgumentParser` has the same shape:
+The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 

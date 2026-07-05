@@ -2,7 +2,7 @@
 
 One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
-Tests extend the language: they state what the code is supposed to do, and check it.
+Tests extend the language. They state what the code is supposed to do, and check it.
 
 Unit testing is a development practice.
 Tests give you a safety net.
@@ -485,8 +485,8 @@ def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
 
 Patch the name where it is used, `weather.urlopen()`, rather than the original in
 `urllib`, so only this module's lookups are redirected.
-The same approach isolates a database, a message queue, or any other service:
-replace the boundary function with a stand-in and assert against its result.
+The same approach isolates a database, a message queue, or any other service.
+Replace the boundary function with a stand-in and assert against its result.
 
 ## White-Box and Black-Box Tests
 
@@ -504,7 +504,7 @@ In Python the distinction is one of discipline, not of compiler enforcement.
 That makes black-box testing the sensible default.
 Test the public surface, the methods a caller is meant to use,
 and you stay free to change the internals without rewriting the tests.
-The `Account` tests are black-box: they never read a private attribute.
+The `Account` tests are black-box. They never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 

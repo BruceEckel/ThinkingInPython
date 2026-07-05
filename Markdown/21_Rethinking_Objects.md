@@ -37,7 +37,7 @@ That is the opposite of Liskov substitution.
 *C++* drew from Simula.
 Objects were optional, and it brought object-oriented programming,
 and exceptions, into the mainstream.
-*Java* drew from Smalltalk: everything is an object,
+*Java* drew from Smalltalk. Everything is an object,
 even when all you need is a function.
 Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
@@ -56,11 +56,11 @@ The industry has been quietly walking back from "everything is an object" and fr
 The *Liskov Substitution Principle* (LSP) says that an object of a subtype must
 be usable anywhere an object of its base type is expected, without breaking the
 program. A subclass may add behavior, but it must honor the base class's
-contract: it accepts the same arguments, returns the same kinds of results, and
+contract. It accepts the same arguments, returns the same kinds of results, and
 raises no surprising exceptions. When subclasses obey it, code written against
 the base class works unchanged on any of them. This is the guarantee that makes
 polymorphism, and patterns like the [Template Method](25_Template_Method.md),
-safe: the base class calls a method and trusts every subclass to stand in for it.
+safe. The base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 
 ## Encapsulation Leaks
@@ -160,7 +160,7 @@ Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
 
-Testing confirms the defensive copy holds: mutating the returned list leaves the original untouched:
+Testing confirms the defensive copy holds. Mutating the returned list leaves the original untouched:
 
 ```python
 # test_plugged.py
@@ -250,7 +250,7 @@ if __name__ == "__main__":
 
 The function reads the same and computes the same.
 The class does not need to own it.
-The function is not worse, and it has an advantage: it does not have to live inside `Point`.
+The function is not worse, and it has an advantage. It does not have to live inside `Point`.
 
 Testing confirms the method and the free function agree:
 
@@ -337,7 +337,7 @@ def test_protocol_and_adapter() -> None:
 
 The third OOP promise is reuse through inheritance.
 In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
-The alternative is composition: a type holds other types as fields.
+The alternative is composition. A type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
 and frozen instances compare by value and can be used as keys:
 
@@ -426,11 +426,11 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Inheriting from `ABC` makes `Shape` abstract: it cannot be instantiated,
+Inheriting from `ABC` makes `Shape` abstract. It cannot be instantiated,
 and `@abstractmethod` forces every subclass to define `area()`.
 
-Dynamic typing produces a different approach:
-any type works as long as it has the method the function calls.
+Dynamic typing produces a different approach.
+Any type works as long as it has the method the function calls.
 There is no shared base class and no declared set of types,
 and validity is checked only at runtime, when the call happens:
 
@@ -597,8 +597,8 @@ if __name__ == "__main__":
 #: 4.0 2
 ```
 
-The checker insists on the guard, and it is right to insist:
-without it, a `None` eventually meets `.log()` and the call fails.
+The checker insists on the guard, and it is right to insist.
+Without it, a `None` eventually meets `.log()` and the call fails.
 But look at what the `None` branch does: nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
@@ -648,7 +648,7 @@ The output is identical and the branches are gone.
 `total()` decides nothing about logging;
 what silence looks like was decided once, inside `NullLogger`,
 instead of at every call site.
-The parameter's type improved too:
+The parameter's type improved too.
 `Logs` is a protocol, so any logger fits,
 and no caller ever sees a `| None`.
 Because `NullLogger` is stateless, one shared `SILENT` instance
@@ -684,8 +684,8 @@ Keep `T | None` there,
 or return the `Result` of
 [Functional Error Handling](14_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
-The test is what callers would write:
-if every one of them would handle absence with the same neutral
+The test is what callers would write.
+If every one of them would handle absence with the same neutral
 behavior, centralize that behavior in a null object.
 If any caller would branch differently,
 absence is information, and it belongs in the type.
@@ -703,8 +703,8 @@ They normalized the crucial idea of types, as seen in
 If you simply avoid implementation inheritance, the payoff for using types is tremendous.
 
 Start with functions and data.
-When a program truly needs an object, it tells you:
-you find yourself passing the same data into every function,
+When a program truly needs an object, it tells you.
+You find yourself passing the same data into every function,
 or you need to bundle behavior with state.
 Objects are useful sometimes.
 They do not need to be everywhere, all the time.

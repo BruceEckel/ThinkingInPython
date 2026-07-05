@@ -453,6 +453,6 @@ so you never need a defensive copy before sharing it.
 It is safe to use as a default argument, unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 Because it cannot change, it is hashable, so it can serve as a dictionary key or a set member.
 This is also why dictionary keys must be immutable.
-A `MappingProxyType` is the one exception to watch:
-it blocks writes through the view, but it is a window onto the original `dict`,
+A `MappingProxyType` is the one exception to watch.
+It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through.

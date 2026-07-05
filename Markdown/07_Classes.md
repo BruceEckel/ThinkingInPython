@@ -92,7 +92,7 @@ by default.
 Because Python is dynamically typed, it doesn't really care about interfaces.
 All it cares about is applying operations to objects.
 With inheritance in C++ or Java, you often inherit only to establish a common interface.
-Python is different: you inherit an implementation, to reuse the code from the base class.
+Python is different. You inherit an implementation, to reuse the code from the base class.
 
 First import the base class the same way you import any name from a module (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
@@ -161,8 +161,8 @@ You can also see that the inherited `show_twice()` method is available in the de
 
 The class `Different` also has a method named `show()`,
 but this class is not derived from `Simple`.
-The `f()` function in the demo demonstrates dynamic typing:
-all it cares about is that `show()` can be applied to `obj`,
+The `f()` function in the demo demonstrates dynamic typing.
+All it cares about is that `show()` can be applied to `obj`,
 with no other type requirements.
 Thus, `f()` works equally on an object of a class derived from `Simple` and one that isn't,
 as long as the `obj` argument has a `show()`.
@@ -232,7 +232,7 @@ Because the change is invisible at the call site,
 do not preemptively add getters and setters.
 You can always add them later when you discover you need the logic.
 
-The default `@property` is *read-only*: it is only a getter.
+The default `@property` is *read-only*. It is only a getter.
 Assigning to it raises an `AttributeError`.
 To enable writing, add a *setter*,
 which allows you to validate the value before storing it:
@@ -267,8 +267,8 @@ except ValueError as e:
 
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
-A write-only property is possible but rare:
-a plain method is a better expression of the intent.
+A write-only property is possible but rare.
+A plain method is a better expression of the intent.
 
 A `@property` reruns its code on every access.
 When the computation is expensive and the answer cannot change,
@@ -302,7 +302,7 @@ The attribute is *lazy*, created on first use,
 so an instance that never asks never pays.
 Pattern catalogs call this *Lazy Initialization*,
 and in Python it is one decorator.
-The stored value lives on the instance:
+The stored value lives on the instance.
 `del n.total` discards it, and the next access recomputes.
 That is also the caution.
 `cached_property` trades freshness for speed,
@@ -398,7 +398,7 @@ Compose("example").f()
 
 Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
-This is a curiosity more than a technique:
-it works because `import` inside a class body binds like any other assignment,
+This is a curiosity more than a technique.
+It works because `import` inside a class body binds like any other assignment,
 but composition, mixins, or a plain module-level function are almost always the clearer choice.
 You will rarely, if ever, want this in your own code.

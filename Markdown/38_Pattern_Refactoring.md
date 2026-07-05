@@ -78,8 +78,8 @@ It treats each subclass's assignment as filling in that same classvar rather tha
 
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` can build it.
-`sum_value()` is an ordinary function:
-it relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
+`sum_value()` is an ordinary function.
+It relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
 We test that each subclass registers itself,
 `create()` builds one by name, the per-pound values are right,
@@ -237,8 +237,8 @@ for kind, items in bins.items():
 #: Total value = 120.08
 ```
 
-This satisfies the requirement, but it has a classic flaw:
-it tests for *every type in the system*.
+This satisfies the requirement, but it has a classic flaw.
+It tests for *every type in the system*.
 When cardboard becomes valuable and you add it,
 you must find any `case` statements that look for specific types.
 Any you miss will silently drop trash on the floor.

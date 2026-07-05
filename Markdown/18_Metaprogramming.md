@@ -234,8 +234,8 @@ print(sorted(c.__name__ for c in Shape.registry))
 Each time a subclass is created,
 `__init_subclass__()` adds it to the registry and removes its base classes,
 so only the current leaves remain.
-That is why `Blue` is absent from the second `Color` print: creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
-For the same reason `Round` is missing from the `Shape` registry: creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
+That is why `Blue` is absent from the second `Color` print. Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
+For the same reason `Round` is missing from the `Shape` registry. Creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
 No metaclass is involved.
 `__init_subclass__()` is implicitly a class method;
 its first argument is the new subclass.
@@ -487,7 +487,7 @@ print(type(b).__name__)
 `@final` is checked statically, by type checkers such as ty, mypy,
 and pyright.
 It states the intent and catches a violation before the code runs.
-It has no runtime effect: the interpreter still lets `class C(B): pass` run.
+It has no runtime effect. The interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter itself to refuse subclassing,
 `__init_subclass__()` can enforce it as each subclass is created.
@@ -564,7 +564,7 @@ That is one more reason to avoid metaclasses unless you truly need them.
 
 ## The `inspect` Module
 
-Up to now we've been modifying classes: `type` builds them, and metaclasses
+Up to now we've been modifying classes. `type` builds them, and metaclasses
 and `__init_subclass__()` run code as they are created.
 The `inspect` module is the other half of metaprogramming: reading the structure
 of live objects.
@@ -731,6 +731,6 @@ with no default, so on the class it is only an annotation, not a bound
 attribute, and `getmembers_static()` does not return it.
 `display_object(Fraggle(9, 2.3))` inspects an instance, whose attributes hold
 its field values, so `x` now appears beside `y` and `z`.
-Both headers read `=== Fraggle ===`: for a class `display_object()` prints the
+Both headers read `=== Fraggle ===`. For a class `display_object()` prints the
 class's own name, and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.

@@ -159,7 +159,7 @@ print(m)
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
 This copy-instead-of-mutate style reduces errors.
-But notice the last two lines: a plain data class is still mutable,
+But notice the last two lines. A plain data class is still mutable,
 so `m.name = "bar"` works.
 
 A data class is a type defined by its fields. `display_object()`, the
@@ -271,11 +271,11 @@ This principle is often stated as *parse, don't validate*.
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
-The check is not repeated because it cannot fail:
-an illegal value can never produce a `Stars` in the first place.
+The check is not repeated because it cannot fail.
+An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
-The style here is functional: instead of mutating an object and re-guarding it,
+The style here is functional. Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Typing](08_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
@@ -383,7 +383,7 @@ When the set of values is small and fixed, an `Enum` is the clearest type.
 As an example, we'll create a `BirthDate` containing a month, day, and year.
 There are exactly twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
-A `BirthDate` then validates across its fields: the day must fit the month.
+A `BirthDate` then validates across its fields. The day must fit the month.
 
 ```python
 # birth_date.py
@@ -548,8 +548,8 @@ When validation grows complicated, libraries make it lighter.
 The [attrs](https://www.attrs.org) library predates and inspired data classes and offers richer validators and converters.
 [Pydantic](https://docs.pydantic.dev) builds validation and parsing into the type itself,
 which is especially useful at the edges of a program where untrusted data comes in.
-The principle is the same:
-make the type responsible for guaranteeing its own values.
+The principle is the same.
+Make the type responsible for guaranteeing its own values.
 
 ## Inheritance and the Generated `__init__` {#dataclass-inheritance}
 
@@ -682,7 +682,7 @@ Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is no
 
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` knows how to serialize dictionaries.
-Decoding goes the other way: parse the JSON into a dictionary,
+Decoding goes the other way. Parse the JSON into a dictionary,
 then hand its parts to the constructors.
 
 ```python

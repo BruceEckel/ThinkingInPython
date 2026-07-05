@@ -137,7 +137,7 @@ after that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
 Access is delegated through `__getattr__()`.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
-It is *lazy*: it builds the inner object on the first call,
+It is *lazy*. It builds the inner object on the first call,
 which is why it needs the `None` sentinel and the `if` guard.
 
 ### Eager Creation
@@ -231,8 +231,8 @@ def test_new_returns_same_instance() -> None:
 Because `__new__()` returns the inner `__OnlyOne` object,
 that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
 not a wrapper around it.
-There are no delegating `__getattr__()` or `__setattr__()` methods here:
-attribute access goes straight to the one object.
+There are no delegating `__getattr__()` or `__setattr__()` methods here.
+Attribute access goes straight to the one object.
 
 ### Borg: Share State Instead of Identity
 
@@ -279,7 +279,7 @@ The shared state depends on `Borg.__init__` rebinding `self.__dict__` to
 `_shared_state`. A dataclass generates its own `__init__` that assigns the
 fields and [never calls the base `__init__`](12_Data_Classes_as_Types.md#dataclass-inheritance),
 so `self.__dict__` is never rebound and each instance keeps its own state. Moving the rebinding into `__post_init__`
-does not help either: it runs after the fields are assigned, so it discards
+does not help either. It runs after the fields are assigned, so it discards
 them. The hand-written `__init__` is what makes the shared state work,
 and a silent loss of sharing is worse than a version that simply does not run.
 

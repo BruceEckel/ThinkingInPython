@@ -160,7 +160,7 @@ print(get(prefs, "theme", "dark"))
 ```
 
 Here `mute` is stored as `None`, so `None` cannot also mean "not supplied".
-The `MISSING` sentinel keeps the two cases apart: a missing key with no default
+The `MISSING` sentinel keeps the two cases apart. A missing key with no default
 raises, while a stored `None` comes back untouched.
 
 ## Variable Argument Lists
@@ -219,10 +219,10 @@ This is the standard way to write a wrapper around another function.
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments.
-A `/` ends the *positional-only* parameters:
-every parameter before it must be passed by position, never by name.
-A `*` begins the *keyword-only* parameters:
-every parameter after it must be passed by name.
+A `/` ends the *positional-only* parameters.
+Every parameter before it must be passed by position, never by name.
+A `*` begins the *keyword-only* parameters.
+Every parameter after it must be passed by name.
 
 ```python
 # param_markers.py
@@ -251,8 +251,8 @@ Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 In the standard library,
 many built-in functions and methods take positional-only parameters, such as `dict.get(key, default, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
-That matters when a subclass overrides a method:
-since the name is not part of the interface,
+That matters when a subclass overrides a method.
+Since the name is not part of the interface,
 the subclass can rename the parameter, and a type checker will not object.
 
 ## Lambdas

@@ -6,7 +6,7 @@ When you call a method in the surrogate,
 it turns around and calls the method in the implementing class.
 These two patterns are so similar that the *Proxy* is a special case of *State*.
 
-The basic idea is simple: from a base class,
+The basic idea is simple. From a base class,
 the surrogate is derived along with the class or classes that provide the actual implementation:
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
@@ -14,9 +14,9 @@ the surrogate is derived along with the class or classes that provide the actual
 When you create a surrogate object, you give it an implementation.
 All method calls to the surrogate are forwarded to that implementation.
 
-Structurally, the difference between *Proxy* and *State* is simple:
-a *Proxy* has only one implementation, while *State* has more than one.
-The application of the patterns is considered (in *GoF Design Patterns*) to be distinct:
+Structurally, the difference between *Proxy* and *State* is simple.
+A *Proxy* has only one implementation, while *State* has more than one.
+The application of the patterns is considered (in *GoF Design Patterns*) to be distinct.
 *Proxy* is used to control access to its implementation,
 while *State* allows you to change the implementation dynamically.
 However, if you expand your notion of "controlling access to implementation" then the two fit neatly together.
@@ -93,8 +93,8 @@ except TypeError as e:
 instead of failing later when the `Proxy` tries to delegate a call it cannot.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols) is the
-structural alternative. The implementation needs no base class:
-conformance is checked by shape, statically by the type checker,
+structural alternative. The implementation needs no base class.
+Conformance is checked by shape, statically by the type checker,
 and, with `@runtime_checkable`, by `isinstance()`:
 
 ```python

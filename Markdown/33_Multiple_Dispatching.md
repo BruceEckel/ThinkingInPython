@@ -8,7 +8,7 @@ But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
-The answer starts with something you probably don't think about:
+The answer starts with something you probably don't think about.
 Python only performs single dispatching.
 That is, if you are performing an operation on more than one object whose type is unknown,
 Python can invoke the dynamic binding mechanism on only one of those types.
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Notice the flexibility of dictionaries: a tuple can be used as a key just as easily as a single object.
+Notice the flexibility of dictionaries. A tuple can be used as a key just as easily as a single object.
 
 ## One Type or Many
 

@@ -237,8 +237,8 @@ Another approach is to create tables inside each `State` object defining the var
 A table cannot be written inside its class,
 because its entries name the *other* states,
 which do not all exist until every class is defined.
-In Python that is no obstacle:
-define the classes first,
+In Python that is no obstacle.
+Define the classes first,
 then fill in the tables at module level,
 after all the state objects exist.
 
@@ -364,8 +364,8 @@ As a table:
 The original Java version of this example needed two extra class hierarchies,
 `Condition` and `Transition`,
 because in Java a method is not a value you can store in a table.
-Python functions are first-class, so those hierarchies vanish:
-a condition is any callable returning a `bool`, an action is any callable,
+Python functions are first-class, so those hierarchies vanish.
+A condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
 
 ![Vending machine state diagram](_images/stateMachine)

@@ -96,7 +96,7 @@ for flower in flower_gen(4):
 #: Chrysanthemum eaten by Worm
 ```
 
-The `accept()`/`visit()` pair is the *double dispatch*:
+The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` resolves the flower's type,
 then `visit()` resolves the visitor's type.
 
@@ -170,8 +170,8 @@ But in Python that is rare.
 As with [Pattern Refactoring](38_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s price-and-weight example,
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
-Because each operation is a plain function, testing is direct:
-call it with each flower type and assert the result.
+Because each operation is a plain function, testing is direct.
+Call it with each flower type and assert the result.
 The cases worth covering are the registered types,
 the `@singledispatch` default for an unregistered type,
 and that the two operations dispatch independently:

@@ -10,7 +10,7 @@ This chapter covers the rest.
 ## Matching Values
 
 The simplest patterns are literal values.
-A `case _` at the end is the wildcard: it matches anything, like a default.
+A `case _` at the end is the wildcard. It matches anything, like a default.
 Each `case` body runs only when its pattern matches, and the first match wins:
 
 ```python
@@ -43,8 +43,8 @@ a dictionary is often shorter (see the end of this chapter).
 ## Alternatives and Capture
 
 Combine several patterns in one `case` with `|`.
-A bare name is a *capture pattern*:
-it always matches and binds the value to that name,
+A bare name is a *capture pattern*.
+It always matches and binds the value to that name,
 which is the wildcard with a name attached:
 
 ```python
@@ -324,7 +324,7 @@ print(describe(301))
 ```
 
 When the set of types is *open* (anyone can add a new one),
-polymorphism is better than a `match`: each type carries its own behavior,
+polymorphism is better than a `match`. Each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
 especially when the cases need to look inside the value.

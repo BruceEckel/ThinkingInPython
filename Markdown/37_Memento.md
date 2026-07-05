@@ -126,8 +126,8 @@ def test_drawing_after_restore_spares_memento() -> None:
     assert checkpoint.strokes == ()
 ```
 
-The third test guards the subtle bug:
-if `restore()` handed the memento's data back by reference,
+The third test guards the subtle bug.
+If `restore()` handed the memento's data back by reference,
 drawing afterward would corrupt the snapshot.
 Both `save()` and `restore()` must copy.
 
@@ -172,7 +172,7 @@ Saving is keeping a reference, exactly the move that failed in
 It is safe now because no operation anywhere can change what
 `before` refers to.
 There is no `Memento` class, no `save()`, and no `restore()`,
-and nothing was copied to protect the past:
+and nothing was copied to protect the past.
 `after` shares the two original stroke strings with `before`.
 This is the argument of
 [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
@@ -255,8 +255,8 @@ if __name__ == "__main__":
 ```
 
 `do()` pushes the present into the past and clears the future,
-because acting after an undo starts a new timeline:
-the states you undid are no longer reachable by redo,
+because acting after an undo starts a new timeline.
+The states you undid are no longer reachable by redo,
 which is how every editor behaves.
 `undo()` and `redo()` just shuttle the present between the two
 stacks.
@@ -296,15 +296,15 @@ def test_bounds_are_reported() -> None:
     assert history.can_redo() and not history.can_undo()
 ```
 
-The alternative design stores commands instead of states:
-each undoable action carries its own inverse,
+The alternative design stores commands instead of states.
+Each undoable action carries its own inverse,
 the Command variation mentioned in
 [Function Objects](30_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
-because immutable states make it nearly free:
-each `Sketch` above shares almost all of its strokes with its
+because immutable states make it nearly free.
+Each `Sketch` above shares almost all of its strokes with its
 neighbors in the history.
 
 ## Mementos That Outlive the Process
@@ -350,11 +350,11 @@ something is producing mementos.
 
 ## Exercises
 
-1.  Add `erase()` to both sketches: it removes the last stroke.
+1.  Add `erase()` to both sketches. It removes the last stroke.
     In `sketch.py` it mutates; in `frozen_sketch.py` it returns a
     new `Sketch`. Write tests proving existing mementos and
     histories are unaffected in each version.
-2.  Give `History` a maximum depth: when the past grows beyond
+2.  Give `History` a maximum depth. When the past grows beyond
     `n` states, the oldest is discarded. What should happen to
     `can_undo()`?
 3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and

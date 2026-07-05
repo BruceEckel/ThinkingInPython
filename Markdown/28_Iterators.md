@@ -2,7 +2,7 @@
 
 An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
-a file, a database cursor, or a computation: it only asks for the next item.
+a file, a database cursor, or a computation. It only asks for the next item.
 
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
@@ -72,7 +72,7 @@ Generators are also lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
-A generator can even be *infinite*: a `while True` loop that yields forever,
+A generator can even be *infinite*. A `while True` loop that yields forever,
 or `itertools.count()`, produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
@@ -186,7 +186,7 @@ Use the class when the wrapper needs its own state or extra methods;
 use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because they all speak the same protocol.
-Both take `expected: type[T]`, so the checker carries the element type through:
+Both take `expected: type[T]`, so the checker carries the element type through.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 Both wrappers should pass matching items and raise on a mismatch:

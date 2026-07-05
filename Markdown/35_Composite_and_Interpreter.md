@@ -16,8 +16,8 @@ introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
 
 A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
-The payoff is uniformity:
-you ask a single file for its size the same way you ask a directory
+The payoff is uniformity.
+You ask a single file for its size the same way you ask a directory
 holding thousands of them.
 The traditional version puts the operation inside a class hierarchy:
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 #: root/data.csv
 ```
 
-The uniformity is unchanged:
+The uniformity is unchanged.
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
@@ -181,14 +181,14 @@ If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that without touching your code,
 while a central `match` would need editing.
 The guidance from [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
-applies directly: match over a closed set, use polymorphism for an open one.
+applies directly. Match over a closed set, use polymorphism for an open one.
 
 ## Interpreter
 
 A tree whose shape follows a grammar is an
 *abstract syntax tree* (AST).
-*Interpreter* is Composite applied to language:
-represent each construct as a node type,
+*Interpreter* is Composite applied to language.
+Represent each construct as a node type,
 and evaluation becomes a tree walk.
 
 In most languages the pattern has a reputation for heaviness,
@@ -239,8 +239,8 @@ def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 ```
 
-The four node classes are the grammar:
-an expression is a number, a variable, a sum, or a product.
+The four node classes are the grammar.
+An expression is a number, a variable, a sum, or a product.
 `Add` and `Mul` hold expressions themselves, which is what makes it a composite.
 
 The `Operators` base class is the clever part.
@@ -257,8 +257,8 @@ before the interpreter ever runs.
 
 This is not a toy trick.
 SymPy expressions, `pandas` and Polars column arithmetic,
-and SQLAlchemy filter conditions all work exactly this way:
-overloaded operators build an expression tree,
+and SQLAlchemy filter conditions all work exactly this way.
+Overloaded operators build an expression tree,
 and a library interprets that tree later,
 symbolically, over a whole column, or as SQL.
 
@@ -298,7 +298,7 @@ if __name__ == "__main__":
 Frozen data classes compare by value,
 so the demo confirms that the operators built exactly the tree
 you would assemble by hand.
-The second line is the point of interpreting rather than computing:
+The second line is the point of interpreting rather than computing.
 `expr` is a value, so the same tree evaluates under different
 variable bindings, as many times as you like.
 An unbound variable raises `KeyError`, naming the variable.
@@ -371,8 +371,8 @@ binding their fields in the patterns.
 
 An interpreter does not have to produce a number or a string.
 It can produce another tree.
-`simplify()` applies algebraic identities:
-adding zero and multiplying by one vanish, multiplying by zero
+`simplify()` applies algebraic identities.
+Adding zero and multiplying by one vanish, multiplying by zero
 collapses, and constant subtrees fold into a single `Num`.
 Each rule is a nested pattern over a pair of already-simplified children:
 

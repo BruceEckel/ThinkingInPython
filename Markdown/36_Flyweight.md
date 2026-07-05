@@ -51,8 +51,8 @@ and `intern()` maps both to one shared copy.
 (The small-integer cache and interning are CPython implementation
 details, not language guarantees. Do not write code that depends
 on them; do notice the technique.)
-Interned strings make comparison cheap:
-equal means identical, so `==` collapses to a pointer check.
+Interned strings make comparison cheap.
+Equal means identical, so `==` collapses to a pointer check.
 
 ## Intrinsic and Extrinsic State
 
@@ -61,8 +61,8 @@ A map can hold millions of cells, but only a handful of
 tile kinds: grass, water, rock.
 The tile's symbol, name, and walkability are intrinsic,
 so they go in a frozen data class.
-The tile's position is extrinsic:
-it is the cell's coordinates in the grid,
+The tile's position is extrinsic.
+It is the cell's coordinates in the grid,
 so the `Tile` object never stores it.
 The factory is `functools.cache` on a constructor function,
 the cached factory from
@@ -114,8 +114,8 @@ Twenty-four cells, three objects.
 The grid can grow to any size and the object count stays at the
 number of tile kinds, because `@cache` returns the same `Tile`
 for the same symbol every time.
-A cell's position never needs storing:
-asking "is the cell at row 1, column 5 walkable?" is
+A cell's position never needs storing.
+Asking "is the cell at row 1, column 5 walkable?" is
 `field[1][5].walkable`, with the coordinates supplied by the asker.
 That is the intrinsic/extrinsic split doing its work.
 
@@ -142,8 +142,8 @@ def test_unknown_symbol_raises() -> None:
 Because `Tile` is frozen, sharing is invisible to clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile at all.
-Remove `frozen=True` and the pattern turns on you:
-mutate the grass tile in one cell and every grass cell
+Remove `frozen=True` and the pattern turns on you.
+Mutate the grass tile in one cell and every grass cell
 in the map changes.
 
 ## Interning in the Constructor
@@ -202,8 +202,8 @@ For tile kinds and colors that is fine, since the universe of
 values is small.
 When the universe is unbounded, such as symbols in a long-running
 parser, the pool itself becomes a memory leak.
-`weakref.WeakValueDictionary` fixes this:
-it holds its values weakly,
+`weakref.WeakValueDictionary` fixes this.
+It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
 
 ```python
@@ -268,8 +268,8 @@ When the full set of shared values is known when you write the
 program, you do not need a pool at runtime.
 An `Enum` (introduced in
 [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too))
-is a flyweight pool the language maintains for you:
-each member is constructed once, at class creation,
+is a flyweight pool the language maintains for you.
+Each member is constructed once, at class creation,
 and every mention anywhere in the program is that one object.
 
 ```python
@@ -301,15 +301,15 @@ if __name__ == "__main__":
 Each member's tuple is passed to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
-The customization must happen in `__new__()`:
-the lookup table behind `Tile(".")` is keyed by the value
+The customization must happen in `__new__()`.
+The lookup table behind `Tile(".")` is keyed by the value
 `__new__()` establishes, so setting `_value_` later,
 in `__init__()`, would leave that table keyed by the tuples.
-With it, `Tile(".")` is a lookup: name, symbol, and attribute access
+With it, `Tile(".")` is a lookup. Name, symbol, and attribute access
 all land on the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
-The trade is fixedness: `tile()` could load `SPECS` from a file,
+The trade is fixedness. `tile()` could load `SPECS` from a file,
 while `Tile.GRASS` is source code.
 The table-driven state machine in
 [State Machines](27_State_Machines.md#table-driven-state-machine)
@@ -320,8 +320,8 @@ exploits the same property, using members as shared, comparable states.
 The pattern is easy to spot once you know its shape.
 Compilers and interpreters intern identifiers so that scope lookups
 compare pointers instead of characters.
-Column stores such as pandas and Polars offer categorical types:
-a column of a million country names stores small integer codes into
+Column stores such as pandas and Polars offer categorical types.
+A column of a million country names stores small integer codes into
 a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.

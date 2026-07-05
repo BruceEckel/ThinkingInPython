@@ -68,7 +68,7 @@ Every later feature in this chapter is, in part, a way to keep more of your code
 
 An *immutable* value cannot change after it is created.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Removing shared mutable state is the practical core of the functional style: a value that never changes cannot develop a bug from being changed somewhere you forgot about.
+Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from being changed somewhere you forgot about.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -99,7 +99,7 @@ When values never change underneath you, two parts of a program can share one wi
 
 Type annotations can state immutability so a checker enforces it.
 `typing.Final` marks a name that must not be rebound.
-The read-only collection types in `collections.abc`, such as `Sequence` and `Mapping`, describe a value you only read: they have no `append()` or item assignment, so a checker rejects any attempt to mutate through them:
+The read-only collection types in `collections.abc`, such as `Sequence` and `Mapping`, describe a value you only read. They have no `append()` or item assignment, so a checker rejects any attempt to mutate through them:
 
 ```python
 # immutable_types.py
@@ -152,7 +152,7 @@ These abilities are why the standard library uses tuples and frozen dataclasses 
 ## Functions as First-Class Objects
 
 A function in Python is an object like any other.
-This is what *first-class* means: you can bind a function to a name, store it in a container, pass it as an argument, and return it from another function.
+This is what *first-class* means. You can bind a function to a name, store it in a container, pass it as an argument, and return it from another function.
 A function value is not special syntax. It is data you can move around.
 
 ```python
@@ -231,8 +231,8 @@ The loop that walks the data is written once, inside `map()`, `filter()`, or `so
 and you supply only the part that differs from one use to the next.
 You stop rewriting the same iteration scaffold,
 along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
-The idea runs the other direction, too:
-a function that takes a function can wrap it with operations like timing, retries, or logging.
+The idea runs the other direction, too.
+A function that takes a function can wrap it with operations like timing, retries, or logging.
 This is what a decorator does in [Decorators](15_Decorators.md).
 
 ## Lambdas
@@ -247,8 +247,8 @@ instead of sending them to a named function defined elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
 Naming that one-liner would cost a line, a name to invent,
 and a definition to look up, with nothing gained in clarity.
-For anything larger, write a `def`:
-a named function carries a docstring, a readable name in tracebacks,
+For anything larger, write a `def`.
+A named function carries a docstring, a readable name in tracebacks,
 and room to grow.
 
 ## Closures
@@ -392,7 +392,7 @@ print(list(running))
 #: [1, 3, 6, 10]
 ```
 
-`lru_cache` is only correct because `fib()` is pure: caching a function with side effects would skip the effects.
+`lru_cache` is only correct because `fib()` is pure. Caching a function with side effects would skip the effects.
 The toolkits reward you for writing pure functions in the first place.
 
 The reason to look here before writing your own version is that these tools are already written, already correct, and implemented in C.
@@ -453,7 +453,7 @@ An iterative version would have to maintain its own stack to remember where it w
 ## Lazy Evaluation
 
 *Lazy evaluation* computes a value only when it is needed.
-A generator is the canonical example: it yields one value at a time instead of building a whole list up front.
+A generator is the canonical example. It yields one value at a time instead of building a whole list up front.
 Combined with `itertools`, you can describe an infinite sequence and take only the part you use:
 
 ```python
@@ -550,8 +550,8 @@ Declarative code says less and means more.
 By naming the result instead of the steps,
 you hand the reader your intent and give the runtime freedom to choose how to deliver it.
 That freedom is why a SQL query, a NumPy expression,
-or a dataframe operation can run on an optimized or parallel engine you never see:
-you described the what, not a fixed sequence of moves.
+or a dataframe operation can run on an optimized or parallel engine you never see.
+You described the what, not a fixed sequence of moves.
 
 ## Parallelism for Free
 
@@ -612,7 +612,7 @@ You decide how far to take it.
 
 1. The cheapest rung is local reasoning. Pure functions and immutable values let you understand one piece at a time, with no hidden state to carry in your head. Most code never needs more.
 2. Next is type checking. A type signature is a small theorem, and the function body is its proof.
-   This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence): types are propositions and programs are their proofs.
+   This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence). Types are propositions and programs are their proofs.
    Running `ty` over the examples in this book discharges that proof for a useful class of mistakes.
 3. Above that is *property-based testing*. You state a law the code must obey, then check it against many generated inputs. It does not prove the law.
    It works to falsify it, which is the falsifiability the chapter's opening requests.
@@ -678,7 +678,7 @@ That is the falsification machinery the chapter's opening called for, automated.
 Two caveats keep this honest.
 First, proof is not exclusive to functional code.
 Hoare logic and tools like Dafny verify imperative programs too.
-What purity changes is the cost: with no mutable state to track, each step of the reasoning is shorter.
+What purity changes is the cost. With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.
 Haskell programmers rarely prove a program correct.

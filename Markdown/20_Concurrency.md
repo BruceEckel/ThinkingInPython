@@ -14,8 +14,8 @@ A task is *CPU-bound* when it spends its time computing inside the process.
 The processor is busy from start to finish.
 
 That boundary decides the tool.
-Waiting can overlap on a single thread: while one task waits, the thread runs another.
-Computing cannot: one core runs one stream of instructions at a time.
+Waiting can overlap on a single thread. While one task waits, the thread runs another.
+Computing cannot. One core runs one stream of instructions at a time.
 So I/O-bound work needs `asyncio`, and CPU-bound work needs separate processes.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
@@ -25,8 +25,8 @@ Four pieces make up the `asyncio` vocabulary.
 Calling it runs nothing; it returns a *coroutine object*,
 a description of work that has not started.
 `await` starts that work and pauses the awaiting coroutine until the result is ready.
-The pause is the point:
-while one coroutine waits, the *event loop* runs another.
+The pause is the point.
+While one coroutine waits, the *event loop* runs another.
 `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 `asyncio.run()` starts the event loop, runs one coroutine to completion,
 and shuts the loop down.
@@ -51,8 +51,8 @@ asyncio.run(main())
 ```
 
 The single `fetch("solo")` behaves like an ordinary function call with a pause inside.
-The `gather()` call is where concurrency appears:
-all three `fetch()` coroutines are in flight at once,
+The `gather()` call is where concurrency appears.
+All three `fetch()` coroutines are in flight at once,
 so the total wait is one sleep, not three.
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
@@ -161,7 +161,7 @@ printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price` as before.
 Only its home changed, from one shared interpreter to several.
 With enough cores the wall-clock time falls toward the time of a single task, not their sum.
-Threads would not have helped: CPython runs only one thread of Python at a time,
+Threads would not have helped. CPython runs only one thread of Python at a time,
 which the next section explains.
 
 ## The GIL and Free Threading

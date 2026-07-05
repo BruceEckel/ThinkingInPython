@@ -114,11 +114,11 @@ which allows the build to complete successfully.
 
 ## Structural Typing with Protocols
 
-Earlier chapters relied on *dynamic typing*: a function accepts any object,
+Earlier chapters relied on *dynamic typing*. A function accepts any object,
 and the only requirement is that the object supports the operations performed on it.
 The type is checked at runtime, when the operation runs.
-Dynamic typing is often called *duck typing*:
-if it looks like a duck and quacks like a duck, treat it as a duck.
+Dynamic typing is often called *duck typing*.
+If it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
 Instead of waiting until the program is running,
@@ -268,7 +268,7 @@ print(box.get().upper())
 
 Constructing `Box("gift")` fixes `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
-A bound constrains the parameter:
+A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 Before Python 3.12 type parameters were written with `TypeVar` and `Generic`,
 which you will still see in older code.
@@ -313,8 +313,8 @@ print(t.bump().bump().report())
 and `report()` is available on the result.
 Had `bump()` been annotated `-> Tally`, the checker would reject `report()`,
 which `Tally` does not have.
-Alternative constructors benefit the same way:
-a `@classmethod` that ends with `return cls(...)` returns `Self`.
+Alternative constructors benefit the same way.
+A `@classmethod` that ends with `return cls(...)` returns `Self`.
 
 ## Hints Are Not Enforced at Run Time
 

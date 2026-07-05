@@ -205,7 +205,7 @@ print(unique == same)
 
 Consider a dictionary whose keys are single characters and whose values count how often each appears, with upper and lower case counted separately.
 To merge them into a case-insensitive count, the comprehension below sums the upper- and lower-case tallies under one lower-case key.
-It does some redundant work: a letter present in both cases (such as `a` and `A`) has the same combined count computed twice, once for each case.
+It does some redundant work. A letter present in both cases (such as `a` and `A`) has the same combined count computed twice, once for each case.
 
 ```python
 # dict_comprehension.py
@@ -290,8 +290,8 @@ Generators are explored further in [Iterators](28_Iterators.md#generators).
 ## Unpacking in Comprehensions
 
 The nested comprehensions above flatten by writing two `for` clauses.
-Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way:
-the unpacking operators `*` and `**` may appear in the output expression of a
+Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way.
+The unpacking operators `*` and `**` may appear in the output expression of a
 comprehension or generator expression, splicing each iterable or mapping into the
 result.
 This extends the [PEP 448](https://peps.python.org/pep-0448/) unpacking you already

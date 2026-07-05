@@ -6,8 +6,8 @@ and *Chain of Responsibility*.
 
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
-So these three patterns are largely unnecessary in Python:
-where *GoF Design Patterns* builds a hierarchy, Python uses a function.
+So these three patterns are largely unnecessary in Python.
+Where *GoF Design Patterns* builds a hierarchy, Python uses a function.
 The sections below show the function form first,
 then the classic object form for contrast.
 
@@ -84,8 +84,8 @@ macro.run()
 Both do the same thing.
 The class version is four classes and a wrapper to say what one list of functions says directly.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
-In Python a callback is just a function, so the replacement is unnecessary:
-the object form earns its keep only when a command must also carry state or support extra operations such as undo.
+In Python a callback is just a function, so the replacement is unnecessary.
+The object form earns its keep only when a command must also carry state or support extra operations such as undo.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
@@ -226,8 +226,8 @@ for algorithm in (Bisection(), Newton(), Secant()):
 ```
 
 We use strategies-as-functions constantly in Python without naming it as a pattern.
-The `key` argument to `sorted()`, `min()`, and `max()` is a strategy:
-you provide a function that decides how to compare.
+The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
+You provide a function that decides how to compare.
 The object form is worth it only when a strategy needs its own configuration or several related methods.
 
 ## Chain of Responsibility

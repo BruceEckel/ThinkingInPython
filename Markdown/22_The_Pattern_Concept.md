@@ -98,8 +98,8 @@ The three purposes are:
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
-Certainly, the *Creational* patterns are fairly straightforward:
-how are you going to create your objects?
+Certainly, the *Creational* patterns are fairly straightforward.
+How are you going to create your objects?
 This is a question you normally need to ask,
 and the name brings you right to that group of patterns.
 But I find *Structural* and *Behavioral* to be far less useful distinctions.
@@ -119,8 +119,8 @@ and the remaining difference is intent.
 ## Design Principles
 
 Design principles are at least as important as design structures,
-but for a different reason:
-principles ask questions about your proposed design,
+but for a different reason.
+Principles ask questions about your proposed design,
 to apply tests for quality.
 Some of these only apply to OOP.
 

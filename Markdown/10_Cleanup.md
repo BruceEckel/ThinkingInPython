@@ -59,8 +59,8 @@ The objects are destroyed later, at interpreter shutdown,
 when the global `counters` list is torn down.
 That list holds the only remaining references,
 so when it goes, the objects it holds go with it.
-That is why the `deleted` lines are missing from the output above:
-the listing ends at `End of delete loop`, the program's last statement,
+That is why the `deleted` lines are missing from the output above.
+The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints only afterward.
 Run `python cleanup.py` directly to see those lines appear.
 

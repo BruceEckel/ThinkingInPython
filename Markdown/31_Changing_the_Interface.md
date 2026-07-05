@@ -1,7 +1,7 @@
 # Changing the Interface
 
 Sometimes the problem you're solving is as simple as "I don't have the interface that I want."
-Two of the patterns in *GoF Design Patterns* solve this problem:
+Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes,
 providing a more comfortable way to deal with a library or bundle of resources.
@@ -86,7 +86,7 @@ because in *GoF Design Patterns* they assert that a Proxy must have an identical
 ### Adapter in Python
 
 The four variations above are Java habits.
-Python is dynamically typed: `WhatIUse.op()` only calls `f()`,
+Python is dynamically typed. `WhatIUse.op()` only calls `f()`,
 so it accepts any object that has an `f()`.
 You do not need a shared base class or a declared interface, only the method.
 The common adapter need is "forward most calls unchanged,
@@ -122,8 +122,8 @@ print(a.g())   # Forwarded to the adaptee unchanged
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 
-Testing verifies both halves of that behavior:
-the new `f()` combines the adaptee's methods,
+Testing verifies both halves of that behavior.
+The new `f()` combines the adaptee's methods,
 and calls to methods it doesn't override forward through to the wrapped object:
 
 ```python

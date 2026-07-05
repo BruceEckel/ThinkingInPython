@@ -368,7 +368,7 @@ because it must unpack the `Result` to reach the number.
 
 The [Decorators](15_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
 
-`@safe` deserves its own check: a good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
+`@safe` deserves its own check. A good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
 
 ```python
 # test_safe.py

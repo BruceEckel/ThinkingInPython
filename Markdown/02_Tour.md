@@ -44,7 +44,7 @@ In this book, the first line of an example will be the name of the file containi
 That file lives in the chapter's `Examples` subdirectory,
 so the above example is `Examples/02_Tour/if.py`.
 
-The `#:` comments are particular to this book: they show the console output for the example.
+The `#:` comments are particular to this book. They show the console output for the example.
 The book tooling validates that this output is correct.
 
 In a C/C++ `if`, you are required to use parentheses around the conditional.
@@ -265,8 +265,8 @@ This makes it useful for any block of literal text,
 such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
-The '`r`' right before a string means "raw":
-backslashes are taken literally, so you don't need to double them.
+The '`r`' right before a string means "raw".
+Backslashes are taken literally, so you don't need to double them.
 
 ### f-Strings
 
