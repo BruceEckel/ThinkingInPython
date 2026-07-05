@@ -4,6 +4,29 @@
 # are spelled correctly for this book. Add new terms here; fix real typos
 # in the prose instead.
 
+builtin
+bytecode
+doorless
+frozensets
+guido
+ints
+maturin
+memoizes
+mixins
+multiplayer
+parallelizable
+polars
+rossum
+savepoints
+stateful
+subproblems
+subtree
+subtrees
+toolchain
+unboxed
+undoable
+unpickle
+walkability
 adaptee
 aggregator
 async

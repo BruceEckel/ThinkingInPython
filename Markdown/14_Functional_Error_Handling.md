@@ -461,4 +461,3 @@ They are expected, and the type should say so.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
     Write the tests first.
-        

@@ -1,21 +1,19 @@
 # Performance
 
-[[Use new profiling features in Python 3.15]]
-[[May need some kind of profiling test rig to demonstrate speedups. If this takes too long for a normal 'make verify', might need to separate and create 'make profile" or something]]
-
 Performance means at least two things when it comes to computing:
 
-1. The speed at which you develop an application.
-2. The speed at which that application executes.
+1. Application development speed
+2. Execution speed
 
 Python addresses the first issue with clear syntax and extensive power and flexibility.
 As to the second issue, Python is commonly considered to be slow.
 
 ## Is It Actually Too Slow?
 
-Computer programming projects have a long history of *premature optimization*, in which designers decide ahead of time, based on their biases,
+Computer programming projects have a long history of *premature optimization*,
+which means deciding ahead of time, based on biases,
 that runtime performance will be insufficient.
-This results in elaborate designs that generate excessive costs.
+This produces elaborate, expensive designs.
 
 Python can be surprising.
 A program coded in the most straightforward way, without concern for performance,
@@ -23,11 +21,12 @@ can often run fast enough for your needs.
 Do not automatically assume that a simply written program will be too slow.
 Try it out first. It might be fine.
 
-If it is too slow, use Occam's Razor. Try the simplest approach first.
+If it is too slow, use Occam's Razor.
+Try the simplest approach first.
 That might be enough, and if it is, you might save a lot of time and money.
 
 What follows is an approach to solving performance problems,
-starting with the simplest techniques and getting successively more complex.
+starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
 
@@ -40,21 +39,69 @@ If it's noticeably less, then buying new hardware might be a quick win.
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
 Although it is tempting to think you "have a pretty good idea where the slowdown is," we turn out to be very bad at guessing this.
-A profiler tells you for sure, and keeps you from wasting your time.
+A profiler tells you for sure, preventing wasted time.
 
-I am currently most impressed with [Scalene](https://github.com/plasma-umass/scalene).
+The standard library provides two complementary profilers.
+`cProfile` is *deterministic*: it records every function call and return.
+Its numbers are exact, but the instrumentation slows the program,
+sometimes enough to distort the very behavior you are measuring:
 
-If you can narrow the problem down to a particular function, there may be techniques that speed up the algorithm used in that function.
+    python -m cProfile -s cumulative my_program.py
+
+Python 3.15 adds a *sampling* profiler,
+`profiling.sampling` ([PEP 799](https://peps.python.org/pep-0799/)).
+Instead of tracing every call, it takes periodic snapshots of the call stack,
+so the overhead is near zero and the program runs at full speed while you watch.
+It can also attach to a process that is already running,
+which makes it the tool for a slowdown you can only reproduce live.
+
+Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
+separates Python time from native time and profiles memory line by line.
+
+If you can narrow the problem down to a particular function,
+there may be techniques that speed up the algorithm used in that function.
 
 ## Benchmark Alternatives with `timeit`
 
-[[`timeit` times small snippets, so you can compare two ways of writing the same thing once a profiler has pointed you at a hot spot]]
+A profiler tells you *where* the time goes.
+Once you discover a hot spot, `timeit` tells you which rewrite wins.
+It runs a small snippet many times and reports the total,
+insulating the measurement from startup cost and clock granularity.
+
+Timings differ from machine to machine,
+so this example prints a comparison instead of raw numbers.
+Membership testing in a `list` scans; in a `set` it hashes:
+
+```python
+# membership.py
+import timeit
+
+n = 100_000
+as_list = list(range(n))
+as_set = set(as_list)
+target = n - 1  # Worst case: the last element in the list
+
+t_list = timeit.timeit(lambda: target in as_list, number=100)
+t_set = timeit.timeit(lambda: target in as_set, number=100)
+print(f"set at least 100x faster: {t_set * 100 < t_list}")
+#: set at least 100x faster: True
+```
+
+One lookup costs little either way;
+a million lookups is the difference between instant and minutes.
+`timeit` also has a command-line form for one-off questions:
+
+    python -m timeit -s "s = set(range(100_000))" "99_999 in s"
+
+Do your benchmarks using data that is shaped like production data.
+A `list` of ten elements can beat a `set`,
+and an optimization tuned to toy input can behave badly in production.
 
 ## Choose Better Algorithms and Data Structures
 
 The biggest speedups usually come from a better algorithm, not faster code.
-A lower Big-O complexity beats micro-optimizing a slow one.
-Often this just means choosing the right container.
+An algorithm with lower Big-O complexity beats micro-optimizing a slow algorithm.
+Often this means choosing the right container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a `deque` (see [Containers](03_Containers.md#deque)) when you add and remove at both ends.
 
@@ -65,7 +112,7 @@ For data kept in sorted order, the `bisect` module finds the insertion point wit
 import bisect
 
 scores = [60, 70, 75, 90]      # Must stay sorted
-i = bisect.bisect(scores, 78)  # Where 78 would go
+i = bisect.bisect(scores, 78)  # Where 78 goes
 print(i)
 #: 3
 bisect.insort(scores, 78)      # Insert and keep it sorted
@@ -107,22 +154,161 @@ print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 
 After `heapify()` the smallest element stays at index 0,
 and `nsmallest()` and `nlargest()` answer top-N questions directly.
-For a priority queue shared across threads, `queue.PriorityQueue` wraps `heapq` with locking,
-covered with concurrency below.
+For a priority queue shared across threads,
+`queue.PriorityQueue` wraps the same heap in a lock;
+[Concurrency](20_Concurrency.md#coordinating-threads-with-queues) shows it in use.
 
-[[Frozen data structures: tuples instead of lists, and frozenset and frozendict -- shouldn't these speed up lookup?]]
+The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
+A `frozenset` looks up exactly as fast as a `set`,
+a `frozendict` behaves like a `dict`,
+and a `tuple` scans like a `list`;
+in CPython they share the same machinery.
+Choose immutability for correctness and safe sharing.
+Its performance role is indirect:
+immutable values are hashable,
+so they can serve as dictionary keys and as arguments to the caches shown below.
 
 ## Write Idiomatic Python
 
-[[Let the interpreter do the work: built-in functions and comprehensions instead of hand-written loops, the C-implemented standard library (`itertools`, `collections`, `functools`), `str.join` instead of `+=` in a loop, and hoisting repeated attribute or global lookups into locals]]
+The interpreter is written in C.
+Built-in functions and comprehensions run their loops in C,
+so the more of your loop you hand to the interpreter,
+the less bytecode runs per element.
+The idiomatic version of a loop is usually also the fast one:
+
+```python
+# builtin_sum.py
+import timeit
+
+numbers = list(range(100_000))
+
+def hand_written() -> int:
+    total = 0
+    for n in numbers:
+        total += n
+    return total
+
+assert hand_written() == sum(numbers)
+t_loop = timeit.timeit(hand_written, number=50)
+t_sum = timeit.timeit(lambda: sum(numbers), number=50)
+print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
+#: sum() at least twice as fast: True
+```
+
+The same principle chooses `"".join(parts)` over `+=` in a loop
+(one linear pass instead of repeated reallocation),
+a comprehension over an `append()` loop,
+and the C-implemented standard library,
+`itertools`, `collections`, and `functools`,
+over hand-rolled equivalents
+([Iterators](28_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+As a last resort in a proven-hot loop,
+hoist a repeated attribute or global lookup into a local,
+as in `append = out.append`.
+That is a micro-optimization, so let a measurement justify it.
 
 ## Lazy Evaluation with Generators
 
-[[Stream values with generators and `itertools` instead of building large intermediate lists, so work happens on demand and memory stays flat]]
+A list-building pipeline materializes every intermediate result.
+A generator pipeline
+([Comprehensions](17_Comprehensions.md#generator-expressions))
+computes one item at a time, on demand,
+so memory stays flat no matter how large the source,
+and no work happens past the point where the consumer stops.
+`tracemalloc` measures the difference:
+
+```python
+# lazy_pipeline.py
+import tracemalloc
+from itertools import islice
+
+N = 1_000_000
+
+def eager_first_evens() -> list[int]:
+    squares = [x * x for x in range(N)]
+    evens = [s for s in squares if s % 2 == 0]
+    return evens[:5]
+
+def lazy_first_evens() -> list[int]:
+    squares = (x * x for x in range(N))
+    evens = (s for s in squares if s % 2 == 0)
+    return list(islice(evens, 5))
+
+tracemalloc.start()
+eager = eager_first_evens()
+_, eager_peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+tracemalloc.start()
+lazy = lazy_first_evens()
+_, lazy_peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+print(eager, eager == lazy)
+#: [0, 4, 16, 36, 64] True
+print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
+#: lazy peak under 1% of eager: True
+```
+
+Both versions produce the same five numbers,
+but the eager one built two million-element lists to get them,
+while the lazy one computed only the handful of values that
+`islice()` pulled through.
+When the consumer needs every element anyway and the data fits in memory,
+a list is fine, and you can iterate it twice;
+a generator is spent after one pass.
 
 ## Caching
 
-[[Demonstrate @cache speedup]]
+If a pure function
+([Functional Programming](40_Functional_Programming.md#pure-functions))
+is called repeatedly with the same arguments,
+the fastest way to compute the answer is to not compute it.
+`functools.cache` stores each result the first time and replays it after that.
+The classic demonstration is naive recursive Fibonacci,
+which recomputes the same subproblems exponentially many times:
+
+```python
+# cache_speedup.py
+from functools import cache
+
+calls = 0
+
+def fib_plain(n: int) -> int:
+    global calls
+    calls += 1
+    if n < 2:
+        return n
+    return fib_plain(n - 1) + fib_plain(n - 2)
+
+@cache
+def fib_cached(n: int) -> int:
+    if n < 2:
+        return n
+    return fib_cached(n - 1) + fib_cached(n - 2)
+
+print(fib_plain(25), calls)
+#: 75025 242785
+print(fib_cached(25), fib_cached.cache_info().misses)
+#: 75025 26
+```
+
+Same answer, 242,785 calls against 26.
+The counts are the speedup;
+the cached version runs thousands of times faster,
+and the gap grows with `n`.
+
+`cache` holds every result forever;
+`functools.lru_cache(maxsize=n)` bounds the memory by evicting the
+least recently used entry.
+Arguments must be hashable,
+one more reason to prefer the immutable containers discussed above.
+For an expensive attribute computed once per object,
+`functools.cached_property` does the same job on instances
+(see [Classes](07_Classes.md#properties)).
+Caching is only correct when the function is pure.
+Caching a function with side effects replays the answer but skips the effects,
+and caching a function that reads outside state can replay a stale answer.
 
 ## Reduce Memory Overhead
 
@@ -152,7 +338,33 @@ except AttributeError as e:
 #: AttributeError
 ```
 
-[[Can you make a dataclass that has slots? Would that be better here?]]
+A data class can generate the slots for you.
+`@dataclass(slots=True)` turns the field declarations into `__slots__`
+and still writes `__init__()`, `__repr__()`, and `__eq__()`:
+
+```python
+# slots_dataclass.py
+from dataclasses import dataclass
+
+@dataclass(slots=True)
+class Point:
+    x: int
+    y: int
+
+p = Point(1, 2)
+print(p)
+#: Point(x=1, y=2)
+try:
+    # z is not one of the declared slots:
+    p.z = 3  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
+```
+
+When the class qualifies as a data class,
+prefer `slots=True` over a hand-written `__slots__`;
+you get the memory savings and the generated methods together.
 
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
@@ -202,11 +414,61 @@ so writing through it changes the original and copies no bytes.
 
 ## Vectorize with NumPy
 
-[[Move numeric loops into whole-array operations. NumPy is a fast library you call, not a compiled extension you write]]
+When the hot spot is arithmetic over a large collection of numbers,
+the biggest step is to remove the Python loop entirely.
+[NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
+like `array` above,
+and executes whole-array expressions in compiled loops:
+
+    import numpy as np
+
+    a = np.arange(1_000_000, dtype=np.float64)
+    b = 3.0 * a + 1.0  # One compiled pass over the array
+
+A numeric loop rewritten this way commonly runs tens of times faster,
+and NumPy is a fast library you call,
+not a compiled extension you write.
+The win survives only while the data stays inside NumPy.
+Calling a Python function on each element,
+or converting arrays to lists and back,
+hands the overhead right back.
+This is the declarative trade from
+[Functional Programming](40_Functional_Programming.md#declarative-style):
+describe the whole-array result and let the engine arrange the steps.
+(NumPy is a third-party dependency,
+so unlike the rest of the book's listings,
+the build does not run this snippet.)
 
 ## JIT Compilation with Numba
 
-[[`@njit` compiles numeric Python to machine code in place, a lighter step than Rust when the hot spot is number-crunching]]
+Sometimes the loop cannot become an array expression,
+because each step depends on the previous one,
+or the control flow is irregular.
+[Numba](https://numba.pydata.org/)'s `@njit` decorator compiles such a
+function to machine code on its first call, in place.
+The source stays Python:
+
+    from numba import njit
+
+    @njit
+    def count_primes(limit: int) -> int:
+        count = 0
+        for n in range(2, limit):
+            for d in range(2, int(n ** 0.5) + 1):
+                if n % d == 0:
+                    break
+            else:
+                count += 1
+        return count
+
+Numba shines on numeric code over simple types and NumPy arrays,
+often landing within striking distance of C.
+The first call pays a compilation delay,
+and code that leans on arbitrary Python objects will not compile.
+When the hot spot is number-crunching,
+`@njit` is a lighter step than rewriting in another language.
+(Numba is also a third-party dependency,
+outside the book's build.)
 
 ## Concurrency and Parallelism
 
@@ -219,6 +481,96 @@ That is a design decision with its own chapter, [Concurrency](20_Concurrency.md)
 
 ## Converting a Slow Function to Rust
 
+The last rung of the ladder moves the hot function,
+and only the hot function, into a compiled language.
+Rust is the current favorite because its tooling makes the bridge
+nearly painless.
+[PyO3](https://pyo3.rs) generates the Python bindings,
+and [maturin](https://www.maturin.rs) builds and installs the result
+as an ordinary Python package.
+`maturin new --bindings pyo3 fastcount` scaffolds the project,
+and one attribute turns a Rust function into a Python function:
+
+    use pyo3::prelude::*;
+
+    #[pyfunction]
+    fn count_primes(limit: u64) -> u64 {
+        let mut count = 0;
+        for n in 2..limit {
+            let mut d = 2;
+            let mut prime = true;
+            while d * d <= n {
+                if n % d == 0 {
+                    prime = false;
+                    break;
+                }
+                d += 1;
+            }
+            if prime {
+                count += 1;
+            }
+        }
+        count
+    }
+
+    #[pymodule]
+    fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
+        m.add_function(wrap_pyfunction!(count_primes, m)?)?;
+        Ok(())
+    }
+
+After `maturin develop` compiles and installs it,
+Python sees a normal module:
+
+    import fastcount
+    fastcount.count_primes(100_000)
+
+Keep the interface coarse.
+One call that does a lot of work wins;
+a million calls that each do a little lose the gain to
+boundary-crossing overhead,
+and so does shipping millions of small Python objects across.
+Numbers, strings, bytes, and NumPy arrays cross cheaply.
+The cost of this rung is a second language and a build toolchain in
+your project, which is why it comes last.
+
 ## Choosing a Strategy
 
-[[Recap: measure first, then work down this list from the cheapest change to the most involved, stopping as soon as the program is fast enough]]
+Measure first.
+Every step below costs something,
+in effort, complexity, or dependencies,
+and a profile is the only way to know which one your program needs.
+Then work down the list from the cheapest change to the most involved,
+stopping as soon as the program is fast enough:
+
+1. Run the straightforward version. It may already be fast enough.
+2. Try a faster platform: PyPy, or better hardware.
+3. Fix the algorithm and the data structures;
+   the order-of-magnitude wins live here.
+4. Write idiomatic Python and let the interpreter's C loops do the work.
+5. Make pipelines lazy with generators.
+6. Cache the pure functions.
+7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
+8. Vectorize with NumPy, or JIT-compile the loop with Numba.
+9. Restructure for concurrency or parallelism ([Concurrency](20_Concurrency.md)).
+10. Rewrite the proven-hot function in Rust.
+
+After every change, measure again.
+Optimizations interact, the bottleneck moves,
+and yesterday's hot spot may be irrelevant today.
+The goal is not the fastest possible program;
+it is a program that is fast enough, at the lowest cost in clarity.
+
+## Exercises
+
+1.  `membership.py` fixes `target` at the worst case, the last element.
+    Measure the average case by timing lookups of many random targets,
+    and see whether the conclusion changes.
+2.  Use `timeit` to find the collection size below which the `list`
+    scan beats the `set` lookup on your machine.
+3.  Rewrite `eager_first_evens()` as a single list comprehension and
+    measure its peak with `tracemalloc`.
+    How close can an eager version get to the lazy one?
+4.  Apply `@cache` to a function that prints as a side effect,
+    and demonstrate that repeated calls skip the printing.
+    Explain why caching is reserved for pure functions.

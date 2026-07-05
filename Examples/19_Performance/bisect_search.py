@@ -2,7 +2,7 @@
 import bisect
 
 scores = [60, 70, 75, 90]      # Must stay sorted
-i = bisect.bisect(scores, 78)  # Where 78 would go
+i = bisect.bisect(scores, 78)  # Where 78 goes
 print(i)
 #: 3
 bisect.insort(scores, 78)      # Insert and keep it sorted

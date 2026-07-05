@@ -318,7 +318,7 @@ print(list(flat))
 #: [1, 2, 3, 4, 5]
 ```
 
-`[*row for row in rows]` reads as "splice each `row` in",
+`[*row for row in rows]` reads as "splice each `row` in,"
 and produces the same flat list as the nested `[x for row in rows for x in row]`,
 while saying what it does more directly.
 `**` does the same for dictionaries, merging each mapping with later keys winning.

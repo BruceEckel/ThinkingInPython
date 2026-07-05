@@ -265,7 +265,7 @@ This makes it useful for any block of literal text,
 such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
-The '`r`' right before a string means "raw".
+The '`r`' right before a string means "raw."
 Python takes backslashes literally, so you don't need to double them.
 
 ### f-Strings

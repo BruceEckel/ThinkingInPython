@@ -167,3 +167,58 @@ which the next section explains.
 ## The GIL and Free Threading
 
 [[The GIL serializes CPU-bound threads, which is why the parallelism above reaches for processes. The free-threaded (no-GIL) builds available since 3.13 lift this and change when threads alone are enough]]
+
+## Coordinating Threads with Queues
+
+When threads divide up work, the danger is shared mutable state.
+The `queue` module packages the standard answer:
+a thread-safe queue that hands each item to exactly one consumer,
+with the locking built in.
+`queue.Queue` is first-in, first-out;
+`queue.PriorityQueue`, the threaded form of
+[Performance](19_Performance.md)'s `heapq`,
+always hands out the smallest item present:
+
+```python
+# priority_queue.py
+import threading
+from queue import PriorityQueue
+
+tasks: PriorityQueue[tuple[int, str]] = PriorityQueue()
+
+def submit(jobs: list[tuple[int, str]]) -> None:
+    for job in jobs:
+        tasks.put(job)
+
+threads = [
+    threading.Thread(
+        target=submit,
+        args=([(3, "backup"), (1, "page oncall")],),
+    ),
+    threading.Thread(
+        target=submit,
+        args=([(2, "rotate logs"), (1, "alert")],),
+    ),
+]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+
+while not tasks.empty():
+    print(tasks.get())
+#: (1, 'alert')
+#: (1, 'page oncall')
+#: (2, 'rotate logs')
+#: (3, 'backup')
+```
+
+The four jobs arrive from two threads in an unpredictable interleaving,
+but the drain comes out in priority order no matter who won each race,
+with equal priorities ordered by the tuple's second field.
+This producer-consumer shape, producers calling `put()` and consumers
+calling `get()`, is how thread pools distribute work,
+and `get()` blocks until an item is available,
+so an idle consumer simply waits.
+The [Object Pool](16_Context_Managers.md#an-object-pool) in
+Context Managers uses the same `Queue` as a throttle.
