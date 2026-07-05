@@ -429,7 +429,7 @@ and manual `workflow_dispatch`. The full example/test suite already runs on your
 machine before you push (and Actions can be slow), so **the default CI path only
 builds and publishes the site**. The workflow has these jobs:
 
-* **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.14,
+* **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.15,
   cached) and pandoc, runs `uv sync --locked`, and builds the static site. On a
   push to `master` it hands the site to the `deploy` job, which publishes it to
   GitHub Pages. Pull requests build the site but do not deploy.

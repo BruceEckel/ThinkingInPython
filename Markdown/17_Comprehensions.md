@@ -286,3 +286,41 @@ print(max(len(str(n)) for n in nums))
 None of these builds an intermediate collection of a million items,
 and `any()` stops as soon as it finds a match.
 Generators are explored further in [Iterators](28_Iterators.md#generators).
+
+## Unpacking in Comprehensions
+
+The nested comprehensions above flatten by writing two `for` clauses.
+Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way:
+the unpacking operators `*` and `**` may appear in the output expression of a
+comprehension or generator expression, splicing each iterable or mapping into the
+result.
+This extends the [PEP 448](https://peps.python.org/pep-0448/) unpacking you already
+know from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
+and replaces many uses of nested comprehensions, `itertools.chain()`, and
+`itertools.chain.from_iterable()`:
+
+```python
+# unpacking_comprehensions.py
+rows = [[1, 2], [3, 4], [5]]
+dicts = [{"a": 1}, {"b": 2}, {"a": 3}]
+
+# * splices each iterable into the result:
+print([*row for row in rows])
+#: [1, 2, 3, 4, 5]
+
+# ** merges each mapping; later keys win, order preserved:
+print({**d for d in dicts})
+#: {'a': 3, 'b': 2}
+
+# The same syntax works in a generator expression:
+flat = (*row for row in rows)
+print(list(flat))
+#: [1, 2, 3, 4, 5]
+```
+
+`[*row for row in rows]` reads as "splice each `row` in",
+and produces the same flat list as the nested `[x for row in rows for x in row]`,
+while saying what it does more directly.
+`**` does the same for dictionaries, merging each mapping with later keys winning.
+The set form `{*s for s in sets}` and the asynchronous generator form
+(`(*a async for a in agen())`) work the same way.

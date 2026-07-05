@@ -133,6 +133,36 @@ show(["a", "b"])
 With the type hints from [Static Typing](08_Static_Typing.md#type-hints),
 such a parameter reads `items: Sequence[str] = ()`.
 
+The `None` sentinel works only because `None` is not a meaningful value here.
+When `None` is itself a valid argument, you need a distinct marker.
+Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/)) adds a `sentinel`
+builtin that creates one unique, self-describing value for exactly this purpose:
+
+```python
+# sentinel_default.py
+
+MISSING = sentinel("MISSING")
+
+def get(data, key, default=MISSING):
+    if key in data:
+        return data[key]
+    if default is MISSING:
+        raise KeyError(key)
+    return default
+
+prefs = {"volume": 3, "mute": None}
+print(get(prefs, "volume"))
+#: 3
+print(get(prefs, "mute"))     # None is a real stored value
+#: None
+print(get(prefs, "theme", "dark"))
+#: dark
+```
+
+Here `mute` is stored as `None`, so `None` cannot also mean "not supplied".
+The `MISSING` sentinel keeps the two cases apart: a missing key with no default
+raises, while a stored `None` comes back untouched.
+
 ## Variable Argument Lists
 
 A `*args` parameter collects extra positional arguments into a tuple,

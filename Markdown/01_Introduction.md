@@ -107,7 +107,7 @@ Learning to ask those questions is one of the most useful things this book can g
 
 ## The Examples
 
-The book targets Python 3.14 and later, uses type hints throughout, and tests with `pytest`.
+The book targets Python 3.15 and later, uses type hints throughout, and tests with `pytest`.
 Early chapters omit hints deliberately, introducing them once [Static Typing](08_Static_Typing.md) covers the syntax; every chapter from there on uses them.
 
 Every code block that begins with a filename comment, like `# tracer.py`,

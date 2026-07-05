@@ -225,3 +225,55 @@ which puts it on the search path without any environment variable.
 Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
 or `uv pip install -e .` for an editable install:
 the package resolves by name from anywhere, and edits to its source take effect immediately, without reinstalling.
+
+## Lazy Imports
+
+Every `import` so far runs the target module's top-level code immediately,
+which is why importing `a_package.module1` earlier printed its message the moment
+it was imported.
+For a large program that imports many modules but uses only some of them on any
+given run, that eager work slows startup.
+
+Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/)) adds the `lazy` soft
+keyword.
+A `lazy import` defers loading the module until the first time you use the
+imported name, so you pay the cost only for what you actually use, while still
+declaring all imports at the top of the file:
+
+```python
+# lazy_imports.py
+lazy import json
+lazy from pathlib import Path
+
+# Once used, the names behave exactly like eager imports:
+print(json.dumps({"a": 1}))
+#: {"a": 1}
+print(Path("report/data.txt").suffix)
+#: .txt
+```
+
+Nothing is loaded at the `lazy import` lines; `json` and `pathlib` load on first
+use, at the `json.dumps` and `Path(...)` calls.
+You can watch the deferral by importing a module whose body prints when it runs:
+
+```python
+# noisy is a module whose top-level body prints when it executes
+lazy import noisy
+
+print("before first use")
+noisy.announce()        # noisy's body runs here, on first access
+print("after first use")
+```
+
+The body of `noisy` does not run at the `lazy import` line.
+It runs at `noisy.announce()`, the first access, so the output is
+`before first use`, then `noisy`'s own message, then `after first use`.
+If a lazily imported module is missing or broken, the error surfaces at that
+first use rather than at the import line.
+
+`lazy` works with both `import` and `from ... import`, but only at module scope:
+using it inside a function, a class body, or a `try` block is a `SyntaxError`,
+and neither `lazy from module import *` nor a `lazy from __future__` import is
+allowed.
+To make every import lazy without editing source, use the `-X lazy_imports`
+command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.

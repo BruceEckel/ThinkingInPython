@@ -12,7 +12,7 @@ Includes a fast introduction for programmers from other languages.
    For Windows: `winget install ezwinports.make`
 3. Install [uv](https://docs.astral.sh/uv/).
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
-   Python (3.14+) and dev tools automatically. No manual Python install is needed.
+   Python (3.15+) and dev tools automatically. No manual Python install is needed.
 5. Run `make check-tools` to verify that the essential tools are available.
 
 Type `make` to see the options.
@@ -37,7 +37,7 @@ and mention that they had gotten some value out of it. Because of the condition 
 which still had a number of examples that were still in Java (!), I found this embarrassing.
 
 In June 2026 I decided to see what the Claude AI could do with it, and in short order it had brought
-everything up to Python 3.14, with type annotations, passing standards checkers, cleaning up prose, etc.
+everything up to Python 3.15, with type annotations, passing standards checkers, cleaning up prose, etc.
 I began going back through my Pycon presentations and blog posts and adding those.
 At the moment it is in decent shape and you can read it online:
 https://bruceeckel.github.io/ThinkingInPython/

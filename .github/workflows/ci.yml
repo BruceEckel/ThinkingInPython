@@ -42,7 +42,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.14"
+          python-version: "3.15"
           enable-cache: true
 
       - name: Install pandoc
@@ -76,7 +76,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.14"
+          python-version: "3.15"
           enable-cache: true
 
       - name: Install pandoc
@@ -129,7 +129,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.14"
+          python-version: "3.15"
           enable-cache: true
 
       # Spelling: codespell is a uv-managed dev tool. Config lives in

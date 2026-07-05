@@ -389,10 +389,13 @@ see [Performance](19_Performance.md).
 ## Immutability
 
 Each mutable container has an immutable counterpart.
-A `tuple` is an immutable `list`.
-A `frozenset` is an immutable `set`.
-A `dict` has no frozen form until Python 3.15,
-but `MappingProxyType` from the `types` module wraps one in a read-only view:
+A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
+Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
+completes the set: a built-in, hashable mapping that rejects modification after
+it is created.
+The example below uses tuples and frozensets, plus `MappingProxyType` from the
+`types` module, which is not a container of its own but a read-only *view* onto a
+`dict` you still hold:
 
 ```python
 # immutability.py
@@ -410,8 +413,7 @@ groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True
 
-# A dict has no frozen form, but MappingProxyType wraps one
-# in a read-only view:
+# MappingProxyType wraps a dict in a read-only view:
 settings = {"debug": False, "level": 3}
 config = MappingProxyType(settings)
 print(config["level"])
@@ -429,6 +431,21 @@ except TypeError as e:
     print(type(e).__name__)
 #: TypeError
 ```
+
+Where a `MappingProxyType` is only a read-only window onto a `dict` that still
+exists and can change, a `frozendict` owns its contents outright.
+It runs under Python 3.15, though type checkers may need a release or two to
+recognize the new built-in:
+
+```python
+prefs = frozendict(theme="dark", zoom=125)
+print(prefs["zoom"])         # 125
+prefs == frozendict(zoom=125, theme="dark")  # True; order ignored
+prefs["zoom"] = 150          # TypeError: item assignment unsupported
+```
+
+Because a `frozendict` cannot change, it is hashable, so like a `tuple` or a
+`frozenset` it can serve as a dictionary key or a set member.
 
 Use the immutable form whenever a container should not change after you build it.
 An immutable container cannot be modified by accident, by you or by code you pass it to,
