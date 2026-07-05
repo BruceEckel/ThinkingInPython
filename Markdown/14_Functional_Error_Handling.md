@@ -14,11 +14,10 @@ And it is easy to forget to handle.
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
 
-## Exceptions Throw Everything Away
+## Exceptions Discard Partial Calculations
 
-Here a function raises an exception partway through a comprehension.
-An exception discards the whole computation,
-so the successful results computed before the failure are lost:
+If a function raises an exception partway through a comprehension, all partial calculations are discarded.
+Any successful results computed before the failure are lost:
 
 ```python
 # exceptions_lose_data.py
@@ -41,7 +40,7 @@ except ValueError as e:
 #: Lost everything: func_a(3)
 ```
 
-Function calls 0-2 produced values, but the exception threw away the whole list.
+Function calls 0-2 produced correct values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
 which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) warns against.
 
@@ -78,9 +77,9 @@ for r in outputs:
 ```
 
 This keeps every result,
-and `match` (covered in [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
+and `match` (see [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
-If a successful answer were also a string, the two cases would collide.
+If a successful answer were also a string, the two cases collide.
 We need something that says "success" or "failure" no matter what types they carry.
 
 ## A Result Type
