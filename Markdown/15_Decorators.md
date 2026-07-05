@@ -1,10 +1,10 @@
 # Decorators
 
-A decorator is a function that is applied to another function or a class.
+A decorator is a function that you apply to another function or a class.
 The decorator itself is a callable that takes a function and returns a function.
-It takes the function to be decorated as an argument, does something to that function, then returns the resulting function, which Python assigns to the original function name.
+It takes the function to decorate as an argument, does something to that function, then returns the resulting function, which Python assigns to the original function name.
 
-To apply the decorator, you put a `@` before the decorator name (for simplicity we use an untyped `Callable`; this is expanded later):
+To apply the decorator, you put a `@` before the decorator name (for simplicity we use an untyped `Callable`; a later section expands this):
 
 ```python
 # simple_decoration.py
@@ -28,7 +28,7 @@ Ordinarily you'd expect to see "Wensleydale," but `hijack()` replaces the origin
 with the decorated one, which in this case never calls `func` so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.
-This name is assigned to `cheese` during decoration, so the name can be anything.
+Decoration binds this function to the name `cheese`, so the local name can be anything.
 The common convention is to name this function `wrapper()`.
 
 A typical decorator function does some work, calls the original function, and does some more work:
@@ -92,7 +92,7 @@ The `@trace` above `add()` means:
 
     add = trace(add)
 
-`trace` returns `wrapper`, which is assigned to the name `add`, so `add` now refers to `wrapper`.
+`trace` returns `wrapper`, which Python assigns to the name `add`, so `add` now refers to `wrapper`.
 Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add()`,
 prints again, and returns the result.
 
@@ -114,10 +114,10 @@ same signature.
 
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
 that captured list. `P.args` is the positional part and `P.kwargs` the keyword part.
-They may only be used together, as the `*args` and `**kwargs` of a function typed with `P`.
+You may only use them together, as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to exactly the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
-even though `wrapper()` is written to forward anything.
+even though the body of `wrapper()` forwards anything.
 Without `P` you would fall back to `*args: Any, **kwargs: Any`,
 and the wrapper would swallow any arguments at all,
 discarding the very signature the decorator is meant to preserve.
@@ -164,8 +164,7 @@ which then wraps `greet`.
 A decorator only has to be a callable that takes a function and returns a callable.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
-The class form separates the two phases cleanly. The constructor runs once,
-when the function is decorated,
+The class form separates the two phases cleanly. The constructor runs once, at decoration,
 and `__call__()` runs on every call to the decorated function.
 Here is the `trace` decorator written as a class:
 
@@ -329,8 +328,8 @@ Every layer presents the same interface, so the layers compose.
 
 ### Decorating Classes
 
-A decorator can be applied to a class instead of a function.
-This one registers every class it is applied to, in `registry`:
+You can apply a decorator to a class instead of a function.
+This one registers every class it decorates, in `registry`:
 
 ```python
 # register.py

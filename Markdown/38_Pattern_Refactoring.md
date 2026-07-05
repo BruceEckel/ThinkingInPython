@@ -19,7 +19,7 @@ which can start as an adequate fit for one problem and grow into a flexible fit 
 Trash arrives at the recycling plant mixed together.
 The program must sort it by material and report the total value of each kind.
 The trash starts out as an undifferentiated pile,
-and the type of each piece must be recovered to sort it.
+and you must recover the type of each piece to sort it.
 
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
@@ -67,7 +67,7 @@ def sum_value(items: list[Trash]) -> float:
 ```
 
 Python implicitly makes `__init_subclass__` a classmethod, so `cls` doesn't need an `@classmethod` decorator.
-It runs once per subclass, right after that subclass is created, so each one can register itself in `Trash.registry` automatically.
+It runs once per subclass, right after Python creates that subclass, so each one can register itself in `Trash.registry` automatically.
 
 Each subclass's `value = ...` line creates its own class attribute, separate from `Trash.value`.
 The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance; it doesn't share storage across subclasses.
@@ -110,7 +110,7 @@ def test_sum_value_totals_weight_times_value() -> None:
     assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
 ```
 
-The trash to process is described in a data file,
+A data file describes the trash to process,
 one `Name:weight` line per piece:
 
 ```text
@@ -316,7 +316,7 @@ Python has neither limitation.
 The standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
 with new types registered from anywhere.
 
-In Python, *Visitor* is implemented with a single-dispatch function:
+In Python, a single-dispatch function implements *Visitor*:
 
 ```python
 # recycling_note.py

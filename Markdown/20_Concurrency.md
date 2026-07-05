@@ -61,7 +61,7 @@ which is why the demonstration needs `main()`.
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
 When a task awaits something outside the processor, the loop runs another task in the meantime.
-Here the same price lookup is written twice.
+Here the same price lookup appears twice.
 `io_price` waits with `asyncio.sleep`, a stand-in for a network call.
 `cpu_price` computes, a stand-in for heavy work.
 A `Meter` records the peak number of tasks in flight at once:

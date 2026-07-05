@@ -48,15 +48,15 @@ print("End of delete loop")
 
 `del c` inside the loop does not delete the object.
 It only unbinds the name `c`.
-Each `Counter` is still referenced by the `counters` list,
+The `counters` list still references each `Counter`,
 so its reference count never reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
 and why every `__repr__()` prints `3`.
-Nothing has been destroyed yet, so the class attribute `count` is still `3` for all three.
+Python has destroyed nothing yet, so the class attribute `count` is still `3` for all three.
 The `End of delete loop` line, printed before any deletion, confirms that the loop destroys nothing.
 
-The objects are destroyed later, at interpreter shutdown,
-when the global `counters` list is torn down.
+Python destroys the objects later, at interpreter shutdown,
+when it tears down the global `counters` list.
 That list holds the only remaining references,
 so when it goes, the objects it holds go with it.
 That is why the `deleted` lines are missing from the output above.
@@ -71,7 +71,7 @@ The language does not promise when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order, or not run the finalizers before exit at all.
 
-Thus, leaning on `__del__()` is fragile because the timing is not guaranteed.
+Thus, leaning on `__del__()` is fragile because Python does not guarantee the timing.
 At interpreter shutdown the globals it refers to may already be gone.
 The Python documentation warns:
 
@@ -87,7 +87,7 @@ The Python documentation warns:
 In this run the deletions happen during shutdown,
 exactly the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
-but the teardown order that allowed that is not guaranteed.
+but nothing guarantees the teardown order that allowed it.
 So `__del__()` should do as little as possible, and you should not depend on it.
 
 Two approaches are more reliable:
@@ -137,8 +137,8 @@ print(Counter.live_count())
 Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.
 `live_count()` is the size of that registry,
 so it reports how many `Counter` objects currently exist.
-When an instance loses its last ordinary reference, here by being popped off the `counters` list,
-it is collected at once, and the dictionary drops its entry on its own.
+When an instance loses its last ordinary reference, here when `pop()` removes it from the `counters` list,
+the interpreter collects it at once, and the dictionary drops its entry on its own.
 So the count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 

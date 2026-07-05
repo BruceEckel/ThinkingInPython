@@ -2,7 +2,7 @@
 
 The *Observer* pattern decouples code behavior and is a kind of callback.
 One object, the *observer*, registers interest in another, the *observable*,
-and is notified whenever the observable's state changes.
+and receives a notification whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
 
 - Observers attach and detach at runtime
@@ -96,7 +96,7 @@ An observer returns `None`. Notification runs one way, from observable to observ
 Collecting a value from each observer is a different pattern,
 such as [Chain of Responsibility](30_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
 
-Testing confirms that every subscriber is called with the new value,
+Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 It also verifies that an unsubscribed observer stops hearing changes.
 Removal is by identity, so a detachable observer needs a named reference, not an inline lambda.
@@ -156,10 +156,10 @@ If observers are coroutines,
 `notify` awaits them together with `asyncio.gather`,
 so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
-`gather` still waits for all of them, so the change is finished only after every observer is successfully notified.
+`gather` still waits for all of them, so the change finishes only after every notification succeeds.
 There is a limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
-The `asyncio` mechanics here (`async def`, `await`, `gather`, `run`) are covered in [Concurrency](20_Concurrency.md#asyncio-mechanics).
+[Concurrency](20_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python
@@ -216,7 +216,7 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-The definition of `AsyncObserver` guarantees that only `async` functions can be used as observers.
+The definition of `AsyncObserver` guarantees that only `async` functions can serve as observers.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscribe order, alarm first.
@@ -287,7 +287,7 @@ class BoxModel(Observable):
 
 Because the model carries no display code, a test drives it without a GUI.
 Build a model, click a cell,
-and check that the neighbors took its color and that observers were notified with the new grid:
+and check that the neighbors took its color and that observers received the new grid:
 
 ```python
 # test_box_observer.py
@@ -328,7 +328,7 @@ It is the only code that touches the screen.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 Run `box_view.py` to play; it opens a window,
-so the example harness does not run it (it is listed in `tools/norun.txt`).
+so the example harness does not run it (`tools/norun.txt` lists it).
 
 ```python
 # box_view.py
@@ -368,7 +368,7 @@ is the model-view split made concrete.
 
 ## Exercises
 
-1.  Write a class decorator that wraps every method of a class to print when the method is entered and exited,
+1.  Write a class decorator that wraps every method of a class to print on method entry and exit,
     giving an execution trace.
     ([Decorators](15_Decorators.md#decorating-classes) and [Metaprogramming](18_Metaprogramming.md#writing-a-metaclass) show the techniques.)
 2.  Create a minimal Observer-Observable design in two classes.
@@ -377,6 +377,6 @@ is the model-view split made concrete.
     and cause the `Observable` to update the `Observer`s.
 3.  Modify `box_observer.py` to turn it into a simple game.
     If any of the squares surrounding the one you clicked is part of a contiguous patch of the same color,
-    then all the squares in that patch are changed to the color you clicked on.
+    then all the squares in that patch take on the color you clicked.
     You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
-    You may also restrict a player's color to the first one that was chosen.
+    You may also restrict a player's color to the first one they chose.

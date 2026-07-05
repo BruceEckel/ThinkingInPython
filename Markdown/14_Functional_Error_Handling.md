@@ -16,8 +16,8 @@ This material comes from my PyCon 2024 talk,
 
 ## Exceptions Discard Partial Calculations
 
-If a function raises an exception partway through a comprehension, all partial calculations are discarded.
-Any successful results computed before the failure are lost:
+If a function raises an exception partway through a comprehension, you lose all partial calculations.
+Any successful results computed before the failure vanish:
 
 ```python
 # exceptions_lose_data.py
@@ -49,7 +49,7 @@ which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types
 The alternative is to return the error.
 The function's return type becomes a union of the answer type and the error type.
 A union like this is a *sum type*: a value that is one thing or another.
-Nothing is thrown away, because the error is just another return value:
+Nothing disappears, because the error is just another return value:
 
 ```python
 # sum_type.py
@@ -91,7 +91,7 @@ Both are frozen data classes,
 parameterized over the answer type and the error type.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
-placeholders that are filled in with concrete types when the class is used.
+placeholders that take concrete types when you use the class.
 Here they have no constraints, which allows them to be used in any context:
 
 ```python
@@ -151,7 +151,7 @@ A function reports failure by returning a `Failure` object,
 success by returning a `Success` object.
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot pretend the function returns an ordinary value. To get the answer, the `Result` must be unpacked.
+The caller cannot pretend the function returns an ordinary value. To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 
@@ -177,8 +177,8 @@ def test_bind_short_circuits_a_failure() -> None:
 
 Real programs chain steps.
 With a `Result`, each step can fail,
-so each call must be checked before the next one runs.
-An exception from existing code can be caught and turned into a `Failure`,
+so you must check each call before the next one runs.
+You can catch an exception from existing code and turn it into a `Failure`,
 so the failure becomes data rather than control flow:
 
 ```python
@@ -255,7 +255,7 @@ The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
 Bind removes the boilerplate by chaining the steps.
 The error checking has not gone away;
-it moved into `bind()`, where it is written once.
+it moved into `bind()`, where it appears once.
 A `Failure` anywhere short-circuits the whole thing.
 
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
@@ -365,7 +365,7 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 
-The [Decorators](15_Decorators.md) chapter explains how decorators like `@safe` are written, including `functools.wraps`.
+The [Decorators](15_Decorators.md) chapter explains how to write decorators like `@safe`, including `functools.wraps`.
 
 `@safe` deserves its own check. A good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
 
@@ -443,7 +443,7 @@ This style does not replace exceptions everywhere.
 Exceptions are still right for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
-In some languages, these errors are called "panics" and are separated from regular exceptions.
+Some languages call these errors "panics" and separate them from regular exceptions.
 
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
@@ -461,3 +461,4 @@ They are expected, and the type should say so.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
     Write the tests first.
+        

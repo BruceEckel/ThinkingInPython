@@ -204,7 +204,7 @@ print(quadrant(Point(-1, -1)))
 ## Mapping Patterns
 
 A mapping pattern matches keys in a dictionary and binds their values.
-Keys you do not mention are ignored,
+It ignores keys you do not mention,
 which makes it a clean way to dispatch on JSON-shaped data:
 
 ```python

@@ -27,7 +27,7 @@ and thus it can sometimes appear at the analysis phase or high-level design phas
 This is interesting because a pattern has a direct implementation in code,
 so you might not expect it to show up before low-level design or implementation.
 
-The basic concept of a pattern can also be seen as the basic concept of program design:
+The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
@@ -48,16 +48,16 @@ If you look at it this way,
 you've already seen some design patterns in this book.
 For example, inheritance can be thought of as a design pattern (albeit one implemented by the compiler).
 It allows you to express differences in behavior (that's the thing that changes) in objects that all have the same interface (that's what stays the same).
-Composition can also be considered a pattern, since it allows you to change,
+Composition also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
 Another pattern that appears in *GoF Design Patterns* is the [Iterator](28_Iterators.md),
 which has been implicitly available in `for` loops from the beginning of the language,
-and was introduced as an explicit feature in Python 2.2.
+and became an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through.
-You can write generic code that performs an operation on all of the elements in a sequence without regard to the way that sequence is built.
-Your generic code can be used with any object that produces an iterator.
+You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
+Your generic code works with any object that produces an iterator.
 
 ## Pattern Evolution
 
@@ -83,13 +83,13 @@ They tend to be subtle and appear over time.
 classified under three purposes (all of which revolve around the particular aspect that can vary).
 The three purposes are:
 
-1.  **Creational**: how an object can be created.
+1.  **Creational**: how to create an object.
     By isolating the details of object creation,
-    your code isn't dependent on what types of objects there are and thus doesn't have to be changed when you add a new type of object.
-    [Singleton](24_Singleton.md) is classified as a creational pattern,
+    your code isn't dependent on what types of objects there are and thus doesn't have to change when you add a new type of object.
+    [Singleton](24_Singleton.md) counts as a creational pattern,
     and later in this book you'll see examples of [Factories](29_Factory.md).
 2.  **Structural**: designing objects to satisfy particular project constraints.
-    These work with the way objects are connected with other objects to ensure that changes in the system don't require changes to those connections.
+    These work with the way objects connect with other objects to ensure that changes in the system don't require changes to those connections.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language, fulfilling a request,
     moving through a sequence (as in an iterator), or implementing an algorithm.
@@ -146,7 +146,7 @@ Some of these only apply to OOP.
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
 -   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de Saint-Exupéry, from *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
-    A common problem we find in frameworks is that they are designed to be general purpose without reference to actual systems.
+    A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,
     misused or not useful.
     However, most developers work on specific systems,
@@ -156,11 +156,11 @@ Some of these only apply to OOP.
     The simpler solution may also turn out to be the more general one.
 -   *Reflexivity*.
     One abstraction per class, one class per abstraction.
-    Might also be called Isomorphism.
+    Also goes by Isomorphism.
 -   *Once and once only*:
     Avoid duplication of logic and structure where the duplication is not accidental,
     i.e., where both pieces of code express the same intent for the same reason.
 -   *Make things as immutable as possible*, as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
 -   *Make functions pure whenever you can*.
 
-This is a small handful of fundamental ideas that can be held in your head while walking through and analyzing your design.
+This is a small handful of fundamental ideas that you can hold in your head while walking through and analyzing your design.

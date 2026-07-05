@@ -68,8 +68,8 @@ print(len(xs), 5 in xs)
 
 Slicing works on any sequence, including strings and tuples.
 
-A `list` is not restricted to one type of element.
-Since each slot just holds a reference to whatever object was put there,
+A `list` does not restrict its elements to one type.
+Since each slot just holds a reference to whatever object you put there,
 the same `list` can mix strings, numbers, `None`, and other containers:
 
 ```python
@@ -145,7 +145,7 @@ Tuples are fixed-length immutable records where each position has a distinct mea
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-The lookup hash value is computed from the keys, so they must be immutable.
+Lookup computes a hash from each key, so keys must be immutable.
 
 ```python
 # dictionaries.py
@@ -230,7 +230,7 @@ print(a.isdisjoint({8, 9}))  # No operator form
 #: True
 ```
 
-A few operators are left out above.
+A few operators do not appear above.
 `<` and `>` test *proper* subset and superset.
 They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
@@ -239,7 +239,7 @@ They match the `update()`, `intersection_update()`, `difference_update()`, and `
 ## Specialized Containers
 
 The `collections` module in the standard library includes container types built for specific jobs.
-Four of these are used consistently: `Counter`, `defaultdict`, `deque`, and `namedtuple`.
+Four of these show up consistently: `Counter`, `defaultdict`, `deque`, and `namedtuple`.
 
 ### `Counter`
 
@@ -391,8 +391,7 @@ see [Performance](19_Performance.md).
 Each mutable container has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
-completes the set: a built-in, hashable mapping that rejects modification after
-it is created.
+completes the set: a built-in, hashable mapping that rejects modification after creation.
 The example below uses tuples and frozensets, plus `MappingProxyType` from the
 `types` module, which is not a container of its own but a read-only *view* onto a
 `dict` you still hold:
@@ -448,7 +447,7 @@ Because a `frozendict` cannot change, it is hashable, so like a `tuple` or a
 `frozenset` it can serve as a dictionary key or a set member.
 
 Use the immutable form whenever a container should not change after you build it.
-An immutable container cannot be modified by accident, by you or by code you pass it to,
+Neither you nor code you pass it to can modify an immutable container by accident,
 so you never need a defensive copy before sharing it.
 It is safe to use as a default argument, unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 Because it cannot change, it is hashable, so it can serve as a dictionary key or a set member.

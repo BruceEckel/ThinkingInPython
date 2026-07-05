@@ -2,7 +2,7 @@
 
 The *Messenger* or *Data Transfer Object* is a way to pass a clump of information around.
 The most typical place for this is in return values from functions,
-where tuples or dictionaries are often used.
+where tuples or dictionaries often serve.
 However, those rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
@@ -23,7 +23,7 @@ print(m.info, m.b, m.more)
 #: Some information ['a', 'list'] 11
 ```
 
-The trick here is that the `__dict__` for the object is assigned to the `dict` that is automatically created by the `**kwargs` argument.
+The trick here is assigning the object's `__dict__` to the `dict` that the `**kwargs` argument automatically creates.
 
 You could create a `Messenger` class and put it in a library to import.
 But it takes so few lines that defining it in place, wherever you need it,

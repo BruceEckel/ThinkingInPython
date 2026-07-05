@@ -9,11 +9,11 @@ You can find supplementary information in [the official language documentation](
 ## Scripting vs. Programming
 
 The goal of Python is improved productivity.
-The language is designed to aid you as much as possible.
+The language aims to aid you as much as possible.
 It tries to hinder you as little as possible.
 It does not impose arbitrary rules or force a particular set of features.
 
-Python is often called a scripting language,
+People often call Python a scripting language,
 but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
 Python is a programming language that also supports scripting.
@@ -23,7 +23,7 @@ and simple programs with Python scripts.
 
 Python is clean to write.
 You will find it easy to read your own code long after you've written it.
-A major factor in code readability is that scoping in Python is determined by indentation.
+A major factor in code readability is that indentation determines scoping in Python.
 Here is a script that runs with `python if.py`:
 
 ```python
@@ -47,7 +47,7 @@ so the above example is `Examples/02_Tour/if.py`.
 The `#:` comments are particular to this book. They show the console output for the example.
 The book tooling validates that this output is correct.
 
-In a C/C++ `if`, you are required to use parentheses around the conditional.
+A C/C++ `if` requires parentheses around the conditional.
 Parentheses are not necessary in Python, although it won't complain if you use them.
 
 The conditional clause ends with a colon.
@@ -58,7 +58,7 @@ followed by an assignment to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level.
 Unlike the brace-placement debates of C++ or Java, there are no options with Python formatting.
-The language forces everyone's code to be indented the same way,
+The language forces everyone to indent code the same way,
 which is one of the main reasons for Python's consistent readability.
 
 Python normally has only one statement per line, so no terminating semicolon is necessary.
@@ -188,7 +188,7 @@ array libraries such as NumPy do.
 `None` is Python's single "no value" object, like `null` elsewhere.
 It is the default return value of a function that returns nothing.
 
-Any object can be tested in a boolean context.
+You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
 and `None` is always false.
 Everything else is true.
@@ -256,8 +256,8 @@ print(r'c:\python\lib\utils')
 #: c:\python\lib\utils
 ```
 
-Python was not named after the snake,
-but rather the Monty Python comedy troupe, as the language creator Guido van Rossum is a fan.
+Python's name comes not from the snake but from the Monty Python comedy troupe,
+of which the language creator Guido van Rossum is a fan.
 Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
@@ -266,7 +266,7 @@ such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
 The '`r`' right before a string means "raw".
-Backslashes are taken literally, so you don't need to double them.
+Python takes backslashes literally, so you don't need to double them.
 
 ### f-Strings
 
@@ -348,4 +348,4 @@ Reserve it for classes that behave like a function to their users.
 The default for a class is still `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
-These can be automatically applied to your code (or at least, pointed out) using tools such as ruff.
+Tools such as ruff can apply these to your code automatically (or at least point them out).

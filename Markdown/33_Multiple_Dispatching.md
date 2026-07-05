@@ -27,9 +27,9 @@ That is why one method call can resolve only one unknown type.
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Each unknown type needs its own dispatching method call.
-The methods in the following example are called `compete()` and `eval_*()`,
+The following example names its methods `compete()` and `eval_*()`,
 and all belong to the same hierarchy.
-Here there will be only two dispatches, which is called *double dispatching*.
+Here there will be only two dispatches; this is *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
 then you'll need a dispatching method call for each hierarchy.
 
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-The information about the various combinations is encoded into each type of `Item`.
+Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
 It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
 It can be more sensible to make the table explicit, like this:
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Notice the flexibility of dictionaries. A tuple can be used as a key just as easily as a single object.
+Notice the flexibility of dictionaries. A tuple serves as a key just as easily as a single object.
 
 ## One Type or Many
 
@@ -263,5 +263,5 @@ def test_outcome_str() -> None:
 ```
 
 Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,
-so the loop runs only when the file is executed directly,
-not when it is imported for testing.
+so the loop runs only when you execute the file directly,
+not when a test imports it.

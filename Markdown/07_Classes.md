@@ -39,12 +39,12 @@ x.show_twice()
 
 Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first parameter.
-Traditionally, the reference is called `self`, but you can use any identifier
+Python programmers traditionally name the reference `self`, but you can use any identifier
 (however, anything other than `self` will probably confuse people).
 To refer to fields in the object or other methods in the object,
 you must use `self` in the expression.
 
-When you call a method for an object, as in `x.show()`, the object reference is passed automatically.
+When you call a method for an object, as in `x.show()`, Python passes the object reference automatically.
 
 The first method, `__init__()`, is the *initializer*.
 The double underscores (a.k.a. "dunder") indicate a special name.
@@ -52,7 +52,7 @@ The `__new__()` method is the *constructor*, but we hardly ever use that.
 It has become common practice to call `__init__()` the constructor, since it does the job of constructors in other OOP languages.
 We follow that practice in this book.
 
-The constructor is automatically called during object creation.
+Python calls the constructor automatically during object creation.
 At the bottom of the example you can see that the creation of an object looks like a function call, but using the class name.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.
@@ -150,19 +150,19 @@ f(Different())
 ```
 
 `Simple2` inherits from `Simple`.
-In the constructor, the base-class constructor is called with `super().__init__()`.
-In `display()`, `show()` can be called as a method of `self`.
+In the constructor, `super().__init__()` calls the base-class constructor.
+In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
-The `@override` decorator on `show()` is explained in the next section.
+The next section explains the `@override` decorator on `show()`.
 
-The demo shows that the base-class constructor is called.
+The demo shows that the base-class constructor runs.
 You can also see that the inherited `show_twice()` method is available in the derived class.
 
 The class `Different` also has a method named `show()`,
-but this class is not derived from `Simple`.
+but this class does not derive from `Simple`.
 The `f()` function in the demo demonstrates dynamic typing.
-All it cares about is that `show()` can be applied to `obj`,
+All it cares about is that it can call `show()` on `obj`,
 with no other type requirements.
 Thus, `f()` works equally on an object of a class derived from `Simple` and one that isn't,
 as long as the `obj` argument has a `show()`.
@@ -369,7 +369,7 @@ For classes that are primarily a bundle of typed data,
 ## Composing Methods with `import`
 
 You can compose methods into a class using `import`.
-A method defined this way can be reused by multiple classes:
+Multiple classes can reuse a method defined this way:
 
 ```python
 # utility.py

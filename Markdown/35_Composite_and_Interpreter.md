@@ -1,7 +1,7 @@
 # Composite and Interpreter
 
 The *Composite* pattern arranges objects in a tree,
-so that a single object and a group of objects can be treated uniformly.
+so that you can treat a single object and a group of objects uniformly.
 The *Interpreter* pattern represents sentences in a small language as trees,
 then evaluates them.
 *GoF Design Patterns* presents them as separate patterns,
@@ -143,7 +143,7 @@ points at every operation that does not yet handle it.
 
 `walk()` is a generator, so a composite is also iterable.
 The `yield from` flattens the recursion into a single stream of paths,
-and any consumer of that stream is decoupled from the tree structure,
+and any consumer of that stream stays decoupled from the tree structure,
 as in [Iterators](28_Iterators.md#generators).
 
 The `entries` field is a tuple of `Entry`, so the whole tree is immutable.
@@ -331,7 +331,7 @@ def test_unbound_variable_raises() -> None:
 
 ## New Operations, Same Tree
 
-Evaluation is not privileged.
+Evaluation has no privileged status.
 Rendering the tree as an infix string is another function,
 in another file, and the node classes never hear about it:
 
@@ -423,7 +423,7 @@ The patterns read like the algebra they implement.
 keep the other side," with the alternatives binding the same name.
 `(Num(a), Num(b))` captures two constants for folding.
 Because every node is frozen, `simplify()` never edits the input.
-It returns a new tree, and unchanged subtrees are shared with the original.
+It returns a new tree that shares unchanged subtrees with the original.
 
 ```python
 # test_simplify.py

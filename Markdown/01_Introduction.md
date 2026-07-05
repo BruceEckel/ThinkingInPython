@@ -3,7 +3,7 @@
 This book is about cultivating the judgment to choose the smallest thing that works.
 You build that judgment through insights, idioms, and patterns.
 It is also honest about design patterns.
-Most were invented to work around the limits of static,
+Most arose to work around the limits of static,
 inheritance-heavy languages, and in Python many of them diminish or dissolve.
 If an idiom or pattern still earns its keep, it stays.
 

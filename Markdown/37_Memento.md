@@ -11,7 +11,7 @@ back when asked, without ever looking inside.
 
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
-so the past must be copied out and guarded.
+so you must copy the past out and guard it.
 Python offers the classic form when you need it,
 and obviates the pattern when state is immutable.
 
@@ -172,7 +172,7 @@ Saving is keeping a reference, exactly the move that failed in
 It is safe now because no operation anywhere can change what
 `before` refers to.
 There is no `Memento` class, no `save()`, and no `restore()`,
-and nothing was copied to protect the past.
+and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
 This is the argument of
 [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
@@ -355,7 +355,7 @@ something is producing mementos.
     new `Sketch`. Write tests proving existing mementos and
     histories are unaffected in each version.
 2.  Give `History` a maximum depth. When the past grows beyond
-    `n` states, the oldest is discarded. What should happen to
+    `n` states, discard the oldest. What should happen to
     `can_undo()`?
 3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and
     reconstruct it.

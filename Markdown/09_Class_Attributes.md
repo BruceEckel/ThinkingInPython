@@ -9,7 +9,7 @@ It is easy to misread one as a per-object default value.
 It is not.
 A class attribute creates one shared variable across all instances of the class.
 If you then create an instance variable of the same name, that instance variable *shadows* the class attribute.
-In C++ or Java, storage for such a field is allocated per object before the constructor runs,
+In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
 
 Here's an example showing why it can be confusing:
@@ -87,8 +87,8 @@ and it catches the accidental shadowing from the earlier example before it happe
 
 ## ClassVar and Inheritance
 
-A `ClassVar` declared on a base class is inherited like any other class
-attribute. A subclass that doesn't declare its own copy reads straight
+Subclasses inherit a `ClassVar` declared on a base class like any
+other class attribute. A subclass that doesn't declare its own copy reads straight
 through to the base's value, via the normal method resolution order.
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
@@ -148,4 +148,4 @@ print(B().x, B(7).x)
 ```
 
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
-This is detailed in [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes).
+[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) covers the details.

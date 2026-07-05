@@ -152,7 +152,7 @@ That is what *Façade* accomplishes.
 If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
-Façade is often implemented as a [Singleton](24_Singleton.md) [Abstract Factory](29_Factory.md#abstract-factories).
+A Façade often takes the form of a [Singleton](24_Singleton.md) [Abstract Factory](29_Factory.md#abstract-factories).
 You can easily get this effect by creating a class containing static factory methods:
 
 ```python
@@ -190,7 +190,7 @@ c = Facade.make_c(1.0)
 The cleaner Python façade is a *module*.
 A module already presents a curated set of names over whatever tangle of classes lives behind it,
 and, as [Singleton](24_Singleton.md#a-module-is-already-a-singleton) notes,
-it is imported once and shared everywhere.
+it loads once, and every importer shares the same module.
 At module level, put the friendly functions and the few classes to expose.
 Keep the messy internals private (using a leading underscore, by convention),
 and the `import` is the façade.

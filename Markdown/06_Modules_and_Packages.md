@@ -31,9 +31,9 @@ The code at the end of the file starts with an `if` clause which checks whether 
 In Python, any identifier that begins and ends with double underscores (commonly called a "dunder") is special in some way.
 Dunder methods, for example, hook your class into the language's operators and built-in functions.
 
-The reason for the `if` is that any file can also be used as a library module within another program.
+The reason for the `if` is that you can also use any file as a library module within another program.
 In that case, you only want its definitions,
-but you don't want the code at the bottom of the file to be executed.
+but you don't want the code at the bottom of the file to run.
 This particular `if` statement is only true when you are running this file directly.
 That is, `__name__` is `"__main__"` when you use the command line:
 
@@ -41,8 +41,8 @@ That is, `__name__` is `"__main__"` when you use the command line:
 python use_module.py
 ```
 
-However, if `use_module.py` is imported as a module into another program,
-`__name__` will not be `"__main__"`, so its `"__main__"` code is not executed.
+However, if another program imports `use_module.py` as a module,
+`__name__` will not be `"__main__"`, so its `"__main__"` code does not run.
 Here is such a program, which does nothing but import it:
 
 ```python
@@ -86,8 +86,8 @@ and it forms its own namespace with the name of that directory.
 To make something a package,
 you put a special file named `__init__.py` in that directory.
 Typically, there's no executable code in `__init__.py`.
-It is only there to flag the directory as a package.^[People are often confused by the name `__init__.py`. In hindsight, it might have been better to have named the file `__package__.py`.]
-A directory without `__init__.py` can still be imported as a *namespace package*,
+It is only there to flag the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to have named the file `__package__.py`.]
+You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book always uses one.
 
@@ -229,8 +229,7 @@ The package resolves by name from anywhere, and edits to its source take effect 
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,
-which is why importing `a_package.module1` earlier printed its message the moment
-it was imported.
+which is why importing `a_package.module1` earlier printed its message the moment it loaded.
 For a large program that imports many modules but uses only some of them on any
 given run, that eager work slows startup.
 
@@ -252,7 +251,7 @@ print(Path("report/data.txt").suffix)
 #: .txt
 ```
 
-Nothing is loaded at the `lazy import` lines; `json` and `pathlib` load on first
+Nothing loads at the `lazy import` lines; `json` and `pathlib` load on first
 use, at the `json.dumps` and `Path(...)` calls.
 You can watch the deferral by importing a module whose body prints when it runs:
 

@@ -80,7 +80,7 @@ If you need the class itself to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
 Modules and cached factories should cover your singleton needs.
-The rest of this chapter is only included because it demonstrates interesting techniques and insights.
+The rest of this chapter exists only because it demonstrates interesting techniques and insights.
 
 ## The Classic Implementations
 
@@ -129,13 +129,13 @@ print(x is y, x.instance is y.instance is z.instance)
 #: False True
 ```
 
-Because the inner class is named with a double underscore,
+Because the inner class's name starts with a double underscore,
 it is private, so an attempt to access it directly produces a type-checking error.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`;
 after that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
-Access is delegated through `__getattr__()`.
+`__getattr__()` delegates access.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 It is *lazy*. It builds the inner object on the first call,
 which is why it needs the `None` sentinel and the `if` guard.
@@ -174,14 +174,14 @@ print(x.val, x is y, x.instance is y.instance)
 
 The bare `__OnlyOne()` works because the nested class is already defined at that
 point in the body. The qualified `OnlyOne.__OnlyOne()` would fail, because the name
-`OnlyOne` is not bound until its own class body finishes running.
+`OnlyOne` stays unbound until its own class body finishes running.
 
-The two differ only in *when* the inner object is created.
+The two differ only in *when* they create the inner object.
 The lazy form defers it to the first `OnlyOne(...)` call,
 so it can wait for data not available at import time,
 but it carries the sentinel and the guard,
 and two threads racing on that first call can both see `None`.
-The eager form creates the object once, when the module is imported:
+The eager form creates the object once, at module import:
 no sentinel, no guard, and no race,
 at the cost of building it whether or not anything uses it.
 
@@ -271,7 +271,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 
 This has the same effect as the singleton,
 but where the singleton wires one-instance behavior into each class,
-*Borg* is reused through inheritance.
+you reuse *Borg* through inheritance.
 
 Unlike the nested-class examples above, `Singleton` should not be a `@dataclass`.
 Making it one still runs, but it quietly stops being a `Borg`.
@@ -279,8 +279,7 @@ The shared state depends on `Borg.__init__` rebinding `self.__dict__` to
 `_shared_state`. A dataclass generates its own `__init__` that assigns the
 fields and [never calls the base `__init__`](12_Data_Classes_as_Types.md#dataclass-inheritance),
 so `self.__dict__` is never rebound and each instance keeps its own state. Moving the rebinding into `__post_init__`
-does not help either. It runs after the fields are assigned, so it discards
-them. The hand-written `__init__` is what makes the shared state work,
+does not help either. It runs after `__init__` assigns the fields, so it discards them. The hand-written `__init__` is what makes the shared state work,
 and a silent loss of sharing is worse than a version that simply does not run.
 
 Testing confirms the objects differ but share one set of state:
@@ -388,7 +387,7 @@ which is the reason to prefer them when you need that.
 
 Finally, a metaclass can intercept construction itself.
 [Here](18_Metaprogramming.md#intercepting-instance-creation), a similar metaclass singleton appears next to the simpler hooks that usually replace it.
-It is included here for completeness:
+It appears here for completeness:
 
 ```python
 # singleton_metaclass.py
@@ -451,7 +450,7 @@ Python has that for free, so most of the ceremony falls away.
 
 ## Exercises
 
-1.  `singleton_eager.py` always creates its inner object, even if it is never used.
+1.  `singleton_eager.py` always creates its inner object, even if nothing ever uses it.
     Modify it to use *lazy initialization*,
     then compare your result with `singleton_pattern.py`.
 2.  Using `cached_factory_singleton.py` as a starting point,

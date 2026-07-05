@@ -17,7 +17,7 @@ An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 The `for` loop calls these for you, so you almost never call them directly.
 Because every container speaks this one protocol,
-a function written against an iterable is automatically decoupled from the container.
+a function written against an iterable automatically stays decoupled from the container.
 
 ## Generators {#generators}
 
@@ -112,7 +112,7 @@ The standard library's `itertools` module contains the generic iterator algorith
 `islice()`, `groupby()`, `takewhile()`, and more, each consuming and producing iterators.
 Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
-This pipeline draws from an infinite source but computes only what is consumed.
+This pipeline draws from an infinite source but computes only what the consumer takes.
 Each stage pulls one item at a time, so an infinite source is fine as long as something downstream stops it:
 
 ```python
@@ -162,7 +162,7 @@ class TypedIterator[T](Iterator[T]):
 ```
 
 Subclassing `collections.abc.Iterator` provides `__iter__()` automatically,
-so only `__next__()` is needed.
+so you supply only `__next__()`.
 A generator wraps an iterator just as well and in fewer lines:
 
 ```python

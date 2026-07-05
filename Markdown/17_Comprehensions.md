@@ -3,7 +3,7 @@
 *Comprehensions* (first introduced in [Control Flow](04_Control_Flow.md#comprehensions))
 build one collection from another in a single expression.
 The idea originated in mathematical set-builder notation,
-and was incorporated into functional programming.
+and passed into functional programming.
 Haskell had list comprehensions, and Python borrowed them.
 
 Comprehensions require a mental shift.
@@ -92,8 +92,8 @@ print(list(map(lambda e: e ** 2,
 The nested form funnels every element through `lambda` calls, and is harder to read.
 The comprehension inlines the test and the expression.
 
-The list comprehension is enclosed within list brackets (`[]`),
-so it is immediately evident that a list is being produced.
+List brackets (`[]`) enclose the list comprehension,
+so it is immediately evident that it produces a list.
 There is only one function call to `isinstance()` and no call to the cryptic `lambda`.
 Instead, the list comprehension uses a conventional iterator,
 an expression, and an `if` clause for the optional predicate.
@@ -107,7 +107,7 @@ A 3 by 3 identity matrix is:
 
 In Python we can represent such a matrix by a list of lists,
 where each sub-list represents a row.
-This matrix can be generated with the following comprehension:
+The following comprehension generates this matrix:
 
 ```python
 # identity_matrix.py
@@ -221,7 +221,7 @@ print(mcase_frequency)
 
 ## Generator Expressions {#generator-expressions}
 
-A comprehension is evaluated eagerly,
+A comprehension evaluates eagerly,
 which means it builds the whole result in memory right away.
 For a large data set, that wastes time and space,
 especially if you consume the result only once.
@@ -241,7 +241,7 @@ print(list(islice(squares, 3)))
 #: [4, 9, 16]
 ```
 
-Nothing is computed until you pull a value.
+No computation happens until you pull a value.
 `next()` produces them one at a time, and `itertools.islice()` takes a few
 without ever building the million-element list.
 
@@ -265,7 +265,7 @@ A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
 So neither saves anything over the set comprehension `{len(w) for w in words}`
 or the dict comprehension `{w: w[0] for w in words}`,
-which read more directly and are preferred.
+which read more directly and are the better choice.
 
 A generator expression earns its keep when the consumer takes values one at a
 time and never needs them all, such as `sum()`, `any()`, `all()`, `min()`,
@@ -285,7 +285,7 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops as soon as it finds a match.
-Generators are explored further in [Iterators](28_Iterators.md#generators).
+[Iterators](28_Iterators.md#generators) explores generators further.
 
 ## Unpacking in Comprehensions
 

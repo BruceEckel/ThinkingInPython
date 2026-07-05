@@ -16,11 +16,11 @@ and you never call that sequence yourself.
 
 ## The Fixed Algorithm
 
-The defining trait of a Template Method is that the *shape* of the algorithm is fixed in the base class.
+The defining trait of a Template Method is that the base class fixes the *shape* of the algorithm.
 Subclasses complete the individual steps.
 The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
 (see [Making a Class Final](18_Metaprogramming.md#making-a-class-final)).
-Here, `run()` is marked with `@final` so the checker rejects any subclass that overrides it,
+Here, `@final` marks `run()`, so the checker rejects any subclass that overrides it,
 while leaving the step methods open:
 
 ```python
@@ -64,7 +64,7 @@ The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
 This pattern leans on the [Liskov Substitution Principle](21_Rethinking_Objects.md#liskov-substitution).
-A subclass must be usable wherever its base class is expected.
+A subclass must work wherever code expects its base class.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
 An override that breaks that trust, doing nothing the flow relies on,

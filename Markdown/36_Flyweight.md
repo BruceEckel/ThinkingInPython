@@ -24,7 +24,7 @@ this chapter is what the argument buys you.
 ## Python Already Does It
 
 CPython flyweights its most common values.
-Small integers (-5 through 256) are created once and shared,
+It creates small integers (-5 through 256) once and shares them,
 and string *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
 
@@ -264,12 +264,12 @@ def test_pool_releases_unused() -> None:
 
 ## A Fixed Set: Enum
 
-When the full set of shared values is known when you write the
+When you know the full set of shared values as you write the
 program, you do not need a pool at runtime.
 An `Enum` (introduced in
 [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too))
 is a flyweight pool the language maintains for you.
-Each member is constructed once, at class creation,
+Python constructs each member once, at class creation,
 and every mention anywhere in the program is that one object.
 
 ```python
@@ -298,11 +298,11 @@ if __name__ == "__main__":
 #: ['.', '~', '#']
 ```
 
-Each member's tuple is passed to `__new__()`,
+Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
 The customization must happen in `__new__()`.
-The lookup table behind `Tile(".")` is keyed by the value
+The lookup table behind `Tile(".")` keys on the value
 `__new__()` establishes, so setting `_value_` later,
 in `__init__()`, would leave that table keyed by the tuples.
 With it, `Tile(".")` is a lookup. Name, symbol, and attribute access

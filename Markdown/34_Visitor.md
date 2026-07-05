@@ -155,7 +155,7 @@ if __name__ == "__main__":
 #: Chrysanthemum: a little nectar | fragrance: faint
 ```
 
-`Flower` is never touched.
+Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
 Adding a new operation is a new function; adding a new flower is a class and,

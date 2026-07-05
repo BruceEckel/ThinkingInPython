@@ -241,7 +241,7 @@ demo_exceptions(1, 1)
 #: finally always runs
 ```
 
-The optional `else` runs when no exception was raised.
+The optional `else` runs when the `try` block raised no exception.
 The optional `finally` always runs, which makes it the place for cleanup.
 
 Python's culture leans on "easier to ask forgiveness than permission."
@@ -252,7 +252,7 @@ rather than checking every precondition first.
 
 A `with` block guarantees that setup and cleanup happen as a pair,
 even if the body raises an exception.
-Opening a file is the canonical case; the file is always closed on the way out:
+Opening a file is the canonical case; the `with` always closes the file on the way out:
 
 ```python
 # context_manager.py

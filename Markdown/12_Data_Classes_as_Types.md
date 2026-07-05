@@ -5,19 +5,19 @@ The type `int` is the set of whole numbers.
 A type you define, like a rating from one to ten, is a smaller set:
 the allowed values.
 We have historically been bad at keeping objects inside that set.
-We let an object be constructed in an illegal state,
+We let code construct an object in an illegal state,
 or we let later code mutate it into one,
 and then we scatter checks everywhere to defend against the mess.
 
 This chapter shows a better approach, built from frozen data classes.
 You validate the value once, at construction,
 and freeze it so it can never change.
-Every object of the type is then guaranteed to be a legal value.
+The type then guarantees that every object is a legal value.
 Code that receives one never has to check it again.
 This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
-This function will be used throughout the chapter.
+This function appears throughout the chapter.
 It raises a custom exception when a value is not legal:
 
 ```python
@@ -61,7 +61,7 @@ print(f2(rating))
 #: 30
 ```
 
-The check is duplicated, it is easy to forget, and the type system is no help.
+Each function duplicates the check, it is easy to forget, and the type system is no help.
 The `int` annotation says "any integer," which is not what we mean.
 
 ## A Class Is Not a Type
@@ -164,7 +164,7 @@ so `m.name = "bar"` works.
 
 A data class is a type defined by its fields. `display_object()`, the
 inspection helper from [Metaprogramming](18_Metaprogramming.md#the-inspect-module),
-shows those fields with the types they were declared with:
+shows those fields with their declared types:
 
 ```python
 # display_messenger.py
@@ -182,7 +182,7 @@ display_object(Messenger("foo", 12, 3.14))
 ```
 
 The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders,
-which are not shown by the default `display_object()`.
+which the default `display_object()` does not show.
 
 ## Immutability
 
@@ -216,14 +216,14 @@ print(cache[m])
 #: value
 ```
 
-If an object cannot change after it is built, then validating it once,
+If an object cannot change once built, then validating it once,
 at construction, is enough for its whole life.
 
 ## A Type Is a Set of Values
 
 If we make `Stars` a frozen data class,
 we can guarantee that every `Stars` object is legal.
-To validate it after the fields are filled in, we define `__post_init__()`,
+To validate it after the fields receive their values, we define `__post_init__()`,
 a hook that the generated `__init__()` calls automatically:
 
 ```python
@@ -259,19 +259,19 @@ and the constructor refuses anything outside the set.
 So if you are holding a `Stars`, it is legal.
 You know it without checking.
 
-This changes how the functions are written.
+This changes how you write the functions.
 `f1()` and `f2()` take a `Stars` and return a `Stars`.
-They do not check their argument, because a `Stars` is already known to be good.
+They do not check their argument, because every `Stars` is already good.
 They do not test their result, because building the returned `Stars` runs the check.
 
 The validation lives in exactly one place, the constructor (which makes it easy to change).
 Immutability guarantees no one can damage the value after that.
 
-This principle is often stated as *parse, don't validate*.
+This principle often goes by *parse, don't validate*.
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
-The check is not repeated because it cannot fail.
+No later code repeats the check, because it cannot fail.
 An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
@@ -355,10 +355,10 @@ if __name__ == "__main__":
 ```
 
 `Person` declares no checks of its own.
-It cannot be built from an illegal name or an illegal email,
+You cannot build it from an illegal name or an illegal email,
 because those values cannot exist.
 
-The tests confirm that an illegal `FullName` or `EmailAddress` is rejected at construction:
+The tests confirm that construction rejects an illegal `FullName` or `EmailAddress`:
 
 ```python
 # test_person.py
@@ -535,7 +535,7 @@ if __name__ == "__main__":
 ```
 
 The `months` field needs a default value, but its default is a list.
-A single default object would be shared by every instance,
+Every instance would share a single default object,
 the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments),
 so data classes reject mutable defaults outright.
 `field(default_factory=make_months)` supplies a function instead of a value.
@@ -556,7 +556,7 @@ Make the type responsible for guaranteeing its own values.
 A data class builds its `__init__` from its fields and assigns them directly.
 It does not call the base class `__init__`.
 If you inherit from an ordinary class that does setup in its own constructor,
-that setup is silently skipped:
+the data class silently skips that setup:
 
 ```python
 # dataclass_inherits_plain.py
@@ -640,7 +640,7 @@ so it does not call it.
 
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,
 recursing into nested data classes.
-`KW_ONLY` forces the fields after it to be passed by keyword:
+`KW_ONLY` forces callers to pass the fields after it by keyword:
 
 ```python
 # dataclass_features.py
@@ -720,7 +720,7 @@ print(from_json(text) == original)  # Round-trip
 JSON data typically arrives from outside the program, untrusted.
 Rebuilding the value through `Person`, `FullName`,
 and `EmailAddress` runs each constructor's validation,
-so malformed JSON is rejected at the boundary instead of leaking a bad object into the rest of the code.
+so the boundary rejects malformed JSON instead of leaking a bad object into the rest of the code.
 The type guards itself.
 
 When a data class is buried inside a larger structure you are dumping,
@@ -785,7 +785,7 @@ reconstructing nested types from the parsed JSON and validating as they go.
     so February allows 29 days when the `BirthDate`'s `Year` is a leap year.
     Write the tests first.
 2.  Give `EmailAddress` a stricter check (a single `@`, with text on both sides).
-    Add tests for the values that should now be rejected.
+    Add tests for the values the check should now reject.
 3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that returns a new `Stars`,
     and show that the precondition and postcondition disappear.
 4.  Feed `from_json()` a JSON string whose email has no `@`,

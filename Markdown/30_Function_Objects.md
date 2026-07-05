@@ -1,6 +1,6 @@
 # Function Objects
 
-A *function object* decouples the choice of function to call from the place where it is called.
+A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of several patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
 
@@ -149,7 +149,7 @@ def newton(f: Fn, a: float, b: float) -> float | None:
 ```
 
 Because each finder is a function with the same signature,
-a *Strategy* is achieved by stepping through the algorithms:
+you achieve a *Strategy* by stepping through the algorithms:
 
 ```python
 # strategy.py
@@ -369,12 +369,12 @@ bus.publish(Closed("inactivity"))    # No handler: nothing happens
 `subscribe` is generic on the event type `E`.
 The checker reads `E` from the first argument and requires the handler to accept that exact type,
 so `subscribe(Deposit, on_withdraw)` is a type error.
-The safety is checked once, at registration.
+The safety check happens once, at registration.
 The stored `dict`, though, mixes handlers for every event type in one structure.
 Its lists cannot name a single event class, so the element type erases the parameter to `Handler[Any]`.
 The generic guards the boundary; the `Any` covers the heterogeneous storage behind it.
 
-For testing, every handler registered for a type is called,
+For testing, publishing calls every handler registered for a type,
 a handler hears only its own event type,
 and an event with no handler is a quiet no-op:
 

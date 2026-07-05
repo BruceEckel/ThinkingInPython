@@ -64,7 +64,7 @@ print(MAX_RETRIES, GREETING)
 ```
 
 You can give the type explicitly, as in `Final[str]`,
-or let it be inferred from the value, as with `MAX_RETRIES`.
+or let the checker infer it from the value, as with `MAX_RETRIES`.
 Marking values `Final` catches accidental reassignments immediately.
 
 ## Gradual Typing
@@ -86,7 +86,7 @@ This book uses [`ty`](https://github.com/astral-sh/ty), Astral's fast checker:
     ty check
 
 It complains where the hints and the code disagree, and is quiet when they agree.
-Every runnable example in this book is checked this way.
+This book checks every runnable example this way.
 The build runs `ty` on every change, so the code you read here checks as well as runs.
 
 ## Catching Mistakes
@@ -116,8 +116,8 @@ which allows the build to complete successfully.
 
 Earlier chapters relied on *dynamic typing*. A function accepts any object,
 and the only requirement is that the object supports the operations performed on it.
-The type is checked at runtime, when the operation runs.
-Dynamic typing is often called *duck typing*.
+Python checks the type at runtime, when the operation runs.
+Programmers often call dynamic typing *duck typing*.
 If it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
@@ -158,7 +158,7 @@ print(render(Square()))
 ```
 
 `Circle` and `Square` never mention `Drawable`.
-Both are accepted because each has a `draw()`, so they are of the right shape.
+The checker accepts both because each has a `draw()`, so they are of the right shape.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 Python preserves the flexibility of dynamic typing but gains the early warning of static types.
 
@@ -188,8 +188,8 @@ print(type(shape).__name__)
 #: Circle
 ```
 
-`make()` takes the class, not an instance, so the argument is annotated with `type[Shape]`.
-Passing `Circle` is allowed because `Circle` is a subclass of `Shape`.
+`make()` takes the class, not an instance, so the argument's annotation is `type[Shape]`.
+Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
 This is the construct functions like `issubclass()` work with, since they compare classes rather than instances.
 
@@ -215,7 +215,7 @@ print(grid)
 
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
-so any pair of ints is accepted as a `Coord`.
+so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate,
 use `NewType`, listed in the summary below.)
 An alias can also name a union.
@@ -247,7 +247,7 @@ print(s.upper())
 
 `T` is a placeholder, filled in separately at each call.
 The checker infers `T` from the argument and then knows the return type.
-That is why both `n + 1` and `s.upper()` check, while `n.upper()` would be flagged.
+That is why both `n + 1` and `s.upper()` check, while `n.upper()` would not.
 
 A class declares type parameters the same way:
 
@@ -270,7 +270,7 @@ Constructing `Box("gift")` fixes `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
-Before Python 3.12 type parameters were written with `TypeVar` and `Generic`,
+Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you will still see in older code.
 A special form, `**P`, captures a whole parameter list.
 [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) uses it
@@ -281,7 +281,7 @@ to give a wrapper the same signature as the function it wraps.
 A method that returns its own instance lets calls chain.
 What should its return annotation be?
 Naming the enclosing class works until someone inherits from it.
-`Self` means "an instance of the class this method was called on,"
+`Self` means "an instance of the class you called this method on,"
 so it follows subclasses:
 
 ```python
@@ -309,9 +309,9 @@ print(t.bump().bump().report())
 #: clicks: 2
 ```
 
-`t.bump()` is called on a `NamedTally`, so `Self` is `NamedTally`,
+`t.bump()` runs on a `NamedTally`, so `Self` is `NamedTally`,
 and `report()` is available on the result.
-Had `bump()` been annotated `-> Tally`, the checker would reject `report()`,
+Had `bump()` declared `-> Tally`, the checker would reject `report()`,
 which `Tally` does not have.
 Alternative constructors benefit the same way.
 A `@classmethod` that ends with `return cls(...)` returns `Self`.
@@ -430,7 +430,7 @@ shapes come from `collections.abc`.
 |-----------|---------|
 | `@overload` | Several typed signatures for one function |
 | `@override` | Declares a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
-| `@final` | A class that must not be subclassed, or a method that must not be overridden |
+| `@final` | Forbids subclassing the class, or overriding the method |
 | `cast(T, x)` | Tells the checker to treat `x` as `T` |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids |
 | `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports |

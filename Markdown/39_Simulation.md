@@ -4,8 +4,8 @@ A simulation models a set of objects that act on their own and interact through 
 This chapter works one example from end to end: a pack of rats mapping a maze.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
-The `asyncio` mechanics (`async def`, `await`, `gather`, `run`)
-are introduced in [Concurrency](20_Concurrency.md#asyncio-mechanics).
+[Concurrency](20_Concurrency.md#asyncio-mechanics) introduces
+the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 ## Rats & Mazes
 
@@ -20,11 +20,11 @@ It only answers questions.
 A *blackboard* is the shared surface every rat writes on.
 The blackboard is a classic coordination technique.
 Independent agents read from and write to one common data structure instead of talking to each other directly.
-Here the blackboard owns the maze, records which cells have been explored,
+Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and launches new rats.
 The rats run as cooperative `asyncio` tasks.
-They take turns instead of running at the same instant, so no lock is needed.
-A rat is never interrupted partway through an update.
+They take turns instead of running at the same instant, so the design needs no lock.
+Nothing interrupts a rat partway through an update.
 
 A *rat* explores.
 Each rat runs as its own task.
@@ -89,7 +89,7 @@ class Rat:
             await asyncio.sleep(0)  # Yield so sibling rats can run
 ```
 
-`number` must be initialized by calling `blackboard.next_number()`,
+Initializing `number` requires calling `blackboard.next_number()`,
 a side-effecting method, not a static default.
 Marking it `field(init=False)` leaves it out of the generated `__init__`,
 and `__post_init__` runs right after that `__init__` finishes,
@@ -142,7 +142,7 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
-`Cell` is nested in `Maze` because it only names concepts `Maze` uses,
+`Cell` nests inside `Maze` because it only names concepts `Maze` uses,
 and it is a `StrEnum` rather than a plain `Enum` so its members keep
 acting like real strings.
 `WALL` still works as the fill character for `ljust()`,
@@ -152,7 +152,7 @@ because a `StrEnum` member is its string value.
 The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
-so a cell is handed to exactly one rat even when several reach it.
+so exactly one rat gets each cell even when several reach it.
 `explore()` claims the entry, releases the first rat, then awaits every task,
 including the ones spawned along the way:
 
@@ -313,7 +313,7 @@ def test_rats_map_every_reachable_cell() -> None:
 
 We can create a GUI demonstration using the same model.
 `rats_view.py` runs the exploration to completion,
-records the order the cells were claimed,
+records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green in turn,
 so you watch the pack move through the maze from the entry outward:
@@ -378,7 +378,7 @@ if __name__ == "__main__":
     show()
 ```
 
-The original Java version of this example was written by Jeremy Meyer.
+Jeremy Meyer wrote the original Java version of this example.
 
 ## A Robot in a Maze
 
@@ -494,13 +494,13 @@ so a plain `from world import Room` here would be circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,
-which is all `Room` is needed for. Every use below is an annotation
+which is the only thing `Room` is for. Every use below is an annotation
 (`room: Room`, `-> Room`), never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
-`finished` is assigned in `__init__`, so each robot owns its own flag
+`__init__` assigns `finished`, so each robot owns its own flag
 from the start.
-`room` is only declared, written as `room: Room` with no value.
+The code only declares `room`, written as `room: Room` with no value.
 That line stores nothing, not even `None`.
 It is a declaration, not a placeholder.
 It promises the type checker that a `Room` will be there,
@@ -845,13 +845,13 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
 1.  Test a `Rat` with a fake blackboard.
     Because `Rat` depends only on the `Recorder` `Protocol`,
     you can drive it with a stand-in.
-    Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it is handed,
+    Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it receives,
     run one rat with `asyncio.run(rat.run())`,
     and assert which cell the rat kept for itself and which cells it spawned.
-    No real `Blackboard`, `Maze`, or task scheduling is needed.
+    You need no real `Blackboard`, `Maze`, or task scheduling.
 2.  Report the cells the rats never reach.
     After `explore()` finishes,
-    compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that were never claimed.
+    compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
     Build a maze for which that set is not empty,
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.

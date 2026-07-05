@@ -113,8 +113,7 @@ The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
 which means the exception *class* itself, such as `ZeroDivisionError`, not an instance of it.
 `__init__()` takes `*types: type[BaseException]`, so `Ignore(ZeroDivisionError)`
 collects the exception classes you hand it into the `types` tuple.
-`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it
-the class of the exception that was raised, or `None` when the block finished cleanly.
+`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class, or `None` when the block finished cleanly.
 That class is what `issubclass(exc_type, self.types)` checks against the classes you
 chose to suppress.
 
@@ -199,7 +198,7 @@ with tag("ul") as outer, tag("li") as inner:
 #: </ul>
 ```
 
-When the number of managers is not known until runtime, `contextlib.ExitStack`
+When you do not know the number of managers until runtime, `contextlib.ExitStack`
 holds a dynamic set of managers and unwinds them in reverse on the way out:
 
 ```python

@@ -1,6 +1,6 @@
 # Metaprogramming
 
-Objects are created by other objects:
+Other objects create objects:
 special objects called "classes" that we set up to produce objects configured to our liking.
 
 Classes are just objects, and we can modify objects:
@@ -27,18 +27,18 @@ What creates these "class" objects?
 Other special objects, called *metaclasses*.
 The default metaclass is `type`,
 and in the vast majority of cases it does the right thing.
-You can customize how classes are produced by running extra code or injecting members as the class is built.
+You can customize how Python produces classes by running extra code or injecting members as it builds each class.
 That is metaclass programming.
 
 Most of the time you do not need a metaclass.
 It is a fascinating tool, and the temptation to use it is strong,
 but Python 3 added simpler hooks that cover almost every case a metaclass used to handle:
 
-- `__init_subclass__()` runs when a subclass is created.
+- `__init_subclass__()` runs at subclass creation.
   It replaces most "do something each time a class is defined" metaclasses.
-- `__set_name__()` lets a descriptor learn the attribute name it was bound to,
+- `__set_name__()` lets a descriptor learn its attribute name,
   at class-creation time.
-- *Class decorators* transform a class after it is built.
+- *Class decorators* transform a class after Python builds it.
 
 Use a metaclass only when these cannot do the job.
 This chapter shows the simpler tools first,
@@ -180,7 +180,7 @@ A common need is for a base class to keep track of its subclasses,
 so you can enumerate them.
 This is the textbook reason people used to write a metaclass.
 In Python 3 it is a few lines with `__init_subclass__()`,
-which Python calls automatically every time a subclass is created:
+which Python calls automatically for every new subclass:
 
 ```python
 # init_subclass.py
@@ -231,12 +231,12 @@ print(sorted(c.__name__ for c in Shape.registry))
 #: ['Circle', 'Square']
 ```
 
-Each time a subclass is created,
-`__init_subclass__()` adds it to the registry and removes its base classes,
+For each new subclass, `__init_subclass__()` adds it to the
+registry and removes its base classes,
 so only the current leaves remain.
 That is why `Blue` is absent from the second `Color` print. Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
 For the same reason `Round` is missing from the `Shape` registry. Creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
-No metaclass is involved.
+This involves no metaclass.
 `__init_subclass__()` is implicitly a class method;
 its first argument is the new subclass.
 
@@ -257,8 +257,8 @@ def test_independent_hierarchies_have_separate_registries() -> None:
 
 ## Learning a Name with `__set_name__()`
 
-Another job that once needed a metaclass is letting an attribute object discover the name it was assigned to.
-A *descriptor* with `__set_name__()` gets that name when the class is created:
+Another job that once needed a metaclass is letting an attribute object discover the name it belongs to.
+A *descriptor* with `__set_name__()` gets that name at class creation:
 
 ```python
 # set_name.py
@@ -289,7 +289,7 @@ print(p.x, p.y)
 #: 3 4
 ```
 
-The `Field` descriptors do not know they are called `x` and `y` until Python tells them through `__set_name__()`.
+The `Field` descriptors do not know their names are `x` and `y` until Python tells them through `__set_name__()`.
 This is metaprogramming, but it needs no metaclass.
 
 Testing confirms the descriptor learns its name and stores under it, and returns itself when accessed on the class:
@@ -343,7 +343,7 @@ print(simple.uses_metaclass())  # type: ignore
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
 except for `__new__()`, which uses `mcl` (metaclass).
-The `cls` is the class object being built.
+The `cls` is the class object under construction.
 As with any subclass, call the base-class version first through `super()`.
 
 Metaprogramming and static typing pull against each other.
@@ -364,7 +364,7 @@ Prefer the narrowest escape that fits, because a broad `Any` also hides genuine 
 Metaclass examples appear to use `__new__()` and `__init__()` interchangeably.
 The difference is timing.
 `__new__()` runs *before* the class object exists, so it can change the name,
-bases, and namespace that will be used to build it.
+bases, and namespace that Python will use to build it.
 `__init__()` runs *after* the class exists,
 so changing those arguments has no effect,
 though you can still modify the finished class object:
@@ -410,7 +410,7 @@ print("has Tag base:", Tag in Demo.__bases__)
 ```
 
 Override `__new__()` when you must change `name`, `bases`,
-or the namespace (including special members like `__slots__`) before the class is built.
+or the namespace (including special members like `__slots__`) before Python builds the class.
 Otherwise, prefer `__init__()`, which is simpler.
 When the choice does not matter,
 pick `__init__()` and reserve `__new__()` for a genuine need.
@@ -484,13 +484,13 @@ print(type(b).__name__)
 # because it would inherit from a final class.
 ```
 
-`@final` is checked statically, by type checkers such as ty, mypy,
-and pyright.
+Type checkers such as ty, mypy, and pyright check `@final`
+statically.
 It states the intent and catches a violation before the code runs.
 It has no runtime effect. The interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter itself to refuse subclassing,
-`__init_subclass__()` can enforce it as each subclass is created.
+`__init_subclass__()` can enforce it at each subclass creation.
 Older literature claims this requires a metaclass. It does not:
 
 ```python
@@ -518,11 +518,11 @@ except TypeError as error:
 ```
 
 The check happens at class-creation time, exactly when it must,
-and `B` itself is built normally because `A` does not forbid subclassing.
+and Python builds `B` itself normally because `A` does not forbid subclassing.
 Use the runtime version only when `@final` is not enough,
 which is rare.
 
-Tests confirm the `@final` marker is set, the runtime-final class refuses subclassing, and its non-final base still allows it:
+Tests confirm the `@final` marker is present, the runtime-final class refuses subclassing, and its non-final base still allows it:
 
 ```python
 # test_final.py
@@ -551,7 +551,7 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 After all this, when is a metaclass the right tool?
 When you need to change the class object itself rather than react to its creation:
 adding methods *to the class* (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
-replacing the namespace mapping with `__prepare__()` so the class body is built in a custom dictionary,
+replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary,
 or enforcing an invariant across an entire family of classes through their shared metaclass.
 These are real but uncommon.
 For everything else, `__init_subclass__()`, `__set_name__()`,
@@ -565,7 +565,7 @@ That is one more reason to avoid metaclasses unless you truly need them.
 ## The `inspect` Module
 
 Up to now we've been modifying classes. `type` builds them, and metaclasses
-and `__init_subclass__()` run code as they are created.
+and `__init_subclass__()` run code during their creation.
 The `inspect` module is the other half of metaprogramming: reading the structure
 of live objects.
 It answers questions like which members an object has, what a function's
@@ -671,7 +671,7 @@ The static variant reads members from the object and its classes directly,
 without invoking descriptors, properties, or `__getattr__()`.
 Inspecting an object therefore never runs its code or triggers a side effect,
 which matters when you point this tool at something unfamiliar.
-Each member is sorted into one of two lists.
+The tool sorts each member into one of two lists.
 Callables become methods, printed with the signature `inspect.signature()`
 reports, or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
@@ -680,7 +680,7 @@ inheritance chain with `inspect.get_annotations()`; an attribute with no
 annotation, such as one assigned dynamically, prints as `name = value`.
 The value is the member's `repr()`, truncated to keep the line within
 `max_width`.
-Standard dunder members are hidden by default.
+The display hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
 show `__new__` and `__init__`.
 

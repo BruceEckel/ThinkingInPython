@@ -12,7 +12,7 @@ and (in this design) you can also pass it an "input" object so it can tell you w
 The key distinction between this design and the next is that here,
 each `State` object decides what other states it can move to,
 based on the "input,"
-whereas in the subsequent design all of the state transitions are held in a single table.
+whereas in the subsequent design a single table holds all of the state transitions.
 Another way to put it is that here,
 each `State` object has its own little `State` table,
 and in the subsequent design there is a single master state transition table for the whole system:
@@ -31,16 +31,15 @@ class State:
 
 This class is unnecessary.
 However, it allows us to say that something is a `State` object in code,
-and provide a slightly different error message when all the methods are not implemented.
+and provide a slightly different error message when a derived class fails to implement all the methods.
 We could have gotten nearly the same effect by saying:
 
     class State: pass
 
-because we would still get exceptions if `run()` or `next()` were called for a derived type
-and they hadn't been implemented.
+because we would still get exceptions if code called `run()` or `next()` on a derived type that hadn't implemented them.
 
 The `StateMachine` keeps track of the current state,
-which is initialized by the constructor.
+which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
 This method not only moves to the next state,
 but it also calls `run()` for each state object;
@@ -86,14 +85,14 @@ class MouseAction(StrEnum):
 ```
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration
-(`Enum` is introduced in [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too)).
+([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
 Because it is a `StrEnum`, each member is its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
-which is how the test input below is parsed.
+which is how the code below parses the test input.
 
-For creating test code, a sequence of mouse inputs is provided from a text file:
+For test code, a text file provides the sequence of mouse inputs:
 
 ```text
 # mouse_moves.txt
@@ -234,15 +233,15 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
-A table cannot be written inside its class,
+You cannot write a table inside its class,
 because its entries name the *other* states,
-which do not all exist until every class is defined.
+which do not all exist until every class definition runs.
 In Python that is no obstacle.
 Define the classes first,
 then fill in the tables at module level,
 after all the state objects exist.
 
-The `StateT` class is an implementation of `State` (so that the same `StateMachine` class can be used from the previous example) that adds a `transitions` dict mapping each input to its next state.
+The `StateT` class is an implementation of `State` (so the same `StateMachine` class from the previous example still serves) that adds a `transitions` dict mapping each input to its next state.
 Its `next()` looks the input up in that `dict`.
 The subclasses now define only their `run()` behavior;
 the transitions live in the tables filled in at the bottom of the file:
@@ -423,7 +422,7 @@ reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are plain methods, stored directly in the table.
 The states are an `Enum`,
-so a misspelled state name is caught by the type checker instead of failing silently at runtime:
+so the type checker catches a misspelled state name instead of letting it fail silently at runtime:
 
 ```python
 # tabledriven/vending_machine.py
@@ -643,7 +642,7 @@ Using `tkinter` we can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock,
 and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
-and a click that the state machine rejects (a selection before any money, say) is caught and shown rather than crashing.
+and the GUI catches a click that the state machine rejects (a selection before any money, say) and shows it rather than crashing.
 Because it requires user interaction the harness skips it (`tools/norun.txt`):
 
 ```python
@@ -721,10 +720,10 @@ if __name__ == "__main__":
 
 1.  Create a program similar to certain DBMS systems that only allow a certain number of connections at any time.
     To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
-    When a user is finished with a connection,
-    the system must be informed so that it can check that connection back in to be reused.
+    When a user finishes with a connection,
+    you must inform the system so that it can check that connection back in for reuse.
     To guarantee this, provide a [proxy](26_Surrogate.md#proxy) object instead of a reference to the actual connection,
-    and design the proxy so that it will cause the connection to be released back to the system.
+    and design the proxy to release the connection back to the system.
 2.  Using [State](26_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on what kind of `Mood` it's in.
     Add an additional kind of `Mood` called `Prozac`.
 3.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
@@ -734,7 +733,7 @@ if __name__ == "__main__":
     In each state subclass,
     override a `next_state()` method that holds its own transition table.
     The input to `next_state()` is a single word read from a text file containing one word per line.
-5.  Modify the previous exercise so that the state machine can be configured by editing a single transition table.
+5.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
 6.  Modify the "mood" exercise (exercise 2) so that it becomes a state machine using `state_machine.py`.
 7.  Create an elevator state machine system using `state_machine.py`.
 8.  Create a heating/air-conditioning system using `state_machine.py`.

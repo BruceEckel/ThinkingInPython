@@ -25,7 +25,7 @@ When you write the tests first, you:
 
 1.  Describe what the code should do, in concrete and verifiable terms,
     not in a separate document that drifts out of date.
-2.  Provide a worked example of how the code is meant to be used.
+2.  Provide a worked example of how to use the code.
 3.  Get a clear definition of done: the code is finished when the tests pass.
 
 Testing then becomes a design tool,
@@ -48,7 +48,7 @@ modeled on Java's JUnit.
 It works, but it carries the class-based boilerplate of its heritage.
 The wider Python world has settled on `pytest`, and so does this book.
 
-`pytest` is built around two ideas that keep tests short.
+`pytest` rests on two ideas that keep tests short.
 A test is just a function whose name starts with `test_`.
 A check is just Python's built-in `assert` statement.
 There is no base class to inherit and no special assertion methods to memorize.
@@ -133,7 +133,7 @@ Two situations come up repeatedly in testing, and both appear in `test_account.p
 
 The first is "this call should cause an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.
-The test passes only if the expected exception is raised inside the block.
+The test passes only if the block raises the expected exception.
 
 The second is comparing floating-point numbers, where exact equality is a trap.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
@@ -147,7 +147,7 @@ and `pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
 and a failure names the exact case that failed.
 
-You are not limited to one variable;
+Nothing limits you to one variable;
 you can give `parametrize` several names and a list of tuples, one tuple per case:
 
 ```python
@@ -176,8 +176,8 @@ The names in the string line up, in order, with the values in each tuple.
 
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 `pytest` replaces both with *fixtures*: functions that build what a test needs.
-These fixtures are declared as parameters to the test functions,
-which tells `pytest` to automatically call the fixture function and pass its result to the test function.
+You declare fixtures as parameters to the test functions,
+which tells `pytest` to call the fixture function and pass its result to the test function.
 
 The `funded` function in `test_account.py` is a fixture.
 A test that names `funded` as an argument receives the value the fixture returns.
@@ -226,7 +226,7 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 This is where shared setup lives.
 
-Fixtures can be parametrized too.
+You can parametrize fixtures too.
 Every test that requests the fixture runs once for each parameter value:
 
 ```python
@@ -245,10 +245,10 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
     return Account(request.param)
 ```
 
-The `scope="session"` fixture is built once and reused,
+`pytest` builds the `scope="session"` fixture once and reuses it,
 which is useful for expensive resources.
-The `preloaded` fixture is rebuilt for each parameter,
-so a test that uses it is automatically checked at every starting balance:
+`pytest` rebuilds the `preloaded` fixture for each parameter,
+so a test that uses it automatically runs at every starting balance:
 
 ```python
 # test_fixtures.py
@@ -263,7 +263,7 @@ def test_deposit_on_any_balance(
     assert bank_name  # The session fixture is available everywhere
 ```
 
-Neither fixture is imported.
+Nothing imports either fixture.
 `pytest` finds them in `conftest.py` and supplies them by name.
 
 ## Isolating Tests from the World
@@ -483,8 +483,8 @@ def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
     assert weather.current_temp("denver") == "21C"
 ```
 
-Patch the name where it is used, `weather.urlopen()`, rather than the original in
-`urllib`, so only this module's lookups are redirected.
+Patch the name at its point of use, `weather.urlopen()`, rather than the original in
+`urllib`, so the patch redirects only this module's lookups.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
 
@@ -494,7 +494,7 @@ A *white-box* test reaches into the internals of the code it checks.
 A *black-box* test treats the code as an opaque box and exercises only its public interface,
 the way a client would.
 
-In a language with access control, the two are enforced differently.
+A language with access control enforces the two differently.
 Python has no access control.
 Every attribute is reachable,
 and a leading underscore is only a convention that says,
@@ -518,9 +518,9 @@ including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) library
 
 ## How This Book Runs Its Tests
 
-The examples in this book are automatically extracted and checked.
-Plain programs are run, and their failures are reported.
-Files named `test_*.py` and `conftest.py` are handed to `pytest` instead,
+The build automatically extracts and checks the examples in this book.
+It runs plain programs and reports their failures.
+It hands files named `test_*.py` and `conftest.py` to `pytest` instead,
 and a failing test fails the build.
 
 ## Exercises

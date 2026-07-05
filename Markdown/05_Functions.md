@@ -1,6 +1,6 @@
 # Functions
 
-Functions are defined with the `def` keyword,
+You define functions with the `def` keyword,
 followed by the function name and parameter list,
 and a colon to begin the function body:
 
@@ -25,7 +25,7 @@ print(a_function("yes"))
 ```
 
 Here the function signature only specifies the name of the function and the parameter names,
-but no argument types or return types (these are covered in [Static Typing](08_Static_Typing.md#type-hints)).
+but no argument types or return types ([Static Typing](08_Static_Typing.md#type-hints) covers these).
 Python is dynamically typed, so type errors surface at runtime rather than at compile time.
 This means the same function can accept and return different types:
 
@@ -80,7 +80,7 @@ print(connect(port=80, host="web.example.com"))  # Any order by name
 #: web.example.com:80 (timeout 30s)
 ```
 
-A default value is evaluated once, when the function is defined.
+Python evaluates a default value once, at function definition.
 This means a mutable default is shared across calls:
 
 ```python
@@ -107,12 +107,13 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object and is not recreated on each call.
+A mutable default persists because it lives on the function object;
+Python does not recreate it on each call.
 This behavior commonly confuses newcomers to the language.
 
-The `None` sentinel is only needed when the function modifies the argument.
+You only need the `None` sentinel when the function modifies the argument.
 If the function only reads the parameter, use an immutable default such as an empty tuple.
-It is still shared across calls, but sharing is harmless because it cannot change:
+Calls still share it, but sharing is harmless because it cannot change:
 
 ```python
 # immutable_default.py
@@ -159,7 +160,7 @@ print(get(prefs, "theme", "dark"))
 #: dark
 ```
 
-Here `mute` is stored as `None`, so `None` cannot also mean "not supplied".
+Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied".
 The `MISSING` sentinel keeps the two cases apart. A missing key with no default
 raises, while a stored `None` comes back untouched.
 
@@ -220,9 +221,9 @@ This is the standard way to write a wrapper around another function.
 
 Two markers in a parameter list control how callers may pass arguments.
 A `/` ends the *positional-only* parameters.
-Every parameter before it must be passed by position, never by name.
+You must pass every parameter before it by position, never by name.
 A `*` begins the *keyword-only* parameters.
-Every parameter after it must be passed by name.
+You must pass every parameter after it by name.
 
 ```python
 # param_markers.py
@@ -272,5 +273,5 @@ print(square(9))
 ```
 
 Compared to other languages,
-Python's lambdas are limited to a single expression.
+Python's lambdas allow only a single expression.
 For anything more complicated, write a separate function.

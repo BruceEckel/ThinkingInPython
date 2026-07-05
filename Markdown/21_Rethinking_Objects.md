@@ -10,7 +10,7 @@ it is not an outsider's complaint.
 We are about to spend the rest of this book on design patterns,
 and most of them assume objects and inheritance.
 Before we start, I want to question how much of that machinery we actually need.
-This chapter is adapted from my PyCon 2023 talk,
+This chapter adapts my PyCon 2023 talk,
 [Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects),
 and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
 
@@ -53,9 +53,8 @@ The industry has been quietly walking back from "everything is an object" and fr
 
 ## The Liskov Substitution Principle {#liskov-substitution}
 
-The *Liskov Substitution Principle* (LSP) says that an object of a subtype must
-be usable anywhere an object of its base type is expected, without breaking the
-program. A subclass may add behavior, but it must honor the base class's
+The *Liskov Substitution Principle* (LSP) says that an object of a subtype must work anywhere code expects an
+object of its base type, without breaking the program. A subclass may add behavior, but it must honor the base class's
 contract. It accepts the same arguments, returns the same kinds of results, and
 raises no surprising exceptions. When subclasses obey it, code written against
 the base class works unchanged on any of them. This is the guarantee that makes
@@ -174,7 +173,7 @@ def test_defensive_copy_prevents_the_leak() -> None:
 
 ## The Immutability Solution
 
-Encapsulation is only needed because of mutability.
+Encapsulation exists only because of mutability.
 If the data cannot change, there is nothing to protect.
 Freeze it, and the whole apparatus disappears.
 The fields are public, there are no getters, and there are no copies:
@@ -266,12 +265,12 @@ def test_method_and_function_agree() -> None:
 
 ## Protocols Generalize, Composition Adapts
 
-Because the function is not attached to a class, it can work on anything shaped like a point.
+Because the function does not belong to a class, it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with the right attributes satisfies it,
 with no declared inheritance.
 This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
-When you are handed a type that does not fit, you adapt it by composition,
+When someone hands you a type that does not fit, you adapt it by composition,
 not inheritance:
 
 ```python
@@ -339,7 +338,7 @@ The third OOP promise is reuse through inheritance.
 In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
 The alternative is composition. A type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
-and frozen instances compare by value and can be used as keys:
+and frozen instances compare by value and work as keys:
 
 ```python
 # composition.py
@@ -426,13 +425,13 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Inheriting from `ABC` makes `Shape` abstract. It cannot be instantiated,
+Inheriting from `ABC` makes `Shape` abstract. You cannot instantiate it,
 and `@abstractmethod` forces every subclass to define `area()`.
 
 Dynamic typing produces a different approach.
 Any type works as long as it has the method the function calls.
 There is no shared base class and no declared set of types,
-and validity is checked only at runtime, when the call happens:
+and the only validity check happens at runtime, when the call runs:
 
 ```python
 # dynamic_typing.py
@@ -646,8 +645,7 @@ if __name__ == "__main__":
 
 The output is identical and the branches are gone.
 `total()` decides nothing about logging;
-what silence looks like was decided once, inside `NullLogger`,
-instead of at every call site.
+`NullLogger` defines silence once, instead of every call site defining it.
 The parameter's type improved too.
 `Logs` is a protocol, so any logger fits,
 and no caller ever sees a `| None`.
@@ -719,7 +717,7 @@ They do not need to be everywhere, all the time.
   Those produce reliability.
 
 The rest of this book is about design patterns.
-Many of them were invented to work around limitations of older object-oriented languages.
+Many of them arose to work around limitations of older object-oriented languages.
 Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol already solve the problem.

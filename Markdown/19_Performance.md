@@ -5,7 +5,7 @@
 
 Performance means at least two things when it comes to computing:
 
-1. The speed at which an application is developed.
+1. The speed at which you develop an application.
 2. The speed at which that application executes.
 
 Python addresses the first issue with clear syntax and extensive power and flexibility.
@@ -199,7 +199,7 @@ print(view.nbytes)
 ```
 
 The view shares storage with `data`,
-so writing through it changes the original and no bytes are copied.
+so writing through it changes the original and copies no bytes.
 
 ## Vectorize with NumPy
 

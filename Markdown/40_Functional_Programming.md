@@ -1,6 +1,6 @@
 # Functional Programming
 
-Functional programming is usually introduced as "programming with functions," and functions are indeed a central part of the practice.
+Introductions to functional programming usually call it "programming with functions," and functions are indeed a central part of the practice.
 But after (slowly) studying it for over ten years, I have started to wonder whether it's actually more about "functionality."
 One definition of science is "what works."
 Science has theories that fit the data, are predictive, and are falsifiable.
@@ -16,8 +16,8 @@ Given the same arguments, it always returns the same value.
 It has no *side effects*: no printing, no file or network access, no mutation of anything outside the function.
 
 Purity is the foundation everything else in this chapter builds on.
-A pure function can be tested in isolation, because its behavior is fully determined by what you pass in.
-Its result can be cached, because the answer never changes.
+You can test a pure function in isolation, because what you pass in fully determines its behavior.
+You can cache its result, because the answer never changes.
 You can reason about it the way you reason about an equation:
 
 ```python
@@ -66,9 +66,9 @@ Every later feature in this chapter is, in part, a way to keep more of your code
 
 ## Immutability
 
-An *immutable* value cannot change after it is created.
+An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from being changed somewhere you forgot about.
+Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from a change somewhere you forgot about.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -123,7 +123,7 @@ Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`, is a typ
 Immutability also unlocks abilities a mutable value lacks.
 An immutable object can be *hashable*.
 It can promise a stable hash for its whole life, so it can serve as a dictionary key or a set member.
-It can also be shared without a defensive copy, because no recipient can change it out from under you.
+You can also share it without a defensive copy, because no recipient can change it out from under you.
 A `list` can do neither:
 
 ```python
@@ -227,7 +227,7 @@ Each call hands a function to another function and lets it do the looping.
 Returning a function is the other half of the definition, covered under [Closures](#closures), below.
 
 Higher-order functions provide separation of concerns.
-The loop that walks the data is written once, inside `map()`, `filter()`, or `sorted()`,
+`map()`, `filter()`, and `sorted()` each contain the loop that walks the data, written once,
 and you supply only the part that differs from one use to the next.
 You stop rewriting the same iteration scaffold,
 along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
@@ -299,7 +299,7 @@ print(tally(), tally(), tally())
 ```
 
 Each call to `make_counter()` builds an independent counter with its own hidden `count`.
-Nothing outside `increment()` can reach that state, so it cannot be corrupted by accident.
+Nothing outside `increment()` can reach that state, so no accident can corrupt it.
 
 ## Partial Application
 
@@ -452,7 +452,7 @@ An iterative version would have to maintain its own stack to remember where it w
 
 ## Lazy Evaluation
 
-*Lazy evaluation* computes a value only when it is needed.
+*Lazy evaluation* computes a value only when something needs it.
 A generator is the canonical example. It yields one value at a time instead of building a whole list up front.
 Combined with `itertools`, you can describe an infinite sequence and take only the part you use:
 
@@ -478,7 +478,7 @@ The [Performance](19_Performance.md) chapter looks at laziness from the angle of
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time, so memory stays flat no matter how large the source grows.
-Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches is never done at all.
+Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches never happens at all.
 
 ## Pattern Matching as Destructuring
 
@@ -529,7 +529,7 @@ print(x, y, x == y)
 
 Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call, evaluate it in any order, or skip a repeat.
 You can also reason about the code by substitution, the same move you make in algebra.
-This is the property that lets parts of a program be checked, and sometimes proved correct, and it connects back to this chapter's opening question about what counts as "what works."
+This is the property that lets you check parts of a program, and sometimes prove them correct, and it connects back to this chapter's opening question about what counts as "what works."
 
 This property is also the quiet reason the `lru_cache` from earlier is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
@@ -566,7 +566,7 @@ Recall `withdraw()` from the start of this chapter.
 Two parallel calls could both read `balance` before either writes it back, and one withdrawal would vanish.
 Making that safe means adding a lock, and the lock serializes the very work you wanted to overlap.
 Purity removes the problem instead of managing it.
-Nothing is shared, so there is nothing to lock.
+With nothing shared, there is nothing to lock.
 
 `count_primes()` is pure, and each call does enough work to be worth spreading across cores:
 
@@ -599,7 +599,7 @@ if __name__ == "__main__":
 Run as a script, this prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run, because a pure call returns the same answer no matter which process ran it, or when.
 Notice what is missing: no locks, no queues, no shared state, and no changes to `count_primes()` itself.
-The function did not have to be prepared for parallel execution.
+The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
 `ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](20_Concurrency.md#parallelism).
 
