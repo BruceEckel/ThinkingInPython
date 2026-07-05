@@ -13,8 +13,7 @@ groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True
 
-# A dict has no frozen form, but MappingProxyType wraps one
-# in a read-only view:
+# MappingProxyType wraps a dict in a read-only view:
 settings = {"debug": False, "level": 3}
 config = MappingProxyType(settings)
 print(config["level"])
