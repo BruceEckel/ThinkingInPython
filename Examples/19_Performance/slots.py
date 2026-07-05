@@ -1,4 +1,5 @@
 # slots.py
+
 class Point:
     __slots__ = ("x", "y")  # No per-instance __dict__
     def __init__(self, x, y):

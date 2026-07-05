@@ -1,4 +1,4 @@
-# array_basics.py
+# compact_array.py
 from array import array
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" = C double

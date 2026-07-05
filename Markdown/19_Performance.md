@@ -161,11 +161,10 @@ For a priority queue shared across threads,
 The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
 A `frozenset` looks up exactly as fast as a `set`,
 a `frozendict` behaves like a `dict`,
-and a `tuple` scans like a `list`;
-in CPython they share the same machinery.
+and a `tuple` scans like a `list`.
+In CPython these share the same machinery.
 Choose immutability for correctness and safe sharing.
-Its performance role is indirect:
-immutable values are hashable,
+Immutable values are hashable,
 so they can serve as dictionary keys and as arguments to the caches shown below.
 
 ## Write Idiomatic Python
@@ -293,27 +292,28 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 #: 75025 26
 ```
 
-Same answer, 242,785 calls against 26.
-The counts are the speedup;
-the cached version runs thousands of times faster,
+Same answer, but 242,785 calls against 26.
+The counts are the speedup.
+The cached version runs thousands of times faster,
 and the gap grows with `n`.
 
-`cache` holds every result forever;
-`functools.lru_cache(maxsize=n)` bounds the memory by evicting the
+`cache` holds every result forever,
+but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the
 least recently used entry.
 Arguments must be hashable,
-one more reason to prefer the immutable containers discussed above.
+which is another reason to prefer immutable containers.
 For an expensive attribute computed once per object,
 `functools.cached_property` does the same job on instances
 (see [Classes](07_Classes.md#properties)).
+
 Caching is only correct when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
 and caching a function that reads outside state can replay a stale answer.
 
 ## Reduce Memory Overhead
 
-When you hold millions of objects, their per-object overhead dominates.
-Three tools cut it down.
+With millions of objects, per-object overhead dominates.
+Three tools reduce that overhead.
 
 By default each instance stores its attributes in a `__dict__`.
 Declaring `__slots__` replaces that dict with a fixed set of fields,
@@ -321,6 +321,7 @@ which shrinks each instance and speeds attribute access:
 
 ```python
 # slots.py
+
 class Point:
     __slots__ = ("x", "y")  # No per-instance __dict__
     def __init__(self, x, y):
@@ -362,17 +363,16 @@ except AttributeError as e:
 #: AttributeError
 ```
 
-When the class qualifies as a data class,
-prefer `slots=True` over a hand-written `__slots__`;
-you get the memory savings and the generated methods together.
-
+If a class can be a data class,
+prefer `slots=True` over a hand-written `__slots__`.
+This produces both memory savings and generated methods.
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
 A `list` of numbers stores full Python objects, each with its own header.
 The `array` module packs numbers into a single block of C values instead:
 
 ```python
-# array_basics.py
+# compact_array.py
 from array import array
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
