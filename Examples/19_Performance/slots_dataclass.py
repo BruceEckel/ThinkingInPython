@@ -29,7 +29,7 @@ class FrozenSlottedPoint:
 
 fp = FrozenPoint(1, 2)
 try:
-    # frozen blocks new attributes too, not just reassignment:
+    # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
 except AttributeError as e:
     print(type(e).__name__)

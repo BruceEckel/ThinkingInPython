@@ -1,9 +1,8 @@
 # Concurrency
 
 [Performance](19_Performance.md) works on making one stream of instructions faster.
-This chapter reaches for the other lever.
 *Concurrency* runs independent tasks so they overlap instead of waiting in line.
-Whether overlap helps at all depends on where each task spends its time.
+Whether this overlap helps depends on where each task spends its time.
 
 ## I/O-Bound vs CPU-Bound
 
@@ -16,7 +15,10 @@ The processor is busy from start to finish.
 That boundary decides the tool.
 Waiting can overlap on a single thread. While one task waits, the thread runs another.
 Computing cannot. One core runs one stream of instructions at a time.
-So I/O-bound work needs `asyncio`, and CPU-bound work needs separate processes.
+So I/O-bound work needs `asyncio`, and CPU-bound work needs multiple cores.
+A separate process is the traditional way to get more than one core.
+Later in this chapter, we show two other approaches,
+each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
@@ -166,7 +168,121 @@ which the next section explains.
 
 ## The GIL and Free Threading
 
-[[The GIL serializes CPU-bound threads, which is why the parallelism above reaches for processes. The free-threaded (no-GIL) builds available since 3.13 lift this and change when threads alone are enough]]
+The standard CPython build has a *Global Interpreter Lock* (GIL):
+only one thread runs Python bytecode at a time, no matter how many
+cores sit idle. A thread releases the GIL while it waits on I/O,
+which is why `asyncio` and a thread pool both help I/O-bound work.
+Neither helps CPU-bound work,
+because a thread that is computing never releases the GIL
+for another thread to run:
+
+```python
+# gil_threads.py
+import timeit
+from concurrent.futures import ThreadPoolExecutor
+
+def cpu_price(order: int) -> int:
+    total = 0
+    for _ in range(1_000_000):  # Working inside the processor
+        total += 1
+    return order * 10
+
+def sequential(orders: list[int]) -> list[int]:
+    return [cpu_price(o) for o in orders]
+
+def threaded(orders: list[int]) -> list[int]:
+    with ThreadPoolExecutor() as pool:
+        return list(pool.map(cpu_price, orders))
+
+orders = [1, 2, 3, 4, 5]
+assert threaded(orders) == sequential(orders)
+
+t_seq = timeit.timeit(lambda: sequential(orders), number=5)
+t_thr = timeit.timeit(lambda: threaded(orders), number=5)
+print(f"threads no faster: {t_thr > t_seq * 0.9}")
+#: threads no faster: True
+```
+
+Swapping the loop for a thread pool changes nothing:
+five threads still take turns holding the one GIL,
+so `threaded()` costs the same as `sequential()`,
+sometimes a little more, from the added scheduling.
+This is exactly why [Parallelism](#parallelism) used processes instead:
+each process gets its own interpreter, and so its own GIL.
+
+Since 3.13, CPython also ships as a *free-threaded* build,
+tracked by [PEP 703](https://peps.python.org/pep-0703/)
+and installed separately (`python3.15t` rather than `python3.15`).
+It removes the GIL, so threads run Python bytecode
+on separate cores at the same time.
+Running the identical `sequential()`/`threaded()` pair above
+under a free-threaded interpreter turns the ratio around:
+
+    threads speedup: 3.8x
+
+On a free-threaded interpreter, threads alone are enough for CPU-bound
+work, and they share memory directly,
+without a process pool's pickling between processes.
+The free-threaded build is newer,
+and some C extensions still assume a GIL,
+so check compatibility before switching a project to it.
+A free-threaded interpreter is one way off the standard build's limits.
+The next section covers another,
+and it runs on the standard build you already have.
+(The speedup above needs a free-threaded interpreter,
+which is not the book's default build,
+so the build does not run that second measurement.
+The number is one machine's actual output.)
+
+## Subinterpreters
+
+A process gets parallelism by giving each task its own interpreter,
+with its own GIL, at the cost of its own operating-system process.
+Since 3.12, CPython can create additional interpreters
+inside the same process ([PEP 684](https://peps.python.org/pep-0684/)),
+each with its own GIL.
+`InterpreterPoolExecutor` runs each call in one of these,
+so multiple interpreters, each locked on its own, run truly at once,
+without leaving the process:
+
+```python
+# subinterpreters.py
+import timeit
+from concurrent.futures import InterpreterPoolExecutor
+
+def cpu_price(order: int) -> int:
+    total = 0
+    for _ in range(1_000_000):  # Working inside the processor
+        total += 1
+    return order * 10
+
+def sequential(orders: list[int]) -> list[int]:
+    return [cpu_price(o) for o in orders]
+
+orders = [1, 2, 3, 4, 5]
+t_seq = timeit.timeit(lambda: sequential(orders), number=5)
+
+with InterpreterPoolExecutor() as pool:
+    parallel = list(pool.map(cpu_price, orders))
+    assert parallel == sequential(orders)  # Also starts the workers
+    t_sub = timeit.timeit(
+        lambda: list(pool.map(cpu_price, orders)), number=5
+    )
+
+print(f"subinterpreters at least 2x faster: {t_seq > t_sub * 2}")
+#: subinterpreters at least 2x faster: True
+```
+
+Unlike a thread pool, this genuinely overlaps computation:
+each worker interpreter holds its own GIL,
+so five of them run on five cores at once instead of taking turns.
+Unlike a process pool, there is only one process,
+so starting a worker is cheaper than starting a new interpreter
+process, though each interpreter still runs in its own memory space,
+and arguments and results still cross that boundary by copying.
+A subinterpreter needs no separate build and no separate install,
+which makes it the first thing to try for CPU-bound work,
+before a process pool or a free-threaded interpreter.
 
 ## Coordinating Threads with Queues
 
