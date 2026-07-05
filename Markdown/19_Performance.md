@@ -97,6 +97,45 @@ Do your benchmarks using data that is shaped like production data.
 A `list` of ten elements can beat a `set`,
 and an optimization tuned to toy input can behave badly in production.
 
+## Write Idiomatic Python
+
+The interpreter is written in C.
+Built-in functions and comprehensions run their loops in C,
+so the more of your loop you hand to the interpreter,
+the less bytecode runs per element.
+The idiomatic version of a loop is usually also the fast one:
+
+```python
+# builtin_sum.py
+import timeit
+
+numbers = list(range(100_000))
+
+def hand_written() -> int:
+    total = 0
+    for n in numbers:
+        total += n
+    return total
+
+assert hand_written() == sum(numbers)
+t_loop = timeit.timeit(hand_written, number=50)
+t_sum = timeit.timeit(lambda: sum(numbers), number=50)
+print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
+#: sum() at least twice as fast: True
+```
+
+The same principle chooses `"".join(parts)` over `+=` in a loop
+(one linear pass instead of repeated reallocation),
+a comprehension over an `append()` loop,
+and the C-implemented standard library,
+`itertools`, `collections`, and `functools`,
+over hand-rolled equivalents
+([Iterators](28_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+As a last resort in a proven-hot loop,
+hoist a repeated attribute or global lookup into a local,
+as in `append = out.append`.
+That is a micro-optimization, so let a measurement justify it.
+
 ## Choose Better Algorithms and Data Structures
 
 The biggest speedups usually come from a better algorithm, not faster code.
@@ -166,45 +205,6 @@ In CPython these share the same machinery.
 Choose immutability for correctness and safe sharing.
 Immutable values are hashable,
 so they can serve as dictionary keys and as arguments to the caches shown below.
-
-## Write Idiomatic Python
-
-The interpreter is written in C.
-Built-in functions and comprehensions run their loops in C,
-so the more of your loop you hand to the interpreter,
-the less bytecode runs per element.
-The idiomatic version of a loop is usually also the fast one:
-
-```python
-# builtin_sum.py
-import timeit
-
-numbers = list(range(100_000))
-
-def hand_written() -> int:
-    total = 0
-    for n in numbers:
-        total += n
-    return total
-
-assert hand_written() == sum(numbers)
-t_loop = timeit.timeit(hand_written, number=50)
-t_sum = timeit.timeit(lambda: sum(numbers), number=50)
-print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
-#: sum() at least twice as fast: True
-```
-
-The same principle chooses `"".join(parts)` over `+=` in a loop
-(one linear pass instead of repeated reallocation),
-a comprehension over an `append()` loop,
-and the C-implemented standard library,
-`itertools`, `collections`, and `functools`,
-over hand-rolled equivalents
-([Iterators](28_Iterators.md#reusable-algorithms) tours the iterator algorithms).
-As a last resort in a proven-hot loop,
-hoist a repeated attribute or global lookup into a local,
-as in `append = out.append`.
-That is a micro-optimization, so let a measurement justify it.
 
 ## Lazy Evaluation with Generators
 
@@ -441,15 +441,32 @@ When the hot spot is arithmetic over a large collection of numbers,
 the biggest step is to remove the Python loop entirely.
 [NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
 like `array` above,
-and executes whole-array expressions in compiled loops:
+and executes whole-array expressions in compiled loops.
+The plain-Python version repeats one expression per element;
+the NumPy version states it once for the whole array:
 
+    import timeit
     import numpy as np
 
-    a = np.arange(1_000_000, dtype=np.float64)
-    b = 3.0 * a + 1.0  # One compiled pass over the array
+    n = 1_000_000
+    numbers = list(range(n))
+    a = np.arange(n, dtype=np.float64)
 
-A numeric loop rewritten this way commonly runs tens of times faster,
-and NumPy is a fast library you call,
+    def pure_python() -> list[float]:
+        return [3.0 * x + 1.0 for x in numbers]
+
+    def vectorized() -> np.ndarray:
+        return 3.0 * a + 1.0
+
+    t_loop = timeit.timeit(pure_python, number=5)
+    t_numpy = timeit.timeit(vectorized, number=5)
+    print(f"NumPy speedup: {t_loop / t_numpy:.1f}x")
+    # Sample run: NumPy speedup: 12.9x
+
+`vectorized()` computes the same `3x + 1` as `pure_python()`,
+but as one compiled pass over contiguous memory
+instead of a million individual Python-level steps.
+NumPy is a fast library you call,
 not a compiled extension you write.
 The win survives only while the data stays inside NumPy.
 Calling a Python function on each element,
@@ -459,8 +476,11 @@ This is the declarative trade from
 [Functional Programming](40_Functional_Programming.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 (NumPy is a third-party dependency,
+and the book's Python 3.15 target has no NumPy release yet,
 so unlike the rest of the book's listings,
-the build does not run this snippet.)
+the build does not run this snippet.
+The comment above shows one machine's actual output;
+expect a different, but still large, multiple on yours.)
 
 ## JIT Compilation with Numba
 
@@ -471,9 +491,9 @@ or the control flow is irregular.
 function to machine code on its first call, in place.
 The source stays Python:
 
+    import timeit
     from numba import njit
 
-    @njit
     def count_primes(limit: int) -> int:
         count = 0
         for n in range(2, limit):
@@ -484,6 +504,19 @@ The source stays Python:
                 count += 1
         return count
 
+    fast_count_primes = njit(count_primes)
+
+    limit = 200_000
+    fast_count_primes(1)  # Compile once, off the clock
+
+    t_python = timeit.timeit(lambda: count_primes(limit), number=1)
+    t_numba = timeit.timeit(lambda: fast_count_primes(limit), number=1)
+    print(f"Numba speedup: {t_python / t_numba:.1f}x")
+    # Sample run: Numba speedup: 15.9x
+
+`njit(count_primes)` compiles the same function `@njit` would decorate;
+calling it once first pays the compilation cost outside the timed region,
+so the comparison measures steady-state speed, not warm-up.
 Numba shines on numeric code over simple types and NumPy arrays,
 often landing within striking distance of C.
 The first call pays a compilation delay,
@@ -491,12 +524,16 @@ and code that leans on arbitrary Python objects will not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 (Numba is also a third-party dependency,
-outside the book's build.)
+and it does not yet support the book's Python 3.15 target,
+so like the NumPy example above,
+the build does not run this snippet.
+The comment above shows one machine's actual output;
+expect a different, but still large, multiple on yours.)
 
-## Concurrency and Parallelism
+## Concurrency
 
 When the time goes to waiting on the outside world,
-or the work could use more than one core,
+or the work could make use of more than one core,
 the fix is not a faster function but a different architecture:
 overlapping tasks with `asyncio`,
 or spreading them across processes.
@@ -504,10 +541,14 @@ That is a design decision with its own chapter, [Concurrency](20_Concurrency.md)
 
 ## Converting a Slow Function to Rust
 
-The last rung of the ladder moves the hot function,
-and only the hot function, into a compiled language.
-Rust is the current favorite because its tooling makes the bridge
-nearly painless.
+One very effective technique is to move the hot function into a compiled language.
+Rust is the current favorite because its tooling makes the bridge nearly painless.
+More importantly, you can pass the hot Python function to your AI for conversion to Rust.
+You AI can also walk you through the process.
+Once you're done, you import a module that looks from the outside like any other Python module.
+It just runs faster.
+In addition, you can do things with Rust that might be much more difficult in Python.
+
 [PyO3](https://pyo3.rs) generates the Python bindings,
 and [maturin](https://www.maturin.rs) builds and installs the result
 as an ordinary Python package.
@@ -550,32 +591,30 @@ Python sees a normal module:
 
 Keep the interface coarse.
 One call that does a lot of work wins;
-a million calls that each do a little lose the gain to
-boundary-crossing overhead,
-and so does shipping millions of small Python objects across.
+a million calls that each do a little lose the gain due to
+boundary-crossing overhead.
+So does shipping millions of small Python objects across the boundary.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
-The cost of this rung is a second language and a build toolchain in
-your project, which is why it comes last.
+The cost of this technique is a second language and a build toolchain in your project.
 
 ## Choosing a Strategy
 
 Measure first.
-Every step below costs something,
-in effort, complexity, or dependencies,
-and a profile is the only way to know which one your program needs.
-Then work down the list from the cheapest change to the most involved,
+Every performance optimization costs something in effort, complexity, or dependencies.
+A profiler is the only way to discover hot spots.
+Work down this list from the cheapest change to the most involved,
 stopping as soon as the program is fast enough:
 
-1. Run the straightforward version. It may already be fast enough.
+1. Run the straightforward version. It may be fast enough.
 2. Try a faster platform: PyPy, or better hardware.
-3. Fix the algorithm and the data structures;
-   the order-of-magnitude wins live here.
-4. Write idiomatic Python and let the interpreter's C loops do the work.
+3. Write idiomatic Python and let the interpreter's C loops do the work.
+4. Fix the algorithm and the data structures.
+   This can produce order-of-magnitude improvements.
 5. Make pipelines lazy with generators.
 6. Cache the pure functions.
 7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
 8. Vectorize with NumPy, or JIT-compile the loop with Numba.
-9. Restructure for concurrency or parallelism ([Concurrency](20_Concurrency.md)).
+9. Restructure for async or parallelism ([Concurrency](20_Concurrency.md)).
 10. Rewrite the proven-hot function in Rust.
 
 After every change, measure again.
