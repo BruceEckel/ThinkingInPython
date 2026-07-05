@@ -315,6 +315,8 @@ and caching a function that reads outside state can replay a stale answer.
 With millions of objects, per-object overhead dominates.
 Three tools reduce that overhead.
 
+### Slots
+
 By default each instance stores its attributes in a `__dict__`.
 Declaring `__slots__` replaces that dict with a fixed set of fields,
 which shrinks each instance and speeds attribute access:
@@ -368,11 +370,14 @@ prefer `slots=True` over a hand-written `__slots__`.
 This produces both memory savings and generated methods.
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
+### Array Instead of List
+
 A `list` of numbers stores full Python objects, each with its own header.
 The `array` module packs numbers into a single block of C values instead:
 
 ```python
 # compact_array.py
+import sys
 from array import array
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
@@ -387,10 +392,28 @@ try:
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
+
+nums = [float(i) for i in range(10_000)]
+packed = array("d", nums)
+list_bytes = sys.getsizeof(nums) + sum(
+    sys.getsizeof(x) for x in nums
+)
+print(f"list:  {list_bytes:,} bytes")
+#: list:  325,176 bytes
+print(f"array: {sys.getsizeof(packed):,} bytes")
+#: array: 80,080 bytes
 ```
 
 Every element shares one type, given by the type code,
 so `array` stores them compactly and rejects values of the wrong type.
+The size comparison shows the cost of boxing:
+the `list` holds an 8-byte pointer to a 24-byte `float` object
+per element, while the `array` spends 8 bytes per element total,
+roughly a four-to-one difference.
+(`sys.getsizeof()` reports a `list`'s own size but not its elements',
+so the elements are summed separately.)
+
+### Memory View
 
 A `memoryview` exposes another object's memory without copying it.
 Slicing a large `bytes` or `bytearray` through a view avoids duplicating the data:
