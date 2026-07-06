@@ -15,8 +15,6 @@ Make sure examples and prose are different from common examples in published lit
 - Exercise solutions in their own directory, with explanations
 ---
 
-Note we can have race conditions with both asynch and parallelism
-
 Run 'make prose' on each chapter
 
 - Is full polymorphism covered? (Not just inheritance-based)
