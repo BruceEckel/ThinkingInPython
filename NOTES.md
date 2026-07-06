@@ -1,4 +1,3 @@
-
 /loop through chapters 02-18 and 20-35 and look for style and voice issues.
 Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.
@@ -10,10 +9,10 @@ Make sure examples and prose are different from common examples in published lit
 
 ## Exercises
 
-- Check exercises. Potentially create new exercises.
-- Explain exercises in intro
-- Exercises should be ones solveable during a live workshop
-- Exercise solutions in their own directory, with explanations
+- Add exercises to the chapters that don't have any (and have something worth exercising). Minimum of three exercises per chapter.
+- Exercises should be ones solveable during live workshop pair-programming
+- Explain exercises in 01_Introduction.md
+- Exercise solutions and explanations in their own "Solutions" directory
 ---
 
 Run 'make prose' on each chapter
