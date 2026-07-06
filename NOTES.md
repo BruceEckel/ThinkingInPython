@@ -1,3 +1,9 @@
+Use my GIL presentation in Concurrency. Rewrite the "## The GIL and Free Threading" section to draw
+from
+
+Turn book in Demystifying the Gil so it is at BruceEckel.github.io/DemystifyingTheGil
+
+
 /loop through chapters 02-18 and 20-35 and look for style and voice issues.
 Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.

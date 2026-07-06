@@ -16,6 +16,10 @@ from the Markdown** by `tools/extract_examples.py`, so:
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
   `.idea/`, `__pycache__`). The drift check only flags book blocks that are missing
   or changed, not "extra" files, so a stray `Examples/` file can linger.
+  Audit for these after a full `--write` sync with:
+  `diff <(cd Examples && find . -type f -not -path '*__pycache__*' -not -path '*.idea*' | sort) <(cd build/examples && find . -type f -not -path '*__pycache__*' | sort)`.
+  Anything only on the `Examples/` side is a candidate for deletion; grep the
+  book for the filename first to confirm nothing still references it.
 
 ## The verify loop after editing a chapter
 
@@ -58,6 +62,12 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   the PEP 798 comprehension-unpacking chapter) that vanished once invoked
   via `uv run`. Always go through `uv run` for anything that executes
   example code; never assume bare `python`/`ty`/`pytest` matches it.
+- **CPython's small-int cache is wider on the pinned 3.15 beta than the
+  textbook `-5..256` range.** Confirmed cached up to at least 1024 on this
+  build. An example meant to show an "uncached" int needs a value safely
+  above that (100000+), not just above 256, or the demo silently proves the
+  opposite of what the prose claims. See project memory
+  (`small-int-cache-extended-py315`) for the chapter-36 case this broke.
 - **`tools/*.py` is not linted by any gate.** Only `build/examples` is checked by
   `make lint`/`make ci`, so a `tools/` script can exceed the 70-char limit with
   nothing catching it (several already do). `ty` still matters there; run it
