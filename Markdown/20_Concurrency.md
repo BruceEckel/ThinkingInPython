@@ -264,6 +264,120 @@ sometimes a little more, from the added scheduling.
 This is exactly why [Parallelism](#parallelism) used processes instead:
 each process gets its own interpreter, and so its own GIL.
 
+The GIL deserves more than a definition,
+because it is misunderstood in both directions.
+It is not a design mistake, and it does not make threaded code safe.
+The rest of this section condenses my PyCon 2026 presentation
+[Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL).
+That repository includes a short book that covers each topic in depth.
+
+### Why Python Has a GIL
+
+The GIL is the consequence of three earlier decisions.
+Each was reasonable on its own.
+In 1990, Python adopted *reference counting* for memory management.
+Every object carries a count of the references to it.
+When the count reaches zero, the object is freed immediately.
+This gave Python deterministic cleanup with no collector pauses.
+It also planted a cost.
+Every count update is a read-modify-write sequence,
+and updates happen millions of times per second.
+In 1991, the C API exposed those counts directly to
+extension authors.
+Easy extensions made Python a coordination language for C libraries
+and eventually produced the scientific Python stack.
+In exchange, reference counting became part of the compiled
+binary interface.
+Changing how it works breaks every extension.
+In 1992, threads arrived, for I/O concurrency rather than for
+multi-core speed.
+Now two threads could update the same count at once and lose
+one of the updates,
+freeing an object still in use or leaking it forever.
+
+One interpreter-wide lock was the cheapest fix that fit the
+three earlier decisions.
+It made every count update, every dict and list mutation,
+and every existing extension safe at once.
+Single-threaded code paid almost nothing.
+Every alternative undid one of the earlier decisions.
+Atomic count updates slow every program to benefit a few.
+A 1996 patch tried fine-grained locks and ran single-threaded
+code about twice as slow.
+A tracing garbage collector would have broken every extension.
+In rejecting that 1996 patch, Guido van Rossum set the bar that
+stood for three decades:
+remove the GIL without slowing single-threaded code.
+Attempts kept failing to clear it, so workarounds shipped instead.
+`multiprocessing` arrived in 2008, `asyncio` in 2014,
+and the per-interpreter GIL of the next section in 2023.
+
+### The GIL Does Not Prevent Races
+
+The lock protects the interpreter, not your program.
+Reference counts stay consistent, dictionaries never corrupt
+their internal structure, and imports do not collide.
+Your shared state gets no such protection.
+The statement `counter += 1` compiles to separate bytecode
+instructions:
+
+```
+LOAD_GLOBAL     counter  # Read the current value
+LOAD_SMALL_INT  1        # Push the constant 1
+BINARY_OP       13 (+=)  # Compute counter + 1
+STORE_GLOBAL    counter  # Write the result back
+```
+
+The GIL can move to another thread between instructions.
+When two threads both read before either writes,
+they compute the same result, and one increment vanishes.
+Since 3.11 the interpreter only switches threads at a function
+call or at the jump that closes a loop iteration,
+so this particular sequence is no longer interrupted in practice.
+That is scheduling luck, not safety.
+Any function call between the read and the write reopens the gap.
+Here the call is a one-microsecond `time.sleep()`,
+a blocking call, and blocking calls release the GIL:
+
+```python
+# gil_race.py
+import threading
+import time
+
+counter = 0
+
+def increment(count: int) -> None:
+    global counter
+    for _ in range(count):
+        value = counter  # Read
+        time.sleep(0.000_001)  # Let other threads run
+        counter = value + 1  # Write back
+
+threads = [
+    threading.Thread(target=increment, args=(50,))
+    for _ in range(8)
+]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(f"lost updates: {counter < 8 * 50}")
+#: lost updates: True
+```
+
+Eight threads each add 50, so `counter` should reach 400.
+A typical run lands near 50.
+Each sleep releases the GIL between a read and its write,
+so all eight threads read the same value,
+and their eight writes store the same result.
+The GIL made this race rare at machine speed.
+It never made it impossible.
+Threads that share mutable state need a lock, or a queue like the
+one in [Coordinating Threads with Queues](#coordinating-threads-with-queues),
+on every build of Python.
+
+### Free Threading
+
 Since 3.13, CPython also ships as a *free-threaded* build,
 tracked by [PEP 703](https://peps.python.org/pep-0703/)
 and installed separately (`python3.15t` rather than `python3.15`).
@@ -274,19 +388,53 @@ under a free-threaded interpreter turns the ratio around:
 
     threads speedup: 3.8x
 
-On a free-threaded interpreter, threads alone are enough for CPU-bound
-work, and they share memory directly,
-without a process pool's pickling between processes.
-The free-threaded build is newer,
-and some C extensions still assume a GIL,
-so check compatibility before switching a project to it.
-A free-threaded interpreter is one way off the standard build's limits.
-The next section covers another,
-and it runs on the standard build you already have.
-(The speedup above needs a free-threaded interpreter,
+(The speedup needs a free-threaded interpreter,
 which is not the book's default build,
 so the build does not run that second measurement.
 The number is one machine's actual output.)
+
+Free threading finally cleared the 1996 bar by making reference
+counting cheap without a global lock.
+Most objects are only ever touched by the thread that created them.
+*Biased reference counting* lets that owning thread update the
+count with plain arithmetic.
+Only other threads pay for an atomic operation.
+Permanent objects like `None`, `True`, and small integers
+become *immortal*.
+Their counts never change at all.
+Mutable containers like dictionaries and lists carry individual
+locks, so two threads contend only when they touch the same
+container.
+Single-threaded code still pays a small penalty for this machinery,
+roughly five to fifteen percent depending on the workload,
+and each release narrows it.
+
+Removing the lock also removed three decades of accidental
+protection for C extensions,
+which were written assuming that only one thread runs at a time.
+The free-threaded build ships with a safety net.
+Loading an extension that has not declared itself thread-safe
+re-enables the GIL for the whole process and emits a warning.
+Free threading pays off only when every extension you load has
+been audited, so check compatibility before switching a project.
+
+It also rewards a particular shape of program.
+Threads that mostly work on data they do not share,
+like `threaded()` above, scale across cores.
+So do threads that accumulate results locally and merge them
+once at the end, caches that are read far more often than written,
+and pipeline stages connected by queues.
+Fine-grained sharing loses.
+A counter with a lock around every increment serializes the
+threads all over again,
+and adds lock overhead the GIL never charged.
+On a free-threaded interpreter, threads alone are enough for
+CPU-bound work, and they share memory directly,
+without a process pool's pickling between processes.
+A free-threaded interpreter is one way off the standard build's
+limits.
+The next section covers another,
+and it runs on the standard build you already have.
 
 ## Subinterpreters
 
