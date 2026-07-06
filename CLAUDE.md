@@ -128,6 +128,18 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   and re-sync rather than fighting the build. See project memory for the
   numpy/numba case and the workaround for illustrating a chapter example
   anyway.
+- **`ty` does not narrow `str` to `Literal[...]` via `match`/`case` or an
+  `in` membership check.** Tried both (`match symbol: case "." | "~" | "#":`
+  and `if symbol not in (".", "~", "#"):`); `ty` still reports the narrowed
+  variable as plain `str` afterward, unlike pyright's literal-narrowing.
+  The only way to satisfy `ty` is an explicit `cast(Literal[...], value)`
+  after the runtime check has proven it safe. See project memory
+  (`typing-construct-hierarchy`) for the chapter-36 case and the
+  boundary-function idiom this led to.
+- **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
+  can name a class defined later in the same file with no string quotes, e.g.
+  `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
+  both at runtime and under `ty check`.
 - **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
