@@ -15,3 +15,4 @@
 32_Observer/box_view.py
 39_Simulation/robot_explorer/maze_view.py
 39_Simulation/rats_and_mazes/rats_view.py
+39_Simulation/chladni_plate/chladni_view.py

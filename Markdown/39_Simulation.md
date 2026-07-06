@@ -1,7 +1,7 @@
 # Simulation
 
 A simulation models a set of objects that act on their own and interact through shared state.
-This chapter works one example from end to end: a pack of rats mapping a maze.
+The first example, a pack of rats mapping a maze, is worked from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](20_Concurrency.md#asyncio-mechanics) introduces
@@ -835,6 +835,276 @@ Two patterns from earlier chapters carry the design.
 Polymorphism replaces a type switch, and a factory builds objects from data.
 Neither needs concurrency.
 
+## Order from Noise
+
+The two simulations so far confirm designs.
+The rats cover every reachable cell because `claim()` is atomic.
+The robot reaches the goal because polymorphism handles every encounter.
+In each case we knew what should happen and ran the program to check it.
+This final example is different.
+Its result appears in no line of its code.
+That is the other thing simulation is for.
+It discovers behavior instead of confirming it.
+
+In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
+The bow made the plate ring.
+A ringing plate does not move evenly.
+Standing waves divide it into regions that swing up and down,
+separated by *nodal lines* that stay still.
+The vibration bounces sand out of the moving regions.
+When a grain lands on a still line, nothing kicks it away again.
+Within seconds the random motion sweeps the sand into sharp, symmetric curves.
+Bowing a different spot rings the plate in a different mode and draws a different figure.
+
+The model needs almost nothing.
+`amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
+The formula is borrowed physics, an approximation for a plate with free edges.
+Treat it as given.
+All that matters here is its shape.
+It is zero along curves, and those curves are the nodal lines.
+A `Grain` is a position.
+`step()` is the entire simulation.
+Every grain takes one random step,
+scaled by how strongly the plate vibrates at that grain's location.
+Grains never look at each other.
+They remember nothing.
+Nothing in the code knows the pattern exists.
+
+```python
+# chladni_plate/chladni.py
+import math
+import random
+from dataclasses import dataclass
+
+type Mode = tuple[int, int]   # Vibration pattern (m, n)
+
+def amplitude(x: float, y: float, mode: Mode) -> float:
+    "Vibration strength at (x, y), zero on the nodal lines."
+    m, n = mode
+    return abs(
+        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+
+def bounce(v: float) -> float:
+    "Reflect v back off the edges of the unit interval."
+    if v < 0.0:
+        return -v
+    if v > 1.0:
+        return 2.0 - v
+    return v
+
+@dataclass
+class Grain:
+    x: float
+    y: float
+
+class Plate:
+    def __init__(self, grains: int, mode: Mode,
+                 seed: int | None = None) -> None:
+        self.rng = random.Random(seed)
+        self.mode = mode
+        self.grains = [
+            Grain(self.rng.random(), self.rng.random())
+            for _ in range(grains)]
+
+    def step(self, kick: float = 0.05) -> None:
+        "Kick every grain, harder where the plate moves more."
+        for g in self.grains:
+            a = amplitude(g.x, g.y, self.mode)
+            g.x = bounce(
+                g.x + self.rng.uniform(-kick, kick) * a)
+            g.y = bounce(
+                g.y + self.rng.uniform(-kick, kick) * a)
+
+    def agitation(self) -> float:
+        "Mean vibration strength underneath the grains."
+        return sum(
+            amplitude(g.x, g.y, self.mode)
+            for g in self.grains) / len(self.grains)
+
+    def render(self, width: int = 60, height: int = 30) -> str:
+        "Character picture of grain density."
+        counts = [[0] * width for _ in range(height)]
+        for g in self.grains:
+            col = min(int(g.x * width), width - 1)
+            row = min(int(g.y * height), height - 1)
+            counts[row][col] += 1
+        shades = " .:*#"
+        return "\n".join(
+            "".join(shades[min(c, len(shades) - 1)]
+                    for c in row).rstrip()
+            for row in counts)
+```
+
+`bounce()` reflects a kicked grain off the edge instead of letting it leave the plate.
+`agitation()` measures the mean vibration strength directly under the grains.
+Grains scattered at random feel the field's average, so agitation starts high.
+A grain resting on a nodal line feels zero.
+One number summarizes how settled the sand is.
+`render()` draws grain density as characters,
+in the same spirit as `Blackboard.render()`,
+so the model can show its state without a window.
+The demo shakes the plate 1200 times and lets the numbers tell the story:
+
+```python
+# chladni_plate/chladni_demo.py
+from chladni import Plate
+
+plate = Plate(grains=2000, mode=(2, 3), seed=42)
+steps = 0
+for target in (0, 100, 400, 1200):
+    for _ in range(target - steps):
+        plate.step()
+    steps = target
+    print(f"steps {target:4}: "
+          f"agitation {plate.agitation():.3f}")
+print(plate.render())
+#: steps    0: agitation 0.585
+#: steps  100: agitation 0.073
+#: steps  400: agitation 0.005
+#: steps 1200: agitation 0.000
+#:  *.                     #                       #
+#:  :##                    #                       #
+#:     ##                  ##                      #
+#:       ##                 ##.                    #
+#:         ##                 ###                  .#
+#:           ##                  ######              ##########
+#:             ##                      ########
+#:               ##                           ###
+#:                 ##                           ##
+#:                   ##                          #*
+#:                     ##                         #
+#:                       ##                       #
+#: #######                 ##                      #
+#:       *##                 ##                    #:
+#:         ##                  ##                   #
+#:           #                   ##                  #:
+#:           ##                    ##                 ##*
+#:            #                      ##                 #######
+#:             #                       ##
+#:             #                         ##
+#:             :#                          ##
+#:              ##                           ##
+#:               ##*                           ##
+#:                 ########                      ##
+#: ######*###              ######                  ##
+#:           ##                  ###                 ##
+#:            #                    .##                 ##
+#:            #                      ##                  ##.
+#:            #                       #                    ##.
+#:            #                       #                    .:##
+```
+
+Agitation collapses toward zero, and the picture shows why.
+The grains have gathered on the nodal lines of mode `(2, 3)`.
+Nothing steered them there.
+A loud region flings its grains around until a random wander happens to cross a quiet line,
+where the kicks shrink toward nothing.
+Noise can carry a grain into a quiet place.
+It cannot carry the grain back out.
+The randomness is not fighting the order.
+It is the engine that produces it.
+
+What can a test assert about a million random kicks?
+Not where any particular grain ends up.
+It pins down the aggregate instead.
+Shaking must collapse agitation,
+and no kick may ever throw a grain off the plate.
+Seeding `random.Random` makes any failure reproducible.
+
+```python
+# chladni_plate/test_chladni.py
+from chladni import Plate
+
+def test_noise_settles_grains_onto_quiet_lines() -> None:
+    plate = Plate(grains=500, mode=(2, 3), seed=1)
+    before = plate.agitation()
+    for _ in range(400):
+        plate.step()
+    assert plate.agitation() < before / 10
+
+def test_kicks_never_knock_grains_off_the_plate() -> None:
+    plate = Plate(grains=200, mode=(3, 5), seed=2)
+    for _ in range(300):
+        plate.step(kick=0.2)
+    assert all(0.0 <= g.x <= 1.0 and 0.0 <= g.y <= 1.0
+               for g in plate.grains)
+```
+
+The tkinter view shows what the text version cannot: the collapse as it happens,
+and the pattern surviving a change of rules.
+Each grain keeps one color from a small palette,
+so you can watch individual grains mix while the collective figure forms.
+Every 400 frames the view switches the plate to a new mode.
+The old figure is suddenly parked on loud regions of the new field.
+It bursts back into chaos, mixes, and condenses into a different figure.
+The order was never a property of the grains.
+It belongs to the field they sit on.
+
+```python
+# chladni_plate/chladni_view.py
+import itertools
+import tkinter as tk
+from typing import Final
+from chladni import Mode, Plate
+
+SIZE: Final[int] = 560
+DOT: Final[int] = 3
+COLORS: Final[list[str]] = [
+    "gold", "coral", "palegreen", "skyblue", "plum"]
+MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
+
+def show(grains: int = 1200, step_ms: int = 30,
+         frames_per_mode: int = 400) -> None:
+    "Shake the grains, changing the mode as patterns form."
+    plate = Plate(grains, MODES[0])
+    root = tk.Tk()
+    root.title(f"Chladni Plate {plate.mode}")
+    canvas = tk.Canvas(root, width=SIZE, height=SIZE,
+                       background="black", highlightthickness=0)
+    canvas.pack()
+    palette = itertools.cycle(COLORS)
+    dots = [
+        canvas.create_oval(0, 0, DOT, DOT, outline="",
+                           fill=next(palette))
+        for _ in plate.grains]
+    modes = itertools.cycle(MODES[1:] + MODES[:1])
+    frames = itertools.count(1)
+
+    def frame() -> None:
+        if next(frames) % frames_per_mode == 0:
+            plate.mode = next(modes)
+            root.title(f"Chladni Plate {plate.mode}")
+        for _ in range(3):
+            plate.step()
+        for dot, g in zip(dots, plate.grains):
+            canvas.moveto(dot, g.x * SIZE - DOT / 2,
+                          g.y * SIZE - DOT / 2)
+        root.after(step_ms, frame)
+
+    frame()
+    root.mainloop()
+
+if __name__ == "__main__":
+    show()
+```
+
+The chapter began by defining a simulation as objects that act on their own and interact through shared state.
+The grains push that definition to its limit.
+The shared state is the plate, and the grains only read it.
+They never sense each other at all.
+Even so, structure the agents never encode appears in the aggregate.
+This is *emergence*: global order arising from local rules that never mention it.
+The three simulations form a progression.
+The rats cooperate through a blackboard.
+The robot follows a script.
+The grains know nothing.
+The less the agents understand,
+the more the run can tell you,
+because the outcome lives in the interactions rather than the instructions.
+When behavior emerges, reading the code is not enough.
+You have to run it.
+
 ## Other Maze Resources
 
 A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
@@ -872,3 +1142,21 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
     Turn that path into a move string, feed it to `run()`,
     and assert that the robot finishes on the `!` square,
     as `test_robot.py` does.
+6.  Freeze the plate.
+    Run the Chladni view with `MODES` starting at `(2, 2)`.
+    Work out what `amplitude()` returns whenever `m == n`,
+    and explain why the result is neither chaos nor a figure.
+    Then explain why the main diagonal shows up in every figure this plate makes.
+    Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
+7.  Change the physics.
+    Replace the body of `amplitude()` with
+    `abs(math.sin(m * math.pi * x) * math.sin(n * math.pi * y))`,
+    the standing waves of a membrane fixed at its edges, like a drumhead.
+    Predict the figures before you run the view.
+    Why are the nodal lines now straight?
+8.  Tune the noise.
+    Rerun `chladni_demo.py` passing `kick=0.005` and then `kick=0.5` to `plate.step()`,
+    printing agitation at the same checkpoints.
+    One setting produces order too slowly and the other never sharpens.
+    Explain both failures,
+    and why an intermediate kick avoids them.
