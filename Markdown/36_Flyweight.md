@@ -4,10 +4,10 @@ Some programs need enormous numbers of fine-grained objects:
 the characters in a document, the tiles in a game map,
 the strings in a compiler's symbol table.
 The *Flyweight* pattern supports them by sharing.
-Instead of a million objects, you keep one object per distinct value
-and reference it a million times.
+Instead of many objects, you keep one object per distinct value and reference it many times.
 
 Two ideas make sharing work.
+
 First, split each object's state in two.
 *Intrinsic state* belongs to the value itself and is identical
 across every use, so it can live in the shared object.
@@ -15,27 +15,35 @@ across every use, so it can live in the shared object.
 supplied by the context.
 Second, route construction through a factory that returns
 the already-existing instance for a given value.
-Handing out one object under many names is only safe when nobody
-can change it, so a flyweight must be immutable.
-[Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution)
-develops that argument;
-this chapter is what the argument buys you.
 
-## Python Already Does It
+Handing out one object under many names is only safe when nobody
+can change it, so a flyweight must be immutable
+(see [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution)).
+
+## Python Uses Flyweights
 
 CPython flyweights its most common values.
-It creates small integers (-5 through 256) once and shares them,
-and string *interning* keeps one copy of identifier-like strings.
+
+It creates small integers once and shares them:
+
+```python
+# small_integer_flyweights.py
+low, low2 = int("256"), int("256")
+high, high2 = int("100000"), int("100000")
+print(low is low2, high is high2)
+#: True False
+```
+
+Both `int("256")` calls return the same cached object,
+while each `int("100000")` call builds a fresh one.
+
+String *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
 
 ```python
-# already_shared.py
+# string_interning.py
 from sys import intern
 
-low, low2 = int("256"), int("256")
-high, high2 = int("257"), int("257")
-print(low is low2, high is high2)
-#: True True
 joined = "".join(["fly", "weight"])
 joined2 = "".join(["fly", "weight"])
 print(joined == joined2, joined is joined2)
@@ -44,28 +52,29 @@ print(intern(joined) is intern(joined2))
 #: True
 ```
 
-Both `int("256")` calls return the same cached object,
-while each `int("257")` call builds a fresh one.
 The two `join()` calls build equal but distinct strings,
 and `intern()` maps both to one shared copy.
-(The small-integer cache and interning are CPython implementation
-details, not language guarantees. Do not write code that depends
-on them; do notice the technique.)
 Interned strings make comparison cheap.
 Equal means identical, so `==` collapses to a pointer check.
 
+The small-integer cache and string interning are CPython implementation
+details, not language guarantees. Do not write code that depends
+on them, but notice the technique.
+
 ## Intrinsic and Extrinsic State
 
-A game map is the pattern's natural habitat.
-A map can hold millions of cells, but only a handful of
-tile kinds: grass, water, rock.
+A map can hold millions of cells, but only a handful of tile kinds.
+Here, we'll limit it to grass, water, and rock.
+
 The tile's symbol, name, and walkability are intrinsic,
 so they go in a frozen data class.
+
 The tile's position is extrinsic.
 It is the cell's coordinates in the grid,
 so the `Tile` object never stores it.
+
 The factory is `functools.cache` on a constructor function,
-the cached factory from
+following the cached factory from
 [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)
 with arguments: one instance per distinct key.
 

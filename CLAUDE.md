@@ -12,7 +12,7 @@ from the Markdown** by `tools/extract_examples.py`, so:
 
 - Edit the code **in the Markdown block**, never in `Examples/` directly.
 - After editing, sync the committed tree: `make sync`
-  (= `python tools/extract_examples.py --write -o Examples`).
+  (= `uv run python tools/extract_examples.py --write -o Examples`).
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
   `.idea/`, `__pycache__`). The drift check only flags book blocks that are missing
   or changed, not "extra" files, so a stray `Examples/` file can linger.
@@ -22,14 +22,14 @@ from the Markdown** by `tools/extract_examples.py`, so:
 Fastest path is `make verify` (fix line endings, sync, then every gate but the
 site build). When iterating on one chapter, the manual sequence is:
 
-1. `python tools/extract_examples.py --write -o Examples`   # sync committed tree
-2. `python tools/extract_examples.py`                       # drift check ("In sync")
-3. `python tools/extract_examples.py --write`               # (re)build build/examples/
-4. `python tools/validate_output.py Markdown/NN_*.md`       # `#:` markers match stdout
-5. `(cd build/examples && ty check NN_Chapter)`             # types
-6. `uv run ruff check build/examples/NN_Chapter`            # lint
-7. `uv run pytest build/examples/NN_Chapter`                # tests
-8. `python tools/run_examples.py NN_Chapter`                # runs scripts, honors norun.txt
+1. `uv run python tools/extract_examples.py --write -o Examples`  # sync committed tree
+2. `uv run python tools/extract_examples.py`                      # drift check ("In sync")
+3. `uv run python tools/extract_examples.py --write`              # (re)build build/examples/
+4. `uv run python tools/validate_output.py Markdown/NN_*.md`      # `#:` markers match stdout
+5. `(cd build/examples && uv run ty check NN_Chapter)`            # types
+6. `uv run ruff check build/examples/NN_Chapter`                 # lint
+7. `uv run pytest build/examples/NN_Chapter`                      # tests
+8. `uv run python tools/run_examples.py NN_Chapter`               # runs scripts, honors norun.txt
 
 Prose-only edits still need `check_anchors.py` (cross-references) and
 `banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
@@ -50,6 +50,14 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   temp file.
 - **Run `ty`/`ruff`/`pytest` against `build/examples/`** (via `uv run`), never a
   loose scratch file, or config/imports resolve differently.
+- **Bare `python`/`ty`/`pytest` on PATH can be a different, older tool than
+  `uv run`'s.** On this machine bare `python` is 3.14.6 while `uv run python`
+  (and `python3`) is the pinned 3.15 beta, and bare `ty` is 0.0.46 against
+  `uv run ty`'s 0.0.56. Running `validate_output.py` with bare `python`
+  produced false failures on 3.15-only syntax (`sentinel`, `lazy import`,
+  the PEP 798 comprehension-unpacking chapter) that vanished once invoked
+  via `uv run`. Always go through `uv run` for anything that executes
+  example code; never assume bare `python`/`ty`/`pytest` matches it.
 - **`tools/*.py` is not linted by any gate.** Only `build/examples` is checked by
   `make lint`/`make ci`, so a `tools/` script can exceed the 70-char limit with
   nothing catching it (several already do). `ty` still matters there; run it
@@ -82,7 +90,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `build/examples/<chapter>`, that open handle blocks the rmtree and
   `extract_examples.py --write` dies with `PermissionError [WinError 32]`. Keep the
   shell at the repo root and run chapter-dir commands in a subshell, e.g.
-  `(cd build/examples && ty check NN_Chapter)`.
+  `(cd build/examples && uv run ty check NN_Chapter)`.
 - **`run_examples.py`: never pass a relative `--tree`.** It goes on `PYTHONPATH`
   and breaks once an example changes cwd. GUI/interactive examples are skipped via
   `tools/norun.txt` (keep those paths current when chapters are renumbered).
