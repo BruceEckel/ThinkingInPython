@@ -1,7 +1,7 @@
 # Composite and Interpreter
 
 The *Composite* pattern arranges objects in a tree,
-so that you can treat a single object and a group of objects uniformly.
+so you can treat a single object and a group of objects uniformly.
 The *Interpreter* pattern represents sentences in a small language as trees,
 then evaluates them.
 *GoF Design Patterns* presents them as separate patterns,
@@ -9,16 +9,13 @@ but the second is the first with meaning attached.
 In Python both reduce to one technique:
 a union of frozen data classes for the nodes,
 and recursive functions that `match` on them.
-This chapter builds each pattern with the exhaustive matching
-introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
+This chapter builds each pattern with [exhaustive matching](13_Pattern_Matching.md#exhaustive-matching).
 
 ## The Classic Composite
 
 A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
 The payoff is uniformity.
-You ask a single file for its size the same way you ask a directory
-holding thousands of them.
 The traditional version puts the operation inside a class hierarchy:
 
 ```python

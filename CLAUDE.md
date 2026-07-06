@@ -101,6 +101,15 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `tools/README.md`'s own "Commands" section deliberately does not re-list every
   target either (it did once, and went stale); it shows only the everyday few and
   points to `make help` for the rest. Don't re-expand it into a full manual copy.
+- **A new third-party dependency may not install on the pinned Python.**
+  `requires-python` tracks a bleeding-edge version (currently 3.15, a beta at
+  the time this was written), so a package can lack a wheel for it (source
+  build then fails) or refuse outright (its own installer version-guards).
+  Before committing a new dev dependency: add it to `pyproject.toml`, run
+  `uv sync`, and if it fails, revert (`git checkout -- pyproject.toml uv.lock`)
+  and re-sync rather than fighting the build. See project memory for the
+  numpy/numba case and the workaround for illustrating a chapter example
+  anyway.
 - **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
