@@ -1,6 +1,8 @@
 # trash.py
 from typing import ClassVar
 
+type Bins = dict[type[Trash], list[Trash]]
+
 class Trash:
     value: ClassVar[float] = 0.0  # Dollars per pound (per subclass)
     registry: ClassVar[dict[str, type[Trash]]] = {}

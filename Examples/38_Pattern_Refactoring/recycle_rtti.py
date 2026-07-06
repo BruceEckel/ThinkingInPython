@@ -1,9 +1,9 @@
 # recycle_rtti.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
+from trash import Aluminum, Bins, Cardboard, Glass, Paper, sum_value
 
-bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+bins: Bins = defaultdict(list)
 for t in parse("trash.dat"):
     match t:
         case Aluminum():

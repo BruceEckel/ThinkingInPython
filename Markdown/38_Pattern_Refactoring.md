@@ -30,6 +30,8 @@ and a `create()` method builds an instance from a material name (this is a [Fact
 # trash.py
 from typing import ClassVar
 
+type Bins = dict[type[Trash], list[Trash]]
+
 class Trash:
     value: ClassVar[float] = 0.0  # Dollars per pound (per subclass)
     registry: ClassVar[dict[str, type[Trash]]] = {}
@@ -189,9 +191,9 @@ The most obvious way to sort is to look at each piece and discover its type usin
 # recycle_rtti.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
+from trash import Aluminum, Bins, Cardboard, Glass, Paper, sum_value
 
-bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+bins: Bins = defaultdict(list)
 for t in parse("trash.dat"):
     match t:
         case Aluminum():
@@ -253,9 +255,9 @@ We can use a dictionary keyed by type:
 # recycle_dict.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Trash, sum_value
+from trash import Bins, sum_value
 
-bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+bins: Bins = defaultdict(list)
 
 for t in parse("trash.dat"):
     bins[type(t)].append(t)  # Bin chosen by the trash piece

@@ -356,9 +356,11 @@ always hands out the smallest item present:
 import threading
 from queue import PriorityQueue
 
-tasks: PriorityQueue[tuple[int, str]] = PriorityQueue()
+type Job = tuple[int, str]  # (priority, description)
 
-def submit(jobs: list[tuple[int, str]]) -> None:
+tasks: PriorityQueue[Job] = PriorityQueue()
+
+def submit(jobs: list[Job]) -> None:
     for job in jobs:
         tasks.put(job)
 

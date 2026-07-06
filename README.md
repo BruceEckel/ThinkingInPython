@@ -91,7 +91,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 33_Multiple_Dispatching.md      |X|X|
 | 34_Visitor.md                   |X|X|
 | 35_Composite_and_Interpreter.md |X| |
-| 36_Flyweight.md                 | | |
+| 36_Flyweight.md                 |X| |
 | 37_Memento.md                   | | |
 | 38_Pattern_Refactoring.md       |X|X|
 | 39_Simulation.md                | | |

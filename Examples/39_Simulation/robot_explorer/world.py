@@ -3,6 +3,7 @@ from typing import Final
 from items import Edge, Item, Robot, Urge
 
 type Coord = tuple[int, int]   # (row, col)
+type RoomMap = dict[Coord, Room]
 
 class Room:
     def __init__(self, occupant: Item) -> None:
@@ -20,7 +21,7 @@ class Doors:
         self.neighbors: dict[Urge, Room] = {}
 
     def connect(self, row: int, col: int,
-                rooms: dict[Coord, Room]) -> None:
+                rooms: RoomMap) -> None:
         for urge, coord in {
             Urge.NORTH: (row - 1, col),
             Urge.SOUTH: (row + 1, col),

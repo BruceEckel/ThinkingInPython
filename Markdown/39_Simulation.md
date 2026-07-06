@@ -528,6 +528,7 @@ from typing import Final
 from items import Edge, Item, Robot, Urge
 
 type Coord = tuple[int, int]   # (row, col)
+type RoomMap = dict[Coord, Room]
 
 class Room:
     def __init__(self, occupant: Item) -> None:
@@ -545,7 +546,7 @@ class Doors:
         self.neighbors: dict[Urge, Room] = {}
 
     def connect(self, row: int, col: int,
-                rooms: dict[Coord, Room]) -> None:
+                rooms: RoomMap) -> None:
         for urge, coord in {
             Urge.NORTH: (row - 1, col),
             Urge.SOUTH: (row + 1, col),
@@ -573,11 +574,11 @@ passes keeps the construction readable instead of tangling it into one loop.
 # Build the maze in three stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
-from world import Coord, Room
+from world import Room, RoomMap
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
-        self.rooms: dict[Coord, Room] = {}
+        self.rooms: RoomMap = {}
         teleports: list[Room] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):

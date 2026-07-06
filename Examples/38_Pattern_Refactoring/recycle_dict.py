@@ -1,9 +1,9 @@
 # recycle_dict.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Trash, sum_value
+from trash import Bins, sum_value
 
-bins: dict[type[Trash], list[Trash]] = defaultdict(list)
+bins: Bins = defaultdict(list)
 
 for t in parse("trash.dat"):
     bins[type(t)].append(t)  # Bin chosen by the trash piece

@@ -2,11 +2,11 @@
 # Build the maze in three stages, then run it.
 
 from items import Empty, Robot, Teleport, Urge, item_factory
-from world import Coord, Room
+from world import Room, RoomMap
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
-        self.rooms: dict[Coord, Room] = {}
+        self.rooms: RoomMap = {}
         teleports: list[Room] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):
