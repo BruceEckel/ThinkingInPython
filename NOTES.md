@@ -10,9 +10,9 @@ Make sure examples and prose are different from common examples in published lit
 ## Exercises
 
 - Add exercises to the chapters that don't have any (and have something worth exercising). Minimum of three exercises per chapter.
-- Exercises should be ones solveable during live workshop pair-programming
-- Explain exercises in 01_Introduction.md
+- Exercises should be solveable during live workshop pair-programming
 - Exercise solutions and explanations in their own "Solutions" directory
+- Explain exercises in 01_Introduction.md
 ---
 
 Run 'make prose' on each chapter
