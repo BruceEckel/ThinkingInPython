@@ -1,9 +1,3 @@
-Use my GIL presentation in Concurrency. Rewrite the "## The GIL and Free Threading" section to draw
-from C:\git\DemystifyingTheGIL. Obviously there's too much there to cram into a section in a chapter so summarize.
-However it's OK if that section is larger and it has its own ### sections, as this is a complex topic.
-
-Take the book in C:\git\DemystifyingTheGIL and add the necessary build process to make it into a website so it is at BruceEckel.github.io/DemystifyingTheGil
-
 /loop through chapters 02-18 and 20-35 and look for style and voice issues.
 Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.
@@ -11,11 +5,13 @@ If an issue has a suggested fix you need me to review, put a checkbox next to it
 If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
-Look for colons
+Go through colon_split_candidates.md
 
-Make sure examples and prose are different from common examples in the literature.
+Make sure examples and prose are different from common examples in published literature (except for my own work).
 
-Exercise solutions
+- Check exercises. Potentially create new exercises.
+- Explain exercises in intro
+- Exercise solutions in their own directory, with explanations
 
 Note we can have race conditions with both asynch and parallelism
 
@@ -30,8 +26,6 @@ Run 'make prose' on each chapter
 - which was
 - which will be
 
-- Check exercises. Potentially create new exercises.
-- Explain exercises in intro
 
 - active voice
 
