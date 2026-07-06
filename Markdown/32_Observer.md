@@ -90,7 +90,7 @@ The observers here are lambdas, but any function or bound method works.
 There is no `Observer` base class to inherit and no notification protocol to implement.
 Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
-but for most cases a list of callbacks is all the *Observer* pattern amounts to.
+but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
 
 An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,

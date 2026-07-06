@@ -64,7 +64,7 @@ The same call works on the whole tree, on a subtree, and on a single file.
 Adding operations exposes the weakness.
 Counting files, finding an entry by name,
 and printing the tree each require a new method in every class.
-That is the problem [Visitor](34_Visitor.md) exists to work around.
+[Visitor](34_Visitor.md) exists to work around exactly this problem.
 
 ## A Composite of Data Classes
 

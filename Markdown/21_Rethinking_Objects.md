@@ -19,7 +19,7 @@ and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceE
 Languages evolve to fit their environment.
 A feature that looks strange now usually made sense for the problem,
 and the hardware, of its time.
-It helps to look at where objects came from.
+It helps to look at the origin of objects.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
@@ -318,7 +318,7 @@ if __name__ == "__main__":
 ```
 
 `Point` and `PairCoord` share no base class.
-They both have `x` and `y`, which is all `distance()` asked for.
+They both have `x` and `y`, which is all `distance()` required.
 
 Testing confirms `distance()` works on both a `Point` and an adapted `Pair`:
 

@@ -134,7 +134,7 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All of that copying defends against mutation.
-Remove the mutation and there is nothing to defend against.
+Remove the mutation and there is nothing left to prevent.
 Make the state a frozen data class and every state *is* a memento:
 
 ```python
@@ -169,8 +169,8 @@ rest along.
 Since each call returns a `Sketch`, calls chain.
 Saving is keeping a reference, exactly the move that failed in
 `aliased_snapshot.py`.
-It is safe now because no operation anywhere can change what
-`before` refers to.
+It is safe now because no operation anywhere can change the
+object bound to `before`.
 There is no `Memento` class, no `save()`, and no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
@@ -265,7 +265,7 @@ so it never interprets anything.
 That works for any state type, `int` to full `Sketch`,
 with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place;
-it would be a stack of aliases, the bug this chapter opened with.
+it would be a stack of aliases, the bug with which this chapter opened.
 
 ```python
 # test_history.py

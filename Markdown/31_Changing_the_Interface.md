@@ -81,7 +81,7 @@ what_i_use.op(what_i_have3.what_i_want())
 ```
 
 This takes liberty with the term "[Proxy](26_Surrogate.md#proxy),"
-because *GoF Design Patterns* asserts that a Proxy must have an identical interface with the object it is a surrogate for.
+because *GoF Design Patterns* asserts that a Proxy must have an identical interface with the object for which it is a surrogate.
 
 ### Adapter in Python
 

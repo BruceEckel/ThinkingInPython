@@ -55,7 +55,7 @@ and thus the way that class works.
 Another pattern that appears in *GoF Design Patterns* is the [Iterator](28_Iterators.md),
 which has been implicitly available in `for` loops from the beginning of the language,
 and became an explicit feature in Python 2.2.
-An iterator allows you to hide the particular implementation of the container as you're stepping through.
+An iterator allows you to hide the particular implementation of the container as you're stepping through it.
 You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
 Your generic code works with any object that produces an iterator.
 

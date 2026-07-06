@@ -257,7 +257,7 @@ def test_independent_hierarchies_have_separate_registries() -> None:
 
 ## Learning a Name with `__set_name__()`
 
-Another job that once needed a metaclass is letting an attribute object discover the name it belongs to.
+Another job that once needed a metaclass is letting an attribute object discover the name to which it belongs.
 A *descriptor* with `__set_name__()` gets that name at class creation:
 
 ```python

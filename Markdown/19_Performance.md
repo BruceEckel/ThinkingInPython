@@ -259,7 +259,7 @@ print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 Both versions produce the same five numbers,
 but the eager one built two million-element lists to get them,
 while the lazy one computed only the handful of values that
-`islice()` pulled through.
+`islice()` extracted.
 When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice;
 a generator is spent after one pass.

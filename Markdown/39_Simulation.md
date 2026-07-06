@@ -17,7 +17,7 @@ and it can hand out an entry point.
 The maze never decides anything.
 It only answers questions.
 
-A *blackboard* is the shared surface every rat writes on.
+A *blackboard* is the shared surface on which every rat writes.
 The blackboard is a classic coordination technique.
 Independent agents read from and write to one common data structure instead of talking to each other directly.
 Here the blackboard owns the maze, records which cells the rats have explored,
@@ -392,7 +392,7 @@ and each type of occupant answers for itself.
 
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
-and the return value is the room the robot ends up in.
+and the return value is the room in which the robot ends up.
 A wall keeps the robot where it is, food is eaten and the robot moves in,
 a teleport returns a distant room.
 There is no `if` or `elif` on the type of occupant anywhere:
@@ -843,7 +843,7 @@ The robot reaches the goal because polymorphism handles every encounter.
 In each case we knew what should happen and ran the program to check it.
 This final example is different.
 Its result appears in no line of its code.
-That is the other thing simulation is for.
+That is simulation's other purpose.
 It discovers behavior instead of confirming it.
 
 In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
@@ -1039,7 +1039,7 @@ Every 400 frames the view switches the plate to a new mode.
 The old figure is suddenly parked on loud regions of the new field.
 It bursts back into chaos, mixes, and condenses into a different figure.
 The order was never a property of the grains.
-It belongs to the field they sit on.
+It belongs to the field on which they sit.
 
 ```python
 # chladni_plate/chladni_view.py
@@ -1055,7 +1055,7 @@ COLORS: Final[list[str]] = [
 MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
 
 def show(grains: int = 1200, step_ms: int = 30,
-         frames_per_mode: int = 400) -> None:
+         frames_per_mode: int = 200) -> None:
     "Shake the grains, changing the mode as patterns form."
     plate = Plate(grains, MODES[0])
     root = tk.Tk()

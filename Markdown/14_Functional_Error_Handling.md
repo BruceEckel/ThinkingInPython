@@ -42,7 +42,7 @@ except ValueError as e:
 
 Function calls 0-2 produced correct values, but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) warns against.
+which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) flags as a problem.
 
 ## Return the Error as a Value
 

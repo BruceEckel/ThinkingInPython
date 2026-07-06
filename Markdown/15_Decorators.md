@@ -324,7 +324,7 @@ This is `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
 Each decorator wraps the result of the one below it.
-That nesting is the transparency the pattern depends on.
+That nesting is the transparency on which the pattern depends.
 Every layer presents the same interface, so the layers compose.
 
 ### Decorating Classes

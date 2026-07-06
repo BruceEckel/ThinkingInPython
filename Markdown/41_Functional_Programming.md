@@ -15,7 +15,7 @@ It reads nothing else and changes nothing else.
 Given the same arguments, it always returns the same value.
 It has no *side effects*: no printing, no file or network access, no mutation of anything outside the function.
 
-Purity is the foundation everything else in this chapter builds on.
+Purity is the foundation on which everything else in this chapter builds.
 You can test a pure function in isolation, because what you pass in fully determines its behavior.
 You can cache its result, because the answer never changes.
 You can reason about it the way you reason about an equation:
@@ -68,7 +68,7 @@ Every later feature in this chapter is, in part, a way to keep more of your code
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from a change somewhere you forgot about.
+Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from some forgotten change elsewhere.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -534,7 +534,7 @@ This is the property that lets you check parts of a program, and sometimes prove
 This property is also the quiet reason the `lru_cache` from earlier is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
 Every optimization that skips or reuses work, from a cache to a database query planner, is cashing in referential transparency.
-The more of your program holds this property, the more of it a machine, or a proof, can reason about.
+The more of your program holds this property, the more of it a machine, or a proof, can verify.
 
 ## Declarative Style
 

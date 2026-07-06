@@ -448,7 +448,7 @@ Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers
 become *immortal*, a change that landed in 3.12 for every build
 but pays off most here, since it removes the one atomic operation
-every thread would otherwise fight over.
+every thread would otherwise contest.
 Their counts never change at all.
 Mutable containers like dictionaries and lists carry individual
 locks, so two threads contend only when they touch the same
@@ -488,7 +488,7 @@ and it runs on the standard build you already have.
 
 Each worker in a process pool gets its own interpreter,
 and so its own GIL.
-That is where the parallelism comes from.
+That is the source of the parallelism.
 The cost is a whole operating-system process per task.
 Since 3.12, CPython can create additional interpreters
 inside the same process ([PEP 684](https://peps.python.org/pep-0684/)),

@@ -74,7 +74,7 @@ The checker treats whatever it cannot see as the type `Any`,
 which is compatible with everything, so typed and untyped code live together.
 This is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
-the tricky data, the code other people depend on.
+the tricky data, the code on which other people depend.
 When a value is truly dynamic, `Any` shows that you mean it to be.
 
 ## The Checker: `ty`
@@ -196,7 +196,7 @@ This is the construct functions like `issubclass()` work with, since they compar
 ## Naming Types: The `type` Statement {#the-type-statement}
 
 An annotation can grow until it obscures what it means.
-`dict[tuple[int, int], str]` is precise, but it does not say what it is for.
+`dict[tuple[int, int], str]` is precise, but it does not say what it means.
 The *type statement* gives the annotation a name:
 
 ```python
