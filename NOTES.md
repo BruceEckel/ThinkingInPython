@@ -5,13 +5,21 @@ If an issue has a suggested fix you need me to review, put a checkbox next to it
 If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
-Go through colon_split_candidates.md
+New Section at end: "Effects"
+- Move appendix A into a chapter at the end of "Design Patterns" section
+- Add "Effects" section at end (so it appears on the web site)
+- "Functional Programming" is first chapter in section
+- "Effect Management" is second chapter
 
 Make sure examples and prose are different from common examples in published literature (except for my own work).
+
+## Exercises
 
 - Check exercises. Potentially create new exercises.
 - Explain exercises in intro
 - Exercise solutions in their own directory, with explanations
+
+---
 
 Note we can have race conditions with both asynch and parallelism
 
@@ -27,13 +35,15 @@ Run 'make prose' on each chapter
 - which will be
 
 
-- active voice
+- active voice: Ask gemini to create a claude skill and how to install it
 
 - Indexing using Leanpub format, before publishing to leanpub
 
 - Search feature on website?
 
 ******************
+
+Appendix perhaps containing learning resources, ask Claude to find the best ones
 
 - Introductory Python YouTube Playlists:
   - [Socratica's Python Programming Tutorials](https://www.youtube.com/playlist?list=PLi01XoE8jYohWFPpC17Z-wWhPOSuh8Er-)

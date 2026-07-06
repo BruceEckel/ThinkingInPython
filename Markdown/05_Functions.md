@@ -162,7 +162,7 @@ print(get(prefs, "theme", "dark"))
 
 Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied."
 The `MISSING` sentinel keeps the two cases apart. A missing key with no default
-raises, while a stored `None` comes back untouched.
+raises an exception, while a stored `None` comes back untouched.
 
 ## Variable Argument Lists
 

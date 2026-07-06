@@ -494,8 +494,8 @@ When threads divide up work, the danger is shared mutable state.
 The `queue` module packages the standard answer:
 a thread-safe queue that hands each item to exactly one consumer,
 with the locking built in.
-`queue.Queue` is first-in, first-out;
-`queue.PriorityQueue`, the threaded form of
+`queue.Queue` is first-in, first-out,
+while `queue.PriorityQueue`, the threaded form of
 [Performance](19_Performance.md)'s `heapq`,
 always hands out the smallest item present:
 
