@@ -222,8 +222,8 @@ or state shared between processes through a
 ## The GIL and Free Threading
 
 Threads would not have helped in the previous section.
-The standard CPython build has a *Global Interpreter Lock* (GIL):
-only one thread runs Python bytecode at a time, no matter how many
+The standard CPython build has a *Global Interpreter Lock* (GIL).
+Only one thread runs Python bytecode at a time, no matter how many
 cores sit idle. A thread releases the GIL while it waits on I/O,
 which is why `asyncio` and a thread pool both help I/O-bound work.
 Neither helps CPU-bound work,
@@ -257,12 +257,12 @@ print(f"threads no faster: {t_thr > t_seq * 0.9}")
 #: threads no faster: True
 ```
 
-Swapping the loop for a thread pool changes nothing:
-five threads still take turns holding the one GIL,
+Swapping the loop for a thread pool changes nothing.
+Five threads still take turns holding the one GIL,
 so `threaded()` costs the same as `sequential()`,
 sometimes a little more, from the added scheduling.
-This is exactly why [Parallelism](#parallelism) used processes instead:
-each process gets its own interpreter, and so its own GIL.
+This is exactly why [Parallelism](#parallelism) used processes instead.
+Each process gets its own interpreter, and so its own GIL.
 
 The GIL deserves more than a definition,
 because it is misunderstood in both directions.
@@ -400,7 +400,9 @@ Most objects are only ever touched by the thread that created them.
 count with plain arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers
-become *immortal*.
+become *immortal*, a change that landed in 3.12 for every build
+but pays off most here, since it removes the one atomic operation
+every thread would otherwise fight over.
 Their counts never change at all.
 Mutable containers like dictionaries and lists carry individual
 locks, so two threads contend only when they touch the same
@@ -477,8 +479,8 @@ print(f"subinterpreters at least 2x faster: {t_seq > t_sub * 2}")
 #: subinterpreters at least 2x faster: True
 ```
 
-Unlike a thread pool, this genuinely overlaps computation:
-each worker interpreter holds its own GIL,
+Unlike a thread pool, this genuinely overlaps computation.
+Each worker interpreter holds its own GIL,
 so five of them run on five cores at once instead of taking turns.
 Unlike a process pool, there is only one process,
 so starting a worker is cheaper than starting a new interpreter

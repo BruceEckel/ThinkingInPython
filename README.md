@@ -52,7 +52,9 @@ Claude's review and re-checking (**Reviewed**). Incomplete reviews live in the
 Delete the review file and mark a cell `X` when that item is done.
 The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray.
 
-### Draft 1
+### Draft (First Pass)
+
+This draft gets all the chapters and sections in place and ready for a serious edit pass.
 
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|
@@ -75,7 +77,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
 | 19_Performance.md               |X|X|
-| 20_Concurrency.md               |🔴|🔴|
+| 20_Concurrency.md               |X| |
 | 21_Rethinking_Objects.md        |X|X|
 | 22_The_Pattern_Concept.md       |X|X|
 | 23_Data_Transfer_Objects.md     |X|X|
