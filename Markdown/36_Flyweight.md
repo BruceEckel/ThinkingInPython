@@ -93,6 +93,8 @@ class Tile:
     name: str
     walkable: bool
 
+#! Can we define dict[str, tuple[str, bool]] as a named type? for understandability
+
 SPECS: Final[dict[str, tuple[str, bool]]] = {
     ".": ("grass", True),
     "~": ("water", False),
@@ -161,6 +163,7 @@ in the map changes.
 
 ## Interning in the Constructor
 
+#! This paragraph is unclear to me:
 The factory function is one honest extra name.
 If you want callers to keep writing `Color(...)`,
 move the pool into `__new__`,
@@ -171,6 +174,8 @@ chapter uses, but keyed by the constructor arguments:
 ```python
 # interned_color.py
 from typing import ClassVar
+
+#! can dict[tuple[int, int, int], Color] be a named type, for understandability
 
 class Color:
     _pool: ClassVar[dict[tuple[int, int, int], Color]] = {}
@@ -196,13 +201,21 @@ if __name__ == "__main__":
 #: 1
 ```
 
-Construction syntax is unchanged and callers cannot tell they
-received a shared object.
-This is exactly what CPython's small-integer cache does.
+#! Explain why we can't use __init__() here, or improve the explanation because it's not obvious to me
+
+#! Is the data class "cost" here an issue? It doesn't seem to do anything we need?
+
+#! Can red, green and blue be dataclass Hue (is that right?) that constrains the value to whatever is appropriate (0-255?)
+
+#! Should cached be a defaultdict?
+
+#! Should we have a contrasting example as well, with __new__ as a constructor function instead?
+
+The construction syntax is unchanged and callers cannot tell they received a shared object
+(This is how CPython's small-integer cache does it).
 The cost is bookkeeping by hand: no data class, and no `__init__()`.
 Python calls `__init__()` on whatever `__new__()` returns,
-so an `__init__()` here would re-run on the cached instance
-at every construction.
+so an `__init__()` here would re-run on the cached instance at every construction.
 Unless you need the constructor syntax,
 the `@cache` factory does the same job with less machinery.
 
@@ -279,11 +292,10 @@ def test_pool_releases_unused() -> None:
 
 When you know the full set of shared values as you write the
 program, you do not need a pool at runtime.
-An `Enum` (introduced in
-[Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too))
+An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too))
 is a flyweight pool the language maintains for you.
 Python constructs each member once, at class creation,
-and every mention anywhere in the program is that one object.
+and any reference produces that one object.
 
 ```python
 # tile_enum.py
@@ -294,11 +306,14 @@ class Tile(Enum):
     WATER = ("~", False)
     ROCK = ("#", False)
 
+    #! This looks like a classvar, if so it should be annotated as such.
+    #! If not, do we explain what it is and how it works in the enum introduction?
+    #! Should it have some kind of sentinel initialization value?
     walkable: bool
 
     def __new__(cls, symbol: str, walkable: bool) -> Tile:
-        member = object.__new__(cls)
-        member._value_ = symbol
+        member = object.__new__(cls)  #! Explain this in the prose
+        member._value_ = symbol  #! What does this do? Is it a special name, if not would _symbol_ be clearer?
         member.walkable = walkable
         return member
 
@@ -315,30 +330,28 @@ Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
 The customization must happen in `__new__()`.
-The lookup table behind `Tile(".")` keys on the value
-`__new__()` establishes, so setting `_value_` later,
+The lookup table behind `Tile(".")` keys on the value `__new__()` establishes, so setting `_value_` later,
 in `__init__()`, would leave that table keyed by the tuples.
-With `_value_` set in `__new__()`, `Tile(".")` is a lookup. Name, symbol, and attribute access
-all land on the same shared member.
+With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
+Name, symbol, and attribute access all land on the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
-The trade is fixedness. `tile()` could load `SPECS` from a file,
-while `Tile.GRASS` is source code.
-The table-driven state machine in
-[State Machines](27_State_Machines.md#table-driven-state-machine)
+The constraing is less flexibility.
+`tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
+The table-driven state machine in [State Machines](27_State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
 
+#! This is a good example of what I like: a summary that is NOT titled "Summary" and introduces new insights instead of rehashing the chapter.
+#! Capture this idea in CLAUDE.md
 ## Flyweights in the Wild
 
 The pattern is easy to spot once you know its shape.
-Compilers and interpreters intern identifiers so that scope lookups
-compare pointers instead of characters.
-Column stores such as pandas and Polars offer categorical types.
-A column of a million country names stores small integer codes into
-a pool of distinct strings.
+Compilers and interpreters intern identifiers so that scope lookups compare pointers instead of characters.
+Column stores such as Pandas and Polars offer categorical types.
+A column of a million country names stores small integer codes into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
-In every case the win is the same:
+In every case the benefit is the same:
 memory proportional to the number of distinct values,
 not the number of uses,
 and equality checks that collapse to identity.
