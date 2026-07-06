@@ -40,11 +40,14 @@ The idiomatic Python singleton is worth trying first.
 Sometimes you do want a class,
 but every construction should return the same object.
 The simplest way is to hide construction behind a cached factory.
+A cached factory applies `functools.cache` to a *constructor function*,
+an ordinary function whose only job is to build and return
+an instance of a class, standing in for a direct call to it.
 `functools.cache` *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
-A zero-argument factory has only one possible call,
-so it constructs the instance once and returns that same object forever:
+A constructor function with no arguments has only one possible call,
+so caching it constructs the instance once and returns that same object forever:
 
 ```python
 # cached_factory_singleton.py

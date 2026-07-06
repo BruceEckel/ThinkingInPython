@@ -73,10 +73,13 @@ The tile's position is extrinsic.
 It is the cell's coordinates in the grid,
 so the `Tile` object never stores it.
 
-The factory is `functools.cache` on a constructor function,
-following the cached factory from
-[Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)
-with arguments: one instance per distinct key.
+The factory pairs `functools.cache` with a constructor function,
+the same building block behind
+[Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)'s
+cached factory. There the function took no arguments,
+so caching produced one shared instance overall.
+Here `tile()` takes a symbol,
+so caching produces one shared instance per distinct symbol instead.
 
 ```python
 # tile_map.py
