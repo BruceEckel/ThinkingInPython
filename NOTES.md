@@ -11,8 +11,8 @@ Make sure examples and prose are different from common examples in published lit
 
 - Check exercises. Potentially create new exercises.
 - Explain exercises in intro
+- Exercises should be ones solveable during a live workshop
 - Exercise solutions in their own directory, with explanations
-
 ---
 
 Note we can have race conditions with both asynch and parallelism

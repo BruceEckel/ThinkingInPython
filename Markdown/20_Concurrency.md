@@ -131,6 +131,52 @@ a pack of rats exploring a maze as cooperating tasks,
 and [Observer](32_Observer.md#observer-and-io) uses `gather()` to notify
 slow observers together instead of one at a time.
 
+## A Single Thread Still Races
+
+`asyncio` runs one coroutine at a time, never two at once.
+It is tempting to conclude that shared state needs no locking there.
+But "one at a time" only protects the instructions between two `await`s,
+not a value that lives across one.
+Two coroutines that read a shared value, `await`, then write it back
+can lose an update with no thread and no GIL in sight:
+
+```python
+# async_race.py
+import asyncio
+
+counter = 0
+
+async def increment(count: int) -> None:
+    global counter
+    for _ in range(count):
+        value = counter  # Read
+        await asyncio.sleep(0)  # Hand control to the event loop
+        counter = value + 1  # Write back
+
+async def main() -> None:
+    await asyncio.gather(*(increment(50) for _ in range(8)))
+    print(counter)
+
+asyncio.run(main())
+#: 50
+```
+
+Eight coroutines each add 50, so `counter` should reach 400.
+Instead it stops at 50.
+Every `await asyncio.sleep(0)` hands control to the event loop
+before the write happens.
+In each round all eight coroutines read the same value before any of
+them writes, so eight additions collapse into one.
+[The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
+shows the identical failure with threads.
+The mechanism differs.
+A thread switch is preemptive and can land between any two bytecode
+instructions, while a coroutine switch happens only at an `await`
+you chose to write.
+That makes the gap easier to find, not safer to leave unguarded.
+A read-modify-write that spans an `await` needs `asyncio.Lock`,
+the same shape of fix a lock gives across threads.
+
 ## Parallelism
 
 The CPU-bound task cannot overlap on one core.
