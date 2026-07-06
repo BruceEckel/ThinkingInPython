@@ -50,6 +50,7 @@ Two passes per draft: my own edit pass (**Edited**), then incorporating
 Claude's review and re-checking (**Reviewed**). Incomplete reviews live in the
 `REVIEW_NN.md` files at the repo root.
 Delete the review file and mark a cell `X` when that item is done.
+The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray.
 
 ### Draft 1
 
@@ -74,7 +75,7 @@ Delete the review file and mark a cell `X` when that item is done.
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
 | 19_Performance.md               |X|X|
-| 20_Concurrency.md 🔴 Unfinished |_|_|
+| 20_Concurrency.md               |🔴|🔴|
 | 21_Rethinking_Objects.md        |X|X|
 | 22_The_Pattern_Concept.md       |X|X|
 | 23_Data_Transfer_Objects.md     |X|X|
@@ -89,10 +90,10 @@ Delete the review file and mark a cell `X` when that item is done.
 | 32_Observer.md                  |X|X|
 | 33_Multiple_Dispatching.md      |X|X|
 | 34_Visitor.md                   |X|X|
-| 35_Composite_and_Interpreter.md | | |
+| 35_Composite_and_Interpreter.md |X| |
 | 36_Flyweight.md                 | | |
 | 37_Memento.md                   | | |
 | 38_Pattern_Refactoring.md       |X|X|
 | 39_Simulation.md                | | |
-| 40_Functional_Programming.md 🔴 Unfinished |_|_|
+| 40_Functional_Programming.md    |🔴|🔴|
 | A_Pattern_Catalog.md            |X|X|

@@ -7,6 +7,8 @@ If you run out of tokens during a chapter, resume when it resets.
 
 Look for colons
 
+Make sure examples and prose are different from common examples in the literature.
+
 Exercise solutions
 
 Note we can have race conditions with both asynch and parallelism

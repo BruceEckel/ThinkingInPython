@@ -106,6 +106,50 @@ def test_total_over_any_iterable() -> None:
     assert total(Countdown(5)) == 15
 ```
 
+## Delegating with `yield from`
+
+A generator can delegate part of its work to another iterator with
+`yield from`. It yields every value produced by that iterator in
+turn, as if the outer generator had written the loop itself:
+
+```python
+# yield_from.py
+from collections.abc import Iterator, Sequence
+
+type Nested = int | Sequence["Nested"]
+
+def flatten(nested: Sequence[Nested]) -> Iterator[int]:
+    for item in nested:
+        if isinstance(item, int):
+            yield item
+        else:
+            yield from flatten(item)
+
+print(list(flatten([1, [2, 3], [4, [5, 6]], 7])))
+#: [1, 2, 3, 4, 5, 6, 7]
+```
+
+`flatten()` calls itself on each nested sequence,
+and `yield from` threads the recursive call's values
+into the outer stream.
+Without it, you would write `for x in flatten(item): yield x`,
+which does the same thing but names the loop explicitly.
+`yield from` is that loop, spelled as a single delegation.
+
+These tests check a nested list and a flat one:
+
+```python
+# test_yield_from.py
+from yield_from import flatten
+
+def test_flatten_nested_lists() -> None:
+    result = list(flatten([1, [2, 3], [4, [5, 6]], 7]))
+    assert result == [1, 2, 3, 4, 5, 6, 7]
+
+def test_flatten_no_nesting() -> None:
+    assert list(flatten([1, 2, 3])) == [1, 2, 3]
+```
+
 ## Reusable Algorithms
 
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,

@@ -2,14 +2,14 @@
 from abc import ABC, abstractmethod
 from typing import override
 
-class Entry(ABC):
+class Node(ABC):
     def __init__(self, name: str) -> None:
         self.name = name
 
     @abstractmethod
     def size(self) -> int: ...
 
-class File(Entry):
+class File(Node):
     def __init__(self, name: str, byte_count: int) -> None:
         super().__init__(name)
         self.byte_count = byte_count
@@ -18,8 +18,8 @@ class File(Entry):
     def size(self) -> int:
         return self.byte_count
 
-class Directory(Entry):
-    def __init__(self, name: str, *entries: Entry) -> None:
+class Directory(Node):
+    def __init__(self, name: str, *entries: Node) -> None:
         super().__init__(name)
         self.entries = entries
 

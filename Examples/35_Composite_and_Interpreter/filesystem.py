@@ -11,11 +11,11 @@ class File:
 @dataclass(frozen=True)
 class Directory:
     name: str
-    entries: tuple[Entry, ...]
+    entries: tuple[Node, ...]
 
-type Entry = File | Directory
+type Node = File | Directory
 
-def disk_usage(entry: Entry) -> int:
+def disk_usage(entry: Node) -> int:
     match entry:
         case File(_, size):
             return size
@@ -24,7 +24,7 @@ def disk_usage(entry: Entry) -> int:
         case _:
             assert_never(entry)
 
-def walk(entry: Entry, prefix: str = "") -> Iterator[str]:
+def walk(entry: Node, prefix: str = "") -> Iterator[str]:
     match entry:
         case File(name, _):
             yield prefix + name
