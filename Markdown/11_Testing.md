@@ -513,7 +513,7 @@ but treat each one as a test that may break when you refactor.
 The tests in this chapter check specific examples: this input produces that output.
 A *property-based* test instead states a law the code must always obey,
 and lets a tool generate the inputs that try to break it.
-[Functional Programming](40_Functional_Programming.md#an-assurance-spectrum) shows the technique,
+[Functional Programming](41_Functional_Programming.md#an-assurance-spectrum) shows the technique,
 including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) library that automates it.
 
 ## How This Book Runs Its Tests

@@ -1,6 +1,6 @@
 # Pattern Catalog
 
-This appendix gathers patterns that are widely documented across the literature,
+This chapter gathers patterns that are widely documented across the literature,
 not only the original *Design Patterns* (GoF) set.
 It draws from *Pattern-Oriented Software Architecture* (POSA),
 *Patterns of Enterprise Application Architecture* (Fowler),
@@ -158,7 +158,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](14_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Function Object](30_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
-| [Memoization](40_Functional_Programming.md#the-functools-and-itertools-toolkits) | Cache a function's results keyed by its arguments. |
+| [Memoization](41_Functional_Programming.md#the-functools-and-itertools-toolkits) | Cache a function's results keyed by its arguments. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
 | Curiously Recurring Template Pattern | A class inherits from a base parameterized by the class itself. |

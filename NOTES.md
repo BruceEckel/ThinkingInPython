@@ -5,12 +5,6 @@ If an issue has a suggested fix you need me to review, put a checkbox next to it
 If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
 If you run out of tokens during a chapter, resume when it resets.
 
-New Section at end: "Effects"
-- Move appendix A into a chapter at the end of "Design Patterns" section
-- Add "Effects" section at end (so it appears on the web site)
-- "Functional Programming" is first chapter in section
-- "Effect Management" is second chapter
-
 Make sure examples and prose are different from common examples in published literature (except for my own work).
 
 ## Exercises

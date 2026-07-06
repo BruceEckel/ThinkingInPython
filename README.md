@@ -97,5 +97,6 @@ This draft gets all the chapters and sections in place and ready for a serious e
 | 37_Memento.md                   | | |
 | 38_Pattern_Refactoring.md       |X|X|
 | 39_Simulation.md                | | |
-| 40_Functional_Programming.md    |🔴|🔴|
-| A_Pattern_Catalog.md            |X|X|
+| 40_Pattern_Catalog.md           |X|X|
+| 41_Functional_Programming.md    |🔴|🔴|
+| 42_Effect_Management.md         | | |

@@ -189,6 +189,7 @@ PARTS = {
     "02": ("I", "Foundations"),
     "11": ("II", "Techniques"),
     "21": ("III", "Patterns"),
+    "41": ("IV", "Effects"),
 }
 
 

@@ -267,7 +267,7 @@ a generator is spent after one pass.
 ## Caching
 
 If a pure function
-([Functional Programming](40_Functional_Programming.md#pure-functions))
+([Functional Programming](41_Functional_Programming.md#pure-functions))
 is called repeatedly with the same arguments,
 the fastest way to compute the answer is to not compute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -515,7 +515,7 @@ Calling a Python function on each element,
 or converting arrays to lists and back,
 reproduces the overhead.
 This is the declarative trade from
-[Functional Programming](40_Functional_Programming.md#declarative-style):
+[Functional Programming](41_Functional_Programming.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
 (NumPy is a third-party dependency,
