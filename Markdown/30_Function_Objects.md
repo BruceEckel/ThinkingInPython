@@ -314,6 +314,7 @@ so there is no `Handler` interface to implement and no registration ceremony:
 
 ```python
 # event_bus.py
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -334,11 +335,13 @@ class Closed:
 
 class EventBus:
     def __init__(self) -> None:
-        self._handlers: dict[type, list[Handler[Any]]] = {}
+        self._handlers: defaultdict[
+            type, list[Handler[Any]]
+        ] = defaultdict(list)
 
     def subscribe[E](self, event_type: type[E],
                      handler: Handler[E]) -> None:
-        self._handlers.setdefault(event_type, []).append(handler)
+        self._handlers[event_type].append(handler)
 
     def publish(self, event: object) -> None:
         for handler in self._handlers.get(type(event), []):
@@ -370,9 +373,16 @@ bus.publish(Closed("inactivity"))    # No handler: nothing happens
 The checker reads `E` from the first argument and requires the handler to accept that exact type,
 so `subscribe(Deposit, on_withdraw)` is a type error.
 The safety check happens once, at registration.
-The stored `dict`, though, mixes handlers for every event type in one structure.
+The stored `defaultdict`, though, mixes handlers for every event type in one structure.
 Its lists cannot name a single event class, so the element type erases the parameter to `Handler[Any]`.
 The generic guards the boundary; the `Any` covers the heterogeneous storage behind it.
+
+`subscribe` indexes `self._handlers` directly,
+letting the `defaultdict` build each event type's list on first use.
+`publish` still calls `.get(type(event), [])` instead of indexing.
+Indexing on a read would insert an empty list as a side effect,
+leaving a stray entry behind for every published event type
+that happens to have no subscriber, such as `Closed`.
 
 For testing, publishing calls every handler registered for a type,
 a handler hears only its own event type,

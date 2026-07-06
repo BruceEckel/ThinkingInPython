@@ -1,10 +1,8 @@
 Use my GIL presentation in Concurrency. Rewrite the "## The GIL and Free Threading" section to draw
-from
+from C:\git\DemystifyingTheGIL. Obviously there's too much there to cram into a section in a chapter so summarize.
+However it's OK if that section is larger and it has its own ### sections, as this is a complex topic.
 
-Look through the book for places where type, NewType or Literal (A) can be used (after they have been introduced) and (B) could improve the clarity and safety of an example.
-
-Turn book in Demystifying the Gil so it is at BruceEckel.github.io/DemystifyingTheGil
-
+Take the book in C:\git\DemystifyingTheGIL and add the necessary build process to make it into a website so it is at BruceEckel.github.io/DemystifyingTheGil
 
 /loop through chapters 02-18 and 20-35 and look for style and voice issues.
 Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
