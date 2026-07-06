@@ -1,6 +1,6 @@
 # test_tile_map.py
 import pytest
-from tile_map import parse_map, tile
+from tile_map import parse_map, tile, to_symbol
 
 def test_same_symbol_same_object() -> None:
     assert tile(".") is tile(".")
@@ -14,4 +14,4 @@ def test_map_shares_tiles() -> None:
 
 def test_unknown_symbol_raises() -> None:
     with pytest.raises(KeyError):
-        tile("?")
+        to_symbol("?")

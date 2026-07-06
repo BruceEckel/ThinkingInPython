@@ -1,6 +1,8 @@
 Use my GIL presentation in Concurrency. Rewrite the "## The GIL and Free Threading" section to draw
 from
 
+Look through the book for places where type, NewType or Literal (A) can be used (after they have been introduced) and (B) could improve the clarity and safety of an example.
+
 Turn book in Demystifying the Gil so it is at BruceEckel.github.io/DemystifyingTheGil
 
 

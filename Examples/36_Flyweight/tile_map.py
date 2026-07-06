@@ -1,27 +1,35 @@
 # tile_map.py
 from dataclasses import dataclass
 from functools import cache
-from typing import Final
+from typing import Final, Literal, cast
+
+type Symbol = Literal[".", "~", "#"]
+type TileSpec = tuple[str, bool]
 
 @dataclass(frozen=True)
 class Tile:
-    symbol: str
+    symbol: Symbol
     name: str
     walkable: bool
 
-SPECS: Final[dict[str, tuple[str, bool]]] = {
+SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
     "~": ("water", False),
     "#": ("rock", False),
 }
 
 @cache
-def tile(symbol: str) -> Tile:
+def tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
+def to_symbol(char: str) -> Symbol:
+    if char not in SPECS:
+        raise KeyError(char)
+    return cast(Symbol, char)
+
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(s) for s in line]
+    return [[tile(to_symbol(s)) for s in line]
             for line in text.split()]
 
 if __name__ == "__main__":

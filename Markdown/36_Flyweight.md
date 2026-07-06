@@ -85,29 +85,35 @@ so caching produces one shared instance per distinct symbol instead.
 # tile_map.py
 from dataclasses import dataclass
 from functools import cache
-from typing import Final
+from typing import Final, Literal, cast
+
+type Symbol = Literal[".", "~", "#"]
+type TileSpec = tuple[str, bool]
 
 @dataclass(frozen=True)
 class Tile:
-    symbol: str
+    symbol: Symbol
     name: str
     walkable: bool
 
-#! Can we define dict[str, tuple[str, bool]] as a named type? for understandability
-
-SPECS: Final[dict[str, tuple[str, bool]]] = {
+SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
     "~": ("water", False),
     "#": ("rock", False),
 }
 
 @cache
-def tile(symbol: str) -> Tile:
+def tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
+def to_symbol(char: str) -> Symbol:
+    if char not in SPECS:
+        raise KeyError(char)
+    return cast(Symbol, char)
+
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(s) for s in line]
+    return [[tile(to_symbol(s)) for s in line]
             for line in text.split()]
 
 if __name__ == "__main__":
@@ -133,10 +139,25 @@ Asking "is the cell at row 1, column 5 walkable?" is
 `field[1][5].walkable`, with the coordinates supplied by the asker.
 That is the intrinsic/extrinsic split doing its work.
 
+`Symbol` names the closed set of valid map characters,
+so `Tile.symbol` and `SPECS` can only hold one of them.
+Add a kind to `SPECS` without adding it to `Symbol`,
+or the reverse, and the checker rejects the mismatch.
+`tile()` trusts its argument is already a `Symbol`,
+so the untrusted boundary is `to_symbol()`,
+the one place raw text meets the checked type.
+It checks membership in `SPECS` at runtime,
+then calls `cast()` to tell the checker what that check just proved.
+`cast()` changes nothing at runtime.
+It exists only for the checker and the reader
+(see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)),
+so use it only where, as here, you have already verified
+what the checker cannot: that `char` is one of the three symbols.
+
 ```python
 # test_tile_map.py
 import pytest
-from tile_map import parse_map, tile
+from tile_map import parse_map, tile, to_symbol
 
 def test_same_symbol_same_object() -> None:
     assert tile(".") is tile(".")
@@ -150,7 +171,7 @@ def test_map_shares_tiles() -> None:
 
 def test_unknown_symbol_raises() -> None:
     with pytest.raises(KeyError):
-        tile("?")
+        to_symbol("?")
 ```
 
 Because `Tile` is frozen, sharing is invisible to clients.
@@ -163,28 +184,29 @@ in the map changes.
 
 ## Interning in the Constructor
 
-#! This paragraph is unclear to me:
-The factory function is one honest extra name.
+A factory function like `tile()` is an honest extra name.
+Its different syntax warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
-move the pool into `__new__`,
-the same maneuver the
+hide the pool inside `__new__` instead.
+This is the same maneuver the
 [Singleton](24_Singleton.md#the-classic-implementations)
-chapter uses, but keyed by the constructor arguments:
+chapter uses. Here the cache is keyed by the constructor
+arguments instead of a single fixed key:
 
 ```python
 # interned_color.py
 from typing import ClassVar
 
-#! can dict[tuple[int, int, int], Color] be a named type, for understandability
+type RGB = tuple[int, int, int]
 
 class Color:
-    _pool: ClassVar[dict[tuple[int, int, int], Color]] = {}
+    _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
     green: int
     blue: int
 
     def __new__(cls, red: int, green: int, blue: int) -> Color:
-        key = (red, green, blue)
+        key: RGB = (red, green, blue)
         cached = cls._pool.get(key)
         if cached is not None:
             return cached
@@ -201,23 +223,20 @@ if __name__ == "__main__":
 #: 1
 ```
 
-#! Explain why we can't use __init__() here, or improve the explanation because it's not obvious to me
-
-#! Is the data class "cost" here an issue? It doesn't seem to do anything we need?
-
-#! Can red, green and blue be dataclass Hue (is that right?) that constrains the value to whatever is appropriate (0-255?)
-
-#! Should cached be a defaultdict?
-
-#! Should we have a contrasting example as well, with __new__ as a constructor function instead?
-
-The construction syntax is unchanged and callers cannot tell they received a shared object
-(This is how CPython's small-integer cache does it).
-The cost is bookkeeping by hand: no data class, and no `__init__()`.
+The construction syntax is unchanged, and callers cannot tell they received a shared object
+(this is how CPython's small-integer cache does it).
+The cost is bookkeeping by hand.
 Python calls `__init__()` on whatever `__new__()` returns,
 so an `__init__()` here would re-run on the cached instance at every construction.
+Skipping `__init__()` means skipping `@dataclass` too,
+since a dataclass only generates `__init__()`.
+`Color` loses the free `__repr__()` and `__eq__()` that `Tile` gets,
+so printing a `Color` falls back to the default `object.__repr__()`.
+A `defaultdict` cannot replace `_pool` either,
+because building a `Color` needs the three color components,
+not just the key that names them.
 Unless you need the constructor syntax,
-the `@cache` factory does the same job with less machinery.
+the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
 ## A Pool That Does Not Leak
 
@@ -306,14 +325,11 @@ class Tile(Enum):
     WATER = ("~", False)
     ROCK = ("#", False)
 
-    #! This looks like a classvar, if so it should be annotated as such.
-    #! If not, do we explain what it is and how it works in the enum introduction?
-    #! Should it have some kind of sentinel initialization value?
     walkable: bool
 
     def __new__(cls, symbol: str, walkable: bool) -> Tile:
-        member = object.__new__(cls)  #! Explain this in the prose
-        member._value_ = symbol  #! What does this do? Is it a special name, if not would _symbol_ be clearer?
+        member = object.__new__(cls)
+        member._value_ = symbol
         member.walkable = walkable
         return member
 
@@ -326,6 +342,13 @@ if __name__ == "__main__":
 #: ['.', '~', '#']
 ```
 
+`walkable` is a bare annotation, not a `ClassVar`.
+It declares a per-member attribute, the same role a dataclass field plays,
+except `__new__()` assigns it by hand instead of a generated `__init__()`.
+`__new__()` runs before any member becomes visible,
+so there is no window where `walkable` is unset.
+It needs no default or sentinel.
+
 Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
@@ -333,16 +356,22 @@ The customization must happen in `__new__()`.
 The lookup table behind `Tile(".")` keys on the value `__new__()` establishes, so setting `_value_` later,
 in `__init__()`, would leave that table keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
+
+`object.__new__(cls)` builds a bare instance directly,
+skipping `Tile.__new__()` itself so the call does not recurse.
+`_value_` is not an ordinary attribute name.
+Enum's metaclass reads it to build the `Tile(".")` lookup table
+and the member's `repr()`, so it keeps that exact name
+rather than something like `_symbol_`.
+
 Name, symbol, and attribute access all land on the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
-The constraing is less flexibility.
+The constraint is less flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The table-driven state machine in [State Machines](27_State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
 
-#! This is a good example of what I like: a summary that is NOT titled "Summary" and introduces new insights instead of rehashing the chapter.
-#! Capture this idea in CLAUDE.md
 ## Flyweights in the Wild
 
 The pattern is easy to spot once you know its shape.
@@ -359,8 +388,9 @@ and equality checks that collapse to identity.
 ## Exercises
 
 1.  Add door (`+`, walkable) and tree (`T`, not walkable) kinds to
-    `tile_map.py`, then write `walkable_neighbors(field, row, col)`
-    returning the count of adjacent walkable cells.
+    `tile_map.py`. Extend `Symbol` and `SPECS` to match, then write
+    `walkable_neighbors(field, row, col)` returning the count of
+    adjacent walkable cells.
     Confirm the tile pool size still equals the number of kinds,
     however large the map.
 2.  Use `tracemalloc` to compare `parse_map()` on a large map
@@ -377,3 +407,6 @@ and equality checks that collapse to identity.
 5.  Rewrite `interned_color.py` to use the weak pool technique from
     `weak_pool.py`, and show that building and dropping a palette of
     colors leaves the pool empty.
+6.  Constrain `red`, `green`, and `blue` to `0`-`255` in
+    `interned_color.py`. Raise `ValueError` from `__new__()` for an
+    out-of-range component, and write a test for it.

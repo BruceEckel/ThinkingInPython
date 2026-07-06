@@ -1,14 +1,16 @@
 # interned_color.py
 from typing import ClassVar
 
+type RGB = tuple[int, int, int]
+
 class Color:
-    _pool: ClassVar[dict[tuple[int, int, int], Color]] = {}
+    _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
     green: int
     blue: int
 
     def __new__(cls, red: int, green: int, blue: int) -> Color:
-        key = (red, green, blue)
+        key: RGB = (red, green, blue)
         cached = cls._pool.get(key)
         if cached is not None:
             return cached
