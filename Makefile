@@ -19,7 +19,7 @@ DOCS ?= Markdown
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full upgrade-tools
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -55,22 +55,23 @@ upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) pandoc
 
 ##@ Everyday
 
-# Fix any CRLF in the working tree, sync Examples/ from the Markdown, then run
-# every gate except the site build. The everyday "is everything still good?"
-# command after editing Markdown/. fix-eol runs first so the eol check inside
-# gate sees an already-clean tree.
-verify: fix-eol sync gate  ## Fix line endings, sync Examples/, then run every gate except the site build
+# Fix any CRLF in the working tree, sync Examples/ and SolutionsCode/ from the
+# Markdown, then run every gate except the site build. The everyday "is
+# everything still good?" command after editing Markdown/ or Solutions/.
+# fix-eol runs first so the eol check inside gate sees an already-clean tree.
+verify: fix-eol sync solutions-sync gate  ## Fix line endings, sync Examples/ and SolutionsCode/, then run every gate except the site build
 
 # Same as verify, plus the site build at the end.
-sync-ci: sync ci  ## Like verify, plus the site build (the full CI gate)
+sync-ci: sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
 # The local gate without the site build: line endings, listing density, drift
-# check, output markers, ty, ruff, run, pytest. `verify` runs `sync` first;
+# check, output markers, ty, ruff, run, pytest, plus the same checks for
+# Solutions/ (solutions-gate). `verify` runs `sync`/`solutions-sync` first;
 # `ci` adds the site. validate_output.py runs with --update: a stale #: marker
 # self-heals (rewriting Markdown/) the same way fix-eol/sync already do,
 # rather than failing the build. A raised exception where none is expected
 # still fails the gate; only marker text is self-corrected.
-gate:  ## The gate without sync or site (check, output, ty, ruff, run, pytest)
+gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/listing_format.py
 	$(PY) tools/banned_phrases.py
@@ -165,6 +166,53 @@ fix-imports: extract  ## Sort imports and drop unused ones in the listings (ruff
 extract:  ## Write build/examples/ from the Markdown
 	$(PY) tools/extract_examples.py --write
 
+##@ Solutions (Solutions/, build/solutions/)
+
+# Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
+# instead of Markdown/. Each Solutions code block is self-contained (it
+# redeclares whatever book context it needs) rather than importing from
+# Examples/, so this tree never breaks when a book example changes.
+solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md
+	$(PY) tools/extract_solutions.py --write -o SolutionsCode
+
+solutions-check:  ## Verify Solutions/*.md matches the committed SolutionsCode/ tree
+	$(PY) tools/extract_solutions.py
+
+solutions-extract:  ## Write build/solutions/ from Solutions/*.md
+	$(PY) tools/extract_solutions.py --write
+
+# validate_output.py needs an absolute --tree: Solutions/*.md's blocks run
+# with cwd inside build/solutions/<chapter>, and a relative tree argument
+# stops resolving once cwd changes (the same gotcha run_examples.py's
+# --tree has; see tools/README.md).
+solutions-output: solutions-extract  ## Update the #: output markers in Solutions/*.md
+	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions
+
+solutions-output-check: solutions-extract  ## Verify the #: output markers in Solutions/*.md, no rewrite
+	$(PY) tools/validate_output.py --tree "$(CURDIR)/build/solutions" Solutions
+
+solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
+	$(TY) check build/solutions
+
+solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must be clean)
+	$(RUFF) check build/solutions
+
+solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
+	$(PYTEST) $(PYTEST_N) build/solutions
+
+# Mirrors `gate`, but for Solutions/: drift check, output markers, ty, ruff,
+# pytest. No run_examples.py equivalent: every extractable Solutions block
+# already carries a #: marker (checked by solutions-output above), and a
+# block with none is a deliberately-unrun illustrative fragment (no `# file.py`
+# slug), so there is nothing further to execute.
+solutions-gate:  ## The Solutions gate: check, output, ty, ruff, pytest
+	$(PY) tools/extract_solutions.py
+	$(PY) tools/extract_solutions.py --write
+	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions
+	$(TY) check build/solutions
+	$(RUFF) check build/solutions
+	$(PYTEST) $(PYTEST_N) build/solutions
+
 ##@ Prose and spelling
 
 # Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
@@ -246,6 +294,9 @@ anchors:  ## Fail if a heading-anchor link points at no real heading
 
 clean-examples:  ## Remove build/examples/
 	$(PY) -c "import shutil; shutil.rmtree('build/examples', ignore_errors=True)"
+
+clean-solutions:  ## Remove build/solutions/
+	$(PY) -c "import shutil; shutil.rmtree('build/solutions', ignore_errors=True)"
 
 clean-site:  ## Remove build/site/
 	$(PY) -c "import shutil; shutil.rmtree('build/site', ignore_errors=True)"

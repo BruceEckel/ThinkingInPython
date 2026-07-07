@@ -149,3 +149,17 @@ print(B().x, B(7).x)
 
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) covers the details.
+
+## Exercises
+
+1.  In `class_attribute_confusion.py`, add a third instance `c = Stars()` after the `Stars.rating = 9` line,
+    and print `c.rating`.
+    Predict its value before running, then explain why it differs from `a.rating`.
+2.  In `class_var_inheritance.py`, add a third subclass `class Middle(Base): pass`
+    (no override, like `Left`) and print `Middle.shared` alongside the others at each step.
+    Confirm `Middle` tracks `Base` exactly like `Left` does.
+3.  In `real_defaults.py`, add a third instance, `b2 = B()`, after `b.x` has been changed some other way,
+    and confirm `b2.x` is still `100`, unaffected.
+4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`) class attribute instead,
+    then have an instance assign to `self.total` directly and explain, using `vars()` as in `inside_objects.py`,
+    what that assignment actually creates.

@@ -466,7 +466,7 @@ def test_decaf_adds_no_cost() -> None:
 
 ## Exercises
 
-1.  Add a `Syrup` extra (cost 0.30) and use it to build a decaf latte with syrup.
+1.  Add a `Syrup` extra (cost 0.30) and use it to build a decaf cappuccino with syrup.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.

@@ -125,6 +125,23 @@ and the output shown is the output it produces.
 If you find a mistake, corrections are welcome;
 see `CONTRIBUTING.md` in the source repository.
 
+## Exercises
+
+Most chapters end with a short "Exercises" section.
+These are meant for a workshop, worked in pairs at a keyboard,
+not left for solitary homework.
+Each one asks you to change a small, already-working example from that chapter
+and observe the result:
+add a class, break an invariant on purpose, extend a table, rewrite one function two ways.
+None of them need a large new program.
+The point is to touch the code, predict what will happen, then run it and check.
+
+Solutions live in the `Solutions/` directory of the source repository,
+one file per chapter, alongside a short explanation of what each exercise demonstrates.
+Try the exercise yourself before reading the solution.
+The value is in the prediction and the surprise when you are wrong,
+not in the code you end up with.
+
 ## Resources
 
 - [The official Python tutorial](https://docs.python.org/3/tutorial/)

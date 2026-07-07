@@ -113,6 +113,27 @@ jobs:
       - name: Lint examples with ruff
         run: uv run ruff check build/examples
 
+      # The same five checks, applied to Solutions/ (worked exercise
+      # answers), which go through a parallel extract/validate/ty/ruff/pytest
+      # pipeline (tools/extract_solutions.py). See tools/README.md.
+      - name: Check solutions match Solutions/*.md
+        run: uv run python tools/extract_solutions.py
+
+      - name: Extract solutions for running
+        run: uv run python tools/extract_solutions.py --write
+
+      - name: Verify solutions #: output markers
+        run: uv run python tools/validate_output.py --tree "$GITHUB_WORKSPACE/build/solutions" Solutions
+
+      - name: Type-check solutions with ty
+        run: uv run ty check build/solutions
+
+      - name: Lint solutions with ruff
+        run: uv run ruff check build/solutions
+
+      - name: Run the solutions' pytest examples
+        run: uv run pytest build/solutions
+
   # Prose checks, opt-in only (same trigger as the gates job). codespell fails
   # on spelling errors; Vale fails on em-dashes (an error-level rule) and prints
   # the warning-level house-style findings. These also run locally via

@@ -689,3 +689,18 @@ It is that purity, immutability, and referential transparency shrink the distanc
 Proof is the far end of that distance.
 The everyday win is everything below it: code you can read, check, and test as statements about what is true.
 That, more than the presence of functions, is the "functionality" the introduction set out to find.
+
+## Exercises
+
+1.  In `pure_functions.py`, write a third function, `deposit(amount)`, that behaves like `withdraw()`
+    but adds to `balance` instead of subtracting.
+    Explain, the way the text does for `withdraw()`, why `deposit()` is impure.
+2.  In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
+    with no change to how `operations["*"](6, 4)` gets called.
+3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of
+    `double` and `triple`, each remembering its own `factor`.
+4.  In `composing.py`, write a third small function, `square(n)`, and build
+    `increment_then_double_then_square = compose(square, increment_then_double)`.
+    Predict `increment_then_double_then_square(3)` before running it.
+5.  In `parallel_pure.py`, add a fifth limit, `50_000`, to the `limits` list,
+    and confirm `parallel == serial` still holds after the change.

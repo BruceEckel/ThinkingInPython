@@ -265,3 +265,21 @@ def test_outcome_str() -> None:
 Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,
 so the loop runs only when you execute the file directly,
 not when a test imports it.
+
+## Exercises
+
+1.  Add a fourth `Item`, `Lizard`, to `paper_scissors_rock_table.py`.
+    Lizard beats Paper and Scissors, and loses to Rock;
+    Lizard versus Lizard is a draw.
+    Add the six new entries (both orders of every pair) that `OUTCOME` needs.
+2.  Add the same `Lizard` to `paper_scissors_rock.py`, the double-dispatch version,
+    which means adding an `eval_lizard()` method to every existing class,
+    plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
+    Compare how much code this took versus adding `Lizard` to the table version.
+3.  In `test_paper_scissors.py`, add `Lizard` to `EXPECTED` with its nine (now sixteen)
+    matchups, and confirm both versions still agree with each other and with `EXPECTED`.
+4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None`
+    parameter that it updates in place with a tally of every item type it chooses,
+    while still yielding plain `(item1, item2)` pairs so existing calls need no change.
+    Pass in your own `Counter` and print how many times `Lizard` appeared across
+    `item_pair_gen(Item, 100, counts)`.

@@ -29,6 +29,15 @@ extracted too, so examples that read them can run.
 `Examples/` is the curated copy committed to git. `build/examples/` is a
 throwaway tree (git-ignored) regenerated from the Markdown for running.
 
+`Solutions/*.md` (worked exercise answers) go through the exact same
+extract/validate/ty/ruff/pytest pipeline, via a parallel set of tools and
+`make` targets described in [extract_solutions.py](#extract_solutionspy)
+below. The one difference is that a Solutions code block is
+**self-contained**: it redeclares whatever small piece of book context it
+needs (a class, a helper function) rather than importing from `Examples/`,
+so the two trees never couple and a change to a book example cannot silently
+break a Solutions file.
+
 ## Commands
 
 Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
@@ -56,16 +65,17 @@ complete, categorized list, generated from the Makefile itself so it never
 drifts out of date (see [make_help.py](#make_help.py) below). The everyday ones:
 
 ```
-make verify     # sync Examples/, then every gate except the site build
+make verify     # sync Examples/ and SolutionsCode/, then every gate but the site
 make sync-ci    # like verify, plus the site build (the full gate)
 make ci         # the full local gate: check, ty, ruff, run, pytest, site
 ```
 
 `make verify` is the everyday command after editing the book: it pushes your
-Markdown changes out to `Examples/` (so the drift check passes), then runs every
-gate except the site build. `make sync-ci` does the same and also builds the
-site. `make ci` runs the gate (with site) without syncing first, so it still
-fails on drift, the way GitHub Actions does.
+Markdown changes out to `Examples/` (so the drift check passes), your
+`Solutions/` changes out to `SolutionsCode/`, then runs every gate except the
+site build. `make sync-ci` does the same and also builds the site. `make ci`
+runs the gate (with site) without syncing first, so it still fails on drift,
+the way GitHub Actions does.
 
 ## make_help.py
 
@@ -186,6 +196,45 @@ strict pass: every example must run. The `--baseline` mechanism remains for
 future bulk work (e.g. importing a batch of new, not-yet-fixed examples): record
 them with `--write-baseline`, gate only regressions with `--baseline`, then trim
 entries as you repair them.
+
+## extract_solutions.py
+
+The exact counterpart of `extract_examples.py`, pointed at `Solutions/`
+instead of `Markdown/`; it imports and reuses that module's `extract()`,
+`check_against()`, `write_tree()`, and `is_derived()` rather than duplicating
+them. `SolutionsCode/` is the committed copy (like `Examples/`);
+`build/solutions/` is the throwaway tree used for running (like
+`build/examples/`). Same two modes: check (default, compares against
+`SolutionsCode/`) and `--write` (materializes a tree, default
+`build/solutions/`, or `-o DIR`).
+
+```
+make solutions-sync           # write SolutionsCode/ from Solutions/*.md
+make solutions-check          # verify Solutions/*.md matches SolutionsCode/
+make solutions-extract        # write build/solutions/ (for the checks below)
+make solutions-output-check   # verify #: markers in Solutions/*.md, no rewrite
+make solutions-output         # rewrite them
+make solutions-ty             # type-check build/solutions/
+make solutions-lint           # ruff-check build/solutions/
+make solutions-test           # pytest build/solutions/ (test_*.py)
+make solutions-gate           # all of the above in one go
+```
+
+`solutions-gate` runs as part of the main `gate` (and therefore `verify`,
+`sync-ci`, and `ci`), so a Solutions regression fails the same build a book
+regression would. There is no Solutions counterpart to `run_examples.py`:
+every extractable Solutions block already carries a `#:` marker (checked by
+`solutions-output`, which executes the block to compare), and a block with
+none is a deliberately-unrun illustrative fragment (no `# file.py` slug), the
+same convention `Markdown/` uses for code that only makes sense narrated in
+prose (a type error, a race outcome).
+
+`validate_output.py` needs an **absolute** `--tree` when pointed at
+`Solutions/`: a block runs with its cwd inside `build/solutions/<chapter>/`,
+and a relative tree argument stops resolving once cwd changes underneath it
+(the `run_location()` gotcha `run_examples.py`'s own `--tree` warning
+already describes). The Makefile passes `$(CURDIR)` for this reason; do the
+same when invoking `validate_output.py --tree` on `Solutions/` by hand.
 
 ## reflow_prose.py
 
@@ -438,7 +487,10 @@ builds and publishes the site**. The workflow has these jobs:
   (`run_examples.py`, all must pass), the pytest examples
   (`pytest build/examples`), the type check (`ty check build/examples`,
   zero diagnostics), and the lint (`ruff check build/examples`, zero
-  findings). Deliberate lint exceptions live in
+  findings), followed by the same five checks for `Solutions/`
+  (`extract_solutions.py`, `validate_output.py --tree build/solutions`,
+  `ty check build/solutions`, `ruff check build/solutions`, and
+  `pytest build/solutions`). Deliberate lint exceptions live in
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
 * **`prose` (opt-in only):** the same checks as `make spell` and `make prose`.
   codespell spell-checks `Markdown/` (config in `[tool.codespell]`, ignore list
@@ -477,13 +529,14 @@ Either way, treat CI as a second opinion: run `make ci` locally first.
 Day to day:
 
 1. Make your changes by editing `Markdown/` (the source of truth for prose and
-   code alike).
-2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/`, then
-   runs the full gate (drift, run, pytest, ty, ruff, site). Use plain `make ci`
-   when you want to confirm there is no drift rather than paper over it.
-3. When it is green, commit and push, including any updated `Examples/` files.
-   The default CI path just rebuilds and publishes the site; it does not re-run
-   the gates, so the push is fast.
+   code alike) or `Solutions/` (worked exercise answers).
+2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/` and
+   `SolutionsCode/`, then runs the full gate (drift, run, pytest, ty, ruff,
+   site, plus the same for `Solutions/`). Use plain `make ci` when you want to
+   confirm there is no drift rather than paper over it.
+3. When it is green, commit and push, including any updated `Examples/` or
+   `SolutionsCode/` files. The default CI path just rebuilds and publishes the
+   site; it does not re-run the gates, so the push is fast.
 4. Only when you want CI to re-check the suite itself (an environment-specific
    change, say, or a release) request the gates: add `[full-ci]` to the push
    commit message, or trigger the workflow manually as shown above.

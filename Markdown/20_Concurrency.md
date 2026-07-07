@@ -592,3 +592,20 @@ and `get()` blocks until an item is available,
 so an idle consumer simply waits.
 The [Object Pool](16_Context_Managers.md#an-object-pool) in
 Context Managers uses the same `Queue` as a throttle.
+
+## Exercises
+
+1.  In `async_mechanics.py`, add a fourth call, `fetch("d")`, to the `gather()` line,
+    and confirm the printed list grows to four entries in the order given, not the order they finish.
+2.  In `event_loop_boundary.py`, add a third task function, `mixed_price()`, that awaits
+    `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
+    Run it through `run()` and predict its `meter.peak` before checking:
+    is it closer to the I/O peak or the CPU peak?
+3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
+    (acquire before reading `counter`, release after writing it back)
+    and confirm `counter` now reaches `400`.
+4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call entirely and run the script several times.
+    Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
+    why the race becomes far less likely to show up without that sleep, but is not thereby fixed.
+5.  In `priority_queue.py`, add a third thread submitting `[(1, "zzz"), (3, "aaa")]`
+    and confirm the drain order still respects priority first, then the description as a tiebreaker.

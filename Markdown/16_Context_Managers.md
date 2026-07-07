@@ -393,3 +393,16 @@ such as creating items lazily on first demand,
 validating an item before lending it out,
 and a timeout on `get()` so a starved borrower fails loudly
 instead of waiting forever.
+
+## Exercises
+
+1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first
+    `with Trace("A") as t:` block, with its own `print(f"inside {u.name}")`.
+    Predict the order the four "enter"/"inside"/"exit" lines appear in before running it.
+2.  In `suppress_cm.py`, add `TypeError` to the tuple passed to `Ignore`,
+    then raise a `TypeError` instead of dividing by zero, and confirm it is also suppressed.
+3.  Add a fourth manager to the `with` statement in `multiple.py`, `tag("li")` again for a second item,
+    and confirm the exit order still reverses the entry order.
+4.  In `object_pool.py`, add a test (alongside the ones in `test_object_pool.py`) that leases both connections at once,
+    using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
+    and confirms `pool.available()` reaches `0`.

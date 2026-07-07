@@ -275,3 +275,17 @@ print(square(9))
 Compared to other languages,
 Python's lambdas allow only a single expression.
 For anything more complicated, write a separate function.
+
+## Exercises
+
+1.  In `mutable_default.py`, call `bad_append(3)` a third time and predict the result before checking it.
+    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it
+    (hint: `target.append(item)` on a tuple).
+2.  In `sentinel_default.py`, add a third key to `prefs`, `"volume2": None`,
+    and call `get(prefs, "volume2")` to confirm the sentinel still tells `None`-as-value apart from missing.
+3.  In `param_markers.py`, add a parameter `label: str = "result"` to `divide()`, keyword-only,
+    so `divide(10, 2, label="half")` prints `"half: 5.0"`.
+    Confirm that `divide(10, 2, "half")`, passing `label` positionally, is now a `TypeError`.
+4.  Rewrite `report()` from `var_args.py` so it also accepts a `total: bool = False` keyword-only flag
+    that, when true, additionally prints `sum(values)`.
+    Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.

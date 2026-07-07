@@ -402,3 +402,20 @@ This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
 but composition, mixins, or a plain module-level function are almost always the clearer choice.
 You will rarely, if ever, want this in your own code.
+
+## Exercises
+
+1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`
+    that sets `self.radius = self.radius / factor`, going through the existing setter.
+    Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5`,
+    then confirm `shrink(-2)`, which would divide the radius down to `-5`,
+    still raises the setter's `ValueError` instead of silently storing a negative radius.
+2.  In `class_methods.py`, add a second alternative constructor, `from_kelvin(cls, k)`,
+    using `celsius = k - 273.15`.
+    Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree, within rounding.
+3.  In `simple2.py`, add a third class, `Simple3(Simple2)`, that overrides `show()` again,
+    printing its own message before calling `super().show(msg)`.
+    Predict, then confirm, the full chain of prints from `Simple3("x").show_twice()`.
+4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py`
+    that returns `self.total / len(self.values)`.
+    Access `n.total` and then `n.average`, and confirm `total` is not recomputed when `average` uses it.

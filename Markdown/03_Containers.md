@@ -455,3 +455,18 @@ this is also why dictionary keys must be immutable.
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through.
+
+## Exercises
+
+1.  In `deque.py`, change `n` from `20_000` to `2_000` and run the timing again.
+    Does `deque_time < list_time` still hold?
+    Change `n` to `200_000` and try again.
+    Explain what changes about the comparison as `n` grows.
+2.  In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
+    change the loop to count occurrences of each `kind` instead of collecting names,
+    and print the result.
+3.  In `set_methods.py`, add a third set `c = {1, 5, 9}` and print `a.union(b, c)`
+    and `a.intersection(b, c)`.
+4.  In `immutability.py`, add a line that tries `groups.add([1, 2])`
+    (a plain list, not a `frozenset`) and catch the exception it raises.
+    Explain, in terms of hashability, why a `frozenset` works as a set member but a `list` does not.

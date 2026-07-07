@@ -324,3 +324,19 @@ while saying what it does more directly.
 `**` does the same for dictionaries, merging each mapping with later keys winning.
 The set form `{*s for s in sets}` and the asynchronous generator form
 (`(*a async for a in agen())`) work the same way.
+
+## Exercises
+
+1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`), write a list comprehension that finds
+    the string elements made only of digits (`e.isdigit()`), converts each to `int` with `int(e)`,
+    and squares it. The predicate must reject `"a"` so `int()` never sees it.
+2.  In `identity_matrix.py`, change the comprehension to build a 3 by 3 matrix
+    with `2` on the diagonal instead of `1`, without adding a second pass over the result.
+3.  In `dict_comprehension.py`, add a fourth entry, `"z": 12`, to `mcase`
+    and confirm the merged `mcase_frequency` still combines upper and lower case correctly.
+4.  In `generator_expression.py`, replace `islice(squares, 3)` with `islice(squares, 5)`
+    and predict which five values it produces,
+    given that `next(squares)` was already called twice before that line.
+5.  In `unpacking_comprehensions.py`, add a fourth entry `{"a": 5, "c": 9}` to `dicts`
+    and predict what `{**d for d in dicts}` produces before running it,
+    paying attention to which value wins for the key `"a"`.

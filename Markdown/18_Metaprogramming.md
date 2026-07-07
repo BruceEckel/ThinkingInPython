@@ -734,3 +734,18 @@ its field values, so `x` now appears beside `y` and `z`.
 Both headers read `=== Fraggle ===`. For a class `display_object()` prints the
 class's own name, and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.
+
+## Exercises
+
+1.  In `init_subclass.py`, add a class `Yellow(Color)` and then `MutedYellow(Yellow)`.
+    Predict `Color.registry` after each new class, then confirm.
+2.  In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
+    set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
+3.  In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)`
+    and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
+    while `c1 is a` (comparing across the different singleton classes) is `False`.
+4.  In `final_runtime.py`, add a class `D(A)` (a second, independent subclass of the non-final `A`)
+    and confirm it succeeds, the same way `Ok` does in `test_final.py`.
+5.  Using `inspect_tour.py` as a model, write a function `describe(func)` that prints a function's
+    name, its `inspect.signature()`, and its docstring (or `"(no docstring)"` if `inspect.getdoc()`
+    returns `None`), then call it on `greet` and on a lambda.

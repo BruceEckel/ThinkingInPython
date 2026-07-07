@@ -276,3 +276,19 @@ and neither `lazy from module import *` nor a `lazy from __future__` import is
 allowed.
 To make every import lazy without editing source, use the `-X lazy_imports`
 command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
+
+## Exercises
+
+1.  Add a third module, `a_package/module3.py`, with its own `function3()`
+    that prints a message when the module loads.
+    Import it three different ways, one each using plain `import a_package.module3`,
+    `from a_package import module3`, and `from a_package.module3 import function3`,
+    and confirm the loading message prints only once no matter how many of the three you use together.
+2.  In `using_packages.py`, add a third import, `import a_package.module1` again, at the bottom of the file.
+    Run it and explain why the "importing module1" message does not print a second time.
+3.  Write a small module `noisy2.py` whose top-level body prints a message, similar to the `noisy` module described in the text.
+    In a new script, `lazy import` both `noisy` and `noisy2`, then use `noisy2` before `noisy`.
+    Confirm the two loading messages print in the order you used the modules, not the order you wrote the `lazy import` lines.
+4.  Rename `module.py` to `Module.py` (capital M) and update `use_module.py`'s import to match.
+    Using [File Names](#file-names), explain why this still runs correctly on Windows
+    but can fail on a case-sensitive filesystem such as Linux's.

@@ -439,3 +439,16 @@ The runtime ignores all of these; they exist for the checker and the reader.
 Older code spells some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`, `Tuple` from `typing` for
 the lowercase built-ins. The forms above are the modern ones.
+
+## Exercises
+
+1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
+    and pass an instance to `render()` without changing `Drawable` or `render()` at all.
+2.  In `area.py`, remove the `# type: ignore` comment and run `ty check` on the file.
+    Read the error, then restore the comment.
+3.  In `generics.py`, write a second generic function, `last[T](items: list[T]) -> T`,
+    that returns the final element, and call it on both a `list[int]` and a `list[str]`
+    the way `first()` is called.
+4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally`
+    whose `report()` returns the message in all capitals, calling `super().report()` first.
+    Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.

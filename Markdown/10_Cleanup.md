@@ -147,3 +147,15 @@ so the count could never fall.
 The weak reference allows the registry to prune itself.
 Unlike the `__del__()` version, this reads the count during normal execution,
 so it never depends on the unreliable bookkeeping at interpreter shutdown.
+
+## Exercises
+
+1.  In `weak_value.py`, change `counters` from a `list` to a plain `dict` keyed by name,
+    then pop entries from that `dict` one at a time and confirm `live_count()` still falls correctly.
+2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []` (rebinding the name)
+    and confirm `live_count()` still reaches `0`.
+    Explain, in terms of what `counters` refers to, why rebinding has the same effect as clearing.
+3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of
+    the `.name` of every live instance, by reading `cls._instances.values()`.
+4.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()`
+    in a `for` loop, and confirm the output is unchanged: nothing is deleted before `End of delete loop` prints.

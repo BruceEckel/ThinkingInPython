@@ -721,3 +721,21 @@ Many of them arose to work around limitations of older object-oriented languages
 Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol already solve the problem.
+
+## Exercises
+
+1.  In `leaky.py`, add a `tags: list[str]` field to `Leaky`, exposed through a `@property` the same way
+    `numbers` is, and demonstrate the same leak by mutating the list you get back.
+    Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
+2.  In `point_distance.py`, add a third point `p3 = Point(6, 8)`
+    and confirm `distance(p1, p3)` and `p1.distance_to(p3)` still agree.
+3.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`, `b`, `c`
+    (no `x` or `y`), and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`, ignoring `c`.
+    Confirm `distance()` works on a `TripleCoord` with no change to `distance()` itself.
+4.  In `shapes_match.py`, add a new shape, `Square(side: float)`, to the `Shape` union,
+    add its `case` to `area()`, and confirm `ty check` still passes.
+    Then temporarily comment out the new `case` and observe what `assert_never()`
+    causes the checker to report.
+5.  In `null_logger.py`, write a second null-object style class, `NullCache`,
+    whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
+    following the same shape as `NullLogger`.

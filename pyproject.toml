@@ -69,6 +69,7 @@ lines-after-imports = 1
 "**/trace_class.py" = ["N801"]
 "**/count_calls.py" = ["N801"]
 "**/repeat_class.py" = ["N801"]
+"**/trace_counting.py" = ["N801"]
 # This example exists to show that importing a module runs its top-level
 # code; the imported name is intentionally unused.
 "**/import_module.py" = ["F401"]
