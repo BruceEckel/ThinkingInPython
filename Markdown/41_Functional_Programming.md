@@ -657,6 +657,18 @@ print(list(repeat("x", 3)))
 #: ['x', 'x', 'x']
 ```
 
+### `islice()`
+
+Slices any iterable, including an infinite one, the way `[start:stop:step]` slices a list.
+
+```python
+# itertools_islice.py
+from itertools import islice
+
+print(list(islice(range(10), 2, 8, 2)))
+#: [2, 4, 6]
+```
+
 ### `count()`
 
 Counts up (or down) forever from a start value, with a fixed step.
@@ -693,18 +705,6 @@ from itertools import chain
 
 print(list(chain([1, 2], [3, 4])))
 #: [1, 2, 3, 4]
-```
-
-### `islice()`
-
-Slices any iterable, including an infinite one, the way `[start:stop:step]` slices a list.
-
-```python
-# itertools_islice.py
-from itertools import islice
-
-print(list(islice(range(10), 2, 8, 2)))
-#: [2, 4, 6]
 ```
 
 ### `pairwise()`
@@ -808,7 +808,10 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 
 ### `zip_longest()`
 
-Zips iterables of different lengths, filling the gaps instead of stopping at the shortest.
+Zips iterables of different lengths, filling the gaps instead of
+stopping at the shortest. The default filler is `None`, but
+`fillvalue` is a keyword-only argument, so a real value needs a
+distinct sentinel when `None` is itself a valid element:
 
 ```python
 # itertools_zip_longest.py
@@ -816,6 +819,10 @@ from itertools import zip_longest
 
 print(list(zip_longest([1, 2, 3], [4, 5])))
 #: [(1, 4), (2, 5), (3, None)]
+
+MISSING = sentinel("MISSING")
+print(list(zip_longest([1, 2, 3], [4, 5], fillvalue=MISSING)))
+#: [(1, 4), (2, 5), (3, MISSING)]
 ```
 
 ### `groupby()`
@@ -930,7 +937,7 @@ Recursion suits problems that are naturally self-similar, such as walking a tree
 Python does not optimize tail calls and limits the call stack, so very deep recursion will raise `RecursionError`.
 For long flat sequences, a loop or one of the `itertools` tools is the better choice.
 
-Recursion pays off when the data is itself recursive.
+Recursion is beneficial when the data is itself recursive.
 Code that walks a tree, nested data, or a directory reads most clearly when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:
 
@@ -968,24 +975,160 @@ Combined with `itertools`, you can describe an infinite sequence and take only t
 from collections.abc import Iterator
 from itertools import count, islice
 
-# A generator yields values one at a time, on demand:
 def squares() -> Iterator[int]:
     for n in count(1):
+        print(f"computing square {n}")  # Proves this runs on demand
         yield n * n
 
 # count() is infinite; islice() pulls only what we ask for:
 first_five = list(islice(squares(), 5))
 print(first_five)
+#: computing square 1
+#: computing square 2
+#: computing square 3
+#: computing square 4
+#: computing square 5
 #: [1, 4, 9, 16, 25]
 ```
 
 `squares()` never finishes on its own, yet the program terminates because `islice()` requests exactly five values.
-Nothing beyond those five is ever computed.
-The [Performance](19_Performance.md) chapter looks at laziness from the angle of memory and speed.
+Each `computing square N` line appears only when `islice()` pulls that value,
+one at a time, the same way any `for` loop consumes a generator.
+Nothing here is a batch.
+`squares()` never runs ahead to precompute several values before handing one back.
+There is no sixth `computing square` line,
+because `islice()` stops asking the moment it has delivered five.
+The [Performance](19_Performance.md) chapter looks at laziness from the perspective of memory and speed.
 
 Laziness matters most at scale.
-A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time, so memory stays flat no matter how large the source grows.
-Stages chain together without building intermediate lists between them, and a consumer that stops early, such as `any()` or `next()`, means the upstream work for the items it never reaches never happens at all.
+A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
+so memory stays flat no matter how large the source grows.
+Stages chain together without building intermediate lists between them, and a consumer that stops early,
+such as `any()` or `next()`, means no upstream work for the items it never reaches.
+
+## Case Study: Pairing Rotations
+
+Here is a recurring practical problem.
+Pair up participants for an activity across several rounds, and
+avoid repeating a pairing until every possible pairing has had a turn.
+This is a good place to see the chapter's ideas working together on
+one small, real program instead of one at a time.
+
+The *circle method* solves it exactly, with no trial and error.
+Fix one player and arrange the rest in a circle.
+Each round, pair players sitting across from each other,
+then rotate everyone except the fixed player by one seat.
+With `n` players this produces `n - 1` rounds where no pair repeats.
+That is the best any schedule can do.
+Those rounds use up every one of the `n * (n - 1) / 2` possible
+pairs exactly once, and none are left over.
+An odd number of players leaves one seat unpaired each round.
+The obvious fix is a *bye*. That student sits out.
+A friendlier fix folds the leftover student into one of the
+round's groups instead, so nobody ever sits out, at the cost of
+a few pairs meeting twice before every pair has met at least once.
+
+The first version of this tried always folding the leftover into
+the *first* group of the round.
+It looked reasonable for three rounds, then testing it over many
+more rounds and larger rosters exposed the flaw.
+The fixed player's own pair is nearly always that first group,
+so the fixed player ended up in a triple in every single round,
+no matter how large the roster grew.
+Growing the roster did not smooth that out.
+It could not, since the fixed player's seat never rotates.
+The fix is to let each round pick a different group at random,
+seeded by the round number:
+
+```python
+# student_pairs.py
+import random
+from collections import deque
+from collections.abc import Iterator
+from itertools import combinations, count, islice
+
+type Student = str
+type Group = tuple[Student, ...]
+type Round = list[Group]
+
+def round_robin(students: list[Student]) -> Iterator[Round]:
+    "Yield groupings; an odd roster gets a triple, not a bye."
+    roster: deque[Student | None] = deque(students)
+    if len(roster) % 2:
+        roster.append(None)  # A placeholder seat for the odd one out
+    fixed = roster.popleft()
+    for round_number in count():
+        seats = [fixed, *roster]
+        half = len(seats) // 2
+        pairs = [(seats[i], seats[-i - 1]) for i in range(half)]
+        groups: list[Group] = []
+        leftover: Student | None = None
+        for a, b in pairs:
+            if a is None or b is None:
+                leftover = a if b is None else b
+            else:
+                groups.append((a, b))
+        if leftover is not None:
+            idx = random.Random(round_number).randrange(len(groups))
+            groups[idx] = (*groups[idx], leftover)
+        yield groups
+        roster.rotate(1)
+
+students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
+rounds = list(islice(round_robin(students), len(students)))
+for i, grouping in enumerate(rounds[:3]):
+    print(i, grouping)
+#: 0 [('Bo', 'Gia'), ('Cy', 'Fi', 'Ana'), ('Di', 'Eve')]
+#: 1 [('Ana', 'Gia', 'Fi'), ('Bo', 'Eve'), ('Cy', 'Di')]
+#: 2 [('Ana', 'Fi', 'Di'), ('Gia', 'Eve'), ('Bo', 'Cy')]
+
+met = [frozenset(pair) for r in rounds for group in r
+       for pair in combinations(group, 2)]
+possible = set(map(frozenset, combinations(students, 2)))
+print(len(set(met)), "of", len(possible), "pairs met at least once")
+#: 21 of 21 pairs met at least once
+print(len(met) - len(set(met)), "repeat meetings")
+#: 14 repeat meetings
+```
+
+`random.Random(round_number)` builds a fresh, independently seeded
+generator every call, so `round_robin()` is still a pure function
+of `students` and how many times it has been advanced.
+Nothing global gets touched, and the same round always merges the
+same leftover into the same group.
+Purity was never the problem with the first attempt.
+Fairness was, and fixing fairness did not cost purity anything.
+Measured the same way as before, across rosters from `7` up to
+`51` students, no single student ever again dominates the triple
+count the way the fixed player did under the first version.
+The spread narrows as the roster grows, instead of staying pinned
+to one unlucky seat forever.
+
+`deque.rotate(1)` moves every seat but the fixed one over by one
+position in constant time.
+That's why the roster is a `deque` and not a `list`.
+Rotating a list means rebuilding it.
+Seven students form three groups a round, two ordinary pairs and
+one triple.
+The triple contributes three meetings instead of one, so a round
+produces five meetings rather than four.
+Seven rounds of that is `35` meetings, but only `21` unique pairs
+exist among seven students, so `14` repeats are unavoidable once
+nobody is left to sit out.
+That is not a flaw in the schedule.
+It is the fewest repeats any triple-forming schedule can have,
+and `itertools.combinations()`, reused from
+[earlier in this chapter](#combinations), proves it by counting.
+Listing every meeting the seven rounds actually produce, then
+comparing that count against the `21` unique pairs, is the same
+substitution-based reasoning
+[Referential Transparency](#referential-transparency) develops next.
+
+Calling `round_robin()` again with `next()` past round `n - 1` does
+not raise `StopIteration`.
+It keeps yielding, cycling back through the same schedule,
+repeating the same, already-minimal set of extra meetings rather
+than accumulating new ones.
 
 ## Pattern Matching as Destructuring
 
