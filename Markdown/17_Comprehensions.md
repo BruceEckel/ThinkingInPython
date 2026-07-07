@@ -267,7 +267,7 @@ So neither saves anything over the set comprehension `{len(w) for w in words}`
 or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are the better choice.
 
-A generator expression earns its keep when the consumer takes values one at a
+Use a generator expression when the consumer takes values one at a
 time and never needs them all, such as `sum()`, `any()`, `all()`, `min()`,
 `max()`, or `str.join()`:
 

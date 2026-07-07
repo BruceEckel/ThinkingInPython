@@ -157,7 +157,7 @@ that triggers a special effect or consults outside state, something
 too large to fit in one table cell.
 
 You can keep the calling code as simple as the object version while
-using a table underneath, exactly the way `paper_scissors_rock.py`'s
+using a table underneath, the way `paper_scissors_rock.py`'s
 `Item.compete()` and `paper_scissors_rock_table.py`'s `Item.compete()`
 both read as `item1.compete(item2)` at the call site. The table only
 changes what happens *inside* `compete()`, a dictionary lookup instead

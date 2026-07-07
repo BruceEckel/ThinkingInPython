@@ -367,7 +367,7 @@ Because classes are already first-class objects,
 the registry shown above does the same job.
 It maps a name straight to a class and constructs it.
 Prefer that.
-A separate factory *class* earns its keep only when creating an object takes real work beyond calling a constructor,
+A separate factory *class* becomes valuable when creating an object takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
 
 ## Abstract Factories
@@ -641,7 +641,7 @@ def test_prototype_untouched() -> None:
 The remaining creational pattern in *GoF Design Patterns* is *Builder*:
 separate the construction of a complex object from its representation,
 assembling it in steps.
-In Java and C++ it earns its keep by curing the *telescoping constructor*.
+In Java and C++ it cures the *telescoping constructor*.
 A class with many optional settings needs a constructor for every
 useful combination, because those languages have no keyword arguments.
 The workaround is a companion class that collects settings one

@@ -63,7 +63,7 @@ info: Function defined here
   |     ^^^^ ---------- Parameter declared here
 ```
 
-The checker pinpoints exactly the mistake the chapter describes: `"3"`
+The checker pinpoints the mistake the chapter describes: `"3"`
 is a `str`, not an `int`, so it violates `width: int`, even though the
 call runs without error at runtime (`"3" * 4` is valid string
 repetition). The `# type: ignore` comment that was on this line in the

@@ -62,11 +62,10 @@ so `todo[0].append("cheese")` shows up in `shallow` too.
 `copy.deepcopy()` walks the whole structure and rebuilds every nested container from scratch,
 so `deep`'s inner lists share nothing with `todo`'s.
 The later `todo[0].append("jam")` never reaches `deep`.
-Every classic memento is some version of this move:
-copy the state before it changes.
 
 ## The Classic Memento
 
+Every classic memento is some version of copying the state before it changes.
 Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable even though the originator is not.
@@ -117,6 +116,17 @@ Languages with access control enforce this opacity.
 In Python it is a convention,
 though freezing the memento means the honest mistakes (mutating the snapshot) fail loudly.
 
+A plain `type Memento = tuple[str, ...]` alias would type-check
+at every call site instead of the class.
+But an alias is *structural*, not *nominal*.
+Any `tuple[str, ...]` in the program satisfies it,
+including one a caretaker builds or unpacks by hand.
+Wrapping the tuple in a one-field dataclass gives `Memento` an identity of its own.
+The only way to see the strokes is through `.strokes`,
+so reaching inside becomes visible in the code, not just a convention to honor.
+`frozen=True` is what makes reassigning `checkpoint.strokes` fail instead of silently succeeding.
+The tuple inside was already immutable, but the attribute itself was not.
+
 ```python
 # test_sketch.py
 from sketch import Sketch
@@ -144,7 +154,7 @@ def test_drawing_after_restore_spares_memento() -> None:
     assert checkpoint.strokes == ()
 ```
 
-The third test guards the subtle bug.
+The third test checks for the subtle bug.
 If `restore()` handed the memento's data back by reference,
 drawing afterward would corrupt the snapshot.
 Both `save()` and `restore()` must copy.
@@ -183,14 +193,14 @@ if __name__ == "__main__":
 
 `draw()` returns a new `Sketch` instead of editing this one,
 using `dataclasses.replace()` to change one field and carry the rest along.
-Since each call returns a `Sketch`, calls chain.
-Saving is keeping a reference,
+Since each call returns a `Sketch`, the calls can be chained.
+Saving means keeping a reference,
 exactly the move that failed in `aliased_snapshot.py`.
-It is safe now because no operation anywhere can change the object bound to `before`.
+Now it is safe because no operation anywhere can change the object bound to `before`.
 There is no `Memento` class, no `save()`, and no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
-This is the argument of [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
+This is the argument made by [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
 as [Flyweight](36_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
@@ -319,10 +329,10 @@ Each `Sketch` above shares almost all of its strokes with its neighbors in the h
 
 ## Mementos That Outlive the Process
 
-A snapshot in memory disappears with the process.
-The same frozen value, serialized, becomes a saved game, a session file,
-or a crash-recovery point.
-`pickle` turns almost any Python object into bytes and back:
+A snapshot in memory disappears when the process ends.
+The same frozen value, serialized, becomes a saved game,
+a session file, or a crash-recovery point.
+The standard library's `pickle` turns almost any Python object into bytes and back:
 
 ```python
 # round_trip.py
@@ -339,10 +349,93 @@ The bytes from `pickle.dumps()` can go to a file and come back in a different pr
 days later.
 The round trip produces a different object with the same value,
 which is all a memento needs, since frozen data classes compare by value.
-Only unpickle data you trust; the format can execute code.
+
+Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,
 convert the state with `dataclasses.asdict()` and write JSON,
 which one of the exercises explores.
+
+Pickle's other limitation is time.
+The bytes encode a class by module and name,
+not by the shape that class had at save time.
+If `Sketch` gains, loses, or renames a field before the load happens,
+`pickle.loads()` still succeeds.
+What breaks is everything that touches the missing piece.
+Splitting the class into its own module keeps the simulation honest,
+since real drift happens between two separate runs of a program,
+not inside one script:
+
+```python
+# sketch_v1.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class SketchV1:
+    strokes: tuple[str, ...]
+```
+
+```python
+# pickle_drift.py
+import pickle
+from dataclasses import dataclass
+import sketch_v1
+from sketch_v1 import SketchV1
+
+blob = pickle.dumps(SketchV1(("circle", "beak")))
+
+@dataclass(frozen=True)
+class SketchV2:
+    strokes: tuple[str, ...]
+    title: str
+
+sketch_v1.SketchV1 = SketchV2  # type: ignore
+restored = pickle.loads(blob)
+print(restored.strokes)
+#: ('circle', 'beak')
+try:
+    print(restored.title)
+except AttributeError as e:
+    print(type(e).__name__, e)
+#: AttributeError 'SketchV2' object has no attribute 'title'
+```
+
+`blob` is written while `sketch_v1.SketchV1` still means the one-field class.
+`sketch_v1.SketchV1 = SketchV2` stands in for that module being edited and reloaded,
+with a field added between the save and the load.
+The type checker flags that reassignment as unsound so it carries a `# type: ignore`.
+There isn't a practical way to declare that `SketchV1` can become a different class.
+`pickle.loads()` never calls `__init__`.
+It looks up the class by the name pickle recorded, `sketch_v1.SketchV1`.
+That name now points at `SketchV2`.
+`pickle.loads()` builds a bare `SketchV2`
+and copies in only the fields the old bytes had.
+`title` is simply absent, since the old bytes never had one.
+The same shortcut skips `__post_init__`,
+so a memento saved before a validated field existed
+can load a value nothing ever validated.
+`restored.strokes` works because both versions agree on that field.
+`restored.title` fails the moment anything asks for it,
+which is often nowhere near the line that called `pickle.loads()`.
+Pickle is convenient because it hides this contract.
+Nothing enforces that the class on load matches the class on save.
+
+Databases hit the same problem and gave it a name.
+A *schema migration* is the disciplined version of this drift,
+a versioned, deliberate step that moves the table shape
+and its data forward together,
+instead of discovering the mismatch when a query runs.
+
+When either limitation rules out `pickle`, a few libraries fill the gap.
+`msgspec` and `pydantic` both validate on load.
+A shape mismatch raises a clear error at the boundary,
+instead of the delayed `AttributeError` from `pickle_drift.py`.
+Protocol Buffers goes further.
+Every field gets an explicit, numbered slot in a schema
+shared across languages.
+Old and new versions can then read each other's messages
+on purpose, not by accident.
+None of the three execute the bytes they read,
+so none carry pickle's security risk either.
 
 ## Snapshots in the Wild
 

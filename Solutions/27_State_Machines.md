@@ -146,7 +146,7 @@ print(person.hello())
 `hello()` method. `UnpredictablePerson` never mentions any specific
 mood by name, so adding a third one changes nothing about the
 surrogate itself, only which `Mood` object gets swapped in through
-`change_to()`. This is exactly the *State* surrogate from
+`change_to()`. This is the *State* surrogate from
 [Surrogate](26_Surrogate.md#state), applied to a new domain.
 
 ## 3. A washing machine, table-driven

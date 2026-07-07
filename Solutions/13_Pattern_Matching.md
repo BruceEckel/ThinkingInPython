@@ -85,7 +85,7 @@ Once `Rectangle` joins the `Shape` union, the checker can prove that a
 `assert_never()` demands its argument have type `Never`, meaning "this
 code is unreachable," but the checker now knows `shape` could
 genuinely be a `Rectangle` at that point, so the two types disagree
-and it reports an error. This is exactly the safety net the chapter
+and it reports an error. This is the safety net the chapter
 describes: the missing case becomes a caught type error instead of a
 silent gap that only shows up when an actual `Rectangle` reaches
 `area()` at runtime.

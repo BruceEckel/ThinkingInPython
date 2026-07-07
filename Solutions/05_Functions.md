@@ -51,7 +51,7 @@ print(get(prefs, "volume2"))
 `in` check finds it, so `get()` returns the stored `None` directly,
 without ever consulting `default`. The `MISSING` sentinel only matters
 when the key is genuinely absent; here it never comes into play,
-which is exactly the point: a present `None` and an absent key are
+which is the point: a present `None` and an absent key are
 different situations, and the sentinel exists to tell them apart.
 
 ## 3. A keyword-only `label` parameter

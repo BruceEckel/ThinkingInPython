@@ -44,7 +44,7 @@ if __name__ == "__main__":
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
 (introduced in [Static Typing](08_Static_Typing.md#the-self-type))
-declares exactly that: an instance of the enclosing class.
+declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block guarantees that the exit code runs at the end of the scope.
 
@@ -239,7 +239,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `nullcontext(value)` is a do-nothing manager that yields `value`, useful when
   a `with` is optional and you want one code path.
 
-`nullcontext` earns its keep when only some runs have a resource to manage.
+`nullcontext` is useful when only some runs have a resource to manage.
 A function might take an optional file to write to, defaulting to standard output.
 The default must stay open, so wrapping `sys.stdout` in `nullcontext` lets a single
 `with` block serve both cases:

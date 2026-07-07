@@ -58,7 +58,7 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import NamedTuple
 
-# SimpleNamespace is exactly the Messenger idiom, built in:
+# SimpleNamespace is the Messenger idiom, built in:
 m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
 print(m.info, m.b, m.more)

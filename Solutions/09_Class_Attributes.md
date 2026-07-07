@@ -115,5 +115,4 @@ through the class, is completely untouched and still reports `2`.
 This is precisely the shadowing bug `ClassVar` exists to catch. Had
 `total` been declared `total: ClassVar[int] = 0`, the type checker
 would flag `a.total = 99` as an error before this line ever ran,
-because it can see this assignment would create exactly this
-confusing shadow.
+because it can see this assignment would create this confusing shadow.

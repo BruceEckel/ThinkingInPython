@@ -38,7 +38,7 @@ print(describe(301))
 
 For a plain value-to-value lookup like this,
 a dictionary is often shorter (see the end of this chapter).
-`match` earns its keep once the patterns do more than test equality.
+`match` becomes valuable once the patterns do more than test equality.
 
 ## Alternatives and Capture
 
@@ -289,7 +289,7 @@ Add a `Triangle` to `Shape` without adding the appropriate `case`, and the check
 A `switch` in other languages cannot do this.
 An `if`/`isinstance()` chain can, but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
-[Rethinking Objects](21_Rethinking_Objects.md#polymorphism-without-inheritance) uses exactly this technique to add operations to a closed set of types without inheritance.
+[Rethinking Objects](21_Rethinking_Objects.md#polymorphism-without-inheritance) uses this technique to add operations to a closed set of types without inheritance.
 `test_exhaustive_area()` tests the area of each shape:
 
 ```python

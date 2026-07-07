@@ -198,7 +198,7 @@ between them:
 ```
 
 the rats, starting in the left room, map every cell of that room and
-none of the right room's, so `unreached` is exactly the right room's
+none of the right room's, so `unreached` is the right room's
 nine open cells. What makes a cell unreachable is not being walled
 off in the abstract but having no path of open cells connecting it to
 the entry; `Maze.entry()` finds the first open cell scanning row by
@@ -257,7 +257,7 @@ control at an `await`, so with nothing to await in between, the two
 statements execute as one uninterruptible unit as far as any other
 coroutine is concerned; nothing else can run "in the middle" of them,
 because there is no scheduling point in the middle. Adding the
-`await` creates exactly that scheduling point, and the whole guarantee
+`await` creates that scheduling point, and the whole guarantee
 depends on there being none.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,

@@ -20,7 +20,7 @@ a pure function must return the same value every time it is called
 with the same arguments. `deposit()` reads and mutates `balance`, a
 name outside its own scope, so its result depends on how many times it
 (or `withdraw()`) has already run. You cannot know what `deposit(30)`
-returns without tracking the history of every prior call, exactly the
+returns without tracking the history of every prior call, which is the
 problem the chapter raises for `withdraw()`.
 
 ## 2. A `"*"` operator added to the dispatch table
@@ -44,7 +44,7 @@ print(operations["+"](6, 4), operations["-"](6, 4), operations["*"](6, 4))
 #: 10 2 24
 ```
 
-`operations["*"](6, 4)` is called exactly the same way as the other
+`operations["*"](6, 4)` is called the same way as the other
 two entries; nothing about the calling code changes. Supporting a new
 operator really was just adding one row to the table, as the chapter
 claims.

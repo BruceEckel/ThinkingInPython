@@ -116,7 +116,7 @@ same signature.
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
 that captured list. `P.args` is the positional part and `P.kwargs` the keyword part.
 You may only use them together, as the `*args` and `**kwargs` of a function typed with `P`.
-They bind the wrapper's arguments to exactly the parameters `P` captured,
+They bind the wrapper's arguments to the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
 Without `P` you would fall back to `*args: Any, **kwargs: Any`,

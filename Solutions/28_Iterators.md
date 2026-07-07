@@ -19,7 +19,7 @@ print(total(evens(5)))
 #: 20
 ```
 
-`evens()` is a generator function, exactly the same shape as
+`evens()` is a generator function which is the same shape as
 `fibonacci()`: a function containing `yield`, so calling it returns an
 iterator rather than running the body immediately. `total()` calls
 `sum()` on whatever iterable it receives, so it sums `evens(5)`'s

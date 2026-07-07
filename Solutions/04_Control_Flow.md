@@ -49,7 +49,7 @@ print(collatz_sequence(10))
 
 Six steps total, and only one of them (`5 -> 16`) starts from an odd
 `n`. `odd_count` increments in the branch that takes `3 * n + 1`,
-which is exactly the branch that only runs when `n` was odd.
+which is the branch that only runs when `n` was odd.
 
 ## 3. Swapped order of `continue` and `break`
 
@@ -65,7 +65,7 @@ print()
 #: 0 1 2 4 5
 ```
 
-The output is exactly the same as the original order. The two `if`
+The output is the same as the original order. The two `if`
 blocks test different, mutually exclusive values of `n` (`6` and
 `3`), so on any given loop iteration at most one of them can be true.
 Since neither block's outcome depends on whether the other one ran

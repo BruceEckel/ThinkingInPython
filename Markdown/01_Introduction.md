@@ -5,7 +5,7 @@ You build that judgment through insights, idioms, and patterns.
 The book is also honest about design patterns.
 Most arose to work around the limits of static,
 inheritance-heavy languages, and in Python many of them diminish or dissolve.
-If an idiom or pattern still earns its keep, it stays.
+If an idiom or pattern is still useful, it stays.
 
 Every language has habits worth learning and habits worth dropping.
 Programmers who come to Python from C++ or Java arrive with patterns,
@@ -46,8 +46,14 @@ to ones as daunting as that commented-output system.
 The result is much better than I've been able to achieve in the past.
 I'm able to keep going until I've tweaked everything that occurs to me.
 
+For things that I have generated rather than written from scratch,
+I've become the director of the movie instead of an actor in it.
+This book is what I've always wanted to create,
+but have never had the capacity to fully flesh out in all its myriad detail.
+With Claude and my directing, rewriting, and editing, I'm able to build my ideal book.
+
 I can't predict the future of books.
-The internet and eBooks have already changed the print book industry.
+The internet and eBooks have been changing the print book industry for decades.
 But with AI, how many people will keep reading computer programming books?
 I hardly do.
 If I need something, I ask AI.

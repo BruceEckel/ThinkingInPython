@@ -53,7 +53,7 @@ A bare function is no longer enough. `command.py`'s original `loony`,
 `new_brain`, and `afford` take no arguments and remember nothing, so a
 plain function fully describes them. Undo needs a command to remember
 *what it did*, here the account and the amount deposited, so it can
-reverse exactly that action later; a fresh call to the same function
+reverse that action later; a fresh call to the same function
 cannot know what a previous call changed. That remembered state is
 precisely what an object gives you and a bare function does not. This
 confirms the chapter's own line: "the object form earns its keep only

@@ -57,8 +57,7 @@ print(plugged.tags)
 `.copy()` closes the leak the same way it does for `numbers`: the
 caller now mutates a throwaway copy, and `plugged`'s real `_tags` is
 untouched. Every new mutable field needs this same defensive copy
-repeated, which is exactly the tedium the chapter uses to motivate
-freezing the data instead.
+repeated. This is the tedium that motivates freezing the data instead.
 
 ## 2. A third point confirming both versions agree
 
@@ -135,7 +134,7 @@ print(distance(TripleCoord(Triple(3, 0, 99)),
 irrelevant to a 2D distance. `TripleCoord` wraps a `Triple` and exposes
 only the two properties `distance()` actually needs, ignoring `c`
 entirely. `distance()` itself never changes: it only ever asked for
-`.x` and `.y`, and `TripleCoord` supplies exactly that shape, the same
+`.x` and `.y`, and `TripleCoord` supplies that shape, the same
 way `PairCoord` adapted `Pair`.
 
 ## 4. Adding `Square` to the closed `Shape` union

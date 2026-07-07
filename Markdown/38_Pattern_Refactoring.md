@@ -308,7 +308,7 @@ The other axis of change is adding new *operations*.
 Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
 
-This is exactly the problem that [Visitor](34_Visitor.md) solves.
+[Visitor](34_Visitor.md) solves this problem.
 Visitor is elaborate:
 a `Visitor` base class with one `visit()` overload per material,
 an `accept()` method added to every element,
@@ -376,7 +376,7 @@ Design patterns are about *separating things that change from things that stay t
 Polymorphism is one way to do that, but it is not the only one.
 The deeper skill is spotting the *vector of change* in a problem (here, new types versus new operations) and choosing the lightest construct that isolates it.
 In Python that construct is often a language feature, not a multi-class pattern.
-The honest measure of a pattern is whether it still earns its keep once the language does part of the work for you.
+The honest measure of a pattern is whether it is still useful once the language does part of the work for you.
 
 ## Exercises
 

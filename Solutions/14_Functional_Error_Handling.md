@@ -219,6 +219,6 @@ This version also trades away genericity on purpose. `func_a()`,
 list of error strings." Reusing one generic `Success[A]`/`Failure[E]`
 pair for both would ask a type checker to recover a type parameter
 from a plain `isinstance()` check, which Python's runtime type
-erasure makes impossible in general; `ty` reports exactly that gap as
+erasure makes impossible in general; `ty` reports that gap as
 an error. Two small concrete classes sidestep the problem entirely,
 since there is no parameter to lose.

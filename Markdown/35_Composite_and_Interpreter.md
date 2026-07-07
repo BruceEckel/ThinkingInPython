@@ -64,7 +64,7 @@ The same call works on the whole tree, on a subtree, and on a single file.
 Adding operations exposes the weakness.
 Counting files, finding an entry by name,
 and printing the tree each require a new method in every class.
-[Visitor](34_Visitor.md) exists to work around exactly this problem.
+[Visitor](34_Visitor.md) exists to solve this problem.
 
 ## A Composite of Data Classes
 
@@ -293,7 +293,7 @@ if __name__ == "__main__":
 ```
 
 Because they are immutable, frozen data classes can be compared by value.
-The demo confirms that the operators built exactly the tree you would assemble by hand.
+The demo confirms that the operators build the tree you would assemble by hand.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` did not compute a number.

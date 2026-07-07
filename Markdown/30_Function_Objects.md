@@ -85,7 +85,7 @@ Both do the same thing.
 The class version is four classes and a wrapper to say what one list of functions says directly.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 In Python a callback is just a function, so the replacement is unnecessary.
-The object form earns its keep only when a command must also carry state or support extra operations such as undo.
+Use the object form when a command must also carry state or support extra operations such as undo.
 
 ## Strategy: Choosing the Algorithm at Runtime
 

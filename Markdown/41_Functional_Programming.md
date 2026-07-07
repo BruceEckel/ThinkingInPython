@@ -324,7 +324,7 @@ print(square(5), cube(5))
 Partial application turns a general function into the specific one a caller needs,
 which is handy when a higher-order function needs a single-argument callable.
 
-Partial application earns its place when an API expects a function of one argument and you have a function of several.
+Use partial application when an API expects a function of one argument and you have a function of several.
 Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`,
 and it binds their values at the moment you build it, which avoids the late-binding surprise a lambda created in a loop can produce.
@@ -483,7 +483,7 @@ Stages chain together without building intermediate lists between them, and a co
 ## Pattern Matching as Destructuring
 
 The `match` statement, covered in [Pattern Matching](13_Pattern_Matching.md),
-earns its place in this chapter as a declarative tool for taking data apart.
+is used in this chapter as a declarative tool for taking data apart.
 You describe the structures you expect, and Python binds the pieces for you.
 One `match` collapses a stack of `isinstance()` tests, length checks,
 and key or index lookups into a single readable description of each shape.
