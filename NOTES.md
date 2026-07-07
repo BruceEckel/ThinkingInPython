@@ -1,10 +1,3 @@
-Topics in Functional Programming all need motivation.
-- e.g. what benefit does recursion give, why shouldn't I just write a 'for' loop?
-- Benefit of reusing standard functools and itertools: things that clearly work, that you don't have to debug
-- Easier to reason about?
-- Etc.
-People are resistant to functional programming and need clear upsides before they are willing to change the way they code.
-
 Make sure examples and prose are different from common examples in published literature (except for my own work).
 
 Run 'make prose' on each chapter

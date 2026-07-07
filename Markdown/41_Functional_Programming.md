@@ -8,6 +8,18 @@ If "computer science" is to live up to its name, there should be some ideas and 
 This seems to me to be the broader challenge that functional programming takes on, and what I explore in this chapter.
 That said, we must still begin with the more traditional explanations of functional programming.
 
+Here is what these ideas buy you, before the vocabulary arrives.
+A pure function cannot corrupt state you forgot about.
+It has fewer bugs to chase, and it needs no mock or fixture to test.
+A cache or a fold from `functools` or `itertools` is code you never write yourself,
+already correct on the edge case you would have missed at first.
+A function with no shared state needs no lock, so it parallelizes with no new code at all.
+And code built from small, checkable pieces is code you can reason about by substitution,
+the same way you check a line of algebra.
+None of this asks you to abandon loops, classes, or mutation.
+It asks you to notice when a piece of code can depend on nothing but its arguments,
+and to write it that way when it can.
+
 ## Pure Functions
 
 A *pure function* computes its result from its arguments alone.
@@ -368,10 +380,12 @@ When a requirement changes, you insert or swap a single stage and leave every ot
 
 The standard library ships the building blocks of functional Python
 under `functools`, from a single fold to an alternate dispatch
-mechanism. The reason to look here before writing your own version is
-that these tools are already written, already correct, and implemented
-in C for speed. We start with the simplest tools and work up to the
-ones with the most moving parts.
+mechanism. Each one replaces code you would otherwise write and debug
+yourself. Caching logic, an eviction policy, a dispatch table, each
+one hides an edge case that's easy to miss on the first attempt.
+These tools are already written, already correct, and implemented in
+C for speed. What follows starts with the simplest tools and works up
+to the ones with the most moving parts.
 
 ### `reduce()`
 
@@ -545,7 +559,8 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 ### `total_ordering()`
 
 Fills in the rest of the comparison methods from `__eq__` and one of
-`__lt__`, `__le__`, `__gt__`, or `__ge__`.
+`__lt__`, `__le__`, `__gt__`, or `__ge__`, so a class needs two
+methods instead of six to sort and compare correctly.
 
 ```python
 # functools_total_ordering.py
@@ -622,6 +637,10 @@ print(d.describe("hi"), "|", d.describe(5))
 
 `itertools` builds lazy iterators from a small set of composable pieces.
 Each one produces values on demand instead of building a list up front.
+Each is also a loop you would otherwise write by hand,
+already tuned in C and already correct on the edge cases a hand-rolled
+version tends to miss, the empty iterable, the single element,
+the point where two sequences run out at different lengths.
 Combine them the way you combine any small function, by feeding one's output to the next.
 What follows starts with the simplest tools and works up to the ones
 with the most moving parts.
@@ -690,7 +709,8 @@ print(list(islice(range(10), 2, 8, 2)))
 
 ### `pairwise()`
 
-Yields consecutive overlapping pairs from an iterable.
+Yields consecutive overlapping pairs from an iterable, without
+indexing by hand and risking an off-by-one at the ends.
 
 ```python
 # itertools_pairwise.py
@@ -702,7 +722,9 @@ print(list(pairwise([1, 2, 3, 4])))
 
 ### `batched()`
 
-Groups an iterable into fixed-size tuples, with a shorter final batch if the length does not divide evenly.
+Groups an iterable into fixed-size tuples, with a shorter final batch
+if the length does not divide evenly, the kind of remainder logic
+that's easy to get wrong in a hand-written loop.
 
 ```python
 # itertools_batched.py
@@ -812,7 +834,9 @@ print([(k, list(g)) for k, g in groupby(data)])
 
 ### `tee()`
 
-Splits one iterable into several independent iterators over the same data.
+Splits one iterable into several independent iterators over the same
+data, so two consumers can each walk it once without collecting it
+into a list first.
 
 ```python
 # itertools_tee.py
@@ -825,7 +849,9 @@ print(list(a), list(b))
 
 ### `product()`
 
-The Cartesian product of the input iterables, the same pairs a nested `for` loop would build.
+The Cartesian product of the input iterables, the same pairs a
+nested `for` loop would build, without writing and re-testing that
+loop yourself.
 
 ```python
 # itertools_product.py
@@ -894,6 +920,12 @@ print(sys.getrecursionlimit())
 #: 1000
 ```
 
+A `for` loop computes this same factorial in about the same number of lines,
+with no risk of hitting that limit.
+Recursion is not a faster or shorter way to count down to zero.
+Its payoff shows up once the problem itself branches, not just repeats,
+which is exactly what the next example does.
+
 Recursion suits problems that are naturally self-similar, such as walking a tree.
 Python does not optimize tail calls and limits the call stack, so very deep recursion will raise `RecursionError`.
 For long flat sequences, a loop or one of the `itertools` tools is the better choice.
@@ -920,7 +952,10 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 ```
 
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
-An iterative version would have to maintain its own stack to remember where it was, reintroducing by hand the bookkeeping recursion gives you for free.
+Writing this as a loop means building your own stack to track which sublists are still open,
+and getting the push and pop right at every depth.
+The recursive version gets that bookkeeping from the call stack for free,
+which is why it stays three lines instead of growing with every level of nesting you support.
 
 ## Lazy Evaluation
 
