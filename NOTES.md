@@ -7,14 +7,6 @@ If you run out of tokens during a chapter, resume when it resets.
 
 Make sure examples and prose are different from common examples in published literature (except for my own work).
 
-## Exercises
-
-- Add exercises to the chapters that don't have any (and have something worth exercising). Minimum of three exercises per chapter.
-- Exercises should be solveable by students during live workshop pair-programming: relatively straightforward, sometimes just changing things around so they can see the point.
-- Put exercise solutions and explanations in their own "Solutions" directory
-- Explain exercises in 01_Introduction.md
----
-
 Run 'make prose' on each chapter
 
 - Is full polymorphism covered? (Not just inheritance-based)

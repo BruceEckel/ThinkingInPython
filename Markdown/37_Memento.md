@@ -1,17 +1,16 @@
 # Memento
 
-Undo is the feature users expect and programmers dread.
-To provide it, a program must capture an object's state at one
-moment and restore it later.
+Undo is a feature users expect and programmers dread.
+It requires a program to capture an object's state at one moment and restore it later.
 The *Memento* pattern does this without breaking encapsulation.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
-A *caretaker* (the undo machinery) stores mementos and hands one
-back when asked, without ever looking inside.
+A *caretaker* (the undo machinery) stores mementos and hands one back when asked,
+without ever looking inside.
 
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
-so you must copy the past out and guard it.
+so you must copy the past and guard it.
 Python offers the classic form when you need it,
 and obviates the pattern when state is immutable.
 
@@ -36,23 +35,43 @@ print(copied)
 `saved = todo` binds a second name to the same list,
 so the "snapshot" mutates right along with the original.
 `list(todo)` makes a real copy, and later changes leave it alone.
-A one-level copy is enough here because the elements are
-immutable strings.
+A one-level copy is enough here because the elements are immutable strings.
 When state nests mutable objects inside mutable objects,
-`copy.deepcopy()` is the blunt instrument that copies all the way
-down.
+`copy.deepcopy()` copies all the way down:
+
+```python
+# nested_mutation.py
+import copy
+
+todo = [["eggs", "milk"], ["bread"]]
+shallow = list(todo)
+todo[0].append("cheese")
+print(shallow)
+#: [['eggs', 'milk', 'cheese'], ['bread']]
+
+deep = copy.deepcopy(todo)
+todo[0].append("jam")
+print(deep)
+#: [['eggs', 'milk', 'cheese'], ['bread']]
+```
+
+`list(todo)` copies the outer list,
+so `shallow` and `todo` are different objects.
+But their elements are the very same inner lists,
+so `todo[0].append("cheese")` shows up in `shallow` too.
+`copy.deepcopy()` walks the whole structure and rebuilds every nested container from scratch,
+so `deep`'s inner lists share nothing with `todo`'s.
+The later `todo[0].append("jam")` never reaches `deep`.
 Every classic memento is some version of this move:
-copy the state out before it changes.
+copy the state before it changes.
 
 ## The Classic Memento
 
-Here the originator is a `Sketch` that accumulates strokes in a
-list.
+Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable even though the originator is not.
 `restore()` copies in the other direction,
-rebuilding a fresh list so the sketch and the memento never share
-one:
+rebuilding a fresh list so the sketch and the memento never share one:
 
 ```python
 # sketch.py
@@ -96,8 +115,7 @@ Whoever holds `checkpoint` stores it and gives it back;
 it does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means the honest mistakes
-(mutating the snapshot) fail loudly.
+though freezing the memento means the honest mistakes (mutating the snapshot) fail loudly.
 
 ```python
 # test_sketch.py
@@ -164,18 +182,15 @@ if __name__ == "__main__":
 ```
 
 `draw()` returns a new `Sketch` instead of editing this one,
-using `dataclasses.replace()` to change one field and carry the
-rest along.
+using `dataclasses.replace()` to change one field and carry the rest along.
 Since each call returns a `Sketch`, calls chain.
-Saving is keeping a reference, exactly the move that failed in
-`aliased_snapshot.py`.
-It is safe now because no operation anywhere can change the
-object bound to `before`.
+Saving is keeping a reference,
+exactly the move that failed in `aliased_snapshot.py`.
+It is safe now because no operation anywhere can change the object bound to `before`.
 There is no `Memento` class, no `save()`, and no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
-This is the argument of
-[Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
+This is the argument of [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
 as [Flyweight](36_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
@@ -203,9 +218,7 @@ def test_equal_states_compare_equal() -> None:
 With states as plain immutable values,
 the caretaker no longer needs to know anything about them.
 Undo and redo are two stacks of past and future states,
-generic over the state type
-(the `class History[S]` syntax is from
-[Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+generic over the state type (the `class History[S]` syntax is from [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 
 ```python
 # history.py
@@ -258,12 +271,11 @@ if __name__ == "__main__":
 because acting after an undo starts a new timeline.
 The states you undid are no longer reachable by redo,
 which is how every editor behaves.
-`undo()` and `redo()` just shuttle the present between the two
-stacks.
+`undo()` and `redo()` just shuttle the present between the two stacks.
 `History` stores whole states, not descriptions of changes,
 so it never interprets anything.
-That works for any state type, `int` to full `Sketch`,
-with one condition: states must be immutable.
+That works for any state type, `int` to full `Sketch`, with one condition:
+states must be immutable.
 `History` cannot protect a list that someone mutates in place;
 it would be a stack of aliases, the bug with which this chapter opened.
 
@@ -298,20 +310,18 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the Command variation mentioned in
-[Function Objects](30_Function_Objects.md).
+the Command variation mentioned in [Function Objects](30_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
 because immutable states make it nearly free.
-Each `Sketch` above shares almost all of its strokes with its
-neighbors in the history.
+Each `Sketch` above shares almost all of its strokes with its neighbors in the history.
 
 ## Mementos That Outlive the Process
 
 A snapshot in memory disappears with the process.
-The same frozen value, serialized, becomes a saved game,
-a session file, or a crash-recovery point.
+The same frozen value, serialized, becomes a saved game, a session file,
+or a crash-recovery point.
 `pickle` turns almost any Python object into bytes and back:
 
 ```python
@@ -325,11 +335,10 @@ print(restored == drawing, restored is drawing)
 #: True False
 ```
 
-The bytes from `pickle.dumps()` can go to a file and come back in
-a different process, days later.
+The bytes from `pickle.dumps()` can go to a file and come back in a different process,
+days later.
 The round trip produces a different object with the same value,
-which is all a memento needs, since frozen data classes compare
-by value.
+which is all a memento needs, since frozen data classes compare by value.
 Only unpickle data you trust; the format can execute code.
 For untrusted storage or other languages,
 convert the state with `dataclasses.asdict()` and write JSON,
@@ -340,30 +349,26 @@ which one of the exercises explores.
 Version control is the memento pattern at industrial scale.
 A git commit is an immutable snapshot of your whole tree,
 checkout is `restore()`,
-and git shares unchanged content between commits just as
-`History` shares unchanged strokes between states.
+and git shares unchanged content between commits just as `History` shares unchanged strokes between states.
 Databases hand out savepoints, mementos scoped to a transaction.
-Multiplayer games snapshot the world so they can rewind and
-replay when a late packet arrives.
-Whenever you see rewind, rollback, or restore,
-something is producing mementos.
+Multiplayer games snapshot the world so they can rewind and replay when a late packet arrives.
+Whenever you see rewind, rollback, or restore, something is producing mementos.
 
 ## Exercises
 
-1.  Add `erase()` to both sketches. It removes the last stroke.
-    In `sketch.py` it mutates; in `frozen_sketch.py` it returns a
-    new `Sketch`. Write tests proving existing mementos and
-    histories are unaffected in each version.
-2.  Give `History` a maximum depth. When the past grows beyond
-    `n` states, discard the oldest. What should happen to
-    `can_undo()`?
-3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and
-    reconstruct it.
+1.  Add `erase()` to both sketches.
+    It removes the last stroke.
+    In `sketch.py` it mutates; in `frozen_sketch.py` it returns a new `Sketch`.
+    Write tests proving existing mementos and histories are unaffected in each version.
+2.  Give `History` a maximum depth.
+    When the past grows beyond `n` states, discard the oldest.
+    What should happen to `can_undo()`?
+3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and reconstruct it.
     What did the round trip change that `pickle` preserved,
     and where does your reconstruction have to compensate?
-4.  Change `sketch.py` so `Memento` holds the list itself instead
-    of a tuple copy, then write the test that exposes the
-    corruption. Which of the three tests in `test_sketch.py`
-    catches it first?
-5.  Add `goto(steps_back)` to `History`: jump the present several
-    states into the past in one call, keeping redo consistent.
+4.  Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
+    then write the test that exposes the corruption.
+    Which of the three tests in `test_sketch.py` catches it first?
+5.  Add `goto(steps_back)` to `History`:
+    jump the present several states into the past in one call,
+    keeping redo consistent.
