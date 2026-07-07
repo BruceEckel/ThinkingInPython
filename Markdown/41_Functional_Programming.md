@@ -364,16 +364,14 @@ Each stage stays small, pure, and testable on its own, and you build larger beha
 Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs.
 When a requirement changes, you insert or swap a single stage and leave every other one untouched.
 
-## The `functools` and `itertools` Toolkits
+## The `functools` Toolkit
 
 The standard library ships the building blocks of functional Python.
 `functools.reduce()` folds a sequence into a single value.
-`functools.lru_cache` records a pure function's results so repeated calls are free.
-`itertools` provides lazy iterators that produce values on demand:
+`functools.lru_cache` records a pure function's results so repeated calls are free:
 
 ```python
 # toolkits.py
-import itertools
 from functools import lru_cache, reduce
 from operator import add
 
@@ -386,18 +384,267 @@ def fib(n: int) -> int:
     return n if n < 2 else fib(n - 1) + fib(n - 2)
 print(fib(30))
 #: 832040
-# itertools builds lazy iterators:
-running = itertools.accumulate([1, 2, 3, 4])
-print(list(running))
-#: [1, 3, 6, 10]
 ```
 
 `lru_cache` is only correct because `fib()` is pure. Caching a function with side effects would skip the effects.
-The toolkits reward you for writing pure functions in the first place.
+The toolkit rewards you for writing pure functions in the first place.
 
 The reason to look here before writing your own version is that these tools are already written, already correct, and implemented in C.
-An accumulation, a grouping, a sliding window, or a memoized cache is one call, not a loop you have to debug.
+A memoized cache or a fold over a sequence is one call, not a loop you have to debug.
 Assembling a solution from vetted parts is faster to write and harder to get wrong, and it keeps the code declarative, naming the operation instead of spelling out its mechanics.
+`itertools`, covered next, applies the same idea to lazy iteration.
+
+## The `itertools` Toolkit
+
+`itertools` builds lazy iterators from a small set of composable pieces.
+Each one produces values on demand instead of building a list up front.
+Combine them the way you combine any small function, by feeding one's output to the next.
+What follows is the simplest possible use of each.
+
+### `count()`
+
+Counts up (or down) forever from a start value, with a fixed step.
+
+```python
+# itertools_count.py
+from itertools import count, islice
+
+print(list(islice(count(10, 2), 5)))
+#: [10, 12, 14, 16, 18]
+```
+
+### `cycle()`
+
+Repeats an iterable forever.
+
+```python
+# itertools_cycle.py
+from itertools import cycle, islice
+
+print(list(islice(cycle("AB"), 5)))
+#: ['A', 'B', 'A', 'B', 'A']
+```
+
+### `repeat()`
+
+Yields the same object over and over, forever or a fixed number of times.
+
+```python
+# itertools_repeat.py
+from itertools import repeat
+
+print(list(repeat("x", 3)))
+#: ['x', 'x', 'x']
+```
+
+### `accumulate()`
+
+Yields the running total of an iterable, or the running result of any two-argument function.
+
+```python
+# itertools_accumulate.py
+from itertools import accumulate
+
+print(list(accumulate([1, 2, 3, 4])))
+#: [1, 3, 6, 10]
+```
+
+### `chain()`
+
+Iterates several iterables one after another, as if they were one.
+`chain.from_iterable(iterables)` does the same when the iterables
+themselves arrive as one lazy sequence, rather than as separate arguments.
+
+```python
+# itertools_chain.py
+from itertools import chain
+
+print(list(chain([1, 2], [3, 4])))
+#: [1, 2, 3, 4]
+```
+
+### `compress()`
+
+Keeps the elements of one iterable wherever the matching selector is true.
+
+```python
+# itertools_compress.py
+from itertools import compress
+
+print(list(compress("ABCD", [1, 0, 1, 0])))
+#: ['A', 'C']
+```
+
+### `dropwhile()`
+
+Skips elements while a predicate holds, then yields everything after.
+
+```python
+# itertools_dropwhile.py
+from itertools import dropwhile
+
+print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+#: [3, 4, 1]
+```
+
+### `takewhile()`
+
+Yields elements while a predicate holds, then stops at the first failure.
+
+```python
+# itertools_takewhile.py
+from itertools import takewhile
+
+print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+#: [1, 2]
+```
+
+### `filterfalse()`
+
+Keeps the elements a predicate rejects, the mirror of `filter()`.
+
+```python
+# itertools_filterfalse.py
+from itertools import filterfalse
+
+print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
+#: [1, 3, 5]
+```
+
+### `groupby()`
+
+Groups consecutive elements that share a key.
+The input must already be sorted by that key, since it only merges neighbors.
+
+```python
+# itertools_groupby.py
+from itertools import groupby
+
+data = ["a", "a", "b", "b", "b", "c"]
+print([(k, list(g)) for k, g in groupby(data)])
+#: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
+```
+
+### `islice()`
+
+Slices any iterable, including an infinite one, the way `[start:stop:step]` slices a list.
+
+```python
+# itertools_islice.py
+from itertools import islice
+
+print(list(islice(range(10), 2, 8, 2)))
+#: [2, 4, 6]
+```
+
+### `pairwise()`
+
+Yields consecutive overlapping pairs from an iterable.
+
+```python
+# itertools_pairwise.py
+from itertools import pairwise
+
+print(list(pairwise([1, 2, 3, 4])))
+#: [(1, 2), (2, 3), (3, 4)]
+```
+
+### `batched()`
+
+Groups an iterable into fixed-size tuples, with a shorter final batch if the length does not divide evenly.
+
+```python
+# itertools_batched.py
+from itertools import batched
+
+print(list(batched(range(7), 3)))
+#: [(0, 1, 2), (3, 4, 5), (6,)]
+```
+
+### `starmap()`
+
+Like `map()`, but unpacks each element as the arguments to the function.
+
+```python
+# itertools_starmap.py
+from itertools import starmap
+
+print(list(starmap(pow, [(2, 5), (3, 2)])))
+#: [32, 9]
+```
+
+### `tee()`
+
+Splits one iterable into several independent iterators over the same data.
+
+```python
+# itertools_tee.py
+from itertools import tee
+
+a, b = tee([1, 2, 3])
+print(list(a), list(b))
+#: [1, 2, 3] [1, 2, 3]
+```
+
+### `zip_longest()`
+
+Zips iterables of different lengths, filling the gaps instead of stopping at the shortest.
+
+```python
+# itertools_zip_longest.py
+from itertools import zip_longest
+
+print(list(zip_longest([1, 2, 3], [4, 5])))
+#: [(1, 4), (2, 5), (3, None)]
+```
+
+### `product()`
+
+The Cartesian product of the input iterables, the same pairs a nested `for` loop would build.
+
+```python
+# itertools_product.py
+from itertools import product
+
+print(list(product("AB", [1, 2])))
+#: [('A', 1), ('A', 2), ('B', 1), ('B', 2)]
+```
+
+### `permutations()`
+
+Every ordering of `r` elements from the iterable.
+
+```python
+# itertools_permutations.py
+from itertools import permutations
+
+print(list(permutations("AB")))
+#: [('A', 'B'), ('B', 'A')]
+```
+
+### `combinations()`
+
+Every way to choose `r` elements where order does not matter and nothing repeats.
+
+```python
+# itertools_combinations.py
+from itertools import combinations
+
+print(list(combinations("ABC", 2)))
+#: [('A', 'B'), ('A', 'C'), ('B', 'C')]
+```
+
+### `combinations_with_replacement()`
+
+Like `combinations()`, but the same element can appear more than once.
+
+```python
+# itertools_combinations_with_replacement.py
+from itertools import combinations_with_replacement
+
+print(list(combinations_with_replacement("AB", 2)))
+#: [('A', 'A'), ('A', 'B'), ('B', 'B')]
+```
 
 ## Recursion
 

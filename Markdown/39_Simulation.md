@@ -1090,6 +1090,11 @@ if __name__ == "__main__":
     show()
 ```
 
+`itertools.cycle()` constructs an infinite iterator from any finite iterable.
+It yields elements from the source item in sequence and cycles back to the beginning when it reaches the end.
+`itertools.count()` creates an infinite iterator yielding evenly spaced numerical values.
+The first argument is the starting point, the second is the step size (defaults to one).
+
 The chapter began by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.

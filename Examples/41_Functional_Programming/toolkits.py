@@ -1,5 +1,4 @@
 # toolkits.py
-import itertools
 from functools import lru_cache, reduce
 from operator import add
 
@@ -12,7 +11,3 @@ def fib(n: int) -> int:
     return n if n < 2 else fib(n - 1) + fib(n - 2)
 print(fib(30))
 #: 832040
-# itertools builds lazy iterators:
-running = itertools.accumulate([1, 2, 3, 4])
-print(list(running))
-#: [1, 3, 6, 10]
