@@ -18,7 +18,8 @@ def main() -> None:
         w.start()
     for w in workers:
         w.join()
-    pairs = sorted(results.get() for _ in workers)
+    pairs: list[tuple[int, int]] = sorted(
+        results.get() for _ in workers)
     print([price for _, price in pairs])
 
 if __name__ == "__main__":

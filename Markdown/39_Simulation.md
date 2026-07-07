@@ -924,7 +924,8 @@ class Plate:
 
     def render(self, width: int = 60, height: int = 30) -> str:
         "Character picture of grain density."
-        counts = [[0] * width for _ in range(height)]
+        counts: list[list[int]] = [
+            [0] * width for _ in range(height)]
         for g in self.grains:
             col = min(int(g.x * width), width - 1)
             row = min(int(g.y * height), height - 1)

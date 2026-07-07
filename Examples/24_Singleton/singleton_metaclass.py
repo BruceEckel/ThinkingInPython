@@ -1,4 +1,5 @@
 # singleton_metaclass.py
+from collections.abc import Callable
 from typing import Any
 
 class SingletonMetaClass(type):
@@ -6,7 +7,7 @@ class SingletonMetaClass(type):
                  namespace: dict[str, Any]) -> None:
         super().__init__(name, bases, namespace)
         klass: Any = cls
-        original_new = klass.__new__
+        original_new: Callable[..., Any] = klass.__new__
 
         def my_new(c: Any, *args: Any, **kwds: Any) -> Any:
             if c.instance is None:

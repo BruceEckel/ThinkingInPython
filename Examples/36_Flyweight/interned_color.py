@@ -11,7 +11,7 @@ class Color:
 
     def __new__(cls, red: int, green: int, blue: int) -> Color:
         key: RGB = (red, green, blue)
-        cached = cls._pool.get(key)
+        cached: Color | None = cls._pool.get(key)
         if cached is not None:
             return cached
         self = super().__new__(cls)

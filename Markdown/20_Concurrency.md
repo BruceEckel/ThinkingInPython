@@ -237,7 +237,8 @@ def main() -> None:
         w.start()
     for w in workers:
         w.join()
-    pairs = sorted(results.get() for _ in workers)
+    pairs: list[tuple[int, int]] = sorted(
+        results.get() for _ in workers)
     print([price for _, price in pairs])
 
 if __name__ == "__main__":
@@ -317,7 +318,7 @@ def main() -> None:
 
     with ProcessPoolExecutor() as pool:
         list(pool.map(work_chunk, [1]))  # Warm up, not timed
-        baseline = None
+        baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, args.total, tasks)
             baseline = baseline or elapsed

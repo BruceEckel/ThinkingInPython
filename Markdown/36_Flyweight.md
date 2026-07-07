@@ -207,7 +207,7 @@ class Color:
 
     def __new__(cls, red: int, green: int, blue: int) -> Color:
         key: RGB = (red, green, blue)
-        cached = cls._pool.get(key)
+        cached: Color | None = cls._pool.get(key)
         if cached is not None:
             return cached
         self = super().__new__(cls)
@@ -265,7 +265,7 @@ _pool: Final[WeakValueDictionary[str, Symbol]] = (
     WeakValueDictionary())
 
 def symbol(name: str) -> Symbol:
-    found = _pool.get(name)
+    found: Symbol | None = _pool.get(name)
     if found is None:
         found = Symbol(name)
         _pool[name] = found

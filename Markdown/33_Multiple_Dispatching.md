@@ -238,7 +238,7 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
 }
 
 def compete(module: Any, player: str, opponent: str) -> Outcome:
-    result = getattr(module, player)().compete(
+    result: Outcome = getattr(module, player)().compete(
         getattr(module, opponent)())
     assert isinstance(result, Outcome)
     return result

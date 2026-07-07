@@ -425,7 +425,7 @@ a versioned, deliberate step that moves the table shape
 and its data forward together,
 instead of discovering the mismatch when a query runs.
 
-When either limitation rules out `pickle`, a few libraries fill the gap.
+When either limitation rules out `pickle`, there are open-source libraries.
 `msgspec` and `pydantic` both validate on load.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.

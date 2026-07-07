@@ -11,7 +11,7 @@ _pool: Final[WeakValueDictionary[str, Symbol]] = (
     WeakValueDictionary())
 
 def symbol(name: str) -> Symbol:
-    found = _pool.get(name)
+    found: Symbol | None = _pool.get(name)
     if found is None:
         found = Symbol(name)
         _pool[name] = found

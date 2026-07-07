@@ -689,13 +689,14 @@ then hand its parts to the constructors.
 # json_round_trip.py
 import json
 from dataclasses import asdict
+from typing import Any
 from person import EmailAddress, FullName, Person
 
 def to_json(person: Person) -> str:
     return json.dumps(asdict(person), indent=2)
 
 def from_json(text: str) -> Person:
-    data = json.loads(text)
+    data: dict[str, Any] = json.loads(text)
     return Person(
         FullName(data["name"]["text"]),
         EmailAddress(data["email"]["text"]),

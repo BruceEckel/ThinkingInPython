@@ -43,7 +43,7 @@ def main() -> None:
 
     with ProcessPoolExecutor() as pool:
         list(pool.map(work_chunk, [1]))  # Warm up, not timed
-        baseline = None
+        baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, args.total, tasks)
             baseline = baseline or elapsed
