@@ -399,7 +399,20 @@ Assembling a solution from vetted parts is faster to write and harder to get wro
 `itertools` builds lazy iterators from a small set of composable pieces.
 Each one produces values on demand instead of building a list up front.
 Combine them the way you combine any small function, by feeding one's output to the next.
-What follows is the simplest possible use of each.
+What follows starts with the simplest tools and works up to the ones
+with the most moving parts.
+
+### `repeat()`
+
+Yields the same object over and over, forever or a fixed number of times.
+
+```python
+# itertools_repeat.py
+from itertools import repeat
+
+print(list(repeat("x", 3)))
+#: ['x', 'x', 'x']
+```
 
 ### `count()`
 
@@ -425,30 +438,6 @@ print(list(islice(cycle("AB"), 5)))
 #: ['A', 'B', 'A', 'B', 'A']
 ```
 
-### `repeat()`
-
-Yields the same object over and over, forever or a fixed number of times.
-
-```python
-# itertools_repeat.py
-from itertools import repeat
-
-print(list(repeat("x", 3)))
-#: ['x', 'x', 'x']
-```
-
-### `accumulate()`
-
-Yields the running total of an iterable, or the running result of any two-argument function.
-
-```python
-# itertools_accumulate.py
-from itertools import accumulate
-
-print(list(accumulate([1, 2, 3, 4])))
-#: [1, 3, 6, 10]
-```
-
 ### `chain()`
 
 Iterates several iterables one after another, as if they were one.
@@ -461,68 +450,6 @@ from itertools import chain
 
 print(list(chain([1, 2], [3, 4])))
 #: [1, 2, 3, 4]
-```
-
-### `compress()`
-
-Keeps the elements of one iterable wherever the matching selector is true.
-
-```python
-# itertools_compress.py
-from itertools import compress
-
-print(list(compress("ABCD", [1, 0, 1, 0])))
-#: ['A', 'C']
-```
-
-### `dropwhile()`
-
-Skips elements while a predicate holds, then yields everything after.
-
-```python
-# itertools_dropwhile.py
-from itertools import dropwhile
-
-print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
-#: [3, 4, 1]
-```
-
-### `takewhile()`
-
-Yields elements while a predicate holds, then stops at the first failure.
-
-```python
-# itertools_takewhile.py
-from itertools import takewhile
-
-print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
-#: [1, 2]
-```
-
-### `filterfalse()`
-
-Keeps the elements a predicate rejects, the mirror of `filter()`.
-
-```python
-# itertools_filterfalse.py
-from itertools import filterfalse
-
-print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
-#: [1, 3, 5]
-```
-
-### `groupby()`
-
-Groups consecutive elements that share a key.
-The input must already be sorted by that key, since it only merges neighbors.
-
-```python
-# itertools_groupby.py
-from itertools import groupby
-
-data = ["a", "a", "b", "b", "b", "c"]
-print([(k, list(g)) for k, g in groupby(data)])
-#: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
 ```
 
 ### `islice()`
@@ -561,6 +488,66 @@ print(list(batched(range(7), 3)))
 #: [(0, 1, 2), (3, 4, 5), (6,)]
 ```
 
+### `accumulate()`
+
+Yields the running total of an iterable, or the running result of any two-argument function.
+
+```python
+# itertools_accumulate.py
+from itertools import accumulate
+
+print(list(accumulate([1, 2, 3, 4])))
+#: [1, 3, 6, 10]
+```
+
+### `compress()`
+
+Keeps the elements of one iterable wherever the matching selector is true.
+
+```python
+# itertools_compress.py
+from itertools import compress
+
+print(list(compress("ABCD", [1, 0, 1, 0])))
+#: ['A', 'C']
+```
+
+### `takewhile()`
+
+Yields elements while a predicate holds, then stops at the first failure.
+
+```python
+# itertools_takewhile.py
+from itertools import takewhile
+
+print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+#: [1, 2]
+```
+
+### `dropwhile()`
+
+Skips elements while a predicate holds, then yields everything after.
+
+```python
+# itertools_dropwhile.py
+from itertools import dropwhile
+
+print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+#: [3, 4, 1]
+```
+
+### `filterfalse()`
+
+Keeps the elements a predicate rejects, the mirror of `filter()`.
+
+```python
+# itertools_filterfalse.py
+from itertools import filterfalse
+
+print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
+#: [1, 3, 5]
+```
+
 ### `starmap()`
 
 Like `map()`, but unpacks each element as the arguments to the function.
@@ -571,6 +558,32 @@ from itertools import starmap
 
 print(list(starmap(pow, [(2, 5), (3, 2)])))
 #: [32, 9]
+```
+
+### `zip_longest()`
+
+Zips iterables of different lengths, filling the gaps instead of stopping at the shortest.
+
+```python
+# itertools_zip_longest.py
+from itertools import zip_longest
+
+print(list(zip_longest([1, 2, 3], [4, 5])))
+#: [(1, 4), (2, 5), (3, None)]
+```
+
+### `groupby()`
+
+Groups consecutive elements that share a key.
+The input must already be sorted by that key, since it only merges neighbors.
+
+```python
+# itertools_groupby.py
+from itertools import groupby
+
+data = ["a", "a", "b", "b", "b", "c"]
+print([(k, list(g)) for k, g in groupby(data)])
+#: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
 ```
 
 ### `tee()`
@@ -584,18 +597,6 @@ from itertools import tee
 a, b = tee([1, 2, 3])
 print(list(a), list(b))
 #: [1, 2, 3] [1, 2, 3]
-```
-
-### `zip_longest()`
-
-Zips iterables of different lengths, filling the gaps instead of stopping at the shortest.
-
-```python
-# itertools_zip_longest.py
-from itertools import zip_longest
-
-print(list(zip_longest([1, 2, 3], [4, 5])))
-#: [(1, 4), (2, 5), (3, None)]
 ```
 
 ### `product()`
