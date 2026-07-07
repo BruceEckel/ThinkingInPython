@@ -155,6 +155,14 @@ if __name__ == "__main__":
 #: Chrysanthemum: a little nectar | fragrance: faint
 ```
 
+Each registered implementation above is named `_`.
+`nectar()` calls it through the dispatcher, never by its own name,
+so the name itself carries no meaning.
+`_` is the conventional placeholder for a name nobody will use.
+Reusing `_` for every registration is safe:
+`@nectar.register` stores the function in its dispatch table
+before the next `def _` rebinds the name, so nothing is lost.
+
 Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.

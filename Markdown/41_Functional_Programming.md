@@ -370,7 +370,7 @@ The standard library ships the building blocks of functional Python
 under `functools`, from a single fold to an alternate dispatch
 mechanism. The reason to look here before writing your own version is
 that these tools are already written, already correct, and implemented
-in C. What follows starts with the simplest tools and works up to the
+in C for speed. We start with the simplest tools and work up to the
 ones with the most moving parts.
 
 ### `reduce()`
@@ -390,8 +390,8 @@ print(reduce(add, [1, 2, 3, 4]))
 ### `cache()`
 
 Remembers every result forever, so repeated calls with the same
-arguments are free. This is only correct for a pure function.
-Caching one with side effects would skip the effects.
+arguments are free. Only works correctly for pure functions.
+Caching a side-effecting function skips the effects.
 
 ```python
 # functools_cache.py
@@ -404,6 +404,9 @@ def fib(n: int) -> int:
 print(fib(30))
 #: 832040
 ```
+
+Because `fib()` is recursive, the values up to and including 30 are now cached.
+This accelerates future calls to `fib()`.
 
 ### `lru_cache()`
 
@@ -487,7 +490,13 @@ print(x.squared)
 #: 25
 print(x.squared)  # No second "computing"
 #: 25
+x.n = 10  # Doesn't change the cached result
+print(x.squared)
+#: 25
 ```
+
+Note that you must be careful with caching,
+because mutating a property doesn't cause the cached result to be recalculated.
 
 ### `wraps()`
 
@@ -563,8 +572,8 @@ print(light < heavy, light <= heavy, light > heavy)
 
 Turns a plain function into one that dispatches on the type of its
 first argument, with per-type implementations registered separately.
-[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) puts this
-to work as an alternative to the *Visitor* pattern.
+[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) uses `singledispatch()` as an alternative to the *Visitor* pattern,
+including why the registered function below is named `_`.
 
 ```python
 # functools_singledispatch.py
@@ -586,6 +595,8 @@ print(describe("hi"), "|", describe(5))
 
 The same dispatch, written as a method so it reads as `self.op(x)`
 instead of a bare function call.
+The registered method below is again named `_`,
+explained in [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch).
 
 ```python
 # functools_singledispatchmethod.py

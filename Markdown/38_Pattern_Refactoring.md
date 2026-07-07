@@ -353,6 +353,8 @@ for t in parse("trash.dat"):
 #: Cardboard: flatten and bundle
 ```
 
+Each implementation above is named `_`, a throwaway name
+[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) explains.
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function and performs the default behavior.
 Adding a `price()` or `weight()` operation means writing another single-dispatch function.

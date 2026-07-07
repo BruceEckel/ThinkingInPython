@@ -5,13 +5,6 @@ Topics in Functional Programming all need motivation.
 - Etc.
 People are resistant to functional programming and need clear upsides before they are willing to change the way they code.
 
-/loop through chapters 02-18 and 20-35 and look for style and voice issues.
-Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
-Do not give overviews or summaries or anything other than issues.
-If an issue has a suggested fix you need me to review, put a checkbox next to it.
-If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
-If you run out of tokens during a chapter, resume when it resets.
-
 Make sure examples and prose are different from common examples in published literature (except for my own work).
 
 Run 'make prose' on each chapter
@@ -31,6 +24,13 @@ Run 'make prose' on each chapter
 - Indexing using Leanpub format, before publishing to leanpub
 
 - Search feature on website?
+
+/loop through the chapters in the book and look for style and voice issues.
+Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
+Do not give overviews or summaries or anything other than issues.
+If an issue has a suggested fix you need me to review, put a checkbox next to it.
+If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
+If you run out of tokens during a chapter, resume when it resets.
 
 ******************
 
