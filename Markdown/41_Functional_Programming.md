@@ -366,32 +366,245 @@ When a requirement changes, you insert or swap a single stage and leave every ot
 
 ## The `functools` Toolkit
 
-The standard library ships the building blocks of functional Python.
-`functools.reduce()` folds a sequence into a single value.
-`functools.lru_cache` records a pure function's results so repeated calls are free:
+The standard library ships the building blocks of functional Python
+under `functools`, from a single fold to an alternate dispatch
+mechanism. The reason to look here before writing your own version is
+that these tools are already written, already correct, and implemented
+in C. What follows starts with the simplest tools and works up to the
+ones with the most moving parts.
+
+### `reduce()`
+
+Folds a sequence into a single value by repeatedly applying a
+two-argument function.
 
 ```python
-# toolkits.py
-from functools import lru_cache, reduce
+# functools_reduce.py
+from functools import reduce
 from operator import add
 
-# reduce() folds a sequence down to a single value:
 print(reduce(add, [1, 2, 3, 4]))
 #: 10
-# lru_cache remembers results, so repeats are free:
-@lru_cache
+```
+
+### `cache()`
+
+Remembers every result forever, so repeated calls with the same
+arguments are free. This is only correct for a pure function.
+Caching one with side effects would skip the effects.
+
+```python
+# functools_cache.py
+from functools import cache
+
+@cache
 def fib(n: int) -> int:
     return n if n < 2 else fib(n - 1) + fib(n - 2)
+
 print(fib(30))
 #: 832040
 ```
 
-`lru_cache` is only correct because `fib()` is pure. Caching a function with side effects would skip the effects.
-The toolkit rewards you for writing pure functions in the first place.
+### `lru_cache()`
 
-The reason to look here before writing your own version is that these tools are already written, already correct, and implemented in C.
-A memoized cache or a fold over a sequence is one call, not a loop you have to debug.
-Assembling a solution from vetted parts is faster to write and harder to get wrong, and it keeps the code declarative, naming the operation instead of spelling out its mechanics.
+Like `cache()`, but bounds memory by discarding the least recently
+used entry once `maxsize` is reached.
+
+```python
+# functools_lru_cache.py
+from functools import lru_cache
+
+@lru_cache(maxsize=2)
+def square(n: int) -> int:
+    return n * n
+
+square(1)
+square(2)
+square(3)  # Evicts 1, the least recently used
+print(square.cache_info())
+#: CacheInfo(hits=0, misses=3, maxsize=2, currsize=2)
+```
+
+### `partial()`
+
+Fixes some of a function's arguments and returns a new function that
+expects the rest. [Partial Application](#partial-application), above,
+covers it in depth.
+
+```python
+# functools_partial.py
+from functools import partial
+
+shout = partial(print, end="!\n")
+shout("hello")
+#: hello!
+```
+
+### `partialmethod()`
+
+The same idea as `partial()`, but for a method. The descriptor binds
+`self` automatically when accessed on an instance.
+
+```python
+# functools_partialmethod.py
+from functools import partialmethod
+
+class Text:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def pad(self, width: int, fill: str = " ") -> str:
+        return self.value.rjust(width, fill)
+
+    zero_pad = partialmethod(pad, fill="0")
+
+print(Text("7").zero_pad(3))
+#: 007
+```
+
+### `cached_property()`
+
+Runs a property's code once, on first access, then reuses the stored
+result. [Classes](07_Classes.md#properties) covers
+it alongside `@property`.
+
+```python
+# functools_cached_property.py
+from functools import cached_property
+
+class Lazy:
+    def __init__(self, n: int) -> None:
+        self.n = n
+
+    @cached_property
+    def squared(self) -> int:
+        print("computing")
+        return self.n * self.n
+
+x = Lazy(5)
+print(x.squared)
+#: computing
+#: 25
+print(x.squared)  # No second "computing"
+#: 25
+```
+
+### `wraps()`
+
+Copies a wrapped function's name and docstring onto its wrapper, so
+introspection still sees the original.
+[Decorators](15_Decorators.md#decorators-as-classes) covers its
+sibling, `update_wrapper()`, for wrapping with a class instance.
+
+```python
+# functools_wraps.py
+from collections.abc import Callable
+from functools import wraps
+
+def trace(func: Callable[[str], str]) -> Callable[[str], str]:
+    @wraps(func)
+    def wrapper(name: str) -> str:
+        return func(name)
+    return wrapper
+
+@trace
+def greet(name: str) -> str:
+    "Say hello."
+    return f"Hello, {name}!"
+
+print(greet.__name__, "-", greet.__doc__)
+#: greet - Say hello.
+```
+
+### `cmp_to_key()`
+
+Wraps an old-style comparator, a function returning negative, zero, or
+positive, into a key function `sorted()` can use directly.
+
+```python
+# functools_cmp_to_key.py
+from functools import cmp_to_key
+
+def by_length_desc(a: str, b: str) -> int:
+    return len(b) - len(a)
+
+words = ["a", "ccc", "bb"]
+print(sorted(words, key=cmp_to_key(by_length_desc)))
+#: ['ccc', 'bb', 'a']
+```
+
+### `total_ordering()`
+
+Fills in the rest of the comparison methods from `__eq__` and one of
+`__lt__`, `__le__`, `__gt__`, or `__ge__`.
+
+```python
+# functools_total_ordering.py
+from functools import total_ordering
+
+@total_ordering
+class Weight:
+    def __init__(self, kg: float) -> None:
+        self.kg = kg
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Weight) and self.kg == other.kg
+
+    def __lt__(self, other: Weight) -> bool:
+        return self.kg < other.kg
+
+light = Weight(2)
+heavy = Weight(5)
+print(light < heavy, light <= heavy, light > heavy)
+#: True True False
+```
+
+### `singledispatch()`
+
+Turns a plain function into one that dispatches on the type of its
+first argument, with per-type implementations registered separately.
+[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) puts this
+to work as an alternative to the *Visitor* pattern.
+
+```python
+# functools_singledispatch.py
+from functools import singledispatch
+
+@singledispatch
+def describe(value: object) -> str:
+    return f"a {type(value).__name__}"
+
+@describe.register
+def _(value: int) -> str:
+    return f"the number {value}"
+
+print(describe("hi"), "|", describe(5))
+#: a str | the number 5
+```
+
+### `singledispatchmethod()`
+
+The same dispatch, written as a method so it reads as `self.op(x)`
+instead of a bare function call.
+
+```python
+# functools_singledispatchmethod.py
+from functools import singledispatchmethod
+
+class Describer:
+    @singledispatchmethod
+    def describe(self, value: object) -> str:
+        return f"a {type(value).__name__}"
+
+    @describe.register
+    def _(self, value: int) -> str:
+        return f"the number {value}"
+
+d = Describer()
+print(d.describe("hi"), "|", d.describe(5))
+#: a str | the number 5
+```
+
 `itertools`, covered next, applies the same idea to lazy iteration.
 
 ## The `itertools` Toolkit
