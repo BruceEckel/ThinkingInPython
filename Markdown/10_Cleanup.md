@@ -103,7 +103,7 @@ Two approaches are more reliable:
 
 1. An explicit finalizer such as the `close()` that file objects provide,
    called from a `with` block. This runs even when an error interrupts the
-   code. [Context Managers](16_Context_Managers.md) covers `with` in full.
+   code. [Context Managers](15_Context_Managers.md) covers `with` in full.
 
 2. A weak reference, which tracks an object without keeping it alive.
    Here, a `WeakValueDictionary` counts live instances,

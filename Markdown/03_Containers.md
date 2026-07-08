@@ -384,7 +384,7 @@ prefer a data class (see [Data Classes as Types](12_Data_Classes_as_Types.md#dat
 
 The standard library has more specialized containers.
 For compact homogeneous storage (`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
-see [Performance](19_Performance.md).
+see [Performance](18_Performance.md).
 
 ## Immutability
 

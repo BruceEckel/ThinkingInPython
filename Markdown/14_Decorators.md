@@ -354,7 +354,7 @@ if __name__ == "__main__":
 #: ['Espresso', 'Latte']
 ```
 
-[Metaprogramming](18_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
+[Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 ## The Decorator Pattern

@@ -24,7 +24,7 @@ and you must recover the type of each piece to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
-and a `create()` method builds an instance from a material name (this is a [Factory](29_Factory.md)):
+and a `create()` method builds an instance from a material name (this is a [Factory](28_Factory.md)):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 
@@ -310,7 +310,7 @@ The other axis of change is adding new *operations*.
 Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
 
-[Visitor](34_Visitor.md) solves this problem.
+[Visitor](33_Visitor.md) solves this problem.
 Visitor is elaborate:
 a `Visitor` base class with one `visit()` overload per material,
 an `accept()` method added to every element,
@@ -356,7 +356,7 @@ for t in parse("trash.dat"):
 ```
 
 Each implementation above is named `_`, a throwaway name
-[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) explains.
+[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explains.
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function and performs the default behavior.
 Adding a `price()` or `weight()` operation means writing another single-dispatch function.

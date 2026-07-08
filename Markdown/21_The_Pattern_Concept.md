@@ -52,7 +52,7 @@ Composition also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
-Another pattern that appears in *GoF Design Patterns* is the [Iterator](28_Iterators.md),
+Another pattern that appears in *GoF Design Patterns* is the [Iterator](27_Iterators.md),
 which has been implicitly available in `for` loops from the beginning of the language,
 and became an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through it.
@@ -86,15 +86,15 @@ The three purposes are:
 1.  **Creational**: how to create an object.
     By isolating the details of object creation,
     your code isn't dependent on what types of objects there are and thus doesn't have to change when you add a new type of object.
-    [Singleton](24_Singleton.md) counts as a creational pattern,
-    and later in this book you'll see examples of [Factories](29_Factory.md).
+    [Singleton](23_Singleton.md) counts as a creational pattern,
+    and later in this book you'll see examples of [Factories](28_Factory.md).
 2.  **Structural**: designing objects to satisfy particular project constraints.
     These work with the way objects connect with other objects to ensure that changes in the system don't require changes to those connections.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language, fulfilling a request,
     moving through a sequence (as in an iterator), or implementing an algorithm.
-    This book contains multiple examples including [Observer](32_Observer.md),
-    [State Machines](27_State_Machines.md), and [Visitor](34_Visitor.md).
+    This book contains multiple examples including [Observer](31_Observer.md),
+    [State Machines](26_State_Machines.md), and [Visitor](33_Visitor.md).
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
@@ -109,10 +109,10 @@ so that classification doesn't lead me to a solution (I'll readily admit that I 
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
 and that is how this book groups them.
-[Surrogate](26_Surrogate.md) treats *Proxy* and *State* as one front-object structure.
-[Function Objects](30_Function_Objects.md) treats *Command*, *Strategy*,
+[Surrogate](25_Surrogate.md) treats *Proxy* and *State* as one front-object structure.
+[Function Objects](29_Function_Objects.md) treats *Command*, *Strategy*,
 and *Chain of Responsibility* as one function-passing structure.
-[Composite and Interpreter](35_Composite_and_Interpreter.md) treats both of its patterns as one recursive-data structure.
+[Composite and Interpreter](34_Composite_and_Interpreter.md) treats both of its patterns as one recursive-data structure.
 When two patterns share a structure, learning one teaches you most of the other,
 and the remaining difference is intent.
 

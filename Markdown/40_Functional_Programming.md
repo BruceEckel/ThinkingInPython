@@ -183,7 +183,7 @@ print(table["title"]("functional python"))
 ```
 
 The dictionary holds functions as values, so a lookup yields a function you can immediately call.
-The [Function Objects](30_Function_Objects.md) chapter approaches the same capability from the pattern side.
+The [Function Objects](29_Function_Objects.md) chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow.
 A dictionary of functions replaces a long `if`/`elif` chain, because you select the behavior by looking it up:
@@ -245,7 +245,7 @@ You stop rewriting the same iteration scaffold,
 along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
 The idea runs the other direction, too.
 A function that takes a function can wrap it with operations like timing, retries, or logging.
-This is what a decorator does in [Decorators](15_Decorators.md).
+This is what a decorator does in [Decorators](14_Decorators.md).
 
 ## Lambdas
 
@@ -516,7 +516,7 @@ because mutating a property doesn't cause the cached result to be recalculated.
 
 Copies a wrapped function's name and docstring onto its wrapper, so
 introspection still sees the original.
-[Decorators](15_Decorators.md#decorators-as-classes) covers its
+[Decorators](14_Decorators.md#decorators-as-classes) covers its
 sibling, `update_wrapper()`, for wrapping with a class instance.
 
 ```python
@@ -587,7 +587,7 @@ print(light < heavy, light <= heavy, light > heavy)
 
 Turns a plain function into one that dispatches on the type of its
 first argument, with per-type implementations registered separately.
-[Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) uses `singledispatch()` as an alternative to the *Visitor* pattern,
+[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) uses `singledispatch()` as an alternative to the *Visitor* pattern,
 including why the registered function below is named `_`.
 
 ```python
@@ -611,7 +611,7 @@ print(describe("hi"), "|", describe(5))
 The same dispatch, written as a method so it reads as `self.op(x)`
 instead of a bare function call.
 The registered method below is again named `_`,
-explained in [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch).
+explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
 
 ```python
 # functools_singledispatchmethod.py
@@ -998,7 +998,7 @@ Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
 There is no sixth `computing square` line,
 because `islice()` stops asking the moment it has delivered five.
-The [Performance](19_Performance.md) chapter looks at laziness from the perspective of memory and speed.
+The [Performance](18_Performance.md) chapter looks at laziness from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
@@ -1155,7 +1155,7 @@ where the alternative is a thicket of nested conditionals.
 Raising an exception is one way to report failure.
 The functional alternative returns a value that represents the failure,
 so the caller must handle it in the open instead of through a separate control path.
-[Functional Error Handling](14_Functional_Error_Handling.md) develops the approach in full,
+[Functional Error Handling](41_Functional_Error_Handling.md) develops the approach in full,
 from a return type of `float | None` up to a `Result` type that carries either an answer or an error.
 The point for this chapter is what the style buys.
 Failure appears in the return type,
@@ -1200,7 +1200,7 @@ The more your program is referentially transparent, the more of it a machine, or
 
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
-A comprehension is the everyday example (see [Comprehensions](17_Comprehensions.md)).
+A comprehension is the everyday example (see [Comprehensions](16_Comprehensions.md)).
 The loop that filters and appends says *how*.
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
 which is "the squares of the even numbers."
@@ -1259,7 +1259,7 @@ The `assert` passes on every run, because a pure call returns the same answer no
 Notice there are no locks, no queues, no shared state, and no changes to `count_primes()` itself.
 The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
-`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](20_Concurrency.md#parallelism).
+`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](19_Concurrency.md#parallelism).
 
 ## An Assurance Spectrum
 

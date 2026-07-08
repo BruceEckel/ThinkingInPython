@@ -4,7 +4,7 @@ A simulation models a set of objects that act on their own and interact through 
 The first example, a pack of rats mapping a maze, is worked from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
-[Concurrency](20_Concurrency.md#asyncio-mechanics) introduces
+[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces
 the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 ## Rats & Mazes
@@ -514,7 +514,7 @@ so no code that reads `room` has to check for `None`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so adding a new kind of item needs no change here.
 Define the subclass with its symbol and the factory finds it.
-This is the registry idea from [Factory](29_Factory.md#the-pythonic-factory-a-dictionary),
+This is the registry idea from [Factory](28_Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy itself as the registry.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.

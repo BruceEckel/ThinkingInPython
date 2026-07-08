@@ -365,7 +365,7 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 
-The [Decorators](15_Decorators.md) chapter explains how to write decorators like `@safe`, including `functools.wraps`.
+The [Decorators](14_Decorators.md) chapter explains how to write decorators like `@safe`, including `functools.wraps`.
 
 `@safe` deserves its own check. A good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
 

@@ -137,7 +137,7 @@ a comprehension over an `append()` loop,
 and the C-implemented standard library,
 `itertools`, `collections`, and `functools`,
 over hand-rolled equivalents
-([Iterators](28_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+([Iterators](27_Iterators.md#reusable-algorithms) tours the iterator algorithms).
 As a last resort in a proven-hot loop,
 hoist a repeated attribute or global lookup into a local,
 as in `append = out.append`.
@@ -202,7 +202,7 @@ After `heapify()` the smallest element stays at index 0,
 and `nsmallest()` and `nlargest()` answer top-N questions directly.
 For a priority queue shared across threads,
 `queue.PriorityQueue` wraps the same heap in a lock.
-[Concurrency](20_Concurrency.md#coordinating-threads-with-queues) shows it in use.
+[Concurrency](19_Concurrency.md#coordinating-threads-with-queues) shows it in use.
 
 The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
 A `frozenset` looks up exactly as fast as a `set`,
@@ -217,7 +217,7 @@ so they can serve as dictionary keys and as arguments to the caches shown below.
 
 A list-building pipeline materializes every intermediate result.
 A generator pipeline
-([Comprehensions](17_Comprehensions.md#generator-expressions))
+([Comprehensions](16_Comprehensions.md#generator-expressions))
 computes one item at a time, on demand,
 so memory stays flat no matter how large the source,
 and no work happens past the point where the consumer stops.
@@ -267,7 +267,7 @@ A generator is spent after one pass.
 ## Caching
 
 If a pure function
-([Functional Programming](41_Functional_Programming.md#pure-functions))
+([Functional Programming](40_Functional_Programming.md#pure-functions))
 is called repeatedly with the same arguments,
 the fastest way to compute the answer is to not compute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -515,7 +515,7 @@ Calling a Python function on each element,
 or converting arrays to lists and back,
 reproduces the overhead.
 This is the declarative trade from
-[Functional Programming](41_Functional_Programming.md#declarative-style):
+[Functional Programming](40_Functional_Programming.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
 (NumPy is a third-party dependency,
@@ -639,7 +639,7 @@ Sometimes the fix is not a faster function but a different architecture.
 When the time goes to waiting on the outside world, use `asyncio`.
 If the work can be done in parallel (pure functions can do this seamlessly),
 you can spread it across multiple cores or multiple processes.
-That is a design decision with its own chapter, [Concurrency](20_Concurrency.md).
+That is a design decision with its own chapter, [Concurrency](19_Concurrency.md).
 
 ## Converting a Slow Function to Rust
 
@@ -715,7 +715,7 @@ stopping as soon as the program is fast enough:
 6. Cache the pure functions.
 7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
 8. Vectorize with NumPy, or JIT-compile the loop with Numba.
-9. Restructure for async or parallelism ([Concurrency](20_Concurrency.md)).
+9. Restructure for async or parallelism ([Concurrency](19_Concurrency.md)).
 10. Rewrite the proven-hot function in Rust.
 
 After every change, measure again.

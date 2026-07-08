@@ -1,6 +1,6 @@
 # Concurrency
 
-[Performance](19_Performance.md) works on making one stream of instructions faster.
+[Performance](18_Performance.md) works on making one stream of instructions faster.
 *Concurrency* runs independent tasks so they overlap instead of waiting in line.
 Whether this overlap helps depends on where each task spends its time.
 
@@ -126,9 +126,9 @@ The I/O tasks each reach their `await` and suspend, so all five are in flight at
 The CPU tasks never `await`, so each runs to the end before the next starts: peak 1.
 The event loop overlaps waiting, not computing.
 Async did not fail. It overlapped the part that runs outside the processor, which for `cpu_price` is nothing.
-[Simulation](39_Simulation.md) builds a full program on these mechanics:
+[Simulation](38_Simulation.md) builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
-and [Observer](32_Observer.md#observer-and-io) uses `gather()` to notify
+and [Observer](31_Observer.md#observer-and-io) uses `gather()` to notify
 slow observers together instead of one at a time.
 
 ## A Single Thread Still Races
@@ -629,7 +629,7 @@ a thread-safe queue that hands each item to exactly one consumer,
 with the locking built in.
 `queue.Queue` is first-in, first-out,
 while `queue.PriorityQueue`, the threaded form of
-[Performance](19_Performance.md)'s `heapq`,
+[Performance](18_Performance.md)'s `heapq`,
 always hands out the smallest item present:
 
 ```python
@@ -675,7 +675,7 @@ This producer-consumer shape, producers calling `put()` and consumers
 calling `get()`, is how thread pools distribute work,
 and `get()` blocks until an item is available,
 so an idle consumer simply waits.
-The [Object Pool](16_Context_Managers.md#an-object-pool) in
+The [Object Pool](15_Context_Managers.md#an-object-pool) in
 Context Managers uses the same `Queue` as a throttle.
 
 ## Exercises

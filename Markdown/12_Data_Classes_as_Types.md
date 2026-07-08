@@ -163,7 +163,7 @@ But notice the last two lines. A plain data class is still mutable,
 so `m.name = "bar"` works.
 
 A data class is a type defined by its fields. `display_object()`, the
-inspection helper from [Metaprogramming](18_Metaprogramming.md#the-inspect-module),
+inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module),
 shows those fields with their declared types:
 
 ```python
@@ -608,7 +608,7 @@ print(c.name, c.open)
 This works because `Connection.__init__` adds an attribute to the existing dict.
 If a base `__init__` instead replaced `self.__dict__`, calling it from
 `__post_init__()` would discard the fields the data class just assigned.
-The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
+The [Borg singleton](23_Singleton.md#borg-share-state-instead-of-identity) is that case.
 
 When the base class is itself a data class, you do not need this.
 The subclass generates one `__init__` covering the inherited fields and the new ones, in order:

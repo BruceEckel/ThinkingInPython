@@ -94,7 +94,7 @@ but for most cases the *Observer* pattern amounts to nothing more than a list of
 
 An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,
-such as [Chain of Responsibility](30_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
+such as [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
 
 Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
@@ -159,7 +159,7 @@ A slow observer no longer holds up the others.
 `gather` still waits for all of them, so the change finishes only after every notification succeeds.
 There is a limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
-[Concurrency](20_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python
@@ -227,7 +227,7 @@ Below its threshold it returns without sending anything.
 
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
-The type-keyed [event bus](30_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
+The type-keyed [event bus](29_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
 
 ## A Visual Example of Observers
 
@@ -370,7 +370,7 @@ is the model-view split made concrete.
 
 1.  Write a class decorator that wraps every method of a class to print on method entry and exit,
     giving an execution trace.
-    ([Decorators](15_Decorators.md#decorating-classes) and [Metaprogramming](18_Metaprogramming.md#writing-a-metaclass) show the techniques.)
+    ([Decorators](14_Decorators.md#decorating-classes) and [Metaprogramming](17_Metaprogramming.md#writing-a-metaclass) show the techniques.)
 2.  Create a minimal Observer-Observable design in two classes.
     Just create the bare minimum in the two classes,
     then demonstrate your design by creating one `Observable` and many `Observer`s,

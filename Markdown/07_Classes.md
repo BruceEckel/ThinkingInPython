@@ -64,7 +64,7 @@ If you declare fields using the C++/Java style,
 they implicitly become class-level fields (similar to static fields in C++/Java).
 
 You can see the shape of an object with `display_object()`, a small inspection
-helper built in [Metaprogramming](18_Metaprogramming.md#the-inspect-module).
+helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
 It prints an object's attributes and methods:
 
 ```python

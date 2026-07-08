@@ -58,7 +58,7 @@ object of its base type, without breaking the program. A subclass may add behavi
 contract. It accepts the same arguments, returns the same kinds of results, and
 raises no surprising exceptions. When subclasses obey it, code written against
 the base class works unchanged on any of them. This is the guarantee that makes
-polymorphism, and patterns like the [Template Method](25_Template_Method.md),
+polymorphism, and patterns like the [Template Method](24_Template_Method.md),
 safe. The base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 
@@ -548,7 +548,7 @@ Adding a new operation over all shapes is easier in the data version.
 You write one function, and the type checker tells you if you missed a case.
 The OOP approach assumes you add types more often than operations,
 which is often not true.
-[Multiple Dispatching](33_Multiple_Dispatching.md#one-type-or-many) and [Visitor](34_Visitor.md#the-pythonic-visitor-singledispatch) explore this trade-off.
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explore this trade-off.
 
 Testing confirms the object-oriented and `match` versions compute the same areas:
 
@@ -654,7 +654,7 @@ serves the whole program,
 and it is safe as a default argument value.
 The standard library ships this exact object as
 `logging.NullHandler`,
-and the maze in [Simulation](39_Simulation.md) points every
+and the maze in [Simulation](38_Simulation.md) points every
 doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 
@@ -680,7 +680,7 @@ a lookup that can fail or a required value that may be missing,
 a silent stand-in buries the problem.
 Keep `T | None` there,
 or return the `Result` of
-[Functional Error Handling](14_Functional_Error_Handling.md#a-result-type),
+[Functional Error Handling](41_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
 The test is what callers would write.
 If every one of them would handle absence with the same neutral

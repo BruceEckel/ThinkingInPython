@@ -12,8 +12,8 @@ Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages made necessary.
 Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
-A [Singleton](24_Singleton.md) is a module.
-A [Visitor](34_Visitor.md) is a function that dispatches on type.
+A [Singleton](23_Singleton.md) is a module.
+A [Visitor](33_Visitor.md) is a function that dispatches on type.
 Before using an idiom or pattern,
 this book asks whether the language already solves the problem,
 and adds the complexity only when the answer is no.
@@ -120,7 +120,7 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](15_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/15_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/15_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The tooling extracts the book examples,

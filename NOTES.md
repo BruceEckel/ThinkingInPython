@@ -8,7 +8,7 @@ Run 'make prose' on each chapter
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
 -
-- Check order of examples in 38_Pattern_Refactoring.md
+- Check order of examples in 37_Pattern_Refactoring.md
 
 - "have to", "could" -> "can"
 - which was

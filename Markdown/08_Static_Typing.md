@@ -273,7 +273,7 @@ A bound constrains the parameter.
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you will still see in older code.
 A special form, `**P`, captures a whole parameter list.
-[Decorators](15_Decorators.md#maintaining-the-wrapped-interface) uses it
+[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses it
 to give a wrapper the same signature as the function it wraps.
 
 ## The `Self` Return Type {#the-self-type}

@@ -80,7 +80,7 @@ what_i_use.op(what_i_have2)
 what_i_use.op(what_i_have3.what_i_want())
 ```
 
-This takes liberty with the term "[Proxy](26_Surrogate.md#proxy),"
+This takes liberty with the term "[Proxy](25_Surrogate.md#proxy),"
 because *GoF Design Patterns* asserts that a Proxy must have an identical interface with the object for which it is a surrogate.
 
 ### Adapter in Python
@@ -152,7 +152,7 @@ That is what *Façade* accomplishes.
 If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
-A Façade often takes the form of a [Singleton](24_Singleton.md) [Abstract Factory](29_Factory.md#abstract-factories).
+A Façade often takes the form of a [Singleton](23_Singleton.md) [Abstract Factory](28_Factory.md#abstract-factories).
 You can easily get this effect by creating a class containing static factory methods:
 
 ```python
@@ -189,7 +189,7 @@ c = Facade.make_c(1.0)
 
 The cleaner Python façade is a *module*.
 A module already presents a curated set of names over whatever tangle of classes lives behind it,
-and, as [Singleton](24_Singleton.md#a-module-is-already-a-singleton) notes,
+and, as [Singleton](23_Singleton.md#a-module-is-already-a-singleton) notes,
 it loads once, and every importer shares the same module.
 At module level, put the friendly functions and the few classes to expose.
 Keep the messy internals private (using a leading underscore, by convention),

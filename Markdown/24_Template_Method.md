@@ -19,7 +19,7 @@ and you never call that sequence yourself.
 The defining trait of a Template Method is that the base class fixes the *shape* of the algorithm.
 Subclasses complete the individual steps.
 The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
-(see [Making a Class Final](18_Metaprogramming.md#making-a-class-final)).
+(see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
 Here, `@final` marks `run()`, so the checker rejects any subclass that overrides it,
 while leaving the step methods open:
 
@@ -63,7 +63,7 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
-This pattern leans on the [Liskov Substitution Principle](21_Rethinking_Objects.md#liskov-substitution).
+This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
 A subclass must work wherever code expects its base class.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
@@ -137,7 +137,7 @@ If they share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
-This is the same trade-off seen in [Function Objects](30_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+This is the same trade-off seen in [Function Objects](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
 ## Exercises

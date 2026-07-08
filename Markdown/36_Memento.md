@@ -200,8 +200,8 @@ Now it is safe because no operation anywhere can change the object bound to `bef
 There is no `Memento` class, no `save()`, and no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
-This is the argument made by [Rethinking Objects](21_Rethinking_Objects.md#the-immutability-solution),
-as [Flyweight](36_Flyweight.md) shares immutable values across space,
+This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution),
+as [Flyweight](35_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
 ```python
@@ -322,7 +322,7 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the Command variation mentioned in [Function Objects](30_Function_Objects.md).
+the Command variation mentioned in [Function Objects](29_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
