@@ -252,7 +252,7 @@ rather than checking every precondition first.
 
 A `with` block guarantees that setup and cleanup happen as a pair,
 even if the body raises an exception.
-Opening a file is the canonical case; the `with` always closes the file on the way out:
+Opening a file is the canonical case. The `with` block always closes the file on the way out:
 
 ```python
 # context_manager.py

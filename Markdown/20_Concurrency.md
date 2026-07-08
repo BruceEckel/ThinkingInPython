@@ -24,7 +24,7 @@ each running inside a single process.
 
 Four pieces make up the `asyncio` vocabulary.
 `async def` defines a *coroutine function*.
-Calling it runs nothing; it returns a *coroutine object*,
+Calling it runs nothing. It returns a *coroutine object*,
 a description of work that has not started.
 `await` starts that work and pauses the awaiting coroutine until the result is ready.
 The pause is the point.
@@ -390,7 +390,7 @@ Swapping the loop for a thread pool changes nothing.
 Five threads still take turns holding the one GIL,
 so `threaded()` costs the same as `sequential()`,
 sometimes a little more, from the added scheduling.
-This is exactly why [Parallelism](#parallelism) used processes instead.
+This is why [Parallelism](#parallelism) used processes instead.
 Each process gets its own interpreter, and so its own GIL.
 
 The GIL deserves more than a definition,

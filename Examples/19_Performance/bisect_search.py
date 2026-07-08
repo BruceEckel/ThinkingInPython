@@ -9,7 +9,7 @@ bisect.insort(scores, 78)      # Insert and keep it sorted
 print(scores)
 #: [60, 70, 75, 78, 90]
 
-def grade(score):
+def grade(score: int) -> str:
     # Map a score to a letter through its cutoff boundaries:
     cutoffs = [60, 70, 80, 90]
     letters = "FDCBA"

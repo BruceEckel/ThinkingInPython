@@ -27,10 +27,10 @@ It closes with a visual model-view example built on the same callable observers.
 
 ## The Pythonic Observer: a List of Callables
 
-In Python an *observer* need not be an object implementing an `Observer` interface;
-it is simply a callable.
-An *observable* need not be a base class with a `changed` flag;
-it is a list of callables and a way to notify them.
+In Python an *observer* need not be an object implementing an `Observer` interface.
+It is simply a callable.
+An *observable* need not be a base class with a `changed` flag.
+It is a list of callables and a way to notify them.
 A `@property` setter is a natural place to fire the notification when state changes:
 
 ```python
@@ -235,7 +235,7 @@ This is the model-view split from the chapter's opening,
 made visible with `tkinter` (in the standard library, so there is nothing to install),
 and split across two files to make the point.
 The *model*, `box_observer.py`,
-is a grid of colored boxes and the rule for a click; it holds no display code.
+is a grid of colored boxes and the rule for a click. It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
 Click a box and every box touching it, diagonals included,
 repaints to the clicked box's color.
@@ -327,7 +327,7 @@ It is the only code that touches the screen.
 `draw()` paints the grid, and the view subscribes it, so every change repaints.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
-Run `box_view.py` to play; it opens a window,
+Run `box_view.py` to play. It opens a window,
 so the example harness does not run it (`tools/norun.txt` lists it).
 
 ```python

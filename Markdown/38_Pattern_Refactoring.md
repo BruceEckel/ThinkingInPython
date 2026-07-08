@@ -72,7 +72,7 @@ Python implicitly makes `__init_subclass__` a classmethod, so `cls` doesn't need
 It runs once per subclass, right after Python creates that subclass, so each one can register itself in `Trash.registry` automatically.
 
 Each subclass's `value = ...` line creates its own class attribute, separate from `Trash.value`.
-The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance; it doesn't share storage across subclasses.
+The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance. It doesn't share storage across subclasses.
 
 None of the subclasses redeclare `value: ClassVar[float]`.
 They don't need to because the checker resolves `value` through the MRO and finds it already declared `ClassVar[float]` on `Trash`.
@@ -372,7 +372,7 @@ Use `singledispatch` only when the behavior genuinely differs by type.
 For operations that belong on the objects and vary by type,
 `singledispatchmethod` does the same thing as a method.
 
-## Summary
+## Choosing the Lightest Construct
 
 Design patterns are about *separating things that change from things that stay the same*.
 Polymorphism is one way to do that, but it is not the only one.

@@ -1,6 +1,5 @@
-Using functools and/or itertools and/or any other beneficial Python tools and techniques,
-write a program that takes a list of students and matches them in pairs.
-subsequent iterations should match them in different pairs, avoiding repeated pairs as much as possible.
+Consider the order of the design patterns chapters -- can we make them simple to complex, or more-useful to more-esoteric?
+Don't make changes yet, just provide analysis.
 
 Make sure examples and prose are different from common examples in published literature (except for my own work).
 

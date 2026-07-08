@@ -77,7 +77,7 @@ insulating the measurement from startup cost and clock granularity.
 
 Timings differ from machine to machine,
 so this example prints a comparison instead of raw numbers.
-Membership testing in a `list` scans; in a `set` it hashes:
+Membership testing in a `list` scans. In a `set` it hashes:
 
 ```python
 # membership.py
@@ -94,8 +94,8 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 #: set at least 100x faster: True
 ```
 
-One lookup costs little either way;
-a million lookups is the difference between instant and minutes.
+One lookup costs little either way.
+A million lookups is the difference between instant and minutes.
 `timeit` also has a command-line form for one-off questions:
 
     python -m timeit -s "s = set(range(100_000))" "99_999 in s"
@@ -165,7 +165,7 @@ bisect.insort(scores, 78)      # Insert and keep it sorted
 print(scores)
 #: [60, 70, 75, 78, 90]
 
-def grade(score):
+def grade(score: int) -> str:
     # Map a score to a letter through its cutoff boundaries:
     cutoffs = [60, 70, 80, 90]
     letters = "FDCBA"
@@ -201,7 +201,7 @@ print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 After `heapify()` the smallest element stays at index 0,
 and `nsmallest()` and `nlargest()` answer top-N questions directly.
 For a priority queue shared across threads,
-`queue.PriorityQueue` wraps the same heap in a lock;
+`queue.PriorityQueue` wraps the same heap in a lock.
 [Concurrency](20_Concurrency.md#coordinating-threads-with-queues) shows it in use.
 
 The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
@@ -261,8 +261,8 @@ but the eager one built two million-element lists to get them,
 while the lazy one computed only the handful of values that
 `islice()` extracted.
 When the consumer needs every element anyway and the data fits in memory,
-a list is fine, and you can iterate it twice;
-a generator is spent after one pass.
+a list is fine, and you can iterate it twice.
+A generator is spent after one pass.
 
 ## Caching
 
@@ -332,7 +332,7 @@ which shrinks each instance and speeds attribute access:
 
 class Point:
     __slots__ = ("x", "y")  # No per-instance __dict__
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
 
@@ -406,8 +406,8 @@ The tradeoff is that instances can no longer grow attributes outside the declare
 Frozen blocks every attribute assignment, not just reassignment,
 so it already stops an instance from growing new fields,
 the same restriction `slots` gives you.
-But frozen enforces this by overriding `__setattr__()`;
-the instance still keeps a `__dict__` underneath.
+But frozen enforces this by overriding `__setattr__()`.
+The instance still keeps a `__dict__` underneath.
 `slots=True` removes that `__dict__`,
 so pairing it with `frozen=True` is the natural default, giving you
 the same immutability at roughly a seven-to-one smaller instance.
@@ -484,8 +484,8 @@ the biggest step is to remove the Python loop entirely.
 [NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
 like `array` above,
 and executes whole-array expressions in compiled loops.
-The plain-Python version repeats one expression per element;
-the NumPy version states it once for the whole array:
+The plain-Python version repeats one expression per element.
+The NumPy version states it once for the whole array:
 
     import timeit
     import numpy as np
@@ -522,8 +522,8 @@ describe the whole-array result and let the engine arrange the steps.
 and the book's Python 3.15 target has no NumPy release yet,
 so unlike the rest of the book's listings,
 the build does not run this snippet.
-The comment above shows one machine's actual output;
-expect a different, but still large, multiple on yours.)
+The comment above shows one machine's actual output.
+Expect a different, but still large, multiple on yours.)
 
 ## JIT Compilation with Numba
 
@@ -557,8 +557,8 @@ The source stays Python:
     print(f"Numba speedup: {t_python / t_numba:.1f}x")
     # Sample run: Numba speedup: 15.9x
 
-`njit(count_primes)` compiles the same function `@njit` would decorate;
-calling it once first pays the compilation cost outside the timed region,
+`njit(count_primes)` compiles the same function `@njit` would decorate.
+Calling it once first pays the compilation cost outside the timed region,
 so the comparison measures steady-state speed, not warm-up.
 Numba shines on numeric code over simple types and NumPy arrays,
 often landing within striking distance of C.
@@ -571,14 +571,14 @@ When the hot spot is number-crunching,
 and it does not yet support the book's Python 3.15 target,
 so like the NumPy example above,
 the build does not run this snippet.
-The comment above shows one machine's actual output;
-expect a different, but still large, multiple on yours.)
+The comment above shows one machine's actual output.
+Expect a different, but still large, multiple on yours.)
 
 ## Combine NumPy and Numba
 
 NumPy and Numba solve different halves of the same problem,
 and a single function often uses both.
-NumPy gives you a compact array;
+NumPy gives you a compact array.
 `@njit` compiles a loop that walks it,
 for the case where the loop cannot become one vectorized expression,
 because the amount of work per element depends on the element's value.
@@ -630,8 +630,8 @@ keeping the array as the shared data structure throughout.
 
 (Like the two examples above, this one needs both NumPy and Numba,
 so the build does not run it.
-The comment shows one machine's actual output;
-expect a different, but still large, multiple on yours.)
+The comment shows one machine's actual output.
+Expect a different, but still large, multiple on yours.)
 
 ## Concurrency
 
@@ -721,8 +721,8 @@ stopping as soon as the program is fast enough:
 After every change, measure again.
 Optimizations interact, the bottleneck moves,
 and yesterday's hot spot may be irrelevant today.
-The goal is not the fastest possible program;
-it is a program that is fast enough, at the lowest cost in clarity.
+The goal is not the fastest possible program.
+It is a program that is fast enough, at the lowest cost in clarity.
 
 ## Exercises
 

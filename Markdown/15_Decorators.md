@@ -5,7 +5,8 @@ The decorator itself is a callable that takes the function to decorate,
 does something with it, then returns the resulting function,
 which Python assigns to the original function name.
 
-To apply the decorator, you put a `@` before the decorator name (for simplicity we use an untyped `Callable`; a later section expands this):
+To apply the decorator, you put a `@` before the decorator name
+(for simplicity we use an untyped `Callable` here, expanded in a later section):
 
 ```python
 # simple_decoration.py
@@ -101,7 +102,7 @@ prints again, and returns the result.
 so the wrapped function still looks like itself when you inspect it.
 This is optional but improves debuggability.
 
-`wraps` keeps the runtime interface; the type parameters
+`wraps` keeps the runtime interface. The type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
 keep the static one.
 `trace[**P, R]` declares two of them.

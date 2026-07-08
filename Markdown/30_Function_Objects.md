@@ -236,7 +236,7 @@ The object form is worth it only when a strategy needs its own configuration or 
 *GoF Design Patterns* implements the chain as a linked list,
 largely because it predates standard list types.
 In Python the chain is a list of functions.
-Bisection needs the interval to bracket a root; the open methods do not:
+Bisection needs the interval to bracket a root. The open methods do not:
 
 ```python
 # chain.py
@@ -375,7 +375,7 @@ so `subscribe(Deposit, on_withdraw)` is a type error.
 The safety check happens once, at registration.
 The stored `defaultdict`, though, mixes handlers for every event type in one structure.
 Its lists cannot name a single event class, so the element type erases the parameter to `Handler[Any]`.
-The generic guards the boundary; the `Any` covers the heterogeneous storage behind it.
+The generic guards the boundary. The `Any` covers the heterogeneous storage behind it.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.

@@ -42,8 +42,8 @@ The `StateMachine` keeps track of the current state,
 which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
 This method not only moves to the next state,
-but it also calls `run()` for each state object;
-thus you can see it's an expansion of the idea of the `State` pattern,
+but it also calls `run()` for each state object.
+Thus you can see it's an expansion of the idea of the `State` pattern,
 since `run()` does something different depending on the state that the system is in:
 
 ```python
@@ -244,8 +244,8 @@ after all the state objects exist.
 The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
 (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
-The subclasses now define only their `run()` behavior;
-the transitions live in the tables filled in at the bottom of the file:
+The subclasses now define only their `run()` behavior.
+The transitions live in the tables filled in at the bottom of the file:
 
 ```python
 # mouse_trap2.py

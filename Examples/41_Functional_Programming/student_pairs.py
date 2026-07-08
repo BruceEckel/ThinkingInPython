@@ -11,7 +11,7 @@ type Round = list[Group]
 def group_rounds(
     students: list[Student], size: int, seed: int = 0
 ) -> Iterator[Round]:
-    "Yield groupings of `size`; greedily keeps repeats to a minimum."
+    "Yield groupings of `size`. Greedily keeps repeats to a minimum."
     history: Counter[frozenset[Student]] = Counter()
     rng = random.Random(seed)
     while True:

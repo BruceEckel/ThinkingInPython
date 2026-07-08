@@ -29,7 +29,7 @@ The first resolves the first type, and the second resolves the second.
 Each unknown type needs its own dispatching method call.
 The following example names its methods `compete()` and `eval_*()`,
 and all belong to the same hierarchy.
-Here there will be only two dispatches; this is *double dispatching*.
+Here there will be only two dispatches. This is *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
 then you'll need a dispatching method call for each hierarchy.
 
@@ -269,7 +269,7 @@ not when a test imports it.
 ## Exercises
 
 1.  Add a fourth `Item`, `Lizard`, to `paper_scissors_rock_table.py`.
-    Lizard beats Paper and Scissors, and loses to Rock;
+    Lizard beats Paper and Scissors, and loses to Rock.
     Lizard versus Lizard is a draw.
     Add the six new entries (both orders of every pair) that `OUTCOME` needs.
 2.  Add the same `Lizard` to `paper_scissors_rock.py`, the double-dispatch version,

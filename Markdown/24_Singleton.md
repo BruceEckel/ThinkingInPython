@@ -135,8 +135,8 @@ print(x is y, x.instance is y.instance is z.instance)
 Because the inner class's name starts with a double underscore,
 it is private, so an attempt to access it directly produces a type-checking error.
 The outer class controls creation through its constructor.
-The first time you create an `OnlyOne` it initializes `instance`;
-after that it reuses the one inner object,
+The first time you create an `OnlyOne` it initializes `instance`.
+After that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
 `__getattr__()` delegates access.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.

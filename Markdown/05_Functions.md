@@ -107,7 +107,7 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object;
+A mutable default persists because it lives on the function object.
 Python does not recreate it on each call.
 This behavior commonly confuses newcomers to the language.
 

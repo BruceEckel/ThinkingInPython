@@ -67,7 +67,7 @@ Python normally has only one statement per line, so no terminating semicolon is 
 ## Variables and References
 
 A variable in Python is a name bound to an object, not a box that holds a value.
-Assignment binds a name; it does not copy.
+Assignment binds a name. It does not copy.
 You don't have to declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
@@ -270,7 +270,7 @@ Python takes backslashes literally, so you don't need to double them.
 
 ### f-Strings
 
-Modern Python uses *f-string*s.
+Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
 It is readable, fast, and preferred:
 
@@ -295,8 +295,8 @@ The format spec after a colon controls width, precision, and alignment.
 You will also see two older styles in existing code:
 C's `printf()` syntax, as in `"val: %d" % val`,
 and the `str.format()` method, as in `"val: {}".format(val)`.
-Both still work, and both use the same format mini-language;
-f-strings replaced them, so this book does not use them.
+Both still work, and both use the same format mini-language.
+F-strings replaced them, so this book does not use them.
 
 ### Common String Operations
 

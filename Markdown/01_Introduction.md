@@ -38,8 +38,8 @@ Without it, this book wouldn't exist.
 And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore this book.
 
 Using Claude made me realize how many compromises I've made on books in the past.
-I would have a good idea about something (for example, automatically interleaving commented output in the listings),
-but I was either unable to implement it or it just seemed too hard, so I didn't do it.
+I would have a good idea about something (for example, automatically interleaving commented output in the listings).
+But I was either unable to implement it, or it seemed too hard. So I didn't do it.
 But with AI I've been able to explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter
 to ones as daunting as that commented-output system.
@@ -82,7 +82,7 @@ You should be comfortable with:
 - Containers: lists, dictionaries, tuples, and sets.
 
 You do not need to know design patterns, metaclasses,
-or type checking; we cover them here.
+or type checking. We cover them here.
 The book is about the language, not the tooling around it.
 Fortunately, `uv` and other tools greatly simplify setup,
 so you don't need to spend time on it.
@@ -128,8 +128,8 @@ then type-checks (with Astral's `ty`), runs, and tests them.
 The code you read is the code that runs,
 and the output shown is the output it produces.
 
-If you find a mistake, corrections are welcome;
-see `CONTRIBUTING.md` in the source repository.
+If you find a mistake, corrections are welcome.
+See `CONTRIBUTING.md` in the source repository.
 
 ## Exercises
 

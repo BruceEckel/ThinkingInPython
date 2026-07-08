@@ -254,8 +254,8 @@ if __name__ == "__main__":
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
 Bind removes the boilerplate by chaining the steps.
-The error checking has not gone away;
-it moved into `bind()`, where it appears once.
+The error checking has not gone away.
+It moved into `bind()`, where it appears once.
 A `Failure` anywhere short-circuits the whole thing.
 
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
@@ -303,7 +303,7 @@ if __name__ == "__main__":
 #: (7, 5) Success(answer='add(7 + 5 + 12): 24')
 ```
 
-Nested binds carry each answer inward; a `Failure` anywhere short-circuits to the end.
+Nested binds carry each answer inward. A `Failure` anywhere short-circuits to the end.
 Only the last input passes all three steps, so it's the only one that reaches `add()`.
 
 Testing confirms combining returns the right value, or the first failure in the chain:

@@ -311,7 +311,7 @@ def test_pool_releases_unused() -> None:
 
 When you know the full set of shared values as you write the
 program, you do not need a pool at runtime.
-An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too))
+An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains for you.
 Python constructs each member once, at class creation,
 and any reference produces that one object.

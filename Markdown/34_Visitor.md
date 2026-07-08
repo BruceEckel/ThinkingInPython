@@ -166,7 +166,7 @@ before the next `def _` rebinds the name, so nothing is lost.
 Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
-Adding a new operation is a new function; adding a new flower is a class and,
+Adding a new operation is a new function. Adding a new flower is a class and,
 where needed, a one-line registration.
 When the operation should read like a method,
 use `functools.singledispatchmethod` instead.

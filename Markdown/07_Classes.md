@@ -296,7 +296,7 @@ print(n.total)  # Second access: stored value, no recomputation
 #: 30
 ```
 
-The first access runs the method; the second answers silently
+The first access runs the method. The second answers silently
 from the stored value.
 The attribute is *lazy*, created on first use,
 so an instance that never asks never pays.
@@ -307,8 +307,8 @@ The stored value lives on the instance.
 That is also the caution.
 `cached_property` trades freshness for speed,
 so if `n.values` changed, `total` would be stale.
-A plain `@property` recomputes every time and is never wrong;
-cache only what cannot change.
+A plain `@property` recomputes every time and is never wrong.
+Cache only what cannot change.
 
 ## String Representation
 

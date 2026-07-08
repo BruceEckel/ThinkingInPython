@@ -1115,7 +1115,7 @@ You have to run it.
 
 A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
 
-A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/steer/) and steering behavior for autonomous moving objects:
+A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/steer/) and steering behavior for autonomous moving objects.
 
 ## Exercises
 
@@ -1140,8 +1140,8 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
 4.  Add a new kind of `Item` to the robot maze.
     Define a `Coin` subclass with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
     Place a few `$` characters in the maze and report how many the robot collects.
-    You should not have to touch `item_factory()`, `Room`, or `GameBuilder`;
-    explain why the factory finds your new item on its own.
+    You should not have to touch `item_factory()`, `Room`, or `GameBuilder`.
+    Explain why the factory finds your new item on its own.
 5.  Compute the solution instead of hard-coding it.
     Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,
     the way `flood()` searches maze cells in `test_rats_and_mazes.py`.

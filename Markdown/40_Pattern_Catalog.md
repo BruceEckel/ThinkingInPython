@@ -33,7 +33,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Bridge | Separate an abstraction from its implementation so both vary independently. |
 | [Composite](35_Composite_and_Interpreter.md) | Treat individual objects and compositions of them uniformly through a tree. |
 | [Decorator](15_Decorators.md#the-decorator-pattern) | Attach responsibilities to an object dynamically by wrapping it. |
-| [Facade](31_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
+| [Façade](31_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
 | [Flyweight](36_Flyweight.md) | Share fine-grained objects to support large numbers of them efficiently. |
 | [Proxy](26_Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
 

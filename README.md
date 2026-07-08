@@ -77,7 +77,7 @@ This draft gets all the chapters and sections in place and ready for a serious e
 | 17_Comprehensions.md            |X|X|
 | 18_Metaprogramming.md           |X|X|
 | 19_Performance.md               |X|X|
-| 20_Concurrency.md               |X| |
+| 20_Concurrency.md               |X|X|
 | 21_Rethinking_Objects.md        |X|X|
 | 22_The_Pattern_Concept.md       |X|X|
 | 23_Data_Transfer_Objects.md     |X|X|
@@ -92,11 +92,11 @@ This draft gets all the chapters and sections in place and ready for a serious e
 | 32_Observer.md                  |X|X|
 | 33_Multiple_Dispatching.md      |X|X|
 | 34_Visitor.md                   |X|X|
-| 35_Composite_and_Interpreter.md |X| |
-| 36_Flyweight.md                 |X| |
-| 37_Memento.md                   |X| |
+| 35_Composite_and_Interpreter.md |X|X|
+| 36_Flyweight.md                 |X|X|
+| 37_Memento.md                   |X|X|
 | 38_Pattern_Refactoring.md       |X|X|
-| 39_Simulation.md                |X| |
+| 39_Simulation.md                |X|X|
 | 40_Pattern_Catalog.md           |X|X|
-| 41_Functional_Programming.md    |X| |
+| 41_Functional_Programming.md    |X|X|
 | 42_Effect_Management.md         |🔴|🔴|

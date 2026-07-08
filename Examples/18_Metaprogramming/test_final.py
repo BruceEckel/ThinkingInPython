@@ -4,7 +4,7 @@ import final_runtime
 import pytest
 
 def test_final_decorator_marks_class() -> None:
-    # @final sets __final__ at runtime; type checkers read it
+    # @final sets __final__ at runtime. Type checkers read it
     assert final.B.__final__ is True  # type: ignore
 
 def test_runtime_final_cannot_be_subclassed() -> None:

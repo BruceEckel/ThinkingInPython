@@ -202,7 +202,7 @@ readability. This is `snake_case`.
   (hyphens aren't importable)
 
 **Packages** (directories with `__init__.py`): also short and all-lowercase, but underscores are
-discouraged; prefer a single run-together word when you can.
+discouraged. Prefer a single run-together word when you can.
 
 - Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
 
@@ -251,7 +251,7 @@ print(Path("report/data.txt").suffix)
 #: .txt
 ```
 
-Nothing loads at the `lazy import` lines; `json` and `pathlib` load on first
+Nothing loads at the `lazy import` lines. `json` and `pathlib` load on first
 use, at the `json.dumps` and `Path(...)` calls.
 You can watch the deferral by importing a module whose body prints when it runs:
 
@@ -289,6 +289,3 @@ command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
 3.  Write a small module `noisy2.py` whose top-level body prints a message, similar to the `noisy` module described in the text.
     In a new script, `lazy import` both `noisy` and `noisy2`, then use `noisy2` before `noisy`.
     Confirm the two loading messages print in the order you used the modules, not the order you wrote the `lazy import` lines.
-4.  Rename `module.py` to `Module.py` (capital M) and update `use_module.py`'s import to match.
-    Using [File Names](#file-names), explain why this still runs correctly on Windows
-    but can fail on a case-sensitive filesystem such as Linux's.

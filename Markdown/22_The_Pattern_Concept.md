@@ -2,7 +2,7 @@
 
 An important step forward in object-oriented design was the "design patterns" movement,
 chronicled in the 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides.
-They became known as the "Gang of Four"^[A reference to Chinese politics ... it made sense at the time.].
+They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
 I will refer to that book as *GoF Design Patterns*, and use *design patterns* for the concept.
 
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
@@ -141,8 +141,8 @@ Some of these only apply to OOP.
     This complements Separation, Encapsulation and Variation,
     and is part of the Low-Coupling-High-Cohesion message.
 -   *Managed Coupling*.
-    Simply declaring that we should have "low coupling" in a design is usually too vague;
-    coupling happens, and the important issue is to acknowledge it and control it,
+    Simply declaring that we should have "low coupling" in a design is usually too vague.
+    Coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
 -   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de Saint-Exupéry, from *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].

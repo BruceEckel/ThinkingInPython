@@ -237,8 +237,8 @@ so only the current leaves remain.
 That is why `Blue` is absent from the second `Color` print. Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
 For the same reason `Round` is missing from the `Shape` registry. Creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
 This involves no metaclass.
-`__init_subclass__()` is implicitly a class method;
-its first argument is the new subclass.
+`__init_subclass__()` is implicitly a class method.
+Its first argument is the new subclass.
 
 Testing checks that each registry holds only its current leaf classes:
 
@@ -531,7 +531,7 @@ import final_runtime
 import pytest
 
 def test_final_decorator_marks_class() -> None:
-    # @final sets __final__ at runtime; type checkers read it
+    # @final sets __final__ at runtime. Type checkers read it
     assert final.B.__final__ is True  # type: ignore
 
 def test_runtime_final_cannot_be_subclassed() -> None:
@@ -676,7 +676,7 @@ Callables become methods, printed with the signature `inspect.signature()`
 reports, or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
 The declared type comes from the class annotations, gathered across the whole
-inheritance chain with `inspect.get_annotations()`; an attribute with no
+inheritance chain with `inspect.get_annotations()`. An attribute with no
 annotation, such as one assigned dynamically, prints as `name = value`.
 The value is the member's `repr()`, truncated to keep the line within
 `max_width`.
@@ -726,7 +726,7 @@ display_object(Fraggle(9, 2.3))
 
 The two calls show the same class from two angles.
 `display_object(Fraggle)` inspects the class object itself.
-It lists `y` and `z`, the fields with defaults; `x` is declared as `x: int`
+It lists `y` and `z`, the fields with defaults. `x` is declared as `x: int`
 with no default, so on the class it is only an annotation, not a bound
 attribute, and `getmembers_static()` does not return it.
 `display_object(Fraggle(9, 2.3))` inspects an instance, whose attributes hold

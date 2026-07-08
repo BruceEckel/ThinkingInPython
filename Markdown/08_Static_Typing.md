@@ -69,7 +69,7 @@ Marking values `Final` catches accidental reassignments immediately.
 
 ## Gradual Typing
 
-You can add hints one function at a time; the unannotated code keeps working.
+You can add hints one function at a time. The unannotated code keeps working.
 The checker treats whatever it cannot see as the type `Any`,
 which is compatible with everything, so typed and untyped code live together.
 This is *gradual typing*.
@@ -125,8 +125,8 @@ Instead of waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*,
 which means the methods and attributes required by whatever consumes that type.
 Dynamic typing and structural typing are the same idea checked at different moments.
-Dynamic typing trusts the object when the code runs;
-structural typing proves the shape before the code runs.
+Dynamic typing trusts the object when the code runs.
+Structural typing proves the shape before the code runs.
 
 A *Protocol* expresses that shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
@@ -331,12 +331,12 @@ The hints themselves are for the tools and for the reader.
 ## Type Hint Summary
 
 These are the type hints you will encounter, in their modern spelling.
-The book uses only a handful of these, but the rest turn up in other code;
-check [the Python documentation](https://docs.python.org/3/library/typing.html) or [Thinking in Types](https://thinkingintypes.com/) if one piques your interest.
+The book uses only a handful of these, but the rest turn up in other code.
+Check [the Python documentation](https://docs.python.org/3/library/typing.html) or [Thinking in Types](https://thinkingintypes.com/) if one piques your interest.
 
 Annotations go in three places: a parameter (`x: int`), a return value (`-> str`),
 and a variable or attribute (`total: int = 0`).
-Most of the names below come from the `typing` module; the abstract container
+Most of the names below come from the `typing` module. The abstract container
 shapes come from `collections.abc`.
 
 ### Basic types
@@ -435,7 +435,7 @@ shapes come from `collections.abc`.
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids |
 | `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports |
 
-The runtime ignores all of these; they exist for the checker and the reader.
+The runtime ignores all of these. They exist for the checker and the reader.
 Older code spells some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`, `Tuple` from `typing` for
 the lowercase built-ins. The forms above are the modern ones.

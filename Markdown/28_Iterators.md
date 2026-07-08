@@ -226,8 +226,8 @@ if __name__ == "__main__":
 #: [1, 2, 3]
 ```
 
-Use the class when the wrapper needs its own state or extra methods;
-use the generator when it does not.
+Use the class when the wrapper needs its own state or extra methods.
+Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because they all speak the same protocol.
 Both take `expected: type[T]`, so the checker carries the element type through.

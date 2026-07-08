@@ -1,7 +1,7 @@
 # Surrogate
 
-Both *Proxy* and *State* provide a surrogate class that you use in your code;
-this surrogate class hides the real class that does the work.
+Both *Proxy* and *State* provide a surrogate class that you use in your code.
+This surrogate class hides the real class that does the work.
 When you call a method in the surrogate,
 it turns around and calls the method in the implementing class.
 These two patterns are so similar that the *Proxy* is a special case of *State*.
@@ -297,12 +297,12 @@ or call tracking (a *smart reference*) to any object, with no per-method code.
 *GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
 But both are really a *Surrogate*:
 a front object that passes method calls through to an implementation.
-*Proxy* fronts for one implementation to control access to it;
+*Proxy* fronts for one implementation to control access to it.
 *State* swaps among several to change behavior over time.
 In Python both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
-You need the separate implementation hierarchy that *GoF Design Patterns* uses only when you do not control the implementing code;
-when you do, the single generic surrogate above is simpler and just as flexible.
+You need the separate implementation hierarchy that *GoF Design Patterns* uses only when you do not control the implementing code.
+When you do, the single generic surrogate above is simpler and just as flexible.
 
 Testing hands the counting proxy a small stand-in and confirms the proxy forwards the call with its result, and counts only callable accesses:
 

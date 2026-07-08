@@ -46,7 +46,7 @@ which pulls in the other direction.
 Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
 They favor immutability.
-Rust makes bindings immutable by default; Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
+Rust makes bindings immutable by default. Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
 They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
@@ -543,8 +543,8 @@ if __name__ == "__main__":
 ```
 
 Choose the approach depending on how the code will grow.
-Adding a new *shape* is easier in the object version because you write one class.
-Adding a new *operation* over all shapes is easier in the data version.
+Adding a new shape is easier in the object version because you write one class.
+Adding a new operation over all shapes is easier in the data version.
 You write one function, and the type checker tells you if you missed a case.
 The OOP approach assumes you add types more often than operations,
 which is often not true.
@@ -644,7 +644,7 @@ if __name__ == "__main__":
 ```
 
 The output is identical and the branches are gone.
-`total()` decides nothing about logging;
+`total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
 The parameter's type improved too.
 `Logs` is a protocol, so any logger fits,

@@ -110,8 +110,8 @@ if __name__ == "__main__":
 ```
 
 The caretaker's side of the contract is restraint.
-Whoever holds `checkpoint` stores it and gives it back;
-it does not reach inside and edit the strokes.
+Whoever holds `checkpoint` stores it and gives it back.
+It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
 though freezing the memento means the honest mistakes (mutating the snapshot) fail loudly.
@@ -286,8 +286,8 @@ which is how every editor behaves.
 so it never interprets anything.
 That works for any state type, `int` to full `Sketch`, with one condition:
 states must be immutable.
-`History` cannot protect a list that someone mutates in place;
-it would be a stack of aliases, the bug with which this chapter opened.
+`History` cannot protect a list that someone mutates in place.
+It would be a stack of aliases, the bug with which this chapter opened.
 
 ```python
 # test_history.py
@@ -451,7 +451,7 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 
 1.  Add `erase()` to both sketches.
     It removes the last stroke.
-    In `sketch.py` it mutates; in `frozen_sketch.py` it returns a new `Sketch`.
+    In `sketch.py` it mutates. In `frozen_sketch.py` it returns a new `Sketch`.
     Write tests proving existing mementos and histories are unaffected in each version.
 2.  Give `History` a maximum depth.
     When the past grows beyond `n` states, discard the oldest.

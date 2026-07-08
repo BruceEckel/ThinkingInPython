@@ -77,12 +77,21 @@ The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
 > methods are invoked, exceptions that occur during their execution are
-> ignored, and a warning is printed to `sys.stderr` instead. Also, when
-> `__del__()` is invoked in response to a module being deleted (e.g.,
-> when execution of the program is done), *other globals referenced by
-> the `__del__()` method may already have been deleted*. For this
-> reason, `__del__()` methods should do the absolute minimum needed to
-> maintain external invariants.
+> ignored, and a warning is printed to `sys.stderr` instead. In particular:
+>
+> - `__del__()` can be invoked when arbitrary code is being executed,
+>   including from any arbitrary thread. If `__del__()` needs to take a
+>   lock or invoke any other blocking resource, it may deadlock as the
+>   resource may already be taken by the code that gets interrupted to
+>   execute `__del__()`.
+> - `__del__()` can be executed during interpreter shutdown. As a
+>   consequence, the global variables it needs to access (including other
+>   modules) may already have been deleted or set to `None`. Python
+>   guarantees that globals whose name begins with a single underscore
+>   are deleted from their module before other globals are deleted; if
+>   no other references to such globals exist, this may help in assuring
+>   that imported modules are still available at the time when the
+>   `__del__()` method is called.
 
 In this run the deletions happen during shutdown,
 exactly the precarious moment the warning describes.

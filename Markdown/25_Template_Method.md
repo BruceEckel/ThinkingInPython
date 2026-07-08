@@ -148,5 +148,5 @@ A hook that holds no state is usually better as a function than as a method to o
     and writes the output to the last file.
     Customize it two ways, once by subclassing and once by passing a function:
 
-    > 1.  Convert all the letters in each file to uppercase.
-    > 2.  Search the files for words given in the first file.
+    1.  Convert all the letters in each file to uppercase.
+    2.  Search the files for words given in the first file.

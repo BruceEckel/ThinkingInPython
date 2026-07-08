@@ -308,7 +308,7 @@ dicts = [{"a": 1}, {"b": 2}, {"a": 3}]
 print([*row for row in rows])
 #: [1, 2, 3, 4, 5]
 
-# ** merges each mapping; later keys win, order preserved:
+# ** merges each mapping. Later keys win, order preserved:
 print({**d for d in dicts})
 #: {'a': 3, 'b': 2}
 

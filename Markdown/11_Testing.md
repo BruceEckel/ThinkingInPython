@@ -147,8 +147,8 @@ and `pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
 and a failure names the exact case that failed.
 
-Nothing limits you to one variable;
-you can give `parametrize` several names and a list of tuples, one tuple per case:
+Nothing limits you to one variable.
+You can give `parametrize` several names and a list of tuples, one tuple per case:
 
 ```python
 # test_balances.py
@@ -241,7 +241,7 @@ def bank_name() -> str:
 
 @pytest.fixture(params=[0.0, 100.0, 1_000_000.0])
 def preloaded(request: pytest.FixtureRequest) -> Account:
-    "Parametrized over starting balances; tests run once per value."
+    "Parametrized over starting balances. Tests run once per value."
     return Account(request.param)
 ```
 

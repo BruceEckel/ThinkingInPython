@@ -168,7 +168,7 @@ This is the same setup-then-teardown shape as a `pytest` fixture that
 [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
 It relies on the generator and decorator machinery from [Decorators](15_Decorators.md)
 and [Iterators](28_Iterators.md#generators).
-The generator form is usually the clearest choice; use a class when the
+The generator form is usually the clearest choice. Use a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Combining Context Managers
@@ -270,7 +270,7 @@ print(buffer.closed)
 #: True
 ```
 
-A real file should close on the way out; `stdout` should not.
+A real file should close on the way out. `stdout` should not.
 With a real resource the `with` closes it, shown by `buffer.closed`.
 With the default, `nullcontext` hands back `sys.stdout` and does nothing on exit,
 so the stream stays open.
