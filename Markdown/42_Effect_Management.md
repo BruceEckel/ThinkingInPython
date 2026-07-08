@@ -39,7 +39,7 @@ For example, suppose your function reads the time of day, or a random number.
 This doesn't change anything in the environment.
 However, the result of your function is almost certainly going to be different from one call to the next
 (unless your function ignores the time of day, but we will treat that case as ignorable).
-Involving the time of day has turned your function from pure to impure,
+Involving the time of day or a random number has turned your function from pure to impure,
 even though your function hasn't modified its environment.
 These are called *side causes* (which matches nicely with side effects) or *implicit inputs*.
 
@@ -59,17 +59,18 @@ def slope(rise: int, run: int) -> float:
 This always produces the same result for the same inputs, *except when `run` is zero*.
 Because an exception is raised instead of returning a result, does that break purity?
 
-There are two schools of thought on this:
+There are two schools of thought:
 
 1. **Pure**: Raising `ZeroDivisionError` instead of returning a number does not break purity.
-The same arguments still produce that same exception every time.
-The function reads nothing outside itself and changes nothing outside itself.
-Purity says the outcome depends on the arguments alone.
-Formal computer science theory backs this up.
-Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
-A bottom value represents a computation that does not terminate normally or result in a standard value.
-Because ⊥ is a valid theoretical value, throwing an uncatchable error is technically referentially transparent.
-You could replace the function call with the crash itself, and the program's behavior wouldn't change.
+    The same arguments still produce that same exception every time.
+    The function reads nothing outside itself and changes nothing outside itself.
+    Purity says the outcome depends on the arguments alone.
+
+    Formal computer science theory backs this up.
+    Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
+    A bottom value represents a computation that does not terminate normally or result in a standard value.
+    Because ⊥ is a valid theoretical value, throwing an uncatchable error is technically referentially transparent.
+    You could replace the function call with the crash itself, and the program's behavior wouldn't change.
 
 2. **Functional**: Exceptions bypass normal control flow which makes code difficult to reason about.
 To make code easier to reason about, functional programming avoids exceptions altogether.
