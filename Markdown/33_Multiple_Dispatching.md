@@ -140,6 +140,8 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
+![Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, landing execution inside Paper.eval_scissors() rather than Scissors's own code](_images/double_dispatch)
+
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
 It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.

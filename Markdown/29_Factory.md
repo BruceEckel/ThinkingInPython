@@ -387,6 +387,8 @@ the effect of changing from one GUI to another.
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
 
+![Two parallel hierarchies, Character and Obstacle, with each concrete factory producing the one matched pair its game needs: KittiesAndPuzzles always pairs Kitty with Puzzle, WarriorsAndWeapons always pairs Warrior with NastyWeapon](_images/abstract_factory)
+
 ```python
 # games.py
 from typing import override

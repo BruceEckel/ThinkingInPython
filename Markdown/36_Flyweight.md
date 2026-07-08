@@ -81,6 +81,8 @@ so caching produced one shared instance overall.
 Here `tile()` takes a symbol,
 so caching produces one shared instance per distinct symbol instead.
 
+![Two water cells at opposite corners of the grid are the same object; the whole 24-cell map reduces to 3 shared Tile instances](_images/flyweight_tiles)
+
 ```python
 # tile_map.py
 from dataclasses import dataclass

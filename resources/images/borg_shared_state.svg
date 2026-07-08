@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <defs>
+    <marker id="bg-tri" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="11" markerHeight="11" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- arrows: each object's __dict__ points at the one shared dict -->
+  <line x1="110" y1="90" x2="270" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+  <line x1="300" y1="90" x2="300" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+  <line x1="490" y1="90" x2="330" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+
+  <!-- x -->
+  <rect x="30" y="20" width="160" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="110" y="42" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">x = Singleton(</text>
+  <text x="110" y="58" font-size="12" fill="#1a1612" text-anchor="middle">"sausage")</text>
+  <text x="110" y="76" font-size="11" fill="#7a6e62" text-anchor="middle">__dict__ -&gt;</text>
+
+  <!-- y -->
+  <rect x="220" y="20" width="160" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="300" y="42" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">y = Singleton(</text>
+  <text x="300" y="58" font-size="12" fill="#1a1612" text-anchor="middle">"eggs")</text>
+  <text x="300" y="76" font-size="11" fill="#7a6e62" text-anchor="middle">__dict__ -&gt;</text>
+
+  <!-- z -->
+  <rect x="410" y="20" width="160" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="490" y="42" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">z = Singleton(</text>
+  <text x="490" y="58" font-size="12" fill="#1a1612" text-anchor="middle">"spam")</text>
+  <text x="490" y="76" font-size="11" fill="#7a6e62" text-anchor="middle">__dict__ -&gt;</text>
+
+  <!-- shared state -->
+  <rect x="190" y="150" width="220" height="70" fill="none" stroke="#8b1a1a" stroke-width="1.5" rx="6"/>
+  <text x="300" y="177" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">_shared_state</text>
+  <text x="300" y="196" font-size="12" fill="#1a1612" text-anchor="middle">val = "spam"</text>
+
+  <text x="300" y="245" font-size="11.5" fill="#7a6e62" text-anchor="middle">x is not y is not z, but x.__dict__ is y.__dict__ is z.__dict__</text>
+</svg>

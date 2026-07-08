@@ -11,6 +11,8 @@ a union of frozen data classes for the nodes,
 and recursive functions that `match` on them.
 This chapter builds each pattern with [exhaustive matching](13_Pattern_Matching.md#exhaustive-matching).
 
+![The same shape, two applications: a filesystem tree where a Directory holds File or Directory entries, and an expression tree where Add and Mul hold other expressions](_images/composite_tree)
+
 ## The Classic Composite
 
 A file system is the canonical composite.

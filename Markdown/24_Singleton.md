@@ -245,6 +245,8 @@ as long as they all share the same data.
 He called this the *Borg*^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."],
 and it points every instance's `__dict__` at the same storage:
 
+![x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three](_images/borg_shared_state)
+
 ```python
 # borg_singleton.py
 # Alex Martelli's 'Borg'

@@ -619,6 +619,8 @@ A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
 
+![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)
+
 ## Coordinating Threads with Queues
 
 When threads divide up work, the danger is shared mutable state.

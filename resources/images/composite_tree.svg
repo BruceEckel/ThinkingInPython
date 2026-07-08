@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320"
+     font-family="'JetBrains Mono', Consolas, monospace">
+
+  <!-- divider -->
+  <line x1="470" y1="8" x2="470" y2="300" stroke="#c8bfb0" stroke-width="1"/>
+
+  <!-- captions -->
+  <text x="230" y="16" font-size="11.5" fill="#7a6e62" text-anchor="middle">Filesystem (Composite)</text>
+  <text x="660" y="16" font-size="11.5" fill="#7a6e62" text-anchor="middle">2 * x + 1 (Interpreter / AST)</text>
+
+  <!-- filesystem edges -->
+  <line x1="230" y1="63" x2="90" y2="127" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="230" y1="63" x2="230" y2="127" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="230" y1="63" x2="370" y2="127" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="230" y1="173" x2="170" y2="227" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="230" y1="173" x2="290" y2="227" stroke="#1a1612" stroke-width="1.2"/>
+
+  <!-- filesystem nodes -->
+  <rect x="165" y="17" width="130" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="230" y="35" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">root/</text>
+  <text x="230" y="51" font-size="11" fill="#7a6e62" text-anchor="middle">1940</text>
+
+  <rect x="30" y="127" width="120" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="90" y="145" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">readme.md</text>
+  <text x="90" y="161" font-size="11" fill="#7a6e62" text-anchor="middle">90</text>
+
+  <rect x="175" y="127" width="110" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="230" y="145" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">src/</text>
+  <text x="230" y="161" font-size="11" fill="#7a6e62" text-anchor="middle">650</text>
+
+  <rect x="310" y="127" width="120" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="370" y="145" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">data.csv</text>
+  <text x="370" y="161" font-size="11" fill="#7a6e62" text-anchor="middle">1200</text>
+
+  <rect x="110" y="227" width="120" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="170" y="245" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">main.py</text>
+  <text x="170" y="261" font-size="11" fill="#7a6e62" text-anchor="middle">400</text>
+
+  <rect x="230" y="227" width="120" height="46" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="290" y="245" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">util.py</text>
+  <text x="290" y="261" font-size="11" fill="#7a6e62" text-anchor="middle">250</text>
+
+  <text x="230" y="298" font-size="11.5" fill="#7a6e62" text-anchor="middle">disk_usage(root) == 1940</text>
+
+  <!-- expr tree edges -->
+  <line x1="680" y1="60" x2="590" y2="130" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="680" y1="60" x2="770" y2="130" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="590" y1="170" x2="540" y2="230" stroke="#1a1612" stroke-width="1.2"/>
+  <line x1="590" y1="170" x2="650" y2="230" stroke="#1a1612" stroke-width="1.2"/>
+
+  <!-- expr tree nodes -->
+  <rect x="630" y="20" width="100" height="40" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="680" y="45" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Add</text>
+
+  <rect x="540" y="130" width="100" height="40" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="590" y="155" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Mul</text>
+
+  <rect x="720" y="130" width="100" height="40" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="770" y="155" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Num(1)</text>
+
+  <rect x="485" y="230" width="110" height="40" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="540" y="255" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Num(2)</text>
+
+  <rect x="595" y="230" width="110" height="40" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="650" y="255" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Var("x")</text>
+
+  <text x="660" y="298" font-size="11.5" fill="#7a6e62" text-anchor="middle">evaluate(expr, x=3) == 7</text>
+</svg>

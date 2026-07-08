@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 480"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <defs>
+    <marker id="mh-tri" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- new_state arriving from outside -->
+  <line x1="430" y1="20" x2="430" y2="348" stroke="#7a6e62" stroke-width="1" stroke-dasharray="2,3"/>
+  <text x="430" y="14" font-size="11" fill="#7a6e62" text-anchor="middle">new_state</text>
+
+  <!-- do(): push present, then clear future -->
+  <line x1="442" y1="90" x2="700" y2="90" stroke="#8b1a1a" stroke-width="1.3"/>
+  <text x="712" y="94" font-size="14" fill="#8b1a1a" text-anchor="middle">&#8709;</text>
+  <line x1="418" y1="140" x2="150" y2="140" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#mh-tri)"/>
+  <text x="565" y="82" font-size="10.5" fill="#8b1a1a" text-anchor="middle">do(): _future.clear()</text>
+  <text x="285" y="132" font-size="10.5" fill="#8b1a1a" text-anchor="middle">do(): push present -&gt; _past</text>
+
+  <!-- undo(): pop past into present, push present into future -->
+  <line x1="152" y1="195" x2="418" y2="195" stroke="#1a1612" stroke-width="1.3" marker-end="url(#mh-tri)"/>
+  <line x1="442" y1="210" x2="708" y2="210" stroke="#1a1612" stroke-width="1.3" marker-end="url(#mh-tri)"/>
+  <text x="285" y="188" font-size="10.5" fill="#1a1612" text-anchor="middle">undo(): pop _past -&gt; present</text>
+  <text x="575" y="225" font-size="10.5" fill="#1a1612" text-anchor="middle">undo(): push present -&gt; _future</text>
+
+  <!-- redo(): pop future into present, push present into past -->
+  <line x1="708" y1="255" x2="442" y2="255" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="1,4" marker-end="url(#mh-tri)"/>
+  <line x1="418" y1="270" x2="152" y2="270" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="1,4" marker-end="url(#mh-tri)"/>
+  <text x="575" y="248" font-size="10.5" fill="#7a6e62" text-anchor="middle">redo(): pop _future -&gt; present</text>
+  <text x="285" y="286" font-size="10.5" fill="#7a6e62" text-anchor="middle">redo(): push present -&gt; _past</text>
+
+  <!-- lanes -->
+  <rect x="40" y="320" width="220" height="120" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="150" y="345" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_past</text>
+  <text x="150" y="363" font-size="11" fill="#7a6e62" text-anchor="middle">list[S]</text>
+  <text x="150" y="380" font-size="10.5" fill="#7a6e62" text-anchor="middle">right end = top of stack</text>
+
+  <rect x="320" y="350" width="220" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.5" rx="6"/>
+  <text x="430" y="378" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_present</text>
+  <text x="430" y="396" font-size="11" fill="#7a6e62" text-anchor="middle">S</text>
+
+  <rect x="600" y="320" width="220" height="120" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="710" y="345" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_future</text>
+  <text x="710" y="363" font-size="11" fill="#7a6e62" text-anchor="middle">list[S]</text>
+  <text x="710" y="380" font-size="10.5" fill="#7a6e62" text-anchor="middle">left end = top of stack</text>
+
+  <text x="430" y="464" font-size="11.5" fill="#7a6e62" text-anchor="middle">do() after undo() discards the old future: acting on a new timeline erases the one you left</text>
+</svg>

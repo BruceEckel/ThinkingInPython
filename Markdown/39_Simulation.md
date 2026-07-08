@@ -522,6 +522,8 @@ Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case:
 
+![A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room](_images/maze_graph)
+
 ```python
 # robot_explorer/world.py
 from typing import Final
