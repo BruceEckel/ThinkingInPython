@@ -26,6 +26,8 @@ The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
 and a `create()` method builds an instance from a material name (this is a [Factory](29_Factory.md)):
 
+![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
+
 ```python
 # trash.py
 from typing import ClassVar

@@ -375,6 +375,8 @@ A plain drink knows its own cost and description.
 An extra dynamically wraps a drink, adds to the cost, and adds to the description.
 Because an extra is itself a drink, you can wrap an extra in another extra.
 
+![Espresso and Cappuccino satisfy Drink directly; Extra wraps a Drink and also satisfies it, so Whipped, Decaf, and ExtraShot can wrap any drink, including each other](_images/decorator_pattern)
+
 ```python
 # coffee.py
 from typing import Protocol
