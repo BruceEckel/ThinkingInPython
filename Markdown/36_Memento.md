@@ -326,7 +326,7 @@ the Command variation mentioned in [Function Objects](29_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
-because immutable states make it nearly free.
+because immutable states make inexpensive.
 Each `Sketch` above shares almost all of its strokes with its neighbors in the history.
 
 ## Mementos That Outlive the Process

@@ -232,7 +232,7 @@ Python calls `__init__()` on whatever `__new__()` returns,
 so an `__init__()` here would re-run on the cached instance at every construction.
 Skipping `__init__()` means skipping `@dataclass` too,
 since a dataclass only generates `__init__()`.
-`Color` loses the free `__repr__()` and `__eq__()` that `Tile` gets,
+`Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
 A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,

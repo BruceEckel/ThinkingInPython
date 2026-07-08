@@ -404,7 +404,8 @@ print(reduce(add, [1, 2, 3, 4]))
 ### `cache()`
 
 Remembers every result forever, so repeated calls with the same
-arguments are free. Only works correctly for pure functions.
+arguments cost nothing.
+Note that this only works correctly for pure functions.
 Caching a side-effecting function skips the effects.
 
 ```python
@@ -961,7 +962,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
 Writing this as a loop means building your own stack to track which sublists are still open,
 and getting the push and pop right at every depth.
-The recursive version gets that bookkeeping from the call stack for free,
+The recursive version gets that bookkeeping from the call stack,
 which is why it stays three lines instead of growing with every level of nesting you support.
 
 ## Lazy Evaluation

@@ -246,7 +246,7 @@ if __name__ == "__main__":
 ```
 
 This prints the same `[10, 20, 30, 40, 50]`,
-but everything `pool.map` did for free is now explicit:
+but everything `pool.map` did is now explicit:
 starting each worker, waiting for it to finish,
 and reassembling results that can arrive in any order
 (`sorted()` restores the input order,

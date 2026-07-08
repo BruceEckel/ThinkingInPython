@@ -200,7 +200,7 @@ because the name is misspelled or the base method is gone,
 the checker reports an error.
 
 At runtime `@override` does nothing but return the method unchanged,
-so it provides a free validation that you've overridden the method correctly.
+so it validates that you've overridden the method correctly.
 
 Apply `@override` to any method that replaces an inherited method,
 except constructors, which are undecorated by convention.

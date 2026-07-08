@@ -195,7 +195,7 @@ At module level, put the friendly functions and the few classes to expose.
 Keep the messy internals private (using a leading underscore, by convention),
 and the `import` is the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
-what a module gives you for free.
+what a module already gives you.
 
 ## Exercises
 

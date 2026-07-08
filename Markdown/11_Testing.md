@@ -503,7 +503,7 @@ In Python the distinction is one of discipline, not of compiler enforcement.
 
 That makes black-box testing the sensible default.
 Test the public surface, the methods a caller is meant to use,
-and you stay free to change the internals without rewriting the tests.
+and you can change the internals without rewriting the tests.
 The `Account` tests are black-box. They never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
