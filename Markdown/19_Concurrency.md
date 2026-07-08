@@ -393,7 +393,7 @@ sometimes a little more, from the added scheduling.
 This is why [Parallelism](#parallelism) used processes instead.
 Each process gets its own interpreter, and so its own GIL.
 
-The GIL deserves more than a definition,
+The GIL needs more than a definition,
 because it is misunderstood in both directions.
 It is not a design mistake, and it does not make threaded code safe.
 The rest of this section condenses my PyCon 2026 presentation

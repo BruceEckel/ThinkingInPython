@@ -6,11 +6,12 @@ Instead of raising an exception,
 a function returns its error as an ordinary value,
 and the type system tracks it.
 
-Exceptions are Python's default error mechanism, and they have real costs.
+Exceptions are Python's default error mechanism, and they have costs.
 An exception unwinds the stack, so it discards any work done so far.
 It does not appear in the function's return type, so the caller cannot see,
 from the signature, that the call might fail.
 And it is easy to forget to handle.
+
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
 
@@ -151,7 +152,8 @@ A function reports failure by returning a `Failure` object,
 success by returning a `Success` object.
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot pretend the function returns an ordinary value. To get the answer, the caller must unpack the `Result`.
+The caller cannot pretend the function returns an ordinary value.
+To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 
@@ -259,9 +261,9 @@ It moved into `bind()`, where it appears once.
 A `Failure` anywhere short-circuits the whole thing.
 
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
-You do not need to know that word to use it.
+You do not need to know that word to use functional error handling.
 
-Testing confirms the hand-written and `bind()` versions agree on every input:
+Testing confirms that the hand-written and `bind()` versions agree on every input:
 
 ```python
 # test_composing.py
@@ -367,7 +369,7 @@ because it must unpack the `Result` to reach the number.
 
 The [Decorators](14_Decorators.md) chapter explains how to write decorators like `@safe`, including `functools.wraps`.
 
-`@safe` deserves its own check. A good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
+To test `@safe`, a good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
 
 ```python
 # test_safe.py
