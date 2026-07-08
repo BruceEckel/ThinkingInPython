@@ -94,10 +94,10 @@ parameterized over the answer type and the error type.
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no constraints, which allows them to be used in any context.
-`Result` is useful well beyond this chapter, so it lives at the root of the examples and any chapter can import it:
+`Result` is useful beyond this chapter, so it lives at the root of the examples and any chapter can import it:
 
 ```python
-# shared/result.py
+# shared: result.py
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -335,7 +335,7 @@ with the exception as the `Failure` value.
 Like `result.py`, it lives at the root of the examples so any chapter can import it:
 
 ```python
-# shared/safe.py
+# shared: safe.py
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success

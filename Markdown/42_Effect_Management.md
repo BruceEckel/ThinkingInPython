@@ -107,18 +107,21 @@ print(f"burned real CPU time for nothing: {busy > idle * 100}")
 #: burned real CPU time for nothing: True
 ```
 
-`compute_and_discard()` and `do_nothing()` produce the same observable result: none.
-Neither prints, writes, nor returns anything a caller can act on.
+Neith `compute_and_discard()` and `do_nothing()` produce anything.
+No prints, writes, or returns; nothing a caller can act on.
 But `compute_and_discard()` still takes measurably longer to run,
-because Python does not notice the work is worthless and skip it.
+because Python cannot tell that the work is worthless, and skip it.
 A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
 
 Effects are not a defect to design away.
 They are the entire reason a program exists.
 The goal of Effect Management is not to eliminate effects.
-It is to know exactly which parts of a program have them, so the rest can stay pure.
+It is to isolate Effects so the rest of the program can stay pure.
 
 ## A Taxonomy of Benefits
+
+Isolating Effects has a cascade of positive value.
+We can more deeply understand the ideas of Effects by treating the depth of Effect analysis as phases.
 
 - Simple pure/impure: concurrency and testability
 - By further subdividing the impure portion we can produce specific benefits:

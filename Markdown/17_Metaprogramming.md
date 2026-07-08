@@ -612,7 +612,7 @@ That tool is a helper used throughout the book, so it lives at the root of the
 examples and any chapter can import it:
 
 ```python
-# shared/display.py
+# shared: display.py
 import inspect
 from collections.abc import Sequence
 

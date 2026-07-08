@@ -15,9 +15,10 @@ Markdown file's stem). A ``# trace.py`` slug in ``08_Decorators.md`` is written
 to ``08_Decorators/trace.py``, verbatim block contents and all. Slugs may
 include sub-paths (``# mouse/MouseAction.py``) to group files within a chapter.
 
-A ``# shared/name.py`` slug is written to the tree root instead of a chapter
-dir (``shared/`` is stripped), so any chapter can import it, e.g.
-``# shared/display.py`` becomes ``display.py`` at the root. The example
+A ``# shared: name.py`` slug (the ``shared:`` marker, not a path segment,
+since no ``Examples/shared/`` directory exists) is written to the tree root
+instead of a chapter dir, so any chapter can import it, e.g.
+``# shared: display.py`` becomes ``display.py`` at the root. The example
 tooling puts the tree root on the import path, so this is how a helper like
 ``result.py`` or ``safe.py`` gets reused across chapters. Use it only for
 something genuinely shared; everything else stays chapter-scoped.
@@ -53,13 +54,10 @@ BUILD_DIR = ROOT / "build"
 DEFAULT_OUT = ROOT / "build" / "examples"
 
 FENCE = re.compile(r"^```(\w+)?\s*$")
-# First content line names a relative path with an extension.
-PATH_LINE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")
-
-# A slug prefixed with this (e.g. "shared/display.py") is written to the tree
-# root instead of a chapter dir, so any chapter can import it. See the module
-# docstring.
-SHARED_PREFIX = "shared/"
+# First content line names a relative path with an extension, optionally
+# preceded by a "shared:" marker (e.g. "# shared: display.py"). See the
+# module docstring.
+PATH_LINE = re.compile(r"^#\s*(?:(shared):\s*)?([\w./\\-]+\.\w+)\s*$")
 
 
 @dataclass
@@ -105,11 +103,11 @@ def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
             if not pm:
                 result.fragments += 1
                 continue
-            slug = pm.group(1).replace("\\", "/")
-            if slug.startswith(SHARED_PREFIX):
-                rel = slug.removeprefix(SHARED_PREFIX)
+            slug = pm.group(2).replace("\\", "/")
+            if pm.group(1):  # "shared:" marker
+                rel = slug
                 # The written file's header comment should match where it
-                # actually lands (the tree root), not the shared/ slug.
+                # actually lands (the tree root), not the shared: marker.
                 block[block.index(first)] = f"# {rel}"
             else:
                 rel = f"{md.stem}/{slug}"

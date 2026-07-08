@@ -50,8 +50,10 @@ INLINE_NORUN = "# extract: no-run"
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')
 # A python fenced block, e.g. ```python or ```py.
 FENCE_RE = re.compile(r'^```(\w+)?\s*$')
-# First content line of a block naming its relative path, e.g. "# trace.py".
-PATH_LINE_RE = re.compile(r'^#\s*([\w./\\-]+\.\w+)\s*$')
+# First content line of a block naming its relative path, e.g. "# trace.py",
+# optionally preceded by a "shared:" marker. Mirrors extract_examples.py's
+# PATH_LINE: a "shared:" block lives at the tree root, not its chapter dir.
+PATH_LINE_RE = re.compile(r'^#\s*(?:(shared):\s*)?([\w./\\-]+\.\w+)\s*$')
 
 
 def is_marker(line: str) -> bool:
@@ -264,12 +266,15 @@ def load_skips() -> list[str]:
     return out
 
 
-def block_slug(block: list[str]) -> str | None:
-    """The relative path a block names on its first content line, if any."""
+def block_slug(block: list[str]) -> tuple[bool, str] | None:
+    """The (is-shared, relative-path) a block names on its first content
+    line, if any."""
     for line in block:
         if line.strip():
             m = PATH_LINE_RE.match(line.rstrip('\n\r'))
-            return m.group(1).replace('\\', '/') if m else None
+            if not m:
+                return None
+            return bool(m.group(1)), m.group(2).replace('\\', '/')
     return None
 
 
@@ -388,8 +393,18 @@ def process_md_block(
     update: bool,
 ) -> BlockResult:
     """Run one ```python block and check or rewrite its #: markers."""
-    slug = block_slug(block)
-    rel = f'{chapter}/{slug}' if slug else None
+    parsed = block_slug(block)
+    if parsed is None:
+        rel: str | None = None
+        filepath: Path | None = None
+    else:
+        shared, slug = parsed
+        if shared:
+            rel = slug
+            filepath = tree / rel
+        else:
+            rel = f'{chapter}/{slug}'
+            filepath = tree / chapter / slug
     text = ''.join(block)
 
     if INLINE_NORUN in text or (
@@ -398,7 +413,6 @@ def process_md_block(
         # GUI/interactive/infinite-loop listing: cannot run unattended.
         return BlockResult(block, ok=True, changed=False)
 
-    filepath = tree / chapter / slug if slug else None
     rundir = filepath.parent if filepath else None
     namespace: dict = {
         '__name__': '__main__',
