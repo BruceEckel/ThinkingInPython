@@ -141,7 +141,7 @@ Notice that in almost every case, testing is a benefit of Effect Management
 ## Converting Effectful to Pure
 
 Let's revisit `slope()` from `divide_by_zero_impurity.py`.
-We can transform away the exception Effect, which makes the function pure again.
+We can transform the exception Effect, which makes the function pure again.
 Here are three ways to do it.
 
 ### Return a Result Type
@@ -177,7 +177,7 @@ Nothing escapes through a raised exception, because `@safe` never lets one leave
 
 ### Catch the Exception You Expect
 
-A narrower fix keeps the exception local.
+If you catch and handle the exception within the function, it never escapes to become an Effect.
 `slope()` can catch the one exception it knows about
 and fold the failure into an ordinary value of its existing return type, `float`,
 instead of introducing a new type:
@@ -264,11 +264,16 @@ and every function downstream is pure by inheritance rather than by discipline.
 
 ## Effect Management Systems
 
+[[Incorporate my work in C:\git\Understanding_Effects here, and throughout the chapter]]
+
 The most basic Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function, the EMS guarantees that your function also reports its Effects.
 Then if another function calls your function, the EMS ensures that the new function also reports whatever Effects it produces.
 An EMS allows you to look at the function signature and know for sure whether it is pure or not.
 If it is not, the EMS will give details about the kinds of impurities that function involves.
+
+More complex EMS systems take advantage of what they know about affects to do more.
+[[...]]
 
 ### Effects by Hand
 
