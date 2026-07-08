@@ -22,11 +22,13 @@ Run 'make prose' on each chapter
 
 - Search feature on website?
 
-/loop through the chapters in the book and look for style and voice issues.
-Fix any obvious issues, and put all the rest in STYLE_AND_VOICE.md, demarking each chapter in the file.
+/loop through the chapters in the book and look for correctness, style and voice issues.
+Fix any obvious issues, and put all the rest in CORRECTNESS_STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.
-If an issue has a suggested fix you need me to review, put a checkbox next to it.
-If I check the box, I will later have you go through STYLE_AND_VOICE.md and fix the ones I have checked.
+The issues you put in CORRECTNESS_STYLE_AND_VOICE.md should be suggested fixes you need me to review.
+I will review CORRECTNESS_STYLE_AND_VOICE.md and hand it back to you.
+If I haven't deleted a suggested fix, it means I want you to do it.
+I may also make further notes next to a suggested fix, inside [[]], giving instructions about the fix.
 If you run out of tokens during a chapter, resume when it resets.
 
 ******************
