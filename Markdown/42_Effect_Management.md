@@ -123,11 +123,16 @@ It is to isolate Effects so the rest of the program can stay pure.
 Isolating Effects has a cascade of positive value.
 We can more deeply understand the ideas of Effects by treating the depth of Effect analysis as phases.
 
-- Simple pure/impure: concurrency and testability
-- By further subdividing the impure portion we can produce specific benefits:
+- Simple pure vs. impure: concurrency and testability
+
+### Subdividing the impure portion
+By further subdividing the impure portion we can produce specific benefits:
+
 - Functional Error Handling: trackable failure, and testability
 - Tracking side causes: testability (replace side cause during testing)
 - Tracking side effects: replace with dummy side effect for testing
+
+Notice that in almost every case, testing is a benefit of Effect Management
 
 ## Converting Effectful to Pure
 
@@ -250,9 +255,21 @@ and every function downstream is pure by inheritance rather than by discipline.
 
 ## Effect Management Systems
 
+### Effects by Hand
+
+[[shown above, is there more?]]
+
 ### Native Effect Managment
 
+[[Built into languages, show an example, refer to repo where I researched it]]
+
 ### Library Effect Management
+
+[[ZIO and Effect.ts, show how complicated it is]]
+
+### Custom AI Languages with Effects
+
+[[List]]
 
 ## Effect Management for Python?
 
