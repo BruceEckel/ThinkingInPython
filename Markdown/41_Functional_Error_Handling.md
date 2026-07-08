@@ -93,10 +93,11 @@ parameterized over the answer type and the error type.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
-Here they have no constraints, which allows them to be used in any context:
+Here they have no constraints, which allows them to be used in any context.
+`Result` is useful well beyond this chapter, so it lives at the root of the examples and any chapter can import it:
 
 ```python
-# result.py
+# shared/result.py
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -156,6 +157,10 @@ The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
+
+A function like this is a *Total Function*: its return type accounts for every outcome it can produce, success or failure, with nothing left for an exception to sneak out through.
+Raise an exception instead, and the signature no longer tells the truth.
+A caller can't see the failure just by reading the return type.
 
 Because failures are values, you can assert on them directly, with no `pytest.raises()`.
 The tests check `unwrap()`, and that `bind()` chains a success and short-circuits a failure:
@@ -326,10 +331,11 @@ def test_combined() -> None:
 In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
-with the exception as the `Failure` value:
+with the exception as the `Failure` value.
+Like `result.py`, it lives at the root of the examples so any chapter can import it:
 
 ```python
-# safe.py
+# shared/safe.py
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success

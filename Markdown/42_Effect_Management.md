@@ -84,7 +84,39 @@ To know the Effects that your function has, exceptions must be tracked as Effect
 
 ## A Program can Never be Pure
 
-[[If it doesn't somehow affect the environmnent, the computer becomes pointless except as a space heater]]
+A perfectly pure program computes something but never lets anyone see it.
+It reads nothing from its environment and changes nothing in its environment,
+so its result never reaches a screen, a file, a socket, or even the exit code the operating system checks.
+From outside the process, that program is indistinguishable from a program that computes nothing at all.
+
+```python
+# pure_and_pointless.py
+import timeit
+
+def compute_and_discard() -> None:
+    total = 0
+    for i in range(2_000_000):
+        total += i * i
+
+def do_nothing() -> None:
+    pass
+
+busy = timeit.timeit(compute_and_discard, number=5)
+idle = timeit.timeit(do_nothing, number=5)
+print(f"burned real CPU time for nothing: {busy > idle * 100}")
+#: burned real CPU time for nothing: True
+```
+
+`compute_and_discard()` and `do_nothing()` produce the same observable result: none.
+Neither prints, writes, nor returns anything a caller can act on.
+But `compute_and_discard()` still takes measurably longer to run,
+because Python does not notice the work is worthless and skip it.
+A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
+
+Effects are not a defect to design away.
+They are the entire reason a program exists.
+The goal of Effect Management is not to eliminate effects.
+It is to know exactly which parts of a program have them, so the rest can stay pure.
 
 ## A Taxonomy of Benefits
 
@@ -96,8 +128,122 @@ To know the Effects that your function has, exceptions must be tracked as Effect
 
 ## Converting Effectful to Pure
 
-- Catching exceptions within your function (but you must know what exceptions your callees raise)
-- Creating a restrictive type argument: for example an int that doesn't accept zero
+Let's revisit `slope()` from `divide_by_zero_impurity.py`.
+We can transform away the exception Effect, which makes the function pure again.
+Here are three ways to do it.
+
+### Return a Result Type
+
+Wrap the answer and the failure in a `Result`,
+the way [Functional Error Handling](41_Functional_Error_Handling.md#turning-exceptions-into-results) does.
+`result.py` and `safe.py` are shared helpers, so this chapter imports them directly instead of rebuilding them.
+Decorate the original `slope()`, unchanged, and every exception it raises becomes a value instead of a crash:
+
+```python
+# slope_result.py
+from result import Failure, Success
+from safe import safe
+
+@safe
+def slope(rise: int, run: int) -> float:
+    return rise / run
+
+for args in [(10, 2), (10, 0)]:
+    match slope(*args):
+        case Success(answer):
+            print(f"slope{args} = {answer}")
+        case Failure(error):
+            print(f"slope{args}: {type(error).__name__}")
+#: slope(10, 2) = 5.0
+#: slope(10, 0): ZeroDivisionError
+```
+
+`slope()`'s body never changed.
+`@safe` catches whatever it raises, so the fix lives entirely outside the function being fixed.
+`slope()` is total again, and `match` still forces the caller to handle both outcomes.
+Nothing escapes through a raised exception, because `@safe` never lets one leave.
+
+### Catch the Exception You Expect
+
+A narrower fix keeps the exception local.
+`slope()` can catch the one exception it knows about
+and fold the failure into an ordinary value of its existing return type, `float`,
+instead of introducing a new type:
+
+```python
+# slope_catch.py
+def validate(run: int) -> int:
+    if run < 0:
+        raise ValueError(f"run cannot be negative: {run}")
+    return run
+
+def slope(rise: int, run: int) -> float:
+    try:
+        return rise / validate(run)
+    except ZeroDivisionError:
+        return float("inf")
+
+print(slope(10, 2))
+#: 5.0
+print(slope(10, 0))
+#: inf
+try:
+    slope(10, -1)
+except ValueError as e:
+    print(f"escaped: {type(e).__name__}: {e}")
+#: escaped: ValueError: run cannot be negative: -1
+```
+
+This works, and it needs no new type.
+But it only guards the exception `slope()` was written to expect.
+`validate()` raises `ValueError` for a negative `run`,
+an exception `slope()` never anticipated,
+and it passes straight through the `try` untouched.
+Catching by hand is only as complete as your knowledge of every exception every callee can raise,
+which is exactly the tracking problem an Effect Management System exists to solve.
+
+### Make the Bad Value Impossible
+
+The third approach removes the failure instead of handling it.
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
+makes illegal values impossible to construct.
+Give `run` a type that cannot hold zero,
+and `slope()` never needs to check for zero at all:
+
+```python
+# slope_nonzero.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class NonZero:
+    value: int
+
+    def __post_init__(self) -> None:
+        if self.value == 0:
+            raise ValueError("NonZero cannot hold 0")
+
+def slope(rise: int, run: NonZero) -> float:
+    return rise / run.value
+
+print(slope(10, NonZero(2)))
+#: 5.0
+try:
+    NonZero(0)
+except ValueError as e:
+    print(e)
+#: NonZero cannot hold 0
+```
+
+The check still happens, but only once, at the one place a `NonZero` comes into existence.
+Every function that receives a `NonZero`, including `slope()`, inherits the guarantee for free.
+`slope()` was never in danger of dividing by zero, so it needed no `try` and no `Result` to say so.
+
+All three approaches produce a pure `slope()`, but they push the cost to different places.
+A `Result` makes every caller handle failure explicitly, at every call site.
+Catching by hand hides the fix inside `slope()`,
+at the cost of a blind spot for any exception nobody thought to catch.
+A restrictive type pays once, at construction,
+and every function downstream is pure by inheritance rather than by discipline.
 
 ## Effect Management Systems
 

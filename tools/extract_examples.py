@@ -14,6 +14,14 @@ The file is written under a directory named for the chapter it appears in (the
 Markdown file's stem). A ``# trace.py`` slug in ``08_Decorators.md`` is written
 to ``08_Decorators/trace.py``, verbatim block contents and all. Slugs may
 include sub-paths (``# mouse/MouseAction.py``) to group files within a chapter.
+
+A ``# shared/name.py`` slug is written to the tree root instead of a chapter
+dir (``shared/`` is stripped), so any chapter can import it, e.g.
+``# shared/display.py`` becomes ``display.py`` at the root. The example
+tooling puts the tree root on the import path, so this is how a helper like
+``result.py`` or ``safe.py`` gets reused across chapters. Use it only for
+something genuinely shared; everything else stays chapter-scoped.
+
 Blocks without such a first line are illustrative fragments and are skipped.
 
 Default mode is ``check``: nothing is written, drift between the Markdown and
@@ -48,10 +56,10 @@ FENCE = re.compile(r"^```(\w+)?\s*$")
 # First content line names a relative path with an extension.
 PATH_LINE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")
 
-# Helpers shared across chapters are written to the tree root rather than a
-# chapter dir, so any example can import them (the example tooling puts the
-# root on the path). Add future shared modules to this set.
-SHARED = {"display.py"}
+# A slug prefixed with this (e.g. "shared/display.py") is written to the tree
+# root instead of a chapter dir, so any chapter can import it. See the module
+# docstring.
+SHARED_PREFIX = "shared/"
 
 
 @dataclass
@@ -98,7 +106,13 @@ def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
                 result.fragments += 1
                 continue
             slug = pm.group(1).replace("\\", "/")
-            rel = slug if slug in SHARED else f"{md.stem}/{slug}"
+            if slug.startswith(SHARED_PREFIX):
+                rel = slug.removeprefix(SHARED_PREFIX)
+                # The written file's header comment should match where it
+                # actually lands (the tree root), not the shared/ slug.
+                block[block.index(first)] = f"# {rel}"
+            else:
+                rel = f"{md.stem}/{slug}"
             content = "\n".join(block).rstrip("\n") + "\n"
             existing = result.examples.get(rel)
             if existing and existing.content != content:
