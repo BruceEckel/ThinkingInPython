@@ -284,7 +284,7 @@ Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path,
 or the pool slowly drains until the program starves.
-"Must happen on every path out" is precisely what a context manager guarantees,
+The context manager guarantees the "must happen on every path out,"
 so in Python a pool is a queue plus one `@contextmanager` method:
 
 ```python

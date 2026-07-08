@@ -1014,73 +1014,83 @@ avoid repeating a pairing until every possible pairing has had a turn.
 This is a good place to see the chapter's ideas working together on
 one small, real program instead of one at a time.
 
-The *circle method* solves it exactly, with no trial and error.
-Fix one player and arrange the rest in a circle.
-Each round, pair players sitting across from each other,
-then rotate everyone except the fixed player by one seat.
-With `n` players this produces `n - 1` rounds where no pair repeats.
-That is the best any schedule can do.
-Those rounds use up every one of the `n * (n - 1) / 2` possible
-pairs exactly once, and none are left over.
-An odd number of players leaves one seat unpaired each round.
-The obvious fix is a *bye*. That student sits out.
-A friendlier fix folds the leftover student into one of the
-round's groups instead, so nobody ever sits out, at the cost of
-a few pairs meeting twice before every pair has met at least once.
+The *circle method* solves the pairs-only version exactly, with no
+trial and error.
+Fix one player, arrange the rest in a circle, and each round pair
+players sitting across from each other, then rotate everyone but
+the fixed player by one seat.
+With `n` players that produces `n - 1` rounds where no pair repeats,
+which is the best any schedule can do, since it uses up every one of
+the `n * (n - 1) / 2` possible pairs exactly once.
+Building it took a few honest wrong turns along the way.
+An odd roster left someone unpaired each round until the leftover
+student was folded into an existing pair instead, and the first way
+of choosing which pair kept favoring the same fixed player for a
+triple every single round, a bug that testing at larger roster sizes
+caught and a seeded random choice fixed.
 
-The first version of this tried always folding the leftover into
-the *first* group of the round.
-It looked reasonable for three rounds, then testing it over many
-more rounds and larger rosters exposed the flaw.
-The fixed player's own pair is nearly always that first group,
-so the fixed player ended up in a triple in every single round,
-no matter how large the roster grew.
-Growing the roster did not smooth that out.
-It could not, since the fixed player's seat never rotates.
-The fix is to let each round pick a different group at random,
-seeded by the round number:
+None of that trick survives a request for groups of three, four,
+or any other size.
+The circle method is a closed-form answer to one narrow question,
+"how do you 1-factorize a complete graph into perfect matchings,"
+and pairs are the only group size where that question has a tidy
+rotation-based answer.
+Scheduling groups of three without repeats is the far harder problem
+that *Kirkman's schoolgirl problem* poses, solvable only for specific
+roster sizes and with no simple formula behind it.
+Rather than chase an exact answer that may not exist for a given
+`students` and `size`, a general version can settle for a good one:
+build each group by always adding whoever its current members have
+met the fewest times before, tracked in a running history instead of
+computed fresh from a round number:
 
 ```python
 # student_pairs.py
 import random
-from collections import deque
+from collections import Counter
 from collections.abc import Iterator
-from itertools import combinations, count, islice
+from itertools import combinations, islice
 
 type Student = str
 type Group = tuple[Student, ...]
 type Round = list[Group]
 
-def round_robin(students: list[Student]) -> Iterator[Round]:
-    "Yield groupings; an odd roster gets a triple, not a bye."
-    roster: deque[Student | None] = deque(students)
-    if len(roster) % 2:
-        roster.append(None)  # A placeholder seat for the odd one out
-    fixed = roster.popleft()
-    for round_number in count():
-        seats = [fixed, *roster]
-        half = len(seats) // 2
-        pairs = [(seats[i], seats[-i - 1]) for i in range(half)]
-        groups: list[Group] = []
-        leftover: Student | None = None
-        for a, b in pairs:
-            if a is None or b is None:
-                leftover = a if b is None else b
-            else:
-                groups.append((a, b))
-        if leftover is not None:
-            idx = random.Random(round_number).randrange(len(groups))
-            groups[idx] = (*groups[idx], leftover)
-        yield groups
-        roster.rotate(1)
+def group_rounds(
+    students: list[Student], size: int, seed: int = 0
+) -> Iterator[Round]:
+    "Yield groupings of `size`; greedily keeps repeats to a minimum."
+    history: Counter[frozenset[Student]] = Counter()
+    rng = random.Random(seed)
+    while True:
+        pool = list(students)
+        rng.shuffle(pool)
+        groups: list[list[Student]] = []
+        while len(pool) >= size:
+            leader = pool.pop()
+            group = [leader]
+            while len(group) < size:
+                closest = min(pool, key=lambda c: sum(
+                    history[frozenset((m, c))] for m in group))
+                pool.remove(closest)
+                group.append(closest)
+            groups.append(group)
+        for extra in pool:  # Too few left for a full group of `size`
+            roomiest = min(groups, key=lambda g: sum(
+                history[frozenset((m, extra))] for m in g))
+            roomiest.append(extra)
+        round_result: Round = [tuple(g) for g in groups]
+        for g in round_result:
+            for pair in combinations(g, 2):
+                history[frozenset(pair)] += 1
+        yield round_result
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
-rounds = list(islice(round_robin(students), len(students)))
+rounds = list(islice(group_rounds(students, 2), len(students)))
 for i, grouping in enumerate(rounds[:3]):
     print(i, grouping)
-#: 0 [('Bo', 'Gia'), ('Cy', 'Fi', 'Ana'), ('Di', 'Eve')]
-#: 1 [('Ana', 'Gia', 'Fi'), ('Bo', 'Eve'), ('Cy', 'Di')]
-#: 2 [('Ana', 'Fi', 'Di'), ('Gia', 'Eve'), ('Bo', 'Cy')]
+#: 0 [('Gia', 'Eve', 'Ana'), ('Di', 'Cy'), ('Fi', 'Bo')]
+#: 1 [('Di', 'Bo', 'Eve'), ('Cy', 'Ana'), ('Gia', 'Fi')]
+#: 2 [('Eve', 'Fi', 'Ana'), ('Bo', 'Gia'), ('Cy', 'Di')]
 
 met = [frozenset(pair) for r in rounds for group in r
        for pair in combinations(group, 2)]
@@ -1089,46 +1099,43 @@ print(len(set(met)), "of", len(possible), "pairs met at least once")
 #: 21 of 21 pairs met at least once
 print(len(met) - len(set(met)), "repeat meetings")
 #: 14 repeat meetings
+
+trios = list(islice(group_rounds(students, 3), 3))
+for i, grouping in enumerate(trios):
+    print(i, grouping)
+#: 0 [('Gia', 'Eve', 'Cy', 'Fi'), ('Di', 'Bo', 'Ana')]
+#: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
+#: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 ```
 
-`random.Random(round_number)` builds a fresh, independently seeded
-generator every call, so `round_robin()` is still a pure function
-of `students` and how many times it has been advanced.
-Nothing global gets touched, and the same round always merges the
-same leftover into the same group.
-Purity was never the problem with the first attempt.
-Fairness was, and fixing fairness did not cost purity anything.
-Measured the same way as before, across rosters from `7` up to
-`51` students, no single student ever again dominates the triple
-count the way the fixed player did under the first version.
-The spread narrows as the roster grows, instead of staying pinned
-to one unlucky seat forever.
+Called with `size=2`, `group_rounds()` matches the specialized
+circle method exactly, `21` of `21` pairs covered in `14` repeat
+meetings, the same numbers the pairs-only version earned through
+several rounds of testing and fixing.
+It does that with no rotation and no notion of a fixed player at
+all, just a shuffle and a greedy choice repeated until the roster
+runs out.
+Called with `size=3`, the same function schedules trios instead.
+Seven students do not split evenly into threes, so one group grows
+to four rather than leaving anyone out, the same "join instead of
+sit out" choice the pairs-only version made for its own leftover.
 
-`deque.rotate(1)` moves every seat but the fixed one over by one
-position in constant time.
-That's why the roster is a `deque` and not a `list`.
-Rotating a list means rebuilding it.
-Seven students form three groups a round, two ordinary pairs and
-one triple.
-The triple contributes three meetings instead of one, so a round
-produces five meetings rather than four.
-Seven rounds of that is `35` meetings, but only `21` unique pairs
-exist among seven students, so `14` repeats are unavoidable once
-nobody is left to sit out.
-That is not a flaw in the schedule.
-It is the fewest repeats any triple-forming schedule can have,
-and `itertools.combinations()`, reused from
-[earlier in this chapter](#combinations), proves it by counting.
-Listing every meeting the seven rounds actually produce, then
-comparing that count against the `21` unique pairs, is the same
-substitution-based reasoning
-[Referential Transparency](#referential-transparency) develops next.
-
-Calling `round_robin()` again with `next()` past round `n - 1` does
-not raise `StopIteration`.
-It keeps yielding, cycling back through the same schedule,
-repeating the same, already-minimal set of extra meetings rather
-than accumulating new ones.
+Generality cost something.
+The circle method needed no memory.
+Which pair sits where in round `r` followed from `r` alone.
+`group_rounds()` needs the `history` `Counter`, because there is no
+formula that predicts, from a round number alone, which grouping of
+arbitrary size keeps every pair's meeting count lowest.
+It is still a pure function in the sense that matters for testing.
+The same `students`, `size`, and `seed` always produce the same
+infinite sequence of rounds, since `random.Random(seed)` never
+reaches outside itself for randomness.
+What changed is that computing round `100` now means having
+already generated rounds `0` through `99`, where the circle method
+could compute round `100` directly, from its arithmetic alone.
+That trade, memory for generality, is the same one
+[Recursion](#recursion) makes when a loop's simple counter is not
+enough and the problem needs a stack instead.
 
 ## Pattern Matching as Destructuring
 
@@ -1162,7 +1169,7 @@ but that is the same discipline that stops an unhandled error from escaping unno
 ## Referential Transparency
 
 An expression is *referentially transparent* when you can replace it with its value without changing the program's behavior.
-Pure functions give you this property, and it is the precise reason purity matters:
+Pure functions give you this property, which is the reason purity matters:
 
 ```python
 # referential_transparency.py
@@ -1177,14 +1184,17 @@ print(x, y, x == y)
 #: 10 10 True
 ```
 
-Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call, evaluate it in any order, or skip a repeat.
+Because `add(2, 3)` and `5` are interchangeable,
+a compiler can cache the call, evaluate it in any order, or skip a repeat.
 You can also reason about the code by substitution, the same move you make in algebra.
-This is the property that lets you check parts of a program, and sometimes prove them correct, and it connects back to this chapter's opening question about what counts as "what works."
+This property lets you check parts of a program, and sometimes prove them correct,
+and it connects back to this chapter's opening question about what counts as "what works."
 
 This property is also the quiet reason the `lru_cache` from earlier is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
-Every optimization that skips or reuses work, from a cache to a database query planner, is cashing in referential transparency.
-The more of your program holds this property, the more of it a machine, or a proof, can verify.
+Every optimization that skips or reuses work, from a cache to a database query planner,
+benefits from referential transparency.
+The more your program is referentially transparent, the more of it a machine, or a proof, can verify.
 
 ## Declarative Style
 
@@ -1193,9 +1203,10 @@ The more of your program holds this property, the more of it a machine, or a pro
 A comprehension is the everyday example (see [Comprehensions](17_Comprehensions.md)).
 The loop that filters and appends says *how*;
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
-"the squares of the even numbers," and leaves the looping to Python.
-This is the broader "functionality" the introduction points toward:
-describe the result, and let the machine arrange the steps.
+which is "the squares of the even numbers."
+It leaves the looping to Python.
+This is the broader "functionality" we want.
+Describe the result, and let the machine arrange the steps.
 Declarative code says less and means more.
 By naming the result instead of the steps,
 you hand the reader your intent and give the runtime freedom to choose how to deliver it.
@@ -1205,8 +1216,6 @@ You described the what, not a fixed sequence of moves.
 
 ## Parallelism for Free
 
-The previous section ended with engines that parallelize behind your back.
-Purity lets you claim that freedom in the open.
 A pure function is automatically parallelizable.
 Each call depends only on its arguments, so no call can affect another.
 The calls can run in any order, on any schedule, on any number of cores, and the answers do not change.
@@ -1218,11 +1227,10 @@ Making that safe means adding a lock, and the lock serializes the very work you 
 Purity removes the problem instead of managing it.
 With nothing shared, there is nothing to lock.
 
-`count_primes()` is pure, and each call does enough work to be worth spreading across cores:
+`count_primes()` is pure, and each call does enough work to spread across cores:
 
 ```python
 # parallel_pure.py
-# A pure function runs in parallel without modification.
 from concurrent.futures import ProcessPoolExecutor
 
 def count_primes(limit: int) -> int:
@@ -1248,7 +1256,7 @@ if __name__ == "__main__":
 `pool.map()` sends the same calls to worker processes, which the operating system places on separate cores.
 Run as a script, this prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run, because a pure call returns the same answer no matter which process ran it, or when.
-Notice what is missing: no locks, no queues, no shared state, and no changes to `count_primes()` itself.
+Notice there are no locks, no queues, no shared state, and no changes to `count_primes()` itself.
 The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
 `ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](20_Concurrency.md#parallelism).
@@ -1260,17 +1268,25 @@ Functional programming's honest answer is not one guarantee but a spectrum.
 The properties built up here, purity, immutability, and referential transparency, buy assurance at every level.
 You decide how far to take it.
 
-1. The cheapest rung is local reasoning. Pure functions and immutable values let you understand one piece at a time, with no hidden state to carry in your head. Most code never needs more.
+1. The cheapest rung is local reasoning.
+   Pure functions and immutable values let you understand one piece at a time,
+   with no hidden state to carry in your head.
+   Most code never needs more.
 2. Next is type checking. A type signature is a small theorem, and the function body is its proof.
-   This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence). Types are propositions and programs are their proofs.
-   Running `ty` over the examples in this book discharges that proof for a useful class of mistakes.
-3. Above that is *property-based testing*. You state a law the code must obey, then check it against many generated inputs. It does not prove the law.
+   This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
+   Types are propositions and programs are their proofs.
+   Running `ty` over the examples in this book demonstrates that proof for a useful class of mistakes.
+3. Above that is [*property-based testing*](#property-based-testing).
+   You state a law the code must obey, then check it against many generated inputs.
+   It does not prove the law.
    It works to falsify it, which is the falsifiability the chapter's opening requests.
 4. At the top is formal proof.
-   Dependently-typed languages such as Lean, Idris, and Rocq prove a program correct for every possible input, checked by machine.
+   Dependently-typed languages such as Lean, Idris,
+   and Rocq prove a program correct for every possible input, checked by machine.
    This is real, but rare outside specialized work.
 
-The middle rung is the one most worth adopting now.
+### Property-Based Testing
+
 You can write a property check by hand, looping over random inputs and asserting the law.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) does the same thing with sharper inputs,
 and shrinks any failure to a minimal counterexample:
@@ -1299,7 +1315,7 @@ The law is "decoding an encoding returns the original," and it holds for every i
 A property test states what must always be true.
 The machine searches for a counterexample, instead of forcing you to write one example at a time.
 
-Hypothesis turns that loop into a declaration.
+Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once, as a normal `test_` function.
 The framework supplies the cases, including awkward ones a handwritten loop would miss,
 such as the empty string and unusual Unicode:
@@ -1322,13 +1338,15 @@ def test_roundtrip(sample: str) -> None:
 
 `@given(st.text())` feeds `test_roundtrip()` a stream of generated strings.
 When a law fails, Hypothesis does not only report the failing input.
-It shrinks it to the smallest example that still fails, so the bug surfaces as the clearest case rather than a random one.
-That is the falsification machinery the chapter's opening called for, automated.
+It shrinks it to the smallest example that still fails,
+so the bug surfaces as the clearest case rather than a random one.
+This is automated falsification machinery.
 
 Two caveats keep this honest.
 First, proof is not exclusive to functional code.
 Hoare logic and tools like Dafny verify imperative programs too.
-What purity changes is the cost. With no mutable state to track, each step of the reasoning is shorter.
+What purity changes is the cost.
+With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.
 Haskell programmers rarely prove a program correct.

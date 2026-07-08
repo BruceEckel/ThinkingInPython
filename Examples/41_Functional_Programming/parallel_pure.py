@@ -1,5 +1,4 @@
 # parallel_pure.py
-# A pure function runs in parallel without modification.
 from concurrent.futures import ProcessPoolExecutor
 
 def count_primes(limit: int) -> int:
