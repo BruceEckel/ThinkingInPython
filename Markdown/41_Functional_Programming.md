@@ -24,7 +24,7 @@ and to write it that way when it can.
 
 A *pure function* computes its result from its arguments alone.
 It reads nothing else and changes nothing else.
-Given the same arguments, it always returns the same value.
+Given the same arguments, it always produces the same outcome, whether that outcome is a returned value or a raised exception.
 It has no *side effects*: no printing, no file or network access, no mutation of anything outside the function.
 
 Purity is the foundation on which everything else in this chapter builds.
