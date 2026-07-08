@@ -293,3 +293,7 @@ AI Effect Languages don't need the extra affordances that benefit humans.
 ## Effect Management for Python?
 
 [[Survey, libraries that are pieces, possibility of adding effect tracking to the Python type system]]
+
+## Effects are the Next Barrier
+
+[[History of programming and barriers, example of namespaces, how lack of Effect tracking holds us back. We'll see it as obvious in the future, just as with namespaces.]]
