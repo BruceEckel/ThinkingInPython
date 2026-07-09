@@ -13,15 +13,17 @@ There's one important thing these all have in common: you can verify function pu
 
 What happens if your potentially-pure function calls other functions?
 If one or more of those other functions have side effects, their impurity causes the calling function to also be impure.
-And to discover whether a function is impure, either trust the documentation or examine that function's code yourself.
+To discover whether a function is impure, you must either trust the documentation or examine that function's code.
+
 This rapidly becomes tedious and error-prone.
 It would be great if the type checking system could perform purity verification for you.
 This is called an *Effect Management System*, and this chapter explores aspects of Effect Management.
 
 ## What is an Effect?
 
-An *Effect* is anything other than purity.
-We say that a function has *side effects* if the result of calling it is anything other than returning a result.
+An *Effect* is what causes impurity.
+We say that a function has *side effects* if calling does anything other than returning a result.
+That is, if it modifies the environment outside the function.
 For example, it might:
 
 - Display something on the console
@@ -35,12 +37,13 @@ For example, it might:
 Side effects are relatively easy to spot because they change things in their environment.
 
 But the meaning of "Effect" is broader than just side effects.
-It also encompasses environmental impacts on the function.
+It also includes the impact of the environment on the function.
 For example, suppose your function reads the time of day, or a random number.
 This doesn't change anything in the environment.
 However, the result of your function is almost certainly going to be different from one call to the next.
-Involving the time of day or a random number has turned your function from pure to impure,
-even though your function hasn't modified its environment.
+If you incorporate any information other than the function arguments, your function becomes impure.
+This is usually involves I/O: the time of day, a random number, a database or network read.
+But it can also be as simple as reading a variable that's global to your function.
 These are called *side causes* (corresponding to side effects) or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
@@ -52,6 +55,7 @@ Consider the following:
 
 ```python
 # divide_by_zero_impurity.py
+
 def slope(rise: int, run: int) -> float:
     return rise / run
 ```
@@ -61,7 +65,7 @@ Because an exception is raised instead of returning a result, does that break pu
 
 There are two schools of thought:
 
-1. **Pure**: Raising `ZeroDivisionError` instead of returning a number does not break purity.
+1.  **Pure**: Raising `ZeroDivisionError` instead of returning a number does not break purity.
     The same arguments still produce that same exception every time.
     The function reads nothing outside itself and changes nothing outside itself.
     Purity says the outcome depends on the arguments alone.
@@ -72,10 +76,10 @@ There are two schools of thought:
     Because ⊥ is a valid theoretical value, throwing an uncatchable error is technically referentially transparent.
     You could replace the function call with the crash itself, and the program's behavior wouldn't change.
 
-2. **Functional**: Exceptions bypass normal control flow which makes code difficult to reason about.
-To make code easier to reason about, functional programming avoids exceptions altogether.
-A *Total Function* doesn't raise exceptions, but instead returns errors as data using explicit wrapper types,
-as we saw in [Functional Error Handling](41_Functional_Error_Handling.md).
+2.  **Functional**: Exceptions bypass normal control flow which makes code difficult to reason about.
+    To make code easier to reason about, functional programming avoids exceptions altogether.
+    A *Total Function* doesn't raise exceptions, but instead returns errors as data using explicit wrapper types,
+    as we saw in [Functional Error Handling](41_Functional_Error_Handling.md).
 
 From an Effect Management standpoint, exceptions are impure.
 If you write a function `a()` that calls a function `b()` that raises an exception,
@@ -117,27 +121,27 @@ Effects are not a defect to design away.
 They are the entire reason a program exists.
 The goal of Effect Management is not to eliminate effects.
 It is to isolate Effects so the rest of the program can stay pure
-(sometimes this is called "pushing the Effects to the edges").
+(this is sometimes called "pushing the Effects to the edges").
 
 ## A Taxonomy of Benefits
 
 The initial and most obvious reason to track Effects is parallelism.
-A function with no Effects touches nothing shared, so you can run it in parallel without any extra work.
+A function with no Effects touches nothing shared and effortlessly runs in parallel.
 The same guarantee makes testing trivial.
 A pure function needs no setup, no mocks, and no teardown.
 Call it with arguments and check the result.
 
 Isolating Effects produces a cascade of value beyond that first split.
-Treat the depth of Effect analysis as a series of phases.
+Consider the depth of Effect analysis as a series of phases.
 The first phase separates pure from impure.
-That phase alone buys parallelism, caching, and easy testing for the pure part.
+That phase produces parallelism, caching, and easy testing for the pure part.
 
 ### Subdividing the Impure Portion
 
 The next phase subdivides the impure portion, and each subdivision produces its own benefit:
 
 - **Exceptions** become data, via [Functional Error Handling](41_Functional_Error_Handling.md).
-  Failure turns into a value the type checker can see,
+  Failures turns into a values the type checker can see,
   and a test checks for a `Failure` as easily as a `Success`.
 - **Side causes** become replaceable inputs.
   A test substitutes a fixed clock for the real one, or a seeded generator for true randomness,
@@ -148,11 +152,11 @@ The next phase subdivides the impure portion, and each subdivision produces its 
 
 Notice that in almost every case, testing is a benefit of Effect Management.
 That is not a coincidence.
-A test is a second caller of your function, one that must run in an environment it completely controls.
+A test must run in an environment it completely controls.
 Untracked Effects are the parts of the environment a test cannot control.
-Every Effect you isolate becomes a knob the test can turn.
+Every Effect you isolate becomes controllable by your tests.
 
-These benefits only arrive if you know where the Effects are.
+You only get these benefits if you know where the Effects are.
 In a small program you find them by inspection.
 As programs grow, inspection stops scaling.
 That failure motivates the machinery in the rest of this chapter.
@@ -189,10 +193,9 @@ for args in [(10, 2), (10, 0)]:
 #: slope(10, 0): ZeroDivisionError
 ```
 
-`slope()`'s body never changed.
 `@safe` catches whatever it raises, so the fix lives entirely outside the function being fixed.
-`slope()` is total again, and `match` still forces the caller to handle both outcomes.
-Nothing escapes through a raised exception, because `@safe` never lets one leave.
+`slope()` is total again, and `match` forces the caller to handle both outcomes.
+Nothing escapes through a raised exception.
 
 ### Catch the Exception You Expect
 
@@ -203,6 +206,7 @@ instead of introducing a new type:
 
 ```python
 # slope_catch.py
+
 def validate(run: int) -> int:
     if run < 0:
         raise ValueError(f"run cannot be negative: {run}")
@@ -226,10 +230,10 @@ except ValueError as e:
 ```
 
 This works, and it needs no new type.
-But it only guards the exception `slope()` was written to expect.
+But it only guards the exception that `slope()` was written to expect.
 `validate()` raises `ValueError` for a negative `run`,
-an exception `slope()` never anticipated,
-and it passes straight through the `try` untouched.
+an exception `slope()` never anticipated.
+By calling it, `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand is only as complete as your knowledge of every exception every callee can raise,
 which is exactly the tracking problem an Effect Management System exists to solve.
 
@@ -277,7 +281,7 @@ Every function that receives a `NonZero`, including `slope()`, inherits that gua
 All three approaches produce a pure `slope()`, but they push the cost to different places.
 A `Result` makes every caller handle failure explicitly, at every call site.
 Catching by hand hides the fix inside `slope()`,
-at the cost of a blind spot for any exception nobody thought to catch.
+at the cost of a blind spot for an exception nobody thought to catch.
 A restrictive type pays once, at construction,
 and every function downstream is pure by inheritance rather than by discipline.
 
@@ -315,7 +319,7 @@ A function you understand today gets called by a function written next week,
 which gets called by code a colleague writes next month.
 Each step adds invisible dependencies, and no one has the full picture.
 
-The most basic Effect Management System (EMS) keeps track of Effects in functions.
+An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function, the EMS guarantees that your function also reports its Effects.
 Then if another function calls your function, the EMS ensures that the new function also reports whatever Effects it produces.
 An EMS allows you to look at the function signature and know for sure whether it is pure or not.

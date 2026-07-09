@@ -35,7 +35,7 @@ It has my voice, and I've gone over every sentence multiple times, editing, rewr
 
 I know some people don't like AI.
 Without it, this book wouldn't exist.
-And it's free, so if AI bothers you more than the resulting product might benefit you, please ignore this book.
+The book is free, so if AI bothers you more than the resulting product might benefit you, please ignore this book.
 
 Using Claude made me realize how many compromises I've made on books in the past.
 I would have a good idea about something (for example, automatically interleaving commented output in the listings).
