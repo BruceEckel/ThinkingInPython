@@ -322,7 +322,7 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the Command variation mentioned in [Function Objects](29_Function_Objects.md).
+the Command variation mentioned in [Function Objects](28_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,

@@ -58,7 +58,7 @@ object of its base type, without breaking the program. A subclass may add behavi
 contract. It accepts the same arguments, returns the same kinds of results, and
 raises no surprising exceptions. When subclasses obey it, code written against
 the base class works unchanged on any of them. This is the guarantee that makes
-polymorphism, and patterns like the [Template Method](24_Template_Method.md),
+polymorphism, and patterns like the [Template Method](25_Template_Method.md),
 safe. The base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 

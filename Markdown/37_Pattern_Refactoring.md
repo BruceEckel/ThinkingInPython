@@ -24,7 +24,7 @@ and you must recover the type of each piece to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
-and a `create()` method builds an instance from a material name (this is a [Factory](28_Factory.md)):
+and a `create()` method builds an instance from a material name (this is a [Factory](27_Factory.md)):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 

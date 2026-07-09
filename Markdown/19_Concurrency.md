@@ -128,7 +128,7 @@ The event loop overlaps waiting, not computing.
 Async did not fail. It overlapped the part that runs outside the processor, which for `cpu_price` is nothing.
 [Simulation](38_Simulation.md) builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
-and [Observer](31_Observer.md#observer-and-io) uses `gather()` to notify
+and [Observer](30_Observer.md#observer-and-io) uses `gather()` to notify
 slow observers together instead of one at a time.
 
 ## A Single Thread Still Races

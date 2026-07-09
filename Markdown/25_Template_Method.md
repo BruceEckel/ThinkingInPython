@@ -137,7 +137,7 @@ If they share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
-This is the same trade-off seen in [Function Objects](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+This is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
 ## Exercises

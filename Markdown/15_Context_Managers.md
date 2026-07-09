@@ -167,7 +167,7 @@ with tag("p") as t:
 This is the same setup-then-teardown shape as a `pytest` fixture that
 [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
 It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
-and [Iterators](27_Iterators.md#generators).
+and [Iterators](23_Iterators.md#generators).
 The generator form is usually the clearest choice. Use a class when the
 manager needs to hold methods or state beyond a single setup and teardown.
 

@@ -300,7 +300,7 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops as soon as it finds a match.
-[Iterators](27_Iterators.md#generators) explores generators further.
+[Iterators](23_Iterators.md#generators) explores generators further.
 
 ## Unpacking in Comprehensions
 

@@ -94,7 +94,7 @@ but for most cases the *Observer* pattern amounts to nothing more than a list of
 
 An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,
-such as [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
+such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
 
 Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
@@ -227,7 +227,7 @@ Below its threshold it returns without sending anything.
 
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
-The type-keyed [event bus](29_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
+The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
 
 ## A Visual Example of Observers
 

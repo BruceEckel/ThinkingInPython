@@ -75,7 +75,7 @@ so the `Tile` object never stores it.
 
 The factory pairs `functools.cache` with a constructor function,
 the same building block behind
-[Singleton](23_Singleton.md#when-you-want-a-class-cache-the-instance)'s
+[Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)'s
 cached factory. There the function took no arguments,
 so caching produced one shared instance overall.
 Here `tile()` takes a symbol,
@@ -191,7 +191,7 @@ Its different syntax warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
 This is the same maneuver the
-[Singleton](23_Singleton.md#the-classic-implementations)
+[Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses. Here the cache is keyed by the constructor
 arguments instead of a single fixed key:
 
@@ -371,7 +371,7 @@ The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
 The constraint is less flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
-The table-driven state machine in [State Machines](26_State_Machines.md#table-driven-state-machine)
+The table-driven state machine in [State Machines](31_State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
 
 ## Flyweights in the Wild

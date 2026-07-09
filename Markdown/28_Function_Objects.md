@@ -412,7 +412,7 @@ def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise
 ```
 
-This is the [Observer](31_Observer.md#the-pythonic-observer-a-list-of-callables),
+This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables),
 narrowed to a single subject.
 The subscribers are functions, and the bus routes each event to them by its type.
 Here a type may have many handlers.

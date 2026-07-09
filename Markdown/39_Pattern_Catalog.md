@@ -19,38 +19,38 @@ An unlinked name means the pattern appears only in this catalog.
 
 | Pattern | Intent |
 |---------|--------|
-| [Abstract Factory](28_Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
-| [Builder](28_Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
-| [Factory Method](28_Factory.md) | Defer instantiation to a method so subclasses choose the concrete type. |
-| [Prototype](28_Factory.md#prototype) | Create new objects by cloning an existing instance. |
-| [Singleton](23_Singleton.md) | Ensure a class has one instance with a single point of access. |
+| [Abstract Factory](27_Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
+| [Builder](27_Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
+| [Factory Method](27_Factory.md) | Defer instantiation to a method so subclasses choose the concrete type. |
+| [Prototype](27_Factory.md#prototype) | Create new objects by cloning an existing instance. |
+| [Singleton](24_Singleton.md) | Ensure a class has one instance with a single point of access. |
 
 ## Structural (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| [Adapter](30_Changing_the_Interface.md#adapter) | Convert one interface into another a client expects. |
+| [Adapter](29_Changing_the_Interface.md#adapter) | Convert one interface into another a client expects. |
 | Bridge | Separate an abstraction from its implementation so both vary independently. |
 | [Composite](34_Composite_and_Interpreter.md) | Treat individual objects and compositions of them uniformly through a tree. |
 | [Decorator](14_Decorators.md#the-decorator-pattern) | Attach responsibilities to an object dynamically by wrapping it. |
-| [Façade](30_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
+| [Façade](29_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
 | [Flyweight](35_Flyweight.md) | Share fine-grained objects to support large numbers of them efficiently. |
-| [Proxy](25_Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
+| [Proxy](26_Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
 
 ## Behavioral (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| [Chain of Responsibility](29_Function_Objects.md#chain-of-responsibility) | Pass a request along a chain until a handler processes it. |
-| [Command](29_Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
+| [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility) | Pass a request along a chain until a handler processes it. |
+| [Command](28_Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
 | [Interpreter](34_Composite_and_Interpreter.md#interpreter) | Represent a grammar and evaluate sentences written in it. |
-| [Iterator](27_Iterators.md) | Access the elements of a collection in order without exposing its structure. |
+| [Iterator](23_Iterators.md) | Access the elements of a collection in order without exposing its structure. |
 | Mediator | Route communication between objects through one place to reduce coupling. |
 | [Memento](36_Memento.md) | Capture and restore an object's state without breaking encapsulation. |
-| [Observer](31_Observer.md) | Notify dependents automatically when an object changes state. |
-| [State](25_Surrogate.md#state) | Change an object's behavior when its internal state changes. |
-| [Strategy](29_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
-| [Template Method](24_Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
+| [Observer](30_Observer.md) | Notify dependents automatically when an object changes state. |
+| [State](26_Surrogate.md#state) | Change an object's behavior when its internal state changes. |
+| [Strategy](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
+| [Template Method](25_Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
 | [Visitor](33_Visitor.md) | Add operations to an object structure without changing its classes. |
 
 ## Concurrency (POSA and others)
@@ -105,7 +105,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Front Controller | Funnel all requests through a single handler. |
 | Money | Represent monetary amounts together with their currency. |
 | Special Case | Supply a subclass for a special case instead of scattering null checks. |
-| [Registry](28_Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
+| [Registry](27_Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
 | Plugin | Choose behavior with classes named at configuration time. |
 
 ## Integration and Messaging (Hohpe and Woolf)
@@ -157,7 +157,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Fluent Interface | Chain method calls that return the receiver for readable APIs. |
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](41_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
-| [Function Object](29_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
+| [Function Object](28_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
 | [Memoization](40_Functional_Programming.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |

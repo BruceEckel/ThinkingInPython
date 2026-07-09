@@ -145,7 +145,7 @@ so none can be forgotten.
 `walk()` is a generator, so a composite is also iterable.
 The `yield from` flattens the recursion into a single stream of paths,
 and any consumer of that stream stays decoupled from the tree structure
-(see [Iterators](27_Iterators.md#delegating-with-yield-from)).
+(see [Iterators](23_Iterators.md#delegating-with-yield-from)).
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 The demo builds `src` first, then places it inside `root`.

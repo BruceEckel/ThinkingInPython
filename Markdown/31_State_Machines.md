@@ -1,5 +1,6 @@
 # State Machines
 
+Recall [*State*](26_Surrogate.md#state): a surrogate object that forwards calls to a swappable implementation.
 While *State* allows the client programmer to change the implementation,
 *StateMachine* imposes a structure to automatically change the implementation from one object to the next.
 The current implementation represents the state that a system is in,
@@ -723,9 +724,9 @@ if __name__ == "__main__":
     To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
     When a user finishes with a connection,
     you must inform the system so that it can check that connection back in for reuse.
-    To guarantee this, provide a [proxy](25_Surrogate.md#proxy) object instead of a reference to the actual connection,
+    To guarantee this, provide a [proxy](26_Surrogate.md#proxy) object instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
-2.  Using [State](25_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
+2.  Using [State](26_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add an additional kind of `Mood` called `Prozac`.
 3.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
 4.  Create a *StateMachine* system whereby the current state along with the input determines the next state.

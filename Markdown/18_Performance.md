@@ -137,7 +137,7 @@ a comprehension over an `append()` loop,
 and the C-implemented standard library,
 `itertools`, `collections`, and `functools`,
 over hand-rolled equivalents
-([Iterators](27_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
 As a last resort in a proven-hot loop,
 hoist a repeated attribute or global lookup into a local,
 as in `append = out.append`.
