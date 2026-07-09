@@ -1,5 +1,4 @@
-Consider the order of the design patterns chapters 22-36 -- can we reorder them simple to complex, or more-useful to more-esoteric?
-Don't make changes yet, just provide analysis.
+Review the book looking for consistency issues
 
 Run 'make prose' on each chapter
 
