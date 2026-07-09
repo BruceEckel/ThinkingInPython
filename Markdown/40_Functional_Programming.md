@@ -59,7 +59,7 @@ The payoff is trust.
 A pure function is the most reliable code you can write, because its behavior is fully described by its inputs.
 You test it with a single assertion and no fixture, since there is nothing to set up or restore.
 You can call it from many threads at once, because it shares no state to corrupt.
-[Parallelism for Free](#parallelism-for-free) turns that safety into speed.
+[Parallelism for Free](#automatic-parallelism) turns that safety into speed.
 A cache can store its results, knowing the answer will never go stale:
 
 ```python
@@ -387,7 +387,7 @@ These tools are already written, already correct, and implemented in
 C for speed. What follows starts with the simplest tools and works up
 to the ones with the most moving parts.
 
-### `reduce()`
+### `reduce`
 
 Folds a sequence into a single value by repeatedly applying a
 two-argument function.
@@ -401,7 +401,7 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
-### `cache()`
+### `cache`
 
 Remembers every result forever, so repeated calls with the same
 arguments cost nothing.
@@ -423,7 +423,7 @@ print(fib(30))
 Because `fib()` is recursive, the values up to and including 30 are now cached.
 This accelerates future calls to `fib()`.
 
-### `lru_cache()`
+### `lru_cache`
 
 Like `cache()`, but bounds memory by discarding the least recently
 used entry once `maxsize` is reached.
@@ -443,7 +443,7 @@ print(square.cache_info())
 #: CacheInfo(hits=0, misses=3, maxsize=2, currsize=2)
 ```
 
-### `partial()`
+### `partial`
 
 Fixes some of a function's arguments and returns a new function that
 expects the rest. [Partial Application](#partial-application), above,
@@ -458,7 +458,7 @@ shout("hello")
 #: hello!
 ```
 
-### `partialmethod()`
+### `partialmethod`
 
 The same idea as `partial()`, but for a method. The descriptor binds
 `self` automatically when accessed on an instance.
@@ -480,7 +480,7 @@ print(Text("7").zero_pad(3))
 #: 007
 ```
 
-### `cached_property()`
+### `cached_property`
 
 Runs a property's code once, on first access, then reuses the stored
 result. [Classes](07_Classes.md#properties) covers
@@ -513,7 +513,7 @@ print(x.squared)
 Note that you must be careful with caching,
 because mutating a property doesn't cause the cached result to be recalculated.
 
-### `wraps()`
+### `wraps`
 
 Copies a wrapped function's name and docstring onto its wrapper, so
 introspection still sees the original.
@@ -540,7 +540,7 @@ print(greet.__name__, "-", greet.__doc__)
 #: greet - Say hello.
 ```
 
-### `cmp_to_key()`
+### `cmp_to_key`
 
 Wraps an old-style comparator, a function returning negative, zero, or
 positive, into a key function `sorted()` can use directly.
@@ -557,7 +557,7 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 #: ['ccc', 'bb', 'a']
 ```
 
-### `total_ordering()`
+### `total_ordering`
 
 Fills in the rest of the comparison methods from `__eq__` and one of
 `__lt__`, `__le__`, `__gt__`, or `__ge__`, so a class needs two
@@ -584,7 +584,7 @@ print(light < heavy, light <= heavy, light > heavy)
 #: True True False
 ```
 
-### `singledispatch()`
+### `singledispatch`
 
 Turns a plain function into one that dispatches on the type of its
 first argument, with per-type implementations registered separately.
@@ -607,7 +607,7 @@ print(describe("hi"), "|", describe(5))
 #: a str | the number 5
 ```
 
-### `singledispatchmethod()`
+### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)`
 instead of a bare function call.
@@ -646,7 +646,7 @@ Combine them the way you combine any small function, by feeding one's output to 
 What follows starts with the simplest tools and works up to the ones
 with the most moving parts.
 
-### `repeat()`
+### `repeat`
 
 Yields the same object over and over, forever or a fixed number of times.
 
@@ -658,7 +658,7 @@ print(list(repeat("x", 3)))
 #: ['x', 'x', 'x']
 ```
 
-### `islice()`
+### `islice`
 
 Slices any iterable, including an infinite one, the way `[start:stop:step]` slices a list.
 
@@ -670,7 +670,7 @@ print(list(islice(range(10), 2, 8, 2)))
 #: [2, 4, 6]
 ```
 
-### `count()`
+### `count`
 
 Counts up (or down) forever from a start value, with a fixed step.
 
@@ -682,7 +682,7 @@ print(list(islice(count(10, 2), 5)))
 #: [10, 12, 14, 16, 18]
 ```
 
-### `cycle()`
+### `cycle`
 
 Repeats an iterable forever.
 
@@ -694,7 +694,7 @@ print(list(islice(cycle("AB"), 5)))
 #: ['A', 'B', 'A', 'B', 'A']
 ```
 
-### `chain()`
+### `chain`
 
 Iterates several iterables one after another, as if they were one.
 `chain.from_iterable(iterables)` does the same when the iterables
@@ -708,7 +708,7 @@ print(list(chain([1, 2], [3, 4])))
 #: [1, 2, 3, 4]
 ```
 
-### `pairwise()`
+### `pairwise`
 
 Yields consecutive overlapping pairs from an iterable, without
 indexing by hand and risking an off-by-one at the ends.
@@ -721,7 +721,7 @@ print(list(pairwise([1, 2, 3, 4])))
 #: [(1, 2), (2, 3), (3, 4)]
 ```
 
-### `batched()`
+### `batched`
 
 Groups an iterable into fixed-size tuples, with a shorter final batch
 if the length does not divide evenly, the kind of remainder logic
@@ -735,7 +735,7 @@ print(list(batched(range(7), 3)))
 #: [(0, 1, 2), (3, 4, 5), (6,)]
 ```
 
-### `accumulate()`
+### `accumulate`
 
 Yields the running total of an iterable, or the running result of any two-argument function.
 
@@ -747,7 +747,7 @@ print(list(accumulate([1, 2, 3, 4])))
 #: [1, 3, 6, 10]
 ```
 
-### `compress()`
+### `compress`
 
 Keeps the elements of one iterable wherever the matching selector is true.
 
@@ -759,7 +759,7 @@ print(list(compress("ABCD", [1, 0, 1, 0])))
 #: ['A', 'C']
 ```
 
-### `takewhile()`
+### `takewhile`
 
 Yields elements while a predicate holds, then stops at the first failure.
 
@@ -771,7 +771,7 @@ print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 #: [1, 2]
 ```
 
-### `dropwhile()`
+### `dropwhile`
 
 Skips elements while a predicate holds, then yields everything after.
 
@@ -783,7 +783,7 @@ print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 #: [3, 4, 1]
 ```
 
-### `filterfalse()`
+### `filterfalse`
 
 Keeps the elements a predicate rejects, the mirror of `filter()`.
 
@@ -795,7 +795,7 @@ print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
 #: [1, 3, 5]
 ```
 
-### `starmap()`
+### `starmap`
 
 Like `map()`, but unpacks each element as the arguments to the function.
 
@@ -807,7 +807,7 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 #: [32, 9]
 ```
 
-### `zip_longest()`
+### `zip_longest`
 
 Zips iterables of different lengths, filling the gaps instead of
 stopping at the shortest. The default filler is `None`, but
@@ -826,7 +826,7 @@ print(list(zip_longest([1, 2, 3], [4, 5], fillvalue=MISSING)))
 #: [(1, 4), (2, 5), (3, MISSING)]
 ```
 
-### `groupby()`
+### `groupby`
 
 Groups consecutive elements that share a key.
 The input must already be sorted by that key, since it only merges neighbors.
@@ -840,7 +840,7 @@ print([(k, list(g)) for k, g in groupby(data)])
 #: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
 ```
 
-### `tee()`
+### `tee`
 
 Splits one iterable into several independent iterators over the same
 data, so two consumers can each walk it once without collecting it
@@ -855,7 +855,7 @@ print(list(a), list(b))
 #: [1, 2, 3] [1, 2, 3]
 ```
 
-### `product()`
+### `product`
 
 The Cartesian product of the input iterables, the same pairs a
 nested `for` loop would build, without writing and re-testing that
@@ -869,7 +869,7 @@ print(list(product("AB", [1, 2])))
 #: [('A', 1), ('A', 2), ('B', 1), ('B', 2)]
 ```
 
-### `permutations()`
+### `permutations`
 
 Every ordering of `r` elements from the iterable.
 
@@ -881,7 +881,7 @@ print(list(permutations("AB")))
 #: [('A', 'B'), ('B', 'A')]
 ```
 
-### `combinations()`
+### `combinations`
 
 Every way to choose `r` elements where order does not matter and nothing repeats.
 
@@ -893,7 +893,7 @@ print(list(combinations("ABC", 2)))
 #: [('A', 'B'), ('A', 'C'), ('B', 'C')]
 ```
 
-### `combinations_with_replacement()`
+### `combinations_with_replacement`
 
 Like `combinations()`, but the same element can appear more than once.
 
@@ -1215,7 +1215,7 @@ That freedom is why a SQL query, a NumPy expression,
 or a dataframe operation can run on an optimized or parallel engine you never see.
 You described the what, not a fixed sequence of moves.
 
-## Parallelism for Free
+## Automatic Parallelism
 
 A pure function is automatically parallelizable.
 Each call depends only on its arguments, so no call can affect another.

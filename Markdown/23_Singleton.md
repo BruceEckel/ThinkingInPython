@@ -190,7 +190,7 @@ at the cost of building it whether or not anything uses it.
 
 Either way, this is a lot of code for what a module does on its own.
 
-### Overriding `__new__()`
+### Overriding `__new__`
 
 A variation uses `__new__()`, the method that actually creates an instance,
 to return the same object every time:
