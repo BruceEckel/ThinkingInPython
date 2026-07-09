@@ -334,10 +334,12 @@ A full EMS does three things:
    Some caller or context supplies the implementation,
    at a point after the function is defined.
 
-The third item is called *delayed binding*, and it is where the leverage lives.
+The third item is called *delayed binding*, and it has leverage.
+Delayed binding exists so that one fixed codebase can serve many contexts
+(test, production, retry-wrapped) without being edited.
 When a hundred functions declare "I need something that can read from storage,"
-none of them contains an opinion about which storage.
-They all flow up to a single point where storage is bound to an implementation.
+none of them contains an opinion about what that storage is.
+They all flow up to a single point or edge, where storage is bound to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
 A test provides an in-memory binding, production provides the real database,
 and none of the hundred functions change.
@@ -391,6 +393,7 @@ print(captured.messages)
 ```
 
 `greet()` performs an `Ask` Effect and a `Tell` Effect, and its signature says so.
+This moves the Effects into explicit arguments.
 The bindings are delayed.
 The demo binds them to test stand-ins, `Scripted` and `Capture`,
 and checks the greeting with no console in sight.
@@ -509,7 +512,7 @@ Instead of writing a computation and letting the compiler observe its Effects,
 you build a *description* of a computation, and execute the description later.
 
 Here is "Hello, World!" in Scala using the [ZIO](https://zio.dev/) library:
-
+[[Does this compile?]]
 ```scala
 import zio._
 import zio.Console.printLine
@@ -607,6 +610,10 @@ It can generate the code only if Effect tracking is available.
 AI Effect Languages don't need the extra affordances that benefit humans.
 
 [[List]]
+
+By the definition above, these are Effect-tracking systems rather than full EMSs.
+For their purpose the other two parts would be liabilities,
+since a host that fixes the implementations can guarantee what generated code is able to do.
 
 ## Effect Management for Python?
 
