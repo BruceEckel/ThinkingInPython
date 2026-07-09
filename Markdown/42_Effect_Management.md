@@ -13,7 +13,7 @@ There's one important thing these all have in common: you can verify function pu
 
 What happens if your potentially-pure function calls other functions?
 If one or more of those other functions have side effects, their impurity causes the calling function to also be impure.
-And to discover whether a function is impure, you either have to trust the documentation or examine that function's code yourself.
+And to discover whether a function is impure, either trust the documentation or examine that function's code yourself.
 This rapidly becomes tedious and error-prone.
 It would be great if the type checking system could perform purity verification for you.
 This is called an *Effect Management System*, and this chapter explores aspects of Effect Management.
@@ -661,11 +661,11 @@ Could Effect tracking be added to Python's type system?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
-A type checker would have to compute the Effect row of every function
+A type checker would need to compute the Effect row of every function
 from the functions it calls, across every library on PyPI,
 almost all of which would be unannotated.
 `async` succeeded because it arrived with the language and split the world visibly.
-An Effect row would have to spread through an ecosystem of untracked code.
+An Effect row would need to spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, the ideas in this chapter are what it will contain.

@@ -68,7 +68,7 @@ Python normally has only one statement per line, so no terminating semicolon is 
 
 A variable in Python is a name bound to an object, not a box that holds a value.
 Assignment binds a name. It does not copy.
-You don't have to declare a variable's type,
+You need not declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
 

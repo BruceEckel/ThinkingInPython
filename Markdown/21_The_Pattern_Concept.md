@@ -85,7 +85,7 @@ The three purposes are:
 
 1.  **Creational**: how to create an object.
     By isolating the details of object creation,
-    your code isn't dependent on what types of objects there are and thus doesn't have to change when you add a new type of object.
+    your code isn't dependent on what types of objects there are and thus won't change when you add a new type of object.
     [Singleton](23_Singleton.md) counts as a creational pattern,
     and later in this book you'll see examples of [Factories](28_Factory.md).
 2.  **Structural**: designing objects to satisfy particular project constraints.

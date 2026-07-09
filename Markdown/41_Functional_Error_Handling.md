@@ -442,7 +442,7 @@ and the `match` tells them apart.
 
 ## The returns Library
 
-You do not have to build `Result` yourself.
+You need not build `Result` yourself.
 The [returns](https://github.com/dry-python/returns) library provides a `Result` type with `Success` and `Failure`,
 the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.

@@ -369,7 +369,7 @@ binding their fields in the patterns.
 
 ## Simplification Rewrites the Tree
 
-An interpreter does not have to produce a number or a string.
+An interpreter need not produce a number or a string.
 It can produce another tree.
 `simplify()` applies algebraic identities.
 Adding zero and multiplying by one vanish, multiplying by zero

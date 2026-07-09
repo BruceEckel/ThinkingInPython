@@ -249,7 +249,7 @@ if __name__ == "__main__":
 
 The function reads the same and computes the same.
 The class does not need to own it.
-The function is not worse, and it has an advantage. It does not have to live inside `Point`.
+The function is not worse, and it has an advantage. It need not live inside `Point`.
 
 Testing confirms the method and the free function agree:
 

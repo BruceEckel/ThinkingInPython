@@ -460,7 +460,7 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
     What should happen to `can_undo()`?
 3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and reconstruct it.
     What did the round trip change that `pickle` preserved,
-    and where does your reconstruction have to compensate?
+    and where must your reconstruction compensate?
 4.  Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
     then write the test that exposes the corruption.
     Which of the three tests in `test_sketch.py` catches it first?

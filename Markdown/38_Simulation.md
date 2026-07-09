@@ -1111,7 +1111,7 @@ The less the agents understand,
 the more the run can tell you,
 because the outcome lives in the interactions rather than the instructions.
 When behavior emerges, reading the code is not enough.
-You have to run it.
+Run it.
 
 ## Other Maze Resources
 
@@ -1142,7 +1142,7 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
 4.  Add a new kind of `Item` to the robot maze.
     Define a `Coin` subclass with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
     Place a few `$` characters in the maze and report how many the robot collects.
-    You should not have to touch `item_factory()`, `Room`, or `GameBuilder`.
+    You shouldn't need to touch `item_factory()`, `Room`, or `GameBuilder`.
     Explain why the factory finds your new item on its own.
 5.  Compute the solution instead of hard-coding it.
     Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,

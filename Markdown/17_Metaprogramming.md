@@ -559,7 +559,7 @@ and class decorators are simpler and easier to read.
 
 One caution: a class has exactly one metaclass.
 Multiple inheritance can accidentally combine classes with different metaclasses,
-which creates a metaclass conflict you then have to resolve.
+which creates a metaclass conflict you must then resolve.
 That is one more reason to avoid metaclasses unless you truly need them.
 
 ## The `inspect` Module

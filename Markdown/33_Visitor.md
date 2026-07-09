@@ -6,7 +6,7 @@ People can confuse the two by looking at the implementation rather than the inte
 The *Visitor* assumption is that you have a primary class hierarchy that is unchangeable.
 Perhaps it's from another vendor and you can't make changes to that hierarchy.
 However, you'd like to add new polymorphic methods to that hierarchy.
-Normally you'd have to add something to the base class interface, but that's unchangeable.
+Normally you'd need to add something to the base class interface, but that's unchangeable.
 How do you get around this?
 
 *Visitor*, the final pattern in *GoF Design Patterns*, solves this kind of problem.
