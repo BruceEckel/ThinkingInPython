@@ -267,7 +267,7 @@ They do not test their result, because building the returned `Stars` runs the ch
 The validation lives in exactly one place, the constructor (which makes it easy to change).
 Immutability guarantees no one can damage the value after that.
 
-This principle often goes by *parse, don't validate*.
+This principle often goes by *parse, don't validate*.^[The phrase was coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.

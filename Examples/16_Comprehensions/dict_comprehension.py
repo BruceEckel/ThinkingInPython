@@ -1,9 +1,6 @@
 # dict_comprehension.py
-mcase = {"a": 10, "b": 34, "A": 7, "Z": 3}
+names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin"]
 
-mcase_frequency = {
-    k.lower(): mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0)
-    for k in mcase
-}
-print(mcase_frequency)
-#: {'a': 17, 'b': 34, 'z': 3}
+lengths = {name.upper(): len(name) for name in names if len(name) > 3}
+print(lengths)
+#: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}

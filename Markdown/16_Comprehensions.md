@@ -203,21 +203,36 @@ print(unique == same)
 
 ## Dictionary Comprehensions
 
-Consider a dictionary whose keys are single characters and whose values count how often each appears, with upper and lower case counted separately.
-To merge them into a case-insensitive count, the comprehension below sums the upper- and lower-case tallies under one lower-case key.
-It does some redundant work. A letter present in both cases (such as `a` and `A`) has the same combined count computed twice, once for each case.
+A dictionary comprehension builds a `dict`, producing a key and a value for
+each element, with an optional filter.
+Here each name becomes an upper-case key mapped to its length,
+keeping only the names longer than three characters:
 
 ```python
 # dict_comprehension.py
-mcase = {"a": 10, "b": 34, "A": 7, "Z": 3}
+names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin"]
 
-mcase_frequency = {
-    k.lower(): mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0)
-    for k in mcase
-}
-print(mcase_frequency)
-#: {'a': 17, 'b': 34, 'z': 3}
+lengths = {name.upper(): len(name) for name in names if len(name) > 3}
+print(lengths)
+#: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}
 ```
+
+The three parts mirror the list comprehension: the `for` clause supplies each
+`name`, the `if` clause drops `"Ni"`, and the `key: value` expression before
+`for` produces each entry.
+A common variant swaps a dictionary's keys and values to invert a lookup:
+
+```python
+# invert_dict.py
+seat_of = {"Arthur": 1, "Galahad": 2, "Robin": 3}
+
+name_at = {seat: name for name, seat in seat_of.items()}
+print(name_at)
+#: {1: 'Arthur', 2: 'Galahad', 3: 'Robin'}
+```
+
+Inverting assumes the values are unique. If two keys share a value,
+the later entry wins, just as with any duplicate key.
 
 ## Generator Expressions {#generator-expressions}
 
@@ -332,8 +347,9 @@ The set form `{*s for s in sets}` and the asynchronous generator form
     and squares it. The predicate must reject `"a"` so `int()` never sees it.
 2.  In `identity_matrix.py`, change the comprehension to build a 3 by 3 matrix
     with `2` on the diagonal instead of `1`, without adding a second pass over the result.
-3.  In `dict_comprehension.py`, add a fourth entry, `"z": 12`, to `mcase`
-    and confirm the merged `mcase_frequency` still combines upper and lower case correctly.
+3.  In `dict_comprehension.py`, add `"Galahad"` to `names`, then predict which
+    entries the comprehension produces before running it, given the
+    `len(name) > 3` filter.
 4.  In `generator_expression.py`, replace `islice(squares, 3)` with `islice(squares, 5)`
     and predict which five values it produces,
     given that `next(squares)` was already called twice before that line.

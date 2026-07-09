@@ -365,117 +365,117 @@ You can add responsibilities to one object at runtime,
 and let the caller choose which responsibilities to add.
 That is the object-oriented *Decorator* pattern.
 
-Consider a coffee shop.
-A class for every drink-and-extra combination explodes: espresso,
-espresso with whipped cream, decaf espresso with whipped cream, and so on.
-Each new extra doubles the menu.
+Consider a pizza shop.
+A class for every pizza-and-topping combination explodes: Margherita,
+Margherita with olives, Margherita with olives and feta, and so on.
+Each new topping doubles the menu.
 
-Instead, model the extras as decorators.
-A plain drink knows its own cost and description.
-An extra dynamically wraps a drink, adds to the cost, and adds to the description.
-Because an extra is itself a drink, you can wrap an extra in another extra.
+Instead, model the toppings as decorators.
+A plain pizza knows its own cost and description.
+A topping dynamically wraps a pizza, adds to the cost, and adds to the description.
+Because a topping is itself a pizza, you can wrap a topping in another topping.
 
-![Espresso and Cappuccino satisfy Drink directly; Extra wraps a Drink and also satisfies it, so Whipped, Decaf, and ExtraShot can wrap any drink, including each other](_images/decorator_pattern)
+![Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other](_images/decorator_pattern)
 
 ```python
-# coffee.py
+# pizza_decorator.py
 from typing import Protocol
 
-class Drink(Protocol):
+class Pizza(Protocol):
     @property
     def cost(self) -> float: ...
     @property
     def description(self) -> str: ...
 
-class Espresso:
-    cost = 1.50
-    description = "Espresso"
+class Margherita:
+    cost = 8.00
+    description = "Margherita"
 
-class Cappuccino:
-    cost = 1.75
-    description = "Cappuccino"
+class Hawaiian:
+    cost = 9.50
+    description = "Hawaiian"
 
-class Extra:
-    "Base object decorator: wraps a Drink and adds to it."
+class Topping:
+    "Base object decorator: wraps a Pizza and adds to it."
     add_cost = 0.0
     name = ""
 
-    def __init__(self, drink: Drink) -> None:
-        self.drink = drink
+    def __init__(self, pizza: Pizza) -> None:
+        self.pizza = pizza
 
     @property
     def cost(self) -> float:
-        return self.drink.cost + self.add_cost
+        return self.pizza.cost + self.add_cost
 
     @property
     def description(self) -> str:
-        return f"{self.drink.description} + {self.name}"
+        return f"{self.pizza.description} + {self.name}"
 
-class Whipped(Extra):
+class Garlic(Topping):
     add_cost = 0.50
-    name = "Whipped cream"
+    name = "Garlic"
 
-class Decaf(Extra):
-    add_cost = 0.0
-    name = "Decaf"
-
-class ExtraShot(Extra):
+class Olives(Topping):
     add_cost = 0.75
-    name = "Extra shot"
+    name = "Olives"
+
+class Feta(Topping):
+    add_cost = 1.25
+    name = "Feta"
 
 if __name__ == "__main__":
-    order = Whipped(ExtraShot(Espresso()))
+    order = Feta(Olives(Margherita()))
     print(f"{order.description}: ${order.cost:.2f}")
 
-    cap = ExtraShot(Decaf(Cappuccino()))
-    print(f"{cap.description}: ${cap.cost:.2f}")
-#: Espresso + Extra shot + Whipped cream: $2.75
-#: Cappuccino + Decaf + Extra shot: $2.50
+    haw = Garlic(Feta(Hawaiian()))
+    print(f"{haw.description}: ${haw.cost:.2f}")
+#: Margherita + Olives + Feta: $10.00
+#: Hawaiian + Feta + Garlic: $11.25
 ```
 
-`Whipped(ExtraShot(Espresso()))` is the object version of stacked `@` decorators.
-Each extra wraps the drink inside it and forwards through the same two-property interface,
+`Feta(Olives(Margherita()))` is the object version of stacked `@` decorators.
+Each topping wraps the pizza inside it and forwards through the same two-property interface,
 `cost` and `description`.
-The `Drink` `Protocol` describes that interface.
-Both the plain drinks and the extras satisfy it structurally,
+The `Pizza` `Protocol` describes that interface.
+Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
 This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 
-Adding a new extra means adding one class.
-Changing the price of an extra means changing one number, in one place.
+Adding a new topping means adding one class.
+Changing the price of a topping means changing one number, in one place.
 Compare that to a class per combination,
-where a price change touches every class that includes that extra.
+where a price change touches every class that includes that topping.
 
 ```python
-# test_coffee.py
-from coffee import Cappuccino, Decaf, Espresso, ExtraShot, Whipped
+# test_pizza_decorator.py
+from pizza_decorator import Feta, Garlic, Hawaiian, Margherita, Olives
 
-def test_plain_drink() -> None:
-    cap = Cappuccino()
-    assert cap.cost == 1.75
-    assert cap.description == "Cappuccino"
+def test_plain_pizza() -> None:
+    pizza = Hawaiian()
+    assert pizza.cost == 9.50
+    assert pizza.description == "Hawaiian"
 
-def test_stacked_extras() -> None:
-    order = Whipped(ExtraShot(Espresso()))
-    assert order.cost == 2.75
+def test_stacked_toppings() -> None:
+    order = Feta(Olives(Margherita()))
+    assert order.cost == 10.00
     assert order.description == (
-        "Espresso + Extra shot + Whipped cream")
+        "Margherita + Olives + Feta")
 
-def test_decaf_adds_no_cost() -> None:
-    order = Decaf(Espresso())
-    assert order.cost == 1.50
-    assert order.description == "Espresso + Decaf"
+def test_single_topping() -> None:
+    order = Garlic(Margherita())
+    assert order.cost == 8.50
+    assert order.description == "Margherita + Garlic"
 ```
 
 ## Exercises
 
-1.  Add a `Syrup` extra (cost 0.30) and use it to build a decaf cappuccino with syrup.
+1.  Add a `Mushroom` topping (cost 0.60) and use it to build a Hawaiian with mushroom and feta.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object *Decorator* pattern for a pizza shop:
-    plain pizzas (Margherita, Hawaiian) and topping decorators (Garlic, Olives, Feta).
-    Build a Margherita decorated with Olives and Feta,
+3.  Implement the object *Decorator* pattern for a coffee shop:
+    plain drinks (Espresso, Cappuccino) and extra decorators (Whipped cream, Decaf, Extra shot).
+    Build an espresso decorated with an extra shot and whipped cream,
     then print its cost and description.
 4.  Write `trace` as a class decorator that also keeps a class-level counter shared across every decorated function,
     and report the total number of traced calls in the program.
