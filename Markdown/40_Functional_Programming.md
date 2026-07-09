@@ -59,7 +59,7 @@ The payoff is trust.
 A pure function is the most reliable code you can write, because its behavior is fully described by its inputs.
 You test it with a single assertion and no fixture, since there is nothing to set up or restore.
 You can call it from many threads at once, because it shares no state to corrupt.
-[Parallelism for Free](#automatic-parallelism) turns that safety into speed.
+[Automatic Parallelism](#automatic-parallelism) turns that safety into speed.
 A cache can store its results, knowing the answer will never go stale:
 
 ```python
