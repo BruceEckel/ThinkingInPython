@@ -1,7 +1,5 @@
-Consider the order of the design patterns chapters -- can we make them simple to complex, or more-useful to more-esoteric?
+Consider the order of the design patterns chapters 22-36 -- can we reorder them simple to complex, or more-useful to more-esoteric?
 Don't make changes yet, just provide analysis.
-
-Make sure examples and prose are different from common examples in published literature (except for my own work).
 
 Run 'make prose' on each chapter
 
@@ -13,7 +11,6 @@ Run 'make prose' on each chapter
 - "have to", "could" -> "can"
 - which was
 - which will be
-
 
 - active voice: Ask gemini to create a claude skill and how to install it
 
