@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Reflow Markdown prose to one sentence per line.
 
-Prose paragraphs in `Markdown/*.md` are hard-wrapped at a fixed column. That
+Prose paragraphs in `Chapters/*.md` are hard-wrapped at a fixed column. That
 makes editing awkward: changing a word reflows a whole paragraph and produces a
 noisy git diff. This tool rewrites each prose paragraph so every sentence sits
 on its own line. Editing then touches only the sentences that change, and diffs
@@ -25,15 +25,15 @@ The tool only moves newlines; it never adds, drops, or alters a word. If that
 invariant ever fails the file is left untouched and reported.
 
 Usage:
-    uv run python tools/reflow_prose.py                  # check all Markdown/, no write
-    uv run python tools/reflow_prose.py --write           # rewrite all Markdown/
+    uv run python tools/reflow_prose.py                  # check all Chapters/, no write
+    uv run python tools/reflow_prose.py --write           # rewrite all Chapters/
     uv run python tools/reflow_prose.py --write 02        # rewrite one chapter by number
     uv run python tools/reflow_prose.py --diff Tour       # diff a chapter by name part
     uv run python tools/reflow_prose.py --write FILE...   # rewrite specific files
     uv run python tools/reflow_prose.py --width 100       # change the wrap width
 
 A positional argument may be a file path or a chapter selector matched against
-Markdown/: a number or stem prefix ("02", "02_A_Python") or a substring ("Tour").
+Chapters/: a number or stem prefix ("02", "02_A_Python") or a substring ("Tour").
 """
 
 import argparse
@@ -366,13 +366,13 @@ def _resolve(selector: str) -> list[Path]:
     """Resolve one selector to Markdown files.
 
     A selector may be a path to a file, or a chapter selector matched against
-    `Markdown/`: a number or stem prefix ("02", "02_A_Python") or a substring
+    `Chapters/`: a number or stem prefix ("02", "02_A_Python") or a substring
     ("Tour"). Matching is case-insensitive.
     """
     path = Path(selector)
     if path.is_file():
         return [path]
-    md = Path("Markdown")
+    md = Path("Chapters")
     matches = sorted(md.glob(f"{selector}*.md"))
     if not matches:
         low = selector.lower()
@@ -384,7 +384,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*",
                         help="files or chapter selectors like '02' or 'Tour' "
-                             "(default: all of Markdown/)")
+                             "(default: all of Chapters/)")
     parser.add_argument("--write", action="store_true", help="rewrite files in place")
     parser.add_argument("--diff", action="store_true", help="print a unified diff")
     parser.add_argument("--width", type=int, default=_DEFAULT_WIDTH,
@@ -400,7 +400,7 @@ def main() -> int:
                 return 2
             files.extend(matched)
     else:
-        files = sorted(Path("Markdown").glob("*.md"))
+        files = sorted(Path("Chapters").glob("*.md"))
 
     total_changed = 0
     total_paras = 0

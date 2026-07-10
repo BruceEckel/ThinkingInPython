@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Capitalize the first letter of prose comments in ```python blocks.
 
-Walks every ``Markdown/*.md`` file, and within fenced ``python`` blocks only,
+Walks every ``Chapters/*.md`` file, and within fenced ``python`` blocks only,
 finds real ``#`` comments (string-aware, so ``#`` inside a literal is ignored).
 A comment's first word is capitalized only when it looks like prose: a run of
 two or more ASCII letters (or the lone article "a") that is NOT immediately
@@ -27,7 +27,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MARKDOWN_DIR = ROOT / "Markdown"
+CHAPTERS_DIR = ROOT / "Chapters"
 ALLOWLIST = ROOT / "tools" / "comment_caps_allow.txt"
 
 FENCE = re.compile(r"^```(\w+)?\s*$")
@@ -195,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
 
     allow = load_allowlist(args.allow)
     total = 0
-    for md in sorted(MARKDOWN_DIR.glob("*.md")):
+    for md in sorted(CHAPTERS_DIR.glob("*.md")):
         changes = process_file(md, args.write, allow)
         if changes:
             print(f"\n{md.name}: {len(changes)} change(s)")

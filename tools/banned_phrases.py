@@ -2,7 +2,7 @@
 """Fail the build if any banned phrase appears in the book.
 
 Reads phrases from `tools/banned_phrases.txt` (one per line) and searches every
-`Markdown/*.md` file, prose and code alike, for each as a literal,
+`Chapters/*.md` file, prose and code alike, for each as a literal,
 case-sensitive substring. Every occurrence is reported as `path:line:col`, and
 a non-zero exit makes it a gate. Use it to retire constructs the book has moved
 past, such as `from __future__ import annotations` (unnecessary on Python 3.14).
@@ -11,7 +11,7 @@ In the phrases file, blank lines and lines starting with `#` are ignored, so you
 can group and explain the entries.
 
 Usage:
-    python tools/banned_phrases.py                 # scan Markdown/
+    python tools/banned_phrases.py                 # scan Chapters/
     python tools/banned_phrases.py path ...        # scan specific files/dirs
     python tools/banned_phrases.py --phrases FILE  # use another phrases file
 """
@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     ap.add_argument("--phrases", type=Path, default=PHRASES_FILE,
                     help=f"phrases file (default: {PHRASES_FILE.name})")
     args = ap.parse_args(argv)
@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     total = 0
-    for path in iter_files(args.paths or ["Markdown"]):
+    for path in iter_files(args.paths or ["Chapters"]):
         for lineno, line in enumerate(
                 path.read_text(encoding="utf-8").splitlines(), 1):
             for phrase in phrases:

@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MARKDOWN_DIR = ROOT / "Markdown"
+CHAPTERS_DIR = ROOT / "Chapters"
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
@@ -100,7 +100,7 @@ def load_chapter(md: Path) -> tuple[str, str]:
 
 def discover() -> list[Chapter]:
     chapters: list[Chapter] = []
-    for md in sorted(MARKDOWN_DIR.glob("*.md")):
+    for md in sorted(CHAPTERS_DIR.glob("*.md")):
         title, _ = load_chapter(md)
         number = md.stem.split("_", 1)[0]
         # A numeric prefix is a chapter; a letter prefix (e.g. A_, B_) is an

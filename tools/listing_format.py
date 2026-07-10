@@ -148,12 +148,12 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     ap.add_argument("--fix", action="store_true",
                     help="remove the offending blank lines in place")
     args = ap.parse_args(argv)
 
-    files = _iter_files(args.paths or ["Markdown"])
+    files = _iter_files(args.paths or ["Chapters"])
     total = 0
     for path in files:
         for lineno, reason in check_file(path, args.fix):

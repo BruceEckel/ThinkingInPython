@@ -18,7 +18,7 @@ file back into the block it came from.
 Usage:
     python tools/fix_imports.py          # report listings to organize (exit 1)
     python tools/fix_imports.py --fix     # rewrite them in place
-    python tools/fix_imports.py --fix Markdown/05_Modules_and_Packages.md
+    python tools/fix_imports.py --fix Chapters/05_Modules_and_Packages.md
 """
 
 import argparse
@@ -27,7 +27,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MARKDOWN_DIR = ROOT / "Markdown"
+CHAPTERS_DIR = ROOT / "Chapters"
 DEFAULT_TREE = ROOT / "build" / "examples"
 # A python fenced block, e.g. ```python or ```py.
 FENCE_RE = re.compile(r'^```(\w+)?\s*$')
@@ -126,8 +126,8 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     ap.add_argument(
-        'targets', nargs='*', type=Path, default=[MARKDOWN_DIR],
-        help='Markdown files or directories (default: Markdown/)',
+        'targets', nargs='*', type=Path, default=[CHAPTERS_DIR],
+        help='Markdown files or directories (default: Chapters/)',
     )
     ap.add_argument(
         '--fix', action='store_true',

@@ -2,7 +2,7 @@
 """Extract tagged code examples from Solutions/*.md into a tree.
 
 The exact counterpart of ``extract_examples.py``, pointed at ``Solutions/``
-instead of ``Markdown/``. A fenced block is extractable when its first
+instead of ``Chapters/``. A fenced block is extractable when its first
 content line is a path comment (``# exercise_1.py``); the file is written
 under a directory named for the chapter (the Solutions file's stem), exactly
 as ``extract_examples.py`` does for the book chapters. See that module's

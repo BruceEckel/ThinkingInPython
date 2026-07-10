@@ -14,12 +14,12 @@ RUFF ?= uv run ruff
 PYTEST_N ?=
 SPELL ?= uv run codespell
 VALE ?= vale
-DOCS ?= Markdown
+DOCS ?= Chapters
 # Files for spell/prose: all of DOCS, or one chapter via CH= (a number or stem
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
-PROSE_FILES = $(if $(CH),Markdown/$(CH)*.md,$(DOCS))
+PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -43,6 +43,12 @@ check-tools:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
 check-tools-full:  ## Check every tool, including pandoc and vale (site/prose)
 	$(PY) tools/check_tools.py --full
 
+# Read-only: catches a stale uv silently stuck on an old Python prerelease,
+# and (Windows) a process running from .venv that would lock it on upgrade.
+# Prints the exact fix command instead of applying anything itself.
+doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
+	$(PY) tools/doctor.py
+
 # Updates uv itself (when it was installed via its standalone installer),
 # then upgrades every uv-managed dev tool (ty, ruff, pytest, ...) to the
 # latest version pyproject.toml allows, rewriting uv.lock. pandoc and vale
@@ -57,7 +63,7 @@ upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) pandoc
 
 # Fix any CRLF in the working tree, sync Examples/ and SolutionsCode/ from the
 # Markdown, then run every gate except the site build. The everyday "is
-# everything still good?" command after editing Markdown/ or Solutions/.
+# everything still good?" command after editing Chapters/ or Solutions/.
 # fix-eol runs first so the eol check inside gate sees an already-clean tree.
 verify: fix-eol sync solutions-sync gate  ## Fix line endings, sync Examples/ and SolutionsCode/, then run every gate except the site build
 
@@ -68,7 +74,7 @@ sync-ci: sync solutions-sync ci  ## Like verify, plus the site build (the full C
 # check, output markers, ty, ruff, run, pytest, plus the same checks for
 # Solutions/ (solutions-gate). `verify` runs `sync`/`solutions-sync` first;
 # `ci` adds the site. validate_output.py runs with --update: a stale #: marker
-# self-heals (rewriting Markdown/) the same way fix-eol/sync already do,
+# self-heals (rewriting Chapters/) the same way fix-eol/sync already do,
 # rather than failing the build. A raised exception where none is expected
 # still fails the gate; only marker text is self-corrected.
 gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
@@ -80,7 +86,7 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(PY) tools/check_anchors.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
-	$(PY) tools/validate_output.py --update Markdown
+	$(PY) tools/validate_output.py --update Chapters
 	$(TY) check build/examples
 	$(RUFF) check build/examples
 	$(PY) tools/run_examples.py
@@ -117,7 +123,7 @@ sync:  ## Update the committed Examples/ tree from the Markdown
 check:  ## Verify book examples match the committed Examples/ tree
 	$(PY) tools/extract_examples.py
 
-site:  ## Render Markdown/ into build/site/ with pandoc
+site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
 
 local: site  ## Build the site, serve it, and open a browser
@@ -142,11 +148,11 @@ run: extract  ## Run every extracted .py and report failures
 # stdout each listing actually produces. Depends on extract so each listing runs
 # from build/examples/<chapter>/, where its sibling imports and data files live.
 output: extract  ## Update the #: output markers in the book's listings
-	$(PY) tools/validate_output.py --update Markdown
+	$(PY) tools/validate_output.py --update Chapters
 
 # Same, but report mismatches instead of rewriting (a gate-friendly check).
 output-check: extract  ## Verify the #: output markers without rewriting
-	$(PY) tools/validate_output.py Markdown
+	$(PY) tools/validate_output.py Chapters
 
 test: extract  ## Run the book's pytest examples (test_*.py)
 	$(PYTEST) $(PYTEST_N) build/examples
@@ -169,7 +175,7 @@ extract:  ## Write build/examples/ from the Markdown
 ##@ Solutions (Solutions/, build/solutions/)
 
 # Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
-# instead of Markdown/. Each Solutions code block is self-contained (it
+# instead of Chapters/. Each Solutions code block is self-contained (it
 # redeclares whatever book context it needs) rather than importing from
 # Examples/, so this tree never breaks when a book example changes.
 solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md

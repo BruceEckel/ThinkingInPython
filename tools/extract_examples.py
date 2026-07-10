@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Extract tagged code/data examples from the book's Markdown into a tree.
 
-A fenced block in any ``Markdown/*.md`` file is treated as an extractable
+A fenced block in any ``Chapters/*.md`` file is treated as an extractable
 *file* when its first non-blank content line is a path comment naming the file
 relative to its chapter, e.g.::
 
@@ -48,7 +48,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MARKDOWN_DIR = ROOT / "Markdown"
+CHAPTERS_DIR = ROOT / "Chapters"
 COMMITTED_DIR = ROOT / "Examples"
 BUILD_DIR = ROOT / "build"
 DEFAULT_OUT = ROOT / "build" / "examples"
@@ -93,7 +93,7 @@ def iter_blocks(lines: list[str]):
             i += 1
 
 
-def extract(markdown_dir: Path = MARKDOWN_DIR) -> ExtractResult:
+def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
     result = ExtractResult()
     for md in sorted(markdown_dir.glob("*.md")):
         text = md.read_text(encoding="utf-8")
@@ -171,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     result = extract()
-    print(f"Scanned {MARKDOWN_DIR.name}: "
+    print(f"Scanned {CHAPTERS_DIR.name}: "
           f"{len(result.examples)} file-blocks, {result.fragments} fragments.")
 
     if result.conflicts:

@@ -98,13 +98,13 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     ap.add_argument("--fix", action="store_true",
                     help="remove the trailing periods in place")
     args = ap.parse_args(argv)
 
     total = 0
-    for path in iter_files(args.paths or ["Markdown"]):
+    for path in iter_files(args.paths or ["Chapters"]):
         for lineno in check_file(path, args.fix):
             if not args.fix:
                 print(f"{path}:{lineno}: one-line comment ends with a period")

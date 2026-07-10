@@ -70,7 +70,7 @@ print(totalSum)
 
 This still runs, since Python does not enforce a naming convention at
 the language level. But it breaks
-[Naming Conventions](../Markdown/02_Tour.md#naming-conventions):
+[Naming Conventions](../Chapters/02_Tour.md#naming-conventions):
 variables and functions should be `snake_case`
 (`total_sum`, not `totalSum`). CapWords is reserved for class names.
 `totalSum` is not a syntax error, only a style violation, one that

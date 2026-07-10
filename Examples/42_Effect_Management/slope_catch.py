@@ -1,4 +1,5 @@
 # slope_catch.py
+
 def validate(run: int) -> int:
     if run < 0:
         raise ValueError(f"run cannot be negative: {run}")

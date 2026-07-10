@@ -46,15 +46,14 @@ https://bruceeckel.github.io/ThinkingInPython/
 
 ## Edit checklist
 
-Two passes per draft: my own edit pass (**Edited**), then incorporating
-Claude's review and re-checking (**Reviewed**). Incomplete reviews live in the
-`REVIEW_NN.md` files at the repo root.
-Delete the review file and mark a cell `X` when that item is done.
-The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray.
 
-### Draft (First Pass)
+### Initial Draft
 
 This draft gets all the chapters and sections in place and ready for a serious edit pass.
+Two passes: my own edit pass (**Edited**), then incorporating
+Claude's review and re-checking (**Reviewed**).
+
+The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray.
 
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|

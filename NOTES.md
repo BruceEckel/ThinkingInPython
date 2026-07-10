@@ -2,6 +2,8 @@ Review the book looking for consistency issues
 
 Run 'make prose' on each chapter
 
+tools: unified config.py. Also look for duplicated code that can be refactored into shared utility functions.
+
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
 -

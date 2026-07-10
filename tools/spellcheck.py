@@ -28,10 +28,10 @@ the diff (`git diff tools/wordlist.txt`) before committing, and revert any
 line that is actually a typo rather than a fix in the prose.
 
 Usage:
-    python tools/spellcheck.py               # check all of Markdown/
+    python tools/spellcheck.py               # check all of Chapters/
     python tools/spellcheck.py --summary     # unique unknowns, by count
     python tools/spellcheck.py --add         # accept every unknown word
-    python tools/spellcheck.py Markdown/09_Testing.md
+    python tools/spellcheck.py Chapters/09_Testing.md
 """
 import argparse
 import re
@@ -148,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     ap.add_argument("--wordlist", type=Path, default=WORDLIST,
                     help=f"accepted-words file (default: {WORDLIST.name})")
     ap.add_argument("--summary", action="store_true",
@@ -163,7 +163,7 @@ def main(argv: list[str] | None = None) -> int:
     if accepted:
         spell.word_frequency.load_words(accepted)
 
-    per_file = {p: collect(p) for p in iter_files(args.paths or ["Markdown"])}
+    per_file = {p: collect(p) for p in iter_files(args.paths or ["Chapters"])}
     every_word = {w for hits in per_file.values() for _, w in hits}
     unknown = spell.unknown(every_word) - accepted
 

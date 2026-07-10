@@ -6,7 +6,7 @@ both in CI.
 
 ## The idea
 
-The Markdown chapters in `Markdown/` are the source of truth for the book's
+The Markdown chapters in `Chapters/` are the source of truth for the book's
 prose *and* its code. A fenced block becomes an extractable file when its first
 non-blank line is a path comment naming the file, relative to its chapter:
 
@@ -49,7 +49,9 @@ uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
 Run `make check-tools` afterward to confirm everything resolved (`uv`, `ty`,
 `ruff`, `pytest`); `make check-tools-full` also checks `pandoc` and `vale`,
 needed only for `make site`/`make local` and `make prose`. See
-[check_tools.py](#check_tools.py) below.
+[check_tools.py](#check_tools.py) below. If something you expect to work
+doesn't, `make doctor` (see [doctor.py](#doctor.py)) checks for the couple
+of environment problems that look like a bug in the book but aren't.
 
 To run GNU Make natively on Windows, install it with winget, which ships with
 modern Windows and is the quickest setup. In Command Prompt or PowerShell, run:
@@ -104,6 +106,26 @@ adds the tools a book maintainer needs for the rest of `make help`: `pandoc`
 ```
 make check-tools        # uv, ty, ruff, pytest (make/git checked, assumed)
 make check-tools-full   # the above, plus pandoc and vale
+```
+
+## doctor.py
+
+Read-only diagnostics for the environment problems that look like a bug in
+the book but are actually local machine state. `.python-version` pins a
+floating minor (e.g. `3.15`), so `uv sync` always resolves to *some* build
+of it — but a stale `uv` binary can keep resolving the same old prerelease
+(alpha/beta) indefinitely, since it only learns a newer one exists once it
+is updated itself. `doctor.py` compares the active interpreter against
+every build `uv python list --all-versions` currently knows about for the
+pinned minor and flags it if a newer one exists that isn't active. On
+Windows it also checks whether a process (typically an editor's `ruff`/`ty`
+language server) is running from `.venv`, since that holds a file lock
+that makes `uv sync` — and so `make upgrade-python` — fail with "Access is
+denied" removing `.venv\Scripts`. Every check prints ok/WARN and, on WARN,
+the exact fix command; nothing is installed, upgraded, or killed.
+
+```
+make doctor
 ```
 
 ## upgrade_tools.py
@@ -200,7 +222,7 @@ entries as you repair them.
 ## extract_solutions.py
 
 The exact counterpart of `extract_examples.py`, pointed at `Solutions/`
-instead of `Markdown/`; it imports and reuses that module's `extract()`,
+instead of `Chapters/`; it imports and reuses that module's `extract()`,
 `check_against()`, `write_tree()`, and `is_derived()` rather than duplicating
 them. `SolutionsCode/` is the committed copy (like `Examples/`);
 `build/solutions/` is the throwaway tree used for running (like
@@ -226,7 +248,7 @@ regression would. There is no Solutions counterpart to `run_examples.py`:
 every extractable Solutions block already carries a `#:` marker (checked by
 `solutions-output`, which executes the block to compare), and a block with
 none is a deliberately-unrun illustrative fragment (no `# file.py` slug), the
-same convention `Markdown/` uses for code that only makes sense narrated in
+same convention `Chapters/` uses for code that only makes sense narrated in
 prose (a type error, a race outcome).
 
 `validate_output.py` needs an **absolute** `--tree` when pointed at
@@ -238,7 +260,7 @@ same when invoking `validate_output.py --tree` on `Solutions/` by hand.
 
 ## reflow_prose.py
 
-Rewrites prose paragraphs in `Markdown/*.md` so each sentence sits on its own
+Rewrites prose paragraphs in `Chapters/*.md` so each sentence sits on its own
 line ("semantic line breaks"). This keeps edits and their diffs sentence-grained
 instead of reflowing a whole hard-wrapped paragraph on every word change. Code
 fences, indented code, tables, headings, list items, blockquotes, HTML blocks,
@@ -267,7 +289,7 @@ uv run python tools/reflow_prose.py --diff Tour   # diff a chapter by name part
 ```
 
 A positional argument (or `CH=`) may be a file path or a chapter selector
-matched against `Markdown/`: a number or stem prefix (`02`, `02_A_Python`) or a
+matched against `Chapters/`: a number or stem prefix (`02`, `02_A_Python`) or a
 substring (`Tour`). With no argument the whole book is processed.
 
 ## Spelling and prose style
@@ -345,7 +367,7 @@ make fix-eol   # convert any offenders to LF
 The book favors dense listings: at most one blank line in a row, and no blank
 line between import groups. Ruff's isort config (`no-lines-before`,
 `lines-after-imports = 1`) enforces the import layout, but only on the extracted
-`.py` files: it cannot rewrite the `Markdown/` source, and it does not check
+`.py` files: it cannot rewrite the `Chapters/` source, and it does not check
 blank-line counts between defs at all. This tool closes both gaps by checking
 the Markdown directly. It is string-aware, so blank lines inside triple-quoted
 strings are never touched, and it only looks at ```python blocks. It is part of
@@ -363,7 +385,7 @@ linter) only, which is happy with one blank line.
 ## banned_phrases.py
 
 Fails the build if any phrase listed in `tools/banned_phrases.txt` appears
-anywhere in `Markdown/`, prose and code alike (unlike Vale, which only sees
+anywhere in `Chapters/`, prose and code alike (unlike Vale, which only sees
 prose). Matching is a literal, case-sensitive substring; each occurrence is
 reported as `path:line:col`. Use it to retire a construct book-wide, for example
 `from __future__ import annotations`, which is unnecessary on Python 3.14. Edit
@@ -426,7 +448,7 @@ id: `## Heading {#stable-id}`, then link `(chapter.md#stable-id)`.
 
 ## build_site.py
 
-Renders `Markdown/*.md` into a browsable site under `build/site/` (git-ignored).
+Renders `Chapters/*.md` into a browsable site under `build/site/` (git-ignored).
 Pandoc converts each chapter; the script adds the title page, an ordered
 contents list, a sidebar, previous/next links, and syntax-highlighting CSS.
 
@@ -493,7 +515,7 @@ builds and publishes the site**. The workflow has these jobs:
   `pytest build/solutions`). Deliberate lint exceptions live in
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
 * **`prose` (opt-in only):** the same checks as `make spell` and `make prose`.
-  codespell spell-checks `Markdown/` (config in `[tool.codespell]`, ignore list
+  codespell spell-checks `Chapters/` (config in `[tool.codespell]`, ignore list
   in `tools/codespell-ignore.txt`) and fails on a spelling error. It then
   installs the Vale binary and runs the house-style rules in `styles/House/`;
   Vale fails the job on an em-dash (error level) and prints the filler
@@ -528,7 +550,7 @@ Either way, treat CI as a second opinion: run `make ci` locally first.
 
 Day to day:
 
-1. Make your changes by editing `Markdown/` (the source of truth for prose and
+1. Make your changes by editing `Chapters/` (the source of truth for prose and
    code alike) or `Solutions/` (worked exercise answers).
 2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/` and
    `SolutionsCode/`, then runs the full gate (drift, run, pytest, ty, ruff,

@@ -102,9 +102,9 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     args = ap.parse_args(argv)
-    files = iter_files(args.paths or ["Markdown"])
+    files = iter_files(args.paths or ["Chapters"])
 
     cache: dict[Path, set[str] | None] = {}
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Lint Markdown prose for small mechanical slips a spell checker misses.
 
-Checks the prose in `Markdown/*.md` for:
+Checks the prose in `Chapters/*.md` for:
 
   MULTI-SPACE    more than one space between words
   SPACE-BEFORE   a space before . , ; ! or ?
@@ -18,9 +18,9 @@ Exit status is non-zero if any issue is found, so it works as a gate. It is run
 as part of `make spell`.
 
 Usage:
-    python tools/prose_lint.py                 # all of Markdown/
-    python tools/prose_lint.py Markdown/06_Classes.md
-    python tools/prose_lint.py Markdown        # a directory: every *.md in it
+    python tools/prose_lint.py                 # all of Chapters/
+    python tools/prose_lint.py Chapters/06_Classes.md
+    python tools/prose_lint.py Chapters        # a directory: every *.md in it
 """
 
 import argparse
@@ -151,10 +151,10 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Markdown/)")
+                    help="Markdown files or directories (default: Chapters/)")
     args = ap.parse_args(argv)
 
-    files = _iter_files(args.paths or ["Markdown"])
+    files = _iter_files(args.paths or ["Chapters"])
     total = 0
     for path in files:
         for lineno, col, code, message in lint_text(

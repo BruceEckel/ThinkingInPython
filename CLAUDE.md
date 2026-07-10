@@ -4,9 +4,9 @@ This file is loaded every session. It captures how the repo is built and verifie
 plus the traps that are easy to rediscover the hard way. Personal writing style
 lives in the global `~/.claude/CLAUDE.md`; accrued facts live in project memory.
 
-## Source of truth: Markdown, not Examples/
+## Source of truth: Chapters/, not Examples/
 
-`Markdown/NN_*.md` is authoritative. Every fenced ```python block whose first line
+`Chapters/NN_*.md` is authoritative. Every fenced ```python block whose first line
 is a `# path/slug.py` comment is an extractable example. `Examples/` is **generated
 from the Markdown** by `tools/extract_examples.py`, so:
 
@@ -29,7 +29,7 @@ site build). When iterating on one chapter, the manual sequence is:
 1. `uv run python tools/extract_examples.py --write -o Examples`  # sync committed tree
 2. `uv run python tools/extract_examples.py`                      # drift check ("In sync")
 3. `uv run python tools/extract_examples.py --write`              # (re)build build/examples/
-4. `uv run python tools/validate_output.py Markdown/NN_*.md`      # `#:` markers match stdout
+4. `uv run python tools/validate_output.py Chapters/NN_*.md`      # `#:` markers match stdout
 5. `(cd build/examples && uv run ty check NN_Chapter)`            # types
 6. `uv run ruff check build/examples/NN_Chapter`                 # lint
 7. `uv run pytest build/examples/NN_Chapter`                      # tests
@@ -37,10 +37,10 @@ site build). When iterating on one chapter, the manual sequence is:
 
 Prose-only edits still need `check_anchors.py` (cross-references) and
 `banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
-runs `validate_output.py --update` over all of `Markdown/` now, so a stale
-`#:` marker anywhere self-heals (rewriting `Markdown/`) instead of failing
+runs `validate_output.py --update` over all of `Chapters/` now, so a stale
+`#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
 the build, the same way `fix-eol`/`sync` already self-heal other drift.
-Check `git diff Markdown/` afterward: a chapter you did not touch can
+Check `git diff Chapters/` afterward: a chapter you did not touch can
 still land in the diff if its output actually changed. An exception
 raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
@@ -104,7 +104,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 - **`run_examples.py`: never pass a relative `--tree`.** It goes on `PYTHONPATH`
   and breaks once an example changes cwd. GUI/interactive examples are skipped via
   `tools/norun.txt` (keep those paths current when chapters are renumbered).
-- **Renumbering a chapter** touches: `Markdown/` and `Examples/` filenames, every
+- **Renumbering a chapter** touches: `Chapters/` and `Examples/` filenames, every
   `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/norun.txt`, and the
   `README.md` tracking table. Appendices use letter prefixes (`A_...`); build_site
   labels them "Appendix X".

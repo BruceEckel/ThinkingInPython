@@ -159,7 +159,7 @@ jobs:
         run: uv sync --locked
 
       - name: Spell-check prose with codespell
-        run: uv run codespell Markdown
+        run: uv run codespell Chapters
 
       # Vale is a standalone binary, not a Python package. Install the latest
       # release; pin "version" below if you want fully reproducible runs.
@@ -177,7 +177,7 @@ jobs:
       # House style: fails on em-dashes (error level); filler findings are
       # warnings and do not fail the job. Config in .vale.ini.
       - name: House-style lint with Vale
-        run: vale Markdown
+        run: vale Chapters
 
   # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython)
   # on a push to master. It depends only on the site build, not on the opt-in

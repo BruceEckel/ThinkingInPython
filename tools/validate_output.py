@@ -28,7 +28,7 @@ Usage:
     python tools/validate_output.py Examples/      # check directory
     python tools/validate_output.py chapter.md     # check Markdown listings
     python tools/validate_output.py --update file.py   # rewrite markers
-    python tools/validate_output.py --update Markdown/ # rewrite the book
+    python tools/validate_output.py --update Chapters/ # rewrite the book
 """
 
 import argparse
