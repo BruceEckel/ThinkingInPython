@@ -57,6 +57,8 @@ from md_prose import (
     mask,
     unmask,
 )
+from tools_config import CHAPTERS_DIR
+from tools_repo import md_files, write_text_lf
 
 # Sentences wider than this are broken at clause punctuation. Roughly the
 # column at which an editor would otherwise soft-wrap the line.
@@ -357,7 +359,7 @@ def process(path: Path, write: bool, show_diff: bool, width: int) -> tuple[bool,
         sys.stdout.writelines(diff)
 
     if write and changed and roundtrip_ok:
-        path.write_text(reflowed, encoding="utf-8")
+        write_text_lf(path, reflowed)
 
     return changed, count, roundtrip_ok
 
@@ -372,11 +374,12 @@ def _resolve(selector: str) -> list[Path]:
     path = Path(selector)
     if path.is_file():
         return [path]
-    md = Path("Chapters")
-    matches = sorted(md.glob(f"{selector}*.md"))
+    matches = sorted(CHAPTERS_DIR.glob(f"{selector}*.md"))
     if not matches:
         low = selector.lower()
-        matches = sorted(p for p in md.glob("*.md") if low in p.stem.lower())
+        matches = sorted(
+            p for p in CHAPTERS_DIR.glob("*.md") if low in p.stem.lower()
+        )
     return matches
 
 
@@ -400,7 +403,7 @@ def main() -> int:
                 return 2
             files.extend(matched)
     else:
-        files = sorted(Path("Chapters").glob("*.md"))
+        files = md_files()
 
     total_changed = 0
     total_paras = 0

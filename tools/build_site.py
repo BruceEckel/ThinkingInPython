@@ -30,7 +30,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
-from tools_config import CHAPTERS_DIR, ROOT
+from tools_config import ROOT
+from tools_repo import md_files
 
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
@@ -100,7 +101,7 @@ def load_chapter(md: Path) -> tuple[str, str]:
 
 def discover() -> list[Chapter]:
     chapters: list[Chapter] = []
-    for md in sorted(CHAPTERS_DIR.glob("*.md")):
+    for md in md_files():
         title, _ = load_chapter(md)
         number = md.stem.split("_", 1)[0]
         # A numeric prefix is a chapter; a letter prefix (e.g. A_, B_) is an

@@ -19,14 +19,15 @@ Usage:
 """
 
 import argparse
+import shutil
 from pathlib import Path
 
-from tools_config import ROOT
 from extract_examples import check_against, extract, is_derived, write_tree
+from tools_config import BUILD_DIR, ROOT
 
 SOLUTIONS_DIR = ROOT / "Solutions"
 COMMITTED_DIR = ROOT / "SolutionsCode"
-DEFAULT_OUT = ROOT / "build" / "solutions"
+DEFAULT_OUT = BUILD_DIR / "solutions"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -53,7 +54,6 @@ def main(argv: list[str] | None = None) -> int:
     if args.write:
         print()
         if is_derived(args.out) and args.out.exists():
-            import shutil
             shutil.rmtree(args.out)
             print(f"Cleaned {args.out}.")
         written = write_tree(result, args.out)

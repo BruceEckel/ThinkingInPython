@@ -1,8 +1,10 @@
 Review the book looking for consistency issues
 
-tools: unified config.py. Also look for duplicated code that can be refactored into shared utility functions.
+Have we learned anything here that should be added to thinking-in-python-skill.md?
 
-Discover rules from this work to add to thinking-in-python-skill.md
+Is there a way we can test all the make targets to ensure there are no failures with any of them?
+I imagine a python program that runs each target in sequence and somehow ensures that it completes without failing.
+Running this program would be a make target of some appropriate name.
 
 Run 'make prose' on each chapter
 

@@ -26,10 +26,10 @@ import argparse
 import re
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, TOOLS_DIR
 from tools_config import FENCE_RE as FENCE
+from tools_config import TOOLS_DIR
 from tools_pycode import scan_line as find_comment_hash
-from tools_repo import write_text_lf
+from tools_repo import md_files, write_text_lf
 
 ALLOWLIST = TOOLS_DIR / "comment_caps_allow.txt"
 
@@ -155,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
 
     allow = load_allowlist(args.allow)
     total = 0
-    for md in sorted(CHAPTERS_DIR.glob("*.md")):
+    for md in md_files():
         changes = process_file(md, args.write, allow)
         if changes:
             print(f"\n{md.name}: {len(changes)} change(s)")

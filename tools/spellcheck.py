@@ -40,9 +40,9 @@ from pathlib import Path
 
 from spellchecker import SpellChecker
 
-from tools_config import TOOLS_DIR
 from md_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
-from tools_repo import add_paths_arg, md_files
+from tools_config import TOOLS_DIR
+from tools_repo import add_paths_arg, md_files, write_text_lf
 
 WORDLIST = TOOLS_DIR / "wordlist.txt"
 
@@ -76,7 +76,7 @@ def rewrite_wordlist(path: Path, words: set[str]) -> None:
     while header and not header[-1].strip():   # exactly one blank separator
         header.pop()
     body = sorted({w.strip().lower() for w in words if w.strip()})
-    path.write_text("\n".join(header + [""] + body) + "\n", encoding="utf-8")
+    write_text_lf(path, "\n".join(header + [""] + body) + "\n")
 
 
 def prose_text(line: str) -> str | None:

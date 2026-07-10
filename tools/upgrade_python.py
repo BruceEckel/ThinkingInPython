@@ -20,7 +20,7 @@ import re
 import sys
 
 from tools_config import PYVER, ROOT
-from tools_repo import run_echoed
+from tools_repo import run_echoed, write_text_lf
 
 PYPROJECT = ROOT / "pyproject.toml"
 MINOR_RE = re.compile(r"(\d+\.\d+)(.*)")
@@ -36,9 +36,7 @@ def pinned() -> tuple[str, str]:
 
 def repin(old_minor: str, suffix: str, new_minor: str) -> None:
     """Move the minor pin and requires-python floor to new_minor."""
-    PYVER.write_text(
-        f"{new_minor}{suffix}\n", encoding="utf-8", newline="\n"
-    )
+    write_text_lf(PYVER, f"{new_minor}{suffix}\n")
     text = PYPROJECT.read_text(encoding="utf-8")
     new_text, n = re.subn(
         r'(requires-python\s*=\s*">=)\d+\.\d+(")',
@@ -46,7 +44,7 @@ def repin(old_minor: str, suffix: str, new_minor: str) -> None:
     )
     if n != 1:
         sys.exit("No requires-python floor found in pyproject.toml")
-    PYPROJECT.write_text(new_text, encoding="utf-8", newline="\n")
+    write_text_lf(PYPROJECT, new_text)
     print(
         f"Repinned {old_minor} -> {new_minor} "
         "in .python-version and requires-python."

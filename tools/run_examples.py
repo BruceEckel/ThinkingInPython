@@ -49,7 +49,7 @@ from pathlib import Path
 
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
 from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TOOLS_DIR
-from tools_repo import load_glob_list
+from tools_repo import load_glob_list, write_text_lf
 
 BASELINE_FILE = TOOLS_DIR / "examples_baseline.txt"
 
@@ -78,7 +78,7 @@ def write_baseline(failing: list[str]) -> None:
         "# One forward-slash relative path per line.\n\n"
     )
     body = "".join(f"{rel}\n" for rel in sorted(failing))
-    BASELINE_FILE.write_text(header + body, encoding="utf-8")
+    write_text_lf(BASELINE_FILE, header + body)
 
 
 def jobs_arg(value: str) -> int:

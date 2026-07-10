@@ -48,7 +48,7 @@ from pathlib import Path
 
 from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, ROOT
 from tools_pycode import walk_fenced
-from tools_repo import block_slug
+from tools_repo import block_slug, md_files, write_text_lf
 
 COMMITTED_DIR = ROOT / "Examples"
 DEFAULT_OUT = EXAMPLES_TREE
@@ -78,7 +78,7 @@ def iter_blocks(lines: list[str]):
 
 def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
     result = ExtractResult()
-    for md in sorted(markdown_dir.glob("*.md")):
+    for md in md_files([markdown_dir]):
         text = md.read_text(encoding="utf-8")
         for lang, block in iter_blocks(text.splitlines()):
             parsed = block_slug(block)
@@ -125,9 +125,7 @@ def write_tree(result: ExtractResult, out_dir: Path) -> int:
         dest = out_dir / ex.path
         dest.parent.mkdir(parents=True, exist_ok=True)
         if not dest.exists() or dest.read_text(encoding="utf-8") != ex.content:
-            # newline="\n" forces LF even on Windows, so regenerating the tree
-            # never introduces CRLF (which .gitattributes would warn about).
-            dest.write_text(ex.content, encoding="utf-8", newline="\n")
+            write_text_lf(dest, ex.content)
             written += 1
     return written
 

@@ -24,7 +24,7 @@ from pathlib import Path
 from tools_config import CHAPTERS_DIR, PATH_LINE_RE
 
 
-def md_files(paths: list[str] | None = None) -> list[Path]:
+def md_files(paths: list[str | Path] | None = None) -> list[Path]:
     """Markdown files named directly, or every *.md in a named directory.
 
     Defaults to CHAPTERS_DIR when `paths` is empty or None.
