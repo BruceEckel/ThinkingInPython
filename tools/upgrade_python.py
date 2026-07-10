@@ -17,12 +17,11 @@ Usage:
 """
 
 import re
-import subprocess
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-PYVER = ROOT / ".python-version"
+from tools_config import PYVER, ROOT
+from tools_repo import run_echoed
+
 PYPROJECT = ROOT / "pyproject.toml"
 MINOR_RE = re.compile(r"(\d+\.\d+)(.*)")
 
@@ -54,11 +53,6 @@ def repin(old_minor: str, suffix: str, new_minor: str) -> None:
     )
 
 
-def run(*cmd: str) -> None:
-    print(f"$ {' '.join(cmd)}")
-    subprocess.run(cmd, check=True)
-
-
 def main(argv: list[str]) -> int:
     minor, suffix = pinned()
     target = argv[0] if argv else minor
@@ -70,11 +64,11 @@ def main(argv: list[str]) -> int:
 
     # install handles a brand-new minor; upgrade pulls the latest
     # patch of an existing one. Both are idempotent. sync follows.
-    run("uv", "python", "install", target)
-    run("uv", "python", "upgrade", target)
-    run("uv", "sync")
+    run_echoed(["uv", "python", "install", target], check=True)
+    run_echoed(["uv", "python", "upgrade", target], check=True)
+    run_echoed(["uv", "sync"], check=True)
     print("Now using: ", end="", flush=True)
-    run("uv", "run", "python", "--version")
+    run_echoed(["uv", "run", "python", "--version"], check=True)
     return 0
 
 

@@ -31,7 +31,8 @@ Usage:
     python tools/upgrade_tools.py
 """
 import shutil
-import subprocess
+
+from tools_repo import run_echoed
 
 # name -> (winget package id, Homebrew formula, fallback install link)
 EXTERNAL: dict[str, tuple[str, str, str]] = {
@@ -41,33 +42,25 @@ EXTERNAL: dict[str, tuple[str, str, str]] = {
 }
 
 
-def run(cmd: list[str]) -> bool:
-    print(f"$ {' '.join(cmd)}")
-    try:
-        return subprocess.run(cmd).returncode == 0
-    except OSError:
-        return False
-
-
 def update_external(
     name: str, winget_id: str, brew_formula: str, link: str
 ) -> None:
-    if shutil.which("winget") and run(
+    if shutil.which("winget") and run_echoed(
             ["winget", "upgrade", "--id", winget_id, "--silent"]):
         return
-    if shutil.which("brew") and run(["brew", "upgrade", brew_formula]):
+    if shutil.which("brew") and run_echoed(["brew", "upgrade", brew_formula]):
         return
     print(f"Could not auto-update {name}. "
           f"Install or upgrade it yourself: {link}")
 
 
 def main() -> int:
-    run(["uv", "self", "update"])
+    run_echoed(["uv", "self", "update"])
 
-    if not run(["uv", "lock", "--upgrade"]):
+    if not run_echoed(["uv", "lock", "--upgrade"]):
         print("`uv lock --upgrade` failed; see the error above.")
         return 1
-    if not run(["uv", "sync"]):
+    if not run_echoed(["uv", "sync"]):
         print("`uv sync` failed; see the error above.")
         return 1
 

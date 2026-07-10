@@ -533,16 +533,19 @@ def test_main_multiple_files_one_fails(tmp_path: Path) -> None:
 # ── block_slug ────────────────────────────────────────────────────────────────
 
 def test_block_slug_simple() -> None:
-    assert block_slug(["# trace.py\n", 'print("hi")\n']) == "trace.py"
+    assert block_slug(["# trace.py\n", 'print("hi")\n']) == (False, "trace.py")
 
 def test_block_slug_subpath_normalized() -> None:
-    assert block_slug(["# mouse/Move.py\n"]) == "mouse/Move.py"
+    assert block_slug(["# mouse/Move.py\n"]) == (False, "mouse/Move.py")
 
 def test_block_slug_none_when_no_path_line() -> None:
     assert block_slug(['print("hi")\n', "#: hi\n"]) is None
 
 def test_block_slug_skips_leading_blank_lines() -> None:
-    assert block_slug(["\n", "# a.py\n"]) == "a.py"
+    assert block_slug(["\n", "# a.py\n"]) == (False, "a.py")
+
+def test_block_slug_shared_marker() -> None:
+    assert block_slug(["# shared: display.py\n"]) == (True, "display.py")
 
 
 # ── collect_files with .md ────────────────────────────────────────────────────

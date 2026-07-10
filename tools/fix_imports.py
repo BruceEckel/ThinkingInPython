@@ -22,25 +22,27 @@ Usage:
 """
 
 import argparse
-import re
 import subprocess
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-CHAPTERS_DIR = ROOT / "Chapters"
-DEFAULT_TREE = ROOT / "build" / "examples"
-# A python fenced block, e.g. ```python or ```py.
-FENCE_RE = re.compile(r'^```(\w+)?\s*$')
-# First content line of a block naming its relative path, e.g. "# trace.py".
-PATH_LINE_RE = re.compile(r'^#\s*([\w./\\-]+\.\w+)\s*$')
+from tools_config import CHAPTERS_DIR, ROOT
+from tools_config import EXAMPLES_TREE as DEFAULT_TREE
+from tools_config import FENCE_RE, PATH_LINE_RE
+from tools_repo import write_text_lf
 
 
 def block_slug(block: list[str]) -> str | None:
-    """The relative path a block names on its first content line, if any."""
+    """The relative path a block names on its first content line, if any.
+
+    A "shared:"-marked block (lives at the tree root, not a chapter dir) is
+    left alone here; extract_examples/validate_output handle that case.
+    """
     for line in block:
         if line.strip():
             m = PATH_LINE_RE.match(line.rstrip('\n\r'))
-            return m.group(1).replace('\\', '/') if m else None
+            if not m or m.group(1):
+                return None
+            return m.group(2).replace('\\', '/')
     return None
 
 
@@ -166,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         total += len(changed)
         if args.fix:
-            md.write_text(new_text, encoding='utf-8', newline='\n')
+            write_text_lf(md, new_text)
             print(f"organized {md.name}: {', '.join(changed)}")
         else:
             print(f"{md.name}: would organize {', '.join(changed)}")

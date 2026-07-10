@@ -16,10 +16,8 @@ import functools
 import http.server
 import threading
 import webbrowser
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-SITE = ROOT / "build" / "site"
+from tools_config import BUILD_SITE_DIR as SITE
 
 
 def main(argv: list[str] | None = None) -> int:

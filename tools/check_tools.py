@@ -22,8 +22,8 @@ Usage:
     python tools/check_tools.py --full  # basic + site/prose tools
 """
 import argparse
-import shutil
-import subprocess
+
+from tools_repo import run_capture
 
 # (name, command, install hint, tier, assumed)
 TOOLS: list[tuple[str, list[str], str, str, bool]] = [
@@ -52,16 +52,13 @@ TOOLS: list[tuple[str, list[str], str, str, bool]] = [
 
 def first_line(cmd: list[str]) -> str | None:
     """First line of cmd's output, or None if missing/failed."""
-    if shutil.which(cmd[0]) is None:
+    result = run_capture(cmd, timeout=60, combine_stderr=True)
+    if result is None:
         return None
-    try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=60)
-    except OSError:
+    output, returncode = result
+    if returncode != 0:
         return None
-    if proc.returncode != 0:
-        return None
-    output = (proc.stdout or proc.stderr).strip()
+    output = output.strip()
     return output.splitlines()[0] if output else ""
 
 

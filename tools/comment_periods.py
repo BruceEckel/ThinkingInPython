@@ -16,13 +16,12 @@ Default mode reports `path:line` and exits non-zero, so it is a gate. Pass --fix
 to remove the periods.
 """
 import argparse
-import re
 from pathlib import Path
 
 from capitalize_comments import find_comment_hash
-
-_FENCE = re.compile(r"^\s*```")
-_PY_OPEN = re.compile(r"^\s*```python\s*$")
+from tools_config import FENCE_ANY_RE as _FENCE
+from tools_config import PY_FENCE_RE as _PY_OPEN
+from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
 def _comment_starts(block: list[str]) -> list[int]:
@@ -81,30 +80,21 @@ def check_file(path: Path, fix: bool) -> list[int]:
         i = j + 1
 
     if fix and findings:
-        path.write_text("\n".join(out), encoding="utf-8", newline="\n")
+        write_text_lf(path, "\n".join(out))
     return findings
-
-
-def iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     ap.add_argument("--fix", action="store_true",
                     help="remove the trailing periods in place")
     args = ap.parse_args(argv)
 
     total = 0
-    for path in iter_files(args.paths or ["Chapters"]):
+    for path in md_files(args.paths):
         for lineno in check_file(path, args.fix):
             if not args.fix:
                 print(f"{path}:{lineno}: one-line comment ends with a period")

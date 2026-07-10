@@ -40,10 +40,11 @@ from pathlib import Path
 
 from spellchecker import SpellChecker
 
+from tools_config import TOOLS_DIR
 from md_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
+from tools_repo import add_paths_arg, md_files
 
-ROOT = Path(__file__).resolve().parent.parent
-WORDLIST = ROOT / "tools" / "wordlist.txt"
+WORDLIST = TOOLS_DIR / "wordlist.txt"
 
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")   # [text](url) -> text
 _URL = re.compile(r"(?:https?://|www\.)\S+")
@@ -113,14 +114,6 @@ def tokens(text: str) -> list[str]:
     return out
 
 
-def iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
-
-
 def collect(path: Path) -> list[tuple[int, str]]:
     """(line_number, word) for every prose word in a file."""
     found: list[tuple[int, str]] = []
@@ -147,8 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     ap.add_argument("--wordlist", type=Path, default=WORDLIST,
                     help=f"accepted-words file (default: {WORDLIST.name})")
     ap.add_argument("--summary", action="store_true",
@@ -163,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
     if accepted:
         spell.word_frequency.load_words(accepted)
 
-    per_file = {p: collect(p) for p in iter_files(args.paths or ["Chapters"])}
+    per_file = {p: collect(p) for p in md_files(args.paths)}
     every_word = {w for hits in per_file.values() for _, w in hits}
     unknown = spell.unknown(every_word) - accepted
 

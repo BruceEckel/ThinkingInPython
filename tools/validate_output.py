@@ -41,19 +41,12 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TREE = ROOT / "build" / "examples"
-NORUN_FILE = ROOT / "tools" / "norun.txt"
-INLINE_NORUN = "# extract: no-run"
+from tools_config import EXAMPLES_TREE as DEFAULT_TREE
+from tools_config import FENCE_RE, INLINE_NORUN_MARKER, NORUN_FILE
+from tools_repo import block_slug, load_glob_list, write_text_lf
 
 # Matches #: or #: <content> at column 0 only.
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')
-# A python fenced block, e.g. ```python or ```py.
-FENCE_RE = re.compile(r'^```(\w+)?\s*$')
-# First content line of a block naming its relative path, e.g. "# trace.py",
-# optionally preceded by a "shared:" marker. Mirrors extract_examples.py's
-# PATH_LINE: a "shared:" block lives at the tree root, not its chapter dir.
-PATH_LINE_RE = re.compile(r'^#\s*(?:(shared):\s*)?([\w./\\-]+\.\w+)\s*$')
 
 
 def is_marker(line: str) -> bool:
@@ -246,36 +239,9 @@ def process_file(path: Path, *, update: bool) -> bool | None:
     # changed can be True here with update=False only via the placeholder
     # fill-in above, which should persist regardless of --update.
     if changed:
-        # newline="\n" keeps LF on Windows; the gate rejects CRLF.
-        path.write_text(
-            ''.join(new_lines), encoding='utf-8', newline='\n'
-        )
+        write_text_lf(path, ''.join(new_lines))
 
     return ok
-
-
-def load_skips() -> list[str]:
-    """Glob patterns (forward-slash relative paths) that must not be run."""
-    if not NORUN_FILE.exists():
-        return []
-    out: list[str] = []
-    for raw in NORUN_FILE.read_text(encoding='utf-8').splitlines():
-        line = raw.split('#', 1)[0].strip()
-        if line:
-            out.append(line.replace('\\', '/'))
-    return out
-
-
-def block_slug(block: list[str]) -> tuple[bool, str] | None:
-    """The (is-shared, relative-path) a block names on its first content
-    line, if any."""
-    for line in block:
-        if line.strip():
-            m = PATH_LINE_RE.match(line.rstrip('\n\r'))
-            if not m:
-                return None
-            return bool(m.group(1)), m.group(2).replace('\\', '/')
-    return None
 
 
 @contextlib.contextmanager
@@ -368,8 +334,7 @@ def process_markdown(
     # changed can be True here with update=False only via a placeholder
     # fill-in, which should persist regardless of --update.
     if changed:
-        # newline="\n" keeps LF on Windows; the gate rejects CRLF.
-        path.write_text(''.join(out), encoding='utf-8', newline='\n')
+        write_text_lf(path, ''.join(out))
     return ok
 
 
@@ -407,7 +372,7 @@ def process_md_block(
             filepath = tree / chapter / slug
     text = ''.join(block)
 
-    if INLINE_NORUN in text or (
+    if INLINE_NORUN_MARKER in text or (
         rel and any(fnmatch.fnmatch(rel, pat) for pat in skips)
     ):
         # GUI/interactive/infinite-loop listing: cannot run unattended.
@@ -474,7 +439,7 @@ def main(argv: list[str] | None = None) -> int:
         print("No .py or .md files found.")
         return 1
 
-    skips = load_skips()
+    skips = load_glob_list(NORUN_FILE)
     n_ok = n_fail = n_skip = 0
     for path in files:
         if args.verbose:

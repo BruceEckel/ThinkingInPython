@@ -18,8 +18,10 @@ Usage:
 import argparse
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-PHRASES_FILE = ROOT / "tools" / "banned_phrases.txt"
+from tools_config import TOOLS_DIR
+from tools_repo import add_paths_arg, md_files
+
+PHRASES_FILE = TOOLS_DIR / "banned_phrases.txt"
 
 
 def load_phrases(path: Path) -> list[str]:
@@ -33,20 +35,11 @@ def load_phrases(path: Path) -> list[str]:
     return phrases
 
 
-def iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
-
-
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     ap.add_argument("--phrases", type=Path, default=PHRASES_FILE,
                     help=f"phrases file (default: {PHRASES_FILE.name})")
     args = ap.parse_args(argv)
@@ -57,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     total = 0
-    for path in iter_files(args.paths or ["Chapters"]):
+    for path in md_files(args.paths):
         for lineno, line in enumerate(
                 path.read_text(encoding="utf-8").splitlines(), 1):
             for phrase in phrases:

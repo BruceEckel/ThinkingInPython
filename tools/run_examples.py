@@ -47,22 +47,11 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TREE = ROOT / "build" / "examples"
-NORUN_FILE = ROOT / "tools" / "norun.txt"
-BASELINE_FILE = ROOT / "tools" / "examples_baseline.txt"
-INLINE_MARKER = "# extract: no-run"
+from tools_config import EXAMPLES_TREE as DEFAULT_TREE
+from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TOOLS_DIR
+from tools_repo import load_glob_list
 
-
-def load_skips() -> list[str]:
-    if not NORUN_FILE.exists():
-        return []
-    out = []
-    for line in NORUN_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.split("#", 1)[0].strip()
-        if line:
-            out.append(line.replace("\\", "/"))
-    return out
+BASELINE_FILE = TOOLS_DIR / "examples_baseline.txt"
 
 
 def is_pytest_file(name: str) -> bool:
@@ -72,20 +61,13 @@ def is_pytest_file(name: str) -> bool:
 
 
 def is_skipped(rel: str, text: str, skips: list[str]) -> bool:
-    if INLINE_MARKER in text:
+    if INLINE_NORUN_MARKER in text:
         return True
     return any(fnmatch.fnmatch(rel, pat) for pat in skips)
 
 
 def load_baseline() -> set[str]:
-    if not BASELINE_FILE.exists():
-        return set()
-    out: set[str] = set()
-    for line in BASELINE_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.split("#", 1)[0].strip()
-        if line:
-            out.add(line.replace("\\", "/"))
-    return out
+    return set(load_glob_list(BASELINE_FILE))
 
 
 def write_baseline(failing: list[str]) -> None:
@@ -166,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
               "Run: python tools/extract_examples.py --write")
         return 2
 
-    skips = load_skips()
+    skips = load_glob_list(NORUN_FILE)
     py_files = sorted(args.tree.rglob("*.py"))
     passed: list[str] = []
     failed: list[tuple[str, str]] = []

@@ -21,13 +21,8 @@ Usage:
 import argparse
 from pathlib import Path
 
-from extract_examples import (
-    ROOT,
-    check_against,
-    extract,
-    is_derived,
-    write_tree,
-)
+from tools_config import ROOT
+from extract_examples import check_against, extract, is_derived, write_tree
 
 SOLUTIONS_DIR = ROOT / "Solutions"
 COMMITTED_DIR = ROOT / "SolutionsCode"

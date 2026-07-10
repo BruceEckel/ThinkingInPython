@@ -30,12 +30,10 @@ import argparse
 import os
 import platform
 import re
-import shutil
-import subprocess
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-PYVER = ROOT / ".python-version"
+from tools_config import PYVER, ROOT
+from tools_repo import run_capture
+
 VENV = ROOT / ".venv"
 
 STAGE_ORDER = {"a": 0, "b": 1, "rc": 2, "": 3}
@@ -65,15 +63,8 @@ def pinned_minor_and_suffix() -> tuple[str, str]:
 
 def run(cmd: list[str]) -> str:
     """Run cmd, return combined stdout ('' on any failure)."""
-    if shutil.which(cmd[0]) is None:
-        return ""
-    try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=30
-        )
-    except OSError:
-        return ""
-    return proc.stdout or ""
+    result = run_capture(cmd, timeout=30)
+    return result[0] if result else ""
 
 
 def check_uv_present() -> tuple[bool, str]:

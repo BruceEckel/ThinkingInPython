@@ -2,6 +2,8 @@ Review the book looking for consistency issues
 
 tools: unified config.py. Also look for duplicated code that can be refactored into shared utility functions.
 
+Discover rules from this work to add to thinking-in-python-skill.md
+
 Run 'make prose' on each chapter
 
 - Is full polymorphism covered? (Not just inheritance-based)

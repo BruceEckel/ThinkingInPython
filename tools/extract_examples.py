@@ -42,22 +42,15 @@ Usage:
 """
 
 import argparse
-import re
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-CHAPTERS_DIR = ROOT / "Chapters"
-COMMITTED_DIR = ROOT / "Examples"
-BUILD_DIR = ROOT / "build"
-DEFAULT_OUT = ROOT / "build" / "examples"
+from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, FENCE_RE, ROOT
+from tools_repo import block_slug
 
-FENCE = re.compile(r"^```(\w+)?\s*$")
-# First content line names a relative path with an extension, optionally
-# preceded by a "shared:" marker (e.g. "# shared: display.py"). See the
-# module docstring.
-PATH_LINE = re.compile(r"^#\s*(?:(shared):\s*)?([\w./\\-]+\.\w+)\s*$")
+COMMITTED_DIR = ROOT / "Examples"
+DEFAULT_OUT = EXAMPLES_TREE
 
 
 @dataclass
@@ -80,7 +73,7 @@ def iter_blocks(lines: list[str]):
     i = 0
     n = len(lines)
     while i < n:
-        m = FENCE.match(lines[i])
+        m = FENCE_RE.match(lines[i])
         if m:
             lang = m.group(1) or ""
             i += 1
@@ -98,16 +91,16 @@ def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
     for md in sorted(markdown_dir.glob("*.md")):
         text = md.read_text(encoding="utf-8")
         for lang, block in iter_blocks(text.splitlines()):
-            first = next((b for b in block if b.strip()), "")
-            pm = PATH_LINE.match(first)
-            if not pm:
+            parsed = block_slug(block)
+            if parsed is None:
                 result.fragments += 1
                 continue
-            slug = pm.group(2).replace("\\", "/")
-            if pm.group(1):  # "shared:" marker
+            shared, slug = parsed
+            if shared:
                 rel = slug
                 # The written file's header comment should match where it
                 # actually lands (the tree root), not the shared: marker.
+                first = next(b for b in block if b.strip())
                 block[block.index(first)] = f"# {rel}"
             else:
                 rel = f"{md.stem}/{slug}"

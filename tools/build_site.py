@@ -29,12 +29,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-CHAPTERS_DIR = ROOT / "Chapters"
+from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
+from tools_config import CHAPTERS_DIR, ROOT
+
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
-DEFAULT_OUT = ROOT / "build" / "site"
 
 # Experimental: give each chapter page its own table of contents (its own
 # sections). Flip this default, or override per-build with --chapter-toc /

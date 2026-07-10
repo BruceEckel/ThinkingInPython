@@ -25,9 +25,9 @@ Usage:
 
 import argparse
 import re
-from pathlib import Path
 
 from md_prose import FENCE, HEADING, LIST_ITEM, code_spans, is_prose_line
+from tools_repo import add_paths_arg, md_files
 
 _MULTI_SPACE = re.compile(r"(?<=\S) {2,}(?=\S)")
 _SPACE_BEFORE = re.compile(r" +([.,;!?])")
@@ -138,23 +138,14 @@ def lint_text(text: str) -> list[Finding]:
     return findings
 
 
-def _iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
-
-
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     args = ap.parse_args(argv)
 
-    files = _iter_files(args.paths or ["Chapters"])
+    files = md_files(args.paths)
     total = 0
     for path in files:
         for lineno, col, code, message in lint_text(

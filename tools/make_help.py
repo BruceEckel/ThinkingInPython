@@ -19,7 +19,8 @@ import argparse
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from tools_config import ROOT
+
 MAKEFILE = ROOT / "Makefile"
 
 _TARGET = re.compile(r"^([a-zA-Z_-]+):.*?##\s?(.*)$")

@@ -20,7 +20,9 @@ import argparse
 import re
 from pathlib import Path
 
-FENCE = re.compile(r"^\s*```")
+from tools_config import FENCE_ANY_RE as FENCE
+from tools_repo import add_paths_arg, md_files
+
 HEADING = re.compile(r"^#{1,6}\s+(.*?)\s*$")
 EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
 ATTR_BLOCK = re.compile(r"\s*\{[^}]*\}\s*$")
@@ -89,22 +91,13 @@ def anchor_links(lines: list[str]):
                 yield i, m.group(1), m.group(2)
 
 
-def iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
-
-
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     args = ap.parse_args(argv)
-    files = iter_files(args.paths or ["Chapters"])
+    files = md_files(args.paths)
 
     cache: dict[Path, set[str] | None] = {}
 

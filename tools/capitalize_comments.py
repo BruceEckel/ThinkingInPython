@@ -26,11 +26,12 @@ import argparse
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-CHAPTERS_DIR = ROOT / "Chapters"
-ALLOWLIST = ROOT / "tools" / "comment_caps_allow.txt"
+from tools_config import CHAPTERS_DIR, TOOLS_DIR
+from tools_config import FENCE_RE as FENCE
+from tools_repo import write_text_lf
 
-FENCE = re.compile(r"^```(\w+)?\s*$")
+ALLOWLIST = TOOLS_DIR / "comment_caps_allow.txt"
+
 # Word = leading run of ASCII letters in the comment text.
 WORD = re.compile(r"^[A-Za-z]+")
 # A path-marker slug like "# trace.py" or "# mouse/Action.py".
@@ -181,7 +182,7 @@ def process_file(path: Path, write: bool,
         text = "\n".join(out)
         if path.read_text(encoding="utf-8").endswith("\n"):
             text += "\n"
-        path.write_text(text, encoding="utf-8", newline="\n")
+        write_text_lf(path, text)
     return changes
 
 

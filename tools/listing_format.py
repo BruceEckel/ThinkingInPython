@@ -19,11 +19,11 @@ them (run by `make fix-listings`).
 """
 
 import argparse
-import re
 from pathlib import Path
 
-_FENCE = re.compile(r"^\s*```")
-_PY_OPEN = re.compile(r"^\s*```python\s*$")
+from tools_config import FENCE_ANY_RE as _FENCE
+from tools_config import PY_FENCE_RE as _PY_OPEN
+from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
 def _in_string(lines: list[str]) -> list[bool]:
@@ -131,29 +131,20 @@ def check_file(path: Path, fix: bool) -> list[tuple[int, str]]:
 
     if fix and drop:
         kept = [ln for k, ln in enumerate(lines) if k not in drop]
-        path.write_text("\n".join(kept), encoding="utf-8", newline="\n")
+        write_text_lf(path, "\n".join(kept))
     return findings
-
-
-def _iter_files(paths: list[str]) -> list[Path]:
-    files: list[Path] = []
-    for p in paths:
-        path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
-    return files
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("paths", nargs="*",
-                    help="Markdown files or directories (default: Chapters/)")
+    add_paths_arg(ap)
     ap.add_argument("--fix", action="store_true",
                     help="remove the offending blank lines in place")
     args = ap.parse_args(argv)
 
-    files = _iter_files(args.paths or ["Chapters"])
+    files = md_files(args.paths)
     total = 0
     for path in files:
         for lineno, reason in check_file(path, args.fix):
