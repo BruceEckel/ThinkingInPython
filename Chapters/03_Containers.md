@@ -31,7 +31,7 @@ The first line creates a `list`.
 The `list` automatically resizes itself.
 The `for` statement iterates through `odds`, so `x` takes on each value in the `list`.
 
-There are no type declarations in this example.
+This example has no type declarations.
 Each object carries its own type.
 
 ## Lists and Slicing
@@ -202,7 +202,7 @@ print(2 in a)
 Every operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
 not only a set, and they can take several arguments at once.
-There is also `isdisjoint()`, which has no operator form:
+`isdisjoint()` is also available, with no operator form:
 
 ```python
 # set_methods.py

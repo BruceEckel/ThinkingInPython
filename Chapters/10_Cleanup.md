@@ -97,7 +97,7 @@ In this run the deletions happen during shutdown,
 exactly the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
-So `__del__()` should do as little as possible, and you should not depend on it.
+`__del__()` should do as little as possible, and you should not depend on it.
 
 Two approaches are more reliable:
 
@@ -148,7 +148,7 @@ Storing each instance in a `WeakValueDictionary` tracks it without keeping it al
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference, here when `pop()` removes it from the `counters` list,
 the interpreter collects it at once, and the dictionary drops its entry on its own.
-So the count falls `3, 2, 1, 0` as the list releases the objects,
+The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
 A plain `dict` or `list` as the registry would keep every instance alive forever,

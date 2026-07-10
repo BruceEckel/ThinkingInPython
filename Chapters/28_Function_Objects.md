@@ -6,7 +6,7 @@ and *Chain of Responsibility*.
 
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
-So these three patterns are largely unnecessary in Python.
+These three patterns are largely unnecessary in Python.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function.
 The sections below show the function form first,
 then the classic object form for contrast.

@@ -393,7 +393,7 @@ The occupants are `Item`s.
 and the return value is the room in which the robot ends up.
 A wall keeps the robot where it is, food is eaten and the robot moves in,
 a teleport returns a distant room.
-There is no `if` or `elif` on the type of occupant anywhere:
+No `if` or `elif` on the type of occupant appears anywhere:
 
 ```python
 # robot_explorer/items.py

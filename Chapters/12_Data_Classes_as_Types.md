@@ -36,7 +36,7 @@ def check(condition: bool, message: str, detail: str = "") -> None:
 Suppose a rating is an integer from one to ten.
 If you represent it as a plain `int`,
 nothing stops a caller from passing eleven, or minus one.
-So every function that takes a rating must check it:
+Every function that takes a rating must check it:
 
 ```python
 # stars_unchecked.py
@@ -257,7 +257,7 @@ if __name__ == "__main__":
 `Stars` now names a set of values: the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside the set.
-So if you are holding a `Stars`, it is legal.
+If you are holding a `Stars`, it is legal.
 You know it without checking.
 
 This changes how you write the functions.
@@ -382,7 +382,7 @@ def test_email_needs_at_sign(bad: str) -> None:
 
 When the set of values is small and fixed, an `Enum` is the clearest type.
 As an example, we'll create a `BirthDate` containing a month, day, and year.
-There are exactly twelve months, so `Month` is an `Enum`.
+A year has exactly twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields. The day must fit the month.
 

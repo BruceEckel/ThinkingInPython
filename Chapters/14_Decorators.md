@@ -110,7 +110,7 @@ keep the static one.
 `**P` is a *parameter specification* (a `ParamSpec`).
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
-So `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
+`func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
 result is `R`," and returning `Callable[P, R]` promises that the wrapper has that
 same signature.
 
@@ -122,7 +122,7 @@ so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
 Without `P` you would fall back to `*args: Any, **kwargs: Any`,
 and the wrapper would swallow any arguments at all,
-discarding the very signature the decorator is meant to preserve.
+discarding the signature the decorator is meant to preserve.
 
 ### Decorators That Take Arguments
 

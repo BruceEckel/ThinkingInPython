@@ -570,8 +570,8 @@ if __name__ == "__main__":
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.
-There is no `switch`, no reflection,
-and no `Condition` or `Transition` class hierarchy.
+Nothing here needs a `switch`, reflection,
+or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those patterns existed to provide.
 
 Because the machine is deterministic,

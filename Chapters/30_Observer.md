@@ -87,7 +87,7 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
-There is no `Observer` base class to inherit and no notification protocol to implement.
+No `Observer` base class needs inheriting, and no notification protocol needs implementing.
 Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
@@ -147,7 +147,7 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 
 ## Observer and I/O
 
-So far, an observer only prints or appends to a list, then returns.
+Until now, an observer only prints or appends to a list, then returns.
 If an observer calls a network service or writes to a database,
 notifying observers one at a time blocks on each.
 The list of callbacks becomes a line of waits.
@@ -157,7 +157,7 @@ If observers are coroutines,
 so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
 `gather` still waits for all of them, so the change finishes only after every notification succeeds.
-There is a limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
+One limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
@@ -246,7 +246,7 @@ The model is an `Observable`.
 and `recolored()` computes the grid that results from a click:
 values in, values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
-There is no `tkinter` here, so we can test the model without a GUI.
+`tkinter` plays no part here, so we can test the model without a GUI.
 It reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python

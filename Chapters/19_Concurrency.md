@@ -15,7 +15,7 @@ The processor is busy from start to finish.
 That boundary decides the tool.
 Waiting can overlap on a single thread. While one task waits, the thread runs another.
 Computing cannot. One core runs one stream of instructions at a time.
-So I/O-bound work needs `asyncio`, and CPU-bound work needs multiple cores.
+I/O-bound work needs `asyncio`, and CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
 Later in this chapter, we show two other approaches,
 each running inside a single process.
@@ -551,7 +551,7 @@ been audited, so check compatibility before switching a project.
 It also rewards a particular shape of program.
 Threads that mostly work on data they do not share,
 like `threaded()` above, scale across cores.
-So do threads that accumulate results locally and merge them
+The same is true of threads that accumulate results locally and merge them
 once at the end, caches that are read far more often than written,
 and pipeline stages connected by queues.
 Fine-grained sharing loses.

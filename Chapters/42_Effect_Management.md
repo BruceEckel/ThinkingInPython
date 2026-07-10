@@ -63,7 +63,7 @@ def slope(rise: int, run: int) -> float:
 This always produces the same result for the same inputs, *except when `run` is zero*.
 Because an exception is raised instead of returning a result, does that break purity?
 
-There are two schools of thought:
+Two schools of thought exist:
 
 1.  **Pure**: Raising `ZeroDivisionError` instead of returning a number does not break purity.
     The same arguments still produce that same exception every time.
@@ -714,7 +714,9 @@ and third-party libraries made the problem worse.
 The solution gave every name a home.
 In Python, every module is automatically a namespace,
 and the practice is so settled that the Zen of Python ends by celebrating it:
+<!-- vale House.EmDash = NO -->
 "Namespaces are one honking great idea -- let's do more of those!"
+<!-- vale House.EmDash = YES -->
 Nobody audits their imports for name collisions anymore.
 The language does the bookkeeping.
 

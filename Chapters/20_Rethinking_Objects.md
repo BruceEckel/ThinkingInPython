@@ -4,7 +4,7 @@ I spent much of my career promoting objects.
 I wrote *Thinking in C++* and *Thinking in Java*,
 served on the C++ Standards Committee for its first eight years,
 and toured the world giving object-oriented programming (OOP) presentations.
-So when I say I have come to doubt that objects should be the default,
+When I say I have come to doubt that objects should be the default,
 it is not an outsider's complaint.
 
 We are about to spend the rest of this book on design patterns,
@@ -430,7 +430,7 @@ and `@abstractmethod` forces every subclass to define `area()`.
 
 Dynamic typing produces a different approach.
 Any type works as long as it has the method the function calls.
-There is no shared base class and no declared set of types,
+No shared base class or declared set of types exists,
 and the only validity check happens at runtime, when the call runs:
 
 ```python
@@ -505,7 +505,7 @@ Dynamic typing and protocols are the same idea, checked at different times.
 A third answer names a closed set of types as a union and dispatches with `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles each case.
-There is no base class and no overridden method.
+No base class or overridden method exists.
 The type checker confirms the match covers every shape:
 
 ```python

@@ -9,7 +9,7 @@ For the singleton, Python does.
 
 Python imports each module once and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
-So a module is a singleton, and module-level names are a single, shared,
+A module is a singleton, and module-level names are a single, shared,
 one-and-only-one piece of state.
 Put the state in a module:
 
@@ -233,7 +233,7 @@ def test_new_returns_same_instance() -> None:
 Because `__new__()` returns the inner `__OnlyOne` object,
 that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
 not a wrapper around it.
-There are no delegating `__getattr__()` or `__setattr__()` methods here.
+No delegating `__getattr__()` or `__setattr__()` methods exist here.
 Attribute access goes straight to the one object.
 
 ### Borg: Share State Instead of Identity

@@ -94,7 +94,7 @@ The comprehension inlines the test and the expression.
 
 List brackets (`[]`) enclose the list comprehension,
 so it is immediately evident that it produces a list.
-There is only one function call to `isinstance()` and no call to the cryptic `lambda`.
+It calls `isinstance()` once, with no call to the cryptic `lambda`.
 Instead, the list comprehension uses a conventional iterator,
 an expression, and an `if` clause for the optional predicate.
 
@@ -275,10 +275,10 @@ print(initials)
 #: {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
-There is no lazy `set` or `dict`, though.
+No lazy `set` or `dict` exists, though.
 A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
-So neither saves anything over the set comprehension `{len(w) for w in words}`
+Neither saves anything over the set comprehension `{len(w) for w in words}`
 or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are the better choice.
 

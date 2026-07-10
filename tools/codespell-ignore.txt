@@ -1,5 +1,6 @@
 adaptee
 bale
 dum
+effekt
 reste
 re-use

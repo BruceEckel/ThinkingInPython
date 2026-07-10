@@ -39,7 +39,7 @@ The book is free, so if AI bothers you more than the resulting product might ben
 
 Using Claude made me realize how many compromises I've made on books in the past.
 I would have a good idea about something (for example, automatically interleaving commented output in the listings).
-But I was either unable to implement it, or it seemed too hard. So I didn't do it.
+But I was either unable to implement it, or it seemed too hard, so I didn't do it.
 But with AI I've been able to explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter
 to ones as daunting as that commented-output system.

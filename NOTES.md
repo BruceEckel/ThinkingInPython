@@ -2,10 +2,6 @@ Review the book looking for consistency issues
 
 Have we learned anything here that should be added to thinking-in-python-skill.md?
 
-Is there a way we can test all the make targets to ensure there are no failures with any of them?
-I imagine a python program that runs each target in sequence and somehow ensures that it completes without failing.
-Running this program would be a make target of some appropriate name.
-
 Run 'make prose' on each chapter
 
 - Is full polymorphism covered? (Not just inheritance-based)

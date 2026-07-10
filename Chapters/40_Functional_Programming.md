@@ -935,7 +935,7 @@ Its payoff shows up once the problem itself branches, not just repeats,
 which is exactly what the next example does.
 
 Recursion suits problems that are naturally self-similar, such as walking a tree.
-Python does not optimize tail calls and limits the call stack, so very deep recursion will raise `RecursionError`.
+Python does not optimize tail calls and limits the call stack, so deep recursion will raise `RecursionError`.
 For long flat sequences, a loop or one of the `itertools` tools is the better choice.
 
 Recursion is beneficial when the data is itself recursive.
@@ -997,7 +997,7 @@ Each `computing square N` line appears only when `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
 Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
-There is no sixth `computing square` line,
+No sixth `computing square` line appears,
 because `islice()` stops asking the moment it has delivered five.
 The [Performance](18_Performance.md) chapter looks at laziness from the perspective of memory and speed.
 
@@ -1015,8 +1015,8 @@ avoid repeating a pairing until every possible pairing has had a turn.
 This is a good place to see the chapter's ideas working together on
 one small, real program instead of one at a time.
 
-The *circle method* solves the pairs-only version exactly, with no
-trial and error.
+The *circle method* solves the pairs-only version exactly,
+by direct construction.
 Fix one player, arrange the rest in a circle, and each round pair
 players sitting across from each other, then rotate everyone but
 the fixed player by one seat.
@@ -1223,7 +1223,7 @@ The calls can run in any order, on any schedule, on any number of cores, and the
 Impure code has no such freedom.
 Recall `withdraw()` from the start of this chapter.
 Two parallel calls could both read `balance` before either writes it back, and one withdrawal would vanish.
-Making that safe means adding a lock, and the lock serializes the very work you wanted to overlap.
+Making that safe means adding a lock, and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
 With nothing shared, there is nothing to lock.
 
@@ -1352,7 +1352,7 @@ Second, most functional code stops well below the top rung.
 Haskell programmers rarely prove a program correct.
 They lean on types and on reasoning by substitution, and save full proof for the few places that earn it.
 
-So the thread running through this chapter is not that functions are special.
+The thread running through this chapter is not that functions are special.
 It is that purity, immutability, and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
 Proof is the far end of that distance.
 The everyday win is everything below it: code you can read, check, and test as statements about what is true.

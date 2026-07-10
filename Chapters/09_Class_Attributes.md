@@ -54,7 +54,7 @@ print(vars(A)["x"])
 #: 100
 ```
 
-So a class attribute seems like a default until someone assigns to an instance variable of the same name.
+A class attribute seems like a default until someone assigns to an instance variable of the same name.
 Changing the class attribute makes the "default" value seem different for every object that has not shadowed it.
 This produces bugs that surface far from their cause.
 

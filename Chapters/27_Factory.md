@@ -3,9 +3,9 @@
 When you discover that you need to add new types to a system,
 the most sensible first step is to use polymorphism to create a common interface to those new types.
 This separates the rest of the code in your system from the knowledge of the specific types that you are adding.
-You may add new types without disturbing existing code ... or so it seems.
+You may add new types without disturbing existing code … or so it seems.
 At first it would appear that the only place you need to change the code in such a design is the place where you inherit a new type,
-but this is not quite true.
+but that isn't the case.
 You must still create an object of your new type,
 and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects appears throughout your application,
@@ -202,7 +202,7 @@ In Python a class is itself a first-class object.
 You can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
-There is no factory method and no factory class. The `dict` is the factory.
+No factory method or factory class exists. The `dict` is the factory.
 You can go one step further, so the factory never needs editing when you add a type,
 by letting each subclass register itself through `__init_subclass__()`:
 
@@ -751,7 +751,7 @@ def test_replace_varies_one_field() -> None:
     assert variant.toppings == base.toppings
 ```
 
-So when does Builder survive in Python?
+When does Builder survive in Python?
 When construction genuinely is a process.
 The steps must happen in an order,
 later steps depend on earlier ones,

@@ -386,7 +386,7 @@ def test_objects_reused_not_recreated() -> None:
 ```
 
 The last test states the pattern's purpose.
-The second lease hands back the very same object,
+The second lease hands back the same object,
 not a new one.
 A production pool adds refinements on this skeleton,
 such as creating items lazily on first demand,

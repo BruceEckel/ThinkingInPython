@@ -50,7 +50,7 @@ Since metaclasses create classes, you can call the metaclass yourself.
 `type` with one argument gives the type of an existing object.
 `type` with three arguments creates a new class: the name,
 a tuple of base classes, and a namespace dictionary of fields and methods.
-So a plain class definition is shorthand for calling `type` yourself:
+A plain class definition is shorthand for calling `type` yourself:
 
 ```python
 # class_via_type.py
@@ -349,7 +349,7 @@ A type describes a fixed set of attributes and signatures,
 but a metaclass changes that structure at runtime,
 adding attributes the class never declared and replacing methods like `__new__()`.
 The checker cannot follow those changes, so it reports the dynamic lines as errors.
-There are three ways to quiet it, from narrowest to broadest:
+Three ways quiet it, from narrowest to broadest:
 `setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
 a localized `# type: ignore` silences one line, as on `simple.uses_metaclass()` above;
 and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.

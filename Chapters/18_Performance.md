@@ -30,7 +30,7 @@ starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
 
-There are alternative interpreters for Python, notably PyPy, which boasts a 4x to 10x speedup.
+Alternative interpreters for Python exist, notably PyPy, which boasts a 4x to 10x speedup.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, then buying new hardware might be a quick win.
@@ -38,13 +38,13 @@ If it's noticeably less, then buying new hardware might be a quick win.
 ## Profilers
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
-Although it is tempting to think you "have a pretty good idea where the slowdown is," we turn out to be very bad at guessing this.
+Although it is tempting to think you "have a pretty good idea where the slowdown is," we turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library provides two complementary profilers.
 `cProfile` is *deterministic*: it records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
-sometimes enough to distort the very behavior you are measuring:
+sometimes enough to distort the behavior you are measuring:
 
     python -m cProfile -s cumulative my_program.py
 
@@ -643,7 +643,7 @@ That is a design decision with its own chapter, [Concurrency](19_Concurrency.md)
 
 ## Converting a Slow Function to Rust
 
-One very effective technique is to move the hot function into a compiled language.
+One effective technique is to move the hot function into a compiled language.
 Rust is excellent for this because its tooling makes the bridge nearly painless.
 More importantly, you can pass the hot Python function to your AI for conversion to Rust.
 Your AI can also walk you through the process.
@@ -694,7 +694,7 @@ Python sees a normal module:
 Keep the interface coarse.
 One call that does a lot of work wins.
 A million calls that each do a little lose the gain due to boundary-crossing overhead.
-So does shipping millions of small Python objects across the boundary.
+Shipping millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The cost of this technique is a second language and a build toolchain in your project.
 

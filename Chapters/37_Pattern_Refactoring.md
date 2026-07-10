@@ -164,7 +164,7 @@ def parse(filename: str) -> list[Trash]:
     return items
 ```
 
-Testing parses a small file written on the spot, so it does not depend on `trash.dat`:
+Testing parses a small in-memory file, so it does not depend on `trash.dat`:
 
 ```python
 # test_parse_trash.py
@@ -301,11 +301,11 @@ for kind, items in bins.items():
 
 `type(t)` is the perfect key because it adapts to new types,
 even ones added at runtime.
-There is nothing to maintain or forget.
+Nothing needs maintaining, and nothing gets forgotten.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far we have changed *types* cheaply.
+We have changed *types* cheaply so far.
 The other axis of change is adding new *operations*.
 Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
@@ -364,7 +364,7 @@ Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.
 
 Compare this to a Visitor implementation.
-There is no `Visitor` class, no `accept()` method bolted onto every material,
+No `Visitor` class exists, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
 When the operation is the same for every type,

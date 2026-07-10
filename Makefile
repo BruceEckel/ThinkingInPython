@@ -19,7 +19,7 @@ DOCS ?= Chapters
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -48,6 +48,16 @@ check-tools-full:  ## Check every tool, including pandoc and vale (site/prose)
 # Prints the exact fix command instead of applying anything itself.
 doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 	$(PY) tools/doctor.py
+
+# Runs every other target here and reports which ones fail. Read-only/idempotent
+# targets run directly; a target that bakes --fix/--write/--add into its recipe
+# (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
+# fix-comment-caps) runs in a disposable git worktree instead, so this working
+# tree is never touched. upgrade-tools, upgrade-python, serve, and local never
+# run (network/environment mutation, or a server that blocks forever); see
+# tools/verify_targets.py's docstring. Logs land in build/target_test_logs/.
+verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
+	$(PY) tools/verify_targets.py
 
 # Updates uv itself (when it was installed via its standalone installer),
 # then upgrades every uv-managed dev tool (ty, ruff, pytest, ...) to the

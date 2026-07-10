@@ -142,7 +142,7 @@ print(total)
 #: 5
 ```
 
-There is no `++` or `--`; use `+= 1` and `-= 1`.
+Python has no `++` or `--`; use `+= 1` and `-= 1`.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 

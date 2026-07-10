@@ -57,7 +57,7 @@ print(deep)
 
 `list(todo)` copies the outer list,
 so `shallow` and `todo` are different objects.
-But their elements are the very same inner lists,
+But their elements are the same inner lists,
 so `todo[0].append("cheese")` shows up in `shallow` too.
 `copy.deepcopy()` walks the whole structure and rebuilds every nested container from scratch,
 so `deep`'s inner lists share nothing with `todo`'s.
@@ -197,7 +197,7 @@ Since each call returns a `Sketch`, the calls can be chained.
 Saving means keeping a reference,
 exactly the move that failed in `aliased_snapshot.py`.
 Now it is safe because no operation anywhere can change the object bound to `before`.
-There is no `Memento` class, no `save()`, and no `restore()`,
+No `Memento` class exists, no `save()`, no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
 This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution),

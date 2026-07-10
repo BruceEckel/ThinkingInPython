@@ -237,7 +237,7 @@ go on.
 Look again at the `bind()` method on `Result`.
 On a `Success`, it feeds the answer to the next function.
 On a `Failure`, it ignores the function and returns the failure unchanged.
-So a `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
+A `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
 # composing_with_bind.py

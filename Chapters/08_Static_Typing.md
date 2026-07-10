@@ -166,10 +166,10 @@ Python preserves the flexibility of dynamic typing but gains the early warning o
 
 A class is itself a value.
 You can pass it to a function, store it in a variable, and call it to make an instance.
-So an annotation needs a way to distinguish the class from an instance of that class.
+This means an annotation needs a way to distinguish the class from an instance of that class.
 A plain `SomeType` annotation means an *instance* of `SomeType`.
 The form `type[SomeType]` means the class object itself, or any subclass of it.
-So `type[C]` annotates the class, not an instance:
+`type[C]` annotates the class, not an instance:
 
 ```python
 # class_values.py
