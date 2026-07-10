@@ -605,20 +605,31 @@ polysemy and effectful in Haskell, and Effect in TypeScript.
 
 ### Custom AI Languages with Effects
 
-Most of these only track the Effects, because the AI can generate whatever code it needs to solve specialized problems.
-It can generate the code only if Effect tracking is available.
+At this writing the world is in the midst of an explosion of experimental languages designed for AI code generation.
+Designs attempt to find the right balance between improving code generation for the AI while maintaining human verifiability.
+One benefit these new languages have: there's no human-constrained adoption curve.
 AI Effect Languages don't need the extra affordances that benefit humans.
+If a language works, an AI can start using it right away.
 
-- [Vera](https://veralang.dev)
-- [Aria](https://www.aria-lang.com)
-- [Aver](https://averlang.dev)
-- [Mog](https://moglang.org)
-- [Lumen](https://alliecatowo.github.io/lumen/)
-- [Dream](https://dreamlang.dev)
+Most of these only **track** Effects, because the AI can generate whatever code it needs to solve specialized problems:
 
-By the definition above, these are Effect-tracking systems rather than full EMSs.
+- [Vera](https://veralang.dev): mandatory contracts checked with Z3 SMT verification.
+- [Aria](https://www.aria-lang.com): built for AI code generation, not human readability.
+- [Aver](https://averlang.dev): effects visible in the type system, with a verify block beside each function.
+- [Mog](https://moglang.org): small enough to fit in a model's context window; effects gated by capabilities.
+- [Lumen](https://alliecatowo.github.io/lumen/): markdown-native source with algebraic effects; `bind effect` rebinds a handler separately from its use, a full-EMS feature.
+- [Dream](https://dreamlang.dev): pairs formal verification with AI-native code generation.
+- [AILANG](https://ailang.sunholo.com): capability-based effects (`IO`, `FS`, `Net`, `Clock`, `AI`) granted per run.
+- [Pact](https://github.com/KikotVit/pact-lang): functions declare a `needs` clause, and a separate `using` clause rebinds each implementation, so tests can swap effects deterministically, another full-EMS feature.
+- [Zero](https://zerolang.ai): capability-based effects, with structured JSON diagnostics instead of prose error messages.
+- [Boruna](https://github.com/escapeboy/boruna): effects declared and policy-gated at the VM level, with tamper-evident replay.
+
+By the definition above, most of these are Effect-tracking systems rather than full EMSs.
 For their purpose the other two parts would be liabilities,
 since a host that fixes the implementations can guarantee what generated code is able to do.
+Pact and Lumen are exceptions.
+Each separates an effect's interface from its implementation and binds the implementation later,
+the second and third properties of a full EMS.
 
 ## Effect Management for Python?
 
