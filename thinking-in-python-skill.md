@@ -1,6 +1,6 @@
 ---
 name: thinking-in-python
-description: Write Python the "Thinking in Python" way. Modern Python 3.14+ idioms, precise static typing, dense readable listings, and disciplined design-pattern usage. Use when writing, reviewing, or refactoring Python code.
+description: Write Python the "Thinking in Python" way. Modern Python 3.15+ idioms, precise static typing, dense readable listings, and disciplined design-pattern usage. Use when writing, reviewing, or refactoring Python code.
 ---
 
 # Programming Python: The Thinking in Python Way
@@ -99,7 +99,7 @@ file passes a strict type checker and linter.
 - If `None` means "nothing there," use one shared null-object
   sentinel (`neighbors.get(urge, EDGE)`), not `None` checks.
 
-**Annotations are lazy (PEP 649, Python 3.14+).**
+**Annotations are lazy (PEP 649, Python 3.15+).**
 
 - Forward references need no quotes and no
   `from __future__ import annotations`.
