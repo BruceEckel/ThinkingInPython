@@ -609,7 +609,12 @@ Most of these only track the Effects, because the AI can generate whatever code 
 It can generate the code only if Effect tracking is available.
 AI Effect Languages don't need the extra affordances that benefit humans.
 
-[[List]]
+- [Vera](https://veralang.dev)
+- [Aria](https://www.aria-lang.com)
+- [Aver](https://averlang.dev)
+- [Mog](https://moglang.org)
+- [Lumen](https://alliecatowo.github.io/lumen/)
+- [Dream](https://dreamlang.dev)
 
 By the definition above, these are Effect-tracking systems rather than full EMSs.
 For their purpose the other two parts would be liabilities,

@@ -1,0 +1,184 @@
+---
+name: thinking-in-python
+description: Write Python the "Thinking in Python" way. Modern Python 3.14+ idioms, precise static typing, dense readable listings, and disciplined design-pattern usage. Use when writing, reviewing, or refactoring Python code.
+---
+
+# Programming Python: The Thinking in Python Way
+
+This skill distills the conventions developed while writing the book
+*Thinking in Python*. Apply them to all Python you write, review, or
+refactor. The style targets modern Python (3.14+) and assumes every
+file passes a strict type checker and linter.
+
+## Core stance
+
+- Write modern Python. Use `match`, PEP 695 generics (`def f[T]`,
+  `class C[T]`, `type Alias = ...`), dataclasses, protocols, and
+  comprehensions where they fit.
+- Every example must type-check and lint clean. Precision is not
+  optional polish. It is part of correctness.
+- Prefer composition, protocols, and functions over inheritance
+  hierarchies. Subclass only when runtime dispatch through a shared
+  base actually earns its keep.
+- Keep code dense and direct. Cut scaffolding, null checks, and
+  repeated demonstration.
+
+## Static typing
+
+**Prefer precise types over `Any`.**
+- Use a `Protocol` for duck-typed conformance with no base class.
+  Prefer it over both `Any` and ABCs.
+- Use `type[C]` when a class object is passed or stored.
+- Use type parameters (`def f[T](...)`, `class C[T]`) when a function
+  or wrapper should carry the element type through.
+- A generic type alias can confine unavoidable erasure: use
+  `Handler[E]` in public signatures and `Handler[Any]` only for a
+  heterogeneous store, so the `Any` is explicit and localized.
+- The one legitimate `Any`: dynamic metaprogramming that adds or swaps
+  attributes on class objects (metaclasses, class decorators). There,
+  funnel through one `Any`-typed name (`klass: Any = cls`) rather than
+  scattering `# type: ignore`. Escapes, narrowest first:
+  `setattr(cls, "name", value)`, a localized `# type: ignore`, then
+  `Any`.
+
+**Pick the strongest construct that fits.**
+- Closed set of constants with behavior attached: `Enum`/`StrEnum`,
+  not `Literal[...]`. An enum carries identity and methods.
+- A primitive standing in for a domain concept: a validated frozen
+  dataclass (with a checking `__post_init__`), not `NewType`.
+  `NewType` only satisfies the checker; the dataclass also enforces
+  the invariant at runtime.
+- `type X = ...` aliases are for compound shapes (tuples, dicts,
+  callables, unions), never a bare scalar rename like
+  `type Symbol = str`. The right side is lazily evaluated (PEP 695),
+  so it can name a class defined later in the file without quotes.
+
+**Constants.**
+- Named constants get the full typed `Final` form:
+  `TOLERANCE: Final[float] = 1e-12`. Not bare `Final`.
+- Module-level lookup tables that act as constants are `UPPER_CASE`
+  with `Final[...]`.
+- Enum members are never annotated `Final` (it breaks the enum).
+
+**Attribute declarations signal their nature.**
+- Shared class constant: `symbol: ClassVar[str] = ""` on the base.
+  Subclass overrides (`symbol = "R"`) do not repeat `ClassVar`.
+- Per-instance state with a value from birth: assign in `__init__`
+  (`self.finished = False`). Never leave it as a bare class-body
+  assignment, which is shared state that reads like a dataclass field.
+- Attribute set later by a builder or factory: a bare annotation with
+  no value (`room: Room`). This stores nothing at runtime and keeps
+  the type precise.
+
+**Avoid `T | None = None` plus asserts.**
+- Do not seed an attribute with `None` because its real value arrives
+  later, then guard every use with `assert x is not None`. That is a
+  Java-style null pattern.
+- If a builder always sets it before anything reads it, use a bare
+  annotation (`room: Room`).
+- If `None` means "nothing there," use one shared null-object
+  sentinel (`neighbors.get(urge, EDGE)`), not `None` checks.
+
+**Annotations are lazy (PEP 649, Python 3.14+).**
+- Forward references need no quotes and no
+  `from __future__ import annotations`.
+- Types imported only under `if TYPE_CHECKING:` are safe in any
+  annotation, including bare class-body declarations. Use this to
+  break import cycles.
+
+**`@override`.**
+- Decorate methods that override a method declared on a user-defined
+  base, implement an abstract method from an ABC, or override a
+  stdlib method meant to be overridden (`JSONEncoder.default`).
+- Do not decorate `__init__`/`__new__`, dunders that merely override
+  `object`/`type`/`Enum` infrastructure defaults (`__repr__`,
+  `__str__`, `__eq__`, ...), or methods on Protocol-satisfying
+  classes (structural, not inheritance).
+
+## Structure and idiom
+
+- **Dispatch on a literal with `match`/`case`,** with a `case _:`
+  default, not an `if`/`elif` chain. It reads as one decision on one
+  value and makes the unknown branch explicit.
+- **Never name identifiers after soft keywords.** No functions,
+  parameters, or variables named `match`, `case`, or `type`. Pick a
+  domain word (`duel()` instead of `match()`).
+- **Exception names need no `Error` suffix.** `InsufficientFunds` and
+  `TypeFailure` are fine. Ignore lint rule N818.
+- **`@dataclass(frozen=True)` already blocks new attributes** (its
+  `__setattr__` rejects every assignment). Pair it with `slots=True`
+  for the memory and access-speed win (the dropped `__dict__`), not
+  to prevent attribute growth.
+- **Polymorphism is broader than method dispatch.** It means one
+  function accepting more than one argument type: ad hoc
+  (overloading), parametric (generics), and subtype (inheritance
+  dispatch). Never write that polymorphism happens only through
+  method calls.
+
+## Formatting and comments
+
+- **Listings stay dense.** At most one blank line anywhere: a single
+  blank between top-level defs/classes, a single blank after the
+  import block, no blank lines between import groups. Imports stay
+  grouped and sorted (stdlib, third-party, local) but contiguous. Do
+  not run a formatter that re-expands to two blanks (Black-style).
+- **Line length is 70.** Long inline comments are the usual culprit.
+  Move the comment to its own line or wrap the statement.
+- **Comment capitalization:** start with a capital when the first
+  word is prose. Leave the case alone when the comment begins with a
+  code identifier (`# os.path.join handles this`).
+- **Comment periods:** a one-line comment ends without a period. Only
+  a multiline comment block (two or more consecutive full-line `#`
+  comments) reads as sentences and keeps its periods.
+- **Header comments:** a single-line comment at the top of a file is
+  fine. If it would run two or more lines, the content belongs in
+  surrounding prose or a docstring, not a block comment.
+- Comments state constraints the code cannot show. Never narrate what
+  the next line does.
+
+## Demos and tests
+
+- **A demo makes its point once and stops.** Collapse repeated prints
+  into one combined `print(...)` that shows the key result
+  (`print(x.val, x is y is z)`). Keep step-by-step output only when
+  the growth is itself the point.
+- **Tests live beside the code they exercise,** in their own
+  `test_*.py` file, one focused file per example rather than one
+  combined test module. When a test carries the verification, the
+  inline demo can stay short.
+- **Importable modules carry no top-level demo.** If a module is both
+  a library and a demonstration, split it: a demo-free library module
+  plus a separate runnable file that imports it and holds the demo.
+- **Nondeterministic output needs taming** before it can be asserted
+  or displayed: round floats (`f"{x:.6f}"`), print
+  `type(e).__name__` instead of a message, or prefer deterministic
+  measures (`sys.getsizeof()`) over wall-clock timings.
+- **Benchmarks warm up outside the timed region.** Create the pool or
+  trigger the JIT before the `timeit` call, or setup cost hides the
+  real speedup.
+
+## Design patterns
+
+- **Name a pattern only when the structure earns it.** A staged
+  constructor is not "the Builder pattern." Before writing "this is
+  the X pattern," confirm the code has the pattern's defining
+  structure. Otherwise describe the technique plainly.
+- **Capitalize pattern names** as proper nouns: Template Method,
+  Factory Method, Observer.
+- Many classic patterns dissolve in Python. First ask whether a
+  function, a dataclass, a protocol, or a closure already solves the
+  problem before building the class hierarchy the pattern's C++/Java
+  form prescribes.
+
+## Concurrency and low-level footguns
+
+- `time.sleep(0)` no longer forces a GIL handoff on current Python.
+  Thread race demos need a tiny nonzero sleep
+  (`time.sleep(0.000_001)`). In asyncio, `await asyncio.sleep(0)`
+  still yields deterministically.
+- CPython's small-int cache extends well past the textbook `-5..256`
+  on recent builds. An "uncached" int demo needs a value of 100000 or
+  more, or it silently proves the opposite.
+- Object immortality (PEP 683) shipped in 3.12 for every build. It is
+  not a free-threading-only feature; free threading just makes it
+  matter more.

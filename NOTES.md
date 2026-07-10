@@ -1,3 +1,5 @@
+Evaluate thinking-in-python-skill.md to see what's missing. Look through the internet for guidelines to fill in what's missing, and propose those as additions in an appropriately-named section at the bottom of thinking-in-python-skill.md.
+
 Review the book looking for consistency issues
 
 Run 'make prose' on each chapter
