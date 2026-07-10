@@ -329,6 +329,21 @@ file passes a strict type checker and linter.
   not a free-threading-only feature; free threading just makes it
   matter more.
 
+- `Path.write_text()`/`open()` for writing translates every `\n` to
+  the platform's line separator by default, `\r\n` on Windows, even
+  with `encoding=` set explicitly. Pass `newline="\n"` whenever the
+  file must stay LF-only, such as a script rewriting a tracked source
+  file in place.
+
+- A module already in `sys.modules` is never re-resolved from
+  `sys.path`, even when a later `import` of the same name happens
+  from a directory that would otherwise come first on the path. A
+  shared utility module named something generic (`config.py`,
+  `utils.py`) can silently shadow an unrelated same-named file loaded
+  dynamically elsewhere in the same process, such as an `exec()`'d
+  script or a plugin. Give a widely-imported shared module a
+  distinctive name instead of a common one.
+
 - Never call a blocking synchronous function (`time.sleep`,
   `requests.get`, plain file I/O) inside an `async def`; it freezes
   the whole event loop, not just the calling coroutine. Use the
