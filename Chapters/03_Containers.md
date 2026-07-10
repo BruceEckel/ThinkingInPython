@@ -297,7 +297,7 @@ Here, the `list` argument is a factory that produces a fresh empty list for each
 ### `deque`
 
 A `deque` (double-ended queue) adds and removes items at either end in constant time.
-A `list` is fast only at its right end:
+A `list` is fast only at the end you append to:
 
 ```python
 # deque.py
@@ -318,13 +318,13 @@ print(dq)
 
 # A plain list can act as a double-ended queue too:
 lst = [1, 2, 3]
-lst.append(4)        # Add on the right
-lst.insert(0, 0)     # Add on the left
+lst.append(4)        # Add at the end
+lst.insert(0, 0)     # Add at the start
 print(lst)
 #: [0, 1, 2, 3, 4]
-print(lst.pop(0))    # Remove from the left
+print(lst.pop(0))    # Remove from the start
 #: 0
-print(lst.pop())     # Remove from the right
+print(lst.pop())     # Remove from the end
 #: 4
 print(lst)
 #: [1, 2, 3]
