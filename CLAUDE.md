@@ -151,3 +151,8 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 - `tools/*.py` all have thorough module docstrings; read them before guessing.
 - The `Makefile` documents every gate and target (`make help`).
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).
+- `thinking-in-python-skill.md` (repo root) and
+  `.claude/skills/thinking-in-python/SKILL.md` are duplicate copies of the
+  same Python coding-style skill, not a symlink (this repo has
+  `core.symlinks = false`). Edit one, then copy the change into the other;
+  nothing enforces sync automatically.
