@@ -21,8 +21,7 @@ them (run by `make fix-listings`).
 import argparse
 from pathlib import Path
 
-from tools_config import FENCE_ANY_RE as _FENCE
-from tools_config import PY_FENCE_RE as _PY_OPEN
+from tools_pycode import iter_python_blocks, scan_line
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
@@ -32,42 +31,7 @@ def _in_string(lines: list[str]) -> list[bool]:
     triple: str | None = None
     for line in lines:
         out.append(triple is not None)
-        i, n = 0, len(line)
-        sq = dq = False
-        while i < n:
-            c = line[i]
-            if triple:
-                if line.startswith(triple, i):
-                    i += 3
-                    triple = None
-                    continue
-                i += 1
-                continue
-            if sq:
-                i += 2 if c == "\\" else 1
-                if c == "'":
-                    sq = False
-                continue
-            if dq:
-                i += 2 if c == "\\" else 1
-                if c == '"':
-                    dq = False
-                continue
-            if c == "#":
-                break
-            if line.startswith("'''", i) or line.startswith('"""', i):
-                triple = line[i:i + 3]
-                i += 3
-                continue
-            if c == "'":
-                sq = True
-                i += 1
-                continue
-            if c == '"':
-                dq = True
-                i += 1
-                continue
-            i += 1
+        _, triple = scan_line(line, triple)
     return out
 
 
@@ -114,20 +78,10 @@ def check_file(path: Path, fix: bool) -> list[tuple[int, str]]:
     lines = path.read_text(encoding="utf-8").split("\n")
     findings: list[tuple[int, str]] = []
     drop: set[int] = set()  # absolute line indices to remove
-    i, n = 0, len(lines)
-    while i < n:
-        if not _PY_OPEN.match(lines[i]):
-            i += 1
-            continue
-        start = i + 1
-        j = start
-        while j < n and not _FENCE.match(lines[j]):
-            j += 1
-        block = lines[start:j]
+    for start, block in iter_python_blocks(lines):
         for idx, reason in _removals(block):
             findings.append((start + idx + 1, reason))  # 1-based line number
             drop.add(start + idx)
-        i = j + 1
 
     if fix and drop:
         kept = [ln for k, ln in enumerate(lines) if k not in drop]

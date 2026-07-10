@@ -46,7 +46,8 @@ import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, FENCE_RE, ROOT
+from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, ROOT
+from tools_pycode import walk_fenced
 from tools_repo import block_slug
 
 COMMITTED_DIR = ROOT / "Examples"
@@ -70,20 +71,9 @@ class ExtractResult:
 
 def iter_blocks(lines: list[str]):
     """Yield (language, block_lines) for each fenced block."""
-    i = 0
-    n = len(lines)
-    while i < n:
-        m = FENCE_RE.match(lines[i])
-        if m:
-            lang = m.group(1) or ""
-            i += 1
-            start = i
-            while i < n and not lines[i].startswith("```"):
-                i += 1
-            yield lang, lines[start:i]
-            i += 1  # skip the closing fence
-        else:
-            i += 1
+    for ev in walk_fenced(lines):
+        if ev.match is not None:
+            yield ev.match.group(1) or "", lines[ev.open_at + 1:ev.end]
 
 
 def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:

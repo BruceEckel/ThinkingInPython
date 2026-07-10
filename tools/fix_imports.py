@@ -25,9 +25,9 @@ import argparse
 import subprocess
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, ROOT
+from tools_config import CHAPTERS_DIR, PATH_LINE_RE, ROOT
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_config import FENCE_RE, PATH_LINE_RE
+from tools_pycode import walk_fenced
 from tools_repo import write_text_lf
 
 
@@ -79,24 +79,18 @@ def splice_markdown(
     lines = text.splitlines(keepends=True)
     out: list[str] = []
     changed: list[str] = []
-    i, n = 0, len(lines)
+    n = len(lines)
 
-    while i < n:
-        m = FENCE_RE.match(lines[i].rstrip('\n\r'))
-        if not (m and (m.group(1) or '') in ('python', 'py')):
-            out.append(lines[i])
-            i += 1
+    for ev in walk_fenced(
+        lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
+    ):
+        if ev.match is None:
+            out.append(lines[ev.open_at])
             continue
 
-        out.append(lines[i])  # opening fence
-        i += 1
-        start = i
-        while i < n and not lines[i].startswith('```'):
-            i += 1
-        block = lines[start:i]
-        fence_close = lines[i] if i < n else None
-        if i < n:
-            i += 1
+        out.append(lines[ev.open_at])  # opening fence
+        block = lines[ev.open_at + 1:ev.end]
+        fence_close = lines[ev.end] if ev.end < n else None
 
         slug = block_slug(block)
         fixed = fixed_for(slug) if slug is not None else None

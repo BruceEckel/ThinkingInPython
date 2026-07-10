@@ -18,9 +18,7 @@ to remove the periods.
 import argparse
 from pathlib import Path
 
-from capitalize_comments import find_comment_hash
-from tools_config import FENCE_ANY_RE as _FENCE
-from tools_config import PY_FENCE_RE as _PY_OPEN
+from tools_pycode import iter_python_blocks, scan_line
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
@@ -29,7 +27,7 @@ def _comment_starts(block: list[str]) -> list[int]:
     starts = []
     triple = None
     for line in block:
-        hash_i, triple = find_comment_hash(line, triple)
+        hash_i, triple = scan_line(line, triple)
         starts.append(hash_i)
     return starts
 
@@ -64,20 +62,10 @@ def check_file(path: Path, fix: bool) -> list[int]:
     lines = path.read_text(encoding="utf-8").split("\n")
     findings: list[int] = []
     out = list(lines)
-    i, n = 0, len(lines)
-    while i < n:
-        if not _PY_OPEN.match(lines[i]):
-            i += 1
-            continue
-        start = i + 1
-        j = start
-        while j < n and not _FENCE.match(lines[j]):
-            j += 1
-        block = lines[start:j]
+    for start, block in iter_python_blocks(lines):
         for idx, new_line in _strip_targets(block).items():
             findings.append(start + idx + 1)
             out[start + idx] = new_line
-        i = j + 1
 
     if fix and findings:
         write_text_lf(path, "\n".join(out))

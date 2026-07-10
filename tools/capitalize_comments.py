@@ -28,6 +28,7 @@ from pathlib import Path
 
 from tools_config import CHAPTERS_DIR, TOOLS_DIR
 from tools_config import FENCE_RE as FENCE
+from tools_pycode import scan_line as find_comment_hash
 from tools_repo import write_text_lf
 
 ALLOWLIST = TOOLS_DIR / "comment_caps_allow.txt"
@@ -66,48 +67,6 @@ def is_full_comment(line: str) -> bool:
 def ends_sentence(comment_text: str) -> bool:
     t = comment_text.rstrip().rstrip("\"')")
     return bool(t) and t[-1] in TERMINAL
-
-
-def find_comment_hash(line: str, in_triple: str | None):
-    """Return (hash_index or -1, triple_state_after_line)."""
-    i, n = 0, len(line)
-    quote = in_triple
-    sq = dq = False
-    while i < n:
-        c = line[i]
-        if quote:
-            if line.startswith(quote, i):
-                i += 3
-                quote = None
-                continue
-            i += 1
-            continue
-        if sq:
-            i += 2 if c == "\\" else 1
-            if c == "'":
-                sq = False
-            continue
-        if dq:
-            i += 2 if c == "\\" else 1
-            if c == '"':
-                dq = False
-            continue
-        if line.startswith("'''", i) or line.startswith('"""', i):
-            quote = line[i:i + 3]
-            i += 3
-            continue
-        if c == "'":
-            sq = True
-            i += 1
-            continue
-        if c == '"':
-            dq = True
-            i += 1
-            continue
-        if c == "#":
-            return i, quote
-        i += 1
-    return -1, quote
 
 
 def transform_comment(line: str, hash_i: int) -> str | None:

@@ -42,7 +42,8 @@ import sys
 from pathlib import Path
 
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_config import FENCE_RE, INLINE_NORUN_MARKER, NORUN_FILE
+from tools_config import INLINE_NORUN_MARKER, NORUN_FILE
+from tools_pycode import walk_fenced
 from tools_repo import block_slug, load_glob_list, write_text_lf
 
 # Matches #: or #: <content> at column 0 only.
@@ -294,36 +295,29 @@ def process_markdown(
     ok = True
     changed = False
     any_markers = False
-    i = 0
     n = len(lines)
 
-    while i < n:
-        m = FENCE_RE.match(lines[i].rstrip('\n\r'))
-        if not (m and (m.group(1) or '') in ('python', 'py')):
-            out.append(lines[i])
-            i += 1
+    for ev in walk_fenced(
+        lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
+    ):
+        if ev.match is None:
+            out.append(lines[ev.open_at])
             continue
 
-        fence_open = lines[i]
-        block_start = i + 1
-        i = block_start
-        while i < n and not lines[i].startswith('```'):
-            i += 1
-        block = lines[block_start:i]
-        fence_close = lines[i] if i < n else None
-        if i < n:
-            i += 1
+        block_start = ev.open_at + 1
+        block = lines[block_start:ev.end]
+        fence_close = lines[ev.end] if ev.end < n else None
 
-        out.append(fence_open)
+        out.append(lines[ev.open_at])  # opening fence
         if any(is_marker(line) for line in block):
-            block = process_md_block(
+            result = process_md_block(
                 block, path, chapter, block_start,
                 tree=tree, skips=skips, update=update,
             )
             any_markers = True
-            ok = ok and block.ok
-            changed = changed or block.changed
-            out.extend(block.lines)
+            ok = ok and result.ok
+            changed = changed or result.changed
+            out.extend(result.lines)
         else:
             out.extend(block)
         if fence_close is not None:
