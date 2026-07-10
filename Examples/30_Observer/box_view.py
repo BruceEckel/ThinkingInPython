@@ -3,7 +3,6 @@ import tkinter as tk
 from box_observer import BoxModel, Grid
 
 def show(model: BoxModel, cell: int = 60) -> None:
-    "Open the window and keep it in step with the model."
     root = tk.Tk()
     root.title("ColorBoxes")
     canvas = tk.Canvas(root, highlightthickness=0,

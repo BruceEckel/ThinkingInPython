@@ -3,7 +3,6 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 class Meter:
-    "Counts how many tasks are active at once."
     def __init__(self) -> None:
         self.active = 0
         self.peak = 0

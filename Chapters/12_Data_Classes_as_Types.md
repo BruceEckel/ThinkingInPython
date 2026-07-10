@@ -18,12 +18,13 @@ This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
 This function appears throughout the chapter.
-It raises a custom exception when a value is not legal:
+It raises `TypeFailure`, a custom exception meaning a value falls
+outside the type's allowed set:
 
 ```python
 # validation.py
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
+    pass
 
 def check(condition: bool, message: str, detail: str = "") -> None:
     if not condition:

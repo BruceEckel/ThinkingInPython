@@ -241,9 +241,10 @@ Click a box and every box touching it, diagonals included,
 repaints to the clicked box's color.
 
 The model is an `Observable`.
-Building the grid, testing adjacency,
-and computing the grid that results from a click are plain functions: values in,
-values out.
+`new_grid()` builds a size x size grid banded into three colors,
+`adjacent()` tests whether two distinct cells touch, including diagonally,
+and `recolored()` computes the grid that results from a click:
+values in, values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
 There is no `tkinter` here, so we can test the model without a GUI.
 It reuses the same `Observable` as the thermometer, from `observers.py`:
@@ -259,22 +260,18 @@ type Coord = tuple[int, int]             # (column, row)
 type Grid = dict[Coord, str]             # Cell -> color
 
 def new_grid(size: int) -> Grid:
-    "Build a size x size grid, banded into three colors."
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
 def adjacent(a: Coord, b: Coord) -> bool:
-    "True if two distinct cells touch, including diagonally."
     return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
 
 def recolored(grid: Grid, clicked: Coord) -> Grid:
-    "Return a new grid: every neighbor of the click takes its color."
     color = grid[clicked]
     return {cell: color if adjacent(cell, clicked) else current
             for cell, current in grid.items()}
 
 class BoxModel(Observable):
-    "The subject: holds the grid and announces every change."
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -336,7 +333,6 @@ import tkinter as tk
 from box_observer import BoxModel, Grid
 
 def show(model: BoxModel, cell: int = 60) -> None:
-    "Open the window and keep it in step with the model."
     root = tk.Tk()
     root.title("ColorBoxes")
     canvas = tk.Canvas(root, highlightthickness=0,

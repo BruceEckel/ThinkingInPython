@@ -1,9 +1,13 @@
 # test_yield_from.py
-from yield_from import flatten
+from collections.abc import Sequence
+import pytest
+from yield_from import Nested, flatten
 
-def test_flatten_nested_lists() -> None:
-    result = list(flatten([1, [2, 3], [4, [5, 6]], 7]))
-    assert result == [1, 2, 3, 4, 5, 6, 7]
-
-def test_flatten_no_nesting() -> None:
-    assert list(flatten([1, 2, 3])) == [1, 2, 3]
+@pytest.mark.parametrize("nested, expected", [
+    ([1, [2, 3], [4, [5, 6]], 7], [1, 2, 3, 4, 5, 6, 7]),
+    ([1, 2, 3], [1, 2, 3]),
+])
+def test_flatten(
+    nested: Sequence[Nested], expected: list[int]
+) -> None:
+    assert list(flatten(nested)) == expected

@@ -329,7 +329,6 @@ from maze import Coord, Maze
 CELL: Final[int] = 26
 
 class RecordingBlackboard(Blackboard):
-    "A blackboard that also remembers the order cells were claimed."
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
         self.order: list[Coord] = []
@@ -342,7 +341,6 @@ class RecordingBlackboard(Blackboard):
         return claimed
 
 def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
-    "Run the rats, then replay the cells they claimed, in order."
     maze = Maze.from_file(layout)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())
@@ -798,7 +796,6 @@ MOVES: Final[dict[str, Urge]] = {
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:
-    "Draw the maze and step the robot through the moves."
     game = GameBuilder(maze)
     rows = maze.splitlines()
     width = max(len(row) for row in rows)
@@ -881,14 +878,12 @@ from dataclasses import dataclass
 type Mode = tuple[int, int]   # Vibration pattern (m, n)
 
 def amplitude(x: float, y: float, mode: Mode) -> float:
-    "Vibration strength at (x, y), zero on the nodal lines."
     m, n = mode
     return abs(
         math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
         - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
 
 def bounce(v: float) -> float:
-    "Reflect v back off the edges of the unit interval."
     if v < 0.0:
         return -v
     if v > 1.0:
@@ -910,7 +905,6 @@ class Plate:
             for _ in range(grains)]
 
     def step(self, kick: float = 0.05) -> None:
-        "Kick every grain, harder where the plate moves more."
         for g in self.grains:
             a = amplitude(g.x, g.y, self.mode)
             g.x = bounce(
@@ -919,13 +913,11 @@ class Plate:
                 g.y + self.rng.uniform(-kick, kick) * a)
 
     def agitation(self) -> float:
-        "Mean vibration strength underneath the grains."
         return sum(
             amplitude(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
     def render(self, width: int = 60, height: int = 30) -> str:
-        "Character picture of grain density."
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
         for g in self.grains:
@@ -1059,7 +1051,6 @@ MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
 
 def show(grains: int = 1200, step_ms: int = 30,
          frames_per_mode: int = 200) -> None:
-    "Shake the grains, changing the mode as patterns form."
     plate = Plate(grains, MODES[0])
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")

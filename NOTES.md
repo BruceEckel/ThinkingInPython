@@ -1,14 +1,12 @@
-Evaluate thinking-in-python-skill.md to see what's missing. Look through the internet for guidelines to fill in what's missing, and propose those as additions in an appropriately-named section at the bottom of thinking-in-python-skill.md.
-
 Review the book looking for consistency issues
-
-Run 'make prose' on each chapter
 
 tools: unified config.py. Also look for duplicated code that can be refactored into shared utility functions.
 
+Run 'make prose' on each chapter
+
 - Is full polymorphism covered? (Not just inheritance-based)
 - 11 Pattern matching: ensure there is a comparison to polymorphism at the end
--
+
 - Check order of examples in 37_Pattern_Refactoring.md
 
 - "have to", "could" -> "can"

@@ -649,9 +649,6 @@ Because it requires user interaction the harness skips it (`tools/norun.txt`):
 
 ```python
 # tabledriven/vending_view.py
-# A tkinter front panel for the vending machine. The model
-# (vending_machine.py) holds the state machine and the money and stock
-# logic; this file only draws and turns button presses into events.
 import tkinter as tk
 from functools import partial
 from vending_machine import (
@@ -663,7 +660,6 @@ from vending_machine import (
 )
 
 def show() -> None:
-    "Open the vending-machine panel."
     vm = VendingMachine()
     root = tk.Tk()
     root.title("Vending Machine")

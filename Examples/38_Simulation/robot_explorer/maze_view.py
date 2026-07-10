@@ -14,7 +14,6 @@ MOVES: Final[dict[str, Urge]] = {
 
 def show(maze: str = string_maze, moves: str = solution,
          step_ms: int = 80) -> None:
-    "Draw the maze and step the robot through the moves."
     game = GameBuilder(maze)
     rows = maze.splitlines()
     width = max(len(row) for row in rows)

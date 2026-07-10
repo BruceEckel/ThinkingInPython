@@ -396,7 +396,6 @@ class Hawaiian:
     description = "Hawaiian"
 
 class Topping:
-    "Base object decorator: wraps a Pizza and adds to it."
     add_cost = 0.0
     name = ""
 

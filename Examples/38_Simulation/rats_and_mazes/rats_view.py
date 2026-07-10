@@ -8,7 +8,6 @@ from maze import Coord, Maze
 CELL: Final[int] = 26
 
 class RecordingBlackboard(Blackboard):
-    "A blackboard that also remembers the order cells were claimed."
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
         self.order: list[Coord] = []
@@ -21,7 +20,6 @@ class RecordingBlackboard(Blackboard):
         return claimed
 
 def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
-    "Run the rats, then replay the cells they claimed, in order."
     maze = Maze.from_file(layout)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())

@@ -2,6 +2,7 @@
 from typing import Any, Final
 import paper_scissors_rock as methods
 import paper_scissors_rock_table as table
+import pytest
 from outcome import Outcome
 
 # (player, opponent): the player's result
@@ -23,13 +24,10 @@ def compete(module: Any, player: str, opponent: str) -> Outcome:
     assert isinstance(result, Outcome)
     return result
 
-def test_table_version_matches_expected() -> None:
+@pytest.mark.parametrize("module", [table, methods])
+def test_matches_expected(module: Any) -> None:
     for (player, opponent), result in EXPECTED.items():
-        assert compete(table, player, opponent) == result
-
-def test_method_version_matches_expected() -> None:
-    for (player, opponent), result in EXPECTED.items():
-        assert compete(methods, player, opponent) == result
+        assert compete(module, player, opponent) == result
 
 def test_both_versions_agree() -> None:
     for player, opponent in EXPECTED:

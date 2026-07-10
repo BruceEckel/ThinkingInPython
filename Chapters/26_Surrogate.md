@@ -65,6 +65,7 @@ so you cannot instantiate an implementation that omits one:
 ```python
 # proxy_interface.py
 from abc import ABC, abstractmethod
+from typing import override
 
 class Service(ABC):
     @abstractmethod
@@ -73,10 +74,13 @@ class Service(ABC):
     def g(self) -> None: ...
 
 class Complete(Service):
+    @override
     def f(self) -> None: print("Complete.f()")
+    @override
     def g(self) -> None: print("Complete.g()")
 
 class Partial(Service):  # Missing g()
+    @override
     def f(self) -> None: print("Partial.f()")
 
 Complete().f()

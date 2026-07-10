@@ -59,7 +59,6 @@ class Settings:
 
 @cache
 def settings() -> Settings:
-    "Always returns the same Settings instance."
     return Settings()
 
 a = settings()

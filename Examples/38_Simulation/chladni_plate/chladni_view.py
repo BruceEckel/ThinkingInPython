@@ -12,7 +12,6 @@ MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
 
 def show(grains: int = 1200, step_ms: int = 30,
          frames_per_mode: int = 200) -> None:
-    "Shake the grains, changing the mode as patterns form."
     plate = Plate(grains, MODES[0])
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")

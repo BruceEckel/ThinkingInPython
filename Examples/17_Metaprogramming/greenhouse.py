@@ -20,7 +20,6 @@ class Event:
             e.run()
 
 def create_mc(description: str) -> None:
-    "Create subclass using the 'type' metaclass."
     class_name = "".join(x.capitalize() for x in description.split())
     def init(self, time: float) -> None:
         Event.__init__(self, description + " [mc]", time)
@@ -28,7 +27,6 @@ def create_mc(description: str) -> None:
         class_name, (Event,), {"__init__": init})
 
 def create_exec(description: str) -> None:
-    "Create subclass by exec-ing a string."
     class_name = "".join(x.capitalize() for x in description.split())
     klass = f"""
 class {class_name}(Event):
