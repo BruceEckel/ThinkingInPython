@@ -357,22 +357,22 @@ types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in scalar types |
+| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
-| `Never`, `NoReturn` | A function that never returns (it always raises or exits) |
+| `Never`, `NoReturn` | `NoReturn` marks a function that never returns (it always raises or exits); `Never` is the broader "impossible" type |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
 ### Containers
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous, mutable collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Type Hints](#type-hints) |
+| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Type Hints](#type-hints) |
 | `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
-| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant*, so `list[Circle]` satisfies `Sequence[Shape]`, see [Iterators](23_Iterators.md#iteration-is-built-in) |
+| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Iterators](23_Iterators.md#iteration-is-built-in) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C` itself, not an instance, see [Classes as Values](#classes-as-values-type) |
 
@@ -436,14 +436,14 @@ types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Self` | The enclosing class type; handy for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
-| `"Name"` | A *forward reference*: a not-yet-defined type, written as a string |
+| `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
 ### Typing decorators and directives
 
 | Construct | Meaning |
 |-----------|---------|
-| `@overload` | Several typed signatures for one function |
-| `@override` | Declares a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
+| `@overload` | Several typed signatures for one function name |
+| `@override` | Declares that a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Metaprogramming.md#making-a-class-final) |
 | `cast(T, x)` | Tells the checker to treat `x` as `T`, see [Flyweight](35_Flyweight.md#intrinsic-and-extrinsic-state) |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
