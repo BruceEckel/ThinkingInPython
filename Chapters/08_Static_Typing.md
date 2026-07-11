@@ -1,18 +1,17 @@
 # Static Typing
 
-C++ and Java make you declare the type of everything,
-and they check those types before the program runs.
-Python checks types at runtime, only when an operation is actually attempted.
-Up until this chapter, we haven't used type declarations.
+C++ and Java make require type declarations,
+and they check those types during compilation.
+The Python runtime checks types only when an operation is actually attempted.
+So far, we haven't used type declarations.
 
 On a small program you do not miss the declarations.
-On a large program, type errors that C++ or Java would catch now appear only when the code runs.
-Sometimes the error waits until a bug report.
+On a large program, type errors that C++ or Java would catch only appear when the code runs.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
 The Python runtime ignores properly formed type hints.
 If you want the equivalent of a compiler in a typed language,
-you must run a separate type-checking tool (this book uses Astral's `ty`).
+you must run a separate type-checking tool (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
 
 You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
 
