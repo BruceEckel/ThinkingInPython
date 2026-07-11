@@ -412,8 +412,8 @@ types come from `collections.abc`.
 | `def f[T](x: T) -> T` | A generic function (the type parameter varies per call), see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `class Box[T]` | A generic class, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
-| `TypeVar`, `Generic[T]` | The pre-3.12 way to write the two above, see [Generic Functions and Classes](#generic-functions-and-classes) |
-| `**P` (`ParamSpec`) | Captures a callable's whole parameter list, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
+| `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
 ### <a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Structural typing</a>
@@ -441,7 +441,7 @@ types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `Self` | The enclosing class type; handy for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
+| `Self` | The enclosing class type; useful for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
 | `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#functions-and-decorators" target="_blank" rel="noopener">Typing decorators and directives</a>
