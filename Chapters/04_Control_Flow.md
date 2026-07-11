@@ -301,7 +301,7 @@ print(parities)
 #: {0, 1}
 ```
 
-[Comprehensions](16_Comprehensions.md#list-comprehensions) covers comprehensions in detail,
+[Comprehensions](16_Comprehensions.md#list-comprehensions) covers the topic in detail,
 as well as generator expressions and the functional tools `map()` and `filter()`.
 
 ## Exercises

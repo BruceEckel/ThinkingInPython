@@ -34,14 +34,14 @@ This means the same function can accept and return different types:
 
 def flexible_args_and_returns(arg):
     if arg == 1:
-        return "one"
+        return "Hello"
     if arg == "one":
-        return True
+        return 2
 
 print(flexible_args_and_returns(1))
-#: one
+#: Hello
 print(flexible_args_and_returns("one"))
-#: True
+#: 2
 ```
 
 Here, the same function applies the '`+`' operator to integers and strings:
@@ -132,7 +132,9 @@ show(["a", "b"])
 ```
 
 With the type hints from [Static Typing](08_Static_Typing.md#type-hints),
-such a parameter reads `items: Sequence[str] = ()`.
+such a parameter reads:
+
+    items: Sequence[str] = ()
 
 The `None` sentinel works only because `None` is not a meaningful value here.
 When `None` is itself a valid argument, you need a distinct marker.
@@ -148,7 +150,7 @@ def get(data, key, default=MISSING):
     if key in data:
         return data[key]
     if default is MISSING:
-        raise KeyError(key)
+        return MISSING  # Normally raise exception here
     return default
 
 prefs = {"volume": 3, "mute": None}
@@ -156,13 +158,16 @@ print(get(prefs, "volume"))
 #: 3
 print(get(prefs, "mute"))     # None is a real stored value
 #: None
+print(get(prefs, "theme"))
+#: MISSING
 print(get(prefs, "theme", "dark"))
 #: dark
 ```
 
 Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied."
-The `MISSING` sentinel keeps the two cases apart. A missing key with no default
-raises an exception, while a stored `None` comes back untouched.
+The `MISSING` sentinel keeps the two cases apart.
+A missing key with no default would normally raise an exception.
+A stored `None` comes back untouched.
 
 ## Variable Argument Lists
 
@@ -177,7 +182,7 @@ def report(label, *values, **options):
 
 report("nums", 1, 2, 3)
 #: nums (1, 2, 3) {}
-report("point", 3, 4, color="red", size=10)   # Extras land in options
+report("point", 3, 4, color="red", size=10)
 #: point (3, 4) {'color': 'red', 'size': 10}
 ```
 
@@ -196,12 +201,12 @@ def f(a, b, c):
 x = [1, 2, 3]
 f(*x)
 #: 1 2 3
-f(*(1, 2, 3))
-#: 1 2 3
+f(*(4, 5, 6))
+#: 4 5 6
 # ** unpacks a dictionary into keyword arguments:
-d = {"a": 10, "b": 20, "c": 30}
+d = {"a": 3.14, "b": 1.62, "c": 2.72}
 f(**d)
-#: 10 20 30
+#: 3.14 1.62 2.72
 
 def report(label, *values, **options):
     print(label, values, options)

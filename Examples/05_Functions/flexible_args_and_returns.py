@@ -2,11 +2,11 @@
 
 def flexible_args_and_returns(arg):
     if arg == 1:
-        return "one"
+        return "Hello"
     if arg == "one":
-        return True
+        return 2
 
 print(flexible_args_and_returns(1))
-#: one
+#: Hello
 print(flexible_args_and_returns("one"))
-#: True
+#: 2
