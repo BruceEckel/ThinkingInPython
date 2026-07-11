@@ -99,4 +99,3 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 40_Functional_Programming.md    |X|X|
 | 41_Functional_Error_Handling.md |X|X|
 | 42_Effect_Management.md         |🔴|🔴|
-| 43_Afterword.md                 |🔴|🔴|

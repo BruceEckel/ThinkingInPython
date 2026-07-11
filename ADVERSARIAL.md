@@ -17,8 +17,9 @@ through 4 and the actionable items in section 5. Notes on that pass:
   (`github.com/BruceEckel/Understanding_Effects` in ch42, repo not yet
   public) was reduced to an unlinked mention; restore the link when the
   repository exists.
-- A draft `43_Afterword.md` addresses 5.4, marked 🔴 in the README pending
-  the author's own edit pass.
+- A draft `43_Afterword.md` was written to address 5.4, then the author
+  chose to leave the book without one; the file and its README row were
+  removed. 5.4 stands as a live suggestion, not a fixed item.
 - Deliberate non-fixes: chapter 40 was not split (5.2; a renumbering
   cascade outweighs the benefit, so this stays a suggestion), and the ch42
   ZIO listing was reviewed for correctness rather than compiled (no Scala
