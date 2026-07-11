@@ -1,5 +1,7 @@
 Review the book looking for consistency issues
 
+Chapter 8 read
+
 Have we learned anything here that should be added to thinking-in-python-skill.md?
 
 Run 'make prose' on each chapter
