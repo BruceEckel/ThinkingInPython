@@ -13,7 +13,7 @@ A pure function cannot corrupt state you forgot about.
 It has fewer bugs to chase, and it needs no mock or fixture to test.
 A cache or a fold from `functools` or `itertools` is code you never write yourself,
 already correct on the edge case you would have missed at first.
-A function with no shared state needs no lock, so it parallelizes with no new code at all.
+A function with no shared state needs no lock, so it parallelizes with no new code.
 And code built from small, checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
 None of this asks you to abandon loops, classes, or mutation.

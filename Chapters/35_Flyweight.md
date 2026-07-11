@@ -178,7 +178,7 @@ def test_unknown_symbol_raises() -> None:
 
 Because `Tile` is frozen, sharing is invisible to clients.
 Nothing they can do to one cell's tile affects another,
-because nothing they can do affects the tile at all.
+because nothing they can do affects the tile.
 
 Remove `frozen=True` and the pattern fails.
 Mutate the grass tile in one cell and every grass cell

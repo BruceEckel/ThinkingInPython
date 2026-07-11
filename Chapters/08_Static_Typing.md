@@ -334,7 +334,7 @@ A `@classmethod` that ends with `return cls(...)` returns `Self`.
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrong type that slips past the checker behaves exactly as it would have with no hints at all.
+A wrong type that slips past the checker behaves exactly as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee, use `isinstance()` or a library built to validate data.
 The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
@@ -463,7 +463,7 @@ the lowercase built-ins. The forms above are the modern ones.
 ## Exercises
 
 1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
-    and pass an instance to `render()` without changing `Drawable` or `render()` at all.
+    and pass an instance to `render()` without changing `Drawable` or `render()`.
 2.  In `area.py`, remove the `# type: ignore` comment and run `ty check` on the file.
     Read the error, then restore the comment.
 3.  In `generics.py`, write a second generic function, `last[T](items: list[T]) -> T`,

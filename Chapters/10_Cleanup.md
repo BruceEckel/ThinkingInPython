@@ -66,10 +66,10 @@ Run `python cleanup.py` directly to see those lines appear.
 
 The order in which the three finalizers run is an unstable implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown, and it can differ from one CPython build to the next.
-That `__del__()` runs before the program exits at all is a reference-counting detail, not a guarantee.
+Whether `__del__()` runs before the program exits is a reference-counting detail, not a guarantee.
 The language does not promise when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
-could destroy the objects in a different order, or not run the finalizers before exit at all.
+could destroy the objects in a different order, or not run the finalizers before exit.
 
 Thus, leaning on `__del__()` is fragile because Python does not guarantee the timing.
 At interpreter shutdown, the globals a `__del__()` method refers to may already be gone.

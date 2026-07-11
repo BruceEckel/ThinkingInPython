@@ -531,7 +531,7 @@ Permanent objects like `None`, `True`, and small integers
 become *immortal*, a change that landed in 3.12 for every build
 but pays off most here, since it removes the one atomic operation
 every thread would otherwise contest.
-Their counts never change at all.
+Their counts never change.
 Mutable containers like dictionaries and lists carry individual
 locks, so two threads contend only when they touch the same
 container.

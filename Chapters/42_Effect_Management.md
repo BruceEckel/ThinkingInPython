@@ -91,7 +91,7 @@ To know the Effects that your function has, exceptions must be tracked as Effect
 A perfectly pure program computes something but never lets anyone see it.
 It reads nothing from its environment and changes nothing in its environment,
 so its result never reaches a screen, a file, a socket, or even the exit code the operating system checks.
-From outside the process, that program is indistinguishable from a program that computes nothing at all.
+From outside the process, that program is indistinguishable from a program that computes nothing.
 
 ```python
 # pure_and_pointless.py
@@ -248,7 +248,7 @@ The third approach removes the failure instead of handling it.
 [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
 makes illegal values impossible to construct.
 Give `run` a type that cannot hold zero,
-and `slope()` never needs to check for zero at all:
+and `slope()` never needs to check for zero:
 
 ```python
 # slope_nonzero.py

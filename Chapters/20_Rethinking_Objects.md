@@ -32,7 +32,7 @@ so the discipline later named the Liskov substitution principle fit naturally.
 and the only thing you do is send messages to objects, always late-bound.
 It was an emphatically dynamic,
 run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
-That style makes no substitutability promises at all.
+That style makes no substitutability promises.
 
 *C++* drew from Simula.
 Objects were optional, and it brought object-oriented programming,

@@ -1091,7 +1091,7 @@ The first argument is the starting point, the second is the step size (defaults 
 The chapter began by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.
-They never sense each other at all.
+They never sense each other.
 Even so, structure the agents never encode appears in the aggregate.
 This is *emergence*: global order arising from local rules that never mention it.
 The three simulations form a progression.

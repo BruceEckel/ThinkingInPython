@@ -348,7 +348,7 @@ Patching the function gives you the exact value you want.
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
 Better still, have the code accept a `random.Random` instance,
-so a test passes a seeded `random.Random(0)` and needs no patching at all:
+so a test passes a seeded `random.Random(0)` and needs no patching:
 
 ```python
 # dice_rng.py

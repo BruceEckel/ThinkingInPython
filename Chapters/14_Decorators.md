@@ -122,7 +122,7 @@ They bind the wrapper's arguments to the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
 Without `P` you would fall back to `*args: Any, **kwargs: Any`,
-and the wrapper would swallow any arguments at all,
+and the wrapper would swallow any arguments,
 discarding the signature the decorator is meant to preserve.
 
 ### Decorators That Take Arguments
