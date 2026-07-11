@@ -74,7 +74,8 @@ from functools import wraps
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        print(f"-> {func.__name__}{args}")  # type: ignore
+        arglist = ", ".join(repr(a) for a in args)
+        print(f"-> {func.__name__}({arglist})")  # type: ignore
         result = func(*args, **kwargs)
         print(f"<- {func.__name__} = {result!r}")  # type: ignore
         return result
@@ -181,7 +182,8 @@ class trace[**P, R]:
         update_wrapper(self, func)  # Copy __name__, __doc__, etc
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        print(f"-> {self.func.__name__}{args}")  # type: ignore
+        arglist = ", ".join(repr(a) for a in args)
+        print(f"-> {self.func.__name__}({arglist})")  # type: ignore
         result = self.func(*args, **kwargs)
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
         return result
@@ -315,7 +317,7 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
-#: -> greet('Bob',)
+#: -> greet('Bob')
 #: Hello, Bob
 #: Hello, Bob
 #: <- greet = 'Bob'

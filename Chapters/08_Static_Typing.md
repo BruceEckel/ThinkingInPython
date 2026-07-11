@@ -2,7 +2,7 @@
 
 C++ and Java require type declarations, and they check those types during compilation.
 The Python runtime checks types only when an operation is actually attempted.
-So far, we haven't used type declarations, which you might not miss on small programs.
+The examples up to this point have no type declarations, which you might not miss on small programs.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
 The Python runtime ignores type hints, as long as they are properly formed.
@@ -11,8 +11,8 @@ you must run a separate type-checking tool (this book uses [Astral's `ty`](https
 
 ## Gradual Typing
 
-You can type add hints one function at a time.
-Un-annotated code still works.
+You can add type hints one function at a time.
+Code without annotations still works.
 The checker treats it as the type `Any`, which is compatible with everything.
 Thus, typed and untyped code can coexist.
 This is *gradual typing*.
@@ -48,7 +48,7 @@ and `str | None` for "a string or nothing."
 
 ## Constants with Final
 
-Marking values `Final` catch accidental reassignments during type checking.
+Marking a value `Final` catches accidental reassignments during type checking.
 
 The naming convention shown earlier used ALL_CAPS to signal a constant,
 but that is only a hint to human readers.

@@ -11,7 +11,7 @@ class ShapeFactory:
     def add_factory(cls, kind: str, shape_factory: Any) -> None:
         cls.factories[kind] = shape_factory
 
-    # A Template Method:
+    # Build and cache each kind's factory on first request:
     @classmethod
     def create_shape(cls, kind: str) -> Shape:
         if kind not in cls.factories:

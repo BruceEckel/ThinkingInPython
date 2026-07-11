@@ -306,7 +306,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
 
 ## Exercises
 
-1.  In `find_factor.py`, call `find_factor(97)`.
+1.  In `loop_else.py`, call `find_factor(97)`.
     Predict whether the `for` loop's `else` clause runs before you check, then confirm.
 2.  Change `collatz_sequence()` in `while_loop.py` to also count how many times `n` is odd,
     and print that count alongside the step count.
@@ -315,6 +315,6 @@ as well as generator expressions and the functional tools `map()` and `filter()`
     Predict whether the output changes before running it,
     and explain why the order of two independent conditions, testing different values of `n`,
     does not matter here.
-4.  In `demo_exceptions.py`, add a call `demo_exceptions(1, 2)` (no error, and `b` is not zero)
+4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)` (no error, and `b` is not zero)
     and a call `demo_exceptions(1, "x")` (a `TypeError` that `except ValueError` does not catch).
     Run the second one and read the traceback that escapes.

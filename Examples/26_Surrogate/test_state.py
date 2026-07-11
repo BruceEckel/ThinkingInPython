@@ -1,5 +1,5 @@
 # test_state.py
-from state import StateD
+from state import Surrogate
 
 class StateA:
     def name(self) -> str:
@@ -10,7 +10,7 @@ class StateB:
         return "B"
 
 def test_state_delegates_and_change_swaps() -> None:
-    s = StateD(StateA())
+    s = Surrogate(StateA())
     assert s.name() == "A"
     s.change_to(StateB())
     assert s.name() == "B"

@@ -161,6 +161,10 @@ put the meaning in the type.
 A function like this is a *Total Function*: its return type accounts for every outcome it can produce, success or failure, with nothing left for an exception to sneak out through.
 Raise an exception instead, and the signature no longer tells the truth.
 A caller can't see the failure just by reading the return type.
+Python does not enforce totality.
+Nothing stops a `Result`-returning function from also raising an exception,
+so this is a discipline the author of the function maintains,
+not a guarantee the checker provides.
 
 Because failures are values, you can assert on them directly, with no `pytest.raises()`.
 The tests check `unwrap()`, and that `bind()` chains a success and short-circuits a failure:

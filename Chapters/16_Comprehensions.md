@@ -43,7 +43,7 @@ print(squared_ints)
 #: [1, 81, 0, 16]
 ```
 
-![](_images/listComprehensions)
+![The parts of a list comprehension: the input sequence, the iteration variable, the optional predicate, and the output expression](_images/listComprehensions)
 
 The comprehension has three parts:
 
@@ -103,7 +103,7 @@ an expression, and an `if` clause for the optional predicate.
 An identity matrix of size `n` is an `n` by `n` square matrix with ones on the main diagonal and zeros elsewhere.
 A 3 by 3 identity matrix is:
 
-![](_images/idMatrix)
+![A 3 by 3 identity matrix: ones on the main diagonal, zeros elsewhere](_images/idMatrix)
 
 In Python we can represent such a matrix by a list of lists,
 where each sub-list represents a row.

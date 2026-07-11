@@ -255,17 +255,30 @@ use, at the `json.dumps` and `Path(...)` calls.
 You can watch the deferral by importing a module whose body prints when it runs:
 
 ```python
-# The noisy module's top-level body prints when it executes
+# noisy.py
+
+print("noisy module loaded")
+
+def announce():
+    print("noisy.announce() called")
+```
+
+```python
+# lazy_noisy.py
 lazy import noisy
 
 print("before first use")
-noisy.announce()        # noisy's body runs here, on first access
+#: before first use
+noisy.announce()  # noisy's body runs here, on first access
+#: noisy module loaded
+#: noisy.announce() called
 print("after first use")
+#: after first use
 ```
 
 The body of `noisy` does not run at the `lazy import` line.
-It runs at `noisy.announce()`, the first access, so the output is
-`before first use`, then `noisy`'s own message, then `after first use`.
+It runs at `noisy.announce()`, the first access,
+which is why `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken, the error surfaces at that
 first use rather than at the import line.
 
@@ -284,6 +297,6 @@ command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
     and confirm the loading message prints only once no matter how many of the three you use together.
 2.  In `using_packages.py`, add a third import, `import a_package.module1` again, at the bottom of the file.
     Run it and explain why the "importing module1" message does not print a second time.
-3.  Write a small module `noisy2.py` whose top-level body prints a message, similar to the `noisy` module described in the text.
+3.  Write a small module `noisy2.py` whose top-level body prints a message, similar to `noisy.py` above.
     In a new script, `lazy import` both `noisy` and `noisy2`, then use `noisy2` before `noisy`.
     Confirm the two loading messages print in the order you used the modules, not the order you wrote the `lazy import` lines.

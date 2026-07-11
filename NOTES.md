@@ -21,6 +21,9 @@ Run 'make prose' on each chapter
 
 - Search feature on website?
 
+- Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better? Put the result
+  at the root in ADVERSARIAL.md
+
 /loop through the chapters in the book and look for correctness, style and voice issues.
 Fix any obvious issues, and put all the rest in CORRECTNESS_STYLE_AND_VOICE.md, demarking each chapter in the file.
 Do not give overviews or summaries or anything other than issues.

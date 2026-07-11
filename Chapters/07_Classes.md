@@ -199,8 +199,8 @@ If `Derived.show` does not actually override a method in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
 
-At runtime `@override` does nothing but return the method unchanged,
-so it validates that you've overridden the method correctly.
+At runtime `@override` does nothing but return the method unchanged.
+All the verification happens in the type checker, before the program runs.
 
 Apply `@override` to any method that replaces an inherited method,
 except constructors, which are undecorated by convention.
@@ -336,7 +336,7 @@ Define `__repr__()` on classes you debug.
 ## Static and Class Methods
 
 A method that doesn't use `self` can be a `@staticmethod`.
-A method needs the class rather than an instance can be a `@classmethod`.
+A method that needs the class rather than an instance can be a `@classmethod`.
 This receives the class as its first argument, conventionally named `cls`:
 
 ```python

@@ -25,6 +25,6 @@ def test_operations_dispatch_independently() -> None:
     # Nectar knows Gladiolus and Chrysanthemum; fragrance knows
     # Ranunculus. A Ranunculus falls to nectar's default but hits
     # fragrance's registered case.
-    runuculus = Ranunculus()
-    assert nectar(runuculus) == "Ranunculus: no nectar"
-    assert fragrance(runuculus) == "strong"
+    ranunculus = Ranunculus()
+    assert nectar(ranunculus) == "Ranunculus: no nectar"
+    assert fragrance(ranunculus) == "strong"

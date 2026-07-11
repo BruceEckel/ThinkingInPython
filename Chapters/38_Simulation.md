@@ -1030,7 +1030,7 @@ The tkinter view shows what the text version cannot: the collapse as it happens,
 and the pattern surviving a change of rules.
 Each grain keeps one color from a small palette,
 so you can watch individual grains mix while the collective figure forms.
-Every 400 frames the view switches the plate to a new mode.
+Every 200 frames the view switches the plate to a new mode.
 The old figure is suddenly parked on loud regions of the new field.
 It bursts back into chaos, mixes, and condenses into a different figure.
 The order was never a property of the grains.

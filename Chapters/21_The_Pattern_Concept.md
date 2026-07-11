@@ -37,7 +37,7 @@ Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
-(here, "vector" refers to the maximum gradient and not a container class).
+(here, "vector" means a direction of change, not a container class).
 This means finding the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,

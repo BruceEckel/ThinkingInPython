@@ -242,6 +242,6 @@ Generating the table from the formula, rather than writing all 36
 entries by hand, confirms the two agree everywhere while keeping the
 lookup itself trivial: `battle_table()` no longer calls any per-weapon
 logic, only indexes into a dictionary. This is
-[Multiple Dispatching](33_Multiple_Dispatching.md#one-type-or-many)'s
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)'s
 own conclusion: the table is both shorter to write and easier to
 audit for a ruleset that is fundamentally a fixed set of answers.

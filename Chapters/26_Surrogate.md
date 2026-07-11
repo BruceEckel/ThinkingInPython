@@ -171,7 +171,7 @@ along with a way to switch from one implementation to another during the lifetim
 # state.py
 from typing import Any
 
-class StateD:
+class Surrogate:
     def __init__(self, implementation: Any) -> None:
         self.__implementation = implementation
     def change_to(self, new_implementation: Any) -> None:
@@ -202,7 +202,7 @@ def run(b: Any) -> None:
     b.h()
     b.g()
 
-b = StateD(Implementation1())
+b = Surrogate(Implementation1())
 run(b)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
@@ -223,7 +223,7 @@ Testing hands the State surrogate a small stand-in and confirms calls reach the 
 
 ```python
 # test_state.py
-from state import StateD
+from state import Surrogate
 
 class StateA:
     def name(self) -> str:
@@ -234,7 +234,7 @@ class StateB:
         return "B"
 
 def test_state_delegates_and_change_swaps() -> None:
-    s = StateD(StateA())
+    s = Surrogate(StateA())
     assert s.name() == "A"
     s.change_to(StateB())
     assert s.name() == "B"
@@ -339,5 +339,7 @@ def test_proxy_counts_only_calls() -> None:
 ## Exercises
 
 1.  Create an example of the "virtual proxy."
-2.  Create an example of the "Smart reference" proxy where you keep count of the number of method calls to a particular object.
+2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally
+    in a `collections.Counter` instead of a single total.
+    Confirm the tally reports `f` called twice and `g` called once.
 3.  Create a simple copy-on-write implementation.

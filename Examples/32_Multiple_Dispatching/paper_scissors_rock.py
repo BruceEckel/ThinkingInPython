@@ -1,4 +1,5 @@
 # paper_scissors_rock.py
+import random
 from typing import Any
 from arena import duel, item_pair_gen
 from outcome import Outcome
@@ -50,6 +51,7 @@ class Rock(Item):
         return Outcome.DRAW
 
 if __name__ == "__main__":
+    random.seed(47)  # Reproducible pairs
     for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win

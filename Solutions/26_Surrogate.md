@@ -41,13 +41,11 @@ instance. This is the same `__getattr__()` delegation `proxy_2.py` and
 `counting_proxy.py` already use, just guarding the moment of creation
 instead of forwarding to an object that already exists.
 
-## 2. A smart reference: counting method calls
-
-`counting_proxy.py`, already shown in this chapter, is exactly this
-exercise:
+## 2. A per-method tally in the counting proxy
 
 ```python
 # exercise_2.py
+from collections import Counter
 from typing import Any
 
 class Implementation:
@@ -57,13 +55,13 @@ class Implementation:
 class CountingProxy:
     def __init__(self, impl: Any) -> None:
         self._impl = impl
-        self.calls = 0
+        self.calls: Counter[str] = Counter()
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self._impl, name)
         if callable(attr):
             def counted(*args: Any, **kwargs: Any) -> Any:
-                self.calls += 1
+                self.calls[name] += 1
                 return attr(*args, **kwargs)
             return counted
         return attr
@@ -72,19 +70,18 @@ p = CountingProxy(Implementation())
 p.f()
 p.g()
 p.f()
-print("calls:", p.calls)
+print(p.calls["f"], p.calls["g"])
 #: f()
 #: g()
 #: f()
-#: calls: 3
+#: 2 1
 ```
 
-Every method access through the proxy returns a wrapped callable that
-increments `self.calls` before forwarding to the real method, so
-`p.calls` tracks exactly how many method calls have passed through
-`p`, regardless of which method was called. A non-callable attribute
-passes straight through, uncounted, which is what
-`test_proxy_counts_only_calls()` in the chapter already checks.
+Where the chapter's version kept one total, this one tallies per
+method name. `__getattr__()` already receives the name being looked
+up, so the wrapper charges the count to that name before forwarding.
+The single `calls` integer becomes a `Counter`, and the report shows
+`f` called twice and `g` once.
 
 ## 3. A simple copy-on-write list
 

@@ -154,6 +154,10 @@ with no `__del__()` and no explicit cleanup call.
 A plain `dict` or `list` as the registry would keep every instance alive forever,
 so the count could never fall.
 The weak reference allows the registry to prune itself.
+The immediate drop in the count is CPython's reference counting at work.
+On an implementation with a tracing collector, such as PyPy,
+the entries disappear only when its collector runs,
+so the counts would not fall promptly.
 Unlike the `__del__()` version, this reads the count during normal execution,
 so it never depends on the unreliable bookkeeping at interpreter shutdown.
 

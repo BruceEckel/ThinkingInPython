@@ -158,8 +158,8 @@ A `@dataclass` reads the class-attribute declarations as a template and generate
 2.  In `class_var_inheritance.py`, add a third subclass `class Middle(Base): pass`
     (no override, like `Left`) and print `Middle.shared` alongside the others at each step.
     Confirm `Middle` tracks `Base` exactly like `Left` does.
-3.  In `real_defaults.py`, add a third instance, `b2 = B()`, after `b.x` has been changed some other way,
-    and confirm `b2.x` is still `100`, unaffected.
+3.  In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
+    Then create a second instance, `b2 = B()`, and confirm `b2.x` is still `100`, unaffected.
 4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`) class attribute instead,
     then have an instance assign to `self.total` directly and explain, using `vars()` as in `inside_objects.py`,
     what that assignment actually creates.

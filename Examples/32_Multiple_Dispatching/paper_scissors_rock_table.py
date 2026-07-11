@@ -1,4 +1,5 @@
 # paper_scissors_rock_table.py
+import random
 from typing import Any, Final
 from arena import duel, item_pair_gen
 from outcome import Outcome
@@ -30,6 +31,7 @@ OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
 }
 
 if __name__ == "__main__":
+    random.seed(47)  # Reproducible pairs
     for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win

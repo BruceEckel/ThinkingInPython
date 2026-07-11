@@ -612,8 +612,9 @@ Each worker interpreter holds its own GIL,
 so five of them run on five cores at once instead of taking turns.
 Unlike a process pool, there is only one process,
 so starting a worker is cheaper than starting a new interpreter
-process, though each interpreter still runs in its own memory space,
-and arguments and results still cross that boundary by copying.
+process. The interpreters share the process's memory,
+but each keeps its own isolated objects,
+so arguments and results still cross that boundary by copying.
 A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.

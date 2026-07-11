@@ -59,9 +59,6 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-# Seed for reproducibility
-random.seed(47)
-
 def item_pair_gen(base: type, n: int) -> Iterator[tuple[Any, Any]]:
     items = base.__subclasses__()
     for _ in range(n):
@@ -75,6 +72,7 @@ Here we demonstrate *Multiple Dispatching*:
 
 ```python
 # paper_scissors_rock.py
+import random
 from typing import Any
 from arena import duel, item_pair_gen
 from outcome import Outcome
@@ -126,6 +124,7 @@ class Rock(Item):
         return Outcome.DRAW
 
 if __name__ == "__main__":
+    random.seed(47)  # Reproducible pairs
     for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win
@@ -149,6 +148,7 @@ It can be more sensible to make the table explicit, like this:
 
 ```python
 # paper_scissors_rock_table.py
+import random
 from typing import Any, Final
 from arena import duel, item_pair_gen
 from outcome import Outcome
@@ -180,6 +180,7 @@ OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
 }
 
 if __name__ == "__main__":
+    random.seed(47)  # Reproducible pairs
     for item1, item2 in item_pair_gen(Item, 10):
         duel(item1, item2)
 #: Scissors <--> Paper : win

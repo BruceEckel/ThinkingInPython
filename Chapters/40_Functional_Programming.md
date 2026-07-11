@@ -810,9 +810,9 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 ### `zip_longest`
 
 Zips iterables of different lengths, filling the gaps instead of
-stopping at the shortest. The default filler is `None`, but
-`fillvalue` is a keyword-only argument, so a real value needs a
-distinct sentinel when `None` is itself a valid element:
+stopping at the shortest. The default filler is `None`.
+When `None` is itself a valid element,
+pass a distinct sentinel as the `fillvalue` keyword argument:
 
 ```python
 # itertools_zip_longest.py
@@ -1023,12 +1023,6 @@ the fixed player by one seat.
 With `n` players that produces `n - 1` rounds where no pair repeats,
 which is the best any schedule can do, since it uses up every one of
 the `n * (n - 1) / 2` possible pairs exactly once.
-Building it took a few honest wrong turns along the way.
-An odd roster left someone unpaired each round until the leftover
-student was folded into an existing pair instead, and the first way
-of choosing which pair kept favoring the same fixed player for a
-triple every single round, a bug that testing at larger roster sizes
-caught and a seeded random choice fixed.
 
 None of that trick survives a request for groups of three, four,
 or any other size.
@@ -1108,17 +1102,18 @@ for i, grouping in enumerate(trios):
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 ```
 
-Called with `size=2`, `group_rounds()` matches the specialized
-circle method exactly, `21` of `21` pairs covered in `14` repeat
-meetings, the same numbers the pairs-only version earned through
-several rounds of testing and fixing.
+Called with `size=2`, `group_rounds()` covers all `21` possible
+pairs across the seven rounds, at the cost of `14` repeat meetings.
+An odd roster cannot pair everyone,
+so each round folds the leftover player into an existing pair,
+and those triples are where the repeats come from.
 It does that with no rotation and no notion of a fixed player at
 all, just a shuffle and a greedy choice repeated until the roster
 runs out.
 Called with `size=3`, the same function schedules trios instead.
 Seven students do not split evenly into threes, so one group grows
-to four rather than leaving anyone out, the same "join instead of
-sit out" choice the pairs-only version made for its own leftover.
+to four rather than leaving anyone out,
+the same join-instead-of-sit-out choice the pair rounds made above.
 
 Generality cost something.
 The circle method needed no memory.

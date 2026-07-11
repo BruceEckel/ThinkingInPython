@@ -145,7 +145,10 @@ Tuples are fixed-length immutable records where each position has a distinct mea
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-Lookup computes a hash from each key, so keys must be immutable.
+Lookup computes a hash from each key, so keys must be *hashable*.
+The mutable built-in containers (`list`, `dict`, `set`) are not hashable,
+so they cannot serve as keys.
+Strings, numbers, and tuples can.
 
 ```python
 # dictionaries.py
@@ -433,19 +436,30 @@ except TypeError as e:
 
 Where a `MappingProxyType` is only a read-only window onto a `dict` that still
 exists and can change, a `frozendict` owns its contents outright.
-It runs under Python 3.15, though type checkers may need a release or two to
-recognize the new built-in:
+It runs under Python 3.15.
+Type checkers need a release or two to catch up with a new built-in,
+which is why this example carries `# type: ignore` comments:
 
 ```python
-prefs = frozendict(theme="dark", zoom=125)
-print(prefs["zoom"])         # 125
-prefs == frozendict(zoom=125, theme="dark")  # True; order ignored
-prefs["zoom"] = 150          # TypeError: item assignment unsupported
+# frozendict_demo.py
+
+prefs = frozendict(theme="dark", zoom=125)  # type: ignore
+print(prefs["zoom"])
+#: 125
+# Equal contents compare equal; entry order is ignored:
+print(prefs == frozendict(zoom=125, theme="dark"))  # type: ignore
+#: True
+try:
+    prefs["zoom"] = 150  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
 ```
 
 Because a `frozendict` cannot change, it is hashable, so like a `tuple` or a
 `frozenset` it can serve as a dictionary key or a set member.
-This is also why dictionary keys must be immutable.
+A dictionary key must be hashable rather than immutable.
+Immutability is how a container earns a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
 Neither you nor code you pass it to can modify an immutable container by accident,

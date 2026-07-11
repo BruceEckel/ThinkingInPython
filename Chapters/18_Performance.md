@@ -391,10 +391,9 @@ except AttributeError as e:
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
-print(f"frozen only:  {frozen_bytes} bytes")
-#: frozen only:  344 bytes
-print(f"frozen+slots: {slotted_bytes} bytes")
-#: frozen+slots: 48 bytes
+print(f"slots at least 5x smaller: "
+      f"{slotted_bytes * 5 < frozen_bytes}")
+#: slots at least 5x smaller: True
 ```
 
 If a class can be a data class,
@@ -410,7 +409,11 @@ But frozen enforces this by overriding `__setattr__()`.
 The instance still keeps a `__dict__` underneath.
 `slots=True` removes that `__dict__`,
 so pairing it with `frozen=True` is the natural default, giving you
-the same immutability at roughly a seven-to-one smaller instance.
+the same immutability in a fraction of the space
+(one machine measured 344 bytes against 48, roughly seven to one).
+The exact byte counts vary by platform and Python build,
+so the listing prints a comparison that holds anywhere
+rather than numbers that hold only here.
 
 ### Array Instead of List
 
@@ -440,10 +443,10 @@ packed = array("d", nums)
 list_bytes = sys.getsizeof(nums) + sum(
     sys.getsizeof(x) for x in nums
 )
-print(f"list:  {list_bytes:,} bytes")
-#: list:  325,176 bytes
-print(f"array: {sys.getsizeof(packed):,} bytes")
-#: array: 80,080 bytes
+array_bytes = sys.getsizeof(packed)
+print(f"array at least 3x smaller: "
+      f"{array_bytes * 3 < list_bytes}")
+#: array at least 3x smaller: True
 ```
 
 Every element shares one type, given by the type code,
@@ -451,7 +454,8 @@ so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing:
 the `list` holds an 8-byte pointer to a 24-byte `float` object
 per element, while the `array` spends 8 bytes per element total,
-roughly a four-to-one difference.
+roughly a four-to-one difference
+(one machine measured 325,176 bytes against 80,080).
 (`sys.getsizeof()` reports a `list`'s own size but not its elements',
 so the elements are summed separately.)
 

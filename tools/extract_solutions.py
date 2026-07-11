@@ -12,6 +12,10 @@ directly rather than duplicating them.
 Default mode is ``check``: compares against the committed ``SolutionsCode/``
 tree. Pass ``--write`` to materialize a tree (default ``build/solutions``).
 
+Both modes first verify that every ``Solutions/*.md`` stem matches a current
+``Chapters/*.md`` stem, so a chapter renumbering cannot silently leave the
+solutions carrying old chapter numbers.
+
 Usage:
     python tools/extract_solutions.py                # check vs SolutionsCode/
     python tools/extract_solutions.py --write         # write build/solutions/
@@ -30,6 +34,28 @@ COMMITTED_DIR = ROOT / "SolutionsCode"
 DEFAULT_OUT = BUILD_DIR / "solutions"
 
 
+def naming_problems() -> list[str]:
+    """Solutions stems that do not match a current Chapters stem.
+
+    Matches by full stem first, then by title (the stem after the
+    numeric prefix) to say which chapter number a stale file should
+    carry now.
+    """
+    chapter_stems = {p.stem for p in (ROOT / "Chapters").glob("*.md")}
+    by_title = {s.partition("_")[2]: s for s in chapter_stems}
+    problems: list[str] = []
+    for path in sorted(SOLUTIONS_DIR.glob("*.md")):
+        if path.stem in chapter_stems:
+            continue
+        expected = by_title.get(path.stem.partition("_")[2])
+        if expected:
+            problems.append(
+                f"{path.name}: chapter is now {expected}.md")
+        else:
+            problems.append(f"{path.name}: no matching chapter")
+    return problems
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -40,6 +66,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
                     help=f"output dir for --write (default: {DEFAULT_OUT.name})")
     args = ap.parse_args(argv)
+
+    stale = naming_problems()
+    if stale:
+        print(f"{len(stale)} Solutions file(s) out of step with "
+              "Chapters/ numbering:")
+        for problem in stale:
+            print(f"  ! {problem}")
+        return 1
 
     result = extract(markdown_dir=SOLUTIONS_DIR)
     print(f"Scanned {SOLUTIONS_DIR.name}: "

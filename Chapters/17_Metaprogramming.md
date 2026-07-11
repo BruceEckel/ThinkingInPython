@@ -87,9 +87,9 @@ print(ml)
 print(ml.x)
 #: 42
 ml.howdy("John")
+#: Howdy, John
 
 print(ml.__class__.__class__)
-#: Howdy, John
 #: <class 'type'>
 ```
 

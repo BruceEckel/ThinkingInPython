@@ -10,7 +10,7 @@ def greet(name: str) -> str:
 
 if __name__ == "__main__":
     greet("Bob")
-#: -> greet('Bob',)
+#: -> greet('Bob')
 #: Hello, Bob
 #: Hello, Bob
 #: <- greet = 'Bob'

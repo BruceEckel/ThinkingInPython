@@ -1,7 +1,7 @@
 # state.py
 from typing import Any
 
-class StateD:
+class Surrogate:
     def __init__(self, implementation: Any) -> None:
         self.__implementation = implementation
     def change_to(self, new_implementation: Any) -> None:
@@ -32,7 +32,7 @@ def run(b: Any) -> None:
     b.h()
     b.g()
 
-b = StateD(Implementation1())
+b = Surrogate(Implementation1())
 run(b)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.

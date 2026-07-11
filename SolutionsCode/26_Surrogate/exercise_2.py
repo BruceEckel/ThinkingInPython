@@ -1,4 +1,5 @@
 # exercise_2.py
+from collections import Counter
 from typing import Any
 
 class Implementation:
@@ -8,13 +9,13 @@ class Implementation:
 class CountingProxy:
     def __init__(self, impl: Any) -> None:
         self._impl = impl
-        self.calls = 0
+        self.calls: Counter[str] = Counter()
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self._impl, name)
         if callable(attr):
             def counted(*args: Any, **kwargs: Any) -> Any:
-                self.calls += 1
+                self.calls[name] += 1
                 return attr(*args, **kwargs)
             return counted
         return attr
@@ -23,8 +24,8 @@ p = CountingProxy(Implementation())
 p.f()
 p.g()
 p.f()
-print("calls:", p.calls)
+print(p.calls["f"], p.calls["g"])
 #: f()
 #: g()
 #: f()
-#: calls: 3
+#: 2 1

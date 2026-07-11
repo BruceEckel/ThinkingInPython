@@ -249,8 +249,9 @@ The default must stay open, so wrapping `sys.stdout` in `nullcontext` lets a sin
 import sys
 from contextlib import nullcontext
 from io import StringIO
+from typing import IO
 
-def emit(lines: list[str], out: StringIO | None = None) -> None:
+def emit(lines: list[str], out: IO[str] | None = None) -> None:
     manager = out if out is not None else nullcontext(sys.stdout)
     with manager as stream:
         for line in lines:

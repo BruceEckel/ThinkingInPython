@@ -37,7 +37,6 @@ except AttributeError as e:
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
-print(f"frozen only:  {frozen_bytes} bytes")
-#: frozen only:  344 bytes
-print(f"frozen+slots: {slotted_bytes} bytes")
-#: frozen+slots: 48 bytes
+print(f"slots at least 5x smaller: "
+      f"{slotted_bytes * 5 < frozen_bytes}")
+#: slots at least 5x smaller: True

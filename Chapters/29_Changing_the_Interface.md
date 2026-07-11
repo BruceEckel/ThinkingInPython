@@ -199,4 +199,9 @@ what a module already gives you.
 
 ## Exercises
 
-1.  Create an adapter class that automatically loads a two-dimensional array of objects into a dictionary as key-value pairs.
+1.  Write a `PairsAdapter` that wraps a list of `(key, value)` tuples,
+    following the shape of `getattr_adapter.py`.
+    Give it a dictionary-style `__getitem__()` that finds a value by key,
+    and forward every other attribute to the wrapped list with `__getattr__()`.
+    Confirm `adapter["name"]` finds a value
+    while `adapter.append(...)` still reaches the underlying list.

@@ -20,7 +20,7 @@ packed = array("d", nums)
 list_bytes = sys.getsizeof(nums) + sum(
     sys.getsizeof(x) for x in nums
 )
-print(f"list:  {list_bytes:,} bytes")
-#: list:  325,176 bytes
-print(f"array: {sys.getsizeof(packed):,} bytes")
-#: array: 80,080 bytes
+array_bytes = sys.getsizeof(packed)
+print(f"array at least 3x smaller: "
+      f"{array_bytes * 3 < list_bytes}")
+#: array at least 3x smaller: True

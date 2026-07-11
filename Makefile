@@ -19,7 +19,7 @@ DOCS ?= Chapters
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -262,6 +262,12 @@ spell-add:  ## Accept every spellcheck-unknown word into wordlist.txt, sorted (r
 # Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
 prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
 	$(VALE) $(PROSE_FILES)
+
+# Advisory only, and deliberately not part of `verify` or `ci`: the network
+# is flaky and a dead external site should never block a build. Run it now
+# and then to catch link rot; check_anchors.py covers internal links.
+links:  ## Check the book's external URLs for link rot (advisory, needs network)
+	$(PY) tools/check_links.py
 
 ##@ Style gates
 

@@ -63,6 +63,15 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
+Starting the engine from the constructor carries a trap.
+`run()` calls methods the subclass supplies,
+so a subclass that defines its own `__init__()` must finish its setup
+before it calls `super().__init__()`.
+Call it first, in the usual style,
+and the engine runs against half-initialized state.
+A framework that separates construction from starting,
+with an explicit `run()` call by the client, avoids the trap entirely.
+
 This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
 A subclass must work wherever code expects its base class.
 The base `run()` calls `customize1()` and `customize2()` through `self`,

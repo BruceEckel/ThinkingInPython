@@ -61,15 +61,15 @@ An unlinked name means the pattern appears only in this catalog.
 | Monitor Object | Serialize access so only one method runs on an object at a time. |
 | Half-Sync/Half-Async | Separate synchronous and asynchronous work, joined by a queue. |
 | Leader/Followers | Let a pool of threads take turns receiving and handling events. |
-| Thread Pool | Reuse a fixed set of worker threads across many tasks. |
+| [Thread Pool](19_Concurrency.md#the-gil-and-free-threading) | Reuse a fixed set of worker threads across many tasks. |
 | Reactor | Dispatch incoming requests to handlers synchronously as they arrive. |
 | Proactor | Dispatch the completion of asynchronous operations to handlers. |
-| Producer-Consumer | Decouple work creation from processing through a shared queue. |
+| [Producer-Consumer](19_Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | Read-Write Lock | Allow concurrent readers but exclusive writers. |
 | Double-Checked Locking | Cut locking cost when lazily initializing a shared resource. |
 | Guarded Suspension | Block a call until a precondition becomes true. |
 | Balking | Refuse an action when the object is not in a suitable state. |
-| Future / Promise | Represent a result that will become available later. |
+| [Future / Promise](19_Concurrency.md#parallelism) | Represent a result that will become available later. |
 | Thread-Specific Storage | Give each thread its own copy of a value. |
 
 ## Architectural (POSA)
@@ -80,7 +80,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Pipes and Filters | Process a stream through a chain of independent transforms. |
 | [Blackboard](38_Simulation.md) | Let independent components cooperate through a shared data store. |
 | Broker | Coordinate requests and replies between distributed components. |
-| Model-View-Controller | Separate data, presentation, and input handling. |
+| [Model-View-Controller](30_Observer.md#a-visual-example-of-observers) | Separate data, presentation, and input handling. |
 | Presentation-Abstraction-Control | Build interactive systems from cooperating agents, each split three ways. |
 | Microkernel | Keep a minimal core and add capability through plug-ins. |
 | Reflection | Let a program inspect and adjust its own structure at runtime. |
@@ -99,12 +99,12 @@ An unlinked name means the pattern appears only in this catalog.
 | Identity Map | Load each object only once per session. |
 | Lazy Load | Defer loading data until it is actually needed. |
 | [Data Transfer Object](22_Data_Transfer_Objects.md) | Carry data between processes in one batched object. |
-| Value Object | A small immutable object compared by value, not identity. |
+| [Value Object](12_Data_Classes_as_Types.md#immutability) | A small immutable object compared by value, not identity. |
 | Service Layer | Define an application boundary as a set of operations. |
 | Gateway | Wrap access to an external system behind a simple interface. |
 | Front Controller | Funnel all requests through a single handler. |
 | Money | Represent monetary amounts together with their currency. |
-| Special Case | Supply a subclass for a special case instead of scattering null checks. |
+| [Special Case](20_Rethinking_Objects.md#null-object) | Supply a subclass for a special case instead of scattering null checks. |
 | [Registry](27_Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
 | Plugin | Choose behavior with classes named at configuration time. |
 
@@ -114,7 +114,7 @@ An unlinked name means the pattern appears only in this catalog.
 |---------|--------|
 | Message Channel | Connect senders and receivers through a logical pipe. |
 | Message | A packet of data sent over a channel. |
-| Publish-Subscribe Channel | Broadcast a message to every interested subscriber. |
+| [Publish-Subscribe Channel](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type) | Broadcast a message to every interested subscriber. |
 | Point-to-Point Channel | Deliver a message to exactly one receiver. |
 | Message Router | Send a message to a destination chosen at runtime. |
 | Content-Based Router | Route by inspecting the message content. |
@@ -148,13 +148,13 @@ An unlinked name means the pattern appears only in this catalog.
 | [Null Object](20_Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | Multiton | Manage a fixed set of named singletons. |
-| Dependency Injection | Supply an object's collaborators from outside it. |
+| [Dependency Injection](11_Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
 | Inversion of Control | Let a framework call your code rather than the reverse. |
 | Service Locator | Look up dependencies through a central registry. |
 | [Resource Acquisition Is Initialization](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
-| Fluent Interface | Chain method calls that return the receiver for readable APIs. |
+| [Fluent Interface](27_Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](41_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Function Object](28_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |

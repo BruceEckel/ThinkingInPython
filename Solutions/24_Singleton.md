@@ -100,7 +100,7 @@ change is what that one object *is*: instead of holding a single
 value, it holds a fixed collection of `Connection`s and tracks which
 are checked out. `acquire()` and `release()` replace the "get the
 instance" idea with "borrow one member of a pool and give it back,"
-similar in spirit to [Context Managers](16_Context_Managers.md#an-object-pool)'s
+similar in spirit to [Context Managers](15_Context_Managers.md#an-object-pool)'s
 `Pool.lease()`, but without the automatic return a context manager
 guarantees; here a caller must remember to call `release()`.
 

@@ -95,5 +95,5 @@ generator's body only runs as far as the next `yield` each time
 something asks it for a value. `islice(..., 10)` asks for exactly ten,
 so only the first ten iterations of `fibonacci()`'s loop ever run; the
 other 999,990 are never computed, the same laziness
-[Comprehensions](17_Comprehensions.md#generator-expressions) and
-[Performance](19_Performance.md) both rely on.
+[Comprehensions](16_Comprehensions.md#generator-expressions) and
+[Performance](18_Performance.md) both rely on.

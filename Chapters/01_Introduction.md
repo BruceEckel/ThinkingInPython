@@ -100,7 +100,7 @@ This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know, or skip it altogether.
 
 *Techniques* covers the idioms and tools that give Python its character:
-testing, data classes as types, pattern matching, functional error handling,
+testing, data classes as types, pattern matching,
 decorators, comprehensions, and metaprogramming.
 Many of these chapters came from presentations I've given, mostly at PyCon.
 
@@ -111,6 +111,12 @@ each reframed for Python and weighed against the language.
 I consistently ask what problem we are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 
+*Effects* closes the book with the functional perspective:
+pure functions, errors returned as values instead of raised exceptions,
+and systems that track a function's effects in its type.
+The final chapter looks at languages that already do this,
+and asks what Python could adopt.
+
 ## The Examples
 
 The book targets Python 3.15 and later, uses type hints throughout, and tests with `pytest`.
@@ -120,7 +126,7 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/15_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/14_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The tooling extracts the book examples,
@@ -136,11 +142,12 @@ See `CONTRIBUTING.md` in the source repository.
 Most chapters end with a short "Exercises" section.
 These are meant for a workshop, worked in pairs at a keyboard,
 not left for solitary homework.
-Each one asks you to change a small, already-working example from that chapter
+Most ask you to change a small, already-working example from that chapter
 and observe the result:
 add a class, break an invariant on purpose, extend a table, rewrite one function two ways.
-None of them need a large new program.
 The point is to touch the code, predict what will happen, then run it and check.
+A few chapters in the Patterns part keep larger exercises,
+where a pattern only shows its value in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository,
 one file per chapter, alongside a short explanation of what each exercise demonstrates.

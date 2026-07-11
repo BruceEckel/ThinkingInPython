@@ -46,7 +46,7 @@ a default argument (`name: str = name`), which freezes that
 particular loop iteration's value; without it, every wrapper would
 share the loop variable's final value instead of its own method's
 name, the classic late-binding closure trap. This is
-[Decorating Classes](15_Decorators.md#decorating-classes)'s
+[Decorating Classes](14_Decorators.md#decorating-classes)'s
 `register` idea taken further: instead of only recording the class,
 this decorator reaches inside it and rewrites every method.
 

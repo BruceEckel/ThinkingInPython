@@ -42,7 +42,7 @@ For example, suppose your function reads the time of day, or a random number.
 This doesn't change anything in the environment.
 However, the result of your function is almost certainly going to be different from one call to the next.
 If you incorporate any information other than the function arguments, your function becomes impure.
-This is usually involves I/O: the time of day, a random number, a database or network read.
+This usually involves I/O: the time of day, a random number, a database or network read.
 But it can also be as simple as reading a variable that's global to your function.
 These are called *side causes* (corresponding to side effects) or *implicit inputs*.
 
@@ -111,7 +111,7 @@ print(f"burned real CPU time for nothing: {busy > idle * 100}")
 #: burned real CPU time for nothing: True
 ```
 
-Neither `compute_and_discard()` and `do_nothing()` produce anything.
+Neither `compute_and_discard()` nor `do_nothing()` produces anything.
 No prints, writes, or returns; nothing a caller can act on.
 But `compute_and_discard()` still takes measurably longer to run,
 because Python cannot tell that the work is worthless, and skip it.
@@ -141,7 +141,7 @@ That phase produces parallelism, caching, and easy testing for the pure part.
 The next phase subdivides the impure portion, and each subdivision produces its own benefit:
 
 - **Exceptions** become data, via [Functional Error Handling](41_Functional_Error_Handling.md).
-  Failures turns into a values the type checker can see,
+  Failures turn into values the type checker can see,
   and a test checks for a `Failure` as easily as a `Success`.
 - **Side causes** become replaceable inputs.
   A test substitutes a fixed clock for the real one, or a seeded generator for true randomness,
@@ -425,8 +425,7 @@ The body looks like ordinary sequential code.
 The compiler observes what you call and tracks the Effects,
 the same way it tracks whether a value is an integer or a string.
 
-The examples in this section and the next come from my research repository
-[Understanding Effects](https://github.com/BruceEckel/Understanding_Effects),
+The examples in this section and the next come from my research,
 which builds the same small programs in four Effect-managing languages.
 
 Here is the greeting program in [Koka](https://koka-lang.github.io/),
@@ -512,7 +511,7 @@ Instead of writing a computation and letting the compiler observe its Effects,
 you build a *description* of a computation, and execute the description later.
 
 Here is "Hello, World!" in Scala using the [ZIO](https://zio.dev/) library:
-[[Does this compile?]]
+
 ```scala
 import zio._
 import zio.Console.printLine

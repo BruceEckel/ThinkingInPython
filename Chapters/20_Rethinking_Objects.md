@@ -26,13 +26,13 @@ a system is a set of things that interact.
 Notably, not everything was an object.
 Simula still had standalone functions.
 It was a compiled, statically typed language,
-so the Liskov substitution principle fit naturally.
+so the discipline later named the Liskov substitution principle fit naturally.
 
 *Smalltalk* took the other road: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
 It was an emphatically dynamic,
 run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
-That is the opposite of Liskov substitution.
+That style makes no substitutability promises at all.
 
 *C++* drew from Simula.
 Objects were optional, and it brought object-oriented programming,
