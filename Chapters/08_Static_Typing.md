@@ -1,19 +1,24 @@
 # Static Typing
 
-C++ and Java make require type declarations,
-and they check those types during compilation.
+C++ and Java require type declarations, and they check those types during compilation.
 The Python runtime checks types only when an operation is actually attempted.
-So far, we haven't used type declarations.
-
-On a small program you do not miss the declarations.
-On a large program, type errors that C++ or Java would catch only appear when the code runs.
+So far, we haven't used type declarations, which you might not miss on small programs.
 
 Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
-The Python runtime ignores properly formed type hints.
-If you want the equivalent of a compiler in a typed language,
+The Python runtime ignores type hints, as long as they are properly formed.
+If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
 
-You can put type hints on some elements and not others, so you can opt in only as much as it pays off.
+## Gradual Typing
+
+You can type add hints one function at a time.
+Un-annotated code still works.
+The checker treats it as the type `Any`, which is compatible with everything.
+Thus, typed and untyped code can coexist.
+This is *gradual typing*.
+You can slowly add hints where they earn their keep: the public interfaces,
+the tricky data, the code on which other people depend.
+An explicit `Any` indicates that a value is truly dynamic.
 
 ## Type Hints
 
@@ -43,11 +48,12 @@ and `str | None` for "a string or nothing."
 
 ## Constants with Final
 
+Marking values `Final` catch accidental reassignments during type checking.
+
 The naming convention shown earlier used ALL_CAPS to signal a constant,
 but that is only a hint to human readers.
-`Final` makes it a hint the type checker enforces.
-If you reassign a `Final`, the checker reports it,
-even though the Python runtime allows the assignment.
+At runtime, a `Final` is still a variable,
+but attempts to reassign it produce type-checking errors:
 
 ```python
 # final_constants.py
@@ -62,19 +68,8 @@ print(MAX_RETRIES, GREETING)
 #: 3 hello
 ```
 
-You can give the type explicitly, as in `Final[str]`,
+You can give the type explicitly, as in `GREETING`,
 or let the checker infer it from the value, as with `MAX_RETRIES`.
-Marking values `Final` catches accidental reassignments immediately.
-
-## Gradual Typing
-
-You can add hints one function at a time. The unannotated code keeps working.
-The checker treats whatever it cannot see as the type `Any`,
-which is compatible with everything, so typed and untyped code live together.
-This is *gradual typing*.
-You can slowly add hints where they earn their keep: the public interfaces,
-the tricky data, the code on which other people depend.
-When a value is truly dynamic, `Any` shows that you mean it to be.
 
 ## The Checker: `ty`
 
@@ -90,7 +85,7 @@ The build runs `ty` on every change, so the code you read here checks as well as
 
 ## Catching Mistakes
 
-The goal is to discover mistakes before the program runs.
+Type checking discovers mistakes before the program runs.
 Consider:
 
 ```python
@@ -121,13 +116,13 @@ If it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
 Instead of waiting until the program is running,
-a type checker verifies ahead of time that an object has the required *shape*,
-which means the methods and attributes required by whatever consumes that type.
+a type checker verifies ahead of time that an object has the required *shape*.
+"Shape" means the methods and attributes required by that type's consumer.
 Dynamic typing and structural typing are the same idea checked at different moments.
 Dynamic typing trusts the object when the code runs.
 Structural typing proves the shape before the code runs.
 
-A *Protocol* expresses that shape.
+A *Protocol* expresses shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
 A `Protocol` instead describes a required shape.
 Any object with that shape qualifies, without inheriting from a base class:
@@ -158,14 +153,17 @@ print(render(Square()))
 
 `Circle` and `Square` never mention `Drawable`.
 The checker accepts both because each has a `draw()`, so they are of the right shape.
+
+`Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
-Python preserves the flexibility of dynamic typing but gains the early warning of static types.
+Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
 
 ## Classes as Values: `type[...]` {#classes-as-values-type}
 
 A class is itself a value.
 You can pass it to a function, store it in a variable, and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
+
 A plain `SomeType` annotation means an *instance* of `SomeType`.
 The form `type[SomeType]` means the class object itself, or any subclass of it.
 `type[C]` annotates the class, not an instance:
@@ -194,7 +192,7 @@ This is the construct functions like `issubclass()` work with, since they compar
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
-An annotation can grow until it obscures what it means.
+An annotation can grow to the point of obscurity.
 `dict[tuple[int, int], str]` is precise, but it does not say what it means.
 The *type statement* gives the annotation a name:
 
@@ -217,8 +215,9 @@ A `type` alias is a new name, not a new type.
 so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate,
 use `NewType`, listed in the summary below.)
+
 An alias can also name a union.
-[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) writes
+[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) uses
 `type Shape = Circle | Square` to define a closed set of alternatives
 that a `match` can check exhaustively.
 
