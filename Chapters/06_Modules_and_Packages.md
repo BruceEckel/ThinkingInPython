@@ -1,6 +1,6 @@
 # Modules and Packages
 
-Each Python file is a namespaced *module* that you can use inside another Python file by *importing* it.
+Each Python file is a namespaced *module* you can `import` into another Python file.
 If the file is in the same directory, you can use an unqualified `import` statement:
 
 ```python
@@ -51,7 +51,6 @@ import use_module
 #: 'module' imported
 ```
 
-If you run `python import_module.py`, you should only see `'module' imported`.
 Importing `use_module` runs its top-level code, including the `print()`,
 but not its `"__main__"` block.
 
@@ -89,7 +88,7 @@ Typically, there's no executable code in `__init__.py`.
 It is only there to flag the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to have named the file `__package__.py`.]
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
-so this book always uses one.
+so this book uses one by default.
 
 To demonstrate, we'll create a directory called `a_package` and give it an `__init__.py` containing nothing but a comment:
 
@@ -272,8 +271,7 @@ first use rather than at the import line.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
-and neither `lazy from module import *` nor a `lazy from __future__` import is
-allowed.
+and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
 To make every import lazy without editing source, use the `-X lazy_imports`
 command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
 
