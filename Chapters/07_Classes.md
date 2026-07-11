@@ -1,6 +1,6 @@
 # Classes
 
-Like most things in Python, class definitions use minimal syntax.
+Class definitions use minimal syntax.
 You start with the `class` keyword followed by the class name and a colon.
 Use `def` to create methods inside the indented class body:
 
@@ -171,7 +171,7 @@ as long as the `obj` argument has a `show()`.
 
 When you override a method, nothing requires the name to match a method in the base class.
 A typo, or a base method that someone later renames or removes,
-silently produces a *new* method instead of an override.
+silently produces a new method instead of an override.
 This bug is easy to miss.
 
 The `@override` decorator from the `typing` module closes that gap.
@@ -296,15 +296,13 @@ print(n.total)  # Second access: stored value, no recomputation
 #: 30
 ```
 
-The first access runs the method. The second answers silently
-from the stored value.
-The attribute is *lazy*, created on first use,
-so an instance that never asks never pays.
-Pattern catalogs call this *Lazy Initialization*,
-and in Python it is one decorator.
+The first access runs the method.
+The second access produces the same result from the stored value.
+The attribute is *lazily initialized*, created on first use,
+so there's no cost if the attribute is not accessed.
 The stored value lives on the instance.
 `del n.total` discards it, and the next access recomputes.
-That is also the caution.
+
 `cached_property` trades freshness for speed,
 so if `n.values` changed, `total` would be stale.
 A plain `@property` recomputes every time and is never wrong.
@@ -337,9 +335,9 @@ Define `__repr__()` on classes you debug.
 
 ## Static and Class Methods
 
-A method that ignores `self` can be a `@staticmethod`.
-One that needs the class rather than an instance can be a `@classmethod`,
-which receives the class as its first argument, conventionally named `cls`:
+A method that doesn't use `self` can be a `@staticmethod`.
+A method needs the class rather than an instance can be a `@classmethod`.
+This receives the class as its first argument, conventionally named `cls`:
 
 ```python
 # class_methods.py
@@ -400,7 +398,7 @@ Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
-but composition, mixins, or a plain module-level function are almost always the clearer choice.
+but composition, mixins, or a plain module-level function are almost always a clearer choice.
 You will rarely, if ever, want this in your own code.
 
 ## Exercises
