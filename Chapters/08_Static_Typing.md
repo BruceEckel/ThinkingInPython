@@ -339,7 +339,7 @@ Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee, use `isinstance()` or a library built to validate data.
 The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
-which is useful at the edges of a program where untrusted input comes in.
+which is useful at the edges of a program where untrusted input enters.
 The hints themselves are for the tools and for the reader.
 
 ## Type Hint Summary
@@ -360,7 +360,7 @@ types come from `collections.abc`.
 | `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in scalar types |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
-| `Any` | Opts out of checking; compatible with every type |
+| `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
 | `Never`, `NoReturn` | A function that never returns (it always raises or exits) |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
@@ -368,54 +368,54 @@ types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous, mutable collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]` |
-| `dict[K, V]` | A dictionary with keys `K` and values `V` |
-| `tuple[A, B]` | A fixed-length tuple (here a pair) |
-| `tuple[T, ...]` | A variable-length tuple of `T` |
-| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant*, so `list[Circle]` satisfies `Sequence[Shape]` |
+| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous, mutable collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Type Hints](#type-hints) |
+| `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
+| `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
+| `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
+| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant*, so `list[Circle]` satisfies `Sequence[Shape]`, see [Iterators](23_Iterators.md#iteration-is-built-in) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
-| `type[C]` | The class object `C` itself, not an instance |
+| `type[C]` | The class object `C` itself, not an instance, see [Classes as Values](#classes-as-values-type) |
 
 ### Unions, optionals, and literals
 
 | Construct | Meaning |
 |-----------|---------|
-| `X` \| `Y` | A *union*: either type |
-| `X` \| `None` | *Optional*: `X` or `None` |
-| `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]` |
+| `X` \| `Y` | A *union*: either type, see [Type Hints](#type-hints) |
+| `X` \| `None` | *Optional*: `X` or `None`, see [Type Hints](#type-hints) |
+| `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
 ### Aliases and distinct types
 
 | Construct | Meaning |
 |-----------|---------|
-| `type Name = ...` | A *type alias* for a longer type, e.g. `type Grid = dict[tuple[int, int], str]` |
-| `NewType("Id", int)` | A distinct type that is `int` at runtime but separate to the checker |
+| `type Name = ...` | A *type alias* for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
+| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
 ### Constants and class variables
 
 | Construct | Meaning |
 |-----------|---------|
-| `Final`, `Final[T]` | A name the checker will not let you reassign |
-| `ClassVar[T]` | A class-level attribute, not one per instance |
+| `Final`, `Final[T]` | A name the checker will not let you reassign, see [Constants with Final](#constants-with-final) |
+| `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) |
 
 ### Generics
 
 | Construct | Meaning |
 |-----------|---------|
-| `def f[T](x: T) -> T` | A generic function (the type parameter varies per call) |
-| `class Box[T]` | A generic class |
-| `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter |
-| `TypeVar`, `Generic[T]` | The pre-3.12 way to write the two above |
-| `**P` (`ParamSpec`) | Captures a callable's whole parameter list, for decorators |
+| `def f[T](x: T) -> T` | A generic function (the type parameter varies per call), see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `class Box[T]` | A generic class, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `TypeVar`, `Generic[T]` | The pre-3.12 way to write the two above, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `**P` (`ParamSpec`) | Captures a callable's whole parameter list, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
 ### Structural typing
 
 | Construct | Meaning |
 |-----------|---------|
-| `Protocol` | A required shape (methods and attributes), satisfied without inheritance |
-| `@runtime_checkable` | Allows `isinstance()` against a `Protocol` |
+| `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
+| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [Surrogate](26_Surrogate.md#proxy) |
 
 ### Dictionary and record shapes
 
@@ -423,7 +423,7 @@ types come from `collections.abc`.
 |-----------|---------|
 | `TypedDict` | A dict with specific keys and value types |
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
-| `NamedTuple` | A typed, named tuple class |
+| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions) |
 
 ### Type narrowing
 
@@ -435,7 +435,7 @@ types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `Self` | The enclosing class type; handy for fluent methods and alternative constructors |
+| `Self` | The enclosing class type; handy for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
 | `"Name"` | A *forward reference*: a not-yet-defined type, written as a string |
 
 ### Typing decorators and directives
@@ -444,10 +444,10 @@ types come from `collections.abc`.
 |-----------|---------|
 | `@overload` | Several typed signatures for one function |
 | `@override` | Declares a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
-| `@final` | Forbids subclassing the class, or overriding the method |
-| `cast(T, x)` | Tells the checker to treat `x` as `T` |
-| `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids |
-| `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports |
+| `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Metaprogramming.md#making-a-class-final) |
+| `cast(T, x)` | Tells the checker to treat `x` as `T`, see [Flyweight](35_Flyweight.md#intrinsic-and-extrinsic-state) |
+| `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
+| `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports, see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
 The runtime ignores all of these. They exist for the checker and the reader.
 Older code spells some of them differently: `Optional[X]` for `X | None`,
