@@ -223,10 +223,15 @@ that a `match` can check exhaustively.
 
 ## Generic Functions and Classes {#generic-functions-and-classes}
 
-A function that returns the first element of a list works for any element type.
-The type that goes in is the type that comes out.
-An annotation of `Any` would accept everything but lose that connection.
-A *type parameter* keeps it.
+Consider a function that returns the first element of a list.
+This function can be applied to a list holding any type.
+A useful annotation would say that the return type matches the list's element type, whatever that type is.
+
+`Any` cannot express that connection.
+It accepts any list, but the returned value doesn't express the type held by the list.
+
+A *type parameter* correctly specifies the returned type.
+The type held by the list is the type the function returns.
 Declare the parameter in square brackets after the function name:
 
 ```python
@@ -235,17 +240,17 @@ Declare the parameter in square brackets after the function name:
 def first[T](items: list[T]) -> T:
     return items[0]
 
-n = first([10, 20, 30])  # Here T is int
+n = first([10, 20, 30])  # T is int
 print(n + 1)
 #: 11
-s = first(["a", "b"])    # Here T is str
+s = first(["a", "b"])    # T is str
 print(s.upper())
 #: A
 ```
 
 `T` is a placeholder, filled in separately at each call.
 The checker infers `T` from the argument and then knows the return type.
-That is why both `n + 1` and `s.upper()` check, while `n.upper()` would not.
+Both `n + 1` and `s.upper()` are successful, while `n.upper()` would fail the type check.
 
 A class declares type parameters the same way:
 
@@ -268,19 +273,21 @@ Constructing `Box("gift")` fixes `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
+
+A special form, `**P`, captures the types of an entire parameter list.
+[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses this
+to give a wrapper the same signature as the function it wraps.
+
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you will still see in older code.
-A special form, `**P`, captures a whole parameter list.
-[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses it
-to give a wrapper the same signature as the function it wraps.
 
 ## The `Self` Return Type {#the-self-type}
 
-A method that returns its own instance lets calls chain.
-What should its return annotation be?
+A method that returns its own instance allows call chaining.
+What should the type annotation be?
 Naming the enclosing class works until someone inherits from it.
 `Self` means "an instance of the class you called this method on,"
-so it follows subclasses:
+so it automatically adapts to subclassing:
 
 ```python
 # self_type.py
@@ -328,14 +335,14 @@ The hints themselves are for the tools and for the reader.
 
 ## Type Hint Summary
 
-These are the type hints you will encounter, in their modern spelling.
+These are the type hints you will encounter, in their modern forms.
 The book uses only a handful of these, but the rest turn up in other code.
 Check [the Python documentation](https://docs.python.org/3/library/typing.html) or [Thinking in Types](https://thinkingintypes.com/) if one piques your interest.
 
 Annotations go in three places: a parameter (`x: int`), a return value (`-> str`),
 and a variable or attribute (`total: int = 0`).
 Most of the names below come from the `typing` module. The abstract container
-shapes come from `collections.abc`.
+types come from `collections.abc`.
 
 ### Basic types
 
@@ -352,11 +359,11 @@ shapes come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous collection of `T` |
+| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous, mutable collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]` |
 | `dict[K, V]` | A dictionary with keys `K` and values `V` |
 | `tuple[A, B]` | A fixed-length tuple (here a pair) |
 | `tuple[T, ...]` | A variable-length tuple of `T` |
-| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Abstract shapes from `collections.abc`; accept more inputs than the concrete types |
+| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant*, so `list[Circle]` satisfies `Sequence[Shape]` |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C` itself, not an instance |
 
