@@ -346,14 +346,20 @@ The hints themselves are for the tools and for the reader.
 
 These are the type hints you will encounter, in their modern forms.
 The book uses only a handful of these, but the rest turn up in other code.
-Check [the Python documentation](https://docs.python.org/3/library/typing.html) or [Thinking in Types](https://thinkingintypes.com/) if one piques your interest.
+Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
+[Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
 Annotations go in three places: a parameter (`x: int`), a return value (`-> str`),
 and a variable or attribute (`total: int = 0`).
 Most of the names below come from the `typing` module. The abstract container
 types come from `collections.abc`.
 
-### Basic types
+<!-- Section headers link out to docs.python.org in a new tab. Safe only
+     because CHAPTER_TOC_DEPTH (build_site.py) stops the in-page TOC at
+     "##"; raising it to 3 would nest an <a> inside the TOC's own <a>
+     for every "###" heading below and break those TOC entries. -->
+
+### <a href="https://docs.python.org/3/library/stdtypes.html#built-in-types" target="_blank" rel="noopener">Basic types</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -364,7 +370,7 @@ types come from `collections.abc`.
 | `Never`, `NoReturn` | `NoReturn` marks a function that never returns (it always raises or exits); `Never` is the broader "impossible" type |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
-### Containers
+### <a href="https://docs.python.org/3/library/stdtypes.html#generic-alias-type" target="_blank" rel="noopener">Containers</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -376,7 +382,7 @@ types come from `collections.abc`.
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C` itself, not an instance, see [Classes as Values](#classes-as-values-type) |
 
-### Unions, optionals, and literals
+### <a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Unions, optionals, and literals</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -384,7 +390,7 @@ types come from `collections.abc`.
 | `X` \| `None` | *Optional*: `X` or `None`, see [Type Hints](#type-hints) |
 | `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
-### Aliases and distinct types
+### <a href="https://docs.python.org/3/library/typing.html#type-aliases" target="_blank" rel="noopener">Aliases and distinct types</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -392,14 +398,14 @@ types come from `collections.abc`.
 | `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
-### Constants and class variables
+### <a href="https://docs.python.org/3/library/typing.html#typing.Final" target="_blank" rel="noopener">Constants and class variables</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Final`, `Final[T]` | A name the checker will not let you reassign, see [Constants with Final](#constants-with-final) |
 | `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) |
 
-### Generics
+### <a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Generics</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -410,14 +416,14 @@ types come from `collections.abc`.
 | `**P` (`ParamSpec`) | Captures a callable's whole parameter list, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
-### Structural typing
+### <a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Structural typing</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
 | `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [Surrogate](26_Surrogate.md#proxy) |
 
-### Dictionary and record shapes
+### <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict" target="_blank" rel="noopener">Dictionary and record shapes</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -425,20 +431,20 @@ types come from `collections.abc`.
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
 | `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions) |
 
-### Type narrowing
+### <a href="https://docs.python.org/3/library/typing.html#typing.TypeGuard" target="_blank" rel="noopener">Type narrowing</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `TypeGuard[T]`, `TypeIs[T]` | A boolean predicate that narrows a type when it returns `True` |
 
-### Self and forward references
+### <a href="https://docs.python.org/3/library/typing.html#typing.Self" target="_blank" rel="noopener">Self and forward references</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Self` | The enclosing class type; handy for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
 | `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
-### Typing decorators and directives
+### <a href="https://docs.python.org/3/library/typing.html#functions-and-decorators" target="_blank" rel="noopener">Typing decorators and directives</a>
 
 | Construct | Meaning |
 |-----------|---------|

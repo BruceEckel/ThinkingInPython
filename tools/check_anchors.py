@@ -28,6 +28,7 @@ EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
 ATTR_BLOCK = re.compile(r"\s*\{[^}]*\}\s*$")
 INLINE_CODE = re.compile(r"`[^`]*`")
 INLINE_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+HTML_TAG = re.compile(r"<[^>]+>")
 LINK = re.compile(r"\]\(([^)]+)\)")
 ANCHOR_TARGET = re.compile(r"^(?:([\w./-]+)\.md)?#([\w-]+)$")
 
@@ -36,6 +37,7 @@ def pandoc_anchor(text: str) -> str:
     """Reproduce pandoc's auto identifier for a heading's visible text."""
     text = INLINE_CODE.sub(lambda m: m.group(0).strip("`"), text)
     text = INLINE_LINK.sub(r"\1", text)  # [text](url) -> text
+    text = HTML_TAG.sub("", text)  # raw <a href=...>text</a> -> text
     return _slug(text)
 
 
