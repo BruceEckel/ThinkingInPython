@@ -158,7 +158,7 @@ The checker accepts both because each has a `draw()`, so they are of the right s
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
 
-## Classes as Values: `type[...]` {#classes-as-values-type}
+## Classes as Values: `type[C]` {#classes-as-values-type}
 
 A class is itself a value.
 You can pass it to a function, store it in a variable, and call it to make an instance.
@@ -198,10 +198,13 @@ The *type statement* gives the annotation a name:
 
 ```python
 # type_aliases.py
+from typing import Literal
+
 type Coord = tuple[int, int]
 type Grid = dict[Coord, str]
+type Color = Literal["red", "blue", "green", "yellow"]
 
-def paint(grid: Grid, cell: Coord, color: str) -> None:
+def paint(grid: Grid, cell: Coord, color: Color) -> None:
     grid[cell] = color
 
 grid: Grid = {}
@@ -216,7 +219,13 @@ so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate,
 use `NewType`, listed in the summary below.)
 
-An alias can also name a union.
+`Color` names a union of literal values instead of a union of types.
+`Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings and no others.
+Passing `"purple"` to `paint()` is a type error, even though `"purple"` is a valid `str`.
+The alias also documents the allowed values in one place,
+instead of scattering the literal list across every function that accepts a `Color`.
+
+An alias can also name a union of types.
 [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) uses
 `type Shape = Circle | Square` to define a closed set of alternatives
 that a `match` can check exhaustively.
@@ -225,7 +234,7 @@ that a `match` can check exhaustively.
 
 Consider a function that returns the first element of a list.
 This function can be applied to a list holding any type.
-A useful annotation would say that the return type matches the list's element type, whatever that type is.
+A useful annotation would return a type that matches the list's element type, whatever that type is.
 
 `Any` cannot express that connection.
 It accepts any list, but the returned value doesn't express the type held by the list.
