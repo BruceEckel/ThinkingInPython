@@ -284,7 +284,7 @@ then applies that instance to `greet`. The arguments go to the constructor,
 and the function arrives later, at `__call__()`.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible.
-The function moves from `__init__()` to `__call__()` the moment the decorator gains arguments.
+The function moves from `__init__()` to `__call__()` when the decorator gains arguments.
 
 The form you choose is mostly a matter of taste.
 Both forms preserve the wrapped function's exact signature for the type checker,

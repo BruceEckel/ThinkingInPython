@@ -2,7 +2,7 @@
 from typing import ClassVar
 
 class Tally:
-    total: ClassVar[int] = 0  # One shared value, not per-instance
+    total: ClassVar[int] = 0  # A single shared value
     label: str  # A normal instance variable
 
     def __init__(self, label: str) -> None:

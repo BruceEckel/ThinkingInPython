@@ -7,7 +7,9 @@ Class-level attributes behave in ways that surprise programmers coming from C++ 
 A field declared in the class body, outside any method, is a *class attribute*.
 It is easy to misread one as a per-object default value.
 It is not.
-A class attribute creates one shared variable across all instances of the class.
+
+> A class attribute creates a single shared variable across all instances of the class.
+
 If you then create an instance variable of the same name, that instance variable *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
@@ -16,18 +18,18 @@ Here's an example showing why it can be confusing:
 
 ```python
 # class_attribute_confusion.py
-class Stars:
-    rating = 5  # One value, shared by the whole class
 
-a = Stars()
-b = Stars()
-print(a.rating, b.rating)  # Both read the class attr
+class Stars:
+    rating = 5  # Shared across all instances
+
+a, b = Stars(), Stars()
+print(a.rating, b.rating)  # Both read the same storage
 #: 5 5
-a.rating = 1  # Assigning makes an instance variable on a
+a.rating = 1  # Assigning makes an instance variable on 'a'
 print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
 #: 1 5
-Stars.rating = 9  # Change the shared class attr
-print(a.rating, b.rating)  # 'a' instance variable, 'b' class attr
+Stars.rating = 9  # Change the shared storage
+print(a.rating, b.rating)  # 'b' reads the class attribute
 #: 1 9
 ```
 
@@ -67,7 +69,7 @@ and stops you from accidentally creating an instance variable that shadows it:
 from typing import ClassVar
 
 class Tally:
-    total: ClassVar[int] = 0  # One shared value, not per-instance
+    total: ClassVar[int] = 0  # A single shared value
     label: str  # A normal instance variable
 
     def __init__(self, label: str) -> None:
@@ -80,6 +82,11 @@ print(Tally.total)  # Shared by the whole class
 #: 2
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
+
+[[This needs further explanation because 'label' would have been called a class attribute
+at its point of definition. Is it not a class attribute because it has no initialization?
+What would it mean if self.label was never initialized?
+Needs research and clarification. ]]
 
 `ClassVar` is a hint for the checker, not the runtime.
 It records that `total` belongs to the class,
@@ -116,8 +123,8 @@ print(Base.shared, Left.shared, Right.shared)
 #: 9 5 100
 ```
 
-`Left` has no `shared` of its own, so it tracks `Base.shared` until the
-moment something assigns to `Left.shared` directly.
+`Left` has no `shared` of its own,
+so it tracks `Base.shared` until something assigns to `Left.shared` directly.
 `Right` overrode `shared` at class-definition time, so it never sees
 changes made through `Base`.
 `ClassVar` doesn't change any of this. It only tells the checker that

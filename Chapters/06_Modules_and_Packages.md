@@ -228,7 +228,7 @@ The package resolves by name from anywhere, and edits to its source take effect 
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,
-which is why importing `a_package.module1` earlier printed its message the moment it loaded.
+which is why importing `a_package.module1` earlier printed its message as it loaded.
 For a large program that imports many modules but uses only some of them on any
 given run, that eager work slows startup.
 

@@ -416,7 +416,7 @@ The same shortcut skips `__post_init__`,
 so a memento saved before a validated field existed
 can load a value nothing ever validated.
 `restored.strokes` works because both versions agree on that field.
-`restored.title` fails the moment anything asks for it,
+`restored.title` fails if anything asks for it,
 which is often nowhere near the line that called `pickle.loads()`.
 Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.

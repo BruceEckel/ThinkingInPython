@@ -339,7 +339,8 @@ which is handy when a higher-order function needs a single-argument callable.
 Use partial application when an API expects a function of one argument and you have a function of several.
 Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`,
-and it binds their values at the moment you build it, which avoids the late-binding surprise a lambda created in a loop can produce.
+and it binds their values when you build it.
+This avoids the late-binding surprise a lambda created in a loop can produce.
 
 ## Composing Functions
 
@@ -998,7 +999,7 @@ one at a time, the same way any `for` loop consumes a generator.
 Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
-because `islice()` stops asking the moment it has delivered five.
+because `islice()` stops asking as soon as it has delivered five.
 The [Performance](18_Performance.md) chapter looks at laziness from the perspective of memory and speed.
 
 Laziness matters most at scale.
