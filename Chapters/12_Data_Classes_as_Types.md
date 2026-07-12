@@ -822,7 +822,7 @@ Four small classes make the differences concrete:
 Each one is inspected with the same helper:
 
 ```python
-# show_redefined.py
+# comparison.py
 from display import REDEFINED_DUNDERS, display_object
 
 def show(obj: object) -> None:
@@ -840,7 +840,7 @@ but with field declarations that look like class variables:
 
 ```python
 # ordinary_class.py
-from show_redefined import show
+from comparison import show
 
 class A:
     x: int
@@ -864,7 +864,7 @@ because they actually allocate storage for those class variables:
 
 ```python
 # class_with_defaults.py
-from show_redefined import show
+from comparison import show
 
 class B:
     x: int = 42
@@ -889,7 +889,7 @@ object reads the same two values straight from the class attributes.
 ```python
 # plain_dataclass.py
 from dataclasses import dataclass
-from show_redefined import show
+from comparison import show
 
 @dataclass
 class C:
@@ -921,7 +921,7 @@ class, tagged `[CV]`, no matter how many `B` instances exist.
 # classvar_dataclass.py
 from dataclasses import dataclass
 from typing import ClassVar
-from show_redefined import show
+from comparison import show
 
 @dataclass
 class D:

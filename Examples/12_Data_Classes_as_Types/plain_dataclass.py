@@ -1,6 +1,6 @@
 # plain_dataclass.py
 from dataclasses import dataclass
-from show_redefined import show
+from comparison import show
 
 @dataclass
 class C:

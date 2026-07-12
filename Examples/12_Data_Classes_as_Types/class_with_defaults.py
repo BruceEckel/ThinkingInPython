@@ -1,5 +1,5 @@
 # class_with_defaults.py
-from show_redefined import show
+from comparison import show
 
 class B:
     x: int = 42

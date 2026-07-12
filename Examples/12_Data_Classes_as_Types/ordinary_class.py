@@ -1,5 +1,5 @@
 # ordinary_class.py
-from show_redefined import show
+from comparison import show
 
 class A:
     x: int

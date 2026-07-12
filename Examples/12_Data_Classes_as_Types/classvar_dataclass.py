@@ -1,7 +1,7 @@
 # classvar_dataclass.py
 from dataclasses import dataclass
 from typing import ClassVar
-from show_redefined import show
+from comparison import show
 
 @dataclass
 class D:
