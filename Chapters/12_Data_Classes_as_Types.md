@@ -17,7 +17,7 @@ Code that receives one never has to check it again.
 This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
-This function appears throughout the chapter.
+The following `check()` function appears throughout the chapter.
 It raises `TypeFailure`, a custom exception meaning a value falls
 outside the type's allowed set:
 
@@ -33,10 +33,10 @@ def check(condition: bool, message: str, detail: str = "") -> None:
 
 ## A Value That Must Be Checked Everywhere
 
-Suppose a rating is an integer from one to ten.
+Suppose a "stars" rating is an integer from one to ten.
 If you represent it as a plain `int`,
 nothing stops a caller from passing eleven, or minus one.
-Every function that takes a rating must check it:
+To prevent that, every function that takes a rating must check it:
 
 ```python
 # stars_unchecked.py
@@ -85,7 +85,7 @@ class Stars:
         check(1 <= self._number <= 10, f"Stars({self._number})")
 
     @property
-    def number(self) -> int:  # No setter: blocks outside mutation
+    def number(self) -> int:  # No setter: blocks external mutation
         return self._number
 
     def __str__(self) -> str:
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 #: 8
 ```
 
-A read-only property keeps outsiders from assigning to `number`,
+A read-only `@property` keeps users from assigning to `number`,
 but the class itself still mutates `_number` and must guard it with a precondition and a postcondition.
 Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
 The problem with DbC is that the contract is spread across every method that touches the value.
