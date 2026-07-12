@@ -929,6 +929,19 @@ Each `C` instance owns its own copies from the moment it is constructed.
 With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
+`C` started from the same bare annotations as `A`.
+`@dataclass` reads them, through `dataclasses.fields()`,
+to learn what fields exist and in what order,
+then uses that to write `__init__`'s parameter list and the assignments inside it.
+`@dataclass` itself stores nothing on the class:
+`x` is still absent from `C.__dict__` after decoration,
+exactly as it was before.
+The promise is only fulfilled per instance,
+when the generated `__init__()` actually runs.
+That is the entire difference from `A`:
+not that `@dataclass` changes the annotations,
+but that it builds something to act on them.
+
 `D` adds a real `ClassVar` alongside an ordinary field:
 
 ```python
