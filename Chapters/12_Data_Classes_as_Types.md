@@ -242,8 +242,8 @@ print(cache[m])
 #: value
 ```
 
-If an object cannot change once built, then validating it once,
-at construction, is enough for its whole life.
+If an object cannot change after it is built,
+then validating it at construction makes it valid for its lifetime.
 
 ## A Type Is a Set of Values
 
