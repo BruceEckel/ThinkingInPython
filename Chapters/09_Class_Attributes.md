@@ -67,26 +67,62 @@ and stops you from accidentally creating an instance variable that shadows it:
 ```python
 # class_var.py
 from typing import ClassVar
+from display import display_object
 
 class Tally:
     total: ClassVar[int] = 0  # A single shared value
-    label: str  # A normal instance variable
+    label: str  # Declared, not yet assigned
 
     def __init__(self, label: str) -> None:
         self.label = label
         Tally.total += 1
 
+display_object(Tally)
+#: === Tally ===
+#: [Attributes]
+#:   • total: typing.ClassVar[int] = 0
+#: [Methods]
+#:   None
 a = Tally("a")
+display_object(a)
+#: === Tally ===
+#: [Attributes]
+#:   • label: str = 'a'
+#:   • total: typing.ClassVar[int] = 1
+#: [Methods]
+#:   None
 b = Tally("b")
-print(Tally.total)  # Shared by the whole class
+print(Tally.total)
 #: 2
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
 
-[[This needs further explanation because 'label' would have been called a class attribute
-at its point of definition. Is it not a class attribute because it has no initialization?
-What would it mean if self.label was never initialized?
-Needs research and clarification. ]]
+`display_object(Tally)` shows what the class actually holds: `total`, and nothing called `label`.
+An assignment in the class body is what creates a class attribute, as `class_attribute_confusion.py` showed above.
+`total: ClassVar[int] = 0` has the `= 0`, so it exists on `Tally` before any instance is built.
+`label: str` has no `=`, so nothing is stored under that name anywhere on the class.
+The annotation only records, in `Tally.__annotations__`, that a `Tally` will eventually carry a `label`.
+That promise is invisible to `display_object()`, which reports attributes that exist,
+not annotations that merely describe one to come.
+
+`display_object(a)` tells a different story once an instance exists.
+Both `label` and `total` appear: `label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
+Constructing `a` ran `self.label = label`, which created a real `label` attribute on `a`, not on `Tally`.
+`total` shows up too, not because `a` has its own copy, but because reading an attribute checks the instance first,
+then falls back to the class, the same rule `Stars` demonstrated earlier in this chapter.
+
+A *bare annotation*, one with no assigned value, is a promise rather than a placeholder.
+It states that instances of this class will carry a `label` attribute of type `str`, set somewhere.
+Here that somewhere is `__init__()`, whose `self.label = label` is what `display_object(a)` above actually found.
+Had `__init__()` never assigned it, no attribute would exist, on the instance or the class.
+The checker would not catch the omission, because it trusts the annotation instead of verifying that every method actually sets it.
+The failure would surface later, as an `AttributeError` from the first code that reads the missing `label`.
+
+The annotation on `label` is not required here.
+Delete it, and `ty` still infers `label: str` correctly from `self.label = label`, because the parameter's own type carries through to the attribute it initializes.
+It earns its place for symmetry with `total`, so the class's two attributes read together at the top instead of one hiding inside the constructor.
+[Simulation](38_Simulation.md#a-robot-in-a-maze) shows the case where the annotation is not optional.
+There, an attribute is set from outside the class entirely, and a bare annotation is the checker's only way to know its type.
 
 `ClassVar` is a hint for the checker, not the runtime.
 It records that `total` belongs to the class,

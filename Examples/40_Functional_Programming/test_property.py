@@ -1,6 +1,5 @@
 # test_property.py
-from hypothesis import given
-from hypothesis import strategies as st
+from hypothesis import given, strategies
 
 def encode(text: str) -> str:
     return text[::-1]
@@ -8,6 +7,6 @@ def encode(text: str) -> str:
 def decode(text: str) -> str:
     return text[::-1]
 
-@given(st.text())
+@given(strategies.text())
 def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample

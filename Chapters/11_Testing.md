@@ -10,7 +10,7 @@ With them you can refactor boldly, change designs, and clean up code.
 
 Perhaps more importantly, tests tell you immediately if a change you've made causes a failure.
 This can save an enormous amount of time.
-If the problem surfaces only after many more changes,
+If the problem only surfaces after multiple changes,
 you have no idea which change caused the bug.
 
 ## Test-Driven Development (TDD)
@@ -54,7 +54,7 @@ A check is just Python's built-in `assert` statement.
 No base class needs inheriting, and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-We will test the following:
+We will test the `Account` class:
 
 ```python
 # account.py
@@ -217,14 +217,14 @@ by adding the `autouse` flag:
 
     @pytest.fixture(autouse=True)
 
-Fixtures remove a lot of duplicated setup.
+Fixtures eliminate duplicated setup.
 Less code generally makes tests easier to read and verify.
 
 ## Sharing Fixtures with conftest.py
 
 A fixture defined in a file named `conftest.py` is available to every test in that directory and below,
 with no import.
-This is where shared setup lives.
+Place shared setup in `conftest.py`.
 
 You can parametrize fixtures too.
 Every test that requests the fixture runs once for each parameter value:
@@ -494,10 +494,40 @@ the way a client would.
 
 A language with access control enforces the two differently.
 Python has no access control.
-Every attribute is reachable,
-and a leading underscore is only a convention that says,
-"this is private, do not rely on it."
-In Python the distinction is one of discipline, not of compiler enforcement.
+Every attribute is reachable.
+A single leading underscore, as in `self._balance`, changes nothing at the language level.
+It is stored under that exact name and reachable exactly like any other attribute.
+It is only a convention that says, "this is private, do not rely on it."
+
+A leading *double* underscore does something real, though it is still not access control.
+Python's compiler rewrites `self.__pin`, written inside a class body,
+into `self._ClassName__pin`, a transformation called *name mangling*.
+`ty` does not model this rewriting, so its report on the code below disagrees with what actually runs:
+
+```python
+# name_mangling.py
+
+class Vault:
+    def __init__(self) -> None:
+        self._balance = 0    # Single underscore: convention only
+        self.__pin = "1234"  # Double underscore: gets mangled
+
+v = Vault()
+print(vars(v))
+#: {'_balance': 0, '_Vault__pin': '1234'}
+# ty: unresolved attribute "_Vault__pin":
+print(v._Vault__pin)  # type: ignore
+#: 1234
+```
+
+`vars(v)` shows what actually got stored: `_balance` under its own name,
+and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
+The rewritten name is a real attribute like any other,
+so `v._Vault__pin` reads it successfully, even though `ty` cannot see that the rewrite happened and reports the line as an error.
+Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
+not to hide the attribute.
+Anyone who knows the class name can still reach it, so it changes the spelling, not the reachability.
+In Python the distinction between white-box and black-box remains one of discipline, not of compiler enforcement.
 
 That makes black-box testing the sensible default.
 Test the public surface, the methods a caller is meant to use,

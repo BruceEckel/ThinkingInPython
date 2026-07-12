@@ -132,7 +132,11 @@ print(x is y, x.instance is y.instance is z.instance)
 ```
 
 Because the inner class's name starts with a double underscore,
-it is private, so an attempt to access it directly produces a type-checking error.
+Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body,
+a rewriting called *name mangling*
+(see [Testing](11_Testing.md#white-box-and-black-box-tests)).
+`OnlyOne.__OnlyOne`, written from outside the class, names an attribute that was never stored under that spelling,
+so it fails at runtime with `AttributeError`, not at type-checking time.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`.
 After that it reuses the one inner object,

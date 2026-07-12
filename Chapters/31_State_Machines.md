@@ -344,7 +344,7 @@ which between them exercise every transition in the trap.
 The rest of the input file only repeats them,
 so the output continues exactly as in the first version.
 
-If you must create and maintain a lot of `State` classes,
+If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
 

@@ -60,12 +60,14 @@ verify-targets:  ## Smoke-test every make target; mutating ones run in a disposa
 	$(PY) tools/verify_targets.py
 
 # Updates uv itself (when it was installed via its standalone installer),
-# then upgrades every uv-managed dev tool (ty, ruff, pytest, ...) to the
-# latest version pyproject.toml allows, rewriting uv.lock. pandoc and vale
-# are updated best-effort through winget or Homebrew, whichever is on PATH.
+# best-effort upgrades a globally installed `ty` (`uv tool upgrade ty`,
+# what bare `ty` on PATH resolves to), then upgrades every uv-managed dev
+# tool (ty, ruff, pytest, ...) to the latest version pyproject.toml
+# allows, rewriting uv.lock. pandoc and vale are updated best-effort
+# through winget or Homebrew, whichever is on PATH.
 # make/git are left alone. Review `git diff uv.lock` before committing.
 # For the pinned Python version itself, use `make upgrade-python`.
-upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) pandoc/vale
+upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/vale
 	$(PY) tools/upgrade_tools.py
 	$(MAKE) check-tools-full
 

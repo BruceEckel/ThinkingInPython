@@ -13,7 +13,7 @@ I will introduce the basic concepts of design patterns, along with examples.
 ## What Is a Pattern?
 
 Initially, you can think of a pattern as an especially clever and insightful way of solving a particular class of problems.
-It looks like a lot of people have worked out all the angles of a problem and have come up with the most general,
+Many people have worked out all the angles of a problem and have come up with the most general,
 flexible solution.
 You may have seen and solved something like it before,
 but your solution probably doesn't have the kind of completeness you'll see embodied in a pattern.

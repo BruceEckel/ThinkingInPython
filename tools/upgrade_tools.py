@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 """Update this project's tools to their latest versions.
 
-Two things are fully automated:
+Three things are fully automated:
 
 - `uv self update` -- updates the uv binary itself. This only works
   when uv was installed via its standalone installer; if it was
   installed through pipx, Homebrew, winget, etc., uv prints its own
   message telling you to upgrade it that way instead, and this script
   moves on regardless.
+- `uv tool upgrade ty` -- upgrades the globally installed `ty`, the
+  copy bare `ty` on PATH resolves to (see this project's CLAUDE.md on
+  bare `ty` lagging `uv run ty`). This is separate from, and does not
+  replace, the project-local copy `uv run ty` uses below; best-effort,
+  since not every machine has installed `ty` this way.
 - `uv lock --upgrade` then `uv sync` -- upgrades every uv-managed dev
   tool (`ty`, `ruff`, `pytest`, `codespell`, ...) to the latest version
   `pyproject.toml`'s constraints allow, and installs the result into
@@ -36,7 +41,7 @@ from tools_repo import run_echoed
 
 # name -> (winget package id, Homebrew formula, fallback install link)
 EXTERNAL: dict[str, tuple[str, str, str]] = {
-    "pandoc": ("JGM.Pandoc", "pandoc",
+    "pandoc": ("JohnMacFarlane.Pandoc", "pandoc",
                "https://pandoc.org/installing.html"),
     "vale": ("errata-ai.Vale", "vale", "https://vale.sh/docs/install"),
 }
@@ -56,6 +61,11 @@ def update_external(
 
 def main() -> int:
     run_echoed(["uv", "self", "update"])
+
+    if not run_echoed(["uv", "tool", "upgrade", "ty"]):
+        print("Could not upgrade the global `ty` tool "
+              "(not installed via `uv tool install ty`?). "
+              "`uv run ty`, used by this project, is unaffected.")
 
     if not run_echoed(["uv", "lock", "--upgrade"]):
         print("`uv lock --upgrade` failed; see the error above.")

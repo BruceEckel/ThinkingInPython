@@ -23,7 +23,7 @@ Try it out first. It might be fine.
 
 If it is too slow, use Occam's Razor.
 Try the simplest approach first.
-That might be enough, and if it is, you might save a lot of time and money.
+That might be enough, and if it is, you might save time and money.
 
 What follows is an approach to solving performance problems,
 starting with the simplest techniques and growing successively more complex.
@@ -696,7 +696,7 @@ Python sees a normal module:
     fastcount.count_primes(100_000)
 
 Keep the interface coarse.
-One call that does a lot of work wins.
+A single call that does significant work wins.
 A million calls that each do a little lose the gain due to boundary-crossing overhead.
 Shipping millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
