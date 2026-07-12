@@ -646,6 +646,10 @@ def display_object(
                 sig = str(inspect.signature(value))
             except (ValueError, TypeError):
                 sig = "(...)"
+            # Trim the signature to keep the line within max_width:
+            sig_budget = max_width - len(name) - 4
+            if len(sig) > sig_budget:
+                sig = sig[:sig_budget - 3] + "..."
             methods.append(f"  • {name}{sig}")
         else:
             label = name

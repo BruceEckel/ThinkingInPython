@@ -10,7 +10,7 @@ class Stars:
         check(1 <= self._number <= 10, f"Stars({self._number})")
 
     @property
-    def number(self) -> int:  # No setter: blocks outside mutation
+    def number(self) -> int:  # No setter: blocks external mutation
         return self._number
 
     def __str__(self) -> str:

@@ -8,7 +8,7 @@ print(m)
 print(m.name, m.number, m.depth)
 #: foo 12 3.14
 
-# __eq__ is generated, so equal fields compare equal:
+# The generated __eq__ compares by field value:
 print(Messenger("xx", 1) == Messenger("xx", 1))
 #: True
 print(Messenger("xx", 1) == Messenger("xx", 2))

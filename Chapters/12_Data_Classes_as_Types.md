@@ -130,6 +130,29 @@ class Messenger:
     depth: float = 0.0  # Default value
 ```
 
+We can see what `@dataclass` generates using `display_object()`, the
+inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module):
+
+```python
+# display_messenger_class.py
+from display import display_object
+from messenger import Messenger
+
+display_object(Messenger, dunder=["__init__", "__repr__", "__eq__"])
+#: === Messenger ===
+#: [Attributes]
+#:   • depth: float = 0.0
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, name: str, number: int, depth: float = 0.0)...
+#:   • __repr__(self)
+```
+
+The dunder methods have indeed been generated,
+and you can see that the constructor arguments cover all the fields in `Messenger`.
+As described in [Class Attributes](09_Class_Attributes.md),
+only `depth` appears as an attribute because it has an initialization value.
+
 ```python
 # demo_messenger.py
 from dataclasses import replace
@@ -141,7 +164,7 @@ print(m)
 print(m.name, m.number, m.depth)
 #: foo 12 3.14
 
-# __eq__ is generated, so equal fields compare equal:
+# The generated __eq__ compares by field value:
 print(Messenger("xx", 1) == Messenger("xx", 1))
 #: True
 print(Messenger("xx", 1) == Messenger("xx", 2))
@@ -158,14 +181,16 @@ print(m)
 #: Messenger(name='bar', number=12, depth=3.14)
 ```
 
+`print(m)` uses `__repr__()` which produces the class name and the named argument values.
+
 `replace()` returns a copy with some fields changed, leaving the original alone.
 This copy-instead-of-mutate style reduces errors.
-But notice the last two lines. A plain data class is still mutable,
-so `m.name = "bar"` works.
 
-A data class is a type defined by its fields. `display_object()`, the
-inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module),
-shows those fields with their declared types:
+Notice the last two lines.
+A plain data class is still mutable, so `m.name = "bar"` works.
+
+A data class is a type defined by its fields.
+`display_object()` shows those fields with their declared types:
 
 ```python
 # display_messenger.py
