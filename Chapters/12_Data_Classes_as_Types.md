@@ -184,7 +184,8 @@ print(m)
 #: Messenger(name='bar', number=12, depth=3.14)
 ```
 
-`print(m)` uses `__repr__()` which produces the class name and the named argument values.
+`print(m)` uses the generated `__repr__()`,
+which produces the class name and the named argument values.
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
 This copy-instead-of-mutate style reduces errors.
@@ -192,8 +193,7 @@ This copy-instead-of-mutate style reduces errors.
 Notice the last two lines.
 A plain data class is still mutable, so `m.name = "bar"` works.
 
-A data class is a type defined by its fields.
-`display_object()` shows those fields with their declared types:
+`display_object()` shows the fields with their declared types:
 
 ```python
 # display_messenger.py

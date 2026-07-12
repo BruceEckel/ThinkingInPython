@@ -145,6 +145,38 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   can invoke real system package managers (`winget`/`brew`). Only run them when
   the user explicitly asks for that specific run, not to "verify" a change.
   `make check-tools[-full]` is read-only and safe to run freely.
+- **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
+  line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`),
+  enforced by `make reflow` (`CH=NN` for one chapter), not any gate.
+  `reflow`/`reflow-check` are standalone `--write`/check-only targets, absent
+  from `verify`/`gate`/`ci`, so hand-edited prose can silently drift out of
+  compliance. Before writing a script to reflow prose across the book, check
+  `tools/reflow_prose.py` first: it already masks inline code/links/footnotes,
+  protects an abbreviation list, and greedily packs clauses to fit a width
+  instead of breaking every comma (a naive "break at every comma" script
+  fragments simple lists like "insights, idioms, and patterns" into three
+  lines, a regression, not a fix). Its `SINGLE_LETTER_WORDS` set holds single
+  uppercase letters that are real words (`"C"`, the language) rather than
+  initials like "B."; extend it if a new one causes a missed sentence split.
+- **`ty` narrows a PEP 661 `sentinel()` parameter imprecisely if the
+  annotation names the generic `sentinel` class instead of the specific
+  value.** `dunder: Sequence[str] | sentinel` lets `ty` narrow the `is
+  ALL_DUNDERS` branch, but the other branch keeps a bogus `sentinel &
+  ~ALL_DUNDERS` type (some other sentinel value, not `Sequence[str]`), which
+  then fails `name in dunder`. Naming the specific value instead,
+  `Sequence[str] | ALL_DUNDERS`, fixes it: the union has only two members, so
+  ruling one out via `is` leaves exactly `Sequence[str]`. See `display.py` in
+  chapter 17 (Metaprogramming); project memory `typing-construct-hierarchy`
+  has the fuller case study.
+- **Every class, even an empty one, carries compiler-generated dunders that
+  always differ from `object`'s own** (`__module__`, `__dict__`,
+  `__firstlineno__`, `__annotate_func__`, `__static_attributes__`,
+  `__weakref__`, `__doc__`). A filter meant to report "dunders this class
+  redefined," built by comparing each dunder to `object`'s version, must
+  restrict that comparison to a known allowlist (chapter 17's
+  `INTERESTING_DUNDERS`) or it leaks all of this bookkeeping as false
+  positives. `__static_attributes__` itself is new in CPython 3.13+: a tuple
+  of names assigned via `self.X` anywhere in the class's own methods.
 
 ## Pointers
 

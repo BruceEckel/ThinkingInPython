@@ -16,7 +16,6 @@ class Fraggle:
         return f"h({s})"
 
 display_object(Fraggle)  # Display the class
-#: === Fraggle ===
 #: [Attributes]
 #:   • y: float = 1.14659 [CV]
 #:   • z: str = 'blivet' [CV]
@@ -27,7 +26,6 @@ display_object(Fraggle)  # Display the class
 
 # Display a specific instance:
 display_object(Fraggle(9, 2.3))
-#: === Fraggle ===
 #: [Attributes]
 #:   • x: int = 9
 #:   • y: float = 2.3
@@ -39,7 +37,6 @@ display_object(Fraggle(9, 2.3))
 
 # ALL_DUNDERS also reveals what @dataclass generated:
 display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
-#: === Fraggle ===
 #: [Attributes]
 #:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]
