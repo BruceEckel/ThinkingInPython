@@ -899,6 +899,16 @@ instead of bare annotations, so they exist as class attributes.
 `B` has no `__init__()` to copy them onto each instance, so every `B`
 object reads the same two values straight from the class attributes.
 
+`show(C(11, "this is C"))` finds the same two names as `show(B())`.
+Neither `x` nor `s` carries `[CV]` this time.
+`C` is a `@dataclass`, so its generated `__init__(self, x: int, s: str)
+-> None` runs `self.x = x` and `self.s = s` for every new `C`, the same
+mechanism `D`'s `__init__()` uses for `x`.
+Each `C` instance owns its own copies from the moment it is constructed.
+`B` runs nothing like that.
+With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the
+class, tagged `[CV]`, no matter how many `B` instances exist.
+
 `D` mixes an ordinary field with a real `ClassVar`.
 `show(D)` tags both attributes `[CV]`, since no instance owns either of
 them yet.
