@@ -83,8 +83,14 @@ _MIN_LEAD = 20
 ABBREV = {
     "e.g", "i.e", "etc", "vs", "cf", "al", "ie", "eg", "mr", "mrs", "ms", "dr",
     "prof", "st", "fig", "no", "vol", "pp", "ch", "sec", "approx", "inc", "ltd",
-    "co", "jr", "sr", "esp", "ca", "viz", "resp",
+    "co", "jr", "sr", "esp", "ca", "viz", "resp", "a.k.a",
 }
+
+# Single uppercase letters that are real words in this book's domain (mostly
+# language names), not initials. A bare single-letter token before ". X" is
+# normally treated as an initial like "B." and never ends a sentence; these
+# are the exceptions.
+SINGLE_LETTER_WORDS = {"C", "R"}
 
 # Character-class bodies, built with chr()/\u escapes so no literal smart quote
 # or private-use character appears in this source file. A sentence may end with

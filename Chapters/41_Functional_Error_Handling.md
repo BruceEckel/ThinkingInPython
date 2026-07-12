@@ -17,7 +17,8 @@ This material comes from my PyCon 2024 talk,
 
 ## Exceptions Discard Partial Calculations
 
-If a function raises an exception partway through a comprehension, you lose all partial calculations.
+If a function raises an exception partway through a comprehension,
+you lose all partial calculations.
 Any successful results computed before the failure vanish:
 
 ```python
@@ -41,7 +42,8 @@ except ValueError as e:
 #: Lost everything: func_a(3)
 ```
 
-Function calls 0-2 produced correct values, but the exception threw away the whole list.
+Function calls 0-2 produced correct values,
+but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
 which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) flags as a problem.
 
@@ -90,11 +92,11 @@ Make success and failure explicit by defining them as types.
 and `Result` is the union of the two.
 Both are frozen data classes,
 parameterized over the answer type and the error type.
-`A`, `B`, and `E` are type parameters
-(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+`A`, `B`, and `E` are type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no constraints, which allows them to be used in any context.
-`Result` is useful beyond this chapter, so it lives at the root of the examples and any chapter can import it:
+`Result` is useful beyond this chapter,
+so it lives at the root of the examples and any chapter can import it:
 
 ```python
 # shared: result.py
@@ -158,7 +160,9 @@ To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 
-A function like this is a *Total Function*: its return type accounts for every outcome it can produce, success or failure, with nothing left for an exception to sneak out through.
+A function like this is a *Total Function*:
+its return type accounts for every outcome it can produce, success or failure,
+with nothing left for an exception to sneak out through.
 Raise an exception instead, and the signature no longer tells the truth.
 A caller can't see the failure just by reading the return type.
 Python does not enforce totality.
@@ -166,8 +170,10 @@ Nothing stops a `Result`-returning function from also raising an exception,
 so this is a discipline the author of the function maintains,
 not a guarantee the checker provides.
 
-Because failures are values, you can assert on them directly, with no `pytest.raises()`.
-The tests check `unwrap()`, and that `bind()` chains a success and short-circuits a failure:
+Because failures are values, you can assert on them directly,
+with no `pytest.raises()`.
+The tests check `unwrap()`,
+and that `bind()` chains a success and short-circuits a failure:
 
 ```python
 # test_result.py
@@ -231,9 +237,8 @@ if __name__ == "__main__":
 ```
 
 Each step returns early when it encounters a `Failure`.
-This works, and it keeps errors as values,
-but every step is the same dance: call, check for `Failure`, return early, unwrap,
-go on.
+This works, and it keeps errors as values, but every step is the same dance:
+call, check for `Failure`, return early, unwrap, go on.
 
 ## Composing With bind
 
@@ -314,10 +319,13 @@ if __name__ == "__main__":
 #: (7, 5) Success(answer='add(7 + 5 + 12): 24')
 ```
 
-Nested binds carry each answer inward. A `Failure` anywhere short-circuits to the end.
-Only the last input passes all three steps, so it's the only one that reaches `add()`.
+Nested binds carry each answer inward.
+A `Failure` anywhere short-circuits to the end.
+Only the last input passes all three steps,
+so it's the only one that reaches `add()`.
 
-Testing confirms combining returns the right value, or the first failure in the chain:
+Testing confirms combining returns the right value,
+or the first failure in the chain:
 
 ```python
 # test_combining.py
@@ -377,9 +385,11 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 
-The [Decorators](14_Decorators.md) chapter explains how to write decorators like `@safe`, including `functools.wraps`.
+The [Decorators](14_Decorators.md) chapter explains how to write decorators like `@safe`,
+including `functools.wraps`.
 
-To test `@safe`, a good input becomes a `Success`, and a raised exception becomes a `Failure` holding that exception:
+To test `@safe`, a good input becomes a `Success`,
+and a raised exception becomes a `Failure` holding that exception:
 
 ```python
 # test_safe.py
@@ -440,7 +450,8 @@ if __name__ == "__main__":
 #: OOPS: Not a number
 ```
 
-`parse()` and `reciprocal()` are both wrapped with `@safe`, so `bind()` chains them.
+`parse()` and `reciprocal()` are both wrapped with `@safe`,
+so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,
 and the `match` tells them apart.
 

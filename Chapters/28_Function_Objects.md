@@ -14,7 +14,8 @@ then the classic object form for contrast.
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
-In Python the action is just a function, and a "macro" is just a list of actions:
+In Python the action is just a function,
+and a "macro" is just a list of actions:
 
 ```python
 # command.py
@@ -90,8 +91,8 @@ Use the object form when a command must also carry state or support extra operat
 ## Strategy: Choosing the Algorithm at Runtime
 
 A *Strategy* is an interchangeable algorithm chosen at runtime.
-For the following examples we will use three real algorithms that find a *root* of a
-function `f`, a value where `f(x)` is zero.
+For the following examples we will use three real algorithms that find a *root* of a function `f`,
+a value where `f(x)` is zero.
 Each takes the function and two hints and returns the root,
 or `None` when it cannot find one.
 The hints are a bracket for bisection and two starting points for the open methods.
@@ -236,7 +237,8 @@ The object form is worth it only when a strategy needs its own configuration or 
 *GoF Design Patterns* implements the chain as a linked list,
 largely because it predates standard list types.
 In Python the chain is a list of functions.
-Bisection needs the interval to bracket a root. The open methods do not:
+Bisection needs the interval to bracket a root.
+The open methods do not:
 
 ```python
 # chain.py
@@ -304,7 +306,8 @@ def test_all_fail_returns_none() -> None:
 ## An Event Bus: Handlers Keyed by Type
 
 Chain of Responsibility kept its handlers in a list and tried them in order.
-If you key that structure by type instead of by position, you have an *event bus*.
+If you key that structure by type instead of by position,
+you have an *event bus*.
 This is a `dict` from each event type to the functions that care about it.
 The events are plain values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
@@ -373,16 +376,19 @@ bus.publish(Closed("inactivity"))    # No handler: nothing happens
 The checker reads `E` from the first argument and requires the handler to accept that exact type,
 so `subscribe(Deposit, on_withdraw)` is a type error.
 The safety check happens once, at registration.
-The stored `defaultdict`, though, mixes handlers for every event type in one structure.
-Its lists cannot name a single event class, so the element type erases the parameter to `Handler[Any]`.
-The generic guards the boundary. The `Any` covers the heterogeneous storage behind it.
+The stored `defaultdict`, though,
+mixes handlers for every event type in one structure.
+Its lists cannot name a single event class,
+so the element type erases the parameter to `Handler[Any]`.
+The generic guards the boundary.
+The `Any` covers the heterogeneous storage behind it.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
 `publish` still calls `.get(type(event), [])` instead of indexing.
 Indexing on a read would insert an empty list as a side effect,
-leaving a stray entry behind for every published event type
-that happens to have no subscriber, such as `Closed`.
+leaving a stray entry behind for every published event type that happens to have no subscriber,
+such as `Closed`.
 
 For testing, publishing calls every handler registered for a type,
 a handler hears only its own event type,
@@ -414,7 +420,8 @@ def test_no_handler_is_a_noop() -> None:
 
 This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables),
 narrowed to a single subject.
-The subscribers are functions, and the bus routes each event to them by its type.
+The subscribers are functions,
+and the bus routes each event to them by its type.
 Here a type may have many handlers.
 If you instead want exactly one handler per type,
 chosen by the argument's type and open to new types without editing a central function,

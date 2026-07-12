@@ -10,7 +10,8 @@ This chapter covers the rest.
 ## Matching Values
 
 The simplest patterns are literal values.
-A `case _` at the end is the wildcard. It matches anything, like a default.
+A `case _` at the end is the wildcard.
+It matches anything, like a default.
 Each `case` body runs only when its pattern matches, and the first match wins:
 
 ```python
@@ -100,7 +101,8 @@ print(summarize([1, 2, 3, 4]))
 
 This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-`test_sequence_patterns()` checks the empty, single-item, and starred cases using `pytest`:
+`test_sequence_patterns()` checks the empty, single-item,
+and starred cases using `pytest`:
 
 ```python
 # test_sequence_patterns.py
@@ -245,12 +247,13 @@ def test_mapping_patterns() -> None:
 ## Exhaustive Matching
 
 When a value is one of a fixed set of types,
-define that set as a union using the `type` statement
-(introduced in [Static Typing](08_Static_Typing.md#the-type-statement)).
+define that set as a union using the `type` statement (introduced in [Static Typing](08_Static_Typing.md#the-type-statement)).
 Now you can perform a match on that union.
-When you end with `case _: assert_never(value)`, the type checker will ensure the match is *exhaustive*.
+When you end with `case _: assert_never(value)`,
+the type checker will ensure the match is *exhaustive*.
 If you add a type to the union and forget its case,
-that becomes a type error caught before the program runs, not a silent fall-through.
+that becomes a type error caught before the program runs,
+not a silent fall-through.
 This is the static-typing payoff applied to control flow:
 
 ```python
@@ -284,10 +287,12 @@ print(area(Square(2.0)))
 #: 4.0
 ```
 
-Add a `Triangle` to `Shape` without adding the appropriate `case`, and the checker flags `assert_never(shape)`.
+Add a `Triangle` to `Shape` without adding the appropriate `case`,
+and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
 A `switch` in other languages cannot do this.
-An `if`/`isinstance()` chain can, but only if you remember to end it with `assert_never()`.
+An `if`/`isinstance()` chain can,
+but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) uses this technique to add operations to a closed set of types without inheritance.
 `test_exhaustive_area()` tests the area of each shape:
@@ -324,7 +329,8 @@ print(describe(301))
 ```
 
 When the set of types is *open* (anyone can add a new one),
-polymorphism is better than a `match`. Each type carries its own behavior,
+polymorphism is better than a `match`.
+Each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
 especially when the cases need to look inside the value.

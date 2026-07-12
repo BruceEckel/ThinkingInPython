@@ -2,13 +2,15 @@
 
 One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
-Tests extend the language. They state what the code is supposed to do, and check it.
+Tests extend the language.
+They state what the code is supposed to do, and check it.
 
 Unit testing is a development practice.
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
 
-Perhaps more importantly, tests tell you immediately if a change you've made causes a failure.
+Perhaps more importantly,
+tests tell you immediately if a change you've made causes a failure.
 This can save an enormous amount of time.
 If the problem only surfaces after multiple changes,
 you have no idea which change caused the bug.
@@ -32,13 +34,16 @@ Testing then becomes a design tool,
 not a verification step you skip when you happen to feel good about the code you just wrote.
 
 That said, TDD requires that you know what you are creating.
-It assumes you are confident the design is correct, so that only implementation remains.
+It assumes you are confident the design is correct,
+so that only implementation remains.
 You need that certainty to write tests first.
 Often, however, you are not sure what direction a program will take you.
 You are experimenting to see what the right approach is.
-When you are not simply producing code, but discovering your design, TDD is wasteful.
+When you are not simply producing code, but discovering your design,
+TDD is wasteful.
 Writing tests for exploratory programming is not practical.
-With the advent of AI, generating tests once you have found a good path becomes far more viable.
+With the advent of AI,
+generating tests once you have found a good path becomes far more viable.
 AI also makes a thorough test suite easier to produce.
 
 ## pytest
@@ -51,7 +56,8 @@ The wider Python world has settled on `pytest`, and so does this book.
 `pytest` rests on two ideas that keep tests short.
 A test is just a function whose name starts with `test_`.
 A check is just Python's built-in `assert` statement.
-No base class needs inheriting, and no special assertion methods need memorizing.
+No base class needs inheriting,
+and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
 We will test the `Account` class:
@@ -129,7 +135,8 @@ so you rarely need a debugger to see what went wrong.
 
 ## Testing for Exceptions and Floating Point
 
-Two situations come up repeatedly in testing, and both appear in `test_account.py`.
+Two situations come up repeatedly in testing,
+and both appear in `test_account.py`.
 
 The first is "this call should cause an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.
@@ -148,7 +155,8 @@ That single function becomes three independent tests,
 and a failure names the exact case that failed.
 
 Nothing limits you to one variable.
-You can give `parametrize` several names and a list of tuples, one tuple per case:
+You can give `parametrize` several names and a list of tuples,
+one tuple per case:
 
 ```python
 # test_balances.py
@@ -210,10 +218,10 @@ def test_spend_some(open_account: Account) -> None:
 
 Everything before the `yield` is setup.
 Everything after it runs once the test finishes, even if the test failed.
-After the `yield` is the place to close files, release locks, or check a final invariant.
+After the `yield` is the place to close files, release locks,
+or check a final invariant.
 
-You can automatically invoke a fixture for every test (without specifying the fixture in each test)
-by adding the `autouse` flag:
+You can automatically invoke a fixture for every test (without specifying the fixture in each test) by adding the `autouse` flag:
 
     @pytest.fixture(autouse=True)
 
@@ -266,7 +274,8 @@ Nothing imports either fixture.
 
 ## Isolating Tests from the World
 
-Good tests do not depend on the real filesystem, environment, random number generation, clock, or network.
+Good tests do not depend on the real filesystem, environment,
+random number generation, clock, or network.
 `pytest` ships built-in fixtures for this.
 `tmp_path` gives each test a private temporary directory.
 `monkeypatch` sets and restores environment variables and attributes,
@@ -368,8 +377,8 @@ def test_roll_with_seeded_rng() -> None:
 ```
 
 The function takes its source of randomness as an argument,
-so production code hands it a fresh `random.Random()` while the test hands it a
-seeded one. The randomness is now an input, not a hidden dependency.
+so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
+The randomness is now an input, not a hidden dependency.
 
 ### The Clock
 
@@ -420,8 +429,8 @@ def test_stamp() -> None:
 `datetime.now()` is harder to patch, because `datetime` is a built-in type,
 so the injection approach is worth the small effort.
 
-If you cannot change the code, the library
-[`time-machine`](https://github.com/adamchainz/time-machine) freezes every clock at once,
+If you cannot change the code,
+the library [`time-machine`](https://github.com/adamchainz/time-machine) freezes every clock at once,
 including `datetime.now()`, with no monkeypatching on your part:
 
 ```python
@@ -450,10 +459,11 @@ but it is the standard answer for code already steeped in `datetime`.
 ### Network Calls
 
 A test must never use a real network.
-The call would be slow, it would fail whenever the service or the connection does,
+The call would be slow,
+it would fail whenever the service or the connection does,
 and it would tie the test to data you do not control.
-`monkeypatch` replaces the function that fetches data with one that returns a
-canned response, so the test runs offline and gives the same answer every time.
+`monkeypatch` replaces the function that fetches data with one that returns a canned response,
+so the test runs offline and gives the same answer every time.
 Here a function reads a URL:
 
 ```python
@@ -481,8 +491,9 @@ def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
     assert weather.current_temp("denver") == "21C"
 ```
 
-Patch the name at its point of use, `weather.urlopen()`, rather than the original in
-`urllib`, so the patch redirects only this module's lookups.
+Patch the name at its point of use, `weather.urlopen()`,
+rather than the original in `urllib`,
+so the patch redirects only this module's lookups.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
 
@@ -495,14 +506,17 @@ the way a client would.
 A language with access control enforces the two differently.
 Python has no access control.
 Every attribute is reachable.
-A single leading underscore, as in `self._balance`, changes nothing at the language level.
+A single leading underscore, as in `self._balance`,
+changes nothing at the language level.
 It is stored under that exact name and reachable exactly like any other attribute.
 It is only a convention that says, "this is private, do not rely on it."
 
-A leading *double* underscore does something real, though it is still not access control.
+A leading *double* underscore does something real,
+though it is still not access control.
 Python's compiler rewrites `self.__pin`, written inside a class body,
 into `self._ClassName__pin`, a transformation called *name mangling*.
-`ty` does not model this rewriting, so its report on the code below disagrees with what actually runs:
+`ty` does not model this rewriting,
+so its report on the code below disagrees with what actually runs:
 
 ```python
 # name_mangling.py
@@ -523,22 +537,27 @@ print(v._Vault__pin)  # type: ignore
 `vars(v)` shows what actually got stored: `_balance` under its own name,
 and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
-so `v._Vault__pin` reads it successfully, even though `ty` cannot see that the rewrite happened and reports the line as an error.
+so `v._Vault__pin` reads it successfully,
+even though `ty` cannot see that the rewrite happened and reports the line as an error.
 Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
 not to hide the attribute.
-Anyone who knows the class name can still reach it, so it changes the spelling, not the reachability.
-In Python the distinction between white-box and black-box remains one of discipline, not of compiler enforcement.
+Anyone who knows the class name can still reach it, so it changes the spelling,
+not the reachability.
+In Python the distinction between white-box and black-box remains one of discipline,
+not of compiler enforcement.
 
 That makes black-box testing the sensible default.
 Test the public surface, the methods a caller is meant to use,
 and you can change the internals without rewriting the tests.
-The `Account` tests are black-box. They never read a private attribute.
+The `Account` tests are black-box.
+They never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 
 ## Property-Based Testing
 
-The tests in this chapter check specific examples: this input produces that output.
+The tests in this chapter check specific examples:
+this input produces that output.
 A *property-based* test instead states a law the code must always obey,
 and lets a tool generate the inputs that try to break it.
 [Functional Programming](40_Functional_Programming.md#an-assurance-spectrum) shows the technique,

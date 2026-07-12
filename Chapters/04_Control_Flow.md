@@ -1,7 +1,8 @@
 # Control Flow
 
 Control-flow statements decide which code runs and how often.
-This chapter covers conditionals, loops, pattern matching, exceptions, the `with` statement, and comprehensions.
+This chapter covers conditionals, loops, pattern matching, exceptions,
+the `with` statement, and comprehensions.
 
 ## Conditionals and Loops
 
@@ -18,7 +19,8 @@ print(grade)
 #: pass
 ```
 
-The example also shows a *conditional expression*: a one-line `if`/`else` that produces a value.
+The example also shows a *conditional expression*:
+a one-line `if`/`else` that produces a value.
 
 Adding `elif` to an `if` statement chains multiple tests:
 
@@ -141,8 +143,10 @@ for i, name, score in zip(range(10), names, scores):
 #: 3 Ted 54
 ```
 
-`enumerate()` yields `(index, item)` pairs counting from zero, which the loop here unpacks into `index` and `name`.
-`zip()` traverses several sequences at once, producing one item from each and stopping when the shortest runs out.
+`enumerate()` yields `(index, item)` pairs counting from zero,
+which the loop here unpacks into `index` and `name`.
+`zip()` traverses several sequences at once,
+producing one item from each and stopping when the shortest runs out.
 
 With `print()`, the default `end` (printed after the value) is a newline.
 You can use `sep` to change the separator between values.
@@ -252,7 +256,8 @@ rather than checking every precondition first.
 
 A `with` block guarantees that setup and cleanup happen as a pair,
 even if the body raises an exception.
-Opening a file is the canonical case. The `with` block always closes the file on the way out:
+Opening a file is the canonical case.
+The `with` block always closes the file on the way out:
 
 ```python
 # context_manager.py
@@ -275,8 +280,7 @@ This is the explicit-finalizer approach from [Cleanup](10_Cleanup.md).
 Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.
 When simply reading or writing a file,
-`pathlib` provides utility methods like `read_text()` and `write_text()`
-that open and close the file for you.
+`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file for you.
 
 ## Comprehensions
 
@@ -307,14 +311,14 @@ as well as generator expressions and the functional tools `map()` and `filter()`
 ## Exercises
 
 1.  In `loop_else.py`, call `find_factor(97)`.
-    Predict whether the `for` loop's `else` clause runs before you check, then confirm.
+    Predict whether the `for` loop's `else` clause runs before you check,
+    then confirm.
 2.  Change `collatz_sequence()` in `while_loop.py` to also count how many times `n` is odd,
     and print that count alongside the step count.
-3.  In `break_continue.py`, swap the order of the two `if` blocks, so the `n == 6` `break` check
-    comes first and the `n == 3` `continue` check comes second.
+3.  In `break_continue.py`, swap the order of the two `if` blocks,
+    so the `n == 6` `break` check comes first and the `n == 3` `continue` check comes second.
     Predict whether the output changes before running it,
-    and explain why the order of two independent conditions, testing different values of `n`,
-    does not matter here.
-4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)` (no error, and `b` is not zero)
-    and a call `demo_exceptions(1, "x")` (a `TypeError` that `except ValueError` does not catch).
+    and explain why the order of two independent conditions,
+    testing different values of `n`, does not matter here.
+4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)` (no error, and `b` is not zero) and a call `demo_exceptions(1, "x")` (a `TypeError` that `except ValueError` does not catch).
     Run the second one and read the traceback that escapes.

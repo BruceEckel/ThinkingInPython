@@ -52,27 +52,33 @@ The `counters` list still references each `Counter`,
 so its reference count never reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
 and why every `__repr__()` prints `3`.
-Python has destroyed nothing yet, so the class attribute `count` is still `3` for all three.
-The `End of delete loop` line, printed before any deletion, confirms that the loop destroys nothing.
+Python has destroyed nothing yet,
+so the class attribute `count` is still `3` for all three.
+The `End of delete loop` line, printed before any deletion,
+confirms that the loop destroys nothing.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
-That list holds the only remaining references,
-so when it goes, the objects it holds go with it.
+That list holds the only remaining references, so when it goes,
+the objects it holds go with it.
 That is why the `deleted` lines are missing from the output above.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints only afterward.
 Run `python cleanup.py` directly to see those lines appear.
 
 The order in which the three finalizers run is an unstable implementation detail.
-It depends on how the interpreter tears down the `counters` list at shutdown, and it can differ from one CPython build to the next.
-Whether `__del__()` runs before the program exits is a reference-counting detail, not a guarantee.
+It depends on how the interpreter tears down the `counters` list at shutdown,
+and it can differ from one CPython build to the next.
+Whether `__del__()` runs before the program exits is a reference-counting detail,
+not a guarantee.
 The language does not promise when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
-could destroy the objects in a different order, or not run the finalizers before exit.
+could destroy the objects in a different order,
+or not run the finalizers before exit.
 
 Thus, leaning on `__del__()` is fragile because Python does not guarantee the timing.
-At interpreter shutdown, the globals a `__del__()` method refers to may already be gone.
+At interpreter shutdown,
+the globals a `__del__()` method refers to may already be gone.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
@@ -102,8 +108,9 @@ but nothing guarantees the teardown order that allowed it.
 Two approaches are more reliable:
 
 1. An explicit finalizer such as the `close()` that file objects provide,
-   called from a `with` block. This runs even when an error interrupts the
-   code. [Context Managers](15_Context_Managers.md) covers `with` in full.
+   called from a `with` block.
+   This runs even when an error interrupts the code.
+   [Context Managers](15_Context_Managers.md) covers `with` in full.
 
 2. A weak reference, which tracks an object without keeping it alive.
    Here, a `WeakValueDictionary` counts live instances,
@@ -146,8 +153,10 @@ print(Counter.live_count())
 Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.
 `live_count()` is the size of that registry,
 so it reports how many `Counter` objects currently exist.
-When an instance loses its last ordinary reference, in this case when `pop()` removes it from the `counters` list,
-the interpreter collects it at once, and the dictionary drops its entry on its own.
+When an instance loses its last ordinary reference,
+in this case when `pop()` removes it from the `counters` list,
+the interpreter collects it at once,
+and the dictionary drops its entry on its own.
 The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
@@ -165,10 +174,11 @@ so it never depends on the unreliable bookkeeping at interpreter shutdown.
 
 1.  In `weak_value.py`, change `counters` from a `list` to a plain `dict` keyed by name,
     then pop entries from that `dict` one at a time and confirm `live_count()` still falls correctly.
-2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []` (rebinding the name)
-    and confirm `live_count()` still reaches `0`.
-    Explain, in terms of what `counters` refers to, why rebinding has the same effect as clearing.
-3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of
-    the `.name` of every live instance, by reading `cls._instances.values()`.
-4.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()`
-    in a `for` loop, and confirm the output is unchanged: nothing is deleted before `End of delete loop` prints.
+2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []` (rebinding the name) and confirm `live_count()` still reaches `0`.
+    Explain, in terms of what `counters` refers to,
+    why rebinding has the same effect as clearing.
+3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
+    by reading `cls._instances.values()`.
+4.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
+    and confirm the output is unchanged:
+    nothing is deleted before `End of delete loop` prints.

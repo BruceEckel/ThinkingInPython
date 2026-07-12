@@ -16,10 +16,11 @@ that runtime performance will be insufficient.
 This produces elaborate, expensive designs.
 
 Python can be surprising.
-A program coded in the most straightforward way, without concern for performance,
-can often run fast enough for your needs.
+A program coded in the most straightforward way,
+without concern for performance, can often run fast enough for your needs.
 Do not automatically assume that a simply written program will be too slow.
-Try it out first. It might be fine.
+Try it out first.
+It might be fine.
 
 If it is too slow, use Occam's Razor.
 Try the simplest approach first.
@@ -30,7 +31,8 @@ starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
 
-Alternative interpreters for Python exist, notably PyPy, which boasts a 4x to 10x speedup.
+Alternative interpreters for Python exist, notably PyPy,
+which boasts a 4x to 10x speedup.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, then buying new hardware might be a quick win.
@@ -38,7 +40,8 @@ If it's noticeably less, then buying new hardware might be a quick win.
 ## Profilers
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
-Although it is tempting to think you "have a pretty good idea where the slowdown is," we turn out to be bad at guessing this.
+Although it is tempting to think you "have a pretty good idea where the slowdown is,"
+we turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library provides two complementary profilers.
@@ -62,8 +65,8 @@ which makes it the tool for a slowdown you can only reproduce live:
 
 Either form ends with a table of hot functions ranked by sample count.
 
-Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
-separates Python time from native time and profiles memory line by line.
+Beyond the standard library,
+[Scalene](https://github.com/plasma-umass/scalene) separates Python time from native time and profiles memory line by line.
 
 If you can narrow the problem down to a particular function,
 there may be techniques that speed up the algorithm used in that function.
@@ -77,7 +80,8 @@ insulating the measurement from startup cost and clock granularity.
 
 Timings differ from machine to machine,
 so this example prints a comparison instead of raw numbers.
-Membership testing in a `list` scans. In a `set` it hashes:
+Membership testing in a `list` scans.
+In a `set` it hashes:
 
 ```python
 # membership.py
@@ -131,13 +135,10 @@ print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
 #: sum() at least twice as fast: True
 ```
 
-The same principle chooses `"".join(parts)` over `+=` in a loop
-(one linear pass instead of repeated reallocation),
-a comprehension over an `append()` loop,
-and the C-implemented standard library,
+The same principle chooses `"".join(parts)` over `+=` in a loop (one linear pass instead of repeated reallocation),
+a comprehension over an `append()` loop, and the C-implemented standard library,
 `itertools`, `collections`, and `functools`,
-over hand-rolled equivalents
-([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+over hand-rolled equivalents ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
 As a last resort in a proven-hot loop,
 hoist a repeated attribute or global lookup into a local,
 as in `append = out.append`.
@@ -151,7 +152,8 @@ Often this means choosing the right container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a `deque` (see [Containers](03_Containers.md#deque)) when you add and remove at both ends.
 
-For data kept in sorted order, the `bisect` module finds the insertion point with binary search:
+For data kept in sorted order,
+the `bisect` module finds the insertion point with binary search:
 
 ```python
 # bisect_search.py
@@ -175,10 +177,11 @@ print([grade(s) for s in (55, 65, 85, 95)])
 #: ['F', 'D', 'B', 'A']
 ```
 
-Because `scores` stays sorted, `bisect` locates a position in O(log n)
-instead of the O(n) scan a `list` would need.
+Because `scores` stays sorted,
+`bisect` locates a position in O(log n) instead of the O(n) scan a `list` would need.
 
-When you repeatedly need the smallest item, a *heap* keeps that item reachable in O(log n).
+When you repeatedly need the smallest item,
+a *heap* keeps that item reachable in O(log n).
 The `heapq` module treats a plain `list` as a binary heap:
 
 ```python
@@ -206,8 +209,7 @@ For a priority queue shared across threads,
 
 The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
 A `frozenset` looks up exactly as fast as a `set`,
-a `frozendict` behaves like a `dict`,
-and a `tuple` scans like a `list`.
+a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
 In CPython these share the same machinery.
 Choose immutability for correctness and safe sharing.
 Immutable values are hashable,
@@ -216,10 +218,8 @@ so they can serve as dictionary keys and as arguments to the caches shown below.
 ## Lazy Evaluation with Generators
 
 A list-building pipeline materializes every intermediate result.
-A generator pipeline
-([Comprehensions](16_Comprehensions.md#generator-expressions))
-computes one item at a time, on demand,
-so memory stays flat no matter how large the source,
+A generator pipeline ([Comprehensions](16_Comprehensions.md#generator-expressions)) computes one item at a time,
+on demand, so memory stays flat no matter how large the source,
 and no work happens past the point where the consumer stops.
 `tracemalloc` measures the difference:
 
@@ -258,17 +258,14 @@ print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 
 Both versions produce the same five numbers,
 but the eager one built two million-element lists to get them,
-while the lazy one computed only the handful of values that
-`islice()` extracted.
+while the lazy one computed only the handful of values that `islice()` extracted.
 When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice.
 A generator is spent after one pass.
 
 ## Caching
 
-If a pure function
-([Functional Programming](40_Functional_Programming.md#pure-functions))
-is called repeatedly with the same arguments,
+If a pure function ([Functional Programming](40_Functional_Programming.md#pure-functions)) is called repeatedly with the same arguments,
 the fastest way to compute the answer is to not compute it.
 `functools.cache` stores each result the first time and replays it after that.
 The classic demonstration is naive recursive Fibonacci,
@@ -301,16 +298,14 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 
 Same answer, but 242,785 calls against 26.
 The counts are the speedup.
-The cached version runs thousands of times faster,
-and the gap grows with `n`.
+The cached version runs thousands of times faster, and the gap grows with `n`.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
 Arguments must be hashable,
 which is another reason to prefer immutable containers.
 For an expensive attribute computed once per object,
-`functools.cached_property` does the same job on instances
-(see [Classes](07_Classes.md#properties)).
+`functools.cached_property` does the same job on instances (see [Classes](07_Classes.md#properties)).
 
 Caching is only correct when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
@@ -348,8 +343,8 @@ except AttributeError as e:
 ```
 
 A data class can generate the slots for you.
-`@dataclass(slots=True)` turns the field declarations into `__slots__`
-and still writes `__init__()`, `__repr__()`, and `__eq__()`:
+`@dataclass(slots=True)` turns the field declarations into `__slots__` and still writes `__init__()`,
+`__repr__()`, and `__eq__()`:
 
 ```python
 # slots_dataclass.py
@@ -408,12 +403,10 @@ the same restriction `slots` gives you.
 But frozen enforces this by overriding `__setattr__()`.
 The instance still keeps a `__dict__` underneath.
 `slots=True` removes that `__dict__`,
-so pairing it with `frozen=True` is the natural default, giving you
-the same immutability in a fraction of the space
-(one machine measured 344 bytes against 48, roughly seven to one).
+so pairing it with `frozen=True` is the natural default,
+giving you the same immutability in a fraction of the space (one machine measured 344 bytes against 48, roughly seven to one).
 The exact byte counts vary by platform and Python build,
-so the listing prints a comparison that holds anywhere
-rather than numbers that hold only here.
+so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
 
 ### Array Instead of List
 
@@ -452,12 +445,10 @@ print(f"array at least 3x smaller: "
 Every element shares one type, given by the type code,
 so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing:
-the `list` holds an 8-byte pointer to a 24-byte `float` object
-per element, while the `array` spends 8 bytes per element total,
-roughly a four-to-one difference
-(one machine measured 325,176 bytes against 80,080).
-(`sys.getsizeof()` reports a `list`'s own size but not its elements',
-so the elements are summed separately.)
+the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
+while the `array` spends 8 bytes per element total,
+roughly a four-to-one difference (one machine measured 325,176 bytes against 80,080).
+(`sys.getsizeof()` reports a `list`'s own size but not its elements', so the elements are summed separately.)
 
 ### Memory View
 
@@ -486,8 +477,7 @@ so writing through it changes the original and copies no bytes.
 When the hot spot is arithmetic over a large collection of numbers,
 the biggest step is to remove the Python loop entirely.
 [NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
-like `array` above,
-and executes whole-array expressions in compiled loops.
+like `array` above, and executes whole-array expressions in compiled loops.
 The plain-Python version repeats one expression per element.
 The NumPy version states it once for the whole array:
 
@@ -510,32 +500,24 @@ The NumPy version states it once for the whole array:
     # Sample run: NumPy speedup: 12.9x
 
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
-but as one compiled pass over contiguous memory
-instead of a million individual Python-level steps.
-NumPy is a fast library you call,
-not a compiled extension you write.
+but as one compiled pass over contiguous memory instead of a million individual Python-level steps.
+NumPy is a fast library you call, not a compiled extension you write.
 The benefit only occurs if the data stays inside NumPy.
 Calling a Python function on each element,
-or converting arrays to lists and back,
-reproduces the overhead.
-This is the declarative trade from
-[Functional Programming](40_Functional_Programming.md#declarative-style):
+or converting arrays to lists and back, reproduces the overhead.
+This is the declarative trade from [Functional Programming](40_Functional_Programming.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
-(NumPy is a third-party dependency,
-and the book's Python 3.15 target has no NumPy release yet,
-so unlike the rest of the book's listings,
-the build does not run this snippet.
+(NumPy is a third-party dependency, and the book's Python 3.15 target has no NumPy release yet, so unlike the rest of the book's listings, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
 ## JIT Compilation with Numba
 
 Sometimes the loop cannot become an array expression,
-because each step depends on the previous one,
-or the control flow is irregular.
-[Numba](https://numba.pydata.org/)'s `@njit` decorator compiles such a
-function to machine code on its first call, in place.
+because each step depends on the previous one, or the control flow is irregular.
+[Numba](https://numba.pydata.org/)'s `@njit` decorator compiles such a function to machine code on its first call,
+in place.
 The source stays Python:
 
     import timeit
@@ -571,10 +553,7 @@ and code that leans on arbitrary Python objects will not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
-(Numba is also a third-party dependency,
-and it does not yet support the book's Python 3.15 target,
-so like the NumPy example above,
-the build does not run this snippet.
+(Numba is also a third-party dependency, and it does not yet support the book's Python 3.15 target, so like the NumPy example above, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
@@ -586,9 +565,9 @@ NumPy gives you a compact array.
 `@njit` compiles a loop that walks it,
 for the case where the loop cannot become one vectorized expression,
 because the amount of work per element depends on the element's value.
-The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture)
-is such a case: from `n`, halve an even value or triple-and-increment
-an odd one, and repeat until you reach 1.
+The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture) is such a case:
+from `n`, halve an even value or triple-and-increment an odd one,
+and repeat until you reach 1.
 The number of steps differs for every starting value,
 so no single array expression produces it:
 
@@ -624,16 +603,13 @@ so no single array expression produces it:
 `collatz_lengths()` takes a NumPy array and returns one,
 so it composes with vectorized NumPy code on either side.
 Compiling changes only what happens inside the loop:
-the same Python source runs as machine code
-instead of as bytecode over boxed `int` objects.
+the same Python source runs as machine code instead of as bytecode over boxed `int` objects.
 This is the pattern in practice:
-use a vectorized NumPy expression wherever the shape of the
-computation allows it,
+use a vectorized NumPy expression wherever the shape of the computation allows it,
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
 
-(Like the two examples above, this one needs both NumPy and Numba,
-so the build does not run it.
+(Like the two examples above, this one needs both NumPy and Numba, so the build does not run it.
 The comment shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
@@ -643,7 +619,8 @@ Sometimes the fix is not a faster function but a different architecture.
 When the time goes to waiting on the outside world, use `asyncio`.
 If the work can be done in parallel (pure functions can do this seamlessly),
 you can spread it across multiple cores or multiple processes.
-That is a design decision with its own chapter, [Concurrency](19_Concurrency.md).
+That is a design decision with its own chapter,
+[Concurrency](19_Concurrency.md).
 
 ## Converting a Slow Function to Rust
 
@@ -656,8 +633,7 @@ It just runs faster.
 In addition, you can do things in Rust that might be much more difficult in Python.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
-and [maturin](https://www.maturin.rs) builds and installs the result
-as an ordinary Python package.
+and [maturin](https://www.maturin.rs) builds and installs the result as an ordinary Python package.
 `maturin new --bindings pyo3 fastcount` scaffolds the project,
 and one attribute turns a Rust function into a Python function:
 
@@ -689,8 +665,7 @@ and one attribute turns a Rust function into a Python function:
         Ok(())
     }
 
-After `maturin develop` compiles and installs it,
-Python sees a normal module:
+After `maturin develop` compiles and installs it, Python sees a normal module:
 
     import fastcount
     fastcount.count_primes(100_000)
@@ -705,12 +680,14 @@ The cost of this technique is a second language and a build toolchain in your pr
 ## Choosing a Strategy
 
 Measure first.
-Every performance optimization costs something in effort, complexity, or dependencies.
+Every performance optimization costs something in effort, complexity,
+or dependencies.
 A profiler is the only way to discover hot spots.
 Work down this list from the cheapest change to the most involved,
 stopping as soon as the program is fast enough:
 
-1. Run the straightforward version. It may be fast enough.
+1. Run the straightforward version.
+   It may be fast enough.
 2. Try a faster platform: PyPy, or better hardware.
 3. Write idiomatic Python and let the interpreter's C loops do the work.
 4. Fix the algorithm and the data structures.
@@ -733,10 +710,8 @@ It is a program that is fast enough, at the lowest cost in clarity.
 1.  `membership.py` fixes `target` at the worst case, the last element.
     Measure the average case by timing lookups of many random targets,
     and see whether the conclusion changes.
-2.  Use `timeit` to find the collection size below which the `list`
-    scan beats the `set` lookup on your machine.
-3.  Rewrite `eager_first_evens()` as a single list comprehension and
-    measure its peak with `tracemalloc`.
+2.  Use `timeit` to find the collection size below which the `list` scan beats the `set` lookup on your machine.
+3.  Rewrite `eager_first_evens()` as a single list comprehension and measure its peak with `tracemalloc`.
     How close can an eager version get to the lazy one?
 4.  Apply `@cache` to a function that prints as a side effect,
     and demonstrate that repeated calls skip the printing.

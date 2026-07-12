@@ -86,8 +86,8 @@ because *GoF Design Patterns* asserts that a Proxy must have an identical interf
 ### Adapter in Python
 
 The four variations above are Java habits.
-Python is dynamically typed. `WhatIUse.op()` only calls `f()`,
-so it accepts any object that has an `f()`.
+Python is dynamically typed.
+`WhatIUse.op()` only calls `f()`, so it accepts any object that has an `f()`.
 You do not need a shared base class or a declared interface, only the method.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
@@ -203,5 +203,4 @@ what a module already gives you.
     following the shape of `getattr_adapter.py`.
     Give it a dictionary-style `__getitem__()` that finds a value by key,
     and forward every other attribute to the wrapped list with `__getattr__()`.
-    Confirm `adapter["name"]` finds a value
-    while `adapter.append(...)` still reaches the underlying list.
+    Confirm `adapter["name"]` finds a value while `adapter.append(...)` still reaches the underlying list.

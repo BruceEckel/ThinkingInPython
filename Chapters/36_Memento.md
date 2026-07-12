@@ -116,8 +116,7 @@ Languages with access control enforce this opacity.
 In Python it is a convention,
 though freezing the memento means the honest mistakes (mutating the snapshot) fail loudly.
 
-A plain `type Memento = tuple[str, ...]` alias would type-check
-at every call site instead of the class.
+A plain `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
 But an alias is *structural*, not *nominal*.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
@@ -332,8 +331,8 @@ Each `Sketch` above shares almost all of its strokes with its neighbors in the h
 ## Mementos That Outlive the Process
 
 A snapshot in memory disappears when the process ends.
-The same frozen value, serialized, becomes a saved game,
-a session file, or a crash-recovery point.
+The same frozen value, serialized, becomes a saved game, a session file,
+or a crash-recovery point.
 The standard library's `pickle` turns almost any Python object into bytes and back:
 
 ```python
@@ -409,12 +408,10 @@ There isn't a practical way to declare that `SketchV1` can become a different cl
 `pickle.loads()` never calls `__init__`.
 It looks up the class by the name pickle recorded, `sketch_v1.SketchV1`.
 That name now points at `SketchV2`.
-`pickle.loads()` builds a bare `SketchV2`
-and copies in only the fields the old bytes had.
+`pickle.loads()` builds a bare `SketchV2` and copies in only the fields the old bytes had.
 `title` is simply absent, since the old bytes never had one.
 The same shortcut skips `__post_init__`,
-so a memento saved before a validated field existed
-can load a value nothing ever validated.
+so a memento saved before a validated field existed can load a value nothing ever validated.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` fails if anything asks for it,
 which is often nowhere near the line that called `pickle.loads()`.
@@ -422,9 +419,8 @@ Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
 Databases hit the same problem and gave it a name.
-A *schema migration* is the disciplined version of this drift,
-a versioned, deliberate step that moves the table shape
-and its data forward together,
+A *schema migration* is the disciplined version of this drift, a versioned,
+deliberate step that moves the table shape and its data forward together,
 instead of discovering the mismatch when a query runs.
 
 When either limitation rules out `pickle`, there are open-source libraries.
@@ -432,10 +428,9 @@ When either limitation rules out `pickle`, there are open-source libraries.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
-Every field gets an explicit, numbered slot in a schema
-shared across languages.
-Old and new versions can then read each other's messages
-on purpose, not by accident.
+Every field gets an explicit, numbered slot in a schema shared across languages.
+Old and new versions can then read each other's messages on purpose,
+not by accident.
 None of the three execute the bytes they read,
 so none carry pickle's security risk either.
 
@@ -453,7 +448,8 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 
 1.  Add `erase()` to both sketches.
     It removes the last stroke.
-    In `sketch.py` it mutates. In `frozen_sketch.py` it returns a new `Sketch`.
+    In `sketch.py` it mutates.
+    In `frozen_sketch.py` it returns a new `Sketch`.
     Write tests proving existing mementos and histories are unaffected in each version.
 2.  Give `History` a maximum depth.
     When the past grows beyond `n` states, discard the oldest.

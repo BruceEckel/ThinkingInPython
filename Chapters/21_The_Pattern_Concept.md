@@ -1,12 +1,15 @@
 # The Pattern Concept
 
 An important step forward in object-oriented design was the "design patterns" movement,
-chronicled in the 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides.
+chronicled in the 1994 book *Design Patterns* by Erich Gamma, Richard Helm,
+Ralph Johnson, and John Vlissides.
 They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
-I will refer to that book as *GoF Design Patterns*, and use *design patterns* for the concept.
+I will refer to that book as *GoF Design Patterns*,
+and use *design patterns* for the concept.
 
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
-along with one or more examples for each, typically in C++ but sometimes in Smalltalk.
+along with one or more examples for each,
+typically in C++ but sometimes in Smalltalk.
 A significant portion of those examples provide inspiration for much of the remainder of this book.
 I will introduce the basic concepts of design patterns, along with examples.
 
@@ -36,8 +39,7 @@ you prevent those changes from propagating other changes throughout your code.
 Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
-Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
-(here, "vector" means a direction of change, not a container class).
+Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change" (here, "vector" means a direction of change, not a container class).
 This means finding the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,
@@ -74,7 +76,8 @@ Your generic code works with any object that produces an iterator.
 
 This progression doesn't say that one stage is better than another.
 It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
-That's not a good use of your time, and you can't force the discovery of patterns that way.
+That's not a good use of your time,
+and you can't force the discovery of patterns that way.
 They tend to be subtle and appear over time.
 
 ## Pattern Taxonomy
@@ -91,8 +94,9 @@ The three purposes are:
 2.  **Structural**: designing objects to satisfy particular project constraints.
     These work with the way objects connect with other objects to ensure that changes in the system don't require changes to those connections.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
-    These encapsulate processes such as interpreting a language, fulfilling a request,
-    moving through a sequence (as in an iterator), or implementing an algorithm.
+    These encapsulate processes such as interpreting a language,
+    fulfilling a request, moving through a sequence (as in an iterator),
+    or implementing an algorithm.
     This book contains multiple examples including [Observer](30_Observer.md),
     [State Machines](31_State_Machines.md), and [Visitor](33_Visitor.md).
 
@@ -120,8 +124,7 @@ and the remaining difference is intent.
 
 Design principles are at least as important as design structures,
 but for a different reason.
-Principles ask questions about your proposed design,
-to apply tests for quality.
+Principles ask questions about your proposed design, to apply tests for quality.
 Some of these only apply to OOP.
 
 -   *Principle of least astonishment* (don't be astonishing).
@@ -131,8 +134,7 @@ Some of these only apply to OOP.
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer can produce.
     This does not appear to be a linear factor, but an exponential one.
--   *Law of Demeter*: a.k.a.
-    "Don't talk to strangers."
+-   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     An object should only reference itself, its attributes,
     and the arguments of its methods.
     This may also be a way to say "minimize coupling."
@@ -160,7 +162,8 @@ Some of these only apply to OOP.
 -   *Once and once only*:
     Avoid duplication of logic and structure where the duplication is not accidental,
     i.e., where both pieces of code express the same intent for the same reason.
--   *Make things as immutable as possible*, as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
+-   *Make things as immutable as possible*,
+    as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
 -   *Make functions pure whenever you can*.
 
 This is a small handful of fundamental ideas that you can hold in your head while walking through and analyzing your design.

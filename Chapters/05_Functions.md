@@ -26,7 +26,8 @@ print(a_function("yes"))
 
 Here the function signature specifies only the function name and the parameter names,
 but no argument types or return types ([Static Typing](08_Static_Typing.md#type-hints) covers these).
-Python is dynamically typed, so type errors surface at runtime rather than at compile time.
+Python is dynamically typed,
+so type errors surface at runtime rather than at compile time.
 This means the same function can accept and return different types:
 
 ```python
@@ -112,7 +113,8 @@ Python does not recreate it on each call.
 This behavior commonly confuses newcomers to the language.
 
 You only need the `None` sentinel when the function modifies the argument.
-If the function only reads the parameter, use an immutable default such as an empty tuple.
+If the function only reads the parameter,
+use an immutable default such as an empty tuple.
 Calls still share it, but sharing is harmless because it cannot change:
 
 ```python
@@ -138,8 +140,8 @@ such a parameter reads:
 
 The `None` sentinel works only because `None` is not a meaningful value here.
 When `None` is itself a valid argument, you need a distinct marker.
-Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/)) adds a `sentinel`
-builtin that creates one unique, self-describing value for this purpose:
+Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/)) adds a `sentinel` builtin that creates one unique,
+self-describing value for this purpose:
 
 ```python
 # sentinel_default.py
@@ -255,7 +257,8 @@ because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 
 In the standard library,
-many built-in functions and methods take positional-only parameters, such as `dict.get(key, default, /)`.
+many built-in functions and methods take positional-only parameters,
+such as `dict.get(key, default, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method.
 Since the name is not part of the interface,
@@ -277,20 +280,21 @@ print(square(9))
 #: 81
 ```
 
-Compared to other languages,
-Python's lambdas allow only a single expression.
+Compared to other languages, Python's lambdas allow only a single expression.
 For anything more complicated, write a separate function.
 
 ## Exercises
 
-1.  In `mutable_default.py`, call `bad_append(3)` a third time and predict the result before checking it.
-    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it
-    (hint: `target.append(item)` on a tuple).
+1.  In `mutable_default.py`,
+    call `bad_append(3)` a third time and predict the result before checking it.
+    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it (hint: `target.append(item)` on a tuple).
 2.  In `sentinel_default.py`, add a third key to `prefs`, `"volume2": None`,
     and call `get(prefs, "volume2")` to confirm the sentinel still tells `None`-as-value apart from missing.
-3.  In `param_markers.py`, add a parameter `label: str = "result"` to `divide()`, keyword-only,
+3.  In `param_markers.py`,
+    add a parameter `label: str = "result"` to `divide()`, keyword-only,
     so `divide(10, 2, label="half")` prints `"half: 5.0"`.
-    Confirm that `divide(10, 2, "half")`, passing `label` positionally, is now a `TypeError`.
-4.  Rewrite `report()` from `var_args.py` so it also accepts a `total: bool = False` keyword-only flag
-    that, when true, additionally prints `sum(values)`.
+    Confirm that `divide(10, 2, "half")`, passing `label` positionally,
+    is now a `TypeError`.
+4.  Rewrite `report()` from `var_args.py` so it also accepts a `total: bool = False` keyword-only flag that,
+    when true, additionally prints `sum(values)`.
     Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.

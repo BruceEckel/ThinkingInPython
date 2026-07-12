@@ -1,11 +1,16 @@
 # Functional Programming
 
-Introductions to functional programming usually call it "programming with functions," and functions are indeed a central part of the practice.
-But after (slowly) studying it for over ten years, I have started to wonder whether it's actually more about "functionality."
+Introductions to functional programming usually call it "programming with functions,"
+and functions are indeed a central part of the practice.
+But after (slowly) studying it for over ten years,
+I have started to wonder whether it's actually more about "functionality."
 One definition of science is "what works."
 Science has theories that fit the data, are predictive, and are falsifiable.
-If "computer science" is to live up to its name, there should be some ideas and practices that fit that definition, and perhaps even some aspects that are mathematically provable.
-This seems to me to be the broader challenge that functional programming takes on, and what I explore in this chapter.
+If "computer science" is to live up to its name,
+there should be some ideas and practices that fit that definition,
+and perhaps even some aspects that are mathematically provable.
+This seems to me to be the broader challenge that functional programming takes on,
+and what I explore in this chapter.
 That said, we must still begin with the more traditional explanations of functional programming.
 
 Here is what these ideas buy you, before the vocabulary arrives.
@@ -13,8 +18,10 @@ A pure function cannot corrupt state you forgot about.
 It has fewer bugs to chase, and it needs no mock or fixture to test.
 A cache or a fold from `functools` or `itertools` is code you never write yourself,
 already correct on the edge case you would have missed at first.
-A function with no shared state needs no lock, so it parallelizes with no new code.
-And code built from small, checkable pieces is code you can reason about by substitution,
+A function with no shared state needs no lock,
+so it parallelizes with no new code.
+And code built from small,
+checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
 None of this asks you to abandon loops, classes, or mutation.
 It asks you to notice when a piece of code can depend on nothing but its arguments,
@@ -24,11 +31,14 @@ and to write it that way when it can.
 
 A *pure function* computes its result from its arguments alone.
 It reads nothing else and changes nothing else.
-Given the same arguments, it always produces the same outcome, whether that outcome is a returned value or a raised exception.
-It has no *side effects*: no printing, no file or network access, no mutation of anything outside the function.
+Given the same arguments, it always produces the same outcome,
+whether that outcome is a returned value or a raised exception.
+It has no *side effects*: no printing, no file or network access,
+no mutation of anything outside the function.
 
 Purity is the foundation on which everything else in this chapter builds.
-You can test a pure function in isolation, because what you pass in fully determines its behavior.
+You can test a pure function in isolation,
+because what you pass in fully determines its behavior.
 You can cache its result, because the answer never changes.
 You can reason about it the way you reason about an equation:
 
@@ -52,13 +62,17 @@ print(withdraw(30), withdraw(30))
 ```
 
 `double()` returns the same answer every time.
-`withdraw()` does not, because each call changes `balance` and the next call sees the new value.
+`withdraw()` does not,
+because each call changes `balance` and the next call sees the new value.
 You cannot understand a single `withdraw()` call without tracking the history of every call before it.
 
 The payoff is trust.
-A pure function is the most reliable code you can write, because its behavior is fully described by its inputs.
-You test it with a single assertion and no fixture, since there is nothing to set up or restore.
-You can call it from many threads at once, because it shares no state to corrupt.
+A pure function is the most reliable code you can write,
+because its behavior is fully described by its inputs.
+You test it with a single assertion and no fixture,
+since there is nothing to set up or restore.
+You can call it from many threads at once,
+because it shares no state to corrupt.
 [Automatic Parallelism](#automatic-parallelism) turns that safety into speed.
 A cache can store its results, knowing the answer will never go stale:
 
@@ -74,13 +88,15 @@ print("ok")
 #: ok
 ```
 
-Every later feature in this chapter is, in part, a way to keep more of your code pure.
+Every later feature in this chapter is, in part,
+a way to keep more of your code pure.
 
 ## Immutability
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Removing shared mutable state is the practical core of the functional style. A value that never changes cannot develop a bug from some forgotten change elsewhere.
+Removing shared mutable state is the practical core of the functional style.
+A value that never changes cannot develop a bug from some forgotten change elsewhere.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -107,11 +123,16 @@ print(moved)
 
 The original `p` is untouched.
 `moved` is a separate value.
-When values never change underneath you, two parts of a program can share one without coordinating, and concurrent code needs no lock to read it.
+When values never change underneath you,
+two parts of a program can share one without coordinating,
+and concurrent code needs no lock to read it.
 
 Type annotations can state immutability so a checker enforces it.
 `typing.Final` marks a name that must not be rebound.
-The read-only collection types in `collections.abc`, such as `Sequence` and `Mapping`, describe a value you only read. They have no `append()` or item assignment, so a checker rejects any attempt to mutate through them:
+The read-only collection types in `collections.abc`,
+such as `Sequence` and `Mapping`, describe a value you only read.
+They have no `append()` or item assignment,
+so a checker rejects any attempt to mutate through them:
 
 ```python
 # immutable_types.py
@@ -129,13 +150,17 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-The annotation is a promise the checker keeps for you, even when the value passed in is a mutable `list`.
-Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`, is a type error caught before the program runs.
+The annotation is a promise the checker keeps for you,
+even when the value passed in is a mutable `list`.
+Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
+is a type error caught before the program runs.
 
 Immutability also unlocks abilities a mutable value lacks.
 An immutable object can be *hashable*.
-It can promise a stable hash for its whole life, so it can serve as a dictionary key or a set member.
-You can also share it without a defensive copy, because no recipient can change it out from under you.
+It can promise a stable hash for its whole life,
+so it can serve as a dictionary key or a set member.
+You can also share it without a defensive copy,
+because no recipient can change it out from under you.
 A `list` can do neither:
 
 ```python
@@ -159,13 +184,17 @@ except TypeError as e:
 #: unhashable type: 'list'
 ```
 
-These abilities are why the standard library uses tuples and frozen dataclasses whenever a value must be a key, cached, or shared across threads.
+These abilities are why the standard library uses tuples and frozen dataclasses whenever a value must be a key,
+cached, or shared across threads.
 
 ## Functions as First-Class Objects
 
 A function in Python is an object like any other.
-This is what *first-class* means. You can bind a function to a name, store it in a container, pass it as an argument, and return it from another function.
-A function value is not special syntax. It is data you can move around.
+This is what *first-class* means.
+You can bind a function to a name, store it in a container,
+pass it as an argument, and return it from another function.
+A function value is not special syntax.
+It is data you can move around.
 
 ```python
 # first_class.py
@@ -182,11 +211,13 @@ print(table["title"]("functional python"))
 #: Functional Python
 ```
 
-The dictionary holds functions as values, so a lookup yields a function you can immediately call.
+The dictionary holds functions as values,
+so a lookup yields a function you can immediately call.
 The [Function Objects](28_Function_Objects.md) chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow.
-A dictionary of functions replaces a long `if`/`elif` chain, because you select the behavior by looking it up:
+A dictionary of functions replaces a long `if`/`elif` chain,
+because you select the behavior by looking it up:
 
 ```python
 # dispatch.py
@@ -236,22 +267,25 @@ print(sorted(words, key=len))
 ```
 
 Each call hands a function to another function and lets it do the looping.
-Returning a function is the other half of the definition, covered under [Closures](#closures), below.
+Returning a function is the other half of the definition,
+covered under [Closures](#closures), below.
 
 Higher-order functions provide separation of concerns.
-`map()`, `filter()`, and `sorted()` each contain the loop that walks the data, written once,
-and you supply only the part that differs from one use to the next.
+`map()`, `filter()`, and `sorted()` each contain the loop that walks the data,
+written once, and you supply only the part that differs from one use to the next.
 You stop rewriting the same iteration scaffold,
 along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
 The idea runs the other direction, too.
-A function that takes a function can wrap it with operations like timing, retries, or logging.
+A function that takes a function can wrap it with operations like timing,
+retries, or logging.
 This is what a decorator does in [Decorators](14_Decorators.md).
 
 ## Lambdas
 
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Functions.md#lambdas).
-The examples above already used lambdas as inline arguments, which is where they fit best.
+The examples above already used lambdas as inline arguments,
+which is where they fit best.
 Their value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
@@ -265,7 +299,8 @@ and room to grow.
 
 ## Closures
 
-When an inner function refers to a variable from the function that created it, Python keeps that variable alive.
+When an inner function refers to a variable from the function that created it,
+Python keeps that variable alive.
 The inner function plus the captured variables is a *closure*.
 This is how a function can carry state without a class:
 
@@ -285,12 +320,15 @@ print(double(10), triple(10))
 #: 20 30
 ```
 
-`multiplier()` returns `multiply()`, and each returned function remembers its own `factor`.
+`multiplier()` returns `multiply()`,
+and each returned function remembers its own `factor`.
 `double` and `triple` are the same code with different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
-A closure fits when you want behavior configured once and then reused, with its configuration kept private.
-The captured variable is reachable only through the returned function, so no other code can read or overwrite it.
+A closure fits when you want behavior configured once and then reused,
+with its configuration kept private.
+The captured variable is reachable only through the returned function,
+so no other code can read or overwrite it.
 That gives you encapsulation without declaring a class:
 
 ```python
@@ -311,7 +349,8 @@ print(tally(), tally(), tally())
 ```
 
 Each call to `make_counter()` builds an independent counter with its own hidden `count`.
-Nothing outside `increment()` can reach that state, so no accident can corrupt it.
+Nothing outside `increment()` can reach that state,
+so no accident can corrupt it.
 
 ## Partial Application
 
@@ -332,12 +371,14 @@ print(square(5), cube(5))
 #: 25 125
 ```
 
-`square` and `cube` are specializations of `power`, each with one argument already supplied.
+`square` and `cube` are specializations of `power`,
+each with one argument already supplied.
 Partial application turns a general function into the specific one a caller needs,
 which is handy when a higher-order function needs a single-argument callable.
 
 Use partial application when an API expects a function of one argument and you have a function of several.
-Rather than write a throwaway wrapper, you preset the fixed arguments and pass the result straight in.
+Rather than write a throwaway wrapper,
+you preset the fixed arguments and pass the result straight in.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`,
 and it binds their values when you build it.
 This avoids the late-binding surprise a lambda created in a loop can produce.
@@ -345,7 +386,8 @@ This avoids the late-binding surprise a lambda created in a loop can produce.
 ## Composing Functions
 
 *Function composition* builds a new function by feeding one function's output straight into the next.
-You can assemble behavior from small pieces, the way a pipeline reads as a sequence of steps:
+You can assemble behavior from small pieces,
+the way a pipeline reads as a sequence of steps:
 
 ```python
 # composing.py
@@ -369,29 +411,32 @@ print(increment_then_double(10))
 #: 22
 ```
 
-`compose(double, increment)` returns a function that increments first, then doubles.
-Each piece stays small and pure, and you combine them without touching their internals.
+`compose(double, increment)` returns a function that increments first,
+then doubles.
+Each piece stays small and pure,
+and you combine them without touching their internals.
 
 Composition scales by addition.
-Each stage stays small, pure, and testable on its own, and you build larger behavior by naming a new composition rather than writing new logic.
+Each stage stays small, pure, and testable on its own,
+and you build larger behavior by naming a new composition rather than writing new logic.
 Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs.
-When a requirement changes, you insert or swap a single stage and leave every other one untouched.
+When a requirement changes,
+you insert or swap a single stage and leave every other one untouched.
 
 ## The `functools` Toolkit
 
-The standard library ships the building blocks of functional Python
-under `functools`, from a single fold to an alternate dispatch
-mechanism. Each one replaces code you would otherwise write and debug
-yourself. Caching logic, an eviction policy, a dispatch table, each
-one hides an edge case that's easy to miss on the first attempt.
-These tools are already written, already correct, and implemented in
-C for speed. What follows starts with the simplest tools and works up
-to the ones with the most moving parts.
+The standard library ships the building blocks of functional Python under `functools`,
+from a single fold to an alternate dispatch mechanism.
+Each one replaces code you would otherwise write and debug yourself.
+Caching logic, an eviction policy, a dispatch table,
+each one hides an edge case that's easy to miss on the first attempt.
+These tools are already written, already correct,
+and implemented in C for speed.
+What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `reduce`
 
-Folds a sequence into a single value by repeatedly applying a
-two-argument function.
+Folds a sequence into a single value by repeatedly applying a two-argument function.
 
 ```python
 # functools_reduce.py
@@ -404,8 +449,8 @@ print(reduce(add, [1, 2, 3, 4]))
 
 ### `cache`
 
-Remembers every result forever, so repeated calls with the same
-arguments cost nothing.
+Remembers every result forever,
+so repeated calls with the same arguments cost nothing.
 Note that this only works correctly for pure functions.
 Caching a side-effecting function skips the effects.
 
@@ -426,8 +471,7 @@ This accelerates future calls to `fib()`.
 
 ### `lru_cache`
 
-Like `cache()`, but bounds memory by discarding the least recently
-used entry once `maxsize` is reached.
+Like `cache()`, but bounds memory by discarding the least recently used entry once `maxsize` is reached.
 
 ```python
 # functools_lru_cache.py
@@ -446,9 +490,8 @@ print(square.cache_info())
 
 ### `partial`
 
-Fixes some of a function's arguments and returns a new function that
-expects the rest. [Partial Application](#partial-application), above,
-covers it in depth.
+Fixes some of a function's arguments and returns a new function that expects the rest.
+[Partial Application](#partial-application), above, covers it in depth.
 
 ```python
 # functools_partial.py
@@ -461,8 +504,8 @@ shout("hello")
 
 ### `partialmethod`
 
-The same idea as `partial()`, but for a method. The descriptor binds
-`self` automatically when accessed on an instance.
+The same idea as `partial()`, but for a method.
+The descriptor binds `self` automatically when accessed on an instance.
 
 ```python
 # functools_partialmethod.py
@@ -483,9 +526,8 @@ print(Text("7").zero_pad(3))
 
 ### `cached_property`
 
-Runs a property's code once, on first access, then reuses the stored
-result. [Classes](07_Classes.md#properties) covers
-it alongside `@property`.
+Runs a property's code once, on first access, then reuses the stored result.
+[Classes](07_Classes.md#properties) covers it alongside `@property`.
 
 ```python
 # functools_cached_property.py
@@ -516,10 +558,10 @@ because mutating a property doesn't cause the cached result to be recalculated.
 
 ### `wraps`
 
-Copies a wrapped function's name and docstring onto its wrapper, so
-introspection still sees the original.
-[Decorators](14_Decorators.md#decorators-as-classes) covers its
-sibling, `update_wrapper()`, for wrapping with a class instance.
+Copies a wrapped function's name and docstring onto its wrapper,
+so introspection still sees the original.
+[Decorators](14_Decorators.md#decorators-as-classes) covers its sibling,
+`update_wrapper()`, for wrapping with a class instance.
 
 ```python
 # functools_wraps.py
@@ -543,8 +585,8 @@ print(greet.__name__, "-", greet.__doc__)
 
 ### `cmp_to_key`
 
-Wraps an old-style comparator, a function returning negative, zero, or
-positive, into a key function `sorted()` can use directly.
+Wraps an old-style comparator, a function returning negative, zero, or positive,
+into a key function `sorted()` can use directly.
 
 ```python
 # functools_cmp_to_key.py
@@ -560,9 +602,9 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 
 ### `total_ordering`
 
-Fills in the rest of the comparison methods from `__eq__` and one of
-`__lt__`, `__le__`, `__gt__`, or `__ge__`, so a class needs two
-methods instead of six to sort and compare correctly.
+Fills in the rest of the comparison methods from `__eq__` and one of `__lt__`,
+`__le__`, `__gt__`, or `__ge__`,
+so a class needs two methods instead of six to sort and compare correctly.
 
 ```python
 # functools_total_ordering.py
@@ -587,8 +629,8 @@ print(light < heavy, light <= heavy, light > heavy)
 
 ### `singledispatch`
 
-Turns a plain function into one that dispatches on the type of its
-first argument, with per-type implementations registered separately.
+Turns a plain function into one that dispatches on the type of its first argument,
+with per-type implementations registered separately.
 [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) uses `singledispatch()` as an alternative to the *Visitor* pattern,
 including why the registered function below is named `_`.
 
@@ -610,8 +652,7 @@ print(describe("hi"), "|", describe(5))
 
 ### `singledispatchmethod`
 
-The same dispatch, written as a method so it reads as `self.op(x)`
-instead of a bare function call.
+The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
 The registered method below is again named `_`,
 explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
 
@@ -640,12 +681,12 @@ print(d.describe("hi"), "|", d.describe(5))
 `itertools` builds lazy iterators from a small set of composable pieces.
 Each one produces values on demand instead of building a list up front.
 Each is also a loop you would otherwise write by hand,
-already tuned in C and already correct on the edge cases a hand-rolled
-version tends to miss, the empty iterable, the single element,
+already tuned in C and already correct on the edge cases a hand-rolled version tends to miss,
+the empty iterable, the single element,
 the point where two sequences run out at different lengths.
-Combine them the way you combine any small function, by feeding one's output to the next.
-What follows starts with the simplest tools and works up to the ones
-with the most moving parts.
+Combine them the way you combine any small function,
+by feeding one's output to the next.
+What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `repeat`
 
@@ -661,7 +702,8 @@ print(list(repeat("x", 3)))
 
 ### `islice`
 
-Slices any iterable, including an infinite one, the way `[start:stop:step]` slices a list.
+Slices any iterable, including an infinite one,
+the way `[start:stop:step]` slices a list.
 
 ```python
 # itertools_islice.py
@@ -698,8 +740,8 @@ print(list(islice(cycle("AB"), 5)))
 ### `chain`
 
 Iterates several iterables one after another, as if they were one.
-`chain.from_iterable(iterables)` does the same when the iterables
-themselves arrive as one lazy sequence, rather than as separate arguments.
+`chain.from_iterable(iterables)` does the same when the iterables themselves arrive as one lazy sequence,
+rather than as separate arguments.
 
 ```python
 # itertools_chain.py
@@ -711,8 +753,8 @@ print(list(chain([1, 2], [3, 4])))
 
 ### `pairwise`
 
-Yields consecutive overlapping pairs from an iterable, without
-indexing by hand and risking an off-by-one at the ends.
+Yields consecutive overlapping pairs from an iterable,
+without indexing by hand and risking an off-by-one at the ends.
 
 ```python
 # itertools_pairwise.py
@@ -724,9 +766,9 @@ print(list(pairwise([1, 2, 3, 4])))
 
 ### `batched`
 
-Groups an iterable into fixed-size tuples, with a shorter final batch
-if the length does not divide evenly, the kind of remainder logic
-that's easy to get wrong in a hand-written loop.
+Groups an iterable into fixed-size tuples,
+with a shorter final batch if the length does not divide evenly,
+the kind of remainder logic that's easy to get wrong in a hand-written loop.
 
 ```python
 # itertools_batched.py
@@ -738,7 +780,8 @@ print(list(batched(range(7), 3)))
 
 ### `accumulate`
 
-Yields the running total of an iterable, or the running result of any two-argument function.
+Yields the running total of an iterable,
+or the running result of any two-argument function.
 
 ```python
 # itertools_accumulate.py
@@ -810,8 +853,9 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 
 ### `zip_longest`
 
-Zips iterables of different lengths, filling the gaps instead of
-stopping at the shortest. The default filler is `None`.
+Zips iterables of different lengths,
+filling the gaps instead of stopping at the shortest.
+The default filler is `None`.
 When `None` is itself a valid element,
 pass a distinct sentinel as the `fillvalue` keyword argument:
 
@@ -843,9 +887,8 @@ print([(k, list(g)) for k, g in groupby(data)])
 
 ### `tee`
 
-Splits one iterable into several independent iterators over the same
-data, so two consumers can each walk it once without collecting it
-into a list first.
+Splits one iterable into several independent iterators over the same data,
+so two consumers can each walk it once without collecting it into a list first.
 
 ```python
 # itertools_tee.py
@@ -858,9 +901,9 @@ print(list(a), list(b))
 
 ### `product`
 
-The Cartesian product of the input iterables, the same pairs a
-nested `for` loop would build, without writing and re-testing that
-loop yourself.
+The Cartesian product of the input iterables,
+the same pairs a nested `for` loop would build,
+without writing and re-testing that loop yourself.
 
 ```python
 # itertools_product.py
@@ -935,12 +978,16 @@ Recursion is not a faster or shorter way to count down to zero.
 Its payoff shows up once the problem itself branches, not just repeats,
 which is exactly what the next example does.
 
-Recursion suits problems that are naturally self-similar, such as walking a tree.
-Python does not optimize tail calls and limits the call stack, so deep recursion will raise `RecursionError`.
-For long flat sequences, a loop or one of the `itertools` tools is the better choice.
+Recursion suits problems that are naturally self-similar,
+such as walking a tree.
+Python does not optimize tail calls and limits the call stack,
+so deep recursion will raise `RecursionError`.
+For long flat sequences,
+a loop or one of the `itertools` tools is the better choice.
 
 Recursion is beneficial when the data is itself recursive.
-Code that walks a tree, nested data, or a directory reads most clearly when its shape matches the data's shape.
+Code that walks a tree, nested data,
+or a directory reads most clearly when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:
 
 ```python
@@ -969,8 +1016,10 @@ which is why it stays three lines instead of growing with every level of nesting
 ## Lazy Evaluation
 
 *Lazy evaluation* computes a value only when something needs it.
-A generator is the canonical example. It yields one value at a time instead of building a whole list up front.
-Combined with `itertools`, you can describe an infinite sequence and take only the part you use:
+A generator is the canonical example.
+It yields one value at a time instead of building a whole list up front.
+Combined with `itertools`,
+you can describe an infinite sequence and take only the part you use:
 
 ```python
 # lazy.py
@@ -993,7 +1042,8 @@ print(first_five)
 #: [1, 4, 9, 16, 25]
 ```
 
-`squares()` never finishes on its own, yet the program terminates because `islice()` requests exactly five values.
+`squares()` never finishes on its own,
+yet the program terminates because `islice()` requests exactly five values.
 Each `computing square N` line appears only when `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
 Nothing here is a batch.
@@ -1005,40 +1055,38 @@ The [Performance](18_Performance.md) chapter looks at laziness from the perspect
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
 so memory stays flat no matter how large the source grows.
-Stages chain together without building intermediate lists between them, and a consumer that stops early,
-such as `any()` or `next()`, means no upstream work for the items it never reaches.
+Stages chain together without building intermediate lists between them,
+and a consumer that stops early, such as `any()` or `next()`,
+means no upstream work for the items it never reaches.
 
 ## Case Study: Pairing Rotations
 
 Here is a recurring practical problem.
-Pair up participants for an activity across several rounds, and
-avoid repeating a pairing until every possible pairing has had a turn.
-This is a good place to see the chapter's ideas working together on
-one small, real program instead of one at a time.
+Pair up participants for an activity across several rounds,
+and avoid repeating a pairing until every possible pairing has had a turn.
+This is a good place to see the chapter's ideas working together on one small,
+real program instead of one at a time.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.
-Fix one player, arrange the rest in a circle, and each round pair
-players sitting across from each other, then rotate everyone but
-the fixed player by one seat.
+Fix one player, arrange the rest in a circle,
+and each round pair players sitting across from each other,
+then rotate everyone but the fixed player by one seat.
 With `n` players that produces `n - 1` rounds where no pair repeats,
-which is the best any schedule can do, since it uses up every one of
-the `n * (n - 1) / 2` possible pairs exactly once.
+which is the best any schedule can do,
+since it uses up every one of the `n * (n - 1) / 2` possible pairs exactly once.
 
 None of that trick survives a request for groups of three, four,
 or any other size.
 The circle method is a closed-form answer to one narrow question,
 "how do you 1-factorize a complete graph into perfect matchings,"
-and pairs are the only group size where that question has a tidy
-rotation-based answer.
-Scheduling groups of three without repeats is the far harder problem
-that *Kirkman's schoolgirl problem* poses, solvable only for specific
-roster sizes and with no simple formula behind it.
-Rather than chase an exact answer that may not exist for a given
-`students` and `size`, a general version can settle for a good one:
-build each group by always adding whoever its current members have
-met the fewest times before, tracked in a running history instead of
-computed fresh from a round number:
+and pairs are the only group size where that question has a tidy rotation-based answer.
+Scheduling groups of three without repeats is the far harder problem that *Kirkman's schoolgirl problem* poses,
+solvable only for specific roster sizes and with no simple formula behind it.
+Rather than chase an exact answer that may not exist for a given `students` and `size`,
+a general version can settle for a good one:
+build each group by always adding whoever its current members have met the fewest times before,
+tracked in a running history instead of computed fresh from a round number:
 
 ```python
 # student_pairs.py
@@ -1103,35 +1151,34 @@ for i, grouping in enumerate(trios):
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 ```
 
-Called with `size=2`, `group_rounds()` covers all `21` possible
-pairs across the seven rounds, at the cost of `14` repeat meetings.
+Called with `size=2`,
+`group_rounds()` covers all `21` possible pairs across the seven rounds,
+at the cost of `14` repeat meetings.
 An odd roster cannot pair everyone,
 so each round folds the leftover player into an existing pair,
 and those triples are where the repeats come from.
-It does that with no rotation and no notion of a fixed player at
-all, just a shuffle and a greedy choice repeated until the roster
-runs out.
+It does that with no rotation and no notion of a fixed player at all,
+just a shuffle and a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.
-Seven students do not split evenly into threes, so one group grows
-to four rather than leaving anyone out,
+Seven students do not split evenly into threes,
+so one group grows to four rather than leaving anyone out,
 the same join-instead-of-sit-out choice the pair rounds made above.
 
 Generality cost something.
 The circle method needed no memory.
 Which pair sits where in round `r` followed from `r` alone.
-`group_rounds()` needs the `history` `Counter`, because there is no
-formula that predicts, from a round number alone, which grouping of
-arbitrary size keeps every pair's meeting count lowest.
+`group_rounds()` needs the `history` `Counter`,
+because there is no formula that predicts, from a round number alone,
+which grouping of arbitrary size keeps every pair's meeting count lowest.
 It is still a pure function in the sense that matters for testing.
-The same `students`, `size`, and `seed` always produce the same
-infinite sequence of rounds, since `random.Random(seed)` never
-reaches outside itself for randomness.
-What changed is that computing round `100` now means having
-already generated rounds `0` through `99`, where the circle method
-could compute round `100` directly, from its arithmetic alone.
-That trade, memory for generality, is the same one
-[Recursion](#recursion) makes when a loop's simple counter is not
-enough and the problem needs a stack instead.
+The same `students`, `size`,
+and `seed` always produce the same infinite sequence of rounds,
+since `random.Random(seed)` never reaches outside itself for randomness.
+What changed is that computing round `100` now means having already generated rounds `0` through `99`,
+where the circle method could compute round `100` directly,
+from its arithmetic alone.
+That trade, memory for generality,
+is the same one [Recursion](#recursion) makes when a loop's simple counter is not enough and the problem needs a stack instead.
 
 ## Pattern Matching as Destructuring
 
@@ -1142,8 +1189,8 @@ One `match` collapses a stack of `isinstance()` tests, length checks,
 and key or index lookups into a single readable description of each shape.
 The test and the extraction happen together,
 so there is no gap where you have confirmed the shape but not yet pulled out its parts.
-This pays off most on shaped data, such as parsed JSON,
-an abstract syntax tree, or the messages of a protocol,
+This pays off most on shaped data, such as parsed JSON, an abstract syntax tree,
+or the messages of a protocol,
 where the alternative is a thicket of nested conditionals.
 
 ## Functional Error Handling
@@ -1180,17 +1227,21 @@ print(x, y, x == y)
 #: 10 10 True
 ```
 
-Because `add(2, 3)` and `5` are interchangeable,
-a compiler can cache the call, evaluate it in any order, or skip a repeat.
-You can also reason about the code by substitution, the same move you make in algebra.
-This property lets you check parts of a program, and sometimes prove them correct,
+Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call,
+evaluate it in any order, or skip a repeat.
+You can also reason about the code by substitution,
+the same move you make in algebra.
+This property lets you check parts of a program,
+and sometimes prove them correct,
 and it connects back to this chapter's opening question about what counts as "what works."
 
 This property is also the quiet reason the `lru_cache` from earlier is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
-Every optimization that skips or reuses work, from a cache to a database query planner,
+Every optimization that skips or reuses work,
+from a cache to a database query planner,
 benefits from referential transparency.
-The more your program is referentially transparent, the more of it a machine, or a proof, can verify.
+The more your program is referentially transparent, the more of it a machine,
+or a proof, can verify.
 
 ## Declarative Style
 
@@ -1214,12 +1265,15 @@ You described the what, not a fixed sequence of moves.
 
 A pure function is automatically parallelizable.
 Each call depends only on its arguments, so no call can affect another.
-The calls can run in any order, on any schedule, on any number of cores, and the answers do not change.
+The calls can run in any order, on any schedule, on any number of cores,
+and the answers do not change.
 
 Impure code has no such freedom.
 Recall `withdraw()` from the start of this chapter.
-Two parallel calls could both read `balance` before either writes it back, and one withdrawal would vanish.
-Making that safe means adding a lock, and the lock serializes the work you wanted to overlap.
+Two parallel calls could both read `balance` before either writes it back,
+and one withdrawal would vanish.
+Making that safe means adding a lock,
+and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
 With nothing shared, there is nothing to lock.
 
@@ -1249,41 +1303,53 @@ if __name__ == "__main__":
 ```
 
 `map()` runs the four calls one at a time, on one core.
-`pool.map()` sends the same calls to worker processes, which the operating system places on separate cores.
+`pool.map()` sends the same calls to worker processes,
+which the operating system places on separate cores.
 Run as a script, this prints `[1229, 2262, 3245, 4203]`.
-The `assert` passes on every run, because a pure call returns the same answer no matter which process ran it, or when.
-Notice there are no locks, no queues, no shared state, and no changes to `count_primes()` itself.
+The `assert` passes on every run,
+because a pure call returns the same answer no matter which process ran it,
+or when.
+Notice there are no locks, no queues, no shared state,
+and no changes to `count_primes()` itself.
 The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
-`ProcessPoolExecutor`, and the reasons Python parallelism uses processes rather than threads, are covered in [Concurrency](19_Concurrency.md#parallelism).
+`ProcessPoolExecutor`,
+and the reasons Python parallelism uses processes rather than threads,
+are covered in [Concurrency](19_Concurrency.md#parallelism).
 
 ## An Assurance Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's honest answer is not one guarantee but a spectrum.
-The properties built up here, purity, immutability, and referential transparency, buy assurance at every level.
+The properties built up here, purity, immutability,
+and referential transparency, buy assurance at every level.
 You decide how far to take it.
 
 1. The cheapest rung is local reasoning.
    Pure functions and immutable values let you understand one piece at a time,
    with no hidden state to carry in your head.
    Most code never needs more.
-2. Next is type checking. A type signature is a small theorem, and the function body is its proof.
+2. Next is type checking.
+   A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
    Types are propositions and programs are their proofs.
    Running `ty` over the examples in this book demonstrates that proof for a useful class of mistakes.
 3. Above that is [*property-based testing*](#property-based-testing).
-   You state a law the code must obey, then check it against many generated inputs.
+   You state a law the code must obey,
+   then check it against many generated inputs.
    It does not prove the law.
-   It works to falsify it, which is the falsifiability the chapter's opening requests.
+   It works to falsify it,
+   which is the falsifiability the chapter's opening requests.
 4. At the top is formal proof.
    Dependently-typed languages such as Lean, Idris,
-   and Rocq prove a program correct for every possible input, checked by machine.
+   and Rocq prove a program correct for every possible input,
+   checked by machine.
    This is real, but rare outside specialized work.
 
 ### Property-Based Testing
 
-You can write a property check by hand, looping over random inputs and asserting the law.
+You can write a property check by hand,
+looping over random inputs and asserting the law.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) does the same thing with sharper inputs,
 and shrinks any failure to a minimal counterexample:
 
@@ -1307,13 +1373,17 @@ print("1000 random cases passed")
 #: 1000 random cases passed
 ```
 
-The law is "decoding an encoding returns the original," and it holds for every input the loop tries.
+The law is "decoding an encoding returns the original,"
+and it holds for every input the loop tries.
 A property test states what must always be true.
-The machine searches for a counterexample, instead of forcing you to write one example at a time.
+The machine searches for a counterexample,
+instead of forcing you to write one example at a time.
 
 Hypothesis turns the hand-written loop into a declaration.
-You describe the inputs with a *Strategy* and state the law once, as a normal `test_` function.
-The framework supplies the cases, including awkward ones a handwritten loop would miss,
+You describe the inputs with a *Strategy* and state the law once,
+as a normal `test_` function.
+The framework supplies the cases,
+including awkward ones a handwritten loop would miss,
 such as the empty string and unusual Unicode:
 
 ```python
@@ -1345,25 +1415,29 @@ With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.
 Haskell programmers rarely prove a program correct.
-They lean on types and on reasoning by substitution, and save full proof for the few places that earn it.
+They lean on types and on reasoning by substitution,
+and save full proof for the few places that earn it.
 
 The thread running through this chapter is not that functions are special.
-It is that purity, immutability, and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
+It is that purity, immutability,
+and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
 Proof is the far end of that distance.
-The everyday win is everything below it: code you can read, check, and test as statements about what is true.
-That, more than the presence of functions, is the "functionality" the introduction set out to find.
+The everyday win is everything below it: code you can read, check,
+and test as statements about what is true.
+That, more than the presence of functions,
+is the "functionality" the introduction set out to find.
 
 ## Exercises
 
-1.  In `pure_functions.py`, write a third function, `deposit(amount)`, that behaves like `withdraw()`
-    but adds to `balance` instead of subtracting.
+1.  In `pure_functions.py`, write a third function, `deposit(amount)`,
+    that behaves like `withdraw()` but adds to `balance` instead of subtracting.
     Explain, the way the text does for `withdraw()`, why `deposit()` is impure.
 2.  In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
     with no change to how `operations["*"](6, 4)` gets called.
-3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of
-    `double` and `triple`, each remembering its own `factor`.
-4.  In `composing.py`, write a third small function, `square(n)`, and build
-    `increment_then_double_then_square = compose(square, increment_then_double)`.
+3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of `double` and `triple`,
+    each remembering its own `factor`.
+4.  In `composing.py`, write a third small function, `square(n)`,
+    and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `parallel_pure.py`, add a fifth limit, `50_000`, to the `limits` list,
     and confirm `parallel == serial` still holds after the change.

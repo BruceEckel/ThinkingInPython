@@ -7,10 +7,10 @@ It draws from *Pattern-Oriented Software Architecture* (POSA),
 *Enterprise Integration Patterns* (Hohpe and Woolf),
 and the common distributed and cloud patterns that emerged later.
 
-Each entry has a one-line intent so you can recognize a pattern by name and
-find it elsewhere. Listing a pattern here is not a recommendation.
-Many overlap, some compete, and several exist only to work around limits of a
-particular language.
+Each entry has a one-line intent so you can recognize a pattern by name and find it elsewhere.
+Listing a pattern here is not a recommendation.
+Many overlap, some compete,
+and several exist only to work around limits of a particular language.
 The body of this book argues that a number of them are unnecessary in Python.
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the pattern appears only in this catalog.

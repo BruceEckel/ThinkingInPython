@@ -47,7 +47,8 @@ def test_messenger_exposes_kwargs_as_attributes() -> None:
 ## The Standard-Library Versions
 
 Python ships with this idiom.
-`types.SimpleNamespace` is exactly a `Messenger`, with keyword arguments becoming attributes.
+`types.SimpleNamespace` is exactly a `Messenger`,
+with keyword arguments becoming attributes.
 When you want the fields named and type-checked,
 a `@dataclass` gives you a typed mutable record with a generated `__init__()`,
 `__repr__()`, and equality, and a `NamedTuple` gives you a typed immutable one:
@@ -128,14 +129,15 @@ display_object(m)
 
 ## Exercises
 
-1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments
-    and confirm the two instances do not share attributes
-    (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
-2.  In `messenger_modern.py`, add a third field, `z: float`, to the `Point` dataclass,
+1.  In `messenger_idiom.py`,
+    create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
+2.  In `messenger_modern.py`, add a third field, `z: float`,
+    to the `Point` dataclass,
     and update the `print(Point(1.0, 2.0))` call to pass three arguments.
-3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int`
-    to `messenger_modern.py`, following `Color`'s shape,
+3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `messenger_modern.py`,
+    following `Color`'s shape,
     and confirm an instance still unpacks and indexes like a plain tuple.
-4.  In `display_namespace.py`, add a fourth keyword argument to `m` when it is constructed
-    instead of assigning `m.more` afterward, and confirm `display_object()` shows all four attributes,
+4.  In `display_namespace.py`,
+    add a fourth keyword argument to `m` when it is constructed instead of assigning `m.more` afterward,
+    and confirm `display_object()` shows all four attributes,
     sorted alphabetically either way.

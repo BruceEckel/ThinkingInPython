@@ -5,8 +5,8 @@ The decorator itself is a callable that takes the function to decorate,
 does something with it, then returns the resulting function,
 which Python assigns to the original function name.
 
-To apply the decorator, you put a `@` before the decorator name
-(for simplicity we use an untyped `Callable` here, expanded in a later section):
+To apply the decorator,
+you put a `@` before the decorator name (for simplicity we use an untyped `Callable` here, expanded in a later section):
 
 ```python
 # simple_decoration.py
@@ -26,14 +26,18 @@ cheese()
 #: Replacement behavior
 ```
 
-Ordinarily you'd expect to see "Wensleydale," but `hijack()` replaces the original `cheese()` function
-with the decorated one, which in this case never calls `func`, so the original `cheese()` behavior never happens.
+Ordinarily you'd expect to see "Wensleydale,"
+but `hijack()` replaces the original `cheese()` function with the decorated one,
+which in this case never calls `func`,
+so the original `cheese()` behavior never happens.
 
 Note the local function name `doesnt_matter`.
-Decoration binds this function to the name `cheese`, so the local name can be anything.
+Decoration binds this function to the name `cheese`,
+so the local name can be anything.
 The common convention is to name this function `wrapper()`.
 
-A typical decorator function does some work, calls the original function, and does some more work:
+A typical decorator function does some work, calls the original function,
+and does some more work:
 
 ```python
 # add_behavior.py
@@ -95,7 +99,8 @@ The `@trace` above `add()` means:
 
     add = trace(add)
 
-`trace` returns `wrapper`, which Python assigns to the name `add`, so `add` now refers to `wrapper`.
+`trace` returns `wrapper`, which Python assigns to the name `add`,
+so `add` now refers to `wrapper`.
 Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add()`,
 prints again, and returns the result.
 
@@ -103,21 +108,20 @@ prints again, and returns the result.
 so the wrapped function still looks like itself when you inspect it.
 This is optional but improves debuggability.
 
-`wraps` keeps the runtime interface. The type parameters
-(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
-keep the static one.
+`wraps` keeps the runtime interface.
+The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)) keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
 `**P` is a *parameter specification* (a `ParamSpec`).
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
-`func: Callable[P, R]` reads as "a function whose parameters are `P` and whose
-result is `R`," and returning `Callable[P, R]` promises that the wrapper has that
-same signature.
+`func: Callable[P, R]` reads as "a function whose parameters are `P` and whose result is `R`,"
+and returning `Callable[P, R]` promises that the wrapper has that same signature.
 
-Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of
-that captured list. `P.args` is the positional part and `P.kwargs` the keyword part.
-You may only use them together, as the `*args` and `**kwargs` of a function typed with `P`.
+Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of that captured list.
+`P.args` is the positional part and `P.kwargs` the keyword part.
+You may only use them together,
+as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters `P` captured,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
@@ -167,7 +171,8 @@ which then wraps `greet`.
 A decorator only has to be a callable that takes a function and returns a callable.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
-The class form separates the two phases cleanly. The constructor runs once, at decoration,
+The class form separates the two phases cleanly.
+The constructor runs once, at decoration,
 and `__call__()` runs on every call to the decorated function.
 Here is the `trace` decorator written as a class:
 
@@ -280,8 +285,9 @@ Compare the two cases.
 `@trace` with no arguments calls `trace(add)`.
 The function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(3)` first, producing an instance,
-then applies that instance to `greet`. The arguments go to the constructor,
-and the function arrives later, at `__call__()`.
+then applies that instance to `greet`.
+The arguments go to the constructor, and the function arrives later,
+at `__call__()`.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible.
 The function moves from `__init__()` to `__call__()` when the decorator gains arguments.
@@ -374,7 +380,8 @@ Each new topping doubles the menu.
 
 Instead, model the toppings as decorators.
 A plain pizza knows its own cost and description.
-A topping dynamically wraps a pizza, adds to the cost, and adds to the description.
+A topping dynamically wraps a pizza, adds to the cost,
+and adds to the description.
 Because a topping is itself a pizza, you can wrap a topping in another topping.
 
 ![Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other](_images/decorator_pattern)

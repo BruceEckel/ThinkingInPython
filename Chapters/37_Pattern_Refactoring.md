@@ -1,8 +1,10 @@
 # Pattern Refactoring
 
 This chapter follows one problem through several designs.
-A first solution solves it, then we ask "what will change?" and reshape the design to absorb that change cheaply.
-This is the spirit of Martin Fowler's *Refactoring*, applied to patterns rather than single statements.
+A first solution solves it,
+then we ask "what will change?" and reshape the design to absorb that change cheaply.
+This is the spirit of Martin Fowler's *Refactoring*,
+applied to patterns rather than single statements.
 
 It is also a Python lesson.
 Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages without multiple dispatch.
@@ -70,11 +72,15 @@ def sum_value(items: list[Trash]) -> float:
     return total
 ```
 
-Python implicitly makes `__init_subclass__` a classmethod, so `cls` doesn't need an `@classmethod` decorator.
-It runs once per subclass, right after Python creates that subclass, so each one can register itself in `Trash.registry` automatically.
+Python implicitly makes `__init_subclass__` a classmethod,
+so `cls` doesn't need an `@classmethod` decorator.
+It runs once per subclass, right after Python creates that subclass,
+so each one can register itself in `Trash.registry` automatically.
 
-Each subclass's `value = ...` line creates its own class attribute, separate from `Trash.value`.
-The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance. It doesn't share storage across subclasses.
+Each subclass's `value = ...` line creates its own class attribute,
+separate from `Trash.value`.
+The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance.
+It doesn't share storage across subclasses.
 
 None of the subclasses redeclare `value: ClassVar[float]`.
 They don't need to because the checker resolves `value` through the MRO and finds it already declared `ClassVar[float]` on `Trash`.
@@ -85,9 +91,8 @@ It registers itself, and `create()` can build it.
 `sum_value()` is an ordinary function.
 It relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
 
-We test that each subclass registers itself,
-`create()` builds one by name, the per-pound values are right,
-and `sum_value()` totals weight times value:
+We test that each subclass registers itself, `create()` builds one by name,
+the per-pound values are right, and `sum_value()` totals weight times value:
 
 ```python
 # test_trash.py
@@ -114,8 +119,7 @@ def test_sum_value_totals_weight_times_value() -> None:
     assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
 ```
 
-A data file describes the trash to process,
-one `Name:weight` line per piece:
+A data file describes the trash to process, one `Name:weight` line per piece:
 
 ```text
 # trash.dat
@@ -355,10 +359,11 @@ for t in parse("trash.dat"):
 #: Cardboard: flatten and bundle
 ```
 
-Each implementation above is named `_`, a throwaway name
-[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explains.
+Each implementation above is named `_`,
+a throwaway name [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explains.
 `recycling_note()` is a new operation defined entirely outside the `Trash` hierarchy.
-`Paper` has no registered note, so it falls through to the base function and performs the default behavior.
+`Paper` has no registered note,
+so it falls through to the base function and performs the default behavior.
 Adding a `price()` or `weight()` operation means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.

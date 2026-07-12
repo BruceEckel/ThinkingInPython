@@ -6,13 +6,16 @@ People can confuse the two by looking at the implementation rather than the inte
 The *Visitor* assumption is that you have a primary class hierarchy that is unchangeable.
 Perhaps it's from another vendor and you can't make changes to that hierarchy.
 However, you'd like to add new polymorphic methods to that hierarchy.
-Normally you'd need to add something to the base class interface, but that's unchangeable.
+Normally you'd need to add something to the base class interface,
+but that's unchangeable.
 How do you get around this?
 
-*Visitor*, the final pattern in *GoF Design Patterns*, solves this kind of problem.
+*Visitor*, the final pattern in *GoF Design Patterns*,
+solves this kind of problem.
 It allows you to extend the interface of the primary class hierarchy.
 It requires that the primary class hierarchy have a method,
-typically called `accept()`, which takes an object of a secondary class hierarchy called `Visitor`.
+typically called `accept()`,
+which takes an object of a secondary class hierarchy called `Visitor`.
 This virtualizes the operations performed upon the primary hierarchy.
 The objects of the primary hierarchy simply `accept()` the `Visitor`,
 then call the `Visitor`'s dynamically bound method:
@@ -102,7 +105,8 @@ then `visit()` resolves the visitor's type.
 
 ## The Pythonic Visitor: singledispatch
 
-Python can add a method to a fixed hierarchy from outside, using `functools.singledispatch`.
+Python can add a method to a fixed hierarchy from outside,
+using `functools.singledispatch`.
 This turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
 That is exactly how *Visitor* works,
@@ -160,14 +164,14 @@ Each registered implementation above is named `_`.
 so the name itself carries no meaning.
 `_` is the conventional placeholder for a name nobody will use.
 Reusing `_` for every registration is safe:
-`@nectar.register` stores the function in its dispatch table
-before the next `def _` rebinds the name, so nothing is lost.
+`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
+so nothing is lost.
 
 Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
-Adding a new operation is a new function. Adding a new flower is a class and,
-where needed, a one-line registration.
+Adding a new operation is a new function.
+Adding a new flower is a class and, where needed, a one-line registration.
 When the operation should read like a method,
 use `functools.singledispatchmethod` instead.
 

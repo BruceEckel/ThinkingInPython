@@ -2,7 +2,8 @@
 
 An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
-a file, a database cursor, or a computation. It only asks for the next item.
+a file, a database cursor, or a computation.
+It only asks for the next item.
 
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
@@ -72,8 +73,9 @@ Generators are also lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
-A generator can even be *infinite*. A `while True` loop that yields forever,
-or `itertools.count()`, produces values on demand with no end.
+A generator can even be *infinite*.
+A `while True` loop that yields forever, or `itertools.count()`,
+produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
 
@@ -108,9 +110,9 @@ def test_total_over_any_iterable() -> None:
 
 ## Delegating with `yield from`
 
-A generator can delegate part of its work to another iterator with
-`yield from`. It yields every value produced by that iterator in
-turn, as if the outer generator had written the loop itself:
+A generator can delegate part of its work to another iterator with `yield from`.
+It yields every value produced by that iterator in turn,
+as if the outer generator had written the loop itself:
 
 ```python
 # yield_from.py
@@ -130,8 +132,7 @@ print(list(flatten([1, [2, 3], [4, [5, 6]], 7])))
 ```
 
 `flatten()` calls itself on each nested sequence,
-and `yield from` threads the recursive call's values
-into the outer stream.
+and `yield from` threads the recursive call's values into the outer stream.
 Without it, you would write `for x in flatten(item): yield x`,
 which does the same thing but names the loop explicitly.
 `yield from` is that loop, spelled as a single delegation.
@@ -157,11 +158,13 @@ def test_flatten(
 ## Reusable Algorithms
 
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
-`islice()`, `groupby()`, `takewhile()`, and more, each consuming and producing iterators.
+`islice()`, `groupby()`, `takewhile()`, and more,
+each consuming and producing iterators.
 Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
 This pipeline draws from an infinite source but computes only what the consumer takes.
-Each stage pulls one item at a time, so an infinite source is fine as long as something downstream stops it:
+Each stage pulls one item at a time,
+so an infinite source is fine as long as something downstream stops it:
 
 ```python
 # reusable_algorithms.py

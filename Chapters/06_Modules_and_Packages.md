@@ -1,7 +1,8 @@
 # Modules and Packages
 
 Each Python file is a namespaced *module* you can `import` into another Python file.
-If the file is in the same directory, you can use an unqualified `import` statement:
+If the file is in the same directory,
+you can use an unqualified `import` statement:
 
 ```python
 # module.py
@@ -29,7 +30,8 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 
 The code at the end of the file starts with an `if` clause that checks whether the standard variable `__name__` is equal to the string `"__main__"`.
 In Python, any identifier that begins and ends with double underscores (commonly called a "dunder") is special in some way.
-Dunder methods, for example, hook your class into the language's operators and built-in functions.
+Dunder methods, for example,
+hook your class into the language's operators and built-in functions.
 
 The reason for the `if` is that you can also use any file as a library module within another program.
 In that case, you only want its definitions,
@@ -190,31 +192,36 @@ print(module3.function3())
 
 ## File Names
 
-A file name must be a valid identifier containing letters, digits, and underscores.
+A file name must be a valid identifier containing letters, digits,
+and underscores.
 It cannot start with a digit.
 
-**Modules** (`.py` files): short, all-lowercase, with underscores between words if that improves
-readability. This is `snake_case`.
+**Modules** (`.py` files): short, all-lowercase,
+with underscores between words if that improves readability.
+This is `snake_case`.
 
 - Good: `result.py`, `cache_singleton.py`, `list_comprehension.py`
-- Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase), `cache-singleton.py`
-  (hyphens aren't importable)
+- Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase),
+  `cache-singleton.py` (hyphens aren't importable)
 
-**Packages** (directories with `__init__.py`): also short and all-lowercase, but underscores are
-discouraged. Prefer a single run-together word when you can.
+**Packages** (directories with `__init__.py`): also short and all-lowercase,
+but underscores are discouraged.
+Prefer a single run-together word when you can.
 
 - Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
 
-**Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`). This book uses `test_*.py`,
-  e.g. `test_result.py`.
+**Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`).
+This book uses `test_*.py`, e.g. `test_result.py`.
 
-Don't shadow standard-library modules. A file named `random.py`, `types.py`, or `weakref.py` can hide
-the stdlib one and break imports.
+Don't shadow standard-library modules.
+A file named `random.py`, `types.py`,
+or `weakref.py` can hide the stdlib one and break imports.
 
 ## `PYTHONPATH`
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
-The original solution to this was to set an environment variable called `PYTHONPATH`, which tells Python where to look for modules and packages.
+The original solution to this was to set an environment variable called `PYTHONPATH`,
+which tells Python where to look for modules and packages.
 `PYTHONPATH` can take multiple paths,
 and Python will keep searching through those paths until it finds your module or package (or doesn't, and reports an error).
 
@@ -223,20 +230,20 @@ but the modern practice is to install your package into the environment you are 
 which puts it on the search path without any environment variable.
 Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
 or `uv pip install -e .` for an editable install.
-The package resolves by name from anywhere, and edits to its source take effect immediately, without reinstalling.
+The package resolves by name from anywhere,
+and edits to its source take effect immediately, without reinstalling.
 
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,
 which is why importing `a_package.module1` earlier printed its message as it loaded.
-For a large program that imports many modules but uses only some of them on any
-given run, that eager work slows startup.
+For a large program that imports many modules but uses only some of them on any given run,
+that eager work slows startup.
 
-Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/)) adds the `lazy` soft
-keyword.
-A `lazy import` defers loading the module until the first time you use the
-imported name, so you pay the cost only for what you actually use, while still
-declaring all imports at the top of the file:
+Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/)) adds the `lazy` soft keyword.
+A `lazy import` defers loading the module until the first time you use the imported name,
+so you pay the cost only for what you actually use,
+while still declaring all imports at the top of the file:
 
 ```python
 # lazy_imports.py
@@ -250,8 +257,9 @@ print(Path("report/data.txt").suffix)
 #: .txt
 ```
 
-Nothing loads at the `lazy import` lines. `json` and `pathlib` load on first
-use, at the `json.dumps` and `Path(...)` calls.
+Nothing loads at the `lazy import` lines.
+`json` and `pathlib` load on first use,
+at the `json.dumps` and `Path(...)` calls.
 You can watch the deferral by importing a module whose body prints when it runs:
 
 ```python
@@ -279,24 +287,30 @@ print("after first use")
 The body of `noisy` does not run at the `lazy import` line.
 It runs at `noisy.announce()`, the first access,
 which is why `noisy module loaded` prints after `before first use`.
-If a lazily imported module is missing or broken, the error surfaces at that
-first use rather than at the import line.
+If a lazily imported module is missing or broken,
+the error surfaces at that first use rather than at the import line.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
-To make every import lazy without editing source, use the `-X lazy_imports`
-command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
+To make every import lazy without editing source,
+use the `-X lazy_imports` command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
 
 ## Exercises
 
-1.  Add a third module, `a_package/module3.py`, with its own `function3()`
-    that prints a message when the module loads.
-    Import it three different ways, one each using plain `import a_package.module3`,
-    `from a_package import module3`, and `from a_package.module3 import function3`,
+1.  Add a third module, `a_package/module3.py`,
+    with its own `function3()` that prints a message when the module loads.
+    Import it three different ways,
+    one each using plain `import a_package.module3`,
+    `from a_package import module3`,
+    and `from a_package.module3 import function3`,
     and confirm the loading message prints only once no matter how many of the three you use together.
-2.  In `using_packages.py`, add a third import, `import a_package.module1` again, at the bottom of the file.
+2.  In `using_packages.py`, add a third import,
+    `import a_package.module1` again, at the bottom of the file.
     Run it and explain why the "importing module1" message does not print a second time.
-3.  Write a small module `noisy2.py` whose top-level body prints a message, similar to `noisy.py` above.
-    In a new script, `lazy import` both `noisy` and `noisy2`, then use `noisy2` before `noisy`.
-    Confirm the two loading messages print in the order you used the modules, not the order you wrote the `lazy import` lines.
+3.  Write a small module `noisy2.py` whose top-level body prints a message,
+    similar to `noisy.py` above.
+    In a new script, `lazy import` both `noisy` and `noisy2`,
+    then use `noisy2` before `noisy`.
+    Confirm the two loading messages print in the order you used the modules,
+    not the order you wrote the `lazy import` lines.

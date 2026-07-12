@@ -4,8 +4,7 @@ A simulation models a set of objects that act on their own and interact through 
 The first example, a pack of rats mapping a maze, is worked from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
-[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces
-the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 ## Rats & Mazes
 
@@ -23,7 +22,8 @@ Independent agents read from and write to one common data structure instead of t
 Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and launches new rats.
 The rats run as cooperative `asyncio` tasks.
-They take turns instead of running at the same instant, so the design needs no lock.
+They take turns instead of running at the same instant,
+so the design needs no lock.
 Nothing interrupts a rat partway through an update.
 
 A *rat* explores.
@@ -143,8 +143,7 @@ class Maze:
 ```
 
 `Cell` nests inside `Maze` because it only names concepts `Maze` uses,
-and it is a `StrEnum` rather than a plain `Enum` so its members keep
-acting like real strings.
+and it is a `StrEnum` rather than a plain `Enum` so its members keep acting like real strings.
 `WALL` still works as the fill character for `ljust()`,
 and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
 because a `StrEnum` member is its string value.
@@ -492,19 +491,20 @@ so a plain `from world import Room` here would be circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,
-which is the only thing `Room` is for. Every use below is an annotation
-(`room: Room`, `-> Room`), never a runtime lookup.
+which is the only thing `Room` is for.
+Every use below is an annotation (`room: Room`, `-> Room`),
+never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
-`__init__` assigns `finished`, so each robot owns its own flag
-from the start.
+`__init__` assigns `finished`, so each robot owns its own flag from the start.
 The code only declares `room`, written as `room: Room` with no value.
 That line stores nothing, not even `None`.
 It is a declaration, not a placeholder.
 It promises the type checker that a `Room` will be there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
-The attribute does not exist until then, so reading it earlier would
-raise `AttributeError`, and the builder runs first so that never happens.
+The attribute does not exist until then,
+so reading it earlier would raise `AttributeError`,
+and the builder runs first so that never happens.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
 so no code that reads `room` has to check for `None`.
 
@@ -563,10 +563,10 @@ class Doors:
 EDGE: Final[Room] = Room(Edge())
 ```
 
-`GameBuilder` assembles the maze in three stages: a room for every
-character, then the connections between rooms, then the teleport pairs.
-Each stage depends on the one before it, so splitting them into labeled
-passes keeps the construction readable instead of tangling it into one loop.
+`GameBuilder` assembles the maze in three stages: a room for every character,
+then the connections between rooms, then the teleport pairs.
+Each stage depends on the one before it,
+so splitting them into labeled passes keeps the construction readable instead of tangling it into one loop.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
@@ -775,7 +775,8 @@ def test_walls_block_and_food_is_eaten() -> None:
 ```
 
 That same model drives a graphical view.
-`maze_view.py` imports the maze and the moves, draws each room as a colored cell,
+`maze_view.py` imports the maze and the moves,
+draws each room as a colored cell,
 and steps the robot along the solution on a timer.
 The view is the only part that touches the screen.
 
@@ -1086,20 +1087,21 @@ if __name__ == "__main__":
 `itertools.cycle()` constructs an infinite iterator from any finite iterable.
 It yields elements from the source item in sequence and cycles back to the beginning when it reaches the end.
 `itertools.count()` creates an infinite iterator yielding evenly spaced numerical values.
-The first argument is the starting point, the second is the step size (defaults to one).
+The first argument is the starting point,
+the second is the step size (defaults to one).
 
 The chapter began by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.
 They never sense each other.
 Even so, structure the agents never encode appears in the aggregate.
-This is *emergence*: global order arising from local rules that never mention it.
+This is *emergence*:
+global order arising from local rules that never mention it.
 The three simulations form a progression.
 The rats cooperate through a blackboard.
 The robot follows a script.
 The grains know nothing.
-The less the agents understand,
-the more the run can tell you,
+The less the agents understand, the more the run can tell you,
 because the outcome lives in the interactions rather than the instructions.
 When behavior emerges, reading the code is not enough.
 Run it.
@@ -1148,8 +1150,7 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
     Then explain why the main diagonal shows up in every figure this plate makes.
     Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
 7.  Change the physics.
-    Replace the body of `amplitude()` with
-    `abs(math.sin(m * math.pi * x) * math.sin(n * math.pi * y))`,
+    Replace the body of `amplitude()` with `abs(math.sin(m * math.pi * x) * math.sin(n * math.pi * y))`,
     the standing waves of a membrane fixed at its edges, like a drumhead.
     Predict the figures before you run the view.
     Why are the nodal lines now straight?
@@ -1157,5 +1158,4 @@ A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/st
     Rerun `chladni_demo.py` passing `kick=0.005` and then `kick=0.5` to `plate.step()`,
     printing agitation at the same checkpoints.
     One setting produces order too slowly and the other never sharpens.
-    Explain both failures,
-    and why an intermediate kick avoids them.
+    Explain both failures, and why an intermediate kick avoids them.

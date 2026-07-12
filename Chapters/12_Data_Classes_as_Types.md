@@ -62,8 +62,7 @@ print(f2(rating))
 #: 30
 ```
 
-Each function duplicates the check,
-the check is easy to forget,
+Each function duplicates the check, the check is easy to forget,
 and the type system is no help.
 The `int` annotation says "any integer," which is not what we mean.
 
@@ -252,7 +251,8 @@ then validating it at construction makes it valid for its lifetime.
 
 If we make `Stars` a frozen data class,
 we can guarantee that every `Stars` object is legal.
-To validate it after the fields receive their values, we define `__post_init__()`,
+To validate it after the fields receive their values,
+we define `__post_init__()`,
 a hook that the generated `__init__()` calls automatically:
 
 ```python
@@ -292,12 +292,15 @@ You know it without checking.
 This changes how you write the functions.
 `f1()` and `f2()` take a `Stars` and return a `Stars`.
 They do not check their argument, because every `Stars` is already good.
-They do not test their result, because building the returned `Stars` runs the check.
+They do not test their result,
+because building the returned `Stars` runs the check.
 
-The validation lives in exactly one place, the constructor (which makes it easy to change).
+The validation lives in exactly one place,
+the constructor (which makes it easy to change).
 Immutability guarantees no one can damage the value after that.
 
-This principle often goes by *parse, don't validate*.^[The phrase was coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
+This principle often goes by *parse,
+don't validate*.^[The phrase was coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
@@ -643,7 +646,8 @@ calling it from `__post_init__()` would discard the fields the data class just a
 The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
 
 When the base class is itself a data class, you do not need this.
-The subclass generates one `__init__` covering the inherited fields and the new ones, in order:
+The subclass generates one `__init__` covering the inherited fields and the new ones,
+in order:
 
 ```python
 # dataclass_inherits_dataclass.py
@@ -715,8 +719,7 @@ Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is no
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` knows how to serialize dictionaries.
 Decoding goes the other way.
-Parse the JSON into a dictionary,
-then hand its parts to the constructors.
+Parse the JSON into a dictionary, then hand its parts to the constructors.
 
 ```python
 # json_round_trip.py
@@ -760,8 +763,7 @@ The type guards itself.
 When a data class is buried inside a larger structure you are dumping,
 converting it by hand first is awkward.
 A custom `JSONEncoder` serializes any data class it meets,
-even nested inside other structures,
-by converting each one to a dict:
+even nested inside other structures, by converting each one to a dict:
 
 ```python
 # json_encoder.py
@@ -838,8 +840,7 @@ def show(obj: object) -> None:
 `show()` wraps `display_object()` with `REDEFINED_DUNDERS`,
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
-For clarity, `show()` also excludes `__hash__` from these reports
-(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+For clarity, `show()` also excludes `__hash__` from these reports (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
 `A` is the plain case, with no defaults and no constructor,
 but with field declarations that look like class variables:
@@ -863,7 +864,8 @@ show(A())
 so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
-[[What are 'x' and 's' doing in this case? Why would you declare them here, what value might they have?]]
+[[What are 'x' and 's' doing in this case?
+Why would you declare them here, what value might they have?]]
 
 `B` adds default values to `x` and `s` which turn them from [[whatever they are called in A]] to class variables,
 because they actually allocate storage for those class variables:
@@ -913,14 +915,11 @@ show(C(11, "this is C"))
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
 `C` is a `@dataclass`,
-so its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s`
-for every new `C`.
+so its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
-With no `__init__()` at all,
-`show(B())` keeps finding `x` and `s` on the class,
-tagged `[CV]`,
-no matter how many `B` instances exist.
+With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the class,
+tagged `[CV]`, no matter how many `B` instances exist.
 
 `D` adds a real `ClassVar` alongside an ordinary field:
 
@@ -967,12 +966,10 @@ That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 `s`, declared `ClassVar[str]`, is a different story.
 `@dataclass` treats a `ClassVar` field as belonging to the class,
-not to any instance,
-and leaves it out of `__init__()` entirely.
+not to any instance, and leaves it out of `__init__()` entirely.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can ever assign one.
-`s` stays on `D` itself and keeps its `[CV]` tag
-no matter how many `D` objects exist.
+`s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D` objects exist.
 
 ## Exercises
 

@@ -10,17 +10,17 @@ some of which you override.
 Python's own `unittest` is an application framework of this kind.
 You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
-The framework's runner is the template method. It calls `setUp()`,
-then your test, then `tearDown()`, for each test,
+The framework's runner is the template method.
+It calls `setUp()`, then your test, then `tearDown()`, for each test,
 and you never call that sequence yourself.
 
 ## The Fixed Algorithm
 
 The defining trait of a Template Method is that the base class fixes the *shape* of the algorithm.
 Subclasses complete the individual steps.
-The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
-(see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
-Here, `@final` marks `run()`, so the checker rejects any subclass that overrides it,
+The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow (see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
+Here, `@final` marks `run()`,
+so the checker rejects any subclass that overrides it,
 while leaving the step methods open:
 
 ```python
@@ -65,8 +65,7 @@ In a GUI program that engine is the main event loop.
 
 Starting the engine from the constructor carries a trap.
 `run()` calls methods the subclass supplies,
-so a subclass that defines its own `__init__()` must finish its setup
-before it calls `super().__init__()`.
+so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
 Call it first, in the usual style,
 and the engine runs against half-initialized state.
 A framework that separates construction from starting,
@@ -77,8 +76,8 @@ A subclass must work wherever code expects its base class.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
 An override that breaks that trust, doing nothing the flow relies on,
-or raising an exception where the base would not, corrupts the fixed algorithm
-even though the code still type-checks.
+or raising an exception where the base would not,
+corrupts the fixed algorithm even though the code still type-checks.
 The Template Method works only when every subclass is a faithful substitute for its base.
 
 The test supplies a recording subclass and verifies the fixed flow:

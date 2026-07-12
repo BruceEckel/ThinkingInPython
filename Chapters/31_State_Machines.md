@@ -1,6 +1,7 @@
 # State Machines
 
-Recall [*State*](26_Surrogate.md#state): a surrogate object that forwards calls to a swappable implementation.
+Recall [*State*](26_Surrogate.md#state):
+a surrogate object that forwards calls to a swappable implementation.
 While *State* allows the client programmer to change the implementation,
 *StateMachine* imposes a structure to automatically change the implementation from one object to the next.
 The current implementation represents the state that a system is in,
@@ -64,13 +65,14 @@ class StateMachine:
             self.current_state.run()
 ```
 
-Treating `run_all()` as a template method is typical, but certainly not required.
-You could override it, but the behavior change usually occurs in `State`'s `run()`.
+Treating `run_all()` as a template method is typical,
+but certainly not required.
+You could override it,
+but the behavior change usually occurs in `State`'s `run()`.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
-The possible moves a mouse can make are the inputs
-to the state machine:
+The possible moves a mouse can make are the inputs to the state machine:
 
 ```python
 # mouse_action.py
@@ -85,8 +87,7 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each possible move by a mouse is a member of the `MouseAction` enumeration
-([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
+Each possible move by a mouse is a member of the `MouseAction` enumeration ([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
 Because it is a `StrEnum`, each member is its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
@@ -238,12 +239,10 @@ You cannot write a table inside its class,
 because its entries name the *other* states,
 which do not all exist until every class definition runs.
 In Python that is no obstacle.
-Define the classes first,
-then fill in the tables at module level,
+Define the classes first, then fill in the tables at module level,
 after all the state objects exist.
 
-The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
-(so the same `StateMachine` class from the previous example still serves).
+The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
@@ -637,12 +636,12 @@ def test_no_transition_raises() -> None:
 ```
 
 Because the actions set `vm.message` instead of printing,
-the model never draws anything, and the same machine can drive more than one view.
+the model never draws anything,
+and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 
 Using `tkinter` we can create a GUI representation of the vending machine.
-The panel reads `amount`, the stock,
-and `message` and shows them on screen.
+The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects (a selection before any money, say) and shows it rather than crashing.
 Because it requires user interaction the harness skips it (`tools/norun.txt`):
@@ -722,7 +721,8 @@ if __name__ == "__main__":
     you must inform the system so that it can check that connection back in for reuse.
     To guarantee this, provide a [proxy](26_Surrogate.md#proxy) object instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
-2.  Using [State](26_Surrogate.md#state), make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
+2.  Using [State](26_Surrogate.md#state),
+    make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add an additional kind of `Mood` called `Prozac`.
 3.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
 4.  Create a *StateMachine* system whereby the current state along with the input determines the next state.

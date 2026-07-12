@@ -59,8 +59,7 @@ print(root.size(), src.size(), File("lone.txt", 10).size())
 #: 1940 650 10
 ```
 
-`Directory.size()` calls `size()` on each entry without knowing
-whether the entry is a `File` or another `Directory`.
+`Directory.size()` calls `size()` on each entry without knowing whether the entry is a `File` or another `Directory`.
 The same call works on the whole tree, on a subtree, and on a single file.
 
 Adding operations exposes the weakness.
@@ -131,26 +130,23 @@ if __name__ == "__main__":
 What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
-This is the same trade explored in
-[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
+This is the same trade explored in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
 a closed set of types, with operations gathered in one place each.
 The `assert_never()` in each `case _` makes that closed set pay off.
 Add a `Symlink` class to the `Node` union.
-Every function whose `case _` calls `assert_never()`
-now fails type checking,
+Every function whose `case _` calls `assert_never()` now fails type checking,
 because `entry` could be a `Symlink` that no case handles.
 The checker flags each function that still needs a new case,
 so none can be forgotten.
 
 `walk()` is a generator, so a composite is also iterable.
 The `yield from` flattens the recursion into a single stream of paths,
-and any consumer of that stream stays decoupled from the tree structure
-(see [Iterators](23_Iterators.md#delegating-with-yield-from)).
+and any consumer of that stream stays decoupled from the tree structure (see [Iterators](23_Iterators.md#delegating-with-yield-from)).
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 The demo builds `src` first, then places it inside `root`.
-Nothing can modify `src` afterward, so sharing subtrees is safe
-(see [Functional Programming](40_Functional_Programming.md#immutability)).
+Nothing can modify `src` afterward,
+so sharing subtrees is safe (see [Functional Programming](40_Functional_Programming.md#immutability)).
 
 ```python
 # test_filesystem.py
@@ -180,15 +176,14 @@ The classic version is still useful when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that without touching your code,
 while a central `match` would need editing.
-The guidance from [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
-applies directly. Match over a closed set, use polymorphism for an open one.
+The guidance from [Pattern Matching](13_Pattern_Matching.md#when-not-to-match) applies directly.
+Match over a closed set, use polymorphism for an open one.
 
 ## Interpreter
 
 A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
 *Interpreter* is Composite applied to language.
-Represent each construct as a node type,
-and evaluation becomes a tree walk.
+Represent each construct as a node type, and evaluation becomes a tree walk.
 
 In most languages the pattern has a reputation for heaviness,
 because you must write a class per construct and a parser to build the trees.
@@ -248,18 +243,17 @@ and those methods do not compute anything.
 They build nodes.
 Writing `x + 1` on two `Expr` values produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
-The reflected forms `__radd__()` and `__rmul__()` handle a plain
-integer on the left, and `wrap()` promotes integers to `Num` nodes,
+The reflected forms `__radd__()` and `__rmul__()` handle a plain integer on the left,
+and `wrap()` promotes integers to `Num` nodes,
 so `2 * x + 1` is a valid sentence in the little language.
 Python has already parsed it, honoring precedence,
 before the interpreter ever runs.
 
-This technique is used in
-SymPy expressions, Pandas and Polars column arithmetic,
-and SQLAlchemy filter conditions.
+This technique is used in SymPy expressions,
+Pandas and Polars column arithmetic, and SQLAlchemy filter conditions.
 Overloaded operators build an expression tree,
-and a library interprets that tree later,
-symbolically, over a whole column, or as SQL.
+and a library interprets that tree later, symbolically, over a whole column,
+or as SQL.
 
 ## Evaluation Is a Tree Walk
 
@@ -299,8 +293,8 @@ The demo confirms that the operators build the tree you would assemble by hand.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` did not compute a number.
-It built a tree, so `expr` is a value you can hand to `evaluate()`
-under different variable bindings, as many times as you like.
+It built a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
+as many times as you like.
 An unbound variable raises `KeyError`, naming the variable.
 
 ```python
@@ -332,8 +326,8 @@ def test_unbound_variable_raises() -> None:
 ## New Operations, Same Tree
 
 Evaluation has no privileged status.
-Rendering the tree as an infix string is another function,
-in another file, and the node classes never hear about it:
+Rendering the tree as an infix string is another function, in another file,
+and the node classes never hear about it:
 
 ```python
 # infix.py
@@ -372,8 +366,8 @@ binding their fields in the patterns.
 An interpreter need not produce a number or a string.
 It can produce another tree.
 `simplify()` applies algebraic identities.
-Adding zero and multiplying by one vanish, multiplying by zero
-collapses, and constant subtrees fold into a single `Num`.
+Adding zero and multiplying by one vanish, multiplying by zero collapses,
+and constant subtrees fold into a single `Num`.
 Each rule is a nested pattern over a pair of already-simplified children:
 
 ```python
@@ -462,12 +456,12 @@ operator methods that build nodes, and `match` functions that walk them.
 
 ## Exercises
 
-1.  Add `find(entry, name)` to `filesystem.py`: a generator yielding
-    the path of every entry whose name matches.
+1.  Add `find(entry, name)` to `filesystem.py`:
+    a generator yielding the path of every entry whose name matches.
     A directory can match, and matching should continue into it.
 2.  Add a `Symlink` node to the `Node` union in `filesystem.py`,
-    holding a name and a target path, and let the type checker show you
-    every operation that must change.
+    holding a name and a target path,
+    and let the type checker show you every operation that must change.
     Decide what `disk_usage()` and `walk()` should do with a link.
 3.  Add `Neg` (negation) and `Div` (division) nodes to `expr.py`,
     along with `__neg__()` and `__truediv__()` operator methods.
@@ -475,9 +469,8 @@ operator methods that build nodes, and `match` functions that walk them.
     What should `simplify()` do with division by `Num(0)`?
 4.  `to_infix()` parenthesizes every operation.
     Rewrite it to emit only the parentheses that precedence requires,
-    so `2 * x + 1` renders as `2 * x + 1`
-    but `(x + 1) * (x + 2)` keeps its parentheses.
-5.  Write `derivative(e, name)`: a function that returns the symbolic
-    derivative of an expression with respect to a variable,
+    so `2 * x + 1` renders as `2 * x + 1` but `(x + 1) * (x + 2)` keeps its parentheses.
+5.  Write `derivative(e, name)`:
+    a function that returns the symbolic derivative of an expression with respect to a variable,
     using the sum rule and the product rule.
     Run its results through `simplify()` and compare.

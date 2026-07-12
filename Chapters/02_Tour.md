@@ -44,11 +44,13 @@ In this book, the first line of an example will be the name of the file containi
 That file lives in the chapter's `Examples` subdirectory,
 so the above example is `Examples/02_Tour/if.py`.
 
-The `#:` comments are particular to this book. They show the console output for the example.
+The `#:` comments are particular to this book.
+They show the console output for the example.
 The book tooling validates that this output is correct.
 
 A C/C++ `if` requires parentheses around the conditional.
-Parentheses are not necessary in Python, although it won't complain if you use them.
+Parentheses are not necessary in Python,
+although it won't complain if you use them.
 
 The conditional clause ends with a colon.
 This indicates that what follows will be a group of indented statements,
@@ -57,17 +59,20 @@ The `print()` statement sends the result to standard output.
 The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level.
-Unlike the brace-placement debates of C++ or Java, there are no options with Python formatting.
+Unlike the brace-placement debates of C++ or Java,
+there are no options with Python formatting.
 The language forces everyone to indent code the same way,
 which is one of the main reasons for Python's consistent readability.
 
-Python normally has only one statement per line, so no terminating semicolon is necessary.
+Python normally has only one statement per line,
+so no terminating semicolon is necessary.
 (You can put more than one statement on a line by separating them with semicolons.)
 
 ## Variables and References
 
 A variable in Python is a name bound to an object, not a box that holds a value.
-Assignment binds a name. It does not copy.
+Assignment binds a name.
+It does not copy.
 You need not declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
@@ -108,8 +113,8 @@ print(first, rest)
 #: 10 [20, 30, 40]
 ```
 
-Numbers, strings, and tuples are *immutable*, which means that
-operations produce new objects rather than changing the original.
+Numbers, strings, and tuples are *immutable*,
+which means that operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Knowing which is which explains when a change is visible through another name,
 as with `a` and `b` above.
@@ -180,8 +185,7 @@ The `bin()` function converts an integer to a binary string for display.
 
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
-The built-in numeric types do not implement it but
-array libraries such as NumPy do.
+The built-in numeric types do not implement it but array libraries such as NumPy do.
 
 ## Booleans, None, and Truthiness
 
@@ -217,7 +221,8 @@ print(name)               # default
 #: default
 ```
 
-`repr()` returns a value's unambiguous representation, so the empty string shows as `''` and not as blank.
+`repr()` returns a value's unambiguous representation,
+so the empty string shows as `''` and not as blank.
 
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean.
@@ -292,9 +297,9 @@ print(f"{total = }")  # Useful for debugging
 
 The format spec after a colon controls width, precision, and alignment.
 
-You will also see two older styles in existing code:
-C's `printf()` syntax, as in `"val: %d" % val`,
-and the `str.format()` method, as in `"val: {}".format(val)`.
+You will also see two older styles in existing code: C's `printf()` syntax,
+as in `"val: %d" % val`, and the `str.format()` method,
+as in `"val: {}".format(val)`.
 Both still work, and both use the same format mini-language.
 F-strings replaced them, so this book does not use them.
 
@@ -327,8 +332,8 @@ String methods return new strings rather than changing the original.
 
 ## Naming Conventions
 
-The basic strategy for naming is to use `snake_case` for identifiers,
-functions, and file names.
+The basic strategy for naming is to use `snake_case` for identifiers, functions,
+and file names.
 This means lower case with words separated by underscores,
 as in `this_is_snake_case`.
 
@@ -340,8 +345,8 @@ starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
 
-A class may instead use `snake_case` when it is documented and used primarily as a
-callable, the way a function is.
+A class may instead use `snake_case` when it is documented and used primarily as a callable,
+the way a function is.
 The standard library does this for `contextlib.suppress` and `contextlib.contextmanager`,
 and for builtins like `property` and `staticmethod`.
 Reserve it for classes that behave like a function to their users.
@@ -354,12 +359,13 @@ Tools such as ruff can apply these to your code automatically (or at least point
 
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm only `c` changed,
-    then explain why `b.append(4)` earlier did change what `a` sees, but this does not.
+    then explain why `b.append(4)` earlier did change what `a` sees,
+    but this does not.
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
-    Predict what `bool()` reports for each before running it, then check your prediction.
-3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero
-    (change `{score:.0f}%` to show `{score:.2f}`),
+    Predict what `bool()` reports for each before running it,
+    then check your prediction.
+3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero (change `{score:.0f}%` to show `{score:.2f}`),
     and a second line using the debug specifier, `f"{score = }"`.
 4.  Rename every identifier in `numbers.py` to camelCase (`totalSum` instead of `total`, and so on),
-    then explain, using [Naming Conventions](#naming-conventions), which renames break the convention
-    and which merely look unfamiliar.
+    then explain, using [Naming Conventions](#naming-conventions),
+    which renames break the convention and which merely look unfamiliar.

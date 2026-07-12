@@ -10,7 +10,8 @@ It is not.
 
 > A class attribute creates a single shared variable across all instances of the class.
 
-If you then create an instance variable of the same name, that instance variable *shadows* the class attribute.
+If you then create an instance variable of the same name,
+that instance variable *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
 
@@ -95,32 +96,51 @@ print(Tally.total)
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
 
-`display_object(Tally)` shows what the class actually holds: `total`, and nothing called `label`.
-An assignment in the class body is what creates a class attribute, as `class_attribute_confusion.py` showed above.
-`total: ClassVar[int] = 0` has the `= 0`, so it exists on `Tally` before any instance is built.
-`label: str` has no `=`, so nothing is stored under that name anywhere on the class.
-The annotation only records, in `Tally.__annotations__`, that a `Tally` will eventually carry a `label`.
-That promise is invisible to `display_object()`, which reports attributes that exist,
+`display_object(Tally)` shows what the class actually holds: `total`,
+and nothing called `label`.
+An assignment in the class body is what creates a class attribute,
+as `class_attribute_confusion.py` showed above.
+`total: ClassVar[int] = 0` has the `= 0`,
+so it exists on `Tally` before any instance is built.
+`label: str` has no `=`,
+so nothing is stored under that name anywhere on the class.
+The annotation only records, in `Tally.__annotations__`,
+that a `Tally` will eventually carry a `label`.
+That promise is invisible to `display_object()`,
+which reports attributes that exist,
 not annotations that merely describe one to come.
 
 `display_object(a)` tells a different story once an instance exists.
-Both `label` and `total` appear: `label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
-Constructing `a` ran `self.label = label`, which created a real `label` attribute on `a`, not on `Tally`.
-`total` shows up too, not because `a` has its own copy, but because reading an attribute checks the instance first,
-then falls back to the class, the same rule `Stars` demonstrated earlier in this chapter.
+Both `label` and `total` appear:
+`label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
+Constructing `a` ran `self.label = label`,
+which created a real `label` attribute on `a`, not on `Tally`.
+`total` shows up too, not because `a` has its own copy,
+but because reading an attribute checks the instance first,
+then falls back to the class,
+the same rule `Stars` demonstrated earlier in this chapter.
 
-A *bare annotation*, one with no assigned value, is a promise rather than a placeholder.
-It states that instances of this class will carry a `label` attribute of type `str`, set somewhere.
-Here that somewhere is `__init__()`, whose `self.label = label` is what `display_object(a)` above actually found.
-Had `__init__()` never assigned it, no attribute would exist, on the instance or the class.
-The checker would not catch the omission, because it trusts the annotation instead of verifying that every method actually sets it.
-The failure would surface later, as an `AttributeError` from the first code that reads the missing `label`.
+A *bare annotation*, one with no assigned value,
+is a promise rather than a placeholder.
+It states that instances of this class will carry a `label` attribute of type `str`,
+set somewhere.
+Here that somewhere is `__init__()`,
+whose `self.label = label` is what `display_object(a)` above actually found.
+Had `__init__()` never assigned it, no attribute would exist,
+on the instance or the class.
+The checker would not catch the omission,
+because it trusts the annotation instead of verifying that every method actually sets it.
+The failure would surface later,
+as an `AttributeError` from the first code that reads the missing `label`.
 
 The annotation on `label` is not required here.
-Delete it, and `ty` still infers `label: str` correctly from `self.label = label`, because the parameter's own type carries through to the attribute it initializes.
-It earns its place for symmetry with `total`, so the class's two attributes read together at the top instead of one hiding inside the constructor.
+Delete it, and `ty` still infers `label: str` correctly from `self.label = label`,
+because the parameter's own type carries through to the attribute it initializes.
+It earns its place for symmetry with `total`,
+so the class's two attributes read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze) shows the case where the annotation is not optional.
-There, an attribute is set from outside the class entirely, and a bare annotation is the checker's only way to know its type.
+There, an attribute is set from outside the class entirely,
+and a bare annotation is the checker's only way to know its type.
 
 `ClassVar` is a hint for the checker, not the runtime.
 It records that `total` belongs to the class,
@@ -128,9 +148,9 @@ and it catches the accidental shadowing from the earlier example before it happe
 
 ## ClassVar and Inheritance
 
-Subclasses inherit a `ClassVar` declared on a base class like any
-other class attribute. A subclass that doesn't declare its own copy reads straight
-through to the base's value, via the normal method resolution order.
+Subclasses inherit a `ClassVar` declared on a base class like any other class attribute.
+A subclass that doesn't declare its own copy reads straight through to the base's value,
+via the normal method resolution order.
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
 
@@ -159,13 +179,15 @@ print(Base.shared, Left.shared, Right.shared)
 
 `Left` has no `shared` of its own,
 so it tracks `Base.shared` until something assigns to `Left.shared` directly.
-`Right` overrode `shared` at class-definition time, so it never sees
-changes made through `Base`.
-`ClassVar` doesn't change any of this. It only tells the checker that
-`shared` belongs to the class, not that subclasses share storage.
+`Right` overrode `shared` at class-definition time,
+so it never sees changes made through `Base`.
+`ClassVar` doesn't change any of this.
+It only tells the checker that `shared` belongs to the class,
+not that subclasses share storage.
 
 For real per-object defaults, write a constructor with default arguments,
-or use a `@dataclass`, which turns the class-attribute syntax into instance variable defaults.
+or use a `@dataclass`,
+which turns the class-attribute syntax into instance variable defaults.
 Each object then gets its own storage for instance variables:
 
 ```python
@@ -193,14 +215,18 @@ A `@dataclass` reads the class-attribute declarations as a template and generate
 
 ## Exercises
 
-1.  In `class_attribute_confusion.py`, add a third instance `c = Stars()` after the `Stars.rating = 9` line,
+1.  In `class_attribute_confusion.py`,
+    add a third instance `c = Stars()` after the `Stars.rating = 9` line,
     and print `c.rating`.
-    Predict its value before running, then explain why it differs from `a.rating`.
-2.  In `class_var_inheritance.py`, add a third subclass `class Middle(Base): pass`
-    (no override, like `Left`) and print `Middle.shared` alongside the others at each step.
+    Predict its value before running,
+    then explain why it differs from `a.rating`.
+2.  In `class_var_inheritance.py`,
+    add a third subclass `class Middle(Base): pass` (no override, like `Left`) and print `Middle.shared` alongside the others at each step.
     Confirm `Middle` tracks `Base` exactly like `Left` does.
 3.  In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
-    Then create a second instance, `b2 = B()`, and confirm `b2.x` is still `100`, unaffected.
+    Then create a second instance, `b2 = B()`,
+    and confirm `b2.x` is still `100`, unaffected.
 4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`) class attribute instead,
-    then have an instance assign to `self.total` directly and explain, using `vars()` as in `inside_objects.py`,
+    then have an instance assign to `self.total` directly and explain,
+    using `vars()` as in `inside_objects.py`,
     what that assignment actually creates.

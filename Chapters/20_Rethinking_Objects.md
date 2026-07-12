@@ -37,8 +37,8 @@ That style makes no substitutability promises.
 *C++* drew from Simula.
 Objects were optional, and it brought object-oriented programming,
 and exceptions, into the mainstream.
-*Java* drew from Smalltalk. Everything is an object,
-even when all you need is a function.
+*Java* drew from Smalltalk.
+Everything is an object, even when all you need is a function.
 Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
 which pulls in the other direction.
@@ -46,20 +46,24 @@ which pulls in the other direction.
 Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
 They favor immutability.
-Rust makes bindings immutable by default. Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
+Rust makes bindings immutable by default.
+Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
 They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
 
-The *Liskov Substitution Principle* (LSP) says that an object of a subtype must work anywhere code expects an
-object of its base type, without breaking the program. A subclass may add behavior, but it must honor the base class's
-contract. It accepts the same arguments, returns the same kinds of results, and
-raises no surprising exceptions. When subclasses obey it, code written against
-the base class works unchanged on any of them. This is the guarantee that makes
-polymorphism, and patterns like the [Template Method](25_Template_Method.md),
-safe. The base class calls a method and trusts every subclass to stand in for it.
+The *Liskov Substitution Principle* (LSP) says that an object of a subtype must work anywhere code expects an object of its base type,
+without breaking the program.
+A subclass may add behavior, but it must honor the base class's contract.
+It accepts the same arguments, returns the same kinds of results,
+and raises no surprising exceptions.
+When subclasses obey it,
+code written against the base class works unchanged on any of them.
+This is the guarantee that makes polymorphism,
+and patterns like the [Template Method](25_Template_Method.md), safe.
+The base class calls a method and trusts every subclass to stand in for it.
 The rest of this chapter shows why.
 
 ## Encapsulation Leaks
@@ -159,7 +163,8 @@ Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
 
-Testing confirms the defensive copy holds. Mutating the returned list leaves the original untouched:
+Testing confirms the defensive copy holds.
+Mutating the returned list leaves the original untouched:
 
 ```python
 # test_plugged.py
@@ -249,7 +254,8 @@ if __name__ == "__main__":
 
 The function reads the same and computes the same.
 The class does not need to own it.
-The function is not worse, and it has an advantage. It need not live inside `Point`.
+The function is not worse, and it has an advantage.
+It need not live inside `Point`.
 
 Testing confirms the method and the free function agree:
 
@@ -265,7 +271,8 @@ def test_method_and_function_agree() -> None:
 
 ## Protocols Generalize, Composition Adapts
 
-Because the function does not belong to a class, it can work on anything shaped like a point.
+Because the function does not belong to a class,
+it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with the right attributes satisfies it,
 with no declared inheritance.
@@ -336,7 +343,8 @@ def test_protocol_and_adapter() -> None:
 
 The third OOP promise is reuse through inheritance.
 In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
-The alternative is composition. A type holds other types as fields.
+The alternative is composition.
+A type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
 and frozen instances compare by value and work as keys:
 
@@ -425,7 +433,8 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Inheriting from `ABC` makes `Shape` abstract. You cannot instantiate it,
+Inheriting from `ABC` makes `Shape` abstract.
+You cannot instantiate it,
 and `@abstractmethod` forces every subclass to define `area()`.
 
 Dynamic typing produces a different approach.
@@ -601,11 +610,9 @@ Without it, a `None` eventually meets `.log()` and the call fails.
 But look at what the `None` branch does: nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
-The *Null Object* pattern replaces "absent" with an object whose
-behavior is neutral.
+The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
 Give the do-nothing case a class,
-and the optional parameter becomes an ordinary required one with a
-default:
+and the optional parameter becomes an ordinary required one with a default:
 
 ```python
 # null_logger.py
@@ -647,15 +654,12 @@ The output is identical and the branches are gone.
 `total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
 The parameter's type improved too.
-`Logs` is a protocol, so any logger fits,
-and no caller ever sees a `| None`.
-Because `NullLogger` is stateless, one shared `SILENT` instance
-serves the whole program,
+`Logs` is a protocol, so any logger fits, and no caller ever sees a `| None`.
+Because `NullLogger` is stateless,
+one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
-The standard library ships this exact object as
-`logging.NullHandler`,
-and the maze in [Simulation](38_Simulation.md) points every
-doorless direction at one shared `EDGE` room,
+The standard library ships this exact object as `logging.NullHandler`,
+and the maze in [Simulation](38_Simulation.md) points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 
 ```python
@@ -679,14 +683,13 @@ When a caller must notice absence,
 a lookup that can fail or a required value that may be missing,
 a silent stand-in buries the problem.
 Keep `T | None` there,
-or return the `Result` of
-[Functional Error Handling](41_Functional_Error_Handling.md#a-result-type),
+or return the `Result` of [Functional Error Handling](41_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
 The test is what callers would write.
-If every one of them would handle absence with the same neutral
-behavior, centralize that behavior in a null object.
-If any caller would branch differently,
-absence is information, and it belongs in the type.
+If every one of them would handle absence with the same neutral behavior,
+centralize that behavior in a null object.
+If any caller would branch differently, absence is information,
+and it belongs in the type.
 
 ## OOP Is Still Sometimes Useful
 
@@ -696,9 +699,10 @@ A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and hashing.
 
-OOP also normalized the crucial idea of types, as seen in
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
-If you simply avoid implementation inheritance, the payoff for using types is tremendous.
+OOP also normalized the crucial idea of types,
+as seen in [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
+If you simply avoid implementation inheritance,
+the payoff for using types is tremendous.
 
 Start with functions and data.
 When a program truly needs an object, it tells you.
@@ -724,18 +728,21 @@ or whether immutable data, a function, and a protocol already solve the problem.
 
 ## Exercises
 
-1.  In `leaky.py`, add a `tags: list[str]` field to `Leaky`, exposed through a `@property` the same way
-    `numbers` is, and demonstrate the same leak by mutating the list you get back.
+1.  In `leaky.py`, add a `tags: list[str]` field to `Leaky`,
+    exposed through a `@property` the same way `numbers` is,
+    and demonstrate the same leak by mutating the list you get back.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
-2.  In `point_distance.py`, add a third point `p3 = Point(6, 8)`
-    and confirm `distance(p1, p3)` and `p1.distance_to(p3)` still agree.
-3.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`, `b`, `c`
-    (no `x` or `y`), and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`, ignoring `c`.
+2.  In `point_distance.py`,
+    add a third point `p3 = Point(6, 8)` and confirm `distance(p1, p3)` and `p1.distance_to(p3)` still agree.
+3.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
+    `b`, `c` (no `x` or `y`),
+    and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,
+    ignoring `c`.
     Confirm `distance()` works on a `TripleCoord` with no change to `distance()` itself.
-4.  In `shapes_match.py`, add a new shape, `Square(side: float)`, to the `Shape` union,
-    add its `case` to `area()`, and confirm `ty check` still passes.
-    Then temporarily comment out the new `case` and observe what `assert_never()`
-    causes the checker to report.
+4.  In `shapes_match.py`, add a new shape, `Square(side: float)`,
+    to the `Shape` union, add its `case` to `area()`,
+    and confirm `ty check` still passes.
+    Then temporarily comment out the new `case` and observe what `assert_never()` causes the checker to report.
 5.  In `null_logger.py`, write a second null-object style class, `NullCache`,
     whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
     following the same shape as `NullLogger`.

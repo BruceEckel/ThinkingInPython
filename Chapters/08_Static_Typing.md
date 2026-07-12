@@ -1,10 +1,13 @@
 # Static Typing
 
-C++ and Java require type declarations, and they check those types during compilation.
+C++ and Java require type declarations,
+and they check those types during compilation.
 The Python runtime checks types only when an operation is actually attempted.
-The examples up to this point have no type declarations, which you might not miss on small programs.
+The examples up to this point have no type declarations,
+which you might not miss on small programs.
 
-Python 3.5 (2015) introduced *type hints*, which look like static type checking in other languages.
+Python 3.5 (2015) introduced *type hints*,
+which look like static type checking in other languages.
 The Python runtime ignores type hints, as long as they are properly formed.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -79,9 +82,11 @@ This book uses [`ty`](https://github.com/astral-sh/ty), Astral's fast checker:
 
     ty check
 
-It complains where the hints and the code disagree, and is quiet when they agree.
+It complains where the hints and the code disagree,
+and is quiet when they agree.
 This book checks every runnable example this way.
-The build runs `ty` on every change, so the code you read here checks as well as runs.
+The build runs `ty` on every change,
+so the code you read here checks as well as runs.
 
 ## Catching Mistakes
 
@@ -99,7 +104,8 @@ print(area("3", 4))  # type: ignore
 ```
 
 At runtime `area("3", 4)` does not cause an error.
-It returns `"3333"`, because `"3" * 4` is the correct syntax for string repetition.
+It returns `"3333"`,
+because `"3" * 4` is the correct syntax for string repetition.
 The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
 
@@ -108,7 +114,8 @@ which allows this book's build to complete successfully.
 
 ## Structural Typing with Protocols
 
-Earlier chapters relied on *dynamic typing*. A function accepts any object,
+Earlier chapters relied on *dynamic typing*.
+A function accepts any object,
 and the only requirement is that the object supports the operations performed on it.
 Python checks the type at runtime, when the operation runs.
 Programmers often call dynamic typing *duck typing*.
@@ -152,7 +159,8 @@ print(render(Square()))
 ```
 
 `Circle` and `Square` never mention `Drawable`.
-The checker accepts both because each has a `draw()`, so they are of the right shape.
+The checker accepts both because each has a `draw()`,
+so they are of the right shape.
 
 `Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
@@ -161,7 +169,8 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 
 A class is itself a value.
-You can pass it to a function, store it in a variable, and call it to make an instance.
+You can pass it to a function, store it in a variable,
+and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an *instance* of `SomeType`.
@@ -185,10 +194,12 @@ print(type(shape).__name__)
 #: Circle
 ```
 
-`make()` takes the class, not an instance, so the argument's annotation is `type[Shape]`.
+`make()` takes the class, not an instance,
+so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
-This is the construct functions like `issubclass()` work with, since they compare classes rather than instances.
+This is the construct functions like `issubclass()` work with,
+since they compare classes rather than instances.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
@@ -216,28 +227,28 @@ print(grid)
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the checker accepts any pair of ints as a `Coord`.
-(To create a distinct type the checker keeps separate,
-use `NewType`, listed in the summary below.)
+(To create a distinct type the checker keeps separate, use `NewType`, listed in the summary below.)
 
 `Color` names a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings and no others.
-Passing `"purple"` to `paint()` is a type error, even though `"purple"` is a valid `str`.
+Passing `"purple"` to `paint()` is a type error,
+even though `"purple"` is a valid `str`.
 The alias also documents the allowed values in one place,
 instead of scattering the literal list across every function that accepts a `Color`.
 
 An alias can also name a union of types.
-[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) uses
-`type Shape = Circle | Square` to define a closed set of alternatives
-that a `match` can check exhaustively.
+[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) uses `type Shape = Circle | Square` to define a closed set of alternatives that a `match` can check exhaustively.
 
 ## Generic Functions and Classes {#generic-functions-and-classes}
 
 Consider a function that returns the first element of a list.
 This function can be applied to a list holding any type.
-A useful annotation would return a type that matches the list's element type, whatever that type is.
+A useful annotation would return a type that matches the list's element type,
+whatever that type is.
 
 `Any` cannot express that connection.
-It accepts any list, but the returned value doesn't express the type held by the list.
+It accepts any list,
+but the returned value doesn't express the type held by the list.
 
 A *type parameter* correctly specifies the returned type.
 The type held by the list is the type the function returns.
@@ -259,7 +270,8 @@ print(s.upper())
 
 `T` is a placeholder, filled in separately at each call.
 The checker infers `T` from the argument and then knows the return type.
-Both `n + 1` and `s.upper()` are successful, while `n.upper()` would fail the type check.
+Both `n + 1` and `s.upper()` are successful,
+while `n.upper()` would fail the type check.
 
 A class declares type parameters the same way:
 
@@ -284,8 +296,7 @@ A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 
 A special form, `**P`, captures the types of an entire parameter list.
-[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses this
-to give a wrapper the same signature as the function it wraps.
+[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses this to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you will still see in older code.
@@ -336,7 +347,8 @@ Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves exactly as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
-If you need a runtime guarantee, use `isinstance()` or a library built to validate data.
+If you need a runtime guarantee,
+use `isinstance()` or a library built to validate data.
 The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
@@ -349,10 +361,10 @@ The book uses only a handful of these, but the rest turn up in other code.
 Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
-Annotations go in three places: a parameter (`x: int`), a return value (`-> str`),
-and a variable or attribute (`total: int = 0`).
-Most of the names below come from the `typing` module. The abstract container
-types come from `collections.abc`.
+Annotations go in three places: a parameter (`x: int`),
+a return value (`-> str`), and a variable or attribute (`total: int = 0`).
+Most of the names below come from the `typing` module.
+The abstract container types come from `collections.abc`.
 
 <!-- Section headers link out to docs.python.org in a new tab. Safe only
      because CHAPTER_TOC_DEPTH (build_site.py) stops the in-page TOC at
@@ -455,10 +467,12 @@ types come from `collections.abc`.
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports, see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
-The runtime ignores all of these. They exist for the checker and the reader.
+The runtime ignores all of these.
+They exist for the checker and the reader.
 Older code spells some of them differently: `Optional[X]` for `X | None`,
-`Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`, `Tuple` from `typing` for
-the lowercase built-ins. The forms above are the modern ones.
+`Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,
+`Tuple` from `typing` for the lowercase built-ins.
+The forms above are the modern ones.
 
 ## Exercises
 
@@ -466,9 +480,9 @@ the lowercase built-ins. The forms above are the modern ones.
     and pass an instance to `render()` without changing `Drawable` or `render()`.
 2.  In `area.py`, remove the `# type: ignore` comment and run `ty check` on the file.
     Read the error, then restore the comment.
-3.  In `generics.py`, write a second generic function, `last[T](items: list[T]) -> T`,
-    that returns the final element, and call it on both a `list[int]` and a `list[str]`
-    the way `first()` is called.
-4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally`
-    whose `report()` returns the message in all capitals, calling `super().report()` first.
+3.  In `generics.py`, write a second generic function,
+    `last[T](items: list[T]) -> T`, that returns the final element,
+    and call it on both a `list[int]` and a `list[str]` the way `first()` is called.
+4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
+    calling `super().report()` first.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.

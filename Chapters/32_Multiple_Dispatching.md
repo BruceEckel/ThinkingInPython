@@ -15,8 +15,7 @@ Python can invoke the dynamic binding mechanism on only one of those types.
 You end up detecting some types manually and effectively producing your own dynamic binding behavior.
 
 The solution is *Multiple Dispatching*.
-Polymorphism broadly means that a function accepts arguments of more than one type
-(see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
+Polymorphism broadly means that a function accepts arguments of more than one type (see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
 It takes several forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
@@ -29,14 +28,15 @@ The first resolves the first type, and the second resolves the second.
 Each unknown type needs its own dispatching method call.
 The following example names its methods `compete()` and `eval_*()`,
 and all belong to the same hierarchy.
-Here there will be only two dispatches. This is *double dispatching*.
+Here there will be only two dispatches.
+This is *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
 then you'll need a dispatching method call for each hierarchy.
 
 Both versions below share one result type, an enumeration called `Outcome`:
 either `WIN`, `LOSE`, or `DRAW`.
-`Outcome` is a `StrEnum`, so each member is its string value and prints as `win`,
-`lose`, or `draw`:
+`Outcome` is a `StrEnum`,
+so each member is its string value and prints as `win`, `lose`, or `draw`:
 
 ```python
 # outcome.py
@@ -49,8 +49,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-We also need two small helper functions,
-one to generate random pairs of items,
+We also need two small helper functions, one to generate random pairs of items,
 and one to play a pair off and print the result:
 
 ```python
@@ -195,7 +194,8 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Notice the flexibility of dictionaries. A tuple serves as a key just as easily as a single object.
+Notice the flexibility of dictionaries.
+A tuple serves as a key just as easily as a single object.
 
 ## One Type or Many
 
@@ -273,14 +273,14 @@ not when a test imports it.
     Lizard beats Paper and Scissors, and loses to Rock.
     Lizard versus Lizard is a draw.
     Add the six new entries (both orders of every pair) that `OUTCOME` needs.
-2.  Add the same `Lizard` to `paper_scissors_rock.py`, the double-dispatch version,
+2.  Add the same `Lizard` to `paper_scissors_rock.py`,
+    the double-dispatch version,
     which means adding an `eval_lizard()` method to every existing class,
     plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
     Compare how much code this took versus adding `Lizard` to the table version.
-3.  In `test_paper_scissors.py`, add `Lizard` to `EXPECTED` with its nine (now sixteen)
-    matchups, and confirm both versions still agree with each other and with `EXPECTED`.
-4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None`
-    parameter that it updates in place with a tally of every item type it chooses,
+3.  In `test_paper_scissors.py`,
+    add `Lizard` to `EXPECTED` with its nine (now sixteen) matchups,
+    and confirm both versions still agree with each other and with `EXPECTED`.
+4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
     while still yielding plain `(item1, item2)` pairs so existing calls need no change.
-    Pass in your own `Counter` and print how many times `Lizard` appeared across
-    `item_pair_gen(Item, 100, counts)`.
+    Pass in your own `Counter` and print how many times `Lizard` appeared across `item_pair_gen(Item, 100, counts)`.

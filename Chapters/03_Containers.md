@@ -29,7 +29,8 @@ for x in odds:
 The first line creates a `list`.
 `append()` adds new elements to `odds`.
 The `list` automatically resizes itself.
-The `for` statement iterates through `odds`, so `x` takes on each value in the `list`.
+The `for` statement iterates through `odds`,
+so `x` takes on each value in the `list`.
 
 This example has no type declarations.
 Each object carries its own type.
@@ -89,8 +90,8 @@ for item in mixed:
 This flexibility is convenient but easy to overuse.
 A `list` of mixed types usually means each element needs different handling,
 which is often better expressed with a `tuple`,
-a [data class](12_Data_Classes_as_Types.md#data-classes),
-or distinct lists, each holding a single type.
+a [data class](12_Data_Classes_as_Types.md#data-classes), or distinct lists,
+each holding a single type.
 
 ## Tuples and Unpacking
 
@@ -237,12 +238,14 @@ A few operators do not appear above.
 `<` and `>` test *proper* subset and superset.
 They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
-They match the `update()`, `intersection_update()`, `difference_update()`, and `symmetric_difference_update()` methods.
+They match the `update()`, `intersection_update()`, `difference_update()`,
+and `symmetric_difference_update()` methods.
 
 ## Specialized Containers
 
 The `collections` module in the standard library includes container types built for specific jobs.
-Four of these show up consistently: `Counter`, `defaultdict`, `deque`, and `namedtuple`.
+Four of these show up consistently: `Counter`, `defaultdict`, `deque`,
+and `namedtuple`.
 
 ### `Counter`
 
@@ -264,7 +267,8 @@ print(counts.most_common(2))
 #: [('the', 3), ('cat', 2)]
 ```
 
-A missing key counts as zero rather than raising `KeyError`, and `most_common()` returns the highest counts first.
+A missing key counts as zero rather than raising `KeyError`,
+and `most_common()` returns the highest counts first.
 
 ### `defaultdict`
 
@@ -294,7 +298,8 @@ print(by_kind["fish"])  # A missing key gets a fresh empty list
 #: []
 ```
 
-The `defaultdict` constructor argument is a *factory*, a callable that builds the default.
+The `defaultdict` constructor argument is a *factory*,
+a callable that builds the default.
 Here, the `list` argument is a factory that produces a fresh empty list for each new key.
 
 ### `deque`
@@ -355,8 +360,9 @@ print(deque_time < list_time)
 #: True
 ```
 
-A `list` can stand in for a `deque`, but `insert(0, x)` and `pop(0)`
-must shift every remaining element, so both are O(n) instead of O(1).
+A `list` can stand in for a `deque`,
+but `insert(0, x)` and `pop(0)` must shift every remaining element,
+so both are O(n) instead of O(1).
 Use a `deque` whenever you need a queue.
 
 ### `namedtuple`
@@ -393,11 +399,11 @@ see [Performance](18_Performance.md).
 
 Each mutable container has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
-Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
-completes the set: a built-in, hashable mapping that rejects modification after creation.
-The example below uses tuples and frozensets, plus `MappingProxyType` from the
-`types` module, which is not a container of its own but a read-only *view* onto a
-`dict` you still hold:
+Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/)) completes the set:
+a built-in, hashable mapping that rejects modification after creation.
+The example below uses tuples and frozensets,
+plus `MappingProxyType` from the `types` module,
+which is not a container of its own but a read-only *view* onto a `dict` you still hold:
 
 ```python
 # immutability.py
@@ -434,8 +440,8 @@ except TypeError as e:
 #: TypeError
 ```
 
-Where a `MappingProxyType` is only a read-only window onto a `dict` that still
-exists and can change, a `frozendict` owns its contents outright.
+Where a `MappingProxyType` is only a read-only window onto a `dict` that still exists and can change,
+a `frozendict` owns its contents outright.
 It runs under Python 3.15.
 Type checkers need a release or two to catch up with a new built-in,
 which is why this example carries `# type: ignore` comments:
@@ -456,15 +462,16 @@ except TypeError as e:
 #: TypeError
 ```
 
-Because a `frozendict` cannot change, it is hashable, so like a `tuple` or a
-`frozenset` it can serve as a dictionary key or a set member.
+Because a `frozendict` cannot change, it is hashable,
+so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
 A dictionary key must be hashable rather than immutable.
 Immutability is how a container earns a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
 Neither you nor code you pass it to can modify an immutable container by accident,
 so you never need a defensive copy before sharing it.
-It is safe to use as a default argument, unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
+It is safe to use as a default argument,
+unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through.
@@ -478,8 +485,9 @@ so changes to that underlying `dict` still show through.
 2.  In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
     change the loop to count occurrences of each `kind` instead of collecting names,
     and print the result.
-3.  In `set_methods.py`, add a third set `c = {1, 5, 9}` and print `a.union(b, c)`
-    and `a.intersection(b, c)`.
-4.  In `immutability.py`, add a line that tries `groups.add([1, 2])`
-    (a plain list, not a `frozenset`) and catch the exception it raises.
-    Explain, in terms of hashability, why a `frozenset` works as a set member but a `list` does not.
+3.  In `set_methods.py`,
+    add a third set `c = {1, 5, 9}` and print `a.union(b, c)` and `a.intersection(b, c)`.
+4.  In `immutability.py`,
+    add a line that tries `groups.add([1, 2])` (a plain list, not a `frozenset`) and catch the exception it raises.
+    Explain, in terms of hashability,
+    why a `frozenset` works as a set member but a `list` does not.

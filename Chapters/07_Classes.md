@@ -39,21 +39,24 @@ x.show_twice()
 
 Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first parameter.
-Python programmers traditionally name the reference `self`, but you can use any identifier
-(however, anything other than `self` will probably confuse people).
+Python programmers traditionally name the reference `self`,
+but you can use any identifier (however, anything other than `self` will probably confuse people).
 To refer to the object's fields or its other methods,
 you must go through `self`.
 
-When you call a method for an object, as in `x.show()`, Python passes the object reference automatically.
+When you call a method for an object, as in `x.show()`,
+Python passes the object reference automatically.
 
 The first method, `__init__()`, is the *initializer*.
 The double underscores (a.k.a. "dunder") indicate a special name.
 The `__new__()` method is the *constructor*, but we hardly ever use that.
-It has become common practice to call `__init__()` the constructor, since it does the job of constructors in other OOP languages.
+It has become common practice to call `__init__()` the constructor,
+since it does the job of constructors in other OOP languages.
 We follow that practice in this book.
 
 Python calls the constructor automatically during object creation.
-At the bottom of the example you can see that the creation of an object looks like a function call, but using the class name.
+At the bottom of the example you can see that the creation of an object looks like a function call,
+but using the class name.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
@@ -63,8 +66,8 @@ This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,
 they implicitly become class-level fields (similar to static fields in C++/Java).
 
-You can see the shape of an object with `display_object()`, a small inspection
-helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
+You can see the shape of an object with `display_object()`,
+a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
 It prints an object's attributes and methods:
 
 ```python
@@ -82,16 +85,19 @@ display_object(x)
 #:   • show_twice(self)
 ```
 
-The instance carries one attribute, `s`, while the two methods belong to the
-class. The constructor `__init__()` is a dunder, so `display_object()` hides it
-by default.
+The instance carries one attribute, `s`,
+while the two methods belong to the class.
+The constructor `__init__()` is a dunder,
+so `display_object()` hides it by default.
 
 ## Inheritance
 
 Because Python is dynamically typed, it doesn't really care about interfaces.
 All it cares about is applying operations to objects.
-With inheritance in C++ or Java, you often inherit only to establish a common interface.
-Python is different. You inherit an implementation, to reuse the code from the base class.
+With inheritance in C++ or Java,
+you often inherit only to establish a common interface.
+Python is different.
+You inherit an implementation, to reuse the code from the base class.
 
 First import the base class the same way you import any name from a module (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
@@ -168,7 +174,8 @@ as long as the `obj` argument has a `show()`.
 
 ## Marking Overrides with `@override`
 
-When you override a method, nothing requires the name to match a method in the base class.
+When you override a method,
+nothing requires the name to match a method in the base class.
 A typo, or a base method that someone later renames or removes,
 silently produces a new method instead of an override.
 This bug is easy to miss.
@@ -231,7 +238,8 @@ Because the change is invisible at the call site,
 do not preemptively add getters and setters.
 You can always add them later when you discover you need the logic.
 
-The default `@property` is *read-only*. It is only a getter.
+The default `@property` is *read-only*.
+It is only a getter.
 Assigning to it raises an `AttributeError`.
 To enable writing, add a *setter*,
 which allows you to validate the value before storing it:
@@ -271,8 +279,8 @@ A plain method is a better expression of the intent.
 
 A `@property` reruns its code on every access.
 When the computation is expensive and the answer cannot change,
-`functools.cached_property` runs it once,
-on first access, and stores the result:
+`functools.cached_property` runs it once, on first access,
+and stores the result:
 
 ```python
 # cached_property_demo.py
@@ -302,8 +310,8 @@ so there's no cost if the attribute is not accessed.
 The stored value lives on the instance.
 `del n.total` discards it, and the next access recomputes.
 
-`cached_property` trades freshness for speed,
-so if `n.values` changed, `total` would be stale.
+`cached_property` trades freshness for speed, so if `n.values` changed,
+`total` would be stale.
 A plain `@property` recomputes every time and is never wrong.
 Cache only what cannot change.
 
@@ -397,22 +405,26 @@ Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
-but composition, mixins, or a plain module-level function are almost always a clearer choice.
+but composition, mixins,
+or a plain module-level function are almost always a clearer choice.
 You will rarely, if ever, want this in your own code.
 
 ## Exercises
 
-1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`
-    that sets `self.radius = self.radius / factor`, going through the existing setter.
+1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
+    going through the existing setter.
     Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5`,
     then confirm `shrink(-2)`, which would divide the radius down to `-5`,
     still raises the setter's `ValueError` instead of silently storing a negative radius.
-2.  In `class_methods.py`, add a second alternative constructor, `from_kelvin(cls, k)`,
-    using `celsius = k - 273.15`.
-    Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree, within rounding.
-3.  In `simple2.py`, add a third class, `Simple3(Simple2)`, that overrides `show()` again,
+2.  In `class_methods.py`, add a second alternative constructor,
+    `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
+    Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
+    within rounding.
+3.  In `simple2.py`, add a third class, `Simple3(Simple2)`,
+    that overrides `show()` again,
     printing its own message before calling `super().show(msg)`.
-    Predict, then confirm, the full chain of prints from `Simple3("x").show_twice()`.
-4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py`
-    that returns `self.total / len(self.values)`.
-    Access `n.total` and then `n.average`, and confirm `total` is not recomputed when `average` uses it.
+    Predict, then confirm,
+    the full chain of prints from `Simple3("x").show_twice()`.
+4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
+    Access `n.total` and then `n.average`,
+    and confirm `total` is not recomputed when `average` uses it.

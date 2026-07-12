@@ -1,6 +1,7 @@
 # Observer
 
-The *Observer* pattern, a kind of callback, decouples the code that changes state from the code that reacts to the change.
+The *Observer* pattern, a kind of callback,
+decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
 and receives a notification whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
@@ -87,19 +88,22 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
-No `Observer` base class needs inheriting, and no notification protocol needs implementing.
+No `Observer` base class needs inheriting,
+and no notification protocol needs implementing.
 Assigning to `celsius` notifies everyone.
 For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
 but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
 
-An observer returns `None`. Notification runs one way, from observable to observers, and nothing comes back.
+An observer returns `None`.
+Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,
 such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
 
 Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 It also verifies that an unsubscribed observer stops hearing changes.
-Removal is by identity, so a detachable observer needs a named reference, not an inline lambda.
+Removal is by identity, so a detachable observer needs a named reference,
+not an inline lambda.
 A list whose `append` is the observer records what arrived:
 
 ```python
@@ -156,8 +160,10 @@ If observers are coroutines,
 `notify` awaits them together with `asyncio.gather`,
 so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
-`gather` still waits for all of them, so the change finishes only after every notification succeeds.
-One limitation: a `@property` setter cannot be a coroutine, so an assignment cannot be awaited.
+`gather` still waits for all of them,
+so the change finishes only after every notification succeeds.
+One limitation: a `@property` setter cannot be a coroutine,
+so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
@@ -227,7 +233,8 @@ Below its threshold it returns without sending anything.
 
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
-The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out, routed by event type.
+The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out,
+routed by event type.
 
 ## A Visual Example of Observers
 
@@ -235,7 +242,8 @@ This is the model-view split from the chapter's opening,
 made visible with `tkinter` (in the standard library, so there is nothing to install),
 and split across two files to make the point.
 The *model*, `box_observer.py`,
-is a grid of colored boxes and the rule for a click. It holds no display code.
+is a grid of colored boxes and the rule for a click.
+It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
 Click a box and every box touching it, diagonals included,
 repaints to the clicked box's color.
@@ -243,8 +251,8 @@ repaints to the clicked box's color.
 The model is an `Observable`.
 `new_grid()` builds a size x size grid banded into three colors,
 `adjacent()` tests whether two distinct cells touch, including diagonally,
-and `recolored()` computes the grid that results from a click:
-values in, values out.
+and `recolored()` computes the grid that results from a click: values in,
+values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
 `tkinter` plays no part here, so we can test the model without a GUI.
 It reuses the same `Observable` as the thermometer, from `observers.py`:
@@ -324,8 +332,8 @@ It is the only code that touches the screen.
 `draw()` paints the grid, and the view subscribes it, so every change repaints.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
-Run `box_view.py` to play. It opens a window,
-so the example harness does not run it (`tools/norun.txt` lists it).
+Run `box_view.py` to play.
+It opens a window, so the example harness does not run it (`tools/norun.txt` lists it).
 
 ```python
 # box_view.py

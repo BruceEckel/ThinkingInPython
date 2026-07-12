@@ -229,11 +229,15 @@ print(sorted(c.__name__ for c in Shape.registry))
 #: ['Circle', 'Square']
 ```
 
-For each new subclass, `__init_subclass__()` adds it to the
-registry and removes its base classes,
+For each new subclass,
+`__init_subclass__()` adds it to the registry and removes its base classes,
 so only the current leaves remain.
-That is why `Blue` is absent from the second `Color` print. Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`, leaving those two leaves beside `Green` and `Red`.
-For the same reason `Round` is missing from the `Shape` registry. Creating `Circle`, a subclass of `Round`, removed `Round`, leaving `Circle` and `Square`.
+That is why `Blue` is absent from the second `Color` print.
+Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`,
+leaving those two leaves beside `Green` and `Red`.
+For the same reason `Round` is missing from the `Shape` registry.
+Creating `Circle`, a subclass of `Round`, removed `Round`,
+leaving `Circle` and `Square`.
 This involves no metaclass.
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
@@ -290,7 +294,8 @@ print(p.x, p.y)
 The `Field` descriptors do not know their names are `x` and `y` until Python tells them through `__set_name__()`.
 This is metaprogramming, but it needs no metaclass.
 
-Testing confirms the descriptor learns its name and stores under it, and returns itself when accessed on the class:
+Testing confirms the descriptor learns its name and stores under it,
+and returns itself when accessed on the class:
 
 ```python
 # test_set_name.py
@@ -348,14 +353,17 @@ Metaprogramming and static typing pull against each other.
 A type describes a fixed set of attributes and signatures,
 but a metaclass changes that structure at runtime,
 adding attributes the class never declared and replacing methods like `__new__()`.
-The checker cannot follow those changes, so it reports the dynamic lines as errors.
+The checker cannot follow those changes,
+so it reports the dynamic lines as errors.
 Three ways quiet it, from narrowest to broadest:
 `setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
-a localized `# type: ignore` silences one line, as on `simple.uses_metaclass()` above;
+a localized `# type: ignore` silences one line,
+as on `simple.uses_metaclass()` above;
 and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
 The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses) uses that last form,
 `klass: Any = cls`, to add an `instance` attribute and swap `__new__()`.
-Prefer the narrowest escape that fits, because a broad `Any` also hides genuine mistakes.
+Prefer the narrowest escape that fits,
+because a broad `Any` also hides genuine mistakes.
 
 ## `__init__()` versus `__new__()` in a Metaclass
 
@@ -481,14 +489,15 @@ print(type(b).__name__)
 # because it would inherit from a final class.
 ```
 
-Type checkers such as ty, mypy, and pyright check `@final`
-statically.
+Type checkers such as ty, mypy, and pyright check `@final` statically.
 It states the intent and catches a violation before the code runs.
-It has no runtime effect. The interpreter still lets `class C(B): pass` run.
+It has no runtime effect.
+The interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter itself to refuse subclassing,
 `__init_subclass__()` can enforce it at each subclass creation.
-Older literature claims this requires a metaclass. It does not:
+Older literature claims this requires a metaclass.
+It does not:
 
 ```python
 # final_runtime.py
@@ -516,10 +525,11 @@ except TypeError as error:
 
 The check happens at class-creation time, exactly when it must,
 and Python builds `B` itself normally because `A` does not forbid subclassing.
-Use the runtime version only when `@final` is not enough,
-which is rare.
+Use the runtime version only when `@final` is not enough, which is rare.
 
-Tests confirm the `@final` marker is present, the runtime-final class refuses subclassing, and its non-final base still allows it:
+Tests confirm the `@final` marker is present,
+the runtime-final class refuses subclassing,
+and its non-final base still allows it:
 
 ```python
 # test_final.py
@@ -561,25 +571,24 @@ That is one more reason to avoid metaclasses unless you truly need them.
 
 ## The `inspect` Module
 
-Up to now we've been modifying classes. `type` builds them, and metaclasses
-and `__init_subclass__()` run code during their creation.
-The `inspect` module is the other half of metaprogramming: reading the structure
-of live objects.
-It answers questions like which members an object has, what a function's
-signature is, and what its docstring says, without you knowing the answers
-in advance.
+Up to now we've been modifying classes.
+`type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
+The `inspect` module is the other half of metaprogramming:
+reading the structure of live objects.
+It answers questions like which members an object has,
+what a function's signature is, and what its docstring says,
+without you knowing the answers in advance.
 
-`inspect` works on any live object: modules, classes, functions, methods, and
-instances.
+`inspect` works on any live object: modules, classes, functions, methods,
+and instances.
 A few functions cover most needs:
 
-- `inspect.signature(callable)` returns a `Signature` object describing the
-  parameters, their annotations, and their defaults.
+- `inspect.signature(callable)` returns a `Signature` object describing the parameters,
+  their annotations, and their defaults.
 - `inspect.getdoc(obj)` returns the cleaned-up docstring.
-- `inspect.getmembers(obj)` and `inspect.getmembers_static(obj)` return an
-  object's `(name, value)` pairs.
-- Predicates such as `inspect.isclass()`, `inspect.isfunction()`, and
-  `inspect.ismethod()` classify what you find.
+- `inspect.getmembers(obj)` and `inspect.getmembers_static(obj)` return an object's `(name, value)` pairs.
+- Predicates such as `inspect.isclass()`, `inspect.isfunction()`,
+  and `inspect.ismethod()` classify what you find.
 
 ```python
 # inspect_tour.py
@@ -600,13 +609,12 @@ print(list(inspect.signature(greet).parameters))
 #: ['name', 'loud']
 ```
 
-`signature()` recovers the full call interface, annotations and defaults
-included, as a structured object rather than a string.
+`signature()` recovers the full call interface,
+annotations and defaults included, as a structured object rather than a string.
 
-Earlier, `new_vs_init.py` called `display_object()` to show the layout of an
-object.
-That tool is a helper used throughout the book, so it lives at the root of the
-examples and any chapter can import it:
+Earlier, `new_vs_init.py` called `display_object()` to show the layout of an object.
+That tool is a helper used throughout the book,
+so it lives at the root of the examples and any chapter can import it:
 
 ```python
 # shared: display.py
@@ -707,81 +715,76 @@ def display_object(
 `False`, omits it.
 Every call in this book sits directly beneath the code that produced it,
 so the class is already visible without a header.
-Pass `header=True` when running `display_object()` on its own, outside a
-listing like this one, especially if several calls to different classes
-run together with nothing else marking where one report ends and the next
-begins.
+Pass `header=True` when running `display_object()` on its own,
+outside a listing like this one,
+especially if several calls to different classes run together with nothing else marking where one report ends and the next begins.
 
-`display_object()` walks every member that `inspect.getmembers_static()`
-returns.
+`display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the object and its classes directly,
 without invoking descriptors, properties, or `__getattr__()`.
 Inspecting an object therefore never runs its code or triggers a side effect,
 which matters when you point this tool at something unfamiliar.
 The tool sorts each member into one of two lists.
-Callables become methods, printed with the signature `inspect.signature()`
-reports, or `(...)` when a built-in has no inspectable signature.
+Callables become methods,
+printed with the signature `inspect.signature()` reports,
+or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
-The declared type comes from the class annotations, gathered across the whole
-inheritance chain with `inspect.get_annotations()`. An attribute with no
-annotation, such as one assigned dynamically, prints as `name = value`.
-The value is the member's `repr()`, truncated to keep the line within
-`max_width`.
-An attribute tagged `[CV]`, for *class variable*, is not stored in `obj`'s
-own `__dict__`.
-A class has no instance-level storage to compare against: every attribute
-`display_object()` shows for a class already lives on that class or a base
-class, so all of them carry the tag.
-`classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`, even though
-`D` declares them directly, because neither belongs to an instance.
-For an instance, the tag distinguishes storage borrowed from the class
-from storage that lives on the object itself, the way `Stars.rating` did
-in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
-`class_with_defaults.py`'s `show(B())` tags the same two names, `B.x` and
-`B.s`, while `display_object(Messenger("foo", 12, 3.14))` tags none,
+The declared type comes from the class annotations,
+gathered across the whole inheritance chain with `inspect.get_annotations()`.
+An attribute with no annotation, such as one assigned dynamically,
+prints as `name = value`.
+The value is the member's `repr()`,
+truncated to keep the line within `max_width`.
+An attribute tagged `[CV]`, for *class variable*,
+is not stored in `obj`'s own `__dict__`.
+A class has no instance-level storage to compare against:
+every attribute `display_object()` shows for a class already lives on that class or a base class,
+so all of them carry the tag.
+`classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
+even though `D` declares them directly, because neither belongs to an instance.
+For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object itself,
+the way `Stars.rating` did in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
+`class_with_defaults.py`'s `show(B())` tags the same two names, `B.x` and `B.s`,
+while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
-The tag reports this dynamically, from where the value actually lives, so
-it applies whether or not the attribute is declared with `typing.ClassVar`.
+The tag reports this dynamically, from where the value actually lives,
+so it applies whether or not the attribute is declared with `typing.ClassVar`.
 The display hides standard dunder members by default.
-Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
-show `__new__` and `__init__`.
-Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member, including
-the interpreter's own machinery.
-`dunder` is typed `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`, naming
-each sentinel value itself rather than the generic `sentinel` class, so a
-type checker narrows `dunder` to plain `Sequence[str]` once both sentinels
-are ruled out, and `name in dunder` needs no further guard.
-`ALL_DUNDERS` is useful for exploring an unfamiliar object, but it buries a
-class's own choices under everything `object` and the interpreter add.
-`INTERESTING_DUNDERS` names the four a reader actually customizes when
-defining a class: `__init__`, `__repr__`, `__eq__`, and `__hash__`. Pass it
-as `dunder` to see those four without the surrounding noise.
+Pass their names in `dunder` to keep specific ones,
+as `new_vs_init.py` does to show `__new__` and `__init__`.
+Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
+including the interpreter's own machinery.
+`dunder` is typed `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
+naming each sentinel value itself rather than the generic `sentinel` class,
+so a type checker narrows `dunder` to plain `Sequence[str]` once both sentinels are ruled out,
+and `name in dunder` needs no further guard.
+`ALL_DUNDERS` is useful for exploring an unfamiliar object,
+but it buries a class's own choices under everything `object` and the interpreter add.
+`INTERESTING_DUNDERS` names the four a reader actually customizes when defining a class:
+`__init__`, `__repr__`, `__eq__`, and `__hash__`.
+Pass it as `dunder` to see those four without the surrounding noise.
 
-A plain class inherits all four of those from `object` without overriding
-any of them, so `INTERESTING_DUNDERS` shows `object`'s generic versions,
+A plain class inherits all four of those from `object` without overriding any of them,
+so `INTERESTING_DUNDERS` shows `object`'s generic versions,
 which can look like the class defined them itself.
-`REDEFINED_DUNDERS` filters harder: among those same four, it keeps only
-the ones whose value differs from `object`'s own, so a class that overrides
-none of them shows no dunders at all.
+`REDEFINED_DUNDERS` filters harder: among those same four,
+it keeps only the ones whose value differs from `object`'s own,
+so a class that overrides none of them shows no dunders at all.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
-Every class, even an empty one, has its own `__module__`, `__dict__`, and a
-handful of other bookkeeping dunders that never match `object`'s, so
-comparing every dunder this way would show that bookkeeping instead of
-filtering it out.
-The comparison itself uses `is`, not `==`, since a dunder inherited
-unchanged from `object` is the same function object, not merely an equal
-one.
+Every class, even an empty one, has its own `__module__`, `__dict__`,
+and a handful of other bookkeeping dunders that never match `object`'s,
+so comparing every dunder this way would show that bookkeeping instead of filtering it out.
+The comparison itself uses `is`, not `==`,
+since a dunder inherited unchanged from `object` is the same function object,
+not merely an equal one.
 
-`exclude` drops specific names regardless of what `dunder` would otherwise
-show, and it applies to any member, not just dunders.
-`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows
-whatever `REDEFINED_DUNDERS` finds redefined, minus `__hash__`, useful
-when a listing has already made that particular point and repeating it
-would only add noise.
-The check runs first, before the `dunder` logic even sees the name, so an
-excluded name never reaches `[Attributes]` or `[Methods]` no matter which
-mode selected it.
+`exclude` drops specific names regardless of what `dunder` would otherwise show,
+and it applies to any member, not just dunders.
+`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
+minus `__hash__`, useful when a listing has already made that particular point and repeating it would only add noise.
+The check runs first, before the `dunder` logic even sees the name,
+so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selected it.
 
 ```python
 # demo_display_object.py
@@ -873,30 +876,36 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS, header=True)
 
 The first two calls show the same class from two angles.
 `display_object(Fraggle)` inspects the class object itself.
-It lists `y` and `z`, the fields with defaults. `x` is declared as `x: int`
-with no default, so on the class it is only an annotation, not a bound
-attribute, and `getmembers_static()` does not return it.
-`display_object(Fraggle(9, 2.3))` inspects an instance, whose attributes hold
-its field values, so `x` now appears beside `y` and `z`.
-Both headers read `=== Fraggle ===`. For a class `display_object()` prints the
-class's own name, and for an instance the name of the instance's class.
+It lists `y` and `z`, the fields with defaults.
+`x` is declared as `x: int` with no default,
+so on the class it is only an annotation, not a bound attribute,
+and `getmembers_static()` does not return it.
+`display_object(Fraggle(9, 2.3))` inspects an instance,
+whose attributes hold its field values, so `x` now appears beside `y` and `z`.
+Both headers read `=== Fraggle ===`.
+For a class `display_object()` prints the class's own name,
+and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.
-The third call passes `ALL_DUNDERS`, and the flood of extra members is
-`@dataclass`'s own doing: `__dataclass_fields__`, `__match_args__`,
-`__hash__` set to `None`, and the rest of the machinery it attaches so that
-`Fraggle` gets equality, a constructor, and a `repr()` for free.
+The third call passes `ALL_DUNDERS`,
+and the flood of extra members is `@dataclass`'s own doing:
+`__dataclass_fields__`, `__match_args__`, `__hash__` set to `None`,
+and the rest of the machinery it attaches so that `Fraggle` gets equality,
+a constructor, and a `repr()` for free.
 
 ## Exercises
 
-1.  In `init_subclass.py`, add a class `Yellow(Color)` and then `MutedYellow(Yellow)`.
+1.  In `init_subclass.py`,
+    add a class `Yellow(Color)` and then `MutedYellow(Yellow)`.
     Predict `Color.registry` after each new class, then confirm.
 2.  In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
     set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
-3.  In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)`
-    and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
+3.  In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)` and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
     while `c1 is a` (comparing across the different singleton classes) is `False`.
-4.  In `final_runtime.py`, add a class `D(A)` (a second, independent subclass of the non-final `A`)
-    and confirm it succeeds, the same way `Ok` does in `test_final.py`.
-5.  Using `inspect_tour.py` as a model, write a function `describe(func)` that prints a function's
-    name, its `inspect.signature()`, and its docstring (or `"(no docstring)"` if `inspect.getdoc()`
-    returns `None`), then call it on `greet` and on a lambda.
+4.  In `final_runtime.py`,
+    add a class `D(A)` (a second, independent subclass of the non-final `A`) and confirm it succeeds,
+    the same way `Ok` does in `test_final.py`.
+5.  Using `inspect_tour.py` as a model,
+    write a function `describe(func)` that prints a function's name,
+    its `inspect.signature()`,
+    and its docstring (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
+    then call it on `greet` and on a lambda.
