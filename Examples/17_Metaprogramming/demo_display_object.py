@@ -15,7 +15,7 @@ class Fraggle:
     def h(self, s: str) -> str:
         return f"h({s})"
 
-display_object(Fraggle, header=True)  # Display the class
+display_object(Fraggle)  # Display the class
 #: === Fraggle ===
 #: [Attributes]
 #:   • y: float = 1.14659 [CV]
@@ -26,7 +26,7 @@ display_object(Fraggle, header=True)  # Display the class
 #:   • h(self, s: str) -> str
 
 # Display a specific instance:
-display_object(Fraggle(9, 2.3), header=True)
+display_object(Fraggle(9, 2.3))
 #: === Fraggle ===
 #: [Attributes]
 #:   • x: int = 9
@@ -38,7 +38,7 @@ display_object(Fraggle(9, 2.3), header=True)
 #:   • h(self, s: str) -> str
 
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS, header=True)
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #: === Fraggle ===
 #: [Attributes]
 #:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
