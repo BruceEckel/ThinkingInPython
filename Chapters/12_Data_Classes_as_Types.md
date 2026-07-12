@@ -135,12 +135,13 @@ inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-modul
 
 ```python
 # display_messenger_class.py
-from display import display_object
+from display import INTERESTING_DUNDERS, display_object
 from messenger import Messenger
 
-display_object(Messenger, dunder=["__init__", "__repr__", "__eq__"])
+display_object(Messenger, INTERESTING_DUNDERS)
 #: === Messenger ===
 #: [Attributes]
+#:   • __hash__ = None
 #:   • depth: float = 0.0
 #: [Methods]
 #:   • __eq__(self, other)
@@ -150,6 +151,9 @@ display_object(Messenger, dunder=["__init__", "__repr__", "__eq__"])
 
 The dunder methods have indeed been generated,
 and you can see that the constructor arguments cover all the fields in `Messenger`.
+`__hash__` is `None`: a plain `@dataclass` compares by value with `__eq__`,
+so it gives up hashability rather than let you put a mutable instance in a
+`set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
 only `depth` appears as an attribute because it has an initialization value.
 

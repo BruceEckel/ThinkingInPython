@@ -1,8 +1,12 @@
 # display.py
 import inspect
 from collections.abc import Sequence
+from typing import Final
 
 ALL_DUNDERS = sentinel("ALL_DUNDERS")
+INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
+    "__init__", "__repr__", "__eq__", "__hash__",
+)
 
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:

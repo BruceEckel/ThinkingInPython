@@ -1,10 +1,11 @@
 # display_messenger_class.py
-from display import display_object
+from display import INTERESTING_DUNDERS, display_object
 from messenger import Messenger
 
-display_object(Messenger, dunder=["__init__", "__repr__", "__eq__"])
+display_object(Messenger, INTERESTING_DUNDERS)
 #: === Messenger ===
 #: [Attributes]
+#:   • __hash__ = None
 #:   • depth: float = 0.0
 #: [Methods]
 #:   • __eq__(self, other)

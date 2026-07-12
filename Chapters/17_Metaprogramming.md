@@ -613,8 +613,12 @@ examples and any chapter can import it:
 # shared: display.py
 import inspect
 from collections.abc import Sequence
+from typing import Final
 
 ALL_DUNDERS = sentinel("ALL_DUNDERS")
+INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
+    "__init__", "__repr__", "__eq__", "__hash__",
+)
 
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
@@ -696,6 +700,11 @@ the interpreter's own machinery.
 itself rather than the generic `sentinel` class, so a type checker narrows
 `dunder` to plain `Sequence[str]` once `dunder is ALL_DUNDERS` rules out the
 other case, and `name in dunder` needs no further guard.
+`ALL_DUNDERS` is useful for exploring an unfamiliar object, but it buries a
+class's own choices under everything `object` and the interpreter add.
+`INTERESTING_DUNDERS` names the four a reader actually customizes when
+defining a class: `__init__`, `__repr__`, `__eq__`, and `__hash__`. Pass it
+as `dunder` to see those four without the surrounding noise.
 
 ```python
 # demo_display_object.py
