@@ -88,9 +88,11 @@ ABBREV = {
 
 # Single uppercase letters that are real words in this book's domain (mostly
 # language names), not initials. A bare single-letter token before ". X" is
-# normally treated as an initial like "B." and never ends a sentence; these
-# are the exceptions.
-SINGLE_LETTER_WORDS = {"C", "R"}
+# normally treated as an initial like "B." and never ends a sentence; this
+# is the exception. "R" is not included: it only appears in the book as a
+# `Callable[P, R]`-style TypeVar, always inside backticks and therefore
+# already masked before this check ever sees it.
+SINGLE_LETTER_WORDS = {"C"}
 
 # Character-class bodies, built with chr()/\u escapes so no literal smart quote
 # or private-use character appears in this source file. A sentence may end with
@@ -139,7 +141,7 @@ def _split_masked(masked: str) -> list[str]:
             # "3. 14": do not treat as a sentence boundary.
             if stripped in ABBREV:
                 continue
-            if len(token) == 1 and token.isupper():
+            if len(token) == 1 and token.isupper() and token not in SINGLE_LETTER_WORDS:
                 continue
             if prev_char.isdigit() and next_char.isdigit():
                 continue
