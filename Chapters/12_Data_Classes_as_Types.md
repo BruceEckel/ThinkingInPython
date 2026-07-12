@@ -18,8 +18,8 @@ This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
 The following `check()` function appears throughout the chapter.
-It raises `TypeFailure`, a custom exception meaning a value falls
-outside the type's allowed set:
+It raises `TypeFailure`,
+a custom exception meaning a value falls outside the type's allowed set:
 
 ```python
 # validation.py
@@ -132,8 +132,8 @@ class Messenger:
     depth: float = 0.0  # Default value
 ```
 
-We can see what `@dataclass` generates using `display_object()`, the
-inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module):
+We can see what `@dataclass` generates using `display_object()`,
+the inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module):
 
 ```python
 # display_messenger_class.py
@@ -153,8 +153,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 The dunder methods have indeed been generated,
 and you can see that the constructor arguments cover all the fields in `Messenger`.
 `__hash__` is `None`: a plain `@dataclass` compares by value with `__eq__`,
-so it gives up hashability rather than let you put a mutable instance in a
-`set` or use it as a `dict` key.
+so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
 only `depth` appears as an attribute because it has an initialization value.
 
@@ -639,8 +638,8 @@ print(c.name, c.open)
 ```
 
 This works because `Connection.__init__` adds an attribute to the existing dict.
-If a base `__init__` instead replaced `self.__dict__`, calling it from
-`__post_init__()` would discard the fields the data class just assigned.
+If a base `__init__` instead replaced `self.__dict__`,
+calling it from `__post_init__()` would discard the fields the data class just assigned.
 The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
 
 When the base class is itself a data class, you do not need this.
@@ -760,8 +759,9 @@ The type guards itself.
 
 When a data class is buried inside a larger structure you are dumping,
 converting it by hand first is awkward.
-A custom `JSONEncoder` serializes any data class it meets, even nested
-inside other structures, by converting each one to a dict:
+A custom `JSONEncoder` serializes any data class it meets,
+even nested inside other structures,
+by converting each one to a dict:
 
 ```python
 # json_encoder.py
@@ -835,9 +835,9 @@ def show(obj: object) -> None:
     display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))
 ```
 
-`show()` wraps `display_object()` with `REDEFINED_DUNDERS`, so each report
-lists only the dunders a class customizes, not the standard machinery
-every object inherits from `object`.
+`show()` wraps `display_object()` with `REDEFINED_DUNDERS`,
+so each report lists only the dunders a class customizes,
+not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes `__hash__` from these reports
 (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
@@ -885,8 +885,8 @@ show(B())
 ```
 
 `show(B())` indicates that both are class variables by tagging them as `[CV]`.
-`B` has no `__init__()` to copy them onto each instance, so every `B`
-object reads the same two values straight from the class attributes.
+`B` has no `__init__()` to copy them onto each instance,
+so every `B` object reads the same two values straight from the class attributes.
 
 `C` becomes a `@dataclass`:
 
@@ -912,12 +912,15 @@ show(C(11, "this is C"))
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
-`C` is a `@dataclass`, so its generated `__init__(self, x: int, s: str)
--> None` runs `self.x = x` and `self.s = s` for every new `C`.
+`C` is a `@dataclass`,
+so its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s`
+for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
-With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the
-class, tagged `[CV]`, no matter how many `B` instances exist.
+With no `__init__()` at all,
+`show(B())` keeps finding `x` and `s` on the class,
+tagged `[CV]`,
+no matter how many `B` instances exist.
 
 `D` adds a real `ClassVar` alongside an ordinary field:
 
@@ -952,23 +955,24 @@ show(D())
 ```
 
 `D` mixes an ordinary field with a real `ClassVar`.
-`show(D)` tags both attributes `[CV]`, since no instance owns either of
-them yet.
+`show(D)` tags both attributes `[CV]`,
+since no instance owns either of them yet.
 `show(D())` tags only `s`.
 The difference comes from what `@dataclass` generated for each field.
 `x` is an ordinary field.
-`__init__()` takes it as a parameter and runs `self.x = x`, the same
-mechanism `C`'s `__init__()` used for both of its fields, so each new `D`
-gets its own copy the moment it is constructed.
+`__init__()` takes it as a parameter and runs `self.x = x`,
+the same mechanism `C`'s `__init__()` used for both of its fields,
+so each new `D` gets its own copy the moment it is constructed.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 `s`, declared `ClassVar[str]`, is a different story.
-`@dataclass` treats a `ClassVar` field as belonging to the class, not to
-any instance, and leaves it out of `__init__()` entirely.
-`__init__(self, x: int = 99) -> None` has no `s` parameter, so no
-constructor call can ever assign one.
-`s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D`
-objects exist.
+`@dataclass` treats a `ClassVar` field as belonging to the class,
+not to any instance,
+and leaves it out of `__init__()` entirely.
+`__init__(self, x: int = 99) -> None` has no `s` parameter,
+so no constructor call can ever assign one.
+`s` stays on `D` itself and keeps its `[CV]` tag
+no matter how many `D` objects exist.
 
 ## Exercises
 
