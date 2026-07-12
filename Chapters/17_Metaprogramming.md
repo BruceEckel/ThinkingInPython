@@ -614,6 +614,8 @@ examples and any chapter can import it:
 import inspect
 from collections.abc import Sequence
 
+ALL_DUNDERS = sentinel("ALL_DUNDERS")
+
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
     merged: dict[str, object] = {}
@@ -628,7 +630,9 @@ def _type_name(annotation: object) -> str:
     return str(annotation)
 
 def display_object(
-    obj: object, dunder: Sequence[str] = (), max_width: int = 65
+    obj: object,
+    dunder: Sequence[str] | ALL_DUNDERS = (),
+    max_width: int = 65,
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
@@ -639,7 +643,8 @@ def display_object(
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         is_dunder = name.startswith("__") and name.endswith("__")
-        if is_dunder and name not in dunder:
+        show_dunder = dunder is ALL_DUNDERS or name in dunder
+        if is_dunder and not show_dunder:
             continue  # Skip standard dunder clutter
         if callable(value):
             try:
@@ -685,14 +690,21 @@ The value is the member's `repr()`, truncated to keep the line within
 The display hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
 show `__new__` and `__init__`.
+Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member, including
+the interpreter's own machinery.
+`dunder` is typed `Sequence[str] | ALL_DUNDERS`, naming the sentinel value
+itself rather than the generic `sentinel` class, so a type checker narrows
+`dunder` to plain `Sequence[str]` once `dunder is ALL_DUNDERS` rules out the
+other case, and `name in dunder` needs no further guard.
 
 ```python
 # demo_display_object.py
 from dataclasses import dataclass
-from display import display_object
+from display import ALL_DUNDERS, display_object
 
 @dataclass
 class Fraggle:
+    """A small dataclass for the demo."""
     x: int
     y: float = 1.14659
     z: str = "blivet"
@@ -724,9 +736,56 @@ display_object(Fraggle(9, 2.3))
 #:   • f(self) -> None
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
+
+# ALL_DUNDERS also reveals what @dataclass generated:
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
+#: === Fraggle ===
+#: [Attributes]
+#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <class '...
+#:   • __class__ = <attribute '__class__'>
+#:   • __dataclass_fields__ = {'x': Field(name='x',type=<class 'i...
+#:   • __dataclass_params__ = _DataclassParams(init=True,repr=Tru...
+#:   • __dict__ = <attribute '__dict__'>
+#:   • __doc__ = 'A small dataclass for the demo.'
+#:   • __firstlineno__ = 5
+#:   • __hash__ = None
+#:   • __match_args__ = ('x', 'y', 'z')
+#:   • __module__ = '__main__'
+#:   • __static_attributes__ = ()
+#:   • __weakref__ = <attribute '__weakref__'>
+#:   • x: int = 9
+#:   • y: float = 2.3
+#:   • z: str = 'blivet'
+#: [Methods]
+#:   • __annotate_func__(format, /)
+#:   • __delattr__(self, name, /)
+#:   • __dir__(self, /)
+#:   • __eq__(self, other)
+#:   • __format__(self, format_spec, /)
+#:   • __ge__(self, value, /)
+#:   • __getattribute__(self, name, /)
+#:   • __getstate__(self, /)
+#:   • __gt__(self, value, /)
+#:   • __init__(self, x: int, y: float = 1.14659, z: str = 'blive...
+#:   • __init_subclass__(type, /)
+#:   • __le__(self, value, /)
+#:   • __lt__(self, value, /)
+#:   • __ne__(self, value, /)
+#:   • __new__(*args, **kwargs)
+#:   • __reduce__(self, /)
+#:   • __reduce_ex__(self, protocol, /)
+#:   • __replace__(self, /, **changes)
+#:   • __repr__(self)
+#:   • __setattr__(self, name, value, /)
+#:   • __sizeof__(self, /)
+#:   • __str__(self, /)
+#:   • __subclasshook__(type, object, /)
+#:   • f(self) -> None
+#:   • g(self, x: int) -> float
+#:   • h(self, s: str) -> str
 ```
 
-The two calls show the same class from two angles.
+The first two calls show the same class from two angles.
 `display_object(Fraggle)` inspects the class object itself.
 It lists `y` and `z`, the fields with defaults. `x` is declared as `x: int`
 with no default, so on the class it is only an annotation, not a bound
@@ -736,6 +795,10 @@ its field values, so `x` now appears beside `y` and `z`.
 Both headers read `=== Fraggle ===`. For a class `display_object()` prints the
 class's own name, and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.
+The third call passes `ALL_DUNDERS`, and the flood of extra members is
+`@dataclass`'s own doing: `__dataclass_fields__`, `__match_args__`,
+`__hash__` set to `None`, and the rest of the machinery it attaches so that
+`Fraggle` gets equality, a constructor, and a `repr()` for free.
 
 ## Exercises
 

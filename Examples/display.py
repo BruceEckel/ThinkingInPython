@@ -2,6 +2,8 @@
 import inspect
 from collections.abc import Sequence
 
+ALL_DUNDERS = sentinel("ALL_DUNDERS")
+
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
     merged: dict[str, object] = {}
@@ -16,7 +18,9 @@ def _type_name(annotation: object) -> str:
     return str(annotation)
 
 def display_object(
-    obj: object, dunder: Sequence[str] = (), max_width: int = 65
+    obj: object,
+    dunder: Sequence[str] | ALL_DUNDERS = (),
+    max_width: int = 65,
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
@@ -27,7 +31,8 @@ def display_object(
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         is_dunder = name.startswith("__") and name.endswith("__")
-        if is_dunder and name not in dunder:
+        show_dunder = dunder is ALL_DUNDERS or name in dunder
+        if is_dunder and not show_dunder:
             continue  # Skip standard dunder clutter
         if callable(value):
             try:
