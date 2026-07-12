@@ -62,7 +62,9 @@ print(f2(rating))
 #: 30
 ```
 
-Each function duplicates the check, the check is easy to forget, and the type system is no help.
+Each function duplicates the check,
+the check is easy to forget,
+and the type system is no help.
 The `int` annotation says "any integer," which is not what we mean.
 
 ## A Class Is Not a Type
@@ -281,7 +283,8 @@ if __name__ == "__main__":
 #: Stars(number=10)
 ```
 
-The `number` in `Stars` is now constrained to a set of values: the integers one through ten.
+The `number` in `Stars` is now constrained to a set of values:
+the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside the set.
 If you are holding a `Stars`, it is legal.
@@ -303,7 +306,8 @@ No other code repeats the check, because it cannot fail.
 An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
-The style here is functional. Instead of mutating an object and re-guarding it,
+The style here is functional.
+Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Typing](08_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
@@ -411,7 +415,8 @@ When the set of values is small and fixed, an `Enum` is the clearest type.
 As an example, we'll create a `BirthDate` containing a month, day, and year.
 A year has exactly twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
-A `BirthDate` then validates across its fields. The day must fit the month.
+A `BirthDate` then validates across its fields.
+The day must fit the month.
 
 ```python
 # birth_date.py
@@ -710,7 +715,8 @@ Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is no
 
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` knows how to serialize dictionaries.
-Decoding goes the other way. Parse the JSON into a dictionary,
+Decoding goes the other way.
+Parse the JSON into a dictionary,
 then hand its parts to the constructors.
 
 ```python
@@ -878,9 +884,7 @@ show(B())
 #:   None
 ```
 
-`B` looks almost the same as `A`, except `x` and `s` carry default values
-instead of bare annotations, so they exist as class attributes.
-`show(B())` finds both, tagged `[CV]`.
+`show(B())` indicates that both are class variables by tagging them as `[CV]`.
 `B` has no `__init__()` to copy them onto each instance, so every `B`
 object reads the same two values straight from the class attributes.
 
