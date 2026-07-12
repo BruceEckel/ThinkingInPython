@@ -810,25 +810,37 @@ reconstructing nested types from the parsed JSON and validating as they go.
 
 ## Comparing Ordinary Classes and Data Classes
 
-Put four classes through the same lens and the differences become concrete.
-`A` is an ordinary class with bare annotations.
-`B` adds default values but no constructor.
-`C` is a plain `@dataclass`.
-`D` adds a `ClassVar` field alongside an ordinary one.
-`show()` wraps `display_object()` with `REDEFINED_DUNDERS`,
-so each report lists only the dunders a class actually customizes,
-not the standard machinery every object inherits from `object`.
-`show()` excludes `__hash__` from these reports,
-since `@dataclass` disabling it was already demonstrated for `Messenger`:
+Now we can look at the differences between these two types of classes.
+In addition, we can add some insight to [Class Attributes](09_Class_Attributes.md).
+Four small classes make the differences concrete:
+
+- `A` is an ordinary class with bare annotations.
+- `B` adds default values but no constructor.
+- `C` is a plain `@dataclass`.
+- `D` adds a `ClassVar` field alongside an ordinary one.
+
+Each one is inspected with the same helper:
 
 ```python
-# comparing_ordinary_to_data_classes.py
-from dataclasses import dataclass
-from typing import ClassVar
+# show_redefined.py
 from display import REDEFINED_DUNDERS, display_object
 
 def show(obj: object) -> None:
     display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))
+```
+
+`show()` wraps `display_object()` with `REDEFINED_DUNDERS`, so each report
+lists only the dunders a class customizes, not the standard machinery
+every object inherits from `object`.
+For clarity, `show()` also excludes `__hash__` from these reports
+(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+
+`A` is the plain case, with no defaults and no constructor,
+but with field declarations that look like class variables:
+
+```python
+# ordinary_class.py
+from show_redefined import show
 
 class A:
     x: int
@@ -839,6 +851,20 @@ show(A())
 #:   None
 #: [Methods]
 #:   None
+```
+
+`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`,
+so every one of them is `object`'s generic version,
+and `show(A())` reports none as redefined.
+
+[[What are 'x' and 's' doing in this case? Why would you declare them here, what value might they have?]]
+
+`B` adds default values to `x` and `s` which turn them from [[whatever they are called in A]] to class variables,
+because they actually allocate storage for those class variables:
+
+```python
+# class_with_defaults.py
+from show_redefined import show
 
 class B:
     x: int = 42
@@ -850,6 +876,20 @@ show(B())
 #:   • x: int = 42 [CV]
 #: [Methods]
 #:   None
+```
+
+`B` looks almost the same as `A`, except `x` and `s` carry default values
+instead of bare annotations, so they exist as class attributes.
+`show(B())` finds both, tagged `[CV]`.
+`B` has no `__init__()` to copy them onto each instance, so every `B`
+object reads the same two values straight from the class attributes.
+
+`C` becomes a `@dataclass`:
+
+```python
+# plain_dataclass.py
+from dataclasses import dataclass
+from show_redefined import show
 
 @dataclass
 class C:
@@ -864,6 +904,24 @@ show(C(11, "this is C"))
 #:   • __eq__(self, other)
 #:   • __init__(self, x: int, s: str) -> None
 #:   • __repr__(self)
+```
+
+`show(C(11, "this is C"))` finds the same two names as `show(B())`.
+Neither `x` nor `s` carries `[CV]` this time.
+`C` is a `@dataclass`, so its generated `__init__(self, x: int, s: str)
+-> None` runs `self.x = x` and `self.s = s` for every new `C`.
+Each `C` instance owns its own copies from the moment it is constructed.
+`B` runs nothing like that.
+With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the
+class, tagged `[CV]`, no matter how many `B` instances exist.
+
+`D` adds a real `ClassVar` alongside an ordinary field:
+
+```python
+# classvar_dataclass.py
+from dataclasses import dataclass
+from typing import ClassVar
+from show_redefined import show
 
 @dataclass
 class D:
@@ -889,34 +947,15 @@ show(D())
 #:   • __repr__(self)
 ```
 
-`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`, so
-every one of them is `object`'s generic version, and `show(A())` reports
-none as redefined.
-
-`B` looks almost the same as `A`, except `x` and `s` carry default values
-instead of bare annotations, so they exist as class attributes.
-`show(B())` finds both, tagged `[CV]`.
-`B` has no `__init__()` to copy them onto each instance, so every `B`
-object reads the same two values straight from the class attributes.
-
-`show(C(11, "this is C"))` finds the same two names as `show(B())`.
-Neither `x` nor `s` carries `[CV]` this time.
-`C` is a `@dataclass`, so its generated `__init__(self, x: int, s: str)
--> None` runs `self.x = x` and `self.s = s` for every new `C`, the same
-mechanism `D`'s `__init__()` uses for `x`.
-Each `C` instance owns its own copies from the moment it is constructed.
-`B` runs nothing like that.
-With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the
-class, tagged `[CV]`, no matter how many `B` instances exist.
-
 `D` mixes an ordinary field with a real `ClassVar`.
 `show(D)` tags both attributes `[CV]`, since no instance owns either of
 them yet.
 `show(D())` tags only `s`.
 The difference comes from what `@dataclass` generated for each field.
 `x` is an ordinary field.
-`__init__()` takes it as a parameter and runs `self.x = x`,
-so each new `D` gets its own copy the moment it is constructed.
+`__init__()` takes it as a parameter and runs `self.x = x`, the same
+mechanism `C`'s `__init__()` used for both of its fields, so each new `D`
+gets its own copy the moment it is constructed.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 `s`, declared `ClassVar[str]`, is a different story.

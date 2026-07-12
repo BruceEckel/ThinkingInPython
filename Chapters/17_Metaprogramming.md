@@ -732,15 +732,14 @@ own `__dict__`.
 A class has no instance-level storage to compare against: every attribute
 `display_object()` shows for a class already lives on that class or a base
 class, so all of them carry the tag.
-`comparing_ordinary_to_data_classes.py`'s `show(B)` tags both `B.x` and
-`B.s`, even though `B` declares them directly, because neither belongs to
-an instance.
+`classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`, even though
+`D` declares them directly, because neither belongs to an instance.
 For an instance, the tag distinguishes storage borrowed from the class
 from storage that lives on the object itself, the way `Stars.rating` did
 in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
-`show(B())` tags the same two names, while
-`display_object(Messenger("foo", 12, 3.14))` tags none, since `@dataclass`
-assigns every field straight onto the new instance.
+`class_with_defaults.py`'s `show(B())` tags the same two names, `B.x` and
+`B.s`, while `display_object(Messenger("foo", 12, 3.14))` tags none,
+since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value actually lives, so
 it applies whether or not the attribute is declared with `typing.ClassVar`.
 The display hides standard dunder members by default.
