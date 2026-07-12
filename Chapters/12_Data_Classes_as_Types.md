@@ -279,7 +279,7 @@ if __name__ == "__main__":
 #: Stars(number=10)
 ```
 
-`Stars` now names a set of values: the integers one through ten.
+The `number` in `Stars` is now constrained to a set of values: the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside the set.
 If you are holding a `Stars`, it is legal.
@@ -297,7 +297,7 @@ This principle often goes by *parse, don't validate*.^[The phrase was coined by 
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
-No later code repeats the check, because it cannot fail.
+No other code repeats the check, because it cannot fail.
 An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
