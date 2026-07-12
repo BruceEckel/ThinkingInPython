@@ -616,6 +616,7 @@ from collections.abc import Sequence
 from typing import Final
 
 ALL_DUNDERS = sentinel("ALL_DUNDERS")
+REDEFINED_DUNDERS = sentinel("REDEFINED_DUNDERS")
 INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
     "__init__", "__repr__", "__eq__", "__hash__",
 )
@@ -633,9 +634,17 @@ def _type_name(annotation: object) -> str:
         return annotation.__name__
     return str(annotation)
 
+def _redefined(name: str, value: object) -> bool:
+    # Restricted to INTERESTING_DUNDERS: every class has __module__,
+    # __dict__, and other bookkeeping dunders that always differ from
+    # object's, so comparing those would never filter anything out.
+    if name not in INTERESTING_DUNDERS:
+        return False
+    return getattr(object, name, None) is not value
+
 def display_object(
     obj: object,
-    dunder: Sequence[str] | ALL_DUNDERS = (),
+    dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
 ) -> None:
     # For a class, the class itself; for an instance, its class:
@@ -647,7 +656,12 @@ def display_object(
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         is_dunder = name.startswith("__") and name.endswith("__")
-        show_dunder = dunder is ALL_DUNDERS or name in dunder
+        if dunder is ALL_DUNDERS:
+            show_dunder = True
+        elif dunder is REDEFINED_DUNDERS:
+            show_dunder = _redefined(name, value)
+        else:
+            show_dunder = name in dunder
         if is_dunder and not show_dunder:
             continue  # Skip standard dunder clutter
         if callable(value):
@@ -696,15 +710,31 @@ Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
 show `__new__` and `__init__`.
 Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member, including
 the interpreter's own machinery.
-`dunder` is typed `Sequence[str] | ALL_DUNDERS`, naming the sentinel value
-itself rather than the generic `sentinel` class, so a type checker narrows
-`dunder` to plain `Sequence[str]` once `dunder is ALL_DUNDERS` rules out the
-other case, and `name in dunder` needs no further guard.
+`dunder` is typed `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`, naming
+each sentinel value itself rather than the generic `sentinel` class, so a
+type checker narrows `dunder` to plain `Sequence[str]` once both sentinels
+are ruled out, and `name in dunder` needs no further guard.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object, but it buries a
 class's own choices under everything `object` and the interpreter add.
 `INTERESTING_DUNDERS` names the four a reader actually customizes when
 defining a class: `__init__`, `__repr__`, `__eq__`, and `__hash__`. Pass it
 as `dunder` to see those four without the surrounding noise.
+
+A plain class inherits all four of those from `object` without overriding
+any of them, so `INTERESTING_DUNDERS` shows `object`'s generic versions,
+which can look like the class defined them itself.
+`REDEFINED_DUNDERS` filters harder: among those same four, it keeps only
+the ones whose value differs from `object`'s own, so a class that overrides
+none of them shows no dunders at all.
+`_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
+deliberately narrowing the comparison to those four.
+Every class, even an empty one, has its own `__module__`, `__dict__`, and a
+handful of other bookkeeping dunders that never match `object`'s, so
+comparing every dunder this way would show that bookkeeping instead of
+filtering it out.
+The comparison itself uses `is`, not `==`, since a dunder inherited
+unchanged from `object` is the same function object, not merely an equal
+one.
 
 ```python
 # demo_display_object.py

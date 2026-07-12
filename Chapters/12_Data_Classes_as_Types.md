@@ -810,6 +810,33 @@ For deep or evolving structures,
 [Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
 
+## Comparing Ordinary Classes and Data Classes
+
+```python
+# comparing_ordinary_to_data_classes.py
+from display import REDEFINED_DUNDERS, display_object
+
+def show(obj: object) -> None:
+    display_object(obj, REDEFINED_DUNDERS)
+
+class A:
+    x: int
+    s: str
+
+show(A)
+#: === A ===
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
+```
+
+`REDEFINED_DUNDERS` keeps a dunder only when its value differs from
+`object`'s own.
+`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`,
+so every one of them is `object`'s generic version, and `show(A)` reports
+none as redefined.
+
 ## Exercises
 
 1.  Add leap-year support to `Month`,

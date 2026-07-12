@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Final
 
 ALL_DUNDERS = sentinel("ALL_DUNDERS")
+REDEFINED_DUNDERS = sentinel("REDEFINED_DUNDERS")
 INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
     "__init__", "__repr__", "__eq__", "__hash__",
 )
@@ -21,9 +22,17 @@ def _type_name(annotation: object) -> str:
         return annotation.__name__
     return str(annotation)
 
+def _redefined(name: str, value: object) -> bool:
+    # Restricted to INTERESTING_DUNDERS: every class has __module__,
+    # __dict__, and other bookkeeping dunders that always differ from
+    # object's, so comparing those would never filter anything out.
+    if name not in INTERESTING_DUNDERS:
+        return False
+    return getattr(object, name, None) is not value
+
 def display_object(
     obj: object,
-    dunder: Sequence[str] | ALL_DUNDERS = (),
+    dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
 ) -> None:
     # For a class, the class itself; for an instance, its class:
@@ -35,7 +44,12 @@ def display_object(
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         is_dunder = name.startswith("__") and name.endswith("__")
-        show_dunder = dunder is ALL_DUNDERS or name in dunder
+        if dunder is ALL_DUNDERS:
+            show_dunder = True
+        elif dunder is REDEFINED_DUNDERS:
+            show_dunder = _redefined(name, value)
+        else:
+            show_dunder = name in dunder
         if is_dunder and not show_dunder:
             continue  # Skip standard dunder clutter
         if callable(value):
