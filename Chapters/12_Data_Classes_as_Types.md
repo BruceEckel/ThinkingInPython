@@ -139,10 +139,9 @@ from display import INTERESTING_DUNDERS, display_object
 from messenger import Messenger
 
 display_object(Messenger, INTERESTING_DUNDERS)
-#: === Messenger ===
 #: [Attributes]
-#:   • __hash__ = None
-#:   • depth: float = 0.0
+#:   • __hash__ = None [CV]
+#:   • depth: float = 0.0 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
 #:   • __init__(self, name: str, number: int, depth: float = 0.0)...
@@ -202,7 +201,6 @@ from display import display_object
 from messenger import Messenger
 
 display_object(Messenger("foo", 12, 3.14))
-#: === Messenger ===
 #: [Attributes]
 #:   • depth: float = 3.14
 #:   • name: str = 'foo'
@@ -812,30 +810,112 @@ reconstructing nested types from the parsed JSON and validating as they go.
 
 ## Comparing Ordinary Classes and Data Classes
 
+Put four classes through the same lens and the differences become concrete.
+`A` is an ordinary class with bare annotations.
+`B` adds default values but no constructor.
+`C` is a plain `@dataclass`.
+`D` adds a `ClassVar` field alongside an ordinary one.
+`show()` wraps `display_object()` with `REDEFINED_DUNDERS`, so each report
+lists only the dunders a class actually customizes, not the standard
+machinery every object inherits from `object`.
+`show()` excludes `__hash__` from these reports, since `@dataclass`
+disabling it was already demonstrated for `Messenger`:
+
 ```python
 # comparing_ordinary_to_data_classes.py
+from dataclasses import dataclass
+from typing import ClassVar
 from display import REDEFINED_DUNDERS, display_object
 
 def show(obj: object) -> None:
-    display_object(obj, REDEFINED_DUNDERS)
+    display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))
 
 class A:
     x: int
     s: str
 
-show(A)
-#: === A ===
+show(A())
 #: [Attributes]
 #:   None
 #: [Methods]
 #:   None
+
+class B:
+    x: int = 42
+    s: str = "Answer"
+
+show(B())
+#: [Attributes]
+#:   • s: str = 'Answer' [CV]
+#:   • x: int = 42 [CV]
+#: [Methods]
+#:   None
+
+@dataclass
+class C:
+    x: int
+    s: str
+
+show(C(11, "this is C"))
+#: [Attributes]
+#:   • s: str = 'this is C'
+#:   • x: int = 11
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int, s: str) -> None
+#:   • __repr__(self)
+
+@dataclass
+class D:
+    x: int = 99
+    s: ClassVar[str] = "this is D"
+
+show(D)
+#: [Attributes]
+#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • x: int = 99 [CV]
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int = 99) -> None
+#:   • __repr__(self)
+
+show(D())
+#: [Attributes]
+#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • x: int = 99
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int = 99) -> None
+#:   • __repr__(self)
 ```
 
-`REDEFINED_DUNDERS` keeps a dunder only when its value differs from
-`object`'s own.
-`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`,
-so every one of them is `object`'s generic version, and `show(A)` reports
+`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`, so
+every one of them is `object`'s generic version, and `show(A())` reports
 none as redefined.
+
+`B` looks almost the same as `A`, except `x` and `s` carry default values
+instead of bare annotations, so they exist as class attributes.
+`show(B())` finds both, tagged `[CV]`.
+`B` has no `__init__()` to copy them onto each instance, so every `B`
+object reads the same two values straight from the class attributes.
+
+`D` mixes an ordinary field with a real `ClassVar`.
+`show(D)` tags both attributes `[CV]`, since no instance owns either of
+them yet.
+`show(D())` tags only `s`.
+The difference comes from what `@dataclass` generated for each field.
+`x` is an ordinary field.
+`__init__()` takes it as a parameter and runs `self.x = x`,
+so each new `D` gets its own copy the moment it is constructed.
+That is why `show(D())`'s `x: int = 99` carries no tag.
+It now lives in that instance's own `__dict__`, not on the class.
+`s`, declared `ClassVar[str]`, is a different story.
+`@dataclass` treats a `ClassVar` field as belonging to the class, not to
+any instance, and leaves it out of `__init__()` entirely.
+`__init__(self, x: int = 99) -> None` has no `s` parameter, so no
+constructor call can ever assign one.
+`s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D`
+objects exist.
 
 ## Exercises
 

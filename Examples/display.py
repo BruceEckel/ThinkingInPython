@@ -30,19 +30,32 @@ def _redefined(name: str, value: object) -> bool:
         return False
     return getattr(object, name, None) is not value
 
+def _shared(obj: object, name: str) -> bool:
+    # A class has no instance-level storage to compare against, so
+    # every attribute it shows is class-level storage by construction.
+    # For an instance, only a name missing from its own __dict__ is:
+    if inspect.isclass(obj):
+        return True
+    return name not in getattr(obj, "__dict__", {})
+
 def display_object(
     obj: object,
     dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
+    header: bool = False,
+    exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
-    print(f"=== {cls.__name__} ===")
+    if header:
+        print(f"=== {cls.__name__} ===")
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
+        if name in exclude:
+            continue
         is_dunder = name.startswith("__") and name.endswith("__")
         if dunder is ALL_DUNDERS:
             show_dunder = True
@@ -66,12 +79,13 @@ def display_object(
             label = name
             if name in annotations:
                 label = f"{name}: {_type_name(annotations[name])}"
+            tag = " [CV]" if _shared(obj, name) else ""
             val_str = repr(value)
             # Trim the value to keep the line within max_width:
-            budget = max_width - len(label) - 7
+            budget = max_width - len(label) - len(tag) - 7
             if len(val_str) > budget:
                 val_str = val_str[:budget - 3] + "..."
-            attributes.append(f"  • {label} = {val_str}")
+            attributes.append(f"  • {label} = {val_str}{tag}")
     print("[Attributes]")
     print("\n".join(attributes) or "  None")
     print("[Methods]")

@@ -78,17 +78,15 @@ class Tally:
         Tally.total += 1
 
 display_object(Tally)
-#: === Tally ===
 #: [Attributes]
-#:   • total: typing.ClassVar[int] = 0
+#:   • total: typing.ClassVar[int] = 0 [CV]
 #: [Methods]
 #:   None
 a = Tally("a")
 display_object(a)
-#: === Tally ===
 #: [Attributes]
 #:   • label: str = 'a'
-#:   • total: typing.ClassVar[int] = 1
+#:   • total: typing.ClassVar[int] = 1 [CV]
 #: [Methods]
 #:   None
 b = Tally("b")

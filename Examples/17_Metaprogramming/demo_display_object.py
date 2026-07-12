@@ -15,18 +15,18 @@ class Fraggle:
     def h(self, s: str) -> str:
         return f"h({s})"
 
-display_object(Fraggle)  # Display the class
+display_object(Fraggle, header=True)  # Display the class
 #: === Fraggle ===
 #: [Attributes]
-#:   • y: float = 1.14659
-#:   • z: str = 'blivet'
+#:   • y: float = 1.14659 [CV]
+#:   • z: str = 'blivet' [CV]
 #: [Methods]
 #:   • f(self) -> None
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
 
 # Display a specific instance:
-display_object(Fraggle(9, 2.3))
+display_object(Fraggle(9, 2.3), header=True)
 #: === Fraggle ===
 #: [Attributes]
 #:   • x: int = 9
@@ -38,21 +38,21 @@ display_object(Fraggle(9, 2.3))
 #:   • h(self, s: str) -> str
 
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS, header=True)
 #: === Fraggle ===
 #: [Attributes]
-#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <class '...
-#:   • __class__ = <attribute '__class__'>
-#:   • __dataclass_fields__ = {'x': Field(name='x',type=<class 'i...
-#:   • __dataclass_params__ = _DataclassParams(init=True,repr=Tru...
-#:   • __dict__ = <attribute '__dict__'>
-#:   • __doc__ = 'A small dataclass for the demo.'
-#:   • __firstlineno__ = 5
-#:   • __hash__ = None
-#:   • __match_args__ = ('x', 'y', 'z')
-#:   • __module__ = '__main__'
-#:   • __static_attributes__ = ()
-#:   • __weakref__ = <attribute '__weakref__'>
+#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
+#:   • __class__ = <attribute '__class__'> [CV]
+#:   • __dataclass_fields__ = {'x': Field(name='x',type=<cla... [CV]
+#:   • __dataclass_params__ = _DataclassParams(init=True,rep... [CV]
+#:   • __dict__ = <attribute '__dict__'> [CV]
+#:   • __doc__ = 'A small dataclass for the demo.' [CV]
+#:   • __firstlineno__ = 5 [CV]
+#:   • __hash__ = None [CV]
+#:   • __match_args__ = ('x', 'y', 'z') [CV]
+#:   • __module__ = '__main__' [CV]
+#:   • __static_attributes__ = () [CV]
+#:   • __weakref__ = <attribute '__weakref__'> [CV]
 #:   • x: int = 9
 #:   • y: float = 2.3
 #:   • z: str = 'blivet'

@@ -395,10 +395,9 @@ class Demo(metaclass=Meta):
     pass
 
 display_object(Demo(), dunder=["__new__", "__init__"])
-#: === Demo ===
 #: [Attributes]
-#:   • added_in_new = 42
-#:   • patched_in_init = 3.14
+#:   • added_in_new = 42 [CV]
+#:   • patched_in_init = 3.14 [CV]
 #: [Methods]
 #:   • __init__(self, /, *args, **kwargs)
 #:   • __new__(*args, **kwargs)
@@ -642,19 +641,32 @@ def _redefined(name: str, value: object) -> bool:
         return False
     return getattr(object, name, None) is not value
 
+def _shared(obj: object, name: str) -> bool:
+    # A class has no instance-level storage to compare against, so
+    # every attribute it shows is class-level storage by construction.
+    # For an instance, only a name missing from its own __dict__ is:
+    if inspect.isclass(obj):
+        return True
+    return name not in getattr(obj, "__dict__", {})
+
 def display_object(
     obj: object,
     dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
+    header: bool = False,
+    exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
-    print(f"=== {cls.__name__} ===")
+    if header:
+        print(f"=== {cls.__name__} ===")
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
     # Read members statically, without triggering dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
+        if name in exclude:
+            continue
         is_dunder = name.startswith("__") and name.endswith("__")
         if dunder is ALL_DUNDERS:
             show_dunder = True
@@ -678,17 +690,27 @@ def display_object(
             label = name
             if name in annotations:
                 label = f"{name}: {_type_name(annotations[name])}"
+            tag = " [CV]" if _shared(obj, name) else ""
             val_str = repr(value)
             # Trim the value to keep the line within max_width:
-            budget = max_width - len(label) - 7
+            budget = max_width - len(label) - len(tag) - 7
             if len(val_str) > budget:
                 val_str = val_str[:budget - 3] + "..."
-            attributes.append(f"  • {label} = {val_str}")
+            attributes.append(f"  • {label} = {val_str}{tag}")
     print("[Attributes]")
     print("\n".join(attributes) or "  None")
     print("[Methods]")
     print("\n".join(methods) or "  None")
 ```
+
+`header=True` prints `=== {ClassName} ===` before the report; the default,
+`False`, omits it.
+Every call in this book sits directly beneath the code that produced it,
+so the class is already visible without a header.
+Pass `header=True` when running `display_object()` on its own, outside a
+listing like this one, especially if several calls to different classes
+run together with nothing else marking where one report ends and the next
+begins.
 
 `display_object()` walks every member that `inspect.getmembers_static()`
 returns.
@@ -705,6 +727,22 @@ inheritance chain with `inspect.get_annotations()`. An attribute with no
 annotation, such as one assigned dynamically, prints as `name = value`.
 The value is the member's `repr()`, truncated to keep the line within
 `max_width`.
+An attribute tagged `[CV]`, for *class variable*, is not stored in `obj`'s
+own `__dict__`.
+A class has no instance-level storage to compare against: every attribute
+`display_object()` shows for a class already lives on that class or a base
+class, so all of them carry the tag.
+`comparing_ordinary_to_data_classes.py`'s `show(B)` tags both `B.x` and
+`B.s`, even though `B` declares them directly, because neither belongs to
+an instance.
+For an instance, the tag distinguishes storage borrowed from the class
+from storage that lives on the object itself, the way `Stars.rating` did
+in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
+`show(B())` tags the same two names, while
+`display_object(Messenger("foo", 12, 3.14))` tags none, since `@dataclass`
+assigns every field straight onto the new instance.
+The tag reports this dynamically, from where the value actually lives, so
+it applies whether or not the attribute is declared with `typing.ClassVar`.
 The display hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones, as `new_vs_init.py` does to
 show `__new__` and `__init__`.
@@ -736,6 +774,16 @@ The comparison itself uses `is`, not `==`, since a dunder inherited
 unchanged from `object` is the same function object, not merely an equal
 one.
 
+`exclude` drops specific names regardless of what `dunder` would otherwise
+show, and it applies to any member, not just dunders.
+`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows
+whatever `REDEFINED_DUNDERS` finds redefined, minus `__hash__`, useful
+when a listing has already made that particular point and repeating it
+would only add noise.
+The check runs first, before the `dunder` logic even sees the name, so an
+excluded name never reaches `[Attributes]` or `[Methods]` no matter which
+mode selected it.
+
 ```python
 # demo_display_object.py
 from dataclasses import dataclass
@@ -754,18 +802,18 @@ class Fraggle:
     def h(self, s: str) -> str:
         return f"h({s})"
 
-display_object(Fraggle)  # Display the class
+display_object(Fraggle, header=True)  # Display the class
 #: === Fraggle ===
 #: [Attributes]
-#:   • y: float = 1.14659
-#:   • z: str = 'blivet'
+#:   • y: float = 1.14659 [CV]
+#:   • z: str = 'blivet' [CV]
 #: [Methods]
 #:   • f(self) -> None
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
 
 # Display a specific instance:
-display_object(Fraggle(9, 2.3))
+display_object(Fraggle(9, 2.3), header=True)
 #: === Fraggle ===
 #: [Attributes]
 #:   • x: int = 9
@@ -777,21 +825,21 @@ display_object(Fraggle(9, 2.3))
 #:   • h(self, s: str) -> str
 
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS, header=True)
 #: === Fraggle ===
 #: [Attributes]
-#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <class '...
-#:   • __class__ = <attribute '__class__'>
-#:   • __dataclass_fields__ = {'x': Field(name='x',type=<class 'i...
-#:   • __dataclass_params__ = _DataclassParams(init=True,repr=Tru...
-#:   • __dict__ = <attribute '__dict__'>
-#:   • __doc__ = 'A small dataclass for the demo.'
-#:   • __firstlineno__ = 5
-#:   • __hash__ = None
-#:   • __match_args__ = ('x', 'y', 'z')
-#:   • __module__ = '__main__'
-#:   • __static_attributes__ = ()
-#:   • __weakref__ = <attribute '__weakref__'>
+#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
+#:   • __class__ = <attribute '__class__'> [CV]
+#:   • __dataclass_fields__ = {'x': Field(name='x',type=<cla... [CV]
+#:   • __dataclass_params__ = _DataclassParams(init=True,rep... [CV]
+#:   • __dict__ = <attribute '__dict__'> [CV]
+#:   • __doc__ = 'A small dataclass for the demo.' [CV]
+#:   • __firstlineno__ = 5 [CV]
+#:   • __hash__ = None [CV]
+#:   • __match_args__ = ('x', 'y', 'z') [CV]
+#:   • __module__ = '__main__' [CV]
+#:   • __static_attributes__ = () [CV]
+#:   • __weakref__ = <attribute '__weakref__'> [CV]
 #:   • x: int = 9
 #:   • y: float = 2.3
 #:   • z: str = 'blivet'
