@@ -11,7 +11,7 @@ class D:
 
 show(D)
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'CV initializer' [CV]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
 #:   • x: int = 99 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
@@ -20,7 +20,7 @@ show(D)
 
 show(D())
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'CV initializer' [CV]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
 #:   • x: int = 99
 #: [Methods]
 #:   • __eq__(self, other)

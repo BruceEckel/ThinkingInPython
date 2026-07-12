@@ -864,10 +864,18 @@ show(A())
 so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
-[[What are 'x' and 's' doing in this case?
-Why would you declare them here, what value might they have?]]
+`x` and `s` in `A` are bare annotations: declared, but never assigned a value.
+As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) puts it,
+a bare annotation is a promise rather than a placeholder.
+It records, in `A.__annotations__`,
+that some future `A` will carry an `x` and an `s`,
+but nothing is actually stored anywhere until code assigns one.
+`A` has no `__init__()` to make that assignment, so the promise never gets kept.
+That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
+on the class or on the instance.
 
-`B` adds default values to `x` and `s` which turn them from [[whatever they are called in A]] to class variables,
+`B` adds default values to `x` and `s`,
+which turn them from bare annotations into class variables,
 because they actually allocate storage for those class variables:
 
 ```python
@@ -968,7 +976,15 @@ not to any instance, and leaves it out of `__init__()` entirely.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can ever assign one.
 `s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D` objects exist.
-[[Explain 'f']]
+
+`f: ClassVar[float]` never appears in either report.
+It has no initializer,
+so it is a bare annotation exactly like `x` and `s` were back in `A`:
+a promise recorded in `D.__annotations__`,
+with no value stored anywhere to report.
+`D.f` raises `AttributeError`, for the same reason `A().x` would.
+Declaring a field `ClassVar` does not, by itself, create anything.
+Only assigning it a value does.
 
 ## Exercises
 
