@@ -815,11 +815,11 @@ Put four classes through the same lens and the differences become concrete.
 `B` adds default values but no constructor.
 `C` is a plain `@dataclass`.
 `D` adds a `ClassVar` field alongside an ordinary one.
-`show()` wraps `display_object()` with `REDEFINED_DUNDERS`, so each report
-lists only the dunders a class actually customizes, not the standard
-machinery every object inherits from `object`.
-`show()` excludes `__hash__` from these reports, since `@dataclass`
-disabling it was already demonstrated for `Messenger`:
+`show()` wraps `display_object()` with `REDEFINED_DUNDERS`,
+so each report lists only the dunders a class actually customizes,
+not the standard machinery every object inherits from `object`.
+`show()` excludes `__hash__` from these reports,
+since `@dataclass` disabling it was already demonstrated for `Messenger`:
 
 ```python
 # comparing_ordinary_to_data_classes.py
