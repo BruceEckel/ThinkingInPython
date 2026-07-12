@@ -17,6 +17,6 @@ except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'name'
 
-cache = {m: "value"}  # Frozen instances are hashable
+cache = {m: "Ni!"}  # Frozen instances are hashable
 print(cache[m])
-#: value
+#: Ni!

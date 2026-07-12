@@ -193,7 +193,7 @@ This copy-instead-of-mutate style reduces errors.
 Notice the last two lines.
 A plain data class is still mutable, so `m.name = "bar"` works.
 
-`display_object()` shows the fields with their declared types:
+`display_object()` shows the attributes with their declared types:
 
 ```python
 # display_messenger.py
@@ -209,8 +209,7 @@ display_object(Messenger("foo", 12, 3.14))
 #:   None
 ```
 
-The generated `__init__()`, `__repr__()`, and `__eq__()` are dunders,
-which the default `display_object()` does not show.
+The default `display_object()` does not show the generated `__init__()`, `__repr__()`, and `__eq__()`.
 
 ## Immutability
 
@@ -239,9 +238,9 @@ except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'name'
 
-cache = {m: "value"}  # Frozen instances are hashable
+cache = {m: "Ni!"}  # Frozen instances are hashable
 print(cache[m])
-#: value
+#: Ni!
 ```
 
 If an object cannot change after it is built,
@@ -252,8 +251,8 @@ then validating it at construction makes it valid for its lifetime.
 If we make `Stars` a frozen data class,
 we can guarantee that every `Stars` object is legal.
 To validate it after the fields receive their values,
-we define `__post_init__()`,
-a hook that the generated `__init__()` calls automatically:
+we define `__post_init__()`.
+The generated `__init__()` calls this automatically:
 
 ```python
 # stars.py
@@ -285,7 +284,7 @@ if __name__ == "__main__":
 The `number` in `Stars` is now constrained to a set of values:
 the integers one through ten.
 The only way to make a `Stars` is through the constructor,
-and the constructor refuses anything outside the set.
+and the constructor refuses anything outside that set.
 If you are holding a `Stars`, it is legal.
 You know it without checking.
 
@@ -295,12 +294,12 @@ They do not check their argument, because every `Stars` is already good.
 They do not test their result,
 because building the returned `Stars` runs the check.
 
-The validation lives in exactly one place,
-the constructor (which makes it easy to change).
-Immutability guarantees no one can damage the value after that.
+The validation lives in exactly one place: the constructor.
+This makes it easy to change.
+Immutability guarantees no one can damage the value after construction.
 
 This principle often goes by *parse,
-don't validate*.^[The phrase was coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
+don't validate*.^[Coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
 Instead of checking a changeable value everywhere and hoping you never miss a spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
@@ -308,13 +307,13 @@ No other code repeats the check, because it cannot fail.
 An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
-The style here is functional.
+This is one aspect of [Functional Programming](40_Functional_Programming.md).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Typing](08_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
-Testing validates the claim that illegal values cannot exist.
+Testing demonstrates that illegal values cannot exist.
 `pytest.raises()` ensures that the constructor rejects every value outside the set:
 
 ```python
@@ -390,9 +389,7 @@ if __name__ == "__main__":
 
 `Person` declares no checks of its own.
 You cannot build it from an illegal name or an illegal email,
-because those values cannot exist.
-
-The tests confirm that construction rejects an illegal `FullName` or `EmailAddress`:
+because those values cannot exist:
 
 ```python
 # test_person.py
