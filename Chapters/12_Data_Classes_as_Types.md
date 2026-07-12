@@ -890,7 +890,7 @@ show(B())
 `B` has no `__init__()` to copy them onto each instance,
 so every `B` object reads the same two values straight from the class attributes.
 
-`C` becomes a `@dataclass`:
+`C` is `A` decorated with `@dataclass`:
 
 ```python
 # plain_dataclass.py
@@ -932,11 +932,12 @@ from comparison import show
 @dataclass
 class D:
     x: int = 99
-    s: ClassVar[str] = "this is D"
+    s: ClassVar[str] = "Initializer"
+    f: ClassVar[float]  # No initializer
 
 show(D)
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
 #:   • x: int = 99 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
@@ -945,7 +946,7 @@ show(D)
 
 show(D())
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
 #:   • x: int = 99
 #: [Methods]
 #:   • __eq__(self, other)
@@ -953,14 +954,11 @@ show(D())
 #:   • __repr__(self)
 ```
 
-`D` mixes an ordinary field with a real `ClassVar`.
 `show(D)` tags both attributes `[CV]`,
 since no instance owns either of them yet.
-`show(D())` tags only `s`.
-The difference comes from what `@dataclass` generated for each field.
+The difference comes from what `@dataclass` generates for each field.
 `x` is an ordinary field.
 `__init__()` takes it as a parameter and runs `self.x = x`,
-the same mechanism `C`'s `__init__()` used for both of its fields,
 so each new `D` gets its own copy the moment it is constructed.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
@@ -970,6 +968,7 @@ not to any instance, and leaves it out of `__init__()` entirely.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can ever assign one.
 `s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D` objects exist.
+[[Explain 'f']]
 
 ## Exercises
 

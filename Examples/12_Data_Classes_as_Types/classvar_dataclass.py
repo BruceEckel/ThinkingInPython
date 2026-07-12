@@ -6,11 +6,12 @@ from comparison import show
 @dataclass
 class D:
     x: int = 99
-    s: ClassVar[str] = "this is D"
+    s: ClassVar[str] = "Initializer"
+    f: ClassVar[float]  # No initializer
 
 show(D)
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • s: typing.ClassVar[str] = 'CV initializer' [CV]
 #:   • x: int = 99 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
@@ -19,7 +20,7 @@ show(D)
 
 show(D())
 #: [Attributes]
-#:   • s: typing.ClassVar[str] = 'this is D' [CV]
+#:   • s: typing.ClassVar[str] = 'CV initializer' [CV]
 #:   • x: int = 99
 #: [Methods]
 #:   • __eq__(self, other)
