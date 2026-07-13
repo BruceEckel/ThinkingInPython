@@ -2,12 +2,12 @@
 from collections.abc import Callable
 
 def hijack(func: Callable) -> Callable:
-    def doesnt_matter() -> None:
+    def wrapper() -> None:
         print("Hijacked!")
         func()
-        print("Hijacking over...")
+        print("Hijacking complete...")
 
-    return doesnt_matter
+    return wrapper
 
 @hijack
 def cheese() -> None:
@@ -16,4 +16,4 @@ def cheese() -> None:
 cheese()
 #: Hijacked!
 #: Wensleydale
-#: Hijacking over...
+#: Hijacking complete...

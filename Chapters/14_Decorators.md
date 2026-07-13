@@ -1,12 +1,14 @@
 # Decorators
 
-A decorator is a function that you apply to another function or a class.
-The decorator itself is a callable that takes the function to decorate,
-does something with it, then returns the resulting function,
-which Python assigns to the original function name.
+A decorator is a callable that you apply to a function or a class.
+The decorator receives the thing it decorates, does something with it,
+then returns a result, which Python binds to the original name.
+Most decorators are applied to functions, so that is where we start.
 
-To apply the decorator,
-you put a `@` before the decorator name (for simplicity we use an untyped `Callable` here, expanded in a later section):
+To apply a decorator,
+put `@` followed by the decorator name on the line above the definition.
+For simplicity, we use an untyped `Callable` here:
+
 
 ```python
 # simple_decoration.py
@@ -26,30 +28,35 @@ cheese()
 #: Replacement behavior
 ```
 
-Ordinarily you'd expect to see "Wensleydale,"
-but `hijack()` replaces the original `cheese()` function with the decorated one,
-which in this case never calls `func`,
-so the original `cheese()` behavior never happens.
+Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface) shows decoratiors with types.
 
-Note the local function name `doesnt_matter`.
-Decoration binds this function to the name `cheese`,
-so the local name can be anything.
-The common convention is to name this function `wrapper()`.
+The `@hijack` above `cheese()` means:
 
-A typical decorator function does some work, calls the original function,
-and does some more work:
+    cheese = hijack(cheese)
+
+`hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
+so `cheese` now refers to `doesnt_matter`.
+Calling `cheese()` runs `doesnt_matter` which never calls `func` and prints its own message instead.
+The original `cheese()` behavior never happens.
+
+Since decoration binds the local function to the name `cheese`,
+the local name (`doesnt_matter()`) can be anything.
+The common convention is to name it `wrapper()`.
+
+A typical decorator returns a wrapper that does some work,
+calls the original function, then does some more work:
 
 ```python
 # add_behavior.py
 from collections.abc import Callable
 
 def hijack(func: Callable) -> Callable:
-    def doesnt_matter() -> None:
+    def wrapper() -> None:
         print("Hijacked!")
         func()
-        print("Hijacking over...")
+        print("Hijacking complete...")
 
-    return doesnt_matter
+    return wrapper
 
 @hijack
 def cheese() -> None:
@@ -58,11 +65,11 @@ def cheese() -> None:
 cheese()
 #: Hijacked!
 #: Wensleydale
-#: Hijacking over...
+#: Hijacking complete...
 ```
 
-Decoration is a simple kind of metaprogramming.
-The same idea appears in design patterns as the *decorator* pattern:
+Decoration is a simple kind of [metaprogramming](17_Metaprogramming.md).
+The same idea appears in design patterns as the *Decorator* pattern:
 wrap an object to add responsibilities to it,
 while keeping the wrapped object's interface so the wrapping stays invisible to the code that uses it.
 
@@ -95,18 +102,11 @@ if __name__ == "__main__":
 #: <- add = 5
 ```
 
-The `@trace` above `add()` means:
-
-    add = trace(add)
-
-`trace` returns `wrapper`, which Python assigns to the name `add`,
-so `add` now refers to `wrapper`.
-Calling `add(2, 3)` runs the wrapper, which prints, calls the real `add()`,
-prints again, and returns the result.
-
-`functools.wraps` copies the original function's name and docstring onto the wrapper,
-so the wrapped function still looks like itself when you inspect it.
-This is optional but improves debuggability.
+`functools.wraps` copies the original function's metadata onto the wrapper:
+its name, docstring, and other attributes.
+Without it, the decorated `add` would report its name as `wrapper` and lose its docstring,
+misleading debuggers, `help()`, and documentation tools.
+This is optional but there is rarely a reason to omit it.
 
 `wraps` keeps the runtime interface.
 The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)) keep the static one.
@@ -129,7 +129,11 @@ Without `P` you would fall back to `*args: Any, **kwargs: Any`,
 and the wrapper would swallow any arguments,
 discarding the signature the decorator is meant to preserve.
 
-### Decorators That Take Arguments
+The `# type: ignore` comments mark the one place the checker cannot follow:
+a bare `Callable` is not guaranteed to have a `__name__` attribute,
+though every actual function does.
+
+## Decorators That Take Arguments
 
 To pass arguments to a decorator, add another layer.
 A decorator with arguments is a function that returns a decorator:
@@ -163,17 +167,19 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-`@repeat(times=3)` calls `repeat(3)`, which returns the real decorator,
-which then wraps `greet`.
+`@repeat(times=3)` first evaluates `repeat(times=3)`,
+which returns the real decorator, which then wraps `greet`.
+Inside `wrapper()`, the first call to `func` happens before the loop,
+so `result` always holds a value of type `R` to return;
+the loop adds the remaining `times - 1` calls.
 
-### Decorators as Classes
+## Decorators as Classes
 
 A decorator only has to be a callable that takes a function and returns a callable.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
-The class form separates the two phases cleanly.
-The constructor runs once, at decoration,
-and `__call__()` runs on every call to the decorated function.
+The class form separates the two phases cleanly: the constructor runs once,
+at decoration, and `__call__()` runs on every call to the decorated function.
 Here is the `trace` decorator written as a class:
 
 ```python
@@ -207,13 +213,14 @@ if __name__ == "__main__":
 so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
-`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function.
-It copies the wrapped function's name and docstring across.
+`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function;
+`wraps` is itself a thin convenience layer over `update_wrapper()`.
+It copies the wrapped function's metadata across.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
 
 Because the instance can hold attributes, state between calls is natural.
-A class decorator that counts calls keeps the count on the instance:
+A class-based decorator that counts calls keeps the count on the instance:
 
 ```python
 # count_calls.py
@@ -284,7 +291,7 @@ if __name__ == "__main__":
 Compare the two cases.
 `@trace` with no arguments calls `trace(add)`.
 The function goes straight to the constructor.
-`@repeat(times=3)` calls `repeat(3)` first, producing an instance,
+`@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
 then applies that instance to `greet`.
 The arguments go to the constructor, and the function arrives later,
 at `__call__()`.
@@ -298,14 +305,14 @@ using the same `**P` and `R` type parameters.
 The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
-That argument-capturing class decorator scales up to small frameworks.
+That argument-capturing class-based decorator scales up to small frameworks.
 A build tool or task runner can offer a `@rule(target, *deps)` decorator.
 Its constructor records the target and dependencies.
 Its `__call__()` registers the decorated function in a class-level table with that metadata.
 A driver later walks the table to run things in order.
 The decorator becomes the registration mechanism for the whole system.
 
-### Stacking Decorators
+## Stacking Decorators
 
 You can apply more than one decorator.
 They nest from the bottom up:
@@ -333,10 +340,11 @@ This is `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
 Each decorator wraps the result of the one below it.
-That nesting is the transparency on which the pattern depends.
-Every layer presents the same interface, so the layers compose.
+Stacking works because each wrapper preserves the interface of what it wraps:
+every layer looks like the original function,
+so the layers compose to any depth.
 
-### Decorating Classes
+## Decorating Classes
 
 You can apply a decorator to a class instead of a function.
 This one registers every class it decorates, in `registry`:
@@ -362,15 +370,21 @@ if __name__ == "__main__":
 #: ['Espresso', 'Latte']
 ```
 
+`register()` returns `cls` unchanged, so this decoration adds no wrapper at all;
+it exists only for its side effect of recording the class.
+A class decorator can also return a replacement class,
+just as a function decorator returns a replacement function.
+
 [Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 ## The Decorator Pattern
 
-The `@` syntax decorates a function or class once, at definition.
-Every call or every instance gets the wrapping.
-You can add responsibilities to one object at runtime,
-and let the caller choose which responsibilities to add.
+The `@` syntax decorates a function or class once, at definition,
+so every call or every instance gets the wrapping.
+Sometimes you want the choice made later:
+add responsibilities to individual objects at runtime,
+and let each caller decide which responsibilities to add.
 That is the object-oriented *Decorator* pattern.
 
 Consider a pizza shop.
@@ -485,6 +499,6 @@ def test_single_topping() -> None:
     plain drinks (Espresso, Cappuccino) and extra decorators (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,
     then print its cost and description.
-4.  Write `trace` as a class decorator that also keeps a class-level counter shared across every decorated function,
+4.  Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
     and report the total number of traced calls in the program.
     Note where the shared state lives compared to the per-instance `count` in `count_calls`.

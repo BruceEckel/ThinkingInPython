@@ -99,3 +99,53 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 40_Functional_Programming.md    |X|X|
 | 41_Functional_Error_Handling.md |X|X|
 | 42_Effect_Management.md         |🔴|🔴|
+
+### Serious Edit
+
+The first serious edit pass.
+
+
+| Chapter | Edited |
+|---------|:------:|
+| 01_Introduction.md              |X|
+| 02_Tour.md                      |X|
+| 03_Containers.md                |X|
+| 04_Control_Flow.md              |X|
+| 05_Functions.md                 |X|
+| 06_Modules_and_Packages.md      |X|
+| 07_Classes.md                   |X|
+| 08_Static_Typing.md             |X|
+| 09_Class_Attributes.md          |X|
+| 10_Cleanup.md                   |X|
+| 11_Testing.md                   |X|
+| 12_Data_Classes_as_Types.md     |X|
+| 13_Pattern_Matching.md          |X|
+| 14_Decorators.md                | |
+| 15_Context_Managers.md          | |
+| 16_Comprehensions.md            | |
+| 17_Metaprogramming.md           | |
+| 18_Performance.md               | |
+| 19_Concurrency.md               | |
+| 20_Rethinking_Objects.md        | |
+| 21_The_Pattern_Concept.md       | |
+| 22_Data_Transfer_Objects.md     | |
+| 23_Iterators.md                 | |
+| 24_Singleton.md                 | |
+| 25_Template_Method.md           | |
+| 26_Surrogate.md                 | |
+| 27_Factory.md                   | |
+| 28_Function_Objects.md          | |
+| 29_Changing_the_Interface.md    | |
+| 30_Observer.md                  | |
+| 31_State_Machines.md            | |
+| 32_Multiple_Dispatching.md      | |
+| 33_Visitor.md                   | |
+| 34_Composite_and_Interpreter.md | |
+| 35_Flyweight.md                 | |
+| 36_Memento.md                   | |
+| 37_Pattern_Refactoring.md       | |
+| 38_Simulation.md                | |
+| 39_Pattern_Catalog.md           | |
+| 40_Functional_Programming.md    | |
+| 41_Functional_Error_Handling.md | |
+| 42_Effect_Management.md         | |
