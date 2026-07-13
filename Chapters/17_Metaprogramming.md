@@ -649,6 +649,17 @@ def _redefined(name: str, value: object) -> bool:
         return False
     return getattr(object, name, None) is not value
 
+def _show_dunder(
+    dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS,
+    name: str,
+    value: object,
+) -> bool:
+    if dunder is ALL_DUNDERS:
+        return True
+    if dunder is REDEFINED_DUNDERS:
+        return _redefined(name, value)
+    return name in dunder
+
 def _shared(obj: object, name: str) -> bool:
     # A class has no instance-level storage to compare against, so
     # every attribute it shows is class-level storage by construction.
@@ -656,6 +667,35 @@ def _shared(obj: object, name: str) -> bool:
     if inspect.isclass(obj):
         return True
     return name not in getattr(obj, "__dict__", {})
+
+def _truncate(text: str, budget: int) -> str:
+    # Keep text within budget, marking a cut with an ellipsis:
+    if len(text) <= budget:
+        return text
+    return text[:budget - 3] + "..."
+
+def _format_method(name: str, value: object, max_width: int) -> str:
+    try:
+        sig = str(inspect.signature(value))
+    except (ValueError, TypeError):
+        sig = "(...)"
+    sig = _truncate(sig, max_width - len(name) - 4)
+    return f"  • {name}{sig}"
+
+def _format_attribute(
+    obj: object,
+    name: str,
+    value: object,
+    annotations: dict[str, object],
+    max_width: int,
+) -> str:
+    label = name
+    if name in annotations:
+        label = f"{name}: {_type_name(annotations[name])}"
+    tag = " [CV]" if _shared(obj, name) else ""
+    budget = max_width - len(label) - len(tag) - 7
+    val_str = _truncate(repr(value), budget)
+    return f"  • {label} = {val_str}{tag}"
 
 def display_object(
     obj: object,
@@ -676,35 +716,14 @@ def display_object(
         if name in exclude:
             continue
         is_dunder = name.startswith("__") and name.endswith("__")
-        if dunder is ALL_DUNDERS:
-            show_dunder = True
-        elif dunder is REDEFINED_DUNDERS:
-            show_dunder = _redefined(name, value)
-        else:
-            show_dunder = name in dunder
-        if is_dunder and not show_dunder:
+        if is_dunder and not _show_dunder(dunder, name, value):
             continue  # Skip standard dunder clutter
         if callable(value):
-            try:
-                sig = str(inspect.signature(value))
-            except (ValueError, TypeError):
-                sig = "(...)"
-            # Trim the signature to keep the line within max_width:
-            sig_budget = max_width - len(name) - 4
-            if len(sig) > sig_budget:
-                sig = sig[:sig_budget - 3] + "..."
-            methods.append(f"  • {name}{sig}")
+            methods.append(_format_method(name, value, max_width))
         else:
-            label = name
-            if name in annotations:
-                label = f"{name}: {_type_name(annotations[name])}"
-            tag = " [CV]" if _shared(obj, name) else ""
-            val_str = repr(value)
-            # Trim the value to keep the line within max_width:
-            budget = max_width - len(label) - len(tag) - 7
-            if len(val_str) > budget:
-                val_str = val_str[:budget - 3] + "..."
-            attributes.append(f"  • {label} = {val_str}{tag}")
+            attributes.append(
+                _format_attribute(obj, name, value, annotations, max_width)
+            )
     print("[Attributes]")
     print("\n".join(attributes) or "  None")
     print("[Methods]")
