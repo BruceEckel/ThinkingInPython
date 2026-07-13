@@ -261,7 +261,7 @@ But it only guards the exception that `slope()` was written to expect.
 an exception `slope()` never anticipated.
 By calling it, `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand is only as complete as your knowledge of every exception every callee can raise,
-which is exactly the tracking problem an Effect Management System exists to solve.
+which is the tracking problem an Effect Management System exists to solve.
 
 Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,
 but did not make those first-class in the function type.

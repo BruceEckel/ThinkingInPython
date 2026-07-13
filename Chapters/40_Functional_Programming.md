@@ -976,7 +976,7 @@ A `for` loop computes this same factorial in about the same number of lines,
 with no risk of hitting that limit.
 Recursion is not a faster or shorter way to count down to zero.
 Its payoff shows up once the problem itself branches, not just repeats,
-which is exactly what the next example does.
+which is shown in the next example.
 
 Recursion suits problems that are naturally self-similar,
 such as walking a tree.
@@ -1043,7 +1043,7 @@ print(first_five)
 ```
 
 `squares()` never finishes on its own,
-yet the program terminates because `islice()` requests exactly five values.
+yet the program terminates because `islice()` requests five values.
 Each `computing square N` line appears only when `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
 Nothing here is a batch.

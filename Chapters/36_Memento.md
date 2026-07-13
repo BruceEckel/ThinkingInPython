@@ -193,8 +193,7 @@ if __name__ == "__main__":
 `draw()` returns a new `Sketch` instead of editing this one,
 using `dataclasses.replace()` to change one field and carry the rest along.
 Since each call returns a `Sketch`, the calls can be chained.
-Saving means keeping a reference,
-exactly the move that failed in `aliased_snapshot.py`.
+Saving means keeping a reference, the move that failed in `aliased_snapshot.py`.
 Now it is safe because no operation anywhere can change the object bound to `before`.
 No `Memento` class exists, no `save()`, no `restore()`,
 and no copying to protect the past.

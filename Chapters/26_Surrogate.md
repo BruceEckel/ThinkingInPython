@@ -11,7 +11,8 @@ From a base class, you derive the surrogate along with the class or classes that
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
-When you create a surrogate object, you give it an implementation.
+A surrogate object acquires an implementation,
+either constructing one itself or receiving one.
 The surrogate forwards all method calls to that implementation.
 
 Structurally, the difference between *Proxy* and *State* is simple.
@@ -131,7 +132,8 @@ One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only t
 not that their signatures match.
 The static checker verifies signatures.
 
-Python has a built-in delegation mechanism that makes `Proxy` even simpler to implement:
+Python has a built-in delegation mechanism, `__getattr__()`,
+that makes `Proxy` even simpler to implement:
 
 ```python
 # proxy_2.py
@@ -162,6 +164,12 @@ p.h()
 
 The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
 and not tied to any particular implementation.
+
+One limit: special methods bypass `__getattr__()`.
+Python looks up dunders like `__len__()` and `__str__()` on the proxy's *type*,
+not on the instance, so `len(p)` and `print(p)` do not delegate,
+even though an explicit `p.__len__()` would.
+A proxy that must forward special methods defines them explicitly.
 
 ## State
 

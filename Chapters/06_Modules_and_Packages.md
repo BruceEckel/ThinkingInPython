@@ -250,7 +250,7 @@ while still declaring all imports at the top of the file:
 lazy import json
 lazy from pathlib import Path
 
-# Once used, the names behave exactly like eager imports:
+# Once used, the names behave like eager imports:
 print(json.dumps({"a": 1}))
 #: {"a": 1}
 print(Path("report/data.txt").suffix)

@@ -345,7 +345,7 @@ A `@classmethod` that ends with `return cls(...)` returns `Self`.
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrong type that slips past the checker behaves exactly as it would have without hints.
+A wrong type that slips past the checker behaves as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee,
 use `isinstance()` or a library built to validate data.

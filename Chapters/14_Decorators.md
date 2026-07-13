@@ -461,6 +461,56 @@ using the same `**P` and `R` type parameters.
 The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
+
+The class form has one real limitation: it does not work on methods.
+None of `trace`, `count_calls`,
+or `repeat_class` above was ever applied to a method, only to a bare function,
+and that was not an accident:
+
+```python
+# method_decoration.py
+from collections.abc import Callable
+
+class Logged:
+    def __init__(self, func: Callable) -> None:
+        self.func = func
+
+    def __call__(self, *args: object, **kwargs: object) -> object:
+        return self.func(*args, **kwargs)
+
+class Example:
+    @Logged
+    def method(self, x: int) -> int:
+        return x
+
+example = Example()
+try:
+    example.method(5)
+except TypeError as e:
+    print(e)
+#: Example.method() missing 1 required positional argument: 'x'
+```
+
+`Example.method` is a `Logged` instance, stored as a plain class attribute.
+Accessing it through `example.method` does not bind it to `example`,
+because a plain object is not a *descriptor*:
+Python performs that binding only for things implementing `__get__()`,
+which every ordinary function does automatically.
+So `example.method(5)` really calls `Logged.__call__(logged_instance, 5)`.
+`self.func` runs with `5` as its only argument,
+and the `Example` instance never arrives.
+The `TypeError` blames a missing `x`,
+with no hint that the real cause is a missing `__get__()`.
+[Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__) shows the descriptor protocol,
+which a class-based decorator would need to implement to work on methods.
+
+A plain function needs none of this: it is already a descriptor,
+so `wrapper()` in the function form binds to an instance like any other method.
+A fully typed class decorator, like `trace_class.trace`,
+even gets the checker involved:
+`ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
+catching the same problem before the program runs.
+
 That argument-capturing class-based decorator scales up to small frameworks.
 A build tool or task runner can offer a `@rule(target, *deps)` decorator.
 Its constructor records the target and dependencies.
@@ -765,6 +815,24 @@ def test_single_topping() -> None:
     assert order.description == "Margherita + Garlic"
 ```
 
+## Decorators You Already Know
+
+Several decorators from earlier chapters use this mechanism.
+`@property`, `cached_property`, `@staticmethod`,
+and `@classmethod` ([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does,
+but return a *descriptor* instead of a plain wrapper.
+That is what lets them change how attribute access itself behaves,
+and it is also what makes them work correctly on methods,
+where a plain `__call__`-based class, like `Logged` above, does not.
+`@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)) is a class decorator like `register`,
+except it returns a modified class instead of the same one unchanged,
+adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
+`functools.cache` and `functools.lru_cache` ([Performance](18_Performance.md#caching)) wrap a function in the same closure-plus-`func` shape as `add_behavior`,
+storing results in a memo dictionary instead of printing around the call.
+None of these needed new syntax to understand.
+They are ordinary decorators,
+built from the closures and callables this chapter covered.
+
 ## Exercises
 
 1.  Add a `Mushroom` topping (cost 0.60) and use it to build a Hawaiian with mushroom and feta.
@@ -778,3 +846,5 @@ def test_single_topping() -> None:
 4.  Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
     and report the total number of traced calls in the program.
     Note where the shared state lives compared to the per-instance `count` in `count_calls`.
+5.  Give `trace_class.trace` a `__get__()` method so it works correctly when applied to an instance method.
+    Apply it to a method on a small class and confirm `self` arrives correctly.

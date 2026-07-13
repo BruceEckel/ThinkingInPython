@@ -222,7 +222,7 @@ A `@dataclass` reads the class-attribute declarations as a template and generate
     then explain why it differs from `a.rating`.
 2.  In `class_var_inheritance.py`,
     add a third subclass `class Middle(Base): pass` (no override, like `Left`) and print `Middle.shared` alongside the others at each step.
-    Confirm `Middle` tracks `Base` exactly like `Left` does.
+    Confirm `Middle` tracks `Base` the way `Left` does.
 3.  In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
     Then create a second instance, `b2 = B()`,
     and confirm `b2.x` is still `100`, unaffected.

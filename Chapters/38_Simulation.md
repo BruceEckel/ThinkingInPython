@@ -151,7 +151,7 @@ because a `StrEnum` member is its string value.
 The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
-so exactly one rat gets each cell even when several reach it.
+so a single rat gets each cell even when several reach it.
 `explore()` claims the entry, releases the first rat, then awaits every task,
 including the ones spawned along the way:
 

@@ -508,7 +508,7 @@ Python has no access control.
 Every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
-It is stored under that exact name and reachable exactly like any other attribute.
+It is stored under that exact name and reachable like any other attribute.
 It is only a convention that says, "this is private, do not rely on it."
 
 A leading *double* underscore does something real,

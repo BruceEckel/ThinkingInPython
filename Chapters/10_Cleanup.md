@@ -100,7 +100,7 @@ The Python documentation warns:
 >   `__del__()` method is called.
 
 In this run the deletions happen during shutdown,
-exactly the precarious moment the warning describes.
+which is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
 `__del__()` should do as little as possible, and you should not depend on it.

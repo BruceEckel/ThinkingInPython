@@ -47,7 +47,7 @@ def test_messenger_exposes_kwargs_as_attributes() -> None:
 ## The Standard-Library Versions
 
 Python ships with this idiom.
-`types.SimpleNamespace` is exactly a `Messenger`,
+`types.SimpleNamespace` is a `Messenger`,
 with keyword arguments becoming attributes.
 When you want the fields named and type-checked,
 a `@dataclass` gives you a typed mutable record with a generated `__init__()`,

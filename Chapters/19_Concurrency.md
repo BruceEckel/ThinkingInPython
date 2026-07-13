@@ -606,7 +606,7 @@ but a C extension must support per-interpreter isolation to be imported in a sub
 
 When threads divide up work, the danger is shared mutable state.
 The `queue` module packages the standard answer:
-a thread-safe queue that hands each item to exactly one consumer,
+a thread-safe queue that hands each item to a single consumer,
 with the locking built in.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`,
 the threaded form of [Performance](18_Performance.md)'s `heapq`,

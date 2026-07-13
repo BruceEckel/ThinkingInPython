@@ -109,7 +109,7 @@ Python can add a method to a fixed hierarchy from outside,
 using `functools.singledispatch`.
 This turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-That is exactly how *Visitor* works,
+This is how *Visitor* works,
 but without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python

@@ -565,7 +565,7 @@ These are real but uncommon.
 For everything else, `__init_subclass__()`, `__set_name__()`,
 and class decorators are simpler and easier to read.
 
-One caution: a class has exactly one metaclass.
+One caution: a class has a single metaclass.
 Multiple inheritance can accidentally combine classes with different metaclasses,
 which creates a metaclass conflict you must then resolve.
 That is one more reason to avoid metaclasses unless you truly need them.

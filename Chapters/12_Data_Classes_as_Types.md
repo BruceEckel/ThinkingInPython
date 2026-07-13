@@ -295,7 +295,7 @@ They do not check their argument, because every `Stars` is already good.
 They do not test their result,
 because building the returned `Stars` runs the check.
 
-The validation lives in exactly one place: the constructor.
+The validation lives in one place: the constructor.
 This makes it easy to change.
 Immutability guarantees no one can damage the value after construction.
 
@@ -413,7 +413,7 @@ def test_email_needs_at_sign(bad: str) -> None:
 
 When the set of values is small and fixed, an `Enum` is the clearest type.
 As an example, we'll create a `BirthDate` containing a month, day, and year.
-A year has exactly twelve months, so `Month` is an `Enum`.
+A year has twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields.
 The day must fit the month.

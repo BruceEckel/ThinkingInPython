@@ -423,7 +423,7 @@ narrowed to a single subject.
 The subscribers are functions,
 and the bus routes each event to them by its type.
 Here a type may have many handlers.
-If you instead want exactly one handler per type,
+If you instead want a single handler per type,
 chosen by the argument's type and open to new types without editing a central function,
 that is `functools.singledispatch`,
 used by [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it).

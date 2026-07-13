@@ -159,8 +159,7 @@ each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
 
 ```python
 # bitwise.py
-# Bitwise and shift operators on integers. Binary literals
-# (starting with 0b) make the bit patterns easy to see.
+# Binary literals (starting with 0b) make the bit patterns readable
 print(bin(0b1100 & 0b1010))  # AND, bits set in both
 #: 0b1000
 print(bin(0b1100 | 0b1010))  # OR, bits set in either
