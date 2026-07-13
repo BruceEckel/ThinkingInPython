@@ -63,6 +63,14 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
+The step methods default to `...`, doing nothing,
+so a subclass overrides only the steps it cares about,
+and a forgotten step silently does nothing.
+When every subclass must supply a step,
+inherit from `ABC` and declare the step with `@abstractmethod`,
+as in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance);
+then Python refuses to instantiate a subclass that forgot it.
+
 Starting the engine from the constructor carries a trap.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
@@ -151,8 +159,8 @@ A hook that holds no state is usually better as a function than as a method to o
 ## Exercises
 
 1.  Create a framework that takes a list of file names.
-    It opens each file except the last for reading and the last for writing,
-    processes each input file by an undetermined policy,
+    It opens every file but the last for reading, and the last one for writing.
+    It processes each input file by an undetermined policy,
     and writes the output to the last file.
     Customize it two ways, once by subclassing and once by passing a function:
 
