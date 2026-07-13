@@ -47,7 +47,7 @@ A typical decorator returns a wrapper that does some work,
 calls the original function, then does some more work:
 
 ```python
-# add_behavior.py
+# typical_decorator.py
 from collections.abc import Callable
 
 def add_behavior(func: Callable) -> Callable:
