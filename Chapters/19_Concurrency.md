@@ -17,7 +17,9 @@ Waiting can overlap on a single thread.
 While one task waits, the thread runs another.
 Computing cannot.
 One core runs one stream of instructions at a time.
-I/O-bound work needs `asyncio`, and CPU-bound work needs multiple cores.
+I/O-bound work overlaps within a single process,
+with `asyncio` or a thread pool;
+CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
 Later in this chapter, we show two other approaches,
 each running inside a single process.
@@ -173,7 +175,8 @@ In each round all eight coroutines read the same value before any of them writes
 so eight additions collapse into one.
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races) shows the identical failure with threads.
 The mechanism differs.
-A thread switch is preemptive and can land between any two bytecode instructions,
+A thread switch is preemptive,
+landing at points the interpreter picks and you did not choose,
 while a coroutine switch happens only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
@@ -252,6 +255,10 @@ This prints the same `[10, 20, 30, 40, 50]`,
 but everything `pool.map` did is now explicit: starting each worker,
 waiting for it to finish,
 and reassembling results that can arrive in any order (`sorted()` restores the input order, since each result is tagged with its `order`).
+Draining after `join()` is safe here because five small tuples fit in the queue's internal buffer.
+A queue carrying bulky data must be drained *before* joining:
+each worker's feeder thread blocks until its data is consumed,
+so the `join()` would deadlock.
 `ProcessPoolExecutor` is built on `multiprocessing`.
 It reuses a pool of workers instead of spawning one process per call,
 returns ordered results without manual bookkeeping,
@@ -545,10 +552,10 @@ and it runs on the standard build you already have.
 
 Each worker in a process pool gets its own interpreter, and so its own GIL.
 That is the source of the parallelism.
-The cost is a whole operating-system process per task.
+The cost is a whole operating-system process per worker.
 Since 3.12, CPython can create additional interpreters inside the same process ([PEP 684](https://peps.python.org/pep-0684/)),
 each with its own GIL.
-`InterpreterPoolExecutor` runs each call in one of these,
+`InterpreterPoolExecutor` (added in 3.14) runs each call in one of these,
 so multiple interpreters, each locked on its own, run truly at once,
 without leaving the process:
 
@@ -591,6 +598,9 @@ so arguments and results still cross that boundary by copying.
 A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
+The one compatibility check mirrors free threading's:
+pure Python always works,
+but a C extension must support per-interpreter isolation to be imported in a subinterpreter.
 
 ![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)
 
