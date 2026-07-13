@@ -41,7 +41,8 @@ a dictionary is often shorter (see [the end of this chapter](#when-not-to-match)
 
 ## Alternatives and Capture
 
-Combine several patterns in one `case` with `|`.
+An alternative combines several patterns in one `case` with `|`.
+
 A bare name is a *capture pattern*.
 Like `_`, it matches any value unconditionally; unlike `_`,
 it also binds the matched value to that name.
@@ -296,9 +297,8 @@ define that set as a union using the [`type` statement](08_Static_Typing.md#the-
 Now you can perform a match on that union.
 When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
-If you add a type to the union and forget its case,
-that becomes a type error caught before the program runs,
-not a silent fall-through.
+Adding a type to the union and forgeting its `case` produces a type error.
+This error is caught during type checking rather than silently falling through.
 This is the static-typing payoff applied to control flow:
 
 ```python
@@ -334,7 +334,6 @@ print(area(Square(2.0)))
 
 Add a `Triangle` to `Shape` without adding the appropriate `case`,
 and the checker flags `assert_never(shape)`.
-`shape` could now be a `Triangle` that no `case` handles.
 
 A plain `switch`, in C, JavaScript, or traditional Java, cannot do this.
 Nothing forces you to add a case, and an unhandled value falls through silently.
@@ -395,7 +394,7 @@ especially when the cases need to look inside the value.
 An alerting system sends a notification through one of three channels: email,
 SMS, or push.
 Every channel renders the notification into a message string for a recipient.
-Every channel also has a rough cost to send.
+Every channel also has a rough cost to send a message.
 
 The inheritance answer declares both operations as abstract methods on a base class.
 Each channel is a subclass that implements them,
@@ -549,14 +548,12 @@ and nothing else changes.
 In the match version, you add a `Webhook` dataclass to the `Notification` union,
 and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `case Webhook(...)` to each.
 
-Now try adding a new operation.
-`priority()` ranks channels by urgency.
-In the object version, every existing subclass needs a new method, `Email`,
-`Sms`, and `Push` alike.
-In the match version, write one new function with its own `match`,
+Now try adding a new operation, `priority()`, that ranks channels by urgency.
+In the object version, every existing subclass needs a new method.
+In the match version, you write one new function with its own `match`,
 and the existing classes and functions stay untouched.
 
-Adding a channel is cheaper with inheritance.
+Adding a type is cheaper with inheritance.
 Adding an operation is cheaper with pattern matching.
 That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
 worked out concretely.
