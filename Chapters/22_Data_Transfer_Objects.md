@@ -25,9 +25,9 @@ print(m.info, m.b, m.more)
 
 The trick here is assigning the object's `__dict__` to the `dict` that the `**kwargs` argument automatically creates.
 
-You could create a `Messenger` class and put it in a library to import.
-But it takes so few lines that defining it in place, wherever you need it,
-usually makes more sense.
+You could create a `Messenger` class and put it in a library to import,
+but there is no need: the standard library already ships this idiom,
+as the next section shows.
 
 Testing confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
 

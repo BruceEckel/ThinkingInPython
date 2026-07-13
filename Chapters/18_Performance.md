@@ -14,7 +14,8 @@ Computer programming projects have a long history of *premature optimization*:
 optimizing before any measurement shows where the time goes,
 often by deciding ahead of time, based on biases,
 that runtime performance will be insufficient.
-This produces elaborate, expensive designs that solve problems that may not exist.
+This produces elaborate,
+expensive designs that solve problems that may not exist.
 
 Python can be surprising.
 A program coded in the most straightforward way,

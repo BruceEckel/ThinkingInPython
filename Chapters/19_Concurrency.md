@@ -18,8 +18,7 @@ While one task waits, the thread runs another.
 Computing cannot.
 One core runs one stream of instructions at a time.
 I/O-bound work overlaps within a single process,
-with `asyncio` or a thread pool;
-CPU-bound work needs multiple cores.
+with `asyncio` or a thread pool; CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
 Later in this chapter, we show two other approaches,
 each running inside a single process.
@@ -598,8 +597,7 @@ so arguments and results still cross that boundary by copying.
 A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
-The one compatibility check mirrors free threading's:
-pure Python always works,
+The one compatibility check mirrors free threading's: pure Python always works,
 but a C extension must support per-interpreter isolation to be imported in a subinterpreter.
 
 ![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)

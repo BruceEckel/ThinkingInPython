@@ -1,8 +1,8 @@
 # The Pattern Concept
 
 An important step forward in object-oriented design was the "design patterns" movement,
-carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma, Richard Helm,
-Ralph Johnson, and John Vlissides.
+carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma,
+Richard Helm, Ralph Johnson, and John Vlissides.
 They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
 I will refer to that book as *GoF Design Patterns*,
 and use *design patterns* for the concept.
@@ -135,8 +135,8 @@ Some of these only apply to OOP.
     the slower the programmer can produce.
     This does not appear to be a linear factor, but an exponential one.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
-    A method should talk only to itself, its own attributes,
-    its parameters, and objects it creates,
+    A method should talk only to itself, its own attributes, its parameters,
+    and objects it creates,
     not to the internals of objects it reached through something else.
     This may also be a way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.

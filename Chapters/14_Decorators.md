@@ -68,6 +68,15 @@ cheese()
 #: Some more work
 ```
 
+`wrapper()` is a *closure*.
+Defined inside `add_behavior()`, it refers to `func`,
+a variable from the enclosing scope, not one of its own parameters.
+Python keeps `func` alive for as long as `wrapper()` exists,
+even after `add_behavior()` has already returned.
+That is what lets `cheese()`, called long after decoration finished,
+still reach the original `cheese` function through `func`.
+[Closures](40_Functional_Programming.md#closures) covers the general mechanism.
+
 Decoration is a simple kind of [metaprogramming](17_Metaprogramming.md).
 The same idea appears in design patterns as the *Decorator* pattern:
 wrap an object to add responsibilities to it,
@@ -571,8 +580,8 @@ def test_registry_looks_up_by_name() -> None:
 
 `@decorator` above a `def` is shorthand for `name = decorator(name)`,
 as the `@hijack` example showed at the start of this chapter.
-Only a `def` or a `class` can follow `@`;
-`@decorator` above a bare assignment, or above a `type` alias,
+Only a `def` or a `class` can follow `@`; `@decorator` above a bare assignment,
+or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
 But the decorator itself is only a function,
 and nothing requires the callable it wraps to come from a `def`:
@@ -596,12 +605,11 @@ if __name__ == "__main__":
 ```
 
 `loud` only asks for a callable and never asks how `func` was created.
-Calling it directly, instead of through `@`,
-decorates the `lambda` on the spot.
+Calling it directly, instead of through `@`, decorates the `lambda` on the spot.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.
-The same call decorates a `functools.partial`,
-a bound method, or an instance of a class with `__call__()`,
+The same call decorates a `functools.partial`, a bound method,
+or an instance of a class with `__call__()`,
 since a decorator only cares that its argument is callable.
 
 A second surprise sits on the return side.
@@ -631,14 +639,12 @@ if __name__ == "__main__":
 and hands back whatever `greeting()` returned.
 `greeting` does not survive decoration as a function:
 the name now refers to the plain `str` that came out of it.
-Calling `greeting()` again would fail,
-since a `str` is not callable.
+Calling `greeting()` again would fail, since a `str` is not callable.
 This idiom pays off for a value that needs one-time setup logic but stays constant afterward;
 a module-level constant computed without a decorator is usually clearer for anything simpler.
 
 The same collapse happens to classes.
-[Singleton](24_Singleton.md#singleton-classes) decorates a class with a callable
-that replaces it with one cached instance,
+[Singleton](24_Singleton.md#singleton-classes) decorates a class with a callable that replaces it with one cached instance,
 so the name that followed `class` ends up bound to an object, not a type.
 
 ## The Decorator Pattern
