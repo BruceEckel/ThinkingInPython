@@ -211,7 +211,7 @@ class OnlyOne:
 
     instance: ClassVar[Any] = None
 
-    def __new__(cls) -> Any:  # __new__ is always a classmethod
+    def __new__(cls) -> Any:  # __new__ is implicitly a staticmethod
         if OnlyOne.instance is None:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
@@ -391,7 +391,7 @@ so the name `Foo` now refers to the decorated instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want.
 But the name no longer points at a class.
 `isinstance(x, Foo)` and subclassing `Foo` no longer work.
-The `__new__()` and metaclass versions below keep the name pointing at a real class,
+The `__new__()` versions above and the metaclass version below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
 ### Singleton Using Metaclasses

@@ -9,7 +9,7 @@ class OnlyOne:
 
     instance: ClassVar[Any] = None
 
-    def __new__(cls) -> Any:  # __new__ is always a classmethod
+    def __new__(cls) -> Any:  # __new__ is implicitly a staticmethod
         if OnlyOne.instance is None:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
