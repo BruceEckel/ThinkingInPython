@@ -619,7 +619,7 @@ so it lives at the root of the examples and any chapter can import it:
 ```python
 # shared: display.py
 import inspect
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Final
 
 ALL_DUNDERS = sentinel("ALL_DUNDERS")
@@ -674,7 +674,9 @@ def _truncate(text: str, budget: int) -> str:
         return text
     return text[:budget - 3] + "..."
 
-def _format_method(name: str, value: object, max_width: int) -> str:
+def _format_method(
+    name: str, value: Callable[..., object], max_width: int
+) -> str:
     try:
         sig = str(inspect.signature(value))
     except (ValueError, TypeError):
@@ -721,9 +723,9 @@ def display_object(
         if callable(value):
             methods.append(_format_method(name, value, max_width))
         else:
-            attributes.append(
-                _format_attribute(obj, name, value, annotations, max_width)
-            )
+            attributes.append(_format_attribute(
+                obj, name, value, annotations, max_width
+            ))
     print("[Attributes]")
     print("\n".join(attributes) or "  None")
     print("[Methods]")

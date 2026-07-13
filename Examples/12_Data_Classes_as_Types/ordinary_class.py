@@ -10,3 +10,6 @@ show(A())
 #:   None
 #: [Methods]
 #:   None
+
+print(A.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}

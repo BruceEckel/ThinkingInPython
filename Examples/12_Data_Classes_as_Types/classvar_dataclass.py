@@ -26,3 +26,9 @@ show(D())
 #:   • __eq__(self, other)
 #:   • __init__(self, x: int = 99) -> None
 #:   • __repr__(self)
+
+for k, v in D.__annotations__.items():
+    print(f"'{k}': {v}")
+#: 'x': <class 'int'>
+#: 's': typing.ClassVar[str]
+#: 'f': typing.ClassVar[float]

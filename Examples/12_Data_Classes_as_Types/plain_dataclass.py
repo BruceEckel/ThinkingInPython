@@ -15,3 +15,6 @@ show(C(11, "this is C"))
 #:   • __eq__(self, other)
 #:   • __init__(self, x: int, s: str) -> None
 #:   • __repr__(self)
+
+print(C.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}

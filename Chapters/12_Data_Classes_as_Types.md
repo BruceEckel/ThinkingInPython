@@ -579,7 +579,7 @@ For a small fixed set, that is an `Enum`.
 When validation grows complicated, libraries make it lighter.
 The [attrs](https://www.attrs.org) library predates and inspired data classes and offers richer validators and converters.
 [Pydantic](https://docs.pydantic.dev) builds validation and parsing into the type itself,
-which is especially useful at the edges of a program where untrusted data comes in.
+which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type responsible for guaranteeing its own values.
 
@@ -595,8 +595,8 @@ the data class silently skips that setup:
 from dataclasses import dataclass
 
 class Connection:
-    def __init__(self) -> None:
-        self.open = True   # Setup the subclass needs
+    def __init__(self, host: str) -> None:
+        self.host = host
 
 @dataclass
 class Logged(Connection):
@@ -605,13 +605,13 @@ class Logged(Connection):
 c = Logged("db")
 print(c.name)
 #: db
-# Connection.__init__ never ran, so 'open' was never set:
-print(hasattr(c, "open"))
+# Connection.__init__ never ran, so 'host' was never set:
+print(hasattr(c, "host"))
 #: False
 ```
 
 The generated `__init__` assigned `name` and stopped.
-Nothing called `Connection.__init__`, so `open` does not exist.
+Nothing called `Connection.__init__`, so `host` does not exist.
 This is easy to miss because the class still constructs without an error.
 
 To run the base initializer, call it yourself from `__post_init__()`,
@@ -622,22 +622,22 @@ which runs after the generated `__init__` assigns the fields:
 from dataclasses import dataclass
 
 class Connection:
-    def __init__(self) -> None:
-        self.open = True
+    def __init__(self, host: str) -> None:
+        self.host = host
 
 @dataclass
 class Logged(Connection):
+    host: str
     name: str
 
     def __post_init__(self) -> None:
-        super().__init__()   # Run the base initializer explicitly
+        super().__init__(self.host)  # Run the base initializer
 
-c = Logged("db")
-print(c.name, c.open)
-#: db True
+c = Logged("localhost", "db")
+print(c.host, c.name)
+#: localhost db
 ```
 
-This works because `Connection.__init__` adds an attribute to the existing dict.
 If a base `__init__` instead replaced `self.__dict__`,
 calling it from `__post_init__()` would discard the fields the data class just assigned.
 The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
@@ -663,7 +663,7 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-The reason is that a data class assembles its `__init__` from a field list:
+A data class assembles its `__init__` from a field list which includes
 its own fields plus any inherited from data class bases.
 It builds the body by assigning those fields, not by chaining to the base.
 It has no way to know what arguments a non-data-class base constructor expects,
@@ -684,9 +684,19 @@ class Point:
     x: int
     y: int
 
+p = Point(10, 20)
+print(asdict(p))   # Nested dict
+#: {'x': 10, 'y': 20}
+print(astuple(p))  # Nested tuple
+#: (10, 20)
+
 @dataclass(frozen=True)
 class Line:
     points: list[Point]
+
+line = Line([Point(2, 7), Point(10, 4)])
+print(asdict(line))  # Recurses into the list of Points
+#: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
 
 @dataclass
 class Config:
@@ -696,14 +706,6 @@ class Config:
     verbose: bool = False
     retries: int = 3
 
-p = Point(10, 20)
-print(asdict(p))   # Nested dict
-#: {'x': 10, 'y': 20}
-print(astuple(p))  # Nested tuple
-#: (10, 20)
-line = Line([Point(2, 7), Point(10, 4)])
-print(asdict(line))  # Recurses into the list of Points
-#: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
@@ -757,8 +759,6 @@ and `EmailAddress` runs each constructor's validation,
 so the boundary rejects malformed JSON instead of leaking a bad object into the rest of the code.
 The type guards itself.
 
-When a data class is buried inside a larger structure you are dumping,
-converting it by hand first is awkward.
 A custom `JSONEncoder` serializes any data class it meets,
 even nested inside other structures, by converting each one to a dict:
 
@@ -808,7 +808,7 @@ The encoder converts each data class to a dictionary and the base encoder handle
 recursing through lists and nested objects.
 
 Encoding is mechanical, but decoding must know which type to rebuild,
-and that is the part the standard library leaves to you.
+and that part the standard library leaves to you.
 For deep or evolving structures,
 [Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
@@ -834,10 +834,11 @@ def show(obj: object) -> None:
     display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))
 ```
 
-`show()` wraps `display_object()` with `REDEFINED_DUNDERS`,
+`show()` calls `display_object()` with `REDEFINED_DUNDERS`,
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
-For clarity, `show()` also excludes `__hash__` from these reports (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+For clarity, `show()` also excludes `__hash__` from these reports
+(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
 `A` is the plain case, with no defaults and no constructor,
 but with field declarations that look like class variables:
@@ -855,25 +856,28 @@ show(A())
 #:   None
 #: [Methods]
 #:   None
+
+print(A.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
 `A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`,
 so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
-`x` and `s` in `A` are bare annotations: declared, but never assigned a value.
+`x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
 As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) puts it,
 a bare annotation is a promise rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
-but nothing is actually stored anywhere until code assigns one.
+but nothing is actually stored anywhere until assigned in code.
 `A` has no `__init__()` to make that assignment, so the promise never gets kept.
 That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
 on the class or on the instance.
 
 `B` adds default values to `x` and `s`,
 which turn them from bare annotations into class variables,
-because they actually allocate storage for those class variables:
+because the assignments allocate storage for those class variables:
 
 ```python
 # class_with_defaults.py
@@ -889,6 +893,9 @@ show(B())
 #:   • x: int = 42 [CV]
 #: [Methods]
 #:   None
+
+print(B.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
 `show(B())` indicates that both are class variables by tagging them as `[CV]`.
@@ -915,18 +922,21 @@ show(C(11, "this is C"))
 #:   • __eq__(self, other)
 #:   • __init__(self, x: int, s: str) -> None
 #:   • __repr__(self)
+
+print(C.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
-`C` is a `@dataclass`,
-so its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
+As a `@dataclass`,
+`C`s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
 With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
-`C` started from the same bare annotations as `A`.
+`C` starts from the same bare annotations as `A`.
 `@dataclass` reads them, through `dataclasses.fields()`,
 to learn what fields exist and in what order,
 then uses that to write `__init__`'s parameter list and the assignments inside it.
@@ -935,7 +945,7 @@ then uses that to write `__init__`'s parameter list and the assignments inside i
 exactly as it was before.
 The promise is only fulfilled per instance,
 when the generated `__init__()` actually runs.
-That is the entire difference from `A`:
+That is the difference from `A`:
 not that `@dataclass` changes the annotations,
 but that it builds something to act on them.
 
@@ -970,16 +980,24 @@ show(D())
 #:   • __eq__(self, other)
 #:   • __init__(self, x: int = 99) -> None
 #:   • __repr__(self)
+
+for k, v in D.__annotations__.items():
+    print(f"'{k}': {v}")
+#: 'x': <class 'int'>
+#: 's': typing.ClassVar[str]
+#: 'f': typing.ClassVar[float]
 ```
 
 `show(D)` tags both attributes `[CV]`,
 since no instance owns either of them yet.
 The difference comes from what `@dataclass` generates for each field.
+
 `x` is an ordinary field.
 `__init__()` takes it as a parameter and runs `self.x = x`,
 so each new `D` gets its own copy the moment it is constructed.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
+
 `s`, declared `ClassVar[str]`, is a different story.
 `@dataclass` treats a `ClassVar` field as belonging to the class,
 not to any instance, and leaves it out of `__init__()` entirely.
