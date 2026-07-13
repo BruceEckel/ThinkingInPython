@@ -567,6 +567,80 @@ def test_registry_looks_up_by_name() -> None:
     assert registry["Latte"] is Latte
 ```
 
+## Decorators Are Just Function Calls
+
+`@decorator` above a `def` is shorthand for `name = decorator(name)`,
+as the `@hijack` example showed at the start of this chapter.
+Only a `def` or a `class` can follow `@`;
+`@decorator` above a bare assignment, or above a `type` alias,
+is a syntax error rather than a decorator applied to something unusual.
+But the decorator itself is only a function,
+and nothing requires the callable it wraps to come from a `def`:
+
+```python
+# lambda_decoration.py
+from collections.abc import Callable
+
+def loud(func: Callable[[int], int]) -> Callable[[int], int]:
+    def wrapper(n: int) -> int:
+        print(f"calling with {n}")
+        return func(n)
+    return wrapper
+
+double = loud(lambda n: n * 2)
+
+if __name__ == "__main__":
+    print(double(21))
+#: calling with 21
+#: 42
+```
+
+`loud` only asks for a callable and never asks how `func` was created.
+Calling it directly, instead of through `@`,
+decorates the `lambda` on the spot.
+`@` is convenient sugar for the common case of decorating a fresh `def`,
+not a requirement.
+The same call decorates a `functools.partial`,
+a bound method, or an instance of a class with `__call__()`,
+since a decorator only cares that its argument is callable.
+
+A second surprise sits on the return side.
+This chapter opened by saying a decorator "returns a result,
+which Python binds to the original name."
+That result does not have to be callable:
+
+```python
+# run_once.py
+from collections.abc import Callable
+
+def run_once[T](func: Callable[[], T]) -> T:
+    return func()
+
+@run_once
+def greeting() -> str:
+    return "Hello, " + "world"
+
+if __name__ == "__main__":
+    print(greeting)
+    print(type(greeting).__name__)
+#: Hello, world
+#: str
+```
+
+`run_once` calls `greeting` immediately, at decoration time,
+and hands back whatever `greeting()` returned.
+`greeting` does not survive decoration as a function:
+the name now refers to the plain `str` that came out of it.
+Calling `greeting()` again would fail,
+since a `str` is not callable.
+This idiom pays off for a value that needs one-time setup logic but stays constant afterward;
+a module-level constant computed without a decorator is usually clearer for anything simpler.
+
+The same collapse happens to classes.
+[Singleton](24_Singleton.md#singleton-classes) decorates a class with a callable
+that replaces it with one cached instance,
+so the name that followed `class` ends up bound to an object, not a type.
+
 ## The Decorator Pattern
 
 The `@` syntax decorates a function or class once, at definition,
