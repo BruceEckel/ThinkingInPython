@@ -350,7 +350,8 @@ A `match` makes the shape of the dispatch explicit.
 
 Note that this example reframes the classic OOP "shapes" example without inheritance and dynamic binding.
 Dynamic binding discovers an object's actual type at runtime.
-Pattern matching does the same, but is a better solution by centralizing type-dependent behavior in a single place.
+Pattern matching does the same,
+but is a better solution by centralizing type-dependent behavior in a single place.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) uses this technique to add operations to a closed set of types without inheritance.
 
 ```python
@@ -392,6 +393,180 @@ Use `match` when the set of cases is closed and you want to handle them in one p
 especially when the cases need to look inside the value.
 (Note that `Enum` is also worth considering here.)
 
+## Dynamic Binding vs. Pattern Matching
+
+An alerting system sends a notification through one of three channels: email,
+SMS, or push.
+Every channel renders the notification into a message string for a recipient.
+Every channel also has a rough cost to send.
+
+The inheritance answer declares both operations as abstract methods on a base class.
+Each channel is a subclass that implements them,
+and dynamic binding picks the right implementation at each call:
+
+```python
+# notifications_oo.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Notification(ABC):
+    @abstractmethod
+    def render(self, recipient: str) -> str: ...
+
+    @abstractmethod
+    def cost(self) -> float: ...
+
+class Email(Notification):
+    def __init__(self, subject: str) -> None:
+        self.subject = subject
+
+    @override
+    def render(self, recipient: str) -> str:
+        return f"Email to {recipient}: {self.subject}"
+
+    @override
+    def cost(self) -> float:
+        return 0.001
+
+class Sms(Notification):
+    def __init__(self, body: str) -> None:
+        self.body = body
+
+    @override
+    def render(self, recipient: str) -> str:
+        return f"SMS to {recipient}: {self.body}"
+
+    @override
+    def cost(self) -> float:
+        return 0.02
+
+class Push(Notification):
+    def __init__(self, title: str) -> None:
+        self.title = title
+
+    @override
+    def render(self, recipient: str) -> str:
+        return f"Push to {recipient}: {self.title}"
+
+    @override
+    def cost(self) -> float:
+        return 0.0005
+
+email = Email("Invoice ready")
+sms = Sms("Code: 5821")
+push = Push("New message")
+
+print(email.render("Dana"))
+#: Email to Dana: Invoice ready
+print(sms.render("Dana"))
+#: SMS to Dana: Code: 5821
+print(push.render("Dana"))
+#: Push to Dana: New message
+print(round(email.cost() + sms.cost() + push.cost(), 4))
+#: 0.0215
+```
+
+`Notification` names the shape every channel must have.
+`@abstractmethod` forces `Email`, `Sms`,
+and `Push` to define both `render()` and `cost()`.
+Forget one and the class stays abstract, so you cannot instantiate it.
+
+A type union with `match` takes the opposite shape.
+The channels become plain data,
+and each operation is a free function that inspects the type:
+
+```python
+# notifications_match.py
+from dataclasses import dataclass
+from typing import assert_never
+
+@dataclass(frozen=True)
+class Email:
+    subject: str
+
+@dataclass(frozen=True)
+class Sms:
+    body: str
+
+@dataclass(frozen=True)
+class Push:
+    title: str
+
+type Notification = Email | Sms | Push
+
+def render(note: Notification, recipient: str) -> str:
+    match note:
+        case Email(subject):
+            return f"Email to {recipient}: {subject}"
+        case Sms(body):
+            return f"SMS to {recipient}: {body}"
+        case Push(title):
+            return f"Push to {recipient}: {title}"
+        case _:
+            assert_never(note)
+
+def cost(note: Notification) -> float:
+    match note:
+        case Email():
+            return 0.001
+        case Sms():
+            return 0.02
+        case Push():
+            return 0.0005
+        case _:
+            assert_never(note)
+
+email = Email("Invoice ready")
+sms = Sms("Code: 5821")
+push = Push("New message")
+
+print(render(email, "Dana"))
+#: Email to Dana: Invoice ready
+print(render(sms, "Dana"))
+#: SMS to Dana: Code: 5821
+print(render(push, "Dana"))
+#: Push to Dana: New message
+print(round(cost(email) + cost(sms) + cost(push), 4))
+#: 0.0215
+```
+
+`render()` and `cost()` each `match` over `Notification` and end with `assert_never()`,
+so the type checker confirms every case is handled.
+
+```python
+# test_notifications.py
+import notifications_match as nm
+import notifications_oo as no
+
+def test_oo_and_match_agree() -> None:
+    assert (no.Email("Hi").render("Dana")
+            == nm.render(nm.Email("Hi"), "Dana"))
+    assert no.Sms("Hi").cost() == nm.cost(nm.Sms("Hi"))
+```
+
+Try growing the system in each direction.
+First, add a new type: a `Webhook` channel.
+In the object version,
+you write one new subclass with its own `render()` and `cost()`,
+and nothing else changes.
+In the match version, you add a `Webhook` dataclass to the `Notification` union,
+and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `case Webhook(...)` to each.
+
+Now try adding a new operation.
+`priority()` ranks channels by urgency.
+In the object version, every existing subclass needs a new method, `Email`,
+`Sms`, and `Push` alike.
+In the match version, write one new function with its own `match`,
+and the existing classes and functions stay untouched.
+
+Adding a channel is cheaper with inheritance.
+Adding an operation is cheaper with pattern matching.
+This split is sometimes called the *expression problem*.
+[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes,
+and [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explore it further.
+Choose inheritance when new types arrive often and the operations stay stable.
+Choose a type union with `match` when the types are fixed and new operations arrive often.
+
 ## Exercises
 
 1.  Write `classify(value)` that uses `match` to return `"empty list"`,
@@ -402,3 +577,8 @@ especially when the cases need to look inside the value.
 3.  Rewrite `mapping_patterns.handle()` to also accept a nested shape,
     such as `{"type": "click", "at": {"x": x, "y": y}}`,
     binding `x` and `y` from the inner dictionary.
+4.  Add a `Webhook` channel to `notifications_match.py`:
+    a dataclass with a `url` field, added to the `Notification` union.
+    Run `ty` before adding its `case` to `render()` and `cost()`,
+    and read the errors.
+    Then add both cases and confirm `ty` passes.

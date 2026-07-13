@@ -6,8 +6,9 @@ Have we learned anything here that should be added to thinking-in-python-skill.m
 
 Run 'make prose' on each chapter
 
-- Is full polymorphism covered? (Not just inheritance-based)
-- 11 Pattern matching: ensure there is a comparison to polymorphism at the end
+Check that all exercises have solutions
+
+- Is full polymorphism covered? (Not just inheritance-based). for example, @overload
 
 - Check order of examples in 37_Pattern_Refactoring.md
 
