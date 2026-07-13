@@ -94,8 +94,7 @@ The comprehension inlines the test and the expression.
 
 List brackets (`[]`) enclose the list comprehension,
 so it is immediately evident that it produces a list.
-The `if` clause names `isinstance()` directly
-and the output expression squares directly,
+The `if` clause names `isinstance()` directly and the output expression squares directly,
 with no `lambda` wrappers in the way.
 
 ## Nested Comprehensions
@@ -133,8 +132,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 ```
 
 `zip()` stops at the end of the shorter sequence;
-pass `strict=True` to make a length mismatch raise `ValueError`
-instead of silently truncating.
+pass `strict=True` to make a length mismatch raise `ValueError` instead of silently truncating.
 
 Unpack a tuple in the iterator,
 here a `(name, function)` pair applied to a value:

@@ -8,7 +8,9 @@ class trace[**P, R]:
         update_wrapper(self, func)  # Copy __name__, __doc__, etc
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        arglist = ", ".join(repr(a) for a in args)
+        positional = [repr(a) for a in args]
+        named = [f"{k}={v!r}" for k, v in kwargs.items()]
+        arglist = ", ".join(positional + named)
         print(f"-> {self.func.__name__}({arglist})")  # type: ignore
         result = self.func(*args, **kwargs)
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
@@ -19,6 +21,6 @@ def add(a: int, b: int) -> int:
     return a + b
 
 if __name__ == "__main__":
-    add(2, 3)
-#: -> add(2, 3)
+    add(2, b=3)
+#: -> add(2, b=3)
 #: <- add = 5

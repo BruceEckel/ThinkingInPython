@@ -83,8 +83,7 @@ The return value decides what happens to that exception.
 A falsy value lets it propagate;
 this includes the implicit `None` of a method with no `return`,
 so propagation is the default.
-A truthy value *suppresses* it:
-the `with` statement swallows the exception,
+A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block:
 
 ```python
@@ -224,15 +223,15 @@ if __name__ == "__main__":
 `tracing` works both ways.
 `with tracing("block"):` brackets a group of statements.
 `@tracing("add")` decorates a function,
-so every call to `add()` enters the context, runs the original `add()`, and exits.
-Note the parentheses in `@tracing("add")`:
-the call constructs the manager, which then decorates the function.
+so every call to `add()` enters the context, runs the original `add()`,
+and exits.
+Note the parentheses in `@tracing("add")`: the call constructs the manager,
+which then decorates the function.
 A generator-based manager recreates its generator on each use,
 so the decorated function can be called any number of times,
 each with a fresh enter and exit.
 The machinery even applies `functools.wraps` for you,
-so `add` keeps its name and docstring
-(see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
+so `add` keeps its name and docstring (see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
 
 A hand-written class opts in by inheriting from `ContextDecorator`:
 
@@ -276,9 +275,8 @@ The decorator form only brackets.
 The manager never sees the function's arguments or return value,
 cannot call the function twice like `repeat`,
 and cannot decide to skip the call like `hijack`.
-What it offers is one definition, usable both ways:
-around a block with `with`, and on a function with `@`,
-when every call deserves the same bracketing.
+What it offers is one definition, usable both ways: around a block with `with`,
+and on a function with `@`, when every call deserves the same bracketing.
 
 ## Combining Context Managers
 
@@ -527,5 +525,4 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
     add a test (alongside the ones in `test_object_pool.py`) that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
-5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function
-    and predict the order of the four bracketing lines before running it.
+5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.

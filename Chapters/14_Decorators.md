@@ -85,7 +85,9 @@ from functools import wraps
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        arglist = ", ".join(repr(a) for a in args)
+        positional = [repr(a) for a in args]
+        named = [f"{k}={v!r}" for k, v in kwargs.items()]
+        arglist = ", ".join(positional + named)
         print(f"-> {func.__name__}({arglist})")  # type: ignore
         result = func(*args, **kwargs)
         print(f"<- {func.__name__} = {result!r}")  # type: ignore
@@ -97,8 +99,8 @@ def add(a: int, b: int) -> int:
     return a + b
 
 if __name__ == "__main__":
-    add(2, 3)
-#: -> add(2, 3)
+    add(2, b=3)
+#: -> add(2, b=3)
 #: <- add = 5
 ```
 
@@ -106,13 +108,13 @@ if __name__ == "__main__":
 its name, docstring, and other attributes.
 Without it, the decorated `add` would report its name as `wrapper` and lose its docstring,
 misleading debuggers, `help()`, and documentation tools.
-This is optional but there is rarely a reason to omit it.
+`wraps` is optional but there is rarely a reason to omit it.
 
 `wraps` keeps the runtime interface.
 The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)) keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
-`**P` is a *parameter specification* (a `ParamSpec`).
+`**P` is a *parameter specification* (`ParamSpec`).
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
 `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose result is `R`,"
@@ -193,7 +195,9 @@ class trace[**P, R]:
         update_wrapper(self, func)  # Copy __name__, __doc__, etc
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        arglist = ", ".join(repr(a) for a in args)
+        positional = [repr(a) for a in args]
+        named = [f"{k}={v!r}" for k, v in kwargs.items()]
+        arglist = ", ".join(positional + named)
         print(f"-> {self.func.__name__}({arglist})")  # type: ignore
         result = self.func(*args, **kwargs)
         print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
@@ -204,8 +208,8 @@ def add(a: int, b: int) -> int:
     return a + b
 
 if __name__ == "__main__":
-    add(2, 3)
-#: -> add(2, 3)
+    add(2, b=3)
+#: -> add(2, b=3)
 #: <- add = 5
 ```
 

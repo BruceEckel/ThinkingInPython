@@ -1,9 +1,9 @@
 # Metaprogramming
 
-Other objects create objects:
-special objects called "classes" that we set up to produce objects configured to our liking.
+Objects are created by other objects:
+special objects called *classes* that we set up to produce objects configured to our liking.
 
-Classes are just objects, and we can modify objects:
+Classes are themselves objects, and we can modify objects:
 
 ```python
 # modify_class.py
@@ -491,8 +491,9 @@ print(type(b).__name__)
 
 Type checkers such as ty, mypy, and pyright check `@final` statically.
 It states the intent and catches a violation before the code runs.
-It has no runtime effect.
-The interpreter still lets `class C(B): pass` run.
+At runtime it only marks the class,
+setting `__final__ = True` (as `test_final.py` below confirms);
+nothing enforces it: the interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter itself to refuse subclassing,
 `__init_subclass__()` can enforce it at each subclass creation.
@@ -900,15 +901,18 @@ so on the class it is only an annotation, not a bound attribute,
 and `getmembers_static()` does not return it.
 `display_object(Fraggle(9, 2.3))` inspects an instance,
 whose attributes hold its field values, so `x` now appears beside `y` and `z`.
-Both headers read `=== Fraggle ===`.
-For a class `display_object()` prints the class's own name,
+With `header=True`, both calls would print the same header, `=== Fraggle ===`:
+for a class `display_object()` reports the class's own name,
 and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.
-The third call passes `ALL_DUNDERS`,
-and the flood of extra members is `@dataclass`'s own doing:
-`__dataclass_fields__`, `__match_args__`, `__hash__` set to `None`,
-and the rest of the machinery it attaches so that `Fraggle` gets equality,
-a constructor, and a `repr()` for free.
+The third call passes `ALL_DUNDERS`.
+Part of the flood is `@dataclass`'s own doing: `__dataclass_fields__`,
+`__match_args__`, `__replace__`, `__hash__` set to `None`,
+and the generated `__init__`, `__eq__`,
+and `__repr__` that give `Fraggle` a constructor, equality,
+and a `repr()` for free.
+The rest, from `__class__` to `__static_attributes__`,
+is the bookkeeping every class carries.
 
 ## Exercises
 
