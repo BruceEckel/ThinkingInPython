@@ -8,10 +8,10 @@ on its own line. Editing then touches only the sentences that change, and diffs
 read sentence by sentence.
 
 A sentence longer than `--width` is broken further, at top-level clause
-punctuation (",", ";", ":"), so no line is wide enough to wrap in an editor. A
-greedy fill inserts the fewest breaks needed: short sentences are left on one
-line. Breaks are never made inside parentheses, brackets, inline code, or
-footnotes.
+punctuation (",", ";", ":") and before a top-level opening "(", so no line
+is wide enough to wrap in an editor. A greedy fill inserts the fewest
+breaks needed: short sentences are left on one line. Breaks are never made
+inside parentheses, brackets, inline code, or footnotes.
 
 Only plain prose paragraphs are touched. Everything else is preserved verbatim:
 fenced code, indented code, tables, headings, list items, blockquotes, HTML
@@ -162,10 +162,16 @@ def split_sentences(paragraph: str) -> list[str]:
 
 
 def _clause_segments(masked: str) -> list[str]:
-    """Split a masked sentence at top-level ",", ";", ":" followed by a space.
+    """Split a masked sentence at top-level ",", ";", ":" followed by a space,
+    and before a top-level opening "(".
 
     Each segment keeps its trailing punctuation. Punctuation inside parentheses,
-    brackets, or masked spans is ignored, so the segments are clause-sized.
+    brackets, or masked spans is ignored, so the segments are clause-sized. A
+    top-level "(" instead breaks *before* itself, so a parenthetical long enough
+    to need its own line starts there, e.g. `the field\n(introduced earlier)`.
+    Only a "(" preceded by whitespace counts: one glued directly onto the
+    previous token, as in `O(n)` or a Markdown link's `[text](url)`, is part
+    of that token and must never be pulled onto its own line.
     """
     depth = 0
     segs: list[str] = []
@@ -174,6 +180,9 @@ def _clause_segments(masked: str) -> list[str]:
     n = len(masked)
     while i < n:
         c = masked[i]
+        if c == "(" and depth == 0 and i > start and masked[i - 1] == " ":
+            segs.append(masked[start:i].rstrip())
+            start = i
         if c in "([{":
             depth += 1
         elif c in ")]}":
