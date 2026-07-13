@@ -172,6 +172,106 @@ It relies on the generator and decorator machinery from [Decorators](14_Decorato
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
+## A Context Manager as a Decorator
+
+A context manager brackets a block of statements: setup before, cleanup after.
+A typical decorator from [Decorators](14_Decorators.md) brackets a function call the same way.
+`contextlib.ContextDecorator` connects the two:
+a context manager that inherits from it can be applied with `@`,
+and every manager `@contextmanager` produces already inherits from it:
+
+```python
+# context_decorator.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def tracing(label: str) -> Iterator[None]:
+    print(f"-> {label}")
+    try:
+        yield
+    finally:
+        print(f"<- {label}")
+
+@tracing("add")
+def add(a: int, b: int) -> int:
+    return a + b
+
+if __name__ == "__main__":
+    with tracing("block"):
+        print("inside")
+    print(add(2, 3))
+    print(add(10, 20))
+#: -> block
+#: inside
+#: <- block
+#: -> add
+#: <- add
+#: 5
+#: -> add
+#: <- add
+#: 30
+```
+
+`tracing` works both ways.
+`with tracing("block"):` brackets a group of statements.
+`@tracing("add")` decorates a function,
+so every call to `add()` enters the context, runs `add()`, and exits.
+Note the parentheses in `@tracing("add")`:
+the manager is constructed first, and the manager decorates.
+A generator-based manager recreates its generator on each use,
+so the decorated function can be called any number of times,
+each with a fresh enter and exit.
+The machinery even applies `functools.wraps` for you,
+so `add` keeps its name and docstring
+(see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
+
+A hand-written class opts in by inheriting from `ContextDecorator`:
+
+```python
+# banner_cm.py
+from contextlib import ContextDecorator
+
+class banner(ContextDecorator):
+    def __init__(self, title: str) -> None:
+        self.title = title
+
+    def __enter__(self) -> None:
+        print(f"=== {self.title} ===")
+
+    def __exit__(self, *exc: object) -> bool:
+        print(f"=== {self.title} ends ===")
+        return False
+
+@banner("report")
+def report() -> None:
+    print("quarterly numbers")
+
+if __name__ == "__main__":
+    report()
+    with banner("meeting"):
+        print("agenda")
+#: === report ===
+#: quarterly numbers
+#: === report ends ===
+#: === meeting ===
+#: agenda
+#: === meeting ends ===
+```
+
+Like `suppress`, `banner` is a class named like a function because you use it like one.
+Unlike the generator form,
+the class form re-enters the same instance on every call to `report()`,
+so any state the instance holds is shared across calls.
+
+The decorator form only brackets.
+The manager never sees the function's arguments or return value,
+cannot call the function twice like `repeat`,
+and cannot decide to skip the call like `hijack`.
+What it offers is one definition, usable both ways:
+around a block with `with`, and on a function with `@`,
+when every call deserves the same bracketing.
+
 ## Combining Context Managers
 
 A single `with` can include several managers, separated by commas.
@@ -237,6 +337,8 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
 - `ExitStack` manages a dynamic or conditional set of managers, as shown above.
+- `ContextDecorator` lets a context manager double as a decorator,
+  as shown above.
 - `nullcontext(value)` is a do-nothing manager that yields `value`,
   useful when a `with` is optional and you want one code path.
 
@@ -410,3 +512,5 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
     add a test (alongside the ones in `test_object_pool.py`) that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
+5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function
+    and predict the order of the four bracketing lines before running it.

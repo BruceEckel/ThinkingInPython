@@ -312,6 +312,10 @@ Its `__call__()` registers the decorated function in a class-level table with th
 A driver later walks the table to run things in order.
 The decorator becomes the registration mechanism for the whole system.
 
+A context manager can also act as a decorator,
+bracketing every call with its setup and cleanup code.
+[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator) shows `contextlib.ContextDecorator`.
+
 ## Stacking Decorators
 
 You can apply more than one decorator.
