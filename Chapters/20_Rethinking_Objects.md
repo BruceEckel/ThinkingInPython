@@ -38,7 +38,7 @@ That style makes no substitutability promises.
 Objects were optional, and it brought object-oriented programming,
 and exceptions, into the mainstream.
 *Java* drew from Smalltalk.
-Everything is an object, even when all you need is a function.
+Everything lives inside a class, even when all you need is a function.
 Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
 which pulls in the other direction.
@@ -162,6 +162,10 @@ if __name__ == "__main__":
 Now the internals are safe, but look at what we are doing.
 We add private fields, getters, and defensive copies,
 all to stop other code from changing our data.
+And these copies plug only the outbound leak.
+The constructor stored the caller's own list,
+so the caller's original reference still mutates the internals.
+A fully defensive class must copy on the way in as well.
 
 Testing confirms the defensive copy holds.
 Mutating the returned list leaves the original untouched:
@@ -697,7 +701,7 @@ None of this means objects are a mistake.
 They improved real things.
 A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
-representation, and hashing.
+representation, and, when frozen, hashing.
 
 OOP also normalized the crucial idea of types,
 as seen in [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
