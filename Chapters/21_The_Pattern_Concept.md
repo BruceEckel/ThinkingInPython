@@ -1,7 +1,7 @@
 # The Pattern Concept
 
 An important step forward in object-oriented design was the "design patterns" movement,
-chronicled in the 1994 book *Design Patterns* by Erich Gamma, Richard Helm,
+carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma, Richard Helm,
 Ralph Johnson, and John Vlissides.
 They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
 I will refer to that book as *GoF Design Patterns*,
@@ -48,7 +48,7 @@ you have the focal point around which to structure your design.
 The goal of design patterns is to isolate changes in your code.
 If you look at it this way,
 you've already seen some design patterns in this book.
-For example, inheritance can be thought of as a design pattern (albeit one implemented by the compiler).
+For example, inheritance can be thought of as a design pattern (albeit one built into the language).
 It allows you to express differences in behavior (that's the thing that changes) in objects that all have the same interface (that's what stays the same).
 Composition also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
@@ -135,12 +135,13 @@ Some of these only apply to OOP.
     the slower the programmer can produce.
     This does not appear to be a linear factor, but an exponential one.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
-    An object should only reference itself, its attributes,
-    and the arguments of its methods.
+    A method should talk only to itself, its own attributes,
+    its parameters, and objects it creates,
+    not to the internals of objects it reached through something else.
     This may also be a way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
-    This complements Separation, Encapsulation and Variation,
+    This complements separating what varies from what stays the same,
     and is part of the Low-Coupling-High-Cohesion message.
 -   *Managed Coupling*.
     Simply declaring that we should have "low coupling" in a design is usually too vague.
