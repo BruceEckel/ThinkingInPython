@@ -11,7 +11,8 @@ and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
 You must still chase down all the points of your code where type matters.
-It happens to be the creation of the type that matters here rather than the use of the type (which polymorphism takes care of).
+It happens to be the creation of the type that matters here rather than the use of the type
+(which polymorphism takes care of).
 The effect is the same.
 Adding a new type can cause problems.
 
@@ -83,7 +84,8 @@ if __name__ == "__main__":
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create.
 It happens to be a string here but it could be any set of data.
-The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape` (the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
+The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
+(the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
 A generator is a special case of a factory,
@@ -258,9 +260,11 @@ def test_unknown_name_raises() -> None:
 
 The static `factory()` method in the previous example forces all the creation operations into one spot,
 so that's the only place you need to change the code.
-However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that you can subclass different types of factories from the basic factory (the above design is a special case).
+However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that you can subclass different types of factories from the basic factory
+(the above design is a special case).
 *GoF Design Patterns* provides no example of this,
-instead repeating the example used for the *Abstract Factory* (you'll see this in the next section).
+instead repeating the example used for the *Abstract Factory*
+(you'll see this in the next section).
 Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
 Notice also that the code loads the specific `Shape` classes dynamically,
 on demand:
@@ -337,10 +341,12 @@ a class method that reaches the registry through `cls` and finds the appropriate
 The factory is immediately used to create the shape object,
 but you could imagine a more complex problem where the caller receives the appropriate factory object and then uses it to create an object in a more sophisticated way.
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
-and a single static method in the base class (as shown in `shape_factory1.py`) will work fine.
+and a single static method in the base class
+(as shown in `shape_factory1.py`) will work fine.
 
 `ShapeFactory` fills its dictionary lazily.
-The first request for a kind builds that kind's factory object (via `eval()`) and caches it for later requests.
+The first request for a kind builds that kind's factory object
+(via `eval()`) and caches it for later requests.
 
 This version leans on `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
@@ -358,7 +364,8 @@ with not one but several factory methods.
 Each factory method creates a different kind of object.
 At the point of creation of the factory object,
 you decide how the program will use every object that factory creates.
-The example given in *GoF Design Patterns* implements portability across various graphical user interfaces (GUIs).
+The example given in *GoF Design Patterns* implements portability across various graphical user interfaces
+(GUIs).
 You create a factory object appropriate to the GUI that you're working with,
 and from then on when you ask it for a menu, button, slider,
 etc. it will automatically create the appropriate version of that item for the GUI.
@@ -441,15 +448,15 @@ In this environment, `Character` objects interact with `Obstacle` objects,
 but there are different types of Characters and obstacles depending on what kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
-In this example, the setup and play is simple,
-but those activities (the *initial conditions* and the *state change*) can determine much of the game's outcome.
+In this example, the setup and play is simple, but those activities
+(the *initial conditions* and the *state change*) can determine much of the game's outcome.
 Here, `GameEnvironment` does not anticipate inheritance,
 although it might make sense to do that.
 
 This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md).
 
-The base classes `Obstacle`, `Character`,
-and `GameElementFactory` (translated from the Java version) force every concrete class to inherit from them.
+The base classes `Obstacle`, `Character`, and `GameElementFactory`
+(translated from the Java version) force every concrete class to inherit from them.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -763,7 +770,8 @@ keyword arguments and a data class already are the builder.
 1.  Add a class `Triangle` to `shape_factory1.py`.
 2.  Add a class `Triangle` to `shape_factory2.py`.
 3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to `games.py`.
-4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
+4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes
+    (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
     In `pizza_direct.py`, enforce it with `__post_init__()`.
     In `pizza_builder.py`,

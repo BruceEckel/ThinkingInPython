@@ -277,7 +277,8 @@ path.unlink()  # Delete the file
 ```
 
 This is the explicit-finalizer approach from [Cleanup](10_Cleanup.md).
-Anything that acquires a resource (a file, a lock, a network connection) can be a context manager.
+Anything that acquires a resource
+(a file, a lock, a network connection) can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.
 When simply reading or writing a file,
 `pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file for you.
@@ -320,5 +321,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
     Predict whether the output changes before running it,
     and explain why the order of two independent conditions,
     testing different values of `n`, does not matter here.
-4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)` (no error, and `b` is not zero) and a call `demo_exceptions(1, "x")` (a `TypeError` that `except ValueError` does not catch).
+4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)`
+    (no error, and `b` is not zero) and a call `demo_exceptions(1, "x")`
+    (a `TypeError` that `except ValueError` does not catch).
     Run the second one and read the traceback that escapes.

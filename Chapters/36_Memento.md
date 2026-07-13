@@ -114,7 +114,8 @@ Whoever holds `checkpoint` stores it and gives it back.
 It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means the honest mistakes (mutating the snapshot) fail loudly.
+though freezing the memento means the honest mistakes
+(mutating the snapshot) fail loudly.
 
 A plain `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
 But an alias is *structural*, not *nominal*.
@@ -226,7 +227,8 @@ def test_equal_states_compare_equal() -> None:
 With states as plain immutable values,
 the caretaker no longer needs to know anything about them.
 Undo and redo are two stacks of past and future states,
-generic over the state type (the `class History[S]` syntax is from [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+generic over the state type
+(the `class History[S]` syntax is from [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 
 ![Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future](_images/memento_history)
 

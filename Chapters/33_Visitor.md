@@ -237,7 +237,8 @@ def test_operations_dispatch_independently() -> None:
     a `Dwarf` uses `Jargon` or `Play`,
     an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
     and a `Troll` uses `Edict` and `Schedule`.
-    You must decide which weapons "win" and "lose" in each interaction (as in `paper_scissors_rock.py`).
+    You must decide which weapons "win" and "lose" in each interaction
+    (as in `paper_scissors_rock.py`).
     Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
     `Elf` and `Troll` and battles the groups against each other until only members of one group remain.

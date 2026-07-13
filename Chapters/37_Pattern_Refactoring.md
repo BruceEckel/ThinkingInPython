@@ -26,7 +26,8 @@ and you must recover the type of each piece to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
-and a `create()` method builds an instance from a material name (this is a [Factory](27_Factory.md)):
+and a `create()` method builds an instance from a material name
+(this is a [Factory](27_Factory.md)):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 
@@ -89,7 +90,8 @@ It treats each subclass's assignment as filling in that same classvar rather tha
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` can build it.
 `sum_value()` is an ordinary function.
-It relies on polymorphism (`t.value`, `t.weight`) and never asks what type each piece is.
+It relies on polymorphism
+(`t.value`, `t.weight`) and never asks what type each piece is.
 
 We test that each subclass registers itself, `create()` builds one by name,
 the per-pound values are right, and `sum_value()` totals weight times value:
@@ -311,7 +313,8 @@ Nothing needs maintaining, and nothing gets forgotten.
 
 We have changed *types* cheaply so far.
 The other axis of change is adding new *operations*.
-Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
+Suppose the `Trash` hierarchy is fixed
+(maybe it ships from a vendor) and you want to add new behaviors to it without editing it:
 price it, weigh it, print recycling instructions, and more later.
 
 [Visitor](33_Visitor.md) solves this problem.
@@ -383,7 +386,8 @@ For operations that belong on the objects and vary by type,
 
 Design patterns are about *separating things that change from things that stay the same*.
 Polymorphism is one way to do that, but it is not the only one.
-The deeper skill is spotting the *vector of change* in a problem (here, new types versus new operations) and choosing the lightest construct that isolates it.
+The deeper skill is spotting the *vector of change* in a problem
+(here, new types versus new operations) and choosing the lightest construct that isolates it.
 In Python that construct is often a language feature, not a multi-class pattern.
 The honest measure of a pattern is whether it is still useful once the language does part of the work for you.
 
@@ -391,7 +395,8 @@ The honest measure of a pattern is whether it is still useful once the language 
 
 1.  Add a `Plastic` material with a per-pound value.
     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
-    and that only `trash.dat` and (optionally) a one-line `recycling_note()` registration do.
+    and that only `trash.dat` and
+    (optionally) a one-line `recycling_note()` registration do.
 2.  Write a `price()` operation as a plain function over a list of `Trash`,
     and a `heaviest()` operation that returns the single heaviest piece.
     Decide for each whether it needs `singledispatch`.

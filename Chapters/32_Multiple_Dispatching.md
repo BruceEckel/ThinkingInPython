@@ -15,7 +15,8 @@ Python can invoke the dynamic binding mechanism on only one of those types.
 You end up detecting some types manually and effectively producing your own dynamic binding behavior.
 
 The solution is *Multiple Dispatching*.
-Polymorphism broadly means that a function accepts arguments of more than one type (see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
+Polymorphism broadly means that a function accepts arguments of more than one type
+(see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
 It takes several forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
@@ -200,8 +201,8 @@ A tuple serves as a key just as easily as a single object.
 ## One Type or Many
 
 Python dispatches on a single type at a time.
-For dispatch on one argument's type,
-`functools.singledispatch` (see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
+For dispatch on one argument's type, `functools.singledispatch`
+(see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
 per-type functions.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
@@ -281,8 +282,8 @@ not when a test imports it.
     which means adding an `eval_lizard()` method to every existing class,
     plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
     Compare how much code this took versus adding `Lizard` to the table version.
-3.  In `test_paper_scissors.py`,
-    add `Lizard` to `EXPECTED` with its nine (now sixteen) matchups,
+3.  In `test_paper_scissors.py`, add `Lizard` to `EXPECTED` with its nine
+    (now sixteen) matchups,
     and confirm both versions still agree with each other and with `EXPECTED`.
 4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
     while still yielding plain `(item1, item2)` pairs so existing calls need no change.

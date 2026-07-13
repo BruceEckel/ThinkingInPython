@@ -91,7 +91,8 @@ The observers here are lambdas, but any function or bound method works.
 No `Observer` base class needs inheriting,
 and no notification protocol needs implementing.
 Assigning to `celsius` notifies everyone.
-For event-heavy programs there are mature libraries (signal/slot systems, `asyncio` events),
+For event-heavy programs there are mature libraries
+(signal/slot systems, `asyncio` events),
 but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
 
 An observer returns `None`.
@@ -165,7 +166,8 @@ so the change finishes only after every notification succeeds.
 One limitation: a `@property` setter cannot be a coroutine,
 so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
-[Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here
+(`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python
@@ -239,7 +241,8 @@ routed by event type.
 ## A Visual Example of Observers
 
 This is the model-view split from the chapter's opening,
-made visible with `tkinter` (in the standard library, so there is nothing to install),
+made visible with `tkinter`
+(in the standard library, so there is nothing to install),
 and split across two files to make the point.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
@@ -333,7 +336,8 @@ It is the only code that touches the screen.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 Run `box_view.py` to play.
-It opens a window, so the example harness does not run it (`tools/norun.txt` lists it).
+It opens a window, so the example harness does not run it
+(`tools/norun.txt` lists it).
 
 ```python
 # box_view.py

@@ -388,19 +388,21 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
 but its fields are self-documenting.
-For records with defaults, methods, or type annotations,
-prefer a data class (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
+For records with defaults, methods, or type annotations, prefer a data class
+(see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 
 The standard library has more specialized containers.
-For compact homogeneous storage (`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
+For compact homogeneous storage
+(`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
 see [Performance](18_Performance.md).
 
 ## Immutability
 
 Each mutable container has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
-Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/)) completes the set:
-a built-in, hashable mapping that rejects modification after creation.
+Since Python 3.15, `frozendict`
+([PEP 814](https://peps.python.org/pep-0814/)) completes the set: a built-in,
+hashable mapping that rejects modification after creation.
 The example below uses tuples and frozensets,
 plus `MappingProxyType` from the `types` module,
 which is not a container of its own but a read-only *view* onto a `dict` you still hold:
@@ -487,7 +489,7 @@ so changes to that underlying `dict` still show through.
     and print the result.
 3.  In `set_methods.py`,
     add a third set `c = {1, 5, 9}` and print `a.union(b, c)` and `a.intersection(b, c)`.
-4.  In `immutability.py`,
-    add a line that tries `groups.add([1, 2])` (a plain list, not a `frozenset`) and catch the exception it raises.
+4.  In `immutability.py`, add a line that tries `groups.add([1, 2])`
+    (a plain list, not a `frozenset`) and catch the exception it raises.
     Explain, in terms of hashability,
     why a `frozenset` works as a set member but a `list` does not.

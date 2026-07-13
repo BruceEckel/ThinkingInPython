@@ -57,7 +57,8 @@ p.h()
 
 It isn't necessary that `Implementation` have the same interface as `Proxy`.
 As long as `Proxy` is somehow "speaking for" the class it forwards method calls to,
-it satisfies the basic idea (this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
+it satisfies the basic idea
+(this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
 However, it is convenient to have a common interface that forces `Implementation` to fulfill all the methods that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
@@ -304,9 +305,9 @@ print("calls:", p.calls)
 ```
 
 Because `__getattr__()` intercepts only the lookups not found directly on the proxy,
-one generic proxy can add lazy initialization (a *virtual proxy*),
-access checks (a *protection proxy*),
-or call tracking (a *smart reference*) to any object, with no per-method code.
+one generic proxy can add lazy initialization (a *virtual proxy*), access checks
+(a *protection proxy*), or call tracking (a *smart reference*) to any object,
+with no per-method code.
 
 *GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
 But both are really a *Surrogate*:

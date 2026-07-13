@@ -29,7 +29,8 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of the file starts with an `if` clause that checks whether the standard variable `__name__` is equal to the string `"__main__"`.
-In Python, any identifier that begins and ends with double underscores (commonly called a "dunder") is special in some way.
+In Python, any identifier that begins and ends with double underscores
+(commonly called a "dunder") is special in some way.
 Dunder methods, for example,
 hook your class into the language's operators and built-in functions.
 
@@ -223,7 +224,8 @@ What if your module or package isn't placed in the same directory as the Python 
 The original solution to this was to set an environment variable called `PYTHONPATH`,
 which tells Python where to look for modules and packages.
 `PYTHONPATH` can take multiple paths,
-and Python will keep searching through those paths until it finds your module or package (or doesn't, and reports an error).
+and Python will keep searching through those paths until it finds your module or package
+(or doesn't, and reports an error).
 
 `PYTHONPATH` still works,
 but the modern practice is to install your package into the environment you are working in,

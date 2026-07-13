@@ -130,7 +130,8 @@ display_object(m)
 ## Exercises
 
 1.  In `messenger_idiom.py`,
-    create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
+    create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
+    (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
 2.  In `messenger_modern.py`, add a third field, `z: float`,
     to the `Point` dataclass,
     and update the `print(Point(1.0, 2.0))` call to pass three arguments.

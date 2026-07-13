@@ -10,7 +10,8 @@ Python 3.5 (2015) introduced *type hints*,
 which look like static type checking in other languages.
 The Python runtime ignores type hints, as long as they are properly formed.
 If you want static type checking like you get from a compiler in a typed language,
-you must run a separate type-checking tool (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
+you must run a separate type-checking tool
+(this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
 
 ## Gradual Typing
 
@@ -361,8 +362,8 @@ The book uses only a handful of these, but the rest turn up in other code.
 Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
-Annotations go in three places: a parameter (`x: int`),
-a return value (`-> str`), and a variable or attribute (`total: int = 0`).
+Annotations go in three places: a parameter (`x: int`), a return value
+(`-> str`), and a variable or attribute (`total: int = 0`).
 Most of the names below come from the `typing` module.
 The abstract container types come from `collections.abc`.
 

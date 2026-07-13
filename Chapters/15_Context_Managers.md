@@ -44,7 +44,8 @@ if __name__ == "__main__":
 ```
 
 `__enter__()` returns the object that `as` binds, often `self`.
-The return annotation `Self` (introduced in [Static Typing](08_Static_Typing.md#the-self-type)) declares an instance of the enclosing class.
+The return annotation `Self`
+(introduced in [Static Typing](08_Static_Typing.md#the-self-type)) declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block guarantees that the exit code runs at the end of the scope.
 
@@ -231,7 +232,8 @@ A generator-based manager recreates its generator on each use,
 so the decorated function can be called any number of times,
 each with a fresh enter and exit.
 The machinery even applies `functools.wraps` for you,
-so `add` keeps its name and docstring (see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
+so `add` keeps its name and docstring
+(see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
 
 A hand-written class opts in by inheriting from `ContextDecorator`:
 
@@ -521,8 +523,8 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 3.  Add a third manager to the `with` statement in `multiple.py`,
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.
-4.  In `object_pool.py`,
-    add a test (alongside the ones in `test_object_pool.py`) that leases both connections at once,
+4.  In `object_pool.py`, add a test
+    (alongside the ones in `test_object_pool.py`) that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.

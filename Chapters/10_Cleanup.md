@@ -174,7 +174,8 @@ so it never depends on the unreliable bookkeeping at interpreter shutdown.
 
 1.  In `weak_value.py`, change `counters` from a `list` to a plain `dict` keyed by name,
     then pop entries from that `dict` one at a time and confirm `live_count()` still falls correctly.
-2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []` (rebinding the name) and confirm `live_count()` still reaches `0`.
+2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
+    (rebinding the name) and confirm `live_count()` still reaches `0`.
     Explain, in terms of what `counters` refers to,
     why rebinding has the same effect as clearing.
 3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,

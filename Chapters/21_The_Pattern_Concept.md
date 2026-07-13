@@ -39,7 +39,8 @@ you prevent those changes from propagating other changes throughout your code.
 Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
-Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change" (here, "vector" means a direction of change, not a container class).
+Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
+(here, "vector" means a direction of change, not a container class).
 This means finding the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,
@@ -48,8 +49,11 @@ you have the focal point around which to structure your design.
 The goal of design patterns is to isolate changes in your code.
 If you look at it this way,
 you've already seen some design patterns in this book.
-For example, inheritance can be thought of as a design pattern (albeit one built into the language).
-It allows you to express differences in behavior (that's the thing that changes) in objects that all have the same interface (that's what stays the same).
+For example, inheritance can be thought of as a design pattern
+(albeit one built into the language).
+It allows you to express differences in behavior
+(that's the thing that changes) in objects that all have the same interface
+(that's what stays the same).
 Composition also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
@@ -64,7 +68,8 @@ Your generic code works with any object that produces an iterator.
 ## Pattern Evolution
 
 1.  **Idiom**: how we write code in a particular language to do this particular type of thing.
-    This could be something as common as the way that you code the process of stepping through an array in C (and not running off the end).
+    This could be something as common as the way that you code the process of stepping through an array in C
+    (and not running off the end).
 2.  **Specific Design**:
     the solution that we came up with to solve this particular problem.
     This might be a clever design, but it makes no attempt to be general.
@@ -83,7 +88,8 @@ They tend to be subtle and appear over time.
 ## Pattern Taxonomy
 
 *GoF Design Patterns* discusses 23 different patterns,
-classified under three purposes (all of which revolve around the particular aspect that can vary).
+classified under three purposes
+(all of which revolve around the particular aspect that can vary).
 The three purposes are:
 
 1.  **Creational**: how to create an object.
@@ -109,7 +115,8 @@ and the name brings you right to that group of patterns.
 But I find *Structural* and *Behavioral* to be far less useful distinctions.
 I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
-so that classification doesn't lead me to a solution (I'll readily admit that I may be missing something here).
+so that classification doesn't lead me to a solution
+(I'll readily admit that I may be missing something here).
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
 and that is how this book groups them.

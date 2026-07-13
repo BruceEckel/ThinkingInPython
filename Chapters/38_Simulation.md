@@ -4,7 +4,8 @@ A simulation models a set of objects that act on their own and interact through 
 The first example, a pack of rats mapping a maze, is worked from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
-[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces the `asyncio` mechanics
+(`async def`, `await`, `gather`, `run`).
 
 ## Rats & Mazes
 
@@ -1087,8 +1088,8 @@ if __name__ == "__main__":
 `itertools.cycle()` constructs an infinite iterator from any finite iterable.
 It yields elements from the source item in sequence and cycles back to the beginning when it reaches the end.
 `itertools.count()` creates an infinite iterator yielding evenly spaced numerical values.
-The first argument is the starting point,
-the second is the step size (defaults to one).
+The first argument is the starting point, the second is the step size
+(defaults to one).
 
 The chapter began by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.

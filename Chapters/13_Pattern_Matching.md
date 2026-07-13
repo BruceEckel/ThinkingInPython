@@ -35,8 +35,8 @@ print(describe(301))
 #: Status 301
 ```
 
-For a plain value-to-value lookup like this,
-a dictionary is often shorter (see [the end of this chapter](#when-not-to-match)).
+For a plain value-to-value lookup like this, a dictionary is often shorter
+(see [the end of this chapter](#when-not-to-match)).
 `match` becomes valuable once the patterns do more than test equality.
 
 ## Alternatives and Capture

@@ -252,8 +252,8 @@ if __name__ == "__main__":
 
 This prints the same `[10, 20, 30, 40, 50]`,
 but everything `pool.map` did is now explicit: starting each worker,
-waiting for it to finish,
-and reassembling results that can arrive in any order (`sorted()` restores the input order, since each result is tagged with its `order`).
+waiting for it to finish, and reassembling results that can arrive in any order
+(`sorted()` restores the input order, since each result is tagged with its `order`).
 Draining after `join()` is safe here because five small tuples fit in the queue's internal buffer.
 A queue carrying bulky data must be drained *before* joining:
 each worker's feeder thread blocks until its data is consumed,
@@ -501,7 +501,8 @@ on every build of Python.
 ### Free Threading
 
 Since 3.13, CPython also ships as a *free-threaded* build,
-tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately (`python3.15t` rather than `python3.15`).
+tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
+(`python3.15t` rather than `python3.15`).
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
 Running the identical `sequential()`/`threaded()` pair above under a free-threaded interpreter turns the ratio around:
 
@@ -552,8 +553,8 @@ and it runs on the standard build you already have.
 Each worker in a process pool gets its own interpreter, and so its own GIL.
 That is the source of the parallelism.
 The cost is a whole operating-system process per worker.
-Since 3.12, CPython can create additional interpreters inside the same process ([PEP 684](https://peps.python.org/pep-0684/)),
-each with its own GIL.
+Since 3.12, CPython can create additional interpreters inside the same process
+([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL.
 `InterpreterPoolExecutor` (added in 3.14) runs each call in one of these,
 so multiple interpreters, each locked on its own, run truly at once,
 without leaving the process:
@@ -667,7 +668,8 @@ The [Object Pool](15_Context_Managers.md#an-object-pool) in Context Managers use
     that awaits `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
-3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()` (acquire before reading `counter`, release after writing it back) and confirm `counter` now reaches `400`.
+3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
+    (acquire before reading `counter`, release after writing it back) and confirm `counter` now reaches `400`.
 4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call entirely and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,

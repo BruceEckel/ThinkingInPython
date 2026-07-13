@@ -5,12 +5,13 @@ a surrogate object that forwards calls to a swappable implementation.
 While *State* allows the client programmer to change the implementation,
 *StateMachine* imposes a structure to automatically change the implementation from one object to the next.
 The current implementation represents the state that a system is in,
-and the system behaves differently from one state to the next (because it uses *State*).
+and the system behaves differently from one state to the next
+(because it uses *State*).
 
 The code that moves the system from one state to the next is often a *Template Method*,
 as seen in the following framework for a basic state machine.
-Each state can be `run()` to perform its behavior,
-and (in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
+Each state can be `run()` to perform its behavior, and
+(in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
 The key distinction between this design and the next is that here,
 each `State` object decides what other states it can move to,
 based on the "input,"
@@ -87,7 +88,8 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each possible move by a mouse is a member of the `MouseAction` enumeration ([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
+Each possible move by a mouse is a member of the `MouseAction` enumeration
+([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
 Because it is a `StrEnum`, each member is its string value.
 Members also compare equal to their equivalent string.
 The members still hash and look up correctly, so they work as dictionary keys,
@@ -242,7 +244,8 @@ In Python that is no obstacle.
 Define the classes first, then fill in the tables at module level,
 after all the state objects exist.
 
-The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state (so the same `StateMachine` class from the previous example still serves).
+The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
+(so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
@@ -643,7 +646,8 @@ The text demo in `vending_machine.py` reads `message` and prints it.
 Using `tkinter` we can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
-and the GUI catches a click that the state machine rejects (a selection before any money, say) and shows it rather than crashing.
+and the GUI catches a click that the state machine rejects
+(a selection before any money, say) and shows it rather than crashing.
 Because it requires user interaction the harness skips it (`tools/norun.txt`):
 
 ```python
@@ -732,10 +736,13 @@ if __name__ == "__main__":
     override a `next_state()` method that holds its own transition table.
     The input to `next_state()` is a single word read from a text file containing one word per line.
 5.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
-6.  Modify the "mood" exercise (exercise 2) so that it becomes a state machine using `state_machine.py`.
+6.  Modify the "mood" exercise
+    (exercise 2) so that it becomes a state machine using `state_machine.py`.
 7.  Create an elevator state machine system using `state_machine.py`.
 8.  Create a heating/air-conditioning system using `state_machine.py`.
 9.  A *generator* produces objects, like a factory but taking no arguments.
-    Write a `mouse_move_generator()` (using `yield`) that produces correct `MouseAction` moves in sequence,
-    where each possible move depends on the previous one (it is another state machine).
+    Write a `mouse_move_generator()`
+    (using `yield`) that produces correct `MouseAction` moves in sequence,
+    where each possible move depends on the previous one
+    (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

@@ -17,7 +17,8 @@ supplied by the context.
 Second, route construction through a factory that returns the already-existing instance for a given value.
 
 Handing out one object under many names is only safe when nobody can change it,
-so a flyweight must be immutable (see [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
+so a flyweight must be immutable
+(see [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
 
 ## Python Uses Flyweights
 
@@ -147,7 +148,8 @@ the one place raw text meets the checked type.
 It checks membership in `SPECS` at runtime,
 then calls `cast()` to tell the checker what that check just proved.
 `cast()` changes nothing at runtime.
-It exists only for the checker and the reader (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)),
+It exists only for the checker and the reader
+(see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)),
 so use it only where, as here,
 you have already verified what the checker cannot:
 that `char` is one of the three symbols.
@@ -219,7 +221,8 @@ if __name__ == "__main__":
 ```
 
 The construction syntax is unchanged,
-and callers cannot tell they received a shared object (this is how CPython's small-integer cache does it).
+and callers cannot tell they received a shared object
+(this is how CPython's small-integer cache does it).
 The cost is bookkeeping by hand.
 Python calls `__init__()` on whatever `__new__()` returns,
 so an `__init__()` here would re-run on the cached instance at every construction.
@@ -379,7 +382,8 @@ and equality checks that collapse to identity.
 
 ## Exercises
 
-1.  Add door (`+`, walkable) and tree (`T`, not walkable) kinds to `tile_map.py`.
+1.  Add door (`+`, walkable) and tree
+    (`T`, not walkable) kinds to `tile_map.py`.
     Extend `Symbol` and `SPECS` to match,
     then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
     Confirm the tile pool size still equals the number of kinds,
@@ -388,7 +392,8 @@ and equality checks that collapse to identity.
     How does the ratio change as the map grows?
 3.  Remove `frozen=True` from `Tile` and set `field[0][0].walkable = False` on a parsed map.
     Write a test that exposes the resulting bug, then restore `frozen=True`.
-4.  Model chess: a frozen `Piece` (color, kind) and a board that is a `dict` mapping squares to pieces.
+4.  Model chess: a frozen `Piece`
+    (color, kind) and a board that is a `dict` mapping squares to pieces.
     A full opening position holds thirty-two piece references.
     How many `Piece` objects exist?
     How do you capture and promote?

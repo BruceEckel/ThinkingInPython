@@ -108,7 +108,8 @@ if __name__ == "__main__":
 
 A read-only `@property` keeps users from assigning to `number`,
 but the class object still mutates `_number` and must guard it with a precondition and a postcondition.
-Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
+Checking arguments on the way in and results on the way out is the practice known as *Design by Contract*
+(DbC).
 The problem with DbC is that the contract is spread across every method that touches the value.
 That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value.
@@ -837,7 +838,8 @@ def show(obj: object) -> None:
 `show()` calls `display_object()` with `REDEFINED_DUNDERS`,
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
-For clarity, `show()` also excludes `__hash__` from these reports (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+For clarity, `show()` also excludes `__hash__` from these reports
+(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
 `A` is the plain case, with no defaults and no constructor,
 but with field declarations that look like class variables:
@@ -1016,7 +1018,8 @@ Only assigning it a value does.
 1.  Add leap-year support to `Month`,
     so February allows 29 days when the `BirthDate`'s `Year` is a leap year.
     Write the tests first.
-2.  Give `EmailAddress` a stricter check (a single `@`, with text on both sides).
+2.  Give `EmailAddress` a stricter check
+    (a single `@`, with text on both sides).
     Add tests for the values the check should now reject.
 3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that returns a new `Stars`,
     and show that the precondition and postcondition disappear.

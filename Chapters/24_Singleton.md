@@ -134,7 +134,8 @@ print(x is y, x.instance is y.instance is z.instance)
 
 Because the inner class's name starts with a double underscore,
 Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body,
-a rewriting called *name mangling* (see [Testing](11_Testing.md#white-box-and-black-box-tests)).
+a rewriting called *name mangling*
+(see [Testing](11_Testing.md#white-box-and-black-box-tests)).
 `OnlyOne.__OnlyOne`, written from outside the class,
 names an attribute that was never stored under that spelling,
 so it fails at runtime with `AttributeError`, not at type-checking time.
@@ -347,7 +348,8 @@ def test_class_variable_returns_same_instance() -> None:
 ### Singleton Classes
 
 You can wrap a class so that calling it returns a cached instance.
-This is a *class decorator* (see [Decorators](14_Decorators.md#decorating-classes)):
+This is a *class decorator*
+(see [Decorators](14_Decorators.md#decorating-classes)):
 
 ```python
 # class_singleton.py
@@ -468,7 +470,8 @@ Python has that already, so most of the ceremony falls away.
     Modify it to use *lazy initialization*,
     then compare your result with `singleton_pattern.py`.
 2.  Using `cached_factory_singleton.py` as a starting point,
-    create a factory that manages a fixed pool of objects (say, database connections) and hands them out,
+    create a factory that manages a fixed pool of objects
+    (say, database connections) and hands them out,
     rather than a single instance.
 3.  Rewrite one of the class-based singletons above as a module,
     and argue which you would use in real code.

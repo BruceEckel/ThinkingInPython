@@ -57,7 +57,8 @@ your function becomes impure.
 This usually involves I/O: the time of day, a random number,
 a database or network read.
 But it can also be as simple as reading a variable that's global to your function.
-These are called *side causes* (corresponding to side effects) or *implicit inputs*.
+These are called *side causes*
+(corresponding to side effects) or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
 But there's another factor that doesn't quite fit either category.
@@ -141,7 +142,8 @@ is a space heater with extra steps.
 Effects are not a defect to design away.
 They are the entire reason a program exists.
 The goal of Effect Management is not to eliminate effects.
-It is to isolate Effects so the rest of the program can stay pure (this is sometimes called "pushing the Effects to the edges").
+It is to isolate Effects so the rest of the program can stay pure
+(this is sometimes called "pushing the Effects to the edges").
 
 ## A Taxonomy of Benefits
 
@@ -265,7 +267,8 @@ which is the tracking problem an Effect Management System exists to solve.
 
 Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,
 but did not make those first-class in the function type.
-They leaked information and are generally considered a failure (C++ changed their specifications to a binary indication of whether or not any exceptions are thrown).
+They leaked information and are generally considered a failure
+(C++ changed their specifications to a binary indication of whether or not any exceptions are thrown).
 
 ### Make the Bad Value Impossible
 
@@ -366,7 +369,8 @@ A full EMS does three things:
    at a point after the function is defined.
 
 The third item is called *delayed binding*, and it has leverage.
-Delayed binding exists so that one fixed codebase can serve many contexts (test, production, retry-wrapped) without being edited.
+Delayed binding exists so that one fixed codebase can serve many contexts
+(test, production, retry-wrapped) without being edited.
 When a hundred functions declare "I need something that can read from storage,"
 none of them contains an opinion about what that storage is.
 They all flow up to a single point or edge,
@@ -666,8 +670,8 @@ because the AI can generate whatever code it needs to solve specialized problems
   `bind effect` rebinds a handler separately from its use, a full-EMS feature.
 - [Dream](https://dreamlang.dev):
   pairs formal verification with AI-native code generation.
-- [AILANG](https://ailang.sunholo.com):
-  capability-based effects (`IO`, `FS`, `Net`, `Clock`, `AI`) granted per run.
+- [AILANG](https://ailang.sunholo.com): capability-based effects
+  (`IO`, `FS`, `Net`, `Clock`, `AI`) granted per run.
 - [Pact](https://github.com/KikotVit/pact-lang):
   functions declare a `needs` clause,
   and a separate `using` clause rebinds each implementation,

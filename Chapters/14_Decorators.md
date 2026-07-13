@@ -39,8 +39,8 @@ so `cheese` now refers to `doesnt_matter`.
 Calling `cheese()` runs `doesnt_matter` which never calls `func` and prints its own message instead.
 The original `cheese()` behavior never happens.
 
-Since decoration binds the local function to the name `cheese`,
-the local name (`doesnt_matter()`) can be anything.
+Since decoration binds the local function to the name `cheese`, the local name
+(`doesnt_matter()`) can be anything.
 The common convention is to name it `wrapper()`.
 
 A typical decorator returns a wrapper that does some work,
@@ -202,12 +202,12 @@ if __name__ == "__main__":
 
 The return type is worth unpacking:
 `Callable[[Callable[P, R]], Callable[P, R]]`.
-`Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`" (see the summary in [Static Typing](08_Static_Typing.md#containers)).
+`Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
+(see the summary in [Static Typing](08_Static_Typing.md#containers)).
 The first, inner brackets hold the parameter types, even when there is only one,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
-That single parameter type is `Callable[P, R]`,
-the wrapped function's type.
+That single parameter type is `Callable[P, R]`, the wrapped function's type.
 So the whole annotation reads as "a callable that takes a `Callable[P, R]` and returns a `Callable[P, R]`."
 That describes `decorate`: it takes `func` and returns `wrapper`,
 both typed `Callable[P, R]`.
@@ -818,8 +818,8 @@ def test_single_topping() -> None:
 ## Decorators You Already Know
 
 Several decorators from earlier chapters use this mechanism.
-`@property`, `cached_property`, `@staticmethod`,
-and `@classmethod` ([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does,
+`@property`, `cached_property`, `@staticmethod`, and `@classmethod`
+([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does,
 but return a *descriptor* instead of a plain wrapper.
 That is what lets them change how attribute access behaves,
 and it is also what makes them work correctly on methods,
@@ -827,7 +827,8 @@ where a plain `__call__`-based class, like `Logged` above, does not.
 `@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)) is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,
 adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
-`functools.cache` and `functools.lru_cache` ([Performance](18_Performance.md#caching)) wrap a function in the same closure-plus-`func` shape as `add_behavior`,
+`functools.cache` and `functools.lru_cache`
+([Performance](18_Performance.md#caching)) wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 None of these needed new syntax to understand.
 They are ordinary decorators,
@@ -835,12 +836,14 @@ built from the closures and callables this chapter covered.
 
 ## Exercises
 
-1.  Add a `Mushroom` topping (cost 0.60) and use it to build a Hawaiian with mushroom and feta.
+1.  Add a `Mushroom` topping
+    (cost 0.60) and use it to build a Hawaiian with mushroom and feta.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object *Decorator* pattern for a coffee shop:
-    plain drinks (Espresso, Cappuccino) and extra decorators (Whipped cream, Decaf, Extra shot).
+3.  Implement the object *Decorator* pattern for a coffee shop: plain drinks
+    (Espresso, Cappuccino) and extra decorators
+    (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,
     then print its cost and description.
 4.  Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,

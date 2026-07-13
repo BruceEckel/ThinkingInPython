@@ -79,8 +79,8 @@ for r in outputs:
 #: answer = 4
 ```
 
-This keeps every result,
-and `match` (see [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
+This keeps every result, and `match`
+(see [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases collide.
 We need something that says "success" or "failure" no matter what types they carry.
@@ -92,7 +92,8 @@ Make success and failure explicit by defining them as types.
 and `Result` is the union of the two.
 Both are frozen data classes,
 parameterized over the answer type and the error type.
-`A`, `B`, and `E` are type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+`A`, `B`, and `E` are type parameters
+(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no constraints, which allows them to be used in any context.
 `Result` is useful beyond this chapter,

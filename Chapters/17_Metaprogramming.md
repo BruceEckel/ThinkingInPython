@@ -414,8 +414,8 @@ print("has Tag base:", Tag in Demo.__bases__)
 #: has Tag base: True
 ```
 
-Override `__new__()` when you must change `name`, `bases`,
-or the namespace (including special members like `__slots__`) before Python builds the class.
+Override `__new__()` when you must change `name`, `bases`, or the namespace
+(including special members like `__slots__`) before Python builds the class.
 Otherwise, prefer `__init__()`, which is simpler.
 When the choice does not matter,
 pick `__init__()` and reserve `__new__()` for a genuine need.
@@ -491,9 +491,9 @@ print(type(b).__name__)
 
 Type checkers such as ty, mypy, and pyright check `@final` statically.
 It states the intent and catches a violation before the code runs.
-At runtime it only marks the class,
-setting `__final__ = True` (as `test_final.py` below confirms);
-nothing enforces it: the interpreter still lets `class C(B): pass` run.
+At runtime it only marks the class, setting `__final__ = True`
+(as `test_final.py` below confirms); nothing enforces it:
+the interpreter still lets `class C(B): pass` run.
 
 If you need the interpreter to refuse subclassing,
 `__init_subclass__()` can enforce it at each subclass creation.
@@ -558,7 +558,8 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
 After all this, when is a metaclass the right tool?
 When you need to change the class object rather than react to its creation:
-adding methods *to the class* (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
+adding methods *to the class*
+(metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
 replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary,
 or enforcing an invariant across an entire family of classes through their shared metaclass.
 These are real but uncommon.
@@ -923,11 +924,11 @@ is the bookkeeping every class carries.
     set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
 3.  In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)` and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
     while `c1 is a` (comparing across the different singleton classes) is `False`.
-4.  In `final_runtime.py`,
-    add a class `D(A)` (a second, independent subclass of the non-final `A`) and confirm it succeeds,
+4.  In `final_runtime.py`, add a class `D(A)`
+    (a second, independent subclass of the non-final `A`) and confirm it succeeds,
     the same way `Ok` does in `test_final.py`.
 5.  Using `inspect_tour.py` as a model,
     write a function `describe(func)` that prints a function's name,
-    its `inspect.signature()`,
-    and its docstring (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
+    its `inspect.signature()`, and its docstring
+    (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.

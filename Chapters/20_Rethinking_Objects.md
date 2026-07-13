@@ -47,14 +47,16 @@ Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
 They favor immutability.
 Rust makes bindings immutable by default.
-Swift and Kotlin encourage it through `let` and `val` (Go has no general immutability).
+Swift and Kotlin encourage it through `let` and `val`
+(Go has no general immutability).
 They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
 
-The *Liskov Substitution Principle* (LSP) says that an object of a subtype must work anywhere code expects an object of its base type,
+The *Liskov Substitution Principle*
+(LSP) says that an object of a subtype must work anywhere code expects an object of its base type,
 without breaking the program.
 A subclass may add behavior, but it must honor the base class's contract.
 It accepts the same arguments, returns the same kinds of results,

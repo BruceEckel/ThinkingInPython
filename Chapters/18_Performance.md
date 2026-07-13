@@ -54,7 +54,8 @@ sometimes enough to distort the behavior you are measuring:
 
     python -m cProfile -s cumulative my_program.py
 
-Python 3.15 gathers the profilers into a single `profiling` package ([PEP 799](https://peps.python.org/pep-0799/)).
+Python 3.15 gathers the profilers into a single `profiling` package
+([PEP 799](https://peps.python.org/pep-0799/)).
 The tracing profiler above becomes `profiling.tracing`,
 with `cProfile` kept as an alias,
 and a new *sampling* profiler arrives as `profiling.sampling`.
@@ -140,10 +141,11 @@ print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
 #: sum() at least twice as fast: True
 ```
 
-The same principle chooses `"".join(parts)` over `+=` in a loop (one linear pass instead of repeated reallocation),
+The same principle chooses `"".join(parts)` over `+=` in a loop
+(one linear pass instead of repeated reallocation),
 a comprehension over an `append()` loop, and the C-implemented standard library,
-`itertools`, `collections`, and `functools`,
-over hand-rolled equivalents ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+`itertools`, `collections`, and `functools`, over hand-rolled equivalents
+([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
 As a last resort in a proven-hot loop,
 hoist a repeated attribute or global lookup into a local,
 as in `append = out.append`.
@@ -226,7 +228,8 @@ so they can serve as dictionary keys and as arguments to the caches shown below.
 ## Lazy Evaluation with Generators
 
 A list-building pipeline materializes every intermediate result.
-A generator pipeline ([Comprehensions](16_Comprehensions.md#generator-expressions)) computes one item at a time,
+A generator pipeline
+([Comprehensions](16_Comprehensions.md#generator-expressions)) computes one item at a time,
 on demand, so memory stays flat no matter how large the source,
 and no work happens past the point where the consumer stops.
 `tracemalloc` measures the difference:
@@ -313,7 +316,8 @@ but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least r
 Arguments must be hashable,
 which is another reason to prefer immutable containers.
 For an expensive attribute computed once per object,
-`functools.cached_property` does the same job on instances (see [Classes](07_Classes.md#properties)).
+`functools.cached_property` does the same job on instances
+(see [Classes](07_Classes.md#properties)).
 
 Caching is only correct when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
@@ -412,7 +416,8 @@ But frozen enforces this by overriding `__setattr__()`.
 The instance still keeps a `__dict__` underneath.
 `slots=True` removes that `__dict__`,
 so pairing it with `frozen=True` is the natural default,
-giving you the same immutability in a fraction of the space (one machine measured 344 bytes against 48, roughly seven to one).
+giving you the same immutability in a fraction of the space
+(one machine measured 344 bytes against 48, roughly seven to one).
 The exact byte counts vary by platform and Python build,
 so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
 
@@ -455,7 +460,8 @@ so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing:
 the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
 while the `array` spends 8 bytes per element total,
-roughly a four-to-one difference (one machine measured 325,176 bytes against 80,080).
+roughly a four-to-one difference
+(one machine measured 325,176 bytes against 80,080).
 (`sys.getsizeof()` reports a `list`'s own size but not its elements', so the elements are summed separately.)
 
 ### Memory View

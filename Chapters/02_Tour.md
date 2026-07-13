@@ -352,7 +352,8 @@ Reserve it for classes that behave like a function to their users.
 The default for a class is still `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
-Tools such as ruff can apply these to your code automatically (or at least point them out).
+Tools such as ruff can apply these to your code automatically
+(or at least point them out).
 
 ## Exercises
 
@@ -363,8 +364,10 @@ Tools such as ruff can apply these to your code automatically (or at least point
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
     Predict what `bool()` reports for each before running it,
     then check your prediction.
-3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero (change `{score:.0f}%` to show `{score:.2f}`),
+3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero
+    (change `{score:.0f}%` to show `{score:.2f}`),
     and a second line using the debug specifier, `f"{score = }"`.
-4.  Rename every identifier in `numbers.py` to camelCase (`totalSum` instead of `total`, and so on),
-    then explain, using [Naming Conventions](#naming-conventions),
+4.  Rename every identifier in `numbers.py` to camelCase
+    (`totalSum` instead of `total`, and so on), then explain,
+    using [Naming Conventions](#naming-conventions),
     which renames break the convention and which merely look unfamiliar.

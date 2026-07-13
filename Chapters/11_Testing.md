@@ -221,7 +221,8 @@ Everything after it runs once the test finishes, even if the test failed.
 After the `yield` is the place to close files, release locks,
 or check a final invariant.
 
-You can automatically invoke a fixture for every test (without specifying the fixture in each test) by adding the `autouse` flag:
+You can automatically invoke a fixture for every test
+(without specifying the fixture in each test) by adding the `autouse` flag:
 
     @pytest.fixture(autouse=True)
 

@@ -184,7 +184,8 @@ flattening the tree into one list of paths.
 Set comprehensions construct sets using the same principles as list comprehensions.
 Instead of `[]`, a set comprehension uses `{}`.
 
-The following set comprehension normalizes each name (capital first letter, the rest lower case),
+The following set comprehension normalizes each name
+(capital first letter, the rest lower case),
 keeps the names longer than one character,
 and collapses the duplicates and case variants:
 
@@ -338,13 +339,14 @@ and produces the same flat list as the nested `[x for row in rows for x in row]`
 while saying what it does more directly.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
-The set form `{*s for s in sets}` and the asynchronous generator form (`(*a async for a in agen())`) work the same way.
+The set form `{*s for s in sets}` and the asynchronous generator form
+(`(*a async for a in agen())`) work the same way.
 
 ## Exercises
 
 1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
-    write a list comprehension that finds the string elements made only of digits (`e.isdigit()`),
-    converts each to `int` with `int(e)`, and squares it.
+    write a list comprehension that finds the string elements made only of digits
+    (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
     The predicate must reject `"a"` so `int()` never sees it.
     Only `str` has `isdigit()`,
     so the predicate must test `isinstance(e, str)` before calling it.

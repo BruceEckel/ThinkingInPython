@@ -40,7 +40,8 @@ x.show_twice()
 Python methods require a reference to the current object.
 When you *define* a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
-but you can use any identifier (however, anything other than `self` will probably confuse people).
+but you can use any identifier
+(however, anything other than `self` will probably confuse people).
 To refer to the object's fields or its other methods,
 you must go through `self`.
 
@@ -60,11 +61,12 @@ but using the class name.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
-To create an object field, you name it, using `self`,
-inside a method (typically in the constructor, but not always).
+To create an object field, you name it, using `self`, inside a method
+(typically in the constructor, but not always).
 This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,
-they implicitly become class-level fields (similar to static fields in C++/Java).
+they implicitly become class-level fields
+(similar to static fields in C++/Java).
 
 You can see the shape of an object with `display_object()`,
 a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
@@ -99,8 +101,10 @@ you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
 
-First import the base class the same way you import any name from a module (see [Modules and Packages](06_Modules_and_Packages.md)).
-Then inherit by listing the class (or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
+First import the base class the same way you import any name from a module
+(see [Modules and Packages](06_Modules_and_Packages.md)).
+Then inherit by listing the class
+(or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
 Here, we import and subclass `Simple`, from the `simple_class` module:
 
 ```python

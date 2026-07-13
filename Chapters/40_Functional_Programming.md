@@ -1247,7 +1247,8 @@ or a proof, can verify.
 
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
-A comprehension is the everyday example (see [Comprehensions](16_Comprehensions.md)).
+A comprehension is the everyday example
+(see [Comprehensions](16_Comprehensions.md)).
 The loop that filters and appends says *how*.
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
 which is "the squares of the even numbers."

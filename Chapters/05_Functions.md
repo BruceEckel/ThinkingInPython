@@ -25,7 +25,8 @@ print(a_function("yes"))
 ```
 
 Here the function signature specifies only the function name and the parameter names,
-but no argument types or return types ([Static Typing](08_Static_Typing.md#type-hints) covers these).
+but no argument types or return types
+([Static Typing](08_Static_Typing.md#type-hints) covers these).
 Python is dynamically typed,
 so type errors surface at runtime rather than at compile time.
 This means the same function can accept and return different types:
@@ -287,7 +288,8 @@ For anything more complicated, write a separate function.
 
 1.  In `mutable_default.py`,
     call `bad_append(3)` a third time and predict the result before checking it.
-    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it (hint: `target.append(item)` on a tuple).
+    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it
+    (hint: `target.append(item)` on a tuple).
 2.  In `sentinel_default.py`, add a third key to `prefs`, `"volume2": None`,
     and call `get(prefs, "volume2")` to confirm the sentinel still tells `None`-as-value apart from missing.
 3.  In `param_markers.py`,
