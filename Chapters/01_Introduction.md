@@ -67,6 +67,9 @@ If I need something, I ask AI.
 My only hope is that this book will be engaging to read,
 and that you will experience some of the same satisfaction that I've had while writing it.
 
+If it's not already true, I think most programmers will regularly use AI.
+I have found that the knowledge contained in this book has helped me guide AIs towards better solutions.
+
 ## Who This Book Is For
 
 I am writing for the programmer who already knows how to program,

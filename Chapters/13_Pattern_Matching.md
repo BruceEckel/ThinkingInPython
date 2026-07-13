@@ -165,8 +165,8 @@ a positional pattern raises a `TypeError`.
 Keyword patterns work differently.
 `Point(x=0, y=y)` matches by attribute name directly, through attribute access,
 not through `__match_args__`.
-Keyword patterns therefore work on any object with the named attributes,
-dataclass or not, and they let you match a subset of attributes while ignoring the rest:
+Keyword patterns work on any object with the named attributes, dataclass or not,
+and they let you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -196,7 +196,7 @@ print(describe(Point(3, 4)))
 `Point(x=0)` matches any point whose `x` attribute is zero,
 ignoring `y` entirely.
 A positional pattern cannot do this:
-it must supply a sub-pattern for every position `__match_args__` defines.
+it must supply a sub-pattern for every position that `__match_args__` defines.
 `Point()` with no arguments matches any `Point` instance, keyword or positional,
 and works as a type-only check or a final catch-all.
 
@@ -278,7 +278,7 @@ print(handle({"button": 1}))
 #: Not an event: {'button': 1}
 ```
 
-`test_mapping_patterns()` verifies a matched event and the fall-through:
+Testing verifies a matched event and the fall-through:
 
 ```python
 # test_mapping_patterns.py
@@ -292,7 +292,7 @@ def test_mapping_patterns() -> None:
 ## Exhaustive Matching
 
 When a value is one of a fixed set of types,
-define that set as a union using the `type` statement (introduced in [Static Typing](08_Static_Typing.md#the-type-statement)).
+define that set as a union using the [`type` statement](08_Static_Typing.md#the-type-statement).
 Now you can perform a match on that union.
 When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
@@ -335,12 +335,23 @@ print(area(Square(2.0)))
 Add a `Triangle` to `Shape` without adding the appropriate `case`,
 and the checker flags `assert_never(shape)`.
 `shape` could now be a `Triangle` that no `case` handles.
-A `switch` in other languages cannot do this.
-An `if`/`isinstance()` chain can,
+
+A plain `switch`, in C, JavaScript, or traditional Java, cannot do this.
+Nothing forces you to add a case, and an unhandled value falls through silently.
+Scala's `match`, Kotlin's `when`,
+and Java's newer switch expressions do check this,
+as long as the matched type is a sealed hierarchy the compiler can see in full.
+
+Python has no `sealed` keyword.
+`assert_never()` plus a type checker fills that role instead.
+An `if`/`isinstance()` chain can also get there,
 but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
+
+Note that this example reframes the classic OOP "shapes" example without inheritance and dynamic binding.
+Dynamic binding discovers an object's actual type at runtime.
+Pattern matching does the same, but is a better solution by centralizing type-dependent behavior in a single place.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) uses this technique to add operations to a closed set of types without inheritance.
-`test_exhaustive_area()` tests the area of each shape:
 
 ```python
 # test_exhaustive.py
@@ -374,7 +385,7 @@ print(describe(301))
 ```
 
 When the set of types is *open* (anyone can add a new one),
-polymorphism is better than a `match`.
+inheritance and dynamic binding works better than `match`.
 Each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,
