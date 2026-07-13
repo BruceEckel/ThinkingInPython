@@ -1,19 +1,19 @@
 # add_behavior.py
 from collections.abc import Callable
 
-def hijack(func: Callable) -> Callable:
+def add_behavior(func: Callable) -> Callable:
     def wrapper() -> None:
-        print("Hijacked!")
+        print("Some work")
         func()
-        print("Hijacking complete...")
+        print("Some more work")
 
     return wrapper
 
-@hijack
+@add_behavior
 def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-#: Hijacked!
+#: Some work
 #: Wensleydale
-#: Hijacking complete...
+#: Some more work

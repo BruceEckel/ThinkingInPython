@@ -28,7 +28,7 @@ cheese()
 #: Replacement behavior
 ```
 
-Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface) shows decoratiors with types.
+Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface) shows decorators with types.
 
 The `@hijack` above `cheese()` means:
 
@@ -50,22 +50,22 @@ calls the original function, then does some more work:
 # add_behavior.py
 from collections.abc import Callable
 
-def hijack(func: Callable) -> Callable:
+def add_behavior(func: Callable) -> Callable:
     def wrapper() -> None:
-        print("Hijacked!")
+        print("Some work")
         func()
-        print("Hijacking complete...")
+        print("Some more work")
 
     return wrapper
 
-@hijack
+@add_behavior
 def cheese() -> None:
     print("Wensleydale")
 
 cheese()
-#: Hijacked!
+#: Some work
 #: Wensleydale
-#: Hijacking complete...
+#: Some more work
 ```
 
 Decoration is a simple kind of [metaprogramming](17_Metaprogramming.md).

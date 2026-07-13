@@ -10,7 +10,7 @@ A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 The `with` statement calls them for you and guarantees that `__exit__()` runs no matter how the block finishes.
 
-Thus, the context manager introduces a scope that determines when initialization and cleanup happen.
+Thus, the context manager marks out a span of execution that determines when initialization and cleanup happen.
 This is far more reliable than using `__del__()`,
 as we saw in [Cleanup](10_Cleanup.md).
 
@@ -80,9 +80,12 @@ When it raises an exception, they hold the exception's type, value,
 and traceback.
 
 The return value decides what happens to that exception.
-A `False` value (including `None`) lets it propagate.
-A `True` value *suppresses* it.
-The `with` statement swallows the exception and execution continues after the block:
+A falsy value lets it propagate;
+this includes the implicit `None` of a method with no `return`,
+so propagation is the default.
+A truthy value *suppresses* it:
+the `with` statement swallows the exception,
+and execution continues after the block:
 
 ```python
 # suppress_cm.py
@@ -172,6 +175,11 @@ It relies on the generator and decorator machinery from [Decorators](14_Decorato
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
+One caution: the manager object `tag("p")` returns is single-use.
+Its generator runs once,
+so reusing the same object in a second `with` raises an exception.
+Construct a fresh manager for each `with` statement.
+
 ## A Context Manager as a Decorator
 
 A context manager brackets a block of statements: setup before, cleanup after.
@@ -216,9 +224,9 @@ if __name__ == "__main__":
 `tracing` works both ways.
 `with tracing("block"):` brackets a group of statements.
 `@tracing("add")` decorates a function,
-so every call to `add()` enters the context, runs `add()`, and exits.
+so every call to `add()` enters the context, runs the original `add()`, and exits.
 Note the parentheses in `@tracing("add")`:
-the manager is constructed first, and the manager decorates.
+the call constructs the manager, which then decorates the function.
 A generator-based manager recreates its generator on each use,
 so the decorated function can be called any number of times,
 each with a fresh enter and exit.
@@ -299,6 +307,13 @@ with tag("ul") as outer, tag("li") as inner:
 #: </ul>
 ```
 
+When the managers do not fit on one line,
+parentheses group them without changing the behavior:
+
+    with (tag("ul") as outer,
+          tag("li") as inner):
+        ...
+
 When you do not know the number of managers until runtime,
 `contextlib.ExitStack` holds a dynamic set of managers and unwinds them in reverse on the way out:
 
@@ -342,7 +357,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `nullcontext(value)` is a do-nothing manager that yields `value`,
   useful when a `with` is optional and you want one code path.
 
-`nullcontext` is useful when only some runs have a resource to manage.
+Only some runs may have a resource to manage.
 A function might take an optional file to write to,
 defaulting to standard output.
 The default must stay open,
@@ -501,11 +516,11 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 
 1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.
-    Predict the order the four "enter"/"inside"/"exit" lines appear in before running it.
+    Predict the order the six "enter"/"inside"/"exit" lines appear in before running it.
 2.  In `suppress_cm.py`, add `TypeError` to the tuple passed to `Ignore`,
     then raise a `TypeError` instead of dividing by zero,
     and confirm it is also suppressed.
-3.  Add a fourth manager to the `with` statement in `multiple.py`,
+3.  Add a third manager to the `with` statement in `multiple.py`,
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.
 4.  In `object_pool.py`,
