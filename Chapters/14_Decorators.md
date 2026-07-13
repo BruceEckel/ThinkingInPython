@@ -133,19 +133,18 @@ Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves 
 `P.args` is the positional part and `P.kwargs` the keyword part.
 You may only use them together,
 as the `*args` and `**kwargs` of a function typed with `P`.
-They bind the wrapper's arguments to the parameters `P` captured,
+They bind the wrapper's arguments to the parameters captured by `**P`,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
-Without `P` you would fall back to `*args: Any, **kwargs: Any`,
+Without `**P` you would fall back to `*args: Any, **kwargs: Any`,
 and the wrapper would swallow any arguments,
 discarding the signature the decorator is meant to preserve.
 
-The `# type: ignore` comments mark the one place the checker cannot follow:
+The `# type: ignore` comments mark where the checker cannot follow:
 a bare `Callable` is not guaranteed to have a `__name__` attribute,
 though every actual function does.
 
-`test_tracer.py` checks the two things `wraps` promises:
-the wrapper reports the original function's name,
+Testing verifies that the wrapper reports the original function's name,
 and it still returns the original result:
 
 ```python
@@ -215,6 +214,14 @@ both typed `Callable[P, R]`.
 
 `@repeat(times=3)` first evaluates `repeat(times=3)`, which returns `decorate`,
 the real decorator, which then wraps `greet`.
+That wrapping happens when Python calls `decorate(greet)`,
+and only then does `decorate`'s own body run, including its `@wraps(func)` line.
+`@wraps(func)` is the same two-step pattern one level down:
+call `wraps(func)` to get a decorator, then apply it to `wrapper`.
+Completing the outer decoration is what triggers the inner one,
+but nothing calls itself.
+The nesting stops at two levels, matching the two nested `def`s in the source.
+
 Inside `wrapper()`, the first call to `func` happens before the loop,
 so `result` always holds a value of type `R` to return;
 the loop adds the remaining `times - 1` calls.
