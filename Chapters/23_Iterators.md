@@ -16,6 +16,8 @@ Two methods make up the protocol.
 An *iterable* has `__iter__()`, which returns an *iterator*.
 An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
+An iterator is also itself iterable: its `__iter__()` returns itself,
+so an iterator works anywhere an iterable is expected.
 The `for` loop calls these for you, so you almost never call them directly.
 Because every container speaks this one protocol,
 a function written against an iterable automatically stays decoupled from the container.
@@ -69,6 +71,10 @@ print(total(Countdown(5)))   # and on a custom iterable
 
 `total()` works on the generator, the list,
 and the custom `Countdown` without knowing or caring which.
+The two custom sources differ in one way worth noting.
+`fibonacci(8)` returns an iterator, which one pass exhausts.
+`Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
+so it can be iterated repeatedly, as the re-iteration test below confirms.
 Generators are also lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
@@ -122,7 +128,7 @@ as if the outer generator had written the loop itself:
 # yield_from.py
 from collections.abc import Iterator, Sequence
 
-type Nested = int | Sequence["Nested"]
+type Nested = int | Sequence[Nested]
 
 def flatten(nested: Sequence[Nested]) -> Iterator[int]:
     for item in nested:

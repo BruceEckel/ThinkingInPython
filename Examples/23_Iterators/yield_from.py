@@ -1,7 +1,7 @@
 # yield_from.py
 from collections.abc import Iterator, Sequence
 
-type Nested = int | Sequence["Nested"]
+type Nested = int | Sequence[Nested]
 
 def flatten(nested: Sequence[Nested]) -> Iterator[int]:
     for item in nested:
