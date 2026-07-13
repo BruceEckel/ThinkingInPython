@@ -1,4 +1,4 @@
-# os_walk_comprehension.py
+# path_walk_comprehension.py
 import tempfile
 from pathlib import Path
 

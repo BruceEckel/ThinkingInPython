@@ -23,7 +23,7 @@ A list comprehension consists of:
 -   An optional predicate expression.
 -   An output expression producing elements of the output list from members of the input sequence that satisfy the predicate.
 
-Let's take a list of integers and square them.
+Let's select the integers from a mixed list and square them.
 Several examples in this chapter use the same input list:
 
 ```python
@@ -44,7 +44,7 @@ print(squared_ints)
 
 ![The parts of a list comprehension: the input sequence, the iteration variable, the optional predicate, and the output expression](_images/listComprehensions)
 
-The comprehension has three parts:
+In this comprehension:
 
 -   The iterator part iterates through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
@@ -94,9 +94,9 @@ The comprehension inlines the test and the expression.
 
 List brackets (`[]`) enclose the list comprehension,
 so it is immediately evident that it produces a list.
-It calls `isinstance()` once, with no call to the cryptic `lambda`.
-Instead, the list comprehension uses a conventional iterator, an expression,
-and an `if` clause for the optional predicate.
+The `if` clause names `isinstance()` directly
+and the output expression squares directly,
+with no `lambda` wrappers in the way.
 
 ## Nested Comprehensions
 
@@ -132,6 +132,10 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 #: ['a=1', 'b=2', 'c=3']
 ```
 
+`zip()` stops at the end of the shorter sequence;
+pass `strict=True` to make a length mismatch raise `ValueError`
+instead of silently truncating.
+
 Unpack a tuple in the iterator,
 here a `(name, function)` pair applied to a value:
 
@@ -152,7 +156,7 @@ print([
 Here's a two-level list comprehension using `Path.walk()`:
 
 ```python
-# os_walk_comprehension.py
+# path_walk_comprehension.py
 import tempfile
 from pathlib import Path
 
@@ -304,8 +308,8 @@ and `any()` stops as soon as it finds a match.
 
 ## Unpacking in Comprehensions
 
-The nested comprehensions above flatten by writing two `for` clauses.
-Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way.
+The `Path.walk()` example above flattens a tree by writing two `for` clauses.
+Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way to flatten.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
 This extends the [PEP 448](https://peps.python.org/pep-0448/) unpacking you already know from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
@@ -344,6 +348,8 @@ The set form `{*s for s in sets}` and the asynchronous generator form (`(*a asyn
     write a list comprehension that finds the string elements made only of digits (`e.isdigit()`),
     converts each to `int` with `int(e)`, and squares it.
     The predicate must reject `"a"` so `int()` never sees it.
+    Only `str` has `isdigit()`,
+    so the predicate must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,
     change the comprehension to build a 3 by 3 matrix with `2` on the diagonal instead of `1`,
     without adding a second pass over the result.
