@@ -8,10 +8,11 @@ on its own line. Editing then touches only the sentences that change, and diffs
 read sentence by sentence.
 
 A sentence longer than `--width` is broken further, at top-level clause
-punctuation (",", ";", ":") and before a top-level opening "(", so no line
-is wide enough to wrap in an editor. A greedy fill inserts the fewest
-breaks needed: short sentences are left on one line. Breaks are never made
-inside parentheses, brackets, inline code, or footnotes.
+punctuation (",", ";", ":"), before a top-level opening "(", and after a
+top-level closing ")", so no line is wide enough to wrap in an editor. A
+greedy fill inserts the fewest breaks needed: short sentences are left on
+one line. Breaks are never made inside parentheses, brackets, inline code,
+or footnotes.
 
 Only plain prose paragraphs are touched. Everything else is preserved verbatim:
 fenced code, indented code, tables, headings, list items, blockquotes, HTML
@@ -163,7 +164,7 @@ def split_sentences(paragraph: str) -> list[str]:
 
 def _clause_segments(masked: str) -> list[str]:
     """Split a masked sentence at top-level ",", ";", ":" followed by a space,
-    and before a top-level opening "(".
+    before a top-level opening "(", and after a top-level closing ")".
 
     Each segment keeps its trailing punctuation. Punctuation inside parentheses,
     brackets, or masked spans is ignored, so the segments are clause-sized. A
@@ -171,7 +172,12 @@ def _clause_segments(masked: str) -> list[str]:
     to need its own line starts there, e.g. `the field\n(introduced earlier)`.
     Only a "(" preceded by whitespace counts: one glued directly onto the
     previous token, as in `O(n)` or a Markdown link's `[text](url)`, is part
-    of that token and must never be pulled onto its own line.
+    of that token and must never be pulled onto its own line. Symmetrically, a
+    top-level ")" breaks *after* itself when a space follows,
+    e.g. `(as shown earlier)\nthe rest of the sentence continues`, so text that
+    trails a long parenthetical can start its own line too. A ")" followed
+    directly by more punctuation (",", ")", etc.) is left alone; the following
+    punctuation's own break, if any, already covers it.
     """
     depth = 0
     segs: list[str] = []
@@ -187,6 +193,17 @@ def _clause_segments(masked: str) -> list[str]:
             depth += 1
         elif c in ")]}":
             depth = max(0, depth - 1)
+            if c == ")" and depth == 0:
+                j = i + 1
+                if j < n and masked[j] == " ":
+                    k = j
+                    while k < n and masked[k] == " ":
+                        k += 1
+                    if k < n:  # never break on trailing punctuation
+                        segs.append(masked[start:j])
+                        start = k
+                        i = k
+                        continue
         elif c in _BREAK_PUNCT and depth == 0:
             # Absorb closing quotes/brackets that trail the punctuation, so the
             # break falls after them: `means "raw,"` | `which ...`.

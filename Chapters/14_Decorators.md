@@ -296,14 +296,12 @@ if __name__ == "__main__":
 so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
-`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function;
-`wraps` is a thin convenience layer over `update_wrapper()`.
-It copies the wrapped function's metadata across.
+
+`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function.
+`wraps` is a thin convenience layer over `update_wrapper()` that copies the wrapped function's metadata across.
+
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
-
-`test_trace_class.py` checks the same two things,
-this time produced by `update_wrapper()`:
 
 ```python
 # test_trace_class.py
@@ -325,7 +323,8 @@ def test_trace_returns_original_result() -> None:
 ```
 
 Because the instance can hold attributes, state between calls is natural.
-A class-based decorator that counts calls keeps the count on the instance:
+Here is s class-based decorator that counts calls.
+It keeps the count on the instance:
 
 ```python
 # count_calls.py
