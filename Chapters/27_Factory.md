@@ -27,7 +27,7 @@ Factory might be the most common design pattern.
 ## Simple Factory Method
 
 As an example, let's revisit the `Shape` system.
-We can make the factory a `static` method of the base class:
+We can make the factory a `@staticmethod` of the base class:
 
 ```python
 # shapefact1/shape_factory1.py
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
 A factory exists to turn data, such as a name,
 into an object without scattering constructors through your code.
-In Python a class is itself a first-class object.
+In Python a class is a first-class object.
 You can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
@@ -329,9 +329,9 @@ if __name__ == "__main__":
 #: Square.erase
 ```
 
-Now the factory method appears in its own class, `ShapeFactory`,
-as the `create()` method.
-The different types of shapes must each create their own `Factory` class with a `create()` method to create an object of their own type.
+Now the factory methods are polymorphic:
+each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
+`ShapeFactory` is the dispatcher that finds and applies the right one.
 The actual creation of shapes happens in `ShapeFactory.create_shape()`,
 a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,

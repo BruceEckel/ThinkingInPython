@@ -713,7 +713,7 @@ Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
 The tracking is enforced the way an EMS would enforce it.
 `await` is a syntax error outside an `async def`,
-so any function that awaits a coroutine must itself become `async`,
+so any function that awaits a coroutine must become `async`,
 and so must its callers, all the way up to the edge.
 Replace "async" with "network access" or "database write" in that sentence and you have described Effect tracking.
 Python demonstrates that the machinery can work.

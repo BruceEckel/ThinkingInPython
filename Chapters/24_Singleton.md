@@ -79,7 +79,7 @@ def test_cache_factory_returns_same_instance() -> None:
         cached_factory_singleton.settings())
 ```
 
-If you need the class itself to hand back one instance from its own constructor,
+If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
 Modules and cached factories should cover your singleton needs.

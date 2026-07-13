@@ -16,7 +16,7 @@ Two methods make up the protocol.
 An *iterable* has `__iter__()`, which returns an *iterator*.
 An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
-An iterator is also itself iterable: its `__iter__()` returns itself,
+An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere an iterable is expected.
 The `for` loop calls these for you, so you almost never call them directly.
 Because every container speaks this one protocol,

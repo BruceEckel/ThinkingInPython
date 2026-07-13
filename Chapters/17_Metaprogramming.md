@@ -495,7 +495,7 @@ At runtime it only marks the class,
 setting `__final__ = True` (as `test_final.py` below confirms);
 nothing enforces it: the interpreter still lets `class C(B): pass` run.
 
-If you need the interpreter itself to refuse subclassing,
+If you need the interpreter to refuse subclassing,
 `__init_subclass__()` can enforce it at each subclass creation.
 Older literature claims this requires a metaclass.
 It does not:
@@ -525,7 +525,7 @@ except TypeError as error:
 ```
 
 The check happens at class-creation time, exactly when it must,
-and Python builds `B` itself normally because `A` does not forbid subclassing.
+and Python builds `B` normally because `A` does not forbid subclassing.
 Use the runtime version only when `@final` is not enough, which is rare.
 
 Tests confirm the `@final` marker is present,
@@ -557,7 +557,7 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 ## When You Still Need a Metaclass
 
 After all this, when is a metaclass the right tool?
-When you need to change the class object itself rather than react to its creation:
+When you need to change the class object rather than react to its creation:
 adding methods *to the class* (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
 replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary,
 or enforcing an invariant across an entire family of classes through their shared metaclass.
@@ -797,7 +797,7 @@ deliberately narrowing the comparison to those four.
 Every class, even an empty one, has its own `__module__`, `__dict__`,
 and a handful of other bookkeeping dunders that never match `object`'s,
 so comparing every dunder this way would show that bookkeeping instead of filtering it out.
-The comparison itself uses `is`, not `==`,
+The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,
 not merely an equal one.
 

@@ -168,13 +168,13 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 
-A class is itself a value.
+A class is also a value.
 You can pass it to a function, store it in a variable,
 and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an *instance* of `SomeType`.
-The form `type[SomeType]` means the class object itself, or any subclass of it.
+The form `type[SomeType]` means the class object, or any subclass of it.
 `type[C]` annotates the class, not an instance:
 
 ```python
@@ -392,7 +392,7 @@ The abstract container types come from `collections.abc`.
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
 | `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Iterators](23_Iterators.md#iteration-is-built-in) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
-| `type[C]` | The class object `C` itself, not an instance, see [Classes as Values](#classes-as-values-type) |
+| `type[C]` | The class object `C` is not an instance, see [Classes as Values](#classes-as-values-type) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Unions, optionals, and literals</a>
 

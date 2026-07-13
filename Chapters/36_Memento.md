@@ -124,7 +124,7 @@ Wrapping the tuple in a one-field dataclass gives `Memento` an identity of its o
 The only way to see the strokes is through `.strokes`,
 so reaching inside becomes visible in the code, not just a convention to honor.
 `frozen=True` is what makes reassigning `checkpoint.strokes` fail instead of silently succeeding.
-The tuple inside was already immutable, but the attribute itself was not.
+The tuple inside was already immutable, but the attribute was not.
 
 ```python
 # test_sketch.py
@@ -456,7 +456,7 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 3.  Serialize a `Sketch` to JSON using `dataclasses.asdict()` and reconstruct it.
     What did the round trip change that `pickle` preserved,
     and where must your reconstruction compensate?
-4.  Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
+4.  Change `sketch.py` so `Memento` holds the list instead of a tuple copy,
     then write the test that exposes the corruption.
     Which of the three tests in `test_sketch.py` catches it first?
 5.  Add `goto(steps_back)` to `History`:

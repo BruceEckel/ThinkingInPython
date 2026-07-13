@@ -107,7 +107,7 @@ if __name__ == "__main__":
 ```
 
 A read-only `@property` keeps users from assigning to `number`,
-but the class itself still mutates `_number` and must guard it with a precondition and a postcondition.
+but the class object still mutates `_number` and must guard it with a precondition and a postcondition.
 Checking arguments on the way in and results on the way out is the practice known as *Design by Contract* (DbC).
 The problem with DbC is that the contract is spread across every method that touches the value.
 That is the same scattering of checks as before, but moved inside the class.
@@ -579,7 +579,7 @@ For a small fixed set, that is an `Enum`.
 
 When validation grows complicated, libraries make it lighter.
 The [attrs](https://www.attrs.org) library predates and inspired data classes and offers richer validators and converters.
-[Pydantic](https://docs.pydantic.dev) builds validation and parsing into the type itself,
+[Pydantic](https://docs.pydantic.dev) builds validation and parsing into the type,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type responsible for guaranteeing its own values.
@@ -643,7 +643,7 @@ If a base `__init__` instead replaced `self.__dict__`,
 calling it from `__post_init__()` would discard the fields the data class just assigned.
 The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
 
-When the base class is itself a data class, you do not need this.
+When the base class is also a data class, you do not need this.
 The subclass generates one `__init__` covering the inherited fields and the new ones,
 in order:
 
@@ -938,7 +938,7 @@ tagged `[CV]`, no matter how many `B` instances exist.
 `@dataclass` reads them, through `dataclasses.fields()`,
 to learn what fields exist and in what order,
 then uses that to write `__init__`'s parameter list and the assignments inside it.
-`@dataclass` itself stores nothing on the class:
+`@dataclass` stores nothing on the class:
 `x` is still absent from `C.__dict__` after decoration,
 exactly as it was before.
 The promise is only fulfilled per instance,
@@ -1000,7 +1000,7 @@ It now lives in that instance's own `__dict__`, not on the class.
 not to any instance, and leaves it out of `__init__()` entirely.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can ever assign one.
-`s` stays on `D` itself and keeps its `[CV]` tag no matter how many `D` objects exist.
+`s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
 
 `f: ClassVar[float]` never appears in either report.
 It has no initializer,

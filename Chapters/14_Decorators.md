@@ -206,7 +206,7 @@ The return type is worth unpacking:
 The first, inner brackets hold the parameter types, even when there is only one,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
-That single parameter type is itself `Callable[P, R]`,
+That single parameter type is `Callable[P, R]`,
 the wrapped function's type.
 So the whole annotation reads as "a callable that takes a `Callable[P, R]` and returns a `Callable[P, R]`."
 That describes `decorate`: it takes `func` and returns `wrapper`,
@@ -297,7 +297,7 @@ so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 `functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function;
-`wraps` is itself a thin convenience layer over `update_wrapper()`.
+`wraps` is a thin convenience layer over `update_wrapper()`.
 It copies the wrapped function's metadata across.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
@@ -383,7 +383,7 @@ def test_counts_are_independent_per_function() -> None:
     assert farewell.count == 1
 ```
 
-The class form shifts in an important way when the decorator itself takes arguments.
+The class form shifts in an important way when the decorator takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
@@ -640,7 +640,7 @@ as the `@hijack` example showed at the start of this chapter.
 Only a `def` or a `class` can follow `@`; `@decorator` above a bare assignment,
 or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
-But the decorator itself is only a function,
+But the decorator is only a function,
 and nothing requires the callable it wraps to come from a `def`:
 
 ```python
@@ -722,7 +722,7 @@ Instead, model the toppings as decorators.
 A plain pizza knows its own cost and description.
 A topping dynamically wraps a pizza, adds to the cost,
 and adds to the description.
-Because a topping is itself a pizza, you can wrap a topping in another topping.
+Because a topping is a pizza, you can wrap a topping in another topping.
 
 ![Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other](_images/decorator_pattern)
 
@@ -821,7 +821,7 @@ Several decorators from earlier chapters use this mechanism.
 `@property`, `cached_property`, `@staticmethod`,
 and `@classmethod` ([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does,
 but return a *descriptor* instead of a plain wrapper.
-That is what lets them change how attribute access itself behaves,
+That is what lets them change how attribute access behaves,
 and it is also what makes them work correctly on methods,
 where a plain `__call__`-based class, like `Logged` above, does not.
 `@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)) is a class decorator like `register`,

@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
 Each registered implementation above is named `_`.
 `nectar()` calls it through the dispatcher, never by its own name,
-so the name itself carries no meaning.
+so the name carries no meaning.
 `_` is the conventional placeholder for a name nobody will use.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,

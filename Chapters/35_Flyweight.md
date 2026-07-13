@@ -10,7 +10,7 @@ you keep one object per distinct value and reference it many times.
 Two ideas make sharing work.
 
 First, split each object's state in two.
-*Intrinsic state* belongs to the value itself and is identical across every use,
+*Intrinsic state* belongs to the value and is identical across every use,
 so it can live in the shared object.
 *Extrinsic state* varies per use, so it must live outside,
 supplied by the context.
@@ -240,7 +240,7 @@ Both pools so far hold their objects forever.
 and `Color._pool` never shrinks.
 For tile kinds and colors that is fine, since the universe of values is small.
 When the universe is unbounded, such as symbols in a long-running parser,
-the pool itself becomes a memory leak.
+the pool becomes a memory leak.
 `weakref.WeakValueDictionary` fixes this.
 It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
@@ -352,7 +352,7 @@ would leave that table keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,
-skipping `Tile.__new__()` itself so the call does not recurse.
+skipping `Tile.__new__()` so the call does not recurse.
 `_value_` is not an ordinary attribute name.
 Enum's metaclass reads it to build the `Tile(".")` lookup table and the member's `repr()`,
 so it keeps that exact name rather than something like `_symbol_`.

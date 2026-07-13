@@ -856,7 +856,7 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 Zips iterables of different lengths,
 filling the gaps instead of stopping at the shortest.
 The default filler is `None`.
-When `None` is itself a valid element,
+When `None` is a valid element,
 pass a distinct sentinel as the `fillvalue` keyword argument:
 
 ```python
@@ -975,7 +975,7 @@ print(sys.getrecursionlimit())
 A `for` loop computes this same factorial in about the same number of lines,
 with no risk of hitting that limit.
 Recursion is not a faster or shorter way to count down to zero.
-Its payoff shows up once the problem itself branches, not just repeats,
+Its payoff shows up once the problem branches, not just repeats,
 which is shown in the next example.
 
 Recursion suits problems that are naturally self-similar,
@@ -985,7 +985,7 @@ so deep recursion will raise `RecursionError`.
 For long flat sequences,
 a loop or one of the `itertools` tools is the better choice.
 
-Recursion is beneficial when the data is itself recursive.
+Recursion is beneficial when the data is recursive.
 Code that walks a tree, nested data,
 or a directory reads most clearly when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:

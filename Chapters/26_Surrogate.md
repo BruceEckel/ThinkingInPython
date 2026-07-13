@@ -12,7 +12,7 @@ From a base class, you derive the surrogate along with the class or classes that
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
 A surrogate object acquires an implementation,
-either constructing one itself or receiving one.
+either constructing one or receiving one.
 The surrogate forwards all method calls to that implementation.
 
 Structurally, the difference between *Proxy* and *State* is simple.
