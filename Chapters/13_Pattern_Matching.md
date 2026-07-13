@@ -100,8 +100,6 @@ print(summarize([1, 2, 3, 4]))
 
 This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-`test_sequence_patterns()` checks the empty, single-item,
-and starred cases using `pytest`:
 
 ```python
 # test_sequence_patterns.py
@@ -116,10 +114,7 @@ def test_sequence_patterns() -> None:
 ## Class Patterns
 
 A class pattern matches by type and extracts attributes.
-With a data class you can match positionally,
-because `@dataclass` fills in the `__match_args__` the pattern uses,
-or by keyword.
-Several examples in this chapter match on a `Point`:
+With a data class you can match positionally or by keyword:
 
 ```python
 # point.py
@@ -159,17 +154,60 @@ print(locate(Point(3, 4)))
 `Point(0, 0)` matches a point whose fields are both zero.
 `Point(0, y)` matches when `x` is zero and *captures* `y`.
 The literal and the capture combine in one pattern.
-`test_class_patterns()` tests the origin, the axis case, and a general point:
+
+Positional matching depends on `__match_args__`, a class attribute listing field names in order.
+`@dataclass` generates it automatically from the field order, so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
+Without a `__match_args__` long enough to cover the positions you supply, a positional pattern raises a `TypeError`.
+
+Keyword patterns work differently.
+`Point(x=0, y=y)` matches by attribute name directly, through attribute access, not through `__match_args__`.
+Keyword patterns therefore work on any object with the named attributes, dataclass or not, and they let you match a subset of attributes while ignoring the rest:
+
+```python
+# keyword_patterns.py
+from point import Point
+
+def describe(p: Point) -> str:
+    match p:
+        case Point(x=0):
+            return "Somewhere on the y-axis"
+        case Point(y=0):
+            return "Somewhere on the x-axis"
+        case Point(x=x, y=y) if x == y:
+            return f"On the diagonal at {x}"
+        case Point():
+            return "Just some point"
+
+print(describe(Point(0, 5)))
+#: Somewhere on the y-axis
+print(describe(Point(3, 0)))
+#: Somewhere on the x-axis
+print(describe(Point(2, 2)))
+#: On the diagonal at 2
+print(describe(Point(3, 4)))
+#: Just some point
+```
+
+`Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y` entirely.
+A positional pattern cannot do this: it must supply a sub-pattern for every position `__match_args__` defines.
+`Point()` with no arguments matches any `Point` instance, keyword or positional, and works as a type-only check or a final catch-all.
 
 ```python
 # test_class_patterns.py
 from class_patterns import locate
+from keyword_patterns import describe
 from point import Point
 
 def test_class_patterns() -> None:
     assert locate(Point(0, 0)) == "The origin"
     assert locate(Point(3, 0)) == "On the x-axis at x=3"
     assert locate(Point(3, 4)) == "At (3, 4)"
+
+def test_keyword_patterns() -> None:
+    assert describe(Point(0, 5)) == "Somewhere on the y-axis"
+    assert describe(Point(3, 0)) == "Somewhere on the x-axis"
+    assert describe(Point(2, 2)) == "On the diagonal at 2"
+    assert describe(Point(3, 4)) == "Just some point"
 ```
 
 ## Guards

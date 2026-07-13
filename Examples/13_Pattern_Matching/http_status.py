@@ -1,5 +1,4 @@
 # http_status.py
-# Literal patterns match exact values.
 
 def describe(status: int) -> str:
     match status:
