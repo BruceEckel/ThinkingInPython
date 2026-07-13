@@ -5,8 +5,8 @@ from repeat import repeat
 @pytest.mark.parametrize("times, expected", [
     (3, 3),
     (1, 1),
-    (0, 1),  # Still calls once, not zero times
-    (-1, 1),  # Still calls once, not zero times
+    (0, 1),
+    (-1, 1),
 ])
 def test_repeat_call_count(times: int, expected: int) -> None:
     calls: list[str] = []

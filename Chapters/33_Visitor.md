@@ -190,6 +190,7 @@ and that the two operations dispatch independently:
 
 ```python
 # test_visitor.py
+import pytest
 from visitor_singledispatch import (
     Chrysanthemum,
     Flower,
@@ -207,10 +208,15 @@ def test_nectar_default_for_unregistered() -> None:
     assert nectar(Ranunculus()) == "Ranunculus: no nectar"
     assert nectar(Flower()) == "Flower: no nectar"
 
-def test_fragrance_registered_and_default() -> None:
-    assert fragrance(Ranunculus()) == "strong"
-    assert fragrance(Gladiolus()) == "faint"
-    assert fragrance(Chrysanthemum()) == "faint"
+@pytest.mark.parametrize("flower, expected", [
+    (Ranunculus(), "strong"),
+    (Gladiolus(), "faint"),
+    (Chrysanthemum(), "faint"),
+])
+def test_fragrance_registered_and_default(
+    flower: Flower, expected: str
+) -> None:
+    assert fragrance(flower) == expected
 
 def test_operations_dispatch_independently() -> None:
     # Nectar knows Gladiolus and Chrysanthemum; fragrance knows

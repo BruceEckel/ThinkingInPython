@@ -1,16 +1,20 @@
 # test_filesystem.py
 from typing import Final
-from filesystem import Directory, File, disk_usage, walk
+import pytest
+from filesystem import Directory, File, Node, disk_usage, walk
 
 SUB: Final[Directory] = Directory(
     "sub", (File("b", 2), File("c", 3)))
 TREE: Final[Directory] = Directory(
     "top", (File("a", 1), SUB))
 
-def test_disk_usage_is_uniform() -> None:
-    assert disk_usage(TREE) == 6
-    assert disk_usage(SUB) == 5
-    assert disk_usage(File("solo", 7)) == 7
+@pytest.mark.parametrize("entry, expected", [
+    (TREE, 6),
+    (SUB, 5),
+    (File("solo", 7), 7),
+])
+def test_disk_usage_is_uniform(entry: Node, expected: int) -> None:
+    assert disk_usage(entry) == expected
 
 def test_walk_yields_full_paths() -> None:
     assert list(walk(TREE)) == [

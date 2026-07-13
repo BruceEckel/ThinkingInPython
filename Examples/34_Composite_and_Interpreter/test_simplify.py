@@ -1,13 +1,21 @@
 # test_simplify.py
-from expr import Add, Mul, Num, Var
+from typing import Final
+import pytest
+from expr import Add, Expr, Mul, Num, Var
 from simplify import simplify
 
-def test_identity_elements_vanish() -> None:
-    x = Var("x")
-    assert simplify(x + 0) == x
-    assert simplify(0 + x) == x
-    assert simplify(1 * x) == x
-    assert simplify(x * 1) == x
+X: Final[Var] = Var("x")
+
+@pytest.mark.parametrize("expr, expected", [
+    (X + 0, X),
+    (0 + X, X),
+    (1 * X, X),
+    (X * 1, X),
+])
+def test_identity_elements_vanish(
+    expr: Expr, expected: Expr,
+) -> None:
+    assert simplify(expr) == expected
 
 def test_zero_absorbs_multiplication() -> None:
     assert simplify(Var("x") * 0) == Num(0)

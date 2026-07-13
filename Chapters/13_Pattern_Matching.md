@@ -104,12 +104,16 @@ The pattern `[first, second]` matches only a two-element sequence and pulls both
 
 ```python
 # test_sequence_patterns.py
+import pytest
 from sequence_patterns import summarize
 
-def test_sequence_patterns() -> None:
-    assert summarize([]) == "Empty"
-    assert summarize([5]) == "One item: 5"
-    assert summarize([1, 2, 3]) == "1, then 2 more"
+@pytest.mark.parametrize("items, expected", [
+    ([], "Empty"),
+    ([5], "One item: 5"),
+    ([1, 2, 3], "1, then 2 more"),
+])
+def test_sequence_patterns(items: list[int], expected: str) -> None:
+    assert summarize(items) == expected
 ```
 
 ## Class Patterns
@@ -203,20 +207,27 @@ and works as a type-only check or a final catch-all.
 
 ```python
 # test_class_patterns.py
+import pytest
 from class_patterns import locate
 from keyword_patterns import describe
 from point import Point
 
-def test_class_patterns() -> None:
-    assert locate(Point(0, 0)) == "The origin"
-    assert locate(Point(3, 0)) == "On the x-axis at x=3"
-    assert locate(Point(3, 4)) == "At (3, 4)"
+@pytest.mark.parametrize("point, expected", [
+    (Point(0, 0), "The origin"),
+    (Point(3, 0), "On the x-axis at x=3"),
+    (Point(3, 4), "At (3, 4)"),
+])
+def test_class_patterns(point: Point, expected: str) -> None:
+    assert locate(point) == expected
 
-def test_keyword_patterns() -> None:
-    assert describe(Point(0, 5)) == "Somewhere on the y-axis"
-    assert describe(Point(3, 0)) == "Somewhere on the x-axis"
-    assert describe(Point(2, 2)) == "On the diagonal at 2"
-    assert describe(Point(3, 4)) == "Just some point"
+@pytest.mark.parametrize("point, expected", [
+    (Point(0, 5), "Somewhere on the y-axis"),
+    (Point(3, 0), "Somewhere on the x-axis"),
+    (Point(2, 2), "On the diagonal at 2"),
+    (Point(3, 4), "Just some point"),
+])
+def test_keyword_patterns(point: Point, expected: str) -> None:
+    assert describe(point) == expected
 ```
 
 ## Guards

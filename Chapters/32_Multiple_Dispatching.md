@@ -257,10 +257,13 @@ def test_both_versions_agree() -> None:
         assert (compete(methods, player, opponent)
                 == compete(table, player, opponent))
 
-def test_outcome_str() -> None:
-    assert str(Outcome.WIN) == "win"
-    assert str(Outcome.LOSE) == "lose"
-    assert str(Outcome.DRAW) == "draw"
+@pytest.mark.parametrize("outcome, expected", [
+    (Outcome.WIN, "win"),
+    (Outcome.LOSE, "lose"),
+    (Outcome.DRAW, "draw"),
+])
+def test_outcome_str(outcome: Outcome, expected: str) -> None:
+    assert str(outcome) == expected
 ```
 
 Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,

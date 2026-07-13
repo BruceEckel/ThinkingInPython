@@ -151,17 +151,21 @@ so sharing subtrees is safe (see [Functional Programming](40_Functional_Programm
 ```python
 # test_filesystem.py
 from typing import Final
-from filesystem import Directory, File, disk_usage, walk
+import pytest
+from filesystem import Directory, File, Node, disk_usage, walk
 
 SUB: Final[Directory] = Directory(
     "sub", (File("b", 2), File("c", 3)))
 TREE: Final[Directory] = Directory(
     "top", (File("a", 1), SUB))
 
-def test_disk_usage_is_uniform() -> None:
-    assert disk_usage(TREE) == 6
-    assert disk_usage(SUB) == 5
-    assert disk_usage(File("solo", 7)) == 7
+@pytest.mark.parametrize("entry, expected", [
+    (TREE, 6),
+    (SUB, 5),
+    (File("solo", 7), 7),
+])
+def test_disk_usage_is_uniform(entry: Node, expected: int) -> None:
+    assert disk_usage(entry) == expected
 
 def test_walk_yields_full_paths() -> None:
     assert list(walk(TREE)) == [
@@ -421,15 +425,23 @@ It returns a new tree that shares unchanged subtrees with the original.
 
 ```python
 # test_simplify.py
-from expr import Add, Mul, Num, Var
+from typing import Final
+import pytest
+from expr import Add, Expr, Mul, Num, Var
 from simplify import simplify
 
-def test_identity_elements_vanish() -> None:
-    x = Var("x")
-    assert simplify(x + 0) == x
-    assert simplify(0 + x) == x
-    assert simplify(1 * x) == x
-    assert simplify(x * 1) == x
+X: Final[Var] = Var("x")
+
+@pytest.mark.parametrize("expr, expected", [
+    (X + 0, X),
+    (0 + X, X),
+    (1 * X, X),
+    (X * 1, X),
+])
+def test_identity_elements_vanish(
+    expr: Expr, expected: Expr,
+) -> None:
+    assert simplify(expr) == expected
 
 def test_zero_absorbs_multiplication() -> None:
     assert simplify(Var("x") * 0) == Num(0)

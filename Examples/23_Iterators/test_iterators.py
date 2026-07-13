@@ -1,10 +1,14 @@
 # test_iterators.py
+import pytest
 from iterators import Countdown, fibonacci, total
 
-def test_fibonacci_sequence() -> None:
-    assert list(fibonacci(8)) == [0, 1, 1, 2, 3, 5, 8, 13]
-    assert list(fibonacci(0)) == []
-    assert list(fibonacci(1)) == [0]
+@pytest.mark.parametrize("n, expected", [
+    (8, [0, 1, 1, 2, 3, 5, 8, 13]),
+    (0, []),
+    (1, [0]),
+])
+def test_fibonacci_sequence(n: int, expected: list[int]) -> None:
+    assert list(fibonacci(n)) == expected
 
 def test_countdown_sequence() -> None:
     assert list(Countdown(5)) == [5, 4, 3, 2, 1]
