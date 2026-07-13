@@ -3,6 +3,8 @@ from collections.abc import Callable
 from functools import update_wrapper
 
 class trace[**P, R]:
+    __name__: str  # Set by update_wrapper(), not __init__
+
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         update_wrapper(self, func)  # Copy __name__, __doc__, etc

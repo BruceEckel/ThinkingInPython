@@ -135,6 +135,29 @@ The `# type: ignore` comments mark the one place the checker cannot follow:
 a bare `Callable` is not guaranteed to have a `__name__` attribute,
 though every actual function does.
 
+`test_tracer.py` checks the two things `wraps` promises:
+the wrapper reports the original function's name,
+and it still returns the original result:
+
+```python
+# test_tracer.py
+from tracer import trace
+
+def test_trace_preserves_name() -> None:
+    @trace
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    assert add.__name__ == "add"
+
+def test_trace_returns_original_result() -> None:
+    @trace
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    assert add(2, 3) == 5
+```
+
 ## Decorators That Take Arguments
 
 To pass arguments to a decorator, add another layer.
@@ -169,11 +192,49 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-`@repeat(times=3)` first evaluates `repeat(times=3)`,
-which returns the real decorator, which then wraps `greet`.
+The return type is worth unpacking:
+`Callable[[Callable[P, R]], Callable[P, R]]`.
+`Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`" (see the summary in [Static Typing](08_Static_Typing.md#containers)).
+The first, inner brackets hold the parameter types, even when there is only one,
+so `[Callable[P, R]]` is a parameter list of length one,
+not a list of callables.
+That single parameter type is itself `Callable[P, R]`,
+the wrapped function's type.
+So the whole annotation reads as "a callable that takes a `Callable[P, R]` and returns a `Callable[P, R]`."
+That describes `decorate`: it takes `func` and returns `wrapper`,
+both typed `Callable[P, R]`.
+
+`@repeat(times=3)` first evaluates `repeat(times=3)`, which returns `decorate`,
+the real decorator, which then wraps `greet`.
 Inside `wrapper()`, the first call to `func` happens before the loop,
 so `result` always holds a value of type `R` to return;
 the loop adds the remaining `times - 1` calls.
+That first call happens unconditionally,
+so `times=0` and a negative `times` still call `func` once, not zero times.
+`test_repeat.py` parametrizes over `times`,
+checking the ordinary case and both edge cases in one test:
+
+```python
+# test_repeat.py
+import pytest
+from repeat import repeat
+
+@pytest.mark.parametrize("times, expected", [
+    (3, 3),
+    (1, 1),
+    (0, 1),
+    (-1, 1),
+])
+def test_repeat_call_count(times: int, expected: int) -> None:
+    calls: list[str] = []
+
+    @repeat(times=times)
+    def record() -> None:
+        calls.append("call")
+
+    record()
+    assert len(calls) == expected
+```
 
 ## Decorators as Classes
 
@@ -190,6 +251,8 @@ from collections.abc import Callable
 from functools import update_wrapper
 
 class trace[**P, R]:
+    __name__: str  # Set by update_wrapper(), not __init__
+
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         update_wrapper(self, func)  # Copy __name__, __doc__, etc
@@ -222,6 +285,28 @@ and calling `add(2, 3)` invokes `__call__()`.
 It copies the wrapped function's metadata across.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
+
+`test_trace_class.py` checks the same two things,
+this time produced by `update_wrapper()`:
+
+```python
+# test_trace_class.py
+from trace_class import trace
+
+def test_trace_preserves_name() -> None:
+    @trace
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    assert add.__name__ == "add"
+
+def test_trace_returns_original_result() -> None:
+    @trace
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    assert add(2, 3) == 5
+```
 
 Because the instance can hold attributes, state between calls is natural.
 A class-based decorator that counts calls keeps the count on the instance:
@@ -257,6 +342,31 @@ if __name__ == "__main__":
 #: 2
 ```
 
+Each `@count_calls` creates its own instance,
+so the count on one decorated function never leaks into another.
+`test_count_calls.py` decorates two functions and checks their counts stay independent:
+
+```python
+# test_count_calls.py
+from count_calls import count_calls
+
+def test_counts_are_independent_per_function() -> None:
+    @count_calls
+    def greet() -> None:
+        pass
+
+    @count_calls
+    def farewell() -> None:
+        pass
+
+    greet()
+    greet()
+    farewell()
+
+    assert greet.count == 2
+    assert farewell.count == 1
+```
+
 The class form shifts in an important way when the decorator itself takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
@@ -290,6 +400,32 @@ if __name__ == "__main__":
 #: Hello, Bob
 #: Hello, Bob
 #: Hello, Bob
+```
+
+This shares `repeat.py`'s edge case: the first call happens before the loop,
+so `times=0` or a negative `times` still calls `func` once.
+`test_repeat_class.py` checks the same cases:
+
+```python
+# test_repeat_class.py
+import pytest
+from repeat_class import repeat
+
+@pytest.mark.parametrize("times, expected", [
+    (3, 3),
+    (1, 1),
+    (0, 1),  # Still calls once, not zero times
+    (-1, 1),  # Still calls once, not zero times
+])
+def test_repeat_call_count(times: int, expected: int) -> None:
+    calls: list[str] = []
+
+    @repeat(times=times)
+    def record() -> None:
+        calls.append("call")
+
+    record()
+    assert len(calls) == expected
 ```
 
 Compare the two cases.
@@ -352,6 +488,35 @@ Stacking works because each wrapper preserves the interface of what it wraps:
 every layer looks like the original function,
 so the layers compose to any depth.
 
+`test_stacking.py` confirms both claims:
+the name survives two layers of wrapping,
+and the inner decorator's repeat still happens once per outer call:
+
+```python
+# test_stacking.py
+from repeat_class import repeat
+from trace_class import trace
+
+def test_stacked_decorators_preserve_name() -> None:
+    @trace
+    @repeat(times=2)
+    def greet(name: str) -> str:
+        return name
+
+    assert greet.__name__ == "greet"
+
+def test_stacked_decorators_repeat_the_call() -> None:
+    calls: list[str] = []
+
+    @trace
+    @repeat(times=2)
+    def record() -> None:
+        calls.append("call")
+
+    record()
+    assert calls == ["call", "call"]
+```
+
 ## Decorating Classes
 
 You can apply a decorator to a class instead of a function.
@@ -385,6 +550,22 @@ just as a function decorator returns a replacement function.
 
 [Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
+
+`test_register.py` checks both halves of that claim:
+`register()` hands back the exact same class object,
+and the registry looks it up by name:
+
+```python
+# test_register.py
+from register import Espresso, Latte, register, registry
+
+def test_register_returns_same_class() -> None:
+    assert register(Espresso) is Espresso
+
+def test_registry_looks_up_by_name() -> None:
+    assert registry["Espresso"] is Espresso
+    assert registry["Latte"] is Latte
+```
 
 ## The Decorator Pattern
 

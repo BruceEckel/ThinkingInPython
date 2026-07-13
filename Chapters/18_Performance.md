@@ -10,10 +10,11 @@ As to the second issue, Python is commonly considered to be slow.
 
 ## Is It Actually Too Slow?
 
-Computer programming projects have a long history of *premature optimization*,
-which means deciding ahead of time, based on biases,
+Computer programming projects have a long history of *premature optimization*:
+optimizing before any measurement shows where the time goes,
+often by deciding ahead of time, based on biases,
 that runtime performance will be insufficient.
-This produces elaborate, expensive designs.
+This produces elaborate, expensive designs that solve problems that may not exist.
 
 Python can be surprising.
 A program coded in the most straightforward way,
@@ -22,9 +23,8 @@ Do not automatically assume that a simply written program will be too slow.
 Try it out first.
 It might be fine.
 
-If it is too slow, use Occam's Razor.
-Try the simplest approach first.
-That might be enough, and if it is, you might save time and money.
+If it is too slow, try the simplest remedy first.
+That might be enough, and if it is, you save time and money.
 
 What follows is an approach to solving performance problems,
 starting with the simplest techniques and growing successively more complex.
@@ -33,6 +33,8 @@ starting with the simplest techniques and growing successively more complex.
 
 Alternative interpreters for Python exist, notably PyPy,
 which boasts a 4x to 10x speedup.
+PyPy typically trails CPython's newest language version,
+so confirm it supports the features and third-party packages you rely on.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, then buying new hardware might be a quick win.
@@ -51,8 +53,10 @@ sometimes enough to distort the behavior you are measuring:
 
     python -m cProfile -s cumulative my_program.py
 
-Python 3.15 adds a *sampling* profiler,
-`profiling.sampling` ([PEP 799](https://peps.python.org/pep-0799/)).
+Python 3.15 gathers the profilers into a single `profiling` package ([PEP 799](https://peps.python.org/pep-0799/)).
+The tracing profiler above becomes `profiling.tracing`,
+with `cProfile` kept as an alias,
+and a new *sampling* profiler arrives as `profiling.sampling`.
 Instead of tracing every call, it takes periodic snapshots of the call stack,
 so the overhead is near zero and the program runs at full speed while you watch:
 
@@ -179,6 +183,9 @@ print([grade(s) for s in (55, 65, 85, 95)])
 
 Because `scores` stays sorted,
 `bisect` locates a position in O(log n) instead of the O(n) scan a `list` would need.
+Only the search is that fast:
+`insort()` still shifts everything after the insertion point,
+so under heavy insert traffic consider the heap below instead.
 
 When you repeatedly need the smallest item,
 a *heap* keeps that item reachable in O(log n).
