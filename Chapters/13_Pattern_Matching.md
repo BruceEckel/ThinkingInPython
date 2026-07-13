@@ -348,11 +348,8 @@ An `if`/`isinstance()` chain can also get there,
 but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 
-Note that this example reframes the classic OOP "shapes" example without inheritance and dynamic binding.
-Dynamic binding discovers an object's actual type at runtime.
-Pattern matching does the same,
-but is a better solution by centralizing type-dependent behavior in a single place.
-[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) uses this technique to add operations to a closed set of types without inheritance.
+This reframes the classic OOP "shapes" example as a closed type union instead of a class hierarchy.
+[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching) compares the two approaches directly.
 
 ```python
 # test_exhaustive.py
@@ -561,11 +558,11 @@ and the existing classes and functions stay untouched.
 
 Adding a channel is cheaper with inheritance.
 Adding an operation is cheaper with pattern matching.
-This split is sometimes called the *expression problem*.
+That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
+worked out concretely.
+It is also called the *expression problem*.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes,
 and [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explore it further.
-Choose inheritance when new types arrive often and the operations stay stable.
-Choose a type union with `match` when the types are fixed and new operations arrive often.
 
 ## Exercises
 
