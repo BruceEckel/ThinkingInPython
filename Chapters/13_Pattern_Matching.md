@@ -4,8 +4,7 @@ The `match` statement compares a value against a series of *patterns* and runs t
 A `match` is far more than a `switch` because a pattern can test a value's shape,
 look inside it, and pull out the parts you need, all in one step.
 
-[Control Flow](04_Control_Flow.md#pattern-matching) gave a taste.
-This chapter covers the rest.
+Pattern matching was briefly introduced in [Control Flow](04_Control_Flow.md#pattern-matching).
 
 ## Matching Values
 
@@ -16,7 +15,6 @@ Each `case` body runs only when its pattern matches, and the first match wins:
 
 ```python
 # http_status.py
-# Literal patterns match exact values.
 
 def describe(status: int) -> str:
     match status:
@@ -38,15 +36,16 @@ print(describe(301))
 ```
 
 For a plain value-to-value lookup like this,
-a dictionary is often shorter (see the end of this chapter).
+a dictionary is often shorter (see [the end of this chapter](#when-not-to-match)).
 `match` becomes valuable once the patterns do more than test equality.
 
 ## Alternatives and Capture
 
 Combine several patterns in one `case` with `|`.
 A bare name is a *capture pattern*.
-It always matches and binds the value to that name,
-making it a wildcard with a name attached:
+Like `_`, it matches any value unconditionally;
+unlike `_`, it also binds the matched value to that name.
+Here, `other` is the capture pattern:
 
 ```python
 # step.py
