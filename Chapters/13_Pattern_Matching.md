@@ -43,8 +43,8 @@ a dictionary is often shorter (see [the end of this chapter](#when-not-to-match)
 
 Combine several patterns in one `case` with `|`.
 A bare name is a *capture pattern*.
-Like `_`, it matches any value unconditionally;
-unlike `_`, it also binds the matched value to that name.
+Like `_`, it matches any value unconditionally; unlike `_`,
+it also binds the matched value to that name.
 Here, `other` is the capture pattern:
 
 ```python
@@ -155,13 +155,18 @@ print(locate(Point(3, 4)))
 `Point(0, y)` matches when `x` is zero and *captures* `y`.
 The literal and the capture combine in one pattern.
 
-Positional matching depends on `__match_args__`, a class attribute listing field names in order.
-`@dataclass` generates it automatically from the field order, so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
-Without a `__match_args__` long enough to cover the positions you supply, a positional pattern raises a `TypeError`.
+Positional matching depends on `__match_args__`,
+a class attribute listing field names in order.
+`@dataclass` generates it automatically from the field order,
+so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
+Without a `__match_args__` long enough to cover the positions you supply,
+a positional pattern raises a `TypeError`.
 
 Keyword patterns work differently.
-`Point(x=0, y=y)` matches by attribute name directly, through attribute access, not through `__match_args__`.
-Keyword patterns therefore work on any object with the named attributes, dataclass or not, and they let you match a subset of attributes while ignoring the rest:
+`Point(x=0, y=y)` matches by attribute name directly, through attribute access,
+not through `__match_args__`.
+Keyword patterns therefore work on any object with the named attributes,
+dataclass or not, and they let you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -188,9 +193,12 @@ print(describe(Point(3, 4)))
 #: Just some point
 ```
 
-`Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y` entirely.
-A positional pattern cannot do this: it must supply a sub-pattern for every position `__match_args__` defines.
-`Point()` with no arguments matches any `Point` instance, keyword or positional, and works as a type-only check or a final catch-all.
+`Point(x=0)` matches any point whose `x` attribute is zero,
+ignoring `y` entirely.
+A positional pattern cannot do this:
+it must supply a sub-pattern for every position `__match_args__` defines.
+`Point()` with no arguments matches any `Point` instance, keyword or positional,
+and works as a type-only check or a final catch-all.
 
 ```python
 # test_class_patterns.py

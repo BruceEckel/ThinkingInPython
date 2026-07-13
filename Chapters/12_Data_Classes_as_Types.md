@@ -209,7 +209,8 @@ display_object(Messenger("foo", 12, 3.14))
 #:   None
 ```
 
-The default `display_object()` does not show the generated `__init__()`, `__repr__()`, and `__eq__()`.
+The default `display_object()` does not show the generated `__init__()`,
+`__repr__()`, and `__eq__()`.
 
 ## Immutability
 
@@ -663,8 +664,7 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-A data class assembles its `__init__` from a field list which includes
-its own fields plus any inherited from data class bases.
+A data class assembles its `__init__` from a field list which includes its own fields plus any inherited from data class bases.
 It builds the body by assigning those fields, not by chaining to the base.
 It has no way to know what arguments a non-data-class base constructor expects,
 so it does not call it.
@@ -837,8 +837,7 @@ def show(obj: object) -> None:
 `show()` calls `display_object()` with `REDEFINED_DUNDERS`,
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
-For clarity, `show()` also excludes `__hash__` from these reports
-(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+For clarity, `show()` also excludes `__hash__` from these reports (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
 `A` is the plain case, with no defaults and no constructor,
 but with field declarations that look like class variables:
@@ -929,8 +928,7 @@ print(C.__annotations__)
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
-As a `@dataclass`,
-`C`s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
+As a `@dataclass`, `C`s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
 With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the class,
@@ -945,8 +943,7 @@ then uses that to write `__init__`'s parameter list and the assignments inside i
 exactly as it was before.
 The promise is only fulfilled per instance,
 when the generated `__init__()` actually runs.
-That is the difference from `A`:
-not that `@dataclass` changes the annotations,
+That is the difference from `A`: not that `@dataclass` changes the annotations,
 but that it builds something to act on them.
 
 `D` adds a real `ClassVar` alongside an ordinary field:
