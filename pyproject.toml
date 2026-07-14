@@ -71,6 +71,9 @@ lines-after-imports = 1
 "**/repeat_class.py" = ["N801"]
 "**/trace_counting.py" = ["N801"]
 "**/banner_cm.py" = ["N801"]
+# This context manager class is named like a function because you use it
+# like one, matching contextlib.suppress's own naming.
+"**/suppress_cm.py" = ["N801"]
 # This example exists to show that importing a module runs its top-level
 # code; the imported name is intentionally unused.
 "**/import_module.py" = ["F401"]

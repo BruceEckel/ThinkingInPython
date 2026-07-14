@@ -14,12 +14,13 @@ from the Markdown** by `tools/extract_examples.py`, so:
 - After editing, sync the committed tree: `make sync`
   (= `uv run python tools/extract_examples.py --write -o Examples`).
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
-  `.idea/`, `__pycache__`). The drift check only flags book blocks that are missing
-  or changed, not "extra" files, so a stray `Examples/` file can linger.
-  Audit for these after a full `--write` sync with:
-  `diff <(cd Examples && find . -type f -not -path '*__pycache__*' -not -path '*.idea*' | sort) <(cd build/examples && find . -type f -not -path '*__pycache__*' | sort)`.
-  Anything only on the `Examples/` side is a candidate for deletion; grep the
-  book for the filename first to confirm nothing still references it.
+  `.idea/`, `__pycache__`). `tools/extract_examples.py`'s check mode (part of
+  `make check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
+  whose name appears nowhere in `Chapters/` is *orphaned* and fails the gate;
+  one still mentioned somewhere (a real hand-written helper) is *referenced*
+  and only reported, since deleting it needs a human call. `make prune-examples`
+  deletes exactly the orphaned ones. A rename or deletion of a book example is
+  the usual cause, so run this after either.
 
 ## The verify loop after editing a chapter
 

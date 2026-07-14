@@ -48,7 +48,7 @@ The return annotation `Self`
 (introduced in [Static Typing](08_Static_Typing.md#the-self-type))
 declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
-A `with` block guarantees that the exit code runs at the end of the scope.
+A `with` block guarantees that `__exit__()` runs at the end of the scope.
 
 ## Cleanup Is Guaranteed
 
@@ -90,8 +90,11 @@ and execution continues after the block:
 
 ```python
 # suppress_cm.py
-class Ignore:
-    def __init__(self, *types: type[BaseException]) -> None:
+ALL = sentinel("ALL")
+type Types = type[BaseException] | tuple[type[BaseException], ...]
+
+class ignore:
+    def __init__(self, types: Types | ALL = ALL) -> None:
         self.types = types
 
     def __enter__(self) -> None:
@@ -99,31 +102,54 @@ class Ignore:
 
     def __exit__(self, exc_type: type[BaseException] | None,
                  exc: BaseException | None, tb: object) -> bool:
-        return (exc_type is not None
-                and issubclass(exc_type, self.types))
+        if exc_type is None:
+            return False
+        if self.types is not ALL:
+            if not issubclass(exc_type, self.types):
+                return False
+        print("ignoring", exc_type.__name__)
+        return True
 
-with Ignore(ZeroDivisionError):
+with ignore(ZeroDivisionError):
     print("before")
     1 / 0
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
 #: before
+#: ignoring ZeroDivisionError
+#: survived
+
+with ignore():  # No argument means ALL
+    print("before")
+    raise KeyError("anything")
+print("survived")
+#: before
+#: ignoring KeyError
 #: survived
 ```
 
-The `1 / 0` raises an exception, `__exit__()` returns `True`,
+The `1 / 0` raises an exception, `__exit__()` prints which type it is ignoring,
+then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
+
+`types` defaults to `ALL`,
+a [sentinel](05_Functions.md#default-and-keyword-arguments)
+meaning every exception.
+`self.types is not ALL` narrows `self.types` back down to `Types` before `issubclass()` runs,
+the same `is`-narrowing used for `ALL_DUNDERS` in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
+`ignore()` with no argument ignores anything;
+`ignore(ZeroDivisionError)` narrows that to one type;
+`ignore((ZeroDivisionError, TypeError))` narrows it to several.
 
 The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
 which means the exception *class* itself, such as `ZeroDivisionError`,
 not an instance of it.
-`__init__()` takes `*types: type[BaseException]`,
-so `Ignore(ZeroDivisionError)` collects the exception classes you hand it into the `types` tuple.
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
 or `None` when the block finished cleanly.
-That class is what `issubclass(exc_type, self.types)` checks against the classes you chose to suppress.
+That class is what `issubclass(exc_type, self.types)` checks against the classes you chose to suppress,
+once `self.types` is something `issubclass()` accepts rather than `ALL`.
 
-The standard library includes its own version of `Ignore` as `contextlib.suppress`.
+The standard library includes its own version of `ignore` as `contextlib.suppress`.
 The above demonstration would instead be:
 
 ```python
@@ -139,8 +165,8 @@ print("survived")
 #: survived
 ```
 
-`suppress` is a class,
-but it is named like a function because you use it like one.
+Like `ignore` above,
+`suppress` is a class named like a function because you use it like one.
 See [Naming Conventions](02_Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
 
@@ -352,7 +378,7 @@ The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions,
-  replacing the `Ignore` class above.
+  replacing the `ignore` class above.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
 - `ExitStack` manages a dynamic or conditional set of managers, as shown above.
@@ -521,7 +547,8 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.
     Predict the order the six "enter"/"inside"/"exit" lines appear in before running it.
-2.  In `suppress_cm.py`, add `TypeError` to the tuple passed to `Ignore`,
+2.  In `suppress_cm.py`,
+    change `ignore(ZeroDivisionError)` to `ignore((ZeroDivisionError, TypeError))`,
     then raise a `TypeError` instead of dividing by zero,
     and confirm it is also suppressed.
 3.  Add a third manager to the `with` statement in `multiple.py`,

@@ -35,8 +35,20 @@ a renamed or deleted example. Writing to any other ``-o`` target keeps the
 non-destructive incremental write, since trees like the committed ``Examples/``
 hold files that are not generated from the book.
 
+Check mode also looks the other way: a file under ``Examples/`` (besides
+``__pycache__`` and ``.idea``) that no current block generates, left behind by
+a rename or deletion since the drift check above only flags missing/changed
+blocks, not extras. Each stray is further classified by grepping every chapter
+for its bare filename: *orphaned* (the name appears nowhere) fails the check
+the same as a missing or changed block; *referenced* (the name still appears
+in some chapter's prose, e.g. a hand-written helper mentioned but not
+extracted) is reported but does not fail the check, since deleting it needs a
+human to confirm it is truly unused. Pass ``--prune`` to delete the orphaned
+files (never the referenced ones).
+
 Usage:
     python tools/extract_examples.py                # check vs Examples/
+    python tools/extract_examples.py --prune        # also delete orphaned strays
     python tools/extract_examples.py --write        # write build/examples/
     python tools/extract_examples.py --write -o DIR  # write somewhere else
 """
@@ -52,6 +64,10 @@ from tools_repo import block_slug, md_files, write_text_lf
 
 COMMITTED_DIR = ROOT / "Examples"
 DEFAULT_OUT = EXAMPLES_TREE
+
+# Directories under Examples/ that are never book-generated and never stray:
+# JetBrains project settings and Python's own bytecode cache.
+NOISE_DIR_NAMES = {"__pycache__", ".idea"}
 
 
 @dataclass
@@ -142,6 +158,45 @@ def check_against(result: ExtractResult, committed: Path):
     return missing, changed
 
 
+def find_strays(result: ExtractResult, committed: Path) -> list[str]:
+    """Files under `committed` that no book block generates.
+
+    Excludes NOISE_DIR_NAMES (__pycache__, .idea), which are expected to sit
+    there without ever having a matching block.
+    """
+    if not committed.exists():
+        return []
+    expected = set(result.examples)
+    strays = []
+    for path in committed.rglob("*"):
+        if not path.is_file():
+            continue
+        if NOISE_DIR_NAMES & set(path.relative_to(committed).parts):
+            continue
+        rel = path.relative_to(committed).as_posix()
+        if rel not in expected:
+            strays.append(rel)
+    return sorted(strays)
+
+
+def classify_strays(strays: list[str]) -> tuple[list[str], list[str]]:
+    """Split strays into (orphaned, referenced).
+
+    Referenced means the bare filename still appears somewhere in
+    Chapters/*.md, e.g. a hand-written helper mentioned in prose but not
+    extracted; that needs a human to confirm it is truly unused, so it is
+    reported but not treated as a failure. Orphaned means the name appears
+    nowhere, so it is safe to delete outright.
+    """
+    book_text = "\n".join(
+        md.read_text(encoding="utf-8") for md in md_files())
+    orphaned, referenced = [], []
+    for rel in strays:
+        name = Path(rel).name
+        (referenced if name in book_text else orphaned).append(rel)
+    return orphaned, referenced
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -149,6 +204,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="write the extracted tree (default: check only)")
     ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
                     help=f"output dir for --write (default: {DEFAULT_OUT.name})")
+    ap.add_argument("--prune", action="store_true",
+                    help="delete orphaned stray files under Examples/ "
+                         "(check mode only)")
     args = ap.parse_args(argv)
 
     result = extract()
@@ -182,8 +240,36 @@ def main(argv: list[str] | None = None) -> int:
               f"{COMMITTED_DIR.name}/:")
         for p in changed:
             print(f"  ~ {p}")
-    if not (missing or changed or result.conflicts):
-        print("\nIn sync: every book example matches the committed tree.")
+
+    strays = find_strays(result, COMMITTED_DIR)
+    orphaned, referenced = classify_strays(strays)
+    if args.prune and orphaned:
+        for p in orphaned:
+            (COMMITTED_DIR / p).unlink()
+        print(f"\nPruned {len(orphaned)} orphaned stray file(s) "
+              f"from {COMMITTED_DIR.name}/:")
+        for p in orphaned:
+            print(f"  - {p}")
+        orphaned = []
+    elif orphaned:
+        print(f"\n{len(orphaned)} orphaned stray file(s) under "
+              f"{COMMITTED_DIR.name}/ (no book block, no reference anywhere; "
+              "run with --prune to delete):")
+        for p in orphaned:
+            print(f"  x {p}")
+    if referenced:
+        print(f"\n{len(referenced)} stray file(s) under {COMMITTED_DIR.name}/ "
+              "with no book block, but the filename is still mentioned in "
+              "the book (review by hand):")
+        for p in referenced:
+            print(f"  ? {p}")
+
+    if not (missing or changed or result.conflicts or orphaned):
+        if referenced:
+            print("\nIn sync otherwise: every book example matches the "
+                  "committed tree.")
+        else:
+            print("\nIn sync: every book example matches the committed tree.")
         return 0
     print("\n(Run with --write to materialize build/examples/ for running.)")
     return 1

@@ -1,4 +1,4 @@
-# exceptions.py
+# demonstrate_exceptions.py
 
 def parse_int(text):
     try:
@@ -16,7 +16,7 @@ def checked_divide(a, b):
         raise ValueError("Divide by zero")
     return a / b
 
-def demo_exceptions(a, b):
+def exceptions(a, b):
     try:
         checked_divide(a, b)
     except ValueError as e:
@@ -26,9 +26,9 @@ def demo_exceptions(a, b):
     finally:
         print("finally always runs")
 
-demo_exceptions(1, 0)
+exceptions(1, 0)
 #: caught: Divide by zero
 #: finally always runs
-demo_exceptions(1, 1)
+exceptions(1, 1)
 #: no exception
 #: finally always runs

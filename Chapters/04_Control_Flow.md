@@ -227,7 +227,7 @@ You can give only the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
 
 ```python
-# exceptions.py
+# demonstrate_exceptions.py
 
 def parse_int(text):
     try:
@@ -245,7 +245,7 @@ def checked_divide(a, b):
         raise ValueError("Divide by zero")
     return a / b
 
-def demo_exceptions(a, b):
+def exceptions(a, b):
     try:
         checked_divide(a, b)
     except ValueError as e:
@@ -255,10 +255,10 @@ def demo_exceptions(a, b):
     finally:
         print("finally always runs")
 
-demo_exceptions(1, 0)
+exceptions(1, 0)
 #: caught: Divide by zero
 #: finally always runs
-demo_exceptions(1, 1)
+exceptions(1, 1)
 #: no exception
 #: finally always runs
 ```
@@ -340,7 +340,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
     Predict whether the output changes before running it,
     and explain why the order of two independent conditions,
     testing different values of `n`, does not matter here.
-4.  In `exceptions.py`, add a call `demo_exceptions(1, 2)`
-    (no error, and `b` is not zero) and a call `demo_exceptions(1, "x")`
+4.  In `demonstrate_exceptions.py`, add a call `exceptions(1, 2)`
+    (no error, and `b` is not zero) and a call `exceptions(1, "x")`
     (a `TypeError` that `except ValueError` does not catch).
     Run the second one and read the traceback that escapes.

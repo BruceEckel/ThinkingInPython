@@ -88,7 +88,9 @@ sync-ci: sync solutions-sync ci  ## Like verify, plus the site build (the full C
 # `ci` adds the site. validate_output.py runs with --update: a stale #: marker
 # self-heals (rewriting Chapters/) the same way fix-eol/sync already do,
 # rather than failing the build. A raised exception where none is expected
-# still fails the gate; only marker text is self-corrected.
+# still fails the gate; only marker text is self-corrected. The drift check
+# also fails on an orphaned stray under Examples/ (a file no block generates
+# and no chapter mentions); run `make prune-examples` to delete those.
 gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/listing_format.py
@@ -134,6 +136,13 @@ sync:  ## Update the committed Examples/ tree from the Markdown
 
 check:  ## Verify book examples match the committed Examples/ tree
 	$(PY) tools/extract_examples.py
+
+# `check`/`gate` already fail on an orphaned stray (a file under Examples/
+# with no matching block and no mention anywhere in the book, typically left
+# behind by a rename). This deletes exactly those; a stray whose filename is
+# still mentioned somewhere in the book is left alone for a human to review.
+prune-examples:  ## Delete orphaned stray files under Examples/ (see `check`)
+	$(PY) tools/extract_examples.py --prune
 
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
