@@ -805,7 +805,7 @@ Each topping wraps the pizza inside it and forwards through the same two-propert
 The `Pizza` `Protocol` describes that interface.
 Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
-This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
@@ -847,18 +847,18 @@ def test_single_topping() -> None:
 
 Several decorators from earlier chapters use this mechanism.
 `@property`, `cached_property`, `@staticmethod`, and `@classmethod`
-([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods))
+(see [Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods))
 each wrap a function the same way `trace` does,
 but return a *descriptor* instead of a plain wrapper.
-That is what lets them change how attribute access behaves,
-and it is also what makes them work correctly on methods,
+That lets them change how attribute access behaves,
+and it also makes them work correctly on methods,
 where a plain `__call__`-based class, like `Logged` above, does not.
-`@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
+`@dataclass` (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
 is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,
 adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
 `functools.cache` and `functools.lru_cache`
-([Performance](18_Performance.md#caching))
+(see [Performance](18_Performance.md#caching))
 wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 None of these needed new syntax to understand.
