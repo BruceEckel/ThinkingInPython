@@ -1,4 +1,5 @@
 # register.py
+
 registry: dict[str, type] = {}
 
 def register(cls: type) -> type:

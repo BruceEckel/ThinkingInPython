@@ -660,21 +660,28 @@ and nothing requires the callable it wraps to come from a `def`:
 # lambda_decoration.py
 from collections.abc import Callable
 
-def loud(func: Callable[[int], int]) -> Callable[[int], int]:
+def report(func: Callable[[int], int]) -> Callable[[int], int]:
     def wrapper(n: int) -> int:
-        print(f"calling with {n}")
+        print(f"Calling {func.__name__} with {n}")  # type: ignore
         return func(n)
     return wrapper
 
-double = loud(lambda n: n * 2)
+double = report(lambda n: n * 2)
+
+@report
+def triple(n: int) -> int:
+    return n * 3
 
 if __name__ == "__main__":
     print(double(21))
-#: calling with 21
+    print(triple(21))
+#: Calling <lambda> with 21
 #: 42
+#: Calling triple with 21
+#: 63
 ```
 
-`loud` only asks for a callable and never asks how `func` was created.
+`report` only asks for a callable and never asks how `func` was created.
 Calling it directly, instead of through `@`, decorates the `lambda` on the spot.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.

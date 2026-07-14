@@ -225,12 +225,15 @@ The construction syntax is unchanged,
 and callers cannot tell they received a shared object
 (this is how CPython's small-integer cache does it).
 The cost is bookkeeping by hand.
-Python calls `__init__()` on whatever `__new__()` returns,
-so an `__init__()` here would re-run on the cached instance at every construction.
-Skipping `__init__()` means skipping `@dataclass` too,
-since a dataclass only generates `__init__()`.
+When `__new__()` returns an instance of the class, as it does here,
+Python calls `__init__()` on it,
+so an `__init__()` would re-run on the cached instance at every construction.
+This class therefore defines no `__init__()`,
+which rules out the plain `@dataclass`,
+whose generated `__init__()` would reintroduce exactly that re-run.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
+(`@dataclass(init=False)` could restore those two generated methods, at the price of still more care with the by-hand field assignment.)
 A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
 not just the key that names them.
