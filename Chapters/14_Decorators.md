@@ -303,7 +303,7 @@ The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 
 `functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function.
-`wraps` is a thin convenience layer over `update_wrapper()` that copies the wrapped function's metadata across.
+`wraps` is a thin convenience layer over `update_wrapper()` that copies the wrapped function's metadata.
 
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.

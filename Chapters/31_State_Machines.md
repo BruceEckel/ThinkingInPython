@@ -66,10 +66,11 @@ class StateMachine:
             self.current_state.run()
 ```
 
-Treating `run_all()` as a template method is typical,
-but certainly not required.
-You could override it,
-but the behavior change usually occurs in `State`'s `run()`.
+`run_all()` is the template method:
+it fixes the flow (report the input, transition, run the new state),
+while the varying behavior lives in each `State`'s `run()` and `next()`.
+As [Template Method](25_Template_Method.md) puts it,
+subclasses supply the steps, not the flow.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
