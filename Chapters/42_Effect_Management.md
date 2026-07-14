@@ -35,10 +35,10 @@ It would be great if the type checking system could perform purity verification 
 This is called an *Effect Management System*,
 and this chapter explores aspects of Effect Management.
 
-## What is an Effect?
+## What Is an Effect?
 
 An *Effect* is what causes impurity.
-We say that a function has *side effects* if calling does anything other than returning a result.
+We say that a function has *side effects* if calling it does anything other than returning a result.
 That is, if it modifies the environment outside the function.
 For example, it might:
 
@@ -97,7 +97,8 @@ Two schools of thought exist:
     Because ⊥ is a valid theoretical value, throwing an uncatchable error is technically referentially transparent.
     You could replace the function call with the crash itself, and the program's behavior wouldn't change.
 
-2.  **Functional**: Exceptions bypass normal control flow which makes code difficult to reason about.
+2.  **Functional**: Exceptions bypass normal control flow,
+    which makes code difficult to reason about.
     To make code easier to reason about,
     functional programming avoids exceptions altogether.
     A *Total Function* doesn't raise exceptions,
@@ -110,7 +111,7 @@ then `a()` also raises that exception unless it is caught within `a()`.
 To know the Effects that your function has,
 exceptions must be tracked as Effects on all functions.
 
-## A Program can Never be Pure
+## A Program Can Never Be Pure
 
 A perfectly pure program computes something but never lets anyone see it.
 It reads nothing from its environment and changes nothing in its environment,
@@ -661,8 +662,8 @@ there's no human-constrained adoption curve.
 AI Effect Languages don't need the extra affordances that benefit humans.
 If a language works, an AI can start using it right away.
 
-Most of these only **track** Effects,
-because the AI can generate whatever code it needs to solve specialized problems:
+Most of these only **track** Effects, rather than providing a full EMS,
+for reasons the end of this section explains:
 
 - [Vera](https://veralang.dev):
   mandatory contracts checked with Z3 SMT verification.
@@ -763,7 +764,7 @@ Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, the ideas in this chapter are what it will contain.
 
-## Effects are the Next Barrier
+## Effects Are the Next Barrier
 
 The history of programming is a history of scaling barriers.
 Each time, the pattern is the same.

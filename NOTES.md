@@ -1,3 +1,7 @@
+You've pointed out that 40_Functional_Programming.md is very long.
+Suggest ways that it could be broken up into multiple chapters, possibly integrating 41_Functional_Error_Handling.md somewhere appropriate.
+Don't do anything, just analyze.
+
 Review the book looking for consistency issues
 
 Chapter 8 read

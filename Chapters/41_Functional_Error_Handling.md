@@ -492,8 +492,7 @@ They are expected, and the type should say so.
     Confirm a `Failure` from `func_e()` still short-circuits.
 2.  Give `Failure` a `map_error()` method that transforms the error it holds,
     leaving a `Success` untouched
-    (for chains to keep working,
-    `Success` needs its own `map_error()` that returns `self`).
+    (for chains to keep working, `Success` needs its own `map_error()` that returns `self`).
     Use it to add a prefix to every error.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.

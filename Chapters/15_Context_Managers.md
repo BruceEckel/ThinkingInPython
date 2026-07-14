@@ -86,10 +86,35 @@ A falsy value lets it propagate;
 this includes the implicit `None` of a method with no `return`,
 so propagation is the default.
 A truthy value *suppresses* it: the `with` statement swallows the exception,
-and execution continues after the block:
+and execution continues after the block.
+
+The standard library provides this behavior ready-made,
+as `contextlib.suppress`:
 
 ```python
-# suppress_cm.py
+# suppress_exceptions.py
+from contextlib import suppress
+
+with suppress(ZeroDivisionError):
+    print("before")
+    1 / 0
+    print("after")  # Never runs
+print("survived")
+#: before
+#: survived
+```
+
+`suppress` is a class named like a function because you use it like one.
+See [Naming Conventions](02_Tour.md#naming-conventions)
+for when a class departs from `CapWords`.
+
+We can write a version with more features:
+reporting which exception it swallowed,
+and accepting no argument to mean "ignore everything":
+
+```python
+# exceptions.py
+
 ALL = sentinel("ALL")
 type Types = type[BaseException] | tuple[type[BaseException], ...]
 
@@ -109,6 +134,27 @@ class ignore:
                 return False
         print(f"ignoring {exc!r}")
         return True
+```
+
+`types` defaults to `ALL`,
+a [sentinel](05_Functions.md#default-and-keyword-arguments)
+meaning every exception.
+`self.types is not ALL` narrows `self.types` back down to `Types` before `issubclass()` runs.
+`ignore()` with no argument ignores anything.
+`ignore(ZeroDivisionError)` narrows that to one type.
+`ignore((ZeroDivisionError, TypeError))` narrows it to several.
+
+The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
+which means the exception *class* itself, such as `ZeroDivisionError`,
+not an instance of it.
+`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
+or `None` when the block finished cleanly.
+That class is what `issubclass(exc_type, self.types)` checks against the classes you chose to suppress,
+once `self.types` is something `issubclass()` accepts rather than `ALL`.
+
+```python
+# demo_exceptions.py
+from exceptions import ignore
 
 with ignore(ZeroDivisionError):
     print("before")
@@ -128,50 +174,11 @@ print("survived")
 #: survived
 ```
 
-The `1 / 0` raises an exception, `__exit__()` prints which exception it is ignoring,
-then returns `True`,
+The `1 / 0` raises an exception,
+`__exit__()` prints which exception it is ignoring, then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 `exc!r` prints the exception's `repr()`,
-which includes both its type and its arguments,
-not just `exc_type.__name__`.
-
-`types` defaults to `ALL`,
-a [sentinel](05_Functions.md#default-and-keyword-arguments)
-meaning every exception.
-`self.types is not ALL` narrows `self.types` back down to `Types` before `issubclass()` runs,
-the same `is`-narrowing used for `ALL_DUNDERS` in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
-`ignore()` with no argument ignores anything;
-`ignore(ZeroDivisionError)` narrows that to one type;
-`ignore((ZeroDivisionError, TypeError))` narrows it to several.
-
-The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
-which means the exception *class* itself, such as `ZeroDivisionError`,
-not an instance of it.
-`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
-or `None` when the block finished cleanly.
-That class is what `issubclass(exc_type, self.types)` checks against the classes you chose to suppress,
-once `self.types` is something `issubclass()` accepts rather than `ALL`.
-
-The standard library includes its own version of `ignore` as `contextlib.suppress`.
-The above demonstration would instead be:
-
-```python
-# suppress_exceptions.py
-from contextlib import suppress
-
-with suppress(ZeroDivisionError):
-    print("before")
-    1 / 0
-    print("after")  # Never runs
-print("survived")
-#: before
-#: survived
-```
-
-Like `ignore` above,
-`suppress` is a class named like a function because you use it like one.
-See [Naming Conventions](02_Tour.md#naming-conventions)
-for when a class departs from `CapWords`.
+which includes both its type and its arguments, not just `exc_type.__name__`.
 
 ## Context Managers as Generators
 
@@ -550,7 +557,7 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.
     Predict the order the six "enter"/"inside"/"exit" lines appear in before running it.
-2.  In `suppress_cm.py`,
+2.  In `demo_exceptions.py`,
     change `ignore(ZeroDivisionError)` to `ignore((ZeroDivisionError, TypeError))`,
     then raise a `TypeError` instead of dividing by zero,
     and confirm it is also suppressed.

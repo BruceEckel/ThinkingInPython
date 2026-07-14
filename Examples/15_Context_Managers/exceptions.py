@@ -1,4 +1,4 @@
-# suppress_cm.py
+# exceptions.py
 ALL = sentinel("ALL")
 type Types = type[BaseException] | tuple[type[BaseException], ...]
 
@@ -18,20 +18,3 @@ class ignore:
                 return False
         print(f"ignoring {exc!r}")
         return True
-
-with ignore(ZeroDivisionError):
-    print("before")
-    1 / 0
-    print("after")  # Never runs: the error jumps straight to __exit__
-print("survived")
-#: before
-#: ignoring ZeroDivisionError('division by zero')
-#: survived
-
-with ignore():  # No argument means ALL
-    print("before")
-    raise KeyError("anything")
-print("survived")
-#: before
-#: ignoring KeyError('anything')
-#: survived
