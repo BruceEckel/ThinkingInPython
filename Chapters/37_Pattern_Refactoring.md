@@ -249,8 +249,8 @@ for kind, items in bins.items():
 
 This satisfies the requirement, but it has a classic flaw.
 It tests for *every type in the system*.
-When cardboard becomes valuable and you add it,
-you must find any `case` statements that look for specific types.
+When a new material joins the system, `Plastic` say,
+you must find every `case` statement that enumerates specific types.
 Any you miss will silently drop trash on the floor.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
