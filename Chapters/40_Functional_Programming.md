@@ -380,7 +380,8 @@ which is handy when a higher-order function needs a single-argument callable.
 Use partial application when an API expects a function of one argument and you have a function of several.
 Rather than write a throwaway wrapper,
 you preset the fixed arguments and pass the result straight in.
-Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect through its `.func` and `.args`,
+Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
+through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
 This avoids the late-binding surprise a lambda created in a loop can produce.
 
@@ -1407,7 +1408,7 @@ def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample
 ```
 
-`@given(st.text())` feeds `test_roundtrip()` a stream of generated strings.
+`@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
 When a law fails, Hypothesis does not only report the failing input.
 It shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.

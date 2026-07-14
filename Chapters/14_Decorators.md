@@ -767,10 +767,10 @@ class Hawaiian:
 
 class Topping:
     add_cost = 0.0
-    name = ""
 
     def __init__(self, pizza: Pizza) -> None:
         self.pizza = pizza
+        self.name = type(self).__name__
 
     @property
     def cost(self) -> float:
@@ -782,15 +782,12 @@ class Topping:
 
 class Garlic(Topping):
     add_cost = 0.50
-    name = "Garlic"
 
 class Olives(Topping):
     add_cost = 0.75
-    name = "Olives"
 
 class Feta(Topping):
     add_cost = 1.25
-    name = "Feta"
 
 if __name__ == "__main__":
     order = Feta(Olives(Margherita()))
@@ -810,7 +807,12 @@ Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
 This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 
-Adding a new topping means adding one class.
+`Topping.__init__()` sets `self.name = type(self).__name__`,
+reading each subclass's own name at construction time instead of repeating it as a string.
+`Garlic`, `Olives`, and `Feta` never mention their own names;
+the class name already is the topping name.
+
+Adding a new topping means adding one class with one line, `add_cost`.
 Changing the price of a topping means changing one number, in one place.
 Compare that to a class per combination,
 where a price change touches every class that includes that topping.

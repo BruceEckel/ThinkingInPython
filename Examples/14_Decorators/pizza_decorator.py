@@ -17,10 +17,10 @@ class Hawaiian:
 
 class Topping:
     add_cost = 0.0
-    name = ""
 
     def __init__(self, pizza: Pizza) -> None:
         self.pizza = pizza
+        self.name = type(self).__name__
 
     @property
     def cost(self) -> float:
@@ -32,15 +32,12 @@ class Topping:
 
 class Garlic(Topping):
     add_cost = 0.50
-    name = "Garlic"
 
 class Olives(Topping):
     add_cost = 0.75
-    name = "Olives"
 
 class Feta(Topping):
     add_cost = 1.25
-    name = "Feta"
 
 if __name__ == "__main__":
     order = Feta(Olives(Margherita()))
