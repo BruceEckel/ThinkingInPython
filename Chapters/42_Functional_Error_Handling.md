@@ -13,6 +13,15 @@ It does not appear in the function's return type, so the caller cannot see,
 from the signature, that the call might fail.
 And it is easy to forget to handle.
 
+Returning the failure as a value reverses those costs.
+Failure appears in the return type,
+so the type checker reminds every caller to handle it,
+and a reviewer sees it without reading the body.
+Control flow stays local,
+with no exception leaping past intermediate frames to a distant handler.
+You do pay by handling the failure at each step,
+but that is the same discipline that stops an unhandled error from escaping unnoticed.
+
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
 

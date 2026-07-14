@@ -280,7 +280,7 @@ A generator is spent after one pass.
 
 ## Caching
 
-If a pure function ([Functional Programming](40_Functional_Programming.md#pure-functions))
+If a pure function ([Functional Foundations](40_Functional_Foundations.md#pure-functions))
 is called repeatedly with the same arguments,
 the fastest way to compute the answer is to not compute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -524,7 +524,7 @@ NumPy is a fast library you call, not a compiled extension you write.
 The benefit only occurs if the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reproduces the overhead.
-This is the declarative trade from [Functional Programming](40_Functional_Programming.md#declarative-style):
+This is the declarative trade from [Functional Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
 (NumPy is a third-party dependency, and the book's Python 3.15 target has no NumPy release yet, so unlike the rest of the book's listings, the build does not run this snippet.

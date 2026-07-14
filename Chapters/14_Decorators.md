@@ -76,7 +76,7 @@ Python keeps `func` alive for as long as `wrapper()` exists,
 even after `add_behavior()` has already returned.
 That is what lets `cheese()`, called long after decoration finished,
 still reach the original `cheese` function through `func`.
-[Closures](40_Functional_Programming.md#closures) covers the general mechanism.
+[Closures](40_Functional_Foundations.md#closures) covers the general mechanism.
 
 Decoration is a simple kind of [metaprogramming](17_Metaprogramming.md).
 The same idea appears in design patterns as the *Decorator* pattern:

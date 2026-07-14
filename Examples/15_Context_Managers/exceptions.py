@@ -1,4 +1,5 @@
 # exceptions.py
+
 ALL = sentinel("ALL")
 type Types = type[BaseException] | tuple[type[BaseException], ...]
 
