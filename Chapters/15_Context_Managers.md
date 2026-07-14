@@ -135,10 +135,12 @@ packaged as a reusable object.
 
 ## The `__exit__()` Arguments
 
-`__exit__(self, exc_type, exc_value, traceback)` receives the details of an exception raised in the block.
+`__exit__(self, exc_type, exc, tb)` receives the details of an exception raised in the block.
 When the block finishes normally, all three are `None`.
-When it raises an exception, they hold the exception's type, value,
-and traceback.
+When it raises an exception, they hold the exception's class,
+its instance, and its traceback object.
+`Trace.__exit__()` above types `exc` and `tb` as `object`,
+the most general type, since it never inspects either one.
 
 The return value decides what happens to that exception.
 A falsy value lets it propagate;
