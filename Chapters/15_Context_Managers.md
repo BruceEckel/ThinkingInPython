@@ -41,15 +41,12 @@ if __name__ == "__main__":
 which prints `enter A`.
 The yielded value is what `as` binds, so `t` is `"A"`.
 The block under the `with` then runs.
-When it finishes,
-`trace()` resumes just after the `yield` and prints `exit A`.
+When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
-The code before `yield` is the setup,
-and the code after it is the cleanup.
+The code before `yield` is the setup, and the code after it is the cleanup.
 The `finally` is what makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
-and `finally` runs the cleanup anyway,
-before the exception propagates.
+and `finally` runs the cleanup anyway, before the exception propagates.
 This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
 It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
 and [Iterators](23_Iterators.md#generators).
@@ -63,9 +60,8 @@ Construct a fresh manager for each `with` statement.
 
 How does `with` know what to run?
 It knows nothing about generators or `@contextmanager`.
-A *context manager* is any object that implements two methods:
-`__enter__()`, which runs at the start of the block,
-and `__exit__()`, which runs at the end.
+A *context manager* is any object that implements two methods: `__enter__()`,
+which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
 Writing the class by hand shows the machinery directly:
 
@@ -107,12 +103,15 @@ The return annotation `Self`
 declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 
+Comparing this to the generator form,
+`__enter__()` is the portion before the `yield`.
+`__exit__()` is the portion after it.
+
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Cleanup Is Guaranteed
 
-Context managers make code shorter, but the point is the guarantee.
 Here, `__exit__()` runs when the block raises an exception,
 but before the exception propagates:
 
@@ -196,15 +195,22 @@ class ignore:
         return True
 ```
 
-`types` defaults to `ALL`,
-a [sentinel](05_Functions.md#default-and-keyword-arguments)
-meaning every exception.
+The `types` parameter
+defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments), meaning every exception.
+
+`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo`
+or a subclass of it, and also accepts a tuple of classes for `classinfo`,
+matching if `cls` is a subclass of any one of them.
 `self.types is not ALL` narrows `self.types` back down to `Types` before `issubclass()` runs.
 `ignore()` with no argument ignores anything.
 `ignore(ZeroDivisionError)` narrows that to one type.
 `ignore((ZeroDivisionError, TypeError))` narrows it to several.
 
-The annotations use [`type[...]`](08_Static_Typing.md#classes-as-values-type),
+Here, `__enter__()` returns `None` because `ignore` is not meant to be used with `as`.
+You can still use `as` but it will just bind to `None`.
+
+The annotations use `type[BaseException]`,
+a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
 which means the exception *class* itself, such as `ZeroDivisionError`,
 not an instance of it.
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
@@ -232,6 +238,10 @@ print("survived")
 #: before
 #: ignoring KeyError('anything')
 #: survived
+
+with ignore() as x:
+    print(f"{x = }")
+#: x = None
 ```
 
 The `1 / 0` raises an exception,
@@ -239,6 +249,8 @@ The `1 / 0` raises an exception,
 and the `with` statement absorbs the error so `survived` still prints.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
+In the last example, `x` receives the return value of `__enter__()`,
+which for `ignore()` is `None`.
 
 ## A Context Manager as a Decorator
 

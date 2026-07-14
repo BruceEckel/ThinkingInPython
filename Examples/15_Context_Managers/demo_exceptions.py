@@ -17,3 +17,7 @@ print("survived")
 #: before
 #: ignoring KeyError('anything')
 #: survived
+
+with ignore() as x:
+    print(f"{x = }")
+#:

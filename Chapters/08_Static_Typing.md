@@ -199,8 +199,6 @@ print(type(shape).__name__)
 so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
-This is the construct functions like `issubclass()` work with,
-since they compare classes rather than instances.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
