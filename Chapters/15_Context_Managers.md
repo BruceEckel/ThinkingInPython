@@ -257,14 +257,16 @@ and the `with` statement absorbs the error so `survived` still prints.
 In the last example, `x` receives the return value of `__enter__()`,
 which for `ignore()` is `None`.
 
-## A Context Manager as a Decorator
+## Context Manager as Decorator
 
 A context manager brackets a block of statements: setup before, cleanup after.
 A typical decorator from [Decorators](14_Decorators.md)
 brackets a function call the same way.
 `contextlib.ContextDecorator` connects the two:
-a context manager that inherits from it can be applied with `@`,
-and every manager `@contextmanager` produces already inherits from it:
+a class that inherits from it works both as a context manager and as a decorator.
+Every manager `@contextmanager` produces already inherits from `ContextDecorator`,
+so `tracing` below works as a decorator with no extra code,
+even though `ContextDecorator` never appears in it:
 
 ```python
 # context_decorator.py
