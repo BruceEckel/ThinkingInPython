@@ -365,7 +365,7 @@ if __name__ == "__main__":
 ```
 
 Each `@count_calls` creates its own instance,
-so the count on one decorated function never leaks into another.
+so the count on one decorated function never leaks into another:
 
 ```python
 # test_count_calls.py
@@ -390,7 +390,7 @@ def test_counts_are_independent_per_function() -> None:
 
 ### A Class Decorator with Arguments
 
-The class form shifts in an important way when the decorator takes arguments.
+The class form provides a valuable benefit when the decorator takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
@@ -424,6 +424,9 @@ if __name__ == "__main__":
 #: Hello, Bob
 #: Hello, Bob
 ```
+
+With decorator arguments,
+the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
 
 This shares `repeat.py`'s edge case: the first call happens before the loop,
 so `times=0` or a negative `times` still calls `func` once.

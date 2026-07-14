@@ -276,7 +276,8 @@ not when a test imports it.
 1.  Add a fourth `Item`, `Lizard`, to `paper_scissors_rock_table.py`.
     Lizard beats Paper and Scissors, and loses to Rock.
     Lizard versus Lizard is a draw.
-    Add the six new entries (both orders of every pair) that `OUTCOME` needs.
+    Add the seven new entries that `OUTCOME` needs:
+    both orders of each mixed pair, plus Lizard versus Lizard.
 2.  Add the same `Lizard` to `paper_scissors_rock.py`,
     the double-dispatch version,
     which means adding an `eval_lizard()` method to every existing class,
