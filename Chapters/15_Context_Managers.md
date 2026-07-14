@@ -4,20 +4,70 @@ The `with` statement,
 introduced in [Control Flow](04_Control_Flow.md#context-managers),
 runs setup before a block and cleanup after it,
 even if the block raises an exception.
-This chapter shows what `with` actually does and how to write your own context managers.
+This chapter shows how to write your own context managers,
+and what `with` actually does.
 
-A *context manager* is any object that implements two methods: `__enter__()`,
-which runs at the start of the block, and `__exit__()`, which runs at the end.
-The `with` statement calls them for you and guarantees that `__exit__()` runs no matter how the block finishes.
-
-Thus, the context manager marks out a span of execution that determines when initialization and cleanup happen.
+A context manager marks out a span of execution that determines when initialization and cleanup happen.
 This is far more reliable than using `__del__()`,
 as we saw in [Cleanup](10_Cleanup.md).
 
+## A Basic Context Manager
+
+The simplest way to write a context manager is a generator function with a single `yield`,
+turned into a context manager by the `contextlib.contextmanager` decorator:
+
+```python
+# trace_gen.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def trace(name: str) -> Iterator[str]:
+    print(f"enter {name}")  # Setup
+    try:
+        yield name  # The block runs here
+    finally:
+        print(f"exit {name}")  # Cleanup
+
+if __name__ == "__main__":
+    with trace("A") as t:
+        print(f"inside {t}")
+#: enter A
+#: inside A
+#: exit A
+```
+
+`with trace("A") as t:` runs the body of `trace()` up to the `yield`,
+which prints `enter A`.
+The yielded value is what `as` binds, so `t` is `"A"`.
+The block under the `with` then runs.
+When it finishes,
+`trace()` resumes just after the `yield` and prints `exit A`.
+
+The code before `yield` is the setup,
+and the code after it is the cleanup.
+The `finally` is what makes the cleanup dependable:
+an exception raised in the block appears at the `yield`,
+and `finally` runs the cleanup anyway,
+before the exception propagates.
+This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
+It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
+and [Iterators](23_Iterators.md#generators).
+
+One caution: the manager object `trace("A")` returns is single-use.
+Its generator runs once,
+so reusing the same object in a second `with` raises an exception.
+Construct a fresh manager for each `with` statement.
+
 ## The Protocol
 
-`with cm as name:` calls `cm.__enter__()`, binds its return value to `name`,
-runs the block, then calls `cm.__exit__()`:
+How does `with` know what to run?
+It knows nothing about generators or `@contextmanager`.
+A *context manager* is any object that implements two methods:
+`__enter__()`, which runs at the start of the block,
+and `__exit__()`, which runs at the end.
+`@contextmanager` manufactures such an object from a generator function.
+Writing the class by hand shows the machinery directly:
 
 ```python
 # trace_cm.py
@@ -43,12 +93,22 @@ if __name__ == "__main__":
 #: exit A
 ```
 
+`with Trace("A") as t:` takes these steps:
+
+1. Evaluate `Trace("A")` to produce a manager object.
+2. Call the manager's `__enter__()`.
+3. Bind `__enter__()`'s return value to `t`.
+4. Run the block.
+5. Call the manager's `__exit__()`, no matter how the block finished.
+
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
 (introduced in [Static Typing](08_Static_Typing.md#the-self-type))
 declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
-A `with` block guarantees that `__exit__()` runs at the end of the scope.
+
+The generator form is usually the clearest choice.
+Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Cleanup Is Guaranteed
 
@@ -179,45 +239,6 @@ The `1 / 0` raises an exception,
 and the `with` statement absorbs the error so `survived` still prints.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
-
-## Context Managers as Generators
-
-Most context managers are simpler to write as a generator.
-`contextlib.contextmanager` turns a function with a single `yield` into a context manager.
-The code before `yield` is the setup, the yielded value is what `as` binds,
-and the code after `yield` is the cleanup.
-Put the cleanup in a `finally` so it runs even if the block raises an exception:
-
-```python
-# generator_cm.py
-from collections.abc import Iterator
-from contextlib import contextmanager
-
-@contextmanager
-def tag(name: str) -> Iterator[str]:
-    print(f"<{name}>")
-    try:
-        yield name
-    finally:
-        print(f"</{name}>")
-
-with tag("p") as t:
-    print(f"  text in {t}")
-#: <p>
-#:   text in p
-#: </p>
-```
-
-This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
-It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
-and [Iterators](23_Iterators.md#generators).
-The generator form is usually the clearest choice.
-Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
-
-One caution: the manager object `tag("p")` returns is single-use.
-Its generator runs once,
-so reusing the same object in a second `with` raises an exception.
-Construct a fresh manager for each `with` statement.
 
 ## A Context Manager as a Decorator
 
