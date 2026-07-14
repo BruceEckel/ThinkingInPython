@@ -1,6 +1,6 @@
 # object_pool.py
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from queue import Queue
 
@@ -34,11 +34,8 @@ if __name__ == "__main__":
         print(conn.query("SELECT name FROM users"))
         print("available during lease:", pool.available())
     print("available after lease:", pool.available())
-    try:
-        with pool.lease() as conn:
-            raise RuntimeError("crash during query")
-    except RuntimeError:
-        pass
+    with suppress(RuntimeError), pool.lease() as conn:
+        raise RuntimeError("crash during query")
     print("available after crash:", pool.available())
 #: connection 1: SELECT name FROM users
 #: available during lease: 1

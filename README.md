@@ -123,7 +123,7 @@ The first serious edit pass.
 | 12_Data_Classes_as_Types.md     |X|
 | 13_Pattern_Matching.md          |X|
 | 14_Decorators.md                |X|
-| 15_Context_Managers.md          | |
+| 15_Context_Managers.md          |X|
 | 16_Comprehensions.md            | |
 | 17_Metaprogramming.md           | |
 | 18_Performance.md               | |

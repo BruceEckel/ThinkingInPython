@@ -354,17 +354,18 @@ so any state the instance holds is shared across calls.
 
 Neither version of `banner` can rewrite arguments, inspect the return value,
 or skip the call.
-A decorator like
-[`repeat`](14_Decorators.md#decorators-that-take-arguments)
+A decorator like [`repeat`](14_Decorators.md#decorators-that-take-arguments)
 or [`hijack`](14_Decorators.md) can do all three,
 because it defines its own wrapper function directly,
 with full access to `*args`, `**kwargs`, and the return value.
 `banner`'s wrapper comes from `ContextDecorator`
 (directly in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
-and that wrapper always makes one unchanged call, bracketed by setup and cleanup.
+and that wrapper always makes one unchanged call,
+bracketed by setup and cleanup.
 Even if `report()` took arguments or returned a value,
 neither version of `banner` would see them.
-What `banner` offers instead is one definition, usable both as a `with` block and as a `@` decorator.
+What `banner` offers instead is one definition,
+usable both as a `with` block and as a `@` decorator.
 Use it when setup and cleanup should be identical on every call,
 with nothing that needs to vary per call.
 
@@ -445,11 +446,10 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `nullcontext(value)` is a do-nothing manager that yields `value`,
   useful when a `with` is optional and you want one code path.
 
-Only some runs may have a resource to manage.
-A function might take an optional file to write to,
-defaulting to standard output.
-The default must stay open,
-so wrapping `sys.stdout` in `nullcontext` lets a single `with` block serve both cases:
+A function might take an optional output file that defaults to standard output.
+A caller-supplied file should be closed when the function is done.
+The default, `sys.stdout`, must stay open.
+Wrapping `sys.stdout` in `nullcontext` lets a single `with` block serve both cases:
 
 ```python
 # nullcontext_demo.py
@@ -488,18 +488,18 @@ so the stream stays open.
 
 Some objects are expensive to create or rationed by the outside world:
 database connections, worker processes, licensed sessions.
-The *Object Pool* pattern creates a fixed set up front and lends them out.
+The *Object Pool* pattern creates a fixed group of these expensive objects and lends them out.
 Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path,
 or the pool slowly drains until the program starves.
-The context manager guarantees the "must happen on every path out,"
-so in Python a pool is a queue plus one `@contextmanager` method:
+A context manager can guarantee that borrowed objects are returned.
+In Python, a pool is a queue plus a `@contextmanager` method:
 
 ```python
 # object_pool.py
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from queue import Queue
 
@@ -533,11 +533,8 @@ if __name__ == "__main__":
         print(conn.query("SELECT name FROM users"))
         print("available during lease:", pool.available())
     print("available after lease:", pool.available())
-    try:
-        with pool.lease() as conn:
-            raise RuntimeError("crash during query")
-    except RuntimeError:
-        pass
+    with suppress(RuntimeError), pool.lease() as conn:
+        raise RuntimeError("crash during query")
     print("available after crash:", pool.available())
 #: connection 1: SELECT name FROM users
 #: available during lease: 1
@@ -547,7 +544,6 @@ if __name__ == "__main__":
 
 `lease()` takes an item out of the queue, yields it to the `with` block,
 and the `finally` puts it back.
-The `finally` is the entire pattern.
 The crash inside the second `with` block still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
@@ -557,7 +553,7 @@ It only tracks custody.
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and a return makes an item available.
-Handing the same pool to several threads therefore just works.
+This means you can hand the same pool to several threads.
 The pool becomes the throttle that limits concurrent use,
 which is how real database connection pools behave.
 
@@ -593,10 +589,9 @@ def test_objects_reused_not_recreated() -> None:
         assert second is first
 ```
 
-The last test states the pattern's purpose.
 The second lease hands back the same object, not a new one.
-A production pool adds refinements on this skeleton,
-such as creating items lazily on first demand,
+A *production pool* adds refinements on this skeleton,
+such as lazily creating items on first demand,
 validating an item before lending it out,
 and a timeout on `get()` so a starved borrower fails loudly instead of waiting forever.
 
