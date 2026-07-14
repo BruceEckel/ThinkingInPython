@@ -234,9 +234,10 @@ The object form is worth it only when a strategy needs its own configuration or 
 ## Chain of Responsibility
 
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
-*GoF Design Patterns* implements the chain as a linked list,
-largely because it predates standard list types.
-In Python the chain is a list of functions.
+*GoF Design Patterns* implements the chain as a linked structure,
+each handler holding a reference to the next and deciding whether to pass the request along.
+In Python the chain is a list of functions,
+and the loop that walks it makes that decision in one place.
 Bisection needs the interval to bracket a root.
 The open methods do not:
 
