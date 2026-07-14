@@ -133,7 +133,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Bulkhead | Isolate resources so one failure does not sink the whole system. |
 | Timeout | Bound how long to wait for a response. |
 | Saga | Run a long transaction as a series of compensable steps. |
-| Command Query Responsibility Segregation | Separate the read model from the write model. |
+| Command Query Responsibility Segregation (CQRS) | Separate the read model from the write model. |
 | Event Sourcing | Store state as a log of events instead of current values. |
 | Sidecar | Attach helper functionality to a service as a separate process. |
 | Ambassador | Proxy a service's outbound calls through a helper. |
@@ -151,7 +151,7 @@ An unlinked name means the pattern appears only in this catalog.
 | [Dependency Injection](11_Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
 | Inversion of Control | Let a framework call your code rather than the reverse. |
 | Service Locator | Look up dependencies through a central registry. |
-| [Resource Acquisition Is Initialization](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
+| [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
 | [Fluent Interface](27_Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
@@ -161,5 +161,5 @@ An unlinked name means the pattern appears only in this catalog.
 | [Memoization](40_Functional_Programming.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
-| Curiously Recurring Template Pattern | A class inherits from a base parameterized by the class itself. |
-| Pointer to Implementation | Hide a class's implementation behind an indirection to cut compile coupling. |
+| Curiously Recurring Template Pattern (CRTP) | A class inherits from a base parameterized by the class itself. |
+| Pointer to Implementation (Pimpl) | Hide a class's implementation behind an indirection to cut compile coupling. |

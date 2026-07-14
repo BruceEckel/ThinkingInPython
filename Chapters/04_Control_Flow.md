@@ -52,6 +52,24 @@ print(not_implemented())
 #: None
 ```
 
+`...` (the *Ellipsis* literal) is a second placeholder.
+Using it alone as a statement does nothing, the same as `pass`:
+
+```python
+# ellipsis_placeholder.py
+
+def not_implemented_yet() -> None:
+    ...
+
+print(not_implemented_yet())
+#: None
+```
+
+`pass` marks an indented block with nothing in it yet.
+`...` marks a one-line stub, usually a function signature with no real body,
+as in a `Protocol` method
+([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
+
 A `while` loop runs until its condition is false:
 
 ```python

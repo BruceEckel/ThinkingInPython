@@ -717,8 +717,8 @@ print(game.show_maze())
 ```
 
 Running it prints the maze before and after the walk.
-The robot eats the food along its path, takes a teleport,
-and reaches the `!` that ends the game.
+The robot eats the food along its path, jumps through both teleports
+(`a`, then `b`), and reaches the `!` that ends the game.
 
 The maze rendering, `show_maze()`, returns a string,
 so the model's correctness is something a test can pin down with no window in sight.
