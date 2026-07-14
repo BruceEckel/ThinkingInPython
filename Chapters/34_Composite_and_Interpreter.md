@@ -294,8 +294,8 @@ if __name__ == "__main__":
 #: 7 21
 ```
 
-Because they are immutable, frozen data classes can be compared by value.
-The demo confirms that the operators build the tree you would assemble by hand.
+Data classes generate `__eq__()`, so two trees compare by value,
+and the demo confirms that the operators build the tree you would assemble by hand.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` did not compute a number.

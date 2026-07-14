@@ -634,10 +634,6 @@ just as a function decorator returns a replacement function.
 shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
-`test_register.py` checks both halves of that claim:
-`register()` hands back the exact same class object,
-and the registry looks it up by name:
-
 ```python
 # test_register.py
 from register import Espresso, Latte, register, registry
