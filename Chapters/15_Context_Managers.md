@@ -199,8 +199,8 @@ class ignore:
 
 The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments).
 This makes `ignore()` with no argument catch all exceptions.
-`ignore(ZeroDivisionError)` narrows that to one type.
-`ignore((ZeroDivisionError, TypeError))` narrows it to several.
+`ignore(ZeroDivisionError)` restricts that to one type.
+`ignore((ZeroDivisionError, TypeError))` restricts it to several.
 
 `__enter__()` returns `None` because `ignore` is not meant to be used with `as`.
 You can still use `as` but it will just bind to `None`.
@@ -208,12 +208,17 @@ You can still use `as` but it will just bind to `None`.
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
 or `None` when the block finished cleanly.
 
-`self.types is not ALL` [narrows](08_Static_Typing.md#narrowing)
-`self.types` back down to `Types` (if it's not `ALL` it must be `Types`).
-`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it.
+`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo`
+or a subclass of it.
 It also accepts a tuple of classes for `classinfo`,
 matching if `cls` is a subclass of any one of them.
-Because of narrowing, by the time `issubclass(exc_type, self.types)` is called, `exc_type` is known to be a `Types`.
+`self.types is not ALL` [narrows](08_Static_Typing.md#narrowing)
+`self.types` from `Types | ALL` down to `Types`,
+since ruling out `ALL` leaves only `Types`.
+By the time `issubclass(exc_type, self.types)` runs,
+narrowing has confirmed `self.types` is a `Types`,
+and the earlier `if exc_type is None: return False` has confirmed
+`exc_type` is not `None`.
 
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
@@ -222,7 +227,9 @@ The annotations use `type[BaseException]`,
 a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
 which means the exception *class* itself, such as `ZeroDivisionError`,
 not an instance of it.
-That class, `exc_type` is what `issubclass(exc_type, self.types)` checks against the `self.types`, the supressed classes.
+`exc_type` is that class,
+and `issubclass(exc_type, self.types)` checks it against `self.types`,
+the suppressed classes.
 
 ```python
 # demo_exceptions.py
