@@ -225,7 +225,9 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-The definition of `AsyncObserver` guarantees that only `async` functions can serve as observers.
+The `AsyncObserver` alias makes the checker reject a plain function as an observer:
+an observer must return an awaitable,
+which is exactly what calling an `async` function produces.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscribe order, alarm first.
