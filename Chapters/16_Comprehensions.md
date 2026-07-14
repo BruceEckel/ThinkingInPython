@@ -43,7 +43,7 @@ print(squared_ints)
 #: [1, 81, 0, 16]
 ```
 
-![The parts of a list comprehension: the input sequence, the iteration variable, the optional predicate, and the output expression](_images/listComprehensions)
+![The parts of a list comprehension](_images/listComprehensions)
 
 In this comprehension:
 
