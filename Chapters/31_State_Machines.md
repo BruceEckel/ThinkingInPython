@@ -66,8 +66,8 @@ class StateMachine:
             self.current_state.run()
 ```
 
-`run_all()` is the template method:
-it fixes the flow (report the input, transition, run the new state),
+`run_all()` is the template method: it fixes the flow
+(report the input, transition, run the new state),
 while the varying behavior lives in each `State`'s `run()` and `next()`.
 As [Template Method](25_Template_Method.md) puts it,
 subclasses supply the steps, not the flow.
