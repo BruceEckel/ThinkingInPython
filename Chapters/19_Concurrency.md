@@ -1,6 +1,7 @@
 # Concurrency
 
-[Performance](18_Performance.md) works on making one stream of instructions faster.
+[Performance](18_Performance.md)
+works on making one stream of instructions faster.
 *Concurrency* runs independent tasks so they overlap instead of waiting in line.
 Whether this overlap helps depends on where each task spends its time.
 
@@ -135,7 +136,8 @@ It overlapped the part that runs outside the processor,
 which for `cpu_price` is nothing.
 [Simulation](38_Simulation.md) builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
-and [Observer](30_Observer.md#observer-and-io) uses `gather()` to notify slow observers together instead of one at a time.
+and [Observer](30_Observer.md#observer-and-io)
+uses `gather()` to notify slow observers together instead of one at a time.
 
 ## A Single Thread Still Races
 
@@ -172,7 +174,8 @@ Instead it stops at 50.
 Every `await asyncio.sleep(0)` hands control to the event loop before the write happens.
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
-[The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races) shows the identical failure with threads.
+[The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
+shows the identical failure with threads.
 The mechanism differs.
 A thread switch is preemptive,
 landing at points the interpreter picks and you did not choose,
@@ -656,7 +659,8 @@ This producer-consumer shape,
 producers calling `put()` and consumers calling `get()`,
 is how thread pools distribute work,
 and `get()` blocks until an item is available, so an idle consumer simply waits.
-The [Object Pool](15_Context_Managers.md#an-object-pool) in Context Managers uses the same `Queue` as a throttle.
+The [Object Pool](15_Context_Managers.md#an-object-pool)
+in Context Managers uses the same `Queue` as a throttle.
 
 ## Exercises
 
@@ -669,7 +673,8 @@ The [Object Pool](15_Context_Managers.md#an-object-pool) in Context Managers use
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
 3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
-    (acquire before reading `counter`, release after writing it back) and confirm `counter` now reaches `400`.
+    (acquire before reading `counter`, release after writing it back)
+    and confirm `counter` now reaches `400`.
 4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call entirely and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,

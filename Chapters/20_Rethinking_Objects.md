@@ -55,8 +55,8 @@ The industry has been quietly walking back from "everything is an object" and fr
 
 ## The Liskov Substitution Principle {#liskov-substitution}
 
-The *Liskov Substitution Principle*
-(LSP) says that an object of a subtype must work anywhere code expects an object of its base type,
+The *Liskov Substitution Principle* (LSP)
+says that an object of a subtype must work anywhere code expects an object of its base type,
 without breaking the program.
 A subclass may add behavior, but it must honor the base class's contract.
 It accepts the same arguments, returns the same kinds of results,
@@ -225,7 +225,8 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-[Data Classes as Types](12_Data_Classes_as_Types.md#immutability) makes the case for frozen data classes.
+[Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
+makes the case for frozen data classes.
 Most encapsulation is only necessary because you allowed mutation in the first place.
 
 ## Methods or Functions?
@@ -479,7 +480,8 @@ if __name__ == "__main__":
 
 `show()` accepts anything.
 Pass it something without a `display()` method and you find out only when the line runs.
-[Static Typing](08_Static_Typing.md#structural-typing-with-protocols) gives this a static form with `Protocol`:
+[Static Typing](08_Static_Typing.md#structural-typing-with-protocols)
+gives this a static form with `Protocol`:
 
 ```python
 # protocols_typed.py
@@ -563,7 +565,9 @@ Adding a new operation over all shapes is easier in the data version.
 You write one function, and the type checker tells you if you missed a case.
 The OOP approach assumes you add types more often than operations,
 which is often not true.
-[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explore this trade-off.
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+explore this trade-off.
 
 Testing confirms the object-oriented and `match` versions compute the same areas:
 
@@ -665,7 +669,8 @@ Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
 The standard library ships this exact object as `logging.NullHandler`,
-and the maze in [Simulation](38_Simulation.md) points every doorless direction at one shared `EDGE` room,
+and the maze in [Simulation](38_Simulation.md)
+points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 
 ```python

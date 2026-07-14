@@ -45,7 +45,8 @@ if __name__ == "__main__":
 
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
-(introduced in [Static Typing](08_Static_Typing.md#the-self-type)) declares an instance of the enclosing class.
+(introduced in [Static Typing](08_Static_Typing.md#the-self-type))
+declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 A `with` block guarantees that the exit code runs at the end of the scope.
 
@@ -140,7 +141,8 @@ print("survived")
 
 `suppress` is a class,
 but it is named like a function because you use it like one.
-See [Naming Conventions](02_Tour.md#naming-conventions) for when a class departs from `CapWords`.
+See [Naming Conventions](02_Tour.md#naming-conventions)
+for when a class departs from `CapWords`.
 
 ## Context Managers as Generators
 
@@ -171,7 +173,8 @@ with tag("p") as t:
 ```
 
 This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
-It relies on the generator and decorator machinery from [Decorators](14_Decorators.md) and [Iterators](23_Iterators.md#generators).
+It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
+and [Iterators](23_Iterators.md#generators).
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
@@ -183,7 +186,8 @@ Construct a fresh manager for each `with` statement.
 ## A Context Manager as a Decorator
 
 A context manager brackets a block of statements: setup before, cleanup after.
-A typical decorator from [Decorators](14_Decorators.md) brackets a function call the same way.
+A typical decorator from [Decorators](14_Decorators.md)
+brackets a function call the same way.
 `contextlib.ContextDecorator` connects the two:
 a context manager that inherits from it can be applied with `@`,
 and every manager `@contextmanager` produces already inherits from it:
@@ -524,7 +528,8 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.
 4.  In `object_pool.py`, add a test
-    (alongside the ones in `test_object_pool.py`) that leases both connections at once,
+    (alongside the ones in `test_object_pool.py`)
+    that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.

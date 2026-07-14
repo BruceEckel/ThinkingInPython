@@ -10,8 +10,8 @@ and the system behaves differently from one state to the next
 
 The code that moves the system from one state to the next is often a *Template Method*,
 as seen in the following framework for a basic state machine.
-Each state can be `run()` to perform its behavior, and
-(in this design) you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
+Each state can be `run()` to perform its behavior, and (in this design)
+you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
 The key distinction between this design and the next is that here,
 each `State` object decides what other states it can move to,
 based on the "input,"
@@ -723,7 +723,8 @@ if __name__ == "__main__":
     To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
     When a user finishes with a connection,
     you must inform the system so that it can check that connection back in for reuse.
-    To guarantee this, provide a [proxy](26_Surrogate.md#proxy) object instead of a reference to the actual connection,
+    To guarantee this, provide a [proxy](26_Surrogate.md#proxy)
+    object instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
 2.  Using [State](26_Surrogate.md#state),
     make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
@@ -736,13 +737,13 @@ if __name__ == "__main__":
     override a `next_state()` method that holds its own transition table.
     The input to `next_state()` is a single word read from a text file containing one word per line.
 5.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
-6.  Modify the "mood" exercise
-    (exercise 2) so that it becomes a state machine using `state_machine.py`.
+6.  Modify the "mood" exercise (exercise 2)
+    so that it becomes a state machine using `state_machine.py`.
 7.  Create an elevator state machine system using `state_machine.py`.
 8.  Create a heating/air-conditioning system using `state_machine.py`.
 9.  A *generator* produces objects, like a factory but taking no arguments.
-    Write a `mouse_move_generator()`
-    (using `yield`) that produces correct `MouseAction` moves in sequence,
+    Write a `mouse_move_generator()` (using `yield`)
+    that produces correct `MouseAction` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

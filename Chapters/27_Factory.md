@@ -341,12 +341,12 @@ a class method that reaches the registry through `cls` and finds the appropriate
 The factory is immediately used to create the shape object,
 but you could imagine a more complex problem where the caller receives the appropriate factory object and then uses it to create an object in a more sophisticated way.
 However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
-and a single static method in the base class
-(as shown in `shape_factory1.py`) will work fine.
+and a single static method in the base class (as shown in `shape_factory1.py`)
+will work fine.
 
 `ShapeFactory` fills its dictionary lazily.
-The first request for a kind builds that kind's factory object
-(via `eval()`) and caches it for later requests.
+The first request for a kind builds that kind's factory object (via `eval()`)
+and caches it for later requests.
 
 This version leans on `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
@@ -449,14 +449,16 @@ but there are different types of Characters and obstacles depending on what kind
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
 In this example, the setup and play is simple, but those activities
-(the *initial conditions* and the *state change*) can determine much of the game's outcome.
+(the *initial conditions* and the *state change*)
+can determine much of the game's outcome.
 Here, `GameEnvironment` does not anticipate inheritance,
 although it might make sense to do that.
 
 This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md).
 
 The base classes `Obstacle`, `Character`, and `GameElementFactory`
-(translated from the Java version) force every concrete class to inherit from them.
+(translated from the Java version)
+force every concrete class to inherit from them.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -747,7 +749,8 @@ When does Builder survive in Python?
 When construction genuinely is a process.
 The steps must happen in an order, later steps depend on earlier ones,
 and rules span the steps.
-`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze) is the real thing.
+`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze)
+is the real thing.
 It assembles a maze in three stages, creating rooms, connecting doors,
 then placing the robot,
 and each stage relies on what the previous stage established.

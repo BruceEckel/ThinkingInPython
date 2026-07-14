@@ -3,18 +3,23 @@
 In numerous places throughout this book,
 we have emphasized the benefits of pure functions:
 
-- [Functional Programming](40_Functional_Programming.md#pure-functions) contrasts `double()`,
-  a pure function, with `withdraw()`,
+- [Functional Programming](40_Functional_Programming.md#pure-functions)
+  contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
-- [Performance](18_Performance.md#caching) turns naive recursive Fibonacci from 242,785 calls into 26 with `functools.cache`.
+- [Performance](18_Performance.md#caching)
+  turns naive recursive Fibonacci from 242,785 calls into 26 with `functools.cache`.
   Caching only works because the cached function is pure.
-- [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) turns shapes into immutable data,
+- [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
+  turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [Observer](30_Observer.md#a-visual-example-of-observers) has `recolored()` return a new grid instead of mutating the one it received,
+- [Observer](30_Observer.md#a-visual-example-of-observers)
+  has `recolored()` return a new grid instead of mutating the one it received,
   so a test checks the change with no GUI in sight.
-- [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) reduces competition between items to pure logic,
+- [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+  reduces competition between items to pure logic,
   a dictionary lookup with nothing to mock.
-- [Composite and Interpreter](34_Composite_and_Interpreter.md#simplification-rewrites-the-tree) has `simplify()` return a new tree instead of editing the one it receives.
+- [Composite and Interpreter](34_Composite_and_Interpreter.md#simplification-rewrites-the-tree)
+  has `simplify()` return a new tree instead of editing the one it receives.
 
 There's one important thing these all have in common:
 you can verify function purity just by examining the code in that function.
@@ -57,8 +62,8 @@ your function becomes impure.
 This usually involves I/O: the time of day, a random number,
 a database or network read.
 But it can also be as simple as reading a variable that's global to your function.
-These are called *side causes*
-(corresponding to side effects) or *implicit inputs*.
+These are called *side causes* (corresponding to side effects)
+or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
 But there's another factor that doesn't quite fit either category.
@@ -195,7 +200,8 @@ Here are three ways to do it.
 ### Return a Result Type
 
 Wrap the answer and the failure in a `Result`,
-the way [Functional Error Handling](41_Functional_Error_Handling.md#turning-exceptions-into-results) does.
+the way [Functional Error Handling](41_Functional_Error_Handling.md#turning-exceptions-into-results)
+does.
 `result.py` and `safe.py` are shared helpers,
 so this chapter imports them directly instead of rebuilding them.
 Decorate the original `slope()`, unchanged,
@@ -273,7 +279,8 @@ They leaked information and are generally considered a failure
 ### Make the Bad Value Impossible
 
 The third approach removes the failure instead of handling it.
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) makes illegal values impossible to construct.
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
+makes illegal values impossible to construct.
 Give `run` a type that cannot hold zero,
 and `slope()` never needs to check for zero:
 
@@ -387,8 +394,8 @@ while the interior stays simple and uniform.
 ### Effects by Hand
 
 You have already seen Effect Management by hand.
-Every technique in [Converting Effectful to Pure](#converting-effectful-to-pure) manually manages one Effect,
-the exception.
+Every technique in [Converting Effectful to Pure](#converting-effectful-to-pure)
+manually manages one Effect, the exception.
 A `Result` tracks failure in the return type.
 A `try` binds the failure to a handler.
 A restrictive type removes the failure at construction.
@@ -725,13 +732,16 @@ It just hard-codes the machinery to a single Effect, concurrency,
 rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
-The [returns](https://github.com/dry-python/returns) library provides `Result` and `Maybe` containers like those in [Functional Error Handling](41_Functional_Error_Handling.md),
+The [returns](https://github.com/dry-python/returns)
+library provides `Result` and `Maybe` containers like those in [Functional Error Handling](41_Functional_Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
-The [effect](https://pypi.org/project/effect/) library ports the description/execution split to Python.
+The [effect](https://pypi.org/project/effect/)
+library ports the description/execution split to Python.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
-The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers directly.
+The [eff](https://github.com/orsinium-labs/eff)
+library models Effect handlers directly.
 Each of these gives you the discipline of one part of an EMS.
 None of them gives you the guarantee,
 because the type checker does not participate.

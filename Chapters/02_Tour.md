@@ -351,7 +351,8 @@ and for builtins like `property` and `staticmethod`.
 Reserve it for classes that behave like a function to their users.
 The default for a class is still `CapWords`.
 
-[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions) covers style issues.
+[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)
+covers style issues.
 Tools such as ruff can apply these to your code automatically
 (or at least point them out).
 

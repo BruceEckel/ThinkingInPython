@@ -51,9 +51,8 @@ If you look at it this way,
 you've already seen some design patterns in this book.
 For example, inheritance can be thought of as a design pattern
 (albeit one built into the language).
-It allows you to express differences in behavior
-(that's the thing that changes) in objects that all have the same interface
-(that's what stays the same).
+It allows you to express differences in behavior (that's the thing that changes)
+in objects that all have the same interface (that's what stays the same).
 Composition also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
@@ -120,10 +119,12 @@ so that classification doesn't lead me to a solution
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
 and that is how this book groups them.
-[Surrogate](26_Surrogate.md) treats *Proxy* and *State* as one front-object structure.
+[Surrogate](26_Surrogate.md)
+treats *Proxy* and *State* as one front-object structure.
 [Function Objects](28_Function_Objects.md) treats *Command*, *Strategy*,
 and *Chain of Responsibility* as one function-passing structure.
-[Composite and Interpreter](34_Composite_and_Interpreter.md) treats both of its patterns as one recursive-data structure.
+[Composite and Interpreter](34_Composite_and_Interpreter.md)
+treats both of its patterns as one recursive-data structure.
 When two patterns share a structure, learning one teaches you most of the other,
 and the remaining difference is intent.
 

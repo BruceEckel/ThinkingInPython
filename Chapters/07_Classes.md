@@ -104,7 +104,8 @@ You inherit an implementation, to reuse the code from the base class.
 First import the base class the same way you import any name from a module
 (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class
-(or classes, since Python supports multiple inheritance) in parentheses after the name of the inheriting class.
+(or classes, since Python supports multiple inheritance)
+in parentheses after the name of the inheriting class.
 Here, we import and subclass `Simple`, from the `simple_class` module:
 
 ```python
@@ -373,7 +374,8 @@ print(Temperature.is_freezing(-4))
 ```
 
 For classes that are primarily a bundle of typed data,
-[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) shows how `@dataclass` writes the constructor and `__repr__()` for you.
+[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
+shows how `@dataclass` writes the constructor and `__repr__()` for you.
 
 ## Composing Methods with `import`
 

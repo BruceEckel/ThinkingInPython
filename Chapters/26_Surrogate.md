@@ -98,7 +98,8 @@ except TypeError as e:
 `Partial` omits `g()`, so constructing it raises `TypeError` at once,
 instead of failing later when the `Proxy` tries to delegate a call it cannot.
 
-A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols) is the structural alternative.
+A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+is the structural alternative.
 The implementation needs no base class.
 The type checker verifies conformance by shape statically, and,
 with `@runtime_checkable`, `isinstance()` does so at runtime:

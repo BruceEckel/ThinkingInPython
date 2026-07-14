@@ -359,7 +359,8 @@ but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 
 This reframes the classic OOP "shapes" example as a closed type union instead of a class hierarchy.
-[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching) compares the two approaches directly.
+[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching)
+compares the two approaches directly.
 
 ```python
 # test_exhaustive.py
@@ -569,8 +570,11 @@ Adding an operation is cheaper with pattern matching.
 That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
 worked out concretely.
 It is also called the *expression problem*.
-[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes,
-and [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explore it further.
+[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
+works through the same split with shapes,
+and [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+explore it further.
 
 ## Exercises
 

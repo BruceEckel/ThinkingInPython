@@ -1,6 +1,7 @@
 # Functional Error Handling
 
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values) made a value carry a guarantee.
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+made a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
 a function returns its error as an ordinary value,
@@ -45,7 +46,8 @@ except ValueError as e:
 Function calls 0-2 produced correct values,
 but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere) flags as a problem.
+which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
+flags as a problem.
 
 ## Return the Error as a Value
 
@@ -80,7 +82,8 @@ for r in outputs:
 ```
 
 This keeps every result, and `match`
-(see [Pattern Matching](13_Pattern_Matching.md#matching-values)) tells the two cases apart.
+(see [Pattern Matching](13_Pattern_Matching.md#matching-values))
+tells the two cases apart.
 But the distinction rides on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases collide.
 We need something that says "success" or "failure" no matter what types they carry.
@@ -392,7 +395,8 @@ but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 
-The [Decorators](14_Decorators.md) chapter explains how to write decorators like `@safe`,
+The [Decorators](14_Decorators.md)
+chapter explains how to write decorators like `@safe`,
 including `functools.wraps`.
 
 To test `@safe`, a good input becomes a `Success`,
@@ -465,7 +469,8 @@ and the `match` tells them apart.
 ## The returns Library
 
 You need not build `Result` yourself.
-The [returns](https://github.com/dry-python/returns) library provides a `Result` type with `Success` and `Failure`,
+The [returns](https://github.com/dry-python/returns)
+library provides a `Result` type with `Success` and `Failure`,
 the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.
 

@@ -360,8 +360,9 @@ Three ways quiet it, from narrowest to broadest:
 a localized `# type: ignore` silences one line,
 as on `simple.uses_metaclass()` above;
 and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
-The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses) uses that last form,
-`klass: Any = cls`, to add an `instance` attribute and swap `__new__()`.
+The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses)
+uses that last form, `klass: Any = cls`,
+to add an `instance` attribute and swap `__new__()`.
 Prefer the narrowest escape that fits,
 because a broad `Any` also hides genuine mistakes.
 
@@ -923,10 +924,11 @@ is the bookkeeping every class carries.
 2.  In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
     set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
 3.  In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)` and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
-    while `c1 is a` (comparing across the different singleton classes) is `False`.
+    while `c1 is a` (comparing across the different singleton classes)
+    is `False`.
 4.  In `final_runtime.py`, add a class `D(A)`
-    (a second, independent subclass of the non-final `A`) and confirm it succeeds,
-    the same way `Ok` does in `test_final.py`.
+    (a second, independent subclass of the non-final `A`)
+    and confirm it succeeds, the same way `Ok` does in `test_final.py`.
 5.  Using `inspect_tour.py` as a model,
     write a function `describe(func)` that prints a function's name,
     its `inspect.signature()`, and its docstring

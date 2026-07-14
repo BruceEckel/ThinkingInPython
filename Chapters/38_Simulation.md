@@ -4,8 +4,8 @@ A simulation models a set of objects that act on their own and interact through 
 The first example, a pack of rats mapping a maze, is worked from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
-[Concurrency](19_Concurrency.md#asyncio-mechanics) introduces the `asyncio` mechanics
-(`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics)
+introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 ## Rats & Mazes
 
@@ -1111,7 +1111,8 @@ Run it.
 
 A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
 
-A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/steer/) and steering behavior for autonomous moving objects.
+A discussion of [algorithms for collision detection](http://www.red3d.com/cwr/steer/)
+and steering behavior for autonomous moving objects.
 
 ## Exercises
 

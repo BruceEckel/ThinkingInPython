@@ -152,7 +152,8 @@ That is what *Façade* accomplishes.
 If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
 then you can create an interface that is useful for the client programmer and that only presents what's necessary.
 
-A Façade often takes the form of a [Singleton](24_Singleton.md) [Abstract Factory](27_Factory.md#abstract-factories).
+A Façade often takes the form of a [Singleton](24_Singleton.md)
+[Abstract Factory](27_Factory.md#abstract-factories).
 You can easily get this effect by creating a class containing static factory methods:
 
 ```python

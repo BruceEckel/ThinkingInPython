@@ -202,8 +202,8 @@ A tuple serves as a key just as easily as a single object.
 
 Python dispatches on a single type at a time.
 For dispatch on one argument's type, `functools.singledispatch`
-(see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)) gives you open,
-per-type functions.
+(see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch))
+gives you open, per-type functions.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` is then a matter of adding rows to the table,

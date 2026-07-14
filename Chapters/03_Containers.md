@@ -304,7 +304,8 @@ Here, the `list` argument is a factory that produces a fresh empty list for each
 
 ### `deque`
 
-A `deque` (double-ended queue) adds and removes items at either end in constant time.
+A `deque` (double-ended queue)
+adds and removes items at either end in constant time.
 A `list` is fast only at the end you append to:
 
 ```python
@@ -392,16 +393,16 @@ For records with defaults, methods, or type annotations, prefer a data class
 (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 
 The standard library has more specialized containers.
-For compact homogeneous storage
-(`array`, `memoryview`) and algorithms over a sorted `list` (`bisect`, `heapq`),
+For compact homogeneous storage (`array`, `memoryview`)
+and algorithms over a sorted `list` (`bisect`, `heapq`),
 see [Performance](18_Performance.md).
 
 ## Immutability
 
 Each mutable container has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
-Since Python 3.15, `frozendict`
-([PEP 814](https://peps.python.org/pep-0814/)) completes the set: a built-in,
+Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
+completes the set: a built-in,
 hashable mapping that rejects modification after creation.
 The example below uses tuples and frozensets,
 plus `MappingProxyType` from the `types` module,

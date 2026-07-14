@@ -99,7 +99,8 @@ We cover them here.
 The book is about the language, not the tooling around it.
 Fortunately, `uv` and other tools greatly simplify setup,
 so you don't need to spend time on it.
-The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python) gives detailed setup instructions.
+The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
+gives detailed setup instructions.
 
 ## How the Book Is Organized
 
@@ -142,7 +143,8 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) is the file `Examples/14_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
+is the file `Examples/14_Decorators/tracer.py`.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
 The tooling extracts the book examples, then type-checks (with Astral's `ty`),

@@ -1,6 +1,7 @@
 # Comprehensions
 
-*Comprehensions* (first introduced in [Control Flow](04_Control_Flow.md#comprehensions)) build one collection from another in a single expression.
+*Comprehensions* (first introduced in [Control Flow](04_Control_Flow.md#comprehensions))
+build one collection from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and passed into functional programming.
 Haskell had list comprehensions, and Python borrowed them.
@@ -308,10 +309,12 @@ and `any()` stops as soon as it finds a match.
 ## Unpacking in Comprehensions
 
 The `Path.walk()` example above flattens a tree by writing two `for` clauses.
-Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/)) adds a more direct way to flatten.
+Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
+adds a more direct way to flatten.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
-This extends the [PEP 448](https://peps.python.org/pep-0448/) unpacking you already know from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
+This extends the [PEP 448](https://peps.python.org/pep-0448/)
+unpacking you already know from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
 and replaces many uses of nested comprehensions, `itertools.chain()`,
 and `itertools.chain.from_iterable()`:
 

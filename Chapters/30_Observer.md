@@ -98,7 +98,8 @@ but for most cases the *Observer* pattern amounts to nothing more than a list of
 An observer returns `None`.
 Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,
-such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility) for the first handler that answers.
+such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility)
+for the first handler that answers.
 
 Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
@@ -166,8 +167,8 @@ so the change finishes only after every notification succeeds.
 One limitation: a `@property` setter cannot be a coroutine,
 so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
-[Concurrency](19_Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here
-(`async def`, `await`, `gather`, `run`).
+[Concurrency](19_Concurrency.md#asyncio-mechanics)
+covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
 For this example, we only need a coroutine to pause at `await` while others run:
 
 ```python
@@ -235,8 +236,8 @@ Below its threshold it returns without sending anything.
 
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
-The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type) is the same fan-out,
-routed by event type.
+The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)
+is the same fan-out, routed by event type.
 
 ## A Visual Example of Observers
 

@@ -213,7 +213,8 @@ print(table["title"]("functional python"))
 
 The dictionary holds functions as values,
 so a lookup yields a function you can immediately call.
-The [Function Objects](28_Function_Objects.md) chapter approaches the same capability from the pattern side.
+The [Function Objects](28_Function_Objects.md)
+chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow.
 A dictionary of functions replaces a long `if`/`elif` chain,
@@ -631,7 +632,8 @@ print(light < heavy, light <= heavy, light > heavy)
 
 Turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered separately.
-[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) uses `singledispatch()` as an alternative to the *Visitor* pattern,
+[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+uses `singledispatch()` as an alternative to the *Visitor* pattern,
 including why the registered function below is named `_`.
 
 ```python
@@ -1050,7 +1052,8 @@ Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
 because `islice()` stops asking as soon as it has delivered five.
-The [Performance](18_Performance.md) chapter looks at laziness from the perspective of memory and speed.
+The [Performance](18_Performance.md)
+chapter looks at laziness from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
@@ -1177,8 +1180,8 @@ since `random.Random(seed)` never reaches outside itself for randomness.
 What changed is that computing round `100` now means having already generated rounds `0` through `99`,
 where the circle method could compute round `100` directly,
 from its arithmetic alone.
-That trade, memory for generality,
-is the same one [Recursion](#recursion) makes when a loop's simple counter is not enough and the problem needs a stack instead.
+That trade, memory for generality, is the same one [Recursion](#recursion)
+makes when a loop's simple counter is not enough and the problem needs a stack instead.
 
 ## Pattern Matching as Destructuring
 
@@ -1198,7 +1201,8 @@ where the alternative is a thicket of nested conditionals.
 Raising an exception is one way to report failure.
 The functional alternative returns a value that represents the failure,
 so the caller must handle it in the open instead of through a separate control path.
-[Functional Error Handling](41_Functional_Error_Handling.md) develops the approach in full,
+[Functional Error Handling](41_Functional_Error_Handling.md)
+develops the approach in full,
 from a return type of `float | None` up to a `Result` type that carries either an answer or an error.
 The point for this chapter is what the style buys.
 Failure appears in the return type,
@@ -1351,7 +1355,8 @@ You decide how far to take it.
 
 You can write a property check by hand,
 looping over random inputs and asserting the law.
-A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/) does the same thing with sharper inputs,
+A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
+does the same thing with sharper inputs,
 and shrinks any failure to a minimal counterexample:
 
 ```python

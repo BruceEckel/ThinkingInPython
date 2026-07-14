@@ -5,8 +5,8 @@ It requires a program to capture an object's state at one moment and restore it 
 The *Memento* pattern does this without breaking encapsulation.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
-A *caretaker* (the undo machinery) stores mementos and hands one back when asked,
-without ever looking inside.
+A *caretaker* (the undo machinery)
+stores mementos and hands one back when asked, without ever looking inside.
 
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
@@ -114,8 +114,8 @@ Whoever holds `checkpoint` stores it and gives it back.
 It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means the honest mistakes
-(mutating the snapshot) fail loudly.
+though freezing the memento means the honest mistakes (mutating the snapshot)
+fail loudly.
 
 A plain `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
 But an alias is *structural*, not *nominal*.

@@ -243,7 +243,8 @@ def test_operations_dispatch_independently() -> None:
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
     `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
     These are the "winners."
-3.  [Multiple Dispatching](32_Multiple_Dispatching.md) replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
+3.  [Multiple Dispatching](32_Multiple_Dispatching.md)
+    replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
     When is the table lookup more appropriate than hard-coding the dynamic dispatch?
     Can you keep the syntactic simplicity of the dispatch while using a table underneath?
 4.  Modify Exercise 2 to use the table lookup technique of `paper_scissors_rock_table.py`.

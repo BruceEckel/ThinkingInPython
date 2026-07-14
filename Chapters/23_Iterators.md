@@ -197,7 +197,8 @@ so the infinite `count(1)` never runs away.
 
 ## A Type-Checking Iterator
 
-The [Decorator Pattern](14_Decorators.md#the-decorator-pattern) wraps an existing iterator and changes its behavior.
+The [Decorator Pattern](14_Decorators.md#the-decorator-pattern)
+wraps an existing iterator and changes its behavior.
 This produces a new iterator with the same interface but added behavior.
 Here, we force every item to be of an expected type:
 

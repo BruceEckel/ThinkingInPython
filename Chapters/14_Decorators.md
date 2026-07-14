@@ -28,7 +28,8 @@ cheese()
 #: Replacement behavior
 ```
 
-Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface) shows decorators with types.
+Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface)
+shows decorators with types.
 
 The `@hijack` above `cheese()` means:
 
@@ -120,7 +121,8 @@ misleading debuggers, `help()`, and documentation tools.
 `wraps` is optional but there is rarely a reason to omit it.
 
 `wraps` keeps the runtime interface.
-The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)) keep the static one.
+The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
+keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
 `**P` is a *parameter specification* (`ParamSpec`).
@@ -500,7 +502,8 @@ So `example.method(5)` really calls `Logged.__call__(logged_instance, 5)`.
 and the `Example` instance never arrives.
 The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
-[Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__) shows the descriptor protocol,
+[Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
+shows the descriptor protocol,
 which a class-based decorator would need to implement to work on methods.
 
 A plain function needs none of this: it is already a descriptor,
@@ -519,7 +522,8 @@ The decorator becomes the registration mechanism for the whole system.
 
 A context manager can also act as a decorator,
 bracketing every call with its setup and cleanup code.
-[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator) shows `contextlib.ContextDecorator`.
+[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator)
+shows `contextlib.ContextDecorator`.
 
 ## Stacking Decorators
 
@@ -613,7 +617,8 @@ it exists only for its side effect of recording the class.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
-[Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()`,
+[Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses)
+shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
 
 `test_register.py` checks both halves of that claim:
@@ -700,7 +705,8 @@ This idiom pays off for a value that needs one-time setup logic but stays consta
 a module-level constant computed without a decorator is usually clearer for anything simpler.
 
 The same collapse happens to classes.
-[Singleton](24_Singleton.md#singleton-classes) decorates a class with a callable that replaces it with one cached instance,
+[Singleton](24_Singleton.md#singleton-classes)
+decorates a class with a callable that replaces it with one cached instance,
 so the name that followed `class` ends up bound to an object, not a type.
 
 ## The Decorator Pattern
@@ -818,16 +824,19 @@ def test_single_topping() -> None:
 
 Several decorators from earlier chapters use this mechanism.
 `@property`, `cached_property`, `@staticmethod`, and `@classmethod`
-([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does,
+([Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods))
+each wrap a function the same way `trace` does,
 but return a *descriptor* instead of a plain wrapper.
 That is what lets them change how attribute access behaves,
 and it is also what makes them work correctly on methods,
 where a plain `__call__`-based class, like `Logged` above, does not.
-`@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)) is a class decorator like `register`,
+`@dataclass` ([Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
+is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,
 adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
 `functools.cache` and `functools.lru_cache`
-([Performance](18_Performance.md#caching)) wrap a function in the same closure-plus-`func` shape as `add_behavior`,
+([Performance](18_Performance.md#caching))
+wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 None of these needed new syntax to understand.
 They are ordinary decorators,
@@ -835,8 +844,8 @@ built from the closures and callables this chapter covered.
 
 ## Exercises
 
-1.  Add a `Mushroom` topping
-    (cost 0.60) and use it to build a Hawaiian with mushroom and feta.
+1.  Add a `Mushroom` topping (cost 0.60)
+    and use it to build a Hawaiian with mushroom and feta.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.

@@ -244,7 +244,8 @@ Attribute access goes straight to the one object.
 
 ### Borg: Share State Instead of Identity
 
-[Alex Martelli observes](http://www.aleax.it/Python/5ep.html) that what you usually want is not one *object* but one shared set of *state*.
+[Alex Martelli observes](http://www.aleax.it/Python/5ep.html)
+that what you usually want is not one *object* but one shared set of *state*.
 You can let people create as many objects as they like,
 as long as they all share the same data.
 He called this the *Borg*^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."],

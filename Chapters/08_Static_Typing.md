@@ -238,7 +238,8 @@ The alias also documents the allowed values in one place,
 instead of scattering the literal list across every function that accepts a `Color`.
 
 An alias can also name a union of types.
-[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) uses `type Shape = Circle | Square` to define a closed set of alternatives that a `match` can check exhaustively.
+[Pattern Matching](13_Pattern_Matching.md#exhaustive-matching)
+uses `type Shape = Circle | Square` to define a closed set of alternatives that a `match` can check exhaustively.
 
 ## Generic Functions and Classes {#generic-functions-and-classes}
 
@@ -297,7 +298,8 @@ A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 
 A special form, `**P`, captures the types of an entire parameter list.
-[Decorators](14_Decorators.md#maintaining-the-wrapped-interface) uses this to give a wrapper the same signature as the function it wraps.
+[Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
+uses this to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you will still see in older code.
@@ -350,8 +352,10 @@ A wrong type that slips past the checker behaves as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee,
 use `isinstance()` or a library built to validate data.
-The [typeguard](https://typeguard.readthedocs.io) library reads your existing annotations and enforces them at runtime.
-[Pydantic](https://docs.pydantic.dev) validates and parses data against typed models,
+The [typeguard](https://typeguard.readthedocs.io)
+library reads your existing annotations and enforces them at runtime.
+[Pydantic](https://docs.pydantic.dev)
+validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
 The hints themselves are for the tools and for the reader.
 

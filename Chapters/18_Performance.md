@@ -71,8 +71,8 @@ which makes it the tool for a slowdown you can only reproduce live:
 
 Either form ends with a table of hot functions ranked by sample count.
 
-Beyond the standard library,
-[Scalene](https://github.com/plasma-umass/scalene) separates Python time from native time and profiles memory line by line.
+Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
+separates Python time from native time and profiles memory line by line.
 
 If you can narrow the problem down to a particular function,
 there may be techniques that speed up the algorithm used in that function.
@@ -157,7 +157,8 @@ The biggest speedups usually come from a better algorithm, not faster code.
 An algorithm with lower Big-O complexity beats micro-optimizing a slow algorithm.
 Often this means choosing the right container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
-Use a `deque` (see [Containers](03_Containers.md#deque)) when you add and remove at both ends.
+Use a `deque` (see [Containers](03_Containers.md#deque))
+when you add and remove at both ends.
 
 For data kept in sorted order,
 the `bisect` module finds the insertion point with binary search:
@@ -184,8 +185,8 @@ print([grade(s) for s in (55, 65, 85, 95)])
 #: ['F', 'D', 'B', 'A']
 ```
 
-Because `scores` stays sorted,
-`bisect` locates a position in O(log n) instead of the O(n) scan a `list` would need.
+Because `scores` stays sorted, `bisect` locates a position in O(log n)
+instead of the O(n) scan a `list` would need.
 Only the search is that fast:
 `insort()` still shifts everything after the insertion point,
 so under heavy insert traffic consider the heap below instead.
@@ -215,9 +216,11 @@ After `heapify()` the smallest element stays at index 0,
 and `nsmallest()` and `nlargest()` answer top-N questions directly.
 For a priority queue shared across threads,
 `queue.PriorityQueue` wraps the same heap in a lock.
-[Concurrency](19_Concurrency.md#coordinating-threads-with-queues) shows it in use.
+[Concurrency](19_Concurrency.md#coordinating-threads-with-queues)
+shows it in use.
 
-The immutable containers from [Containers](03_Containers.md#immutability) are not a speed upgrade.
+The immutable containers from [Containers](03_Containers.md#immutability)
+are not a speed upgrade.
 A `frozenset` looks up exactly as fast as a `set`,
 a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
 In CPython these share the same machinery.
@@ -229,8 +232,9 @@ so they can serve as dictionary keys and as arguments to the caches shown below.
 
 A list-building pipeline materializes every intermediate result.
 A generator pipeline
-([Comprehensions](16_Comprehensions.md#generator-expressions)) computes one item at a time,
-on demand, so memory stays flat no matter how large the source,
+([Comprehensions](16_Comprehensions.md#generator-expressions))
+computes one item at a time, on demand,
+so memory stays flat no matter how large the source,
 and no work happens past the point where the consumer stops.
 `tracemalloc` measures the difference:
 
@@ -276,7 +280,8 @@ A generator is spent after one pass.
 
 ## Caching
 
-If a pure function ([Functional Programming](40_Functional_Programming.md#pure-functions)) is called repeatedly with the same arguments,
+If a pure function ([Functional Programming](40_Functional_Programming.md#pure-functions))
+is called repeatedly with the same arguments,
 the fastest way to compute the answer is to not compute it.
 `functools.cache` stores each result the first time and replays it after that.
 The classic demonstration is naive recursive Fibonacci,
@@ -579,8 +584,9 @@ NumPy gives you a compact array.
 `@njit` compiles a loop that walks it,
 for the case where the loop cannot become one vectorized expression,
 because the amount of work per element depends on the element's value.
-The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture) is such a case:
-from `n`, halve an even value or triple-and-increment an odd one,
+The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture)
+is such a case: from `n`,
+halve an even value or triple-and-increment an odd one,
 and repeat until you reach 1.
 The number of steps differs for every starting value,
 so no single array expression produces it:
@@ -647,7 +653,8 @@ It just runs faster.
 In addition, you can do things in Rust that might be much more difficult in Python.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
-and [maturin](https://www.maturin.rs) builds and installs the result as an ordinary Python package.
+and [maturin](https://www.maturin.rs)
+builds and installs the result as an ordinary Python package.
 `maturin new --bindings pyo3 fastcount` scaffolds the project,
 and one attribute turns a Rust function into a Python function:
 

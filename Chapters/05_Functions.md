@@ -141,8 +141,8 @@ such a parameter reads:
 
 The `None` sentinel works only because `None` is not a meaningful value here.
 When `None` is also a valid argument, you need a distinct marker.
-Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/)) adds a `sentinel` builtin that creates one unique,
-self-describing value for this purpose:
+Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
+adds a `sentinel` builtin that creates a unique self-describing value for this purpose:
 
 ```python
 # sentinel_default.py

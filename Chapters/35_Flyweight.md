@@ -187,7 +187,8 @@ A factory function like `tile()` is an honest extra name.
 Its different syntax warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
-This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations) chapter uses.
+This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
+chapter uses.
 Here the cache is keyed by the constructor arguments instead of a single fixed key:
 
 ```python
@@ -308,7 +309,8 @@ def test_pool_releases_unused() -> None:
 
 When you know the full set of shared values as you write the program,
 you do not need a pool at runtime.
-An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too) is a flyweight pool the language maintains for you.
+An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too)
+is a flyweight pool the language maintains for you.
 Python constructs each member once, at class creation,
 and any reference produces that one object.
 
@@ -365,8 +367,8 @@ The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
 The constraint is less flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
-The table-driven state machine in [State Machines](31_State_Machines.md#table-driven-state-machine) exploits the same property,
-using members as shared, comparable states.
+The table-driven state machine in [State Machines](31_State_Machines.md#table-driven-state-machine)
+exploits the same property, using members as shared, comparable states.
 
 ## Flyweights in the Wild
 
@@ -382,8 +384,8 @@ and equality checks that collapse to identity.
 
 ## Exercises
 
-1.  Add door (`+`, walkable) and tree
-    (`T`, not walkable) kinds to `tile_map.py`.
+1.  Add door (`+`, walkable) and tree (`T`, not walkable)
+    kinds to `tile_map.py`.
     Extend `Symbol` and `SPECS` to match,
     then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
     Confirm the tile pool size still equals the number of kinds,
@@ -392,8 +394,8 @@ and equality checks that collapse to identity.
     How does the ratio change as the map grows?
 3.  Remove `frozen=True` from `Tile` and set `field[0][0].walkable = False` on a parsed map.
     Write a test that exposes the resulting bug, then restore `frozen=True`.
-4.  Model chess: a frozen `Piece`
-    (color, kind) and a board that is a `dict` mapping squares to pieces.
+4.  Model chess: a frozen `Piece` (color, kind)
+    and a board that is a `dict` mapping squares to pieces.
     A full opening position holds thirty-two piece references.
     How many `Piece` objects exist?
     How do you capture and promote?

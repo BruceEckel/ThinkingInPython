@@ -242,7 +242,8 @@ which is why importing `a_package.module1` earlier printed its message as it loa
 For a large program that imports many modules but uses only some of them on any given run,
 that eager work slows startup.
 
-Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/)) adds the `lazy` soft keyword.
+Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
+adds the `lazy` soft keyword.
 A `lazy import` defers loading the module until the first time you use the imported name,
 so you pay the cost only for what you actually use,
 while still declaring all imports at the top of the file:

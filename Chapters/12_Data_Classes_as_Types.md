@@ -312,7 +312,8 @@ Illegal values are unrepresentable.
 This is one aspect of [Functional Programming](40_Functional_Programming.md).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-[Static Typing](08_Static_Typing.md#type-hints) argues for letting the type carry the meaning.
+[Static Typing](08_Static_Typing.md#type-hints)
+argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
 Testing demonstrates that illegal values cannot exist.
@@ -579,8 +580,10 @@ Choose the tool that makes the legal set easiest to express.
 For a small fixed set, that is an `Enum`.
 
 When validation grows complicated, libraries make it lighter.
-The [attrs](https://www.attrs.org) library predates and inspired data classes and offers richer validators and converters.
-[Pydantic](https://docs.pydantic.dev) builds validation and parsing into the type,
+The [attrs](https://www.attrs.org)
+library predates and inspired data classes and offers richer validators and converters.
+[Pydantic](https://docs.pydantic.dev)
+builds validation and parsing into the type,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type responsible for guaranteeing its own values.
@@ -642,7 +645,8 @@ print(c.host, c.name)
 
 If a base `__init__` instead replaced `self.__dict__`,
 calling it from `__post_init__()` would discard the fields the data class just assigned.
-The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity) is that case.
+The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity)
+is that case.
 
 When the base class is also a data class, you do not need this.
 The subclass generates one `__init__` covering the inherited fields and the new ones,
@@ -810,8 +814,9 @@ recursing through lists and nested objects.
 
 Encoding is mechanical, but decoding must know which type to rebuild,
 and that part the standard library leaves to you.
-For deep or evolving structures,
-[Pydantic](https://docs.pydantic.dev) and [dataclasses-json](https://github.com/lidatong/dataclasses-json) automate the decode side,
+For deep or evolving structures, [Pydantic](https://docs.pydantic.dev)
+and [dataclasses-json](https://github.com/lidatong/dataclasses-json)
+automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
 
 ## Comparing Ordinary Classes and Data Classes
@@ -867,8 +872,8 @@ so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
 `x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
-As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) puts it,
-a bare annotation is a promise rather than a placeholder.
+As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values)
+puts it, a bare annotation is a promise rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
 but nothing is actually stored anywhere until assigned in code.
