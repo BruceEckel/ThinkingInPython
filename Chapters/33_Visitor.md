@@ -170,6 +170,9 @@ so nothing is lost.
 Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
+Dispatch follows inheritance:
+an unregistered subclass uses its nearest registered ancestor,
+falling back to the `Flower` default only when no ancestor is registered.
 Adding a new operation is a new function.
 Adding a new flower is a class and, where needed, a one-line registration.
 When the operation should read like a method,

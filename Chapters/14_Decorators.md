@@ -605,6 +605,7 @@ This one registers every class it decorates, in `registry`:
 
 ```python
 # register.py
+
 registry: dict[str, type] = {}
 
 def register(cls: type) -> type:
@@ -625,7 +626,7 @@ if __name__ == "__main__":
 ```
 
 `register()` returns `cls` unchanged, so this decoration adds no wrapper at all;
-it exists only for its side effect of recording the class.
+it exists only for the side effect of recording the class.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
