@@ -745,6 +745,10 @@ def test_replace_varies_one_field() -> None:
     assert variant.toppings == base.toppings
 ```
 
+[Decorators](14_Decorators.md#the-decorator-pattern) has its own `Pizza`,
+modeling toppings as wrapper objects instead of builder-collected fields,
+to illustrate the unrelated Decorator pattern.
+
 When does Builder survive in Python?
 When construction genuinely is a process.
 The steps must happen in an order, later steps depend on earlier ones,

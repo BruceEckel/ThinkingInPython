@@ -815,6 +815,11 @@ Changing the price of a topping means changing one number, in one place.
 Compare that to a class per combination,
 where a price change touches every class that includes that topping.
 
+[Factory](27_Factory.md#builder) has its own `Pizza`,
+a frozen data class assembled by a `PizzaBuilder`,
+to illustrate the unrelated Builder pattern.
+The two examples share a topic, not a type.
+
 ```python
 # test_pizza_decorator.py
 from pizza_decorator import Feta, Garlic, Hawaiian, Margherita, Olives
