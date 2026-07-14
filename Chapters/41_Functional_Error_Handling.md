@@ -98,7 +98,7 @@ parameterized over the answer type and the error type.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
-Here they have no constraints, which allows them to be used in any context.
+Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
 so it lives at the root of the examples and any chapter can import it:
 
@@ -491,7 +491,9 @@ They are expected, and the type should say so.
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
     Confirm a `Failure` from `func_e()` still short-circuits.
 2.  Give `Failure` a `map_error()` method that transforms the error it holds,
-    leaving a `Success` untouched.
+    leaving a `Success` untouched
+    (for chains to keep working,
+    `Success` needs its own `map_error()` that returns `self`).
     Use it to add a prefix to every error.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
