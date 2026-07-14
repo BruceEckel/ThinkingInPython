@@ -121,6 +121,10 @@ print(a.g())   # Forwarded to the adaptee unchanged
 `__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
+special methods bypass `__getattr__()`,
+so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders itself,
+as exercise 1 does with `__getitem__()`.
 
 Testing verifies both halves of that behavior.
 The new `f()` combines the adaptee's methods,
