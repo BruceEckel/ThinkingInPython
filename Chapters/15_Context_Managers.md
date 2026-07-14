@@ -107,7 +107,7 @@ class ignore:
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print("ignoring", exc_type.__name__)
+        print(f"ignoring {exc!r}")
         return True
 
 with ignore(ZeroDivisionError):
@@ -116,7 +116,7 @@ with ignore(ZeroDivisionError):
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
 #: before
-#: ignoring ZeroDivisionError
+#: ignoring ZeroDivisionError('division by zero')
 #: survived
 
 with ignore():  # No argument means ALL
@@ -124,13 +124,16 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: ignoring KeyError
+#: ignoring KeyError('anything')
 #: survived
 ```
 
-The `1 / 0` raises an exception, `__exit__()` prints which type it is ignoring,
+The `1 / 0` raises an exception, `__exit__()` prints which exception it is ignoring,
 then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
+`exc!r` prints the exception's `repr()`,
+which includes both its type and its arguments,
+not just `exc_type.__name__`.
 
 `types` defaults to `ALL`,
 a [sentinel](05_Functions.md#default-and-keyword-arguments)

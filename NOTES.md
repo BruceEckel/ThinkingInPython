@@ -11,6 +11,7 @@ Check that all exercises have solutions
 - Is full polymorphism covered? (Not just inheritance-based). for example, @overload
 
 - Check order of examples in 37_Pattern_Refactoring.md
+- Chapter 42: investigate stateless library
 
 - "have to", "could" -> "can"
 - which was

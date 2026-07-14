@@ -16,7 +16,7 @@ class ignore:
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print("ignoring", exc_type.__name__)
+        print(f"ignoring {exc!r}")
         return True
 
 with ignore(ZeroDivisionError):
@@ -25,7 +25,7 @@ with ignore(ZeroDivisionError):
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
 #: before
-#: ignoring ZeroDivisionError
+#: ignoring ZeroDivisionError('division by zero')
 #: survived
 
 with ignore():  # No argument means ALL
@@ -33,5 +33,5 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: ignoring KeyError
+#: ignoring KeyError('anything')
 #: survived
