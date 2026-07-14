@@ -50,6 +50,32 @@ Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
 
+## Narrowing {#narrowing}
+
+A union type covers every case until you rule some out.
+Testing `is not None` on an `X | None` value proves it to the checker,
+not just to you:
+
+```python
+# narrowing.py
+
+def shout(text: str | None) -> str:
+    if text is not None:
+        return text.upper()
+    return "(nothing)"
+
+print(shout("hi"))
+#: HI
+print(shout(None))
+#: (nothing)
+```
+
+Inside the `if`, the checker *narrows* `text` from `str | None` to `str`,
+so `.upper()` needs no cast.
+Outside the `if`, `text` is still the full `str | None`.
+The same narrowing follows an `isinstance()` check, an equality test,
+or a comparison against a specific value such as `is not SOME_SENTINEL`.
+
 ## Constants with Final
 
 Marking a value `Final` catches accidental reassignments during type checking.
