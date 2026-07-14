@@ -325,7 +325,7 @@ def test_trace_returns_original_result() -> None:
 ```
 
 Because the instance can hold attributes, state between calls is natural.
-Here is s class-based decorator that counts calls.
+Here is a class-based decorator that counts calls.
 It keeps the count on the instance:
 
 ```python
@@ -361,7 +361,6 @@ if __name__ == "__main__":
 
 Each `@count_calls` creates its own instance,
 so the count on one decorated function never leaks into another.
-`test_count_calls.py` decorates two functions and checks their counts stay independent:
 
 ```python
 # test_count_calls.py
