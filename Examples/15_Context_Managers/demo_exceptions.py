@@ -20,4 +20,4 @@ print("survived")
 
 with ignore() as x:
     print(f"{x = }")
-#:
+#: x = None

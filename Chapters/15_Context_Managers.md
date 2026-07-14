@@ -137,8 +137,8 @@ packaged as a reusable object.
 
 `__exit__(self, exc_type, exc, tb)` receives the details of an exception raised in the block.
 When the block finishes normally, all three are `None`.
-When it raises an exception, they hold the exception's class,
-its instance, and its traceback object.
+When it raises an exception, they hold the exception's class, its instance,
+and its traceback object.
 `Trace.__exit__()` above types `exc` and `tb` as `object`,
 the most general type, since it never inspects either one.
 
@@ -208,8 +208,7 @@ You can still use `as` but it will just bind to `None`.
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
 or `None` when the block finished cleanly.
 
-`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo`
-or a subclass of it.
+`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it.
 It also accepts a tuple of classes for `classinfo`,
 matching if `cls` is a subclass of any one of them.
 `self.types is not ALL` [narrows](08_Static_Typing.md#narrowing)
@@ -217,8 +216,7 @@ matching if `cls` is a subclass of any one of them.
 since ruling out `ALL` leaves only `Types`.
 By the time `issubclass(exc_type, self.types)` runs,
 narrowing has confirmed `self.types` is a `Types`,
-and the earlier `if exc_type is None: return False` has confirmed
-`exc_type` is not `None`.
+and the earlier `if exc_type is None: return False` has confirmed `exc_type` is not `None`.
 
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
@@ -270,9 +268,9 @@ A context manager brackets a block of statements: setup before, cleanup after.
 A typical decorator from [Decorators](14_Decorators.md)
 brackets a function call the same way.
 `contextlib.ContextDecorator` connects the two:
-a class that inherits from it works both as a context manager and as a decorator.
+a subclass works both as a context manager and as a decorator.
 Every manager `@contextmanager` produces already inherits from `ContextDecorator`,
-so `tracing` below works as a decorator with no extra code,
+so `banner` works as a decorator,
 even though `ContextDecorator` never appears in it:
 
 ```python
@@ -281,48 +279,41 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 @contextmanager
-def tracing(label: str) -> Iterator[None]:
-    print(f"-> {label}")
+def banner(title: str) -> Iterator[None]:
+    print(f"=== {title} ===")
     try:
         yield
     finally:
-        print(f"<- {label}")
+        print(f"=== {title} ends ===")
 
-@tracing("add")
-def add(a: int, b: int) -> int:
-    return a + b
+@banner("report")
+def report() -> None:
+    print("quarterly numbers")
 
 if __name__ == "__main__":
-    with tracing("block"):
-        print("inside")
-    print(add(2, 3))
-    print(add(10, 20))
-#: -> block
-#: inside
-#: <- block
-#: -> add
-#: <- add
-#: 5
-#: -> add
-#: <- add
-#: 30
+    report()
+    with banner("meeting"):
+        print("agenda")
+#: === report ===
+#: quarterly numbers
+#: === report ends ===
+#: === meeting ===
+#: agenda
+#: === meeting ends ===
 ```
 
-`tracing` works both ways.
-`with tracing("block"):` brackets a group of statements.
-`@tracing("add")` decorates a function,
-so every call to `add()` enters the context, runs the original `add()`,
-and exits.
-Note the parentheses in `@tracing("add")`: the call constructs the manager,
+`banner` works as both a decorator for `report` and in a `with` in `__main__`.
+Note the parentheses in `@banner("report")`: the call constructs the manager,
 which then decorates the function.
 A generator-based manager recreates its generator on each use,
 so the decorated function can be called any number of times,
 each with a fresh enter and exit.
 The machinery even applies `functools.wraps` for you,
-so `add` keeps its name and docstring
+so `report` keeps its name and docstring
 (see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
 
-A hand-written class opts in by inheriting from `ContextDecorator`:
+Here's the same `banner` as a class.
+This time it inherits from `ContextDecorator`:
 
 ```python
 # banner_cm.py
@@ -355,17 +346,27 @@ if __name__ == "__main__":
 #: === meeting ends ===
 ```
 
-Like `suppress`, `banner` is a class named like a function because you use it like one.
+Like `suppress` and `ignore`,
+the class version of `banner` uses a lowercase name because you use it like a function.
 Unlike the generator form,
 the class form re-enters the same instance on every call to `report()`,
 so any state the instance holds is shared across calls.
 
-The decorator form only brackets.
-The manager never sees the function's arguments or return value,
-cannot call the function twice like `repeat`,
-and cannot decide to skip the call like `hijack`.
-What it offers is one definition, usable both ways: around a block with `with`,
-and on a function with `@`, when every call deserves the same bracketing.
+Neither version of `banner` can rewrite arguments, inspect the return value,
+or skip the call.
+A decorator like
+[`repeat`](14_Decorators.md#decorators-that-take-arguments)
+or [`hijack`](14_Decorators.md) can do all three,
+because it defines its own wrapper function directly,
+with full access to `*args`, `**kwargs`, and the return value.
+`banner`'s wrapper comes from `ContextDecorator`
+(directly in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
+and that wrapper always makes one unchanged call, bracketed by setup and cleanup.
+Even if `report()` took arguments or returned a value,
+neither version of `banner` would see them.
+What `banner` offers instead is one definition, usable both as a `with` block and as a `@` decorator.
+Use it when setup and cleanup should be identical on every call,
+with nothing that needs to vary per call.
 
 ## Combining Context Managers
 
@@ -616,4 +617,4 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
     that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
-5.  Stack `@tracing("outer")` and `@tracing("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
+5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.

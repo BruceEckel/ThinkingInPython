@@ -3,28 +3,24 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 @contextmanager
-def tracing(label: str) -> Iterator[None]:
-    print(f"-> {label}")
+def banner(title: str) -> Iterator[None]:
+    print(f"=== {title} ===")
     try:
         yield
     finally:
-        print(f"<- {label}")
+        print(f"=== {title} ends ===")
 
-@tracing("add")
-def add(a: int, b: int) -> int:
-    return a + b
+@banner("report")
+def report() -> None:
+    print("quarterly numbers")
 
 if __name__ == "__main__":
-    with tracing("block"):
-        print("inside")
-    print(add(2, 3))
-    print(add(10, 20))
-#: -> block
-#: inside
-#: <- block
-#: -> add
-#: <- add
-#: 5
-#: -> add
-#: <- add
-#: 30
+    report()
+    with banner("meeting"):
+        print("agenda")
+#: === report ===
+#: quarterly numbers
+#: === report ends ===
+#: === meeting ===
+#: agenda
+#: === meeting ends ===

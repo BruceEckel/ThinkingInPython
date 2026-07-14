@@ -482,7 +482,7 @@ The decorator becomes the registration mechanism for the whole system.
 
 A context manager can also act as a decorator,
 bracketing every call with its setup and cleanup code.
-[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator)
+[Context Managers](15_Context_Managers.md#context-manager-as-decorator)
 shows `contextlib.ContextDecorator`.
 
 ### A Limitation: Methods Need a Descriptor
