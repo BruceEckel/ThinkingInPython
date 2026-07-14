@@ -1,4 +1,4 @@
-# The Functional Toolkits
+# Functional Toolkits
 
 [Functional Foundations](40_Functional_Foundations.md)
 built behavior from small, pure, composable pieces.

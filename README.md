@@ -97,7 +97,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 38_Simulation.md                |X|X|
 | 39_Pattern_Catalog.md           |X|X|
 | 40_Functional_Foundations.md    |X|X|
-| 41_The_Functional_Toolkits.md   |X|X|
+| 41_Functional_Toolkits.md       |X|X|
 | 42_Functional_Error_Handling.md |X|X|
 | 43_Functional_Assurance.md      |X|X|
 | 44_Effect_Management.md         |🔴|🔴|
@@ -149,7 +149,7 @@ The first serious edit pass.
 | 38_Simulation.md                | |
 | 39_Pattern_Catalog.md           | |
 | 40_Functional_Foundations.md    | |
-| 41_The_Functional_Toolkits.md   | |
+| 41_Functional_Toolkits.md       | |
 | 42_Functional_Error_Handling.md | |
 | 43_Functional_Assurance.md      | |
 | 44_Effect_Management.md         | |

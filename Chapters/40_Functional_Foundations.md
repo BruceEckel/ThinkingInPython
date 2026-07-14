@@ -17,7 +17,7 @@ and to write it that way when it can.
 
 This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
-[The Functional Toolkits](41_The_Functional_Toolkits.md)
+[Functional Toolkits](41_Functional_Toolkits.md)
 tours the standard library's support,
 [Functional Error Handling](42_Functional_Error_Handling.md)
 turns failure into an ordinary value,
@@ -424,7 +424,7 @@ When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 
 The standard library ships these building blocks ready-made;
-[The Functional Toolkits](41_The_Functional_Toolkits.md) tours them.
+[Functional Toolkits](41_Functional_Toolkits.md) tours them.
 
 ## Exercises
 

@@ -15,7 +15,7 @@ and what this chapter explores.
 The preceding chapters built the machinery.
 [Functional Foundations](40_Functional_Foundations.md)
 established pure functions and immutable values,
-[The Functional Toolkits](41_The_Functional_Toolkits.md)
+[Functional Toolkits](41_Functional_Toolkits.md)
 supplied the standard library's support,
 and [Functional Error Handling](42_Functional_Error_Handling.md)
 made failure an ordinary value.
@@ -48,7 +48,7 @@ This property lets you check parts of a program,
 and sometimes prove them correct,
 and it connects back to this chapter's opening question about what counts as "what works."
 
-This property is also the quiet reason [`lru_cache`](41_The_Functional_Toolkits.md#lru_cache)
+This property is also the quiet reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
 is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
 Every optimization that skips or reuses work,

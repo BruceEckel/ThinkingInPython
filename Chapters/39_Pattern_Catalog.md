@@ -158,7 +158,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](42_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Function Object](28_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
-| [Memoization](41_The_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
+| [Memoization](41_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
 | Curiously Recurring Template Pattern (CRTP) | A class inherits from a base parameterized by the class itself. |
