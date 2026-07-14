@@ -261,6 +261,9 @@ A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
 at decoration, and `__call__()` runs on every call to the decorated function.
+
+### A Stateless Class Decorator
+
 Here is the `trace` decorator written as a class:
 
 ```python
@@ -324,6 +327,8 @@ def test_trace_returns_original_result() -> None:
     assert add(2, 3) == 5
 ```
 
+### A Class Decorator with State
+
 Because the instance can hold attributes, state between calls is natural.
 Here is a class-based decorator that counts calls.
 It keeps the count on the instance:
@@ -382,6 +387,8 @@ def test_counts_are_independent_per_function() -> None:
     assert greet.count == 2
     assert farewell.count == 1
 ```
+
+### A Class Decorator with Arguments
 
 The class form shifts in an important way when the decorator takes arguments.
 Without arguments, the constructor receives the function.
@@ -444,6 +451,8 @@ def test_repeat_call_count(times: int, expected: int) -> None:
     assert len(calls) == expected
 ```
 
+### Function Form or Class Form?
+
 Compare the two cases.
 `@trace` with no arguments calls `trace(add)`.
 The function goes straight to the constructor.
@@ -461,6 +470,19 @@ using the same `**P` and `R` type parameters.
 The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
+That argument-capturing class-based decorator scales up to small frameworks.
+A build tool or task runner can offer a `@rule(target, *deps)` decorator.
+Its constructor records the target and dependencies.
+Its `__call__()` registers the decorated function in a class-level table with that metadata.
+A driver later walks the table to run things in order.
+The decorator becomes the registration mechanism for the whole system.
+
+A context manager can also act as a decorator,
+bracketing every call with its setup and cleanup code.
+[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator)
+shows `contextlib.ContextDecorator`.
+
+### A Limitation: Methods Need a Descriptor
 
 The class form has one real limitation: it does not work on methods.
 None of `trace`, `count_calls`,
@@ -511,18 +533,6 @@ A fully typed class decorator, like `trace_class.trace`,
 even gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
 catching the same problem before the program runs.
-
-That argument-capturing class-based decorator scales up to small frameworks.
-A build tool or task runner can offer a `@rule(target, *deps)` decorator.
-Its constructor records the target and dependencies.
-Its `__call__()` registers the decorated function in a class-level table with that metadata.
-A driver later walks the table to run things in order.
-The decorator becomes the registration mechanism for the whole system.
-
-A context manager can also act as a decorator,
-bracketing every call with its setup and cleanup code.
-[Context Managers](15_Context_Managers.md#a-context-manager-as-a-decorator)
-shows `contextlib.ContextDecorator`.
 
 ## Stacking Decorators
 
