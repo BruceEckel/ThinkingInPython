@@ -703,7 +703,7 @@ def run_once[T](func: Callable[[], T]) -> T:
 
 @run_once
 def greeting() -> str:
-    return "Hello, " + "world"
+    return "Hello, world"
 
 if __name__ == "__main__":
     print(greeting)
@@ -717,8 +717,8 @@ and hands back whatever `greeting()` returned.
 `greeting` does not survive decoration as a function:
 the name now refers to the plain `str` that came out of it.
 Calling `greeting()` again would fail, since a `str` is not callable.
-This idiom pays off for a value that needs one-time setup logic but stays constant afterward;
-a module-level constant computed without a decorator is usually clearer for anything simpler.
+This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
+A module-level constant computed without a decorator is usually clearer for anything simpler.
 
 The same collapse happens to classes.
 [Singleton](24_Singleton.md#singleton-classes)

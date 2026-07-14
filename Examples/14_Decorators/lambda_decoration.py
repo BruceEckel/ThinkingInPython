@@ -18,3 +18,5 @@ if __name__ == "__main__":
     print(triple(21))
 #: Calling <lambda> with 21
 #: 42
+#: Calling triple with 21
+#: 63

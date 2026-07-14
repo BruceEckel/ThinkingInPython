@@ -155,8 +155,9 @@ def test_drawing_after_restore_spares_memento() -> None:
 ```
 
 The third test checks for the subtle bug.
-If `restore()` handed the memento's data back by reference,
-drawing afterward would corrupt the snapshot.
+If the memento shared a mutable list with the sketch,
+as in the variant exercise 4 explores,
+drawing after a restore would corrupt the snapshot.
 Both `save()` and `restore()` must copy.
 
 ## Immutability

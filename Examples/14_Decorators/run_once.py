@@ -6,7 +6,7 @@ def run_once[T](func: Callable[[], T]) -> T:
 
 @run_once
 def greeting() -> str:
-    return "Hello, " + "world"
+    return "Hello, world"
 
 if __name__ == "__main__":
     print(greeting)
