@@ -256,7 +256,7 @@ def test_repeat_call_count(times: int, expected: int) -> None:
 
 ## Decorators as Classes
 
-A decorator only has to be a callable that takes a function and returns a callable.
+A decorator must be a callable that takes a function and returns a callable.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
