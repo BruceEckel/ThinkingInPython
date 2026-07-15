@@ -67,7 +67,7 @@ but Python 3 added simpler hooks that cover almost every case a metaclass used t
 
 - `__init_subclass__()` runs at subclass creation.
   It replaces most "do something each time a class is defined" metaclasses.
-- `__set_name__()` lets a descriptor learn its attribute name,
+- `__set_name__()` lets a class attribute learn its own name,
   at class-creation time.
 - *Class decorators* transform a class after Python builds it.
 
@@ -267,7 +267,7 @@ The `type` approach in the previous section builds a class from a name,
 a tuple of bases, and a namespace dict.
 A second way is to write an ordinary `class` statement in an f-string,
 then `exec()` that string as code.
-The class definition (`klass`) is easier to read:
+The class definition (`klass`) is easier to read and modify:
 
 ```python
 # commander.py
@@ -342,7 +342,8 @@ so you can enumerate them.
 This is the textbook reason people used to justify a metaclass.
 In Python 3 it is a few lines with `__init_subclass__()`,
 which is called automatically for every new subclass.
-This example tracks the "leaf" subclasses (those with no subclasses of their own),
+This example tracks the "leaf" subclasses
+(those with no subclasses of their own),
 using __init_subclass__ instead of a metaclass:
 
 ```python
@@ -422,12 +423,57 @@ def test_independent_hierarchies_have_separate_registries() -> None:
 
 ## Learning a Name with `__set_name__()`
 
-Another job that once needed a metaclass is letting an attribute object discover the name to which it belongs.
-A *descriptor* with `__set_name__()` gets that name at class creation:
+A *descriptor* is any object whose class defines `__get__()`,
+and optionally `__set__()` or `__delete__()`.
+Assigned to a class attribute, a descriptor takes over access to that attribute.
+Instead of going straight to the instance's `__dict__`,
+`__get__()` is called on a read and `__set__()` on a write.
+[Decorators](14_Decorators.md#a-limitation-methods-need-a-descriptor)
+already relied on this without naming it.
+A function is an object like any other, and its class defines `__get__()`,
+which makes every function a descriptor:
+
+```python
+# function_is_descriptor.py
+class Person:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def greet(self) -> str:
+        return f"Hello, {self.name}"
+
+# def left a plain function in the class namespace:
+plain = Person.__dict__["greet"]
+print(type(plain).__name__, hasattr(plain, "__get__"))
+#: function True
+
+# Reading it through an instance triggers __get__(),
+# which returns a bound method:
+p = Person("Ann")
+print(p.greet())
+#: Hello, Ann
+
+print(plain.__get__(p, Person)())
+#: Hello, Ann
+```
+
+The last line performs by hand what `p.greet` does automatically:
+method binding is not special machinery, just the descriptor protocol at work.
+
+Here is another job that once needed a metaclass.
+In `x = Field()` below, `Field()` runs before the assignment,
+so the new instance cannot know it is about to be bound to the name `x`.
+Python now delivers that name automatically:
+when a `class` body finishes executing,
+it calls `__set_name__(owner, name)` on every class attribute that defines it,
+not only descriptors,
+passing the freshly created class and the name the attribute was assigned to.
+`Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
+the actual descriptor protocol,
+and uses the delivered name to build its storage key:
 
 ```python
 # set_name.py
-# A descriptor learns its attribute name at class-creation time.
 from typing import Any
 
 class Field:
@@ -454,10 +500,19 @@ print(p.x, p.y)
 #: 3 4
 ```
 
-The `Field` descriptors do not know their names are `x` and `y` until Python tells them through `__set_name__()`.
+By the time the `class Point` statement finishes,
+each `Field` knows its own name and stores values under `_x` or `_y` in the instance's `__dict__`.
+The underscore prefix is not decoration:
+a data descriptor outranks the instance `__dict__`,
+so if `__get__()` asked `obj` for plain `"x"`,
+that lookup would reach the descriptor and call `__get__()` again, forever.
+The `obj is None` branch handles access through the class itself,
+`Point.x` rather than `p.x`;
+returning `self` there exposes the descriptor object for inspection.
 This is metaprogramming, but it needs no metaclass.
 
-Testing confirms the descriptor learns its name and stores under it,
+Testing confirms the descriptor learns its name,
+stores each value under the storage key built from that name,
 and returns itself when accessed on the class:
 
 ```python

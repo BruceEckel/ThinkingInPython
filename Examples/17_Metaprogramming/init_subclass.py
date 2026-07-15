@@ -1,6 +1,4 @@
 # init_subclass.py
-# Track the "leaf" subclasses (those with no subclasses of their own),
-# using __init_subclass__ instead of a metaclass.
 from typing import ClassVar
 
 class Color:

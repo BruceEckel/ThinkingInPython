@@ -1,5 +1,4 @@
 # set_name.py
-# A descriptor learns its attribute name at class-creation time.
 from typing import Any
 
 class Field:

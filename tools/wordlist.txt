@@ -2,6 +2,7 @@
 # Terms, names, and coined words that are not in the English dictionary but
 # used in the book. Add new terms here; fix real typos in the prose instead.
 # One lowercase word per line; '#' starts a comment.
+init
 adaptee
 affordances
 aggregator
