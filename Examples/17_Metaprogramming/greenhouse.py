@@ -9,6 +9,9 @@ NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
 
 @dataclass
 class Event:
+    action: str
+    hour: int
+    minute: int
     events: ClassVar[list[Event]] = []  # Registry of all Events
     event_makers: ClassVar[dict[str, EventMaker]] = {
         name: NOT_CREATED  # Dict key-value pair
@@ -19,9 +22,6 @@ class Event:
             "RingBell",
         )
     }
-    action: str
-    hour: int
-    minute: int
 
     def __post_init__(self) -> None:
         Event.events.append(self)
