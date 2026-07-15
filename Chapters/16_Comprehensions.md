@@ -54,7 +54,7 @@ In this comprehension:
 
 You can achieve the same results using the built-in functions `map()` and `filter()` with an anonymous `lambda`.
 `filter()` applies a predicate to a sequence and retains the members that satisfy the predicate.
-It produces a lazy iterator, which `list()` turns into a `list`:
+It produces a lazy iterator, which `list()` expands into a `list`:
 
 ```python
 # filtering.py
