@@ -228,7 +228,7 @@ if __name__ == "__main__":
 #: 8:00: LightOn
 ```
 
-Now the end user only needs to write and maintain the `schedule.txt` file:
+Now the end user only needs to write and maintain the file containing the schedule:
 
 ```text
 # schedule.txt
@@ -242,7 +242,6 @@ ThermostatDay 6:00
 LightOn 8:00
 ```
 
-The schedule text file is created and edited by the end user.
 `load_schedule()` reads that file, filtering out blank lines and comments,
 then builds an `Event` from each surviving line.
 `line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three plain strings in one step,
