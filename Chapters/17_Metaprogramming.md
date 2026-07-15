@@ -1,23 +1,42 @@
 # Metaprogramming
 
-Objects are created by other objects:
-special objects called *classes* that we set up to produce objects configured to our liking.
+Objects are created by other (special) objects.
+These special objects are called *classes* and we configure them to produce desired objects.
 
-Classes are themselves objects, and we can modify objects:
+So, classes are themselves objects.
+We can modify objects:
 
 ```python
 # modify_class.py
+from display import display_object
+
 class Foo:
     pass
 
-Foo.field = 42  # type: ignore
-x = Foo()
-print(x.field)  # type: ignore
-#: 42
+display_object(Foo)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
 
-Foo.method = lambda self: "Hi!"  # type: ignore
-print(x.method())  # type: ignore
-#: Hi!
+x = Foo()
+
+Foo.n = 42  # type: ignore
+display_object(Foo)
+#: [Attributes]
+#:   • n = 42 [CV]
+#: [Methods]
+#:   None
+
+Foo.m = lambda self: f"{self.n = }"  # type: ignore
+display_object(Foo)
+#: [Attributes]
+#:   • n = 42 [CV]
+#: [Methods]
+#:   • m(self)
+
+print(x.m())  # type: ignore
+#: self.n = 42
 ```
 
 A change to a class affects every object of that class,

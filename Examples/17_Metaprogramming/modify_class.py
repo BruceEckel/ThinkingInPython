@@ -1,12 +1,30 @@
 # modify_class.py
+from display import display_object
+
 class Foo:
     pass
 
-Foo.field = 42  # type: ignore
-x = Foo()
-print(x.field)  # type: ignore
-#: 42
+display_object(Foo)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
 
-Foo.method = lambda self: "Hi!"  # type: ignore
-print(x.method())  # type: ignore
-#: Hi!
+x = Foo()
+
+Foo.n = 42  # type: ignore
+display_object(Foo)
+#: [Attributes]
+#:   • n = 42 [CV]
+#: [Methods]
+#:   None
+
+Foo.m = lambda self: f"{self.n = }"  # type: ignore
+display_object(Foo)
+#: [Attributes]
+#:   • n = 42 [CV]
+#: [Methods]
+#:   • m(self)
+
+print(x.m())  # type: ignore
+#: self.n = 42
