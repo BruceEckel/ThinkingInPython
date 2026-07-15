@@ -3,10 +3,21 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import ClassVar, cast
 
+type EventMaker = Callable[[float], Event]
+NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
+
 @dataclass
 class Event:
     events: ClassVar[list[Event]] = []  # Registry of all Events
-    subclasses: ClassVar[dict[str, Callable[[float], Event]]] = {}
+    subclasses: ClassVar[dict[str, EventMaker]] = {
+        name: NOT_CREATED  # The dict pair
+        for name in (
+            "ThermostatDay", "ThermostatNight",
+            "LightOn", "LightOff",
+            "WaterOn", "WaterOff",
+            "RingBell",
+        )
+    }
     action: str
     time: float
 
@@ -22,15 +33,18 @@ class Event:
             e.run()
 
     @classmethod
-    def create_via_metaclass(cls, class_name: str) -> None:
+    def _create_via_metaclass(cls, class_name: str) -> None:
+        if class_name not in cls.subclasses:
+            raise ValueError(f"Unknown event class: {class_name!r}")
         def init(self: Event, time: float) -> None:
             Event.__init__(self, class_name + " [mc]", time)
         new_cls = type(class_name, (Event,), {"__init__": init})
-        cls.subclasses[class_name] = cast(
-            Callable[[float], Event], new_cls)
+        cls.subclasses[class_name] = cast(EventMaker, new_cls)
 
     @classmethod
-    def create_via_exec(cls, class_name: str) -> None:
+    def _create_via_exec(cls, class_name: str) -> None:
+        if class_name not in cls.subclasses:
+            raise ValueError(f"Unknown event class: {class_name!r}")
         namespace: dict[str, type[Event]] = {"Event": Event}
         klass = f"""
 class {class_name}(Event):
@@ -39,7 +53,17 @@ class {class_name}(Event):
 """
         exec(klass, namespace)
         cls.subclasses[class_name] = cast(
-            Callable[[float], Event], namespace[class_name])
+            EventMaker, namespace[class_name])
+
+    @classmethod
+    def initialize_via_metaclass(cls) -> None:
+        for class_name in cls.subclasses:
+            cls._create_via_metaclass(class_name)
+
+    @classmethod
+    def initialize_via_exec(cls) -> None:
+        for class_name in cls.subclasses:
+            cls._create_via_exec(class_name)
 
     @classmethod
     def instantiate(cls, init: str) -> None:
@@ -59,13 +83,10 @@ if __name__ == "__main__":
         "RingBell(7.00)",
         "ThermostatDay(6.00)",
     ]
-    class_names = [init.split("(")[0] for init in initializations]
-    for class_name in class_names:
-        Event.create_via_metaclass(class_name)
+    Event.initialize_via_metaclass()
     for init in initializations:
         Event.instantiate(init)
-    for class_name in class_names:
-        Event.create_via_exec(class_name)
+    Event.initialize_via_exec()
     for init in initializations:
         Event.instantiate(init)
     Event.run_events()
