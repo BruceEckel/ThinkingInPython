@@ -213,8 +213,7 @@ if __name__ == "__main__":
 
 `create_via_metaclass()` builds each subclass with `type`.
 `create_via_exec()` does the same thing with `exec()` on a string of class-definition code.
-The `exec()` version is easier to follow because it looks like ordinary class definitions.
-Use `type` only when the dynamic version is genuinely clearer than generated source text.
+The `exec()` version is easier to follow because it reads as a class definition.
 
 `exec()` runs its string as Python code with the full power of the language:
 imports, file access, network calls, anything.
@@ -234,7 +233,7 @@ dangerous on anything reaching the program from outside it.
 `create_via_metaclass()` and `create_via_exec()` take the class name directly,
 rather than a human-readable description to reformat into one.
 `initializations` is a list of call expressions, one per class,
-so `init.split("(")[0]` pulls the class name straight off the front of each one.
+so `init.split("(")[0]` pulls the class name from each.
 That avoids a separate `descriptions` list,
 which would have to name the same seven classes by hand and stay in sync with `initializations`.
 
