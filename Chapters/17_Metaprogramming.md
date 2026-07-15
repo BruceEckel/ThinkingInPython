@@ -314,7 +314,8 @@ seeded with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
 so it believes `namespace[class_name]` is a plain `type[Command]` whose constructor takes a `label` argument.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place the class is created,
-the same idiom [Generating Classes with `type`](#generating-classes-with-type) uses for `EventMaker`.
+the same idiom [Generating Classes with `type`](#generating-classes-with-type)
+uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 
