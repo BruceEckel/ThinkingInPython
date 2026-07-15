@@ -35,7 +35,7 @@ print(describe(301))
 #: Status 301
 ```
 
-For a plain value-to-value lookup like this, a dictionary is often shorter
+For a value-to-value lookup like this, a dictionary is often shorter
 (see [the end of this chapter](#when-not-to-match)).
 `match` becomes valuable once the patterns do more than test equality.
 
@@ -346,7 +346,7 @@ print(area(Square(2.0)))
 Add a `Triangle` to `Shape` without adding the appropriate `case`,
 and the checker flags `assert_never(shape)`.
 
-A plain `switch`, in C, JavaScript, or traditional Java, cannot do this.
+A `switch` in C, JavaScript, or traditional Java, cannot do this.
 Nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions do check this,
@@ -375,7 +375,7 @@ def test_exhaustive_area() -> None:
 
 `match` is not a replacement for everything.
 
-For a plain value-to-value lookup, a dictionary is shorter and faster:
+For a value-to-value lookup, a dictionary is shorter and faster:
 
 ```python
 # value_to_value_lookup.py

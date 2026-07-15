@@ -249,7 +249,7 @@ and those methods do not compute anything.
 They build nodes.
 Writing `x + 1` on two `Expr` values produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
-The reflected forms `__radd__()` and `__rmul__()` handle a plain integer on the left,
+The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
 and `wrap()` promotes integers to `Num` nodes,
 so `2 * x + 1` is a valid sentence in the little language.
 Python has already parsed it, honoring precedence,

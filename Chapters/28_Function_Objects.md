@@ -310,7 +310,7 @@ Chain of Responsibility kept its handlers in a list and tried them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
 This is a `dict` from each event type to the functions that care about it.
-The events are plain values,
+The events are values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.
 The handlers are ordinary functions,

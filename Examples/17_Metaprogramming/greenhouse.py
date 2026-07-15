@@ -19,14 +19,14 @@ class Event:
         for e in sorted(Event.events, key=lambda e: e.time):
             e.run()
 
-def create_mc(description: str) -> None:
+def create_via_metaclass(description: str) -> None:
     class_name = "".join(x.capitalize() for x in description.split())
     def init(self, time: float) -> None:
         Event.__init__(self, description + " [mc]", time)
     globals()[class_name] = type(
         class_name, (Event,), {"__init__": init})
 
-def create_exec(description: str) -> None:
+def create_via_exec(description: str) -> None:
     class_name = "".join(x.capitalize() for x in description.split())
     klass = f"""
 class {class_name}(Event):
@@ -41,11 +41,11 @@ if __name__ == "__main__":
     initializations = "ThermostatNight(5.00); LightOff(2.00); \
         WaterOn(3.30); WaterOff(4.45); LightOn(1.00); \
         RingBell(7.00); ThermostatDay(6.00)"
-    for dsc in descriptions:
-        create_mc(dsc)
+    for desc in descriptions:
+        create_via_metaclass(desc)
     exec(initializations, globals())
-    for dsc in descriptions:
-        create_exec(dsc)
+    for desc in descriptions:
+        create_via_exec(desc)
     exec(initializations, globals())
     Event.run_events()
 #: 1.00: Light on [mc]

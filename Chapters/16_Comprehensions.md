@@ -280,6 +280,49 @@ Each name documents a stage of the pipeline,
 so a reader can follow the transformation one step at a time instead of parsing every step simultaneously.
 Use this split whenever a comprehension needs a comment to explain what it does.
 
+## Comprehensions Build, Loops Execute
+
+A comprehension's output expression can be any expression,
+including a call with a side effect, such as `print()`.
+Nothing stops you from using a comprehension to run code
+and throw away the result it builds:
+
+```python
+# comprehension_side_effects.py
+wasted = [print(n) for n in [1, 2, 3]]
+print(wasted)
+#: 1
+#: 2
+#: 3
+#: [None, None, None]
+```
+
+`wasted` runs `print()` for its side effect.
+`print()` returns `None`,
+so `wasted` ends up holding three `None`s.
+`wasted` is a list built only to be thrown away.
+Worse, a reader scanning `[...]` expects a meaningful collection,
+not a loop wearing a disguise.
+
+The idiomatic version says what it does:
+
+```python
+# for_loop_side_effects.py
+for n in [1, 2, 3]:
+    print(n)
+#: 1
+#: 2
+#: 3
+```
+
+Same effect, no wasted list.
+The `for` loop reads honestly.
+It executes code rather than building a collection.
+Use a comprehension when you want the collection it produces,
+and a `for` loop when you want the side effect.
+If a comprehension's result is never assigned or used,
+that's a sign it should be a loop instead.
+
 ## Set Comprehensions
 
 Set comprehensions construct sets using the same principles as list comprehensions.

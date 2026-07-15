@@ -144,7 +144,7 @@ class Maze:
 ```
 
 `Cell` nests inside `Maze` because it only names concepts `Maze` uses,
-and it is a `StrEnum` rather than a plain `Enum` so its members keep acting like real strings.
+and it is a `StrEnum` rather than an `Enum` so its members keep acting like real strings.
 `WALL` still works as the fill character for `ljust()`,
 and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
 because a `StrEnum` member is its string value.
@@ -274,7 +274,7 @@ asyncio.run(main())
 Because claiming is atomic,
 the rats always cover every cell reachable from the entry,
 no matter how the tasks interleave.
-Testing verifies this by comparing the cells the rats visited against a plain flood fill of the same maze.
+Testing verifies this by comparing the cells the rats visited against a flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -488,7 +488,7 @@ def item_factory(symbol: str) -> Item:
 ```
 
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
-so a plain `from world import Room` here would be circular.
+so `from world import Room` here would be circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,

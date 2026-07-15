@@ -516,7 +516,7 @@ The number is one machine's actual output.)
 
 Free threading finally cleared the 1996 bar by making reference counting cheap without a global lock.
 Most objects are only ever touched by the thread that created them.
-*Biased reference counting* lets that owning thread update the count with plain arithmetic.
+*Biased reference counting* lets that owning thread update the count with arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*,
 a change that landed in 3.12 for every build but pays off most here,

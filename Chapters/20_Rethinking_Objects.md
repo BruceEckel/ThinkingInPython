@@ -233,7 +233,7 @@ Most encapsulation is only necessary because you allowed mutation in the first p
 
 The second OOP promise is that behavior belongs inside the object, as methods.
 But a method is only a function whose first argument is the object.
-Compare a method with a plain function that does the same thing:
+Compare a method with a function that does the same thing:
 
 ```python
 # point_distance.py

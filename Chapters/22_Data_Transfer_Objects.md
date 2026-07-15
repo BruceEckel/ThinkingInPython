@@ -137,7 +137,7 @@ display_object(m)
     and update the `print(Point(1.0, 2.0))` call to pass three arguments.
 3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `messenger_modern.py`,
     following `Color`'s shape,
-    and confirm an instance still unpacks and indexes like a plain tuple.
+    and confirm an instance still unpacks and indexes like a tuple.
 4.  In `display_namespace.py`,
     add a fourth keyword argument to `m` when it is constructed instead of assigning `m.more` afterward,
     and confirm `display_object()` shows all four attributes,

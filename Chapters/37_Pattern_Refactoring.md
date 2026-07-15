@@ -399,7 +399,7 @@ The honest measure of a pattern is whether it is still useful once the language 
     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
     and that only `trash.dat` and (optionally)
     a one-line `recycling_note()` registration do.
-2.  Write a `price()` operation as a plain function over a list of `Trash`,
+2.  Write a `price()` operation as a function over a list of `Trash`,
     and a `heaviest()` operation that returns the single heaviest piece.
     Decide for each whether it needs `singledispatch`.
 3.  Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,

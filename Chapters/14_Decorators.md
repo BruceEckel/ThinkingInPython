@@ -516,7 +516,7 @@ except TypeError as e:
 #: Example.method() missing 1 required positional argument: 'x'
 ```
 
-`Example.method` is a `Logged` instance, stored as a plain class attribute.
+`Example.method` is a `Logged` instance, stored as a class attribute.
 Accessing it through `example.method` does not bind it to `example`,
 because a plain object is not a *descriptor*:
 Python performs that binding only for things implementing `__get__()`,
@@ -530,7 +530,7 @@ with no hint that the real cause is a missing `__get__()`.
 shows the descriptor protocol,
 which a class-based decorator would need to implement to work on methods.
 
-A plain function needs none of this: it is already a descriptor,
+A function needs none of this: it is already a descriptor,
 so `wrapper()` in the function form binds to an instance like any other method.
 A fully typed class decorator, like `trace_class.trace`,
 even gets the checker involved:
@@ -715,7 +715,7 @@ if __name__ == "__main__":
 `run_once` calls `greeting` immediately, at decoration time,
 and hands back whatever `greeting()` returned.
 `greeting` does not survive decoration as a function:
-the name now refers to the plain `str` that came out of it.
+the name now refers to the `str` that came out of it.
 Calling `greeting()` again would fail, since a `str` is not callable.
 This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
 A module-level constant computed without a decorator is usually clearer for anything simpler.
@@ -852,7 +852,7 @@ each wrap a function the same way `trace` does,
 but return a *descriptor* instead of a plain wrapper.
 That lets them change how attribute access behaves,
 and it also makes them work correctly on methods,
-where a plain `__call__`-based class, like `Logged` above, does not.
+where a `__call__`-based class, like `Logged` above, does not.
 `@dataclass` (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
 is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,

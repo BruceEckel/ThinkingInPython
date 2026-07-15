@@ -556,7 +556,7 @@ if __name__ == "__main__":
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message}")  # A plain text view
+        print(f"{event}: {machine.message}")  # Text view
 #: quarter: Total = 25
 #: quarter: Total = 50
 #: dollar: Total = 150

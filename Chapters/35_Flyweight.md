@@ -228,8 +228,8 @@ The cost is bookkeeping by hand.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` would re-run on the cached instance at every construction.
-This class therefore defines no `__init__()`,
-which rules out the plain `@dataclass`,
+This class therefore defines no `__init__()`.
+This rules out `@dataclass`,
 whose generated `__init__()` would reintroduce exactly that re-run.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.

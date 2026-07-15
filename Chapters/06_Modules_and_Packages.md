@@ -304,7 +304,7 @@ use the `-X lazy_imports` command-line option or the `PYTHON_LAZY_IMPORTS` envir
 1.  Add a third module, `a_package/module3.py`,
     with its own `function3()` that prints a message when the module loads.
     Import it three different ways,
-    one each using plain `import a_package.module3`,
+    one each using `import a_package.module3`,
     `from a_package import module3`,
     and `from a_package.module3 import function3`,
     and confirm the loading message prints only once no matter how many of the three you use together.

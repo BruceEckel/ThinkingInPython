@@ -117,7 +117,7 @@ In Python it is a convention,
 though freezing the memento means the honest mistakes (mutating the snapshot)
 fail loudly.
 
-A plain `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
+A `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
 But an alias is *structural*, not *nominal*.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.

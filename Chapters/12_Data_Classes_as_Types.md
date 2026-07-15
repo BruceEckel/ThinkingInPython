@@ -34,7 +34,7 @@ def check(condition: bool, message: str, detail: str = "") -> None:
 ## A Value That Must Be Checked Everywhere
 
 Suppose a "stars" rating is an integer from one to ten.
-If you represent it as a plain `int`,
+If you represent it as an `int`,
 nothing stops a caller from passing eleven, or minus one.
 To prevent that, every function that takes a rating must check it:
 
@@ -152,7 +152,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 
 The dunder methods have indeed been generated,
 and you can see that the constructor arguments cover all the fields in `Messenger`.
-`__hash__` is `None`: a plain `@dataclass` compares by value with `__eq__`,
+`__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
 only `depth` appears as an attribute because it has an initialization value.
@@ -180,7 +180,7 @@ print(m)
 print(mc)
 #: Messenger(name='foo', number=12, depth=9.9)
 
-m.name = "bar"  # A plain data class is mutable
+m.name = "bar"  # Data classes are mutable by default
 print(m)
 #: Messenger(name='bar', number=12, depth=3.14)
 ```
@@ -192,7 +192,7 @@ which produces the class name and the named argument values.
 This copy-instead-of-mutate style reduces errors.
 
 Notice the last two lines.
-A plain data class is still mutable, so `m.name = "bar"` works.
+A data class is mutable, so `m.name = "bar"` works.
 
 `display_object()` shows the attributes with their declared types:
 
@@ -828,7 +828,7 @@ Four small classes make the differences concrete:
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
-- `C` is a plain `@dataclass`.
+- `C` is a `@dataclass`.
 - `D` adds a `ClassVar` field alongside an ordinary one.
 
 Each one is inspected with the same helper:

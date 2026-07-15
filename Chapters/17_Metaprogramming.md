@@ -69,7 +69,7 @@ Since metaclasses create classes, you can call the metaclass yourself.
 `type` with one argument gives the type of an existing object.
 `type` with three arguments creates a new class: the name,
 a tuple of base classes, and a namespace dictionary of fields and methods.
-A plain class definition is shorthand for calling `type` yourself:
+A class definition is shorthand for calling `type` yourself:
 
 ```python
 # class_via_type.py
@@ -93,11 +93,29 @@ You can add bases, fields, and methods the same way:
 
 ```python
 # my_list.py
+from display import display_object
 
 def howdy(self, you: str) -> None:
     print("Howdy, " + you)
 
 MyList = type("MyList", (list,), dict(x=42, howdy=howdy))
+
+display_object(MyList)
+#: [Attributes]
+#:   • x = 42 [CV]
+#: [Methods]
+#:   • append(self, object, /)
+#:   • clear(self, /)
+#:   • copy(self, /)
+#:   • count(self, value, /)
+#:   • extend(self, iterable, /)
+#:   • howdy(self, you: str) -> None
+#:   • index(self, value, start=0, stop=9223372036854775807, /)
+#:   • insert(self, index, object, /)
+#:   • pop(self, index=-1, /)
+#:   • remove(self, value, /)
+#:   • reverse(self, /)
+#:   • sort(self, /, *, key=None, reverse=False)
 
 ml = MyList()
 ml.append("Camembert")
@@ -112,11 +130,13 @@ print(ml.__class__.__class__)
 #: <class 'type'>
 ```
 
+Because `MyList` inherits `list`, it gets all the methods from `list`.
+
 Printing the class of the class produces the metaclass.
 
 Generating classes programmatically with `type` opens up possibilities.
 Where you might otherwise write many near-identical subclasses by hand,
-you can generate them in a loop:
+you can generate them dynamically:
 
 ```python
 # greenhouse.py
@@ -140,14 +160,15 @@ class Event:
         for e in sorted(Event.events, key=lambda e: e.time):
             e.run()
 
-def create_mc(description: str) -> None:
+def create_via_metaclass(description: str) -> None:
     class_name = "".join(x.capitalize() for x in description.split())
+    # A local function, to add to the generated class:
     def init(self, time: float) -> None:
         Event.__init__(self, description + " [mc]", time)
     globals()[class_name] = type(
         class_name, (Event,), {"__init__": init})
 
-def create_exec(description: str) -> None:
+def create_via_exec(description: str) -> None:
     class_name = "".join(x.capitalize() for x in description.split())
     klass = f"""
 class {class_name}(Event):
@@ -162,11 +183,11 @@ if __name__ == "__main__":
     initializations = "ThermostatNight(5.00); LightOff(2.00); \
         WaterOn(3.30); WaterOff(4.45); LightOn(1.00); \
         RingBell(7.00); ThermostatDay(6.00)"
-    for dsc in descriptions:
-        create_mc(dsc)
+    for desc in descriptions:
+        create_via_metaclass(desc)
     exec(initializations, globals())
-    for dsc in descriptions:
-        create_exec(dsc)
+    for desc in descriptions:
+        create_via_exec(desc)
     exec(initializations, globals())
     Event.run_events()
 #: 1.00: Light on [mc]
@@ -185,11 +206,21 @@ if __name__ == "__main__":
 #: 7.00: Ring bell [exec]
 ```
 
-`create_mc()` builds each subclass with `type`.
-`create_exec()` does the same thing by running a string of class-definition code with `exec()`.
+`create_via_metaclass()` builds each subclass with `type`.
+`create_via_exec()` does the same thing by running a string of class-definition code with `exec()`.
 The `exec()` version is easier for most readers to follow,
 because it looks like ordinary class definitions.
 Use `type` only when the dynamic version is genuinely clearer than generated source text.
+
+Both versions call `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+In `create_via_metaclass()`, `init()` is a nested function,
+not a method defined inside a `class` statement,
+so the compiler never gives it the `__class__` cell that zero-argument `super()` needs;
+calling it raises `RuntimeError: super(): __class__ cell not found`.
+The `exec()`'d code in `create_via_exec()` is a real `class` statement,
+so `super().__init__(...)` would work there.
+It stays as `Event.__init__(self, ...)` anyway,
+to keep the two techniques visibly parallel.
 
 ## Self-Registration of Subclasses
 
@@ -485,7 +516,7 @@ so the singletons stay independent.
 
 This works, but it is heavier than the problem usually requires.
 [Singleton](24_Singleton.md) covers the lighter alternatives,
-from a class decorator down to a plain module.
+from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 
 ## Making a Class Final
@@ -799,7 +830,7 @@ Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
 including the interpreter's own machinery.
 `dunder` is typed `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
 naming each sentinel value itself rather than the generic `sentinel` class,
-so a type checker narrows `dunder` to plain `Sequence[str]` once both sentinels are ruled out,
+so a type checker narrows `dunder` to `Sequence[str]` once both sentinels are ruled out,
 and `name in dunder` needs no further guard.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
 but it buries a class's own choices under everything `object` and the interpreter add.
@@ -807,7 +838,7 @@ but it buries a class's own choices under everything `object` and the interprete
 `__init__`, `__repr__`, `__eq__`, and `__hash__`.
 Pass it as `dunder` to see those four without the surrounding noise.
 
-A plain class inherits all four of those from `object` without overriding any of them,
+A class inherits all four of those from `object` without overriding any of them,
 so `INTERESTING_DUNDERS` shows `object`'s generic versions,
 which can look like the class defined them itself.
 `REDEFINED_DUNDERS` filters harder: among those same four,

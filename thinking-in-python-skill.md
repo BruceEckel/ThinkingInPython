@@ -243,18 +243,21 @@ file passes a strict type checker and linter.
   a multiline comment block (two or more consecutive full-line `#`
   comments) reads as sentences and keeps its periods.
 
-- **Header comments:** a single-line comment at the top of a file is
-  fine. If it would run two or more lines, the content belongs in
-  surrounding prose or a docstring, not a block comment.
-
-- Comments state constraints the code cannot show. Never narrate what
-  the next line does.
+- **Descriptions belong in prose, not comments.** A comment that
+  explains what an example does, why, or a design choice behind it
+  goes in the chapter prose after the code block, not in the code —
+  this applies to the header comment and to inline comments anywhere
+  else in the body. Comments stay in the code only for a tool
+  directive (`# type: ignore`, `# noqa`), the single-line
+  `# path/slug.py` file marker, or when specifically requested. Never
+  narrate what the next line does.
 
 - **Docstrings live outside chapter listings.** A chapter listing
   explains itself in the surrounding prose, not a docstring (see
-  "Header comments" above). A `tools/` helper module or other code
-  outside a listing gets a real one: PEP 257 triple double-quotes, a
-  one-line summary ending in a period, and, if more is needed, a
+  "Descriptions belong in prose, not comments" above). A `tools/`
+  helper module or other code outside a listing gets a real one:
+  PEP 257 triple double-quotes, a one-line summary ending in a
+  period, and, if more is needed, a
   blank line followed by parameters, return value, and exceptions
   raised.
 

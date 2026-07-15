@@ -193,7 +193,7 @@ so under heavy insert traffic consider the heap below instead.
 
 When you repeatedly need the smallest item,
 a *heap* keeps that item reachable in O(log n).
-The `heapq` module treats a plain `list` as a binary heap:
+The `heapq` module treats a `list` as a binary heap:
 
 ```python
 # heap_queue.py

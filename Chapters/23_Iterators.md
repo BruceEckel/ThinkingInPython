@@ -275,5 +275,5 @@ def test_typed_iterator_passes_and_rejects() -> None:
 1.  Write a generator `evens(n)` that yields the first `n` even numbers,
     and confirm `total()` from `iterators.py` sums them without modification.
 2.  Rewrite `Countdown` to also support `len()`,
-    then explain why a plain generator cannot.
+    then explain why a generator cannot.
 3.  Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
