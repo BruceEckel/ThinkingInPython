@@ -67,8 +67,7 @@ if __name__ == "__main__":
 #: [1, 9, 0, 4]
 ```
 
-`map()` applies a function to each member.
-We reuse `ints` from `filtering.py`:
+`map()` applies a function to each member:
 
 ```python
 # mapping.py
