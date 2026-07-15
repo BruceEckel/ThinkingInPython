@@ -382,6 +382,7 @@ class SketchV1:
 import pickle
 from dataclasses import dataclass
 import sketch_v1
+from exceptions import ignore
 from sketch_v1 import SketchV1
 
 blob = pickle.dumps(SketchV1(("circle", "beak")))
@@ -395,11 +396,9 @@ sketch_v1.SketchV1 = SketchV2  # type: ignore
 restored = pickle.loads(blob)
 print(restored.strokes)
 #: ('circle', 'beak')
-try:
+with ignore(AttributeError):
     print(restored.title)
-except AttributeError as e:
-    print(type(e).__name__, e)
-#: AttributeError 'SketchV2' object has no attribute 'title'
+#: AttributeError("'SketchV2' object has no attribute 'title'")
 ```
 
 `blob` is written while `sketch_v1.SketchV1` still means the one-field class.

@@ -12,7 +12,7 @@ print(a[1], a.typecode, a.itemsize)
 with ignore(TypeError):
     # The value must match the type code:
     a.append("x")  # type: ignore
-#: ignoring TypeError('must be real number, not str')
+#: TypeError('must be real number, not str')
 
 nums = [float(i) for i in range(10_000)]
 packed = array("d", nums)

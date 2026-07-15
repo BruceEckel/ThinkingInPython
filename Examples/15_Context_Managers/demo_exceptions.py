@@ -7,7 +7,7 @@ with ignore(ZeroDivisionError):
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
 #: before
-#: ignoring ZeroDivisionError('division by zero')
+#: ZeroDivisionError('division by zero')
 #: survived
 
 with ignore():  # No argument means ALL
@@ -15,7 +15,7 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: ignoring KeyError('anything')
+#: KeyError('anything')
 #: survived
 
 with ignore() as x:

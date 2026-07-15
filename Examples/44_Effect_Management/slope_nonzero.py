@@ -17,4 +17,4 @@ print(slope(10, NonZero(2)))
 #: 5.0
 with ignore(ValueError):
     NonZero(0)
-#: ignoring ValueError('NonZero cannot hold 0')
+#: ValueError('NonZero cannot hold 0')

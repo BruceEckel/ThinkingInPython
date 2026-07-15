@@ -34,4 +34,4 @@ if __name__ == "__main__":
 #: Running Start
 #: Running Stop
 #: Running Pause
-#: ignoring ValueError("Unknown command: 'Reset'")
+#: ValueError("Unknown command: 'Reset'")

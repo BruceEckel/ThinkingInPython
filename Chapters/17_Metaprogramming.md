@@ -189,13 +189,12 @@ class Event:
     def _make_class(cls, class_name: str) -> None:
         if class_name not in cls.event_makers:
             raise ValueError(f"Unknown event class: {class_name!r}")
-        if cls.event_makers[class_name] is not NOT_CREATED:
-            return
-        print(f"Creating {class_name}")
-        def init(self: Event, hour: int, minute: int) -> None:
-            Event.__init__(self, class_name, hour, minute)
-        new_cls = type(class_name, (Event,), {"__init__": init})
-        cls.event_makers[class_name] = cast(EventMaker, new_cls)
+        if cls.event_makers[class_name] is NOT_CREATED:
+            print(f"Creating {class_name}")
+            def init(self: Event, hour: int, minute: int) -> None:
+                Event.__init__(self, class_name, hour, minute)
+            new_cls = type(class_name, (Event,), {"__init__": init})
+            cls.event_makers[class_name] = cast(EventMaker, new_cls)
 
     @classmethod
     def add_event(cls, event: str) -> None:

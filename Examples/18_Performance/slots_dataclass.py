@@ -32,7 +32,7 @@ fp = FrozenPoint(1, 2)
 with ignore(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
-#: ignoring FrozenInstanceError("cannot assign to field 'z'")
+#: FrozenInstanceError("cannot assign to field 'z'")
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))

@@ -14,4 +14,4 @@ print(distances[Point(3, 4)])
 # A list has no stable hash, so it cannot be a key:
 with ignore(TypeError):
     hash([3, 4])
-#: ignoring TypeError("unhashable type: 'list'")
+#: TypeError("unhashable type: 'list'")
