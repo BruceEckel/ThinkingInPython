@@ -14,7 +14,7 @@ class Event:
     minute: int
     events: ClassVar[list[Event]] = []  # Registry of all Events
     event_makers: ClassVar[dict[str, EventMaker]] = {
-        name: NOT_CREATED  # Dict key-value pair
+        name : NOT_CREATED  # Dict key : value pair
         for name in (
             "ThermostatDay", "ThermostatNight",
             "LightOn", "LightOff",
@@ -26,11 +26,16 @@ class Event:
     def __post_init__(self) -> None:
         Event.events.append(self)
 
-    @staticmethod
-    def run_events() -> None:
-        for e in sorted(
-                Event.events, key=lambda e: (e.hour, e.minute)):
-            print(f"{e.hour}:{e.minute:02d}: {e.action}")
+    @classmethod
+    def load_schedule(cls, path: Path) -> None:
+        lines = [
+            line for line in path.read_text().splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
+        for line in lines:
+            class_name, hour, minute = (
+                line.replace(":", " ").split())
+            cls._class_for(class_name)(int(hour), int(minute))
 
     @classmethod
     def _class_for(cls, class_name: str) -> EventMaker:
@@ -44,18 +49,14 @@ class Event:
             cls.event_makers[class_name] = cast(EventMaker, new_cls)
         return cls.event_makers[class_name]
 
-    @classmethod
-    def add_event(cls, event: str) -> None:
-        class_name, hour, minute = (event.replace(":", " ").split())
-        cls._class_for(class_name)(int(hour), int(minute))
+    @staticmethod
+    def run_events() -> None:
+        for e in sorted(
+                Event.events, key=lambda e: (e.hour, e.minute)):
+            print(f"{e.hour}:{e.minute:02d}: {e.action}")
 
 if __name__ == "__main__":
-    schedule = [
-        line for line in Path("schedule.txt").read_text().splitlines()
-        if line.strip() and not line.startswith("#")
-    ]
-    for event in schedule:
-        Event.add_event(event)
+    Event.load_schedule(Path("schedule.txt"))
     Event.run_events()
 #: Creating ThermostatNight
 #: Creating LightOff

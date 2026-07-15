@@ -308,7 +308,7 @@ define that set as a union using the [`type` statement](08_Static_Typing.md#the-
 Now you can perform a match on that union.
 When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
-Adding a type to the union and forgeting its `case` produces a type error.
+Adding a type to the union and forgetting its `case` produces a type error.
 This error is caught during type checking rather than silently falling through.
 This is the static-typing payoff applied to control flow:
 

@@ -9,7 +9,6 @@ To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
 For simplicity, we use an untyped `Callable` here:
 
-
 ```python
 # simple_decoration.py
 from collections.abc import Callable

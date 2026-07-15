@@ -1,9 +1,7 @@
-
 # Accepted words for tools/spellcheck.py (the full-dictionary prose check).
-# One lowercase word per line; '#' starts a comment. These are technical
-# are spelled correctly for this book. Add new terms here; fix real typos
-# in the prose instead.
-# terms, names, and coined words that are not in the English dictionary but
+# Terms, names, and coined words that are not in the English dictionary but
+# used in the book. Add new terms here; fix real typos in the prose instead.
+# One lowercase word per line; '#' starts a comment.
 adaptee
 affordances
 aggregator
@@ -51,6 +49,7 @@ enums
 esque
 etc
 eval
+falsy
 façade
 filename
 filesystem
@@ -64,6 +63,7 @@ functor
 getters
 globals
 guido
+hashability
 hashable
 haskell
 hoare
@@ -119,6 +119,7 @@ parameterized
 parametrizing
 polars
 postcondition
+pre
 precompute
 profiler
 profilers
@@ -137,6 +138,7 @@ redeclare
 refactor
 refactoring
 reframed
+reframes
 rel
 resizes
 rocq
@@ -163,22 +165,26 @@ superset
 swappable
 teardown
 teleport
+teleports
 tkinter
 toolchain
 toolkits
 traceback
 tracebacks
 truthiness
+truthy
 tuple
 tuples
 typeguard
 unboxed
 undoable
+unescaped
 unpickle
 unrepresentable
 untracked
 untrusted
 untyped
+unvalidated
 validators
 vectorize
 vectorizing
@@ -188,6 +194,7 @@ virtualize
 virtualizes
 vlissides
 walkability
+whitespace
 wildcard
 workaround
 workarounds
