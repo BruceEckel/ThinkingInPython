@@ -1,13 +1,13 @@
 # commander.py
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import ClassVar, cast
 from exceptions import ignore
 
+@dataclass
 class Command:
+    label: str
     KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
-
-    def __init__(self, label: str) -> None:
-        self.label = label
 
     def run(self) -> str:
         return f"Running {self.label}"

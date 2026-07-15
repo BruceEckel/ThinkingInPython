@@ -160,27 +160,40 @@ from typing import ClassVar, cast
 type EventMaker = Callable[[int, int], Event]
 NOT_CREATED: EventMaker = cast(EventMaker, sentinel("NOT_CREATED"))
 
+class EventMakers(dict[str, EventMaker]):
+    def __getitem__(self, class_name: str) -> EventMaker:
+        if class_name not in self:
+            raise ValueError(f"Unknown event class: {class_name!r}")
+        if super().__getitem__(class_name) is NOT_CREATED:
+            print(f"Creating {class_name}")
+            # Local function to pass to type constructor:
+            def init(self: Event, hour: int, minute: int) -> None:
+                Event.__init__(self, class_name, hour, minute)
+            new_cls = type(class_name, (Event,), {"__init__": init})
+            self[class_name] = cast(EventMaker, new_cls)
+        return super().__getitem__(class_name)
+
 @dataclass
 class Event:
     action: str
     hour: int
     minute: int
     events: ClassVar[list[Event]] = []  # Registry of all Events
-    event_makers: ClassVar[dict[str, EventMaker]] = {
-        name : NOT_CREATED  # Dict key : value pair
+    _event_maker: ClassVar[EventMakers] = EventMakers({
+        name : NOT_CREATED  # Dict key : value
         for name in (
             "ThermostatDay", "ThermostatNight",
             "LightOn", "LightOff",
             "WaterOn", "WaterOff",
             "RingBell",
         )
-    }
+    })
 
     def __post_init__(self) -> None:
         Event.events.append(self)
 
-    @classmethod
-    def load_schedule(cls, path: Path) -> None:
+    @staticmethod
+    def load_schedule(path: Path) -> None:
         lines = [
             line for line in path.read_text().splitlines()
             if line.strip() and not line.startswith("#")
@@ -188,19 +201,7 @@ class Event:
         for line in lines:
             class_name, hour, minute = (
                 line.replace(":", " ").split())
-            cls._class_for(class_name)(int(hour), int(minute))
-
-    @classmethod
-    def _class_for(cls, class_name: str) -> EventMaker:
-        if class_name not in cls.event_makers:
-            raise ValueError(f"Unknown event class: {class_name!r}")
-        if cls.event_makers[class_name] is NOT_CREATED:
-            print(f"Creating {class_name}")
-            def init(self: Event, hour: int, minute: int) -> None:
-                Event.__init__(self, class_name, hour, minute)
-            new_cls = type(class_name, (Event,), {"__init__": init})
-            cls.event_makers[class_name] = cast(EventMaker, new_cls)
-        return cls.event_makers[class_name]
+            Event._event_maker[class_name](int(hour), int(minute))
 
     @staticmethod
     def run_events() -> None:
@@ -243,20 +244,20 @@ LightOn 8:00
 ```
 
 `load_schedule()` reads that file, filtering out blank lines and comments,
-then builds an `Event` from each surviving line.
-`line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three plain strings in one step,
-by replacing the colon with a second space before splitting on whitespace.
-`_class_for()` gets the class object used to build that `Event`.
-The first time an event type is actually needed,
+then builds an `Event` from each resulting line.
+`line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three plain strings in a single step,
+replacing the colon with a second space before splitting on whitespace.
+`cls._event_maker[class_name]` gets the class object used to build that `Event`.
+The first time an event type is needed,
 the class is built and registered under its name.
 
-`Event.event_makers` comes pre-populated with the seven legitimate event names,
+`Event._event_maker` comes pre-populated with the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
 Populating that dict does not build any classes.
 It only reserves the names,
-so `_class_for()` has something to check a `class_name` against before building anything.
+so `EventMakers.__getitem__()` has something to check a `class_name` against before building anything.
 
-`_class_for()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+`EventMakers.__getitem__()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 `init()` is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
@@ -264,22 +265,21 @@ so the compiler never gives it the `__class__` cell that zero-argument `super()`
 
 The `type` approach in the previous section builds a class from a name,
 a tuple of bases, and a namespace dict.
-`exec()` offers a second way:
-write the class as an ordinary `class` statement inside an f-string,
-then run that string as code.
-The generated source reads like a class definition, because it is one:
+A second way is to write the class as an ordinary `class` statement inside an f-string,
+then `exec()` that string as code.
+The class definition (`klass`) is easier to read:
 
 ```python
 # commander.py
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import ClassVar, cast
 from exceptions import ignore
 
+@dataclass
 class Command:
+    label: str
     KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
-
-    def __init__(self, label: str) -> None:
-        self.label = label
 
     def run(self) -> str:
         return f"Running {self.label}"
@@ -309,52 +309,34 @@ if __name__ == "__main__":
 #: ValueError("Unknown command: 'Reset'")
 ```
 
-`make_class()` execs `klass` into a private `namespace` dict,
-seeded with `{"Command": Command}` so the generated class's own reference to `Command` resolves.
-Nothing is written into the real module namespace
-([`globals()`](06_Modules_and_Packages.md), covered when modules are introduced):
-`namespace[class_name]` is the only way to reach the class afterward.
-The checker only knows `Command`'s own `__init__(self, label)`,
-not that the generated subclass replaces it with a no-argument `__init__`,
-so `cast(Callable[[], Command], ...)` records the narrower,
-actual signature at the one place the class is created,
-the same idiom [Generating Classes with `type`](#generating-classes-with-type)
-uses for `EventMaker`.
+`make_class()` execs `klass` into a private `namespace` dict rather than the module's namespace,
+seeded with `{"Command": Command}` so the generated class can find its base.
+The type checker can't see into the string,
+so it believes `namespace[class_name]` is a plain `type[Command]` whose constructor takes a `label` argument.
+`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place the class is created,
+the same idiom [Generating Classes with `type`](#generating-classes-with-type) uses for `EventMaker`.
+Unlike `EventMakers`, `make_class()` caches nothing:
+calling `make_class("Start")` twice builds two distinct classes.
 
-Notice `super().__init__(...)` inside the generated class, working normally.
-Unlike `_class_for()`'s `init()`,
-defined as a nested function and never given a `__class__` cell,
-this `__init__` is a method defined inside a real `class` statement,
-even though that statement arrived as a string.
-The compiler doesn't distinguish where the source text came from,
-only whether the method is textually inside a `class` block.
+Notice that `super().__init__(...)` works inside the generated class.
+`EventMakers.__getitem__()` had to call `Event.__init__()` directly,
+because its `init()` was a nested function with no `__class__` cell.
+Here `__init__` is defined textually inside a `class` block,
+and the compiler doesn't care that the block arrived as a string.
 
-`exec()` runs its string as Python code with the full power of the language:
-imports, file access, network calls, anything.
-A string built from untrusted input,
-such as a web form or a file another user uploaded,
-would hand an attacker that same access.
-
-`Command.KNOWN_COMMANDS` is what keeps `make_class()` safe.
-It checks `class_name` before doing anything with it,
-and raises `ValueError` for any name that isn't `"Start"`, `"Stop"`,
-or `"Pause"`.
-An unrecognized name gets rejected, not executed.
-
-That check matters for a sharper reason than just rejecting nonsense.
-`klass` splices `class_name` directly into class-definition source text before handing it to `exec()`.
-An unvalidated `class_name` containing a newline and a second statement could break out of the intended `class` block and run arbitrary code there,
-the same way an unescaped string breaks out of a hand-built SQL query.
-`_class_for()`, back in [Generating Classes with `type`](#generating-classes-with-type),
-never has this risk:
-`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value,
-never as source code to parse.
-Building a class from a string template and validating what gets spliced into it are two different concerns,
-and skipping the second one is exactly how this kind of vulnerability gets shipped.
-
-Treat `exec()` and `eval()` the way you'd treat string-built SQL:
-safe on data you already validated,
-dangerous on anything reaching the program from outside it unchecked.
+The string is also the danger.
+`exec()` runs its argument with the full power of the language,
+and `klass` splices `class_name` directly into source text,
+so an unvalidated name containing a newline and a second statement could break out of the `class` block and run anything,
+the same way an unescaped value breaks out of a hand-built SQL query.
+The `KNOWN_COMMANDS` check closes that hole:
+only three fixed names ever reach the template.
+`EventMakers` never has this risk,
+because `type(class_name, (Event,), ...)` treats `class_name` as a plain string value,
+never as source code.
+Treat `exec()` and `eval()` like string-built SQL:
+safe on values you've already validated,
+dangerous on anything that reaches the program from outside, unchecked.
 
 ## Self-Registration of Subclasses
 
