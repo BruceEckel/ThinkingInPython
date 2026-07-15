@@ -14,7 +14,7 @@ class Simple:
     # Two methods:
     def show(self, msg=""):
         if msg:
-            print(msg + ":", self.s)
+            print(f"{msg}:", self.s)
         else:
             print(self.s)
     def show_twice(self):

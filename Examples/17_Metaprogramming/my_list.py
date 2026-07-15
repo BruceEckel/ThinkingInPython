@@ -2,7 +2,7 @@
 from display import display_object
 
 def howdy(self, you: str) -> None:
-    print("Howdy, " + you)
+    print(f"Howdy, {you}")
 
 MyList = type("MyList", (list,), dict(x=42, howdy=howdy))
 

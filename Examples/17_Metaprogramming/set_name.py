@@ -5,7 +5,7 @@ from typing import Any
 class Field:
     def __set_name__(self, owner: type, name: str) -> None:
         self.name = name
-        self.storage = "_" + name
+        self.storage = f"_{name}"
 
     def __get__(self, obj: Any, owner: type | None = None) -> Any:
         if obj is None:

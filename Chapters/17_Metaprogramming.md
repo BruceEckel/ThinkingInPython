@@ -79,9 +79,10 @@ then metaclasses for situations that still need them.
 
 Since metaclasses create classes, you can call the metaclass yourself.
 `type` with one argument gives the type of an existing object.
-`type` with three arguments creates a new class: the name,
-a tuple of base classes, and a namespace dictionary of fields and methods.
-A class definition is shorthand for calling `type` yourself:
+`type` with three arguments creates a new class.
+These arguments are the name, a tuple of base classes,
+and a namespace dictionary of fields and methods.
+A class definition is shorthand for calling `type`:
 
 ```python
 # class_via_type.py
@@ -90,7 +91,6 @@ class C:
 
 D = type("D", (), {})  # The same construction, by hand
 
-# Both are produced by the metaclass type:
 print(type(C), type(D))
 #: <class 'type'> <class 'type'>
 # Both inherit object:
@@ -108,7 +108,7 @@ You can add bases, fields, and methods the same way:
 from display import display_object
 
 def howdy(self, you: str) -> None:
-    print("Howdy, " + you)
+    print(f"Howdy, {you}")
 
 MyList = type("MyList", (list,), dict(x=42, howdy=howdy))
 
@@ -147,7 +147,7 @@ Because `MyList` inherits `list`, it gets all the methods from `list`.
 Printing the class of the class produces the metaclass.
 
 Generating classes programmatically with `type` creates possibilities.
-Where you might otherwise write many near-identical subclasses by hand,
+For example, where you might otherwise write many near-identical subclasses by hand,
 you can instead generate them dynamically:
 
 ```python
@@ -158,7 +158,7 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 type EventMaker = Callable[[int, int], Event]
-NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
+NOT_CREATED: EventMaker = cast(EventMaker, sentinel("NOT_CREATED"))
 
 @dataclass
 class Event:
@@ -454,7 +454,7 @@ from typing import Any
 class Field:
     def __set_name__(self, owner: type, name: str) -> None:
         self.name = name
-        self.storage = "_" + name
+        self.storage = f"_{name}"
 
     def __get__(self, obj: Any, owner: type | None = None) -> Any:
         if obj is None:

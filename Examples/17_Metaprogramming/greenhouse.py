@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 type EventMaker = Callable[[int, int], Event]
-NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
+NOT_CREATED: EventMaker = cast(EventMaker, sentinel("NOT_CREATED"))
 
 @dataclass
 class Event:

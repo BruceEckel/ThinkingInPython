@@ -287,7 +287,7 @@ class ShapeFactory:
     @classmethod
     def create_shape(cls, kind: str) -> Shape:
         if kind not in cls.factories:
-            cls.factories[kind] = eval(kind + ".Factory()")
+            cls.factories[kind] = eval(f"{kind}.Factory()")
         return cls.factories[kind].create()
 
 class Shape:

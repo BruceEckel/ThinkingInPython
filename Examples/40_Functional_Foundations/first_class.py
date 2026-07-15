@@ -1,6 +1,6 @@
 # first_class.py
 def shout(text: str) -> str:
-    return text.upper() + "!"
+    return f"{text.upper()}!"
 
 # A function is an object you can bind to another name:
 loud = shout
