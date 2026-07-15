@@ -330,6 +330,7 @@ print(lengths)
 The three parts mirror the list comprehension:
 the `for` clause supplies each `name`, the `if` clause drops `"Ni"`,
 and the `key: value` expression before `for` produces each entry.
+
 A common variant swaps a dictionary's keys and values to invert a lookup:
 
 ```python
@@ -412,13 +413,13 @@ and `any()` stops as soon as it finds a match.
 
 ## Unpacking in Comprehensions
 
-The `Path.walk()` example above flattens a tree by writing two `for` clauses.
+`path_walk_comprehension.py` flattened a tree by writing two `for` clauses.
 Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
 adds a more direct way to flatten.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
 This extends the [PEP 448](https://peps.python.org/pep-0448/)
-unpacking you already know from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
+unpacking from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
 and replaces many uses of nested comprehensions, `itertools.chain()`,
 and `itertools.chain.from_iterable()`:
 
@@ -444,6 +445,10 @@ print(list(flat))
 `[*row for row in rows]` reads as "splice each `row` in,"
 and produces the same flat list as the nested `[x for row in rows for x in row]`,
 while saying what it does more directly.
+This is a shallow flatten: it splices only the outer iterable,
+so a nested list inside a row stays nested.
+`[*row for row in [[1, [2, 3]], [4]]]` produces `[1, [2, 3], 4]`,
+not `[1, 2, 3, 4]`.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
 The set form `{*s for s in sets}` and the asynchronous generator form

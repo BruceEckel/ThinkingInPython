@@ -106,7 +106,6 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 
 The first serious edit pass.
 
-
 | Chapter | Edited |
 |---------|:------:|
 | 01_Introduction.md              |X|
@@ -124,7 +123,7 @@ The first serious edit pass.
 | 13_Pattern_Matching.md          |X|
 | 14_Decorators.md                |X|
 | 15_Context_Managers.md          |X|
-| 16_Comprehensions.md            | |
+| 16_Comprehensions.md            |X|
 | 17_Metaprogramming.md           | |
 | 18_Performance.md               | |
 | 19_Concurrency.md               | |
