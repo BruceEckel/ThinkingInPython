@@ -265,7 +265,7 @@ so the compiler never gives it the `__class__` cell that zero-argument `super()`
 
 The `type` approach in the previous section builds a class from a name,
 a tuple of bases, and a namespace dict.
-A second way is to write the class as an ordinary `class` statement inside an f-string,
+A second way is to write an ordinary `class` statement in an f-string,
 then `exec()` that string as code.
 The class definition (`klass`) is easier to read:
 
@@ -314,18 +314,14 @@ seeded with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
 so it believes `namespace[class_name]` is a plain `type[Command]` whose constructor takes a `label` argument.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place the class is created,
-the same idiom [Generating Classes with `type`](#generating-classes-with-type)
-uses for `EventMaker`.
+the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 
-Notice that `super().__init__(...)` works inside the generated class.
-`EventMakers.__getitem__()` had to call `Event.__init__()` directly,
-because its `init()` was a nested function with no `__class__` cell.
-Here `__init__` is defined textually inside a `class` block,
-and the compiler doesn't care that the block arrived as a string.
+`__init__` is defined textually inside a `class` block.
+The compiler doesn't care that the block arrived as a string.
 
-The string is also the danger.
+That string is also the danger.
 `exec()` runs its argument with the full power of the language,
 and `klass` splices `class_name` directly into source text,
 so an unvalidated name containing a newline and a second statement could break out of the `class` block and run anything,
@@ -341,16 +337,16 @@ dangerous on anything that reaches the program from outside, unchecked.
 
 ## Self-Registration of Subclasses
 
-A common need is for a base class to keep track of its subclasses,
+Often a base class needs to keep track of its subclasses,
 so you can enumerate them.
-This is the textbook reason people used to write a metaclass.
+This is the textbook reason people used to justify a metaclass.
 In Python 3 it is a few lines with `__init_subclass__()`,
-which Python calls automatically for every new subclass:
+which is called automatically for every new subclass.
+This example tracks the "leaf" subclasses (those with no subclasses of their own),
+using __init_subclass__ instead of a metaclass:
 
 ```python
 # init_subclass.py
-# Track the "leaf" subclasses (those with no subclasses of their own),
-# using __init_subclass__ instead of a metaclass.
 from typing import ClassVar
 
 class Color:
@@ -402,14 +398,14 @@ so only the current leaves remain.
 That is why `Blue` is absent from the second `Color` print.
 Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`,
 leaving those two leaves beside `Green` and `Red`.
-For the same reason `Round` is missing from the `Shape` registry.
+For the same reason, `Round` is missing from the `Shape` registry.
 Creating `Circle`, a subclass of `Round`, removed `Round`,
 leaving `Circle` and `Square`.
 This involves no metaclass.
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
 
-Testing checks that each registry holds only its current leaf classes:
+Testing shows that each registry holds only its current leaf classes:
 
 ```python
 # test_init_subclass.py
