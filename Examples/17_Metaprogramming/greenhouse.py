@@ -33,7 +33,7 @@ class Event:
             print(f"{e.hour}:{e.minute:02d}: {e.action}")
 
     @classmethod
-    def _make_class(cls, class_name: str) -> None:
+    def _class_for(cls, class_name: str) -> EventMaker:
         if class_name not in cls.event_makers:
             raise ValueError(f"Unknown event class: {class_name!r}")
         if cls.event_makers[class_name] is NOT_CREATED:
@@ -42,12 +42,12 @@ class Event:
                 Event.__init__(self, class_name, hour, minute)
             new_cls = type(class_name, (Event,), {"__init__": init})
             cls.event_makers[class_name] = cast(EventMaker, new_cls)
+        return cls.event_makers[class_name]
 
     @classmethod
     def add_event(cls, event: str) -> None:
         class_name, hour, minute = (event.replace(":", " ").split())
-        cls._make_class(class_name)
-        cls.event_makers[class_name](int(hour), int(minute))
+        cls._class_for(class_name)(int(hour), int(minute))
 
 if __name__ == "__main__":
     schedule = [

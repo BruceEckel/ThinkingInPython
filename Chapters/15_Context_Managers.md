@@ -173,8 +173,7 @@ We can write a version with more features:
 reporting which exception it swallowed,
 and accepting no argument to mean "ignore everything".
 It turns out to be useful enough to reuse elsewhere in the book,
-so it lives at the root of the examples,
-where any chapter can import it:
+so it lives at the root of the examples, where any chapter can import it:
 
 ```python
 # shared: exceptions.py
