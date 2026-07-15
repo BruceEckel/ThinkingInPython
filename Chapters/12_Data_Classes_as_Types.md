@@ -34,8 +34,8 @@ def check(condition: bool, message: str, detail: str = "") -> None:
 ## A Value That Must Be Checked Everywhere
 
 Suppose a "stars" rating is an integer from one to ten.
-If you represent it as an `int`,
-nothing stops a caller from passing eleven, or minus one.
+If you represent it as an `int`, nothing stops a caller from passing eleven,
+or minus one.
 To prevent that, every function that takes a rating must check it:
 
 ```python

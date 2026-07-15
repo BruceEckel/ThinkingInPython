@@ -20,6 +20,6 @@ print(m)
 print(mc)
 #: Messenger(name='foo', number=12, depth=9.9)
 
-m.name = "bar"  # A plain data class is mutable
+m.name = "bar"  # Data classes are mutable by default
 print(m)
 #: Messenger(name='bar', number=12, depth=3.14)

@@ -284,8 +284,7 @@ Use this split whenever a comprehension needs a comment to explain what it does.
 
 A comprehension's output expression can be any expression,
 including a call with a side effect, such as `print()`.
-Nothing stops you from using a comprehension to run code
-and throw away the result it builds:
+Nothing stops you from using a comprehension to run code and throw away the result it builds:
 
 ```python
 # comprehension_side_effects.py
@@ -298,8 +297,7 @@ print(wasted)
 ```
 
 `wasted` runs `print()` for its side effect.
-`print()` returns `None`,
-so `wasted` ends up holding three `None`s.
+`print()` returns `None`, so `wasted` ends up holding three `None`s.
 `wasted` is a list built only to be thrown away.
 Worse, a reader scanning `[...]` expects a meaningful collection,
 not a loop wearing a disguise.

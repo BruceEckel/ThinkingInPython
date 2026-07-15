@@ -243,18 +243,22 @@ file passes a strict type checker and linter.
   a multiline comment block (two or more consecutive full-line `#`
   comments) reads as sentences and keeps its periods.
 
-- **Descriptions belong in prose, not comments.** A comment that
-  explains what an example does, why, or a design choice behind it
-  goes in the chapter prose after the code block, not in the code —
-  this applies to the header comment and to inline comments anywhere
-  else in the body. Comments stay in the code only for a tool
-  directive (`# type: ignore`, `# noqa`), the single-line
-  `# path/slug.py` file marker, or when specifically requested. Never
-  narrate what the next line does.
+- **New descriptions belong in prose, not comments.** When writing or
+  adding to an example, a comment that explains what it does, why, or
+  a design choice behind it goes in the chapter prose after the code
+  block, not in the code — this applies to the header comment and to
+  inline comments anywhere else in the body. Comments stay in the
+  code only for a tool directive (`# type: ignore`, `# noqa`), the
+  single-line `# path/slug.py` file marker, or when specifically
+  requested. Never narrate what the next line does. This rule is
+  about comments you are about to write, not a license to edit
+  comments already sitting in existing example code — leave those
+  alone unless asked about that specific comment, even if you're
+  mid-edit on the same block for an unrelated reason.
 
 - **Docstrings live outside chapter listings.** A chapter listing
   explains itself in the surrounding prose, not a docstring (see
-  "Descriptions belong in prose, not comments" above). A `tools/`
+  "New descriptions belong in prose, not comments" above). A `tools/`
   helper module or other code outside a listing gets a real one:
   PEP 257 triple double-quotes, a one-line summary ending in a
   period, and, if more is needed, a
