@@ -244,6 +244,10 @@ html {{ font-size: 18px; }}
 body {{ background: var(--paper); color: var(--ink);
   font-family: Georgia, serif; line-height: 1.75; padding: 0 1.5rem; }}
 .page {{ max-width: var(--max-width); margin: 0 auto; padding: 4rem 0 6rem; }}
+figure {{ margin: 2.5rem 0; text-align: center; }}
+figure img {{ max-width: 100%; height: auto; }}
+figcaption {{ font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 0.9rem; color: var(--muted); margin-top: 0.75rem; }}
 .book-title {{ font-family: '{HEADING_FONT}', sans-serif; font-size: 3.5rem;
   font-weight: 600; line-height: 1.1; margin-bottom: 0.5rem; }}
 .book-author {{ font-family: 'Cormorant SC', serif; font-size: 0.85rem;
