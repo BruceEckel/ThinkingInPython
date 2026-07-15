@@ -198,6 +198,88 @@ By then the directory is already deleted.
 The comprehension already finished building `py_paths` as plain strings while the directory still existed,
 so nothing later needs the files themselves.
 
+## Breaking Up a Complex Comprehension
+
+A comprehension earns its place when it reads clearly.
+Nothing stops you from nesting more `for` and `if` clauses,
+or wrapping the whole thing in another call,
+but each addition makes the expression harder to read in one pass.
+Here, filtering, flattening, sorting,
+and formatting all happen in a single expression:
+
+```python
+# dense_comprehension.py
+warehouses = {
+    "East": [
+        ("widget", 12, 4.50),
+        ("gadget", 0, 9.00),
+        ("gizmo", 5, 2.25),
+    ],
+    "West": [
+        ("widget", 3, 4.75),
+        ("thingamajig", 8, 15.00),
+    ],
+}
+
+report = [
+    f"{wh}: {name} (${price:.2f})"
+    for wh, name, price in sorted(
+        [(wh, name, price)
+         for wh, items in warehouses.items()
+         for name, qty, price in items
+         if qty > 0 and price < 10],
+        key=lambda t: t[2])
+]
+
+if __name__ == "__main__":
+    for line in report:
+        print(line)
+#: East: gizmo ($2.25)
+#: East: widget ($4.50)
+#: West: widget ($4.75)
+```
+
+Reading this means untangling several questions at once: which items qualify,
+how the warehouses flatten together, what order the result ends up in,
+and how each line is displayed.
+A comprehension nested inside `sorted()`,
+itself nested inside the outer comprehension,
+is doing four jobs in one expression.
+
+Splitting it into named steps removes none of the logic,
+but each step now states its own purpose:
+
+```python
+# comprehension_steps.py
+from dense_comprehension import warehouses
+
+in_stock = [
+    (wh, name, price)
+    for wh, items in warehouses.items()
+    for name, qty, price in items
+    if qty > 0 and price < 10
+]
+in_stock.sort(key=lambda t: t[2])
+
+report = [
+    f"{wh}: {name} (${price:.2f})"
+    for wh, name, price in in_stock
+]
+
+for line in report:
+    print(line)
+#: East: gizmo ($2.25)
+#: East: widget ($4.50)
+#: West: widget ($4.75)
+```
+
+`in_stock` answers "which items qualify, flattened across warehouses."
+`sort()` answers "in what order."
+`report` answers "how each line is displayed."
+Each name documents a stage of the pipeline,
+so a reader can follow the transformation one step at a time instead of parsing every step simultaneously.
+Use this split whenever a comprehension needs a comment to explain what it does.
+
 ## Set Comprehensions
 
 Set comprehensions construct sets using the same principles as list comprehensions.
@@ -214,16 +296,20 @@ names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
 unique = {name[0].upper() + name[1:].lower()
           for name in names if len(name) > 1}
+
 print(sorted(unique))  # Sorted for stable display
 #: ['Alice', 'Bob', 'John']
 
-# set() of a list comprehension gives the same result, but builds a
-# throwaway list first, so the set comprehension is preferred:
 same = set([name[0].upper() + name[1:].lower()
             for name in names if len(name) > 1])
+
 print(unique == same)
 #: True
 ```
+
+`same` builds a list with a list comprehension, then passes it to `set()`.
+This produces the same result, but because it builds a throwaway list first,
+the set comprehension is more efficient.
 
 ## Dictionary Comprehensions
 
