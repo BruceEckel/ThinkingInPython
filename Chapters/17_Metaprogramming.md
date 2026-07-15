@@ -146,7 +146,7 @@ Because `MyList` inherits `list`, it gets all the methods from `list`.
 
 Printing the class of the class produces the metaclass.
 
-Generating classes programmatically with `type` opens up possibilities.
+Generating classes programmatically with `type` creates possibilities.
 Where you might otherwise write many near-identical subclasses by hand,
 you can instead generate them dynamically:
 
