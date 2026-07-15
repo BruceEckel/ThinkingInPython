@@ -1,5 +1,3 @@
-The image caption text in the html looks just like regular text.
-Can it be made to stand out so that it's obviously a caption?
 
 Review the book looking for consistency issues
 
@@ -9,7 +7,7 @@ Have we learned anything here that should be added to thinking-in-python-skill.m
 
 Run 'make prose' on each chapter
 
-Check that all exercises have solutions
+Review all exercises to make sure they refer to existing examples and that all  exercises have solutions
 
 - Is full polymorphism covered? (Not just inheritance-based). for example, @overload
 
