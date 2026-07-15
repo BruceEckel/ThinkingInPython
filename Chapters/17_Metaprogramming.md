@@ -162,6 +162,9 @@ NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
 
 @dataclass
 class Event:
+    action: str
+    hour: int
+    minute: int
     events: ClassVar[list[Event]] = []  # Registry of all Events
     event_makers: ClassVar[dict[str, EventMaker]] = {
         name: NOT_CREATED  # Dict key-value pair
@@ -172,9 +175,6 @@ class Event:
             "RingBell",
         )
     }
-    action: str
-    hour: int
-    minute: int
 
     def __post_init__(self) -> None:
         Event.events.append(self)
@@ -227,6 +227,8 @@ if __name__ == "__main__":
 #: 8:00: LightOn
 ```
 
+Now the end user only needs to write and maintain the `schedule.txt` file:
+
 ```text
 # schedule.txt
 ThermostatNight 5:00
@@ -239,100 +241,23 @@ ThermostatDay 6:00
 LightOn 8:00
 ```
 
-`add_event()` calls `_class_for()` for its class name every time,
-which triggers building the class the first time that event type is actually needed,
-registering it under its name, and returning it either way.
-[Generating Classes with `exec()`](#generating-classes-with-exec)
-covers the alternative,
-building each class from a string of source text instead.
+`add_event()` calls `_class_for()` to get the class object used to build an `Event`.
+The first time that event type is actually needed,
+the class is built and registered under its name.
 
-`schedule.txt` is what makes this the scenario raised earlier:
-a file someone else edits, not literals hardcoded in the program.
-Reading it starts with `Path("schedule.txt").read_text().splitlines()`,
-then drops blank lines and the leading `# schedule.txt` comment,
-the same kind of header every code listing in this book starts with,
-the same way [State Machines](31_State_Machines.md) filters `mouse_moves.txt`.
-What's left is a list of plain `ClassName H:MM` entries,
-no Python syntax at all.
+`schedule.txt` is a file someone edits, not literals hardcoded in the program.
 `event.replace(":", " ").split()` turns `"WaterOn 3:30"` into three plain strings in one step,
-by replacing the colon with a second space before splitting on whitespace:
-`class_name`, `hour_str`, and `minute_str`.
-`int()` turns the last two into the plain `int`s `Event` actually wants.
-None of this touches `exec()` or `eval()`:
-the file's contents are read as inert text, then parsed as plain data,
-never handed to anything that would interpret them as code.
+by replacing the colon with a second space before splitting on whitespace.
 
-`Event.event_makers` does not start empty.
-It comes pre-populated with the seven legitimate event names,
+`Event.event_makers` comes pre-populated with the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
-`Event` owns this vocabulary, not `__main__`:
-nothing outside the class gets to decide what event types can exist.
 Populating that dict does not build any classes.
 It only reserves the names,
 so `_class_for()` has something to check a `class_name` against before building anything.
 
-`add_event()` calls `cls._class_for(class_name)` before doing anything else,
-so the first `ThermostatNight 5:00` line is what triggers building the `ThermostatNight` class,
-not a separate setup pass that builds all seven up front.
-The `#:` output shows this directly:
-each `Creating` line appears in schedule order,
-as `add_event()` reaches that line,
-not in the order `event_makers` happens to store its keys.
-`_class_for()` checks `cls.event_makers[class_name] is not NOT_CREATED` before building anything,
-so a name that already exists is a no-op and `_class_for()` just returns the class already there.
-The repeated `LightOn 8:00` line at the end of `schedule.txt` proves this:
-`LightOn` was already built while processing the earlier `LightOn 1:00` entry,
-so this second occurrence produces no second `Creating LightOn` line,
-only a second `8:00: LightOn` entry in the final report.
-
-There is only one place that needs to build a specific class: `_class_for()`.
-An earlier version of this design split that into two methods,
-a private one that built a single class and a public one that walked every key and called it for each.
-Once creation happens lazily, on demand, that split has no reason left to exist:
-the check-and-build logic lives in one method,
-guarded by the `is not NOT_CREATED` check at the top.
-`_class_for()` stays private, marked with a leading underscore,
-because it is still an implementation detail: call `add_event()` instead,
-which triggers it only when needed.
-
-`add_event()` no longer checks `class_name` itself.
-`_class_for()` does, raising `ValueError` for any name that isn't one of the seven `Event` already declared,
-before `add_event()` gets anywhere near calling it.
-Nothing outside `Event` can create or instantiate an event type `Event` didn't declare,
-whether the name came from `schedule.txt` or from calling `_class_for()` directly.
-That matters here for real, not hypothetically:
-`schedule.txt` is a file someone else could edit,
-and the check holds no matter what they put in it.
-
-`_class_for()` takes the class name directly,
-rather than a human-readable description to reformat into one.
-`__main__` never needs to build a separate `class_names` list from the schedule:
-`add_event()` parses a name out of each line itself,
-using it both to look the event up and, the first time, to trigger `_class_for()`.
-
-`_class_for()` registers the class it builds in `Event.event_makers` and returns it either way,
-so `add_event()` never indexes `event_makers` itself:
-`cls._class_for(class_name)(int(hour), int(minute))` calls straight through to whichever `EventMaker`
-(a callable that takes an `hour` and a `minute` and returns an `Event`)
-`_class_for()` hands back.
-
-The checker only knows `Event`'s own dataclass-generated `__init__(self, action, hour, minute)`,
-not that these particular subclasses replace it with `__init__(self, hour, minute)`,
-and it has no way to know that `NOT_CREATED` is always replaced before anything calls it.
-That promise no longer depends on remembering a separate setup step:
-`add_event()` only ever reaches an `EventMaker` through `_class_for()`'s return value,
-so there is no way to call one through the public API without `_class_for()` running first.
-Reaching into `Event.event_makers` directly and calling a still-`NOT_CREATED` entry is still possible,
-and would still raise `TypeError` rather than a clean `ValueError`,
-but `cast()` was never going to catch that;
-it only tells the checker to stop checking.
-
 `_class_for()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 `init()` is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
-Calling it would raise `RuntimeError: super(): __class__ cell not found`.
-[Generating Classes with `exec()`](#generating-classes-with-exec)
-shows the same idea built a different way, one where `super()` works normally.
 
 ## Generating Classes with `exec()`
 
