@@ -1,0 +1,9 @@
+# schedule.txt
+ThermostatNight 5:00
+LightOff 2:00
+WaterOn 3:30
+WaterOff 4:45
+LightOn 1:00
+RingBell 7:00
+ThermostatDay 6:00
+LightOn 8:00

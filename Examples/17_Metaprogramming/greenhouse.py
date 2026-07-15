@@ -1,15 +1,16 @@
 # greenhouse.py
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import ClassVar, cast
 
-type EventMaker = Callable[[float], Event]
+type EventMaker = Callable[[int, int], Event]
 NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
 
 @dataclass
 class Event:
     events: ClassVar[list[Event]] = []  # Registry of all Events
-    subclasses: ClassVar[dict[str, EventMaker]] = {
+    event_makers: ClassVar[dict[str, EventMaker]] = {
         name: NOT_CREATED  # Dict key-value pair
         for name in (
             "ThermostatDay", "ThermostatNight",
@@ -19,56 +20,56 @@ class Event:
         )
     }
     action: str
-    time: float
+    hour: int
+    minute: int
 
     def __post_init__(self) -> None:
         Event.events.append(self)
 
     @staticmethod
     def run_events() -> None:
-        for e in sorted(Event.events, key=lambda e: e.time):
-            print(f"{e.time:.2f}: {e.action}")
+        for e in sorted(
+                Event.events, key=lambda e: (e.hour, e.minute)):
+            print(f"{e.hour}:{e.minute:02d}: {e.action}")
 
     @classmethod
-    def _create(cls, class_name: str) -> None:
-        if class_name not in cls.subclasses:
+    def _make_class(cls, class_name: str) -> None:
+        if class_name not in cls.event_makers:
             raise ValueError(f"Unknown event class: {class_name!r}")
-        def init(self: Event, time: float) -> None:
-            Event.__init__(self, class_name, time)
+        if cls.event_makers[class_name] is not NOT_CREATED:
+            return
+        print(f"Creating {class_name}")
+        def init(self: Event, hour: int, minute: int) -> None:
+            Event.__init__(self, class_name, hour, minute)
         new_cls = type(class_name, (Event,), {"__init__": init})
-        cls.subclasses[class_name] = cast(EventMaker, new_cls)
+        cls.event_makers[class_name] = cast(EventMaker, new_cls)
 
     @classmethod
-    def initialize(cls) -> None:
-        for class_name in cls.subclasses:
-            cls._create(class_name)
-
-    @classmethod
-    def instantiate(cls, init: str) -> None:
-        class_name, rest = init.split("(", 1)
-        if class_name not in cls.subclasses:
-            raise ValueError(f"Unknown event class: {class_name!r}")
-        time = float(rest.rstrip(")"))
-        cls.subclasses[class_name](time)
+    def add_event(cls, event: str) -> None:
+        class_name, hour, minute = (event.replace(":", " ").split())
+        cls._make_class(class_name)
+        cls.event_makers[class_name](int(hour), int(minute))
 
 if __name__ == "__main__":
-    initializations = [
-        "ThermostatNight(5.00)",
-        "LightOff(2.00)",
-        "WaterOn(3.30)",
-        "WaterOff(4.45)",
-        "LightOn(1.00)",
-        "RingBell(7.00)",
-        "ThermostatDay(6.00)",
+    schedule = [
+        line for line in Path("schedule.txt").read_text().splitlines()
+        if line.strip() and not line.startswith("#")
     ]
-    Event.initialize()
-    for init in initializations:
-        Event.instantiate(init)
+    for event in schedule:
+        Event.add_event(event)
     Event.run_events()
-#: 1.00: LightOn
-#: 2.00: LightOff
-#: 3.30: WaterOn
-#: 4.45: WaterOff
-#: 5.00: ThermostatNight
-#: 6.00: ThermostatDay
-#: 7.00: RingBell
+#: Creating ThermostatNight
+#: Creating LightOff
+#: Creating WaterOn
+#: Creating WaterOff
+#: Creating LightOn
+#: Creating RingBell
+#: Creating ThermostatDay
+#: 1:00: LightOn
+#: 2:00: LightOff
+#: 3:30: WaterOn
+#: 4:45: WaterOff
+#: 5:00: ThermostatNight
+#: 6:00: ThermostatDay
+#: 7:00: RingBell
+#: 8:00: LightOn

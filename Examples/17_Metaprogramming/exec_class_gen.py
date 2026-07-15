@@ -1,18 +1,18 @@
 # exec_class_gen.py
 from collections.abc import Callable
-from typing import cast
+from typing import ClassVar, cast
 
 class Command:
+    KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
+
     def __init__(self, label: str) -> None:
         self.label = label
 
     def run(self) -> str:
         return f"Running {self.label}"
 
-KNOWN_COMMANDS = {"Start", "Stop", "Pause"}
-
 def make_command(class_name: str) -> Callable[[], Command]:
-    if class_name not in KNOWN_COMMANDS:
+    if class_name not in Command.KNOWN_COMMANDS:
         raise ValueError(f"Unknown command: {class_name!r}")
     namespace: dict[str, type[Command]] = {"Command": Command}
     klass = f"""
