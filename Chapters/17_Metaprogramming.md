@@ -163,7 +163,7 @@ NOT_CREATED = cast(EventMaker, sentinel("NOT_CREATED"))
 class Event:
     events: ClassVar[list[Event]] = []  # Registry of all Events
     subclasses: ClassVar[dict[str, EventMaker]] = {
-        name: NOT_CREATED  # The dict pair
+        name: NOT_CREATED  # Dict key-value pair
         for name in (
             "ThermostatDay", "ThermostatNight",
             "LightOn", "LightOff",
@@ -177,46 +177,24 @@ class Event:
     def __post_init__(self) -> None:
         Event.events.append(self)
 
-    def run(self) -> None:
-        print(f"{self.time:.2f}: {self.action}")
-
     @staticmethod
     def run_events() -> None:
         for e in sorted(Event.events, key=lambda e: e.time):
-            e.run()
+            print(f"{e.time:.2f}: {e.action}")
 
     @classmethod
-    def _create_via_metaclass(cls, class_name: str) -> None:
+    def _create(cls, class_name: str) -> None:
         if class_name not in cls.subclasses:
             raise ValueError(f"Unknown event class: {class_name!r}")
         def init(self: Event, time: float) -> None:
-            Event.__init__(self, class_name + " [mc]", time)
+            Event.__init__(self, class_name, time)
         new_cls = type(class_name, (Event,), {"__init__": init})
         cls.subclasses[class_name] = cast(EventMaker, new_cls)
 
     @classmethod
-    def _create_via_exec(cls, class_name: str) -> None:
-        if class_name not in cls.subclasses:
-            raise ValueError(f"Unknown event class: {class_name!r}")
-        namespace: dict[str, type[Event]] = {"Event": Event}
-        klass = f"""
-class {class_name}(Event):
-    def __init__(self, time: float) -> None:
-        Event.__init__(self, "{class_name} [exec]", time)
-"""
-        exec(klass, namespace)
-        cls.subclasses[class_name] = cast(
-            EventMaker, namespace[class_name])
-
-    @classmethod
-    def initialize_via_metaclass(cls) -> None:
+    def initialize(cls) -> None:
         for class_name in cls.subclasses:
-            cls._create_via_metaclass(class_name)
-
-    @classmethod
-    def initialize_via_exec(cls) -> None:
-        for class_name in cls.subclasses:
-            cls._create_via_exec(class_name)
+            cls._create(class_name)
 
     @classmethod
     def instantiate(cls, init: str) -> None:
@@ -236,111 +214,77 @@ if __name__ == "__main__":
         "RingBell(7.00)",
         "ThermostatDay(6.00)",
     ]
-    Event.initialize_via_metaclass()
-    for init in initializations:
-        Event.instantiate(init)
-    Event.initialize_via_exec()
+    Event.initialize()
     for init in initializations:
         Event.instantiate(init)
     Event.run_events()
-#: 1.00: LightOn [mc]
-#: 1.00: LightOn [exec]
-#: 2.00: LightOff [mc]
-#: 2.00: LightOff [exec]
-#: 3.30: WaterOn [mc]
-#: 3.30: WaterOn [exec]
-#: 4.45: WaterOff [mc]
-#: 4.45: WaterOff [exec]
-#: 5.00: ThermostatNight [mc]
-#: 5.00: ThermostatNight [exec]
-#: 6.00: ThermostatDay [mc]
-#: 6.00: ThermostatDay [exec]
-#: 7.00: RingBell [mc]
-#: 7.00: RingBell [exec]
+#: 1.00: LightOn
+#: 2.00: LightOff
+#: 3.30: WaterOn
+#: 4.45: WaterOff
+#: 5.00: ThermostatNight
+#: 6.00: ThermostatDay
+#: 7.00: RingBell
 ```
 
-`_create_via_metaclass()` builds each subclass with `type`.
-`_create_via_exec()` does the same thing with `exec()` on a string of class-definition code.
-The `exec()` version is easier to follow because it reads as a class definition.
+`_create()` builds each subclass with `type`, then registers it under its name.
+[Generating Classes with `exec()`](#generating-classes-with-exec)
+covers the alternative,
+building each class from a string of source text instead.
 
-`Event.subclasses` no longer starts empty.
+`Event.subclasses` does not start empty.
 It comes pre-populated with the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
-`Event` owns this vocabulary now, not `__main__`:
+`Event` owns this vocabulary, not `__main__`:
 nothing outside the class gets to decide what event types can exist.
-`initialize_via_metaclass()` and `initialize_via_exec()` are the public entry points.
-Each walks `cls.subclasses`' own keys and replaces every placeholder,
-calling `_create_via_metaclass()` or `_create_via_exec()` once per name.
-Those two are private, marked with a leading underscore,
-because they're an implementation detail:
-call the `initialize_via_*()` methods instead.
+`initialize()` is the public entry point.
+It walks `cls.subclasses`' own keys and replaces every placeholder,
+calling `_create()` once per name.
+`_create()` is private, marked with a leading underscore,
+because it's an implementation detail: call `initialize()` instead.
 
-The per-name loop lives in `initialize_via_metaclass()`,
-not inside `_create_via_metaclass()` itself,
+The per-name loop lives in `initialize()`, not inside `_create()` itself,
 and that placement is not arbitrary.
-A function defined inside a loop closes over the loop variable, not a snapshot of its value at that point in the loop.
+A function defined inside a loop closes over the loop variable,
+not a snapshot of its value at that point in the loop.
 Defining `init()` directly inside a `for class_name in cls.subclasses:` loop would make every generated class's `init()` share the same `class_name` cell,
 and by the time any of them actually ran,
 that cell would hold whatever name the loop landed on last,
 so every event would report the same, wrong, action text.
-Calling `cls._create_via_metaclass(class_name)` from the loop instead avoids this,
+Calling `cls._create(class_name)` from the loop instead avoids this,
 because a function's parameters are a fresh binding on every call,
 not a variable shared across iterations.
 
-`exec()` runs its string as Python code with the full power of the language:
-imports, file access, network calls, anything.
-A string built from untrusted input,
-such as a web form or a file another user uploaded,
-would hand an attacker that same access.
-
-`instantiate()` is what keeps this safe even if `initializations` came from a file someone else edits.
-It checks `class_name` against `Event.subclasses` before doing anything with it,
+`instantiate()` checks `class_name` against `Event.subclasses` before calling anything,
 and raises `ValueError` for any name that isn't one of the seven `Event` already declared.
-An unrecognized name gets rejected, not executed.
+`_create()` makes the same check.
+Together they mean nothing outside `Event` can create or instantiate an event type `Event` didn't declare,
+whether the name came from `initializations` or from calling a method directly.
+That matters even here, with no `exec()` in sight:
+`initializations` could just as easily be read from a file someone else edits,
+and the check would still hold.
 
-The same check, now inside `_create_via_metaclass()` and `_create_via_exec()` themselves,
-protects `_create_via_exec()` for a sharper reason.
-Its `klass` string splices `class_name` directly into class-definition source text before handing it to `exec()`.
-An unvalidated `class_name` containing a newline and a second statement could break out of the intended `class` block and run arbitrary code there too,
-the same way an unescaped string breaks out of a hand-built SQL query.
-`_create_via_metaclass()` never had this second risk:
-`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value,
-never as source code to parse.
-Checking `class_name` against `cls.subclasses` in both private methods means neither one can ever run on a name `Event` didn't already declare,
-whether it's called through `initialize_via_*()` or directly.
-
-Treat `exec()` and `eval()` the way you'd treat string-built SQL:
-safe on data you already validated,
-dangerous on anything reaching the program from outside it unchecked.
-
-`_create_via_metaclass()` and `_create_via_exec()` take the class name directly,
+`_create()` takes the class name directly,
 rather than a human-readable description to reformat into one.
 The `class_names = [init.split("(")[0] for init in initializations]` step from before is gone entirely:
 creation no longer needs a list of names extracted from the schedule,
-since `initialize_via_metaclass()` and `initialize_via_exec()` take no arguments,
+since `initialize()` takes no arguments,
 walking `Event.subclasses`' own keys instead.
 `instantiate()` still parses a name out of each `initializations` entry the same way as before,
 but only to look it up, not to decide what may be created.
 
-Both private methods register the class they create in `Event.subclasses`,
+`_create()` registers the class it creates in `Event.subclasses`,
 a dict from class name to a callable that takes `time` and returns an `Event`.
-`_create_via_metaclass()` stores the class `type()` just built.
-`_create_via_exec()` stores what its `exec()` call defined,
-but into a private `namespace` dict rather than the real module namespace
-([`globals()`](06_Modules_and_Packages.md), covered when modules are introduced),
-so the generated class never becomes a module-level name at all.
-That private dict starts empty, unlike the module's own globals,
-so it has to be seeded with `{"Event": Event}` first,
-or the `class` statement's own reference to `Event` would fail to resolve.
-Looking up the result afterward, `namespace[class_name]`, is enough:
-nothing outside `_create_via_exec()` needs to reach the new class by any other route than `Event.subclasses`.
 
-`Callable[[float], Event]` appears four times over: as `subclasses`' value type, and in each `cast()` call.
+`Callable[[float], Event]` appears three times over:
+as `subclasses`' value type, and in each of the two `cast()` calls.
 `type EventMaker = Callable[[float], Event]` names it once,
-the same way [The `type` Statement](08_Static_Typing.md#the-type-statement) names any annotation that would otherwise repeat itself into obscurity.
+the same way [The `type` Statement](08_Static_Typing.md#the-type-statement)
+names any annotation that would otherwise repeat itself into obscurity.
 The alias's own right side is not evaluated where it's declared,
-so writing `Event` there, before the class exists, needs no forward-reference quotes:
-a PEP 695 type statement resolves lazily, the same way a bare annotation already does under PEP 649.
+so writing `Event` there, before the class exists,
+needs no forward-reference quotes: a PEP 695 type statement resolves lazily,
+the same way a bare annotation already does under PEP 649.
 
 `NOT_CREATED` is cast once, at the top of the file,
 instead of separately at every place it's used as a placeholder.
@@ -351,21 +295,114 @@ so naming `EventMaker` here does not force it to resolve `Event` early either.
 The checker only knows `Event`'s own dataclass-generated `__init__(self, action, time)`,
 not that these particular subclasses replace it with `__init__(self, time)`,
 and it has no way to know that `NOT_CREATED` is always replaced before `instantiate()` ever reads it.
-That second promise is only as good as the code that calls `initialize_via_metaclass()` or `initialize_via_exec()` first.
-Calling `instantiate()` before either has run would still type-check,
+That second promise is only as good as the code that calls `initialize()` first.
+Calling `instantiate()` before it has run would still type-check,
 but at runtime it would try to call the `NOT_CREATED` sentinel and raise `TypeError`,
 not the cleaner `ValueError` `instantiate()` raises for a genuinely unknown name.
 `cast()` cannot catch that mistake; it only tells the checker to stop checking.
 
-Both versions call `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
-In `_create_via_metaclass()`, `init()` is a nested function,
-not a method defined inside a `class` statement,
+`_create()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+`init()` is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
-Calling it raises `RuntimeError: super(): __class__ cell not found`.
-The `exec()`'d code in `_create_via_exec()` is a real `class` statement,
-so `super().__init__(...)` would work there.
-It stays as `Event.__init__(self, ...)` anyway,
-to keep the two techniques visibly parallel.
+Calling it would raise `RuntimeError: super(): __class__ cell not found`.
+[Generating Classes with `exec()`](#generating-classes-with-exec)
+shows the same idea built a different way, one where `super()` works normally.
+
+## Generating Classes with `exec()`
+
+The `type` approach in the previous section builds a class from a name,
+a tuple of bases, and a namespace dict.
+`exec()` offers a second way:
+write the class as an ordinary `class` statement inside an f-string,
+then run that string as code.
+The generated source reads like a class definition, because it is one:
+
+```python
+# exec_class_gen.py
+from collections.abc import Callable
+from typing import cast
+
+class Command:
+    def __init__(self, label: str) -> None:
+        self.label = label
+
+    def run(self) -> str:
+        return f"Running {self.label}"
+
+KNOWN_COMMANDS = {"Start", "Stop", "Pause"}
+
+def make_command(class_name: str) -> Callable[[], Command]:
+    if class_name not in KNOWN_COMMANDS:
+        raise ValueError(f"Unknown command: {class_name!r}")
+    namespace: dict[str, type[Command]] = {"Command": Command}
+    klass = f"""
+class {class_name}(Command):
+    def __init__(self) -> None:
+        super().__init__("{class_name}")
+"""
+    exec(klass, namespace)
+    return cast(Callable[[], Command], namespace[class_name])
+
+if __name__ == "__main__":
+    for name in ("Start", "Stop", "Pause"):
+        cls = make_command(name)
+        print(cls().run())
+    try:
+        make_command("Reset")
+    except ValueError as e:
+        print(e)
+#: Running Start
+#: Running Stop
+#: Running Pause
+#: Unknown command: 'Reset'
+```
+
+`make_command()` execs `klass` into a private `namespace` dict,
+seeded with `{"Command": Command}` so the generated class's own reference to `Command` resolves.
+Nothing is written into the real module namespace
+([`globals()`](06_Modules_and_Packages.md), covered when modules are introduced):
+`namespace[class_name]` is the only way to reach the class afterward.
+The checker only knows `Command`'s own `__init__(self, label)`,
+not that the generated subclass replaces it with a no-argument `__init__`,
+so `cast(Callable[[], Command], ...)` records the narrower,
+actual signature at the one place the class is created,
+the same idiom [Generating Classes with `type`](#generating-classes-with-type)
+uses for `EventMaker`.
+
+Notice `super().__init__(...)` inside the generated class, working normally.
+Unlike `_create()`'s `init()`,
+defined as a nested function and never given a `__class__` cell,
+this `__init__` is a method defined inside a real `class` statement,
+even though that statement arrived as a string.
+The compiler doesn't distinguish where the source text came from,
+only whether the method is textually inside a `class` block.
+
+`exec()` runs its string as Python code with the full power of the language:
+imports, file access, network calls, anything.
+A string built from untrusted input,
+such as a web form or a file another user uploaded,
+would hand an attacker that same access.
+
+`KNOWN_COMMANDS` is what keeps `make_command()` safe.
+It checks `class_name` before doing anything with it,
+and raises `ValueError` for any name that isn't `"Start"`, `"Stop"`,
+or `"Pause"`.
+An unrecognized name gets rejected, not executed.
+
+That check matters for a sharper reason than just rejecting nonsense.
+`klass` splices `class_name` directly into class-definition source text before handing it to `exec()`.
+An unvalidated `class_name` containing a newline and a second statement could break out of the intended `class` block and run arbitrary code there,
+the same way an unescaped string breaks out of a hand-built SQL query.
+`_create()`, back in [Generating Classes with `type`](#generating-classes-with-type),
+never has this risk:
+`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value,
+never as source code to parse.
+Building a class from a string template and validating what gets spliced into it are two different concerns,
+and skipping the second one is exactly how this kind of vulnerability gets shipped.
+
+Treat `exec()` and `eval()` the way you'd treat string-built SQL:
+safe on data you already validated,
+dangerous on anything reaching the program from outside it unchecked.
 
 ## Self-Registration of Subclasses
 
