@@ -442,7 +442,7 @@ class Person:
     def greet(self) -> str:
         return f"Hello, {self.name}"
 
-# def left a plain function in the class namespace:
+# def created a plain function in the class namespace:
 plain = Person.__dict__["greet"]
 print(type(plain).__name__, hasattr(plain, "__get__"))
 #: function True
@@ -457,19 +457,19 @@ print(plain.__get__(p, Person)())
 #: Hello, Ann
 ```
 
-The last line performs by hand what `p.greet` does automatically:
-method binding is not special machinery, just the descriptor protocol at work.
+The last line performs by hand what `p.greet` does automatically.
+Method binding is not special machinery, just the descriptor protocol at work.
 
 Here is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
 so the new instance cannot know it is about to be bound to the name `x`.
-Python now delivers that name automatically:
-when a `class` body finishes executing,
+Python delivers that name automatically.
+When a `class` body finishes executing,
 it calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
 passing the freshly created class and the name the attribute was assigned to.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
-the actual descriptor protocol,
+(the descriptor protocol)
 and uses the delivered name to build its storage key:
 
 ```python
