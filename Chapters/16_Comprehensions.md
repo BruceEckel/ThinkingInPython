@@ -180,24 +180,23 @@ for path in sorted(py_paths):  # Sorted for stable output
 #: pkg/util.py
 ```
 
-`tempfile.TemporaryDirectory()` is a
-[context manager](15_Context_Managers.md#a-basic-context-manager)
+`tempfile.TemporaryDirectory()` is a [context manager](15_Context_Managers.md#a-basic-context-manager)
 that creates a scratch directory and deletes it, and everything in it,
 when the `with` block exits.
 That gives the example a throwaway file tree to walk,
 without touching any real files or leaving anything behind.
+
+In the `py_paths` comprehension,
+the first `for` walks the directories and the second `for` walks the files in each,
+flattening the tree into one list of paths.
 
 A `with` block, unlike a function body, does not create a new scope.
 `py_paths` is assigned inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
 By then the directory is already deleted.
-The comprehension already finished building `py_paths` as plain strings
-while the directory still existed,
+The comprehension already finished building `py_paths` as plain strings while the directory still existed,
 so nothing later needs the files themselves.
-
-The outer `for` walks the directories and the inner `for` walks the files in each,
-flattening the tree into one list of paths.
 
 ## Set Comprehensions
 
