@@ -1,6 +1,5 @@
-You've pointed out that 40_Functional_Programming.md is very long.
-Suggest ways that it could be broken up into multiple chapters, possibly integrating 41_Functional_Error_Handling.md somewhere appropriate.
-Don't do anything, just analyze.
+The image caption text in the html looks just like regular text.
+Can it be made to stand out so that it's obviously a caption?
 
 Review the book looking for consistency issues
 

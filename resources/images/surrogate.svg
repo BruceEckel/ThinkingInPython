@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>A surrogate and the implementation deriving from a common base class</title>
+  <defs>
+    <marker id="sg-tri" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="11" markerHeight="11" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+    <marker id="sg-diamond" viewBox="0 0 16 10" refX="1" refY="5"
+            markerWidth="17" markerHeight="11" orient="auto">
+      <path d="M1,5 L8,1 L15,5 L8,9 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- realization: Surrogate and each Implementation derive from Interface -->
+  <line x1="90" y1="130" x2="300" y2="72" stroke="#7a6e62" stroke-width="1.2"
+        stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
+  <line x1="280" y1="130" x2="330" y2="72" stroke="#7a6e62" stroke-width="1.2"
+        stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
+  <line x1="470" y1="130" x2="380" y2="72" stroke="#7a6e62" stroke-width="1.2"
+        stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
+  <line x1="640" y1="130" x2="410" y2="72" stroke="#7a6e62" stroke-width="1.2"
+        stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
+
+  <!-- Interface -->
+  <rect x="270" y="20" width="160" height="50" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="350" y="40" font-size="11" font-style="italic" fill="#8b1a1a"
+        text-anchor="middle">&#171;Protocol&#187;</text>
+  <text x="350" y="60" font-size="16" font-weight="bold" fill="#1a1612"
+        text-anchor="middle">Interface</text>
+
+  <!-- Surrogate -->
+  <rect x="20" y="130" width="140" height="46" fill="none"
+        stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="90" y="159" font-size="15" font-weight="bold" fill="#1a1612"
+        text-anchor="middle">Surrogate</text>
+
+  <!-- Implementation1 -->
+  <rect x="210" y="130" width="140" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="280" y="159" font-size="14" fill="#1a1612"
+        text-anchor="middle">Implementation1</text>
+
+  <!-- Implementation2 -->
+  <rect x="400" y="130" width="140" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="470" y="159" font-size="14" fill="#1a1612"
+        text-anchor="middle">Implementation2</text>
+
+  <!-- Etc. -->
+  <rect x="590" y="130" width="90" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
+  <text x="635" y="159" font-size="14" fill="#7a6e62"
+        text-anchor="middle">Etc.</text>
+
+  <!-- aggregation: Surrogate holds an implementation at runtime -->
+  <line x1="160" y1="260" x2="350" y2="260" stroke="#1a1612" stroke-width="1.2"
+        marker-start="url(#sg-diamond)"/>
+  <text x="255" y="248" font-size="11.5" fill="#8b1a1a"
+        text-anchor="middle">implementation</text>
+
+  <rect x="20" y="235" width="140" height="46" fill="none"
+        stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="90" y="264" font-size="15" font-weight="bold" fill="#1a1612"
+        text-anchor="middle">Surrogate</text>
+
+  <rect x="350" y="235" width="150" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="425" y="264" font-size="14" fill="#1a1612"
+        text-anchor="middle">Implementation</text>
+
+  <text x="350" y="315" font-size="12" fill="#7a6e62" text-anchor="middle">
+    Surrogate forwards every call to whichever implementation it holds
+  </text>
+</svg>
