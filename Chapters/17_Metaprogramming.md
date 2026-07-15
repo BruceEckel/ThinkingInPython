@@ -20,6 +20,11 @@ display_object(Foo)
 #:   None
 
 x = Foo()
+display_object(x)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
 
 Foo.n = 42  # type: ignore
 display_object(Foo)
@@ -37,8 +42,15 @@ display_object(Foo)
 
 print(x.m())  # type: ignore
 #: self.n = 42
+
+display_object(x)
+#: [Attributes]
+#:   • n = 42 [CV]
+#: [Methods]
+#:   • m(self)
 ```
 
+Note that `x` is modified by the changes made to the class *after* `x` was created.
 A change to a class affects every object of that class,
 even ones already created.
 
@@ -246,7 +258,8 @@ Its `klass` string splices `class_name` directly into class-definition source te
 An unvalidated `class_name` containing a newline and a second statement could break out of the intended `class` block and run arbitrary code there too,
 the same way an unescaped string breaks out of a hand-built SQL query.
 `create_via_metaclass()` never had this second risk:
-`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value, never as source code to parse.
+`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value,
+never as source code to parse.
 Validating before either function runs closes both paths at once.
 
 Treat `exec()` and `eval()` the way you'd treat string-built SQL:

@@ -11,6 +11,8 @@ display_object(Foo)
 #:   None
 
 x = Foo()
+display_object(x)
+#:
 
 Foo.n = 42  # type: ignore
 display_object(Foo)
@@ -28,3 +30,6 @@ display_object(Foo)
 
 print(x.m())  # type: ignore
 #: self.n = 42
+
+display_object(x)
+#:
