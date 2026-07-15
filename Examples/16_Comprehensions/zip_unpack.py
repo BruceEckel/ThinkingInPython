@@ -3,7 +3,7 @@ all_slots = [
     ("doubled", lambda v: v * 2),
     ("squared", lambda v: v ** 2),
 ]
-values = [10, 3]
+values = [10, 3, 42]
 print([
     f"{name}({v}) = {f(v)}"
     for (name, f), v in zip(all_slots, values)

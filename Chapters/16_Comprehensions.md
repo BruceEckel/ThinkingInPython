@@ -100,23 +100,27 @@ with no `lambda` wrappers in the way.
 ## Nested Comprehensions
 
 An identity matrix of size `n` is an `n` by `n` square matrix with ones on the main diagonal and zeros elsewhere.
-A 3 by 3 identity matrix is:
-
-![A 3 by 3 identity matrix: ones on the main diagonal, zeros elsewhere](_images/idMatrix)
-
 In Python we can represent such a matrix by a list of lists,
 where each sub-list represents a row.
-The following comprehension generates this matrix:
+The following comprehension generates an identity matrix:
 
 ```python
 # identity_matrix.py
-matrix = [[1 if col == row else 0 for col in range(3)]
-          for row in range(3)]
+from typing import Final
+
+SIZE: Final[int] = 6
+
+matrix = [[1 if col == row else 0 for col in range(SIZE)]
+          for row in range(SIZE)]
+
 for row in matrix:
     print(row)
-#: [1, 0, 0]
-#: [0, 1, 0]
-#: [0, 0, 1]
+#: [1, 0, 0, 0, 0, 0]
+#: [0, 1, 0, 0, 0, 0]
+#: [0, 0, 1, 0, 0, 0]
+#: [0, 0, 0, 1, 0, 0]
+#: [0, 0, 0, 0, 1, 0]
+#: [0, 0, 0, 0, 0, 1]
 ```
 
 ## Techniques
@@ -125,7 +129,7 @@ Use `zip()` to walk two sequences together, taking one element from each:
 
 ```python
 # zip_pairs.py
-names = ["a", "b", "c"]
+names = ["a", "b", "c", "d"]
 values = [1, 2, 3]
 print([f"{n}={v}" for n, v in zip(names, values)])
 #: ['a=1', 'b=2', 'c=3']
@@ -143,7 +147,7 @@ all_slots = [
     ("doubled", lambda v: v * 2),
     ("squared", lambda v: v ** 2),
 ]
-values = [10, 3]
+values = [10, 3, 42]
 print([
     f"{name}({v}) = {f(v)}"
     for (name, f), v in zip(all_slots, values)
@@ -175,6 +179,22 @@ for path in sorted(py_paths):  # Sorted for stable output
 #: main.py
 #: pkg/util.py
 ```
+
+`tempfile.TemporaryDirectory()` is a
+[context manager](15_Context_Managers.md#a-basic-context-manager)
+that creates a scratch directory and deletes it, and everything in it,
+when the `with` block exits.
+That gives the example a throwaway file tree to walk,
+without touching any real files or leaving anything behind.
+
+A `with` block, unlike a function body, does not create a new scope.
+`py_paths` is assigned inside the `with`,
+but the name is still visible afterward,
+in the `for path in sorted(py_paths):` line below it.
+By then the directory is already deleted.
+The comprehension already finished building `py_paths` as plain strings
+while the directory still existed,
+so nothing later needs the files themselves.
 
 The outer `for` walks the directories and the inner `for` walks the files in each,
 flattening the tree into one list of paths.
