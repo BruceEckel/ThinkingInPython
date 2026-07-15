@@ -337,7 +337,7 @@ then run that string as code.
 The generated source reads like a class definition, because it is one:
 
 ```python
-# exec_class_gen.py
+# commander.py
 from collections.abc import Callable
 from typing import ClassVar, cast
 
@@ -350,24 +350,25 @@ class Command:
     def run(self) -> str:
         return f"Running {self.label}"
 
-def make_command(class_name: str) -> Callable[[], Command]:
-    if class_name not in Command.KNOWN_COMMANDS:
-        raise ValueError(f"Unknown command: {class_name!r}")
-    namespace: dict[str, type[Command]] = {"Command": Command}
-    klass = f"""
+    @classmethod
+    def make_class(cls, class_name: str) -> Callable[[], Command]:
+        if class_name not in cls.KNOWN_COMMANDS:
+            raise ValueError(f"Unknown command: {class_name!r}")
+        klass = f"""
 class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-    exec(klass, namespace)
-    return cast(Callable[[], Command], namespace[class_name])
+        namespace: dict[str, type[Command]] = {"Command": Command}
+        exec(klass, namespace)
+        return cast(Callable[[], Command], namespace[class_name])
 
 if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
-        cls = make_command(name)
-        print(cls().run())
+        command_class = Command.make_class(name)
+        print(command_class().run())
     try:
-        make_command("Reset")
+        Command.make_class("Reset")
     except ValueError as e:
         print(e)
 #: Running Start
@@ -376,7 +377,7 @@ if __name__ == "__main__":
 #: Unknown command: 'Reset'
 ```
 
-`make_command()` execs `klass` into a private `namespace` dict,
+`make_class()` execs `klass` into a private `namespace` dict,
 seeded with `{"Command": Command}` so the generated class's own reference to `Command` resolves.
 Nothing is written into the real module namespace
 ([`globals()`](06_Modules_and_Packages.md), covered when modules are introduced):
@@ -402,7 +403,7 @@ A string built from untrusted input,
 such as a web form or a file another user uploaded,
 would hand an attacker that same access.
 
-`Command.KNOWN_COMMANDS` is what keeps `make_command()` safe.
+`Command.KNOWN_COMMANDS` is what keeps `make_class()` safe.
 It checks `class_name` before doing anything with it,
 and raises `ValueError` for any name that isn't `"Start"`, `"Stop"`,
 or `"Pause"`.

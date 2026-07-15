@@ -1,4 +1,4 @@
-# exec_class_gen.py
+# commander.py
 from collections.abc import Callable
 from typing import ClassVar, cast
 
@@ -11,24 +11,25 @@ class Command:
     def run(self) -> str:
         return f"Running {self.label}"
 
-def make_command(class_name: str) -> Callable[[], Command]:
-    if class_name not in Command.KNOWN_COMMANDS:
-        raise ValueError(f"Unknown command: {class_name!r}")
-    namespace: dict[str, type[Command]] = {"Command": Command}
-    klass = f"""
+    @classmethod
+    def make_class(cls, class_name: str) -> Callable[[], Command]:
+        if class_name not in cls.KNOWN_COMMANDS:
+            raise ValueError(f"Unknown command: {class_name!r}")
+        klass = f"""
 class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-    exec(klass, namespace)
-    return cast(Callable[[], Command], namespace[class_name])
+        namespace: dict[str, type[Command]] = {"Command": Command}
+        exec(klass, namespace)
+        return cast(Callable[[], Command], namespace[class_name])
 
 if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
-        cls = make_command(name)
-        print(cls().run())
+        command_class = Command.make_class(name)
+        print(command_class().run())
     try:
-        make_command("Reset")
+        Command.make_class("Reset")
     except ValueError as e:
         print(e)
 #: Running Start
