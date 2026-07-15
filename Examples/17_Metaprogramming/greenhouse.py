@@ -1,10 +1,12 @@
 # greenhouse.py
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, cast
 
 @dataclass
 class Event:
     events: ClassVar[list[Event]] = []  # Registry of all Events
+    subclasses: ClassVar[dict[str, Callable[[float], Event]]] = {}
     action: str
     time: float
 
@@ -19,20 +21,33 @@ class Event:
         for e in sorted(Event.events, key=lambda e: e.time):
             e.run()
 
-def create_via_metaclass(class_name: str) -> None:
-    # A local function, to include in the generated class:
-    def init(self, time: float) -> None:
-        Event.__init__(self, class_name + " [mc]", time)
-    globals()[class_name] = type(
-        class_name, (Event,), {"__init__": init})
+    @classmethod
+    def create_via_metaclass(cls, class_name: str) -> None:
+        def init(self: Event, time: float) -> None:
+            Event.__init__(self, class_name + " [mc]", time)
+        new_cls = type(class_name, (Event,), {"__init__": init})
+        cls.subclasses[class_name] = cast(
+            Callable[[float], Event], new_cls)
 
-def create_via_exec(class_name: str) -> None:
-    klass = f"""
+    @classmethod
+    def create_via_exec(cls, class_name: str) -> None:
+        namespace: dict[str, type[Event]] = {"Event": Event}
+        klass = f"""
 class {class_name}(Event):
     def __init__(self, time: float) -> None:
         Event.__init__(self, "{class_name} [exec]", time)
 """
-    exec(klass, globals())
+        exec(klass, namespace)
+        cls.subclasses[class_name] = cast(
+            Callable[[float], Event], namespace[class_name])
+
+    @classmethod
+    def instantiate(cls, init: str) -> None:
+        class_name, rest = init.split("(", 1)
+        if class_name not in cls.subclasses:
+            raise ValueError(f"Unknown event class: {class_name!r}")
+        time = float(rest.rstrip(")"))
+        cls.subclasses[class_name](time)
 
 if __name__ == "__main__":
     initializations = [
@@ -46,13 +61,13 @@ if __name__ == "__main__":
     ]
     class_names = [init.split("(")[0] for init in initializations]
     for class_name in class_names:
-        create_via_metaclass(class_name)
+        Event.create_via_metaclass(class_name)
     for init in initializations:
-        exec(init, globals())
+        Event.instantiate(init)
     for class_name in class_names:
-        create_via_exec(class_name)
+        Event.create_via_exec(class_name)
     for init in initializations:
-        exec(init, globals())
+        Event.instantiate(init)
     Event.run_events()
 #: 1.00: LightOn [mc]
 #: 1.00: LightOn [exec]

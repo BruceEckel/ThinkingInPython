@@ -140,12 +140,14 @@ you can generate them dynamically:
 
 ```python
 # greenhouse.py
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, cast
 
 @dataclass
 class Event:
     events: ClassVar[list[Event]] = []  # Registry of all Events
+    subclasses: ClassVar[dict[str, Callable[[float], Event]]] = {}
     action: str
     time: float
 
@@ -160,20 +162,33 @@ class Event:
         for e in sorted(Event.events, key=lambda e: e.time):
             e.run()
 
-def create_via_metaclass(class_name: str) -> None:
-    # A local function, to include in the generated class:
-    def init(self, time: float) -> None:
-        Event.__init__(self, class_name + " [mc]", time)
-    globals()[class_name] = type(
-        class_name, (Event,), {"__init__": init})
+    @classmethod
+    def create_via_metaclass(cls, class_name: str) -> None:
+        def init(self: Event, time: float) -> None:
+            Event.__init__(self, class_name + " [mc]", time)
+        new_cls = type(class_name, (Event,), {"__init__": init})
+        cls.subclasses[class_name] = cast(
+            Callable[[float], Event], new_cls)
 
-def create_via_exec(class_name: str) -> None:
-    klass = f"""
+    @classmethod
+    def create_via_exec(cls, class_name: str) -> None:
+        namespace: dict[str, type[Event]] = {"Event": Event}
+        klass = f"""
 class {class_name}(Event):
     def __init__(self, time: float) -> None:
         Event.__init__(self, "{class_name} [exec]", time)
 """
-    exec(klass, globals())
+        exec(klass, namespace)
+        cls.subclasses[class_name] = cast(
+            Callable[[float], Event], namespace[class_name])
+
+    @classmethod
+    def instantiate(cls, init: str) -> None:
+        class_name, rest = init.split("(", 1)
+        if class_name not in cls.subclasses:
+            raise ValueError(f"Unknown event class: {class_name!r}")
+        time = float(rest.rstrip(")"))
+        cls.subclasses[class_name](time)
 
 if __name__ == "__main__":
     initializations = [
@@ -187,13 +202,13 @@ if __name__ == "__main__":
     ]
     class_names = [init.split("(")[0] for init in initializations]
     for class_name in class_names:
-        create_via_metaclass(class_name)
+        Event.create_via_metaclass(class_name)
     for init in initializations:
-        exec(init, globals())
+        Event.instantiate(init)
     for class_name in class_names:
-        create_via_exec(class_name)
+        Event.create_via_exec(class_name)
     for init in initializations:
-        exec(init, globals())
+        Event.instantiate(init)
     Event.run_events()
 #: 1.00: LightOn [mc]
 #: 1.00: LightOn [exec]
@@ -220,15 +235,23 @@ imports, file access, network calls, anything.
 A string built from untrusted input,
 such as a web form or a file another user uploaded,
 would hand an attacker that same access.
-Every string `exec()` runs here is a literal written directly in this file:
-the entries in `initializations`,
-and the `klass` string built only from `class_name`,
-which only ever comes from those same literals.
-Nothing here originates outside the program,
-so there's nothing for an attacker to control.
+
+`instantiate()` is what keeps this safe even if `initializations` came from a file someone else edits.
+It checks `class_name` against `Event.subclasses` before doing anything with it,
+and raises `ValueError` for any name that was never created through `create_via_metaclass()` or `create_via_exec()`.
+An unrecognized name gets rejected, not executed.
+
+That check also protects `create_via_exec()` itself.
+Its `klass` string splices `class_name` directly into class-definition source text before handing it to `exec()`.
+An unvalidated `class_name` containing a newline and a second statement could break out of the intended `class` block and run arbitrary code there too,
+the same way an unescaped string breaks out of a hand-built SQL query.
+`create_via_metaclass()` never had this second risk:
+`type(class_name, (Event,), ...)` always treats `class_name` as a plain string value, never as source code to parse.
+Validating before either function runs closes both paths at once.
+
 Treat `exec()` and `eval()` the way you'd treat string-built SQL:
-safe on data you wrote yourself,
-dangerous on anything reaching the program from outside it.
+safe on data you already validated,
+dangerous on anything reaching the program from outside it unchecked.
 
 `create_via_metaclass()` and `create_via_exec()` take the class name directly,
 rather than a human-readable description to reformat into one.
@@ -237,31 +260,31 @@ so `init.split("(")[0]` pulls the class name from each.
 That avoids a separate `descriptions` list,
 which would have to name the same seven classes by hand and stay in sync with `initializations`.
 
-Both functions need the new class reachable by name afterward,
-so `ThermostatNight(5.00)` in `initializations` can find it.
-`globals()` returns the module's global namespace as a mutable dict,
-the same dict Python already uses to look up top-level names.
-`create_via_metaclass()` writes into that dict directly.
-`globals()[class_name] = type(...)` has the same effect as `ThermostatNight = type(...)` typed at module level,
-just with the name coming from a variable instead of being written out.
-`create_via_exec()` reaches the same result differently.
-Passing `globals()` as `exec()`'s namespace means the `class` statement inside the generated string defines its class straight into the module's globals,
-as if that statement had been typed directly.
+Both functions register the class they create in `Event.subclasses`,
+a dict from class name to a callable that takes `time` and returns an `Event`.
+`create_via_metaclass()` stores the class `type()` just built.
+`create_via_exec()` stores what its `exec()` call defined,
+but into a private `namespace` dict rather than the real module namespace
+([`globals()`](06_Modules_and_Packages.md), covered when modules are introduced),
+so the generated class never becomes a module-level name at all.
+That private dict starts empty, unlike the module's own globals,
+so it has to be seeded with `{"Event": Event}` first,
+or the `class` statement's own reference to `Event` would fail to resolve.
+Looking up the result afterward, `namespace[class_name]`, is enough:
+nothing outside `create_via_exec()` needs to reach the new class by any other route than `Event.subclasses`.
 
-`for init in initializations: exec(init, globals())` then calls `ThermostatNight(5.00)` and the rest,
-looking each name up in that same dict.
-This loop runs twice, once right after each batch of `create_via_*()` calls.
-The second batch's class names are identical to the first's,
-so they overwrite the first batch's entries in `globals()` once `create_via_exec()` runs.
-Running the initializations immediately after each batch,
-before the next batch overwrites those names,
-is what lets both the `[mc]` and `[exec]` events reach `Event.events`.
+Both stores go through `cast(Callable[[float], Event], ...)`.
+The checker only knows `Event`'s own dataclass-generated `__init__(self, action, time)`,
+not that these particular subclasses replace it with `__init__(self, time)`.
+`cast()` records, at the one place each class is created,
+that it is safe to treat as `Callable[[float], Event]` from here on,
+which is what `instantiate()`'s `cls.subclasses[class_name](time)` call actually needs.
 
 Both versions call `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 In `create_via_metaclass()`, `init()` is a nested function,
 not a method defined inside a `class` statement,
-so the compiler never gives it the `__class__` cell that zero-argument `super()` needs;
-calling it raises `RuntimeError: super(): __class__ cell not found`.
+so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
+Calling it raises `RuntimeError: super(): __class__ cell not found`.
 The `exec()`'d code in `create_via_exec()` is a real `class` statement,
 so `super().__init__(...)` would work there.
 It stays as `Event.__init__(self, ...)` anyway,

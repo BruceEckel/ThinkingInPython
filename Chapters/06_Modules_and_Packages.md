@@ -28,6 +28,26 @@ This automatically prevents name clashes between the imported module's names and
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
+A module's own namespace is concrete, not just a figure of speech.
+`globals()` returns it as a mutable `dict`,
+the same dict Python already searches when it looks up a top-level name.
+Assigning into that dict has the same effect as writing the assignment directly:
+
+```python
+# globals_demo.py
+x = 10
+print(globals()["x"])
+#: 10
+
+globals()["y"] = 42
+print(y)  # type: ignore  # noqa: F821
+#: 42
+```
+
+This is rarely useful on its own,
+but it matters whenever code needs to define a module-level name whose spelling isn't known until runtime,
+such as a class built dynamically and registered under a computed name.
+
 The code at the end of the file starts with an `if` clause that checks whether the standard variable `__name__` is equal to the string `"__main__"`.
 In Python, any identifier that begins and ends with double underscores
 (commonly called a "dunder") is special in some way.
