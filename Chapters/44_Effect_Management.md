@@ -288,6 +288,7 @@ and `slope()` never needs to check for zero:
 ```python
 # slope_nonzero.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class NonZero:
@@ -302,11 +303,9 @@ def slope(rise: int, run: NonZero) -> float:
 
 print(slope(10, NonZero(2)))
 #: 5.0
-try:
+with ignore(ValueError):
     NonZero(0)
-except ValueError as e:
-    print(e)
-#: NonZero cannot hold 0
+#: ValueError('NonZero cannot hold 0')
 ```
 
 The check still happens, but only once, when a `NonZero` comes into existence.

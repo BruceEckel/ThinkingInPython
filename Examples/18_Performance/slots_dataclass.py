@@ -1,6 +1,7 @@
 # slots_dataclass.py
 import sys
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(slots=True)
 class Point:
@@ -28,12 +29,10 @@ class FrozenSlottedPoint:
     y: int
 
 fp = FrozenPoint(1, 2)
-try:
+with ignore(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
-except AttributeError as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+#: ignoring FrozenInstanceError("cannot assign to field 'z'")
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))

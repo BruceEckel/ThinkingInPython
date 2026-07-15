@@ -1,5 +1,6 @@
 # immutability.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Point:
@@ -7,11 +8,9 @@ class Point:
     y: int
 
 p = Point(1, 2)
-try:
+with ignore(AttributeError):
     setattr(p, "x", 5)  # A frozen instance rejects assignment
-except AttributeError as e:
-    print(e)
-#: cannot assign to field 'x'
+#: ignoring FrozenInstanceError("cannot assign to field 'x'")
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
 print(moved)

@@ -101,6 +101,7 @@ Instead of modifying an object, you build a new one from the old:
 ```python
 # immutability.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Point:
@@ -108,11 +109,9 @@ class Point:
     y: int
 
 p = Point(1, 2)
-try:
+with ignore(AttributeError):
     setattr(p, "x", 5)  # A frozen instance rejects assignment
-except AttributeError as e:
-    print(e)
-#: cannot assign to field 'x'
+#: FrozenInstanceError("cannot assign to field 'x'")
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
 print(moved)
@@ -164,6 +163,7 @@ A `list` can do neither:
 ```python
 # hashable.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Point:
@@ -175,11 +175,9 @@ distances = {Point(0, 0): 0.0, Point(3, 4): 5.0}
 print(distances[Point(3, 4)])
 #: 5.0
 # A list has no stable hash, so it cannot be a key:
-try:
+with ignore(TypeError):
     hash([3, 4])
-except TypeError as e:
-    print(e)
-#: unhashable type: 'list'
+#: TypeError("unhashable type: 'list'")
 ```
 
 These abilities are why the standard library uses tuples and frozen dataclasses whenever a value must be a key,

@@ -17,5 +17,5 @@ class ignore:
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print(f"ignoring {exc!r}")
+        print(f"{exc!r}")
         return True

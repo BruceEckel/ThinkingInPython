@@ -171,10 +171,13 @@ for when a class departs from `CapWords`.
 
 We can write a version with more features:
 reporting which exception it swallowed,
-and accepting no argument to mean "ignore everything":
+and accepting no argument to mean "ignore everything".
+It turns out to be useful enough to reuse elsewhere in the book,
+so it lives at the root of the examples,
+where any chapter can import it:
 
 ```python
-# exceptions.py
+# shared: exceptions.py
 
 ALL = sentinel("ALL")
 type Types = type[BaseException] | tuple[type[BaseException], ...]
@@ -193,7 +196,7 @@ class ignore:
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print(f"ignoring {exc!r}")
+        print(f"{exc!r}")
         return True
 ```
 
@@ -239,7 +242,7 @@ with ignore(ZeroDivisionError):
     print("after")  # Never runs: the error jumps straight to __exit__
 print("survived")
 #: before
-#: ignoring ZeroDivisionError('division by zero')
+#: ZeroDivisionError('division by zero')
 #: survived
 
 with ignore():  # No argument means ALL
@@ -247,7 +250,7 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: ignoring KeyError('anything')
+#: KeyError('anything')
 #: survived
 
 with ignore() as x:

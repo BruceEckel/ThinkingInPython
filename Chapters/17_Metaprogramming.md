@@ -340,6 +340,7 @@ The generated source reads like a class definition, because it is one:
 # commander.py
 from collections.abc import Callable
 from typing import ClassVar, cast
+from exceptions import ignore
 
 class Command:
     KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
@@ -367,14 +368,12 @@ if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
         command_class = Command.make_class(name)
         print(command_class().run())
-    try:
+    with ignore(ValueError):
         Command.make_class("Reset")
-    except ValueError as e:
-        print(e)
 #: Running Start
 #: Running Stop
 #: Running Pause
-#: Unknown command: 'Reset'
+#: ValueError("Unknown command: 'Reset'")
 ```
 
 `make_class()` execs `klass` into a private `namespace` dict,

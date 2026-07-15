@@ -1,5 +1,6 @@
 # hashable.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Point:
@@ -11,8 +12,6 @@ distances = {Point(0, 0): 0.0, Point(3, 4): 5.0}
 print(distances[Point(3, 4)])
 #: 5.0
 # A list has no stable hash, so it cannot be a key:
-try:
+with ignore(TypeError):
     hash([3, 4])
-except TypeError as e:
-    print(e)
-#: unhashable type: 'list'
+#: ignoring TypeError("unhashable type: 'list'")

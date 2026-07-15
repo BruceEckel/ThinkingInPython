@@ -367,6 +367,7 @@ A data class can generate the slots for you.
 # slots_dataclass.py
 import sys
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(slots=True)
 class Point:
@@ -394,12 +395,10 @@ class FrozenSlottedPoint:
     y: int
 
 fp = FrozenPoint(1, 2)
-try:
+with ignore(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
-except AttributeError as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+#: FrozenInstanceError("cannot assign to field 'z'")
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
@@ -435,6 +434,7 @@ The `array` module packs numbers into a single block of C values instead:
 # compact_array.py
 import sys
 from array import array
+from exceptions import ignore
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
 a.append(4.0)
@@ -442,12 +442,10 @@ print(a)
 #: array('d', [1.0, 2.0, 3.0, 4.0])
 print(a[1], a.typecode, a.itemsize)
 #: 2.0 d 8
-try:
+with ignore(TypeError):
     # The value must match the type code:
     a.append("x")  # type: ignore
-except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+#: TypeError('must be real number, not str')
 
 nums = [float(i) for i in range(10_000)]
 packed = array("d", nums)
