@@ -95,17 +95,18 @@ def jobs_arg(value: str) -> int:
 
 
 def run_one(
-    path: Path, rel: str, timeout: float, root: Path
+    path: Path, rel: str, timeout: float, utils_dir: Path
 ) -> tuple[str, str, str]:
     """Execute one example as a subprocess. Returns (status, rel, last_stderr).
 
     status is "passed", "failed", or "timeout". Examples are independent
     subprocesses with their own cwd, so this is safe to call concurrently. The
-    tree root is put on PYTHONPATH so examples can import shared helpers (such
-    as display.py) that live there.
+    tree's utils/ directory is put on PYTHONPATH so examples can import
+    shared helpers (such as display.py) that live there.
     """
     existing = os.environ.get("PYTHONPATH")
-    pythonpath = str(root) if not existing else f"{root}{os.pathsep}{existing}"
+    pythonpath = (str(utils_dir) if not existing
+                  else f"{utils_dir}{os.pathsep}{existing}")
     env = {**os.environ, "PYTHONPATH": pythonpath}
     try:
         proc = subprocess.run(
@@ -161,8 +162,8 @@ def main(argv: list[str] | None = None) -> int:
         rel = f.relative_to(args.tree).as_posix()
         if args.subtree and args.subtree not in rel:
             continue
-        if f.parent == args.tree:
-            continue  # shared helper at the tree root, imported not run
+        if f.parent == args.tree / "utils":
+            continue  # shared helper in utils/, imported not run
         if is_pytest_file(f.name):
             pytest_files.append(rel)  # run by `pytest`, not as a script
             continue
@@ -175,13 +176,14 @@ def main(argv: list[str] | None = None) -> int:
     # Each example is its own subprocess, so threads parallelize cleanly: the
     # work happens in child processes, not under the GIL.
     jobs = max(1, args.jobs)
+    utils_dir = args.tree / "utils"
     if jobs == 1:
-        results = [run_one(f, rel, args.timeout, args.tree)
+        results = [run_one(f, rel, args.timeout, utils_dir)
                    for f, rel in to_run]
     else:
         with ThreadPoolExecutor(max_workers=jobs) as pool:
             results = list(pool.map(
-                lambda fr: run_one(fr[0], fr[1], args.timeout, args.tree),
+                lambda fr: run_one(fr[0], fr[1], args.timeout, utils_dir),
                 to_run))
 
     for status, rel, tail in results:

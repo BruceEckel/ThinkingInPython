@@ -43,16 +43,18 @@ def add_paths_arg(ap: argparse.ArgumentParser) -> None:
     )
 
 
-def block_slug(block: list[str]) -> tuple[bool, str] | None:
-    """The (is_shared, relative_path) a block names on its first content
-    line, if any. is_shared is True for a "shared: name.py" marker, meaning
-    the file lands at the tree root rather than a chapter directory."""
+def block_slug(block: list[str]) -> str | None:
+    """The relative path a block names on its first content line, if any.
+
+    A slug starting with "utils/" is the caller's cue that the file lands
+    at the tree root's utils/ directory rather than a chapter directory.
+    """
     for line in block:
         if line.strip():
             m = PATH_LINE_RE.match(line.rstrip('\n\r'))
             if not m:
                 return None
-            return bool(m.group(1)), m.group(2).replace('\\', '/')
+            return m.group(1).replace('\\', '/')
     return None
 
 

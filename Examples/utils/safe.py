@@ -1,4 +1,4 @@
-# safe.py
+# utils/safe.py
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success

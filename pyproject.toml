@@ -80,7 +80,14 @@ lines-after-imports = 1
 # This example deliberately demonstrates assigning a lambda to a name.
 "**/lambdas.py" = ["E731"]
 
-# Examples run with cwd set to their chapter dir; adding the tree root to the
-# import path lets test files import shared helpers (display.py) kept there.
+# Examples run with cwd set to their chapter dir; adding the tree's utils/
+# directory to the import path lets test files import shared helpers
+# (display.py) kept there. ty needs the same path told to it separately:
+# it does not read pytest's pythonpath, and its own first-party resolution
+# only walks up a checked file's ancestor directories, so a sibling like
+# utils/ is otherwise invisible to it.
 [tool.pytest.ini_options]
-pythonpath = ["build/examples"]
+pythonpath = ["build/examples/utils"]
+
+[tool.ty.environment]
+extra-paths = ["build/examples/utils"]

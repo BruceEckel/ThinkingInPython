@@ -250,10 +250,10 @@ def run_location(rundir: Path | None, root: Path | None = None):
     """Run a block from ``rundir`` (cwd + sys.path), leaving no trace.
 
     Imports of sibling extracted files and relative data paths resolve as they
-    do under run_examples. The tree root is also placed on sys.path so a block
-    can import shared helpers (such as display.py) kept there. sys.path and any
-    modules imported by the block are restored afterward so one block cannot
-    leak into the next.
+    do under run_examples. The tree's utils/ directory is also placed on
+    sys.path so a block can import shared helpers (such as display.py) kept
+    there. sys.path and any modules imported by the block are restored
+    afterward so one block cannot leak into the next.
     """
     if rundir is None or not rundir.exists():
         yield
@@ -352,18 +352,16 @@ def process_md_block(
     update: bool,
 ) -> BlockResult:
     """Run one ```python block and check or rewrite its #: markers."""
-    parsed = block_slug(block)
-    if parsed is None:
+    slug = block_slug(block)
+    if slug is None:
         rel: str | None = None
         filepath: Path | None = None
+    elif slug.startswith('utils/'):
+        rel = slug
+        filepath = tree / rel
     else:
-        shared, slug = parsed
-        if shared:
-            rel = slug
-            filepath = tree / rel
-        else:
-            rel = f'{chapter}/{slug}'
-            filepath = tree / chapter / slug
+        rel = f'{chapter}/{slug}'
+        filepath = tree / chapter / slug
     text = ''.join(block)
 
     if INLINE_NORUN_MARKER in text or (
@@ -379,7 +377,7 @@ def process_md_block(
     }
     label = f'{path}:{rel}' if rel else str(path)
 
-    with run_location(rundir, tree):
+    with run_location(rundir, tree / 'utils'):
         new_lines, ok, changed = process_block(
             block, label, update=update,
             namespace=namespace, line_offset=block_start,

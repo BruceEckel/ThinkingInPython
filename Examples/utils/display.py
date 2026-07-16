@@ -1,4 +1,4 @@
-# display.py
+# utils/display.py
 import inspect
 from collections.abc import Callable, Sequence
 from typing import Final

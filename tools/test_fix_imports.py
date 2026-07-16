@@ -20,6 +20,9 @@ def test_block_slug_none_without_path_line() -> None:
 def test_block_slug_skips_blank_lines() -> None:
     assert block_slug(["\n", "# a.py\n"]) == "a.py"
 
+def test_block_slug_utils_prefix() -> None:
+    assert block_slug(["# utils/display.py\n"]) == "utils/display.py"
+
 
 # ── splice_markdown ───────────────────────────────────────────────────────────
 

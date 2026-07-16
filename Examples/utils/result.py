@@ -1,4 +1,4 @@
-# result.py
+# utils/result.py
 from collections.abc import Callable
 from dataclasses import dataclass
 

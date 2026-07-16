@@ -34,15 +34,15 @@ from tools_repo import write_text_lf
 def block_slug(block: list[str]) -> str | None:
     """The relative path a block names on its first content line, if any.
 
-    A "shared:"-marked block (lives at the tree root, not a chapter dir) is
-    left alone here; extract_examples/validate_output handle that case.
+    A "utils/"-prefixed slug lives at the tree root's utils/ directory
+    rather than a chapter dir; ``fixed_for`` below resolves it there.
     """
     for line in block:
         if line.strip():
             m = PATH_LINE_RE.match(line.rstrip('\n\r'))
-            if not m or m.group(1):
+            if not m:
                 return None
-            return m.group(2).replace('\\', '/')
+            return m.group(1).replace('\\', '/')
     return None
 
 
@@ -152,7 +152,8 @@ def main(argv: list[str] | None = None) -> int:
         def fixed_for(slug: str | None) -> str | None:
             if slug is None:
                 return None
-            fp = args.tree / chapter / slug
+            fp = (args.tree / slug if slug.startswith('utils/')
+                  else args.tree / chapter / slug)
             return fp.read_text(encoding='utf-8') if fp.exists() else None
 
         new_text, changed = splice_markdown(

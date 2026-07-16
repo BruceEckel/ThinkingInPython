@@ -976,13 +976,19 @@ print(list(inspect.signature(greet).parameters))
 
 `signature()` recovers the full call interface,
 annotations and defaults included, as a structured object rather than a string.
+Annotations are not discarded at runtime.
+Python evaluates them and stores the result on the function,
+even though it never checks them
+([Hints Are Not Enforced at Run Time](08_Static_Typing.md#hints-are-not-enforced-at-run-time)).
+`signature()` reads that stored data (not the original source text)
+to build the `Signature` object.
 
-Earlier, `new_vs_init.py` called `display_object()` to show the layout of an object.
-That tool is a helper used throughout the book,
-so it lives at the root of the examples and any chapter can import it:
+Throughout the book we've been using `display_object()` to show the layout of an object.
+The `utils/` prefix makes it live in the shared `utils/` directory at the top of the examples tree,
+and any chapter can import it:
 
 ```python
-# shared: display.py
+# utils/display.py
 import inspect
 from collections.abc import Callable, Sequence
 from typing import Final
@@ -1096,6 +1102,12 @@ def display_object(
     print("[Methods]")
     print("\n".join(methods) or "  None")
 ```
+
+This works because the example tooling puts `utils/` on the import path,
+not because Python searches other directories automatically.
+`tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
+The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
+Without either, `from display import display_object` fails with `ModuleNotFoundError`.
 
 `header=True` prints `=== {ClassName} ===` before the report; the default,
 `False`, omits it.

@@ -109,10 +109,10 @@ parameterized over the answer type and the error type.
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
-so it lives at the root of the examples and any chapter can import it:
+so it lives in `utils/` and any chapter can import it:
 
 ```python
-# shared: result.py
+# utils/result.py
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -363,10 +363,10 @@ In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returne
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Failure` value.
-Like `result.py`, it lives at the root of the examples so any chapter can import it:
+Like `result.py`, it lives in `utils/` and any chapter can import it:
 
 ```python
-# shared: safe.py
+# utils/safe.py
 from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success

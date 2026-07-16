@@ -4,9 +4,11 @@
 Every tools/*.py script operates on the same repo layout (Chapters/ as the
 source of truth, build/examples/ as the extracted, runnable tree) and the
 same conventions for reading it: a fenced block's first content line names
-the file it extracts to (optionally with a "shared:" marker), and a line
-starting with "#:" marks expected stdout. Centralizing them here means a
-rename or convention change happens in one place instead of N.
+the file it extracts to, and a line starting with "#:" marks expected
+stdout. A slug starting with "utils/" lands at the tree root's "utils/"
+directory instead of a chapter dir, so any chapter can import it.
+Centralizing them here means a rename or convention change happens in one
+place instead of N.
 
 Behavior lives in tools_repo.py; this module holds only constants. Named
 tools_config rather than the shorter "config" so it can never collide with
@@ -44,6 +46,7 @@ FENCE_ANY_RE = re.compile(r"^\s*```")
 PY_FENCE_RE = re.compile(r"^\s*```python\s*$")
 
 # A block's first content line naming the relative path it extracts to, e.g.
-# "# trace.py", optionally preceded by a "shared:" marker meaning the file
-# lands at the tree root instead of its chapter dir (e.g. "# shared: display.py").
-PATH_LINE_RE = re.compile(r"^#\s*(?:(shared):\s*)?([\w./\\-]+\.\w+)\s*$")
+# "# trace.py" or "# mouse/Move.py". A "utils/" prefix (e.g.
+# "# utils/display.py") is handled by the caller: it means the file lands
+# at the tree root's utils/ directory instead of a chapter dir.
+PATH_LINE_RE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")

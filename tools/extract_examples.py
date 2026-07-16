@@ -15,11 +15,10 @@ Markdown file's stem). A ``# trace.py`` slug in ``08_Decorators.md`` is written
 to ``08_Decorators/trace.py``, verbatim block contents and all. Slugs may
 include sub-paths (``# mouse/MouseAction.py``) to group files within a chapter.
 
-A ``# shared: name.py`` slug (the ``shared:`` marker, not a path segment,
-since no ``Examples/shared/`` directory exists) is written to the tree root
-instead of a chapter dir, so any chapter can import it, e.g.
-``# shared: display.py`` becomes ``display.py`` at the root. The example
-tooling puts the tree root on the import path, so this is how a helper like
+A slug starting with ``utils/`` is written to the tree root's ``utils/``
+directory instead of a chapter dir, so any chapter can import it, e.g.
+``# utils/display.py`` becomes ``utils/display.py`` at the root. The example
+tooling puts that directory on the import path, so this is how a helper like
 ``result.py`` or ``safe.py`` gets reused across chapters. Use it only for
 something genuinely shared; everything else stays chapter-scoped.
 
@@ -97,19 +96,11 @@ def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
     for md in md_files([markdown_dir]):
         text = md.read_text(encoding="utf-8")
         for lang, block in iter_blocks(text.splitlines()):
-            parsed = block_slug(block)
-            if parsed is None:
+            slug = block_slug(block)
+            if slug is None:
                 result.fragments += 1
                 continue
-            shared, slug = parsed
-            if shared:
-                rel = slug
-                # The written file's header comment should match where it
-                # actually lands (the tree root), not the shared: marker.
-                first = next(b for b in block if b.strip())
-                block[block.index(first)] = f"# {rel}"
-            else:
-                rel = f"{md.stem}/{slug}"
+            rel = slug if slug.startswith("utils/") else f"{md.stem}/{slug}"
             content = "\n".join(block).rstrip("\n") + "\n"
             existing = result.examples.get(rel)
             if existing and existing.content != content:
