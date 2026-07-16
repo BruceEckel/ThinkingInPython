@@ -698,7 +698,11 @@ The class is an instance of the metaclass.
 The class's own instances are not.
 
 One useful metamethod is `__call__()`.
-It runs first when you create an instance of the class.
+It is the same method that makes any object callable when parentheses are attached.
+`obj()` invokes `type(obj).__call__(obj, ...)`.
+A class is an object, an instance of its metaclass,
+so `ClassName()` invokes `__call__()` on the metaclass the same way.
+It is the first thing that runs when you create an instance of the class.
 The only reason `__new__()` and `__init__()` normally run is because the default `type.__call__()` calls them.
 A metaclass that overrides `__call__()` sits above that step and decides whether to call them at all.
 That lets it skip building a new instance,
@@ -744,7 +748,7 @@ The `[T]` on `__call__()` ties its return type to `cls`,
 so `ASingleton()` reveals as `ASingleton` instead of `Any`.
 Without it, every singleton would lose its type and a type checker could no longer catch a misspelled attribute access on the result.
 
-You might expect to parametrize the class itself,
+You might expect to parameterize[^parametrize] the class itself,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That does not work.
 A `ClassVar` cannot depend on a type parameter of its own class,
@@ -1336,3 +1340,13 @@ is the bookkeeping every class carries.
     Python evaluates `Singleton[ASingleton]` eagerly,
     before the name `ASingleton` is even bound,
     so there is no equivalent incomplete-type stage to lean on.
+
+[^parametrize]: Four spellings are in use, all correct.
+    The stem is `parametr-` or `parameter-`.
+    The suffix is `-ize` in the US
+    or `-ise` in the UK and Commonwealth countries.
+    The two choices are independent,
+    giving `parametrize`, `parametrise`, `parameterize`, and `parameterise`.
+    This book follows pytest's own spelling for `@pytest.mark.parametrize`,
+    and uses "parameterize" everywhere else,
+    for the general sense of a class or function taking a parameter.

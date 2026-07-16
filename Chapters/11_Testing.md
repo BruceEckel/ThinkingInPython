@@ -235,7 +235,7 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 Place shared setup in `conftest.py`.
 
-You can parametrize fixtures too.
+You can parameterize fixtures too.
 Every test that requests the fixture runs once for each parameter value:
 
 ```python

@@ -116,8 +116,10 @@ numba
 op
 optionals
 parallelizable
+parameterize
 parameterization
 parameterized
+parametrise
 parametrizing
 polars
 postcondition
