@@ -563,6 +563,16 @@ A metaclass is a subclass of `type`.
 You attach it with the `metaclass=` keyword in the class header.
 Python then uses your metaclass, instead of `type`, to build the class.
 
+Since a metaclass is itself a subclass of `type`,
+writing `class Simple1(SimpleMeta1):` would mean something else.
+That syntax makes `SimpleMeta1` an ordinary base class,
+so `Simple1` would become a metaclass-shaped class,
+not a class built by `SimpleMeta1`.
+`metaclass=` is the particular mechanism for naming what builds a class,
+independent of its base classes.
+A subclass only needs to repeat `metaclass=` if its own bases do not already carry the same metaclass.
+Python computes a new class's metaclass from all of its bases automatically.
+
 ```python
 # simple_meta1.py
 from typing import Any
@@ -688,9 +698,8 @@ The class is an instance of the metaclass.
 The class's own instances are not.
 
 One useful metamethod is `__call__()`.
-It runs first, when you create an instance of the class.
-`__new__()` and `__init__()` still run too,
-but only because the default `type.__call__()` calls them.
+It runs first when you create an instance of the class.
+The only reason `__new__()` and `__init__()` normally run is because the default `type.__call__()` calls them.
 A metaclass that overrides `__call__()` sits above that step and decides whether to call them at all.
 That lets it skip building a new instance entirely,
 for example by returning one it already cached.
