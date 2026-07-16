@@ -6,7 +6,7 @@ class Person:
     def greet(self) -> str:
         return f"Hello, {self.name}"
 
-# def left a plain function in the class namespace:
+# def created a plain function in the class namespace:
 plain = Person.__dict__["greet"]
 print(type(plain).__name__, hasattr(plain, "__get__"))
 #: function True

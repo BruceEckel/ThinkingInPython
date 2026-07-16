@@ -340,8 +340,8 @@ dangerous on anything that reaches the program from outside, unchecked.
 Often a base class needs to keep track of its subclasses,
 so you can enumerate them.
 This is the textbook reason people used to justify a metaclass.
-In Python 3 it is a few lines with `__init_subclass__()`,
-which is called automatically for every new subclass.
+`__init_subclass__()` is called automatically for every new subclass,
+so it only takes a few lines to produce self-registration.
 This example tracks the "leaf" subclasses
 (those with no subclasses of their own),
 using __init_subclass__ instead of a metaclass:
@@ -457,7 +457,7 @@ print(plain.__get__(p, Person)())
 #: Hello, Ann
 ```
 
-The last line performs by hand what `p.greet` does automatically.
+The last line performs by hand what `p.greet()` does automatically.
 Method binding is not special machinery, just the descriptor protocol at work.
 
 Here is another job that once needed a metaclass.
@@ -469,8 +469,7 @@ it calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
 passing the freshly created class and the name the attribute was assigned to.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
-(the descriptor protocol)
-and uses the delivered name to build its storage key:
+(the descriptor protocol) and uses the delivered name to build its storage key:
 
 ```python
 # set_name.py
@@ -482,11 +481,13 @@ class Field:
         self.storage = f"_{name}"
 
     def __get__(self, obj: Any, owner: type | None = None) -> Any:
+        print(f"{self.name}.__get__({type(obj).__name__})")
         if obj is None:
             return self
         return getattr(obj, self.storage)
 
     def __set__(self, obj: Any, value: Any) -> None:
+        print(f"{self.name}.__set__({type(obj).__name__}, {value})")
         setattr(obj, self.storage, value)
 
 class Point:
@@ -495,10 +496,27 @@ class Point:
 
 p = Point()
 p.x = 3
+#: x.__set__(Point, 3)
 p.y = 4
+#: y.__set__(Point, 4)
 print(p.x, p.y)
+#: x.__get__(Point)
+#: y.__get__(Point)
 #: 3 4
+print(isinstance(Point.x, Field))
+#: x.__get__(NoneType)
+#: True
 ```
+
+The trace shows every read and write routing through the descriptor,
+not the instance's `__dict__` directly:
+`p.x = 3` prints `x.__set__(Point, 3)` before storing anything,
+and `print(p.x, p.y)` prints `x.__get__(Point)` and `y.__get__(Point)`,
+in argument-evaluation order, before either value appears.
+`Point.x` triggers `__get__()` too, but with `obj` as `None`,
+which the trailing `x.__get__(NoneType)` confirms; that branch returns `self`,
+exposing the descriptor object itself,
+which is why `isinstance(Point.x, Field)` is `True`.
 
 By the time the `class Point` statement finishes,
 each `Field` knows its own name and stores values under `_x` or `_y` in the instance's `__dict__`.
@@ -506,9 +524,6 @@ The underscore prefix is not decoration:
 a data descriptor outranks the instance `__dict__`,
 so if `__get__()` asked `obj` for plain `"x"`,
 that lookup would reach the descriptor and call `__get__()` again, forever.
-The `obj is None` branch handles access through the class itself,
-`Point.x` rather than `p.x`;
-returning `self` there exposes the descriptor object for inspection.
 This is metaprogramming, but it needs no metaclass.
 
 Testing confirms the descriptor learns its name,
