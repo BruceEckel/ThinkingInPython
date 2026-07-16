@@ -469,8 +469,7 @@ it calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
 passing the freshly created class and the name the attribute was assigned to.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
-the descriptor protocol,
-and uses the delivered name to build its storage key.
+the descriptor protocol, and uses the delivered name to build its storage key.
 A `print()` at the top of each method traces the descriptor's whole life:
 naming at class creation, then every read and write:
 
@@ -519,11 +518,9 @@ The first two trace lines appear before any instance exists:
 Python calls `__set_name__()` as it finishes executing the `class Point` statement,
 once for each `Field`,
 handing each one the new class and its own attribute name.
-From then on, every read and write routes through the descriptor
-instead of going straight to the instance's `__dict__`.
+From then on, every read and write routes through the descriptor instead of going straight to the instance's `__dict__`.
 `p.x = 3` prints `x.__set__ = 3` before anything is stored.
-In `print(p.x, p.y)`,
-Python evaluates both arguments before calling `print()`,
+In `print(p.x, p.y)`, Python evaluates both arguments before calling `print()`,
 so both `__get__` lines appear ahead of `3 4`.
 The final access, `Point.x`, goes through the class rather than an instance,
 so `__get__()` receives `obj=None` and reports `via class`.
@@ -535,7 +532,8 @@ The underscore prefix is not decoration.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
 If `__get__()` asked `obj` for plain `"x"`,
-that lookup would route back to the descriptor and call `__get__()` again, forever.
+that lookup would route back to the descriptor and call `__get__()` again,
+forever.
 Storing under `"_x"`, a name no descriptor claims, breaks the loop.
 This is metaprogramming, but it needs no metaclass.
 
@@ -598,8 +596,7 @@ and patches a new method onto the freshly built class.
 In the `display_object` listing,
 `uses_metaclass(self)` sits alongside `foo` and `bar`,
 indistinguishable from the methods written in the class body.
-The injected value is a plain lambda,
-but a function is a descriptor
+The injected value is a plain lambda, but a function is a descriptor
 ([Learning a Name with `__set_name__()`](#learning-a-name-with-__set_name__)),
 so `Simple1().uses_metaclass()` binds it like any other method.
 
@@ -685,8 +682,7 @@ pick `__init__()` and reserve `__new__()` for a genuine need.
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances.
 These are sometimes called *metamethods*,
-and they differ from `classmethod`s because a `classmethod`
-stays callable on both the class and its instances,
+and they differ from `classmethod`s because a `classmethod` stays callable on both the class and its instances,
 while a metamethod works only through the class.
 The class is an instance of the metaclass.
 The class's own instances are not.
@@ -695,8 +691,7 @@ One useful metamethod is `__call__()`.
 It runs first, when you create an instance of the class.
 `__new__()` and `__init__()` still run too,
 but only because the default `type.__call__()` calls them.
-A metaclass that overrides `__call__()` sits above that step
-and decides whether to call them at all.
+A metaclass that overrides `__call__()` sits above that step and decides whether to call them at all.
 That lets it skip building a new instance entirely,
 for example by returning one it already cached.
 This is one way to build a [Singleton](24_Singleton.md):
@@ -737,19 +732,16 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons stay independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
 so `ASingleton()` reveals as `ASingleton` instead of `Any`.
-Without it, every singleton would lose its type
-and a type checker could no longer catch
-a misspelled attribute access on the result.
+Without it, every singleton would lose its type and a type checker could no longer catch a misspelled attribute access on the result.
 
 You might expect to parametrize the class itself,
-with `class Singleton[T](type)`
-and `_instances: ClassVar[dict[type, T]]`.
+with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That does not work.
 A `ClassVar` cannot depend on a type parameter of its own class,
 because `ClassVar` means one shared value for the whole class,
 not a different value per instantiation.
-Even with that fixed, a subclass would need to write
-`class ASingleton(metaclass=Singleton[ASingleton]):`,
+Even with that fixed,
+a subclass would need to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finishes defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,

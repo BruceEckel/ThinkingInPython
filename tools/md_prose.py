@@ -24,7 +24,10 @@ import re
 PUA_START = 0xE000
 PUA_END = 0xF8FF
 
-_FOOTNOTE = re.compile(r"\^\[[^\]]*\]")
+# Pandoc's inline footnote, `^[...]`, and a reference-style footnote
+# marker, `[^label]` (its `[^label]: ...` definition is a separate
+# block, not matched here).
+_FOOTNOTE = re.compile(r"\^\[[^\]]*\]|\[\^[^\]]+\]")
 _INLINE_CODE = re.compile(r"``[^`]*``|`[^`]*`")
 
 
