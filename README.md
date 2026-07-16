@@ -124,7 +124,7 @@ The first serious edit pass.
 | 14_Decorators.md                |X|
 | 15_Context_Managers.md          |X|
 | 16_Comprehensions.md            |X|
-| 17_Metaprogramming.md           | |
+| 17_Metaprogramming.md           |X|
 | 18_Performance.md               | |
 | 19_Concurrency.md               | |
 | 20_Rethinking_Objects.md        | |

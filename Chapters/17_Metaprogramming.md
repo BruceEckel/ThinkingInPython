@@ -1077,13 +1077,10 @@ def display_object(
     obj: object,
     dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
-    header: bool = False,
     exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
-    if header:
-        print(f"=== {cls.__name__} ===")
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
@@ -1106,28 +1103,21 @@ def display_object(
     print("\n".join(methods) or "  None")
 ```
 
-This works because the example tooling puts `utils/` on the import path,
+Importing into any example works because the example tooling puts `utils/` on the import path,
 not because Python searches other directories automatically.
 `tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
 The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
 Without either, `from display import display_object` fails with `ModuleNotFoundError`.
-
-`header=True` prints `=== {ClassName} ===` before the report; the default,
-`False`, omits it.
-Every call in this book sits directly beneath the code that produced it,
-so the class is already visible without a header.
-Pass `header=True` when running `display_object()` on its own,
-outside a listing like this one,
-especially if several calls to different classes run together with nothing else marking where one report ends and the next begins.
 
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the object and its classes directly,
 without invoking descriptors, properties, or `__getattr__()`.
 Inspecting an object therefore never runs its code or triggers a side effect,
 which matters when you point this tool at something unfamiliar.
+
 The tool sorts each member into one of two lists.
 Callables become methods,
-printed with the signature `inspect.signature()` reports,
+printed with the signature that `inspect.signature()` reports,
 or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
 The declared type comes from the class annotations,
@@ -1136,6 +1126,7 @@ An attribute with no annotation, such as one assigned dynamically,
 prints as `name = value`.
 The value is the member's `repr()`,
 truncated to keep the line within `max_width`.
+
 An attribute tagged `[CV]`, for *class variable*,
 is not stored in `obj`'s own `__dict__`.
 A class has no instance-level storage to compare against:
@@ -1150,7 +1141,8 @@ while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value actually lives,
 so it applies whether or not the attribute is declared with `typing.ClassVar`.
-The display hides standard dunder members by default.
+
+`display_object()` hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones,
 as `new_vs_init.py` does to show `__new__` and `__init__`.
 Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
@@ -1161,7 +1153,7 @@ so a type checker narrows `dunder` to `Sequence[str]` once both sentinels are ru
 and `name in dunder` needs no further guard.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
 but it buries a class's own choices under everything `object` and the interpreter add.
-`INTERESTING_DUNDERS` names the four a reader actually customizes when defining a class:
+`INTERESTING_DUNDERS` names the four a reader typically customizes when defining a class:
 `__init__`, `__repr__`, `__eq__`, and `__hash__`.
 Pass it as `dunder` to see those four without the surrounding noise.
 
@@ -1173,6 +1165,7 @@ it keeps only the ones whose value differs from `object`'s own,
 so a class that overrides none of them shows no dunders.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
+
 Every class, even an empty one, has its own `__module__`, `__dict__`,
 and a handful of other bookkeeping dunders that never match `object`'s,
 so comparing every dunder this way would show that bookkeeping instead of filtering it out.
@@ -1278,18 +1271,21 @@ It lists `y` and `z`, the fields with defaults.
 `x` is declared as `x: int` with no default,
 so on the class it is only an annotation, not a bound attribute,
 and `getmembers_static()` does not return it.
+
 `display_object(Fraggle(9, 2.3))` inspects an instance,
 whose attributes hold its field values, so `x` now appears beside `y` and `z`.
-With `header=True`, both calls would print the same header, `=== Fraggle ===`:
-for a class `display_object()` reports the class's own name,
-and for an instance the name of the instance's class.
 The method list is the same either way, because methods live on the class.
+
 The third call passes `ALL_DUNDERS`.
-Part of the flood is `@dataclass`'s own doing: `__dataclass_fields__`,
-`__match_args__`, `__replace__`, `__hash__` set to `None`,
-and the generated `__init__`, `__eq__`,
-and `__repr__` that give `Fraggle` a constructor, equality,
-and a `repr()` for free.
+A `@dataclass` produces many of these:
+
+- `__dataclass_fields__`
+- `__match_args__`
+- `__replace__`
+- `__hash__`, set to `None`
+- The generated `__init__`, `__eq__`, and `__repr__`,
+  which give `Fraggle` a constructor, equality, and a `repr()` for free.
+
 The rest, from `__class__` to `__static_attributes__`,
 is the bookkeeping every class carries.
 
@@ -1312,7 +1308,8 @@ is the bookkeeping every class carries.
     (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.
 
-[^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern* (CRTP):
+[^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern*
+(CRTP):
 
     ```cpp
     template <typename T>

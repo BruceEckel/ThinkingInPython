@@ -84,13 +84,10 @@ def display_object(
     obj: object,
     dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
     max_width: int = 65,
-    header: bool = False,
     exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class itself; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
-    if header:
-        print(f"=== {cls.__name__} ===")
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
