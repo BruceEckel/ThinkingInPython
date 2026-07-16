@@ -78,7 +78,7 @@ so a subclass that defines its own `__init__()` must finish its setup before it 
 Call it first, in the usual style,
 and the engine runs against half-initialized state.
 A framework that separates construction from starting,
-with an explicit `run()` call by the client, avoids the trap entirely.
+with an explicit `run()` call by the client, avoids the trap.
 
 This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
 A subclass must work wherever code expects its base class.

@@ -701,7 +701,7 @@ One useful metamethod is `__call__()`.
 It runs first when you create an instance of the class.
 The only reason `__new__()` and `__init__()` normally run is because the default `type.__call__()` calls them.
 A metaclass that overrides `__call__()` sits above that step and decides whether to call them at all.
-That lets it skip building a new instance entirely,
+That lets it skip building a new instance,
 for example by returning one it already cached.
 This is one way to build a [Singleton](24_Singleton.md):
 
@@ -710,6 +710,7 @@ This is one way to build a [Singleton](24_Singleton.md):
 from typing import Any, ClassVar
 
 class Singleton(type):
+    # A shared dict of class objects : instances
     _instances: ClassVar[dict[type, Any]] = {}
 
     def __call__[T](
@@ -738,7 +739,7 @@ print(a.__class__.__name__, c.__class__.__name__)
 ```
 
 Each class gets its own entry in the `_instances` dictionary,
-so the singletons stay independent.
+so the singletons are independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
 so `ASingleton()` reveals as `ASingleton` instead of `Any`.
 Without it, every singleton would lose its type and a type checker could no longer catch a misspelled attribute access on the result.
@@ -749,9 +750,8 @@ That does not work.
 A `ClassVar` cannot depend on a type parameter of its own class,
 because `ClassVar` means one shared value for the whole class,
 not a different value per instantiation.
-Even with that fixed,
-a subclass would need to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
-naming `ASingleton` before its class body finishes defining it.[^crtp]
+Even ignoring that, a subclass would need to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
+naming `ASingleton` before its class body finished defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
 which runs only after `ASingleton` already exists.
@@ -761,10 +761,61 @@ This works, but it is heavier than the problem usually requires.
 from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 
+### Multiple Inheritance in a Metaclass
+
+`Singleton` stores its cache in `_instances`, which is a `dict` attribute.
+It doesn't inherit from `dict` directly.
+That raises a natural question.
+Can a metaclass inherit from more than one class, the way an ordinary class can?
+
+Trying the obvious version fails.
+`type` and `dict` are both built-in types with their own C-level instance layout,
+and CPython allows multiple inheritance only when at most one base carries a nontrivial layout:
+
+```python
+# metaclass_layout_conflict.py
+from typing import Any
+from exceptions import ignore
+
+with ignore(TypeError):
+    class Singleton(type, dict[type, Any]):  # type: ignore
+        pass
+#: TypeError('multiple bases have instance lay-out conflict')
+```
+
+The failure has nothing to do with metaclasses.
+`class X(dict, type): pass` fails the same way with no metaclass involved.
+`type` and `dict` each bring an incompatible layout,
+so combining them is impossible in any context.
+
+A metaclass can multiply inherit like any other class,
+as long as the extra class is a plain mixin with no competing layout:
+
+```python
+# mixin.py
+class Mixin:
+    def helper(self) -> str:
+        return "hi"
+
+class Base(type, Mixin):
+    pass
+
+class Derived(metaclass=Base):
+    pass
+
+print(Derived.helper())
+#: hi
+```
+
+The constraint here is the ordinary "at most one layout-bearing base" rule that governs every Python class,
+not something specific to metaclasses.
+Composing a `dict`, the way `Singleton._instances` already does,
+sidesteps the conflict.
+
 ## Making a Class Final
 
 It is sometimes useful to forbid inheritance.
-The modern way to say so is the `@final` decorator from `typing`:
+The modern way to say so is the `typing.final` decorator:
 
 ```python
 # final.py
@@ -777,37 +828,30 @@ class B:
 b = B()
 print(type(b).__name__)
 #: B
-
-# The type checker rejects `class C(B): ...`,
-# because it would inherit from a final class.
 ```
+
+The type checker rejects `class C(B): ...` because it would inherit a `final` class.
 
 Type checkers such as ty, mypy, and pyright check `@final` statically.
 It states the intent and catches a violation before the code runs.
 At runtime it only marks the class, setting `__final__ = True`
-(as `test_final.py` below confirms); nothing enforces it:
-the interpreter still lets `class C(B): pass` run.
+(as `test_final.py` below confirms).
+Nothing enforces it and the interpreter still runs `class C(B): pass`.
 
 If you need the interpreter to refuse subclassing,
-`__init_subclass__()` can enforce it at each subclass creation.
-Older literature claims this requires a metaclass.
-It does not:
+older literature claims this requires a metaclass.
+It does not; `__init_subclass__()` can enforce it at each subclass creation:
 
 ```python
 # final_runtime.py
-# Runtime finality with __init_subclass__, no metaclass required.
 
 class A:
     pass
 
 class B(A):
-    # Any attempt to subclass it fails at class creation:
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
             f"{B.__name__} is final; you cannot subclass it")
-
-print(B.__bases__)
-#: (<class '__main__.A'>,)
 
 try:
     class C(B):
@@ -817,8 +861,8 @@ except TypeError as error:
 #: B is final; you cannot subclass it
 ```
 
-The check happens at class-creation time, exactly when it must,
-and Python builds `B` normally because `A` does not forbid subclassing.
+The check happens at class-creation time.
+Python builds `B` normally because `A` does not forbid subclassing.
 Use the runtime version only when `@final` is not enough, which is rare.
 
 Tests confirm the `@final` marker is present,
@@ -832,7 +876,6 @@ import final_runtime
 import pytest
 
 def test_final_decorator_marks_class() -> None:
-    # @final sets __final__ at runtime. Type checkers read it
     assert final.B.__final__ is True  # type: ignore
 
 def test_runtime_final_cannot_be_subclassed() -> None:
@@ -843,7 +886,6 @@ def test_runtime_final_cannot_be_subclassed() -> None:
 def test_runtime_non_final_base_can_be_subclassed() -> None:
     class Ok(final_runtime.A):
         pass
-
     assert issubclass(Ok, final_runtime.A)
 ```
 
@@ -851,28 +893,56 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
 After all this, when is a metaclass the right tool?
 When you need to change the class object rather than react to its creation:
-adding methods *to the class*
-(metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above),
-replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary,
-or enforcing an invariant across an entire family of classes through their shared metaclass.
+
+- Adding methods *to the class*
+  (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above).
+- Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
+- Enforcing an invariant across an entire family of classes through their shared metaclass.
+
 These are real but uncommon.
 For everything else, `__init_subclass__()`, `__set_name__()`,
 and class decorators are simpler and easier to read.
 
 One caution: a class has a single metaclass.
-Multiple inheritance can accidentally combine classes with different metaclasses,
-which creates a metaclass conflict you must then resolve.
-That is one more reason to avoid metaclasses unless you truly need them.
+Multiple inheritance can accidentally combine classes with different metaclasses:
+
+```python
+# multiple_metaclass_inheritance.py
+class MetaA(type):
+    pass
+
+class MetaB(type):
+    pass
+
+class A(metaclass=MetaA):
+    pass
+
+class B(metaclass=MetaB):
+    pass
+
+try:
+    class C(A, B):  # type: ignore
+        pass
+except TypeError as error:
+    print(type(error).__name__)
+#: TypeError
+```
+
+This creates a metaclass conflict you must resolve.
+It's one more reason to avoid metaclasses (and arguably, multiple inheritance)
+unless you truly need them.
 
 ## The `inspect` Module
 
 Up to now we've been modifying classes.
 `type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
-The `inspect` module is the other half of metaprogramming:
-reading the structure of live objects.
-It answers questions like which members an object has,
-what a function's signature is, and what its docstring says,
-without you knowing the answers in advance.
+The `inspect` module is the other half of metaprogramming.
+`inspect` reads the structure of live objects.
+It answers questions like:
+
+- Which members an object has
+- What a function's signature is
+- What its docstring says
 
 `inspect` works on any live object: modules, classes, functions, methods,
 and instances.
@@ -1085,7 +1155,7 @@ so `INTERESTING_DUNDERS` shows `object`'s generic versions,
 which can look like the class defined them itself.
 `REDEFINED_DUNDERS` filters harder: among those same four,
 it keeps only the ones whose value differs from `object`'s own,
-so a class that overrides none of them shows no dunders at all.
+so a class that overrides none of them shows no dunders.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
 Every class, even an empty one, has its own `__module__`, `__dict__`,

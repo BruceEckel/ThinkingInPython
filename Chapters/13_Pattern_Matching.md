@@ -198,8 +198,7 @@ print(describe(Point(3, 4)))
 #: Just some point
 ```
 
-`Point(x=0)` matches any point whose `x` attribute is zero,
-ignoring `y` entirely.
+`Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
 A positional pattern cannot do this:
 it must supply a sub-pattern for every position that `__match_args__` defines.
 `Point()` with no arguments matches any `Point` instance, keyword or positional,

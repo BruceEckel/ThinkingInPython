@@ -127,7 +127,7 @@ class Ranunculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
-# A new operation, defined entirely outside the Flower hierarchy:
+# A new operation, defined outside the Flower hierarchy:
 @singledispatch
 def nectar(flower: Flower) -> str:
     return f"{flower}: no nectar"

@@ -624,7 +624,7 @@ if __name__ == "__main__":
 #: ['Espresso', 'Latte']
 ```
 
-`register()` returns `cls` unchanged, so this decoration adds no wrapper at all;
+`register()` returns `cls` unchanged, so this decoration adds no wrapper;
 it exists only for the side effect of recording the class.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.

@@ -747,7 +747,7 @@ at the cost of `14` repeat meetings.
 An odd roster cannot pair everyone,
 so each round folds the leftover player into an existing pair,
 and those triples are where the repeats come from.
-It does that with no rotation and no notion of a fixed player at all,
+It does that with no rotation and no notion of a fixed player,
 just a shuffle and a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.
 Seven students do not split evenly into threes,

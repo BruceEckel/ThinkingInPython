@@ -492,7 +492,7 @@ so writing through it changes the original and copies no bytes.
 ## Vectorize with NumPy
 
 When the hot spot is arithmetic over a large collection of numbers,
-the biggest step is to remove the Python loop entirely.
+the biggest step is to remove the Python loop.
 [NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
 like `array` above, and executes whole-array expressions in compiled loops.
 The plain-Python version repeats one expression per element.

@@ -140,7 +140,7 @@ It earns its place for symmetry with `total`,
 so the class's two attributes read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
-There, an attribute is set from outside the class entirely,
+There, an attribute is set from outside the class,
 and a bare annotation is the checker's only way to know its type.
 
 `ClassVar` is a hint for the checker, not the runtime.

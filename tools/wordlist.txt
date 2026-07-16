@@ -99,6 +99,7 @@ metadata
 metamethod
 metamethods
 metaprogramming
+mixin
 mixins
 monkeypatching
 mul

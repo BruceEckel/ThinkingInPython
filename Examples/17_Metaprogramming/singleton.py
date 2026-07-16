@@ -2,6 +2,7 @@
 from typing import Any, ClassVar
 
 class Singleton(type):
+    # A shared dict of class objects : instances
     _instances: ClassVar[dict[type, Any]] = {}
 
     def __call__[T](

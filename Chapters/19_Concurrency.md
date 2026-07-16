@@ -675,7 +675,7 @@ in Context Managers uses the same `Queue` as a throttle.
 3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
     (acquire before reading `counter`, release after writing it back)
     and confirm `counter` now reaches `400`.
-4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call entirely and run the script several times.
+4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,
     but is not thereby fixed.

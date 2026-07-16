@@ -228,7 +228,7 @@ for args in [(10, 2), (10, 0)]:
 ```
 
 `@safe` catches whatever it raises,
-so the fix lives entirely outside the function being fixed.
+so the fix lives outside the function being fixed.
 `slope()` is total again, and `match` forces the caller to handle both outcomes.
 Nothing escapes through a raised exception.
 
@@ -448,7 +448,7 @@ and `greet()` never changes.
 This is delayed binding by hand,
 and it is why "pass in your dependencies" is such durable advice.
 
-The technique works, but the bookkeeping falls entirely on you.
+The technique works, but the bookkeeping falls on you.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down,
 so parameters accumulate at every level of the call stack.
 Nothing propagates automatically.

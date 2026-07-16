@@ -939,7 +939,7 @@ Neither `x` nor `s` carries `[CV]` this time.
 As a `@dataclass`, `C`s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
-With no `__init__()` at all, `show(B())` keeps finding `x` and `s` on the class,
+With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
@@ -1005,7 +1005,7 @@ It now lives in that instance's own `__dict__`, not on the class.
 
 `s`, declared `ClassVar[str]`, is a different story.
 `@dataclass` treats a `ClassVar` field as belonging to the class,
-not to any instance, and leaves it out of `__init__()` entirely.
+not to any instance, and leaves it out of `__init__()`.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can ever assign one.
 `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
