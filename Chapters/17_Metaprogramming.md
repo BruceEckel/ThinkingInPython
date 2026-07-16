@@ -685,13 +685,18 @@ pick `__init__()` and reserve `__new__()` for a genuine need.
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances.
 These are sometimes called *metamethods*.
-One useful metamethod is `__call__()`, which runs when you create an instance.
-Overriding it lets a metaclass intercept instance creation,
+One useful metamethod is `__call__()`.
+It runs first, when you write `ASingleton()`.
+`__new__()` and `__init__()` still run too,
+but only because the default `type.__call__()` calls them.
+A metaclass that overrides `__call__()` sits above that step
+and decides whether to call them at all.
+That lets it skip building a new instance entirely,
+for example by returning one it already cached,
 which is one way to build a [Singleton](24_Singleton.md):
 
 ```python
 # singleton.py
-# Singleton metaclass intercepts instance creation through __call__.
 from typing import Any, ClassVar
 
 class Singleton(type):
