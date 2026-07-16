@@ -1309,8 +1309,7 @@ is the bookkeeping every class carries.
     (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.
 
-[^crtp]: C++ templates can do this,
-    via the *Curiously Recurring Template Pattern* (CRTP):
+[^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern* (CRTP):
 
     ```cpp
     template <typename T>
@@ -1326,13 +1325,14 @@ is the bookkeeping every class carries.
 
     C++ templates are instantiated by the compiler on demand,
     not executed like Python's `class` statement.
-    A class name is a valid incomplete type
-    the moment it is declared,
-    so `Singleton<ASingleton>` only needs the name `ASingleton`
-    to exist as a base class.
-    Its member functions are not compiled
-    until something actually calls them,
+    A C++ class name is a valid *incomplete type*
+    the moment the compiler sees `class ASingleton`,
+    before it reads a single member.
+    `Singleton<ASingleton>` can use that name as its template argument
+    without the class being finished.
+    Its member functions are not compiled until something actually calls them,
     by which point `ASingleton` is complete.
+
     Python evaluates `Singleton[ASingleton]` eagerly,
     before the name `ASingleton` is even bound,
     so there is no equivalent incomplete-type stage to lean on.
