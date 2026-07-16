@@ -1,14 +1,15 @@
 # singleton.py
-# Singleton metaclass intercepts instance creation through __call__.
 from typing import Any, ClassVar
 
 class Singleton(type):
     _instances: ClassVar[dict[type, Any]] = {}
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__[T](
+            cls: type[T], *args: Any, **kwargs: Any) -> T:
+        if cls not in Singleton._instances:
+            Singleton._instances[cls] = type.__call__(
+                cls, *args, **kwargs)
+        return Singleton._instances[cls]
 
 class ASingleton(metaclass=Singleton):
     pass

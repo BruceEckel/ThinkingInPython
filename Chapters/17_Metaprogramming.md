@@ -684,16 +684,22 @@ pick `__init__()` and reserve `__new__()` for a genuine need.
 
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances.
-These are sometimes called *metamethods*.
+These are sometimes called *metamethods*,
+and they differ from `classmethod`s because a `classmethod`
+stays callable on both the class and its instances,
+while a metamethod works only through the class.
+The class is an instance of the metaclass.
+The class's own instances are not.
+
 One useful metamethod is `__call__()`.
-It runs first, when you write `ASingleton()`.
+It runs first, when you create an instance of the class.
 `__new__()` and `__init__()` still run too,
 but only because the default `type.__call__()` calls them.
 A metaclass that overrides `__call__()` sits above that step
 and decides whether to call them at all.
 That lets it skip building a new instance entirely,
-for example by returning one it already cached,
-which is one way to build a [Singleton](24_Singleton.md):
+for example by returning one it already cached.
+This is one way to build a [Singleton](24_Singleton.md):
 
 ```python
 # singleton.py
@@ -702,10 +708,12 @@ from typing import Any, ClassVar
 class Singleton(type):
     _instances: ClassVar[dict[type, Any]] = {}
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__[T](
+            cls: type[T], *args: Any, **kwargs: Any) -> T:
+        if cls not in Singleton._instances:
+            Singleton._instances[cls] = type.__call__(
+                cls, *args, **kwargs)
+        return Singleton._instances[cls]
 
 class ASingleton(metaclass=Singleton):
     pass
@@ -727,6 +735,25 @@ print(a.__class__.__name__, c.__class__.__name__)
 
 Each class gets its own entry in the `_instances` dictionary,
 so the singletons stay independent.
+The `[T]` on `__call__()` ties its return type to `cls`,
+so `ASingleton()` reveals as `ASingleton` instead of `Any`.
+Without it, every singleton would lose its type
+and a type checker could no longer catch
+a misspelled attribute access on the result.
+
+You might expect to parametrize the class itself,
+with `class Singleton[T](type)`
+and `_instances: ClassVar[dict[type, T]]`.
+That does not work.
+A `ClassVar` cannot depend on a type parameter of its own class,
+because `ClassVar` means one shared value for the whole class,
+not a different value per instantiation.
+Even with that fixed, a subclass would need to write
+`class ASingleton(metaclass=Singleton[ASingleton]):`,
+naming `ASingleton` before its class body finishes defining it.[^crtp]
+The method-level `[T]` on `__call__()` avoids both problems.
+It binds `T` from `cls` at the call site, `ASingleton()`,
+which runs only after `ASingleton` already exists.
 
 This works, but it is heavier than the problem usually requires.
 [Singleton](24_Singleton.md) covers the lighter alternatives,
@@ -1198,3 +1225,31 @@ is the bookkeeping every class carries.
     its `inspect.signature()`, and its docstring
     (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.
+
+[^crtp]: C++ templates can do this,
+    via the *Curiously Recurring Template Pattern* (CRTP):
+
+    ```cpp
+    template <typename T>
+    class Singleton {
+        static T& instance() {
+            static T inst;
+            return inst;
+        }
+    };
+
+    class ASingleton : public Singleton<ASingleton> {};
+    ```
+
+    C++ templates are instantiated by the compiler on demand,
+    not executed like Python's `class` statement.
+    A class name is a valid incomplete type
+    the moment it is declared,
+    so `Singleton<ASingleton>` only needs the name `ASingleton`
+    to exist as a base class.
+    Its member functions are not compiled
+    until something actually calls them,
+    by which point `ASingleton` is complete.
+    Python evaluates `Singleton[ASingleton]` eagerly,
+    before the name `ASingleton` is even bound,
+    so there is no equivalent incomplete-type stage to lean on.
