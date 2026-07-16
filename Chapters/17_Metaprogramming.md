@@ -980,15 +980,14 @@ print(list(inspect.signature(greet).parameters))
 
 `signature()` recovers the full call interface,
 annotations and defaults included, as a structured object rather than a string.
-Annotations are not discarded at runtime.
+Type annotations (a.k.a. type hints) are not discarded at runtime.
 Python evaluates them and stores the result on the function,
-even though it never checks them
-([Hints Are Not Enforced at Run Time](08_Static_Typing.md#hints-are-not-enforced-at-run-time)).
+even though it [never checks them](08_Static_Typing.md#hints-are-not-enforced-at-run-time).
 `signature()` reads that stored data (not the original source text)
 to build the `Signature` object.
 
 Throughout the book we've been using `display_object()` to show the layout of an object.
-The `utils/` prefix makes it live in the shared `utils/` directory at the top of the examples tree,
+The `utils/` prefix makes it live in the shared `utils/` directory at the top of the `Examples` tree,
 and any chapter can import it:
 
 ```python
