@@ -469,7 +469,10 @@ it calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
 passing the freshly created class and the name the attribute was assigned to.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
-(the descriptor protocol) and uses the delivered name to build its storage key:
+the descriptor protocol,
+and uses the delivered name to build its storage key.
+A `print()` at the top of each method traces the descriptor's whole life:
+naming at class creation, then every read and write:
 
 ```python
 # set_name.py
@@ -477,53 +480,63 @@ from typing import Any
 
 class Field:
     def __set_name__(self, owner: type, name: str) -> None:
+        print(f"{name}.__set_name__ on {owner.__name__}")
         self.name = name
         self.storage = f"_{name}"
 
     def __get__(self, obj: Any, owner: type | None = None) -> Any:
-        print(f"{self.name}.__get__({type(obj).__name__})")
+        via = "class" if obj is None else "instance"
+        print(f"{self.name}.__get__ via {via}")
         if obj is None:
             return self
         return getattr(obj, self.storage)
 
     def __set__(self, obj: Any, value: Any) -> None:
-        print(f"{self.name}.__set__({type(obj).__name__}, {value})")
+        print(f"{self.name}.__set__ = {value}")
         setattr(obj, self.storage, value)
 
 class Point:
     x = Field()
     y = Field()
+#: x.__set_name__ on Point
+#: y.__set_name__ on Point
 
 p = Point()
 p.x = 3
-#: x.__set__(Point, 3)
+#: x.__set__ = 3
 p.y = 4
-#: y.__set__(Point, 4)
+#: y.__set__ = 4
 print(p.x, p.y)
-#: x.__get__(Point)
-#: y.__get__(Point)
+#: x.__get__ via instance
+#: y.__get__ via instance
 #: 3 4
 print(isinstance(Point.x, Field))
-#: x.__get__(NoneType)
+#: x.__get__ via class
 #: True
 ```
 
-The trace shows every read and write routing through the descriptor,
-not the instance's `__dict__` directly:
-`p.x = 3` prints `x.__set__(Point, 3)` before storing anything,
-and `print(p.x, p.y)` prints `x.__get__(Point)` and `y.__get__(Point)`,
-in argument-evaluation order, before either value appears.
-`Point.x` triggers `__get__()` too, but with `obj` as `None`,
-which the trailing `x.__get__(NoneType)` confirms; that branch returns `self`,
-exposing the descriptor object itself,
+The first two trace lines appear before any instance exists:
+Python calls `__set_name__()` as it finishes executing the `class Point` statement,
+once for each `Field`,
+handing each one the new class and its own attribute name.
+From then on, every read and write routes through the descriptor
+instead of going straight to the instance's `__dict__`.
+`p.x = 3` prints `x.__set__ = 3` before anything is stored.
+In `print(p.x, p.y)`,
+Python evaluates both arguments before calling `print()`,
+so both `__get__` lines appear ahead of `3 4`.
+The final access, `Point.x`, goes through the class rather than an instance,
+so `__get__()` receives `obj=None` and reports `via class`.
+That branch returns `self`, the descriptor object itself,
 which is why `isinstance(Point.x, Field)` is `True`.
 
-By the time the `class Point` statement finishes,
-each `Field` knows its own name and stores values under `_x` or `_y` in the instance's `__dict__`.
-The underscore prefix is not decoration:
-a data descriptor outranks the instance `__dict__`,
-so if `__get__()` asked `obj` for plain `"x"`,
-that lookup would reach the descriptor and call `__get__()` again, forever.
+Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
+The underscore prefix is not decoration.
+A descriptor that defines `__set__()` is a *data descriptor*,
+and on every lookup a data descriptor outranks the instance's `__dict__`.
+If `__get__()` asked `obj` for plain `"x"`,
+that lookup would route back to the descriptor and call `__get__()` again, forever.
+Storing under `"_x"`, a name no descriptor claims, breaks the loop.
 This is metaprogramming, but it needs no metaclass.
 
 Testing confirms the descriptor learns its name,
