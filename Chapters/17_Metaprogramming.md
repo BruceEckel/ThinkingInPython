@@ -567,8 +567,8 @@ Python then uses your metaclass, instead of `type`, to build the class.
 
 ```python
 # simple_meta1.py
-# Writing a metaclass and applying it with the `metaclass=` keyword.
 from typing import Any
+from display import display_object
 
 class SimpleMeta1(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
@@ -582,17 +582,30 @@ class Simple1(metaclass=SimpleMeta1):
     @staticmethod
     def bar() -> None: pass
 
-simple = Simple1()
-print([m for m in dir(simple) if not m.startswith("__")])
-#: ['bar', 'foo', 'uses_metaclass']
-# A method injected by the metaclass:
-print(simple.uses_metaclass())  # type: ignore
+display_object(Simple1)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   • bar() -> None
+#:   • foo(self) -> None
+#:   • uses_metaclass(self)
+print(Simple1().uses_metaclass())  # type: ignore
 #: Yes!
 ```
 
+`SimpleMeta1.__init__()` runs once, as the `class Simple1` statement finishes,
+and patches a new method onto the freshly built class.
+In the `display_object` listing,
+`uses_metaclass(self)` sits alongside `foo` and `bar`,
+indistinguishable from the methods written in the class body.
+The injected value is a plain lambda,
+but a function is a descriptor
+([Learning a Name with `__set_name__()`](#learning-a-name-with-__set_name__)),
+so `Simple1().uses_metaclass()` binds it like any other method.
+
 By convention the first argument of a metaclass method is `cls` rather than `self`,
-except for `__new__()`, which uses `mcl` (metaclass).
-The `cls` is the class object under construction.
+except for `__new__()`, which uses `mcl` (metaclass);
+here `cls` is the class object under construction, `Simple1`.
 As with any subclass, call the base-class version first through `super()`.
 
 Metaprogramming and static typing pull against each other.
@@ -604,7 +617,7 @@ so it reports the dynamic lines as errors.
 Three ways quiet it, from narrowest to broadest:
 `setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
 a localized `# type: ignore` silences one line,
-as on `simple.uses_metaclass()` above;
+as on `Simple1().uses_metaclass()` above;
 and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
 The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses)
 uses that last form, `klass: Any = cls`,

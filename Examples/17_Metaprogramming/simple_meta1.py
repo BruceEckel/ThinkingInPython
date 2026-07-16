@@ -1,6 +1,6 @@
 # simple_meta1.py
-# Writing a metaclass and applying it with the `metaclass=` keyword.
 from typing import Any
+from display import display_object
 
 class SimpleMeta1(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
@@ -14,9 +14,12 @@ class Simple1(metaclass=SimpleMeta1):
     @staticmethod
     def bar() -> None: pass
 
-simple = Simple1()
-print([m for m in dir(simple) if not m.startswith("__")])
-#: ['bar', 'foo', 'uses_metaclass']
-# A method injected by the metaclass:
-print(simple.uses_metaclass())  # type: ignore
+display_object(Simple1)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   • bar() -> None
+#:   • foo(self) -> None
+#:   • uses_metaclass(self)
+print(Simple1().uses_metaclass())  # type: ignore
 #: Yes!
