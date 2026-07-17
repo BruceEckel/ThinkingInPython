@@ -4,6 +4,8 @@ import timeit
 
 n = 10_000
 data = list(range(n, 0, -1))
+print(data[:8])
+#: [10000, 9999, 9998, 9997, 9996, 9995, 9994, 9993]
 
 def heap_min_extractions() -> list[int]:
     heap = data.copy()

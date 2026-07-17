@@ -390,6 +390,8 @@ import timeit
 
 n = 10_000
 data = list(range(n, 0, -1))
+print(data[:8])
+#: [10000, 9999, 9998, 9997, 9996, 9995, 9994, 9993]
 
 def heap_min_extractions() -> list[int]:
     heap = data.copy()
@@ -418,7 +420,7 @@ so extracting 100 smallest items costs roughly O(100n).
 `heapify()` pays O(n) once, then each `heappop()` costs only O(log n),
 so the same 100 extractions cost roughly O(n + 100 log n).
 That gap is why the heap wins by more than an order of magnitude here,
-and it only widens as `n` grows.
+and the gap widens as `n` grows.
 
 The immutable containers from [Containers](03_Containers.md#immutability)
 are not a speed upgrade.
@@ -929,7 +931,7 @@ Step 4 on that list, fixing the algorithm, is usually the biggest win,
 because it changes which curve your program is on,
 not just where it sits on that curve:
 
-![Six growth rates plotted against input size n: O(1) and O(log n) stay nearly flat, O(n) and O(n log n) climb steadily, O(n²) curves upward, and O(2ⁿ) shoots off the top of the chart before n reaches 7](_images/big_o_growth)
+![Big O growth rates vs. input size n](_images/big_o_growth)
 
 ## Exercises
 
