@@ -66,7 +66,8 @@ You invoke it like this:
 
     python -m profiling.sampling run my_program.py
 
-The new profiler can also attach to a process that is already running, using the process ID.
+The new profiler can also attach to a process that is already running,
+using the process ID.
 This makes it the tool for a slowdown you can only reproduce live:
 
     python -m profiling.sampling attach 12345
@@ -111,8 +112,8 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 #: set at least 100x faster: True
 ```
 
-`timeit.timeit()` calls its first argument repeatedly
-and returns the total elapsed time in seconds for every call combined, not the time for one call.
+`timeit.timeit()` calls its first argument repeatedly and returns the total elapsed time in seconds for every call combined,
+not the time for one call.
 That first argument is a `lambda` here rather than a string of code,
 since a `lambda` can close over `target`, `as_list`, and `as_set` directly,
 with no separate `setup` argument needed to build them.
@@ -155,15 +156,52 @@ print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
 #: sum() at least twice as fast: True
 ```
 
-The same principle chooses `"".join(parts)` over `+=` in a loop
-(one linear pass instead of repeated reallocation),
-a comprehension over an `append()` loop, and the C-implemented standard library,
-`itertools`, `collections`, and `functools`, over hand-rolled equivalents
-([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
-As a last resort in a proven-hot loop,
+Other examples:
+
+- String concatenation: `"".join(parts)` is faster than `+=` in a loop
+  (one linear pass instead of repeated reallocation).
+- A comprehension is faster than an `append()` loop.
+- The C-implemented standard library's `itertools`, `collections`,
+  and `functools`, are faster than hand-rolled equivalents
+  ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
+
+As a last resort in a proven hot loop,
 hoist a repeated attribute or global lookup into a local,
 as in `append = out.append`.
-That is a micro-optimization, so let a measurement justify it.
+That is a micro-optimization, so let a measurement justify it:
+
+```python
+# hoist_attribute_lookup.py
+import timeit
+
+n = 100_000
+
+def with_attribute_lookup() -> list[int]:
+    out: list[int] = []
+    for i in range(n):
+        out.append(i)
+    return out
+
+def with_hoisted_local() -> list[int]:
+    out: list[int] = []
+    append = out.append
+    for i in range(n):
+        append(i)
+    return out
+
+assert with_attribute_lookup() == with_hoisted_local()
+t_attr = timeit.timeit(with_attribute_lookup, number=100)
+t_local = timeit.timeit(with_hoisted_local, number=100)
+close = abs(t_local - t_attr) < 0.2 * t_attr
+print(f"hoisting made little difference: {close}")
+#: hoisting made little difference: True
+```
+
+Here the hoist does not pay off.
+Modern CPython already caches a repeated attribute lookup like `out.append` inside a loop,
+so it costs little more than the local variable would have.
+The measurement proves the point because it catches a "classic" optimization that no longer works,
+just as readily as it would catch one that does.
 
 ## Choose Better Algorithms and Data Structures
 

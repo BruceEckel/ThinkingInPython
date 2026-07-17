@@ -468,7 +468,7 @@ except TypeError as e:
 Because a `frozendict` cannot change, it is hashable,
 so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
 A dictionary key must be hashable rather than immutable.
-Immutability is how a container earns a stable hash.
+Immutability is how a container produces a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
 Neither you nor code you pass it to can modify an immutable container by accident,
