@@ -438,7 +438,7 @@ A list-building pipeline materializes every intermediate result.
 A generator pipeline
 ([Comprehensions](16_Comprehensions.md#generator-expressions))
 computes one item at a time, on demand,
-so memory stays flat no matter how large the source,
+so memory use doesn't grow with the size of the source,
 and no work happens past the point where the consumer stops.
 `tracemalloc` measures the difference:
 
@@ -486,9 +486,9 @@ A generator is spent after one pass.
 
 If a pure function ([Functional Foundations](40_Functional_Foundations.md#pure-functions))
 is called repeatedly with the same arguments,
-the fastest way to compute the answer is to not compute it.
+the fastest way to compute the answer is to not recompute it.
 `functools.cache` stores each result the first time and replays it after that.
-The classic demonstration is naive recursive Fibonacci,
+The classic demonstration is the naive recursive Fibonacci,
 which recomputes the same subproblems exponentially many times:
 
 ```python
@@ -522,7 +522,7 @@ The cached version runs thousands of times faster, and the gap grows with `n`.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
-Arguments must be hashable,
+The arguments must be hashable,
 which is another reason to prefer immutable containers.
 For an expensive attribute computed once per object,
 `functools.cached_property` does the same job on instances
@@ -621,8 +621,10 @@ Frozen blocks every attribute assignment, not just reassignment,
 so it already stops an instance from growing new fields,
 the same restriction `slots` gives you.
 But frozen enforces this by overriding `__setattr__()`.
-The instance still keeps a `__dict__` underneath.
-`slots=True` removes that `__dict__`,
+The instance still keeps a `__dict__` underneath,
+and `sys.getsizeof()` reports only an object's own size, not what it references,
+so `frozen_bytes` adds the dict's size on top to count it too.
+`slots=True` removes that `__dict__` entirely,
 so pairing it with `frozen=True` is the natural default,
 giving you the same immutability in a fraction of the space
 (one machine measured 344 bytes against 48, roughly seven to one).
@@ -669,7 +671,6 @@ the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
 while the `array` spends 8 bytes per element total,
 roughly a four-to-one difference
 (one machine measured 325,176 bytes against 80,080).
-(`sys.getsizeof()` reports a `list`'s own size but not its elements', so the elements are summed separately.)
 
 ### Memory View
 

@@ -644,7 +644,7 @@ chapter looks at laziness from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
-so memory stays flat no matter how large the source grows.
+so memory use doesn't grow with the size of the source.
 Stages chain together without building intermediate lists between them,
 and a consumer that stops early, such as `any()` or `next()`,
 means no upstream work for the items it never reaches.

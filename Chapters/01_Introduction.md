@@ -60,6 +60,17 @@ but have never had the capacity to fully flesh out in all its myriad detail.
 With Claude and my directing, rewriting, and editing,
 I'm able to build my ideal book.
 
+To be clear, using Claude greatly simplified and sped the writing process.
+It did not make it trivial.
+Once Claude had incorporated,
+translated and integrated my own work into the book,
+and once it had made initial generations of new material,
+I went through line by line and concept by concept,
+inevitably rewriting and asking for clarification,
+often creating more examples to answer further questions.
+One pass would often change the book enough that it needed another pass.
+It was much faster than without Claude, but it still took time and effort.
+
 I can't predict the future of books.
 The internet and eBooks have been changing the print book industry for decades.
 But with AI, how many people will keep reading computer programming books?
