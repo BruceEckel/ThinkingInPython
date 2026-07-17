@@ -162,7 +162,7 @@ Other examples:
   (one linear pass instead of repeated reallocation).
 - A comprehension is faster than an `append()` loop.
 - The C-implemented standard library's `itertools`, `collections`,
-  and `functools`, are faster than hand-rolled equivalents
+  and `functools` are faster than hand-rolled equivalents
   ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
 
 As a last resort in a proven hot loop,
@@ -344,13 +344,13 @@ print(max_nums)  # Heap ordering is maintained
 
 After `heapify()` the smallest element is placed at index 0,
 and `heapify_max()` mirrors it with the largest element at index 0.
-`nsmallest()` and `nlargest()` answer top-N questions without building new a heap.
+`nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
 
 The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 maintains the list according to its own logic.
 This means you must always use the heap version of an operation,
 not the list version.
-Although calling `nums.pop()` does produce the smallest value the first time you do it,
+Although calling `nums.pop(0)` does produce the smallest value the first time you do it,
 it also destroys the heap ordering,
 so if you call it again you won't get the smallest value:
 
@@ -756,7 +756,7 @@ but as one compiled pass over contiguous memory instead of a million individual 
 NumPy is a fast library you call, not a compiled extension you write.
 The benefit only occurs if the data stays inside NumPy.
 Calling a Python function on each element,
-or converting arrays to lists and back, reproduces overhead.
+or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade from [Functional Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
@@ -780,7 +780,7 @@ compiles such a function to machine code on its first call, in place:
     def count_primes(limit: int) -> int:
         count = 0
         for n in range(2, limit):
-            for d in range(2, int(n ** 0.5) + 1):
+            for d in range(2, int(n**0.5) + 1):
                 if n % d == 0:
                     break
             else:

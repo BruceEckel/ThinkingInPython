@@ -125,7 +125,7 @@ The first serious edit pass.
 | 15_Context_Managers.md          |X|
 | 16_Comprehensions.md            |X|
 | 17_Metaprogramming.md           |X|
-| 18_Performance.md               | |
+| 18_Performance.md               |X|
 | 19_Concurrency.md               | |
 | 20_Rethinking_Objects.md        | |
 | 21_The_Pattern_Concept.md       | |
