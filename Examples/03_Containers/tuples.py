@@ -1,15 +1,15 @@
 # tuples.py
 
 point = (3, 4)
-point = 3, 4        # Also a tuple; the comma is what matters
-empty = ()          # Empty tuple
-x, y = point        # Unpacking
+point = 3, 4  # Also a tuple; the comma is what matters
+empty = ()  # Empty tuple
+x, y = point  # Unpacking
 print(x, y)
 #: 3 4
-single = (42,)      # A one-element tuple needs the trailing comma
+single = (42,)  # A one-element tuple needs the trailing comma
 print(len(single))
 #: 1
-print(tuple([1, 2, 3]))    # Converts a list to a tuple
+print(tuple([1, 2, 3]))  # Converts a list to a tuple
 #: (1, 2, 3)
 print(tuple("abc"))
 #: ('a', 'b', 'c')

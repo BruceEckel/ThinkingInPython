@@ -110,7 +110,7 @@ TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 
 def bisection(f: Fn, a: float, b: float) -> float | None:
-    if f(a) * f(b) > 0:   # Endpoints must bracket a root
+    if f(a) * f(b) > 0:  # Endpoints must bracket a root
         return None
     for _ in range(MAX_ITER):
         mid = (a + b) / 2
@@ -126,7 +126,7 @@ def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
-        if f1 == f0:   # Flat step: cannot continue
+        if f1 == f0:  # Flat step: cannot continue
             return None
         x2 = x1 - f1 * (x1 - x0) / (f1 - f0)
         if abs(x2 - x1) < TOLERANCE:
@@ -135,7 +135,7 @@ def secant(f: Fn, a: float, b: float) -> float | None:
     return None
 
 def newton(f: Fn, a: float, b: float) -> float | None:
-    x = (a + b) / 2   # Start between the hints
+    x = (a + b) / 2  # Start between the hints
     h = 1e-7
     for _ in range(MAX_ITER):
         # Approximate the derivative with a central difference:
@@ -161,7 +161,7 @@ def solve(f: Fn, a: float, b: float,
     return finder(f, a, b)
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 for finder in (bisection, newton, secant):
     root = solve(f, 0.0, 2.0, finder)
@@ -254,7 +254,7 @@ def solve(f: Fn, a: float, b: float,
     return None
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 chain: list[RootFinder] = [bisection, secant, newton]
 # [0, 2] brackets the root, so bisection succeeds first:
@@ -282,7 +282,7 @@ from algorithms import bisection, newton, secant
 from chain import solve
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 def test_first_successful_finder_wins() -> None:
     root = solve(f, 0.0, 2.0, [bisection, secant, newton])
@@ -300,7 +300,7 @@ def test_empty_chain_returns_none() -> None:
 
 def test_all_fail_returns_none() -> None:
     def g(x: float) -> float:
-        return x * x + 1   # No real root
+        return x * x + 1  # No real root
     assert solve(g, 0.0, 2.0, [bisection]) is None
 ```
 
@@ -362,7 +362,7 @@ def on_withdraw(event: Withdraw) -> None:
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)
-bus.subscribe(Deposit, audit)        # Two handlers for one event type
+bus.subscribe(Deposit, audit)  # Two handlers for one event type
 bus.subscribe(Withdraw, on_withdraw)
 
 bus.publish(Deposit(100))
@@ -370,7 +370,7 @@ bus.publish(Deposit(100))
 #:   audit: a deposit of 100
 bus.publish(Withdraw(30))
 #: - withdraw 30
-bus.publish(Closed("inactivity"))    # No handler: nothing happens
+bus.publish(Closed("inactivity"))  # No handler: nothing happens
 ```
 
 `subscribe` is generic on the event type `E`.

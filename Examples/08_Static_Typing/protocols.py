@@ -12,7 +12,7 @@ class Square:
     def draw(self) -> str:
         return "square"
 
-def render(shape: Drawable) -> str:   # Accepts anything with draw()
+def render(shape: Drawable) -> str:  # Accepts anything with draw()
     return shape.draw()
 
 print(render(Circle()))

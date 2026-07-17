@@ -3,7 +3,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Self
 
-type Coord = tuple[int, int]   # (column, row)
+type Coord = tuple[int, int]  # (column, row)
 
 class Maze:
     class Cell(StrEnum):

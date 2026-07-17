@@ -42,8 +42,8 @@ class ItemSlot:
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
-        self.amount = 0    # Money inserted, in cents
-        self.row = 0       # The first selection digit
+        self.amount = 0  # Money inserted, in cents
+        self.row = 0  # The first selection digit
         self.message = ""  # Last action, for a view to display
         # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
@@ -115,10 +115,10 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy it again
+        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy it again
         FirstDigit("C", 2), SecondDigit("three", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("one", 0),    # Sold out
+        FirstDigit("D", 3), SecondDigit("one", 0),  # Sold out
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()

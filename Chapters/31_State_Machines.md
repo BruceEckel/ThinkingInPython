@@ -474,8 +474,8 @@ class ItemSlot:
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
-        self.amount = 0    # Money inserted, in cents
-        self.row = 0       # The first selection digit
+        self.amount = 0  # Money inserted, in cents
+        self.row = 0  # The first selection digit
         self.message = ""  # Last action, for a view to display
         # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
@@ -547,10 +547,10 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("two", 1),    # Buy it again
+        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy it again
         FirstDigit("C", 2), SecondDigit("three", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("one", 0),    # Sold out
+        FirstDigit("D", 3), SecondDigit("one", 0),  # Sold out
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
@@ -606,8 +606,8 @@ def test_buy_dispenses_and_charges() -> None:
     feed(vm, Money("quarter", 25), Money("quarter", 25),
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.WANT_MORE
-    assert vm.amount == 0                 # 50 in, 50 spent
-    assert vm.items[0][1].quantity == 4   # One dispensed from five
+    assert vm.amount == 0  # 50 in, 50 spent
+    assert vm.items[0][1].quantity == 4  # One dispensed from five
     assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
@@ -616,8 +616,8 @@ def test_too_expensive_clears_back_to_collecting() -> None:
     feed(vm, Money("quarter", 25),
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.COLLECTING
-    assert vm.amount == 25                # Money kept
-    assert vm.items[0][1].quantity == 5   # Nothing dispensed
+    assert vm.amount == 25  # Money kept
+    assert vm.items[0][1].quantity == 5  # Nothing dispensed
 
 def test_sold_out_goes_to_unavailable() -> None:
     vm = VendingMachine()

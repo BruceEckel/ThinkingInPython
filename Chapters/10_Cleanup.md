@@ -11,7 +11,7 @@ This seems like a candidate for releasing resources:
 from typing import ClassVar
 
 class Counter:
-    count: ClassVar[int] = 0   # Number of objects of this class
+    count: ClassVar[int] = 0  # Number of objects of this class
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -139,13 +139,13 @@ for name in ["First", "Second", "Third"]:
 
 print(Counter.live_count())
 #: 3
-counters.pop()               # Release "Third"
+counters.pop()  # Release "Third"
 print(Counter.live_count())
 #: 2
-counters.pop()               # Release "Second"
+counters.pop()  # Release "Second"
 print(Counter.live_count())
 #: 1
-counters.clear()             # Release "First"
+counters.clear()  # Release "First"
 print(Counter.live_count())
 #: 0
 ```

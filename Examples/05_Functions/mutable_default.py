@@ -11,7 +11,7 @@ print(bad_append(2))  # Surprise, the default kept the 1
 
 def good_append(item, target=None):
     if target is None:
-        target = []    # A fresh list each call
+        target = []  # A fresh list each call
     target.append(item)
     return target
 

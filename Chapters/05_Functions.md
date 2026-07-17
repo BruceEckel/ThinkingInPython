@@ -74,9 +74,9 @@ Keyword arguments make a call self-documenting:
 def connect(host, port=5432, timeout=30):
     return f"{host}:{port} (timeout {timeout}s)"
 
-print(connect("db.example.com"))                 # Uses both defaults
+print(connect("db.example.com"))  # Uses both defaults
 #: db.example.com:5432 (timeout 30s)
-print(connect("db.example.com", timeout=5))      # Skip to a keyword
+print(connect("db.example.com", timeout=5))  # Skip to a keyword
 #: db.example.com:5432 (timeout 5s)
 print(connect(port=80, host="web.example.com"))  # Any order by name
 #: web.example.com:80 (timeout 30s)
@@ -99,7 +99,7 @@ print(bad_append(2))  # Surprise, the default kept the 1
 
 def good_append(item, target=None):
     if target is None:
-        target = []    # A fresh list each call
+        target = []  # A fresh list each call
     target.append(item)
     return target
 
@@ -159,7 +159,7 @@ def get(data, key, default=MISSING):
 prefs = {"volume": 3, "mute": None}
 print(get(prefs, "volume"))
 #: 3
-print(get(prefs, "mute"))     # None is a real stored value
+print(get(prefs, "mute"))  # None is a real stored value
 #: None
 print(get(prefs, "theme"))
 #: MISSING
@@ -276,7 +276,7 @@ It is useful for passing behavior to functions such as `sorted()`:
 words = ["banana", "kiwi", "apple", "fig"]
 print(sorted(words, key=lambda w: len(w)))  # Sort by length
 #: ['fig', 'kiwi', 'apple', 'banana']
-square = lambda n: n * n                    # Usually prefer def
+square = lambda n: n * n  # Usually prefer def
 print(square(9))
 #: 81
 ```

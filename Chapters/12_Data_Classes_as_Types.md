@@ -95,7 +95,7 @@ class Stars:
     def f1(self, n: int) -> int:
         check(1 <= n <= 10, f"f1({n})")  # Precondition
         self._number = n + 5
-        self._validate()                 # Postcondition
+        self._validate()  # Postcondition
         return self._number
 
 if __name__ == "__main__":
@@ -444,7 +444,7 @@ class Year:
 
 class Month(Enum):
     JANUARY = (1, 31)
-    FEBRUARY = (2, 28)   # Leap years are left as an exercise
+    FEBRUARY = (2, 28)  # Leap years are left as an exercise
     MARCH = (3, 31)
     APRIL = (4, 30)
     MAY = (5, 31)
@@ -500,9 +500,9 @@ def test_valid_date() -> None:
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),   # February has 28 days
-    (4, 31),   # April has 30
-    (9, 31),   # September has 30
+    (2, 31),  # February has 28 days
+    (4, 31),  # April has 30
+    (9, 31),  # September has 30
 ])
 def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
     with pytest.raises(TypeFailure):
@@ -691,7 +691,7 @@ class Point:
     y: int
 
 p = Point(10, 20)
-print(asdict(p))   # Nested dict
+print(asdict(p))  # Nested dict
 #: {'x': 10, 'y': 20}
 print(astuple(p))  # Nested tuple
 #: (10, 20)

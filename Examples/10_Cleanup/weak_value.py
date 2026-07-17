@@ -20,12 +20,12 @@ for name in ["First", "Second", "Third"]:
 
 print(Counter.live_count())
 #: 3
-counters.pop()               # Release "Third"
+counters.pop()  # Release "Third"
 print(Counter.live_count())
 #: 2
-counters.pop()               # Release "Second"
+counters.pop()  # Release "Second"
 print(Counter.live_count())
 #: 1
-counters.clear()             # Release "First"
+counters.clear()  # Release "First"
 print(Counter.live_count())
 #: 0

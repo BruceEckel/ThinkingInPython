@@ -19,7 +19,7 @@ class Stars:
     def f1(self, n: int) -> int:
         check(1 <= n <= 10, f"f1({n})")  # Precondition
         self._number = n + 5
-        self._validate()                 # Postcondition
+        self._validate()  # Postcondition
         return self._number
 
 if __name__ == "__main__":

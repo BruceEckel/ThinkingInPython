@@ -107,7 +107,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Self
 
-type Coord = tuple[int, int]   # (column, row)
+type Coord = tuple[int, int]  # (column, row)
 
 class Maze:
     class Cell(StrEnum):
@@ -528,7 +528,7 @@ so the robot can try any direction without a special case:
 from typing import Final
 from items import Edge, Item, Robot, Urge
 
-type Coord = tuple[int, int]   # (row, col)
+type Coord = tuple[int, int]  # (row, col)
 type RoomMap = dict[Coord, Room]
 
 class Room:
@@ -877,7 +877,7 @@ import math
 import random
 from dataclasses import dataclass
 
-type Mode = tuple[int, int]   # Vibration pattern (m, n)
+type Mode = tuple[int, int]  # Vibration pattern (m, n)
 
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode

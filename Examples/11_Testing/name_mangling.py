@@ -2,7 +2,7 @@
 
 class Vault:
     def __init__(self) -> None:
-        self._balance = 0    # Single underscore: convention only
+        self._balance = 0  # Single underscore: convention only
         self.__pin = "1234"  # Double underscore: gets mangled
 
 v = Vault()

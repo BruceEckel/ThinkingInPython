@@ -11,9 +11,9 @@ for value in [0, 1, "", "hi", [], [1], None]:
 #: None -> False
 
 if not []:
-    print("empty")        # An empty list is falsy
+    print("empty")  # An empty list is falsy
 #: empty
 
-name = "" or "default"    # 'or' returns the first truthy operand
-print(name)               # default
+name = "" or "default"  # 'or' returns the first truthy operand
+print(name)  # default
 #: default

@@ -6,7 +6,7 @@ async def fetch(item: str) -> str:
     return item.upper()
 
 async def main() -> None:
-    print(await fetch("solo"))   # Await one coroutine
+    print(await fetch("solo"))  # Await one coroutine
     print(await asyncio.gather(  # Run several concurrently
         fetch("a"), fetch("b"), fetch("c")))
 

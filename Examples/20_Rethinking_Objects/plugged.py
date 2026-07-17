@@ -22,6 +22,6 @@ class Plugged:
 if __name__ == "__main__":
     plugged = Plugged([1, 2])
     plugged.numbers.append(999)  # Mutates a copy, not ours
-    plugged.bob.name = "Ralph"   # Ditto
+    plugged.bob.name = "Ralph"  # Ditto
     print(plugged.numbers, plugged.bob)
 #: [1, 2] Bob(name='Bob')

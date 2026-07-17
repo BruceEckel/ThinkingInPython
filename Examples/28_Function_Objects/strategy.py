@@ -6,7 +6,7 @@ def solve(f: Fn, a: float, b: float,
     return finder(f, a, b)
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 for finder in (bisection, newton, secant):
     root = solve(f, 0.0, 2.0, finder)

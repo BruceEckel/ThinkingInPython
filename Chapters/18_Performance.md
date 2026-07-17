@@ -221,11 +221,11 @@ the `bisect` module finds the insertion point using binary search:
 # bisect_search.py
 import bisect
 
-scores = [60, 70, 75, 90]      # Must stay sorted
+scores = [60, 70, 75, 90]  # Must stay sorted
 i = bisect.bisect(scores, 78)  # Where 78 goes
 print(i)
 #: 3
-bisect.insort(scores, 78)      # Insert and keep it sorted
+bisect.insort(scores, 78)  # Insert and keep it sorted
 print(scores)
 #: [60, 70, 75, 78, 90]
 
@@ -309,15 +309,15 @@ so the negation trick is no longer necessary:
 import heapq
 
 nums = [5, 1, 8, 3, 2]
-heapq.heapify(nums)          # Rearrange into a min-heap in place
+heapq.heapify(nums)  # Rearrange into a min-heap in place
 print(nums)
 #: [1, 2, 8, 3, 5]
-print(nums[0])               # The smallest stays at the front
+print(nums[0])  # The smallest stays at the front
 #: 1
 heapq.heappush(nums, 7)
 print(nums)
 #: [1, 2, 7, 3, 5, 8]
-print(heapq.heappop(nums))   # Remove and return the smallest
+print(heapq.heappop(nums))  # Remove and return the smallest
 #: 1
 print(nums)
 #: [2, 3, 7, 8, 5]
@@ -331,14 +331,14 @@ max_nums = [5, 1, 8, 3, 2]
 heapq.heapify_max(max_nums)  # Rearrange into a max-heap in place
 print(max_nums)
 #: [8, 3, 5, 1, 2]
-print(max_nums[0])           # The largest stays at the front
+print(max_nums[0])  # The largest stays at the front
 #: 8
 heapq.heappush_max(max_nums, 9)
 print(max_nums)
 #: [9, 3, 8, 1, 2, 5]
 print(heapq.heappop_max(max_nums))  # Remove and return the largest
 #: 9
-print(max_nums)   # Heap ordering is maintained
+print(max_nums)  # Heap ordering is maintained
 #: [8, 3, 5, 1, 2]
 ```
 
@@ -351,7 +351,7 @@ maintains the list according to its own logic.
 This means you must always use the heap version of an operation,
 not the list version.
 Although calling `nums.pop()` does produce the smallest value the first time you do it,
-it also destroys the order of the heap,
+it also destroys the heap ordering,
 so if you call it again you won't get the smallest value:
 
 ```python
@@ -683,7 +683,7 @@ view = memoryview(data)  # No copy of the underlying bytes
 chunk = view[1:4]
 print(bytes(chunk))
 #: b'BCD'
-view[0] = ord("z")       # Writes through to the original
+view[0] = ord("z")  # Writes through to the original
 print(data)
 #: bytearray(b'zBCDEF')
 print(view.nbytes)

@@ -113,11 +113,11 @@ class Service(Protocol):
     def f(self) -> None: ...
     def g(self) -> None: ...
 
-class Complete:          # Conforms without inheriting Service
+class Complete:  # Conforms without inheriting Service
     def f(self) -> None: print("Complete.f()")
     def g(self) -> None: print("Complete.g()")
 
-class Partial:           # Missing g()
+class Partial:  # Missing g()
     def f(self) -> None: print("Partial.f()")
 
 print(isinstance(Complete(), Service))

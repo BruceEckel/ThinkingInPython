@@ -105,16 +105,16 @@ class Adapter:
     def __init__(self, adaptee: WhatIHave) -> None:
         self._adaptee = adaptee
 
-    def f(self) -> str:                       # The new interface
+    def f(self) -> str:  # The new interface
         return self._adaptee.g() + self._adaptee.h()
 
     def __getattr__(self, name: str) -> Any:  # Forwards the rest
         return getattr(self._adaptee, name)
 
 a = Adapter(WhatIHave())
-print(a.f())   # Adapted method
+print(a.f())  # Adapted method
 #: gh
-print(a.g())   # Forwarded to the adaptee unchanged
+print(a.g())  # Forwarded to the adaptee unchanged
 #: g
 ```
 

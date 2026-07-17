@@ -12,7 +12,7 @@ def get(data, key, default=MISSING):
 prefs = {"volume": 3, "mute": None}
 print(get(prefs, "volume"))
 #: 3
-print(get(prefs, "mute"))     # None is a real stored value
+print(get(prefs, "mute"))  # None is a real stored value
 #: None
 print(get(prefs, "theme"))
 #: MISSING

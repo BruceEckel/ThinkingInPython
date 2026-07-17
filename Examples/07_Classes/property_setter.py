@@ -15,7 +15,7 @@ class Circle:
         self._radius = value
 
 c = Circle(10)
-c.radius = 5      # The setter validates, then stores
+c.radius = 5  # The setter validates, then stores
 print(c.radius)
 #: 5
 try:

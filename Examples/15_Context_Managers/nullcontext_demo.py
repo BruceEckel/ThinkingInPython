@@ -10,11 +10,11 @@ def emit(lines: list[str], out: IO[str] | None = None) -> None:
         for line in lines:
             print(line, file=stream)
 
-emit(["alpha", "beta"])   # Defaults to stdout, left open
+emit(["alpha", "beta"])  # Defaults to stdout, left open
 #: alpha
 #: beta
 buffer = StringIO()
-emit(["gamma"], buffer)   # A managed resource, closed on exit
+emit(["gamma"], buffer)  # A managed resource, closed on exit
 try:
     print(buffer.read())
 except ValueError as e:

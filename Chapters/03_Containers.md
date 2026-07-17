@@ -47,13 +47,13 @@ A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 xs = [10, 20, 30, 40, 50]
 print(xs[0], xs[-1])  # First and last
 #: 10 50
-print(xs[1:3])   # The stop index is excluded
+print(xs[1:3])  # The stop index is excluded
 #: [20, 30]
-print(xs[:2])    # From the start
+print(xs[:2])  # From the start
 #: [10, 20]
-print(xs[2:])    # To the end
+print(xs[2:])  # To the end
 #: [30, 40, 50]
-print(xs[::2])   # Every second item
+print(xs[::2])  # Every second item
 #: [10, 30, 50]
 print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
@@ -103,15 +103,15 @@ Tuples are the natural way to return several values from a function and to group
 # tuples.py
 
 point = (3, 4)
-point = 3, 4        # Also a tuple; the comma is what matters
-empty = ()          # Empty tuple
-x, y = point        # Unpacking
+point = 3, 4  # Also a tuple; the comma is what matters
+empty = ()  # Empty tuple
+x, y = point  # Unpacking
 print(x, y)
 #: 3 4
-single = (42,)      # A one-element tuple needs the trailing comma
+single = (42,)  # A one-element tuple needs the trailing comma
 print(len(single))
 #: 1
-print(tuple([1, 2, 3]))    # Converts a list to a tuple
+print(tuple([1, 2, 3]))  # Converts a list to a tuple
 #: (1, 2, 3)
 print(tuple("abc"))
 #: ('a', 'b', 'c')
@@ -159,8 +159,8 @@ print(ages)
 #: {'Alice': 30, 'Bob': 25}
 print(ages["Alice"])
 #: 30
-ages["Carol"] = 41         # Add or update
-print("Bob" in ages)       # Membership tests the keys
+ages["Carol"] = 41  # Add or update
+print("Bob" in ages)  # Membership tests the keys
 #: True
 print(ages.get("Dan", 0))  # A default when the key is missing
 #: 0
@@ -186,18 +186,18 @@ a = {1, 2, 3, 3}  # Duplicates collapse
 print(a)
 #: {1, 2, 3}
 b = {3, 4, 5}
-print(a & b)      # Intersection
+print(a & b)  # Intersection
 #: {3}
-print(a | b)      # Union
+print(a | b)  # Union
 #: {1, 2, 3, 4, 5}
-print(a - b)      # Difference
+print(a - b)  # Difference
 #: {1, 2}
-print(a ^ b)      # Symmetric difference
+print(a ^ b)  # Symmetric difference
 #: {1, 2, 4, 5}
 c = {1, 2}
-print(c <= a)     # Subset
+print(c <= a)  # Subset
 #: True
-print(a >= c)     # Superset
+print(a >= c)  # Superset
 #: True
 print(2 in a)
 #: True
@@ -314,26 +314,26 @@ from collections import deque
 from timeit import timeit
 
 dq = deque([1, 2, 3])
-dq.append(4)         # Add on the right
-dq.appendleft(0)     # Add on the left
+dq.append(4)  # Add on the right
+dq.appendleft(0)  # Add on the left
 print(dq)
 #: deque([0, 1, 2, 3, 4])
 print(dq.popleft())  # Remove from the left
 #: 0
-print(dq.pop())      # Remove from the right
+print(dq.pop())  # Remove from the right
 #: 4
 print(dq)
 #: deque([1, 2, 3])
 
 # A plain list can act as a double-ended queue too:
 lst = [1, 2, 3]
-lst.append(4)        # Add at the end
-lst.insert(0, 0)     # Add at the start
+lst.append(4)  # Add at the end
+lst.insert(0, 0)  # Add at the start
 print(lst)
 #: [0, 1, 2, 3, 4]
-print(lst.pop(0))    # Remove from the start
+print(lst.pop(0))  # Remove from the start
 #: 0
-print(lst.pop())     # Remove from the end
+print(lst.pop())  # Remove from the end
 #: 4
 print(lst)
 #: [1, 2, 3]
@@ -380,9 +380,9 @@ print(alice)
 #: Person(name='Alice', age=30, height=1.65)
 print(alice.name, alice.age)  # Access by name
 #: Alice 30
-print(alice[0])               # Still indexable like a tuple
+print(alice[0])  # Still indexable like a tuple
 #: Alice
-name, age, height = alice     # And unpackable
+name, age, height = alice  # And unpackable
 print(height)
 #: 1.65
 ```

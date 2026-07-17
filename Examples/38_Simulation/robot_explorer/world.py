@@ -2,7 +2,7 @@
 from typing import Final
 from items import Edge, Item, Robot, Urge
 
-type Coord = tuple[int, int]   # (row, col)
+type Coord = tuple[int, int]  # (row, col)
 type RoomMap = dict[Coord, Room]
 
 class Room:

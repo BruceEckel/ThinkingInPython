@@ -15,7 +15,7 @@ def test_no_subscribers_is_a_noop() -> None:
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     obs = Observable()
-    record = received.append   # Named so it can be removed
+    record = received.append  # Named so it can be removed
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)

@@ -67,7 +67,7 @@ class Thermometer(Observable):
     @celsius.setter
     def celsius(self, value: float) -> None:
         self._celsius = value
-        self.notify(value)   # State changed; tell the observers
+        self.notify(value)  # State changed; tell the observers
 ```
 
 Using it, subscribed callables react to every temperature change:
@@ -126,7 +126,7 @@ def test_no_subscribers_is_a_noop() -> None:
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     obs = Observable()
-    record = received.append   # Named so it can be removed
+    record = received.append  # Named so it can be removed
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)
@@ -205,19 +205,19 @@ class Thermometer(Observable):
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
-        await asyncio.sleep(0.02)   # Slow network alert
+        await asyncio.sleep(0.02)  # Slow network alert
         print(f"alarm sent: {celsius}C")
 
 async def log_reading(celsius: float) -> None:
-    await asyncio.sleep(0.01)   # Faster local write
+    await asyncio.sleep(0.01)  # Faster local write
     print(f"logged: {celsius}C")
 
 async def main() -> None:
     t = Thermometer()
     t.subscribe(alarm)
     t.subscribe(log_reading)
-    await t.set_celsius(20)   # Below the alarm threshold
-    await t.set_celsius(150)   # Triggers the alarm too
+    await t.set_celsius(20)  # Below the alarm threshold
+    await t.set_celsius(150)  # Triggers the alarm too
 
 asyncio.run(main())
 #: logged: 20C
@@ -270,8 +270,8 @@ from observers import Observable
 
 COLORS: Final[tuple[str, str, str]] = (
     "skyblue", "palegreen", "khaki")
-type Coord = tuple[int, int]             # (column, row)
-type Grid = dict[Coord, str]             # Cell -> color
+type Coord = tuple[int, int]  # (column, row)
+type Grid = dict[Coord, str]  # Cell -> color
 
 def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
@@ -307,29 +307,29 @@ from box_observer import BoxModel, Grid, adjacent, new_grid, recolored
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
     assert len(grid) == 9
-    assert grid[(0, 0)] == "skyblue"     # COLORS[0]
+    assert grid[(0, 0)] == "skyblue"  # COLORS[0]
     assert grid[(0, 1)] == grid[(1, 0)]  # Same (x + y) color band
 
 def test_adjacent() -> None:
-    assert adjacent((1, 1), (2, 2))      # Diagonal
-    assert adjacent((1, 1), (1, 2))      # Edge
+    assert adjacent((1, 1), (2, 2))  # Diagonal
+    assert adjacent((1, 1), (1, 2))  # Edge
     assert not adjacent((1, 1), (1, 1))  # Not its own neighbor
     assert not adjacent((0, 0), (2, 0))  # Two away
 
 def test_recolored_touches_only_neighbors() -> None:
     grid = new_grid(5)
     out = recolored(grid, (2, 2))
-    assert out[(1, 1)] == grid[(2, 2)]   # Diagonal neighbor: changed
-    assert out[(2, 3)] == grid[(2, 2)]   # Edge neighbor: changed
-    assert out[(0, 0)] == grid[(0, 0)]   # Two away: unchanged
-    assert out is not grid               # Pure: a new grid
+    assert out[(1, 1)] == grid[(2, 2)]  # Diagonal neighbor: changed
+    assert out[(2, 3)] == grid[(2, 2)]  # Edge neighbor: changed
+    assert out[(0, 0)] == grid[(0, 0)]  # Two away: unchanged
+    assert out is not grid  # Pure: a new grid
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)
     seen: list[Grid] = []
-    model.subscribe(seen.append)         # The observer is a callable
+    model.subscribe(seen.append)  # The observer is a callable
     model.click((2, 2))
-    assert seen[-1] is model.grid        # Observer got the new grid
+    assert seen[-1] is model.grid  # Observer got the new grid
     assert model.grid[(1, 1)] == model.grid[(2, 2)]
 ```
 
@@ -361,7 +361,7 @@ def show(model: BoxModel, cell: int = 60) -> None:
                 x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
                 fill=color, outline="white")
 
-    model.subscribe(draw)   # Repaint on every model change
+    model.subscribe(draw)  # Repaint on every model change
     canvas.bind("<Button-1>",
                 lambda e: model.click((e.x // cell, e.y // cell)))
     draw(model.grid)

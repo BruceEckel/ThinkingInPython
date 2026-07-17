@@ -80,16 +80,16 @@ This is *dynamic typing*.
 ```python
 # references.py
 
-x = 10        # x names an int
-x = "ten"     # The same name now binds to a str
+x = 10  # x names an int
+x = "ten"  # The same name now binds to a str
 a = [1, 2, 3]
-b = a         # b binds to the same list, not a copy
+b = a  # b binds to the same list, not a copy
 b.append(4)
-print(a)       # The same object: a and b
+print(a)  # The same object: a and b
 #: [1, 2, 3, 4]
 print(a is b)  # Identical objects
 #: True
-c = a[:]       # A shallow copy
+c = a[:]  # A shallow copy
 print(a is c, a == c)  # Different object, equal value
 #: False True
 ```
@@ -105,7 +105,7 @@ which makes it easy to swap without a temporary:
 # multiple_assignment.py
 
 a, b = 1, 2
-a, b = b, a         # Swap, no temporary needed
+a, b = b, a  # Swap, no temporary needed
 print(a, b)
 #: 2 1
 first, *rest = [10, 20, 30, 40]
@@ -130,20 +130,20 @@ The operators are what you expect, with two worth noting:
 ```python
 # numbers.py
 
-print(7 / 2)    # True division, always a float
+print(7 / 2)  # True division, always a float
 #: 3.5
-print(7 // 2)   # Floor division
+print(7 // 2)  # Floor division
 #: 3
-print(7 % 2)    # Remainder
+print(7 % 2)  # Remainder
 #: 1
 print(2 ** 10)  # Exponentiation
 #: 1024
-print(10 ** 30) # A 31-digit int, no overflow
+print(10 ** 30)  # A 31-digit int, no overflow
 #: 1000000000000000000000000000000
 print(abs(-5), round(3.14159, 2))
 #: 5 3.14
 total = 0
-total += 5      # Augmented assignment, like other languages
+total += 5  # Augmented assignment, like other languages
 print(total)
 #: 5
 ```
@@ -167,15 +167,15 @@ print(bin(0b1100 | 0b1010))  # OR, bits set in either
 #: 0b1110
 print(bin(0b1100 ^ 0b1010))  # XOR, bits set in exactly one
 #: 0b110
-print(bin(~0b1100))          # NOT, inverts every bit
+print(bin(~0b1100))  # NOT, inverts every bit
 #: -0b1101
-print(bin(1 << 4))           # Left shift, same as 1 * 2 ** 4
+print(bin(1 << 4))  # Left shift, same as 1 * 2 ** 4
 #: 0b10000
-print(bin(64 >> 2))          # Right shift, same as 64 // 2 ** 2
+print(bin(64 >> 2))  # Right shift, same as 64 // 2 ** 2
 #: 0b10000
 
 flags = 0
-flags |= 0b0010         # Set bits with the augmented form
+flags |= 0b0010  # Set bits with the augmented form
 flags |= 0b1000
 print(bin(flags))
 #: 0b1010
@@ -213,11 +213,11 @@ for value in [0, 1, "", "hi", [], [1], None]:
 #: None -> False
 
 if not []:
-    print("empty")        # An empty list is falsy
+    print("empty")  # An empty list is falsy
 #: empty
 
-name = "" or "default"    # 'or' returns the first truthy operand
-print(name)               # default
+name = "" or "default"  # 'or' returns the first truthy operand
+print(name)  # default
 #: default
 ```
 

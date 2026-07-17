@@ -3,7 +3,7 @@ from algorithms import bisection, newton, secant
 from chain import solve
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 def test_first_successful_finder_wins() -> None:
     root = solve(f, 0.0, 2.0, [bisection, secant, newton])
@@ -21,5 +21,5 @@ def test_empty_chain_returns_none() -> None:
 
 def test_all_fail_returns_none() -> None:
     def g(x: float) -> float:
-        return x * x + 1   # No real root
+        return x * x + 1  # No real root
     assert solve(g, 0.0, 2.0, [bisection]) is None

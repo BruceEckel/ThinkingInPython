@@ -10,7 +10,7 @@ def solve(f: Fn, a: float, b: float,
     return None
 
 def f(x: float) -> float:
-    return x * x - 2   # Root at the square root of 2
+    return x * x - 2  # Root at the square root of 2
 
 chain: list[RootFinder] = [bisection, secant, newton]
 # [0, 2] brackets the root, so bisection succeeds first:

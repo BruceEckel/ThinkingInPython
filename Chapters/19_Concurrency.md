@@ -47,7 +47,7 @@ async def fetch(item: str) -> str:
     return item.upper()
 
 async def main() -> None:
-    print(await fetch("solo"))   # Await one coroutine
+    print(await fetch("solo"))  # Await one coroutine
     print(await asyncio.gather(  # Run several concurrently
         fetch("a"), fetch("b"), fetch("c")))
 
@@ -94,7 +94,7 @@ type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def io_price(order: int, meter: Meter) -> int:
     meter.enter()
-    await asyncio.sleep(0.05)   # Waiting outside the processor
+    await asyncio.sleep(0.05)  # Waiting outside the processor
     meter.leave()
     return order * 10
 

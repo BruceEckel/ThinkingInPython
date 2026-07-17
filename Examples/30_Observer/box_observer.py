@@ -4,8 +4,8 @@ from observers import Observable
 
 COLORS: Final[tuple[str, str, str]] = (
     "skyblue", "palegreen", "khaki")
-type Coord = tuple[int, int]             # (column, row)
-type Grid = dict[Coord, str]             # Cell -> color
+type Coord = tuple[int, int]  # (column, row)
+type Grid = dict[Coord, str]  # Cell -> color
 
 def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]

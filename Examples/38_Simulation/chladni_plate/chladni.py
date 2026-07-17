@@ -3,7 +3,7 @@ import math
 import random
 from dataclasses import dataclass
 
-type Mode = tuple[int, int]   # Vibration pattern (m, n)
+type Mode = tuple[int, int]  # Vibration pattern (m, n)
 
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode

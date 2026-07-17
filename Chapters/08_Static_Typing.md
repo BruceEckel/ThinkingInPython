@@ -176,7 +176,7 @@ class Square:
     def draw(self) -> str:
         return "square"
 
-def render(shape: Drawable) -> str:   # Accepts anything with draw()
+def render(shape: Drawable) -> str:  # Accepts anything with draw()
     return shape.draw()
 
 print(render(Circle()))
@@ -289,7 +289,7 @@ def first[T](items: list[T]) -> T:
 n = first([10, 20, 30])  # T is int
 print(n + 1)
 #: 11
-s = first(["a", "b"])    # T is str
+s = first(["a", "b"])  # T is str
 print(s.upper())
 #: A
 ```

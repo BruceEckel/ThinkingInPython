@@ -18,7 +18,7 @@ type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def io_price(order: int, meter: Meter) -> int:
     meter.enter()
-    await asyncio.sleep(0.05)   # Waiting outside the processor
+    await asyncio.sleep(0.05)  # Waiting outside the processor
     meter.leave()
     return order * 10
 

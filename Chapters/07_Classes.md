@@ -229,7 +229,7 @@ class Circle:
         self.radius = radius  # A plain attribute
 
     @property
-    def area(self):           # Used like an attribute, not a call
+    def area(self):  # Used like an attribute, not a call
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)
@@ -267,7 +267,7 @@ class Circle:
         self._radius = value
 
 c = Circle(10)
-c.radius = 5      # The setter validates, then stores
+c.radius = 5  # The setter validates, then stores
 print(c.radius)
 #: 5
 try:
@@ -337,7 +337,7 @@ class Point:
         return f"Point({self.x}, {self.y})"
 
 p = Point(3, 4)
-print(p)       # Falls back to __repr__
+print(p)  # Falls back to __repr__
 #: Point(3, 4)
 print([p, p])
 #: [Point(3, 4), Point(3, 4)]
@@ -359,11 +359,11 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):    # An alternative constructor
+    def from_fahrenheit(cls, f):  # An alternative constructor
         return cls((f - 32) * 5 / 9)
 
     @staticmethod
-    def is_freezing(celsius):        # Needs no self or cls
+    def is_freezing(celsius):  # Needs no self or cls
         return celsius <= 0
 
 t = Temperature.from_fahrenheit(212)
