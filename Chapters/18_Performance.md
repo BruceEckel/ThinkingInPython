@@ -358,16 +358,16 @@ so if you call it again you won't get the smallest value:
 from heapq import heapify, nsmallest
 
 heap = [10, 9, 8, 7, 6, 5, 4, 3]
-heapify(heap)              # In-place
+heapify(heap)  # In-place
 print(heap)
 #: [3, 6, 4, 7, 10, 5, 8, 9]
-print(heap.pop(0))         # Smallest
+print(heap.pop(0))  # Smallest
 #: 3
-print(heap)                # 'heap[0]' no longer smallest
+print(heap)  # 'heap[0]' no longer smallest
 #: [6, 4, 7, 10, 5, 8, 9]
-print(nsmallest(1, heap))  # The true smallest
+print(nsmallest(len(heap), heap))  # True smallest
 #: [4]
-print(heap)                # Not reordered by nsmallest()
+print(heap)  # Not reordered by nsmallest()
 #: [6, 4, 7, 10, 5, 8, 9]
 ```
 
@@ -924,6 +924,12 @@ Optimizations interact, the bottleneck moves,
 and yesterday's hot spot may be irrelevant today.
 The goal is not the fastest possible program.
 It is a program that is fast enough, at the lowest cost in clarity.
+
+Step 4 on that list, fixing the algorithm, is usually the biggest win,
+because it changes which curve your program is on,
+not just where it sits on that curve:
+
+![Six growth rates plotted against input size n: O(1) and O(log n) stay nearly flat, O(n) and O(n log n) climb steadily, O(n²) curves upward, and O(2ⁿ) shoots off the top of the chart before n reaches 7](_images/big_o_growth)
 
 ## Exercises
 
