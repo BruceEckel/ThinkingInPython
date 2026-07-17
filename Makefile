@@ -19,7 +19,7 @@ DOCS ?= Chapters
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -52,10 +52,11 @@ doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 # Runs every other target here and reports which ones fail. Read-only/idempotent
 # targets run directly; a target that bakes --fix/--write/--add into its recipe
 # (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
-# fix-comment-caps) runs in a disposable git worktree instead, so this working
-# tree is never touched. upgrade-tools, upgrade-python, serve, and local never
-# run (network/environment mutation, or a server that blocks forever); see
-# tools/verify_targets.py's docstring. Logs land in build/target_test_logs/.
+# fix-comment-caps, fix-comment-spacing) runs in a disposable git worktree
+# instead, so this working tree is never touched. upgrade-tools, upgrade-python,
+# serve, and local never run (network/environment mutation, or a server that
+# blocks forever); see tools/verify_targets.py's docstring. Logs land in
+# build/target_test_logs/.
 verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
 	$(PY) tools/verify_targets.py
 
@@ -97,6 +98,7 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(PY) tools/banned_phrases.py
 	$(PY) tools/comment_periods.py
 	$(PY) tools/capitalize_comments.py
+	$(PY) tools/comment_spacing.py
 	$(PY) tools/check_anchors.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
@@ -318,6 +320,15 @@ comment-caps:  ## Fail if a prose comment is not capitalized (heuristic)
 
 fix-comment-caps:  ## Capitalize them
 	$(PY) tools/capitalize_comments.py --write
+
+# An inline comment (code precedes it on the line) must start exactly two
+# spaces after the code; a full-line comment or a #: output marker is left
+# alone. Run `make fix-comment-spacing` to collapse the gap to two spaces.
+comment-spacing:  ## Fail if an inline listing comment isn't two spaces after code
+	$(PY) tools/comment_spacing.py
+
+fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
+	$(PY) tools/comment_spacing.py --fix
 
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading

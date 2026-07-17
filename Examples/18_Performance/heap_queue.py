@@ -31,3 +31,5 @@ print(max_nums)
 #: [9, 3, 8, 1, 2, 5]
 print(heapq.heappop_max(max_nums))  # Remove and return the largest
 #: 9
+print(max_nums)
+#:

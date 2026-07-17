@@ -428,6 +428,21 @@ make fix-comment-caps   # capitalize the flagged comments
 When the checker is wrong, add the comment's text to the allowlist; when it is
 right, capitalize the comment (or run `make fix-comment-caps`).
 
+## comment_spacing.py
+
+Enforces that an inline comment in a ```python listing (code precedes it on
+the same line) starts exactly two spaces after the code ends. A full-line
+comment and a `#:` output marker have no code on their line to measure the
+gap from, so both are left alone. It is string-aware (a `#` inside a string
+is not a comment) and collapses any gap, including one used to
+column-align several comments, to two spaces. It is part of the `make ci`
+gate.
+
+```
+make comment-spacing       # check (part of `make ci`)
+make fix-comment-spacing   # collapse the gaps to two spaces
+```
+
 ## check_anchors.py
 
 Verifies that every heading-anchor link resolves to a real heading, so a typo

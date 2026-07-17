@@ -338,19 +338,20 @@ print(max_nums)
 #: [9, 3, 8, 1, 2, 5]
 print(heapq.heappop_max(max_nums))  # Remove and return the largest
 #: 9
+print(max_nums)   # Heap ordering is maintained
+#: [8, 3, 5, 1, 2]
 ```
 
-After `heapify()` the smallest element stays at index 0,
+After `heapify()` the smallest element is placed at index 0,
 and `heapify_max()` mirrors it with the largest element at index 0.
-`nsmallest()` and `nlargest()` answer top-N questions directly,
-without building a heap of your own.
+`nsmallest()` and `nlargest()` answer top-N questions without building new a heap.
 
 The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 maintains the list according to its own logic.
 This means you must always use the heap version of an operation,
 not the list version.
 Although calling `nums.pop()` does produce the smallest value the first time you do it,
-it also corrupts the order of the heap,
+it also destroys the order of the heap,
 so if you call it again you won't get the smallest value:
 
 ```python
