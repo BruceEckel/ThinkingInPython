@@ -124,7 +124,8 @@ as with `a` and `b` above.
 Integers have unlimited precision, so they never overflow.
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
-`/` always produces a `float`, and `//` is floor division.
+`/` always produces a `float`, and `//` is floor division
+(divide, then round down to the nearest integer).
 
 ```python
 # numbers.py

@@ -205,15 +205,17 @@ just as readily as it would catch one that does.
 
 ## Choose Better Algorithms and Data Structures
 
-The biggest speedups usually come from a better algorithm, not faster code.
+The biggest speedups usually come from a better algorithm.
 An algorithm with lower Big-O complexity beats micro-optimizing a slow algorithm.
 Often this means choosing the right container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a `deque` (see [Containers](03_Containers.md#deque))
 when you add and remove at both ends.
 
+### Bisect
+
 For data kept in sorted order,
-the `bisect` module finds the insertion point with binary search:
+the `bisect` module finds the insertion point using binary search:
 
 ```python
 # bisect_search.py
@@ -239,9 +241,11 @@ print([grade(s) for s in (55, 65, 85, 95)])
 
 Because `scores` stays sorted, `bisect` locates a position in O(log n)
 instead of the O(n) scan a `list` would need.
-Only the search is that fast:
-`insort()` still shifts everything after the insertion point,
-so under heavy insert traffic consider the heap below instead.
+Only the search is fast,
+because `insort()` still shifts everything after the insertion point.
+Under heavy insert traffic consider the heap below instead.
+
+### Comparison
 
 That leaves three ways to answer the same membership question: scan a `list`,
 binary-search a sorted `list` with `bisect`,
@@ -288,33 +292,133 @@ to O(log n) shows up as orders of magnitude here rather than a modest improvemen
 Hashing wins again over `bisect`,
 since it needs only one hash and one equality check no matter how large `as_set` grows.
 
-When you repeatedly need the smallest item,
+### Heap
+
+When you repeatedly need the smallest or largest item,
 a *heap* keeps that item reachable in O(log n).
-The `heapq` module treats a `list` as a binary heap:
+The `heapq` module treats a `list` as a binary heap.
+Through Python 3.13, `heapq` only built a min-heap;
+getting a max-heap meant negating every value going in and out.
+Python 3.14 added `_max` variants
+(`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
+that keep the largest item at index 0 instead,
+so the negation trick is no longer necessary:
 
 ```python
 # heap_queue.py
 import heapq
 
 nums = [5, 1, 8, 3, 2]
-heapq.heapify(nums)         # Rearrange into a heap in place
-print(nums[0])              # The smallest stays at the front
+heapq.heapify(nums)          # Rearrange into a min-heap in place
+print(nums)
+#: [1, 2, 8, 3, 5]
+print(nums[0])               # The smallest stays at the front
 #: 1
-heapq.heappush(nums, 0)
-print(heapq.heappop(nums))  # Remove and return the smallest
-#: 0
+heapq.heappush(nums, 7)
+print(nums)
+#: [1, 2, 7, 3, 5, 8]
+print(heapq.heappop(nums))   # Remove and return the smallest
+#: 1
+print(nums)
+#: [2, 3, 7, 8, 5]
+# Doesn't make a heap from the list:
 print(heapq.nsmallest(3, [5, 1, 8, 3, 2]))
 #: [1, 2, 3]
 print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 #: [8, 5]
+
+max_nums = [5, 1, 8, 3, 2]
+heapq.heapify_max(max_nums)  # Rearrange into a max-heap in place
+print(max_nums)
+#: [8, 3, 5, 1, 2]
+print(max_nums[0])           # The largest stays at the front
+#: 8
+heapq.heappush_max(max_nums, 9)
+print(max_nums)
+#: [9, 3, 8, 1, 2, 5]
+print(heapq.heappop_max(max_nums))  # Remove and return the largest
+#: 9
 ```
 
 After `heapify()` the smallest element stays at index 0,
-and `nsmallest()` and `nlargest()` answer top-N questions directly.
+and `heapify_max()` mirrors it with the largest element at index 0.
+`nsmallest()` and `nlargest()` answer top-N questions directly,
+without building a heap of your own.
+
+The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
+maintains the list according to its own logic.
+This means you must always use the heap version of an operation,
+not the list version.
+Although calling `nums.pop()` does produce the smallest value the first time you do it,
+it also corrupts the order of the heap,
+so if you call it again you won't get the smallest value:
+
+```python
+# heap_corruption.py
+from heapq import heapify, nsmallest
+
+heap = [10, 9, 8, 7, 6, 5, 4, 3]
+heapify(heap)              # In-place
+print(heap)
+#: [3, 6, 4, 7, 10, 5, 8, 9]
+print(heap.pop(0))         # Smallest
+#: 3
+print(heap)                # 'heap[0]' no longer smallest
+#: [6, 4, 7, 10, 5, 8, 9]
+print(nsmallest(1, heap))  # The true smallest
+#: [4]
+print(heap)                # Not reordered by nsmallest()
+#: [6, 4, 7, 10, 5, 8, 9]
+```
+
 For a priority queue shared across threads,
 `queue.PriorityQueue` wraps the same heap in a lock.
 [Concurrency](19_Concurrency.md#coordinating-threads-with-queues)
 shows it in use.
+
+A heap and a hash solve different problems.
+Hashing answers "is this here?" in O(1) but has no notion of order,
+so finding the smallest element still means scanning every item.
+A heap keeps that order updated as you go,
+so pulling the smallest item costs only O(log n),
+no matter how many times you repeat it:
+
+```python
+# heap_vs_hash.py
+import heapq
+import timeit
+
+n = 10_000
+data = list(range(n, 0, -1))
+
+def heap_min_extractions() -> list[int]:
+    heap = data.copy()
+    heapq.heapify(heap)
+    return [heapq.heappop(heap) for _ in range(100)]
+
+def hash_min_extractions() -> list[int]:
+    remaining = set(data)
+    result = []
+    for _ in range(100):
+        smallest = min(remaining)
+        remaining.remove(smallest)
+        result.append(smallest)
+    return result
+
+assert heap_min_extractions() == hash_min_extractions()
+t_heap = timeit.timeit(heap_min_extractions, number=50)
+t_hash = timeit.timeit(hash_min_extractions, number=50)
+print(f"heap at least 10x faster than repeated min() on a set: "
+      f"{t_heap * 10 < t_hash}")
+#: heap at least 10x faster than repeated min() on a set: True
+```
+
+Each `min()` call on `remaining` walks the whole `set`,
+so extracting 100 smallest items costs roughly O(100n).
+`heapify()` pays O(n) once, then each `heappop()` costs only O(log n),
+so the same 100 extractions cost roughly O(n + 100 log n).
+That gap is why the heap wins by more than an order of magnitude here,
+and it only widens as `n` grows.
 
 The immutable containers from [Containers](03_Containers.md#immutability)
 are not a speed upgrade.
