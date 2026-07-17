@@ -889,52 +889,133 @@ In addition, you can do things in Rust that might be much more difficult in Pyth
 and [maturin](https://www.maturin.rs)
 builds and installs the result as an ordinary Python package.
 `maturin new --bindings pyo3 fastcount` scaffolds the project,
-and one attribute turns a Rust function into a Python function:
+and one attribute turns a Rust function into a Python function.
+Here is the complete crate,
+reimplementing `count_primes` from [JIT Compilation with Numba](#jit-compilation-with-numba)
+and `collatz_lengths` from [Combine NumPy and Numba](#combine-numpy-and-numba)
+above:
 
-    use pyo3::prelude::*;
+```rust
+// fastcount/src/lib.rs
+use pyo3::prelude::*;
 
-    #[pyfunction]
-    fn count_primes(limit: u64) -> u64 {
-        let mut count = 0;
-        for n in 2..limit {
-            let mut d = 2;
-            let mut prime = true;
-            while d * d <= n {
-                if n % d == 0 {
-                    prime = false;
-                    break;
-                }
-                d += 1;
+#[pyfunction]
+fn count_primes(limit: u64) -> u64 {
+    let mut count = 0;
+    for n in 2..limit {
+        let mut d = 2;
+        let mut prime = true;
+        while d * d <= n {
+            if n % d == 0 {
+                prime = false;
+                break;
             }
-            if prime {
-                count += 1;
-            }
+            d += 1;
         }
-        count
+        if prime {
+            count += 1;
+        }
     }
+    count
+}
 
-    #[pymodule]
-    fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
-        m.add_function(wrap_pyfunction!(count_primes, m)?)?;
-        Ok(())
-    }
+#[pyfunction]
+fn collatz_lengths(values: Vec<u64>) -> Vec<u64> {
+    values
+        .into_iter()
+        .map(|start| {
+            let mut n = start;
+            let mut steps = 0;
+            while n != 1 {
+                n = if n % 2 == 0 { n / 2 } else { 3 * n + 1 };
+                steps += 1;
+            }
+            steps
+        })
+        .collect()
+}
 
-After `maturin develop` compiles and installs it, Python sees a normal module:
+#[pymodule]
+fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(count_primes, m)?)?;
+    m.add_function(wrap_pyfunction!(collatz_lengths, m)?)?;
+    Ok(())
+}
+```
 
-    import fastcount
-    fastcount.count_primes(100_000)
+`maturin develop` compiles and installs it,
+and Python sees a normal module with both functions attached:
+
+```python
+# rust/fastcount/demo.py
+import timeit
+import fastcount
+
+def count_primes(limit: int) -> int:
+    count = 0
+    for n in range(2, limit):
+        for d in range(2, int(n**0.5) + 1):
+            if n % d == 0:
+                break
+        else:
+            count += 1
+    return count
+
+def collatz_lengths(values: list[int]) -> list[int]:
+    lengths = []
+    for start in values:
+        n = start
+        steps = 0
+        while n != 1:
+            n = n // 2 if n % 2 == 0 else 3 * n + 1
+            steps += 1
+        lengths.append(steps)
+    return lengths
+
+limit = 200_000
+assert fastcount.count_primes(limit) == count_primes(limit)
+t_python = timeit.timeit(lambda: count_primes(limit), number=1)
+t_rust = timeit.timeit(lambda: fastcount.count_primes(limit), number=1)
+print(f"count_primes Rust speedup: {t_python / t_rust:.1f}x")
+# Sample run: count_primes Rust speedup: 12.2x
+
+values = list(range(1, 50_000))
+assert fastcount.collatz_lengths(values) == collatz_lengths(values)
+t_python = timeit.timeit(lambda: collatz_lengths(values), number=1)
+t_rust = timeit.timeit(lambda: fastcount.collatz_lengths(values), number=1)
+print(f"collatz_lengths Rust speedup: {t_python / t_rust:.1f}x")
+# Sample run: collatz_lengths Rust speedup: 34.3x
+```
+
+`rust/README.md` at the repository root explains how to build and run it yourself.
+`cd rust && make` compiles both functions, installs the module,
+and runs this same comparison, printing your machine's own numbers.
+The main book build never does this and never requires a Rust toolchain;
+building `rust/` is a separate, opt-in step.
+
+This closes the loop on the four ways this chapter speeds up the same computation.
+The plain Python loop, timed in the Numba example above, is the baseline.
+NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
+`@njit` compiles the untranslatable loop on its first call, from inside Python.
+Rust compiles that loop ahead of time so there is no warm-up and no Numba dependency at runtime,
+at the cost of a second language and a build step.
 
 Keep the interface coarse.
 A single call that does significant work wins.
 A million calls that each do a little lose the gain due to boundary-crossing overhead.
 Shipping millions of small Python objects across the boundary loses it too.
-Numbers, strings, bytes, and NumPy arrays cross cheaply.
-The cost of this technique is a second language and a build toolchain in your project.
+Numbers, strings, bytes, and NumPy arrays cross cheaply,
+and so does the plain list of integers `collatz_lengths()` takes and returns here.
+
+<!-- TODO(py315-deps): once NumPy and Numba are available, extend
+rust/fastcount/demo.py (and this listing)
+to also time the NumPy+Numba collatz_lengths version from Combine NumPy and Numba above,
+so this compares Rust against that combination too, not just plain Python. -->
 
 ## Concurrency
 
 Sometimes the fix is not a faster function but a different architecture.
-When the time goes to waiting on the outside world, use `asyncio`.
+When the slowdown comes from waiting on the outside world, use `asyncio`.
 If the work can be done in parallel (pure functions can do this seamlessly),
 you can spread it across multiple cores or multiple processes.
 That is a design decision with its own chapter,
@@ -943,9 +1024,9 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
+A profiler is the only way to discover hot spots.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
-A profiler is the only way to discover hot spots.
 Work down this list from the cheapest change to the most involved,
 stopping as soon as the program is fast enough:
 

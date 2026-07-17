@@ -22,7 +22,15 @@ tooling puts that directory on the import path, so this is how a helper like
 ``result.py`` or ``safe.py`` gets reused across chapters. Use it only for
 something genuinely shared; everything else stays chapter-scoped.
 
-Blocks without such a first line are illustrative fragments and are skipped.
+A slug starting with ``rust/`` (e.g. ``# rust/fastcount/demo.py``) is
+excluded entirely, counted as a fragment rather than extracted: it is a
+Python caller for a compiled Rust/PyO3 module, extracted separately by
+``tools/extract_rust.py`` into ``rust/``, not ``Examples/``. That module
+does not exist in this build's Python environment, so running the caller
+here would fail; see ``rust/README.md``.
+
+Blocks without such a first line, or with a ``rust/``-prefixed slug, are
+illustrative fragments and are skipped.
 
 Default mode is ``check``: nothing is written, drift between the Markdown and
 the committed ``Examples/`` tree is reported, and a non-zero exit signals
@@ -97,7 +105,7 @@ def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
         text = md.read_text(encoding="utf-8")
         for lang, block in iter_blocks(text.splitlines()):
             slug = block_slug(block)
-            if slug is None:
+            if slug is None or slug.startswith("rust/"):
                 result.fragments += 1
                 continue
             rel = slug if slug.startswith("utils/") else f"{md.stem}/{slug}"

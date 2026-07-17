@@ -197,6 +197,32 @@ Default mode is **check**: nothing is written. It reports
 It exits non-zero on any of these, so CI catches prose/code drift. Pass
 `--write` to materialize `build/examples/` (use `-o DIR` for another target).
 
+A block whose slug starts with `rust/` (e.g. `# rust/fastcount/demo.py`)
+is skipped here on purpose: see `extract_rust.py` below.
+
+## extract_rust.py
+
+A second, separate extractor for the Rust/PyO3 examples in
+[Converting a Slow Function to Rust](../Chapters/18_Performance.md#converting-a-slow-function-to-rust),
+extended to a second language. A ` ```rust ` block whose first line is a
+Rust comment naming the file (relative to `rust/`, e.g.
+`// fastcount/src/lib.rs`) extracts there; a ` ```python ` block whose
+slug starts with `rust/` (the Python caller `extract_examples.py` skips
+above) extracts to that same path. Default mode is **check** against the
+committed `rust/` tree; pass `--write` to update it.
+
+This tool only ever touches the specific files a book block names
+(`src/lib.rs`, a demo `.py`), never the rest of a crate directory
+(`Cargo.toml`, `pyproject.toml`, real hand-maintained project files). It
+does not build or run anything, that needs a Rust toolchain and is never
+done by the main build; see `rust/README.md` and `rust/Makefile` (run
+`make` from inside `rust/`).
+
+```
+python tools/extract_rust.py            # check vs rust/
+python tools/extract_rust.py --write     # update rust/
+```
+
 ## run_examples.py
 
 Runs every `.py` under `build/examples/`, each in its own directory so the

@@ -48,5 +48,17 @@ PY_FENCE_RE = re.compile(r"^\s*```python\s*$")
 # A block's first content line naming the relative path it extracts to, e.g.
 # "# trace.py" or "# mouse/Move.py". A "utils/" prefix (e.g.
 # "# utils/display.py") is handled by the caller: it means the file lands
-# at the tree root's utils/ directory instead of a chapter dir.
+# at the tree root's utils/ directory instead of a chapter dir. A "rust/"
+# prefix (e.g. "# rust/fastcount/demo.py") is also handled by the caller
+# (extract_examples.py): that slug is excluded entirely, since it is a
+# Python caller for a Rust module built by extract_rust.py, not a normal
+# book example the main build can run.
 PATH_LINE_RE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")
+
+# A ```rust opener at any indent, for extract_rust.py.
+RUST_FENCE_RE = re.compile(r"^\s*```rust\s*$")
+
+# A ```rust block's first content line naming the file it extracts to,
+# relative to rust/, e.g. "// fastcount/src/lib.rs". The Rust-comment
+# analog of PATH_LINE_RE above.
+RUST_PATH_LINE_RE = re.compile(r"^//\s*([\w./\\-]+\.\w+)\s*$")

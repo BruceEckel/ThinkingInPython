@@ -1,0 +1,13 @@
+# Cargo build artifacts.
+/target
+
+# The isolated venv `uv run`/`uv sync` creates here, separate from the
+# repository root's own .venv/ (already gitignored at the root, but this
+# crate is its own uv project, so it gets its own venv too).
+.venv/
+
+# Python bytecode cache.
+__pycache__/
+*.pyc
+
+.DS_Store
