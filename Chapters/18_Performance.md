@@ -482,6 +482,27 @@ When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice.
 A generator is spent after one pass.
 
+Fitting the whole data set in memory buys more than a second pass.
+Random access, sorting,
+and the `bisect` searches from earlier in this chapter all need an indexable structure,
+not a stream of values that arrive once and disappear.
+NumPy's vectorized arithmetic, covered later in this chapter,
+needs the same thing.
+It wants a whole array in memory, not values arriving one at a time.
+
+The risk is the cliff at the edge of that memory.
+Performance does not degrade in proportion to how close the data gets to available RAM.
+A data set that fits runs at full speed.
+One that no longer fits forces the operating system to swap pages to disk,
+turning microseconds into milliseconds, a thousandfold slowdown,
+not a modest one.
+Push further and the process fails outright, with `MemoryError` or an OS kill.
+There is no middle ground between full speed and failure.
+
+That cliff is why it's worth building a lazy pipeline to handle a data set that could grow.
+If a data set can ever outgrow memory, stream it from the start,
+like `lazy_first_evens()`.
+
 ## Caching
 
 If a pure function ([Functional Foundations](40_Functional_Foundations.md#pure-functions))
@@ -642,7 +663,7 @@ import sys
 from array import array
 from exceptions import ignore
 
-a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
+a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
 a.append(4.0)
 print(a)
 #: array('d', [1.0, 2.0, 3.0, 4.0])
@@ -654,10 +675,10 @@ with ignore(TypeError):
 #: TypeError('must be real number, not str')
 
 nums = [float(i) for i in range(10_000)]
-packed = array("d", nums)
 list_bytes = sys.getsizeof(nums) + sum(
     sys.getsizeof(x) for x in nums
 )
+packed = array("d", nums)
 array_bytes = sys.getsizeof(packed)
 print(f"array at least 3x smaller: "
       f"{array_bytes * 3 < list_bytes}")
@@ -697,9 +718,10 @@ so writing through it changes the original and copies no bytes.
 ## Vectorize with NumPy
 
 When the hot spot is arithmetic over a large collection of numbers,
-the biggest step is to remove the Python loop.
-[NumPy](https://numpy.org/) stores numbers unboxed in contiguous arrays,
-like `array` above, and executes whole-array expressions in compiled loops.
+the biggest improvement comes from removing the Python loop.
+[NumPy](https://numpy.org/)
+stores numbers unboxed in contiguous arrays like `array` does,
+and executes whole-array expressions in compiled loops.
 The plain-Python version repeats one expression per element.
 The NumPy version states it once for the whole array:
 
@@ -721,12 +743,20 @@ The NumPy version states it once for the whole array:
     print(f"NumPy speedup: {t_loop / t_numpy:.1f}x")
     # Sample run: NumPy speedup: 12.9x
 
+`np.arange(n, dtype=np.float64)` is NumPy's version of the `list(range(n))` line above it.
+Both build the same sequence of `n` numbers
+(notice that it's `arange` not `arrange`).
+`list(range(n))` boxes each one as a Python `int`.
+`np.arange()` packs them into one contiguous block of C doubles,
+the same layout `array` used earlier in this chapter,
+with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code did.
+
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
 but as one compiled pass over contiguous memory instead of a million individual Python-level steps.
 NumPy is a fast library you call, not a compiled extension you write.
 The benefit only occurs if the data stays inside NumPy.
 Calling a Python function on each element,
-or converting arrays to lists and back, reproduces the overhead.
+or converting arrays to lists and back, reproduces overhead.
 This is the declarative trade from [Functional Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
@@ -734,13 +764,15 @@ describe the whole-array result and let the engine arrange the steps.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
+<!-- TODO(py315-deps): NumPy has no Python 3.15 wheel yet. Once it
+does, convert this indented block to a real, fenced, tested example. -->
+
 ## JIT Compilation with Numba
 
 Sometimes the loop cannot become an array expression,
 because each step depends on the previous one, or the control flow is irregular.
-[Numba](https://numba.pydata.org/)'s `@njit` decorator compiles such a function to machine code on its first call,
-in place.
-The source stays Python:
+The `@njit` decorator from [Numba](https://numba.pydata.org/)
+compiles such a function to machine code on its first call, in place:
 
     import timeit
     from numba import njit
@@ -766,18 +798,22 @@ The source stays Python:
     # Sample run: Numba speedup: 15.9x
 
 `njit(count_primes)` compiles the same function `@njit` would decorate.
-Calling it once first pays the compilation cost outside the timed region,
-so the comparison measures steady-state speed, not warm-up.
+Calling it once first pays the compilation and warm-up cost outside the timed region.
+Thus the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
-often landing within striking distance of C.
+often running nearly as fast as C.
 The first call pays a compilation delay,
-and code that leans on arbitrary Python objects will not compile.
+and code that uses general Python objects, such as custom classes,
+will not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
 (Numba is also a third-party dependency, and it does not yet support the book's Python 3.15 target, so like the NumPy example above, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
+
+<!-- TODO(py315-deps): Numba does not support Python 3.15 yet. Once it
+does, convert this indented block to a real, fenced, tested example. -->
 
 ## Combine NumPy and Numba
 
@@ -836,14 +872,8 @@ keeping the array as the shared data structure throughout.
 The comment shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
-## Concurrency
-
-Sometimes the fix is not a faster function but a different architecture.
-When the time goes to waiting on the outside world, use `asyncio`.
-If the work can be done in parallel (pure functions can do this seamlessly),
-you can spread it across multiple cores or multiple processes.
-That is a design decision with its own chapter,
-[Concurrency](19_Concurrency.md).
+<!-- TODO(py315-deps): needs both NumPy and Numba on Python 3.15. Once
+both ship, convert this indented block to a real, fenced, tested example. -->
 
 ## Converting a Slow Function to Rust
 
@@ -900,6 +930,15 @@ A million calls that each do a little lose the gain due to boundary-crossing ove
 Shipping millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The cost of this technique is a second language and a build toolchain in your project.
+
+## Concurrency
+
+Sometimes the fix is not a faster function but a different architecture.
+When the time goes to waiting on the outside world, use `asyncio`.
+If the work can be done in parallel (pure functions can do this seamlessly),
+you can spread it across multiple cores or multiple processes.
+That is a design decision with its own chapter,
+[Concurrency](19_Concurrency.md).
 
 ## Choosing a Strategy
 

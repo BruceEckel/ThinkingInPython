@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -301,6 +301,14 @@ prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
 # and then to catch link rot; check_anchors.py covers internal links.
 links:  ## Check the book's external URLs for link rot (advisory, needs network)
 	$(PY) tools/check_links.py
+
+# Advisory only, like `links` above: lists `TODO(tag): ...` HTML-comment
+# markers left in the Markdown (see tools/list_todos.py), each one an
+# example that stays illustrative until something outside the book's
+# control changes (a dependency ships a wheel, a build becomes the
+# default). Never fails, and is not part of `verify`/`gate`/`ci`.
+todos:  ## List TODO(tag): ... markers left in the book (advisory)
+	$(PY) tools/list_todos.py
 
 ##@ Style gates
 

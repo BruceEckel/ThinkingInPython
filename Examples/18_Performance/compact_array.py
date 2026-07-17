@@ -3,7 +3,7 @@ import sys
 from array import array
 from exceptions import ignore
 
-a = array("d", [1.0, 2.0, 3.0])  # "d" = C double
+a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
 a.append(4.0)
 print(a)
 #: array('d', [1.0, 2.0, 3.0, 4.0])
@@ -15,10 +15,10 @@ with ignore(TypeError):
 #: TypeError('must be real number, not str')
 
 nums = [float(i) for i in range(10_000)]
-packed = array("d", nums)
 list_bytes = sys.getsizeof(nums) + sum(
     sys.getsizeof(x) for x in nums
 )
+packed = array("d", nums)
 array_bytes = sys.getsizeof(packed)
 print(f"array at least 3x smaller: "
       f"{array_bytes * 3 < list_bytes}")

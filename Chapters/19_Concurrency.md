@@ -514,6 +514,10 @@ Running the identical `sequential()`/`threaded()` pair above under a free-thread
 (The speedup needs a free-threaded interpreter, which is not the book's default build, so the build does not run that second measurement.
 The number is one machine's actual output.)
 
+<!-- TODO(free-threaded-default): if free threading ever becomes
+CPython's default build, convert this indented block to a real, fenced,
+tested example. -->
+
 Free threading finally cleared the 1996 bar by making reference counting cheap without a global lock.
 Most objects are only ever touched by the thread that created them.
 *Biased reference counting* lets that owning thread update the count with arithmetic.
