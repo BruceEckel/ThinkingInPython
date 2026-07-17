@@ -243,6 +243,51 @@ Only the search is that fast:
 `insort()` still shifts everything after the insertion point,
 so under heavy insert traffic consider the heap below instead.
 
+That leaves three ways to answer the same membership question: scan a `list`,
+binary-search a sorted `list` with `bisect`,
+or hash straight to the answer with a `set`.
+Timing all three together shows the size of each step:
+
+```python
+# search_comparison.py
+import bisect
+import timeit
+
+n = 100_000
+as_list = list(range(n))
+as_set = set(as_list)
+target = n // 2
+
+def scan() -> bool:
+    return target in as_list
+
+def binary_search() -> bool:
+    i = bisect.bisect_left(as_list, target)
+    return i < len(as_list) and as_list[i] == target
+
+def hashed() -> bool:
+    return target in as_set
+
+assert {scan(), binary_search(), hashed()} == {True}
+t_scan = timeit.timeit(scan, number=1000)
+t_search = timeit.timeit(binary_search, number=1000)
+t_hashed = timeit.timeit(hashed, number=1000)
+print(f"binary search at least 100x faster than scan: "
+      f"{t_search * 100 < t_scan}")
+#: binary search at least 100x faster than scan: True
+print(f"hashing at least 3x faster than binary search: "
+      f"{t_hashed * 3 < t_search}")
+#: hashing at least 3x faster than binary search: True
+```
+
+The scan loses badly,
+since it walks roughly half the `list` before reaching `target`.
+`bisect` narrows that to a handful of comparisons,
+one per halving of the remaining range, which is why moving from O(n)
+to O(log n) shows up as orders of magnitude here rather than a modest improvement.
+Hashing wins again over `bisect`,
+since it needs only one hash and one equality check no matter how large `as_set` grows.
+
 When you repeatedly need the smallest item,
 a *heap* keeps that item reachable in O(log n).
 The `heapq` module treats a `list` as a binary heap:

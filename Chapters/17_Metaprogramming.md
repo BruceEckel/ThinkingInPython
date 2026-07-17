@@ -50,8 +50,10 @@ display_object(x)
 #:   • m(self)
 ```
 
-Note that `x` is modified by the changes made to the class *after* `x` was created.
-A change to a class affects every object of that class,
+Note that `x` sees the changes made to the class *after* `x` was created.
+The instance itself never changed; its `__dict__` is as empty as before.
+Attribute lookup on an instance falls through to its class,
+so a change to a class reaches every object of that class,
 even ones already created.
 
 What creates these "class" objects?
@@ -247,7 +249,7 @@ LightOn 8:00
 then builds an `Event` from each resulting line.
 `line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three plain strings in a single step,
 replacing the colon with a second space before splitting on whitespace.
-`cls._event_maker[class_name]` gets the class object used to build that `Event`.
+`Event._event_maker[class_name]` gets the class object used to build that `Event`.
 The first time an event type is needed,
 the class is built and registered under its name.
 
@@ -257,7 +259,7 @@ Populating that dict does not build any classes.
 It only reserves the names,
 so `EventMakers.__getitem__()` has something to check a `class_name` against before building anything.
 
-`EventMakers.__getitem__()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+The `init()` function nested inside `EventMakers.__getitem__()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 `init()` is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
@@ -344,7 +346,7 @@ This is the textbook reason people used to justify a metaclass.
 so it only takes a few lines to produce self-registration.
 This example tracks the "leaf" subclasses
 (those with no subclasses of their own),
-using __init_subclass__ instead of a metaclass:
+using `__init_subclass__()` instead of a metaclass:
 
 ```python
 # init_subclass.py
@@ -423,8 +425,9 @@ def test_independent_hierarchies_have_separate_registries() -> None:
 
 ## Learning a Name with `__set_name__()`
 
-A *descriptor* is any object whose class defines `__get__()`,
-and optionally `__set__()` or `__delete__()`.
+A *descriptor* is any object whose class defines at least one of `__get__()`,
+`__set__()`, or `__delete__()`.
+Most descriptors define `__get__()` and add the others as needed.
 Assigned to a class attribute, a descriptor takes over access to that attribute.
 Instead of going straight to the instance's `__dict__`,
 `__get__()` is called on a read and `__set__()` on a write.
@@ -681,6 +684,11 @@ print("has Tag base:", Tag in Demo.__bases__)
 #: has Tag base: True
 ```
 
+`added_in_init` never appears because `type.__new__()` copies `nmspc` into the new class's own `__dict__` as it builds the class.
+By the time `__init__()` runs, the two mappings are independent,
+so mutating the original dict changes nothing the class can see.
+`setattr(cls, ...)` still works because it modifies the class object itself.
+
 Override `__new__()` when you must change `name`, `bases`, or the namespace
 (including special members like `__slots__`) before Python builds the class.
 Otherwise, prefer `__init__()`, which is simpler.
@@ -745,7 +753,7 @@ print(a.__class__.__name__, c.__class__.__name__)
 Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
-so `ASingleton()` reveals as `ASingleton` instead of `Any`.
+so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
 Without it, every singleton would lose its type and a type checker could no longer catch a misspelled attribute access on the result.
 
 You might expect to parameterize[^parametrize] the class itself,
@@ -791,6 +799,11 @@ The failure has nothing to do with metaclasses.
 `class X(dict, type): pass` fails the same way with no metaclass involved.
 `type` and `dict` each bring an incompatible layout,
 so combining them is impossible in any context.
+
+The `# type: ignore` comment is there because ty knows this rule statically.
+Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
+A checker that predicts a crash before the program ever runs is static typing at its best;
+the comment suppresses the diagnostic only because raising that crash is the point.
 
 A metaclass can multiply inherit like any other class,
 as long as the extra class is a plain mixin with no competing layout:
@@ -981,10 +994,14 @@ print(list(inspect.signature(greet).parameters))
 `signature()` recovers the full call interface,
 annotations and defaults included, as a structured object rather than a string.
 Type annotations (a.k.a. type hints) are not discarded at runtime.
-Python evaluates them and stores the result on the function,
+Python keeps them attached to the function and evaluates them on demand,
+the deferred evaluation of PEP 649,
 even though it [never checks them](08_Static_Typing.md#hints-are-not-enforced-at-run-time).
-`signature()` reads that stored data (not the original source text)
+`signature()` requests that stored data (not the original source text)
 to build the `Signature` object.
+The `ALL_DUNDERS` listing at the end of this chapter shows the machinery on a class:
+`__annotate_func__` is the code that computes the annotations,
+and `__annotations_cache__` holds the result after the first request.
 
 Throughout the book we've been using `display_object()` to show the layout of an object.
 The `utils/` prefix makes it live in the shared `utils/` directory at the top of the `Examples` tree,
@@ -1307,6 +1324,9 @@ is the bookkeeping every class carries.
     its `inspect.signature()`, and its docstring
     (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.
+6.  Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run ty over the file.
+    Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints:
+    the static report and the runtime failure describe the same collision.
 
 [^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern*
 (CRTP):
