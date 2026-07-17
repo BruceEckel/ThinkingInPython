@@ -10,12 +10,11 @@ As to the second issue, Python is commonly considered to be slow.
 
 ## Is It Actually Too Slow?
 
-Computer programming projects have a long history of *premature optimization*:
-optimizing before any measurement shows where the time goes,
-often by deciding ahead of time, based on biases,
+Computer programming projects have a long history of *premature optimization*.
+This means optimizing before any measurement shows where the time goes.
+Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
-This produces elaborate,
-expensive designs that solve problems that may not exist.
+This results in elaborate, expensive designs that solve nonexistent problems.
 
 Python can be surprising.
 A program coded in the most straightforward way,
@@ -47,25 +46,28 @@ Although it is tempting to think you "have a pretty good idea where the slowdown
 we turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
-The standard library provides two complementary profilers.
-`cProfile` is *deterministic*: it records every function call and return.
+The standard library includes two profilers.
+The classic `cProfile` was introduced in 2006.
+It deterministically records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
-sometimes enough to distort the behavior you are measuring:
+sometimes enough to distort the behavior you are measuring.
+Here's how you run `cProfile` on `my_program.py`:
 
     python -m cProfile -s cumulative my_program.py
 
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
-The tracing profiler above becomes `profiling.tracing`,
-with `cProfile` kept as an alias,
-and a new *sampling* profiler arrives as `profiling.sampling`.
+The deterministic tracing profiler becomes `profiling.tracing`,
+with `cProfile` kept as an alias.
+Python 3.15 also adds a new *sampling* profiler named `profiling.sampling`.
 Instead of tracing every call, it takes periodic snapshots of the call stack,
-so the overhead is near zero and the program runs at full speed while you watch:
+so the overhead is near zero and the program runs at full speed while you watch.
+You invoke it like this:
 
     python -m profiling.sampling run my_program.py
 
-It can also attach to a process that is already running, by process ID,
-which makes it the tool for a slowdown you can only reproduce live:
+The new profiler can also attach to a process that is already running, using the process ID.
+This makes it the tool for a slowdown you can only reproduce live:
 
     python -m profiling.sampling attach 12345
 
@@ -85,9 +87,14 @@ It runs a small snippet many times and reports the total,
 insulating the measurement from startup cost and clock granularity.
 
 Timings differ from machine to machine,
-so this example prints a comparison instead of raw numbers.
-Membership testing in a `list` scans.
-In a `set` it hashes:
+so the following example prints a comparison instead of raw numbers.
+A `list` tests membership by scanning.
+`target in as_list` walks the list from the start,
+comparing each element until it finds a match or reaches the end.
+A `set` tests membership through hashing.
+`target in as_set` computes a hash of `target` and jumps straight to the bucket that value occupies.
+Scanning gets slower as the list grows.
+Hashing stays fast no matter how many elements the set holds:
 
 ```python
 # membership.py
@@ -104,7 +111,14 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 #: set at least 100x faster: True
 ```
 
-One lookup costs little either way.
+`timeit.timeit()` calls its first argument repeatedly
+and returns the total elapsed time in seconds for every call combined, not the time for one call.
+That first argument is a `lambda` here rather than a string of code,
+since a `lambda` can close over `target`, `as_list`, and `as_set` directly,
+with no separate `setup` argument needed to build them.
+`number` sets how many times `timeit` calls the lambda, 100 in this case.
+
+A single lookup costs little either way.
 A million lookups is the difference between instant and minutes.
 `timeit` also has a command-line form for one-off questions:
 
