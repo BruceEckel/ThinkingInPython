@@ -67,17 +67,28 @@ complete, categorized list, generated from the Makefile itself so it never
 drifts out of date (see [make_help.py](#make_help.py) below). The everyday ones:
 
 ```
-make verify     # sync Examples/ and SolutionsCode/, then every gate but the site
+make all        # every everyday fixer, refresh markers, sync, then the full gate but the site
+make verify     # refresh markers, sync Examples/ and SolutionsCode/, then every gate but the site
 make sync-ci    # like verify, plus the site build (the full gate)
 make ci         # the full local gate: check, ty, ruff, run, pytest, site
 ```
 
-`make verify` is the everyday command after editing the book: it pushes your
-Markdown changes out to `Examples/` (so the drift check passes), your
-`Solutions/` changes out to `SolutionsCode/`, then runs every gate except the
-site build. `make sync-ci` does the same and also builds the site. `make ci`
-runs the gate (with site) without syncing first, so it still fails on drift,
-the way GitHub Actions does.
+`make all` is the loop to repeat after editing a chapter: every mutating
+fixer (`reflow`, the comment-style fixers, import sorting, blank-line
+cleanup), then a refresh of the `#:` output markers, then a sync of the
+generated trees, then the full gate; see [run_all.py](#run_allpy) below.
+`make verify` is the lighter everyday command: it skips the fixers and
+just refreshes markers and pushes your Markdown changes out to
+`Examples/` (so the drift check passes) and your `Solutions/` changes out
+to `SolutionsCode/`, then runs every gate except the site build. `make
+sync-ci` does the same and also builds the site. Both `verify` and
+`sync-ci` refresh markers (`output`/`solutions-output`) *before*
+syncing, on purpose: `gate`/`solutions-gate` also refresh markers, but
+only after whatever sync step ran ahead of them already copied the
+Markdown, so a marker that needed fixing would otherwise stay one sync
+behind until the *next* run caught it up. `make ci` runs the gate (with
+site) without syncing first, so it still fails on drift, the way GitHub
+Actions does.
 
 ## make_help.py
 
@@ -90,6 +101,20 @@ POSIX toolchain being on PATH: every other target already requires Python
 
 ```
 make help   # categorized list of every documented target
+```
+
+## run_all.py
+
+Runs `make all`: the everyday edit-and-check loop, as an ordered list of
+`make` targets (`ALL_TARGETS` in the script) run one at a time as their own
+subprocess, stopping at the first failure. Add or remove a target name in
+that list to change what `make all` runs; its `--help` text comes straight
+from that target's own `## text` comment in the Makefile (the same one
+`make help` reads), so nothing else needs updating.
+
+```
+make all               # run every target in ALL_TARGETS, in order
+make all ARGS=--help   # list them, with their doc text, without running
 ```
 
 ## check_tools.py

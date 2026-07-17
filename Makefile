@@ -18,8 +18,11 @@ DOCS ?= Chapters
 # Files for spell/prose: all of DOCS, or one chapter via CH= (a number or stem
 # prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
 PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
+# Extra args for `make all`, e.g. `make all ARGS=--help` to list its
+# targets (tools/run_all.py's ALL_TARGETS) without running them.
+ARGS ?=
 
-.PHONY: help reset verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -74,14 +77,31 @@ upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) global
 
 ##@ Everyday
 
-# Fix any CRLF in the working tree, sync Examples/ and SolutionsCode/ from the
-# Markdown, then run every gate except the site build. The everyday "is
-# everything still good?" command after editing Chapters/ or Solutions/.
-# fix-eol runs first so the eol check inside gate sees an already-clean tree.
-verify: fix-eol sync solutions-sync gate  ## Fix line endings, sync Examples/ and SolutionsCode/, then run every gate except the site build
+# The edit-and-check loop to repeat after touching a chapter: every
+# mutating fixer (reflow, the comment-style fixers, import sorting,
+# blank-line cleanup), a refresh of the #: output markers, a sync of the
+# generated trees, then the full gate. The marker refresh runs before the
+# sync on purpose, so a stale #: marker converges in this one run instead
+# of needing a second `make all` to catch up. The ordered target list, and
+# the doc text `ARGS=--help` prints for each one, both live in
+# tools/run_all.py (ALL_TARGETS) -- add a target there to include it,
+# nothing else needs to change.
+all:  ## Run every everyday fixer plus sync and gate; ARGS=--help lists them without running
+	$(PY) tools/run_all.py $(ARGS)
+
+# Fix any CRLF in the working tree, refresh the #: output markers, sync
+# Examples/ and SolutionsCode/ from the Markdown, then run every gate except
+# the site build. The everyday "is everything still good?" command after
+# editing Chapters/ or Solutions/. Order matters: fix-eol runs first so the
+# eol check inside gate sees an already-clean tree, and output/
+# solutions-output (which rewrite stale #: markers) run before sync/
+# solutions-sync so the marker rewrite is what gets synced, not a since-
+# corrected-in-place Markdown -- reversing that leaves Examples/
+# SolutionsCode one run behind whenever a marker needed fixing.
+verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line endings, refresh #: markers, sync Examples/ and SolutionsCode/, then run every gate except the site build
 
 # Same as verify, plus the site build at the end.
-sync-ci: sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
+sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest, plus the same checks for

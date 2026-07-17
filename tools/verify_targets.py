@@ -18,14 +18,15 @@ various check-* targets rewrite a tracked file only if it is genuinely out
 of sync, which it should not be if the gate already passes) and run
 directly against this working tree.
 
-A handful of targets bake --fix/--write/--add into their recipe (reflow,
-spell-add, fix-imports, fix-listings, fix-comment-periods,
-fix-comment-caps, fix-comment-spacing): reflow alone would reformat most of
+A handful of targets bake --fix/--write/--add/--update into their recipe
+(reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
+fix-comment-caps, fix-comment-spacing, output, solutions-output, and all,
+which chains most of the others): reflow alone would reformat most of
 the book's prose on every run, since it is not covered by any gate. Those
-run inside a disposable `git worktree` checked out at HEAD instead, so this
-working tree is never touched. That worktree reflects the last commit, not
-any uncommitted changes, so it tests each target's own wiring rather than
-whether running it right now would leave your draft clean.
+run inside a disposable `git worktree` checked out at HEAD instead, so
+this working tree is never touched. That worktree reflects the last
+commit, not any uncommitted changes, so it tests each target's own wiring
+rather than whether running it right now would leave your draft clean.
 
 Every target's combined stdout/stderr is saved to
 build/target_test_logs/<target>.log for inspection after the run.
@@ -65,8 +66,9 @@ EXCLUDED: dict[str, str] = {
 # Targets whose recipe rewrites tracked files unconditionally: run these in
 # a disposable worktree rather than this working tree.
 WORKTREE_TARGETS: frozenset[str] = frozenset({
-    "reflow", "spell-add", "fix-imports", "fix-listings",
+    "all", "reflow", "spell-add", "fix-imports", "fix-listings",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
+    "output", "solutions-output",
 })
 
 

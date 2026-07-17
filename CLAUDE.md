@@ -24,8 +24,17 @@ from the Markdown** by `tools/extract_examples.py`, so:
 
 ## The verify loop after editing a chapter
 
-Fastest path is `make verify` (fix line endings, sync, then every gate but the
-site build). When iterating on one chapter, the manual sequence is:
+Fastest path is `make verify` (fix line endings, refresh `#:` output markers,
+sync, then every gate but the site build). `make all` is the heavier version:
+it also runs every mutating fixer (`reflow`, the comment-style fixers, import
+sorting, blank-line cleanup) before the marker refresh and sync; its ordered
+target list lives in `tools/run_all.py` (`ALL_TARGETS`), and `make all
+ARGS=--help` lists it without running anything. In both, the marker refresh
+runs *before* the sync, not after: `gate`/`solutions-gate` refresh markers
+too, but only after their own prior sync step already copied the Markdown,
+so a marker that needed fixing would otherwise stay one sync behind until
+the next run caught it up. When iterating on one chapter, the manual
+sequence is:
 
 1. `uv run python tools/extract_examples.py --write -o Examples`  # sync committed tree
 2. `uv run python tools/extract_examples.py`                      # drift check ("In sync")
