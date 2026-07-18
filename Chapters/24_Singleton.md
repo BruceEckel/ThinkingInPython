@@ -36,6 +36,17 @@ For the large majority of singleton needs,
 the module approach solves the problem.
 The idiomatic Python singleton is worth trying first.
 
+The sharing rides on mutation, and the near-miss is rebinding.
+`from config import settings` copies a *binding* to the one shared dict,
+so mutating through it, `settings["theme"] = "dark"`, is visible everywhere.
+But `settings = {}` in your module rebinds only your module's name,
+and the two modules silently diverge:
+`config.settings` still holds the old dict,
+while your code now talks to a private one.
+To replace the whole value, go through the module: `import config`,
+then `config.settings = {...}`.
+Mutate through any name; rebind only through the module.
+
 ## When You Want a Class: Cache the Instance
 
 Sometimes you do want a class,
@@ -78,6 +89,18 @@ def test_cache_factory_returns_same_instance() -> None:
     assert (cached_factory_singleton.settings() is
         cached_factory_singleton.settings())
 ```
+
+Two practical notes on this form.
+First, like every lazy singleton, it has a first-call race under threads:
+concurrent first calls can each run the constructor,
+and each caller can end up holding a different object,
+with only one of them staying in the cache.
+When threads may arrive before the singleton exists, create it eagerly instead:
+call `settings()` once at import time, or use the module form,
+which the import system builds exactly once.
+Second, a singleton is shared state, and shared state leaks between tests.
+The cached factory has an escape hatch the classic forms lack:
+`settings.cache_clear()` discards the instance, so each test can start fresh.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
@@ -241,6 +264,15 @@ that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
 not a wrapper around it.
 No delegating `__getattr__()` or `__setattr__()` methods exist here.
 Attribute access goes straight to the one object.
+
+A rule governs what happens after `__new__()`:
+Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
+Here it returns something else, the inner object, so no `__init__()` ever runs.
+That has a second consequence: `x` is not an `OnlyOne` at all,
+so `isinstance(x, OnlyOne)` is `False`.
+The metaclass version at the end of this chapter returns the class's own instance,
+which puts it on the other side of the rule,
+with a behavior worth comparing when you get there.
 
 ### Borg: Share State Instead of Identity
 
@@ -448,6 +480,17 @@ def test_metaclass_returns_same_instance() -> None:
             is singleton_metaclass.Bar("y"))
 ```
 
+This is the other side of the `__new__()` rule.
+`my_new()` returns an instance of `Bar` itself,
+so Python calls `__init__()` after every construction,
+on the same shared object.
+Each `Bar(...)` call therefore overwrites `val`,
+which is why `x` prints as `spam`.
+The [Overriding `__new__`](#overriding-__new__)
+version returned a foreign object, so its `__init__()` never ran at all.
+Same pattern, opposite `__init__()` behavior,
+and the difference is only what `__new__()` returns.
+
 ## Which Should You Use?
 
 Use the lightest tool that fits:
@@ -476,3 +519,8 @@ Python has that already, so most of the ceremony falls away.
     rather than a single instance.
 3.  Rewrite one of the class-based singletons above as a module,
     and argue which you would use in real code.
+4.  In `shared_config.py`, replace the mutation with a rebinding,
+    `settings = {"theme": "dark"}`,
+    and add `import config` plus `print(config.settings)` at the end.
+    Predict both printed values before running it,
+    and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a Singleton](#a-module-is-already-a-singleton).
