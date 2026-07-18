@@ -285,6 +285,10 @@ because acting after an undo starts a new timeline.
 The states you undid are no longer reachable by redo,
 which is how every editor behaves.
 `undo()` and `redo()` just shuttle the present between the two stacks.
+Neither checks its own precondition:
+undoing with no past raises `IndexError` from `pop()`.
+`can_undo()` and `can_redo()` exist so callers ask first,
+which is how an editor knows to gray out the menu item.
 `History` stores whole states, not descriptions of changes,
 so it never interprets anything.
 That works for any state type, `int` to full `Sketch`, with one condition:
@@ -418,6 +422,14 @@ so a memento saved before a validated field existed can load a value nothing eve
 which is often nowhere near the line that called `pickle.loads()`.
 Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
+
+Drift in the other direction is quieter still.
+Delete or rename a field, and old bytes load with no error anywhere, ever.
+The stale name arrives in the object's `__dict__` as a ghost attribute,
+readable but invisible to the class definition,
+while the renamed field is simply missing.
+The added-field drift above at least fails when something touches the gap.
+The removed-field drift never raises at all; the data is just quietly wrong.
 
 Databases hit the same problem and gave it a name.
 A *schema migration* is the disciplined version of this drift, a versioned,
