@@ -141,6 +141,19 @@ if __name__ == "__main__":
 
 ![Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, landing execution inside Paper.eval_scissors() rather than Scissors's own code](_images/double_dispatch)
 
+Follow one duel to keep the perspective straight.
+`scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,
+and calls `paper.eval_scissors(...)`.
+That call is the second dispatch: it resolves `paper`,
+landing in `Paper.eval_scissors()`, the one method that knows both types.
+Now note whose result it returns.
+`Paper.eval_scissors()` returns `WIN`,
+and that is the outcome for the *scissors that started the duel*,
+not for the `Paper` whose code is running: scissors cut paper.
+Every `eval_*()` method answers for the original caller,
+the object named in the method's own name.
+Misread that convention and every result in the class appears backward.
+
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
 It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
@@ -197,6 +210,12 @@ if __name__ == "__main__":
 
 Notice the flexibility of dictionaries.
 A tuple serves as a key just as easily as a single object.
+Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
+The match is on classes *exactly*,
+so a subclass of `Paper` finds none of `Paper`'s rows.
+And a missing pair raises `KeyError` at the first duel that needs it,
+the fail-fast policy that suits a table under construction,
+which is exactly what you want while adding `Lizard` in exercise 1.
 
 ## One Type or Many
 
@@ -209,12 +228,88 @@ the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` is then a matter of adding rows to the table,
 with no methods to edit across the classes.
 
+The version most programmers write first is neither of these:
+it is an `isinstance()` ladder inside `compete()`,
+testing the opponent's type case by case.
+It works, and it is the worst of both worlds,
+type tests scattered through every class like the method version,
+with none of dispatch's automatic resolution,
+and every new `Item` forces an edit to every ladder.
+Both patterns in this chapter exist to avoid writing it.
+
 The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
 is a workaround for languages that cannot store types in a table and look a behavior up by them.
 Python can, so the table is both shorter and easier to maintain.
 Use the spread-out method version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
+
+Python's own operators already contain a two-step dispatch,
+and it answers the `Number + Number` question that opened this chapter.
+`a + b` first tries `type(a).__add__(a, b)`.
+If that returns the special value `NotImplemented`,
+Python turns around and tries `type(b).__radd__(b, a)`.
+The first call dispatches on `a`'s type, the fallback on `b`'s:
+double dispatching, built into the language,
+which is how an `int` on the left can learn to add itself to a type written decades after `int` was.
+Returning `NotImplemented`
+(a sentinel value, not the `NotImplementedError` exception, a lookalike pair worth keeping apart)
+is how an operand says "I don't know this type; ask the other object."
+Here is the machinery, with each dispatch traced:
+
+```python
+# radd_dispatch.py
+from typing import Any
+
+class Meters:
+    def __init__(self, n: float) -> None:
+        self.n = n
+
+    def __repr__(self) -> str:
+        return f"Meters({self.n})"
+
+    def __add__(self, other: object) -> Any:
+        print(f"__add__({self!r}, {other!r})")
+        if isinstance(other, Meters):
+            return Meters(self.n + other.n)
+        if isinstance(other, int | float):
+            return Meters(self.n + other)
+        return NotImplemented
+
+    def __radd__(self, other: object) -> Any:
+        print(f"__radd__({self!r}, {other!r})")
+        if isinstance(other, int | float):
+            return Meters(other + self.n)
+        return NotImplemented
+
+print(Meters(3) + Meters(4))
+#: __add__(Meters(3), Meters(4))
+#: Meters(7)
+print(Meters(3) + 4)  # The left operand handles it
+#: __add__(Meters(3), 4)
+#: Meters(7)
+print(4 + Meters(3))  # int declines; the right operand handles it
+#: __radd__(Meters(3), 4)
+#: Meters(7)
+try:
+    Meters(3) + "four"  # Both sides decline
+except TypeError as e:
+    print(type(e).__name__)
+#: __add__(Meters(3), 'four')
+#: TypeError
+```
+
+The first two additions resolve inside `__add__()`:
+the left operand recognized the type.
+The third is the interesting one.
+`4 + Meters(3)` asks `int.__add__` first, and `int` has never heard of `Meters`,
+so it returns `NotImplemented`.
+Python then, with no error anywhere, turns to `Meters.__radd__`,
+whose trace line shows the operands arriving swapped.
+The last case shows what the sentinel is for.
+`Meters.__add__` runs, declines the string, `str` has no `__radd__` to consult,
+and only after both sides have declined does Python raise `TypeError`.
+Declining is not failing; the error appears only when nobody volunteers.
 
 The win/lose/draw result is pure logic,
 which makes it easy to validate through testing.
