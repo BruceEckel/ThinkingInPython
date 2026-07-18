@@ -77,13 +77,13 @@ An unlinked name means the pattern appears only in this catalog.
 | Pattern | Intent |
 |---------|--------|
 | Layers | Stack responsibilities so each layer uses only the one beneath it. |
-| Pipes and Filters | Process a stream through a chain of independent transforms. |
+| [Pipes and Filters](23_Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | [Blackboard](38_Simulation.md) | Let independent components cooperate through a shared data store. |
 | Broker | Coordinate requests and replies between distributed components. |
 | [Model-View-Controller](30_Observer.md#a-visual-example-of-observers) | Separate data, presentation, and input handling. |
 | Presentation-Abstraction-Control | Build interactive systems from cooperating agents, each split three ways. |
 | Microkernel | Keep a minimal core and add capability through plug-ins. |
-| Reflection | Let a program inspect and adjust its own structure at runtime. |
+| [Reflection](17_Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |
 
 ## Enterprise Application (Fowler)
 
@@ -147,9 +147,9 @@ An unlinked name means the pattern appears only in this catalog.
 |---------|--------|
 | [Null Object](20_Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
-| Multiton | Manage a fixed set of named singletons. |
+| [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a fixed set of named singletons. |
 | [Dependency Injection](11_Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| Inversion of Control | Let a framework call your code rather than the reverse. |
+| [Inversion of Control](25_Template_Method.md) | Let a framework call your code rather than the reverse. |
 | Service Locator | Look up dependencies through a central registry. |
 | [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |

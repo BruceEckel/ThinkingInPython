@@ -143,6 +143,13 @@ file passes a strict type checker and linter.
   for the memory and access-speed win (the dropped `__dict__`), not
   to prevent attribute growth.
 
+- **A class whose `__init__()` only assigns parameters or defaults to
+  fields is a `@dataclass`** (frozen unless mutation is the point).
+  Write the manual form only when the code is teaching it (an
+  interning `__new__()`, a `__dict__` trick), and then say why in an
+  adjacent comment or prose: a deviation from this idiom is part of a
+  lesson, never an accident.
+
 - **Polymorphism is broader than method dispatch.** It means one
   function accepting more than one argument type: ad hoc
   (overloading), parametric (generics), and subtype (inheritance

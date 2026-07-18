@@ -98,21 +98,24 @@ just after the `await`.
 The three delays make the resumptions visible: c sleeps shortest,
 so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
-`gather()` returns `['A', 'B', 'C']`, showing that the results follow the argument order,
-not the finishing order.
+`gather()` returns `['A', 'B', 'C']`,
+showing that the results follow the argument order, not the finishing order.
 The total wait is one 0.03-second sleep, not the sum of all three.
 
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
 
-Beware a list comprehension that awaits.
-`[await c for c in coroutines]`,
-returns the same list as `gather()` but is the sequential version.
+Beware a list comprehension that awaits:
+`[await c for c in coroutines]` returns the same list as `gather()` but is the sequential version.
 Each `await` runs its coroutine to completion before the next one starts,
 so nothing overlaps and the waits add up.
-`gather()` is concurrent because it starts every task before it waits for any of them.
-[[Is that right, does it actually start them? Or does it start the first task and run until
-that task hits an await, then starts the second]]
+`gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
+Scheduling is not yet running.
+The task bodies execute only after `gather()` itself suspends,
+each in turn up to its first `await`, which is exactly what the a, b,
+c started lines in the trace show.
+The comprehension never reaches that state:
+it does not even wrap the next coroutine until the previous one has finished entirely.
 
 ## Structured Concurrency with `TaskGroup`
 
@@ -162,55 +165,87 @@ re-raising the failure wrapped in an *exception group*,
 a container for simultaneous failures,
 since more than one task can go down at once.
 The `except*` form catches members of a group by type.
-Choose by failure policy.
-`gather()` is compact when every task is expected to succeed and you want the ordered list of results.
-`TaskGroup` is for when a failure anywhere should stop the whole batch:
-cancel the rest, wait for the cancellations to land, and surface the error.
-[[Wouldn't you always choose TaskGroup? What would be the benefit of gather()?
-Can't TaskGroup return an ordered list of results, programmatically?
-If necessary, add an example showing this.]]
+
+`TaskGroup` can also produce `gather()`'s ordered result list.
+Keep the task objects and harvest them after the block,
+which is safe because the block cannot exit until every task has finished:
+
+```python
+# task_group_results.py
+import asyncio
+
+async def fetch(item: str, delay: float) -> str:
+    await asyncio.sleep(delay)
+    return item.upper()
+
+async def main() -> None:
+    pairs = [("a", 0.03), ("b", 0.02), ("c", 0.01)]
+    async with asyncio.TaskGroup() as tg:
+        tasks = [tg.create_task(fetch(i, d)) for i, d in pairs]
+    print([t.result() for t in tasks])
+
+asyncio.run(main())
+#: ['A', 'B', 'C']
+```
+
+The comprehension keeps the tasks in argument order,
+so the harvested results come out exactly as `gather()`'s would,
+no matter which task finished first.
+Given that, why does `gather()` survive?
+Weight, and one genuinely different mode.
+For a batch expected to succeed, `await gather(...)` is a single expression:
+no `async with`, no task list, no harvest step.
+And `gather(..., return_exceptions=True)` collects failures *as values* in the result list,
+for batches where partial failure is data to examine rather than a reason to stop.
+A health check across ten services wants the nine answers and the one error.
+`TaskGroup` has no such mode.
+Its contract is all-or-cancel,
+and keeping siblings alive past a failure means catching inside each task yourself.
+For new code where a failure should stop the batch,
+`TaskGroup` is the sound default.
+`gather()` remains the compact happy-path form,
+and the only form for failure-as-data.
 
 ## Overlapping the Waits
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
-When a task awaits something outside the processor,
-the loop runs another task in the meantime.
-Here the same price lookup appears twice.
-`io_price` waits with `asyncio.sleep`, a stand-in for a network call.
-`cpu_price` performs computations as a stand-in for heavy work.
+When a task awaits, the loop runs another task in the meantime.
+In the following example, the same price lookup appears twice.
+`io_price` waits using `asyncio.sleep` as a stand-in for a network call.
+`cpu_price` performs computations to represent heavy work.
 A `Meter` records the peak number of tasks in flight at once:
 
 ```python
 # event_loop_boundary.py
 import asyncio
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 
+@dataclass
 class Meter:
-    def __init__(self) -> None:
-        self.active = 0
-        self.peak = 0
+    active: int = 0
+    peak: int = 0
 
-    def enter(self) -> None:
+    def __enter__(self) -> None:
         self.active += 1
         self.peak = max(self.peak, self.active)
 
-    def leave(self) -> None:
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
         self.active -= 1
 
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def io_price(order: int, meter: Meter) -> int:
-    meter.enter()
-    await asyncio.sleep(0.05)  # Waiting outside the processor
-    meter.leave()
+    with meter:  # In flight for the span of the block
+        await asyncio.sleep(0.05)  # Waiting outside the processor
     return order * 10
 
 async def cpu_price(order: int, meter: Meter) -> int:
-    meter.enter()
-    total = 0
-    for _ in range(1_000_000):  # Working inside the processor
-        total += 1
-    meter.leave()
+    with meter:
+        total = 0
+        for _ in range(1_000_000):  # Working inside the processor
+            total += 1
     return order * 10
 
 async def run(task: PriceTask,

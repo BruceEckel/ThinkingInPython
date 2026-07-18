@@ -1,11 +1,12 @@
 # event_loop_boundary.py
 import asyncio
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 
+@dataclass
 class Meter:
-    def __init__(self) -> None:
-        self.active = 0
-        self.peak = 0
+    active: int = 0
+    peak: int = 0
 
     def enter(self) -> None:
         self.active += 1

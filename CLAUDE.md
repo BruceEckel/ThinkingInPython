@@ -75,6 +75,15 @@ surfaces. Read as a first-time reader and apply these lenses:
   shown idiom (`[await c for c in coros]` instead of `gather()`), and
   does the chapter warn them it behaves differently?
 
+A third, mechanical pass audits each listing against the house style
+in `thinking-in-python-skill.md`: the book's listings must practice
+what its chapters preach. The trigger is an *unexplained* deviation.
+`interned_color.py` hand-rolls what a dataclass generates and the
+prose says why, which is fine; chapter 19's `Meter` carried a
+hand-written field-assigning `__init__` for no reason, which is the
+drift this pass exists to catch. `grep "def __init__(self" Chapters/`
+is a cheap sweep for the most common case.
+
 Implement confident, small fixes directly. For additions — new listings,
 new exercises, restructured explanations — propose first and let the
 author decide: additions change voice and pacing, and rejecting
