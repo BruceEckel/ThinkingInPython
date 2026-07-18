@@ -49,6 +49,40 @@ scaffolded once by `maturin new --bindings pyo3 <name>`) that
 `extract_rust.py` never touches, only `src/lib.rs` and the paired demo
 file are book-generated.
 
+## Deep-reviewing a chapter: two passes, not one
+
+A request to "deep review" a chapter means an editing pass *and* a
+teaching pass. The editing pass is correctness: verify every technical
+claim (web-search anything post-cutoff or version-dependent), run the
+chapter's gates, execute the extracted scripts directly and compare
+against their `#:` markers — repeatedly for timing-comparison booleans,
+since the self-healing gate would silently flip a flaky `True` to
+`False` — and fix outright errors in prose or code.
+
+The teaching pass asks what's *missing*, which a correctness pass never
+surfaces. Read as a first-time reader and apply these lenses:
+
+- **Misconceptions:** what would a reader still misunderstand after each
+  section? What question does it raise but not answer?
+- **Lookalike pairs:** list every pair of similar constructs the chapter
+  uses (`asyncio.sleep()`/`time.sleep()` was the canonical miss); is the
+  difference taught, or just assumed?
+- **Mechanism vs. outcome:** does each example show *how* the machinery
+  works, or only the final result? The test: could a reader narrate the
+  mechanism from the output alone? Tracing output (start/resume lines)
+  often teaches more than a summary number.
+- **Near-miss code:** what would a reader plausibly write instead of the
+  shown idiom (`[await c for c in coros]` instead of `gather()`), and
+  does the chapter warn them it behaves differently?
+
+Implement confident, small fixes directly. For additions — new listings,
+new exercises, restructured explanations — propose first and let the
+author decide: additions change voice and pacing, and rejecting
+candidates that would bloat the chapter is part of the author's role.
+Any new listing follows the full loop below (fenced block with `# slug.py`
+first line, deterministic markers or wide-margin threshold booleans,
+sync, gates, `make reflow CH=NN` on the new prose).
+
 ## The verify loop after editing a chapter
 
 Fastest path is `make verify` (fix line endings, refresh `#:` output markers,
