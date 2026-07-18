@@ -10,7 +10,7 @@ and use *design patterns* for the concept.
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
-A significant portion of those examples provide inspiration for much of the remainder of this book.
+A significant portion of those examples provides inspiration for much of the remainder of this book.
 I will introduce the basic concepts of design patterns, along with examples.
 
 ## What Is a Pattern?
@@ -20,6 +20,13 @@ Many people have worked out all the angles of a problem and have come up with th
 flexible solution.
 You may have seen and solved something like it before,
 but your solution probably doesn't have the kind of completeness you'll see embodied in a pattern.
+
+That admiration has a failure mode.
+Once you know a catalog of patterns, it is tempting to treat it as a checklist,
+and to install patterns as proof of sophistication.
+A pattern earns its place only when the problem it solves is actually present.
+If nothing varies, you do not need machinery for isolating variation,
+and a pattern without its problem is pure overhead.
 
 Although they're called "design patterns,"
 they really aren't tied to the realm of design.
@@ -40,11 +47,17 @@ Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
-(here, "vector" means a direction of change, not a container class).
+(here, "vector" means a direction of change, not an array of numbers).
 This means finding the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
+Notice the verb: a vector of change is discovered, not predicted.
+Guess at it up front and you usually build flexibility in a direction nothing ever moves,
+paying in complexity for generality that never earns its keep.
+Let real changes reveal it.
+The second time a requirement shifts the same part of the design,
+you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
 If you look at it this way,
@@ -64,6 +77,20 @@ An iterator allows you to hide the particular implementation of the container as
 You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
 Your generic code works with any object that produces an iterator.
 
+Iterator's fate is worth pausing on, because it repeats.
+A pattern is often a sign of something a language is missing:
+enough programmers wrote the same scaffolding often enough to name it,
+and the scaffolding exists only because the language would not write it for them.
+When a language later absorbs the feature,
+the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language.].
+Python has absorbed several.
+Iterator became the machinery of the `for` loop,
+and *Strategy* and *Command* shrink to passing a function
+([Function Objects](28_Function_Objects.md) shows both).
+This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md)
+posed: how much of each pattern's machinery does Python still need,
+and how much dissolves into functions, data, and protocols?
+
 ## Pattern Evolution
 
 1.  **Idiom**: how we write code in a particular language to do this particular type of thing.
@@ -77,6 +104,13 @@ Your generic code works with any object that produces an iterator.
 4.  **Design Pattern**: how to solve an entire class of similar problems.
     This usually only appears after applying a standard design a number of times,
     and then seeing a common pattern throughout these applications.
+
+In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
+meaningless outside a language that provides `with`.
+[Template Method](25_Template_Method.md) is a design pattern, stage four:
+a shape of solution you could build in any language with polymorphism.
+The ladder between them is climbed by generalization,
+and descended again every time a language absorbs a pattern into a feature.
 
 This progression doesn't say that one stage is better than another.
 It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
