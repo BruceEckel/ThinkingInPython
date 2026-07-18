@@ -8,27 +8,26 @@ class Meter:
     active: int = 0
     peak: int = 0
 
-    def enter(self) -> None:
+    def __enter__(self) -> None:
         self.active += 1
         self.peak = max(self.peak, self.active)
 
-    def leave(self) -> None:
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
         self.active -= 1
 
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def io_price(order: int, meter: Meter) -> int:
-    meter.enter()
-    await asyncio.sleep(0.05)  # Waiting outside the processor
-    meter.leave()
+    with meter:  # In flight for the span of the block
+        await asyncio.sleep(0.05)  # Waiting outside the processor
     return order * 10
 
 async def cpu_price(order: int, meter: Meter) -> int:
-    meter.enter()
-    total = 0
-    for _ in range(1_000_000):  # Working inside the processor
-        total += 1
-    meter.leave()
+    with meter:
+        total = 0
+        for _ in range(1_000_000):  # Working inside the processor
+            total += 1
     return order * 10
 
 async def run(task: PriceTask,

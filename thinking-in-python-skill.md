@@ -150,6 +150,14 @@ file passes a strict type checker and linter.
   adjacent comment or prose: a deviation from this idiom is part of a
   lesson, never an accident.
 
+- **Prefer a context manager wherever paired begin/end calls bracket
+  a span**: enter/leave, acquire/release, start/stop, open/close.
+  Replace the pair with `__enter__`/`__exit__` (or
+  `@contextmanager`) and a `with` block, so the end call cannot be
+  forgotten and runs even when the body raises. A manual pair
+  survives only when the span crosses scopes, with the release
+  happening in a different method, object, or task than the acquire.
+
 - **Polymorphism is broader than method dispatch.** It means one
   function accepting more than one argument type: ad hoc
   (overloading), parametric (generics), and subtype (inheritance

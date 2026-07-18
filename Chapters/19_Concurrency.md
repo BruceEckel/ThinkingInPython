@@ -213,7 +213,12 @@ When a task awaits, the loop runs another task in the meantime.
 In the following example, the same price lookup appears twice.
 `io_price` waits using `asyncio.sleep` as a stand-in for a network call.
 `cpu_price` performs computations to represent heavy work.
-A `Meter` records the peak number of tasks in flight at once:
+A `Meter` records the peak number of tasks in flight at once.
+It is a context manager ([Context Managers](15_Context_Managers.md)):
+each task wraps its working span in `with meter:`,
+so entry counts the task in flight, exit counts it done,
+and the exit runs even if the body raises,
+a guarantee a manual `enter()`/`leave()` pair cannot make:
 
 ```python
 # event_loop_boundary.py
