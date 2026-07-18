@@ -1,7 +1,7 @@
 # flower_visitors.py
 import random
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, override
 
 # The Flower hierarchy cannot be changed:
 class Flower:
@@ -18,8 +18,11 @@ class Gladiolus(Flower):
     pass
 class Ranunculus(Flower):
     pass
+
 class Chrysanthemum(Flower):
-    pass
+    @override
+    def eat(self, eater: Visitor) -> None:
+        print(self, "is toxic to", eater)
 
 # The secondary hierarchy accepted by Flower:
 class Visitor:
@@ -73,4 +76,4 @@ for flower in flower_gen(4):
 #: Ranunculus eaten by Worm
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
+#: Chrysanthemum is toxic to Worm

@@ -288,7 +288,7 @@ print(Meters(3) + Meters(4))
 print(Meters(3) + 4)  # The left operand handles it
 #: __add__(Meters(3), 4)
 #: Meters(7)
-print(4 + Meters(3))  # int declines; the right operand handles it
+print(4 + Meters(3))  # Int declines; the right operand handles it
 #: __radd__(Meters(3), 4)
 #: Meters(7)
 try:

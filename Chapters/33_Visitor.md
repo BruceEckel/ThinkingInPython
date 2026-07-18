@@ -24,7 +24,7 @@ then call the `Visitor`'s dynamically bound method:
 # flower_visitors.py
 import random
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, override
 
 # The Flower hierarchy cannot be changed:
 class Flower:
@@ -41,8 +41,11 @@ class Gladiolus(Flower):
     pass
 class Ranunculus(Flower):
     pass
+
 class Chrysanthemum(Flower):
-    pass
+    @override
+    def eat(self, eater: Visitor) -> None:
+        print(self, "is toxic to", eater)
 
 # The secondary hierarchy accepted by Flower:
 class Visitor:
@@ -96,12 +99,31 @@ for flower in flower_gen(4):
 #: Ranunculus eaten by Worm
 #: Chrysanthemum pollinated by Bee
 #: Chrysanthemum pollinated by Fly
-#: Chrysanthemum eaten by Worm
+#: Chrysanthemum is toxic to Worm
 ```
 
 The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` resolves the flower's type,
-then `visit()` resolves the visitor's type.
+then `visit()` resolves the visitor's type,
+and the `pollinate()` or `eat()` call inside `visit()` lands back on the flower's type.
+The last line of output shows both dispatches doing visible work.
+`Chrysanthemum` overrides `eat()`
+(chrysanthemums really do produce a natural insecticide),
+so that line depends on both unknown types at once:
+the worm's type chose `eat()`, and the flower's type chose *which* `eat()` runs.
+Delete the override and the program still runs;
+the flower-side dispatch simply goes back to having nothing to say.
+
+One annotation in the listing is load-bearing.
+`accept()` types its visitor as `Any`,
+because the `Visitor` base class declares no `visit()` method,
+so `visitor.visit(self)` would fail the type checker under an honest `Visitor` annotation.
+The classic pattern fixes this by declaring `visit()` abstract on the visitor base;
+a Python version can give `Visitor` an abstract `visit()`,
+or describe visitors with a `Protocol`.
+The `Any` is the quiet price of the empty base,
+the same bargain [Data Transfer Objects](22_Data_Transfer_Objects.md)
+paid for its attribute bag.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -172,7 +194,10 @@ Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
 Dispatch follows inheritance:
 an unregistered subclass uses its nearest registered ancestor,
-falling back to the `Flower` default only when no ancestor is registered.
+falling back to the `Flower` default only when no ancestor is registered
+(the tests below pin this down).
+A union annotation, `flower: Gladiolus | Ranunculus`,
+registers one implementation for several types at once.
 Adding a new operation is a new function.
 Adding a new flower is a class and, where needed, a one-line registration.
 When the operation should read like a method,
@@ -228,6 +253,13 @@ def test_operations_dispatch_independently() -> None:
     ranunculus = Ranunculus()
     assert nectar(ranunculus) == "Ranunculus: no nectar"
     assert fragrance(ranunculus) == "strong"
+
+def test_dispatch_follows_inheritance() -> None:
+    # Unregistered subclass: nearest registered ancestor wins
+    class Hybrid(Gladiolus):
+        pass
+
+    assert nectar(Hybrid()) == "Hybrid: abundant nectar"
 ```
 
 ## Exercises

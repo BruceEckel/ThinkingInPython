@@ -34,3 +34,10 @@ def test_operations_dispatch_independently() -> None:
     ranunculus = Ranunculus()
     assert nectar(ranunculus) == "Ranunculus: no nectar"
     assert fragrance(ranunculus) == "strong"
+
+def test_dispatch_follows_inheritance() -> None:
+    # Unregistered subclass: nearest registered ancestor wins
+    class Hybrid(Gladiolus):
+        pass
+
+    assert nectar(Hybrid()) == "Hybrid: abundant nectar"
