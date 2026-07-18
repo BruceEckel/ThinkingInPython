@@ -83,6 +83,26 @@ Any new listing follows the full loop below (fenced block with `# slug.py`
 first line, deterministic markers or wide-margin threshold booleans,
 sync, gates, `make reflow CH=NN` on the new prose).
 
+Accrued notes from the chapters 18-38 review sweep:
+
+- "reach for" sits in `tools/banned_phrases.txt` and is an easy tic to
+  type when drafting new prose; the gate catches it, but check drafts
+  for it before running the gate.
+- Cross-chapter threads now exist whose ends must stay consistent when
+  either end is edited: reflected operators and `NotImplemented` are
+  taught in 32 (`radd_dispatch.py`) and applied in 34 (`expr.py`, plus
+  its exercise 6); exact-type dict dispatch is noted in 31 (engine),
+  32 (OUTCOME table), and 37 (`bins[type(t)]`); the registry factory's
+  import-time-registration and name-collision caveats live in 27 and
+  back the registries in 20/37; frozen-is-shallow is demonstrated in 20
+  (`frozen_leaky.py`) and assumed by 22's `NamedTuple`-vs-frozen
+  contrast and 35/36's immutability arguments; the load-bearing-`Any`
+  bargain runs 22 → 33; the constructor-starts-the-engine trap runs
+  25 (`premature_engine.py`) → 31 (StateMachine's `__init__`); 29 ends
+  with the wrapper disambiguation map (Proxy/Decorator/Adapter/Façade)
+  that leans on 26 and 14; 21's dissolves-into-the-language thesis
+  (Norvig footnote) is what 23/24/27/28's "Pythonic" sections cash in.
+
 ## The verify loop after editing a chapter
 
 Fastest path is `make verify` (fix line endings, refresh `#:` output markers,
@@ -152,6 +172,15 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   is repo drift; run the extracted script directly first
   (`build/examples/<chapter>/<file>.py`) to check whether the value is
   actually stable before accepting an auto-fix.
+- **Async timing markers flip silently on Windows timers.** A `#:` trace
+  that depends on ordering between asyncio deadlines needs wide margins.
+  Chapter 19's `task_group.py` cancellation demo with 0.01/0.02/0.03s
+  sleeps let task "a" complete before cancellation landed (b's failure
+  and a's deadline fell inside one timer tick), and the self-healing
+  gate rewrote the marker to contradict the prose. Use roughly 5-10x
+  gaps between competing deadlines (0.01/0.05/0.25), widest where a
+  cancellation must propagate, and treat any `git diff` on a timing
+  marker as a red flag to investigate, not drift to accept.
 - **`validate_output.py` on the whole tree can leak `__del__` output between
   chapters.** It `exec()`s every block's code against a fresh `namespace` dict
   reused as that block's globals. A class defined there forms a reference

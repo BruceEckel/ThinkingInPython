@@ -153,6 +153,10 @@ The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
+This is the read-modify-write hazard [Concurrency](19_Concurrency.md#a-single-thread-still-races)
+demonstrated, avoided by construction:
+a race needs a suspension point inside the update, and `claim()` contains none
+(exercise 3 inserts one and watches the guarantee fail).
 `explore()` claims the entry, releases the first rat, then awaits every task,
 including the ones spawned along the way:
 
@@ -316,7 +320,9 @@ We can create a GUI demonstration using the same model.
 records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green in turn,
-so you watch the pack move through the maze from the entry outward:
+so you watch the pack move through the maze from the entry outward.
+Like every windowed view in this book, the harness skips it
+(`tools/norun.txt` lists all three of this chapter's views):
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -719,6 +725,17 @@ print(game.show_maze())
 Running it prints the maze before and after the walk.
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
+
+Stage 3 pairs the teleports with a small idiom worth decoding.
+`pairs = iter(teleports)` makes one iterator,
+and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
+so each pass consumes two rooms: the first and second `a`, then the two `b`s,
+with the sort by target letter lining the partners up beforehand.
+The near-miss is `zip(teleports, teleports)`,
+which walks two independent passes over the list and pairs every room with itself.
+One iterator, referenced twice, is the whole trick.
+The `assert isinstance` lines that follow are for the type checker as much as for safety:
+each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
 
 The maze rendering, `show_maze()`, returns a string,
 so the model's correctness is something a test can pin down with no window in sight.
