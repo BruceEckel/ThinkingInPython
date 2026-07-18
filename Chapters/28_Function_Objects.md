@@ -87,6 +87,46 @@ The class version is four classes and a wrapper to say what one list of function
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 In Python a callback is just a function, so the replacement is unnecessary.
 Use the object form when a command must also carry state or support extra operations such as undo.
+Halfway between the two, a *bound method* is a ready-made command.
+`account.deposit` names a function with its instance already attached,
+so it drops into a command list alongside plain functions,
+carrying its state without any `Command` class.
+
+Building commands in a loop springs Python's best-known closure trap:
+
+```python
+# late_binding.py
+from collections.abc import Callable
+from functools import partial
+
+commands: list[Callable[[], None]] = [
+    lambda: print(f"step {n}") for n in range(3)
+]
+for command in commands:
+    command()  # Every lambda sees the final n
+#: step 2
+#: step 2
+#: step 2
+
+fixed: list[Callable[[], None]] = [
+    partial(print, f"step {n}") for n in range(3)
+]
+for command in fixed:
+    command()
+#: step 0
+#: step 1
+#: step 2
+```
+
+The two comprehensions look alike and differ in *when* they read `n`.
+A lambda's body runs when the command is called, not when it is created,
+and all three lambdas close over the one loop variable,
+which holds 2 by the time anything calls them.
+`functools.partial` ([Functional Foundations](40_Functional_Foundations.md#partial-application))
+evaluates its arguments at construction time,
+so each command captures the value `n` had on its own iteration.
+The older spelling `lambda n=n: ...` does the same job with a default argument.
+When commands built in a loop all behave like the last one, this is why.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
@@ -150,7 +190,8 @@ def newton(f: Fn, a: float, b: float) -> float | None:
 ```
 
 Because each finder is a function with the same signature,
-you achieve a *Strategy* by stepping through the algorithms:
+passing one to `solve()` chooses the strategy,
+and the loop below simply tries each choice in turn:
 
 ```python
 # strategy.py
@@ -229,7 +270,47 @@ for algorithm in (Bisection(), Newton(), Secant()):
 We use strategies-as-functions constantly in Python without naming it as a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
-The object form is worth it only when a strategy needs its own configuration or several related methods.
+
+When a strategy needs configuration, the next step is not yet a class.
+It is a *closure* ([Functional Foundations](40_Functional_Foundations.md#closures)),
+a function that manufactures the strategy with the settings baked in:
+
+```python
+# configured_strategy.py
+from algorithms import Fn, RootFinder
+
+def bisection_within(tolerance: float) -> RootFinder:
+    def finder(f: Fn, a: float, b: float) -> float | None:
+        if f(a) * f(b) > 0:  # Endpoints must bracket a root
+            return None
+        while abs(b - a) > tolerance:
+            mid = (a + b) / 2
+            if f(a) * f(mid) <= 0:
+                b = mid
+            else:
+                a = mid
+        return (a + b) / 2
+    return finder
+
+def f(x: float) -> float:
+    return x * x - 2  # Root at the square root of 2
+
+coarse = bisection_within(0.1)
+fine = bisection_within(1e-9)
+r1, r2 = coarse(f, 0.0, 2.0), fine(f, 0.0, 2.0)
+assert r1 is not None and r2 is not None
+print(f"{r1:.6f} {r2:.6f}")
+#: 1.406250 1.414214
+```
+
+Each call to `bisection_within()` returns a new finder with its tolerance sealed inside.
+The coarse strategy stops within a tenth and reports 1.406250.
+The fine one reports the root to six places.
+Both satisfy `RootFinder`, so either drops into `solve()`,
+or into the chain below, unchanged.
+`functools.partial` does the same job when the configurable version already exists with the setting as a parameter.
+Save the strategy *class* for an algorithm that carries several related methods or mutable state.
+Configuration alone is a closure's job.
 
 ## Chain of Responsibility
 
@@ -440,3 +521,7 @@ and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-an
 3.  Use `sorted()` with a `key` function to sort a list of `(name, score)` tuples by score,
     then by name.
     Explain why `key` is the *Strategy* pattern.
+4.  Following `bisection_within()`,
+    add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
+    with a closure, and with `functools.partial`.
+    Confirm both drop into `chain.py`'s `solve()` with no change to `solve()`.

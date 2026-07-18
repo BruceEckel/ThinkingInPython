@@ -8,10 +8,10 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    coroutine = fetch("a", 0.03)  # Calling runs nothing yet
-    print(type(coroutine).__name__)
+    x = fetch("a", 0.03)  # Calling runs nothing yet
+    print(type(x).__name__)
     results = await asyncio.gather(  # Run all three concurrently
-        coroutine, fetch("b", 0.02), fetch("c", 0.01))
+        x, fetch("b", 0.02), fetch("c", 0.01))
     print(results)
 
 asyncio.run(main())
