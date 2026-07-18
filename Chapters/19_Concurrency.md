@@ -43,26 +43,57 @@ It is the entry point, called once to run the program:
 # async_mechanics.py
 import asyncio
 
-async def fetch(item: str) -> str:
-    await asyncio.sleep(0.01)  # A stand-in for a network wait
+async def fetch(item: str, delay: float) -> str:
+    print(f"{item}: started")
+    await asyncio.sleep(delay)  # A stand-in for a network wait
+    print(f"{item}: resumed")
     return item.upper()
 
 async def main() -> None:
-    print(await fetch("solo"))  # Await one coroutine
-    print(await asyncio.gather(  # Run several concurrently
-        fetch("a"), fetch("b"), fetch("c")))
+    results = await asyncio.gather(  # Run all three concurrently
+        fetch("a", 0.03), fetch("b", 0.02), fetch("c", 0.01))
+    print(results)
 
 asyncio.run(main())
-#: SOLO
+#: a: started
+#: b: started
+#: c: started
+#: c: resumed
+#: b: resumed
+#: a: resumed
 #: ['A', 'B', 'C']
 ```
 
-The single `fetch("solo")` behaves like an ordinary function call with a pause inside.
-The `gather()` call is where concurrency appears.
-All three `fetch()` coroutines are in flight at once,
-so the total wait is one sleep, not three.
+The trace shows the event loop's schedule.
+`gather()` starts the three coroutines in the order given,
+and each runs until it reaches its `await`, so the started lines print as a, b,
+c.
+At the `await` each task *suspends*: it stops executing,
+remembers its place in the function, and hands control back to the event loop.
+A suspended task runs no bytecode and holds no processor; it is a paused frame,
+local variables intact, waiting to continue.
+The freed loop starts the next coroutine,
+which is how all three are in flight during the first wait.
+Suspending also registers a wake-up condition with the loop.
+`asyncio.sleep()` asks for a timer;
+a real network request would ask the loop to watch a socket for the reply.
+When a timer fires, the loop resumes that task exactly where it paused,
+just after the `await`.
+The three delays make the resumptions visible: c sleeps shortest,
+so its timer fires first, and the resumed lines print as c, b, a,
+the reverse of the starts.
+Yet `gather()` returns `['A', 'B', 'C']`: results follow the argument order,
+not the finishing order.
+The total wait is one 0.03-second sleep, not the sum of all three.
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
+
+Beware the lookalike: a list comprehension that awaits,
+`[await c for c in coroutines]`,
+returns the same list as `gather()` but is the sequential version.
+Each `await` runs its coroutine to completion before the next one starts,
+so nothing overlaps and the waits add up.
+`gather()` is concurrent because it starts every task before it waits for any of them.
 
 ## Overlapping the Waits
 
@@ -71,7 +102,7 @@ When a task awaits something outside the processor,
 the loop runs another task in the meantime.
 Here the same price lookup appears twice.
 `io_price` waits with `asyncio.sleep`, a stand-in for a network call.
-`cpu_price` computes, a stand-in for heavy work.
+`cpu_price` performs computations as a stand-in for heavy work.
 A `Meter` records the peak number of tasks in flight at once:
 
 ```python
@@ -717,24 +748,30 @@ in Context Managers uses the same `Queue` as a throttle.
 
 ## Exercises
 
-1.  In `async_mechanics.py`, add a fourth call, `fetch("d")`,
-    to the `gather()` line,
-    and confirm the printed list grows to four entries in the order given,
+1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
+    to the `gather()` line.
+    Confirm that "d" starts last but resumes first,
+    and that the printed list still grows to four entries in the order given,
     not the order they finish.
-2.  In `event_loop_boundary.py`, add a third task function, `mixed_price()`,
+2.  In `async_mechanics.py`,
+    replace the `gather()` call with `[await c for c in coros]`,
+    where `coros` is a list of the same three `fetch()` calls.
+    Predict the started/resumed trace and the total run time before running it,
+    and explain why this version takes the sum of the three delays.
+3.  In `event_loop_boundary.py`, add a third task function, `mixed_price()`,
     that awaits `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
-3.  In `event_loop_boundary.py`,
+4.  In `event_loop_boundary.py`,
     change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
     Explain the result using `blocking_the_loop.py`.
-4.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
+5.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
     (acquire before reading `counter`, release after writing it back)
     and confirm `counter` now reaches `400`.
-5.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
+6.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,
     but is not thereby fixed.
-6.  In `priority_queue.py`,
+7.  In `priority_queue.py`,
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
