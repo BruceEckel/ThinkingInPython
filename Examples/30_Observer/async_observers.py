@@ -31,7 +31,7 @@ class Thermometer(Observable):
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
-        await asyncio.sleep(0.02)  # Slow network alert
+        await asyncio.sleep(0.05)  # Slow network alert
         print(f"alarm sent: {celsius}C")
 
 async def log_reading(celsius: float) -> None:

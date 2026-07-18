@@ -52,7 +52,8 @@ class Observable:
         self._observers.remove(observer)
 
     def notify(self, data: Any) -> None:
-        for observer in self._observers:
+        # Copy: observers may detach during notification
+        for observer in list(self._observers):
             observer(data)
 
 class Thermometer(Observable):
@@ -151,6 +152,49 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     assert readings == [20.0]
 ```
 
+The `list()` copy inside `notify()` is a single word doing quiet work.
+An observer may react to a notification by unsubscribing,
+a one-shot listener detaching itself is the natural example,
+and that mutates `self._observers` in the middle of the loop walking it.
+Iterate the list directly and removing the current observer shifts every later one left,
+so the next observer is silently skipped, no error anywhere.
+The copy makes detaching during notification safe,
+and a newcomer subscribing mid-notification starts hearing from the next change:
+
+```python
+# self_removing_observer.py
+from observers import Observable
+
+obs = Observable()
+seen: list[str] = []
+
+def once(data: object) -> None:
+    seen.append(f"once: {data}")
+    obs.unsubscribe(once)  # Detaches itself mid-notification
+
+obs.subscribe(once)
+obs.subscribe(lambda d: seen.append(f"always: {d}"))
+obs.notify(1)
+obs.notify(2)
+print(seen)
+#: ['once: 1', 'always: 1', 'always: 2']
+```
+
+`once` hears the first change and detaches; `always` hears both.
+Under the naive loop, `always: 1` would be missing:
+`once`'s self-removal would have skipped it.
+
+Two more realities of Observer deserve a sentence each.
+An observer that *raises* stops the loop,
+and every observer after it never hears the change;
+decide whether `notify()` should catch, collect, and continue
+(exercise 3 makes this concrete).
+And subscriptions are strong references:
+an observable that outlives its observers keeps each subscribed bound method's instance alive,
+the classic *lapsed listener* leak.
+Long-lived observables need disciplined `unsubscribe()` calls,
+or weak references (`weakref.WeakMethod`) doing the forgetting automatically.
+
 ## Observer and I/O
 
 Until now, an observer only prints or appends to a list, then returns.
@@ -205,7 +249,7 @@ class Thermometer(Observable):
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
-        await asyncio.sleep(0.02)  # Slow network alert
+        await asyncio.sleep(0.05)  # Slow network alert
         print(f"alarm sent: {celsius}C")
 
 async def log_reading(celsius: float) -> None:
@@ -379,15 +423,17 @@ is the model-view split made concrete.
 
 ## Exercises
 
-1.  Write a class decorator that wraps every method of a class to print on method entry and exit,
-    giving an execution trace.
-    ([Decorators](14_Decorators.md#decorating-classes) and [Metaprogramming](17_Metaprogramming.md#writing-a-metaclass) show the techniques.)
-2.  Create a minimal Observer-Observable design in two classes.
+1.  Create a minimal Observer-Observable design in two classes.
     Just create the bare minimum in the two classes,
     then demonstrate your design by creating one `Observable` and many `Observer`s,
     and cause the `Observable` to update the `Observer`s.
-3.  Modify `box_observer.py` to turn it into a simple game.
+2.  Modify `box_observer.py` to turn it into a simple game.
     If any of the squares surrounding the one you clicked is part of a contiguous patch of the same color,
     then all the squares in that patch take on the color you clicked.
     You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
     You may also restrict a player's color to the first one they chose.
+3.  Make `Observable.notify()` survive a raising observer:
+    every other observer still hears the change,
+    and the failures are re-raised afterward, together, as an `ExceptionGroup`
+    (the container [Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup) introduced).
+    Write a test in which the first observer raises and the second still records its notification.

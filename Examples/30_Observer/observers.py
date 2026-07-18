@@ -15,7 +15,8 @@ class Observable:
         self._observers.remove(observer)
 
     def notify(self, data: Any) -> None:
-        for observer in self._observers:
+        # Copy: observers may detach during notification
+        for observer in list(self._observers):
             observer(data)
 
 class Thermometer(Observable):
