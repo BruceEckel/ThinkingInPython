@@ -18,8 +18,10 @@ and there are a number of ways to accomplish this adaptation:
 from typing import Any, override
 
 class WhatIHave:
-    def g(self) -> None: ...
-    def h(self) -> None: ...
+    def g(self) -> None:
+        print("WhatIHave.g()")
+    def h(self) -> None:
+        print("WhatIHave.h()")
 
 class WhatIWant:
     def f(self) -> None: ...
@@ -71,17 +73,44 @@ adapt = ProxyAdapter(what_i_have)
 what_i_use2 = WhatIUse2()
 what_i_have2 = WhatIHave2()
 what_i_have3 = WhatIHave3()
-what_i_use.op(adapt)
-# Approach 2:
-what_i_use2.op(what_i_have)
-# Approach 3:
-what_i_use.op(what_i_have2)
-# Approach 4:
-what_i_use.op(what_i_have3.what_i_want())
+what_i_use.op(adapt)  # Approach 1: separate adapter
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use2.op(what_i_have)  # Approach 2: adapting op()
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use.op(what_i_have2)  # Approach 3: adapter built in
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use.op(what_i_have3.what_i_want())  # Approach 4
+#: WhatIHave.g()
+#: WhatIHave.h()
 ```
+
+The output is deliberately monotonous.
+Four different structures produce one behavior:
+every route ends at the same two methods on a `WhatIHave`.
+The approaches differ only in where the adaptation lives, a separate object,
+the call site, the adaptee's own class, or an inner class the adaptee hands out.
+When the output cannot tell the approaches apart,
+the choice among them is purely one of packaging,
+and the next section argues Python lets you skip most of the packaging too.
 
 This takes liberty with the term "[Proxy](26_Surrogate.md#proxy),"
 because *GoF Design Patterns* asserts that a Proxy must have an identical interface with the object for which it is a surrogate.
+
+Two details in the listing repay attention.
+The `/` in `WhatIUse.op()` makes its parameter positional-only,
+and it is load-bearing: `WhatIUse2.op()` renames the parameter to `what_i_have`,
+and renaming a keyword-callable parameter in an override breaks substitutability,
+so the checker rejects it without the `/`.
+Second, the approaches split into two families *GoF Design Patterns* names.
+`ProxyAdapter` is an *object adapter*:
+it holds the adaptee and can wrap any instance handed to it at runtime.
+`WhatIHave2` is a *class adapter*: it inherits from the adaptee,
+which fixes the adapted class at definition time and exposes the adaptee's entire surface,
+`g()` and `h()` included, to every client of the adapter.
+Composition keeps the two interfaces separate; inheritance merges them.
 
 ### Adapter in Python
 
@@ -121,6 +150,11 @@ print(a.g())  # Forwarded to the adaptee unchanged
 `__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+You have already seen one in earnest:
+`PairCoord` in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
+adapts a `Pair` to the `Coord` protocol,
+an adapter as a frozen dataclass with two properties,
+built precisely because the handed-to-you type did not fit.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
 special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders itself,
@@ -201,6 +235,23 @@ Keep the messy internals private (using a leading underscore, by convention),
 and the `import` is the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module already gives you.
+
+This chapter completes a family of wrappers that share one structure,
+a front object forwarding to something behind it,
+often through the same few lines of `__getattr__()`.
+What separates them is intent,
+the distinction [The Pattern Concept](21_The_Pattern_Concept.md)
+said remains when structures match.
+A [Proxy](26_Surrogate.md#proxy)
+keeps the wrapped object's interface and controls access to it.
+A [Decorator](14_Decorators.md#the-decorator-pattern)
+keeps the interface and layers on behavior.
+An *Adapter* changes the interface into the one you need.
+A *Façade* fronts a whole tangle of objects rather than one,
+narrowing many interfaces down to a comfortable few.
+When you cannot decide what to call your wrapper,
+ask what would break if you removed it: access control, added behavior,
+interface fit, or simplicity.
 
 ## Exercises
 

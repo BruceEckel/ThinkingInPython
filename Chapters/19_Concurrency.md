@@ -67,13 +67,13 @@ asyncio.run(main())
 #: ['A', 'B', 'C']
 ```
 
-The first printed line is proof that calling runs nothing.
+The first printed line is proof that calling a coroutine runs nothing.
 `fetch("a", 0.03)` has already been called on `main()`'s first line,
 yet no started line has appeared, only the name of the object the call built:
-a coroutine.
+`coroutine`.
 The work begins when `gather()` receives that object.
-Forget the `await gather()` and the work never happens at all;
-Python's only complaint is a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
+If you forget the `await gather()`, the work doesn't happen.
+Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
 
 The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
@@ -128,7 +128,7 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    pairs = [("a", 0.03), ("b", 0.02), ("c", 0.01)]
+    pairs = [("a", 0.25), ("b", 0.05), ("c", 0.01)]
     try:
         async with asyncio.TaskGroup() as tg:
             for item, delay in pairs:
@@ -138,17 +138,17 @@ async def main() -> None:
 
 asyncio.run(main())
 #: c: fetched
-#: a: fetched
 #: caught: fetch('b') failed
 ```
 
 `tg.create_task()` schedules a task immediately,
 so all three are in flight together, exactly as under `gather()`.
 The trace shows the failure discipline. c, with the shortest delay,
-completes and prints. b raises at 0.02 seconds,
+completes and prints. b raises at 0.05 seconds,
 and the group responds by cancelling a,
-which is still suspended in its sleep with 0.01 seconds to go,
+which is still suspended with 0.2 seconds of sleep to go,
 so a's fetched line never appears.
+(The wide gap between b's failure and a's deadline is deliberate: it gives the cancellation room to land on any platform's timer, so the trace stays deterministic.)
 Only when every task has finished or been cancelled does the block exit,
 re-raising the failure wrapped in an *exception group*,
 a container for simultaneous failures,

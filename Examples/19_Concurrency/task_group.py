@@ -9,7 +9,7 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    pairs = [("a", 0.03), ("b", 0.02), ("c", 0.01)]
+    pairs = [("a", 0.25), ("b", 0.05), ("c", 0.01)]
     try:
         async with asyncio.TaskGroup() as tg:
             for item, delay in pairs:

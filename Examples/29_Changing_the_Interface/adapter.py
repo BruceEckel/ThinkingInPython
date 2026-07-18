@@ -3,8 +3,10 @@
 from typing import Any, override
 
 class WhatIHave:
-    def g(self) -> None: ...
-    def h(self) -> None: ...
+    def g(self) -> None:
+        print("WhatIHave.g()")
+    def h(self) -> None:
+        print("WhatIHave.h()")
 
 class WhatIWant:
     def f(self) -> None: ...
@@ -56,10 +58,15 @@ adapt = ProxyAdapter(what_i_have)
 what_i_use2 = WhatIUse2()
 what_i_have2 = WhatIHave2()
 what_i_have3 = WhatIHave3()
-what_i_use.op(adapt)
-# Approach 2:
-what_i_use2.op(what_i_have)
-# Approach 3:
-what_i_use.op(what_i_have2)
-# Approach 4:
-what_i_use.op(what_i_have3.what_i_want())
+what_i_use.op(adapt)  # Approach 1: separate adapter
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use2.op(what_i_have)  # Approach 2: adapting op()
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use.op(what_i_have2)  # Approach 3: adapter built in
+#: WhatIHave.g()
+#: WhatIHave.h()
+what_i_use.op(what_i_have3.what_i_want())  # Approach 4
+#: WhatIHave.g()
+#: WhatIHave.h()
