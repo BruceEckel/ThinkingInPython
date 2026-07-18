@@ -170,8 +170,55 @@ and not tied to any particular implementation.
 One limit: special methods bypass `__getattr__()`.
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's *type*,
 not on the instance, so `len(p)` and `print(p)` do not delegate,
-even though an explicit `p.__len__()` would.
+even though an explicit `p.__len__()` would:
+
+```python
+# dunder_bypass.py
+from typing import Any
+
+class Words:
+    def __init__(self) -> None:
+        self.items = ["spam", "eggs"]
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+class Proxy:
+    def __init__(self) -> None:
+        self.__implementation = Words()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+p = Proxy()
+print(p.__len__())  # The explicit call delegates
+#: 2
+try:
+    # Special-method lookup skips the instance:
+    len(p)  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+The two calls look interchangeable and are not.
+`p.__len__()` is ordinary attribute access,
+so the failed instance lookup falls through to `__getattr__()`, which delegates.
+`len(p)` asks `type(p)` for `__len__()` directly, finds none,
+and reports that `Proxy` has no length.
+The type checker agrees, rejecting `len(p)` statically for the same reason,
+which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
+
+Identity has the same seam.
+`isinstance(p, Words)` is `False`; delegation forwards the methods,
+not the type.
+But an `isinstance()` check against a `@runtime_checkable` `Protocol` passes,
+because its probe for each method is ordinary attribute access,
+which `__getattr__()` answers like any other lookup.
+Code that checks surrogates structurally keeps working;
+code that demands the implementation's class does not.
+One more reason structural typing suits this pattern.
 
 ## State
 
@@ -310,6 +357,23 @@ one generic proxy can add lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*) to any object,
 with no per-method code.
 
+Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
+The one used here is the *fallback* hook:
+Python calls it only after normal lookup fails,
+which is why `self._impl` and `self.calls` inside it resolve normally.
+`__getattribute__()` intercepts *every* attribute access,
+including each `self.` access in its own body,
+so the naive version calls itself forever.
+Writing one means routing every internal access through `object.__getattribute__(self, "_impl")`,
+machinery a surrogate almost never needs.
+The fallback hook has a related trap of its own:
+if `__getattr__()`'s body touches a proxy attribute that does not exist,
+a misspelled `self._imp`,
+or any attribute on an instance built without `__init__()`,
+that failed lookup calls `__getattr__()` again,
+and the error surfaces as `RecursionError`,
+not the `AttributeError` that would point at the typo.
+
 *GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
 But both are really a *Surrogate*:
 a front object that passes method calls through to an implementation.
@@ -355,3 +419,7 @@ def test_proxy_counts_only_calls() -> None:
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
     Confirm the tally reports `f` called twice and `g` called once.
 3.  Create a simple copy-on-write implementation.
+4.  In `counting_proxy.py`,
+    misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
+    Explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo,
+    using the fallback-hook behavior described in this chapter.
