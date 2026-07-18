@@ -125,7 +125,7 @@ asyncio.run(main())
 #: cpu: peak=1, prices=[10, 20, 30, 40, 50]
 ```
 
-Both runs use the same `asyncio.gather`, yet the peaks differ.
+Both runs use the same `asyncio.gather()`, yet the peaks differ.
 The I/O tasks each reach their `await` and suspend,
 so all five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     main()
 ```
 
-`pool.map` sends each order to a worker process and gathers the results in order,
+`pool.map()` sends each order to a worker process and gathers the results in order,
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price` as before.
 Only its home changed, from one shared interpreter to several.
