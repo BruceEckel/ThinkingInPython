@@ -20,8 +20,10 @@ class Leaky:
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
+    print(leaky.numbers is leaky._numbers)  # The same object
     # Both mutate the "private" internals through the getters:
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
+#: True
 #: [1, 2, 999] Bob(name='Ralph')

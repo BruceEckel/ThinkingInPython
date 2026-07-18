@@ -16,6 +16,8 @@ def distance(a: Point, b: Point) -> float:  # As a free function
 if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
     print(p1.distance_to(p2))
+    print(Point.distance_to(p1, p2))  # The method, as a function
     print(distance(p1, p2))
+#: 5.0
 #: 5.0
 #: 5.0

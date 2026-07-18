@@ -99,15 +99,20 @@ class Leaky:
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
+    print(leaky.numbers is leaky._numbers)  # The same object
     # Both mutate the "private" internals through the getters:
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
+#: True
 #: [1, 2, 999] Bob(name='Ralph')
 ```
 
 Encapsulation with private fields and getters still leaks.
-The output shows that the internals changed from outside.
+The `is` check shows the mechanism:
+the getter does not return a view or a snapshot of the list,
+it returns the list, the identical object the underscore was hiding.
+Python's `return` hands out references, never copies.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
 
@@ -169,6 +174,15 @@ The constructor stored the caller's own list,
 so the caller's original reference still mutates the internals.
 A fully defensive class must copy on the way in as well.
 
+The two getters also copy differently, and the difference is its own trap.
+`list.copy()` is *shallow*: it duplicates the container but shares the elements,
+which is safe here only because the elements are immutable `int`s.
+`Bob` gets `deepcopy()`,
+which recursively copies everything the object references,
+the conservative choice when a field's own fields might be mutable.
+A shallow copy of a list of `Bob`s would plug nothing:
+the caller's copy of the list would still hold your actual `Bob`s.
+
 Testing confirms the defensive copy holds.
 Mutating the returned list leaves the original untouched:
 
@@ -225,6 +239,38 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
+Two quiet changes in the listing do as much work as `frozen=True`,
+and it pays to notice them.
+`frozen=True` is shallow:
+it stops assignment to the fields of `Immutable` itself,
+but it cannot stop mutation inside a field that is itself mutable.
+Declare the field as a `list` instead and the leak reopens:
+
+```python
+# frozen_leaky.py
+from dataclasses import FrozenInstanceError, dataclass
+
+@dataclass(frozen=True)
+class FrozenLeaky:
+    numbers: list[int]  # A mutable field in a frozen class
+
+fl = FrozenLeaky([1, 2])
+fl.numbers.append(999)  # frozen=True does not stop this
+print(fl.numbers)
+#: [1, 2, 999]
+try:
+    fl.numbers = []  # type: ignore
+except FrozenInstanceError as e:
+    print(type(e).__name__)
+#: FrozenInstanceError
+```
+
+Frozen guards the binding, not the object.
+`fl.numbers` must keep pointing at the same list, and rebinding it raises,
+but nothing stops that list from changing, the identical leak `Leaky` had.
+That is why `numbers` became a `tuple` and why `Bob` froze too.
+Immutability pays off only when it goes all the way down.
+
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
 makes the case for frozen data classes.
 Most encapsulation is only necessary because you allowed mutation in the first place.
@@ -254,11 +300,19 @@ def distance(a: Point, b: Point) -> float:  # As a free function
 if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
     print(p1.distance_to(p2))
+    print(Point.distance_to(p1, p2))  # The method, as a function
     print(distance(p1, p2))
+#: 5.0
 #: 5.0
 #: 5.0
 ```
 
+The middle call is the claim made concrete.
+Fetched from the class instead of from an instance,
+`distance_to` is an ordinary function,
+and `p1` is passed to it as the first argument.
+`p1.distance_to(p2)` is shorthand for exactly that call;
+the dot fills in `self`, nothing more.
 The function reads the same and computes the same.
 The class does not need to own it.
 The function is not worse, and it has an advantage.
@@ -480,6 +534,11 @@ if __name__ == "__main__":
 
 `show()` accepts anything.
 Pass it something without a `display()` method and you find out only when the line runs.
+The annotation is doing that, and `Any` is not `object`.
+Annotated `t: object`, the safe top type, `show()` would fail the type checker,
+because `object` has no `display()` method.
+`Any` instead switches the checker off for `t`, permitting every operation.
+It is dynamic typing opted into, one parameter at a time.
 [Static Typing](08_Static_Typing.md#structural-typing-with-protocols)
 gives this a static form with `Protocol`:
 
@@ -518,6 +577,30 @@ if __name__ == "__main__":
 A structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
+
+The `ABC` in `shapes_oo.py` and this `Protocol` are lookalikes that differ in who must know about whom.
+An abstract base class is *nominal*: a type joins by inheriting from it,
+the membership is declared in the subclass's own source,
+and the base can carry shared implementation for its children.
+A protocol is *structural*:
+any type with the right members already satisfies it,
+including types in libraries you cannot edit,
+and the type's author never needs to hear that your protocol exists.
+That independence is why this chapter leans on protocols.
+They connect pieces without requiring any piece to change.
+
+A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
+does and does not get you.
+Satisfying `Displayable` is a shape claim: the method exists,
+with the right signature, and the checker verifies that half of the contract.
+The other half is semantic.
+`display()` must also behave the way callers rely on:
+return a description rather than raise, finish rather than block,
+describe the object rather than change it.
+No checker sees that half.
+Substitution is safe only when both halves hold,
+whether membership came from inheriting a base class or matching a protocol.
+The machine checks the signatures; you still owe the behavior.
 
 A third answer names a closed set of types as a union and dispatches with `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
@@ -743,17 +826,22 @@ or whether immutable data, a function, and a protocol already solve the problem.
     exposed through a `@property` the same way `numbers` is,
     and demonstrate the same leak by mutating the list you get back.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
-2.  In `point_distance.py`,
+2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]` and rerun `ty check`.
+    Notice that it does not object:
+    the checker sees nothing wrong with a mutable field in a frozen class.
+    Demonstrate the leak with an `append()`, then restore the `tuple`.
+    Who, then, is responsible for making immutability go all the way down?
+3.  In `point_distance.py`,
     add a third point `p3 = Point(6, 8)` and confirm `distance(p1, p3)` and `p1.distance_to(p3)` still agree.
-3.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
+4.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
     `b`, `c` (no `x` or `y`),
     and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,
     ignoring `c`.
     Confirm `distance()` works on a `TripleCoord` with no change to `distance()` itself.
-4.  In `shapes_match.py`, add a new shape, `Square(side: float)`,
+5.  In `shapes_match.py`, add a new shape, `Square(side: float)`,
     to the `Shape` union, add its `case` to `area()`,
     and confirm `ty check` still passes.
     Then temporarily comment out the new `case` and observe what `assert_never()` causes the checker to report.
-5.  In `null_logger.py`, write a second null-object style class, `NullCache`,
+6.  In `null_logger.py`, write a second null-object style class, `NullCache`,
     whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
     following the same shape as `NullLogger`.

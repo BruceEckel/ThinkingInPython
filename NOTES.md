@@ -1,7 +1,6 @@
-
 Review the book looking for consistency issues
 
-Chapter 8 read
+Deep review chapter 20 as both editor and teacher: fix errors, but also propose additions — misconceptions left unaddressed, mechanisms shown only by outcome, lookalike constructs never contrasted, near-miss code a reader would write. Implement the ones you're confident in, report the rest.
 
 Have we learned anything here that should be added to thinking-in-python-skill.md?
 
