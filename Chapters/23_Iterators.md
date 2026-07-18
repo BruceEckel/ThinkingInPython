@@ -22,6 +22,33 @@ The `for` loop calls these for you, so you almost never call them directly.
 Because every container speaks this one protocol,
 a function written against an iterable automatically stays decoupled from the container.
 
+The protocol is small enough to drive by hand:
+
+```python
+# manual_protocol.py
+nums = [1, 2]
+it = iter(nums)  # What a for loop calls first
+print(iter(nums) is iter(nums))  # A fresh iterator per pass
+#: False
+print(iter(it) is it)  # An iterator returns itself
+#: True
+print(next(it), next(it))  # What the loop calls per step
+#: 1 2
+try:
+    next(it)
+except StopIteration:
+    print("StopIteration ends the loop")
+#: StopIteration ends the loop
+```
+
+A `for` loop is exactly this sequence: one `iter()` call,
+then `next()` until `StopIteration`,
+which the loop absorbs as the normal end rather than an error.
+The two `is` checks preview a distinction the rest of this chapter leans on.
+A list builds a fresh iterator for every pass,
+so you can loop over it again and again.
+An iterator returns itself: one pass is all it has.
+
 ## Generators {#generators}
 
 You rarely write `__iter__()`/`__next__()` by hand,
@@ -84,6 +111,41 @@ A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list could never do.
+
+Two consequences of that laziness surprise people, and both are silent:
+
+```python
+# generator_lifecycle.py
+from collections.abc import Iterator
+
+def squares(n: int) -> Iterator[int]:
+    print("first next() reached the body")
+    for i in range(n):
+        yield i * i
+
+sq = squares(3)  # Runs none of the body
+print("created")
+#: created
+print(list(sq))
+#: first next() reached the body
+#: [0, 1, 4]
+print(list(sq))  # Exhausted: empty, and no error
+#: []
+```
+
+Calling `squares(3)` runs none of its body.
+The `print` at the top fires only when the first value is demanded.
+Any validation at the top of a generator inherits this delay:
+a `raise` meant to reject a bad argument fires at first use,
+far from the call that caused the problem.
+To validate eagerly,
+check the arguments in a plain function and have it return an inner generator.
+The second surprise is the second pass.
+An exhausted generator does not fail; it produces nothing,
+so the empty `list(sq)` gives you no error to point at the bug.
+When data must be walked twice, collect it into a list once,
+or hand out an iterable like `Countdown` above,
+whose `__iter__()` builds a fresh generator for every pass.
 
 These tests collect each iterator into a list and compare,
 covering the sequences and their empty edge cases,
@@ -170,7 +232,9 @@ def test_flatten(
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
 `islice()`, `groupby()`, `takewhile()`, and more,
 each consuming and producing iterators.
-Combined with generator expressions, such as `(x * x for x in data if x > 0)`,
+Combined with generator expressions
+([Comprehensions](16_Comprehensions.md#generator-expressions)),
+such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
 This pipeline draws from an infinite source but computes only what the consumer takes.
 Each stage pulls one item at a time,
@@ -194,6 +258,14 @@ print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
 Nothing runs until `list()` pulls values through,
 and `islice()` and `takewhile()` decide when to stop,
 so the infinite `count(1)` never runs away.
+
+Choose `takewhile()` deliberately,
+because its lookalike is the `if` clause of a generator expression
+(or `filter()`), and they part ways on an infinite source.
+The `if` version *skips* nonmatching values but keeps looking forever,
+so once values stop matching for good, a `list()` around it never returns.
+`takewhile()` *stops* at the first failure.
+Skipping and stopping look alike on finite data and behave nothing alike on infinite data.
 
 ## A Type-Checking Iterator
 
@@ -277,3 +349,7 @@ def test_typed_iterator_passes_and_rejects() -> None:
 2.  Rewrite `Countdown` to also support `len()`,
     then explain why a generator cannot.
 3.  Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
+4.  `generator_lifecycle.py` returns an empty list on its second pass.
+    Fix the caller two ways: collect into a list once and reuse it,
+    then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
+    Which fix would you choose for a stream of a million items, and why?
