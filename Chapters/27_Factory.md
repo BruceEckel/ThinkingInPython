@@ -174,6 +174,15 @@ if __name__ == "__main__":
 #: Square.erase
 ```
 
+The privacy has a price.
+The nested `class` statements run again on every call,
+so each call to `factory()` defines fresh `Circle` and `Square` classes.
+Two shapes from different calls share behavior but not a class:
+`type(a) is type(b)` is `False`,
+and `isinstance()` comparisons across calls fail with it.
+When that matters, the practical compromise is module-level classes with a leading underscore:
+discouraged by convention rather than hidden, but defined once.
+
 ## The Pythonic Factory: a Dictionary
 
 A factory exists to turn data, such as a name,
@@ -224,6 +233,17 @@ It registers itself, and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler),
 and it is the most common form of factory in idiomatic Python.
 The sections below show the classic object-oriented factories for contrast.
+
+Know *when* the registration happens:
+`__init_subclass__()` runs as the subclass's `class` statement executes.
+In one file that timing is invisible,
+but a subclass defined in another module joins the registry only when that module is imported.
+The classic failure is a plugin that "never registered": the class is fine,
+the registry is fine, and nothing ever imported the module that defines it.
+The registry also keys on `cls.__name__` alone,
+so two classes that share a name, from different modules,
+silently overwrite each other.
+Key on a qualified name if that can happen.
 
 Testing confirms that every subclass registers itself,
 and a new subclass needs no change to `make()`.
@@ -459,6 +479,13 @@ This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md
 The base classes `Obstacle`, `Character`, and `GameElementFactory`
 (translated from the Java version)
 force every concrete class to inherit from them.
+Note what their `raise NotImplementedError` bodies do and do not enforce.
+They fail at *call* time:
+a concrete factory that forgets `make_obstacle()` constructs without complaint and raises only when the missing method finally runs.
+An `@abstractmethod` fails at *instantiation*,
+the way `Partial()` did in [Surrogate](26_Surrogate.md),
+which catches the omission as early as possible.
+The two spellings look interchangeable in a listing and fail at different moments.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -784,3 +811,8 @@ keyword arguments and a data class already are the builder.
     In `pizza_builder.py`,
     decide whether it belongs in `topping()` or `build()`.
     In which version can an invalid pizza exist, even momentarily?
+6.  Move `Circle` and `Square` out of `registry.py` into a new module,
+    `extra_shapes.py`.
+    Confirm that `make("Circle")` now raises `KeyError` until `extra_shapes` is imported,
+    and explain exactly which line of which file performs the registration,
+    and when it runs.
