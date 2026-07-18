@@ -13,13 +13,14 @@ The processor sits idle through the wait.
 A task is *CPU-bound* when it spends its time computing inside the process.
 The processor is busy from start to finish.
 
-That boundary decides the tool.
+That boundary decides the tool to use.
 Waiting can overlap on a single thread.
 While one task waits, the thread runs another.
 Computing cannot.
 One core runs one stream of instructions at a time.
 I/O-bound work overlaps within a single process,
-with `asyncio` or a thread pool; CPU-bound work needs multiple cores.
+with `asyncio` or a thread pool.
+CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
 Later in this chapter, we show two other approaches,
 each running inside a single process.
@@ -27,17 +28,18 @@ each running inside a single process.
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
 Four pieces make up the `asyncio` vocabulary.
-`async def` defines a *coroutine function*.
-Calling it runs nothing.
-It returns a *coroutine object*, a description of work that has not started.
-`await` starts that work and pauses the awaiting coroutine until the result is ready.
-The pause is the point.
-While one coroutine waits,
-the *event loop* finds other coroutines that are ready to run.
-`asyncio.gather()` awaits several coroutines at once and collects their results in order.
-`asyncio.run()` starts the event loop, runs one coroutine to completion,
-and shuts the loop down.
-It is the entry point, called once to run the program:
+
+1. `async def` defines a *coroutine function*.
+   Calling it runs nothing.
+   It returns a *coroutine object*, a description of work that has not started.
+2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
+   The pause is the point.
+   While one coroutine waits,
+   the *event loop* finds other coroutines that are ready to run.
+3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
+4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
+   and shuts the loop down.
+   It is the entry point, called once to run the program:
 
 ```python
 # async_mechanics.py
@@ -50,7 +52,7 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    x = fetch("a", 0.03)  # Calling runs nothing yet
+    x = fetch("a", 0.03)  # Nothing runs yet
     print(type(x).__name__)
     results = await asyncio.gather(  # Run all three concurrently
         x, fetch("b", 0.02), fetch("c", 0.01))
@@ -68,8 +70,8 @@ asyncio.run(main())
 ```
 
 The first printed line is proof that calling a coroutine runs nothing.
-`fetch("a", 0.03)` has already been called on `main()`'s first line,
-yet no started line has appeared, only the name of the object the call built:
+`fetch("a", 0.03)` is called on `main()`'s first line,
+yet no started line appears, only the name of the object that the call built:
 `coroutine`.
 The work begins when `gather()` receives that object.
 If you forget the `await gather()`, the work doesn't happen.
@@ -79,40 +81,46 @@ The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and starts the tasks in the order given.
 Each runs until it reaches its `await`, so the started lines print as a, b, c.
-At the `await` each task *suspends*: it stops executing,
-remembers its place in the function, and hands control back to the event loop.
+At the `await` each task *suspends*.
+It stops executing, remembers its place in the function,
+and hands control back to the event loop.
+
 A suspended task runs no bytecode and holds no processor; it is a paused frame,
 local variables intact, waiting to continue.
-The freed loop starts the next coroutine,
+The event loop starts the next coroutine,
 which is how all three are in flight during the first wait.
-Suspending also registers a wake-up condition with the loop.
+Suspending also registers a wake-up condition with the event loop.
+
 `asyncio.sleep()` asks for a timer;
 a real network request would ask the loop to watch a socket for the reply.
 When a timer fires, the loop resumes that task exactly where it paused,
 just after the `await`.
 The three delays make the resumptions visible: c sleeps shortest,
 so its timer fires first, and the resumed lines print as c, b, a,
-the reverse of the starts.
-Yet `gather()` returns `['A', 'B', 'C']`: results follow the argument order,
+the reverse of the starting order.
+`gather()` returns `['A', 'B', 'C']`, showing that the results follow the argument order,
 not the finishing order.
 The total wait is one 0.03-second sleep, not the sum of all three.
+
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
 
-Beware the lookalike: a list comprehension that awaits,
+Beware a list comprehension that awaits.
 `[await c for c in coroutines]`,
 returns the same list as `gather()` but is the sequential version.
 Each `await` runs its coroutine to completion before the next one starts,
 so nothing overlaps and the waits add up.
 `gather()` is concurrent because it starts every task before it waits for any of them.
+[[Is that right, does it actually start them? Or does it start the first task and run until
+that task hits an await, then starts the second]]
 
 ## Structured Concurrency with `TaskGroup`
 
-`gather()` has a weakness the traces so far cannot show: failure.
-If one of its coroutines raises,
+What happens if `gather()` encounters a failure?
+If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
-but the other tasks it started keep running, now unsupervised,
-and their results and errors are discarded.
+but the other tasks it started keep running.
+Now these tasks are unsupervised and their results and errors are discarded.
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative:
 an `async with` block that owns every task started inside it and refuses to be exited until all of them are accounted for:
 
@@ -158,6 +166,9 @@ Choose by failure policy.
 `gather()` is compact when every task is expected to succeed and you want the ordered list of results.
 `TaskGroup` is for when a failure anywhere should stop the whole batch:
 cancel the rest, wait for the cancellations to land, and surface the error.
+[[Wouldn't you always choose TaskGroup? What would be the benefit of gather()?
+Can't TaskGroup return an ordered list of results, programmatically?
+If necessary, add an example showing this.]]
 
 ## Overlapping the Waits
 
