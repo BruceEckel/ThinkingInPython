@@ -58,8 +58,8 @@
         fill="#c48a12">O(n log n)</text>
   <text x="628" y="368" font-size="12" font-weight="bold"
         fill="#4d8b31">O(n)</text>
-  <text x="628" y="380" font-size="12" font-weight="bold"
+  <text x="628" y="390" font-size="12" font-weight="bold"
         fill="#3f6fa8">O(log n)</text>
-  <text x="628" y="410" font-size="12" font-weight="bold"
+  <text x="628" y="404" font-size="12" font-weight="bold"
         fill="#12907c">O(1)</text>
 </svg>
