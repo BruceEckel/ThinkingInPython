@@ -116,7 +116,7 @@ from concurrent.futures import ProcessPoolExecutor
 def count_primes(limit: int) -> int:
     count = 0
     for n in range(2, limit):
-        if all(n % d for d in range(2, int(n ** 0.5) + 1)):
+        if all(n % d for d in range(2, int(n**0.5) + 1)):
             count += 1
     return count
 
@@ -195,6 +195,7 @@ def encode(text: str) -> str:
 def decode(text: str) -> str:
     return text[::-1]
 
+random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"
 for _ in range(1000):
     size = random.randint(0, 8)
@@ -238,6 +239,23 @@ It shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
 
+The roundtrip law is one member of a small family of reusable property shapes,
+and knowing the family is most of the skill.
+An *invariant* states a fact about every output:
+sorting produces an ordered list.
+*Idempotence* states that repeating changes nothing:
+sorting a sorted list leaves it alone.
+An *oracle* states that two implementations agree: the simple,
+obviously correct version matches the fast one,
+which is exactly what `parallel_pure.py`'s `assert parallel == serial` already claimed.
+The trap to avoid is a property that restates the implementation:
+asserting `encode(text) == text[::-1]` tests nothing,
+because the test and the code would share any bug.
+A good law, like the roundtrip,
+constrains the function's *behavior* without repeating its body.
+All of these lean on purity.
+Hypothesis can rerun and shrink freely only because each call is independent of every other.
+
 Two caveats keep this honest.
 First, proof is not exclusive to functional code.
 Hoare logic and tools like Dafny verify imperative programs too.
@@ -262,3 +280,16 @@ is the "functionality" the introduction set out to find.
 
 1.  In `parallel_pure.py`, add a fifth limit, `50_000`, to the `limits` list,
     and confirm `parallel == serial` still holds after the change.
+2.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
+    an invariant (every adjacent pair of the output is ordered) and idempotence
+    (sorting a sorted list changes nothing).
+    Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
+3.  State a law that is *false* and watch Hypothesis falsify it:
+    `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
+    Report the counterexample Hypothesis shrinks to,
+    and explain what it reveals about Unicode case mapping.
+4.  Write a property test for `group_rounds()` from [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
+    for any roster and any group size,
+    every student appears in exactly one group per round.
+    Use a strategy that generates rosters of distinct names,
+    and note how the seeded generator keeps failures reproducible.

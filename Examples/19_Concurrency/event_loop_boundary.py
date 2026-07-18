@@ -16,19 +16,20 @@ class Meter:
                  tb: object) -> None:
         self.active -= 1
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
-
 async def io_price(order: int, meter: Meter) -> int:
-    with meter:  # In flight for the span of the block
-        await asyncio.sleep(0.05)  # Waiting outside the processor
+    with meter:
+        await asyncio.sleep(0.05)  # Off-processor work
     return order * 10
 
 async def cpu_price(order: int, meter: Meter) -> int:
     with meter:
         total = 0
-        for _ in range(1_000_000):  # Working inside the processor
+        for _ in range(1_000_000):  # On-processor work
             total += 1
     return order * 10
+
+# Defines an async function:
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def run(task: PriceTask,
               orders: list[int]) -> tuple[list[int], int]:

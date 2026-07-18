@@ -8,6 +8,7 @@ def encode(text: str) -> str:
 def decode(text: str) -> str:
     return text[::-1]
 
+random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"
 for _ in range(1000):
     size = random.randint(0, 8)

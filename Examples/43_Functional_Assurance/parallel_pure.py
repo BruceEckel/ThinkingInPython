@@ -4,7 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 def count_primes(limit: int) -> int:
     count = 0
     for n in range(2, limit):
-        if all(n % d for d in range(2, int(n ** 0.5) + 1)):
+        if all(n % d for d in range(2, int(n**0.5) + 1)):
             count += 1
     return count
 

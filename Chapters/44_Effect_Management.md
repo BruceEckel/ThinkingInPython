@@ -408,6 +408,7 @@ Instead of calling `input()` and `print()` directly,
 
 ```python
 # ask_tell.py
+from dataclasses import dataclass, field
 from typing import Protocol
 
 class Ask(Protocol):
@@ -424,9 +425,9 @@ class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
 
+@dataclass
 class Capture:
-    def __init__(self) -> None:
-        self.messages: list[str] = []
+    messages: list[str] = field(default_factory=list)
 
     def tell(self, message: str) -> None:
         self.messages.append(message)
@@ -719,6 +720,8 @@ print(asyncio.run(description))
 Calling `greet()` runs nothing.
 It builds a coroutine object, a description of work.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
+This is the same demonstration [Concurrency](19_Concurrency.md#asyncio-mechanics)
+opened with, and it can now be read with new eyes.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
@@ -818,3 +821,27 @@ That was true of every solution to every previous barrier at this stage.
 Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way we regard a program written in one global namespace.
+
+## Exercises
+
+1.  Write the production bindings for `ask_tell.py`:
+    a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
+    and run `greet(Console(), Console())` interactively.
+    Confirm `greet()` itself required no change,
+    which is the delayed-binding payoff.
+2.  Feel the bookkeeping the chapter describes.
+    Add a `Log` Effect (a protocol with `log(message)`)
+    used by a new helper that `greet()` calls.
+    Count how many signatures you had to edit to thread it through,
+    then explain what an EMS would have done instead.
+3.  Classify every Effect in `slope_catch.py`,
+    `withdraw()` from [Functional Foundations](40_Functional_Foundations.md#pure-functions),
+    and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,
+    or exception.
+    Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
+    applies to each?
+4.  `NonZero` guards zero but not negative values,
+    while `validate()` in `slope_catch.py` rejects negatives but not zero.
+    Build a `PositiveInt` that makes both bad values unconstructable,
+    rewrite `slope()` to take it,
+    and note which checks disappear from `slope()` as a result.

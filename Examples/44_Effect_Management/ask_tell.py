@@ -1,4 +1,5 @@
 # ask_tell.py
+from dataclasses import dataclass, field
 from typing import Protocol
 
 class Ask(Protocol):
@@ -15,9 +16,9 @@ class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
 
+@dataclass
 class Capture:
-    def __init__(self) -> None:
-        self.messages: list[str] = []
+    messages: list[str] = field(default_factory=list)
 
     def tell(self, message: str) -> None:
         self.messages.append(message)

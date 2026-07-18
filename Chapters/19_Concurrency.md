@@ -215,9 +215,8 @@ In the following example, the same price lookup appears twice.
 `cpu_price` performs computations to represent heavy work.
 
 A `Meter` records the peak number of tasks in flight at once.
-It is a [context manager](15_Context_Managers.md)
-so each task wraps its working span in `with meter:`.
-`__entry__()` counts the task in flight, `__exit__()` counts it done,
+It is a [context manager](15_Context_Managers.md):
+`__enter__()` counts the task in flight, `__exit__()` counts it done,
 and `__exit__()` runs even if the body raises an exception:
 
 ```python
@@ -239,19 +238,20 @@ class Meter:
                  tb: object) -> None:
         self.active -= 1
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
-
 async def io_price(order: int, meter: Meter) -> int:
-    with meter:  # In flight for the span of the block
-        await asyncio.sleep(0.05)  # Waiting outside the processor
+    with meter:
+        await asyncio.sleep(0.05)  # Off-processor work
     return order * 10
 
 async def cpu_price(order: int, meter: Meter) -> int:
     with meter:
         total = 0
-        for _ in range(1_000_000):  # Working inside the processor
+        for _ in range(1_000_000):  # On-processor work
             total += 1
     return order * 10
+
+# Defines an async function:
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def run(task: PriceTask,
               orders: list[int]) -> tuple[list[int], int]:
@@ -271,6 +271,14 @@ asyncio.run(main())
 #: io : peak=5, prices=[10, 20, 30, 40, 50]
 #: cpu: peak=1, prices=[10, 20, 30, 40, 50]
 ```
+
+`Meter` appears two different ways here.
+`run()` creates it with plain `meter = Meter()`.
+What's needed there is the shared object itself, not a scope to enter.
+Each task then enters that same object as a context manager,
+writing `with meter:` around its own active span.
+`Meter.__enter__()` returns `None`,
+so `with Meter() as meter:` in `run()` would bind `meter` to `None` instead of the object.
 
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
 The I/O tasks each reach their `await` and suspend,
