@@ -172,6 +172,14 @@ The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
+Python's humbler spelling of the same idea is `int | None`,
+and the comparison locates `Result`'s value.
+Both force the caller to unpack, but `None` says only "no answer,"
+while a `Failure` carries *why*.
+Use `| None` when absence is the whole story, a lookup that found nothing.
+Use `Result` when the caller may need to act on the reason,
+or when several different failures must stay distinguishable,
+as [Matching on the Error](#matching-on-the-error) shows below.
 
 A function like this is a *Total Function*:
 its return type accounts for every outcome it can produce, success or failure,
@@ -224,7 +232,7 @@ def func_b(i: int) -> Result[int, str]:
 
 def func_c(i: int) -> Result[int, str]:
     try:
-        1 / (i - 3)
+        1 / (i - 3)  # A probe: raises when i == 3
     except ZeroDivisionError as e:
         # The exception becomes a value:
         return Failure(f"func_c({i}): {e}")
@@ -289,6 +297,17 @@ A `Failure` anywhere short-circuits the whole thing.
 
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
 You do not need to know that word to use functional error handling.
+
+One near-miss to expect when you start chaining:
+`bind()` requires each step to return a `Result`.
+Feed it a plain function, `.bind(str)` say,
+and the chain now holds a bare `str` where a `Result` belongs,
+which the checker flags at the next `bind()`.
+To chain a plain function, wrap its return value:
+`.bind(lambda x: Success(str(x)))`.
+Libraries like `returns` name that pattern `map()`,
+a sibling of `bind()` for steps that cannot fail,
+and exercise 2's `map_error()` is the same idea aimed at the error side.
 
 Testing confirms that the hand-written and `bind()` versions agree on every input:
 
@@ -371,12 +390,12 @@ from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success
 
-def safe[A](
-    func: Callable[..., A],
-) -> Callable[..., Result[A, Exception]]:
+def safe[**P, A](
+    func: Callable[P, A],
+) -> Callable[P, Result[A, Exception]]:
     @wraps(func)
     def wrapper(
-        *args: object, **kwargs: object
+        *args: P.args, **kwargs: P.kwargs
     ) -> Result[A, Exception]:
         try:
             return Success(func(*args, **kwargs))
@@ -403,6 +422,10 @@ if __name__ == "__main__":
 but `@safe` has changed its type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
+The `**P` parameter carries the wrapped function's whole parameter list through,
+the technique from [Decorators](14_Decorators.md#maintaining-the-wrapped-interface),
+so `parse("42")` type-checks and `parse(42)` does not:
+`@safe` changes only the return type, never what the function accepts.
 
 The [Decorators](14_Decorators.md)
 chapter explains how to write decorators like `@safe`,

@@ -3,12 +3,12 @@ from collections.abc import Callable
 from functools import wraps
 from result import Failure, Result, Success
 
-def safe[A](
-    func: Callable[..., A],
-) -> Callable[..., Result[A, Exception]]:
+def safe[**P, A](
+    func: Callable[P, A],
+) -> Callable[P, Result[A, Exception]]:
     @wraps(func)
     def wrapper(
-        *args: object, **kwargs: object
+        *args: P.args, **kwargs: P.kwargs
     ) -> Result[A, Exception]:
         try:
             return Success(func(*args, **kwargs))
