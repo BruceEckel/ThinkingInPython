@@ -209,16 +209,16 @@ and the only form for failure-as-data.
 ## Overlapping the Waits
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
-When a task awaits, the loop runs another task in the meantime.
+When a task awaits, the event loop runs another task in the meantime.
 In the following example, the same price lookup appears twice.
-`io_price` waits using `asyncio.sleep` as a stand-in for a network call.
+`io_price` `await`s on `asyncio.sleep` as a stand-in for a network call.
 `cpu_price` performs computations to represent heavy work.
+
 A `Meter` records the peak number of tasks in flight at once.
-It is a context manager ([Context Managers](15_Context_Managers.md)):
-each task wraps its working span in `with meter:`,
-so entry counts the task in flight, exit counts it done,
-and the exit runs even if the body raises,
-a guarantee a manual `enter()`/`leave()` pair cannot make:
+It is a [context manager](15_Context_Managers.md)
+so each task wraps its working span in `with meter:`.
+`__entry__()` counts the task in flight, `__exit__()` counts it done,
+and `__exit__()` runs even if the body raises an exception:
 
 ```python
 # event_loop_boundary.py

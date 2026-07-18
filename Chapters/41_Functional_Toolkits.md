@@ -34,6 +34,11 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
+For addition specifically, `sum()` is the built-in spelling,
+and `math.prod()` covers multiplication.
+`reduce()` earns its keep for every other fold,
+where no dedicated built-in exists.
+
 ### `cache`
 
 Remembers every result forever,
@@ -55,6 +60,13 @@ print(fib(30))
 
 Because `fib()` is recursive, the values up to and including 30 are now cached.
 This accelerates future calls to `fib()`.
+
+One trap: decorating a *method* with `@cache` keys every entry on `self`,
+so the cache holds a strong reference to each instance forever,
+the lapsed-listener leak of [Observer](30_Observer.md) in cache form.
+For the usual case, one expensive value per instance,
+use `@cached_property` below,
+which stores the result on the instance and dies with it.
 
 ### `lru_cache`
 
@@ -143,6 +155,9 @@ print(x.squared)
 
 Note that you must be careful with caching,
 because mutating a property doesn't cause the cached result to be recalculated.
+The escape hatch is `del x.squared`:
+deleting the cached attribute discards the stored value,
+and the next access recomputes it from the current state.
 
 ### `wraps`
 
@@ -214,6 +229,12 @@ heavy = Weight(5)
 print(light < heavy, light <= heavy, light > heavy)
 #: True True False
 ```
+
+The plain class exists to show the tool.
+In real code this `Weight` would be `@dataclass(frozen=True, order=True)`,
+which generates all six comparisons from the field order and makes `total_ordering` unnecessary.
+`total_ordering` earns its keep when the class cannot be a dataclass,
+or when the ordering is not simply the fields in declaration order.
 
 ### `singledispatch`
 
@@ -487,6 +508,16 @@ a, b = tee([1, 2, 3])
 print(list(a), list(b))
 #: [1, 2, 3] [1, 2, 3]
 ```
+
+Two cautions.
+After `tee()`, use only the returned iterators;
+advancing the original source steals values the copies never see.
+And `tee()` buffers every value one copy has consumed and the other has not,
+so draining `a` completely before touching `b`, as this demo does,
+stores the whole sequence anyway.
+When one consumer runs far ahead of the other,
+`list()` is simpler and no more expensive.
+`tee()` wins when the consumers stay roughly in step.
 
 ### `product`
 

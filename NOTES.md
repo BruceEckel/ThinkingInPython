@@ -1,3 +1,10 @@
+Change Part IV · Effects to Part IV · Functional Programming, and the chapters should be:
+40 Foundations
+41 Toolkits
+42 Error Handling
+43 Assurance
+44 Effect Management
+
 Review the book looking for consistency issues
 
 Deep review chapter 20 as both editor and teacher: fix errors, but also propose additions — misconceptions left unaddressed, mechanisms shown only by outcome, lookalike constructs never contrasted, near-miss code a reader would write. Implement the ones you're confident in, report the rest.

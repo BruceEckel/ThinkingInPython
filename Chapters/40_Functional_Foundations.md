@@ -118,6 +118,9 @@ print(moved)
 #: Point(x=11, y=2)
 ```
 
+The demonstration spells the assignment `setattr(p, "x", 5)` because the direct spelling `p.x = 5` never gets to run:
+the type checker rejects it statically, as it should.
+`setattr()` slips past the static check so the listing can show the *runtime* rejection too.
 The original `p` is untouched.
 `moved` is a separate value.
 When values never change underneath you,
@@ -151,6 +154,14 @@ The annotation is a promise the checker keeps for you,
 even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error caught before the program runs.
+Mind what `Final` does and does not freeze.
+It locks the *binding*, not the object:
+declare `CONFIG: Final[list[int]] = [...]` and `CONFIG.append(...)` still succeeds,
+for the checker and at runtime alike.
+This is the shallow-freezing lesson of [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+in another costume.
+For an immutable value, make the value's own type immutable,
+`Final[tuple[int, ...]]`, and let `Final` guard only the name.
 
 Immutability also unlocks abilities a mutable value lacks.
 An immutable object can be *hashable*.
@@ -267,6 +278,18 @@ Each call hands a function to another function and lets it do the looping.
 Returning a function is the other half of the definition,
 covered under [Closures](#closures), below.
 
+The lambdas above exist to show the machinery,
+and for exactly these cases Python offers a lookalike you should usually prefer:
+the comprehension ([Comprehensions](16_Comprehensions.md)).
+`[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
+more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
+`map()` and `filter()` earn their keep when the function *already exists*:
+`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
+The rule of thumb: existing function, use the higher-order form;
+expression you are writing on the spot, use the comprehension.
+`sorted()`'s `key` has no comprehension equivalent,
+so it is a higher-order argument either way.
+
 Higher-order functions provide separation of concerns.
 `map()`, `filter()`, and `sorted()` each contain the loop that walks the data,
 written once, and you supply only the part that differs from one use to the next.
@@ -349,6 +372,17 @@ Each call to `make_counter()` builds an independent counter with its own hidden 
 Nothing outside `increment()` can reach that state,
 so no accident can corrupt it.
 
+The `nonlocal` statement is what lets `increment()` *assign* to the captured variable.
+Reading a captured name, as `multiply()` read `factor`, needs no declaration.
+But assignment is how Python decides a name is local,
+so `count += 1` alone would make `count` a fresh local,
+one referenced before assignment,
+and the call would fail with `UnboundLocalError`.
+`nonlocal count` redirects the assignment to the enclosing function's variable.
+Forgetting it is the standard stumble when a closure first needs to write,
+and the error message, complaining about a local variable,
+points nowhere near the missing declaration.
+
 ## Partial Application
 
 *Partial application* fixes some of a function's arguments and produces a new function that expects the rest.
@@ -379,7 +413,8 @@ you preset the fixed arguments and pass the result straight in.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
-This avoids the late-binding surprise a lambda created in a loop can produce.
+This avoids the late-binding surprise a lambda created in a loop can produce,
+demonstrated in [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py`.
 
 ## Composing Functions
 
