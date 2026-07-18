@@ -64,6 +64,22 @@ which drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
+Notice which direction the calls flow.
+`run()` lives in the base class,
+yet `self.customize1()` executes `MyApp`'s version,
+because attribute lookup on `self` starts at the object's actual type,
+and `self` is a `MyApp`.
+The base class calls code written after it, sometimes years after.
+Framework authors call this the *Hollywood Principle*: don't call us,
+we'll call you.
+Your code supplies the steps; the framework decides when they run.
+
+A caution about the `@final` lock: it binds only under the type checker.
+At runtime Python ignores it,
+and a subclass override of `run()` replaces the fixed algorithm without complaint.
+The guarantee is real, but it is the checker's guarantee,
+one more reason to make `ty` or another checker part of the build.
+
 The step methods default to `...`, doing nothing,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
@@ -76,9 +92,47 @@ Starting the engine from the constructor carries a trap.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
 Call it first, in the usual style,
-and the engine runs against half-initialized state.
-A framework that separates construction from starting,
-with an explicit `run()` call by the client, avoids the trap.
+and the engine runs against half-initialized state:
+
+```python
+# premature_engine.py
+from typing import final, override
+
+class Framework:
+    def __init__(self) -> None:
+        self.run()
+
+    @final
+    def run(self) -> None:
+        self.step()
+
+    def step(self) -> None: ...
+
+class Greeter(Framework):
+    def __init__(self, name: str) -> None:
+        super().__init__()  # Usual style: engine runs now...
+        self.name = name  # ...before this line has happened
+
+    @override
+    def step(self) -> None:
+        print(f"Hello, {self.name}!")
+
+try:
+    Greeter("Bruce")
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
+```
+
+`Greeter("Bruce")` never gets to greet.
+`super().__init__()` starts the engine, the engine calls `step()`,
+and `step()` reads `self.name` one line before the constructor assigns it.
+The quick fix is reordering: assign `self.name` first,
+then call `super().__init__()`.
+That works, but it inverts the convention every Python programmer carries,
+and the next subclass author will restore the usual order without thinking.
+The reliable fix changes the framework: separate construction from starting,
+and have the client call `run()` explicitly on a fully built object.
 
 This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
 A subclass must work wherever code expects its base class.
@@ -167,3 +221,7 @@ A hook that holds no state is usually better as a function than as a method to o
 
     1.  Convert all the letters in each file to uppercase.
     2.  Search the files for words given in the first file.
+2.  Fix `premature_engine.py` both ways:
+    first reorder the two lines in `Greeter.__init__()`,
+    then instead redesign `Framework` so clients construct the object and call `run()` explicitly.
+    Which fix still protects a second subclass author who has never read this chapter?
