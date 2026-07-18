@@ -32,11 +32,12 @@ Calling it runs nothing.
 It returns a *coroutine object*, a description of work that has not started.
 `await` starts that work and pauses the awaiting coroutine until the result is ready.
 The pause is the point.
-While one coroutine waits, the *event loop* runs another.
+While one coroutine waits,
+the *event loop* finds other coroutines that are ready to run.
 `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 `asyncio.run()` starts the event loop, runs one coroutine to completion,
 and shuts the loop down.
-It is the entry point, called once, at the top of the program:
+It is the entry point, called once to run the program:
 
 ```python
 # async_mechanics.py
@@ -134,6 +135,54 @@ The event loop overlaps waiting, not computing.
 Async did not fail.
 It overlapped the part that runs outside the processor,
 which for `cpu_price` is nothing.
+
+The `asyncio.sleep()` in `io_price` is not `time.sleep()`.
+Awaiting `asyncio.sleep()` suspends only the current task and hands the wait to the event loop,
+which is what let all five `io_price` tasks overlap.
+`time.sleep()` is a blocking call: it stops the whole thread,
+and the event loop runs on that thread,
+so a coroutine that calls it freezes every task in the program, not just itself:
+
+```python
+# blocking_the_loop.py
+import asyncio
+import time
+from collections.abc import Awaitable, Iterable
+
+async def yielding_wait() -> None:
+    await asyncio.sleep(0.05)  # Suspends this task only
+
+async def blocking_wait() -> None:
+    time.sleep(0.05)  # Stops the whole event loop
+
+async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
+    start = time.perf_counter()
+    await asyncio.gather(*tasks)
+    return time.perf_counter() - start
+
+async def main() -> None:
+    t_yield = await elapsed(yielding_wait() for _ in range(5))
+    t_block = await elapsed(blocking_wait() for _ in range(5))
+    print(f"awaited sleeps overlap: {t_yield < 0.05 * 2}")
+    print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
+
+asyncio.run(main())
+#: awaited sleeps overlap: True
+#: blocking sleeps serialize: True
+```
+
+Five awaited sleeps finish together in about the time of one.
+Five blocking sleeps cannot overlap at all:
+each stalls the loop for its full duration,
+so the total is never less than their sum.
+To the event loop, a blocking call is `cpu_price` all over again,
+work that never yields.
+The rule inside `async def` is to await, never block.
+A blocking call you cannot rewrite,
+a library function that reads a file or talks to a database,
+belongs in a thread,
+and `await asyncio.to_thread(blocking_call)` moves it there while the loop keeps running.
+
 [Simulation](38_Simulation.md) builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
 and [Observer](30_Observer.md#observer-and-io)
@@ -676,13 +725,16 @@ in Context Managers uses the same `Queue` as a throttle.
     that awaits `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
-3.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
+3.  In `event_loop_boundary.py`,
+    change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
+    Explain the result using `blocking_the_loop.py`.
+4.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
     (acquire before reading `counter`, release after writing it back)
     and confirm `counter` now reaches `400`.
-4.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
+5.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,
     but is not thereby fixed.
-5.  In `priority_queue.py`,
+6.  In `priority_queue.py`,
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
