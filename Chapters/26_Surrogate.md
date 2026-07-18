@@ -423,3 +423,10 @@ def test_proxy_counts_only_calls() -> None:
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo,
     using the fallback-hook behavior described in this chapter.
+5.  Create a program similar to certain DBMS systems that allow only a fixed number of connections at any time.
+    Implement this with a singleton-like system ([Singleton](24_Singleton.md))
+    that controls the number of "connection" objects it creates.
+    When a user finishes with a connection,
+    the system must check that connection back in for reuse.
+    To guarantee this, hand out a proxy instead of a reference to the actual connection,
+    and design the proxy to release the connection back to the system.

@@ -71,6 +71,11 @@ class StateMachine:
 while the varying behavior lives in each `State`'s `run()` and `next()`.
 As [Template Method](25_Template_Method.md) puts it,
 subclasses supply the steps, not the flow.
+The constructor also runs the initial state,
+the construction-starts-the-engine choice that chapter warned about.
+It is safe here because the state objects are stateless singletons,
+fully formed before any machine exists.
+A `State` whose `run()` read attributes off the machine would revive the trap.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
@@ -351,6 +356,20 @@ If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
 
+The two versions also answer a question this input file never asks:
+what happens on an *unexpected* input?
+They answer it differently.
+Version 1's `case _` arms return the current state,
+so an input a state does not recognize is silently ignored,
+and the machine stays put.
+Version 2's table holds only the explicit transitions,
+and its `next()` raises on anything else.
+Neither is wrong, but the choice deserves to be deliberate.
+Ignoring suits a machine fed from a noisy source that includes events not meant for it.
+Failing fast suits a table you are still building,
+where a missing entry is a bug you want to hear about,
+and it is the policy the table-driven engine below adopts as well.
+
 ## Table-Driven State Machine
 
 The previous design keeps each state's transitions inside the state class.
@@ -418,6 +437,12 @@ Several candidate transitions can share one `(state, input)` key,
 told apart by their conditions.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
+Note that the lookup keys on `type(event)` *exactly*: a dictionary probe,
+not an `isinstance()` walk.
+That is what lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
+and it cuts the other way too:
+define a further subclass of an event type and it matches none of its parent's rows.
+An event's dispatch class must appear in the table verbatim.
 
 ### A Vending Machine
 
@@ -649,6 +674,9 @@ The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects
 (a selection before any money, say) and shows it rather than crashing.
+The button loop builds sixteen commands with `partial(select, r, c)`,
+not with a lambda: sixteen lambdas closing over `r` and `c` would all see the loop's final values,
+the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime).
 Because it requires user interaction the harness skips it (`tools/norun.txt`):
 
 ```python
@@ -720,29 +748,22 @@ if __name__ == "__main__":
 
 ## Exercises
 
-1.  Create a program similar to certain DBMS systems that only allow a certain number of connections at any time.
-    To implement this, use a singleton-like system that controls the number of "connection" objects that it creates.
-    When a user finishes with a connection,
-    you must inform the system so that it can check that connection back in for reuse.
-    To guarantee this, provide a [proxy](26_Surrogate.md#proxy)
-    object instead of a reference to the actual connection,
-    and design the proxy to release the connection back to the system.
-2.  Using [State](26_Surrogate.md#state),
+1.  Using [State](26_Surrogate.md#state),
     make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add an additional kind of `Mood` called `Prozac`.
-3.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
-4.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
+2.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
+3.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
     Each state stores a reference back to the controller object so that it can request the state change.
     Use a `dict` to map a `str` naming a state to its state object.
     In each state subclass,
     override a `next_state()` method that holds its own transition table.
     The input to `next_state()` is a single word read from a text file containing one word per line.
-5.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
-6.  Modify the "mood" exercise (exercise 2)
+4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
+5.  Modify the "mood" exercise (exercise 1)
     so that it becomes a state machine using `state_machine.py`.
-7.  Create an elevator state machine system using `state_machine.py`.
-8.  Create a heating/air-conditioning system using `state_machine.py`.
-9.  A *generator* produces objects, like a factory but taking no arguments.
+6.  Create an elevator state machine system using `state_machine.py`.
+7.  Create a heating/air-conditioning system using `state_machine.py`.
+8.  A *generator* produces objects, like a factory but taking no arguments.
     Write a `mouse_move_generator()` (using `yield`)
     that produces correct `MouseAction` moves in sequence,
     where each possible move depends on the previous one
