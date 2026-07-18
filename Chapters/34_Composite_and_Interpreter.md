@@ -255,6 +255,16 @@ so `2 * x + 1` is a valid sentence in the little language.
 Python has already parsed it, honoring precedence,
 before the interpreter ever runs.
 
+The reflected methods ride the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many):
+`2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
+Unlike that chapter's `Meters`, though,
+these reflected methods trust their operand completely.
+The type checker rejects `"a" + x` in source it can see,
+but at runtime nothing checks: `str.__add__` declines, `Var.__radd__` runs,
+and `Add(Num("a"), x)` is built without complaint,
+an ill-typed tree instead of an error.
+Exercise 6 closes the hole with the declining-`NotImplemented` idiom.
+
 This technique is used in SymPy expressions,
 Pandas and Polars column arithmetic, and SQLAlchemy filter conditions.
 Overloaded operators build an expression tree,
@@ -467,6 +477,13 @@ Composite is the data: a union of node types, some holding others.
 Interpreter is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into frozen data classes, a union,
 operator methods that build nodes, and `match` functions that walk them.
+One practical limit rides along:
+every function here recurses once per level of tree,
+and Python's recursion limit (roughly a thousand frames)
+caps how deep a tree they can walk.
+Realistic expressions never approach it.
+A machine-generated chain of thousands of nested nodes does,
+and the escape is an iterative walk driving an explicit stack of pending nodes.
 
 ## Exercises
 
@@ -488,3 +505,8 @@ operator methods that build nodes, and `match` functions that walk them.
     a function that returns the symbolic derivative of an expression with respect to a variable,
     using the sum rule and the product rule.
     Run its results through `simplify()` and compare.
+6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
+    an ill-typed tree the checker would have rejected in source it can see.
+    Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
+    ([Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) shows the idiom),
+    and confirm `"a" + x` now raises `TypeError`.
