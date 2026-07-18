@@ -252,6 +252,16 @@ It tests for *every type in the system*.
 When a new material joins the system, `Plastic` say,
 you must find every `case` statement that enumerates specific types.
 Any you miss will silently drop trash on the floor.
+Readers of [Composite and Interpreter](34_Composite_and_Interpreter.md)
+may expect `assert_never()` to make the checker catch the missed case,
+and here it cannot help: exhaustiveness checking needs a *closed* union,
+and the registry keeps `Trash` deliberately open,
+so no checker can know the set is complete.
+This is a `match` over an open set,
+exactly what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
+warned against.
+When the set is open, sorting must not enumerate it,
+which is what the next section arranges.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
 
@@ -308,6 +318,12 @@ for kind, items in bins.items():
 `type(t)` is the perfect key because it adapts to new types,
 even ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
+The key is the *exact* class,
+the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
+and [Multiple Dispatching](32_Multiple_Dispatching.md).
+Derive `CrushedAluminum` from `Aluminum` and it sorts into its own bin,
+not its parent's, which is what a sorter usually wants,
+but is worth knowing before you subclass a material.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
@@ -387,9 +403,12 @@ For operations that belong on the objects and vary by type,
 
 Design patterns are about *separating things that change from things that stay the same*.
 Polymorphism is one way to do that, but it is not the only one.
-The deeper skill is spotting the *vector of change* in a problem
-(here, new types versus new operations)
+The deeper skill is spotting the *vector of change*
+([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
+in a problem (here, new types versus new operations)
 and choosing the lightest construct that isolates it.
+This chapter discovered its vectors the honest way, one requirement at a time,
+rather than predicting them up front.
 In Python that construct is often a language feature, not a multi-class pattern.
 The honest measure of a pattern is whether it is still useful once the language does part of the work for you.
 
