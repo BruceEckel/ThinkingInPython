@@ -50,11 +50,14 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
+    coroutine = fetch("a", 0.03)  # Calling runs nothing yet
+    print(type(coroutine).__name__)
     results = await asyncio.gather(  # Run all three concurrently
-        fetch("a", 0.03), fetch("b", 0.02), fetch("c", 0.01))
+        coroutine, fetch("b", 0.02), fetch("c", 0.01))
     print(results)
 
 asyncio.run(main())
+#: coroutine
 #: a: started
 #: b: started
 #: c: started
@@ -64,10 +67,18 @@ asyncio.run(main())
 #: ['A', 'B', 'C']
 ```
 
+The first printed line is proof that calling runs nothing.
+`fetch("a", 0.03)` has already been called on `main()`'s first line,
+yet no started line has appeared, only the name of the object the call built:
+a coroutine.
+The work begins when `gather()` receives that object.
+Forget the `await gather()` and the work never happens at all;
+Python's only complaint is a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
+
 The trace shows the event loop's schedule.
-`gather()` starts the three coroutines in the order given,
-and each runs until it reaches its `await`, so the started lines print as a, b,
-c.
+`gather()` wraps each coroutine in a *task*,
+the event loop's unit of scheduling, and starts the tasks in the order given.
+Each runs until it reaches its `await`, so the started lines print as a, b, c.
 At the `await` each task *suspends*: it stops executing,
 remembers its place in the function, and hands control back to the event loop.
 A suspended task runs no bytecode and holds no processor; it is a paused frame,
@@ -94,6 +105,58 @@ returns the same list as `gather()` but is the sequential version.
 Each `await` runs its coroutine to completion before the next one starts,
 so nothing overlaps and the waits add up.
 `gather()` is concurrent because it starts every task before it waits for any of them.
+
+## Structured Concurrency with `TaskGroup`
+
+`gather()` has a weakness the traces so far cannot show: failure.
+If one of its coroutines raises,
+`gather()` re-raises that exception into the awaiting code,
+but the other tasks it started keep running, now unsupervised,
+and their results and errors are discarded.
+`asyncio.TaskGroup` (added in 3.11) is the structured alternative:
+an `async with` block that owns every task started inside it and refuses to be exited until all of them are accounted for:
+
+```python
+# task_group.py
+import asyncio
+
+async def fetch(item: str, delay: float) -> str:
+    await asyncio.sleep(delay)
+    if item == "b":
+        raise ValueError(f"fetch({item!r}) failed")
+    print(f"{item}: fetched")
+    return item.upper()
+
+async def main() -> None:
+    pairs = [("a", 0.03), ("b", 0.02), ("c", 0.01)]
+    try:
+        async with asyncio.TaskGroup() as tg:
+            for item, delay in pairs:
+                tg.create_task(fetch(item, delay))
+    except* ValueError as group:
+        print(f"caught: {group.exceptions[0]}")
+
+asyncio.run(main())
+#: c: fetched
+#: caught: fetch('b') failed
+```
+
+`tg.create_task()` schedules a task immediately,
+so all three are in flight together, exactly as under `gather()`.
+The trace shows the failure discipline. c, with the shortest delay,
+completes and prints. b raises at 0.02 seconds,
+and the group responds by cancelling a,
+which is still suspended in its sleep with 0.01 seconds to go,
+so a's fetched line never appears.
+Only when every task has finished or been cancelled does the block exit,
+re-raising the failure wrapped in an *exception group*,
+a container for simultaneous failures,
+since more than one task can go down at once.
+The `except*` form catches members of a group by type.
+Choose by failure policy.
+`gather()` is compact when every task is expected to succeed and you want the ordered list of results.
+`TaskGroup` is for when a failure anywhere should stop the whole batch:
+cancel the rest, wait for the cancellations to land, and surface the error.
 
 ## Overlapping the Waits
 
@@ -252,6 +315,9 @@ asyncio.run(main())
 Eight coroutines each add 50, so `counter` should reach 400.
 Instead it stops at 50.
 Every `await asyncio.sleep(0)` hands control to the event loop before the write happens.
+The sleep is not the cause, only the smallest possible stand-in:
+in real code that middle `await` is a database query or an HTTP call,
+and the same update is lost while it waits.
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
@@ -298,6 +364,22 @@ The computation is the same `cpu_price` as before.
 Only its home changed, from one shared interpreter to several.
 With enough cores the wall-clock time falls toward the time of a single task,
 not their sum.
+
+Two mechanics separate a process pool from every in-process tool in this chapter,
+and both surface in this short listing.
+First, the `if __name__ == "__main__"` guard is not decoration.
+To create a worker, the operating system starts a fresh Python interpreter,
+and that interpreter *imports* this module to find `cpu_price()`.
+During the import the module's name is not `"__main__"`,
+so the guard keeps each worker from running `main()` and building a pool of workers of its own;
+leave it out and Python detects the runaway spawning and raises `RuntimeError`.
+Second, work crosses the process boundary by *pickling*.
+Each argument and each return value is serialized in one process and rebuilt in the other,
+and the function itself travels by name,
+so it must be importable from the top level of the module:
+passing a `lambda` to `pool.map()` fails with a pickling error.
+This is also [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule in another costume:
+a million tiny results can cost more to pickle than the parallelism saved.
 
 `ProcessPoolExecutor` is not the only way to get separate processes.
 The `multiprocessing` module underneath it exposes the raw pieces:
@@ -440,10 +522,51 @@ Threads would not have helped in the previous section.
 The standard CPython build has a *Global Interpreter Lock* (GIL).
 Only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
-A thread releases the GIL while it waits on I/O,
-which is why `asyncio` and a thread pool both help I/O-bound work.
-Neither helps CPU-bound work,
-because a thread that is computing never releases the GIL for another thread to run:
+A thread releases the GIL while it waits on I/O. That single fact decides what a thread pool is good for,
+and both halves of the claim are worth demonstrating.
+The waiting half first.
+Here `time.sleep()` stands in for a blocking network call,
+and five threads overlap five of those waits even with the GIL in place:
+
+```python
+# io_threads.py
+import time
+import timeit
+from concurrent.futures import ThreadPoolExecutor
+
+def io_price(order: int) -> int:
+    time.sleep(0.05)  # Waiting outside the processor
+    return order * 10
+
+def sequential(orders: list[int]) -> list[int]:
+    return [io_price(o) for o in orders]
+
+def threaded(orders: list[int]) -> list[int]:
+    with ThreadPoolExecutor() as pool:
+        return list(pool.map(io_price, orders))
+
+orders = [1, 2, 3, 4, 5]
+assert threaded(orders) == sequential(orders)
+t_seq = timeit.timeit(lambda: sequential(orders), number=1)
+t_thr = timeit.timeit(lambda: threaded(orders), number=1)
+print(f"threads at least 3x faster on I/O: {t_thr * 3 < t_seq}")
+#: threads at least 3x faster on I/O: True
+```
+
+Five 50-millisecond waits finish in about the time of one.
+Each sleeping thread has released the GIL,
+so the operating system runs another thread while it waits,
+the same overlap `asyncio` achieved with suspended tasks.
+This is `blocking_the_loop.py` turned inside out:
+a blocking call freezes an event loop,
+but a pool of threads absorbs blocking calls comfortably,
+which is why `asyncio.to_thread()` hands its blocking work to exactly this kind of pool.
+Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the surgery;
+`asyncio` earns its keep when the waits number in the thousands,
+since tasks are far lighter than threads.
+
+Computing is the other half, and it turns the result around.
+A thread that is computing never releases the GIL for another thread to run:
 
 ```python
 # gil_threads.py
@@ -587,7 +710,7 @@ Since 3.13, CPython also ships as a *free-threaded* build,
 tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 (`python3.15t` rather than `python3.15`).
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
-Running the identical `sequential()`/`threaded()` pair above under a free-threaded interpreter turns the ratio around:
+Running `gil_threads.py`'s CPU-bound `sequential()`/`threaded()` pair under a free-threaded interpreter turns the ratio around:
 
     threads speedup: 3.8x
 
@@ -746,6 +869,29 @@ and `get()` blocks until an item is available, so an idle consumer simply waits.
 The [Object Pool](15_Context_Managers.md#an-object-pool)
 in Context Managers uses the same `Queue` as a throttle.
 
+One caution before copying the drain loop:
+`while not tasks.empty()` is trustworthy here only because both producers have already been joined,
+so nothing can add or remove an item after `empty()` answers.
+While other threads are still running,
+`empty()` reports a moment that may already be over.
+A live consumer does not poll `empty()`;
+it calls `get()` and lets the block do the waiting.
+
+This chapter has now used two queues that share an interface but not a home,
+and a third exists.
+`queue.Queue` locks between threads in one interpreter.
+`multiprocessing.Queue`, in `multiprocessing_raw.py`,
+pickles items across process boundaries.
+`asyncio.Queue` belongs on the event loop:
+`await queue.get()` suspends the task instead of blocking the thread,
+and it is not thread-safe at all,
+because the single-threaded loop needs no locking.
+Match the queue to the concurrency model.
+The interfaces look alike,
+but the first two block the calling thread while the third suspends a task,
+and as `blocking_the_loop.py` showed,
+a blocked thread and a suspended task are very different events on an event loop.
+
 ## Exercises
 
 1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
@@ -754,8 +900,8 @@ in Context Managers uses the same `Queue` as a throttle.
     and that the printed list still grows to four entries in the order given,
     not the order they finish.
 2.  In `async_mechanics.py`,
-    replace the `gather()` call with `[await c for c in coros]`,
-    where `coros` is a list of the same three `fetch()` calls.
+    replace the `gather()` call with `[await c for c in coroutines]`,
+    where `coroutines` is a list of the same three `fetch()` calls.
     Predict the started/resumed trace and the total run time before running it,
     and explain why this version takes the sum of the three delays.
 3.  In `event_loop_boundary.py`, add a third task function, `mixed_price()`,
@@ -768,10 +914,14 @@ in Context Managers uses the same `Queue` as a throttle.
 5.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
     (acquire before reading `counter`, release after writing it back)
     and confirm `counter` now reaches `400`.
-6.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
+6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
+    calling `main()` unconditionally, and run it.
+    Read the error, then explain it with the import mechanics described in [Parallelism](#parallelism):
+    what did each worker process do when it imported the module?
+7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
     why the race becomes far less likely to show up without that sleep,
     but is not thereby fixed.
-7.  In `priority_queue.py`,
+8.  In `priority_queue.py`,
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
