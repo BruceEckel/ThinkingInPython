@@ -36,6 +36,14 @@ print(low is low2, high is high2)
 
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
+The `int("...")` spelling is load-bearing.
+Write the literals directly, `low, low2 = 256, 256`,
+and the demonstration silently breaks:
+the compiler pools equal constants within a code object,
+so even `100000 is 100000` prints `True`,
+sharing that comes from constant folding rather than from the integer cache.
+Parsing the value out of a string at runtime defeats the compiler's pooling and leaves only the cache to explain any sharing.
+(Python warns about `is` on a literal for exactly this reason: the compiler makes the answer misleading.)
 
 String *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
@@ -233,12 +241,22 @@ This rules out `@dataclass`,
 whose generated `__init__()` would reintroduce exactly that re-run.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
+The missing `__eq__()` costs less than it appears:
+for a perfectly interned type, equal values *are* the same object,
+so the default identity comparison already answers correctly.
 (`@dataclass(init=False)` could restore those two generated methods, at the price of still more care with the by-hand field assignment.)
 A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
 not just the key that names them.
 Unless you need the constructor syntax,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
+
+One more property carries over from [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
+every lazy check-then-insert pool races under threads.
+Two threads asking for the same new color can each build "the" shared object,
+one wins the pool, and identity between their two results fails.
+When flyweights meet threads,
+populate the pool eagerly or guard the insert with a lock.
 
 ## A Pool That Does Not Leak
 
