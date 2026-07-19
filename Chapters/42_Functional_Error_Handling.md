@@ -1,4 +1,4 @@
-# Functional Error Handling
+# Error Handling
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 made a value carry a guarantee.

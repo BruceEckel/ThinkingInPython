@@ -147,7 +147,7 @@ and any consumer of that stream stays decoupled from the tree structure
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 The demo builds `src` first, then places it inside `root`.
 Nothing can modify `src` afterward, so sharing subtrees is safe
-(see [Functional Foundations](40_Functional_Foundations.md#immutability)).
+(see [Foundations](40_Functional_Foundations.md#immutability)).
 
 ```python
 # test_filesystem.py

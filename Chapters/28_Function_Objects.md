@@ -122,7 +122,7 @@ The two comprehensions look alike and differ in *when* they read `n`.
 A lambda's body runs when the command is called, not when it is created,
 and all three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
-`functools.partial` ([Functional Foundations](40_Functional_Foundations.md#partial-application))
+`functools.partial` ([Foundations](40_Functional_Foundations.md#partial-application))
 evaluates its arguments at construction time,
 so each command captures the value `n` had on its own iteration.
 The older spelling `lambda n=n: ...` does the same job with a default argument.
@@ -272,7 +272,7 @@ The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
 
 When a strategy needs configuration, the next step is not yet a class.
-It is a *closure* ([Functional Foundations](40_Functional_Foundations.md#closures)),
+It is a *closure* ([Foundations](40_Functional_Foundations.md#closures)),
 a function that manufactures the strategy with the settings baked in:
 
 ```python

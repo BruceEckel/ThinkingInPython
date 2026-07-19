@@ -777,7 +777,7 @@ When a caller must notice absence,
 a lookup that can fail or a required value that may be missing,
 a silent stand-in buries the problem.
 Keep `T | None` there,
-or return the `Result` of [Functional Error Handling](42_Functional_Error_Handling.md#a-result-type),
+or return the `Result` of [Error Handling](42_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
 The test is what callers would write.
 If every one of them would handle absence with the same neutral behavior,

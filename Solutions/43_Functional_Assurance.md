@@ -1,4 +1,4 @@
-# Functional Assurance: Solutions
+# Assurance: Solutions
 
 ## 1. A fifth limit added to the parallel prime count
 

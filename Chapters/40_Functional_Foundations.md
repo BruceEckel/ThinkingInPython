@@ -1,4 +1,4 @@
-# Functional Foundations
+# Foundations
 
 This chapter begins the book's exploration of functional programming.
 Here is what its ideas buy you, before the vocabulary arrives.
@@ -17,11 +17,11 @@ and to write it that way when it can.
 
 This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
-[Functional Toolkits](41_Functional_Toolkits.md)
+[Toolkits](41_Functional_Toolkits.md)
 tours the standard library's support,
-[Functional Error Handling](42_Functional_Error_Handling.md)
+[Error Handling](42_Functional_Error_Handling.md)
 turns failure into an ordinary value,
-and [Functional Assurance](43_Functional_Assurance.md)
+and [Assurance](43_Functional_Assurance.md)
 examines what the discipline lets you claim about your code.
 
 ## Pure Functions
@@ -457,7 +457,7 @@ When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 
 The standard library ships these building blocks ready-made;
-[Functional Toolkits](41_Functional_Toolkits.md) tours them.
+[Toolkits](41_Functional_Toolkits.md) tours them.
 
 ## Exercises
 

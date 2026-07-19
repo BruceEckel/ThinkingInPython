@@ -1,6 +1,6 @@
-# Functional Toolkits
+# Toolkits
 
-[Functional Foundations](40_Functional_Foundations.md)
+[Foundations](40_Functional_Foundations.md)
 built behavior from small, pure, composable pieces.
 The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.

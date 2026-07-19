@@ -1,4 +1,4 @@
-# Functional Assurance
+# Assurance
 
 Introductions to functional programming usually call it "programming with functions,"
 and functions are indeed a central part of the practice.
@@ -13,11 +13,11 @@ This seems to me to be the broader challenge that functional programming takes o
 and what this chapter explores.
 
 The preceding chapters built the machinery.
-[Functional Foundations](40_Functional_Foundations.md)
+[Foundations](40_Functional_Foundations.md)
 established pure functions and immutable values,
-[Functional Toolkits](41_Functional_Toolkits.md)
+[Toolkits](41_Functional_Toolkits.md)
 supplied the standard library's support,
-and [Functional Error Handling](42_Functional_Error_Handling.md)
+and [Error Handling](42_Functional_Error_Handling.md)
 made failure an ordinary value.
 This chapter asks what that machinery lets you claim about your code,
 and how far those claims can go.
@@ -88,7 +88,7 @@ so there is no gap where you have confirmed the shape but not yet pulled out its
 This pays off most on shaped data, such as parsed JSON, an abstract syntax tree,
 or the messages of a protocol,
 where the alternative is a thicket of nested conditionals.
-[Functional Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+[Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
 put this to work, taking a `Result` apart with one branch per kind of failure.
 
 ## Automatic Parallelism
@@ -99,7 +99,7 @@ The calls can run in any order, on any schedule, on any number of cores,
 and the answers do not change.
 
 Impure code has no such freedom.
-Recall `withdraw()` from [Functional Foundations](40_Functional_Foundations.md#pure-functions).
+Recall `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions).
 Two parallel calls could both read `balance` before either writes it back,
 and one withdrawal would vanish.
 Making that safe means adding a lock,
@@ -288,7 +288,7 @@ is the "functionality" the introduction set out to find.
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
     and explain what it reveals about Unicode case mapping.
-4.  Write a property test for `group_rounds()` from [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
+4.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names,

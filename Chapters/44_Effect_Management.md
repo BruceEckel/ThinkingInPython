@@ -3,7 +3,7 @@
 In numerous places throughout this book,
 we have emphasized the benefits of pure functions:
 
-- [Functional Foundations](40_Functional_Foundations.md#pure-functions)
+- [Foundations](40_Functional_Foundations.md#pure-functions)
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
 - [Performance](18_Performance.md#caching)
@@ -103,7 +103,7 @@ Two schools of thought exist:
     functional programming avoids exceptions altogether.
     A *Total Function* doesn't raise exceptions,
     but instead returns errors as data using explicit wrapper types,
-    as we saw in [Functional Error Handling](42_Functional_Error_Handling.md).
+    as we saw in [Error Handling](42_Functional_Error_Handling.md).
 
 From an Effect Management standpoint, exceptions are impure.
 If you write a function `a()` that calls a function `b()` that raises an exception,
@@ -170,7 +170,7 @@ The next phase subdivides the impure portion,
 and each subdivision produces its own benefit:
 
 - **Exceptions** become data,
-  via [Functional Error Handling](42_Functional_Error_Handling.md).
+  via [Error Handling](42_Functional_Error_Handling.md).
   Failures turn into values the type checker can see,
   and a test checks for a `Failure` as easily as a `Success`.
 - **Side causes** become replaceable inputs.
@@ -201,7 +201,7 @@ Here are three ways to do it.
 ### Return a Result Type
 
 Wrap the answer and the failure in a `Result`,
-the way [Functional Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results)
+the way [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results)
 does.
 `result.py` and `safe.py` are shared helpers,
 so this chapter imports them directly instead of rebuilding them.
@@ -736,7 +736,7 @@ rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
 The [returns](https://github.com/dry-python/returns)
-library provides `Result` and `Maybe` containers like those in [Functional Error Handling](42_Functional_Error_Handling.md),
+library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional_Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/)
@@ -835,7 +835,7 @@ and future programmers will regard a function with hidden Effects the way we reg
     Count how many signatures you had to edit to thread it through,
     then explain what an EMS would have done instead.
 3.  Classify every Effect in `slope_catch.py`,
-    `withdraw()` from [Functional Foundations](40_Functional_Foundations.md#pure-functions),
+    `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions),
     and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,
     or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)

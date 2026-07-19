@@ -1,4 +1,4 @@
-# Functional Error Handling: Solutions
+# Error Handling: Solutions
 
 ## 1. A fourth step, `func_e()`, added to the `bind()` chain
 

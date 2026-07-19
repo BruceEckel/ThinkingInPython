@@ -1,4 +1,4 @@
-Change Part IV · Effects to Part IV · Functional Programming, and the chapters should be:
+Change "Part IV · Effects" to "Part IV · Functional Programming", and the chapters should be:
 40 Foundations
 41 Toolkits
 42 Error Handling

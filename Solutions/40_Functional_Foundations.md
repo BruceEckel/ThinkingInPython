@@ -1,4 +1,4 @@
-# Functional Foundations: Solutions
+# Foundations: Solutions
 
 ## 1. `deposit()` is impure for the same reason `withdraw()` is
 

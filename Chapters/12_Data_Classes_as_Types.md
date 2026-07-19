@@ -310,7 +310,7 @@ An illegal value can never produce a `Stars` in the first place.
 Illegal values are unrepresentable.
 
 This is one aspect of functional programming
-(see [Functional Foundations](40_Functional_Foundations.md#immutability)).
+(see [Foundations](40_Functional_Foundations.md#immutability)).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Typing](08_Static_Typing.md#type-hints)
