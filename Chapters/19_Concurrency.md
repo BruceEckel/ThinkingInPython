@@ -1012,15 +1012,6 @@ But it has only been in the last decade or so that advances such as async/await 
 
 Here are just a few of the topics that fall under the purview of "concurrency":
 
-- **Erlang and Elixir:** Treat each unit of concurrency as an isolated process that shares nothing and talks only through messages.
-  Erlang was built at Ericsson for telephone switches.
-  Elixir is newer, built on the same BEAM virtual machine.
-- **Actor languages:** Give each unit of concurrency the shape of an actor,
-  an isolated object that reacts only to messages, never shares state directly,
-  and can spawn more actors.
-- **Communicating Sequential Processes
-  (CSP):** Models concurrency as independent processes that communicate only over explicit channels,
-  the approach Go's goroutines and channels are built on.
 - **Processes:** Independent programs, each with its own memory space,
   isolated from every other process by the operating system.
 - **Threads:** Independent sequences of execution inside a single process,
@@ -1038,17 +1029,26 @@ Here are just a few of the topics that fall under the purview of "concurrency":
   generalizing a lock from one holder to a fixed count.
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
-- **Structured concurrency:** Ties a spawned task's lifetime to the scope that created it,
-  the model behind this chapter's `TaskGroup`.
 - **Message passing and channels:** Let concurrent units exchange data by sending values through a queue-like channel instead of sharing memory directly.
-- **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
-  and what happens when two threads touch the same memory with no synchronization between them.
-- **Deadlocks:** Happen when two or more threads each wait forever for a resource the other one holds.
-- **Livelocks:** Happen when threads keep reacting to each other and changing state,
-  but none of them makes progress.
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interfered.
+- **Structured concurrency:** Ties a spawned task's lifetime to the scope that created it,
+  the model behind this chapter's `TaskGroup`.
+- **Deadlocks:** Happen when two or more threads each wait forever for a resource the other one holds.
+- **Livelocks:** Happen when threads keep reacting to each other and changing state,
+  but none of them makes progress.
+- **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
+  and what happens when two threads touch the same memory with no synchronization between them.
+- **Actor languages:** Give each unit of concurrency the shape of an actor,
+  an isolated object that reacts only to messages, never shares state directly,
+  and can spawn more actors.
+- **Communicating Sequential Processes
+  (CSP):** Models concurrency as independent processes that communicate only over explicit channels,
+  the approach Go's goroutines and channels are built on.
+- **Erlang and Elixir:** Treat each unit of concurrency as an isolated process that shares nothing and talks only through messages.
+  Erlang was built at Ericsson for telephone switches.
+  Elixir is newer, built on the same BEAM virtual machine.
 - The list goes on...
 
 
