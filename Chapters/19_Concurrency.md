@@ -1110,7 +1110,9 @@ Knowing which kind of sameness a piece of code relies on,
 and which real differences it does not erase,
 is most of what concurrency asks of you.
 
-![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)
+![asyncio and threads never overlap their computing (one GIL, taking turns).
+Processes and subinterpreters genuinely run at once
+(five separate GILs)](_images/concurrency_models)
 
 ## Concurrency is Not Easy
 
