@@ -393,8 +393,8 @@ async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         value = counter  # Read
-        await asyncio.sleep(0)  # Hand control to the event loop
-        counter = value + 1  # Write back
+        await asyncio.sleep(0)  # Release control to event loop
+        counter = value + 1  # Write
 
 async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
@@ -406,16 +406,13 @@ asyncio.run(main())
 
 Eight coroutines each add 50, so `counter` should reach 400.
 Instead it stops at 50.
-Every `await asyncio.sleep(0)` hands control to the event loop before the write happens.
-The sleep is not the cause, only the smallest possible stand-in:
-in real code that middle `await` is a database query or an HTTP call,
-and the same update is lost while it waits.
+Every `await asyncio.sleep(0)` releases control to the event loop before the write happens.
+(The `sleep(0)` is a stand-in for a database query or an HTTP call).
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
 
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
 shows the identical failure with threads.
-The mechanism differs.
 A thread switch is preemptive,
 landing at points the interpreter picks and you did not choose,
 while a coroutine switch happens only at an `await` you chose to write.
@@ -428,7 +425,7 @@ the same shape of fix a lock gives across threads.
 The CPU-bound task cannot overlap on one core.
 Give it several cores and it can.
 `ProcessPoolExecutor` runs each call in its own process,
-each with its own interpreter,
+each with its own interpreter and GIL,
 so the operating system can place them on different cores and run them at the same time:
 
 ```python
@@ -458,21 +455,22 @@ Only its home changed, from one shared interpreter to several.
 With enough cores the wall-clock time falls toward the time of a single task,
 not their sum.
 
-Two mechanics separate a process pool from every in-process tool in this chapter,
-and both surface in this short listing.
-First, the `if __name__ == "__main__"` guard is not decoration.
-To create a worker, the operating system starts a fresh Python interpreter,
-and that interpreter *imports* this module to find `cpu_price()`.
-During the import the module's name is not `"__main__"`,
-so the guard keeps each worker from running `main()` and building a pool of workers of its own;
-leave it out and Python detects the runaway spawning and raises `RuntimeError`.
-Second, work crosses the process boundary by *pickling*.
-Each argument and each return value is serialized in one process and rebuilt in the other,
-and the function itself travels by name,
-so it must be importable from the top level of the module:
-passing a `lambda` to `pool.map()` fails with a pickling error.
-This is also [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule in another costume:
-a million tiny results can cost more to pickle than the parallelism saved.
+Two issues separate a process pool from every in-process tool in this chapter,
+and both surface in this short listing:
+
+1. The `if __name__ == "__main__"` guard is not decoration.
+   To create a worker, the operating system starts a fresh Python interpreter,
+   and that interpreter *imports* this module to find `cpu_price()`.
+   During the import the module's name is not `"__main__"`,
+   so the guard keeps each worker from running `main()` and building a pool of workers of its own.
+   Leave it out and Python detects the runaway spawning and raises `RuntimeError`.
+2. Work crosses the process boundary by *pickling*.
+   Each argument and each return value is serialized in one process and rebuilt in the other,
+   and the function itself travels by name,
+   so it must be importable from the top level of the module:
+   passing a `lambda` to `pool.map()` fails with a pickling error.
+   This is also [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule in another costume:
+   a million tiny results can cost more to pickle than the parallelism saved.
 
 `ProcessPoolExecutor` is not the only way to get separate processes.
 The `multiprocessing` module underneath it exposes the raw pieces:
@@ -516,16 +514,20 @@ Draining after `join()` is safe here because five small tuples fit in the queue'
 A queue carrying bulky data must be drained *before* joining:
 each worker's feeder thread blocks until its data is consumed,
 so the `join()` would deadlock.
+
 `ProcessPoolExecutor` is built on `multiprocessing`.
 It reuses a pool of workers instead of spawning one process per call,
 returns ordered results without manual bookkeeping,
 and shares its `submit()`/`map()`/`Future` interface with `ThreadPoolExecutor`,
 so switching between processes and threads, as the next section does,
 is a one-line change.
-Drop to `multiprocessing` directly for a job that is not one call returning one value:
-a worker that runs continuously and communicates over its own `Queue`,
-or state shared between processes through a `multiprocessing.Manager`, `Value`,
-or `Array`.
+
+Use `multiprocessing` for a job that is not one call returning one value:
+
+- A worker that runs continuously and communicates over its own `Queue`
+- State shared between processes through a `multiprocessing.Manager`, `Value`,
+  or `Array`.
+
 `ProcessPoolExecutor` does not expose any of those.
 
 The claim that wall-clock time falls toward a single task's time, not their sum,
@@ -538,7 +540,6 @@ and watch what happens once task count passes the number of cores:
 # task_scaling.py
 """Split a fixed workload across a growing number of tasks and
 time each split on a warm pool.
-
     python task_scaling.py
     python task_scaling.py --total 200_000_000 --max-tasks 128
 """
@@ -593,17 +594,19 @@ if __name__ == "__main__":
     main()
 ```
 
-`work_chunk()` is deliberately dumb, pure looping,
-so the only variable across a run is how finely the total work gets split.
-The pool is created once and warmed with a throwaway call before any measurement starts,
-so process startup never leaks into a timed result,
-the same discipline `timeit` needs around any one-time setup cost.
+`work_chunk()` is deliberately simple, pure looping.
+The only difference between one run and another is how finely the total work gets split.
+The pool is created once and warmed up with a throwaway call before any measurement starts.
+This way, process startup never leaks into a timed result,
+which is the discipline `timeit` needs around any one-time setup cost.
+
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
-Wall time drops sharply between one task and a task for every core,
+Wall time drops sharply between a single task and a task for every core,
 then keeps dropping a little past that point as smaller,
 more numerous chunks balance the load better across workers,
 before flattening out.
+
 The defaults above finish in about a second,
 small enough for a full `make verify` run.
 Raise `--total` and `--max-tasks` to push the curve onto a slower,
