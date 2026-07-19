@@ -989,37 +989,67 @@ a blocked thread and a suspended task are very different events on an event loop
 
 Concurrency is neither simple nor solved.
 
-This is how confused we are about concurrency: there are ongoing arguments about what the term even means!
-Rob Pike, creator of the Go language, famously muddied the waters by declaring, "concurrency is not parallelism"
-(I'm hoping he meant to say "concurrency is not **only** parallelism"). [[Formal definition of concurrency, with citations/footnotes]]
+This is how confused we are about concurrency.
+There are ongoing arguments about what the term even means!
+Rob Pike, creator of the Go language, famously muddied the waters by declaring,
+"concurrency is not parallelism"
+(I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
 
-You can find someone that declares "concurrency is easy!" because they've dipped their toes in it and never encountered a tricky problem. I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it, your life will be simpler."
+You can find someone that declares "concurrency is easy!" because they've dipped their toes in it and never encountered a tricky problem.
+I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it,
+your life will be simpler."
 
-Even when you understand the problems produced by shared mutable state, you might not have a choice.
-Certain solutions require as much data as possible to be packed into RAM, and in those cases you almost inevitably share mutable state. Some problems allow immutability, other problems require memory efficiency over everything. These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
+Even when you understand the problems produced by shared mutable state,
+you might not have a choice.
+Certain solutions require as much data as possible to be packed into RAM,
+and in those cases you almost inevitably share mutable state.
+Some problems allow immutability,
+other problems require memory efficiency over everything.
+These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
 People have worked tirelessly to try to figure out better ways to program concurrently.
 But it has only been in the last decade or so that advances such as async/await and structured concurrency have become widely accepted.
 
 Here are just a few of the topics that fall under the purview of "concurrency":
 
-- [[Swedish language for telephony, and its successor built on the same platform]].
-- [[Actor languages]]
-- [[Communicating Sequential Processes (CSP)]]
-- Processes
-- Threads
-- Tasks
-- Coroutines
-- Asynchrony
-- Parallelism
-- Locks
-- Barriers
-- Structured concurrency
-- Deadlocks
-- Livelocks
-- Software transactional memory (STM)
-- [[What else?]]
-- The list goes on
+- **Erlang and Elixir:** Treat each unit of concurrency as an isolated process that shares nothing and talks only through messages.
+  Erlang was built at Ericsson for telephone switches.
+  Elixir is newer, built on the same BEAM virtual machine.
+- **Actor languages:** Give each unit of concurrency the shape of an actor,
+  an isolated object that reacts only to messages, never shares state directly,
+  and can spawn more actors.
+- **Communicating Sequential Processes
+  (CSP):** Models concurrency as independent processes that communicate only over explicit channels,
+  the approach Go's goroutines and channels are built on.
+- **Processes:** Independent programs, each with its own memory space,
+  isolated from every other process by the operating system.
+- **Threads:** Independent sequences of execution inside a single process,
+  sharing that process's memory.
+- **Tasks:** Units of work scheduled to run concurrently,
+  such as the objects `asyncio` schedules on its event loop.
+- **Coroutines:** Functions that can suspend at an `await` and resume later,
+  the building block `async def` produces.
+- **Asynchrony:** Describes an operation that starts now and finishes later,
+  without blocking the caller while it waits.
+- **Parallelism:** Runs multiple computations at the same instant,
+  which needs multiple CPU cores.
+- **Locks:** Grant exclusive access to a shared resource so only one thread or task touches it at a time.
+- **Semaphores:** Limit how many threads or tasks may hold a resource at once,
+  generalizing a lock from one holder to a fixed count.
+- **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
+  then release them together.
+- **Structured concurrency:** Ties a spawned task's lifetime to the scope that created it,
+  the model behind this chapter's `TaskGroup`.
+- **Message passing and channels:** Let concurrent units exchange data by sending values through a queue-like channel instead of sharing memory directly.
+- **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
+  and what happens when two threads touch the same memory with no synchronization between them.
+- **Deadlocks:** Happen when two or more threads each wait forever for a resource the other one holds.
+- **Livelocks:** Happen when threads keep reacting to each other and changing state,
+  but none of them makes progress.
+- **Software transactional memory
+  (STM):** Runs a block of code as an atomic transaction against shared memory,
+  retrying automatically if another thread interfered.
+- The list goes on...
 
 
 
@@ -1058,3 +1088,18 @@ Here are just a few of the topics that fall under the purview of "concurrency":
 8.  In `priority_queue.py`,
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
+
+[^concurrency-def]: Pike's own definition, from the same talk,
+clarifies the joke.
+    Concurrency is the composition of independently executing computations.
+    Parallelism is running those computations at the same time.
+    You can have concurrency without parallelism.
+    The `asyncio` examples in this chapter show it.
+    Coroutines interleave on a single thread, and no two of them ever execute at the same instant.
+
+    The distinction goes back further than Pike's 2012 talk at Heroku's Waza conference.
+    Edsger Dijkstra's 1965 paper, "Solution of a Problem in Concurrent Programming Control,"
+    started the formal study of concurrent programs.
+    Leslie Lamport's 2015 Turing Lecture,
+    "The Computer Science of Concurrency: The Early Years,"
+    surveys the decades since.
