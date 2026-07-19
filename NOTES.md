@@ -1,3 +1,11 @@
+Look through chapter 19 for words or phrasing that is confusing, odd, or out-of-character.
+My goal is:
+- Simple, plain, clear explanations
+- Short sentences that remove uneccessary words without being overly terse
+- Avoid flourishes
+- Avoid writing that obscures
+
+
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
 Review all the exercises and make sure they all have solutions that work.

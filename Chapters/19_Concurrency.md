@@ -393,7 +393,7 @@ async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         value = counter  # Read
-        await asyncio.sleep(0)  # Release control to event loop
+        await asyncio.sleep(0)  # Release control to the event loop
         counter = value + 1  # Write
 
 async def main() -> None:
@@ -407,7 +407,7 @@ asyncio.run(main())
 Eight coroutines each add 50, so `counter` should reach 400.
 Instead it stops at 50.
 Every `await asyncio.sleep(0)` releases control to the event loop before the write happens.
-(The `sleep(0)` is a stand-in for a database query or an HTTP call).
+(The `sleep(0)` is a stand-in for a database query or an HTTP call.)
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
 
@@ -524,7 +524,7 @@ is a one-line change.
 
 Use `multiprocessing` for a job that is not one call returning one value:
 
-- A worker that runs continuously and communicates over its own `Queue`
+- A worker that runs continuously and communicates over its own `Queue`.
 - State shared between processes through a `multiprocessing.Manager`, `Value`,
   or `Array`.
 
@@ -540,6 +540,7 @@ and watch what happens once task count passes the number of cores:
 # task_scaling.py
 """Split a fixed workload across a growing number of tasks and
 time each split on a warm pool.
+
     python task_scaling.py
     python task_scaling.py --total 200_000_000 --max-tasks 128
 """
@@ -596,9 +597,9 @@ if __name__ == "__main__":
 
 `work_chunk()` is deliberately simple, pure looping.
 The only difference between one run and another is how finely the total work gets split.
-The pool is created once and warmed up with a throwaway call before any measurement starts.
-This way, process startup never leaks into a timed result,
-which is the discipline `timeit` needs around any one-time setup cost.
+The pool is created once and warmed up with a throwaway call before any measurement starts,
+the same discipline `timeit` needs around any one-time setup cost.
+This way, process startup never leaks into a timed result.
 
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
