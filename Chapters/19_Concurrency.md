@@ -904,8 +904,6 @@ before a process pool or a free-threaded interpreter.
 The one compatibility check mirrors free threading's: pure Python always works,
 but a C extension must support per-interpreter isolation to be imported in a subinterpreter.
 
-![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)
-
 ## Coordinating Threads with Queues
 
 When threads divide up work, the danger is shared mutable state.
@@ -1111,6 +1109,8 @@ the shortcut that looks tempting and breaks first.
 Knowing which kind of sameness a piece of code relies on,
 and which real differences it does not erase,
 is most of what concurrency asks of you.
+
+![The same cpu_price workload under all four models: asyncio and threads never overlap the computing (one GIL, taking turns), while processes and subinterpreters genuinely run at once (five separate GILs)](_images/concurrency_models)
 
 ## Concurrency is Not Easy
 
