@@ -209,11 +209,11 @@ and the only form for failure-as-data.
 ## Overlapping the Waits
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
-When a task awaits, the event loop runs another task in the meantime.
+When a task awaits, the event loop finds another task to run in the meantime.
+
 In the following example, the same price lookup appears twice.
 `io_price` `await`s on `asyncio.sleep` as a stand-in for a network call.
 `cpu_price` performs computations to represent heavy work.
-
 A `Meter` records the peak number of tasks in flight at once.
 It is a [context manager](15_Context_Managers.md):
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
@@ -253,11 +253,11 @@ async def cpu_price(order: int, meter: Meter) -> int:
 # Defines an async function:
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
-async def run(task: PriceTask,
+async def run(price_task: PriceTask,
               orders: list[int]) -> tuple[list[int], int]:
     meter = Meter()
-    coros = [task(o, meter) for o in orders]
-    prices = await asyncio.gather(*coros)
+    coroutines = [price_task(o, meter) for o in orders]
+    prices = await asyncio.gather(*coroutines)
     return prices, meter.peak
 
 async def main() -> None:
@@ -272,13 +272,9 @@ asyncio.run(main())
 #: cpu: peak=1, prices=[10, 20, 30, 40, 50]
 ```
 
-`Meter` appears two different ways here.
-`run()` creates it with plain `meter = Meter()`.
-What's needed there is the shared object itself, not a scope to enter.
-Each task then enters that same object as a context manager,
+`run()` creates the `Meter` object, then passes it to each task.
+A task uses that object as a context manager,
 writing `with meter:` around its own active span.
-`Meter.__enter__()` returns `None`,
-so `with Meter() as meter:` in `run()` would bind `meter` to `None` instead of the object.
 
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
 The I/O tasks each reach their `await` and suspend,
@@ -286,15 +282,11 @@ so all five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
 The event loop overlaps waiting, not computing.
-Async did not fail.
-It overlapped the part that runs outside the processor,
-which for `cpu_price` is nothing.
 
-The `asyncio.sleep()` in `io_price` is not `time.sleep()`.
-Awaiting `asyncio.sleep()` suspends only the current task and hands the wait to the event loop,
+Notice that `asyncio.sleep()` in `io_price` is different from `time.sleep()`.
+Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
 which is what let all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
-and the event loop runs on that thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 
 ```python
@@ -307,7 +299,7 @@ async def yielding_wait() -> None:
     await asyncio.sleep(0.05)  # Suspends this task only
 
 async def blocking_wait() -> None:
-    time.sleep(0.05)  # Stops the whole event loop
+    time.sleep(0.05)  # Stops the event loop
 
 async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
     start = time.perf_counter()
@@ -329,13 +321,53 @@ Five awaited sleeps finish together in about the time of one.
 Five blocking sleeps cannot overlap at all:
 each stalls the loop for its full duration,
 so the total is never less than their sum.
-To the event loop, a blocking call is `cpu_price` all over again,
-work that never yields.
-The rule inside `async def` is to await, never block.
-A blocking call you cannot rewrite,
-a library function that reads a file or talks to a database,
-belongs in a thread,
-and `await asyncio.to_thread(blocking_call)` moves it there while the loop keeps running.
+
+## Escaping to a Thread
+
+The rule inside `async def` is to `await`, never block.
+If you cannot rewrite a blocking call,
+for example a library function that reads a file or talks to a database,
+you can put it in a thread.
+`await asyncio.to_thread(blocking_call)` moves `blocking_call` into a thread,
+allowing the event loop to keep running:
+
+```python
+# to_thread.py
+import asyncio
+import time
+from collections.abc import Awaitable, Iterable
+
+async def blocking_wait() -> None:
+    time.sleep(0.05)  # Stops the event loop
+
+async def offloaded_wait() -> None:
+    await asyncio.to_thread(time.sleep, 0.05)  # Runs in a thread
+
+async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
+    start = time.perf_counter()
+    await asyncio.gather(*tasks)
+    return time.perf_counter() - start
+
+async def main() -> None:
+    t_block = await elapsed(blocking_wait() for _ in range(5))
+    t_offload = await elapsed(offloaded_wait() for _ in range(5))
+    print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
+    print(f"offloaded sleeps overlap: {t_offload < 0.05 * 2}")
+
+asyncio.run(main())
+#: blocking sleeps serialize: True
+#: offloaded sleeps overlap: True
+```
+
+`blocking_wait` is the same stalled call as before.
+`offloaded_wait` calls the identical `time.sleep()`,
+but through `asyncio.to_thread()`,
+which hands the call to a worker thread and awaits its completion.
+`time.sleep()` itself still blocks, but it blocks a worker thread,
+not the one running the event loop,
+so the loop stays free to run the other four tasks while each sleep finishes.
+Five offloaded sleeps overlap and finish together,
+the same shape of result `asyncio.sleep()` gave the loop directly.
 
 [Simulation](38_Simulation.md) builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
@@ -345,7 +377,7 @@ uses `gather()` to notify slow observers together instead of one at a time.
 ## A Single Thread Still Races
 
 `asyncio` runs one coroutine at a time, never two at once.
-It is tempting to conclude that shared state needs no locking there.
+This makes it tempting to conclude that shared state needs no locking.
 But "one at a time" only protects the instructions between two `await`s,
 not a value that lives across one.
 Two coroutines that read a shared value, `await`,
@@ -380,6 +412,7 @@ in real code that middle `await` is a database query or an HTTP call,
 and the same update is lost while it waits.
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
+
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
 shows the identical failure with threads.
 The mechanism differs.

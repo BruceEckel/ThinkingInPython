@@ -31,11 +31,11 @@ async def cpu_price(order: int, meter: Meter) -> int:
 # Defines an async function:
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
-async def run(task: PriceTask,
+async def run(price_task: PriceTask,
               orders: list[int]) -> tuple[list[int], int]:
     meter = Meter()
-    coros = [task(o, meter) for o in orders]
-    prices = await asyncio.gather(*coros)
+    coroutines = [price_task(o, meter) for o in orders]
+    prices = await asyncio.gather(*coroutines)
     return prices, meter.peak
 
 async def main() -> None:

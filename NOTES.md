@@ -5,6 +5,8 @@ Change Part IV · Effects to Part IV · Functional Programming, and the chapters
 43 Assurance
 44 Effect Management
 
+Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
+
 Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
