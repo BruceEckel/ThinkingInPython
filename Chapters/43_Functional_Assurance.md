@@ -15,8 +15,7 @@ and what this chapter explores.
 The preceding chapters built the machinery.
 [Foundations](40_Functional_Foundations.md)
 established pure functions and immutable values,
-[Toolkits](41_Functional_Toolkits.md)
-supplied the standard library's support,
+[Toolkits](41_Functional_Toolkits.md) supplied the standard library's support,
 and [Error Handling](42_Functional_Error_Handling.md)
 made failure an ordinary value.
 This chapter asks what that machinery lets you claim about your code,

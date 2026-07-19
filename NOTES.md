@@ -1,10 +1,3 @@
-Change "Part IV · Effects" to "Part IV · Functional Programming", and the chapters should be:
-40 Foundations
-41 Toolkits
-42 Error Handling
-43 Assurance
-44 Effect Management
-
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
 Review all the exercises and make sure they all have solutions that work.

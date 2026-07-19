@@ -1,7 +1,7 @@
 # Toolkits
 
-[Foundations](40_Functional_Foundations.md)
-built behavior from small, pure, composable pieces.
+[Foundations](40_Functional_Foundations.md) built behavior from small, pure,
+composable pieces.
 The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.
 `itertools` assembles lazy iterators from composable parts.
