@@ -985,6 +985,46 @@ but the first two block the calling thread while the third suspends a task,
 and as `blocking_the_loop.py` showed,
 a blocked thread and a suspended task are very different events on an event loop.
 
+## Concurrency is Not Easy
+
+Concurrency is neither simple nor solved.
+
+This is how confused we are about concurrency: there are ongoing arguments about what the term even means!
+Rob Pike, creator of the Go language, famously muddied the waters by declaring, "concurrency is not parallelism"
+(I'm hoping he meant to say "concurrency is not **only** parallelism"). [[Formal definition of concurrency, with citations/footnotes]]
+
+You can find someone that declares "concurrency is easy!" because they've dipped their toes in it and never encountered a tricky problem. I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it, your life will be simpler."
+
+Even when you understand the problems produced by shared mutable state, you might not have a choice.
+Certain solutions require as much data as possible to be packed into RAM, and in those cases you almost inevitably share mutable state. Some problems allow immutability, other problems require memory efficiency over everything. These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
+
+People have worked tirelessly to try to figure out better ways to program concurrently.
+But it has only been in the last decade or so that advances such as async/await and structured concurrency have become widely accepted.
+
+Here are just a few of the topics that fall under the purview of "concurrency":
+
+- [[Swedish language for telephony, and its successor built on the same platform]].
+- [[Actor languages]]
+- [[Communicating Sequential Processes (CSP)]]
+- Processes
+- Threads
+- Tasks
+- Coroutines
+- Asynchrony
+- Parallelism
+- Locks
+- Barriers
+- Structured concurrency
+- Deadlocks
+- Livelocks
+- Software transactional memory (STM)
+- [[What else?]]
+- The list goes on
+
+
+
+
+
 ## Exercises
 
 1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
