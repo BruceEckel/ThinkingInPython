@@ -1110,7 +1110,7 @@ Knowing which kind of sameness a piece of code relies on,
 and which real differences it does not erase,
 is most of what concurrency asks of you.
 
-![asyncio and threads never overlap their computing (one GIL, taking turns).
+![Asyncio and threads share a single GIL and take turns.
 Processes and subinterpreters genuinely run at once
 (five separate GILs)](_images/concurrency_models)
 
@@ -1118,13 +1118,14 @@ Processes and subinterpreters genuinely run at once
 
 Concurrency is neither simple nor solved.
 
-This is how confused we are about concurrency.
-There are ongoing arguments about what the term even means!
+This is how confused we are about concurrency:
+there are ongoing arguments about what the term even means!
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
+[[what it means]]
 
-You can find someone that declares "concurrency is easy!" because they've dipped their toes in it and never encountered a tricky problem.
+The people who declare "concurrency is easy!" have dipped their toes in it and never encountered a tricky problem.
 I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it,
 your life will be simpler."
 
@@ -1138,7 +1139,6 @@ These are the kinds of decisions you must make when you move from the examples p
 
 People have worked tirelessly to try to figure out better ways to program concurrently.
 But it has only been in the last decade or so that advances such as async/await and structured concurrency have become widely accepted.
-
 Here are just a few of the topics that fall under the purview of "concurrency":
 
 - **Processes:** Independent programs, each with its own memory space,
