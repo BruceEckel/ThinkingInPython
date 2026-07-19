@@ -985,6 +985,133 @@ but the first two block the calling thread while the third suspends a task,
 and as `blocking_the_loop.py` showed,
 a blocked thread and a suspended task are very different events on an event loop.
 
+## One Task, Many Backends
+
+Every section so far has kept threads, processes, subinterpreters,
+and asyncio apart on purpose.
+Blending them without knowing which parts are compatible is how races and pickling errors happen.
+Two real points of convergence exist in the standard library, though,
+not because the models are secretly the same,
+but because two small pieces of them genuinely are.
+
+The first is `concurrent.futures.Executor`.
+`ThreadPoolExecutor`, `ProcessPoolExecutor`,
+and `InterpreterPoolExecutor` are not just similar.
+They all subclass `Executor` and inherit `submit()` and `map()` from it.
+A function written against that base class runs unmodified on any of them:
+
+```python
+# any_executor.py
+from concurrent.futures import (
+    Executor,
+    InterpreterPoolExecutor,
+    ProcessPoolExecutor,
+    ThreadPoolExecutor,
+)
+
+def cpu_price(order: int) -> int:
+    total = 0
+    for _ in range(1_000_000):  # Working inside the processor
+        total += 1
+    return order * 10
+
+def run_on(executor: Executor, orders: list[int]) -> list[int]:
+    with executor:
+        return list(executor.map(cpu_price, orders))
+
+def main() -> None:
+    orders = [1, 2, 3, 4, 5]
+    backends: list[Executor] = [
+        ThreadPoolExecutor(),
+        ProcessPoolExecutor(),
+        InterpreterPoolExecutor(),
+    ]
+    results = [run_on(b, orders) for b in backends]
+    print(results[0])
+    print(all(r == results[0] for r in results))
+
+if __name__ == "__main__":
+    main()
+```
+
+`run_on()` never mentions which backend it received,
+only the shape every `Executor` shares.
+Passing the same five orders through all three prints the identical `[10, 20, 30, 40, 50]`,
+then `True` for the check that all three answers matched.
+Underneath, the three workers could not be more different, an OS thread,
+an OS process, a subinterpreter, but `run_on()` cannot see that,
+and does not need to.
+
+asyncio has no seat at that table.
+An `Executor` blocks a worker and hands back a result.
+A coroutine is the opposite shape,
+a suspended function the event loop resumes on its own schedule.
+The second point of convergence is `await`.
+A native coroutine, a `to_thread()` call,
+and a `run_in_executor()` call all produce the same thing an `async def` can wait on,
+so `TaskGroup`, from [Structured Concurrency with TaskGroup](#structured-concurrency-with-taskgroup),
+does not care which kind of task it is holding either:
+
+```python
+# mixed_await.py
+import asyncio
+import time
+from concurrent.futures import ProcessPoolExecutor
+
+async def io_price(order: int) -> int:
+    await asyncio.sleep(0.05)  # A native coroutine
+    return order * 10
+
+def blocking_price(order: int) -> int:
+    time.sleep(0.05)  # A blocking call, needs a thread
+    return order * 10
+
+def cpu_price(order: int) -> int:
+    total = 0
+    for _ in range(1_000_000):  # Needs its own process
+        total += 1
+    return order * 10
+
+async def process_price(
+    pool: ProcessPoolExecutor, order: int
+) -> int:
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(pool, cpu_price, order)
+
+async def main() -> None:
+    with ProcessPoolExecutor() as pool:
+        async with asyncio.TaskGroup() as tg:
+            tasks = [
+                tg.create_task(io_price(1)),
+                tg.create_task(asyncio.to_thread(blocking_price, 2)),
+                tg.create_task(process_price(pool, 3)),
+            ]
+    print([t.result() for t in tasks])
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Three different backends are running inside that one `TaskGroup`.
+`io_price()` suspends and resumes on the event loop the way `fetch()` did in this chapter's first listing.
+`to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
+`process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
+wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
+All three start together, and the block does not exit until all three finish,
+printing `[10, 20, 30]`.
+The event loop is doing the same job it did in the chapter's first listing.
+It schedules awaitables,
+and it no longer cares whether the work underneath is a coroutine, a thread,
+or a process.
+
+Neither of these is a single `Task` class hiding three incompatible `run()` methods behind one name,
+the shortcut that looks tempting and breaks first.
+`Executor` unifies backends that share a blocking, submit-and-wait shape.
+`await` unifies backends that share nothing but a promised result.
+Knowing which kind of sameness a piece of code relies on,
+and which real differences it does not erase,
+is most of what concurrency asks of you.
+
 ## Concurrency is Not Easy
 
 Concurrency is neither simple nor solved.
