@@ -28,7 +28,7 @@ async def cpu_price(order: int, meter: Meter) -> int:
             total += 1
     return order * 10
 
-# Defines an async function:
+# The type of an async price function:
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def run(price_task: PriceTask,

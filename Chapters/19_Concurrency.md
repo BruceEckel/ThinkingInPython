@@ -85,15 +85,15 @@ At the `await` each task *suspends*.
 It stops executing, remembers its place in the function,
 and hands control back to the event loop.
 
-A suspended task runs no bytecode and holds no processor; it is a paused frame,
-local variables intact, waiting to continue.
+A suspended task runs no bytecode and uses no processor time;
+it is a paused frame, local variables intact, waiting to continue.
 The event loop starts the next coroutine,
 which is how all three are in flight during the first wait.
 Suspending also registers a wake-up condition with the event loop.
 
 `asyncio.sleep()` asks for a timer;
 a real network request would ask the loop to watch a socket for the reply.
-When a timer fires, the loop resumes that task exactly where it paused,
+When a timer fires, the loop resumes that task where it paused,
 just after the `await`.
 The three delays make the resumptions visible: c sleeps shortest,
 so its timer fires first, and the resumed lines print as c, b, a,
@@ -112,10 +112,10 @@ so nothing overlaps and the waits add up.
 `gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
 Scheduling is not yet running.
 The task bodies execute only after `gather()` itself suspends,
-each in turn up to its first `await`, which is exactly what the a, b,
+each in turn up to its first `await`, which is what the a, b,
 c started lines in the trace show.
 The comprehension never reaches that state:
-it does not even wrap the next coroutine until the previous one has finished entirely.
+it does not even wrap the next coroutine until the previous one has finished.
 
 ## Structured Concurrency with `TaskGroup`
 
@@ -125,7 +125,7 @@ If one of its coroutines raises an exception,
 but the other tasks it started keep running.
 Now these tasks are unsupervised and their results and errors are discarded.
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative:
-an `async with` block that owns every task started inside it and refuses to be exited until all of them are accounted for:
+an `async with` block that owns every task started inside it and does not exit until every one is accounted for:
 
 ```python
 # task_group.py
@@ -153,8 +153,8 @@ asyncio.run(main())
 ```
 
 `tg.create_task()` schedules a task immediately,
-so all three are in flight together, exactly as under `gather()`.
-The trace shows the failure discipline. c, with the shortest delay,
+so all three are in flight together, just as under `gather()`.
+The trace shows how failure is handled. c, with the shortest delay,
 completes and prints. b raises at 0.05 seconds,
 and the group responds by cancelling a,
 which is still suspended with 0.2 seconds of sleep to go,
@@ -192,7 +192,7 @@ The comprehension keeps the tasks in argument order,
 so the harvested results come out exactly as `gather()`'s would,
 no matter which task finished first.
 Given that, why does `gather()` survive?
-Weight, and one genuinely different mode.
+It is lighter, and it has one genuinely different mode.
 For a batch expected to succeed, `await gather(...)` is a single expression:
 no `async with`, no task list, no harvest step.
 And `gather(..., return_exceptions=True)` collects failures *as values* in the result list,
@@ -200,7 +200,7 @@ for batches where partial failure is data to examine rather than a reason to sto
 A health check across ten services wants the nine answers and the one error.
 `TaskGroup` has no such mode.
 Its contract is all-or-cancel,
-and keeping siblings alive past a failure means catching inside each task yourself.
+and keeping siblings alive past a failure means catching exceptions inside each task yourself.
 For new code where a failure should stop the batch,
 `TaskGroup` is the sound default.
 `gather()` remains the compact happy-path form,
@@ -212,8 +212,8 @@ and the only form for failure-as-data.
 When a task awaits, the event loop finds another task to run in the meantime.
 
 In the following example, the same price lookup appears twice.
-`io_price` `await`s on `asyncio.sleep` as a stand-in for a network call.
-`cpu_price` performs computations to represent heavy work.
+`io_price()` awaits `asyncio.sleep()` as a stand-in for a network call.
+`cpu_price()` performs computations to represent heavy work.
 A `Meter` records the peak number of tasks in flight at once.
 It is a [context manager](15_Context_Managers.md):
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
@@ -250,7 +250,7 @@ async def cpu_price(order: int, meter: Meter) -> int:
             total += 1
     return order * 10
 
-# Defines an async function:
+# The type of an async price function:
 type PriceTask = Callable[[int, Meter], Awaitable[int]]
 
 async def run(price_task: PriceTask,
@@ -359,8 +359,8 @@ asyncio.run(main())
 #: offloaded sleeps overlap: True
 ```
 
-`blocking_wait` is the same stalled call as before.
-`offloaded_wait` calls the identical `time.sleep()`,
+`blocking_wait()` is the same stalled call as before.
+`offloaded_wait()` calls the identical `time.sleep()`,
 but through `asyncio.to_thread()`,
 which hands the call to a worker thread and awaits its completion.
 `time.sleep()` itself still blocks, but it blocks a worker thread,
@@ -450,7 +450,7 @@ if __name__ == "__main__":
 
 `pool.map()` sends each order to a worker process and gathers the results in order,
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
-The computation is the same `cpu_price` as before.
+The computation is the same `cpu_price()` as before.
 Only its home changed, from one shared interpreter to several.
 With enough cores the wall-clock time falls toward the time of a single task,
 not their sum.
@@ -507,7 +507,7 @@ if __name__ == "__main__":
 ```
 
 This prints the same `[10, 20, 30, 40, 50]`,
-but everything `pool.map` did is now explicit: starting each worker,
+but everything `pool.map()` did is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result is tagged with its `order`).
 Draining after `join()` is safe here because five small tuples fit in the queue's internal buffer.
@@ -603,7 +603,7 @@ This way, process startup never leaks into a timed result.
 
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
-Wall time drops sharply between a single task and a task for every core,
+Wall time drops sharply as the split grows from one task to one task per core,
 then keeps dropping a little past that point as smaller,
 more numerous chunks balance the load better across workers,
 before flattening out.
@@ -619,8 +619,8 @@ Threads would not have helped in the previous section.
 The standard CPython build has a *Global Interpreter Lock* (GIL).
 Only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
-A thread releases the GIL while it waits on I/O. That single fact decides what a thread pool is good for,
-and both halves of the claim are worth demonstrating.
+A thread releases the GIL while it waits on I/O. That single fact decides what a thread pool is good for.
+Both halves, the waiting and the computing, are worth demonstrating.
 The waiting half first.
 Here `time.sleep()` stands in for a blocking network call,
 and five threads overlap five of those waits even with the GIL in place:
@@ -656,10 +656,10 @@ so the operating system runs another thread while it waits,
 the same overlap `asyncio` achieved with suspended tasks.
 This is `blocking_the_loop.py` turned inside out:
 a blocking call freezes an event loop,
-but a pool of threads absorbs blocking calls comfortably,
-which is why `asyncio.to_thread()` hands its blocking work to exactly this kind of pool.
+but a pool of threads absorbs blocking calls,
+which is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
 Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the surgery;
-`asyncio` earns its keep when the waits number in the thousands,
+`asyncio` pays off when you have thousands of waits,
 since tasks are far lighter than threads.
 
 Computing is the other half, and it turns the result around.
@@ -795,7 +795,7 @@ A typical run lands near 50.
 Each sleep releases the GIL between a read and its write,
 so all eight threads read the same value,
 and their eight writes store the same result.
-The GIL made this race rare at machine speed.
+At full speed, with no deliberate sleep, the GIL made this race rare.
 It never made it impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues),
@@ -811,7 +811,7 @@ Running `gil_threads.py`'s CPU-bound `sequential()`/`threaded()` pair under a fr
 
     threads speedup: 3.8x
 
-(The speedup needs a free-threaded interpreter, which is not the book's default build, so the build does not run that second measurement.
+(The speedup needs a free-threaded interpreter, which the book's build does not use, so that measurement does not run during verification.
 The number is one machine's actual output.)
 
 <!-- TODO(free-threaded-default): if free threading ever becomes
@@ -820,7 +820,8 @@ tested example. -->
 
 Free threading finally cleared the 1996 bar by making reference counting cheap without a global lock.
 Most objects are only ever touched by the thread that created them.
-*Biased reference counting* lets that owning thread update the count with arithmetic.
+*Biased reference counting* lets that owning thread update the count with ordinary,
+non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*,
 a change that landed in 3.12 for every build but pays off most here,
@@ -863,7 +864,7 @@ The cost is a whole operating-system process per worker.
 Since 3.12, CPython can create additional interpreters inside the same process
 ([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL.
 `InterpreterPoolExecutor` (added in 3.14) runs each call in one of these,
-so multiple interpreters, each locked on its own, run truly at once,
+so multiple interpreters, each with its own lock, truly run at once,
 without leaving the process:
 
 ```python
@@ -990,7 +991,7 @@ a blocked thread and a suspended task are very different events on an event loop
 ## One Task, Many Backends
 
 Every section so far has kept threads, processes, subinterpreters,
-and asyncio apart on purpose.
+and `asyncio` apart on purpose.
 Blending them without knowing which parts are compatible is how races and pickling errors happen.
 Two real points of convergence exist in the standard library, though,
 not because the models are secretly the same,
@@ -1044,7 +1045,7 @@ Underneath, the three workers could not be more different, an OS thread,
 an OS process, a subinterpreter, but `run_on()` cannot see that,
 and does not need to.
 
-asyncio has no seat at that table.
+`asyncio` has no seat at that table.
 An `Executor` blocks a worker and hands back a result.
 A coroutine is the opposite shape,
 a suspended function the event loop resumes on its own schedule.
@@ -1107,7 +1108,7 @@ and it no longer cares whether the work underneath is a coroutine, a thread,
 or a process.
 
 Neither of these is a single `Task` class hiding three incompatible `run()` methods behind one name,
-the shortcut that looks tempting and breaks first.
+the shortcut that looks tempting and soon breaks.
 `Executor` unifies backends that share a blocking, submit-and-wait shape.
 `await` unifies backends that share nothing but a promised result.
 Knowing which kind of sameness a piece of code relies on,
@@ -1127,7 +1128,9 @@ there are ongoing arguments about what the term even means!
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
-[[what it means]]
+In everyday English,
+*concurrent* means "operating or occurring at the same time."
+By that definition, concurrency and parallelism are the same thing.
 
 The people who declare "concurrency is easy!" have dipped their toes in it and never encountered a tricky problem.
 I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it,
@@ -1135,14 +1138,14 @@ your life will be simpler."
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
-Certain solutions require as much data as possible to be packed into RAM,
+Some systems need as much data as possible packed into RAM,
 and in those cases you almost inevitably share mutable state.
-Some problems allow immutability,
-other problems require memory efficiency over everything.
+Some problems allow immutability.
+Others require memory efficiency over everything.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
-People have worked tirelessly to try to figure out better ways to program concurrently.
-But it has only been in the last decade or so that advances such as async/await and structured concurrency have become widely accepted.
+People have worked tirelessly to find better ways to program concurrently.
+Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
 Here are just a few of the topics that fall under the purview of "concurrency":
 
 - **Processes:** Independent programs, each with its own memory space,
@@ -1223,7 +1226,7 @@ Here are just a few of the topics that fall under the purview of "concurrency":
     then the description as a tiebreaker.
 
 [^concurrency-def]: Pike's own definition, from the same talk,
-clarifies the joke.
+clarifies what he meant.
     Concurrency is the composition of independently executing computations.
     Parallelism is running those computations at the same time.
     You can have concurrency without parallelism.
