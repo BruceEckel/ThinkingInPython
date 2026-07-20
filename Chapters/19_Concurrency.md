@@ -22,18 +22,19 @@ Each *process* (allocated when you start a program)
 gets one thread and its own heap.
 The program can request more threads from the OS,
 but all threads within a process share the same heap.
-This means each thread must be careful not to corrupt parts of the heap used by other threads.
+This means each thread must not corrupt parts of the heap used by other threads.
 
 When a program requests an additional thread from the OS,
-that thread gets its own function-call stack.
+that thread gets its own function-call stack,
+separate from the original process stack.
 Every function call pushes arguments and the return address onto the stack.
 When the function ends,
 its stack frame is popped and execution jumps back to the return address.
-The return value typically travels back in a CPU register.
+(The return value typically travels back in a CPU register.)
 Thus it is essential that each thread own its call stack.
 
-The context switch must preserve the state of the current thread before switching to a different thread.
-This stores the CPU register set, which includes:
+A context switch must preserve the state of the current thread before switching to a different thread.
+It stores the CPU register set, which includes:
 
 - The program counter (the next instruction to execute)
 - The stack pointer
@@ -86,7 +87,7 @@ Mapping every parallel task onto its own OS thread worked,
 but it pushed all scheduling decisions onto the OS and needed extra machinery
 (thread pools, pinning, tuning) to perform well.
 Languages and runtimes responded by taking on more of that scheduling,
-thus multiplexing many lightweight,
+multiplexing many lightweight,
 language-managed tasks onto a smaller number of OS threads.
 In special, latency-sensitive domains
 (real-time control, high-frequency trading, packet processing)
@@ -97,7 +98,7 @@ so a task can run with minimal interference.
 
 A task is *I/O-bound* when it spends its time waiting on something outside the process:
 a network reply, a disk read, a database query.
-The processor sits idle through the wait.
+Given nothing else to do, the processor sits idle through the wait.
 A task is *CPU-bound* when it spends its time computing inside the process.
 The processor is busy from start to finish.
 
@@ -115,19 +116,23 @@ each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
+Instead of using threads for I/O bound problems, asynchrony allows you to create coroutines.
+Each coroutine, upon encountring I/O, suspends itself and yields control, but not to the OS.
+Instead, control is given to the *event loop* which (with the help of the OS), discovers the next task which is available to run.
+This is captured in two keywords and the `asyncio` library.
+
 Four pieces make up the `asyncio` vocabulary.
 
 1. `async def` defines a *coroutine function*.
-   Calling it runs nothing.
-   It returns a *coroutine object*, a description of work that has not started.
+   Calling it doesn't run anything but instead returns a *coroutine object*.
+   This is a description of work that has not started.
 2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
-   The pause is the point.
-   While one coroutine waits,
+   While that coroutine waits,
    the *event loop* finds other coroutines that are ready to run.
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
-   It is the entry point, called once to run the program:
+   This is the entry point, called once to run the program:
 
 ```python
 # async_mechanics.py
@@ -159,7 +164,7 @@ asyncio.run(main())
 
 The first printed line is proof that calling a coroutine runs nothing.
 `fetch("a", 0.03)` is called on `main()`'s first line,
-yet no started line appears, only the name of the object that the call built:
+yet no "started" line appears, only the name of the object that the call built:
 `coroutine`.
 The work begins when `gather()` receives that object.
 If you forget the `await gather()`, the work doesn't happen.
