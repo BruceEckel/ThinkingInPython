@@ -2,8 +2,77 @@
 
 [Performance](18_Performance.md)
 works on making one stream of instructions faster.
-*Concurrency* runs independent tasks so they overlap instead of waiting in line.
-Whether this overlap helps depends on where each task spends its time.
+*Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
+
+The meaning of "at the same time" depends on context.
+Early machines had a single CPU, and early operating systems (OS)
+were basically just program loaders.
+To enable an OS to do more, *threads* were created.
+Threads allocate the CPU to one task for a slice of time,
+then stop that task and switch to a different task for another time slice.
+We say that each task is allocated its own thread,
+and the OS performs *context switching* from one thread to the next.
+The OS controls everything: allocating threads,
+deciding how long a time slice is, performing the context switch,
+and deciding which thread is ready to run next.
+
+Each *process* (allocated when you start a program) gets a thread and its own heap.
+The program can request more threads from the OS, but all these threads share the same heap,
+which means that each thread must be careful not to corrupt parts of the heap used by other threads.
+
+When a program requests an additional thread from the OS,
+that thread gets its own function-call stack.
+Every function call pushes arguments and the return address onto the stack.
+At the end of the function the return value is pushed onto the stack,
+execution jumps to the return address, and the caller pops the return value.
+Thus it is essential that each thread own its call stack.
+
+The context switch must preserve the state of the current thread before switching to a different thread.
+This stores the CPU register set, which includes:
+
+- The program counter (which instruction to execute next)
+- The stack pointer
+- Other registers and flags used by the program
+
+The thread's stack is not copied; it just sits and waits for the thread to resume.
+The heap is not copied because it is shared between all the threads in that process.
+
+Although a context switch is made to be as efficient as possible,
+it has overhead.
+And for the OS to evenly distribute computing resources across threads,
+it must time slice fairly frequently.
+Typically a thread only runs a few milliseconds at a time.
+
+Using more than one thread within a program solved an immediate problem:
+if a thread got stuck (*blocked*) waiting for I/O (e.g. disk, network, waiting on a lock),
+it could voluntarily yield its use of the CPU to the operating system,
+which could then use that CPU for another thread, producing faster overall progress.
+
+Another benefit of threads was seen when more CPUs became available on a single machine.
+Threads were already designed to distribute computing resources,
+so more CPUs simply meant more resources to distribute (of course, it wasn't *quite* that easy).
+Threads could also be made to do ad-hoc parallelism:
+some CPUs could be dedicated to running parallel parts of a program by adapting the threading mechanism.
+
+Although threads have been adapted to these purposes, the OS is always at a disadvantage:
+it doesn't know details of the program it's running, and therefore cannot optimize it.
+It cannot, for example, perform faster context switches by knowing what data is important to preserve and what isn't.
+In addition, each thread requires enough resources to work for every program,
+even though some tasks might only require a fraction of those resources.
+Engineers learned all kinds of tricks to make programs run faster despite these disadvantages,
+but these also made the resulting programs more expensive to create and maintain.
+
+The answer was to move the context switch out of the OS and into the program.
+This way engineers are not fighting the threading system.
+The programming language decides, based on its knowledge of the program,
+the minimum necessary data to include in the context switch.
+The programmer minimizes context switches by deciding when they happen.
+This shift in control of context switching greatly simplifies writing and reasoning about the program.
+
+The second big shift was in language-level control of parallelism.
+Adapting threads to distribute CPUs worked, but required extra mechanisms.
+
+
 
 ## I/O-Bound vs CPU-Bound
 
