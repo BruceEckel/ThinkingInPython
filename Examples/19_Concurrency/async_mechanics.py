@@ -3,7 +3,7 @@ import asyncio
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)  # A stand-in for a network wait
+    await asyncio.sleep(delay)  # Stand-in for a network request
     print(f"{item}: resumed")
     return item.upper()
 

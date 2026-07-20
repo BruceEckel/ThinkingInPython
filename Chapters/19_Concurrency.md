@@ -186,8 +186,8 @@ The event loop starts the next coroutine,
 which is how all three are in flight during the first wait.
 
 Suspending also registers a wake-up condition with the event loop.
-`asyncio.sleep()` asks for a timer, but
-a real network request would ask the loop to watch a socket for the reply.
+`asyncio.sleep()` asks for a timer,
+but a real network request would ask the loop to watch a socket for the reply.
 When the timer fires, the loop resumes that task where it paused,
 just after the `await`.
 The three delays make the resumptions visible: c sleeps shortest,
@@ -195,7 +195,8 @@ so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
 `gather()` returns `['A', 'B', 'C']`,
 showing that the results follow the argument order, not the finishing order.
-Note that the total wait is the longest delay (0.03-second), not the sum of all three.
+Note that the total wait is the longest delay (0.03-second),
+not the sum of all three.
 
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
@@ -207,11 +208,12 @@ so nothing overlaps and the delays add instead of overlapping.
 `gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
 
 Scheduling does not mean running.
-The task bodies execute only after `gather()` itself suspends.
-Each runs up to its first `await`, which is what the a, b,
-c started lines in the trace show.
-The comprehension never reaches that state:
-it does not even wrap the next coroutine until the previous one has finished.
+The task bodies execute only after `gather()` suspends
+(`gather()` is itself fueled by the event loop).
+Each runs until its first `await`, which is what the `a: started`, etc.,
+lines in the trace show.
+The comprehension doesn't achieve multiple coroutines in flight:
+it does not start the next coroutine until the previous one has finished.
 
 ## Structured Concurrency with `TaskGroup`
 
@@ -219,15 +221,17 @@ What happens if `gather()` encounters a failure?
 If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
 but the other tasks it started keep running.
-Now these tasks are unsupervised and their results and errors are discarded.
-`asyncio.TaskGroup` (added in 3.11) is the structured alternative:
-an `async with` block that owns every task started inside it and does not exit until every one is accounted for:
+Those other tasks become unsupervised and their results and errors are discarded.
+
+`asyncio.TaskGroup` (added in 3.11) is the structured alternative.
+An `async with` block owns every task started inside it and does not exit until every one is accounted for:
 
 ```python
 # task_group.py
 import asyncio
 
 async def fetch(item: str, delay: float) -> str:
+    print(f"{item}: started")
     await asyncio.sleep(delay)
     if item == "b":
         raise ValueError(f"fetch({item!r}) failed")
@@ -238,14 +242,29 @@ async def main() -> None:
     pairs = [("a", 0.25), ("b", 0.05), ("c", 0.01)]
     try:
         async with asyncio.TaskGroup() as tg:
-            for item, delay in pairs:
-                tg.create_task(fetch(item, delay))
+            tasks = {
+                item: tg.create_task(fetch(item, delay))
+                for item, delay in pairs
+            }
     except* ValueError as group:
         print(f"caught: {group.exceptions[0]}")
+    for item, task in tasks.items():
+        if task.cancelled():
+            print(f"{item}: cancelled")
+        elif (exc := task.exception()) is not None:
+            print(f"{item}: raised {exc!r}")
+        else:
+            print(f"{item}: {task.result()}")
 
 asyncio.run(main())
+#: a: started
+#: b: started
+#: c: started
 #: c: fetched
 #: caught: fetch('b') failed
+#: a: cancelled
+#: b: raised ValueError("fetch('b') failed")
+#: c: C
 ```
 
 `tg.create_task()` schedules a task immediately,
@@ -262,9 +281,18 @@ a container for simultaneous failures,
 since more than one task can go down at once.
 The `except*` form catches members of a group by type.
 
-`TaskGroup` can also produce `gather()`'s ordered result list.
-Keep the task objects and harvest them after the block,
-which is safe because the block cannot exit until every task has finished:
+Keeping the task objects pays off even after a partial failure.
+`a` never reaches its `fetched` print because the group cancels it,
+so `task.cancelled()` is `True`.
+`b` completed, but with an exception,
+so `task.exception()` returns the `ValueError` instead of raising it.
+`c` finished before the failure landed, and its result is untouched:
+`task.result()` returns `'C'`, exactly as if nothing else had gone wrong.
+A partial failure cancels whatever was still in flight.
+It does not erase what already succeeded.
+
+When every task succeeds,
+the same pattern collapses to `gather()`'s ordered result list:
 
 ```python
 # task_group_results.py
