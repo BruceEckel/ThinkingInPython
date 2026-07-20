@@ -116,9 +116,11 @@ each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
-Instead of using threads for I/O bound problems, asynchrony allows you to create coroutines.
-Each coroutine, upon encountring I/O, suspends itself and yields control, but not to the OS.
-Instead, control is given to the *event loop* which (with the help of the OS), discovers the next task which is available to run.
+Instead of using threads for I/O bound problems,
+asynchrony allows you to create coroutines.
+Each coroutine, upon encountering I/O,
+suspends itself and yields control ... but not to the OS.
+Instead, control is given to the *event loop* which discovers the next task which is available to run.
 This is captured in two keywords and the `asyncio` library.
 
 Four pieces make up the `asyncio` vocabulary.
@@ -140,7 +142,7 @@ import asyncio
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)  # A stand-in for a network wait
+    await asyncio.sleep(delay)  # Stand-in for a network request
     print(f"{item}: resumed")
     return item.upper()
 
@@ -164,10 +166,10 @@ asyncio.run(main())
 
 The first printed line is proof that calling a coroutine runs nothing.
 `fetch("a", 0.03)` is called on `main()`'s first line,
-yet no "started" line appears, only the name of the object that the call built:
+yet no "started" line appears, only the type of object the call built:
 `coroutine`.
 The work begins when `gather()` receives that object.
-If you forget the `await gather()`, the work doesn't happen.
+If you forget `await gather()`, the work doesn't happen.
 Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
 
 The trace shows the event loop's schedule.
@@ -178,34 +180,35 @@ At the `await` each task *suspends*.
 It stops executing, remembers its place in the function,
 and hands control back to the event loop.
 
-A suspended task runs no bytecode and uses no processor time;
-it is a paused frame, local variables intact, waiting to continue.
+A suspended task is a paused frame that runs no bytecode and uses no processor time.
+Local variables remain intact, waiting to continue.
 The event loop starts the next coroutine,
 which is how all three are in flight during the first wait.
-Suspending also registers a wake-up condition with the event loop.
 
-`asyncio.sleep()` asks for a timer;
+Suspending also registers a wake-up condition with the event loop.
+`asyncio.sleep()` asks for a timer, but
 a real network request would ask the loop to watch a socket for the reply.
-When a timer fires, the loop resumes that task where it paused,
+When the timer fires, the loop resumes that task where it paused,
 just after the `await`.
 The three delays make the resumptions visible: c sleeps shortest,
 so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
 `gather()` returns `['A', 'B', 'C']`,
 showing that the results follow the argument order, not the finishing order.
-The total wait is one 0.03-second sleep, not the sum of all three.
+Note that the total wait is the longest delay (0.03-second), not the sum of all three.
 
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
 
-Beware a list comprehension that awaits:
-`[await c for c in coroutines]` returns the same list as `gather()` but is the sequential version.
+Beware a list comprehension that awaits.
+`[await c for c in coroutines]` becomes the sequential version of `gather()`.
 Each `await` runs its coroutine to completion before the next one starts,
-so nothing overlaps and the waits add up.
+so nothing overlaps and the delays add instead of overlapping.
 `gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
-Scheduling is not yet running.
-The task bodies execute only after `gather()` itself suspends,
-each in turn up to its first `await`, which is what the a, b,
+
+Scheduling does not mean running.
+The task bodies execute only after `gather()` itself suspends.
+Each runs up to its first `await`, which is what the a, b,
 c started lines in the trace show.
 The comprehension never reaches that state:
 it does not even wrap the next coroutine until the previous one has finished.
