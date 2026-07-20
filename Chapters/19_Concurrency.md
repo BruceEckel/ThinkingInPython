@@ -1,7 +1,6 @@
 # Concurrency
 
-[Performance](18_Performance.md)
-works on making one stream of instructions faster.
+[Performance](18_Performance.md) makes one stream of instructions faster.
 *Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
 
 The meaning of "at the same time" depends on context.
