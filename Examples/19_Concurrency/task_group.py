@@ -10,7 +10,8 @@ async def main() -> None:
                 for item, delay in PAIRS
             }
     except* ValueError as group:
-        print(f"caught: {group.exceptions[0]}")
+        for exc in group.exceptions:
+            print(f"caught: {exc}")
     for item, task in tasks.items():
         if task.cancelled():
             print(f"{item}: cancelled")
@@ -25,11 +26,14 @@ asyncio.run(main())
 #: c: started
 #: d: started
 #: e: started
+#: f: started
 #: a: fetched
 #: b: fetched
 #: caught: fetch('c') failed
+#: caught: fetch('d') failed
 #: a: A
 #: b: B
 #: c: raised ValueError("fetch('c') failed")
-#: d: cancelled
+#: d: raised ValueError("fetch('d') failed")
 #: e: cancelled
+#: f: cancelled

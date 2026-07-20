@@ -20,12 +20,14 @@ asyncio.run(main())
 #: c: started
 #: d: started
 #: e: started
+#: f: started
 #: a: fetched
 #: b: fetched
-#: d: fetched
 #: e: fetched
+#: f: fetched
 #: a: A
 #: b: B
 #: c: raised ValueError("fetch('c') failed")
-#: d: D
+#: d: raised ValueError("fetch('d') failed")
 #: e: E
+#: f: F

@@ -5,14 +5,15 @@ PAIRS = [
     ("a", 0.01),
     ("b", 0.02),
     ("c", 0.03),
-    ("d", 0.2),
-    ("e", 0.3),
+    ("d", 0.03),
+    ("e", 0.2),
+    ("f", 0.3),
 ]
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
-    if item == "c":
+    if item in ("c", "d"):
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()

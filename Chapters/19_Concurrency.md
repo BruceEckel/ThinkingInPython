@@ -235,26 +235,28 @@ PAIRS = [
     ("a", 0.01),
     ("b", 0.02),
     ("c", 0.03),
-    ("d", 0.2),
-    ("e", 0.3),
+    ("d", 0.03),
+    ("e", 0.2),
+    ("f", 0.3),
 ]
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
-    if item == "c":
+    if item in ("c", "d"):
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()
 ```
 
-`a` and `b` have the shortest delays, and `c` fails partway through.
-`d` and `e` are still sleeping when the failure occurs,
+`a` and `b` have the shortest delays and succeed.
+`c` and `d` share the same delay, so they fail together.
+`e` and `f` are still sleeping when that happens,
 with a wide gap to their own deadlines
 (this gives cancellation room to land on any platform's timer,
 producing a deterministic trace).
 
-First we see how `TaskGroup` handles the exception:
+First we see how `TaskGroup` handles the failures:
 
 ```python
 # task_group.py
@@ -269,7 +271,8 @@ async def main() -> None:
                 for item, delay in PAIRS
             }
     except* ValueError as group:
-        print(f"caught: {group.exceptions[0]}")
+        for exc in group.exceptions:
+            print(f"caught: {exc}")
     for item, task in tasks.items():
         if task.cancelled():
             print(f"{item}: cancelled")
@@ -284,41 +287,45 @@ asyncio.run(main())
 #: c: started
 #: d: started
 #: e: started
+#: f: started
 #: a: fetched
 #: b: fetched
 #: caught: fetch('c') failed
+#: caught: fetch('d') failed
 #: a: A
 #: b: B
 #: c: raised ValueError("fetch('c') failed")
-#: d: cancelled
+#: d: raised ValueError("fetch('d') failed")
 #: e: cancelled
+#: f: cancelled
 ```
 
 `tg.create_task()` schedules a task immediately,
-so all five are in flight together, just as under `gather()`.
-`c` raises an exception at 0.03 seconds,
-and the `TaskGroup` responds by cancelling `d` and `e`,
+so all six are in flight together, just as under `gather()`.
+`c` and `d` raise at the same 0.03-second mark,
+and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.
 Only when every task has finished or been cancelled does the block exit.
-As it exits, it re-raises the failure wrapped in an *exception group*.
-This is a container for simultaneous failures,
+As it exits, it re-raises both failures wrapped in an *exception group*,
+a container for simultaneous failures,
 since more than one task can go down at once.
-The `except*` form catches members of a group by type.
+The `except*` form catches members of a group by type,
+and iterating `group.exceptions` reaches every member, not just the first.
 
 Keeping the task objects pays off even after a partial failure.
 `a` and `b` already succeeded, and their results are untouched:
 `task.result()` returns `'A'` and `'B'`,
 exactly as if nothing else had gone wrong.
-`c` completed, but with an exception,
+`c` and `d` each completed with their own exception,
 so `task.exception()` returns the `ValueError` instead of raising it.
-`d` and `e` never reach their `fetched` print because the group cancels them,
+`e` and `f` never reach their `fetched` print because the group cancels them,
 so `task.cancelled()` is `True` for both.
 A partial failure cancels whatever was still in flight.
 It does not erase what already succeeded.
 
 When a failure is data to examine rather than a reason to stop,
-`gather(..., return_exceptions=True)` handles the same five fetches differently:
+`gather(..., return_exceptions=True)` handles the same six fetches differently:
 
 ```python
 # gather_with_exceptions.py
@@ -343,23 +350,25 @@ asyncio.run(main())
 #: c: started
 #: d: started
 #: e: started
+#: f: started
 #: a: fetched
 #: b: fetched
-#: d: fetched
 #: e: fetched
+#: f: fetched
 #: a: A
 #: b: B
 #: c: raised ValueError("fetch('c') failed")
-#: d: D
+#: d: raised ValueError("fetch('d') failed")
 #: e: E
+#: f: F
 ```
 
-`c` fails at the same 0.03-second mark as before,
+`c` and `d` fail at the same 0.03-second mark as before,
 but this time nothing stops.
-`d` and `e` are not cancelled: `gather()` does not supervise its siblings the way `TaskGroup` does,
+`e` and `f` are not cancelled: `gather()` does not supervise its siblings the way `TaskGroup` does,
 so both keep sleeping and print their `fetched` line right on schedule.
-`return_exceptions=True` catches `c`'s `ValueError` and places it in the result list,
-in argument order, alongside the three successful results.
+`return_exceptions=True` catches both `ValueError`s and places them in the result list,
+in argument order, alongside the successful results.
 Nothing propagates, so no `try`/`except*` is needed at the call site.
 
 This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
