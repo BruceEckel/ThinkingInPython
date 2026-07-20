@@ -1,4 +1,4 @@
-# task_group.py
+# gather_with_exceptions.py
 import asyncio
 
 async def fetch(item: str, delay: float) -> str:
@@ -17,21 +17,15 @@ async def main() -> None:
         ("d", 0.2),
         ("e", 0.3),
     ]
-    try:
-        async with asyncio.TaskGroup() as tg:
-            tasks = {
-                item: tg.create_task(fetch(item, delay))
-                for item, delay in pairs
-            }
-    except* ValueError as group:
-        print(f"caught: {group.exceptions[0]}")
-    for item, task in tasks.items():
-        if task.cancelled():
-            print(f"{item}: cancelled")
-        elif (exc := task.exception()) is not None:
-            print(f"{item}: raised {exc!r}")
+    results = await asyncio.gather(
+        *(fetch(item, delay) for item, delay in pairs),
+        return_exceptions=True,
+    )
+    for (item, _), result in zip(pairs, results):
+        if isinstance(result, BaseException):
+            print(f"{item}: raised {result!r}")
         else:
-            print(f"{item}: {task.result()}")
+            print(f"{item}: {result}")
 
 asyncio.run(main())
 #: a: started
@@ -41,9 +35,10 @@ asyncio.run(main())
 #: e: started
 #: a: fetched
 #: b: fetched
-#: caught: fetch('c') failed
+#: d: fetched
+#: e: fetched
 #: a: A
 #: b: B
 #: c: raised ValueError("fetch('c') failed")
-#: d: cancelled
-#: e: cancelled
+#: d: D
+#: e: E

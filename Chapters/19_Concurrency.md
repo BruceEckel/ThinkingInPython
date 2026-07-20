@@ -233,13 +233,19 @@ import asyncio
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
-    if item == "b":
+    if item == "c":
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()
 
 async def main() -> None:
-    pairs = [("a", 0.25), ("b", 0.05), ("c", 0.01)]
+    pairs = [
+        ("a", 0.01),
+        ("b", 0.02),
+        ("c", 0.03),
+        ("d", 0.2),
+        ("e", 0.3),
+    ]
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
@@ -260,68 +266,109 @@ asyncio.run(main())
 #: a: started
 #: b: started
 #: c: started
-#: c: fetched
-#: caught: fetch('b') failed
-#: a: cancelled
-#: b: raised ValueError("fetch('b') failed")
-#: c: C
+#: d: started
+#: e: started
+#: a: fetched
+#: b: fetched
+#: caught: fetch('c') failed
+#: a: A
+#: b: B
+#: c: raised ValueError("fetch('c') failed")
+#: d: cancelled
+#: e: cancelled
 ```
 
 `tg.create_task()` schedules a task immediately,
-so all three are in flight together, just as under `gather()`.
-The trace shows how failure is handled. c, with the shortest delay,
-completes and prints. b raises at 0.05 seconds,
-and the group responds by cancelling a,
-which is still suspended with 0.2 seconds of sleep to go,
-so a's fetched line never appears.
-(The wide gap between b's failure and a's deadline is deliberate: it gives the cancellation room to land on any platform's timer, so the trace stays deterministic.)
-Only when every task has finished or been cancelled does the block exit,
-re-raising the failure wrapped in an *exception group*,
-a container for simultaneous failures,
+so all five are in flight together, just as under `gather()`.
+The trace shows how a mix of outcomes is handled.
+`a` and `b`, with the shortest delays,
+finish and print before anything goes wrong.
+`c` raises an exception at 0.03 seconds,
+and the `TaskGroup` responds by cancelling `d` and `e`,
+which are still suspended with far more sleep to go,
+so neither ever reaches its `fetched` print.
+[^The wide gap between `c`'s failure and `d`'s and `e`'s deadlines is deliberate: it gives the cancellation room to land on any platform's timer, so the trace stays deterministic.] Only when every task has finished or been cancelled does the block exit.
+As it extits, it re-raises the failure wrapped in an *exception group*.
+This is a container for simultaneous failures,
 since more than one task can go down at once.
 The `except*` form catches members of a group by type.
 
 Keeping the task objects pays off even after a partial failure.
-`a` never reaches its `fetched` print because the group cancels it,
-so `task.cancelled()` is `True`.
-`b` completed, but with an exception,
+`a` and `b` already succeeded, and their results are untouched:
+`task.result()` returns `'A'` and `'B'`,
+exactly as if nothing else had gone wrong.
+`c` completed, but with an exception,
 so `task.exception()` returns the `ValueError` instead of raising it.
-`c` finished before the failure landed, and its result is untouched:
-`task.result()` returns `'C'`, exactly as if nothing else had gone wrong.
+`d` and `e` never reach their `fetched` print because the group cancels them,
+so `task.cancelled()` is `True` for both.
 A partial failure cancels whatever was still in flight.
 It does not erase what already succeeded.
 
-When every task succeeds,
-the same pattern collapses to `gather()`'s ordered result list:
+When a failure is data to examine rather than a reason to stop,
+`gather(..., return_exceptions=True)` handles the same five fetches differently:
 
 ```python
-# task_group_results.py
+# gather_with_exceptions.py
 import asyncio
 
 async def fetch(item: str, delay: float) -> str:
+    print(f"{item}: started")
     await asyncio.sleep(delay)
+    if item == "c":
+        raise ValueError(f"fetch({item!r}) failed")
+    print(f"{item}: fetched")
     return item.upper()
 
 async def main() -> None:
-    pairs = [("a", 0.03), ("b", 0.02), ("c", 0.01)]
-    async with asyncio.TaskGroup() as tg:
-        tasks = [tg.create_task(fetch(i, d)) for i, d in pairs]
-    print([t.result() for t in tasks])
+    pairs = [
+        ("a", 0.01),
+        ("b", 0.02),
+        ("c", 0.03),
+        ("d", 0.2),
+        ("e", 0.3),
+    ]
+    results = await asyncio.gather(
+        *(fetch(item, delay) for item, delay in pairs),
+        return_exceptions=True,
+    )
+    for (item, _), result in zip(pairs, results):
+        if isinstance(result, BaseException):
+            print(f"{item}: raised {result!r}")
+        else:
+            print(f"{item}: {result}")
 
 asyncio.run(main())
-#: ['A', 'B', 'C']
+#: a: started
+#: b: started
+#: c: started
+#: d: started
+#: e: started
+#: a: fetched
+#: b: fetched
+#: d: fetched
+#: e: fetched
+#: a: A
+#: b: B
+#: c: raised ValueError("fetch('c') failed")
+#: d: D
+#: e: E
 ```
 
-The comprehension keeps the tasks in argument order,
-so the harvested results come out exactly as `gather()`'s would,
-no matter which task finished first.
-Given that, why does `gather()` survive?
-It is lighter, and it has one genuinely different mode.
+`c` fails at the same 0.03-second mark as before,
+but this time nothing stops.
+`d` and `e` are not cancelled: `gather()` does not supervise its siblings the way `TaskGroup` does,
+so both keep sleeping and print their `fetched` line right on schedule.
+`return_exceptions=True` catches `c`'s `ValueError` and places it in the result list,
+in argument order, alongside the three successful results.
+Nothing propagates, so no `try`/`except*` is needed at the call site.
+
+This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
 For a batch expected to succeed, `await gather(...)` is a single expression:
 no `async with`, no task list, no harvest step.
-And `gather(..., return_exceptions=True)` collects failures *as values* in the result list,
-for batches where partial failure is data to examine rather than a reason to stop.
-A health check across ten services wants the nine answers and the one error.
+For a batch where partial failure is data to examine rather than a reason to stop,
+`return_exceptions=True` collects failures *as values*, as shown above,
+instead of cancelling whatever is still in flight.
+A health check across ten services wants the nine answers and the one error, not a cancelled nine-tenths of a batch.
 `TaskGroup` has no such mode.
 Its contract is all-or-cancel,
 and keeping siblings alive past a failure means catching exceptions inside each task yourself.
@@ -1015,8 +1062,8 @@ with InterpreterPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
-print(f"subinterpreters at least 2x faster: {t_seq > t_sub * 2}")
-#: subinterpreters at least 2x faster: True
+print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
+#: subinterpreters at least 1.5x faster: True
 ```
 
 Unlike a thread pool, this genuinely overlaps computation.

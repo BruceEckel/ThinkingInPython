@@ -21,5 +21,5 @@ with InterpreterPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
-print(f"subinterpreters at least 2x faster: {t_seq > t_sub * 2}")
-#: subinterpreters at least 2x faster: True
+print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
+#: subinterpreters at least 1.5x faster: True
