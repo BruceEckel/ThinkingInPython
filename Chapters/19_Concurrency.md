@@ -251,8 +251,7 @@ async def fetch(item: str, delay: float) -> str:
 `c` and `d` share the same delay, so they fail together.
 `e` and `f` are still sleeping when that happens,
 with a wide gap to their own deadlines
-(this gives cancellation room to land on any platform's timer,
-producing a deterministic trace).
+(this gives cancellation room to land on any platform's timer, producing a deterministic trace).
 
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative.
 An `async with` block owns every task started inside it and does not exit until every one is accounted for:
@@ -364,7 +363,8 @@ asyncio.run(main())
 
 `c` and `d` fail at the same 0.03-second mark as before,
 but this time nothing stops.
-`e` and `f` are not cancelled: `gather()` does not supervise its siblings the way `TaskGroup` does,
+`e` and `f` are not cancelled:
+`gather()` does not supervise its siblings the way `TaskGroup` does,
 so both keep sleeping and print their `fetched` line right on schedule.
 `return_exceptions=True` catches both `ValueError`s and places them in the result list,
 in argument order, alongside the successful results.
@@ -372,9 +372,9 @@ Nothing propagates, so no `try`/`except*` is needed at the call site.
 
 This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
 For a batch where partial failure is data to examine rather than a reason to stop,
-`return_exceptions=True` collects failures *as values*
-instead of cancelling whatever is still in flight.
-A health check across ten services wants whatever answers come back, errors included, not a cancelled remainder of the batch.
+`return_exceptions=True` collects failures *as values* instead of cancelling whatever is still in flight.
+A health check across ten services wants all the answers including the errors,
+not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
 Its contract is all-or-cancel,
 and keeping siblings alive past a failure means catching exceptions inside each task yourself.
