@@ -224,11 +224,21 @@ but the other tasks it started keep running.
 Those other tasks become unsupervised and their results and errors are discarded.
 
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative.
-An `async with` block owns every task started inside it and does not exit until every one is accounted for:
+An `async with` block owns every task started inside it and does not exit until every one is accounted for.
+The `TaskGroup` version and the `gather()` version that follows it run the same five fetches,
+so `fetch()` and its `(item, delay)` pairs are worth sharing between them:
 
 ```python
-# task_group.py
+# utils/fetch_demo.py
 import asyncio
+
+PAIRS = [
+    ("a", 0.01),
+    ("b", 0.02),
+    ("c", 0.03),
+    ("d", 0.2),
+    ("e", 0.3),
+]
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
@@ -237,20 +247,27 @@ async def fetch(item: str, delay: float) -> str:
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()
+```
+
+`a` and `b` have the shortest delays,
+`c` fails partway through,
+and `d` and `e` are still sleeping when that happens,
+with a wide gap to their own deadlines
+(deliberate: it gives cancellation room to land on any platform's timer,
+so the trace stays deterministic).
+Wired into a `TaskGroup`:
+
+```python
+# task_group.py
+import asyncio
+from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
-    pairs = [
-        ("a", 0.01),
-        ("b", 0.02),
-        ("c", 0.03),
-        ("d", 0.2),
-        ("e", 0.3),
-    ]
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
                 item: tg.create_task(fetch(item, delay))
-                for item, delay in pairs
+                for item, delay in PAIRS
             }
     except* ValueError as group:
         print(f"caught: {group.exceptions[0]}")
@@ -280,15 +297,12 @@ asyncio.run(main())
 
 `tg.create_task()` schedules a task immediately,
 so all five are in flight together, just as under `gather()`.
-The trace shows how a mix of outcomes is handled.
-`a` and `b`, with the shortest delays,
-finish and print before anything goes wrong.
 `c` raises an exception at 0.03 seconds,
 and the `TaskGroup` responds by cancelling `d` and `e`,
 which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.
-[^The wide gap between `c`'s failure and `d`'s and `e`'s deadlines is deliberate: it gives the cancellation room to land on any platform's timer, so the trace stays deterministic.] Only when every task has finished or been cancelled does the block exit.
-As it extits, it re-raises the failure wrapped in an *exception group*.
+Only when every task has finished or been cancelled does the block exit.
+As it exits, it re-raises the failure wrapped in an *exception group*.
 This is a container for simultaneous failures,
 since more than one task can go down at once.
 The `except*` form catches members of a group by type.
@@ -310,28 +324,14 @@ When a failure is data to examine rather than a reason to stop,
 ```python
 # gather_with_exceptions.py
 import asyncio
-
-async def fetch(item: str, delay: float) -> str:
-    print(f"{item}: started")
-    await asyncio.sleep(delay)
-    if item == "c":
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
-    pairs = [
-        ("a", 0.01),
-        ("b", 0.02),
-        ("c", 0.03),
-        ("d", 0.2),
-        ("e", 0.3),
-    ]
     results = await asyncio.gather(
-        *(fetch(item, delay) for item, delay in pairs),
+        *(fetch(item, delay) for item, delay in PAIRS),
         return_exceptions=True,
     )
-    for (item, _), result in zip(pairs, results):
+    for (item, _), result in zip(PAIRS, results):
         if isinstance(result, BaseException):
             print(f"{item}: raised {result!r}")
         else:

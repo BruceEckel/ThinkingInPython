@@ -1,27 +1,13 @@
 # task_group.py
 import asyncio
-
-async def fetch(item: str, delay: float) -> str:
-    print(f"{item}: started")
-    await asyncio.sleep(delay)
-    if item == "c":
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
-    pairs = [
-        ("a", 0.01),
-        ("b", 0.02),
-        ("c", 0.03),
-        ("d", 0.2),
-        ("e", 0.3),
-    ]
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
                 item: tg.create_task(fetch(item, delay))
-                for item, delay in pairs
+                for item, delay in PAIRS
             }
     except* ValueError as group:
         print(f"caught: {group.exceptions[0]}")
