@@ -8,10 +8,11 @@ async def main() -> None:
         return_exceptions=True,
     )
     for (item, _), result in zip(PAIRS, results):
-        if isinstance(result, BaseException):
-            print(f"{item}: raised {result!r}")
-        else:
-            print(f"{item}: {result}")
+        match result:
+            case BaseException():
+                print(f"{item}: raised {result!r}")
+            case _:
+                print(f"{item}: {result}")
 
 asyncio.run(main())
 #: a: started

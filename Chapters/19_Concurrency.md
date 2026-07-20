@@ -225,8 +225,7 @@ Those other tasks become unsupervised and their results and errors are discarded
 
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative.
 An `async with` block owns every task started inside it and does not exit until every one is accounted for.
-The `TaskGroup` version and the `gather()` version that follows it run the same five fetches,
-so `fetch()` and its `(item, delay)` pairs are worth sharing between them:
+The `TaskGroup` version and the `gather()` version that follows it use common code:
 
 ```python
 # utils/fetch_demo.py
@@ -249,13 +248,13 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 ```
 
-`a` and `b` have the shortest delays,
-`c` fails partway through,
-and `d` and `e` are still sleeping when that happens,
+`a` and `b` have the shortest delays, and `c` fails partway through.
+`d` and `e` are still sleeping when the failure occurs,
 with a wide gap to their own deadlines
-(deliberate: it gives cancellation room to land on any platform's timer,
-so the trace stays deterministic).
-Wired into a `TaskGroup`:
+(this gives cancellation room to land on any platform's timer,
+producing a deterministic trace).
+
+First we see how `TaskGroup` handles the exception:
 
 ```python
 # task_group.py
@@ -332,10 +331,11 @@ async def main() -> None:
         return_exceptions=True,
     )
     for (item, _), result in zip(PAIRS, results):
-        if isinstance(result, BaseException):
-            print(f"{item}: raised {result!r}")
-        else:
-            print(f"{item}: {result}")
+        match result:
+            case BaseException():
+                print(f"{item}: raised {result!r}")
+            case _:
+                print(f"{item}: {result}")
 
 asyncio.run(main())
 #: a: started
@@ -363,10 +363,8 @@ in argument order, alongside the three successful results.
 Nothing propagates, so no `try`/`except*` is needed at the call site.
 
 This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
-For a batch expected to succeed, `await gather(...)` is a single expression:
-no `async with`, no task list, no harvest step.
 For a batch where partial failure is data to examine rather than a reason to stop,
-`return_exceptions=True` collects failures *as values*, as shown above,
+`return_exceptions=True` collects failures *as values*
 instead of cancelling whatever is still in flight.
 A health check across ten services wants the nine answers and the one error, not a cancelled nine-tenths of a batch.
 `TaskGroup` has no such mode.
