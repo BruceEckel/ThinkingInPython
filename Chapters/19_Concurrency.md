@@ -1222,7 +1222,7 @@ In everyday English,
 By that definition, concurrency and parallelism are the same thing.
 
 The people who declare "concurrency is easy!" have dipped their toes in it and never encountered a tricky problem.
-I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than to say "avoid it,
+I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than demonstrating the danger and saying "avoid it,
 your life will be simpler."
 
 Even when you understand the problems produced by shared mutable state,
@@ -1235,20 +1235,11 @@ These are the kinds of decisions you must make when you move from the examples p
 
 People have worked tirelessly to find better ways to program concurrently.
 Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
-Here are just a few of the topics that fall under the purview of "concurrency":
+The vocabulary this chapter built,
+from processes and threads to tasks and coroutines,
+is a small corner of the territory.
+Here are a few of the topics beyond it:
 
-- **Processes:** Independent programs, each with its own memory space,
-  isolated from every other process by the operating system.
-- **Threads:** Independent sequences of execution inside a single process,
-  sharing that process's memory.
-- **Tasks:** Units of work scheduled to run concurrently,
-  such as the objects `asyncio` schedules on its event loop.
-- **Coroutines:** Functions that can suspend at an `await` and resume later,
-  the building block `async def` produces.
-- **Asynchrony:** Describes an operation that starts now and finishes later,
-  without blocking the caller while it waits.
-- **Parallelism:** Runs multiple computations at the same instant,
-  which needs multiple CPU cores.
 - **Locks:** Grant exclusive access to a shared resource so only one thread or task touches it at a time.
 - **Semaphores:** Limit how many threads or tasks may hold a resource at once,
   generalizing a lock from one holder to a fixed count.
@@ -1258,8 +1249,6 @@ Here are just a few of the topics that fall under the purview of "concurrency":
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interfered.
-- **Structured concurrency:** Ties a spawned task's lifetime to the scope that created it,
-  the model behind this chapter's `TaskGroup`.
 - **Deadlocks:** Happen when two or more threads each wait forever for a resource the other one holds.
 - **Livelocks:** Happen when threads keep reacting to each other and changing state,
   but none of them makes progress.
@@ -1275,10 +1264,6 @@ Here are just a few of the topics that fall under the purview of "concurrency":
   Erlang was built at Ericsson for telephone switches.
   Elixir is newer, built on the same BEAM virtual machine.
 - The list goes on...
-
-
-
-
 
 ## Exercises
 
