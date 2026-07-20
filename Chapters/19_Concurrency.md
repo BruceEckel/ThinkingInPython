@@ -223,9 +223,7 @@ If one of its coroutines raises an exception,
 but the other tasks it started keep running.
 Those other tasks become unsupervised and their results and errors are discarded.
 
-`asyncio.TaskGroup` (added in 3.11) is the structured alternative.
-An `async with` block owns every task started inside it and does not exit until every one is accounted for.
-The `TaskGroup` version and the `gather()` version that follows it use common code:
+The following two examples use common code:
 
 ```python
 # utils/fetch_demo.py
@@ -256,7 +254,8 @@ with a wide gap to their own deadlines
 (this gives cancellation room to land on any platform's timer,
 producing a deterministic trace).
 
-First we see how `TaskGroup` handles the failures:
+`asyncio.TaskGroup` (added in 3.11) is the structured alternative.
+An `async with` block owns every task started inside it and does not exit until every one is accounted for:
 
 ```python
 # task_group.py
@@ -375,7 +374,7 @@ This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contr
 For a batch where partial failure is data to examine rather than a reason to stop,
 `return_exceptions=True` collects failures *as values*
 instead of cancelling whatever is still in flight.
-A health check across ten services wants the nine answers and the one error, not a cancelled nine-tenths of a batch.
+A health check across ten services wants whatever answers come back, errors included, not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
 Its contract is all-or-cancel,
 and keeping siblings alive past a failure means catching exceptions inside each task yourself.
