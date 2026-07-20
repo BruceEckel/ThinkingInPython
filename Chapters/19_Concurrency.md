@@ -7,9 +7,12 @@ works on making one stream of instructions faster.
 The meaning of "at the same time" depends on context.
 Early machines had a single CPU, and early operating systems (OS)
 were basically just program loaders.
-To enable an OS to do more, the *thread of execution* was created.
-Threads allocate the CPU to one task for a slice of time,
-then stop that task and switch to a different task for another time slice.
+The first step beyond that was *time-sharing*.
+The CPU runs one program for a slice of time,
+then the OS stops it and switches to a different program for another time slice.
+Later came a lighter unit of scheduling that lives inside a program:
+the *thread of execution*.
+A modern OS schedules threads, not whole programs.
 We say that each task (unit of work) is allocated its own thread,
 and the OS performs *context switching* from one thread to the next.
 The OS controls everything: allocating threads,
@@ -25,8 +28,9 @@ This means each thread must be careful not to corrupt parts of the heap used by 
 When a program requests an additional thread from the OS,
 that thread gets its own function-call stack.
 Every function call pushes arguments and the return address onto the stack.
-At the end of the function the return value is pushed onto the stack,
-execution jumps to the return address, and the caller pops the return value.
+When the function ends,
+its stack frame is popped and execution jumps back to the return address.
+The return value typically travels back in a CPU register.
 Thus it is essential that each thread own its call stack.
 
 The context switch must preserve the state of the current thread before switching to a different thread.
@@ -55,7 +59,7 @@ producing faster overall progress.
 Another benefit of threads was seen when more CPUs became available on a single machine.
 Threads were already designed to distribute computing resources,
 so more CPUs simply meant more resources to distribute
-(of course, it wasn't *quite* that easy).
+(of course, it wasn't quite that easy).
 Threads could also be made to do ad-hoc parallelism:
 some CPUs could be dedicated to running parallel parts of a program by adapting the threading mechanism.
 
@@ -72,7 +76,7 @@ but these tricks made the resulting programs more expensive to create and mainta
 
 The answer was to move the context switch out of the OS and into the program.
 This way engineers are not fighting the threading system.
-This is called *asynchrony*, or *coroutines*.
+This is called *asynchrony*, implemented with *coroutines*.
 The programming language decides, based on its knowledge of the program,
 the minimum necessary data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
