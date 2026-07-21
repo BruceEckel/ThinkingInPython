@@ -1293,6 +1293,195 @@ is most of what concurrency asks of you.
 Processes and subinterpreters genuinely run at once
 (five separate GILs)](_images/concurrency_models)
 
+## Locks, Semaphores, and Failure Modes
+
+`async_race.py` and `gil_race.py` showed shared mutable state losing updates with no coordination in place.
+Fixing that loss means introducing coordination,
+and coordination brings its own failure modes.
+
+### Locks
+
+A *lock* grants exclusive access to a shared resource so only one thread holds it at a time.
+Wrapping the read-modify-write from `gil_race.py` in a lock restores the missing updates:
+
+```python
+# locks.py
+import threading
+import time
+
+counter = 0
+lock = threading.Lock()
+
+def increment(count: int) -> None:
+    global counter
+    for _ in range(count):
+        with lock:
+            value = counter  # Read
+            time.sleep(0.000_001)  # Let other threads run
+            counter = value + 1  # Write back
+
+threads = [
+    threading.Thread(target=increment, args=(50,))
+    for _ in range(8)
+]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(counter)
+#: 400
+```
+
+The only change from `gil_race.py` is the `with lock:` around the read,
+the sleep, and the write.
+Whichever thread enters that block first keeps every other thread out until it finishes,
+so the read-modify-write behaves as one step no matter when the scheduler switches threads.
+All 400 increments now land.
+`asyncio.Lock` protects the same shape of gap between threads in `async_race.py`,
+a read-modify-write that spans an `await`, for tasks instead of threads.
+
+### Semaphores
+
+A *semaphore* generalizes a lock from one holder to a fixed count.
+Where a lock admits one thread,
+`threading.Semaphore(n)` admits up to `n` at once and blocks the rest:
+
+```python
+# semaphore_limit.py
+import threading
+import time
+
+active = 0
+peak = 0
+lock = threading.Lock()
+pool = threading.Semaphore(2)  # At most 2 workers at once
+
+def worker() -> None:
+    global active, peak
+    with pool:
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        time.sleep(0.05)
+        with lock:
+            active -= 1
+
+threads = [threading.Thread(target=worker) for _ in range(5)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(f"peak concurrent workers: {peak}")
+#: peak concurrent workers: 2
+```
+
+Five threads start together,
+but the semaphore lets only two run their sleep at once.
+`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits),
+guarded here by a separate lock since threads, unlike `asyncio` tasks,
+can genuinely run at the same instant.
+A semaphore initialized to 1 behaves exactly like a lock;
+raising the count is what turns it into a throttle on a limited resource,
+such as a fixed number of database connections.
+
+### Deadlock
+
+A *deadlock* happens when two or more threads each hold a resource the other one needs,
+and neither can proceed.
+Four conditions must all hold at once: exclusive access to each resource,
+a thread holding one resource while it waits for another,
+no way to force a thread to give up what it holds,
+and a cycle of threads each waiting on the next.
+Break any one of the four and deadlock becomes impossible.
+The classic trigger is two locks acquired in opposite order by two threads:
+
+```python
+# deadlock.py
+import threading
+
+lock_a = threading.Lock()
+lock_b = threading.Lock()
+both_holding = threading.Barrier(2)
+both_tried = threading.Barrier(2)
+timed_out = [False, False]
+
+def worker(first: threading.Lock, second: threading.Lock,
+           index: int) -> None:
+    with first:
+        both_holding.wait()  # Neither releases "first" until now
+        if second.acquire(timeout=0.2):
+            second.release()
+        else:
+            timed_out[index] = True
+        both_tried.wait()  # Neither releases "first" until now
+
+t1 = threading.Thread(target=worker, args=(lock_a, lock_b, 0))
+t2 = threading.Thread(target=worker, args=(lock_b, lock_a, 1))
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+print(f"deadlock detected: {all(timed_out)}")
+#: deadlock detected: True
+```
+
+`t1` takes `lock_a` then reaches for `lock_b`.
+`t2` takes `lock_b` then reaches for `lock_a`.
+The first `Barrier` holds both threads until each already holds its first lock,
+guaranteeing the circular wait actually forms instead of leaving it to chance.
+Each thread's `second.acquire()` then waits on a lock the other thread holds,
+and will not release, until it gives up.
+A real deadlock has no `timeout` and never gives up.
+Both threads wait forever.
+The timeout here exists only so this demonstration finishes; without it,
+this listing would hang the book's build.
+The second `Barrier` holds each thread until both have tried,
+so neither lock is released early and masks the other thread's wait.
+The fix is simpler than the mechanism:
+have every thread acquire shared locks in the same global order.
+If both threads had reached for `lock_a` first,
+whichever got there first would finish and release it before the other ever blocked.
+
+### Livelock
+
+A *livelock* is not blocked.
+Threads keep running and keep changing state, but none of them makes progress,
+the way two people in a hallway each step aside for the other, forever.
+No lock is involved, so no timeout can fix it, and there is nothing to acquire.
+This shape is easier to see as a plain simulation than as real threads:
+
+```python
+# livelock.py
+def step(name: str, other_wants: bool) -> bool:
+    if other_wants:
+        print(f"{name}: yields")
+        return True  # Still wants the resource
+    print(f"{name}: proceeds")
+    return False
+
+a_wants = True
+b_wants = True
+for _ in range(3):
+    a_wants, b_wants = step("a", b_wants), step("b", a_wants)
+print(f"resolved: {not (a_wants or b_wants)}")
+#: a: yields
+#: b: yields
+#: a: yields
+#: b: yields
+#: a: yields
+#: b: yields
+#: resolved: False
+```
+
+Each round, `a` and `b` both see the other still wanting the resource,
+so both politely yield, which is exactly why both still want it next round.
+Being polite to a thread that is equally polite produces no progress at all.
+A real livelock looks busy on a thread monitor, CPU time spent,
+state visibly changing, while a deadlock looks idle, threads parked and waiting.
+Both end the same way: nothing gets done.
+The usual fix is to break the symmetry,
+for example letting only the thread with the lower ID yield.
+
 ## Concurrency is Not Easy
 
 Concurrency is neither simple nor solved.
