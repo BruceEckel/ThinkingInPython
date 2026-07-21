@@ -1322,33 +1322,57 @@ Processes and subinterpreters genuinely run at once
 
 `asyncio` handles I/O-bound work.
 Processes and subinterpreters handle CPU-bound work.
-A fair question follows: does new code ever still need a `threading.Thread`?
+In light of these, does new code ever need a `threading.Thread`?
 
 It does, but not for the reason threads were once the default choice.
 [I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
-split the world in two at the start of this chapter,
-and neither half needs a thread to structure its concurrency anymore.
-`asyncio` overlaps the waiting.
-A process pool, or [Subinterpreters](#subinterpreters)
-on the standard build with no separate install, overlaps the computing.
+bisects concurrency at the start of this chapter.
+Neither half needs a thread to structure its concurrency.
+`asyncio` allows overlap across periods of waiting on external operations.
+A process pool or [subinterpreter](#subinterpreters)
+overlaps CPU-bound computing.
 
-What a thread still does better than either is bridge to code that was never written to cooperate with an event loop.
+What is left over for threads to do?
+Bridging to code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.
-Rewriting all of it is not realistic.
+
+If support for asynchrony had been in Python from the beginning,
+all libraries could be expected to conform.
+But rewriting all existing libraries to use `asyncio` instead of threads is not realistic.
 `asyncio.to_thread()`, from [Escaping to a Thread](#escaping-to-a-thread),
-is the standard library's own admission of this.
+is the standard library supporting this reality.
 Even a program written as `asyncio` from top to bottom keeps a thread pool underneath it,
 because the code it calls into does not share that shape.
 
 A free-threaded interpreter changes the answer,
-but only for code built against that separate install.
+but only for code built against that (currently) separate install.
 There, a thread can genuinely parallelize CPU-bound work while sharing memory directly,
 paying no pickling cost at all,
 something neither a GIL-bound thread nor a process pool offers.
 On the standard build, a thread's job stays narrower:
 not structuring your own concurrency,
 but not blocking it while you wait on code that structures none of its own.
+
+Free threading does not close this gap for I/O-bound work.
+It solves a narrower problem:
+parallelizing CPU-bound work across cores from inside one process.
+With the GIL, only one thread executes Python bytecode at any instant,
+and [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
+already showed that guarantee doesn't protect a read-modify-write spanning a function call.
+Free threading removes even that much serialization.
+Two threads can now execute at the same instant on separate cores,
+so the same kind of gap opens more easily, not less.
+`asyncio` still only switches at an `await` you wrote,
+which is what lets [A Single Thread Still Races](#a-single-thread-still-races)
+reason about interleaving at all.
+A thread also still costs an OS stack and an OS scheduling entity that free threading does not remove,
+while an `asyncio` task is cheap enough to run by the thousand.
+And [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
+cancellable batches have no thread equivalent.
+There is still no safe way to cancel a running thread.
+Free threading changes what a thread is for.
+It does not change what `asyncio` is for.
 
 ## Locks, Semaphores, and Failure Modes
 
