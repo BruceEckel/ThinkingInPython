@@ -602,7 +602,7 @@ just as the same race between threads needs a `threading.Lock`.
 
 ## Parallelism
 
-The CPU-bound task cannot overlap on one core.
+A CPU-bound task cannot overlap on one core.
 Give it several cores and it can.
 `ProcessPoolExecutor` runs each call in its own process,
 each with its own interpreter and GIL,
@@ -614,7 +614,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 def cpu_price(order: int) -> int:
     total = 0
-    for _ in range(1_000_000):  # Working inside the processor
+    for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
 
@@ -631,9 +631,9 @@ if __name__ == "__main__":
 `pool.map()` sends each order to a worker process and gathers the results in order,
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price()` as before.
-Only its home changed, from one shared interpreter to several.
-With enough cores the wall-clock time falls toward the time of a single task,
-not their sum.
+But it is no longer on a single shared interpreter on a single core.
+The work has been distributed across multiple interpreters, each on its own core.
+With enough cores the wall-clock time falls toward the time of a single task.
 
 Two issues separate a process pool from every in-process tool in this chapter,
 and both surface in this short listing:
@@ -645,11 +645,11 @@ and both surface in this short listing:
    so the guard keeps each worker from running `main()` and building a pool of workers of its own.
    Leave it out and Python detects the runaway spawning and raises `RuntimeError`.
 2. Work crosses the process boundary by *pickling*.
-   Each argument and each return value is serialized in one process and rebuilt in the other,
-   and the function itself travels by name,
-   so it must be importable from the top level of the module:
-   passing a `lambda` to `pool.map()` fails with a pickling error.
-   This is also [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule in another costume:
+   Each argument and each return value is serialized in one process and rebuilt in the other.
+   The function itself travels by name,
+   so it must be importable from the top level of the module.
+   Passing a `lambda` to `pool.map()` fails with a pickling error.
+   This echoes [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule:
    a million tiny results can cost more to pickle than the parallelism saved.
 
 `ProcessPoolExecutor` is not the only way to get separate processes.
@@ -663,7 +663,7 @@ import multiprocessing as mp
 
 def cpu_price(order: int, results: mp.Queue) -> None:
     total = 0
-    for _ in range(1_000_000):  # Working inside the processor
+    for _ in range(1_000_000):  # Processor work
         total += 1
     results.put((order, order * 10))
 
@@ -671,8 +671,8 @@ def main() -> None:
     orders = [1, 2, 3, 4, 5]
     results: mp.Queue = mp.Queue()
     workers = [
-        mp.Process(target=cpu_price, args=(o, results))
-        for o in orders
+        mp.Process(target=cpu_price, args=(order, results))
+        for order in orders
     ]
     for w in workers:
         w.start()
@@ -686,8 +686,7 @@ if __name__ == "__main__":
     main()
 ```
 
-This prints the same `[10, 20, 30, 40, 50]`,
-but everything `pool.map()` did is now explicit: starting each worker,
+Everything `pool.map()` did is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result is tagged with its `order`).
 Draining after `join()` is safe here because five small tuples fit in the queue's internal buffer.
