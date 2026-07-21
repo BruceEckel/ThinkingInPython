@@ -320,7 +320,7 @@ so neither ever reaches its `fetched` print.
 Only when every task has finished or been cancelled does the block exit.
 As it exits, it re-raises both failures wrapped in an *exception group*,
 a container for simultaneous failures,
-since more than one task can go down at once.
+since more than one task can fail at once.
 The `except*` form catches members of a group by type,
 and iterating through `group.exceptions` reaches every member.
 
@@ -1707,6 +1707,41 @@ A deadlock looks idle, with tasks parked and waiting.
 In both cases, nothing gets done.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.
+
+## Rules of Thumb
+
+- **Don't wrap a lone wait in `async`/`await` machinery.**
+  `asyncio` pays off once you have waits to overlap.
+- **A comprehension that awaits is not concurrent.**
+  `[await c for c in coroutines]` runs one coroutine at a time.
+  Only `gather()` or `TaskGroup` schedule every coroutine as a task before waiting on any of them.
+- **Choose `TaskGroup` when a failure should stop the batch,
+  `gather(return_exceptions=True)` when it shouldn't.**
+  `TaskGroup`'s contract is all-or-cancel.
+  `gather()` can hand back errors as data alongside the successes.
+- **A read-modify-write that spans an `await` still races,
+  with no thread in sight.**
+  Guard it with `asyncio.Lock`, the same fix a lock gives for threads.
+- **Never call a blocking function directly inside a coroutine.**
+  `time.sleep()` freezes every task on the loop, not just its own.
+  Use `asyncio.sleep()`, or hand the blocking call to `asyncio.to_thread()`.
+- **Prefer `ProcessPoolExecutor` over raw `multiprocessing`.**
+  Reserve `multiprocessing` itself for a job that is not one call returning one value:
+  a continuously running worker, or state shared through a `Manager`.
+- **More cores only speed up the parallel fraction of the work.**
+  Splitting past the number of cores buys a little more.
+  Then the per-task cost of pickling and reassembling catches up,
+  and the gains flatten (Amdahl's Law).
+- **For CPU-bound work, try a subinterpreter first, a process pool second,
+  and a free-threaded build only once every extension you use is known to support it.**
+- **Match the queue to the concurrency model.**
+  `queue.Queue` blocks a thread,
+  `multiprocessing.Queue` pickles across processes,
+  `asyncio.Queue` suspends a task and needs no locking at all.
+- **A shared lock only prevents deadlock if every user agrees on the order.**
+  Acquire shared locks in the same sequence everywhere.
+  When two units keep yielding to each other instead,
+  break the symmetry so only one of them gives way.
 
 ## Concurrency is Not Easy
 
