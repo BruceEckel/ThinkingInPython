@@ -1514,18 +1514,12 @@ from processes and threads to tasks and coroutines,
 is a small corner of the territory.
 Here are a few of the topics beyond it:
 
-- **Locks:** Grant exclusive access to a shared resource so only one thread or task touches it at a time.
-- **Semaphores:** Limit how many threads or tasks may hold a resource at once,
-  generalizing a lock from one holder to a fixed count.
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
 - **Message passing and channels:** Let concurrent units exchange data by sending values through a queue-like channel instead of sharing memory directly.
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interfered.
-- **Deadlocks:** Happen when two or more threads each wait forever for a resource the other one holds.
-- **Livelocks:** Happen when threads keep reacting to each other and changing state,
-  but none of them makes progress.
 - **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
   and what happens when two threads touch the same memory with no synchronization between them.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
