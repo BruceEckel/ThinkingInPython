@@ -464,8 +464,8 @@ A task uses that object as a context manager,
 writing `with meter:` around its own active span.
 
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
-The I/O tasks each reach their `await` and suspend,
-so all five are in flight at once: peak 5.
+The I/O tasks each reach their `await`, at which point that tasks suspends.
+All five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
 
@@ -510,6 +510,9 @@ Five blocking sleeps cannot overlap at all:
 each stalls the loop for its full duration,
 so the total is never less than their sum.
 
+Notice that you cannot call `await` on `time.sleep()`,
+which is an extra indicator that it is the wrong function to use.
+
 ## Escaping to a Thread
 
 The rule inside `async def` is to `await`, never block.
@@ -523,32 +526,21 @@ allowing the event loop to keep running:
 # to_thread.py
 import asyncio
 import time
-from collections.abc import Awaitable, Iterable
-
-async def blocking_wait() -> None:
-    time.sleep(0.05)  # Stops the event loop
 
 async def offloaded_wait() -> None:
     await asyncio.to_thread(time.sleep, 0.05)  # Runs in a thread
 
-async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
-    start = time.perf_counter()
-    await asyncio.gather(*tasks)
-    return time.perf_counter() - start
-
 async def main() -> None:
-    t_block = await elapsed(blocking_wait() for _ in range(5))
-    t_offload = await elapsed(offloaded_wait() for _ in range(5))
-    print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
-    print(f"offloaded sleeps overlap: {t_offload < 0.05 * 2}")
+    start = time.perf_counter()
+    await asyncio.gather(*(offloaded_wait() for _ in range(5)))
+    elapsed = time.perf_counter() - start
+    print(f"offloaded sleeps overlap: {elapsed < 0.05 * 2}")
 
 asyncio.run(main())
-#: blocking sleeps serialize: True
 #: offloaded sleeps overlap: True
 ```
 
-`blocking_wait()` is the same stalled call as before.
-`offloaded_wait()` calls the identical `time.sleep()`,
+`offloaded_wait()` calls the same `time.sleep()` that stalled `blocking_the_loop.py`'s `blocking_wait()`,
 but through `asyncio.to_thread()`,
 which hands the call to a worker thread and awaits its completion.
 `time.sleep()` itself still blocks, but it blocks a worker thread,
@@ -606,7 +598,7 @@ landing at points the interpreter picks and you did not choose,
 while a coroutine switch happens only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
-the same shape of fix a lock gives across threads.
+just as the same race between threads needs a `threading.Lock`.
 
 ## Parallelism
 
