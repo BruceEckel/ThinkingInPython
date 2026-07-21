@@ -1712,8 +1712,7 @@ for example letting only the task with the lower ID give.
 
 Concurrency is neither simple nor solved.
 
-This is how confused we are about concurrency:
-there are ongoing arguments about what the term even means.
+There are ongoing arguments about what the term even means.
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
@@ -1721,13 +1720,13 @@ Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 Both asyncrony and parallelism fit.
 
 Someone who declares that "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
-This chapter makes concurrency look easy only because it has only touched the surface of shared mutable state problems.
+This chapter makes concurrency look easy because it has only touched the surface of shared mutable state problems.
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
 Some problems allow immutability.
 Others require memory efficiency over everything.
-There are solutions that require as much data as possible packed into RAM.
+There are solutions that require as much data as possible be packed into RAM.
 In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
@@ -1739,17 +1738,24 @@ is a small corner of the territory.
 Here are a few of the topics beyond it:
 
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
-  then release them together. [[are group() and TaskGroup not barriers?]]
-- **Message passing and channels:** Let concurrent units exchange data by sending values through a queue-like channel instead of sharing memory directly.
+  then release them together.
+  Unlike `gather()` or `TaskGroup`,
+  a barrier is a rendezvous point the running code reaches and blocks on itself,
+  often reused across repeated phases,
+  not a supervisor waiting from outside for everything to finish.
+- **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory directly.
+  Actor languages and CSP, below,
+  are two different disciplines built on this same idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
-  an isolated object that reacts only to messages, never shares state directly,
-  and can spawn more actors. [[do actors use Message passing and channels?]]
+  an isolated object that reacts only to messages sent to its own mailbox,
+  never shares state directly, and can spawn more actors.
+  Erlang, built at Ericsson for telephone switches, and Elixir,
+  newer and built on the same BEAM virtual machine,
+  are its most established production examples.
 - **Communicating Sequential Processes
-  (CSP):** Models concurrency as independent processes that communicate only over explicit channels,
-  the approach Go's goroutines and channels are built on. [[Do these also use Message passing and channels? ]]
-- **Erlang and Elixir:** Treat each unit of concurrency as an isolated process that shares nothing and talks only through messages.
-  Erlang was built at Ericsson for telephone switches.
-  Elixir is newer, built on the same BEAM virtual machine. [[Are these not actor languages?]]
+  (CSP):** Models concurrency as independent processes that communicate only over explicit,
+  shared channels, rather than an actor's private mailbox.
+  This is the approach Go's goroutines and channels are built on.
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interfered.[^stm-status]
