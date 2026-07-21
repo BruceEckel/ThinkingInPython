@@ -3,11 +3,11 @@ import asyncio
 
 active = 0
 peak = 0
-pool = asyncio.Semaphore(2)  # At most 2 tasks at once
+semaphore = asyncio.Semaphore(2)
 
 async def worker() -> None:
     global active, peak
-    async with pool:
+    async with semaphore:
         active += 1
         peak = max(peak, active)
         await asyncio.sleep(0.05)

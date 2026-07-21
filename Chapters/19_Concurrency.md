@@ -1498,26 +1498,27 @@ That number belongs to the machine, not to Python.
 On one well-provisioned machine,
 60,000 threads parked on a never-set `threading.Event` started in about four seconds with room to spare.
 A laptop with far less memory can fail at a fraction of that.
-To find your own machine's number, raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an exception.
+To find your own machine's number,
+raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an exception.
 Tasks have no equivalent ceiling to compare it against,
 since a task never runs out of the OS resource that a thread does.
 
 ## Locks, Semaphores, and Failure Modes
 
-`async_race.py` showed shared mutable state losing updates with no coordination in place,
-using tasks instead of threads.
-That was not a fluke, and not a special case worth a footnote.
+`async_race.py` shows shared mutable state losing updates with no coordination in place,
+but using tasks instead of threads.
 Threads are not the source of deadlock and livelock.
-Shared mutable state is,
-and `asyncio` shares mutable state just as readily as threads do.
-Removing the OS thread scheduler does not remove these failure modes;
-it only moves where they can happen,
-from anywhere the OS preempts you to the `await` points you wrote yourself.
+That source is shared mutable state,
+and `asyncio` shares it just as readily as threads do.
+Removing the OS thread scheduler does not remove these failure modes.
+It only moves where they can happen.
+With threads, that point is anywhere the OS decides to preempt you.
+`asyncio` narrows this to the `await` points you wrote yourself.
 
 ### Locks
 
 A *lock* grants exclusive access to a shared resource so only one task holds it at a time.
-Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates:
+Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates by serializing access to `counter`:
 
 ```python
 # async_locks.py
@@ -1544,14 +1545,16 @@ asyncio.run(main())
 
 The only change from `async_race.py` is the `async with lock:` around the read,
 the yielding `await`, and the write.
-A task that reaches `async with lock:` while another task already holds it suspends there,
-so only one task's read-modify-write is ever in progress,
+If a task reaches `async with lock:` while another task already holds the lock,
+it suspends itself until that lock becomes available.
+This way, only one task's read-modify-write is ever in progress,
 no matter how many times the event loop switches to another task in between.
-All 400 increments now land, the same fix `threading.Lock` gives across threads.
+All 400 increments now occur,
+the same fix `threading.Lock` produces for threads.
 
 ### Semaphores
 
-A *semaphore* generalizes a lock from one holder to a fixed count.
+A *semaphore* generalizes a lock from a single lock-holder to a fixed number of them.
 Where a lock admits one task,
 `asyncio.Semaphore(n)` admits up to `n` at once and suspends the rest:
 
@@ -1561,11 +1564,11 @@ import asyncio
 
 active = 0
 peak = 0
-pool = asyncio.Semaphore(2)  # At most 2 tasks at once
+semaphore = asyncio.Semaphore(2)
 
 async def worker() -> None:
     global active, peak
-    async with pool:
+    async with semaphore:
         active += 1
         peak = max(peak, active)
         await asyncio.sleep(0.05)
@@ -1580,14 +1583,13 @@ asyncio.run(main())
 ```
 
 Five tasks start together,
-but the semaphore admits only two into the sleep at once.
+but `semaphore` admits only two into the sleep at once.
 `peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
 Unlike the threaded version of this example,
 `active` and `peak` need no lock of their own:
 nothing else runs between `active += 1` and `peak = max(peak, active)`,
 since neither line contains an `await`.
-[A Single Thread Still Races](#a-single-thread-still-races) is still the rule,
-not an exception; a gap only opens where an `await` sits inside it.
+
 A semaphore initialized to 1 behaves exactly like a lock;
 raising the count is what turns it into a throttle on a limited resource,
 such as a fixed number of database connections.
@@ -1597,13 +1599,14 @@ such as a fixed number of database connections.
 A *deadlock* happens when two or more tasks each hold a resource the other one needs,
 and neither can proceed.
 Four conditions must all hold at once: exclusive access to each resource,
-a task holding one resource while it waits for another,
+a task holds one resource while it waits for another,
 no way to force a task to give up what it holds,
 and a cycle of tasks each waiting on the next.
 Break any one of the four and deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
-which is why the classic trigger, two locks acquired in opposite order,
-reproduces with two tasks and two `asyncio.Lock` objects just as reliably:
+so we can easily produce dealock with `asyncio`.
+Here, there are two tasks and two `asyncio.Lock` objects.
+The two locks are acquired in opposite order:
 
 ```python
 # async_deadlock.py
@@ -1636,18 +1639,17 @@ asyncio.run(main())
 
 The first task takes `lock_a` then reaches for `lock_b`.
 The second takes `lock_b` then reaches for `lock_a`.
-The `sleep(0.01)` gives each task time to grab its first lock before either reaches for its second,
-and needs no `Barrier` to make that ordering reliable: unlike threads,
-only one task runs at a time,
+The `sleep(0.01)` gives each task time to grab its first lock before either reaches for its second.
+Unlike threads, only one task runs at a time,
 so there is no OS scheduler free to interleave the two tasks' first lines in an unlucky order.
 Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other holds and will never release.
 A real deadlock has no `timeout` and never resolves.
 Both tasks wait forever, the event loop included,
-since nothing remains that could ever wake them.
-The timeout here exists only so this demonstration finishes; without it,
-this listing would hang the book's build.
-The fix is the same one that works across threads:
+since nothing remains that can wake them.
+Here, the timeout ensures that the example terminates.
+
+The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
 If both tasks had reached for `lock_a` first,
 whichever got there first would finish and release it before the other ever waited.
@@ -1666,12 +1668,12 @@ import asyncio
 a_wants = True
 b_wants = True
 
-async def yielder(name: str) -> None:
+async def giver(name: str) -> None:
     global a_wants, b_wants
     for _ in range(3):
         other_wants = b_wants if name == "a" else a_wants
         if other_wants:
-            print(f"{name}: yields")
+            print(f"{name}: gives")
         else:
             print(f"{name}: proceeds")
             if name == "a":
@@ -1681,57 +1683,55 @@ async def yielder(name: str) -> None:
         await asyncio.sleep(0)
 
 async def main() -> None:
-    await asyncio.gather(yielder("a"), yielder("b"))
+    await asyncio.gather(giver("a"), giver("b"))
     print(f"resolved: {not (a_wants or b_wants)}")
 
 asyncio.run(main())
-#: a: yields
-#: b: yields
-#: a: yields
-#: b: yields
-#: a: yields
-#: b: yields
+#: a: gives
+#: b: gives
+#: a: gives
+#: b: gives
+#: a: gives
+#: b: gives
 #: resolved: False
 ```
 
-Both tasks run for real here, not a stand-in simulation.
 Each round, `a` checks `b_wants` and `b` checks `a_wants`,
-and both still see the other wanting the resource, so both yield,
+and both still see the other wanting the resource, so both give,
 which is exactly why both still want it next round.
-Being polite to a task that is equally polite produces no progress at all,
+Being polite when interacting with a task that is equally polite produces no progress at all,
 even though the event loop keeps both tasks busy the whole time.
-A real livelock looks busy on a monitor, CPU time spent, state visibly changing,
-while a deadlock looks idle, tasks parked and waiting.
-Both end the same way: nothing gets done.
+A real livelock looks busy on a monitor,
+with CPU time spent and state visibly changing.
+A deadlock looks idle, with tasks parked and waiting.
+In both cases, nothing gets done.
 The usual fix is to break the symmetry,
-for example letting only the task with the lower ID yield.
+for example letting only the task with the lower ID give.
 
 ## Concurrency is Not Easy
 
 Concurrency is neither simple nor solved.
 
 This is how confused we are about concurrency:
-there are ongoing arguments about what the term even means!
+there are ongoing arguments about what the term even means.
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
-In everyday English,
-*concurrent* means "operating or occurring at the same time."
-By that definition, concurrency and parallelism are the same thing.
+*Concurrent* means "operating or occurring at the same time."
+Both asyncrony and parallelism fit.
 
-The people who declare "concurrency is easy!" have dipped their toes in it and never encountered a tricky problem.
-I've made concurrency look easy in this chapter only because I haven't done much with the issue of shared mutable state other than demonstrating the danger and saying "avoid it,
-your life will be simpler."
+Someone who declares that "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
+This chapter makes concurrency look easy only because it has only touched the surface of shared mutable state problems.
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
-Some systems need as much data as possible packed into RAM,
-and in those cases you almost inevitably share mutable state.
 Some problems allow immutability.
 Others require memory efficiency over everything.
+There are solutions that require as much data as possible packed into RAM.
+In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
-People have worked tirelessly to find better ways to program concurrently.
+People have worked to find better ways to program concurrently.
 Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
 The vocabulary this chapter built,
 from processes and threads to tasks and coroutines,
@@ -1739,22 +1739,22 @@ is a small corner of the territory.
 Here are a few of the topics beyond it:
 
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
-  then release them together.
+  then release them together. [[are group() and TaskGroup not barriers?]]
 - **Message passing and channels:** Let concurrent units exchange data by sending values through a queue-like channel instead of sharing memory directly.
-- **Software transactional memory
-  (STM):** Runs a block of code as an atomic transaction against shared memory,
-  retrying automatically if another thread interfered.
-- **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
-  and what happens when two threads touch the same memory with no synchronization between them.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages, never shares state directly,
-  and can spawn more actors.
+  and can spawn more actors. [[do actors use Message passing and channels?]]
 - **Communicating Sequential Processes
   (CSP):** Models concurrency as independent processes that communicate only over explicit channels,
-  the approach Go's goroutines and channels are built on.
+  the approach Go's goroutines and channels are built on. [[Do these also use Message passing and channels? ]]
 - **Erlang and Elixir:** Treat each unit of concurrency as an isolated process that shares nothing and talks only through messages.
   Erlang was built at Ericsson for telephone switches.
-  Elixir is newer, built on the same BEAM virtual machine.
+  Elixir is newer, built on the same BEAM virtual machine. [[Are these not actor languages?]]
+- **Software transactional memory
+  (STM):** Runs a block of code as an atomic transaction against shared memory,
+  retrying automatically if another thread interfered.[^stm-status]
+- **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
+  and what happens when two threads touch the same memory with no synchronization between them.
 - The list goes on...
 
 ## Exercises
@@ -1806,3 +1806,15 @@ clarifies what he meant.
     Leslie Lamport's 2015 Turing Lecture,
     "The Computer Science of Concurrency: The Early Years,"
     surveys the decades since.
+
+[^stm-status]: Python has no mainstream STM library today.
+    PyPy-STM, an experimental PyPy variant from 2012 to 2015,
+    used STM internally to remove the GIL and exposed a
+    `with __pypy__.thread.atomic:` block for ordinary Python code.
+    PyPy's own documentation now treats it as discontinued.
+    GIL-removal research moved instead to the fine-grained locking
+    [Free Threading](#free-threading) covers.
+    A couple of academic prototypes exist (PSTM, TraM),
+    but neither is a maintained library suited to real code.
+    Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
+    are where STM actually succeeded as a practical, widely used tool.

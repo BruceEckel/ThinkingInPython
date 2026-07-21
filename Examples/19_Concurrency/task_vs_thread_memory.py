@@ -22,7 +22,8 @@ async def bytes_per_task() -> float:
     )
     for t in tasks:
         t.cancel()
-    # Without this, the first CancelledError would raise here
+    # Without "return_exceptions=True", the first CancelledError
+    # would raise an exception and exit the function:
     await asyncio.gather(*tasks, return_exceptions=True)
     tracemalloc.stop()
     return grown / TASKS
