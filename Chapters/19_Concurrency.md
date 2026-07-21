@@ -706,9 +706,10 @@ Use `multiprocessing` for a job that is not one call returning one value:
 
 - A worker that runs continuously and communicates over its own `Queue`.
 - State shared between processes through a `multiprocessing.Manager`, `Value`,
-  or `Array`. `ProcessPoolExecutor` does not expose these.
+  or `Array`.
+  `ProcessPoolExecutor` does not expose these.
 
-We can test the claim that wall-clock time falls toward a single task's time, not their sum.
+We can test the claim that wall-clock time falls toward a single task's time as we add more cores.
 Split a fixed amount of work into a growing number of tasks,
 keep the pool warm across every measurement,
 and watch what happens once task count passes the number of cores:
@@ -716,8 +717,11 @@ and watch what happens once task count passes the number of cores:
 ```python
 # task_scaling.py
 """
-python task_scaling.py
-python task_scaling.py --total 200_000_000 --max-tasks 128
+Split a fixed workload across a growing number of
+tasks and time each split on a warm pool.
+
+    python task_scaling.py
+    python task_scaling.py --total 200_000_000 --max-tasks 128
 """
 import argparse
 import os
@@ -739,7 +743,10 @@ def timed_split(
     return time.perf_counter() - start
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "--total", type=int, default=10_000_000,
         help="total loop iterations, split across tasks",
@@ -770,11 +777,11 @@ if __name__ == "__main__":
     main()
 ```
 
-`work_chunk()` is deliberately simple, pure looping.
+`work_chunk()` is deliberately simple looping.
 The only difference between one run and another is how finely the total work gets split.
 The pool is created once and warmed up with a throwaway call before any measurement starts,
 the same discipline `timeit` needs around any one-time setup cost.
-This way, process startup never leaks into a timed result.
+This way, process startup delays never leak into a timed result.
 
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
@@ -783,15 +790,14 @@ then keeps dropping a little past that point as smaller,
 more numerous chunks balance the load better across workers,
 before flattening out.
 
-The defaults above finish in about a second,
-small enough for a full `make verify` run.
+The defaults above finish quickly.
 Raise `--total` and `--max-tasks` to push the curve onto a slower,
 more dramatic slope on your own machine.
 
 ### Why Speedup Isn't Linear
 
-`task_scaling.py`'s curve keeps dropping, then flattens,
-for a reason with a name: *Amdahl's Law*.
+`task_scaling.py`'s curve keeps dropping, then flattens.
+This is *Amdahl's Law*.
 Every parallel job carries some part that cannot be split.
 Building each chunk, pickling it across the process boundary,
 and reassembling the results are unavoidably serial,

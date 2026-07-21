@@ -1,6 +1,7 @@
 # task_scaling.py
-"""Split a fixed workload across a growing number of tasks and
-time each split on a warm pool.
+"""
+Split a fixed workload across a growing number of
+tasks and time each split on a warm pool.
 
     python task_scaling.py
     python task_scaling.py --total 200_000_000 --max-tasks 128
@@ -25,7 +26,10 @@ def timed_split(
     return time.perf_counter() - start
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "--total", type=int, default=10_000_000,
         help="total loop iterations, split across tasks",
