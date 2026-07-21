@@ -602,7 +602,7 @@ just as the same race between threads needs a `threading.Lock`.
 
 ## Parallelism
 
-A CPU-bound task cannot overlap on one core.
+A CPU-bound task cannot overlap if only a single core is available.
 Give it several cores and it can.
 `ProcessPoolExecutor` runs each call in its own process,
 each with its own interpreter and GIL,
@@ -632,7 +632,8 @@ if __name__ == "__main__":
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price()` as before.
 But it is no longer on a single shared interpreter on a single core.
-The work has been distributed across multiple interpreters, each on its own core.
+The work has been distributed across multiple interpreters,
+each on its own core.
 With enough cores the wall-clock time falls toward the time of a single task.
 
 Two issues separate a process pool from every in-process tool in this chapter,
@@ -678,8 +679,7 @@ def main() -> None:
         w.start()
     for w in workers:
         w.join()
-    pairs: list[tuple[int, int]] = sorted(
-        results.get() for _ in workers)
+    pairs = sorted(results.get() for _ in workers)
     print([price for _, price in pairs])
 
 if __name__ == "__main__":
@@ -689,7 +689,8 @@ if __name__ == "__main__":
 Everything `pool.map()` did is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result is tagged with its `order`).
-Draining after `join()` is safe here because five small tuples fit in the queue's internal buffer.
+*Draining* a queue means reading every item out of it until it is empty.
+Doing that after `join()` only works here because all five results are small enough for every worker to finish writing without needing a reader first.
 A queue carrying bulky data must be drained *before* joining:
 each worker's feeder thread blocks until its data is consumed,
 so the `join()` would deadlock.
@@ -705,23 +706,18 @@ Use `multiprocessing` for a job that is not one call returning one value:
 
 - A worker that runs continuously and communicates over its own `Queue`.
 - State shared between processes through a `multiprocessing.Manager`, `Value`,
-  or `Array`.
+  or `Array`. `ProcessPoolExecutor` does not expose these.
 
-`ProcessPoolExecutor` does not expose any of those.
-
-The claim that wall-clock time falls toward a single task's time, not their sum,
-is worth checking rather than trusting.
+We can test the claim that wall-clock time falls toward a single task's time, not their sum.
 Split a fixed amount of work into a growing number of tasks,
 keep the pool warm across every measurement,
 and watch what happens once task count passes the number of cores:
 
 ```python
 # task_scaling.py
-"""Split a fixed workload across a growing number of tasks and
-time each split on a warm pool.
-
-    python task_scaling.py
-    python task_scaling.py --total 200_000_000 --max-tasks 128
+"""
+python task_scaling.py
+python task_scaling.py --total 200_000_000 --max-tasks 128
 """
 import argparse
 import os
