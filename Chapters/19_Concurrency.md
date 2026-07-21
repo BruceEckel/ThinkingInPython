@@ -1295,175 +1295,187 @@ Processes and subinterpreters genuinely run at once
 
 ## Locks, Semaphores, and Failure Modes
 
-`async_race.py` and `gil_race.py` showed shared mutable state losing updates with no coordination in place.
-Fixing that loss means introducing coordination,
-and coordination brings its own failure modes.
+`async_race.py` showed shared mutable state losing updates with no coordination in place,
+using tasks instead of threads.
+That was not a fluke, and not a special case worth a footnote.
+Threads are not the source of deadlock and livelock.
+Shared mutable state is,
+and `asyncio` shares mutable state just as readily as threads do.
+Removing the OS thread scheduler does not remove these failure modes;
+it only moves where they can happen,
+from anywhere the OS preempts you to the `await` points you wrote yourself.
 
 ### Locks
 
-A *lock* grants exclusive access to a shared resource so only one thread holds it at a time.
-Wrapping the read-modify-write from `gil_race.py` in a lock restores the missing updates:
+A *lock* grants exclusive access to a shared resource so only one task holds it at a time.
+Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates:
 
 ```python
-# locks.py
-import threading
-import time
+# async_locks.py
+import asyncio
 
 counter = 0
-lock = threading.Lock()
+lock = asyncio.Lock()
 
-def increment(count: int) -> None:
+async def increment(count: int) -> None:
     global counter
     for _ in range(count):
-        with lock:
+        async with lock:
             value = counter  # Read
-            time.sleep(0.000_001)  # Let other threads run
-            counter = value + 1  # Write back
+            await asyncio.sleep(0)  # Yield to the event loop
+            counter = value + 1  # Write
 
-threads = [
-    threading.Thread(target=increment, args=(50,))
-    for _ in range(8)
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
-print(counter)
+async def main() -> None:
+    await asyncio.gather(*(increment(50) for _ in range(8)))
+    print(counter)
+
+asyncio.run(main())
 #: 400
 ```
 
-The only change from `gil_race.py` is the `with lock:` around the read,
-the sleep, and the write.
-Whichever thread enters that block first keeps every other thread out until it finishes,
-so the read-modify-write behaves as one step no matter when the scheduler switches threads.
-All 400 increments now land.
-`asyncio.Lock` protects the same shape of gap between threads in `async_race.py`,
-a read-modify-write that spans an `await`, for tasks instead of threads.
+The only change from `async_race.py` is the `async with lock:` around the read,
+the yielding `await`, and the write.
+A task that reaches `async with lock:` while another task already holds it suspends there,
+so only one task's read-modify-write is ever in progress,
+no matter how many times the event loop switches to another task in between.
+All 400 increments now land, the same fix `threading.Lock` gives across threads.
 
 ### Semaphores
 
 A *semaphore* generalizes a lock from one holder to a fixed count.
-Where a lock admits one thread,
-`threading.Semaphore(n)` admits up to `n` at once and blocks the rest:
+Where a lock admits one task,
+`asyncio.Semaphore(n)` admits up to `n` at once and suspends the rest:
 
 ```python
-# semaphore_limit.py
-import threading
-import time
+# async_semaphore.py
+import asyncio
 
 active = 0
 peak = 0
-lock = threading.Lock()
-pool = threading.Semaphore(2)  # At most 2 workers at once
+pool = asyncio.Semaphore(2)  # At most 2 tasks at once
 
-def worker() -> None:
+async def worker() -> None:
     global active, peak
-    with pool:
-        with lock:
-            active += 1
-            peak = max(peak, active)
-        time.sleep(0.05)
-        with lock:
-            active -= 1
+    async with pool:
+        active += 1
+        peak = max(peak, active)
+        await asyncio.sleep(0.05)
+        active -= 1
 
-threads = [threading.Thread(target=worker) for _ in range(5)]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
-print(f"peak concurrent workers: {peak}")
+async def main() -> None:
+    await asyncio.gather(*(worker() for _ in range(5)))
+    print(f"peak concurrent workers: {peak}")
+
+asyncio.run(main())
 #: peak concurrent workers: 2
 ```
 
-Five threads start together,
-but the semaphore lets only two run their sleep at once.
-`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits),
-guarded here by a separate lock since threads, unlike `asyncio` tasks,
-can genuinely run at the same instant.
+Five tasks start together,
+but the semaphore admits only two into the sleep at once.
+`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
+Unlike the threaded version of this example,
+`active` and `peak` need no lock of their own:
+nothing else runs between `active += 1` and `peak = max(peak, active)`,
+since neither line contains an `await`.
+[A Single Thread Still Races](#a-single-thread-still-races) is still the rule,
+not an exception; a gap only opens where an `await` sits inside it.
 A semaphore initialized to 1 behaves exactly like a lock;
 raising the count is what turns it into a throttle on a limited resource,
 such as a fixed number of database connections.
 
 ### Deadlock
 
-A *deadlock* happens when two or more threads each hold a resource the other one needs,
+A *deadlock* happens when two or more tasks each hold a resource the other one needs,
 and neither can proceed.
 Four conditions must all hold at once: exclusive access to each resource,
-a thread holding one resource while it waits for another,
-no way to force a thread to give up what it holds,
-and a cycle of threads each waiting on the next.
+a task holding one resource while it waits for another,
+no way to force a task to give up what it holds,
+and a cycle of tasks each waiting on the next.
 Break any one of the four and deadlock becomes impossible.
-The classic trigger is two locks acquired in opposite order by two threads:
+None of these conditions mentions threads or an OS scheduler,
+which is why the classic trigger, two locks acquired in opposite order,
+reproduces with two tasks and two `asyncio.Lock` objects just as reliably:
 
 ```python
-# deadlock.py
-import threading
+# async_deadlock.py
+import asyncio
 
-lock_a = threading.Lock()
-lock_b = threading.Lock()
-both_holding = threading.Barrier(2)
-both_tried = threading.Barrier(2)
-timed_out = [False, False]
+lock_a = asyncio.Lock()
+lock_b = asyncio.Lock()
 
-def worker(first: threading.Lock, second: threading.Lock,
-           index: int) -> None:
-    with first:
-        both_holding.wait()  # Neither releases "first" until now
-        if second.acquire(timeout=0.2):
-            second.release()
-        else:
-            timed_out[index] = True
-        both_tried.wait()  # Neither releases "first" until now
+async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+    async with first:
+        await asyncio.sleep(0.01)  # Let the other task grab its lock
+        async with second:
+            pass  # Never reached
 
-t1 = threading.Thread(target=worker, args=(lock_a, lock_b, 0))
-t2 = threading.Thread(target=worker, args=(lock_b, lock_a, 1))
-t1.start()
-t2.start()
-t1.join()
-t2.join()
-print(f"deadlock detected: {all(timed_out)}")
+async def main() -> None:
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(
+                worker(lock_a, lock_b),
+                worker(lock_b, lock_a),
+            ),
+            timeout=0.5,
+        )
+    except TimeoutError:
+        print("deadlock detected: True")
+
+asyncio.run(main())
 #: deadlock detected: True
 ```
 
-`t1` takes `lock_a` then reaches for `lock_b`.
-`t2` takes `lock_b` then reaches for `lock_a`.
-The first `Barrier` holds both threads until each already holds its first lock,
-guaranteeing the circular wait actually forms instead of leaving it to chance.
-Each thread's `second.acquire()` then waits on a lock the other thread holds,
-and will not release, until it gives up.
-A real deadlock has no `timeout` and never gives up.
-Both threads wait forever.
+The first task takes `lock_a` then reaches for `lock_b`.
+The second takes `lock_b` then reaches for `lock_a`.
+The `sleep(0.01)` gives each task time to grab its first lock before either reaches for its second,
+and needs no `Barrier` to make that ordering reliable: unlike threads,
+only one task runs at a time,
+so there is no OS scheduler free to interleave the two tasks' first lines in an unlucky order.
+Once both hold their first lock,
+each task's `async with second:` suspends on a lock the other holds and will never release.
+A real deadlock has no `timeout` and never resolves.
+Both tasks wait forever, the event loop included,
+since nothing remains that could ever wake them.
 The timeout here exists only so this demonstration finishes; without it,
 this listing would hang the book's build.
-The second `Barrier` holds each thread until both have tried,
-so neither lock is released early and masks the other thread's wait.
-The fix is simpler than the mechanism:
-have every thread acquire shared locks in the same global order.
-If both threads had reached for `lock_a` first,
-whichever got there first would finish and release it before the other ever blocked.
+The fix is the same one that works across threads:
+have every task acquire shared locks in the same global order.
+If both tasks had reached for `lock_a` first,
+whichever got there first would finish and release it before the other ever waited.
 
 ### Livelock
 
 A *livelock* is not blocked.
-Threads keep running and keep changing state, but none of them makes progress,
+Tasks keep running and keep changing state, but none of them makes progress,
 the way two people in a hallway each step aside for the other, forever.
-No lock is involved, so no timeout can fix it, and there is nothing to acquire.
-This shape is easier to see as a plain simulation than as real threads:
+No lock is involved, so no timeout can fix it, and there is nothing to acquire:
 
 ```python
-# livelock.py
-def step(name: str, other_wants: bool) -> bool:
-    if other_wants:
-        print(f"{name}: yields")
-        return True  # Still wants the resource
-    print(f"{name}: proceeds")
-    return False
+# async_livelock.py
+import asyncio
 
 a_wants = True
 b_wants = True
-for _ in range(3):
-    a_wants, b_wants = step("a", b_wants), step("b", a_wants)
-print(f"resolved: {not (a_wants or b_wants)}")
+
+async def yielder(name: str) -> None:
+    global a_wants, b_wants
+    for _ in range(3):
+        other_wants = b_wants if name == "a" else a_wants
+        if other_wants:
+            print(f"{name}: yields")
+        else:
+            print(f"{name}: proceeds")
+            if name == "a":
+                a_wants = False
+            else:
+                b_wants = False
+        await asyncio.sleep(0)
+
+async def main() -> None:
+    await asyncio.gather(yielder("a"), yielder("b"))
+    print(f"resolved: {not (a_wants or b_wants)}")
+
+asyncio.run(main())
 #: a: yields
 #: b: yields
 #: a: yields
@@ -1473,14 +1485,17 @@ print(f"resolved: {not (a_wants or b_wants)}")
 #: resolved: False
 ```
 
-Each round, `a` and `b` both see the other still wanting the resource,
-so both politely yield, which is exactly why both still want it next round.
-Being polite to a thread that is equally polite produces no progress at all.
-A real livelock looks busy on a thread monitor, CPU time spent,
-state visibly changing, while a deadlock looks idle, threads parked and waiting.
+Both tasks run for real here, not a stand-in simulation.
+Each round, `a` checks `b_wants` and `b` checks `a_wants`,
+and both still see the other wanting the resource, so both yield,
+which is exactly why both still want it next round.
+Being polite to a task that is equally polite produces no progress at all,
+even though the event loop keeps both tasks busy the whole time.
+A real livelock looks busy on a monitor, CPU time spent, state visibly changing,
+while a deadlock looks idle, tasks parked and waiting.
 Both end the same way: nothing gets done.
 The usual fix is to break the symmetry,
-for example letting only the thread with the lower ID yield.
+for example letting only the task with the lower ID yield.
 
 ## Concurrency is Not Easy
 
