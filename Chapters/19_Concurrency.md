@@ -33,6 +33,19 @@ its stack frame is popped and execution jumps back to the return address.
 (The return value typically travels back in a CPU register.)
 Thus it is essential that each thread own its call stack.
 
+Neither one starts at a fixed size, though they grow in different ways.
+The heap has no space reserved for it in advance.
+It starts essentially empty and grows only as the program asks for more,
+one allocation at a time.
+A stack does have a size decided when its thread is created,
+and that size does not change afterward.
+If a chain of function calls needs more room than that,
+the stack overflows instead of growing to fit.
+A heap allocation is reached only through a reference,
+which can be redirected to a new, larger block.
+A stack is addressed directly by the code running on it,
+so it cannot be moved to a new location.
+
 A context switch must preserve the state of the current thread before switching to a different thread.
 It stores the CPU register set, which includes:
 
@@ -1322,57 +1335,172 @@ Processes and subinterpreters genuinely run at once
 
 `asyncio` handles I/O-bound work.
 Processes and subinterpreters handle CPU-bound work.
-In light of these, does new code ever need a `threading.Thread`?
+In light of these, does new code ever need threads?
 
 It does, but not for the reason threads were once the default choice.
-[I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
-bisects concurrency at the start of this chapter.
-Neither half needs a thread to structure its concurrency.
+[I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound) bisects concurrency.
+Neither technology requires threads to structure its concurrency.
 `asyncio` allows overlap across periods of waiting on external operations.
 A process pool or [subinterpreter](#subinterpreters)
 overlaps CPU-bound computing.
 
-What is left over for threads to do?
+What role remains for threads?
 Bridging to code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.
 
-If support for asynchrony had been in Python from the beginning,
+If Python always supported coroutines,
 all libraries could be expected to conform.
 But rewriting all existing libraries to use `asyncio` instead of threads is not realistic.
 `asyncio.to_thread()`, from [Escaping to a Thread](#escaping-to-a-thread),
 is the standard library supporting this reality.
-Even a program written as `asyncio` from top to bottom keeps a thread pool underneath it,
-because the code it calls into does not share that shape.
+Thus, even a program written as `asyncio` from top to bottom keeps a thread pool underneath,
+because the code it calls into does not support asynchrony.
 
-A free-threaded interpreter changes the answer,
-but only for code built against that (currently) separate install.
-There, a thread can genuinely parallelize CPU-bound work while sharing memory directly,
-paying no pickling cost at all,
-something neither a GIL-bound thread nor a process pool offers.
-On the standard build, a thread's job stays narrower:
-not structuring your own concurrency,
+Free threading, however, does not affect I/O-bound work.
+It solves a narrower problem: without the GIL,
+a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
+paying no pickling cost at all.
+This is something neither a GIL-bound thread nor a process pool offers.
+With the GIL, a thread's job is reduced to not structuring your own concurrency,
 but not blocking it while you wait on code that structures none of its own.
 
-Free threading does not close this gap for I/O-bound work.
-It solves a narrower problem:
-parallelizing CPU-bound work across cores from inside one process.
-With the GIL, only one thread executes Python bytecode at any instant,
-and [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
-already showed that guarantee doesn't protect a read-modify-write spanning a function call.
-Free threading removes even that much serialization.
-Two threads can now execute at the same instant on separate cores,
-so the same kind of gap opens more easily, not less.
-`asyncio` still only switches at an `await` you wrote,
-which is what lets [A Single Thread Still Races](#a-single-thread-still-races)
-reason about interleaving at all.
-A thread also still costs an OS stack and an OS scheduling entity that free threading does not remove,
+The GIL [does not prevent races](#the-gil-does-not-prevent-races).
+It doesn't protect a read-modify-write spanning a function call.
+With free threading,
+two threads can execute at the same instant on separate cores.
+Race conditions become even easier.
+
+`asyncio` only switches at an `await`,
+which is what lets you [reason about interleaving](#a-single-thread-still-races).
+A thread costs an OS stack and an OS scheduling entity that free threading does not remove,
 while an `asyncio` task is cheap enough to run by the thousand.
-And [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
+[`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
 There is still no safe way to cancel a running thread.
 Free threading changes what a thread is for.
 It does not change what `asyncio` is for.
+
+### Measuring the Difference
+
+The claim that a thread costs real memory while a task costs much less is supportable.
+`threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
+A common default across platforms is on the order of one mebibyte.[^A memibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
+`tracemalloc` can measure a task's actual heap footprint directly,
+since a task is nothing more than ordinary Python objects.
+We can calculate the ration between the two:
+
+```python
+# task_vs_thread_memory.py
+import asyncio
+import threading
+import tracemalloc
+
+TASKS = 20_000
+STACK_SIZE = 1024 * 1024  # 1 MiB, a common thread stack reservation
+
+async def parked() -> None:
+    await asyncio.sleep(999)  # Suspended, never resumes
+
+async def bytes_per_task() -> float:
+    tracemalloc.start()
+    before = tracemalloc.take_snapshot()
+    tasks = [asyncio.ensure_future(parked()) for _ in range(TASKS)]
+    await asyncio.sleep(0)  # Let every task reach its own await
+    after = tracemalloc.take_snapshot()
+    grown = sum(
+        stat.size_diff
+        for stat in after.compare_to(before, "lineno")
+        if stat.size_diff > 0
+    )
+    for t in tasks:
+        t.cancel()
+    # Without "return_exceptions=True", the first CancelledError
+    # would raise an exception and exit the function:
+    await asyncio.gather(*tasks, return_exceptions=True)
+    tracemalloc.stop()
+    return grown / TASKS
+
+default_stack = threading.stack_size()
+threading.stack_size(STACK_SIZE)  # A real, settable cost
+configured_stack = threading.stack_size()
+threading.stack_size(default_stack)  # Restore the previous setting
+
+task_cost = asyncio.run(bytes_per_task())
+tasks_per_stack = configured_stack / task_cost
+print(f"one thread's stack reservation: {configured_stack:,} bytes")
+print(f"average bytes per task: {task_cost:.0f}")
+print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
+print(f"holds over 200 tasks: {tasks_per_stack > 200}")
+#: one thread's stack reservation: 1,048,576 bytes
+#: average bytes per task: 1353
+#: tasks fitting in one thread's stack: 775
+#: holds over 200 tasks: True
+```
+
+`bytes_per_task()` creates 20,000 tasks that immediately suspend on `asyncio.sleep(999)`,
+so they stay alive doing nothing.
+This tells us the heap growth using `tracemalloc`.
+`threading.stack_size()` is read, set, read again, then restored,
+so the measurement leaves the rest of the program untouched.
+One thread's reserved stack,
+paid before it runs a single line of its target function,
+could instead hold roughly 775 suspended tasks.
+The stack figure is a reservation,
+address space set aside whether every byte is touched or not.
+The task figure is heap `tracemalloc` actually measured.
+Both are real costs of a different kind,
+and the comparison still favors tasks over threads by hundreds to one.
+
+The same gap shows up in time, not only space:
+
+```python
+# thread_vs_task_speed.py
+import asyncio
+import threading
+import time
+
+COUNT = 3000
+
+def noop() -> None:
+    pass
+
+async def async_noop() -> None:
+    pass
+
+def spawn_threads() -> float:
+    start = time.perf_counter()
+    threads = [threading.Thread(target=noop) for _ in range(COUNT)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    return time.perf_counter() - start
+
+async def spawn_async_tasks() -> float:
+    start = time.perf_counter()
+    await asyncio.gather(*(async_noop() for _ in range(COUNT)))
+    return time.perf_counter() - start
+
+t_threads = spawn_threads()
+t_tasks = asyncio.run(spawn_async_tasks())
+print(f"tasks at least 5x faster to spawn: {t_tasks * 5 < t_threads}")
+#: tasks at least 5x faster to spawn: True
+```
+
+Starting and joining 3,000 threads does OS-level work for each one,
+allocating a stack, registering with the scheduler, tearing it down again.
+Scheduling 3,000 tasks skips all of that;
+`gather()` only builds Python objects and steps the event loop through them.
+
+How many threads can one machine support before `threading.Thread()` raises `RuntimeError: can't start new thread`?
+That number belongs to the machine, not to Python.
+On one well-provisioned machine,
+60,000 threads parked on a never-set `threading.Event` started in about four seconds with room to spare.
+A laptop with far less memory can fail at a fraction of that.
+To find your own machine's number, raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an exception.
+Tasks have no equivalent ceiling to compare it against,
+since a task never runs out of the OS resource that a thread does.
 
 ## Locks, Semaphores, and Failure Modes
 
