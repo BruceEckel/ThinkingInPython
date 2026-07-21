@@ -55,9 +55,9 @@ It stores the CPU register set, which includes:
 
 The thread's stack is not copied.
 It sits and waits for the thread to resume.
-The heap is not copied because it is shared between all threads in that process.
+The heap is not duplicated; it is shared between all threads in that process.
 
-Although a context switch is made to be as efficient as possible,
+Although context switching between threads is made to be as efficient as possible,
 it has overhead.
 Also, the OS must time slice fairly frequently to evenly distribute computing resources across threads.
 Typically a thread only runs a few milliseconds at a time.
@@ -69,7 +69,7 @@ it could voluntarily yield its use of the CPU to the operating system,
 which could then use that CPU for another thread,
 producing faster overall progress.
 
-Another benefit of threads was seen when more CPUs became available on a single machine.
+Another benefit of threads emerged when more CPUs became available on a single machine.
 Threads were already designed to distribute computing resources,
 so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
@@ -91,7 +91,7 @@ The answer was to move the context switch out of the OS and into the program.
 This way engineers are not fighting the threading system.
 This is called *asynchrony*, implemented with *coroutines*.
 The programming language decides, based on its knowledge of the program,
-the minimum necessary data to include in the context switch.
+the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
 This shift in control of context switching greatly simplifies writing and reasoning about the program.
 
@@ -109,7 +109,7 @@ so a task can run with minimal interference.
 
 ## I/O-Bound vs CPU-Bound
 
-A task is *I/O-bound* when it spends its time waiting on something outside the process:
+A task is *I/O-bound* when it waits on something outside the process:
 a network reply, a disk read, a database query.
 Given nothing else to do, the processor sits idle through the wait.
 A task is *CPU-bound* when it spends its time computing inside the process.
@@ -133,7 +133,7 @@ Instead of using threads for I/O bound problems,
 asynchrony allows you to create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
-Instead, control is given to the *event loop* which discovers the next task which is available to run.
+Instead, control is given to the *event loop* which discovers the next available task to run.
 This is captured in two keywords and the `asyncio` library:
 
 1. `async def` defines a *coroutine function*.
