@@ -787,6 +787,31 @@ small enough for a full `make verify` run.
 Raise `--total` and `--max-tasks` to push the curve onto a slower,
 more dramatic slope on your own machine.
 
+### Why Speedup Isn't Linear
+
+`task_scaling.py`'s curve keeps dropping, then flattens,
+for a reason with a name: *Amdahl's Law*.
+Every parallel job carries some part that cannot be split.
+Building each chunk, pickling it across the process boundary,
+and reassembling the results are unavoidably serial,
+whatever else runs on more cores.
+If that serial part is a fraction `s` of the total work,
+the best any number of cores can do is `1 / (s + (1 - s) / n)`;
+as `n` grows without bound, that ceiling approaches `1 / s` and stops climbing.
+A job that spends 10 percent of its time in serial overhead never speeds up more than tenfold,
+on 16 cores or 1,600.
+
+Splitting into more, smaller tasks buys real gains up to a point,
+since finer chunks even out the load across workers, as described above.
+Past that point, though,
+each additional task adds its own slice of the same serial overhead:
+one more chunk to pickle, one more result to collect.
+Once that added overhead outweighs the smaller pieces it produces,
+the curve stops falling.
+This ceiling is not specific to `ProcessPoolExecutor`, or even to Python;
+it applies to any system that divides work across independent workers,
+which is why adding cores is not, by itself, a scaling strategy.
+
 ## The GIL and Free Threading
 
 Threads would not have helped in the previous section.
@@ -1567,9 +1592,10 @@ Here are a few of the topics beyond it:
 4.  In `event_loop_boundary.py`,
     change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
     Explain the result using `blocking_the_loop.py`.
-5.  In `async_race.py`, add an `asyncio.Lock()` around the read-modify-write in `increment()`
-    (acquire before reading `counter`, release after writing it back)
-    and confirm `counter` now reaches `400`.
+5.  In `async_locks.py`,
+    replace `lock = asyncio.Lock()` with `lock = asyncio.Semaphore(1)`.
+    Confirm `counter` still reaches `400`,
+    and explain why a semaphore initialized to `1` behaves exactly like a lock.
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     calling `main()` unconditionally, and run it.
     Read the error, then explain it with the import mechanics described in [Parallelism](#parallelism):
