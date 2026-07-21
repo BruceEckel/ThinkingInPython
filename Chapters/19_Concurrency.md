@@ -384,13 +384,13 @@ Nothing propagates, so no `try`/`except*` is needed at the call site.
 
 This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
 For a batch where partial failure is data to examine rather than a reason to stop,
-`return_exceptions=True` collects failures *as values* instead of cancelling whatever is still in flight.
+`return_exceptions=True` collects failures as values instead of cancelling whatever is still in flight.
 A health check across ten services needs all the answers including the errors,
 not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
 Its contract is all-or-cancel.
 Keeping siblings alive past a failure means catching exceptions inside each task yourself.
-Use `TaskGroup` for new code where a failure should stop the batch.
+Use `TaskGroup` where a failure should stop the batch.
 `gather()` provides failure-as-data.
 
 ## Overlapping the Waits
@@ -402,12 +402,12 @@ In the following example, the same price lookup appears twice.
 `io_price()` awaits `asyncio.sleep()` as a stand-in for a network call.
 `cpu_price()` performs computations to represent heavy work.
 A `Meter` records the peak number of tasks in flight at once.
-It is a [context manager](15_Context_Managers.md):
+`Meter` is a [context manager](15_Context_Managers.md):
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
 and `__exit__()` runs even if the body raises an exception:
 
 ```python
-# event_loop_boundary.py
+# peak_concurrency.py
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -468,6 +468,7 @@ The I/O tasks each reach their `await` and suspend,
 so all five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
+
 The event loop overlaps waiting, not computing.
 
 Notice that `asyncio.sleep()` in `io_price` is different from `time.sleep()`.
@@ -1810,11 +1811,11 @@ Here are a few of the topics beyond it:
     where `coroutines` is a list of the same three `fetch()` calls.
     Predict the started/resumed trace and the total run time before running it,
     and explain why this version takes the sum of the three delays.
-3.  In `event_loop_boundary.py`, add a third task function, `mixed_price()`,
+3.  In `peak_concurrency.py`, add a third task function, `mixed_price()`,
     that awaits `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
-4.  In `event_loop_boundary.py`,
+4.  In `peak_concurrency.py`,
     change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
     Explain the result using `blocking_the_loop.py`.
 5.  In `async_locks.py`,
