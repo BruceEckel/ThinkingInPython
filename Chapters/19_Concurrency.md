@@ -1318,6 +1318,38 @@ is most of what concurrency asks of you.
 Processes and subinterpreters genuinely run at once
 (five separate GILs)](_images/concurrency_models)
 
+### Are Threads Still Necessary?
+
+`asyncio` handles I/O-bound work.
+Processes and subinterpreters handle CPU-bound work.
+A fair question follows: does new code ever still need a `threading.Thread`?
+
+It does, but not for the reason threads were once the default choice.
+[I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
+split the world in two at the start of this chapter,
+and neither half needs a thread to structure its concurrency anymore.
+`asyncio` overlaps the waiting.
+A process pool, or [Subinterpreters](#subinterpreters)
+on the standard build with no separate install, overlaps the computing.
+
+What a thread still does better than either is bridge to code that was never written to cooperate with an event loop.
+Most database drivers, most GUI toolkits,
+and plenty of C extensions block the calling thread and expose no `async` entry point.
+Rewriting all of it is not realistic.
+`asyncio.to_thread()`, from [Escaping to a Thread](#escaping-to-a-thread),
+is the standard library's own admission of this.
+Even a program written as `asyncio` from top to bottom keeps a thread pool underneath it,
+because the code it calls into does not share that shape.
+
+A free-threaded interpreter changes the answer,
+but only for code built against that separate install.
+There, a thread can genuinely parallelize CPU-bound work while sharing memory directly,
+paying no pickling cost at all,
+something neither a GIL-bound thread nor a process pool offers.
+On the standard build, a thread's job stays narrower:
+not structuring your own concurrency,
+but not blocking it while you wait on code that structures none of its own.
+
 ## Locks, Semaphores, and Failure Modes
 
 `async_race.py` showed shared mutable state losing updates with no coordination in place,
