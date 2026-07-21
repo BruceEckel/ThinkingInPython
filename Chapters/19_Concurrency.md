@@ -121,9 +121,7 @@ asynchrony allows you to create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
 Instead, control is given to the *event loop* which discovers the next task which is available to run.
-This is captured in two keywords and the `asyncio` library.
-
-Four pieces make up the `asyncio` vocabulary.
+This is captured in two keywords and the `asyncio` library:
 
 1. `async def` defines a *coroutine function*.
    Calling it doesn't run anything but instead returns a *coroutine object*.
@@ -190,6 +188,7 @@ Suspending also registers a wake-up condition with the event loop.
 but a real network request would ask the loop to watch a socket for the reply.
 When the timer fires, the loop resumes that task where it paused,
 just after the `await`.
+
 The three delays make the resumptions visible: c sleeps shortest,
 so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
@@ -299,17 +298,18 @@ asyncio.run(main())
 ```
 
 `tg.create_task()` schedules a task immediately,
-so all six are in flight together, just as under `gather()`.
+so all six are in flight together.
 `c` and `d` raise at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.
+
 Only when every task has finished or been cancelled does the block exit.
 As it exits, it re-raises both failures wrapped in an *exception group*,
 a container for simultaneous failures,
 since more than one task can go down at once.
 The `except*` form catches members of a group by type,
-and iterating `group.exceptions` reaches every member, not just the first.
+and iterating through `group.exceptions` reaches every member.
 
 Keeping the task objects pays off even after a partial failure.
 `a` and `b` already succeeded, and their results are untouched:
@@ -322,8 +322,8 @@ so `task.cancelled()` is `True` for both.
 A partial failure cancels whatever was still in flight.
 It does not erase what already succeeded.
 
-When a failure is data to examine rather than a reason to stop,
-`gather(..., return_exceptions=True)` handles the same six fetches differently:
+When failure is not termination but data,
+`gather(..., return_exceptions=True)` handles the situation differently:
 
 ```python
 # gather_with_exceptions.py
@@ -361,11 +361,10 @@ asyncio.run(main())
 #: f: F
 ```
 
-`c` and `d` fail at the same 0.03-second mark as before,
-but this time nothing stops.
-`e` and `f` are not cancelled:
-`gather()` does not supervise its siblings the way `TaskGroup` does,
-so both keep sleeping and print their `fetched` line right on schedule.
+Again, `c` and `d` fail at the 0.03-second mark, but this time nothing stops.
+`gather()` does not supervise its siblings the way `TaskGroup` does.
+`e` and `f` are not cancelled.
+Both keep sleeping and eventually print their `fetched` line.
 `return_exceptions=True` catches both `ValueError`s and places them in the result list,
 in argument order, alongside the successful results.
 Nothing propagates, so no `try`/`except*` is needed at the call site.
@@ -373,15 +372,13 @@ Nothing propagates, so no `try`/`except*` is needed at the call site.
 This is the trade `gather()` offers instead of `TaskGroup`'s all-or-cancel contract.
 For a batch where partial failure is data to examine rather than a reason to stop,
 `return_exceptions=True` collects failures *as values* instead of cancelling whatever is still in flight.
-A health check across ten services wants all the answers including the errors,
+A health check across ten services needs all the answers including the errors,
 not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
-Its contract is all-or-cancel,
-and keeping siblings alive past a failure means catching exceptions inside each task yourself.
-For new code where a failure should stop the batch,
-`TaskGroup` is the sound default.
-`gather()` remains the compact happy-path form,
-and the only form for failure-as-data.
+Its contract is all-or-cancel.
+Keeping siblings alive past a failure means catching exceptions inside each task yourself.
+Use `TaskGroup` for new code where a failure should stop the batch.
+`gather()` provides failure-as-data.
 
 ## Overlapping the Waits
 
