@@ -190,6 +190,22 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   gaps between competing deadlines (0.01/0.05/0.25), widest where a
   cancellation must propagate, and treat any `git diff` on a timing
   marker as a red flag to investigate, not drift to accept.
+- **Thousands of live `asyncio` tasks in one process can wedge Windows'
+  `ProactorEventLoop` for every later `asyncio.run()` call in that process.**
+  Chapter 19's `task_vs_thread_memory.py` used to create and cancel 20,000
+  tasks. Run standalone (its own process, one `asyncio.run()` ever), that's
+  instant. Run through `validate_output.py` (which execs every chapter's
+  blocks, including every later `asyncio.run()` block, in one process), it
+  triggered a storm of `RuntimeError: loop ... is not the running loop`,
+  one per orphaned task, that took minutes to print and looked exactly like
+  a hang — the `KeyboardInterrupt`s a human sends to escape it then get
+  misattributed to whatever line happened to be executing next, in that or
+  a later chapter. Bisected the threshold on this machine: 15,000 tasks ran
+  clean, 20,000 didn't. Fixed by dropping `TASKS` to 5,000, comfortably under
+  the cliff. If a future example needs a large task count again, verify it
+  through `validate_output.py` on the real chapter file (not a standalone
+  script run), since only the multi-`asyncio.run()`-per-process path
+  reproduces this.
 - **`validate_output.py` on the whole tree can leak `__del__` output between
   chapters.** It `exec()`s every block's code against a fresh `namespace` dict
   reused as that block's globals. A class defined there forms a reference

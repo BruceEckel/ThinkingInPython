@@ -1432,7 +1432,7 @@ import asyncio
 import threading
 import tracemalloc
 
-TASKS = 20_000
+TASKS = 5_000
 STACK_SIZE = 1024 * 1024  # 1 MiB, a common thread stack reservation
 
 async def parked() -> None:
@@ -1469,19 +1469,19 @@ print(f"average bytes per task: {task_cost:.0f}")
 print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: one thread's stack reservation: 1,048,576 bytes
-#: average bytes per task: 1353
-#: tasks fitting in one thread's stack: 775
+#: average bytes per task: 1350
+#: tasks fitting in one thread's stack: 777
 #: holds over 200 tasks: True
 ```
 
-`bytes_per_task()` creates 20,000 tasks that immediately suspend on `asyncio.sleep(999)`,
+`bytes_per_task()` creates 5,000 tasks that immediately suspend on `asyncio.sleep(999)`,
 so they stay alive doing nothing.
 This tells us the heap growth using `tracemalloc`.
 `threading.stack_size()` is read, set, read again, then restored,
 so the measurement leaves the rest of the program untouched.
 One thread's reserved stack,
 paid before it runs a single line of its target function,
-could instead hold roughly 775 suspended tasks.
+could instead hold roughly 777 suspended tasks.
 The stack figure is a reservation,
 address space set aside whether every byte is touched or not.
 The task figure is heap `tracemalloc` actually measured.

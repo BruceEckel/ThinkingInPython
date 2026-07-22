@@ -3,7 +3,7 @@ import asyncio
 import threading
 import tracemalloc
 
-TASKS = 20_000
+TASKS = 5_000
 STACK_SIZE = 1024 * 1024  # 1 MiB, a common thread stack reservation
 
 async def parked() -> None:
@@ -40,6 +40,6 @@ print(f"average bytes per task: {task_cost:.0f}")
 print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: one thread's stack reservation: 1,048,576 bytes
-#: average bytes per task: 1353
-#: tasks fitting in one thread's stack: 775
+#: average bytes per task: 1350
+#: tasks fitting in one thread's stack: 777
 #: holds over 200 tasks: True
