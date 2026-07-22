@@ -821,37 +821,53 @@ which is why adding cores is not, by itself, a scaling strategy.
 
 ## The GIL and Free Threading
 
-Threads would not have helped in the previous section.
+Threads don't help the previous section.
 The standard CPython build has a *Global Interpreter Lock* (GIL).
-Only one thread runs Python bytecode at a time,
+With the GIL, only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
-A thread releases the GIL while it waits on I/O. That single fact decides what a thread pool is good for.
-Both halves, the waiting and the computing, are worth demonstrating.
-The waiting half first.
+
+However, a thread releases the GIL while it waits on I/O. That release is why a thread pool helps with I/O-bound work.
+The next two examples make that concrete, one for waiting and one for computing.
+Both use the same harness,
+which runs a price function sequentially and threaded, confirms they agree,
+and times each:
+
+```python
+# thread_compare.py
+import timeit
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+
+def compare(
+    price: Callable[[int], int], orders: list[int], number: int
+) -> tuple[float, float]:
+    def sequential() -> list[int]:
+        return [price(o) for o in orders]
+
+    def threaded() -> list[int]:
+        with ThreadPoolExecutor() as pool:
+            return list(pool.map(price, orders))
+
+    assert threaded() == sequential()
+    t_seq = timeit.timeit(sequential, number=number)
+    t_thr = timeit.timeit(threaded, number=number)
+    return t_seq, t_thr
+```
+
 Here `time.sleep()` stands in for a blocking network call,
 and five threads overlap five of those waits even with the GIL in place:
 
 ```python
 # io_threads.py
 import time
-import timeit
-from concurrent.futures import ThreadPoolExecutor
+from thread_compare import compare
 
 def io_price(order: int) -> int:
-    time.sleep(0.05)  # Waiting outside the processor
+    time.sleep(0.05)  # Stand-in for I/O
     return order * 10
 
-def sequential(orders: list[int]) -> list[int]:
-    return [io_price(o) for o in orders]
-
-def threaded(orders: list[int]) -> list[int]:
-    with ThreadPoolExecutor() as pool:
-        return list(pool.map(io_price, orders))
-
 orders = [1, 2, 3, 4, 5]
-assert threaded(orders) == sequential(orders)
-t_seq = timeit.timeit(lambda: sequential(orders), number=1)
-t_thr = timeit.timeit(lambda: threaded(orders), number=1)
+t_seq, t_thr = compare(io_price, orders, number=1)
 print(f"threads at least 3x faster on I/O: {t_thr * 3 < t_seq}")
 #: threads at least 3x faster on I/O: True
 ```
@@ -862,19 +878,17 @@ so the operating system runs another thread while it waits,
 the same overlap `asyncio` achieved with suspended tasks.
 This is `blocking_the_loop.py` turned inside out:
 a blocking call freezes an event loop,
-but a pool of threads absorbs blocking calls,
-which is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
-Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the surgery;
+but a pool of threads absorbs blocking calls.
+This is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
+Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the surgery.
 `asyncio` pays off when you have thousands of waits,
 since tasks are far lighter than threads.
 
-Computing is the other half, and it turns the result around.
-A thread that is computing never releases the GIL for another thread to run:
+In contrast, a thread that is computing never releases the GIL for another thread to run:
 
 ```python
 # gil_threads.py
-import timeit
-from concurrent.futures import ThreadPoolExecutor
+from thread_compare import compare
 
 def cpu_price(order: int) -> int:
     total = 0
@@ -882,36 +896,23 @@ def cpu_price(order: int) -> int:
         total += 1
     return order * 10
 
-def sequential(orders: list[int]) -> list[int]:
-    return [cpu_price(o) for o in orders]
-
-def threaded(orders: list[int]) -> list[int]:
-    with ThreadPoolExecutor() as pool:
-        return list(pool.map(cpu_price, orders))
-
 orders = [1, 2, 3, 4, 5]
-assert threaded(orders) == sequential(orders)
-
-t_seq = timeit.timeit(lambda: sequential(orders), number=5)
-t_thr = timeit.timeit(lambda: threaded(orders), number=5)
+t_seq, t_thr = compare(cpu_price, orders, number=5)
 print(f"threads no faster: {t_thr > t_seq * 0.9}")
 #: threads no faster: True
 ```
 
 Swapping the loop for a thread pool changes nothing.
 Five threads still take turns holding the one GIL,
-so `threaded()` costs the same as `sequential()`, sometimes a little more,
-from the added scheduling.
+so the threaded run costs the same as the sequential one,
+sometimes a little more because of the added scheduling.
 This is why [Parallelism](#parallelism) used processes instead.
-Each process gets its own interpreter, and so its own GIL.
-
-The GIL needs more than a definition,
-because it is misunderstood in both directions.
-It is not a design mistake, and it does not make threaded code safe.
-The rest of this section condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL).
-That repository includes a short book that covers each topic in depth.
+Each process gets its own interpreter with its own GIL.
 
 ### Why Python Has a GIL
+
+> This condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL),
+> which includes a short book that covers each topic in depth.
 
 The GIL is the consequence of three earlier decisions.
 Each was reasonable on its own.
@@ -919,9 +920,11 @@ In 1990, Python adopted *reference counting* for memory management.
 Every object carries a count of the references to it.
 When the count reaches zero, the object is freed immediately.
 This gave Python deterministic cleanup with no collector pauses.
-It also planted a cost.
+
+It also added a cost.
 Every count update is a read-modify-write sequence,
 and updates happen millions of times per second.
+
 In 1991, the C API exposed those counts directly to extension authors.
 Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
 In exchange, reference counting became part of the compiled binary interface.
@@ -934,6 +937,7 @@ One interpreter-wide lock was the cheapest fix that fit the three earlier decisi
 It made every count update, every dict and list mutation,
 and every existing extension safe at once.
 Single-threaded code paid almost nothing.
+
 Every alternative undid one of the earlier decisions.
 Atomic count updates slow every program to benefit a few.
 A 1996 patch tried fine-grained locks and ran single-threaded code about twice as slow.
@@ -947,9 +951,9 @@ and the per-interpreter GIL of the next section in 2023.
 
 ### The GIL Does Not Prevent Races
 
-The lock protects the interpreter, not your program.
-Reference counts stay consistent,
+The lock ensures that reference counts stay consistent,
 dictionaries never corrupt their internal structure, and imports do not collide.
+
 Your shared state gets no such protection.
 The statement `counter += 1` compiles to separate bytecode instructions:
 
@@ -963,12 +967,14 @@ STORE_GLOBAL    counter  # Write the result back
 The GIL can move to another thread between instructions.
 When two threads both read before either writes, they compute the same result,
 and one increment vanishes.
+
 Since 3.11 the interpreter only switches threads at a function call or at the jump that closes a loop iteration,
 so this particular sequence is no longer interrupted in practice.
 That is scheduling luck, not safety.
+
 Any function call between the read and the write reopens the gap.
-Here the call is a one-microsecond `time.sleep()`, a blocking call,
-and blocking calls release the GIL:
+Here the call is a one-microsecond `time.sleep()`, which is a blocking call.
+Blocking calls release the GIL:
 
 ```python
 # gil_race.py
@@ -1001,15 +1007,15 @@ A typical run lands near 50.
 Each sleep releases the GIL between a read and its write,
 so all eight threads read the same value,
 and their eight writes store the same result.
+
 At full speed, with no deliberate sleep, the GIL made this race rare.
-It never made it impossible.
+But it never made it impossible.
 Threads that share mutable state need a lock,
-or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues),
-on every build of Python.
+or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
 
 ### Free Threading
 
-Since 3.13, CPython also ships as a *free-threaded* build,
+Since 3.13, CPython also provides a *free-threaded* build,
 tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 (`python3.15t` rather than `python3.15`).
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
@@ -1041,17 +1047,18 @@ and each release narrows it.
 
 Removing the lock also removed three decades of accidental protection for C extensions,
 which were written assuming that only one thread runs at a time.
-The free-threaded build ships with a safety net.
+The free-threaded build comes with a safety net.
 Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning.
 Free threading pays off only when every extension you load has been audited,
 so check compatibility before switching a project.
 
-It also rewards a particular shape of program.
+Free threading also rewards a particular program shape.
 Threads that mostly work on data they do not share, like `threaded()` above,
 scale across cores.
 The same is true of threads that accumulate results locally and merge them once at the end,
 caches that are read far more often than written,
 and pipeline stages connected by queues.
+
 Fine-grained sharing loses.
 A counter with a lock around every increment serializes the threads all over again,
 and adds lock overhead the GIL never charged.
@@ -1059,8 +1066,7 @@ On a free-threaded interpreter, threads alone are enough for CPU-bound work,
 and they share memory directly,
 without a process pool's pickling between processes.
 A free-threaded interpreter is one way off the standard build's limits.
-The next section covers another,
-and it runs on the standard build you already have.
+The next section covers another, and it runs on the standard build.
 
 ## Subinterpreters
 
@@ -1598,7 +1604,7 @@ no way to force a task to give up what it holds,
 and a cycle of tasks each waiting on the next.
 Break any one of the four and deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
-so we can easily produce dealock with `asyncio`.
+so we can easily produce deadlock with `asyncio`.
 Here, there are two tasks and two `asyncio.Lock` objects.
 The two locks are acquired in opposite order:
 
