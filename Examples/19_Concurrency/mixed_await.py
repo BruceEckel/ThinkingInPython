@@ -4,11 +4,11 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 
 async def io_price(order: int) -> int:
-    await asyncio.sleep(0.05)  # A native coroutine
+    await asyncio.sleep(0.05)  # Native coroutine
     return order * 10
 
 def blocking_price(order: int) -> int:
-    time.sleep(0.05)  # A blocking call, needs a thread
+    time.sleep(0.05)  # Blocking call, needs a thread
     return order * 10
 
 def cpu_price(order: int) -> int:

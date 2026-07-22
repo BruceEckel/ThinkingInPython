@@ -33,7 +33,8 @@ its stack frame is popped and execution jumps back to the return address.
 (The return value typically travels back in a CPU register.)
 Thus it is essential that each thread own its call stack.
 
-Neither one starts at a fixed size, though they grow in different ways.
+Neither the heap nor the stack starts at a fixed size,
+though they grow in different ways.
 The heap has no space reserved for it in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
@@ -464,7 +465,7 @@ A task uses that object as a context manager,
 writing `with meter:` around its own active span.
 
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
-The I/O tasks each reach their `await`, at which point that tasks suspends.
+The I/O tasks each reach their `await`, at which point that task suspends.
 All five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
@@ -892,7 +893,7 @@ from thread_compare import compare
 
 def cpu_price(order: int) -> int:
     total = 0
-    for _ in range(1_000_000):  # Working inside the processor
+    for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
 
@@ -911,8 +912,7 @@ Each process gets its own interpreter with its own GIL.
 
 ### Why Python Has a GIL
 
-*(This condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL),
-which includes a short book that covers each topic in depth.)*
+*(This condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL), which includes a short book that covers each topic in depth.)*
 
 The GIL is the consequence of three earlier decisions.
 Each was reasonable on its own.
@@ -978,8 +978,8 @@ Blocking calls release the GIL:
 
 ```python
 # gil_race.py
-import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 counter = 0
 
@@ -990,14 +990,8 @@ def increment(count: int) -> None:
         time.sleep(0.000_001)  # Let other threads run
         counter = value + 1  # Write back
 
-threads = [
-    threading.Thread(target=increment, args=(50,))
-    for _ in range(8)
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+with ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(increment, [50] * 8))
 print(f"lost updates: {counter < 8 * 50}")
 #: lost updates: True
 ```
@@ -1041,9 +1035,9 @@ since it removes the one atomic operation every thread would otherwise contest.
 Their counts never change.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
-Single-threaded code still pays a small penalty for this machinery,
+Single-threaded code pays a small penalty for this machinery,
 roughly five to fifteen percent depending on the workload,
-and each release narrows it.
+but this should improve in future releases.
 
 Removing the lock also removed three decades of accidental protection for C extensions,
 which were written assuming that only one thread runs at a time.
@@ -1065,20 +1059,19 @@ and adds lock overhead the GIL never charged.
 On a free-threaded interpreter, threads alone are enough for CPU-bound work,
 and they share memory directly,
 without a process pool's pickling between processes.
-A free-threaded interpreter is one way off the standard build's limits.
-The next section covers another, and it runs on the standard build.
 
 ## Subinterpreters
 
-Each worker in a process pool gets its own interpreter, and so its own GIL.
-That is the source of the parallelism.
-The cost is a whole operating-system process per worker.
+Subinterpreters work on standard Python, and do not need free threading.
+[Parallelism](#parallelism)'s process pool's speedup comes from giving each worker its own interpreter and thus its own GIL,
+but pays for it with an operating-system process per worker.
 
 Since 3.12, CPython can create additional interpreters inside the same process
-([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL.
-`InterpreterPoolExecutor` (added in 3.14) runs each call in one of these,
-so multiple interpreters, each with its own lock, truly run at once,
-without leaving the process:
+([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL,
+avoiding the per-worker process cost.
+`InterpreterPoolExecutor` (added in 3.14)
+runs each call in one of these subinterpreters.
+Within a single process, multiple interpreters run in parallel:
 
 ```python
 # subinterpreters.py
@@ -1087,7 +1080,7 @@ from concurrent.futures import InterpreterPoolExecutor
 
 def cpu_price(order: int) -> int:
     total = 0
-    for _ in range(1_000_000):  # Working inside the processor
+    for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
 
@@ -1110,13 +1103,10 @@ print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
 
 Unlike a thread pool, this genuinely overlaps computation.
 Each worker interpreter holds its own GIL,
-so five of them run on five cores at once instead of taking turns.
-
-Unlike a process pool, there is only one process,
-so starting a worker is cheaper than starting a new interpreter process.
+so several of them run on separate cores at once instead of taking turns.
 The interpreters share the process's memory,
-but each keeps its own isolated objects,
-so arguments and results still cross that boundary by copying.
+but each keeps its own isolated objects.
+Arguments and results cross that boundary by copying.
 
 A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
@@ -1128,38 +1118,27 @@ but a C extension must support per-interpreter isolation to be imported in a sub
 
 When threads divide up work, the danger is shared mutable state.
 The standard solution is a thread-safe queue that hands each item to a single consumer,
-with the locking built in.
+with builtin locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
-(the threaded form of [Performance](18_Performance.md)'s `heapq`)
-always hands out the smallest item:
+(the threaded form of `heapq` seen in [Performance](18_Performance.md))
+always produces the smallest item:
 
 ```python
 # priority_queue.py
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from queue import PriorityQueue
 
 type Job = tuple[int, str]  # (priority, description)
 
 tasks: PriorityQueue[Job] = PriorityQueue()
 
-def submit(jobs: list[Job]) -> None:
+def enqueue(jobs: list[Job]) -> None:
     for job in jobs:
         tasks.put(job)
 
-threads = [
-    threading.Thread(
-        target=submit,
-        args=([(3, "backup"), (1, "page oncall")],),
-    ),
-    threading.Thread(
-        target=submit,
-        args=([(2, "rotate logs"), (1, "alert")],),
-    ),
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+with ThreadPoolExecutor(max_workers=2) as pool:
+    pool.submit(enqueue, [(3, "backup"), (1, "page oncall")])
+    pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")])
 
 while not tasks.empty():
     print(tasks.get())
@@ -1174,19 +1153,19 @@ but the drain comes out in priority order no matter who won each race.
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 
-This producer-consumer shape,
-producers calling `put()` and consumers calling `get()`,
-is how thread pools distribute work,
-and `get()` blocks until an item is available, so an idle consumer simply waits.
+Producers calling `put()` and consumers calling `get()` is how thread pools distribute work.
+`get()` blocks until an item is available, so an idle consumer simply waits.
 The [Object Pool](15_Context_Managers.md#an-object-pool)
 in Context Managers uses the same `Queue` as a throttle.
 
-`while not tasks.empty()` is trustworthy here only because both producers have already been joined,
-so nothing can add or remove an item after `empty()` answers.
-While other threads are still running,
-`empty()` reports a moment that may already be over.
-A live consumer does not poll `empty()`;
-it calls `get()` and lets the block do the waiting.
+`while not tasks.empty()` is trustworthy here only because the `with` block already waited for both producers to finish before it exited,
+so nothing can add or remove an item while this loop runs.
+
+That guarantee is specific to this listing.
+While other threads are still adding or removing items,
+`empty()`'s answer can be true the instant it returns and already wrong by the time the loop acts on it.
+A live consumer does not poll `empty()` at all;
+it calls `get()` directly and lets the block do the waiting.
 
 Python provides three queue classes with near-identical interfaces,
 the first two of which we've already seen:
@@ -1226,8 +1205,11 @@ asyncio.run(main())
 so `get()` suspends it rather than blocking the thread underneath it.
 `producer` then runs, sleeps to stand in for slow work, and puts an item,
 which wakes the waiting `consumer`.
-`asyncio.Queue` contains no locks and is not thread-safe,
-because a single-threaded event loop needs neither.
+`asyncio.Queue` needs no locks,
+since the event loop lets only one coroutine touch it at a time.
+That guarantee holds only within the event loop's own thread.
+Call it from another thread and nothing protects it,
+which is why the class is not thread-safe.
 
 The similar queue interfaces hide a consequential difference.
 `queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
@@ -1241,7 +1223,7 @@ Match the queue to the concurrency model.
 
 Every section so far has kept threads, processes, subinterpreters,
 and `asyncio` apart.
-Blending them without knowing which parts are compatible produce races and pickling errors.
+Blending them without knowing which parts are compatible produces races and pickling errors.
 Two real points of convergence exist in the standard library, though,
 not because the models are secretly the same,
 but because two small pieces of them genuinely are.
@@ -1283,21 +1265,20 @@ if __name__ == "__main__":
     print(all(r == results[0] for r in results))
 ```
 
-`run_on()` never mentions which backend it received,
-only the shape every `Executor` shares.
-Underneath, the three workers could not be more different, an OS thread,
-an OS process, a subinterpreter.
+`run_on()` accepts the base type `Executor`, so it takes all three subtypes:
+an OS thread, an OS process, a subinterpreter.
 
 `asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
-A coroutine is the opposite shape,
-a suspended function the event loop resumes on its own schedule.
+A coroutine does the opposite.
+It is a suspended function that runs only when the event loop resumes it.
 
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
-and a `run_in_executor()` call all produce the same thing an `async def` can wait on,
-so `TaskGroup`, from [Structured Concurrency with TaskGroup](#structured-concurrency-with-taskgroup),
-does not care which kind of task it is holding either:
+and a `run_in_executor()` call all produce an *awaitable*,
+the same thing an `async def` can wait on.
+[`TaskGroup`](#structured-concurrency-with-taskgroup)
+does not care which kind of task it is holding, either:
 
 ```python
 # mixed_await.py
@@ -1415,10 +1396,10 @@ It does not change what `asyncio` is for.
 
 The claim that a thread costs real memory while a task costs much less is supportable.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
-A common default across platforms is on the order of one mebibyte.[^A memibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
+A common default across platforms is on the order of one mebibyte.[^A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` can measure a task's actual heap footprint directly,
 since a task is nothing more than ordinary Python objects.
-We can calculate the ration between the two:
+We can calculate the ratio between the two:
 
 ```python
 # task_vs_thread_memory.py
@@ -1615,10 +1596,10 @@ asyncio.run(main())
 Five tasks start together,
 but `semaphore` admits only two into the sleep at once.
 `peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
-Unlike the threaded version of this example,
-`active` and `peak` need no lock of their own:
-nothing else runs between `active += 1` and `peak = max(peak, active)`,
-since neither line contains an `await`.
+A threaded equivalent of this worker would need its own lock around `active += 1` and `peak = max(peak, active)`,
+since a preemptive switch could land between them.
+Here, neither line contains an `await`,
+so nothing else runs between them and no lock is needed.
 
 A semaphore initialized to 1 behaves exactly like a lock;
 raising the count is what turns it into a throttle on a limited resource,
@@ -1782,7 +1763,7 @@ Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
 *Concurrent* means "operating or occurring at the same time."
-Both asyncrony and parallelism fit.
+Both asynchrony and parallelism fit.
 
 Someone who declares that "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
 This chapter makes concurrency look easy because it has only touched the surface of shared mutable state problems.

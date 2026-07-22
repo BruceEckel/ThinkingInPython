@@ -1,6 +1,6 @@
 # gil_race.py
-import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 counter = 0
 
@@ -11,13 +11,7 @@ def increment(count: int) -> None:
         time.sleep(0.000_001)  # Let other threads run
         counter = value + 1  # Write back
 
-threads = [
-    threading.Thread(target=increment, args=(50,))
-    for _ in range(8)
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+with ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(increment, [50] * 8))
 print(f"lost updates: {counter < 8 * 50}")
 #: lost updates: True
