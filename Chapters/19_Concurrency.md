@@ -1189,16 +1189,16 @@ A live consumer does not poll `empty()`;
 it calls `get()` and lets the block do the waiting.
 
 Python provides three queue classes with near-identical interfaces,
-and this chapter has used two of them:
+the first two of which we've already seen:
 
 - `queue.Queue` (and its sibling `PriorityQueue`)
   coordinates threads within one interpreter,
   protecting its internals with locks.
 - `multiprocessing.Queue`, seen in `multiprocessing_raw.py`,
   carries items across process boundaries by pickling them.
+- `asyncio.Queue`, which coordinates tasks on an event loop.
 
-The third is `asyncio.Queue`, which coordinates tasks on an event loop.
-Its `await queue.get()` suspends the calling task instead of blocking the thread:
+`asyncio.Queue` has an `await queue.get()` that suspends the calling task instead of blocking the thread:
 
 ```python
 # async_queue.py
@@ -1228,9 +1228,10 @@ so `get()` suspends it rather than blocking the thread underneath it.
 which wakes the waiting `consumer`.
 `asyncio.Queue` contains no locks and is not thread-safe,
 because a single-threaded event loop needs neither.
-The similar interfaces hide a consequential difference.
-The first two block the calling thread while they wait.
-The third suspends a task.
+
+The similar queue interfaces hide a consequential difference.
+`queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
+`asyncio.Queue` suspends a task instead.
 As `blocking_the_loop.py` showed,
 a blocked thread freezes every task on an event loop,
 while a suspended task lets the rest keep running.
@@ -1239,8 +1240,8 @@ Match the queue to the concurrency model.
 ## One Task, Many Backends
 
 Every section so far has kept threads, processes, subinterpreters,
-and `asyncio` apart on purpose.
-Blending them without knowing which parts are compatible is how races and pickling errors happen.
+and `asyncio` apart.
+Blending them without knowing which parts are compatible produce races and pickling errors.
 Two real points of convergence exist in the standard library, though,
 not because the models are secretly the same,
 but because two small pieces of them genuinely are.
@@ -1249,7 +1250,7 @@ The first is `concurrent.futures.Executor`.
 `ThreadPoolExecutor`, `ProcessPoolExecutor`,
 and `InterpreterPoolExecutor` are not just similar.
 They all subclass `Executor` and inherit `submit()` and `map()` from it.
-A function written against that base class runs unmodified on any of them:
+A function written against that base class runs unmodified on all three:
 
 ```python
 # any_executor.py
@@ -1262,7 +1263,7 @@ from concurrent.futures import (
 
 def cpu_price(order: int) -> int:
     total = 0
-    for _ in range(1_000_000):  # Working inside the processor
+    for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
 
@@ -1270,7 +1271,7 @@ def run_on(executor: Executor, orders: list[int]) -> list[int]:
     with executor:
         return list(executor.map(cpu_price, orders))
 
-def main() -> None:
+if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
     backends: list[Executor] = [
         ThreadPoolExecutor(),
@@ -1280,23 +1281,18 @@ def main() -> None:
     results = [run_on(b, orders) for b in backends]
     print(results[0])
     print(all(r == results[0] for r in results))
-
-if __name__ == "__main__":
-    main()
 ```
 
 `run_on()` never mentions which backend it received,
 only the shape every `Executor` shares.
-Passing the same five orders through all three prints the identical `[10, 20, 30, 40, 50]`,
-then `True` for the check that all three answers matched.
 Underneath, the three workers could not be more different, an OS thread,
-an OS process, a subinterpreter, but `run_on()` cannot see that,
-and does not need to.
+an OS process, a subinterpreter.
 
-`asyncio` has no seat at that table.
+`asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
 A coroutine is the opposite shape,
 a suspended function the event loop resumes on its own schedule.
+
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
 and a `run_in_executor()` call all produce the same thing an `async def` can wait on,
@@ -1310,11 +1306,11 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 
 async def io_price(order: int) -> int:
-    await asyncio.sleep(0.05)  # A native coroutine
+    await asyncio.sleep(0.05)  # Native coroutine
     return order * 10
 
 def blocking_price(order: int) -> int:
-    time.sleep(0.05)  # A blocking call, needs a thread
+    time.sleep(0.05)  # Blocking call, needs a thread
     return order * 10
 
 def cpu_price(order: int) -> int:

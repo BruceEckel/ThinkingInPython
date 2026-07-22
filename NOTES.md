@@ -1,3 +1,8 @@
+"is how" "happen"
+
+if __name__ == "__main__":
+    main()
+
 Look through chapter 19 for words or phrasing that is confusing, odd, or out-of-character.
 My goal is:
 - Simple, plain, clear explanations
