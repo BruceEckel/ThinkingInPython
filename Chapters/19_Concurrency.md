@@ -732,7 +732,7 @@ from concurrent.futures import ProcessPoolExecutor
 def work_chunk(n: int) -> int:
     total = 0
     for i in range(n):
-        total += i * i
+        total += i * i  # CPU-intensive
     return total
 
 def timed_split(
@@ -802,21 +802,20 @@ if __name__ == "__main__":
     main()
 ```
 
-`work_chunk()` is deliberately simple looping.
 The only difference between one run and another is how finely the total work gets split.
-The pool is created once and warmed up with a throwaway call before any measurement starts,
-the same discipline `timeit` needs around any one-time setup cost.
-This way, process startup delays never leak into a timed result.
 
+The pool is created once and warmed up with a throwaway call before any measurement starts.
+This way, process startup delays never leak into a timed result.
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
+
 Wall time drops sharply as the split grows from one task to one task per core,
 then keeps dropping a little past that point as smaller,
 more numerous chunks balance the load better across workers,
 before flattening out.
 
-The defaults above finish quickly, small enough for a full `make verify` run.
-`--auto` trades that speed for a fuller picture: it raises the total workload,
+The default version finishes quickly to support fast testing.
+`--auto` raises the total workload,
 sweeps task counts by doubling up to twice the core count,
 and draws the result as a bar for each count.
 One run on a 32-core machine produced this:
