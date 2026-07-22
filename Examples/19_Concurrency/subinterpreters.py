@@ -16,7 +16,7 @@ t_seq = timeit.timeit(lambda: sequential(orders), number=5)
 
 with InterpreterPoolExecutor() as pool:
     parallel = list(pool.map(cpu_price, orders))
-    assert parallel == sequential(orders)  # Also starts the workers
+    assert parallel == sequential(orders)
     t_sub = timeit.timeit(
         lambda: list(pool.map(cpu_price, orders)), number=5
     )

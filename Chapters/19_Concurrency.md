@@ -1073,6 +1073,7 @@ The next section covers another, and it runs on the standard build.
 Each worker in a process pool gets its own interpreter, and so its own GIL.
 That is the source of the parallelism.
 The cost is a whole operating-system process per worker.
+
 Since 3.12, CPython can create additional interpreters inside the same process
 ([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL.
 `InterpreterPoolExecutor` (added in 3.14) runs each call in one of these,
@@ -1098,7 +1099,7 @@ t_seq = timeit.timeit(lambda: sequential(orders), number=5)
 
 with InterpreterPoolExecutor() as pool:
     parallel = list(pool.map(cpu_price, orders))
-    assert parallel == sequential(orders)  # Also starts the workers
+    assert parallel == sequential(orders)
     t_sub = timeit.timeit(
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
@@ -1110,11 +1111,13 @@ print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
 Unlike a thread pool, this genuinely overlaps computation.
 Each worker interpreter holds its own GIL,
 so five of them run on five cores at once instead of taking turns.
+
 Unlike a process pool, there is only one process,
 so starting a worker is cheaper than starting a new interpreter process.
 The interpreters share the process's memory,
 but each keeps its own isolated objects,
 so arguments and results still cross that boundary by copying.
+
 A subinterpreter needs no separate build and no separate install,
 which makes it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
@@ -1124,12 +1127,11 @@ but a C extension must support per-interpreter isolation to be imported in a sub
 ## Coordinating Threads with Queues
 
 When threads divide up work, the danger is shared mutable state.
-The `queue` module packages the standard answer:
-a thread-safe queue that hands each item to a single consumer,
+The standard solution is a thread-safe queue that hands each item to a single consumer,
 with the locking built in.
-`queue.Queue` is first-in, first-out, while `queue.PriorityQueue`,
-the threaded form of [Performance](18_Performance.md)'s `heapq`,
-always hands out the smallest item present:
+`queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
+(the threaded form of [Performance](18_Performance.md)'s `heapq`)
+always hands out the smallest item:
 
 ```python
 # priority_queue.py
@@ -1168,8 +1170,10 @@ while not tasks.empty():
 ```
 
 The four jobs arrive from two threads in an unpredictable interleaving,
-but the drain comes out in priority order no matter who won each race,
-with equal priorities ordered by the tuple's second field.
+but the drain comes out in priority order no matter who won each race.
+When two jobs share a priority,
+tuple comparison falls through to the second field, the description string.
+
 This producer-consumer shape,
 producers calling `put()` and consumers calling `get()`,
 is how thread pools distribute work,
@@ -1177,7 +1181,6 @@ and `get()` blocks until an item is available, so an idle consumer simply waits.
 The [Object Pool](15_Context_Managers.md#an-object-pool)
 in Context Managers uses the same `Queue` as a throttle.
 
-One caution before copying the drain loop:
 `while not tasks.empty()` is trustworthy here only because both producers have already been joined,
 so nothing can add or remove an item after `empty()` answers.
 While other threads are still running,
@@ -1185,20 +1188,53 @@ While other threads are still running,
 A live consumer does not poll `empty()`;
 it calls `get()` and lets the block do the waiting.
 
-This chapter has now used two queues that share an interface but not a home,
-and a third exists.
-`queue.Queue` locks between threads in one interpreter.
-`multiprocessing.Queue`, in `multiprocessing_raw.py`,
-pickles items across process boundaries.
-`asyncio.Queue` belongs on the event loop:
-`await queue.get()` suspends the task instead of blocking the thread,
-and it is not thread-safe at all,
-because the single-threaded loop needs no locking.
+Python provides three queue classes with near-identical interfaces,
+and this chapter has used two of them:
+
+- `queue.Queue` (and its sibling `PriorityQueue`)
+  coordinates threads within one interpreter,
+  protecting its internals with locks.
+- `multiprocessing.Queue`, seen in `multiprocessing_raw.py`,
+  carries items across process boundaries by pickling them.
+
+The third is `asyncio.Queue`, which coordinates tasks on an event loop.
+Its `await queue.get()` suspends the calling task instead of blocking the thread:
+
+```python
+# async_queue.py
+import asyncio
+
+async def consumer(queue: asyncio.Queue[str]) -> None:
+    item = await queue.get()  # Suspends until an item arrives
+    print(f"consumed {item}")
+
+async def producer(queue: asyncio.Queue[str]) -> None:
+    await asyncio.sleep(0.01)  # Stand-in for slow work
+    await queue.put("data")
+
+async def main() -> None:
+    queue: asyncio.Queue[str] = asyncio.Queue()
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(consumer(queue))
+        tg.create_task(producer(queue))
+
+asyncio.run(main())
+#: consumed data
+```
+
+`consumer` starts first and finds the queue empty,
+so `get()` suspends it rather than blocking the thread underneath it.
+`producer` then runs, sleeps to stand in for slow work, and puts an item,
+which wakes the waiting `consumer`.
+`asyncio.Queue` contains no locks and is not thread-safe,
+because a single-threaded event loop needs neither.
+The similar interfaces hide a consequential difference.
+The first two block the calling thread while they wait.
+The third suspends a task.
+As `blocking_the_loop.py` showed,
+a blocked thread freezes every task on an event loop,
+while a suspended task lets the rest keep running.
 Match the queue to the concurrency model.
-The interfaces look alike,
-but the first two block the calling thread while the third suspends a task,
-and as `blocking_the_loop.py` showed,
-a blocked thread and a suspended task are very different events on an event loop.
 
 ## One Task, Many Backends
 
