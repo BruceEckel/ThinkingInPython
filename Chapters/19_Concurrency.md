@@ -716,18 +716,13 @@ and watch what happens once task count passes the number of cores:
 
 ```python
 # task_scaling.py
-"""
-Split a fixed workload across a growing number of
-tasks and time each split on a warm pool.
-
-    python task_scaling.py
-    python task_scaling.py --total 200_000_000 --max-tasks 128
-    python task_scaling.py --auto
-"""
-import argparse
 import os
 import time
 from concurrent.futures import ProcessPoolExecutor
+from typing import Final
+
+TOTAL: Final[int] = 20_000_000  # Loop iterations, split across tasks
+CORE_MULTIPLIER: Final[int] = 2  # Largest sweep point = cores * this
 
 def work_chunk(n: int) -> int:
     total = 0
@@ -743,63 +738,23 @@ def timed_split(
     list(pool.map(work_chunk, [chunk] * tasks))
     return time.perf_counter() - start
 
-def plot_speedups(results: list[tuple[int, float]]) -> None:
-    width = 40
-    best = max(speedup for _, speedup in results)
-    print("\nspeedup by task count:")
-    for tasks, speedup in results:
-        bar = "#" * max(1, round(speedup / best * width))
-        print(f"{tasks:>4} | {bar:<{width}} {speedup:4.2f}x")
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "--total", type=int, default=None,
-        help="total loop iterations (default: 10_000_000, "
-             "200_000_000 with --auto)",
-    )
-    parser.add_argument(
-        "--max-tasks", type=int, default=None,
-        help="largest task count to try (default: 2 * cores)",
-    )
-    parser.add_argument(
-        "--auto", action="store_true",
-        help="sweep task counts by doubling and plot the curve",
-    )
-    args = parser.parse_args()
-
-    total = args.total or (200_000_000 if args.auto else 10_000_000)
+if __name__ == "__main__":
     cores = os.cpu_count() or 1
-    max_tasks = args.max_tasks or cores * 2
-    if args.auto:
-        doubled = {2**i for i in range(20) if 2**i <= max_tasks}
-        task_counts = sorted(doubled | {cores, max_tasks})
-    else:
-        task_counts = sorted({1, 2, cores, max_tasks})
-    print(f"cores = {cores}, total = {total}")
+    max_tasks = cores * CORE_MULTIPLIER
+    doubled = {2**i for i in range(20) if 2**i <= max_tasks}
+    task_counts = sorted(doubled | {cores, max_tasks})
+    print(f"cores = {cores}, total = {TOTAL}")
 
-    results: list[tuple[int, float]] = []
     with ProcessPoolExecutor() as pool:
         list(pool.map(work_chunk, [1]))  # Warm up, not timed
         baseline: float | None = None
         for tasks in task_counts:
-            elapsed = timed_split(pool, total, tasks)
+            elapsed = timed_split(pool, TOTAL, tasks)
             baseline = baseline or elapsed
-            speedup = baseline / elapsed
-            results.append((tasks, speedup))
             print(
                 f"{tasks:>3} tasks: {elapsed:6.3f}s "
-                f"({speedup:4.2f}x)"
+                f"({baseline / elapsed:4.2f}x)"
             )
-
-    if args.auto:
-        plot_speedups(results)
-
-if __name__ == "__main__":
-    main()
 ```
 
 The only difference between one run and another is how finely the total work gets split.
@@ -814,36 +769,27 @@ then keeps dropping a little past that point as smaller,
 more numerous chunks balance the load better across workers,
 before flattening out.
 
-The default version finishes quickly to support fast testing.
-`--auto` raises the total workload,
-sweeps task counts by doubling up to twice the core count,
-and draws the result as a bar for each count.
+Task counts double from 1 up to `CORE_MULTIPLIER` times the core count,
+so the sweep covers well below, at, and beyond the number of cores available.
 One run on a 32-core machine produced this:
 
-    cores = 32, total = 200000000
-      1 tasks:  6.159s (1.00x)
-      2 tasks:  3.261s (1.89x)
-      4 tasks:  1.934s (3.18x)
-      8 tasks:  1.303s (4.73x)
-     16 tasks:  0.972s (6.33x)
-     32 tasks:  0.849s (7.25x)
-     64 tasks:  0.744s (8.27x)
+    cores = 32, total = 20000000
+      1 tasks:  0.600s (1.00x)
+      2 tasks:  0.367s (1.64x)
+      4 tasks:  0.247s (2.43x)
+      8 tasks:  0.186s (3.22x)
+     16 tasks:  0.145s (4.14x)
+     32 tasks:  0.103s (5.85x)
+     64 tasks:  0.111s (5.42x)
 
-    speedup by task count:
-       1 | #####                                    1.00x
-       2 | #########                                1.89x
-       4 | ###############                          3.18x
-       8 | #######################                  4.73x
-      16 | ###############################          6.33x
-      32 | ###################################      7.25x
-      64 | ######################################## 8.27x
-
-(This is one machine's real output.
-Run counts and core-relative timing shift with load and hardware,
-so `--auto` is not part of the automated `make verify` run.)
-The curve visibly bends past 32, the core count on this machine:
-doubling from 32 to 64 tasks buys a smaller jump than doubling from 16 to 32 did.
-This is the flattening the next section names and explains.
+This is one machine's real output.
+Exact timings shift with load and hardware, but the shape holds:
+wall time drops sharply up to the core count,
+then flattens or even reverses past it,
+as doubling from 32 to 64 tasks did here.
+`TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing:
+raise `TOTAL` for a slower, more dramatic slope on your own machine,
+or lower `CORE_MULTIPLIER` to stop the sweep right at the core count instead of past it.
 
 ### Why Speedup Isn't Linear
 
@@ -853,9 +799,12 @@ Every parallel job carries some part that cannot be split.
 Building each chunk, pickling it across the process boundary,
 and reassembling the results are unavoidably serial,
 whatever else runs on more cores.
-If that serial part is a fraction `s` of the total work,
-the best any number of cores can do is `1 / (s + (1 - s) / n)`;
-as `n` grows without bound, that ceiling approaches `1 / s` and stops climbing.
+If that serial part is a fraction *s* of the total work,
+the best any number of cores can do is:
+
+    speedup(n) = 1 / (s + (1 − s) / n)
+
+As *n* → ∞, that ceiling approaches 1 / *s* and stops climbing.
 A job that spends 10 percent of its time in serial overhead never speeds up more than tenfold,
 on 16 cores or 1,600.
 
