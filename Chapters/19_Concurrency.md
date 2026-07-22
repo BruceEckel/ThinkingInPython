@@ -911,8 +911,8 @@ Each process gets its own interpreter with its own GIL.
 
 ### Why Python Has a GIL
 
-> This condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL),
-> which includes a short book that covers each topic in depth.
+*(This condenses my PyCon 2026 presentation [Demystifying the GIL](https://github.com/BruceEckel/DemystifyingTheGIL),
+which includes a short book that covers each topic in depth.)*
 
 The GIL is the consequence of three earlier decisions.
 Each was reasonable on its own.
@@ -1344,15 +1344,13 @@ Three different backends are running inside that one `TaskGroup`.
 `to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
-All three start together, and the block does not exit until all three finish,
-printing `[10, 20, 30]`.
+All three start together, and the block does not exit until all three finish.
 The event loop is doing the same job it did in the chapter's first listing.
 It schedules awaitables,
 and it no longer cares whether the work underneath is a coroutine, a thread,
 or a process.
 
-Neither of these is a single `Task` class hiding three incompatible `run()` methods behind one name,
-the shortcut that looks tempting and soon breaks.
+Neither of these is a single `Task` class hiding three incompatible `run()` methods behind one name.
 `Executor` unifies backends that share a blocking, submit-and-wait shape.
 `await` unifies backends that share nothing but a promised result.
 Knowing which kind of sameness a piece of code relies on,
