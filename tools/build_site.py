@@ -42,7 +42,7 @@ TEMPLATE = ROOT / "template.html"
 # --no-chapter-toc. CHAPTER_TOC_DEPTH controls how deep the list goes
 # (2 = top-level "##" sections only; 3 also includes "###" subsections).
 CHAPTER_TOC = True
-CHAPTER_TOC_DEPTH = 2
+CHAPTER_TOC_DEPTH = 3
 
 FRONT_STEM = "00_Front"
 BOOK_TITLE = "Thinking in Python"
