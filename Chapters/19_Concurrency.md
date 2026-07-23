@@ -2,6 +2,8 @@
 
 [Performance](18_Performance.md) makes one stream of instructions faster.
 *Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
+Performance is about the math, while concurrency is about the machine.
+The objectives of both are to speed progress.
 
 The meaning of "at the same time" depends on context.
 Early machines had a single CPU, and early operating systems (OS)
