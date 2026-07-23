@@ -1886,6 +1886,7 @@ Here are a few of the topics beyond it:
     are where STM actually succeeded as a practical, widely used tool.
 
 [^libraries]: Libraries worth exploring:
+
     - [BOCPY](https://microsoft.github.io/bocpy/): Behavior-Oriented Concurrency
     - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency
     - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio
