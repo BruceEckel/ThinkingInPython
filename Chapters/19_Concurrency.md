@@ -1724,7 +1724,7 @@ In both cases, nothing gets done.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.
 
-## Guidlines
+## Guidelines
 
 - **Don't wrap a lone wait in `async`/`await` machinery.**
   `asyncio` pays off once you have waits to overlap.
