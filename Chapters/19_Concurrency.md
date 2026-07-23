@@ -3,7 +3,7 @@
 [Performance](18_Performance.md) makes one stream of instructions faster.
 *Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
 Performance is about the math, while concurrency is about the machine.
-The objectives of both are to speed progress.
+Both try to speed progress.
 
 The meaning of "at the same time" depends on context.
 Early machines had a single CPU, and early operating systems (OS)
@@ -11,7 +11,7 @@ were basically just program loaders.
 The first step beyond that was *time-sharing*.
 The CPU runs one program for a slice of time,
 then the OS stops it and switches to a different program for another time slice.
-Later came a lighter unit of scheduling that lives inside a program:
+Later came a finer-grained unit of scheduling that lives inside a program:
 the *thread of execution*.
 A modern OS schedules threads, not whole programs.
 We say that each task (unit of work) is allocated its own thread,
