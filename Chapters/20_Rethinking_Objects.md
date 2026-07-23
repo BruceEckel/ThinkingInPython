@@ -695,13 +695,13 @@ does and does not get you.
 Satisfying `Displayable` is a shape claim: the method exists,
 with the right signature, and the checker verifies that half of the contract.
 The other half is semantic.
-`display()` must also behave the way callers rely on:
+`display()` must also behave the way callers expect:
 return a description rather than raise an exception, finish rather than block,
 describe the object rather than change it.
 No checker sees that half.
 Substitution is safe only when both halves hold,
 whether membership came from inheriting a base class or matching a protocol.
-The machine checks the signatures; you still owe the behavior.
+The machine checks the signatures; you still own the behavior.
 
 ### Pattern Matching on a Union
 
@@ -761,12 +761,11 @@ Inheritance is only one expression of polymorphism.
 More broadly, polymorphism means that a function parameter accepts more than one type.
 The questions are which types it accepts and what the function may do with them.
 
-Type theory names three kinds.
+Type theory defines three kinds of polymorphism.
 The distinction goes back to Christopher Strachey's 1967 lecture notes,
 [Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf).
 
-*Subtype polymorphism* is what [Polymorphism Without Inheritance](#polymorphism-without-inheritance)
-demonstrated.
+*Subtype polymorphism* is demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
 One function accepts any type that fits a shape,
 whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
 The caller writes one function.
@@ -806,12 +805,14 @@ if __name__ == "__main__":
 #: ['1', '2', '3']
 ```
 
-Each `@overload` line is a promise to the type checker, not a function that runs.
+Each `@overload` line is a promise to the type checker,
+not a function that runs.
 Only the last, unmarked definition executes.
 `stringify(42)` checks as returning `str`,
 and `stringify([1, 2, 3])` checks as returning `list[str]`,
 even though both calls run the same branching body.
-[`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch) is ad-hoc polymorphism's other Python form.
+[`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch)
+is ad-hoc polymorphism's other Python form.
 It uses genuinely separate functions per type,
 instead of one function branching internally.
 
@@ -848,14 +849,14 @@ if __name__ == "__main__":
 #: 4.0 2
 ```
 
-The checker insists on the guard, and it is right to insist.
+The checker correctly insists on the guard.
 Without it, a `None` eventually meets `.log()` and the call fails.
 But look at what the `None` branch does: nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
-Give the do-nothing case a class,
-and the optional parameter becomes an ordinary required one with a default:
+Give the do-nothing case a class, and the optional parameter becomes required,
+with a default:
 
 ```python
 # null_logger.py
@@ -896,7 +897,7 @@ if __name__ == "__main__":
 The output is identical and the branches are gone.
 `total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
-The parameter's type improved too.
+The parameter's type also improved.
 `Logs` is a protocol, so any logger fits, and no caller ever sees a `| None`.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
@@ -906,33 +907,17 @@ and the maze in [Simulation](38_Simulation.md)
 points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 
-```python
-# test_null_logger.py
-import null_logger as nl
-import optional_logger as ol
-
-def test_versions_agree() -> None:
-    prices = [1.0, 2.0, 3.5]
-    assert ol.total(prices) == nl.total(prices) == 6.5
-
-def test_list_logger_records_each_step() -> None:
-    logger = nl.ListLogger()
-    nl.total([1.0, 2.0], logger)
-    assert logger.lines == [
-        "added 1.0, total 1.0", "added 2.0, total 3.0"]
-```
-
 Null objects stand in for "nothing to do," not "nothing there."
 When a caller must notice absence,
 a lookup that can fail or a required value that may be missing,
 a silent stand-in buries the problem.
 Keep `T | None` there,
-or return the `Result` of [Error Handling](42_Functional_Error_Handling.md#a-result-type),
+or return `Result` from [Error Handling](42_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
-The test is what callers would write.
-If every one of them would handle absence with the same neutral behavior,
+
+If every decision handles absence with the same neutral behavior,
 centralize that behavior in a null object.
-If any caller would branch differently, absence is information,
+If any caller branches differently, then absence is information,
 and it belongs in the type.
 
 ## OOP Is Useful, Sometimes
@@ -958,9 +943,8 @@ But not everywhere, all the time.
 - Prefer immutable data structures over encapsulation.
 - Prefer functions over methods.
 - Prefer composing structures over inheriting implementation.
-- Use protocols to fit pieces together, rather than a base-class hierarchy.
-- Prioritize simplicity, clarity, and maintainability.
-  Those produce reliability.
+- Prefer protocols over a base-class hierarchy.
+- Prioritize simplicity, clarity, and maintainability, to produce reliability.
 
 This part of the book is about design patterns.
 Many of these arose to work around limitations of older object-oriented languages.
