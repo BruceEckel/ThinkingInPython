@@ -18,14 +18,13 @@ and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceE
 Languages evolve to fit their environment.
 A feature that looks strange now usually made sense for the problem,
 and the hardware, of its time.
-It helps to look at the origin of objects.
+Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
-Notably, not everything was an object.
-Simula still had standalone functions.
+Notably, not everything in Simulat was an object; the language still had standalone functions.
 It was a compiled, statically typed language,
-so the discipline later named the Liskov substitution principle fit naturally.
+so the discipline later named the Liskov Substitution Principle (LSP) fit naturally.
 
 *Smalltalk* took the other road: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
@@ -34,8 +33,8 @@ run-time world where you built programs by finding the closest existing object a
 That style makes no substitutability promises.
 
 *C++* drew from Simula.
-Objects were optional, and it brought object-oriented programming,
-and exceptions, into the mainstream.
+Objects were optional, and it brought object-oriented programming and exceptions into the mainstream.
+
 *Java* drew from Smalltalk.
 Everything lives inside a class, even when all you need is a function.
 Java is statically compiled, so substitutability matters,
@@ -46,7 +45,7 @@ Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
 They favor immutability.
 Rust makes bindings immutable by default.
-Swift and Kotlin encourage it through `let` and `val`
+Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
 They compose data structures instead of inheriting implementation,
 and they let code live outside classes, which cuts duplication.
