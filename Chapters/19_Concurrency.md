@@ -702,10 +702,11 @@ and shares its `submit()`/`map()`/`Future` interface with `ThreadPoolExecutor`,
 so switching between processes and threads, as the next section does,
 is a one-line change.
 
-Use `multiprocessing` for a job that is not one call returning one value:
+A pool fits work shaped like a function call: one call in, one result out.
+Use `multiprocessing` when the job is a different shape:
 
 - A worker that runs continuously and communicates over its own `Queue`.
-- State shared between processes through a `multiprocessing.Manager`, `Value`,
+- Processes that share state through a `multiprocessing.Manager`, `Value`,
   or `Array`.
   `ProcessPoolExecutor` does not expose these.
 
@@ -1727,7 +1728,7 @@ for example letting only the task with the lower ID give.
 ## Guidelines
 
 - **Don't wrap a lone wait in `async`/`await` machinery.**
-  `asyncio` pays off once you have waits to overlap.
+  `asyncio` pays off once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
   Only `gather()` or `TaskGroup` schedule every coroutine as a task before waiting on any of them.
@@ -1738,12 +1739,14 @@ for example letting only the task with the lower ID give.
 - **A read-modify-write that spans an `await` still races,
   with no thread in sight.**
   Guard it with `asyncio.Lock`, the same fix a lock gives for threads.
-- **Never call a blocking function directly inside a coroutine.**
+- **Never call a blocking function inside a coroutine.**
   `time.sleep()` freezes every task on the loop, not just its own.
   Use `asyncio.sleep()`, or hand the blocking call to `asyncio.to_thread()`.
 - **Prefer `ProcessPoolExecutor` over raw `multiprocessing`.**
-  Reserve `multiprocessing` itself for a job that is not one call returning one value:
-  a continuously running worker, or state shared through a `Manager`.
+  A pool fits work shaped like a function call: one call in, one result out.
+  Use raw `multiprocessing` when the job is a different shape:
+  a worker that runs continuously,
+  or processes that share state through a `Manager`.
 - **More cores only speed up the parallel fraction of the work.**
   Splitting past the number of cores buys a little more.
   Then the per-task cost of pickling and reassembling catches up,
