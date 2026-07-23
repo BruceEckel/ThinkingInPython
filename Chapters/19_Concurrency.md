@@ -20,7 +20,7 @@ The OS controls everything: allocating threads,
 deciding how long a time slice is, performing the context switch,
 and deciding which thread is ready to run next.
 
-Each *process* (allocated when you start a program)
+Each *process* (allocated to a program when you start it)
 gets one thread and its own heap.
 The program can request more threads from the OS,
 but all threads within a process share the same heap.

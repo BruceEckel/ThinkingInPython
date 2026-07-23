@@ -13,6 +13,9 @@ My goal is:
 
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
+That's the whole trick behind effect systems:
+the code that requests an effect is decoupled from the code that performs it (A handler sits in between).
+
 Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
