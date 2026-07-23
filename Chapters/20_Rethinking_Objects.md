@@ -7,12 +7,11 @@ and toured the world giving object-oriented programming (OOP) presentations.
 When I say I have come to doubt that objects should be the default,
 it is not an outsider's complaint.
 
-We are about to spend the rest of this book on design patterns,
-and most of them assume objects and inheritance.
-Before we start, I want to question how much of that machinery we actually need.
+This section is about design patterns, most of which assume objects and inheritance.
+First, however, I want to question how much of that machinery we actually need.
 This chapter adapts my PyCon 2023 talk,
 [Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects),
-and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PatternMatching).
+and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PolymorphismUnbound).
 
 ## Evolution
 
