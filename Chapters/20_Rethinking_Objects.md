@@ -761,7 +761,59 @@ Inheritance is only one expression of polymorphism.
 More broadly, polymorphism means that a function parameter accepts more than one type.
 The questions are which types it accepts and what the function may do with them.
 
-[[Add examples including ad-hoc (function overloading) and parametric, anything else? ]]
+Type theory names three kinds.
+The distinction goes back to Christopher Strachey's 1967 lecture notes,
+[Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf).
+
+*Subtype polymorphism* is what [Polymorphism Without Inheritance](#polymorphism-without-inheritance)
+demonstrated.
+One function accepts any type that fits a shape,
+whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
+The caller writes one function.
+The type varies underneath it.
+
+*Parametric polymorphism* is a single implementation that treats every type the same way,
+because it never inspects the type at all.
+[Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
+One body works for any `T`.
+The checker tracks which `T` filled in at each call.
+
+*Ad-hoc polymorphism* runs the opposite way.
+A different implementation handles each type, chosen by that type.
+Python's version of ad-hoc polymorphism is `@overload`,
+which lets one function name carry several typed signatures,
+backed by a single implementation that branches at run time:
+
+```python
+# overload_example.py
+from typing import overload
+
+@overload
+def stringify(value: int) -> str: ...
+
+@overload
+def stringify(value: list[int]) -> list[str]: ...
+
+def stringify(value: int | list[int]) -> str | list[str]:
+    if isinstance(value, list):
+        return [str(v) for v in value]
+    return str(value)
+
+if __name__ == "__main__":
+    print(stringify(42))
+    print(stringify([1, 2, 3]))
+#: 42
+#: ['1', '2', '3']
+```
+
+Each `@overload` line is a promise to the type checker, not a function that runs.
+Only the last, unmarked definition executes.
+`stringify(42)` checks as returning `str`,
+and `stringify([1, 2, 3])` checks as returning `list[str]`,
+even though both calls run the same branching body.
+[`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch) is ad-hoc polymorphism's other Python form.
+It uses genuinely separate functions per type,
+instead of one function branching internally.
 
 ## Null Object
 
