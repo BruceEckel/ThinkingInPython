@@ -1275,10 +1275,9 @@ It is a suspended function that runs only when the event loop resumes it.
 
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
-and a `run_in_executor()` call all produce an *awaitable*,
-the same thing an `async def` can wait on.
+and a `run_in_executor()` call all produce an *awaitable*.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)
-does not care which kind of task it is holding, either:
+does not care which kind of task it is holding:
 
 ```python
 # mixed_await.py
@@ -1320,7 +1319,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Three different backends are running inside that one `TaskGroup`.
+Three different backends are running inside one `TaskGroup`.
 `io_price()` suspends and resumes on the event loop the way `fetch()` did in this chapter's first listing.
 `to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
@@ -1331,12 +1330,13 @@ It schedules awaitables,
 and it no longer cares whether the work underneath is a coroutine, a thread,
 or a process.
 
-Neither of these is a single `Task` class hiding three incompatible `run()` methods behind one name.
+Each of these two interfaces unifies one small piece of the backends,
+not the whole.
 `Executor` unifies backends that share a blocking, submit-and-wait shape.
 `await` unifies backends that share nothing but a promised result.
-Knowing which kind of sameness a piece of code relies on,
-and which real differences it does not erase,
-is most of what concurrency asks of you.
+Everything else about the backends stays different.
+Most of what concurrency asks of you is knowing what a shared interface hides,
+and what it leaves different underneath.
 
 ![Asyncio and threads share a single GIL and take turns.
 Processes and subinterpreters genuinely run at once
@@ -1349,32 +1349,34 @@ Processes and subinterpreters handle CPU-bound work.
 In light of these, does new code ever need threads?
 
 It does, but not for the reason threads were once the default choice.
-[I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound) bisects concurrency.
-Neither technology requires threads to structure its concurrency.
+[I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
+divides concurrent work into two kinds, and neither kind needs threads.
 `asyncio` allows overlap across periods of waiting on external operations.
 A process pool or [subinterpreter](#subinterpreters)
 overlaps CPU-bound computing.
 
 What role remains for threads?
-Bridging to code that doesn't cooperate with an event loop.
+Creating bridges to code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.
 
-If Python always supported coroutines,
+If Python had always supported coroutines,
 all libraries could be expected to conform.
 But rewriting all existing libraries to use `asyncio` instead of threads is not realistic.
 `asyncio.to_thread()`, from [Escaping to a Thread](#escaping-to-a-thread),
-is the standard library supporting this reality.
+is the standard library solution.
 Thus, even a program written as `asyncio` from top to bottom keeps a thread pool underneath,
-because the code it calls into does not support asynchrony.
+because the libraries it calls still block.
 
 Free threading, however, does not affect I/O-bound work.
 It solves a narrower problem: without the GIL,
 a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
 paying no pickling cost at all.
 This is something neither a GIL-bound thread nor a process pool offers.
-With the GIL, a thread's job is reduced to not structuring your own concurrency,
-but not blocking it while you wait on code that structures none of its own.
+With the GIL, a thread no longer structures your concurrency.
+`asyncio` does that.
+A thread's remaining job is to absorb a blocking call,
+so the wait cannot freeze the event loop.
 
 The GIL [does not prevent races](#the-gil-does-not-prevent-races).
 It doesn't protect a read-modify-write spanning a function call.
@@ -1383,9 +1385,9 @@ two threads can execute at the same instant on separate cores.
 Race conditions become even easier.
 
 `asyncio` only switches at an `await`,
-which is what lets you [reason about interleaving](#a-single-thread-still-races).
+which makes it easier to [reason about interleaving](#a-single-thread-still-races).
 A thread costs an OS stack and an OS scheduling entity that free threading does not remove,
-while an `asyncio` task is cheap enough to run by the thousand.
+while an `asyncio` task is cheap enough to run in the thousands.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
 There is still no safe way to cancel a running thread.
@@ -1394,9 +1396,9 @@ It does not change what `asyncio` is for.
 
 ### Measuring the Difference
 
-The claim that a thread costs real memory while a task costs much less is supportable.
+We can support the claim that a thread costs real memory while a task costs much less.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
-A common default across platforms is on the order of one mebibyte.[^A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
+A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` can measure a task's actual heap footprint directly,
 since a task is nothing more than ordinary Python objects.
 We can calculate the ratio between the two:
