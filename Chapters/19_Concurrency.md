@@ -78,9 +78,9 @@ so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
 By adapting the threading mechanism,
 threads could also perform ad-hoc parallelism:
-some CPUs could be dedicated to run parts of a program simultaneously.
+multiple CPUs could run multiple parts of a program simultaneously.
 
-Although threads have been adapted to these purposes,
+Although threads are adapted to these purposes,
 the OS is always at a disadvantage:
 it doesn't know details of the program it's running,
 and therefore cannot optimize that program.
@@ -91,9 +91,8 @@ even though some tasks need only a fraction of that.
 Engineers learned various tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
-The answer moves the context switch out of the OS and into the program.
-This is called *asynchrony*, implemented with *coroutines*.
-Engineers don't have to fighting the threading system.
+*Asynchrony*, implemented with *coroutines*, moves the context switch out of the OS and into the program.
+Engineers don't have to fight the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
@@ -106,10 +105,6 @@ but it pushed all scheduling decisions onto the OS and needed extra machinery
 Languages and runtimes responded by taking on more of that scheduling,
 multiplexing many lightweight,
 language-managed tasks onto a smaller number of OS threads.
-In special, latency-sensitive domains
-(real-time control, high-frequency trading, packet processing)
-specific CPUs are even isolated from ordinary OS activity altogether,
-so a task can run with minimal interference.
 
 ## I/O-Bound vs CPU-Bound
 
