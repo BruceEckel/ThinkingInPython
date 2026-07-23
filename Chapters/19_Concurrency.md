@@ -1780,8 +1780,8 @@ This works for both asynchrony and parallelism.
 
 Also, notice how much we've talked about the OS in this chapter.
 The comfortable abstraction provided by normal programming is pierced to tatters by concurrency.
-Sometimes you even need to go beyond the OS-level abstraction, all the way to hardware,
-in order to understand a particular bug.
+Sometimes you even need to go beyond the OS-level abstraction,
+all the way to hardware, in order to understand a particular bug.
 
 Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
 This chapter makes concurrency look (somewhat)
@@ -1890,12 +1890,16 @@ Here are a few of the topics beyond it:
 
 [^libraries]: Libraries worth exploring:
 
-    - [BOCPY](https://microsoft.github.io/bocpy/): Behavior-Oriented Concurrency.
+    - [BOCPY](https://microsoft.github.io/bocpy/):
+      Behavior-Oriented Concurrency.
     - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency.
     - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio.
     - [uvloop](https://github.com/MagicStack/uvloop):
       Fast drop-in replacement for the standard event loop.
       See also [rsloop](https://github.com/RustedBytes/rsloop).
-    - [MPIRE](https://github.com/sybrenjansen/mpire): Makes `multiprocessing` easier and faster.
-    - [RAY](https://www.ray.io/): Distribute tasks across multiple CPUs, GPUs, and clusters.
-    - [Dask](https://www.dask.org/): Parallelizes tools like NumPy, Pandas, and Scikit-Learn.
+    - [MPIRE](https://github.com/sybrenjansen/mpire):
+      Makes `multiprocessing` easier and faster.
+    - [RAY](https://www.ray.io/): Distribute tasks across multiple CPUs, GPUs,
+      and clusters.
+    - [Dask](https://www.dask.org/): Parallelizes tools like NumPy, Pandas,
+      and Scikit-Learn.

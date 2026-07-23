@@ -1128,8 +1128,7 @@ Run it.
 
 A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
 
-A discussion of algorithms for collision detection and
-[steering behavior for autonomous moving objects](http://www.red3d.com/cwr/steer/).
+A discussion of algorithms for collision detection and [steering behavior for autonomous moving objects](http://www.red3d.com/cwr/steer/).
 
 ## Exercises
 

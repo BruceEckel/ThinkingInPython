@@ -7,7 +7,8 @@ and toured the world giving object-oriented programming (OOP) presentations.
 When I say I have come to doubt that objects should be the default,
 it is not an outsider's complaint.
 
-This section is about design patterns, most of which assume objects and inheritance.
+This part of the book is about design patterns,
+most of which assume objects and inheritance.
 First, however, I want to question how much of that machinery we actually need.
 This chapter adapts my PyCon 2023 talk,
 [Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects),
@@ -22,9 +23,11 @@ Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
-Notably, not everything in Simulat was an object; the language still had standalone functions.
+Notably, not everything in Simulat was an object;
+the language still had standalone functions.
 It was a compiled, statically typed language,
-so the discipline later named the Liskov Substitution Principle (LSP) fit naturally.
+so the discipline later named the Liskov Substitution Principle (LSP)
+fit naturally.
 
 *Smalltalk* took the other road: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
@@ -33,7 +36,8 @@ run-time world where you built programs by finding the closest existing object a
 That style makes no substitutability promises.
 
 *C++* drew from Simula.
-Objects were optional, and it brought object-oriented programming and exceptions into the mainstream.
+Objects were optional,
+and it brought object-oriented programming and exceptions into the mainstream.
 
 *Java* drew from Smalltalk.
 Everything lives inside a class, even when all you need is a function.
@@ -783,10 +787,9 @@ centralize that behavior in a null object.
 If any caller would branch differently, absence is information,
 and it belongs in the type.
 
-## OOP Is Still Sometimes Useful
+## OOP Is Useful, Sometimes
 
 None of this means objects are a mistake.
-They improved real things.
 A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and, when frozen, hashing.
@@ -797,11 +800,10 @@ If you simply avoid implementation inheritance,
 the payoff for using types is tremendous.
 
 Start with functions and data.
-When a program truly needs an object, it tells you.
-You find yourself passing the same data into every function,
-or you need to bundle behavior with state.
-Objects are useful sometimes.
-They do not need to be everywhere, all the time.
+When a program truly needs an object, it tells you:
+passing the same data into every function, or bundling behavior with state.
+OOP Is Useful, Sometimes.
+But not everywhere, all the time.
 
 ## Guidelines
 
@@ -812,8 +814,8 @@ They do not need to be everywhere, all the time.
 - Prioritize simplicity, clarity, and maintainability.
   Those produce reliability.
 
-The rest of this book is about design patterns.
-Many of them arose to work around limitations of older object-oriented languages.
+This part of the book is about design patterns.
+Many of these arose to work around limitations of older object-oriented languages.
 Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol already solve the problem.
