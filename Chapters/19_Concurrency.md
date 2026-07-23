@@ -22,6 +22,7 @@ and deciding which thread is ready to run next.
 
 Each *process* (allocated to a program when you start it)
 gets one thread and its own heap.
+Every thread has its own stack.
 The program can request more threads from the OS,
 but all threads within a process share the same heap.
 This means each thread must not corrupt parts of the heap used by other threads.
@@ -35,14 +36,14 @@ its stack frame is popped and execution jumps back to the return address.
 (The return value typically travels back in a CPU register.)
 Thus it is essential that each thread own its call stack.
 
-Neither the heap nor the stack starts at a fixed size,
-though they grow in different ways.
+The heap and the stack grow in opposite ways.
 The heap has no space reserved for it in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
-A stack does have a size decided when its thread is created,
-and that size does not change afterward.
-If a chain of function calls needs more room than that,
+A stack is the reverse: its maximum size is fixed when its thread is created,
+and that size never changes.
+What varies at runtime is only how much of that fixed allotment is in use.
+If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
 A heap allocation is reached only through a reference,
 which can be redirected to a new, larger block.
