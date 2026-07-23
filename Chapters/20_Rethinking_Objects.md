@@ -761,7 +761,7 @@ Inheritance is only one expression of polymorphism.
 More broadly, polymorphism means that a function parameter accepts more than one type.
 The questions are which types it accepts and what the function may do with them.
 
-[[Examples including ad-hoc (function overloading) and parametric, anything else? ]]
+[[Add examples including ad-hoc (function overloading) and parametric, anything else? ]]
 
 ## Null Object
 
