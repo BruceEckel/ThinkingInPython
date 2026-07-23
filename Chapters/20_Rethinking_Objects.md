@@ -538,6 +538,7 @@ Annotated `t: object`, the safe top type, `show()` would fail the type checker,
 because `object` has no `display()` method.
 `Any` instead switches the checker off for `t`, permitting every operation.
 It is dynamic typing opted into, one parameter at a time.
+
 ### Protocols
 
 [Static Typing](08_Static_Typing.md#structural-typing-with-protocols)
@@ -756,10 +757,9 @@ explore this trade-off.
 
 ## What Is Polymorphism?
 
-This is usually taught through inheritance, but that is only one form.
-More broadly, polymorphism means a function parameter accepts more than one type.
-The questions are which types it accepts,
-and what the function may do with them.
+Inheritance is only one expression of polymorphism.
+More broadly, polymorphism means that a function parameter accepts more than one type.
+The questions are which types it accepts and what the function may do with them.
 
 [[Examples including ad-hoc (function overloading) and parametric, anything else? ]]
 
