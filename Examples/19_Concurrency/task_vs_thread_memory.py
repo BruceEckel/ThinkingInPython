@@ -12,7 +12,7 @@ async def parked() -> None:
 async def bytes_per_task() -> float:
     tracemalloc.start()
     before = tracemalloc.take_snapshot()
-    tasks = [asyncio.ensure_future(parked()) for _ in range(TASKS)]
+    tasks = [asyncio.create_task(parked()) for _ in range(TASKS)]
     await asyncio.sleep(0)  # Let every task reach its own await
     after = tracemalloc.take_snapshot()
     grown = sum(

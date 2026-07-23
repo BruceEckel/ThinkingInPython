@@ -1400,7 +1400,7 @@ We can support the claim that a thread costs real memory while a task costs much
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` can measure a task's actual heap footprint directly,
-since a task is nothing more than ordinary Python objects.
+since a task is made of ordinary Python objects.
 We can calculate the ratio between the two:
 
 ```python
@@ -1418,7 +1418,7 @@ async def parked() -> None:
 async def bytes_per_task() -> float:
     tracemalloc.start()
     before = tracemalloc.take_snapshot()
-    tasks = [asyncio.ensure_future(parked()) for _ in range(TASKS)]
+    tasks = [asyncio.create_task(parked()) for _ in range(TASKS)]
     await asyncio.sleep(0)  # Let every task reach its own await
     after = tracemalloc.take_snapshot()
     grown = sum(
@@ -1456,16 +1456,15 @@ so they stay alive doing nothing.
 This tells us the heap growth using `tracemalloc`.
 `threading.stack_size()` is read, set, read again, then restored,
 so the measurement leaves the rest of the program untouched.
-One thread's reserved stack,
-paid before it runs a single line of its target function,
+A single thread's reserved stack,
+paid before it runs one line of its target function,
 could instead hold roughly 777 suspended tasks.
-The stack figure is a reservation,
+The stack figure is
 address space set aside whether every byte is touched or not.
-The task figure is heap `tracemalloc` actually measured.
-Both are real costs of a different kind,
-and the comparison still favors tasks over threads by hundreds to one.
+The task figure is heap measured by `tracemalloc`.
+The comparison favors tasks over threads by hundreds to one.
 
-The same gap shows up in time, not only space:
+We see a similar difference in time:
 
 ```python
 # thread_vs_task_speed.py
@@ -1503,7 +1502,7 @@ print(f"tasks at least 5x faster to spawn: {t_tasks * 5 < t_threads}")
 
 Starting and joining 3,000 threads does OS-level work for each one,
 allocating a stack, registering with the scheduler, tearing it down again.
-Scheduling 3,000 tasks skips all of that;
+Scheduling 3,000 tasks skips all of that.
 `gather()` only builds Python objects and steps the event loop through them.
 
 How many threads can one machine support before `threading.Thread()` raises `RuntimeError: can't start new thread`?
@@ -1518,7 +1517,7 @@ since a task never runs out of the OS resource that a thread does.
 
 ## Locks, Semaphores, and Failure Modes
 
-`async_race.py` shows shared mutable state losing updates with no coordination in place,
+`async_race.py` showed shared mutable state losing updates with no coordination in place,
 but using tasks instead of threads.
 Threads are not the source of deadlock and livelock.
 That source is shared mutable state,
