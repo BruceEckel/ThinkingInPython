@@ -30,8 +30,8 @@ Nothing interrupts a rat partway through an update.
 A *rat* explores.
 Each rat runs as its own task.
 From its current cell it looks at the four neighbors and tries to claim the open ones.
-Claiming a cell is how a rat both marks it visited and reserves it,
-so no two rats ever cover the same ground.
+By claiming a cell, a rat both marks it visited and reserves it.
+This way, no two rats ever cover the same ground.
 When a rat finds more than one open neighbor,
 it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.

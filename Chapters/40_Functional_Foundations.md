@@ -321,7 +321,7 @@ and room to grow.
 When an inner function refers to a variable from the function that created it,
 Python keeps that variable alive.
 The inner function plus the captured variables is a *closure*.
-This is how a function can carry state without a class:
+This way, a function can carry state without a class:
 
 ```python
 # closures.py

@@ -20,7 +20,7 @@ async def main() -> None:
             timeout=0.5,
         )
     except TimeoutError:
-        print("deadlock detected: True")
+        print("deadlock detected")
 
 asyncio.run(main())
-#: deadlock detected: True
+#: deadlock detected

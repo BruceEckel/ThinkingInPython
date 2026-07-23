@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
 The construction syntax is unchanged,
 and callers cannot tell they received a shared object
-(this is how CPython's small-integer cache does it).
+(this is how CPython's small-integer cache works).
 The cost is bookkeeping by hand.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,

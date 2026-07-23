@@ -83,8 +83,8 @@ it doesn't know details of the program it's running,
 and therefore cannot optimize that program.
 The OS cannot, for example,
 perform faster context switches by knowing what data is important to preserve and what isn't.
-In addition, each thread requires enough resources to work for every program,
-even though some tasks might only require a fraction of those resources.
+In addition, each thread reserves enough resources to serve any program,
+even though some tasks need only a fraction of them.
 Engineers learned various tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
@@ -130,7 +130,7 @@ each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
-Instead of using threads for I/O bound problems,
+Instead of using threads for I/O-bound problems,
 asynchrony allows you to create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
@@ -208,7 +208,7 @@ so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
 `gather()` returns `['A', 'B', 'C']`,
 showing that the results follow the argument order, not the finishing order.
-Note that the total wait is the longest delay (0.03-second),
+Note that the total wait is the longest delay (0.03 seconds),
 not the sum of all three.
 
 An `await` is only legal inside an `async def`,
@@ -217,12 +217,12 @@ which is why the demonstration needs `main()`.
 Beware a list comprehension that awaits.
 `[await c for c in coroutines]` becomes the sequential version of `gather()`.
 Each `await` runs its coroutine to completion before the next one starts,
-so nothing overlaps and the delays add instead of overlapping.
+so nothing overlaps and the delays add.
 `gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
 
 Scheduling does not mean running.
 The task bodies execute only after `gather()` suspends
-(`gather()` is itself fueled by the event loop).
+(the event loop drives `gather()` too).
 Each runs until its first `await`, which is what the `a: started`, etc.,
 lines in the trace show.
 The comprehension doesn't achieve multiple coroutines in flight:
@@ -327,8 +327,7 @@ and iterating through `group.exceptions` reaches every member.
 
 Keeping the task objects pays off even after a partial failure.
 `a` and `b` already succeeded, and their results are untouched:
-`task.result()` returns `'A'` and `'B'`,
-exactly as if nothing else had gone wrong.
+`task.result()` returns `'A'` and `'B'`, as if nothing else had gone wrong.
 `c` and `d` each completed with their own exception,
 so `task.exception()` returns the `ValueError` instead of raising it.
 `e` and `f` never reach their `fetched` print because the group cancels them,
@@ -511,7 +510,7 @@ Five blocking sleeps cannot overlap at all:
 each stalls the loop for its full duration,
 so the total is never less than their sum.
 
-Notice that you cannot call `await` on `time.sleep()`,
+Notice that you cannot `await time.sleep()`,
 which is an extra indicator that it is the wrong function to use.
 
 ## Escaping to a Thread
@@ -814,7 +813,7 @@ since finer chunks even out the load across workers, as described above.
 Past that point, though,
 each additional task adds its own slice of the same serial overhead:
 one more chunk to pickle, one more result to collect.
-Once that added overhead outweighs the smaller pieces it produces,
+Once that added overhead outweighs the benefit of the smaller pieces,
 the curve stops falling.
 This ceiling is not specific to `ProcessPoolExecutor`, or even to Python;
 it applies to any system that divides work across independent workers,
@@ -822,7 +821,7 @@ which is why adding cores is not, by itself, a scaling strategy.
 
 ## The GIL and Free Threading
 
-Threads don't help the previous section.
+Threads don't help with the previous section's CPU-bound work.
 The standard CPython build has a *Global Interpreter Lock* (GIL).
 With the GIL, only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
@@ -1063,8 +1062,9 @@ without a process pool's pickling between processes.
 ## Subinterpreters
 
 Subinterpreters work on standard Python, and do not need free threading.
-[Parallelism](#parallelism)'s process pool's speedup comes from giving each worker its own interpreter and thus its own GIL,
-but pays for it with an operating-system process per worker.
+The process pool in [Parallelism](#parallelism)
+gets its speedup by giving each worker its own interpreter,
+and thus its own GIL, but it pays with an operating-system process per worker.
 
 Since 3.12, CPython can create additional interpreters inside the same process
 ([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL,
@@ -1118,7 +1118,7 @@ but a C extension must support per-interpreter isolation to be imported in a sub
 
 When threads divide up work, the danger is shared mutable state.
 The standard solution is a thread-safe queue that hands each item to a single consumer,
-with builtin locking.
+with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
 (the threaded form of `heapq` seen in [Performance](18_Performance.md))
 always produces the smallest item:
@@ -1265,8 +1265,9 @@ if __name__ == "__main__":
     print(all(r == results[0] for r in results))
 ```
 
-`run_on()` accepts the base type `Executor`, so it takes all three subtypes:
-an OS thread, an OS process, a subinterpreter.
+`run_on()` accepts the base type `Executor`, so it takes all three subtypes,
+whose workers could not be more different: an OS thread, an OS process,
+a subinterpreter.
 
 `asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
@@ -1351,7 +1352,7 @@ In light of these, does new code ever need threads?
 It does, but not for the reason threads were once the default choice.
 [I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
 divides concurrent work into two kinds, and neither kind needs threads.
-`asyncio` allows overlap across periods of waiting on external operations.
+`asyncio` overlaps waits on external operations.
 A process pool or [subinterpreter](#subinterpreters)
 overlaps CPU-bound computing.
 
@@ -1453,14 +1454,13 @@ print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 
 `bytes_per_task()` creates 5,000 tasks that immediately suspend on `asyncio.sleep(999)`,
 so they stay alive doing nothing.
-This tells us the heap growth using `tracemalloc`.
+The two `tracemalloc` snapshots capture the heap they add.
 `threading.stack_size()` is read, set, read again, then restored,
 so the measurement leaves the rest of the program untouched.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold roughly 777 suspended tasks.
-The stack figure is
-address space set aside whether every byte is touched or not.
+The stack figure is address space set aside whether every byte is touched or not.
 The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one.
 
@@ -1505,15 +1505,15 @@ allocating a stack, registering with the scheduler, tearing it down again.
 Scheduling 3,000 tasks skips all of that.
 `gather()` only builds Python objects and steps the event loop through them.
 
-How many threads can one machine support before `threading.Thread()` raises `RuntimeError: can't start new thread`?
+How many threads can one machine support before `Thread.start()` raises `RuntimeError: can't start new thread`?
 That number belongs to the machine, not to Python.
 On one well-provisioned machine,
 60,000 threads parked on a never-set `threading.Event` started in about four seconds with room to spare.
 A laptop with far less memory can fail at a fraction of that.
 To find your own machine's number,
 raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an exception.
-Tasks have no equivalent ceiling to compare it against,
-since a task never runs out of the OS resource that a thread does.
+Tasks have no equivalent ceiling,
+because a task consumes none of the OS resources that limit threads.
 
 ## Locks, Semaphores, and Failure Modes
 
@@ -1555,9 +1555,9 @@ asyncio.run(main())
 #: 400
 ```
 
-The only change from `async_race.py` is the `async with lock:` around the read,
-the yielding `await`, and the write.
-If a task reaches `async with lock:` while another task already holds the lock,
+The only change from `async_race.py` is the addition of `async with lock`.
+This protects the read, the yielding `await`, and the write.
+If a task reaches `async with lock` while another task already holds the lock,
 it suspends itself until that lock becomes available.
 This way, only one task's read-modify-write is ever in progress,
 no matter how many times the event loop switches to another task in between.
@@ -1594,30 +1594,32 @@ asyncio.run(main())
 #: peak concurrent workers: 2
 ```
 
-Five tasks start together,
-but `semaphore` admits only two into the sleep at once.
+Five tasks start together, but `semaphore` admits only two at a time.
 `peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
 A threaded equivalent of this worker would need its own lock around `active += 1` and `peak = max(peak, active)`,
 since a preemptive switch could land between them.
-Here, neither line contains an `await`,
-so nothing else runs between them and no lock is needed.
+Here, the first `await` comes after both updates,
+so the task keeps control through them and needs no lock.
 
-A semaphore initialized to 1 behaves exactly like a lock;
-raising the count is what turns it into a throttle on a limited resource,
+A semaphore initialized to one behaves exactly like a lock.
+Raising the count turns it into a throttle on a limited resource,
 such as a fixed number of database connections.
 
 ### Deadlock
 
-A *deadlock* happens when two or more tasks each hold a resource the other one needs,
-and neither can proceed.
-Four conditions must all hold at once: exclusive access to each resource,
-a task holds one resource while it waits for another,
-no way to force a task to give up what it holds,
-and a cycle of tasks each waiting on the next.
+*Deadlock* happens when two or more tasks each hold a resource the other needs,
+so neither can proceed.
+Four conditions must all hold at once:
+
+1. Exclusive access to each resource
+2. A task holds one resource while it waits for another
+3. No way to force a task to give up what it holds
+4. A cycle of tasks each waiting on the next
+
 Break any one of the four and deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
-so we can easily produce deadlock with `asyncio`.
-Here, there are two tasks and two `asyncio.Lock` objects.
+which means we can also produce deadlock with `asyncio`.
+This example has two tasks and two `asyncio.Lock` objects.
 The two locks are acquired in opposite order:
 
 ```python
@@ -1643,17 +1645,18 @@ async def main() -> None:
             timeout=0.5,
         )
     except TimeoutError:
-        print("deadlock detected: True")
+        print("deadlock detected")
 
 asyncio.run(main())
-#: deadlock detected: True
+#: deadlock detected
 ```
 
 The first task takes `lock_a` then reaches for `lock_b`.
 The second takes `lock_b` then reaches for `lock_a`.
 The `sleep(0.01)` gives each task time to grab its first lock before either reaches for its second.
-Unlike threads, only one task runs at a time,
-so there is no OS scheduler free to interleave the two tasks' first lines in an unlucky order.
+Tasks, unlike threads, run one at a time,
+so no OS scheduler can interleave the two tasks' first lines in an unlucky order.
+
 Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other holds and will never release.
 A real deadlock has no `timeout` and never resolves.
@@ -1664,7 +1667,7 @@ Here, the timeout ensures that the example terminates.
 The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
 If both tasks had reached for `lock_a` first,
-whichever got there first would finish and release it before the other ever waited.
+whichever got there first would finish and release that lock before the other waited.
 
 ### Livelock
 
@@ -1709,10 +1712,11 @@ asyncio.run(main())
 ```
 
 Each round, `a` checks `b_wants` and `b` checks `a_wants`,
-and both still see the other wanting the resource, so both give,
-which is exactly why both still want it next round.
+and both still see the other wanting the resource, so both give.
+Thus both still want it on the next round.
 Being polite when interacting with a task that is equally polite produces no progress at all,
 even though the event loop keeps both tasks busy the whole time.
+
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks parked and waiting.
@@ -1720,7 +1724,7 @@ In both cases, nothing gets done.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.
 
-## Rules of Thumb
+## Guidlines
 
 - **Don't wrap a lone wait in `async`/`await` machinery.**
   `asyncio` pays off once you have waits to overlap.
@@ -1773,7 +1777,7 @@ Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
 Some problems allow immutability.
 Others require memory efficiency over everything.
-There are solutions that require as much data as possible be packed into RAM.
+Some solutions require packing as much data as possible into RAM.
 In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 

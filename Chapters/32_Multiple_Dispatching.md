@@ -250,8 +250,8 @@ and it answers the `Number + Number` question that opened this chapter.
 If that returns the special value `NotImplemented`,
 Python turns around and tries `type(b).__radd__(b, a)`.
 The first call dispatches on `a`'s type, the fallback on `b`'s:
-double dispatching, built into the language,
-which is how an `int` on the left can learn to add itself to a type written decades after `int` was.
+double dispatching, built into the language.
+This is how an `int` on the left can learn to add itself to a type written decades after `int` was.
 Returning `NotImplemented`
 (a sentinel value, not the `NotImplementedError` exception, a lookalike pair worth keeping apart)
 is how an operand says "I don't know this type; ask the other object."
