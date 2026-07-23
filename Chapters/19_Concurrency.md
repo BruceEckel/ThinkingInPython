@@ -91,7 +91,8 @@ even though some tasks need only a fraction of that.
 Engineers learned various tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
-*Asynchrony*, implemented with *coroutines*, moves the context switch out of the OS and into the program.
+*Asynchrony*, implemented with *coroutines*,
+moves the context switch out of the OS and into the program.
 Engineers don't have to fight the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
@@ -1779,7 +1780,7 @@ This works for both asynchrony and parallelism.
 
 Also, notice how much we've talked about the OS in this chapter.
 The comfortable abstraction provided by normal programming is pierced to tatters by concurrency.
-Sometimes you need to go beyond the OS-level abstraction all the way to hardware,
+Sometimes you even need to go beyond the OS-level abstraction, all the way to hardware,
 in order to understand a particular bug.
 
 Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
@@ -1867,11 +1868,13 @@ Here are a few of the topics beyond it:
     The `asyncio` examples in this chapter show it.
     Coroutines interleave on a single thread, and no two of them ever execute at the same instant.
 
-    The distinction goes back further than Pike's 2012 talk at Heroku's Waza conference.
-    Edsger Dijkstra's 1965 paper, "Solution of a Problem in Concurrent Programming Control,"
+    The distinction goes back further than
+    [Pike's 2012 talk](https://go.dev/blog/waza-talk) at Heroku's Waza conference.
+    Edsger Dijkstra's 1965 paper,
+    "[Solution of a Problem in Concurrent Programming Control](https://repositories.lib.utexas.edu/items/84831631-07fe-484b-a45c-3cff9f6b1f43),"
     started the formal study of concurrent programs.
     Leslie Lamport's 2015 Turing Lecture,
-    "The Computer Science of Concurrency: The Early Years,"
+    "[The Computer Science of Concurrency: The Early Years](https://lamport.azurewebsites.net/pubs/turing.pdf),"
     surveys the decades since.
 
 [^stm-status]: Python has no mainstream STM library today.
@@ -1887,9 +1890,12 @@ Here are a few of the topics beyond it:
 
 [^libraries]: Libraries worth exploring:
 
-    - [BOCPY](https://microsoft.github.io/bocpy/): Behavior-Oriented Concurrency
-    - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency
-    - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio
+    - [BOCPY](https://microsoft.github.io/bocpy/): Behavior-Oriented Concurrency.
+    - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency.
+    - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio.
     - [uvloop](https://github.com/MagicStack/uvloop):
       Fast drop-in replacement for the standard event loop.
       See also [rsloop](https://github.com/RustedBytes/rsloop).
+    - [MPIRE](https://github.com/sybrenjansen/mpire): Makes `multiprocessing` easier and faster.
+    - [RAY](https://www.ray.io/): Distribute tasks across multiple CPUs, GPUs, and clusters.
+    - [Dask](https://www.dask.org/): Parallelizes tools like NumPy, Pandas, and Scikit-Learn.
