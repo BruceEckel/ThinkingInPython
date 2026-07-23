@@ -42,7 +42,7 @@ It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
 A stack is the reverse: its maximum size is fixed when its thread is created,
 and that size never changes.
-What varies at runtime is only how much of that fixed allotment is in use.
+What varies at runtime is the amount used out of that fixed allotment.
 If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
 A heap allocation is reached only through a reference,
