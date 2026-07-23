@@ -23,13 +23,13 @@ Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
-Notably, not everything in Simulat was an object;
+Notably, not everything in Simula was an object;
 the language still had standalone functions.
 It was a compiled, statically typed language,
 so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
 
-*Smalltalk* took the other road: everything is an object,
+*Smalltalk* took the other path: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
 It was an emphatically dynamic,
 run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
@@ -52,7 +52,7 @@ Rust makes bindings immutable by default.
 Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
 They compose data structures instead of inheriting implementation,
-and they let code live outside classes, which cuts duplication.
+and they let code live outside classes, reducing duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
@@ -65,10 +65,17 @@ It accepts the same arguments, returns the same kinds of results,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
-This is the guarantee that makes polymorphism,
+This is what makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
+A statically typed compiler can check part of it,
+that an override's signature stays compatible,
+but not whether the override actually behaves the way the base class promises.
 The base class calls a method and trusts every subclass to stand in for it.
-The rest of this chapter shows why.
+
+Python has no compiler to enforce even that structural check.
+Nothing stops a subclass from breaking the base class's contract.
+The interpreter runs code that violates the LSP without objection.
+That code may or may not fail at run time.
 
 ## Encapsulation Leaks
 
@@ -76,7 +83,7 @@ The first OOP promise is encapsulation: hide the data,
 expose it only through methods you control.
 In Python the usual move is a leading underscore and a read-only property.
 It does not work as well as it looks.
-A getter that returns a mutable object hands the caller a reference to the real internals:
+A getter that returns a mutable object hands the caller a reference to the underlying internals:
 
 ```python
 # leaky.py
@@ -113,7 +120,8 @@ if __name__ == "__main__":
 Encapsulation with private fields and getters still leaks.
 The `is` check shows the mechanism:
 the getter does not return a view or a snapshot of the list,
-it returns the list, the identical object the underscore was hiding.
+it returns a reference to the list,
+the identical object the underscore was hiding.
 Python's `return` hands out references, never copies.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
@@ -132,7 +140,7 @@ def test_getter_leaks_internal_state() -> None:
 
 Mutating the returned list manipulates the internal state.
 
-## Plugging the Leaks Is Tedious
+## Plugging Leaks Is Tedious
 
 You can stop the leak by copying everything a getter returns.
 It works, but every getter must remember to do it,
@@ -154,7 +162,7 @@ class Plugged:
 
     @property
     def numbers(self) -> list[int]:
-        return self._numbers.copy()  # Hand back a copy, not our list
+        return self._numbers.copy()  # Isolate by returning a copy
 
     @property
     def bob(self) -> Bob:
@@ -162,7 +170,7 @@ class Plugged:
 
 if __name__ == "__main__":
     plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates a copy, not ours
+    plugged.numbers.append(999)  # Mutates the copy
     plugged.bob.name = "Ralph"  # Ditto
     print(plugged.numbers, plugged.bob)
 #: [1, 2] Bob(name='Bob')
@@ -175,6 +183,10 @@ And these copies plug only the outbound leak.
 The constructor stored the caller's own list,
 so the caller's original reference still mutates the internals.
 A fully defensive class must copy on the way in as well.
+
+A `@dataclass` version of `Plugged` would trim the constructor,
+but its generated `__repr__` prints `_numbers` and `_bob` directly,
+leaking the internals yet again.
 
 The two getters also copy differently, and the difference is its own trap.
 `list.copy()` is *shallow*: it duplicates the container but shares the elements,
@@ -268,20 +280,21 @@ except FrozenInstanceError as e:
 ```
 
 Frozen guards the binding, not the object.
-`fl.numbers` must keep pointing at the same list, and rebinding it raises,
-but nothing stops that list from changing, the identical leak `Leaky` had.
-That is why `numbers` became a `tuple` and why `Bob` froze too.
+`fl.numbers` must keep pointing at the same list,
+and attempting to rebind it raises an exception.
+But nothing stops that list from changing, the identical leak `Leaky` had.
+That is why `numbers` became a `tuple` and `Bob` was also frozen.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
 makes the case for frozen data classes.
-Most encapsulation is only necessary because you allowed mutation in the first place.
+Most encapsulation is only necessary when mutation is allowed.
 
 ## Methods or Functions?
 
 The second OOP promise is that behavior belongs inside the object, as methods.
 But a method is only a function whose first argument is the object.
-Compare a method with a function that does the same thing:
+Compare a method to a function that does the same thing:
 
 ```python
 # point_distance.py
@@ -293,10 +306,10 @@ class Point:
     x: float
     y: float
 
-    def distance_to(self, other: Point) -> float:  # As a method
+    def distance_to(self, other: Point) -> float:  # Method
         return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
-def distance(a: Point, b: Point) -> float:  # As a free function
+def distance(a: Point, b: Point) -> float:  # Free function
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
 if __name__ == "__main__":
@@ -320,8 +333,6 @@ The class does not need to own it.
 The function is not worse, and it has an advantage.
 It need not live inside `Point`.
 
-Testing confirms the method and the free function agree:
-
 ```python
 # test_point_distance.py
 from point_distance import Point, distance
@@ -334,12 +345,11 @@ def test_method_and_function_agree() -> None:
 
 ## Protocols Generalize, Composition Adapts
 
-Because the function does not belong to a class,
+When the function does not belong to a class,
 it can work on anything shaped like a point.
 A `Protocol` describes that shape,
-and any type with the right attributes satisfies it,
-with no declared inheritance.
-This is the structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+and any type with the right attributes satisfies it, without inheritance.
+This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
 When someone hands you a type that does not fit, you adapt it by composition,
 not inheritance:
 
@@ -369,7 +379,7 @@ class Pair:  # Suppose you are handed this, with no x or y
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # An adapter built by composition, not inheritance
+class PairCoord:  # Adapter: uses composition, not inheritance
     pair: Pair
 
     @property
@@ -388,24 +398,13 @@ if __name__ == "__main__":
 ```
 
 `Point` and `PairCoord` share no base class.
-They both have `x` and `y`, which is all `distance()` required.
-
-Testing confirms `distance()` works on both a `Point` and an adapted `Pair`:
-
-```python
-# test_distance_protocol.py
-import distance_protocol as dp
-
-def test_protocol_and_adapter() -> None:
-    assert dp.distance(dp.Point(3, 0), dp.Point(0, 4)) == 5
-    assert dp.distance(dp.PairCoord(dp.Pair(3, 0)),
-                       dp.PairCoord(dp.Pair(0, 4))) == 5
-```
+They both have `x` and `y`, which is all `distance()` requires.
 
 ## Compose, Do Not Inherit
 
 The third OOP promise is reuse through inheritance.
-In practice, inheriting implementation couples a subclass to its base in ways that are hard to undo.
+In practice, implementation inheritance couples a subclass to its base in ways that are hard to undo.
+
 The alternative is composition.
 A type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
@@ -438,9 +437,9 @@ print(c.address)
 #: Address(city='Crested Butte', postal='81224')
 
 # A copy with one nested field changed leaves c intact
-moved = replace(c, address=replace(c.address, city="Carbondale"))
+moved = replace(c, address=replace(c.address, city="Ft. Collins"))
 print(c.address.city, "->", moved.address.city)
-#: Crested Butte -> Carbondale
+#: Crested Butte -> Ft. Collins
 
 twin = Contact(
     Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
@@ -453,14 +452,10 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 ## Polymorphism Without Inheritance
 
 The fourth OOP promise is polymorphism.
-This is usually taught through inheritance, but that is only one form.
-More broadly, polymorphism means a function parameter accepts more than one type.
-The questions are which types it accepts,
-and what the function may do with them.
 
-The classic object-oriented answer uses an abstract base class.
-The base type names both the allowed types, its subclasses,
-and what you may do with them, its methods:
+### Abstract Base Classes
+
+The classic object-oriented example uses an abstract base class:
 
 ```python
 # shapes_oo.py
@@ -499,6 +494,8 @@ if __name__ == "__main__":
 Inheriting from `ABC` makes `Shape` abstract.
 You cannot instantiate it,
 and `@abstractmethod` forces every subclass to define `area()`.
+
+### Dynamic Typing
 
 Dynamic typing produces a different approach.
 Any type works as long as it has the method the function calls.
@@ -541,6 +538,8 @@ Annotated `t: object`, the safe top type, `show()` would fail the type checker,
 because `object` has no `display()` method.
 `Any` instead switches the checker off for `t`, permitting every operation.
 It is dynamic typing opted into, one parameter at a time.
+### Protocols
+
 [Static Typing](08_Static_Typing.md#structural-typing-with-protocols)
 gives this a static form with `Protocol`:
 
@@ -581,15 +580,114 @@ and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
 The `ABC` in `shapes_oo.py` and this `Protocol` are lookalikes that differ in who must know about whom.
-An abstract base class is *nominal*: a type joins by inheriting from it,
+An abstract base class is *nominal* (named): a type joins by inheriting from it,
 the membership is declared in the subclass's own source,
 and the base can carry shared implementation for its children.
-A protocol is *structural*:
-any type with the right members already satisfies it,
-including types in libraries you cannot edit,
-and the type's author never needs to hear that your protocol exists.
-That independence is why this chapter leans on protocols.
+A protocol is *structural*: it is satisfied by any type with the right members.
+This includes types in libraries you cannot edit.
+The type's author never needs to hear that your protocol exists.
+That independence is why this chapter emphasizes protocols.
 They connect pieces without requiring any piece to change.
+
+Because membership is structural,
+one class can satisfy any number of protocols at once,
+with no inheritance graph connecting them.
+Each protocol only names the shape it needs.
+Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
+or `Loggable`.
+There is no shared ancestor for their method resolution orders to collide over.
+Classic multiple inheritance can hit the diamond problem,
+where two base classes trace back to a common ancestor and the interpreter must pick which version of an overridden method wins.
+Protocols avoid that question.
+Satisfying three of them costs nothing more than having the three methods:
+
+```python
+# multi_protocol.py
+import json
+from dataclasses import asdict, dataclass
+from typing import Protocol
+
+class Priced(Protocol):
+    def total(self) -> float: ...
+
+class Serializable(Protocol):
+    def to_json(self) -> str: ...
+
+class Loggable(Protocol):
+    def describe(self) -> str: ...
+
+@dataclass(frozen=True)
+class Invoice:
+    amount: float
+    customer: str
+
+    def total(self) -> float:
+        return self.amount
+
+    def to_json(self) -> str:
+        return json.dumps(asdict(self))
+
+    def describe(self) -> str:
+        return f"Invoice for {self.customer}"
+
+def charge(item: Priced) -> float:
+    return item.total()
+
+def persist(item: Serializable) -> str:
+    return item.to_json()
+
+def audit(item: Loggable) -> str:
+    return item.describe()
+
+if __name__ == "__main__":
+    invoice = Invoice(19.99, "Ada")
+    print(charge(invoice))
+    print(persist(invoice))
+    print(audit(invoice))
+#: 19.99
+#: {"amount": 19.99, "customer": "Ada"}
+#: Invoice for Ada
+```
+
+`Invoice` inherits from nothing but `object`, yet `charge()`, `persist()`,
+and `audit()` each accept it, because each only checks the one method it needs.
+
+That same structural check has a blind spot.
+Two unrelated protocols can share a method name and signature by coincidence,
+and nothing distinguishes them.
+A class satisfies both, whether or not that was ever intended:
+
+```python
+# protocol_collision.py
+from dataclasses import dataclass
+from typing import Protocol
+
+class Priced(Protocol):
+    def total(self) -> float: ...
+
+class Weighted(Protocol):
+    def total(self) -> float: ...
+
+@dataclass(frozen=True)
+class Package:
+    weight_kg: float
+
+    def total(self) -> float:
+        return self.weight_kg  # Weight, not a price
+
+def charge(item: Priced) -> float:
+    return item.total()
+
+if __name__ == "__main__":
+    package = Package(4.5)
+    print(charge(package))  # Silently treated as a price
+#: 4.5
+```
+
+`ty` accepts `package` as a `Priced` argument without complaint,
+and `charge()` returns `4.5`, silently treating a weight as a price.
+The checker matched the shape correctly.
+The mismatch lives entirely in what the number means, and no checker sees that.
 
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not get you.
@@ -597,17 +695,19 @@ Satisfying `Displayable` is a shape claim: the method exists,
 with the right signature, and the checker verifies that half of the contract.
 The other half is semantic.
 `display()` must also behave the way callers rely on:
-return a description rather than raise, finish rather than block,
+return a description rather than raise an exception, finish rather than block,
 describe the object rather than change it.
 No checker sees that half.
 Substitution is safe only when both halves hold,
 whether membership came from inheriting a base class or matching a protocol.
 The machine checks the signatures; you still owe the behavior.
 
-A third answer names a closed set of types as a union and dispatches with `match`,
+### Pattern Matching on a Union
+
+Another approach uses a union and a `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles each case.
-No base class or overridden method exists.
+No base class or overridden method.
 The type checker confirms the match covers every shape:
 
 ```python
@@ -654,18 +754,14 @@ which is often not true.
 and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 explore this trade-off.
 
-Testing confirms the object-oriented and `match` versions compute the same areas:
+## What Is Polymorphism?
 
-```python
-# test_shapes.py
-import shapes_match as sm
-import shapes_oo as so
+This is usually taught through inheritance, but that is only one form.
+More broadly, polymorphism means a function parameter accepts more than one type.
+The questions are which types it accepts,
+and what the function may do with them.
 
-def test_oo_and_match_shapes_agree() -> None:
-    assert (so.Rectangle(3.0, 4.0).area()
-            == sm.area(sm.Rectangle(3.0, 4.0)))
-    assert so.Circle(1.0).area() == sm.area(sm.Circle(1.0))
-```
+[[Examples including ad-hoc (function overloading) and parametric, anything else? ]]
 
 ## Null Object
 

@@ -13,7 +13,7 @@ class Plugged:
 
     @property
     def numbers(self) -> list[int]:
-        return self._numbers.copy()  # Hand back a copy, not our list
+        return self._numbers.copy()  # Isolate by returning a copy
 
     @property
     def bob(self) -> Bob:
@@ -21,7 +21,7 @@ class Plugged:
 
 if __name__ == "__main__":
     plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates a copy, not ours
+    plugged.numbers.append(999)  # Mutates the copy
     plugged.bob.name = "Ralph"  # Ditto
     print(plugged.numbers, plugged.bob)
 #: [1, 2] Bob(name='Bob')

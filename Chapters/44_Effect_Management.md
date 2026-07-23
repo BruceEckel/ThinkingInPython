@@ -269,7 +269,7 @@ But it only guards the exception that `slope()` was written to expect.
 `validate()` raises `ValueError` for a negative `run`,
 an exception `slope()` never anticipated.
 By calling it, `validate()`'s Effect becomes `slope()`'s Effect.
-Catching by hand is only as complete as your knowledge of every exception every callee can raise,
+Catching by hand is only as complete as your knowledge of every exception every that a callee can raise,
 which is the tracking problem an Effect Management System exists to solve.
 
 Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,

@@ -1,7 +1,7 @@
 Chapter 20 might need "## What Is Polymorphism?"
 
 "happen" "is what" "does it" "ever" "at all" "only"
-"was to"
+"was to" "in the first place"
 
 if __name__ == "__main__":
     main()

@@ -7,10 +7,10 @@ class Point:
     x: float
     y: float
 
-    def distance_to(self, other: Point) -> float:  # As a method
+    def distance_to(self, other: Point) -> float:  # Method
         return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
-def distance(a: Point, b: Point) -> float:  # As a free function
+def distance(a: Point, b: Point) -> float:  # Free function
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
 if __name__ == "__main__":

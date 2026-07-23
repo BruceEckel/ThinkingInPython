@@ -23,7 +23,7 @@ class Pair:  # Suppose you are handed this, with no x or y
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # An adapter built by composition, not inheritance
+class PairCoord:  # Adapter: uses composition, not inheritance
     pair: Pair
 
     @property

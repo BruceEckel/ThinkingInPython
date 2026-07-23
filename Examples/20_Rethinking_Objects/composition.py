@@ -24,9 +24,9 @@ print(c.address)
 #: Address(city='Crested Butte', postal='81224')
 
 # A copy with one nested field changed leaves c intact
-moved = replace(c, address=replace(c.address, city="Carbondale"))
+moved = replace(c, address=replace(c.address, city="Ft. Collins"))
 print(c.address.city, "->", moved.address.city)
-#: Crested Butte -> Carbondale
+#: Crested Butte -> Ft. Collins
 
 twin = Contact(
     Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
