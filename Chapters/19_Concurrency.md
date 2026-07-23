@@ -63,12 +63,11 @@ it has overhead.
 Also, the OS must time slice fairly frequently to evenly distribute computing resources across threads.
 Typically a thread only runs a few milliseconds at a time.
 
-Using more than one thread within a program solved an immediate problem:
-if a thread got stuck (*blocked*) waiting for I/O
+Using more than one thread within a program solved an immediate problem.
+When a thread got stuck (*blocked*) waiting for I/O
 (e.g. disk, network, waiting on a lock),
-it could voluntarily yield its use of the CPU to the operating system,
-which could then use that CPU for another thread,
-producing faster overall progress.
+it handed its CPU back to the operating system,
+which ran another thread in its place, producing faster overall progress.
 
 Another benefit of threads emerged when more CPUs became available on a single machine.
 Threads were already designed to distribute computing resources,
@@ -263,8 +262,9 @@ async def fetch(item: str, delay: float) -> str:
 `a` and `b` have the shortest delays and succeed.
 `c` and `d` share the same delay, so they fail together.
 `e` and `f` are still sleeping when that happens,
-with a wide gap to their own deadlines
-(this gives cancellation room to land on any platform's timer, producing a deterministic trace).
+with a wide gap to their own deadlines.
+The gap gives cancellation time to arrive first on any platform's timer,
+which keeps the trace deterministic.
 
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative.
 An `async with` block owns every task started inside it and does not exit until every one is accounted for:
@@ -827,7 +827,8 @@ The standard CPython build has a *Global Interpreter Lock* (GIL).
 With the GIL, only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
 
-However, a thread releases the GIL while it waits on I/O. That release is why a thread pool helps with I/O-bound work.
+However, a thread waiting on I/O releases the GIL.
+That release is why a thread pool helps with I/O-bound work.
 The next two examples make that concrete, one for waiting and one for computing.
 Both use the same harness,
 which runs a price function sequentially and threaded, confirms they agree,
@@ -1029,10 +1030,10 @@ Most objects are only ever touched by the thread that created them.
 *Biased reference counting* lets that owning thread update the count with ordinary,
 non-atomic arithmetic.
 Only other threads pay for an atomic operation.
-Permanent objects like `None`, `True`, and small integers become *immortal*,
-a change that landed in 3.12 for every build but pays off most here,
-since it removes the one atomic operation every thread would otherwise contest.
+Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts never change.
+Immortality landed in 3.12 for every build but pays off most here,
+since it removes the one atomic operation every thread would otherwise contest.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
 Single-threaded code pays a small penalty for this machinery,
@@ -1348,7 +1349,7 @@ Processes and subinterpreters genuinely run at once
 
 `asyncio` handles I/O-bound work.
 Processes and subinterpreters handle CPU-bound work.
-In light of these, does new code ever need threads?
+With both halves covered, does new code ever need threads?
 
 It does, but not for the reason threads were once the default choice.
 [I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
@@ -1672,7 +1673,7 @@ whichever got there first would finish and release that lock before the other wa
 
 ### Livelock
 
-A *livelock* is not blocked.
+A *livelock* blocks nothing.
 Tasks keep running and keep changing state, but none of them makes progress,
 the way two people in a hallway each step aside for the other, forever.
 No lock is involved, so no timeout can fix it, and there is nothing to acquire:
@@ -1727,6 +1728,9 @@ for example letting only the task with the lower ID give.
 
 ## Guidelines
 
+- **Remember that concurrency is a performance tool.**
+  Explore [Performance](18_Performance.md)
+  before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**
   `asyncio` pays off once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
@@ -1748,7 +1752,7 @@ for example letting only the task with the lower ID give.
   a worker that runs continuously,
   or processes that share state through a `Manager`.
 - **More cores only speed up the parallel fraction of the work.**
-  Splitting past the number of cores buys a little more.
+  Splitting past the number of cores sometimes buys a little more.
   Then the per-task cost of pickling and reassembling catches up,
   and the gains flatten (Amdahl's Law).
 - **For CPU-bound work, try a subinterpreter first, a process pool second,
@@ -1756,7 +1760,7 @@ for example letting only the task with the lower ID give.
 - **Match the queue to the concurrency model.**
   `queue.Queue` blocks a thread,
   `multiprocessing.Queue` pickles across processes,
-  `asyncio.Queue` suspends a task and needs no locking at all.
+  `asyncio.Queue` suspends a task and needs no locking.
 - **A shared lock only prevents deadlock if every user agrees on the order.**
   Acquire shared locks in the same sequence everywhere.
   When two units keep yielding to each other instead,
@@ -1770,21 +1774,21 @@ There are ongoing arguments about what the term even means.
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
-*Concurrent* means "operating or occurring at the same time."
-Both asynchrony and parallelism fit.
+As we've seen in this chapter,
+concurrency means "operating or occurring at the same time."
+This works for both asynchrony and parallelism.
 
-Someone who declares that "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
+Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
 This chapter makes concurrency look easy because it has only touched the surface of shared mutable state problems.
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
-Some problems allow immutability.
-Others require memory efficiency over everything.
-Some solutions require packing as much data as possible into RAM.
+Some problems preclude immutability.
+For example, a solution might require packing as much data as possible into RAM.
 In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
-People have worked to find better ways to program concurrently.
+People continue to work toward better ways of concurrent programming.
 Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
 The vocabulary this chapter built,
 from processes and threads to tasks and coroutines,
@@ -1803,19 +1807,18 @@ Here are a few of the topics beyond it:
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages sent to its own mailbox,
   never shares state directly, and can spawn more actors.
-  Erlang, built at Ericsson for telephone switches, and Elixir,
-  newer and built on the same BEAM virtual machine,
-  are its most established production examples.
+  The most established production examples include Erlang,
+  built at Ericsson for telephone switches.
+  Elixir is newer and built on the Erlang's BEAM virtual machine.
 - **Communicating Sequential Processes
-  (CSP):** Models concurrency as independent processes that communicate only over explicit,
+  (CSP):** Independent processes that communicate only over explicit,
   shared channels, rather than an actor's private mailbox.
   This is the approach Go's goroutines and channels are built on.
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
-  retrying automatically if another thread interfered.[^stm-status]
+  retrying automatically if another thread interferes.[^stm-status]
 - **Memory models and data races:** Define which writes by one thread are guaranteed visible to another,
   and what happens when two threads touch the same memory with no synchronization between them.
-- The list goes on...
 
 ## Exercises
 
@@ -1852,8 +1855,7 @@ Here are a few of the topics beyond it:
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
 
-[^concurrency-def]: Pike's own definition, from the same talk,
-clarifies what he meant.
+[^concurrency-def]: Pike's definition from that talk clarifies what he meant.
     Concurrency is the composition of independently executing computations.
     Parallelism is running those computations at the same time.
     You can have concurrency without parallelism.
@@ -1872,8 +1874,7 @@ clarifies what he meant.
     used STM internally to remove the GIL and exposed a
     `with __pypy__.thread.atomic:` block for ordinary Python code.
     PyPy's own documentation now treats it as discontinued.
-    GIL-removal research moved instead to the fine-grained locking
-    [Free Threading](#free-threading) covers.
+    GIL-removal research moved instead to [fine-grained locking](#free-threading).
     A couple of academic prototypes exist (PSTM, TraM),
     but neither is a maintained library suited to real code.
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
