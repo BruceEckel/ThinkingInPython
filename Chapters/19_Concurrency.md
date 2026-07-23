@@ -57,42 +57,43 @@ It stores the CPU register set, which includes:
 - The stack pointer
 - Other registers and flags used by the program
 
-The thread's stack is not copied.
-It sits and waits for the thread to resume.
-The heap is not duplicated; it is shared between all threads in that process.
+The thread's stack is not copied because every thread has its own stack.
+There is only a single heap, shared between all threads in that process.
 
-Although context switching between threads is made to be as efficient as possible,
-it has overhead.
+Context switching between threads is as efficient as possible,
+but it still has overhead.
 Also, the OS must time slice fairly frequently to evenly distribute computing resources across threads.
 Typically a thread only runs a few milliseconds at a time.
 
-Using more than one thread within a program solved an immediate problem.
-When a thread got stuck (*blocked*) waiting for I/O
+Using more than one thread within a program solves an immediate problem.
+When a thread gets stuck (*blocked*) waiting for I/O
 (e.g. disk, network, waiting on a lock),
-it handed its CPU back to the operating system,
-which ran another thread in its place, producing faster overall progress.
+it hands its CPU back to the operating system.
+While that thread is blocked, the OS can run other threads,
+producing faster overall progress.
 
 Another benefit of threads emerged when more CPUs became available on a single machine.
 Threads were already designed to distribute computing resources,
 so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
-Threads could also be made to do ad-hoc parallelism:
-some CPUs could be dedicated to running parallel parts of a program by adapting the threading mechanism.
+By adapting the threading mechanism,
+threads could also perform ad-hoc parallelism:
+some CPUs could be dedicated to run parts of a program simultaneously.
 
 Although threads have been adapted to these purposes,
 the OS is always at a disadvantage:
 it doesn't know details of the program it's running,
 and therefore cannot optimize that program.
-The OS cannot, for example,
-perform faster context switches by knowing what data is important to preserve and what isn't.
-In addition, each thread reserves enough resources to serve any program,
-even though some tasks need only a fraction of them.
+For example, the OS does not know what data is important to preserve and what isn't.
+If it knew, it could perform faster context switches.
+In addition, each thread reserves a stack large enough to serve virtually any program,
+even though some tasks need only a fraction of that.
 Engineers learned various tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
-The answer was to move the context switch out of the OS and into the program.
-This way engineers are not fighting the threading system.
+The answer moves the context switch out of the OS and into the program.
 This is called *asynchrony*, implemented with *coroutines*.
+Engineers don't have to fighting the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
@@ -1781,8 +1782,14 @@ As we've seen in this chapter,
 concurrency means "operating or occurring at the same time."
 This works for both asynchrony and parallelism.
 
+Also, notice how much we've talked about the OS in this chapter.
+The comfortable abstraction provided by normal programming is pierced to tatters by concurrency.
+Sometimes you need to go beyond the OS-level abstraction all the way to hardware,
+in order to understand a particular bug.
+
 Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
-This chapter makes concurrency look easy because it has only touched the surface of shared mutable state problems.
+This chapter makes concurrency look (somewhat)
+easy because it has only touched the surface of shared mutable state problems.
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
@@ -1791,7 +1798,7 @@ For example, a solution might require packing as much data as possible into RAM.
 In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
-People continue to work toward better ways of concurrent programming.
+People continue to work toward better ways of concurrent programming.[^libraries]
 Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
 The vocabulary this chapter built,
 from processes and threads to tasks and coroutines,
@@ -1882,3 +1889,11 @@ Here are a few of the topics beyond it:
     but neither is a maintained library suited to real code.
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
     are where STM actually succeeded as a practical, widely used tool.
+
+[^libraries]: Libraries worth exploring:
+    - [BOCPY](https://microsoft.github.io/bocpy/): Behavior-Oriented Concurrency
+    - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency
+    - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio
+    - [uvloop](https://github.com/MagicStack/uvloop):
+      Fast drop-in replacement for the standard event loop.
+      See also [rsloop](https://github.com/RustedBytes/rsloop).
