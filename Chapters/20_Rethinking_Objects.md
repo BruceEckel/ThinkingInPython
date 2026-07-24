@@ -513,13 +513,15 @@ if __name__ == "__main__":
 
 `show()` accepts anything: `Any`, which is not `object`.
 Pass it something without a `display()` method and you'll get an exception when the line runs.
-If we used `t: object` (the safe top type), `show()` would fail the type checker because `object` has no `display()` method.
+If we used `t: object` (the safe top type),
+`show()` would fail the type checker because `object` has no `display()` method.
 `Any` switches the checker off for `t`, and this permits any type.
 Each `Any` parameter moves you back into dynamic typing.
 
 ### Protocols
 
-[`Protocol`](08_Static_Typing.md#structural-typing-with-protocols) re-establishes static typing:
+[`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+re-establishes static typing:
 
 ```python
 # protocols_typed.py
@@ -543,11 +545,10 @@ A structural type describes the required shape,
 and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
-The `ABC` in `shapes_oo.py` and this `Protocol` are lookalikes that differ in who must know about whom.
-An abstract base class is *nominal* (named): a type joins by inheriting from it,
-the membership is declared in the subclass's own source,
+An abstract base class is *nominal* (named): a type joins by inheriting from it.
+Membership is declared in the subclass's own source,
 and the base can carry shared implementation for its children.
-A protocol is *structural*: it is satisfied by any type with the right members.
+A protocol is *structural*: it works with any type that has the right members.
 This includes types in libraries you cannot edit.
 The type's author never needs to hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
@@ -559,9 +560,10 @@ with no inheritance graph connecting them.
 Each protocol only names the shape it needs.
 Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
 or `Loggable`.
-There is no shared ancestor for their method resolution orders to collide over.
-Classic multiple inheritance can hit the diamond problem,
-where two base classes trace back to a common ancestor and the interpreter must pick which version of an overridden method wins.
+
+Classic multiple inheritance has *the diamond problem*.
+If two base classes trace back to a common ancestor,
+the interpreter must pick which version of an overridden method to call.
 Protocols avoid that question.
 Satisfying three of them costs nothing more than having the three methods:
 
@@ -618,8 +620,7 @@ and `audit()` each accept it, because each only checks the one method it needs.
 
 That same structural check has a blind spot.
 Two unrelated protocols can share a method name and signature by coincidence,
-and nothing distinguishes them.
-A class satisfies both, whether or not that was ever intended:
+and nothing distinguishes them:
 
 ```python
 # protocol_collision.py
