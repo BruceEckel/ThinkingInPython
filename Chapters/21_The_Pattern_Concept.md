@@ -11,7 +11,7 @@ and use *design patterns* for the concept.
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 A significant portion of those examples provides inspiration for much of this part of the book.
-I will introduce the basic concepts of design patterns, along with examples.
+I introduce the basic concepts of design patterns, along with examples.
 
 ## What Is a Pattern?
 
@@ -21,19 +21,19 @@ flexible solution.
 You may have seen and solved something like it before,
 but your solution probably doesn't have the kind of completeness you'll see embodied in a pattern.
 
-That admiration has a failure mode.
+That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern earns its place only when the problem it solves is actually present.
 If nothing varies, you do not need machinery for isolating variation,
-and a pattern without its problem is pure overhead.
+and a pattern without its problem is just overhead.
 
 Although they're called "design patterns,"
-they really aren't tied to the realm of design.
-A pattern seems to stand apart from the traditional way of thinking about analysis,
+they aren't tied to the realm of design.
+Patterns seem to stand apart from the traditional way of thinking about analysis,
 design, and implementation.
-Instead, a pattern embodies a complete idea within a program,
-and thus it can sometimes appear at the analysis phase or high-level design phase.
+Instead, a pattern embodies a complete idea within a program.
+Thus it can sometimes appear at the analysis phase or high-level design phase.
 This is interesting because a pattern has a direct implementation in code,
 so you might not expect it to show up before low-level design or implementation.
 
@@ -41,8 +41,8 @@ The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
-Once you find some part of your program that's likely to change for one reason or another,
-you prevent those changes from propagating other changes throughout your code.
+Once you find some part of your program that's likely to change for some reason,
+patterns can prevent those changes from propagating other changes throughout your code.
 Not only does this make the code much cheaper to maintain,
 but it is also usually simpler to understand (which results in lowered costs).
 
