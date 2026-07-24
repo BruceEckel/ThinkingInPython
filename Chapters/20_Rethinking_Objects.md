@@ -654,16 +654,66 @@ and `charge()` returns `4.5`, silently treating a weight as a price.
 The checker matched the shape correctly.
 The mismatch lives entirely in what the number means, and no checker sees that.
 
+A distinct type per concept could close this gap.
+`typing.NewType` looks like the natural fix:
+
+```python
+# newtype_boundary.py
+from typing import NewType
+
+UserId = NewType("UserId", int)
+
+def lookup(uid: UserId) -> str:
+    return f"user-{uid}"
+
+if __name__ == "__main__":
+    print(lookup(UserId(42)))
+    # ty: expected "UserId", found "int":
+    print(lookup(42))  # type: ignore
+#: user-42
+#: user-42
+```
+
+Without the `# type: ignore`, `ty` rejects the second call.
+`UserId` and `int` are different types to the checker.
+The same distinction would separate `Priced` and `Weighted` in `protocol_collision.py`,
+if `total()` returned a `Price` or a `Weight` instead of a bare `float`.
+
+`NewType` is only an aid during type checking.
+It builds no wrapper object.
+At runtime it is the identity function, so `UserId(42)` is `42`:
+
+```python
+# test_newtype_boundary.py
+from newtype_boundary import UserId
+
+def test_newtype_has_no_runtime_effect() -> None:
+    assert UserId(42) == 42
+    assert type(UserId(42)) is int
+```
+
+Nothing in that test can fail.
+The `NewType` protection lives in the checker alone.
+A caller who passes a raw `int` where `UserId` is expected raises no exception.
+The value doesn't change.
+There is nothing at runtime for a test to catch.
+Only the checker sees it, and only at edit time.
+Here, that diagnostic is silenced by the same `# type: ignore` that lets this book's build pass.
+[Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
+takes the other route.
+A frozen dataclass with a validating `__post_init__` enforces the distinction at runtime too,
+at the cost of a constructor call instead of a bare literal.
+
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not get you.
-Satisfying `Displayable` is a shape claim: the method exists,
+Satisfying a protocl is a shape claim: the methods exist,
 with the right signature, and the checker verifies that half of the contract.
 The other half is semantic.
-`display()` must also behave the way callers expect:
-return a description rather than raise an exception, finish rather than block,
+methods must also behave the way callers expect.
+For example, return a description rather than raise an exception, finish rather than block,
 describe the object rather than change it.
 No checker sees that half.
-Substitution is safe only when both halves hold,
+Substitution is safe only when both halves work,
 whether membership came from inheriting a base class or matching a protocol.
 The machine checks the signatures; you still own the behavior.
 
