@@ -58,22 +58,20 @@ The industry has been quietly walking back from "everything is an object" and fr
 ## The Liskov Substitution Principle {#liskov-substitution}
 
 The *Liskov Substitution Principle* (LSP)
-says that an object of a subtype must work anywhere code expects an object of its base type,
-without breaking the program.
-A subclass may add behavior, but it must honor the base class's contract.
+says that an object of a subtype must work anywhere code expects an object of its base type.
+A subclass may add behavior, but it must honor the base class contract.
 It accepts the same arguments, returns the same kinds of results,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
 This is what makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
-A statically typed compiler can check part of it,
-that an override's signature stays compatible,
-but not whether the override actually behaves the way the base class promises.
+A statically typed compiler can check that an override's signature stays compatible.
+It cannot check whether the override actually behaves the way the base class promises.
 The base class calls a method and trusts every subclass to stand in for it.
 
-Python has no compiler to enforce even that structural check.
-Nothing stops a subclass from breaking the base class's contract.
+Python has no compiler to enforce that structural check.
+Nothing stops a subclass from breaking the base class contract.
 The interpreter runs code that violates the LSP without objection.
 That code may or may not fail at run time.
 
@@ -81,8 +79,8 @@ That code may or may not fail at run time.
 
 The first OOP promise is encapsulation: hide the data,
 expose it only through methods you control.
-In Python the usual move is a leading underscore and a read-only property.
-It does not work as well as it looks.
+Python hides a field with a leading underscore and a read-only property.
+This does not work as well as it looks.
 A getter that returns a mutable object hands the caller a reference to the underlying internals:
 
 ```python
@@ -125,19 +123,6 @@ the identical object the underscore was hiding.
 Python's `return` hands out references, never copies.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
-
-Testing shows the leak:
-
-```python
-# test_leaky.py
-from leaky import Leaky
-
-def test_getter_leaks_internal_state() -> None:
-    leaky = Leaky([1, 2])
-    leaky.numbers.append(999)  # Changes the internal list
-    assert leaky.numbers == [1, 2, 999]
-```
-
 Mutating the returned list manipulates the internal state.
 
 ## Plugging Leaks Is Tedious
