@@ -19,9 +19,10 @@ This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
 [Toolkits](41_Functional_Toolkits.md) tours the standard library's support,
 [Error Handling](42_Functional_Error_Handling.md)
-turns failure into an ordinary value,
-and [Assurance](43_Functional_Assurance.md)
-examines what the discipline lets you claim about your code.
+turns failure into an ordinary value, [Assurance](43_Functional_Assurance.md)
+examines what the discipline lets you claim about your code,
+and [Effect Management](44_Effect_Management.md)
+tracks a function's effects in its type.
 
 ## Pure Functions
 

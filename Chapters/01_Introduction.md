@@ -117,26 +117,29 @@ gives detailed setup instructions.
 
 Each chapter is largely self-contained, so you can read straight through,
 or jump to a chapter that interests you.
+The book is organized into four parts.
 
-*Foundations* is a fast tour of the language: its syntax, containers, functions,
-classes, and static typing.
+Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
+functions, classes, and static typing.
 This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
 
-*Techniques* covers the idioms and tools that give Python its character:
-testing, data classes as types, pattern matching, decorators, comprehensions,
+Part II, *Techniques*,
+covers the idioms and tools that give Python its character: testing,
+data classes as types, pattern matching, decorators, comprehensions,
 and metaprogramming.
 Many of these chapters came from presentations I've given, mostly at PyCon.
 
-*Patterns* opens by stepping back to question object orientation itself,
+Part III, *Patterns*,
+opens by stepping back to question object orientation itself,
 because several of the patterns that follow exist to manage problems that objects create.
 The part then works through the classic design patterns,
 each reframed for Python and weighed against the language.
 I consistently ask what problem we are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 
-*Effects* closes the book with the functional perspective: pure functions,
+Part IV, *Functional Programming*, closes the book with pure functions,
 errors returned as values instead of raised exceptions,
 and systems that track a function's effects in its type.
 The final chapter looks at languages that already do this,

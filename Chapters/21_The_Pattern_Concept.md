@@ -10,7 +10,7 @@ and use *design patterns* for the concept.
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
-A significant portion of those examples provides inspiration for much of the remainder of this book.
+A significant portion of those examples provides inspiration for much of this part of the book.
 I will introduce the basic concepts of design patterns, along with examples.
 
 ## What Is a Pattern?
