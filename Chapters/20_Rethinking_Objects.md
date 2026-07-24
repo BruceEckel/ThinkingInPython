@@ -942,7 +942,7 @@ the payoff for using types is tremendous.
 Start with functions and data.
 When a program truly needs an object, it tells you:
 passing the same data into every function, or bundling behavior with state.
-OOP Is Useful, Sometimes.
+OOP is useful, sometimes.
 But not everywhere, all the time.
 
 ## Guidelines
@@ -953,8 +953,7 @@ But not everywhere, all the time.
 - Prefer protocols over a base-class hierarchy.
 - Prioritize simplicity, clarity, and maintainability, to produce reliability.
 
-This part of the book is about design patterns.
-Many of these arose to work around limitations of older object-oriented languages.
+Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
 Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol already solve the problem.
