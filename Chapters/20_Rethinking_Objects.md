@@ -706,10 +706,10 @@ at the cost of a constructor call instead of a bare literal.
 
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not get you.
-Satisfying a protocl is a shape claim: the methods exist,
-with the right signature, and the checker verifies that half of the contract.
+Satisfying a protocol is a shape claim: the methods exist,
+with the right signatures, and the checker verifies that half of the contract.
 The other half is semantic.
-methods must also behave the way callers expect.
+A method must also behave the way callers expect.
 For example, return a description rather than raise an exception, finish rather than block,
 describe the object rather than change it.
 No checker sees that half.
@@ -761,7 +761,8 @@ if __name__ == "__main__":
 ```
 
 Adding a new shape is easier in the OOP version because you write one class.
-Adding a new operation over all shapes is easier in the pattern matching (functional) version.
+Adding a new operation over all shapes is easier in the pattern matching
+(functional) version.
 Modify one function, and the type checker tells you if you missed a case.
 
 The OOP approach assumes you add types more often than operations,
