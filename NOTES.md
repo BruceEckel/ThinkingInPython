@@ -3,9 +3,6 @@ Chapter 20 might need "## What Is Polymorphism?"
 "happen" "is what" "does it" "ever" "at all" "only"
 "was to" "in the first place" "already" "even"
 
-if __name__ == "__main__":
-    main()
-
 Look through chapter 19 for words or phrasing that is confusing, odd, or out-of-character.
 My goal is:
 - Simple, plain, clear explanations

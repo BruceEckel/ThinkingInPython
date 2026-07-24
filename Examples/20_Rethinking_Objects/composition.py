@@ -17,19 +17,24 @@ class Contact:  # A Contact has a Name and an Address
     address: Address
 
 c = Contact(
-    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    Name("Gerald", "Spigot-Farthingale"),
+    Address("Sodding-on-the-Wold", "12345")
+)
 print(c.name)
-#: Name(first='Bruce', last='Eckel')
+#: Name(first='Gerald', last='Spigot-Farthingale')
 print(c.address)
-#: Address(city='Crested Butte', postal='81224')
+#: Address(city='Sodding-on-the-Wold', postal='12345')
 
 # A copy with one nested field changed leaves c intact
-moved = replace(c, address=replace(c.address, city="Ft. Collins"))
+moved = replace(c,
+    address=replace(c.address, city="Fenwick-under-Custard"))
 print(c.address.city, "->", moved.address.city)
-#: Crested Butte -> Ft. Collins
+#: Sodding-on-the-Wold -> Fenwick-under-Custard
 
 twin = Contact(
-    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    Name("Gerald", "Spigot-Farthingale"),
+    Address("Sodding-on-the-Wold", "12345")
+)
 print(c == twin)  # Value equality, field by field
 #: True
 print({c: "value"}[c])  # Hashable, so it works as a dict key

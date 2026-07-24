@@ -7,11 +7,8 @@ def cpu_price(order: int) -> int:
         total += 1
     return order * 10
 
-def main() -> None:
+if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
     with ProcessPoolExecutor() as pool:
         prices = list(pool.map(cpu_price, orders))
     print(prices)
-
-if __name__ == "__main__":
-    main()

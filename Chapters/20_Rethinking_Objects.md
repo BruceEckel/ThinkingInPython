@@ -279,7 +279,7 @@ Most encapsulation is only necessary when mutation is allowed.
 
 The second OOP promise is that behavior belongs inside the object, as methods.
 But a method is only a function whose first argument is the object.
-Compare a method to a function that does the same thing:
+Compare a method `distance_to()` to a function `distance()` that does the same thing:
 
 ```python
 # point_distance.py
@@ -307,7 +307,7 @@ if __name__ == "__main__":
 #: 5.0
 ```
 
-The middle call is the claim made concrete.
+The middle call shows the method called as if it were a free function.
 Fetched from the class instead of from an instance,
 `distance_to` is an ordinary function,
 and `p1` is passed to it as the first argument.
@@ -317,16 +317,6 @@ The function reads the same and computes the same.
 The class does not need to own it.
 The function is not worse, and it has an advantage.
 It need not live inside `Point`.
-
-```python
-# test_point_distance.py
-from point_distance import Point, distance
-
-def test_method_and_function_agree() -> None:
-    p1, p2 = Point(3, 0), Point(0, 4)
-    assert p1.distance_to(p2) == 5
-    assert distance(p1, p2) == 5
-```
 
 ## Protocols Generalize, Composition Adapts
 
@@ -385,12 +375,12 @@ if __name__ == "__main__":
 `Point` and `PairCoord` share no base class.
 They both have `x` and `y`, which is all `distance()` requires.
 
-## Compose, Do Not Inherit
+## Prefer Composition to Inheritance
 
 The third OOP promise is reuse through inheritance.
 In practice, implementation inheritance couples a subclass to its base in ways that are hard to undo.
 
-The alternative is composition.
+Before inheritance, there was composition.
 A type holds other types as fields.
 `dataclasses.replace()` gives you the copy-with-changes that immutability needs,
 and frozen instances compare by value and work as keys:
@@ -415,19 +405,24 @@ class Contact:  # A Contact has a Name and an Address
     address: Address
 
 c = Contact(
-    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    Name("Gerald", "Spigot-Farthingale"),
+    Address("Sodding-on-the-Wold", "12345")
+)
 print(c.name)
-#: Name(first='Bruce', last='Eckel')
+#: Name(first='Gerald', last='Spigot-Farthingale')
 print(c.address)
-#: Address(city='Crested Butte', postal='81224')
+#: Address(city='Sodding-on-the-Wold', postal='12345')
 
 # A copy with one nested field changed leaves c intact
-moved = replace(c, address=replace(c.address, city="Ft. Collins"))
+moved = replace(c,
+    address=replace(c.address, city="Fenwick-under-Custard"))
 print(c.address.city, "->", moved.address.city)
-#: Crested Butte -> Ft. Collins
+#: Sodding-on-the-Wold -> Fenwick-under-Custard
 
 twin = Contact(
-    Name("Bruce", "Eckel"), Address("Crested Butte", "81224"))
+    Name("Gerald", "Spigot-Farthingale"),
+    Address("Sodding-on-the-Wold", "12345")
+)
 print(c == twin)  # Value equality, field by field
 #: True
 print({c: "value"}[c])  # Hashable, so it works as a dict key
@@ -446,24 +441,25 @@ The classic object-oriented example uses an abstract base class:
 # shapes_oo.py
 import math
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import override
 
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float: ...
 
+@dataclass(frozen=True)
 class Rectangle(Shape):
-    def __init__(self, length: float, width: float) -> None:
-        self.length = length
-        self.width = width
+    length: float
+    width: float
 
     @override
     def area(self) -> float:
         return self.length * self.width
 
+@dataclass(frozen=True)
 class Circle(Shape):
-    def __init__(self, radius: float) -> None:
-        self.radius = radius
+    radius: float
 
     @override
     def area(self) -> float:
@@ -482,9 +478,8 @@ and `@abstractmethod` forces every subclass to define `area()`.
 
 ### Dynamic Typing
 
-Dynamic typing produces a different approach.
-Any type works as long as it has the method the function calls.
-No shared base class or declared set of types exists,
+With dynamic typing, any type works as long as it has the necessary method(s).
+There's no shared base class or declared set of types,
 and the only validity check happens at runtime, when the call runs:
 
 ```python
@@ -516,40 +511,23 @@ if __name__ == "__main__":
 #: Glider 65
 ```
 
-`show()` accepts anything.
-Pass it something without a `display()` method and you find out only when the line runs.
-The annotation is doing that, and `Any` is not `object`.
-Annotated `t: object`, the safe top type, `show()` would fail the type checker,
-because `object` has no `display()` method.
-`Any` instead switches the checker off for `t`, permitting every operation.
-It is dynamic typing opted into, one parameter at a time.
+`show()` accepts anything: `Any`, which is not `object`.
+Pass it something without a `display()` method and you'll get an exception when the line runs.
+If we used `t: object` (the safe top type), `show()` would fail the type checker because `object` has no `display()` method.
+`Any` switches the checker off for `t`, and this permits any type.
+Each `Any` parameter moves you back into dynamic typing.
 
 ### Protocols
 
-[Static Typing](08_Static_Typing.md#structural-typing-with-protocols)
-gives this a static form with `Protocol`:
+[`Protocol`](08_Static_Typing.md#structural-typing-with-protocols) re-establishes static typing:
 
 ```python
 # protocols_typed.py
-from dataclasses import dataclass
 from typing import Protocol
+from dynamic_typing import Bicycle, Glider
 
 class Displayable(Protocol):
     def display(self) -> str: ...
-
-@dataclass(frozen=True)
-class Bicycle:
-    id: str
-
-    def display(self) -> str:
-        return f"Bicycle {self.id}"
-
-@dataclass(frozen=True)
-class Glider:
-    size: int
-
-    def display(self) -> str:
-        return f"Glider {self.size}"
 
 def show(t: Displayable) -> str:
     return t.display()

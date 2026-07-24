@@ -8,13 +8,10 @@ def count_primes(limit: int) -> int:
             count += 1
     return count
 
-def main() -> None:
+if __name__ == "__main__":
     limits = [10_000, 20_000, 30_000, 40_000]
     serial = list(map(count_primes, limits))
     with ProcessPoolExecutor() as pool:
         parallel = list(pool.map(count_primes, limits))
     assert parallel == serial
     print(parallel)
-
-if __name__ == "__main__":
-    main()

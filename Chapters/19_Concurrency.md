@@ -618,14 +618,11 @@ def cpu_price(order: int) -> int:
         total += 1
     return order * 10
 
-def main() -> None:
+if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
     with ProcessPoolExecutor() as pool:
         prices = list(pool.map(cpu_price, orders))
     print(prices)
-
-if __name__ == "__main__":
-    main()
 ```
 
 `pool.map()` sends each order to a worker process and gathers the results in order,
@@ -668,7 +665,7 @@ def cpu_price(order: int, results: mp.Queue) -> None:
         total += 1
     results.put((order, order * 10))
 
-def main() -> None:
+if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
     results: mp.Queue = mp.Queue()
     workers = [
@@ -681,9 +678,6 @@ def main() -> None:
         w.join()
     pairs = sorted(results.get() for _ in workers)
     print([price for _, price in pairs])
-
-if __name__ == "__main__":
-    main()
 ```
 
 Everything `pool.map()` did is now explicit: starting each worker,

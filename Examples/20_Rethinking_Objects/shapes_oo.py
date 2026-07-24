@@ -1,24 +1,25 @@
 # shapes_oo.py
 import math
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import override
 
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float: ...
 
+@dataclass(frozen=True)
 class Rectangle(Shape):
-    def __init__(self, length: float, width: float) -> None:
-        self.length = length
-        self.width = width
+    length: float
+    width: float
 
     @override
     def area(self) -> float:
         return self.length * self.width
 
+@dataclass(frozen=True)
 class Circle(Shape):
-    def __init__(self, radius: float) -> None:
-        self.radius = radius
+    radius: float
 
     @override
     def area(self) -> float:
