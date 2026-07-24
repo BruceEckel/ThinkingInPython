@@ -1,5 +1,6 @@
 # null_logger.py
 from typing import Final, Protocol
+from optional_logger import ListLogger
 
 class Logs(Protocol):
     def log(self, message: str) -> None: ...
@@ -9,13 +10,6 @@ class NullLogger:
         pass
 
 SILENT: Final[NullLogger] = NullLogger()
-
-class ListLogger:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
-
-    def log(self, message: str) -> None:
-        self.lines.append(message)
 
 def total(prices: list[float],
           logger: Logs = SILENT) -> float:

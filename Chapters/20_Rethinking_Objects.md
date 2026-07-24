@@ -721,9 +721,10 @@ The machine checks the signatures; you still own the behavior.
 
 Another approach uses a union and a `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
-The shapes become immutable data, and one free function handles each case.
-No base class or overridden method.
-The type checker confirms the match covers every shape:
+The shapes become immutable data, and one free function handles all the cases.
+There is no base class or overridden methods.
+The type checker ensures that the match covers every shape.
+Here is `shapes_oo.py` modified to use pattern matching:
 
 ```python
 # shapes_match.py
@@ -759,10 +760,10 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Choose the approach depending on how the code will grow.
-Adding a new shape is easier in the object version because you write one class.
-Adding a new operation over all shapes is easier in the data version.
-You write one function, and the type checker tells you if you missed a case.
+Adding a new shape is easier in the OOP version because you write one class.
+Adding a new operation over all shapes is easier in the pattern matching (functional) version.
+Modify one function, and the type checker tells you if you missed a case.
+
 The OOP approach assumes you add types more often than operations,
 which is often not true.
 [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
@@ -779,22 +780,21 @@ Type theory defines three kinds of polymorphism.
 The distinction goes back to Christopher Strachey's 1967 lecture notes,
 [Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf).
 
-*Subtype polymorphism* is demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
+*Subtype polymorphism* was demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
 One function accepts any type that fits a shape,
 whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
 The caller writes one function.
 The type varies underneath it.
 
-*Parametric polymorphism* is a single implementation that treats every type the same way,
-because it never inspects the type at all.
+*Parametric polymorphism* is a single implementation for multiple types.
 [Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
 One body works for any `T`.
-The checker tracks which `T` filled in at each call.
+The checker infers the concrete type behind `T` at each call site.
 
-*Ad-hoc polymorphism* runs the opposite way.
-A different implementation handles each type, chosen by that type.
+With *ad-hoc polymorphism* (typically *function overloading*),
+a different implementation handles each type, chosen by that type.
 Python's version of ad-hoc polymorphism is `@overload`,
-which lets one function name carry several typed signatures,
+which lets one function name have multiple typed signatures,
 backed by a single implementation that branches at run time:
 
 ```python
@@ -825,6 +825,7 @@ Only the last, unmarked definition executes.
 `stringify(42)` checks as returning `str`,
 and `stringify([1, 2, 3])` checks as returning `list[str]`,
 even though both calls run the same branching body.
+
 [`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch)
 is ad-hoc polymorphism's other Python form.
 It uses genuinely separate functions per type,
@@ -832,8 +833,8 @@ instead of one function branching internally.
 
 ## Null Object
 
-Polymorphism also removes the most common conditional, the `None` check.
-A parameter typed `T | None` makes every use a branch.
+Polymorphism removes the most common conditional, the `None` check.
+A parameter typed `T | None` reintroduces that check everywhere the parameter is used.
 Here a logger is optional, so the function guards each logging call:
 
 ```python
@@ -875,6 +876,7 @@ with a default:
 ```python
 # null_logger.py
 from typing import Final, Protocol
+from optional_logger import ListLogger
 
 class Logs(Protocol):
     def log(self, message: str) -> None: ...
@@ -884,13 +886,6 @@ class NullLogger:
         pass
 
 SILENT: Final[NullLogger] = NullLogger()
-
-class ListLogger:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
-
-    def log(self, message: str) -> None:
-        self.lines.append(message)
 
 def total(prices: list[float],
           logger: Logs = SILENT) -> float:
@@ -908,7 +903,6 @@ if __name__ == "__main__":
 #: 4.0 2
 ```
 
-The output is identical and the branches are gone.
 `total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
 The parameter's type also improved.
@@ -921,12 +915,11 @@ and the maze in [Simulation](38_Simulation.md)
 points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
 
-Null objects stand in for "nothing to do," not "nothing there."
-When a caller must notice absence,
-a lookup that can fail or a required value that may be missing,
-a silent stand-in buries the problem.
-Keep `T | None` there,
-or return `Result` from [Error Handling](42_Functional_Error_Handling.md#a-result-type),
+Null objects stand in for "nothing to do," not `None`'s "nothing there."
+Sometimes a caller must notice absence,
+like a lookup that can fail or a required value that may be missing.
+In these cases, use `T | None`,
+or return [`Result`](42_Functional_Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
 
 If every decision handles absence with the same neutral behavior,
