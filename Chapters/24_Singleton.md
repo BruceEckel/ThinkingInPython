@@ -31,29 +31,31 @@ print(settings)
 ```
 
 No class, no ceremony.
-For the large majority of singleton needs,
-the module approach solves the problem.
-The idiomatic Python singleton is worth trying first.
+For the majority of singleton needs, the module approach solves the problem.
 
-The sharing rides on mutation, and the near-miss is rebinding.
-`from config import settings` copies a *binding* to the one shared dict,
-so mutating through it, `settings["theme"] = "dark"`, is visible everywhere.
+Mutation is what makes the sharing work.
+Rebinding is the mistake that quietly ends it.
+`from config import settings` gives your module its own name for the same `dict` object named by `config.settings`.
+Mutating through your name, `settings["theme"] = "dark"`,
+changes that shared object, so every module sees it.
 But `settings = {}` in your module rebinds only your module's name,
 and the two modules silently diverge:
 `config.settings` still holds the old dict,
 while your code now talks to a private one.
 To replace the whole value, go through the module: `import config`,
 then `config.settings = {...}`.
-Mutate through any name; rebind only through the module.
+Mutate through any name.
+Rebind only through the module.
 
 ## When You Want a Class: Cache the Instance
 
 Sometimes you do want a class,
 but every construction should return the same object.
-The simplest way is to hide construction behind a cached factory.
-A cached factory applies `functools.cache` to a *constructor function*,
-an ordinary function whose only job is to build and return an instance of a class,
+The simplest solution is to hide construction behind a cached factory.
+A cached factory applies `functools.cache` to a *constructor function*.
+This is an ordinary function whose only job is to build and return an instance of a class,
 standing in for a direct call to it.
+
 `functools.cache` *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
