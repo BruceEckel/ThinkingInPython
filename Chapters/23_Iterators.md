@@ -486,6 +486,79 @@ Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
 This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md).
 
+Writing the four GoF Iterator methods in Python shows what the other two were doing.
+`first()` resets an index, `is_done()` compares it to `len()`,
+and `current_item()` reads without consuming.
+Over a generator, the same interface needs a buffer,
+and one method cannot be written at all:
+
+```python
+# gof_iterator.py
+from collections.abc import Iterable, Iterator
+from typing import Protocol
+
+DONE = sentinel("DONE")
+
+class GoFIterator[T](Protocol):
+    def first(self) -> None: ...
+    def advance(self) -> None: ...
+    def is_done(self) -> bool: ...
+    def current_item(self) -> T: ...
+
+class OverStream[T]:
+    def __init__(self, source: Iterable[T]) -> None:
+        self.source: Iterator[T] = iter(source)
+        self.lookahead: T | DONE = DONE
+        self.advance()  # Pulled early, to answer is_done()
+
+    def first(self) -> None:
+        raise NotImplementedError("a stream cannot rewind")
+
+    def advance(self) -> None:
+        self.lookahead = next(self.source, DONE)
+
+    def is_done(self) -> bool:
+        return self.lookahead is DONE
+
+    def current_item(self) -> T:
+        if self.lookahead is DONE:
+            raise IndexError("past the end")
+        return self.lookahead
+
+def walk(it: GoFIterator[int]) -> list[int]:
+    out: list[int] = []
+    while not it.is_done():
+        out.append(it.current_item())
+        it.advance()
+    return out
+
+stream = OverStream(x * 2 for x in [1, 2, 3])
+print(walk(stream))
+#: [2, 4, 6]
+try:
+    stream.first()
+except NotImplementedError as e:
+    print(e)
+#: a stream cannot rewind
+```
+
+`walk()` is the loop a *GoF* caller writes,
+and it drives any type with those four methods,
+because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
+rather than a base class.
+`OverStream` pays for the interface twice.
+The constructor pulls an item before anyone asks for one,
+since `is_done()` cannot answer without knowing whether a next value exists,
+and `current_item()` then hands back that stored value instead of taking a new one.
+`first()` has nowhere to go.
+A generator keeps no record of what it already produced.
+
+Those two methods are what Python dropped.
+`current_item()` is the only one that reads without advancing,
+and `first()` assumes a collection you can traverse again.
+Take both away and `advance()` has to return the value it moved to,
+which is `__next__()`.
+
 You can ask a GoF iterator whether it is done multiple times without disturbing it.
 Python fuses that question into `__next__()`, so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.

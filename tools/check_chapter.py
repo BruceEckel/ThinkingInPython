@@ -76,8 +76,16 @@ def main(argv: list[str] | None = None) -> int:
 
     if not run("extract", [*PY, "tools/extract_examples.py", "--write"]):
         return 1
+    # Also refresh the committed Examples/ tree. Without this an editing
+    # session leaves it behind the Markdown, and the drift shows up much
+    # later as a `gate` failure about a file you no longer remember.
+    if not run("sync",
+               [*PY, "tools/extract_examples.py", "--write", "-o",
+                "Examples"]):
+        return 1
 
     results = [
+        True, True,  # extract and sync, already known to have passed
         run("output markers",
             [*PY, "tools/validate_output.py", str(md)]),
         run("listing format", [*PY, "tools/listing_format.py", str(md)]),

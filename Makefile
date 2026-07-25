@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -127,6 +127,14 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(RUFF) check build/examples
 	$(PY) tools/run_examples.py
 	$(PYTEST) $(PYTEST_N) build/examples
+	$(PY) tools/gate_stamp.py --write gate
+
+# When did the book last pass the gate, and has anything changed since?
+# The stamp records a hash per Chapters/ and Solutions/ file, so this
+# answers the second half too. `gate` writes it; `verify`, `ci`, and `all`
+# inherit it, since each runs `gate`.
+gate-status:  ## Report when the gate last passed and what changed since
+	$(PY) tools/gate_stamp.py
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates
