@@ -23,8 +23,8 @@ Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
-Notably, not everything in Simula was an object;
-the language still had standalone functions.
+Notably, not everything in Simula was an object.
+The language still had standalone functions.
 It was a compiled, statically typed language,
 so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
@@ -70,8 +70,12 @@ A statically typed compiler can check that an override's signature stays compati
 It cannot check whether the override actually behaves the way the base class promises.
 The base class calls a method and trusts every subclass to stand in for it.
 
-Python has no compiler to enforce that structural check.
-Nothing stops a subclass from breaking the base class contract.
+Python has no compiler, but this is not the boundary you might expect.
+A type checker reads an override's signature and reports one that no longer fits,
+especially when [`@override`](07_Classes.md#marking-overrides-with-override)
+marks the intent.
+What no tool reads is the behavior behind the signature.
+Nothing stops a subclass from breaking the base class contract while matching it perfectly.
 The interpreter runs code that violates the LSP without objection.
 That code may or may not fail at run time.
 
@@ -238,8 +242,7 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-Two quiet changes in the listing do as much work as `frozen=True`,
-and it pays to notice them.
+Two quiet changes in the listing do as much work as `frozen=True`.
 `frozen=True` is shallow:
 it stops assignment to the fields of `Immutable` itself,
 but it cannot stop mutation inside a field that is itself mutable.
@@ -272,8 +275,7 @@ That is why `numbers` became a `tuple` and `Bob` was also frozen.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
-makes the case for frozen data classes.
-Most encapsulation is only necessary when mutation is allowed.
+makes the fuller case for frozen data classes.
 
 ## Methods or Functions?
 
@@ -311,11 +313,10 @@ The middle call shows the method called as if it were a free function.
 Fetched from the class instead of from an instance,
 `distance_to` is an ordinary function,
 and `p1` is passed to it as the first argument.
-`p1.distance_to(p2)` is shorthand for exactly that call;
-the dot fills in `self`, nothing more.
+`p1.distance_to(p2)` is shorthand for that call.
+The dot fills in `self`, nothing more.
 The function reads the same and computes the same.
-The class does not need to own it.
-The function is not worse, and it has an advantage.
+It is not worse, and it has an advantage.
 It need not live inside `Point`.
 
 ## Protocols Generalize, Composition Adapts
@@ -428,6 +429,14 @@ print(c == twin)  # Value equality, field by field
 print({c: "value"}[c])  # Hashable, so it works as a dict key
 #: value
 ```
+
+`Contact` inherits nothing, and gains no methods it did not ask for.
+It holds a `Name` and an `Address`, and those types stay usable on their own.
+The nested `replace()` shows the cost of that arrangement:
+changing a city means rebuilding the `Address` and then the `Contact`.
+What you buy is the last two lines.
+Two contacts built from equal parts are equal, and the whole structure hashes,
+because value equality and hashing follow from the fields rather than from a base class.
 
 ## Polymorphism Without Inheritance
 
@@ -561,7 +570,7 @@ Each protocol only names the shape it needs.
 Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
 or `Loggable`.
 
-Classic multiple inheritance has *the diamond problem*.
+Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
 the interpreter must pick which version of an overridden method to call.
 Protocols avoid that question.
@@ -778,8 +787,11 @@ More broadly, polymorphism means that a function parameter accepts more than one
 The questions are which types it accepts and what the function may do with them.
 
 Type theory defines three kinds of polymorphism.
-The distinction goes back to Christopher Strachey's 1967 lecture notes,
-[Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf).
+Christopher Strachey's 1967 lecture notes,
+[Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf),
+named the first two, parametric and ad hoc.
+Cardelli and Wegner added the third, subtyping,
+in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
 
 *Subtype polymorphism* was demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
 One function accepts any type that fits a shape,
@@ -911,7 +923,7 @@ The parameter's type also improved.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
-The standard library ships this exact object as `logging.NullHandler`,
+The standard library ships this idea as `logging.NullHandler`,
 and the maze in [Simulation](38_Simulation.md)
 points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.
