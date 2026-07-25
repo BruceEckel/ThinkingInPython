@@ -248,9 +248,13 @@ Python's own operators already contain a two-step dispatch,
 and it answers the `Number + Number` question that opened this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
-Python turns around and tries `type(b).__radd__(b, a)`.
+Python turns around and tries `type(b).__radd__(b, a)`,
+the *reflected* form of `__add__()`.
 The first call dispatches on `a`'s type, the fallback on `b`'s:
 double dispatching, built into the language.
+Every binary operator has a reflected form,
+named by inserting an `r` before the operator's name: `__rsub__()`,
+`__rmul__()`, `__rtruediv__()`.
 This is how an `int` on the left can learn to add itself to a type written decades after `int` was.
 Returning `NotImplemented`
 (a sentinel value, not the `NotImplementedError` exception, a lookalike pair worth keeping apart)
