@@ -15,6 +15,7 @@
   border: none;
   border-bottom: 1px solid var(--rule);
   background: none;
+  line-height: 1;
   padding: 0 0 1px;
   cursor: pointer;
   transition: color 0.2s;
