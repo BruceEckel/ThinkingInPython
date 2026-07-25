@@ -18,6 +18,8 @@ class Messenger:
         self.__dict__ = kwargs
 
 m: Any = Messenger(info="Some information", b=["a", "list"])
+print(vars(m))
+#: {'info': 'Some information', 'b': ['a', 'list']}
 m.more = 11
 print(m.info, m.b, m.more)
 #: Some information ['a', 'list'] 11
@@ -25,7 +27,7 @@ print(vars(m))
 #: {'info': 'Some information', 'b': ['a', 'list'], 'more': 11}
 ```
 
-The trick here is replacing the object's `__dict__`,
+`class Messenger` replaces the object's `__dict__`,
 the dict where Python keeps an instance's attributes,
 with the `dict` that the `**kwargs` argument automatically creates.
 `vars(m)` returns that same `__dict__`,
@@ -33,101 +35,32 @@ and its output shows the attributes and the keyword arguments are one dict:
 `m.more = 11` added a key,
 just as passing `more=11` to the constructor would have.
 
+Because `**kwargs` is the only parameter,
+`Messenger` accepts nothing but keyword arguments.
+`Messenger("Some information")` raises a `TypeError`.
+The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)
+is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
+since a bare `*` must be followed by a named parameter.
+The one name a caller cannot use is `self`.
+Writing `def __init__(self, /, **kwargs)` makes `self` positional-only and frees the name,
+so `Messenger(self="me")` becomes a legal attribute instead of a duplicate argument.
+
 The `m: Any` annotation is quiet but load-bearing.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
-`Any` switches the checker off for `m`
-(the bargain described in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)),
-and that is the honest price of an ad-hoc attribute bag:
+`Any` switches the checker off for `m`,
+the bargain described in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
+That is the price of an ad-hoc attribute bag:
 no checker knows your attribute names,
 so a typo like `m.inof` is a runtime `AttributeError`, not a static error.
-The typed alternatives below buy the checker back.
-
-You could create a `Messenger` class and put it in a library to import,
-but there is no need: the standard library already ships this idiom,
-as the next section shows.
-
-Testing confirms the `Messenger` turns keyword arguments into attributes and takes new ones afterward:
-
-```python
-# test_messenger_idiom.py
-from typing import Any
-from messenger_idiom import Messenger
-
-def test_messenger_exposes_kwargs_as_attributes() -> None:
-    m: Any = Messenger(info="hi", count=3)
-    assert m.info == "hi"
-    assert m.count == 3
-    m.added = 9  # Attributes can be added afterward, too
-    assert m.added == 9
-```
 
 ## The Standard-Library Versions
 
-Python ships with this idiom.
-`types.SimpleNamespace` is a `Messenger`,
+In the standard Python library, `types.SimpleNamespace` is a `Messenger`,
 with keyword arguments becoming attributes.
-When you want the fields named and type-checked,
-a `@dataclass` gives you a typed mutable record with a generated `__init__()`,
-`__repr__()`, and equality, and a `NamedTuple` gives you a typed immutable one:
-
-```python
-# messenger_modern.py
-from dataclasses import dataclass
-from types import SimpleNamespace
-from typing import NamedTuple
-
-# SimpleNamespace is the Messenger idiom, built in:
-m = SimpleNamespace(info="Some information", b=["a", "list"])
-m.more = 11
-print(m.info, m.b, m.more)
-#: Some information ['a', 'list'] 11
-
-# A dataclass is the typed, mutable version:
-@dataclass
-class Point:
-    x: float
-    y: float
-
-print(Point(1.0, 2.0))
-#: Point(x=1.0, y=2.0)
-
-# A NamedTuple is the typed, immutable version:
-class Color(NamedTuple):
-    r: int
-    g: int
-    b: int
-
-print(Color(255, 0, 0))
-#: Color(r=255, g=0, b=0)
-```
-
-Use `SimpleNamespace` for an ad-hoc bag of attributes,
-a `@dataclass` for a typed mutable record,
-and a `NamedTuple` for a typed immutable one.
-Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
-To make a `@dataclass` guarantee that its values are legal, not merely typed,
-see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
-
-This verifies that the `@dataclass` carries fields and value equality,
-and the `NamedTuple` is a named record you can still treat as a tuple:
-
-```python
-# test_messenger_modern.py
-from messenger_modern import Color, Point
-
-def test_dataclass_point_has_fields_and_equality() -> None:
-    assert Point(1.0, 2.0).x == 1.0
-    assert Point(1.0, 2.0) == Point(1.0, 2.0)
-    assert Point(1.0, 2.0) != Point(1.0, 3.0)
-
-def test_namedtuple_color_is_a_named_record() -> None:
-    c = Color(255, 0, 0)
-    assert c.r == 255
-    assert (c.r, c.g, c.b) == tuple(c)
-```
-
-`display_object()` shows that a `SimpleNamespace` keeps each keyword argument as an attribute:
+`display_object()` from [Metaprogramming](17_Metaprogramming.md#the-inspect-module)
+confirms that each keyword argument lands in the instance's `__dict__`,
+alongside anything assigned afterward:
 
 ```python
 # display_namespace.py
@@ -136,6 +69,8 @@ from display import display_object
 
 m = SimpleNamespace(info="Some information", b=["a", "list"])
 m.more = 11
+print(m.info, m.b, m.more)
+#: Some information ['a', 'list'] 11
 display_object(m)
 #: [Attributes]
 #:   • b = ['a', 'list']
@@ -145,11 +80,59 @@ display_object(m)
 #:   None
 ```
 
+A `SimpleNamespace` is as anonymous as the hand-rolled `Messenger`.
+It accepts any name you invent, so no checker can know which names to expect.
+When you want the fields named and checked, declare them.
+A `@dataclass` generates `__init__()`, `__repr__()`,
+and equality from those declarations, producing a mutable record:
+
+```python
+# point_dataclass.py
+from dataclasses import dataclass
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+p = Point(1.0, 2.0)
+print(p)
+#: Point(x=1.0, y=2.0)
+p.x = 3.5
+print(p)
+#: Point(x=3.5, y=2.0)
+```
+
+A `NamedTuple` declares its fields the same way but produces an immutable record.
+Because it is a tuple underneath, each field is readable by name or by position:
+
+```python
+# color_namedtuple.py
+from typing import NamedTuple
+
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+red = Color(255, 0, 0)
+print(red)
+#: Color(r=255, g=0, b=0)
+print(red.r, red[0])
+#: 255 255
+```
+
+Use `SimpleNamespace` for an ad-hoc bag of attributes,
+a `@dataclass` for a typed mutable record,
+and a `NamedTuple` for a typed immutable one.
+Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
+To make a `@dataclass` guarantee that its values are legal, not merely typed,
+see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
+
 ## Returning Multiple Values
 
-This chapter opened by claiming the most typical Messenger is a return value,
-so here is that use.
-A function computes several related things,
+The most common Messenger is a return value.
+Here, a function computes several related things,
 and a `NamedTuple` carries them back under their own names:
 
 ```python
@@ -249,10 +232,10 @@ when a record should be a distinct type that equals nothing but its own kind.
 1.  In `messenger_idiom.py`,
     create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
     (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
-2.  In `messenger_modern.py`, add a third field, `z: float`,
+2.  In `point_dataclass.py`, add a third field, `z: float`,
     to the `Point` dataclass,
-    and update the `print(Point(1.0, 2.0))` call to pass three arguments.
-3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `messenger_modern.py`,
+    and update both `Point(...)` calls to pass three arguments.
+3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `color_namedtuple.py`,
     following `Color`'s shape,
     and confirm an instance still unpacks and indexes like a tuple.
 4.  In `display_namespace.py`,

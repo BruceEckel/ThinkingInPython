@@ -25,8 +25,7 @@ That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern earns its place only when the problem it solves is actually present.
-If nothing varies, you do not need machinery for isolating variation
-A pattern without its problem is just overhead.
+If nothing varies, you do not need machinery for isolating variation A pattern without its problem is just overhead.
 
 Although they're called "design patterns,"
 they aren't tied to the realm of design.

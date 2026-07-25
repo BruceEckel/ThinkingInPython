@@ -128,7 +128,7 @@ The first serious edit pass.
 | 18_Performance.md               |X|
 | 19_Concurrency.md               |X|
 | 20_Rethinking_Objects.md        |X|
-| 21_The_Pattern_Concept.md       | |
+| 21_The_Pattern_Concept.md       |X|
 | 22_Data_Transfer_Objects.md     | |
 | 23_Iterators.md                 | |
 | 24_Singleton.md                 | |

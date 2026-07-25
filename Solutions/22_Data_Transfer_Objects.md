@@ -39,14 +39,19 @@ class Point:
     y: float
     z: float
 
-print(Point(1.0, 2.0, 3.0))
+p = Point(1.0, 2.0, 3.0)
+print(p)
 #: Point(x=1.0, y=2.0, z=3.0)
+p.x = 3.5
+print(p == Point(3.5, 2.0, 3.0))
+#: True
 ```
 
 `@dataclass` reads whatever fields the class body declares and
-generates `__init__()` and `__repr__()` to match, so adding `z: float`
-automatically extends the constructor to three positional arguments
-and the `repr()` to three fields, with no other code to update.
+generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
+`z: float` extends the constructor to three positional arguments, the
+`repr()` to three fields, and the equality comparison to three values,
+with no other code to update.
 
 ## 3. A `NamedTuple` called `Fraction`
 

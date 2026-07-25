@@ -8,6 +8,6 @@ def cpu_price(order: int) -> int:
     return order * 10
 
 orders = [1, 2, 3, 4, 5]
-t_seq, t_thr = compare(cpu_price, orders, number=5)
-print(f"threads no faster: {t_thr > t_seq * 0.9}")
+seq, thr = compare(cpu_price, orders, number=5)
+print(f"threads no faster: {thr > seq * 0.9}")
 #: threads no faster: True

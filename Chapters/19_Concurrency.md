@@ -833,10 +833,15 @@ and times each:
 import timeit
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from typing import NamedTuple
+
+class Times(NamedTuple):
+    sequential: float
+    threaded: float
 
 def compare(
     price: Callable[[int], int], orders: list[int], number: int
-) -> tuple[float, float]:
+) -> Times:
     def sequential() -> list[int]:
         return [price(o) for o in orders]
 
@@ -845,10 +850,16 @@ def compare(
             return list(pool.map(price, orders))
 
     assert threaded() == sequential()
-    t_seq = timeit.timeit(sequential, number=number)
-    t_thr = timeit.timeit(threaded, number=number)
-    return t_seq, t_thr
+    return Times(timeit.timeit(sequential, number=number),
+                 timeit.timeit(threaded, number=number))
 ```
+
+Two timings of the same type come back from one call,
+so returning them as a bare `tuple[float, float]` would leave every caller remembering which float came first.
+`Times` names them, as [Data Transfer Objects](22_Data_Transfer_Objects.md#returning-multiple-values)
+describes.
+The two callers below use the two styles a `NamedTuple` allows,
+access by field name and positional unpacking.
 
 Here `time.sleep()` stands in for a blocking network call,
 and five threads overlap five of those waits even with the GIL in place:
@@ -863,8 +874,9 @@ def io_price(order: int) -> int:
     return order * 10
 
 orders = [1, 2, 3, 4, 5]
-t_seq, t_thr = compare(io_price, orders, number=1)
-print(f"threads at least 3x faster on I/O: {t_thr * 3 < t_seq}")
+times = compare(io_price, orders, number=1)
+print("threads at least 3x faster on I/O: "
+      f"{times.threaded * 3 < times.sequential}")
 #: threads at least 3x faster on I/O: True
 ```
 
@@ -893,8 +905,8 @@ def cpu_price(order: int) -> int:
     return order * 10
 
 orders = [1, 2, 3, 4, 5]
-t_seq, t_thr = compare(cpu_price, orders, number=5)
-print(f"threads no faster: {t_thr > t_seq * 0.9}")
+seq, thr = compare(cpu_price, orders, number=5)
+print(f"threads no faster: {thr > seq * 0.9}")
 #: threads no faster: True
 ```
 

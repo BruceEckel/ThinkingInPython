@@ -710,8 +710,8 @@ Satisfying a protocol is a shape claim: the methods exist,
 with the right signatures, and the checker verifies that half of the contract.
 The other half is semantic.
 A method must also behave the way callers expect.
-For example, return a description rather than raise an exception, finish rather than block,
-describe the object rather than change it.
+For example, return a description rather than raise an exception,
+finish rather than block, describe the object rather than change it.
 No checker sees that half.
 Substitution is safe only when both halves work,
 whether membership came from inheriting a base class or matching a protocol.

@@ -7,6 +7,7 @@ def io_price(order: int) -> int:
     return order * 10
 
 orders = [1, 2, 3, 4, 5]
-t_seq, t_thr = compare(io_price, orders, number=1)
-print(f"threads at least 3x faster on I/O: {t_thr * 3 < t_seq}")
+times = compare(io_price, orders, number=1)
+print("threads at least 3x faster on I/O: "
+      f"{times.threaded * 3 < times.sequential}")
 #: threads at least 3x faster on I/O: True
