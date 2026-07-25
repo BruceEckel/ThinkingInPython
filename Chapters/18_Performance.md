@@ -192,14 +192,17 @@ def with_hoisted_local() -> list[int]:
 assert with_attribute_lookup() == with_hoisted_local()
 t_attr = timeit.timeit(with_attribute_lookup, number=100)
 t_local = timeit.timeit(with_hoisted_local, number=100)
-close = abs(t_local - t_attr) < 0.2 * t_attr
-print(f"hoisting made little difference: {close}")
-#: hoisting made little difference: True
+print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
+#: hoisting did not halve the time: True
 ```
 
 Here the hoist does not pay off.
 Modern CPython already caches a repeated attribute lookup like `out.append` inside a loop,
 so it costs little more than the local variable would have.
+The threshold is deliberately loose.
+Timing noise on a busy machine easily reaches ten or twenty percent,
+so a claim about a small difference would be measuring the machine's mood.
+A hoist worth writing would beat that margin without argument.
 The measurement proves the point because it catches a "classic" optimization that no longer works,
 just as readily as it would catch one that does.
 
@@ -350,7 +353,7 @@ The output shows that the [heap-management algorithm](https://docs.python.org/3.
 maintains the list according to its own logic.
 This means you must always use the heap version of an operation,
 not the list version.
-Although calling `nums.pop(0)` does produce the smallest value the first time you do it,
+Although calling the list's own `pop(0)` does produce the smallest value the first time,
 it also destroys the heap ordering,
 so if you call it again you won't get the smallest value:
 
@@ -425,7 +428,7 @@ and the gap widens as `n` grows.
 
 The immutable containers from [Containers](03_Containers.md#immutability)
 are not a speed upgrade.
-A `frozenset` looks up exactly as fast as a `set`,
+A `frozenset` looks up just as fast as a `set`,
 a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
 In CPython these share the same machinery.
 Choose immutability for correctness and safe sharing.
@@ -537,9 +540,10 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 #: 75025 26
 ```
 
-Same answer, but 242,785 calls against 26.
-The counts are the speedup.
-The cached version runs thousands of times faster, and the gap grows with `n`.
+Same answer, from 242,785 calls against 26.
+Every avoided call is work the cached version never does,
+and the gap widens as `n` grows.
+The counts, not a stopwatch, are what this listing measures.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
@@ -1002,7 +1006,7 @@ at the cost of a second language and a build step.
 
 Keep the interface coarse.
 A single call that does significant work wins.
-A million calls that each do a little lose the gain due to boundary-crossing overhead.
+A million calls that each do a little spend the gain on boundary-crossing overhead.
 Shipping millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply,
 and so does the plain list of integers `collatz_lengths()` takes and returns here.
@@ -1066,3 +1070,10 @@ not just where it sits on that curve:
 4.  Apply `@cache` to a function that prints as a side effect,
     and demonstrate that repeated calls skip the printing.
     Explain why caching is reserved for pure functions.
+5.  In `heap_corruption.py`, replace `heap.pop(0)` with `heappop(heap)`.
+    Pop three times, printing the heap after each one,
+    and confirm `heap[0]` is the smallest remaining value every time.
+    Why does the list still look unsorted after a correct pop?
+6.  In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
+    Confirm that an instance accepts an attribute `Point` refuses,
+    such as `p.z = 3`, and find where the storage for it came from.

@@ -132,3 +132,77 @@ function silently breaks that promise. Any side effect the function
 performs, printing, writing a file, incrementing a counter, happens
 only on the first call with a given argument and is silently skipped
 on every repeat, which is rarely what you want.
+
+## 5. Popping a heap correctly
+
+```python
+# exercise_5.py
+from heapq import heapify, heappop
+
+heap = [10, 9, 8, 7, 6, 5, 4, 3]
+heapify(heap)
+print(heap)
+#: [3, 6, 4, 7, 10, 5, 8, 9]
+
+for _ in range(3):
+    smallest = heappop(heap)
+    print(smallest, heap, heap[0] == min(heap))
+#: 3 [4, 6, 5, 7, 10, 9, 8] True
+#: 4 [5, 6, 8, 7, 10, 9] True
+#: 5 [6, 7, 8, 9, 10] True
+```
+
+Each pop returns the true smallest remaining value, `3`, `4`, `5`, and
+`heap[0]` is still the minimum after every one of them. Compare this
+with `heap.pop(0)` in the original, which returns the right value once
+and leaves the list no longer a heap.
+
+The list still looks unsorted because a heap was never meant to be
+sorted. It only guarantees that every element is smaller than its two
+children at positions `2i + 1` and `2i + 2`, which puts the smallest
+element at index 0 and says nothing about the order of the rest.
+`heappop()` maintains that weaker property, and maintaining it is
+cheap: the last element moves to the front and sinks back down through
+O(log n) comparisons. Sorting all of it on every pop would cost far
+more and buy nothing, since only the front element is ever read.
+
+## 6. A subclass that forgets `__slots__`
+
+```python
+# exercise_6.py
+
+class Point:
+    __slots__ = ("x", "y")
+    def __init__(self, x: int, y: int) -> None:
+        self.x = x
+        self.y = y
+
+class Point3D(Point):  # Declares no __slots__ of its own
+    pass
+
+p = Point3D(1, 2)
+p.z = 3  # type: ignore
+print(vars(p))
+#: {'z': 3}
+print(hasattr(Point(1, 2), "__dict__"))
+#: False
+print(Point3D.__slots__)
+#: ('x', 'y')
+```
+
+`Point` refuses `p.z = 3` with an `AttributeError`, but `Point3D`
+accepts it, and `vars(p)` shows where the value went: an instance
+`__dict__` that the base class does not have.
+
+Declaring `__slots__` does not disable the instance dictionary for a
+whole hierarchy. It only omits one from the class that declares it.
+Any subclass that does not declare its own `__slots__` gets the
+default behavior, a `__dict__`, and inherits the parent's slots
+alongside it. The last line shows the trap: `Point3D.__slots__` reads
+`('x', 'y')`, inherited from `Point`, so an attribute lookup suggests
+the subclass is slotted when it is not.
+
+The memory saving is quietly lost. Every `Point3D` pays for both the
+slot descriptors and a dictionary. A subclass of a slotted class must
+declare `__slots__` itself, using an empty tuple when it adds no
+fields of its own.

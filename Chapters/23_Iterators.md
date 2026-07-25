@@ -19,16 +19,14 @@ which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere an iterable is expected.
 The `for` loop calls these for you, so you almost never call them directly.
-Because every container speaks this one protocol,
-a function written against an iterable automatically stays decoupled from the container.
-
-The protocol is small enough to drive by hand:
+Every container uses this protocol,
+so a function written against an iterable automatically stays decoupled from the container.
 
 ```python
-# manual_protocol.py
+# basic_iteration.py
 nums = [1, 2]
-it = iter(nums)  # What a for loop calls first
-print(iter(nums) is iter(nums))  # A fresh iterator per pass
+it = iter(nums)  # Called by a for loop
+print(iter(nums) is iter(nums))
 #: False
 print(iter(it) is it)  # An iterator returns itself
 #: True
@@ -41,18 +39,16 @@ except StopIteration:
 #: StopIteration ends the loop
 ```
 
-A `for` loop is exactly this sequence: one `iter()` call,
-then `next()` until `StopIteration`,
-which the loop absorbs as the normal end rather than an error.
-The two `is` checks preview a distinction the rest of this chapter leans on.
-A list builds a fresh iterator for every pass,
-so you can loop over it again and again.
-An iterator returns itself: one pass is all it has.
+A `for` loop makes one `iter()` call,
+then calls `next()` until `StopIteration` occurs.
+A loop absorbs `StopIteration` as the normal end rather than an error.
+The first `is` shows that calling `iter()` creates a new iterator.
+The second `is` shows that an iterator returns itself.
 
 ## Generators {#generators}
 
-You rarely write `__iter__()`/`__next__()` by hand,
-because a *generator* writes them for you.
+You rarely write `__iter__()`/`__next__()` by hand.
+A *generator* writes them for you.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
 A class becomes iterable by writing `__iter__()` as a generator:
