@@ -86,29 +86,32 @@ print(list(Countdown(5)))
 #: [5, 4, 3, 2, 1]
 print(total(fibonacci(8)))  # Works on a generator
 #: 33
-print(total([1, 2, 3, 4]))  # and on a list
+print(total([1, 2, 3, 4]))  # and a list
 #: 10
-print(total(Countdown(5)))  # and on a custom iterable
+print(total(Countdown(5)))  # and a custom iterable
 #: 15
 ```
 
-`total()` works on the generator, the list,
-and the custom `Countdown` without knowing or caring which.
-The two custom sources differ in one way worth noting.
+`total()` takes an `Iterable` so it works equally well on the generator,
+the list, and the custom `Countdown`.
+
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
 so it can be iterated repeatedly, as the re-iteration test below confirms.
-Generators are also lazy.
+
+Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
+
 A generator can even be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
-which a list could never do.
+which a list cannot do.
 
-Two consequences of that laziness surprise people, and both are silent:
+There are two surprising consequences of laziness.
+Both are silent:
 
 ```python
 # generator_lifecycle.py
@@ -119,34 +122,78 @@ def squares(n: int) -> Iterator[int]:
     for i in range(n):
         yield i * i
 
-sq = squares(3)  # Runs none of the body
+sq = squares(6)  # Body not executed
 print("created")
 #: created
-print(list(sq))
+print(next(sq))
 #: first next() reached the body
-#: [0, 1, 4]
+#: 0
+print(list(sq))  # Remainder of list
+#: [1, 4, 9, 16, 25]
 print(list(sq))  # Exhausted: empty, and no error
 #: []
 ```
 
-Calling `squares(3)` runs none of its body.
+Calling `squares(6)` runs none of its body.
 The `print` at the top fires only when the first value is demanded.
 Any validation at the top of a generator inherits this delay:
 a `raise` meant to reject a bad argument fires at first use,
 far from the call that caused the problem.
+
 To validate eagerly,
 check the arguments in a plain function and have it return an inner generator.
-The second surprise is the second pass.
+
+The second surprise is the second call to `list(sq)`.
 An exhausted generator does not fail.
 It produces nothing,
 so the empty `list(sq)` gives you no error to point at the bug.
+
 When data must be walked twice, collect it into a list once,
 or hand out an iterable like `Countdown` above,
 whose `__iter__()` builds a fresh generator for every pass.
+
 `itertools.tee(it, 2)` splits one iterator into two independent ones,
-which looks like a third option but is rarely cheaper.
+which looks like a third option but is rarely cheaper:
+
+```python
+# tee.py
+import tracemalloc
+from collections.abc import Iterator
+from itertools import tee
+
+def squares(n: int) -> Iterator[int]:
+    return (i * i for i in range(n))
+
+a, b = tee(squares(5))  # Two independent readers, one source
+print(list(a), list(b))
+#: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
+
+N = 100_000
+first, second = tee(squares(N))
+tracemalloc.start()
+for _ in first:  # Drain one branch; second has not started
+    pass
+buffered, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+tracemalloc.start()
+collected = list(squares(N))
+listed, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+print(f"tee held as much as the list: {buffered > listed * 0.9}")
+#: tee held as much as the list: True
+```
+
+Both branches see all five squares,
+so `tee` delivers the second pass the generator could not.
+The second half prices it.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
-so two passes over a long stream can cost the memory the list would have cost anyway.
+and draining `first` while `second` waits buffers the whole stream.
+That is the memory a list would have used,
+which the comparison confirms
+(one machine measured 4,096,544 bytes buffered against 3,999,992 for the list).
+Reach for `tee` when two consumers advance together,
+not when one finishes before the other starts.
 
 These tests collect each iterator into a list and compare,
 covering the sequences and their empty edge cases,

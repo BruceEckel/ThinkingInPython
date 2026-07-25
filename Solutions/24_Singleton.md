@@ -139,3 +139,51 @@ their complexity when something genuinely needs the shape of a class,
 such as participating in an interface other code expects, or needing
 `__new__()`-level control over construction; absent that requirement,
 a module is the simpler tool that already does the job.
+
+## 4. Rebinding instead of mutating
+
+```python
+# config.py
+settings: dict[str, str] = {}
+```
+
+```python
+# exercise_4.py
+import config
+from config import settings
+
+settings = {"theme": "dark"}  # noqa: F811
+print(settings)
+#: {'theme': 'dark'}
+print(config.settings)
+#: {}
+```
+
+The two prints disagree, and that is the whole lesson. `from config
+import settings` copies a binding: two names, this module's `settings`
+and `config.settings`, initially pointing at one dict. Mutating
+through either name, as the original `settings["theme"] = "dark"` did,
+changes the object both names refer to, so both see it. Assigning to
+`settings` changes only which object this module's name refers to. The
+name in `config` still points at the original empty dict, which is why
+the second print shows `{}`.
+
+Nothing warns you at runtime. The module still imports, the assignment
+succeeds, and the local `settings` holds what you put in it. The
+sharing is simply gone, and it fails silently in whichever direction
+the other module reads. `import config` and then `config.settings =
+{...}` replaces the value everyone sees, because it rebinds the
+attribute on the one module object rather than a name in your own
+namespace.
+
+A linter does object, which is why the listing carries `# noqa:
+F811`. Ruff reads the assignment as redefining a name that was just
+imported and flags it as an unused import followed by a shadowing
+binding. That rule exists because this is far more often a mistake
+than an intention. Here it is deliberate, so the solution silences the
+warning, but in ordinary code the warning is the one automatic signal
+you get that a shared name has stopped being shared.
+
+This is the difference between a name and the object it refers to,
+which every singleton built on module state depends on. Mutate through
+any name, rebind only through the module.

@@ -1,5 +1,4 @@
 # borg_singleton.py
-# Alex Martelli's 'Borg'
 from typing import Any, ClassVar
 
 class Borg:

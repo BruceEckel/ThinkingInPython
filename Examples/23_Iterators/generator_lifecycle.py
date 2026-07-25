@@ -6,11 +6,13 @@ def squares(n: int) -> Iterator[int]:
     for i in range(n):
         yield i * i
 
-sq = squares(3)  # Runs none of the body
+sq = squares(6)  # Body not executed
 print("created")
 #: created
-print(list(sq))
+print(next(sq))
 #: first next() reached the body
-#: [0, 1, 4]
+#: 0
+print(list(sq))  # Remainder of list
+#: [1, 4, 9, 16, 25]
 print(list(sq))  # Exhausted: empty, and no error
 #: []

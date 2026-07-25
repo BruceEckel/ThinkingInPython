@@ -9,8 +9,8 @@ For the singleton, Python does.
 
 Python imports each module once and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
-A module is a singleton, and module-level names are a single, shared,
-one-and-only-one piece of state.
+A module is a singleton, and anything defined at module level is shared,
+with one copy for the whole program.
 Put the state in a module:
 
 ```python
@@ -23,7 +23,6 @@ Mutating it through one import is visible through every other:
 
 ```python
 # shared_config.py
-# A module's globals are shared.
 from config import settings
 
 settings["theme"] = "dark"
@@ -274,6 +273,55 @@ The metaclass version at the end of this chapter returns the class's own instanc
 which puts it on the other side of the rule,
 with a behavior worth comparing when you get there.
 
+### One Instance in a Class Variable
+
+The nested private class is not required.
+This version keeps the single instance in a class variable and builds it,
+when needed, out of the class being constructed:
+
+```python
+# class_variable_singleton.py
+from typing import Any, ClassVar
+
+class CVSingleton:
+    val: Any
+    __instance: ClassVar[CVSingleton | None] = None
+
+    def __new__(cls, val: Any) -> CVSingleton:
+        instance = CVSingleton.__instance
+        if instance is None:
+            instance = object.__new__(cls)
+            CVSingleton.__instance = instance
+        instance.val = val
+        return instance
+
+x = CVSingleton("sausage")
+y = CVSingleton("eggs")
+z = CVSingleton("spam")
+# Every construction returns the one instance; x.val is now spam:
+print(x.val, x is y is z)
+#: spam True
+```
+
+```python
+# test_class_variable.py
+import class_variable_singleton
+
+def test_class_variable_returns_same_instance() -> None:
+    a = class_variable_singleton.CVSingleton("a")
+    b = class_variable_singleton.CVSingleton("b")
+    assert a is b
+    assert a.val == "b"  # Last write wins on the shared instance
+```
+
+`object.__new__(cls)` builds an instance of `CVSingleton` rather than a foreign object,
+which lands this version on the far side of the rule from `new_singleton.py`.
+`isinstance(x, CVSingleton)` is `True`,
+and if the class defined an `__init__()`,
+Python would run it on the shared instance after every construction.
+`CVSingleton` defines none, and assigns `val` inside `__new__()` instead,
+which is why the last construction's value is the one that survives.
+
 ### Borg: Share State Instead of Identity
 
 [Alex Martelli observes](http://www.aleax.it/Python/5ep.html)
@@ -287,7 +335,6 @@ and it points every instance's `__dict__` at the same storage:
 
 ```python
 # borg_singleton.py
-# Alex Martelli's 'Borg'
 from typing import Any, ClassVar
 
 class Borg:
@@ -339,43 +386,6 @@ def test_borg_shares_state_but_not_identity() -> None:
     assert x is not y  # Distinct objects...
     assert x.val == y.val  # ...sharing one set of state
     assert x.val == "second"
-```
-
-A simpler version relies on a class variable holding a single shared value:
-
-```python
-# class_variable_singleton.py
-from typing import Any, ClassVar
-
-class CVSingleton:
-    val: Any
-    __instance: ClassVar[CVSingleton | None] = None
-
-    def __new__(cls, val: Any) -> CVSingleton:
-        instance = CVSingleton.__instance
-        if instance is None:
-            instance = object.__new__(cls)
-            CVSingleton.__instance = instance
-        instance.val = val
-        return instance
-
-x = CVSingleton("sausage")
-y = CVSingleton("eggs")
-z = CVSingleton("spam")
-# Every construction returns the one instance; x.val is now spam:
-print(x.val, x is y is z)
-#: spam True
-```
-
-```python
-# test_class_variable.py
-import class_variable_singleton
-
-def test_class_variable_returns_same_instance() -> None:
-    a = class_variable_singleton.CVSingleton("a")
-    b = class_variable_singleton.CVSingleton("b")
-    assert a is b
-    assert a.val == "b"  # Last write wins on the shared instance
 ```
 
 ### Singleton Classes
@@ -432,9 +442,9 @@ which is the reason to prefer them when you need that.
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction itself.
-[Here](17_Metaprogramming.md#intercepting-instance-creation),
-a similar metaclass singleton appears next to the simpler hooks that usually replace it.
-It appears here for completeness:
+[Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation)
+places a similar metaclass singleton beside the simpler hooks that usually replace it.
+This version is here for completeness:
 
 ```python
 # singleton_metaclass.py
