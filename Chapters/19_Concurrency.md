@@ -1020,7 +1020,7 @@ Since 3.13, CPython also provides a *free-threaded* build,
 tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 (`python3.15t` rather than `python3.15`).
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
-Running `gil_threads.py`'s CPU-bound `sequential()`/`threaded()` pair under a free-threaded interpreter turns the ratio around:
+Running `gil_threads.py` under a free-threaded interpreter turns the ratio around:
 
     threads speedup: 3.8x
 
@@ -1334,7 +1334,7 @@ Three different backends are running inside one `TaskGroup`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
 All three start together, and the block does not exit until all three finish.
-The event loop is doing the same job it did in the chapter's first listing.
+The event loop is doing the job it has done all chapter.
 It schedules awaitables,
 and it no longer cares whether the work underneath is a coroutine, a thread,
 or a process.
@@ -1382,7 +1382,8 @@ It solves a narrower problem: without the GIL,
 a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
 paying no pickling cost at all.
 This is something neither a GIL-bound thread nor a process pool offers.
-With the GIL, a thread no longer structures your concurrency.
+
+Under the standard build, then, a thread no longer structures your concurrency.
 `asyncio` does that.
 A thread's remaining job is to absorb a blocking call,
 so the wait cannot freeze the event loop.
@@ -1609,8 +1610,12 @@ since a preemptive switch could land between them.
 Here, the first `await` comes after both updates,
 so the task keeps control through them and needs no lock.
 
-A semaphore initialized to one behaves exactly like a lock.
-Raising the count turns it into a throttle on a limited resource,
+A semaphore initialized to one behaves like a lock,
+with one difference worth knowing.
+A `Lock` refuses a release it never granted,
+raising `RuntimeError: Lock is not acquired.` An over-released `Semaphore` quietly raises its own limit instead,
+so a stray `release()` turns a semaphore of one into a semaphore of two.
+Raising the count deliberately turns it into a throttle on a limited resource,
 such as a fixed number of database connections.
 
 ### Deadlock
@@ -1821,7 +1826,7 @@ Here are a few of the topics beyond it:
   never shares state directly, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
-  Elixir is newer and built on the Erlang's BEAM virtual machine.
+  Elixir is newer and built on Erlang's BEAM virtual machine.
 - **Communicating Sequential Processes
   (CSP):** Independent processes that communicate only over explicit,
   shared channels, rather than an actor's private mailbox.
@@ -1854,7 +1859,8 @@ Here are a few of the topics beyond it:
 5.  In `async_locks.py`,
     replace `lock = asyncio.Lock()` with `lock = asyncio.Semaphore(1)`.
     Confirm `counter` still reaches `400`,
-    and explain why a semaphore initialized to `1` behaves exactly like a lock.
+    and explain why a semaphore initialized to `1` stands in for a lock here.
+    Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     calling `main()` unconditionally, and run it.
     Read the error, then explain it with the import mechanics described in [Parallelism](#parallelism):

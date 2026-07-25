@@ -1,4 +1,4 @@
-# exercise_5.py
+# exercise_5_stray_release.py
 import asyncio
 
 counter = 0
@@ -13,8 +13,9 @@ async def increment(count):
             counter = value + 1
 
 async def main():
+    semaphore.release()  # Nothing was acquired
     await asyncio.gather(*(increment(50) for _ in range(8)))
     print(counter)
 
 asyncio.run(main())
-#: 400
+#: 200

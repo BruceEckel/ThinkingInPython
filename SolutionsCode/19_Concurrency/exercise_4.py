@@ -1,5 +1,6 @@
-# exercise_3.py
+# exercise_4.py
 import asyncio
+import time
 from dataclasses import dataclass
 
 @dataclass
@@ -14,12 +15,9 @@ class Meter:
     def __exit__(self, exc_type, exc, tb):
         self.active -= 1
 
-async def mixed_price(order, meter):
+async def io_price(order, meter):
     with meter:
-        await asyncio.sleep(0.05)   # Waiting, off the processor
-        total = 0
-        for _ in range(1_000_000):  # Working, on the processor
-            total += 1
+        time.sleep(0.05)  # Blocking, and never awaited
     return order * 10
 
 async def run(price_task, orders):
@@ -29,8 +27,8 @@ async def run(price_task, orders):
     return prices, meter.peak
 
 async def main():
-    prices, peak = await run(mixed_price, [1, 2, 3, 4, 5])
-    print(f"mixed peak={peak}, prices={prices}")
+    prices, peak = await run(io_price, [1, 2, 3, 4, 5])
+    print(f"blocking peak={peak}, prices={prices}")
 
 asyncio.run(main())
-#: mixed peak=5, prices=[10, 20, 30, 40, 50]
+#: blocking peak=1, prices=[10, 20, 30, 40, 50]
