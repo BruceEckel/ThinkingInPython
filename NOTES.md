@@ -2,9 +2,12 @@ Chapter 20 might need "## What Is Polymorphism?"
 
 "happen" "is what" "does it" "ever" "at all" "only"
 "was to" "in the first place" "already" "even" "honest" "buy" "ships"
+"load-bearing"
 
 lets this book's build pass
 passes the book build?
+
+Look for places display_object could be replaced with print(vars(obj))
 
 Look through chapter 19 for words or phrasing that is confusing, odd, or out-of-character.
 My goal is:
@@ -75,3 +78,38 @@ Appendix perhaps containing learning resources, ask Claude to find the best ones
 ---
 Potential Pycon talks:
 Concurrency for beginners
+
+---
+Short monty python phrases
+- "Ni!"
+- "Spam"
+- "Spam, spam, spam"
+- "And now for something completely different"
+- "It's..."
+- "Nudge nudge"
+- "Wink wink"
+- "Say no more"
+- "Nobody expects the Spanish Inquisition!"
+- "This is an ex-parrot"
+- "Pining for the fjords"
+- "'E's not dead, 'e's resting"
+- "I'm not dead yet"
+- "It's just a flesh wound"
+- "Bring out your dead"
+- "Your father smelt of elderberries"
+- "A shrubbery"
+- "What is your favourite colour?"
+- "African or European?"
+- "Naughty naughty, very naughty"
+- "Lumberjack"
+- "Albatross!"
+- "My hovercraft is full of eels"
+- "Silly walks"
+- "Argument Clinic"
+- "No it isn't"
+- "Cheese shop"
+- "Blancmange"
+- "Crunchy frog"
+- "Run away!"
+- "Fetchez la vache"
+- "Nudge, wink, say no more"

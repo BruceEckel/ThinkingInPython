@@ -8,8 +8,7 @@ class Stats(NamedTuple):
 def summarize(data: list[float]) -> Stats:
     return Stats(sum(data) / len(data), len(data))
 
-stats = summarize([2.0, 4.0, 6.0])
-print(stats)
+print(summarize([2.0, 4.0, 6.0]))
 #: Stats(mean=4.0, count=3)
 mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
 print(mean, count)

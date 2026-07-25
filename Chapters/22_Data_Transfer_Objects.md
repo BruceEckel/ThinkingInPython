@@ -1,9 +1,8 @@
 # Data Transfer Objects
 
-The *Messenger* or *Data Transfer Object* is a way to pass a clump of information around.
-The most typical place for this is in return values from functions,
-where tuples or dictionaries often serve.
-However, those rely on indexing.
+The *Messenger* or *Data Transfer Object* is a way to pass a package of information around.
+The most typical use is for function return values.
+Although tuples or dictionaries are often used for that, those rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
 
@@ -17,22 +16,20 @@ class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
 
-m: Any = Messenger(info="Some information", b=["a", "list"])
+m: Any = Messenger(info="Spam", b=["x", "y"])
 print(vars(m))
-#: {'info': 'Some information', 'b': ['a', 'list']}
+#: {'info': 'Spam', 'b': ['x', 'y']}
 m.more = 11
 print(m.info, m.b, m.more)
-#: Some information ['a', 'list'] 11
+#: Spam ['x', 'y'] 11
 print(vars(m))
-#: {'info': 'Some information', 'b': ['a', 'list'], 'more': 11}
+#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
 ```
 
-`class Messenger` replaces the object's `__dict__`,
-the dict where Python keeps an instance's attributes,
-with the `dict` that the `**kwargs` argument automatically creates.
+The constructor replaces the object's `__dict__` with the `dict` the `**kwargs` argument automatically creates.
 `vars(m)` returns that same `__dict__`,
 and its output shows the attributes and the keyword arguments are one dict:
-`m.more = 11` added a key,
+`m.more = 11` adds a key,
 just as passing `more=11` to the constructor would have.
 
 Because `**kwargs` is the only parameter,
@@ -41,47 +38,34 @@ Because `**kwargs` is the only parameter,
 The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
 since a bare `*` must be followed by a named parameter.
-The one name a caller cannot use is `self`.
-Writing `def __init__(self, /, **kwargs)` makes `self` positional-only and frees the name,
-so `Messenger(self="me")` becomes a legal attribute instead of a duplicate argument.
 
-The `m: Any` annotation is quiet but load-bearing.
+The `m: Any` annotation is required.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
-`Any` switches the checker off for `m`,
-the bargain described in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
-That is the price of an ad-hoc attribute bag:
-no checker knows your attribute names,
-so a typo like `m.inof` is a runtime `AttributeError`, not a static error.
+`Any` switches the checker off for `m`.
+The price of an ad-hoc attribute bag is that no checker knows your attribute names.
+A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 ## The Standard-Library Versions
 
-In the standard Python library, `types.SimpleNamespace` is a `Messenger`,
-with keyword arguments becoming attributes.
-`display_object()` from [Metaprogramming](17_Metaprogramming.md#the-inspect-module)
-confirms that each keyword argument lands in the instance's `__dict__`,
-alongside anything assigned afterward:
+In the standard Python library, `types.SimpleNamespace` is a `Messenger`.
+Here, too, keyword arguments become attributes that land in the instance's `__dict__`:
 
 ```python
 # display_namespace.py
 from types import SimpleNamespace
-from display import display_object
 
-m = SimpleNamespace(info="Some information", b=["a", "list"])
+m = SimpleNamespace(info="Spam", b=["x", "y"])
+print(vars(m))
+#: {'info': 'Spam', 'b': ['x', 'y']}
 m.more = 11
-print(m.info, m.b, m.more)
-#: Some information ['a', 'list'] 11
-display_object(m)
-#: [Attributes]
-#:   • b = ['a', 'list']
-#:   • info = 'Some information'
-#:   • more = 11
-#: [Methods]
-#:   None
+print(vars(m))
+#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
 ```
 
-A `SimpleNamespace` is as anonymous as the hand-rolled `Messenger`.
-It accepts any name you invent, so no checker can know which names to expect.
+A `SimpleNamespace` also accepts any name you invent,
+so no checker can know which names to expect.
+
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
 and equality from those declarations, producing a mutable record:
@@ -126,12 +110,9 @@ print(red._asdict(), Color._fields)
 #: {'r': 255, 'g': 0, 'b': 0} ('r', 'g', 'b')
 ```
 
-Printing a `NamedTuple` gives the same readable output a data class gives,
-the class name followed by each field with its name.
+Printing a `NamedTuple` gives the same readable output a data class gives.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
-Since the fields cannot be assigned,
-`_replace()` is how you produce an updated copy,
-the immutable equivalent of `red.g = 128`.
+Since the fields cannot be mutated, `_replace()` produces an updated copy.
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` does not mean private.
 `NamedTuple` marks its own members that way so they cannot collide with a field you name,
@@ -147,8 +128,7 @@ see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-value
 ## Returning Multiple Values
 
 The most common Messenger is a return value.
-Here, a function computes several related things,
-and a `NamedTuple` carries them back under their own names:
+Here, a function computes two results, returned in a `NamedTuple`:
 
 ```python
 # fetch_stats.py
@@ -161,25 +141,24 @@ class Stats(NamedTuple):
 def summarize(data: list[float]) -> Stats:
     return Stats(sum(data) / len(data), len(data))
 
-stats = summarize([2.0, 4.0, 6.0])
-print(stats)
+print(summarize([2.0, 4.0, 6.0]))
 #: Stats(mean=4.0, count=3)
 mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
 print(mean, count)
 #: 2.0 2
 ```
 
-The near-miss is annotating the return as `tuple[float, int]` and returning a bare tuple.
-It runs, but every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
+Without `Stats` you'd annotate the return as `tuple[float, int]` and return a bare tuple.
+Now every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
 knowledge the code no longer states anywhere.
 `Stats` names the slots and documents itself at each call site,
-and because a `NamedTuple` is a tuple, the unpacking idiom keeps working.
+and because a `NamedTuple` is a tuple, you can unpack it.
 
 ## A NamedTuple Is Still a Tuple
 
 A `NamedTuple` inherits its equality from `tuple`: positional and type-blind.
 Any tuple-shaped value with the same contents compares equal,
-including a different record type that happens to share the shape:
+including a different record type that happens to have the same shape:
 
 ```python
 # still_a_tuple.py
