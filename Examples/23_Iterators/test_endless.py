@@ -1,9 +1,10 @@
 # test_endless.py
 from collections.abc import Iterator
 from itertools import count, islice, takewhile
+from typing import Final
 import pytest
 
-LIMIT = 1000
+LIMIT: Final[int] = 1000
 
 class Tripwire(Exception):
     pass

@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -176,6 +176,14 @@ serve:  ## Serve build/site/ at http://localhost:8000
 	$(PY) tools/serve.py
 
 ##@ Examples (build/examples/)
+
+# The edit loop for one chapter's listings. `gate` checks all 44 chapters and
+# spends most of its time executing listings you did not touch; this runs the
+# same code-example checks (markers, listing style, ty, ruff, pytest) against
+# one chapter, in about a second. It is not a substitute for `gate`, which
+# also catches cross-chapter breakage: run that before committing.
+check-ch:  ## Run the code checks for one chapter only (CH=12), ~1s
+	$(PY) tools/check_chapter.py $(CH)
 
 examples: extract run  ## Extract then run (the full verification pass)
 

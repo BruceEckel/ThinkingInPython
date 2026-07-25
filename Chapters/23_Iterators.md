@@ -341,16 +341,17 @@ Skipping and stopping look the same on finite data and behave nothing alike on i
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call never returns, and no test survives.
 In the following, `counter()` stands in for `count(1)`.
-It counts up the same way, then raises an exception once something has pulled `LIMIT` values.
-A consumer that would have run forever fails in a fraction of a second:
+It counts up the same way,
+then raises an exception once something has pulled `LIMIT` values:
 
 ```python
 # test_endless.py
 from collections.abc import Iterator
 from itertools import count, islice, takewhile
+from typing import Final
 import pytest
 
-LIMIT = 1000
+LIMIT: Final[int] = 1000
 
 class Tripwire(Exception):
     pass
@@ -377,25 +378,25 @@ def test_islice_stops_after_its_count() -> None:
     assert list(islice(counter(LIMIT), 3)) == [1, 2, 3]
 ```
 
-The first test is `list(count(1))` with a fuse in it.
-`list()` asks for value after value and never decides to stop,
+The first test is `list(count(1))` but with a builtin termination.
+`list()` asks for value after value and never stops,
 so the tripwire fires rather than the list being returned.
-The second test is the near-miss from the paragraph above.
+The second test is the near-miss described previously.
 Nothing after `2` satisfies `n < 3`,
 yet `list()` keeps pulling in the hope of another match,
 and trips the same wire.
-The last two stop on their own and never reach it.
-Failing loudly at 1,000 values is a stand-in for a real program's failure,
-which is a process that stops responding or dies when it exhausts memory.
+The last two stop on their own and never reach the trip wire.
 
+Failing at 1,000 values is a stand-in for a real program's failure,
+which stops responding or dies when it exhausts memory.
 No tool warns you first.
 `ty` accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
 Whether an iterator ever ends is not something a checker can decide by reading the code,
 and a generator built from `while True` is indistinguishable from a finite one until it runs.
 The one rule that touches this code is a comprehension check that offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
-the same hang in fewer characters.
-Knowing which of your sources are endless is your job, not the toolchain's.
+the same problem with fewer characters.
+Nothing in the toolchain (except an AI) will discover problems like this.
 
 ## A Type-Checking Iterator
 
@@ -407,13 +408,13 @@ Here, we force every item to be of an expected type:
 ```python
 # typed_iterator.py
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import override
 
+@dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
-    def __init__(self, it: Iterator[object],
-                 expected: type[T]) -> None:
-        self.imp = it
-        self.expected = expected
+    imp: Iterator[object]
+    expected: type[T]
 
     @override
     def __next__(self) -> T:
@@ -426,8 +427,14 @@ class TypedIterator[T](Iterator[T]):
 ```
 
 Subclassing `collections.abc.Iterator` provides `__iter__()` automatically,
-so you supply only `__next__()`.
-A generator wraps an iterator just as well and in fewer lines:
+so you need only supply `__next__()`.
+
+Note the `eq=False` in the `dataclass` decoration.
+A data class that generates `__eq__()` sets `__hash__` to `None`.
+Comparing iterators by field value is incorrect because two wrappers over one source would compare equal no matter how far each had advanced.
+Turning equality off restores the correct identity comparison for an iterator.
+
+A generator wraps an iterator just as well, and in fewer lines:
 
 ```python
 # typed_generator.py
@@ -448,11 +455,9 @@ if __name__ == "__main__":
 Use the class when the wrapper needs its own state or extra methods.
 Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
-because they all speak the same protocol.
+because they all use the same protocol.
 Both take `expected: type[T]`, so the checker carries the element type through.
-`typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
-
-Both wrappers should pass matching items and raise on a mismatch:
+This way, `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 ```python
 # test_typed.py
@@ -473,23 +478,79 @@ def test_typed_iterator_passes_and_rejects() -> None:
 
 ## The Pattern That Disappeared
 
-*GoF Design Patterns* gives Iterator a class of its own,
+*GoF Design Patterns* gives Iterator a pattern of its own,
 with separate methods to start a traversal, advance it,
 test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
-Four methods became two, `__iter__()` and `__next__()`,
-and the language calls both on your behalf.
-This is the dissolving that [The Pattern Concept](21_The_Pattern_Concept.md)
-describes, carried far enough that using the pattern stops feeling like a decision.
+Those four methods became two: `__iter__()` and `__next__()`.
+The language calls both on your behalf.
+This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md).
 
-What the absorption took with it was the explicit question.
-A GoF iterator is asked whether it is done,
-and the code doing the asking can act on the answer.
-Python moved that question inside the `for` loop,
-which is why both surprises in this chapter are quiet ones.
-An exhausted generator reports "finished" to a loop that keeps the news to itself,
-and a generator that has not started reports nothing at all.
-You get the protocol for free and pay for it in visibility.
+You can ask a GoF iterator whether it is done multiple times without disturbing it.
+Python fuses that question into `__next__()`, so the only way to ask is to take.
+The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
+You can catch that exception yourself,
+or hand `next()` a default and compare against it,
+but neither restores the free query of the GoF Iterator:
+
+```python
+# asking_costs.py
+from collections.abc import Iterator
+
+DONE = sentinel("DONE")
+
+def doubled(source: Iterator[int]) -> Iterator[int]:
+    while True:
+        yield next(source) * 2  # Escapes when source runs out
+
+def doubled_ok(source: Iterator[int]) -> Iterator[int]:
+    for n in source:  # The loop absorbs the exception
+        yield n * 2
+
+numbers = iter([1, 2])
+print(next(numbers, DONE) is DONE)  # Asking consumes the 1
+#: False
+print(next(numbers, DONE) is DONE)  # Asking consumes the 2
+#: False
+print(next(numbers, DONE) is DONE)  # No more left
+#: True
+
+try:
+    print(list(doubled(iter([1, 2]))))
+except RuntimeError as e:
+    print(f"{type(e).__name__}: {e}")
+#: RuntimeError: generator raised StopIteration
+print(list(doubled_ok(iter([1, 2]))))
+#: [2, 4]
+```
+
+Each question costs an item.
+Nothing in the protocol looks ahead without advancing,
+which is why a peekable iterator has to buffer,
+and why `tee` buffered a whole stream earlier in this chapter.
+`DONE` is a [sentinel](05_Functions.md#default-and-keyword-arguments),
+because the answer must be distinguishable from every value the source could yield.
+`None` would collapse an exhausted source and a source that yielded `None` into the same reply.
+`doubled()` shows the other half of the price.
+Letting `StopIteration` escape a generator body does not end that generator politely.
+Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
+turning an ordinary end of stream into a failure that reads like a bug elsewhere.
+
+Notice which spelling needs the guard.
+Forwarding values untouched has no such problem,
+since `yield from source` ends the delegation when the source runs out.
+Per-item work cannot be written that way,
+because `yield from` passes values through unchanged.
+`doubled_ok()` reaches the same place by letting `for` do the asking,
+which absorbs the exception the way every loop in this chapter has.
+Calling `next()` inside a loop you wrote yourself is the one spelling that hands you the exception to deal with,
+and the fix is almost never a `try`.
+It is to stop asking by hand.
+
+Both surprises earlier in this chapter come from the same fusion.
+`for` and `list()` catch the answer for you and report nothing,
+so an exhausted source and an empty one produce identical output.
+The protocol is free, and quiet.
 
 ## Exercises
 

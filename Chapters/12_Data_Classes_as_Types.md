@@ -44,7 +44,8 @@ An exception is a value like any other, and the values it carries deserve names.
 such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
-`eq=False` turns off the generated `__eq__()`, which matters more than it appears.
+`eq=False` turns off the generated `__eq__()`,
+which matters more than it appears.
 A data class that defines `__eq__()` sets `__hash__` to `None`,
 and an unhashable exception is a trap if you put it in a set.
 Identity is the correct comparison for an exception.

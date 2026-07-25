@@ -99,6 +99,30 @@ file passes a strict type checker and linter.
 - If `None` means "nothing there," use one shared null-object
   sentinel (`neighbors.get(urge, EDGE)`), not `None` checks.
 
+**Use the `sentinel` builtin when a marker must be distinct from every
+legal value** (PEP 661, Python 3.15+).
+
+- `MISSING = sentinel("MISSING")` prints as `MISSING` in a repr or a
+  traceback. A bare `object()` prints `<object object at 0x...>` and
+  names nothing.
+
+- Use it for a default that must detect absence (telling a missing key
+  from a stored `None`), a `next(it, DONE)` probe, a not-yet-created
+  placeholder, or a flag meaning "all of them."
+
+- Keep `None` when it cannot collide with a legal value. `None` is
+  still the right default for an ordinary optional, and a sentinel
+  there is ceremony.
+
+- Create each sentinel once and share that name. Two `sentinel("X")`
+  calls build two unequal objects, even in one module, so an `is`
+  check against a freshly made one silently fails.
+
+- When a parameter takes either a sentinel or a real value, annotate
+  the union with the specific sentinel value (`Sequence[str] | ALL`),
+  never the generic `sentinel` class, so the checker narrows to the
+  real type once the sentinel is ruled out.
+
 **Annotations are lazy (PEP 649, Python 3.15+).**
 
 - Forward references need no quotes and no

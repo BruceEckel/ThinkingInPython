@@ -1,12 +1,12 @@
 # typed_iterator.py
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import override
 
+@dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
-    def __init__(self, it: Iterator[object],
-                 expected: type[T]) -> None:
-        self.imp = it
-        self.expected = expected
+    imp: Iterator[object]
+    expected: type[T]
 
     @override
     def __next__(self) -> T:

@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+"""Run the code-example gates for one chapter, and nothing else.
+
+`make gate` checks the whole book and takes tens of seconds, most of it
+spent executing every listing in all 44 chapters. When you are editing the
+listings in a single chapter, almost none of that work is about your edit.
+This runs the same checks a code example must pass, scoped to one chapter:
+
+    make check-ch CH=12          # or CH=12_Data_Classes_as_Types
+
+The steps, in order:
+
+1. ``extract_examples.py --write`` rebuilds ``build/examples/`` from the
+   Markdown. This is whole-book (and cheap), because a chapter's listings
+   import their siblings and the tree has to be consistent.
+2. ``validate_output.py`` on this chapter alone, checking (not rewriting)
+   its ``#:`` markers. This is the step the full gate spends its time on,
+   and the one worth narrowing.
+3. The Markdown-level listing gates: blank-line density, comment periods,
+   comment spacing, comment capitalization. Hand-editing a listing is what
+   trips these, so they belong in an edit-loop check.
+4. ``ty``, ``ruff``, and ``pytest`` over this chapter's extracted directory.
+
+Only ``capitalize_comments.py`` still reads the whole book, since it takes
+no path argument; it is fast enough not to matter.
+
+Step 1 is fail-fast: nothing downstream means anything against a tree that
+would not build. The rest all run even after one fails, so a single pass
+reports every problem instead of making you rediscover them one at a time.
+
+A prose-only chapter (no extracted directory) skips steps 4 and reports so.
+"""
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+from tools_config import CHAPTERS_DIR, EXAMPLES_TREE, ROOT
+
+PY = [sys.executable]
+NO_TESTS_COLLECTED = 5  # pytest's exit code for an empty directory
+
+
+def resolve(selector: str) -> Path:
+    """The one chapter a number or stem prefix names."""
+    matches = sorted(CHAPTERS_DIR.glob(f"{selector}*.md"))
+    if not matches:
+        low = selector.lower()
+        matches = sorted(
+            p for p in CHAPTERS_DIR.glob("*.md") if low in p.stem.lower())
+    if not matches:
+        raise SystemExit(f"error: no chapter matches {selector!r}")
+    if len(matches) > 1:
+        names = ", ".join(p.stem for p in matches)
+        raise SystemExit(f"error: {selector!r} matches several: {names}")
+    return matches[0]
+
+
+def run(label: str, command: list[str], ok: tuple[int, ...] = (0,)) -> bool:
+    proc = subprocess.run(command, cwd=ROOT)
+    passed = proc.returncode in ok
+    print(f"{'ok  ' if passed else 'FAIL'}  {label}")
+    return passed
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("chapter",
+                    help="chapter number or stem prefix, e.g. 12")
+    args = ap.parse_args(argv)
+
+    md = resolve(args.chapter)
+    chapter_dir = EXAMPLES_TREE / md.stem
+    print(f"Checking {md.name}\n")
+
+    if not run("extract", [*PY, "tools/extract_examples.py", "--write"]):
+        return 1
+
+    results = [
+        run("output markers",
+            [*PY, "tools/validate_output.py", str(md)]),
+        run("listing format", [*PY, "tools/listing_format.py", str(md)]),
+        run("comment periods", [*PY, "tools/comment_periods.py", str(md)]),
+        run("comment spacing", [*PY, "tools/comment_spacing.py", str(md)]),
+        run("comment caps", [*PY, "tools/capitalize_comments.py"]),
+    ]
+
+    if chapter_dir.is_dir():
+        target = str(chapter_dir)
+        results += [
+            run("ty", ["uv", "run", "ty", "check", target]),
+            run("ruff", ["uv", "run", "ruff", "check", target]),
+            run("pytest",
+                ["uv", "run", "pytest", "-q", target],
+                ok=(0, NO_TESTS_COLLECTED)),
+        ]
+    else:
+        print(f"skip  ty/ruff/pytest ({md.stem} extracts no examples)")
+
+    failed = results.count(False)
+    print(f"\n{len(results) - failed} passed, {failed} failed")
+    if failed:
+        print("Run `make gate` before committing: this checks one chapter,"
+              " not the book.")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
