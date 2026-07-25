@@ -54,7 +54,7 @@ but every construction should return the same object.
 The simplest solution is to hide construction behind a cached factory.
 A cached factory applies `functools.cache` to a *constructor function*.
 This is an ordinary function whose only job is to build and return an instance of a class,
-standing in for a direct call to it.
+standing in for a direct call to the class constructor.
 
 `functools.cache` *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
@@ -91,15 +91,49 @@ def test_cache_factory_returns_same_instance() -> None:
         cached_factory_singleton.settings())
 ```
 
-Two practical notes on this form.
+Nothing stops a caller from writing `Settings()` and getting a second instance.
+You cannot prevent that.
+Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
+which is the whole of what Python offers.
+It is a sign, not a lock.
+Two stronger-looking moves fail the same way.
+Deleting the name after building the instance leaves the class reachable,
+because `type(settings())` hands it back.
+Defining the class inside `settings()` also looks airtight,
+and `@cache` runs that body only once,
+so there is still exactly one instance and no module-level name at all.
+`type(settings())` recovers it anyway,
+and the nesting costs you the return annotation:
+a class with no name outside the function cannot be named in the signature,
+so `settings()` must return a `Protocol` instead of the class.
+This is the advisory privacy that [Rethinking Objects](20_Rethinking_Objects.md#encapsulation-leaks)
+examines at length.
+The reachable class is also useful: a test that wants a fresh,
+uncached `Settings` needs to name it.
+
+Three practical notes on this form.
 First, like every lazy singleton, it has a first-call race under threads:
 concurrent first calls can each run the constructor,
 and each caller can end up holding a different object,
 with only one of them staying in the cache.
+This is not a narrow window.
+Eight threads calling `settings()` at once,
+with a constructor slow enough to widen it,
+ran that constructor eight times and handed back eight different objects.
 When threads may arrive before the singleton exists, create it eagerly instead:
 call `settings()` once at import time, or use the module form,
 which the import system builds exactly once.
-Second, a singleton is shared state, and shared state leaks between tests.
+
+Second, a lock is the other fix for that race, and not the obvious one.
+Wrapping the cached function's body in a `threading.Lock` changes nothing,
+because every thread has already missed the cache before reaching the lock.
+They serialize, each still builds an object,
+and the cache keeps whichever finished last.
+The check has to happen inside the lock, which means an explicit slot to check,
+and at that point `@cache` is no longer what makes the object single.
+[Concurrency](19_Concurrency.md#locks) covers the machinery.
+
+Third, a singleton is shared state, and shared state leaks between tests.
 The cached factory has an escape hatch the classic forms lack:
 `settings.cache_clear()` discards the instance, so each test can start fresh.
 
@@ -157,9 +191,8 @@ print(x is y, x.instance is y.instance is z.instance)
 ```
 
 Because the inner class's name starts with a double underscore,
-Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body,
-a rewriting called *name mangling*
-(see [Testing](11_Testing.md#white-box-and-black-box-tests)).
+Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
+This is [name mangling](11_Testing.md#white-box-and-black-box-tests).
 `OnlyOne.__OnlyOne`, written from outside the class,
 names an attribute that was never stored under that spelling,
 so it fails at runtime with `AttributeError`, not at type-checking time.
