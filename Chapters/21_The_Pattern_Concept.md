@@ -25,8 +25,8 @@ That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern earns its place only when the problem it solves is actually present.
-If nothing varies, you do not need machinery for isolating variation,
-and a pattern without its problem is just overhead.
+If nothing varies, you do not need machinery for isolating variation
+A pattern without its problem is just overhead.
 
 Although they're called "design patterns,"
 they aren't tied to the realm of design.
@@ -34,17 +34,16 @@ Patterns seem to stand apart from the traditional way of thinking about analysis
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
 Thus it can sometimes appear at the analysis phase or high-level design phase.
-This is interesting because a pattern has a direct implementation in code,
-so you might not expect it to show up before low-level design or implementation.
+Because a pattern has a direct implementation in code,
+you might not expect it to show up before low-level design or implementation.
 
 The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
-Once you find some part of your program that's likely to change for some reason,
-patterns can prevent those changes from propagating other changes throughout your code.
-Not only does this make the code much cheaper to maintain,
-but it is also usually simpler to understand (which results in lowered costs).
+Once you find a part of your program that's likely to change,
+patterns can prevent those changes from causing secondary effects throughout your code.
+This make the code cheaper to maintain and also usually simpler to understand.
 
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
@@ -52,16 +51,16 @@ This means finding the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
-Notice the verb: a vector of change is discovered, not predicted.
-Guess at it up front and you usually build flexibility in a direction nothing ever moves,
-paying in complexity for generality that never earns its keep.
+
+Notice that a vector of change is discovered, not predicted.
+Guessing at it up front often builds flexibility in a direction that doesn't get used.
+This creates complexity to produce generality that never pays off.
 Let real changes reveal it.
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
-If you look at it this way,
-you've already seen some design patterns in this book.
+You've already seen some design patterns in this book.
 For example, inheritance can be thought of as a design pattern
 (albeit one built into the language).
 It allows you to express differences in behavior (that's the thing that changes)
@@ -75,12 +74,11 @@ which has been implicitly available in `for` loops from the beginning of the lan
 and became an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through it.
 You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
-Your generic code works with any object that produces an iterator.
+Generic code can work with any object that produces an iterator.
 
-Iterator's fate is worth pausing on, because it repeats.
-A pattern is often a sign of something a language is missing:
-enough programmers wrote the same scaffolding often enough to name it,
-and the scaffolding exists only because the language would not write it for them.
+A pattern is often a sign of something missing in a language.
+Enough programmers wrote the same scaffolding often enough to name it.
+That scaffolding exists only because the language would not write it for them.
 When a language later absorbs the feature,
 the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language.].
 Python has absorbed several.
@@ -97,7 +95,7 @@ and how much dissolves into functions, data, and protocols?
     This could be something as common as the way that you code the process of stepping through an array in C
     (and not running off the end).
 2.  **Specific Design**:
-    the solution that we came up with to solve this particular problem.
+    the solution that arose to solve this particular problem.
     This might be a clever design, but it makes no attempt to be general.
 3.  **Standard Design**: a way to solve this *kind* of problem.
     A design that has become more general, typically through reuse.
@@ -109,13 +107,10 @@ In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
 meaningless outside a language that provides `with`.
 [Template Method](25_Template_Method.md) is a design pattern, stage four:
 a shape of solution you could build in any language with polymorphism.
-The ladder between them is climbed by generalization,
-and descended again every time a language absorbs a pattern into a feature.
 
 This progression doesn't say that one stage is better than another.
 It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
-That's not a good use of your time,
-and you can't force the discovery of patterns that way.
+You can't force the discovery of patterns that way.
 They tend to be subtle and appear over time.
 
 ## Pattern Taxonomy
@@ -129,9 +124,9 @@ The three purposes are:
     By isolating the details of object creation,
     your code isn't dependent on what types of objects there are and thus won't change when you add a new type of object.
     [Singleton](24_Singleton.md) counts as a creational pattern,
-    and later in this book you'll see examples of [Factories](27_Factory.md).
+    and later in this book you'll see examples of [factories](27_Factory.md).
 2.  **Structural**: designing objects to satisfy particular project constraints.
-    These work with the way objects connect with other objects to ensure that changes in the system don't require changes to those connections.
+    How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
@@ -142,8 +137,8 @@ The three purposes are:
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
 Certainly, the *Creational* patterns are fairly straightforward.
-How are you going to create your objects?
-This is a question you normally need to ask,
+How will you create objects?
+This is a normal question,
 and the name brings you right to that group of patterns.
 But I find *Structural* and *Behavioral* to be far less useful distinctions.
 I have not been able to look at a problem and say "clearly,
