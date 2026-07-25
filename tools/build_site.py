@@ -29,6 +29,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import search_index
 from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools_config import ROOT
 from tools_repo import md_files
@@ -214,8 +215,10 @@ def render_index(chapters: list[Chapter]) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{BOOK_TITLE}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="search.css">
+  <script src="search.js" defer></script>
 </head>
 <body>
   <div class="page">
@@ -312,6 +315,12 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
     (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
+    sections = search_index.write(
+        [search_index.Source(ch.md, ch.out_name, ch.title, ch.label)
+         for ch in chapters], out_dir)
+    for name in ("search.css", "search.js"):
+        shutil.copy2(STATIC_SRC / name, out_dir / name)
+
     copied = 0
     for name in sorted(used_images):
         filename = img_map.get(name)
@@ -323,6 +332,9 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
 
     print(f"Built {len(chapters)} pages + index into {out_dir}")
     print(f"Copied {copied} image(s).")
+    print(f"Indexed {sections} sections for search "
+          f"({(out_dir / search_index.INDEX_NAME).stat().st_size / 1024:.0f}"
+          " KB).")
     if missing:
         print(f"\nWARNING: {len(missing)} referenced image(s) not found in "
               f"{IMAGES_SRC.relative_to(ROOT)}:")

@@ -1,0 +1,147 @@
+/* Search overlay for the static site. The trigger link and the dialog are
+   both created by search.js, so a page only needs this stylesheet and that
+   script. Colors come from the variables the page already defines. */
+
+.search-toggle {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  background: none;
+  padding: 0 0 1px;
+  cursor: pointer;
+  transition: color 0.2s;
+  z-index: 100;
+}
+.search-toggle:hover { color: var(--accent); border-color: var(--accent); }
+/* Chapter pages already anchor "Contents" top right; sit to its left.
+   search.js adds this class when it finds that link, so the rule needs no
+   :has() support. */
+.search-toggle.beside-toc { right: 7.5rem; }
+
+.search-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 22, 18, 0.35);
+  display: none;
+  z-index: 200;
+}
+.search-scrim[data-open] { display: block; }
+
+.search-dialog {
+  position: fixed;
+  top: 8vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(46rem, calc(100vw - 3rem));
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1.5rem 3rem rgba(26, 22, 18, 0.25);
+  z-index: 201;
+}
+
+.search-field {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+.search-field input {
+  flex: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  outline: none;
+}
+.search-field input::placeholder { color: var(--muted); opacity: 0.7; }
+.search-count {
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+.search-results li { border-bottom: 1px solid var(--rule); }
+.search-results li:last-child { border-bottom: none; }
+.search-results a {
+  display: block;
+  padding: 0.9rem 1.5rem;
+  color: var(--ink);
+  text-decoration: none;
+  border: none;
+}
+.search-results a:hover,
+.search-results a:focus,
+.search-results [aria-selected="true"] a {
+  background: rgba(139, 26, 26, 0.07);
+  outline: none;
+}
+.search-where {
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.search-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  margin: 0.15rem 0 0.25rem;
+}
+.search-snippet {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.search-snippet mark,
+.search-heading mark {
+  background: rgba(139, 26, 26, 0.16);
+  color: var(--ink);
+  padding: 0 0.1em;
+}
+
+.search-note {
+  padding: 1.1rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.search-hint {
+  padding: 0.7rem 1.5rem;
+  border-top: 1px solid var(--rule);
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+}
+.search-hint kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  letter-spacing: 0;
+}
+
+@media (max-width: 34rem) {
+  .search-toggle,
+  body:has(.toc-toggle) .search-toggle { right: auto; left: 1.5rem; }
+  .search-dialog { top: 0; max-height: 100vh; height: 100vh; width: 100vw; }
+  .search-hint { display: none; }
+}
