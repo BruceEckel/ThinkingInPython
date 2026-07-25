@@ -25,7 +25,8 @@ That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern earns its place only when the problem it solves is actually present.
-If nothing varies, you do not need machinery for isolating variation A pattern without its problem is just overhead.
+If nothing varies, you do not need machinery for isolating variation.
+A pattern without its problem is just overhead.
 
 Although they're called "design patterns,"
 they aren't tied to the realm of design.
@@ -34,7 +35,9 @@ design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
 Thus it can sometimes appear at the analysis phase or high-level design phase.
 Because a pattern has a direct implementation in code,
-you might not expect it to show up before low-level design or implementation.
+you might expect it to appear no earlier than low-level design.
+It appears at every level,
+and you often discover that you need one only once you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
@@ -42,9 +45,9 @@ Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
 Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
-This make the code cheaper to maintain and also usually simpler to understand.
+This makes the code cheaper to maintain and usually simpler to understand.
 
-Often, the most difficult part of developing an elegant and cheap-to-maintain design is in discovering what I call "the vector of change"
+Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 This means finding the most important thing that changes in your system,
 which points to your greatest cost.
@@ -90,13 +93,16 @@ and how much dissolves into functions, data, and protocols?
 
 ## Pattern Evolution
 
+A pattern arrives in stages, each more general than the last:
+
 1.  **Idiom**: how we write code in a particular language to do this particular type of thing.
     This could be something as common as the way that you code the process of stepping through an array in C
     (and not running off the end).
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
     This might be a clever design, but it makes no attempt to be general.
-3.  **Standard Design**: a way to solve this *kind* of problem.
+3.  **Standard Design**: a way to solve every problem of that kind,
+    not just the one in front of you.
     A design that has become more general, typically through reuse.
 4.  **Design Pattern**: how to solve an entire class of similar problems.
     This usually only appears after applying a standard design a number of times,
@@ -161,7 +167,8 @@ and the remaining difference is intent.
 Design principles are at least as important as design structures,
 but for a different reason.
 Principles ask questions about your proposed design, to apply tests for quality.
-Some of these only apply to OOP.
+Most hold for any code.
+*Reflexivity* and the *Law of Demeter* assume classes and objects.
 
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*.
