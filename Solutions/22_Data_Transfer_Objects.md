@@ -81,81 +81,27 @@ with `num, denom = f` works the same way it would for a plain
 
 ## 4. A fourth attribute supplied at construction
 
-`display_object()` is the book's shared inspection helper, kept at the
-tree root the same way `Examples/display.py` is, so any solution can
-import it:
-
-```python
-# display.py
-import inspect
-from collections.abc import Sequence
-
-def _annotations(cls: type) -> dict[str, object]:
-    merged: dict[str, object] = {}
-    for base in reversed(cls.__mro__):
-        merged.update(inspect.get_annotations(base))
-    return merged
-
-def _type_name(annotation: object) -> str:
-    if isinstance(annotation, type):
-        return annotation.__name__
-    return str(annotation)
-
-def display_object(
-    obj: object, dunder: Sequence[str] = (), max_width: int = 65
-) -> None:
-    cls = obj if inspect.isclass(obj) else type(obj)
-    print(f"=== {cls.__name__} ===")
-    annotations = _annotations(cls)
-    attributes: list[str] = []
-    methods: list[str] = []
-    for name, value in inspect.getmembers_static(obj):
-        is_dunder = name.startswith("__") and name.endswith("__")
-        if is_dunder and name not in dunder:
-            continue
-        if callable(value):
-            try:
-                sig = str(inspect.signature(value))
-            except (ValueError, TypeError):
-                sig = "(...)"
-            methods.append(f"  • {name}{sig}")
-        else:
-            label = name
-            if name in annotations:
-                label = f"{name}: {_type_name(annotations[name])}"
-            val_str = repr(value)
-            budget = max_width - len(label) - 7
-            if len(val_str) > budget:
-                val_str = val_str[:budget - 3] + "..."
-            attributes.append(f"  • {label} = {val_str}")
-    print("[Attributes]")
-    print("\n".join(attributes) or "  None")
-    print("[Methods]")
-    print("\n".join(methods) or "  None")
-```
-
 ```python
 # exercise_4.py
 from types import SimpleNamespace
-from display import display_object
 
-m = SimpleNamespace(info="Some information", b=["a", "list"],
-                     more=11, extra="stuff")
-display_object(m)
-#: === SimpleNamespace ===
-#: [Attributes]
-#:   • b = ['a', 'list']
-#:   • extra = 'stuff'
-#:   • info = 'Some information'
-#:   • more = 11
-#: [Methods]
-#:   None
+built = SimpleNamespace(info="Spam", b=["x", "y"], more=11,
+                        extra="eggs")
+print(vars(built))
+#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11, 'extra': 'eggs'}
+
+assigned = SimpleNamespace(info="Spam", b=["x", "y"], more=11)
+assigned.extra = "eggs"
+print(vars(assigned))
+#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11, 'extra': 'eggs'}
+
+print(vars(built) == vars(assigned))
+#: True
 ```
 
-`display_object()` shows all four attributes regardless of whether
-they were passed as keyword arguments to the constructor or assigned
-afterward, as `m.more = 11` did in the original. Both ways add an
-entry to the instance's `__dict__`, which is all `display_object()`
-reads. The listing is alphabetical either way, since `display_object()`
-sorts by iterating `inspect.getmembers_static()`, which returns
-members already sorted by name.
+A keyword argument and a later assignment both add one entry to the
+instance's `__dict__`, and `vars()` reads that dict. The two
+namespaces are indistinguishable afterward. Even the order matches,
+because a dict keeps insertion order and both routes add `extra`
+last. Assign the attributes in a different sequence and the dicts
+still compare equal, since dict equality ignores order.

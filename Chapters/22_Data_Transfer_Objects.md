@@ -2,7 +2,7 @@
 
 The *Messenger* or *Data Transfer Object* is a way to pass a package of information around.
 The most typical use is for function return values.
-Although tuples or dictionaries are often used for that, those rely on indexing.
+Tuples and dictionaries are often used for that, but both rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
 
@@ -29,17 +29,16 @@ print(vars(m))
 The constructor replaces the object's `__dict__` with the `dict` the `**kwargs` argument automatically creates.
 `vars(m)` returns that same `__dict__`,
 and its output shows the attributes and the keyword arguments are one dict:
-`m.more = 11` adds a key,
-just as passing `more=11` to the constructor would have.
+`m.more = 11` adds a key, just as passing `more=11` to the constructor would.
 
 Because `**kwargs` is the only parameter,
 `Messenger` accepts nothing but keyword arguments.
-`Messenger("Some information")` raises a `TypeError`.
+`Messenger("Spam")` raises a `TypeError`.
 The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
 since a bare `*` must be followed by a named parameter.
 
-The `m: Any` annotation is required.
+The `m: Any` annotation is not decoration.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
 `Any` switches the checker off for `m`.
@@ -115,8 +114,8 @@ A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Since the fields cannot be mutated, `_replace()` produces an updated copy.
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` does not mean private.
-`NamedTuple` marks its own members that way so they cannot collide with a field you name,
-so a record is free to declare a field called `replace` or `fields`.
+`NamedTuple` marks its own members that way so they cannot collide with a field you name.
+A record is free to declare a field called `replace` or `fields`.
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
 a `@dataclass` for a typed mutable record,
@@ -127,7 +126,7 @@ see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-value
 
 ## Returning Multiple Values
 
-The most common Messenger is a return value.
+This is the return-value use promised at the start.
 Here, a function computes two results, returned in a `NamedTuple`:
 
 ```python
@@ -149,7 +148,7 @@ print(mean, count)
 ```
 
 Without `Stats` you'd annotate the return as `tuple[float, int]` and return a bare tuple.
-Now every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
+Every caller would then own the knowledge that position 0 is the mean and position 1 is the count,
 knowledge the code no longer states anywhere.
 `Stats` names the slots and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
@@ -196,14 +195,14 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
 ```
 
-A color is not a box, but the first comparison cannot tell them apart.
+`Color` and `Dimensions` mean different things,
+but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 This refines the selection rule.
 Choose `NamedTuple` when tuple behavior is the point: unpacking,
 multiple return values, compatibility with code that expects a tuple.
-Choose a frozen dataclass
-([Data Classes as Types](12_Data_Classes_as_Types.md#immutability))
+Choose a [frozen dataclass](12_Data_Classes_as_Types.md#immutability)
 when a record should be a distinct type that equals nothing but its own kind.
 
 ## Exercises
@@ -218,11 +217,12 @@ when a record should be a distinct type that equals nothing but its own kind.
     following `Color`'s shape,
     and confirm an instance still unpacks and indexes like a tuple.
 4.  In `display_namespace.py`,
-    add a fourth keyword argument to `m` when it is constructed instead of assigning `m.more` afterward,
-    and confirm `display_object()` shows all four attributes,
-    sorted alphabetically either way.
+    add a fourth attribute to `m` by passing it to the constructor,
+    then add it by assignment instead.
+    Confirm `vars(m)` reports the same four attributes, in the same order,
+    either way.
 5.  In `fetch_stats.py`,
-    change `summarize()` to return a plain `tuple[float, int]`.
+    change `summarize()` to return a bare `tuple[float, int]`.
     Every caller still runs.
     What did the call sites lose,
     and which mistakes would the type checker still catch?
