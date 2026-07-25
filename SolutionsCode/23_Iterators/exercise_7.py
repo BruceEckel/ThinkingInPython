@@ -1,5 +1,7 @@
-# gof_iterator.py
-from collections.abc import Iterable, Iterator
+# exercise_7.py
+from collections.abc import Iterable, Iterator, Sequence
+from dataclasses import dataclass
+from itertools import count
 from typing import Protocol
 
 DONE = sentinel("DONE")
@@ -10,14 +12,31 @@ class GoFIterator[T](Protocol):
     def is_done(self) -> bool: ...
     def current_item(self) -> T: ...
 
+@dataclass
+class OverSequence[T]:
+    items: Sequence[T]
+    index: int = 0
+
+    def first(self) -> None:
+        self.index = 0
+
+    def advance(self) -> None:
+        self.index += 1
+
+    def is_done(self) -> bool:
+        return self.index >= len(self.items)
+
+    def current_item(self) -> T:
+        return self.items[self.index]
+
 class OverStream[T]:
     def __init__(self, source: Iterable[T]) -> None:
         self.source: Iterator[T] = iter(source)
-        self.seen: list[T] = []  # Every item the traversal has read
+        self.seen: list[T] = []
         self.index = 0
 
     def first(self) -> None:
-        self.index = 0  # Rewinds into seen, not into source
+        self.index = 0
 
     def advance(self) -> None:
         self.index += 1
@@ -40,11 +59,17 @@ def traverse(it: GoFIterator[int]) -> list[int]:
         it.advance()
     return out
 
-stream = OverStream(x * 2 for x in [1, 2, 3])
-print(traverse(stream))
+seq = OverSequence([2, 4, 6])
+print(traverse(seq))
 #: [2, 4, 6]
-stream.first()
-print(traverse(stream))  # A second pass, from a spent generator
+seq.first()
+print(traverse(seq))
 #: [2, 4, 6]
-print(stream.seen)
-#: [2, 4, 6]
+
+endless = OverStream(count(1))
+for _ in range(50_000):
+    endless.is_done()
+    endless.current_item()
+    endless.advance()
+print(len(endless.seen))
+#: 50000

@@ -266,10 +266,12 @@ and both thread the recursive call's values into the outer stream.
 `flatten_loop()` does it by hand: start the recursive call,
 then re-yield each value it produces.
 `flatten()` replaces those two lines with `yield from`,
+and the matching output shows the substitution is exact.
 
-`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop that only re-yields and tells you to write `yield from` instead.
+`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop that only re-yields,
+and tells you to write `yield from` instead.
 
-The two spellings agree for a generator that only produces values,
+The two forms agree for a generator that only produces values,
 as `flatten()` does.
 However, the `yield from` expression has a value:
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.
@@ -385,7 +387,7 @@ The second test is the near-miss described previously.
 Nothing after `2` satisfies `n < 3`,
 yet `list()` keeps pulling in the hope of another match,
 and trips the same wire.
-The last two stop on their own and never reach the trip wire.
+The last two stop on their own and never reach the tripwire.
 
 Failing at 1,000 values is a stand-in for a real program's failure,
 which stops responding or dies when it exhausts memory.
@@ -394,7 +396,8 @@ No tool warns you first.
 and so does `ruff` with every one of its rules enabled.
 Whether an iterator ever ends is not something a checker can decide by reading the code,
 and a generator built from `while True` is indistinguishable from a finite one until it runs.
-The one rule that touches this code is a comprehension check that offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
+The one rule that touches this code is a comprehension check.
+It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.
 Nothing in the toolchain (except an AI) will discover problems like this.
 
@@ -431,7 +434,9 @@ so you need only supply `__next__()`.
 
 Note the `eq=False` in the `dataclass` decoration.
 A data class that generates `__eq__()` sets `__hash__` to `None`.
-Comparing iterators by field value is incorrect because two wrappers over one source would compare equal no matter how far each had advanced.
+Comparing iterators by field value is also incorrect.
+Two wrappers over one source would compare equal,
+no matter how far each had advanced.
 Turning equality off restores the correct identity comparison for an iterator.
 
 A generator wraps an iterator just as well, and in fewer lines:
@@ -478,7 +483,7 @@ def test_typed_iterator_passes_and_rejects() -> None:
 
 ## The Pattern That Disappeared
 
-*GoF Design Patterns* gives Iterator a pattern of its own,
+*GoF Design Patterns* gives Iterator a class of its own,
 with separate methods to start a traversal, advance it,
 test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
@@ -487,10 +492,11 @@ The language calls both on your behalf.
 This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md).
 
 Writing the four GoF Iterator methods in Python shows what the other two were doing.
+Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
-Over a generator, the same interface needs a buffer,
-and one method cannot be written at all:
+Over a generator, all four can still be written,
+but only by keeping everything the traversal has seen:
 
 ```python
 # gof_iterator.py
@@ -508,24 +514,27 @@ class GoFIterator[T](Protocol):
 class OverStream[T]:
     def __init__(self, source: Iterable[T]) -> None:
         self.source: Iterator[T] = iter(source)
-        self.lookahead: T | DONE = DONE
-        self.advance()  # Pulled early, to answer is_done()
+        self.seen: list[T] = []  # Every item the traversal has read
+        self.index = 0
 
     def first(self) -> None:
-        raise NotImplementedError("a stream cannot rewind")
+        self.index = 0  # Rewinds into seen, not into source
 
     def advance(self) -> None:
-        self.lookahead = next(self.source, DONE)
+        self.index += 1
 
     def is_done(self) -> bool:
-        return self.lookahead is DONE
+        while len(self.seen) <= self.index:
+            item = next(self.source, DONE)
+            if item is DONE:
+                return True
+            self.seen.append(item)
+        return False
 
     def current_item(self) -> T:
-        if self.lookahead is DONE:
-            raise IndexError("past the end")
-        return self.lookahead
+        return self.seen[self.index]
 
-def walk(it: GoFIterator[int]) -> list[int]:
+def traverse(it: GoFIterator[int]) -> list[int]:
     out: list[int] = []
     while not it.is_done():
         out.append(it.current_item())
@@ -533,30 +542,41 @@ def walk(it: GoFIterator[int]) -> list[int]:
     return out
 
 stream = OverStream(x * 2 for x in [1, 2, 3])
-print(walk(stream))
+print(traverse(stream))
 #: [2, 4, 6]
-try:
-    stream.first()
-except NotImplementedError as e:
-    print(e)
-#: a stream cannot rewind
+stream.first()
+print(traverse(stream))  # A second pass, from a spent generator
+#: [2, 4, 6]
+print(stream.seen)
+#: [2, 4, 6]
 ```
 
-`walk()` is the loop a *GoF* caller writes,
+`traverse()` is the loop a *GoF* caller writes,
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
 rather than a base class.
-`OverStream` pays for the interface twice.
-The constructor pulls an item before anyone asks for one,
-since `is_done()` cannot answer without knowing whether a next value exists,
-and `current_item()` then hands back that stored value instead of taking a new one.
-`first()` has nowhere to go.
-A generator keeps no record of what it already produced.
+The second pass is the part to notice.
+The generator was spent by the end of the first one,
+yet `first()` rewinds and `traverse()` produces the same three values.
 
-Those two methods are what Python dropped.
-`current_item()` is the only one that reads without advancing,
-and `first()` assumes a collection you can traverse again.
-Take both away and `advance()` has to return the value it moved to,
+`seen` is how.
+`is_done()` pulls from the source only when the cache cannot reach the current index,
+so every item read once stays read.
+`current_item()` then indexes the cache instead of touching the source,
+which is what lets it report a value without advancing.
+Look at the last line of output.
+By the time all four methods work, `seen` holds the entire stream.
+The interface did not merely need a buffer.
+It rebuilt the list.
+
+That is the cost the pattern hides.
+`first()` and `current_item()` assume a collection you can re-read and inspect in place,
+so honoring them over a stream means recreating one item by item.
+The chapter has now reached that conclusion three times: here,
+in `tee`'s buffering,
+and in the advice to collect into a list when data must be walked twice.
+Python dropped both methods rather than pay for them everywhere.
+Take them away and `advance()` has to return the value it moved to,
 which is `__next__()`.
 
 You can ask a GoF iterator whether it is done multiple times without disturbing it.
@@ -613,7 +633,7 @@ turning an ordinary end of stream into a failure that reads like a bug elsewhere
 Only `next()` in a loop hands you that exception.
 The alternatives absorb it for you.
 `yield from source` ends its delegation when the source runs out,
-which includes forwarding values untouched.
+which covers forwarding values untouched.
 It cannot do per-item work, because it passes each value through unchanged.
 That is why `doubled_ok()` uses a `for` loop,
 which absorbs the exception as every loop in this chapter has.
@@ -636,3 +656,21 @@ The protocol is free, and quiet.
     Fix the caller two ways: collect into a list once and reuse it,
     then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
     Which fix would you choose for a stream of a million items, and why?
+5.  In `tee.py`, consume both branches in lockstep instead of draining one first,
+    by looping over `zip(first, second, strict=True)`.
+    Predict what happens to `buffered` before you measure it,
+    then explain the result using the rule that closes that section.
+6.  The prose pairs the generator expression's `if` clause with `filter()`,
+    but no test covers `filter()`.
+    Add one to `test_endless.py`,
+    and say which existing test it should resemble.
+7.  `gof_iterator.py` shows only the stream version.
+    Write `OverSequence` over a `Sequence[T]`,
+    confirm `traverse()` drives it with no changes to `traverse()`,
+    and explain why it needs no `seen` list.
+    Then build an `OverStream` over `itertools.count(1)`, traverse 50,000 items,
+    and report `len(stream.seen)`.
+    What has `first()` cost you on an endless source?
+8.  Write `peek(it)` that reports an iterator's next value without consuming it.
+    You cannot, so write a `Peekable` wrapper that can,
+    and name what it stores that a bare iterator does not.

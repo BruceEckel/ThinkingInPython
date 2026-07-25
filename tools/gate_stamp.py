@@ -31,7 +31,6 @@ import hashlib
 import json
 import subprocess
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from tools_config import BUILD_DIR, ROOT
@@ -107,7 +106,9 @@ def report() -> int:
     if not edited:
         print("Nothing in Chapters/ or Solutions/ has changed since.")
         return 0
-    shown = ", ".join(Path(name).name for name in edited[:MAX_LISTED])
+    # Keep the folder: Chapters/ and Solutions/ share file names by design,
+    # so a bare basename reports the same thing twice.
+    shown = ", ".join(edited[:MAX_LISTED])
     extra = len(edited) - MAX_LISTED
     more = f", +{extra} more" if extra > 0 else ""
     print(f"{len(edited)} file(s) changed since: {shown}{more}")
