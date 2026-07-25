@@ -120,7 +120,22 @@ print(red)
 #: Color(r=255, g=0, b=0)
 print(red.r, red[0])
 #: 255 255
+print(red._replace(g=128))
+#: Color(r=255, g=128, b=0)
+print(red._asdict(), Color._fields)
+#: {'r': 255, 'g': 0, 'b': 0} ('r', 'g', 'b')
 ```
+
+Printing a `NamedTuple` gives the same readable output a data class gives,
+the class name followed by each field with its name.
+A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
+Since the fields cannot be assigned,
+`_replace()` is how you produce an updated copy,
+the immutable equivalent of `red.g = 128`.
+The leading underscore on `_replace()`, `_asdict()`,
+and `_fields` does not mean private.
+`NamedTuple` marks its own members that way so they cannot collide with a field you name,
+so a record is free to declare a field called `replace` or `fields`.
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
 a `@dataclass` for a typed mutable record,
@@ -147,8 +162,8 @@ def summarize(data: list[float]) -> Stats:
     return Stats(sum(data) / len(data), len(data))
 
 stats = summarize([2.0, 4.0, 6.0])
-print(stats.mean, stats.count)
-#: 4.0 3
+print(stats)
+#: Stats(mean=4.0, count=3)
 mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
 print(mean, count)
 #: 2.0 2
@@ -158,25 +173,10 @@ The near-miss is annotating the return as `tuple[float, int]` and returning a ba
 It runs, but every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
 knowledge the code no longer states anywhere.
 `Stats` names the slots and documents itself at each call site,
-and because a `NamedTuple` is a tuple,
-the unpacking idiom callers already use keeps working.
-
-Testing confirms both access styles see the same values:
-
-```python
-# test_fetch_stats.py
-from fetch_stats import Stats, summarize
-
-def test_summarize_returns_named_fields() -> None:
-    s = summarize([2.0, 4.0, 6.0])
-    assert s == Stats(4.0, 3)
-    assert s == (4.0, 3)  # A NamedTuple is still a tuple
-```
+and because a `NamedTuple` is a tuple, the unpacking idiom keeps working.
 
 ## A NamedTuple Is Still a Tuple
 
-That last test line is the flip side of the convenience,
-and it is worth seeing once.
 A `NamedTuple` inherits its equality from `tuple`: positional and type-blind.
 Any tuple-shaped value with the same contents compares equal,
 including a different record type that happens to share the shape:

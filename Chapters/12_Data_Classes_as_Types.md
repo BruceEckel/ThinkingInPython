@@ -245,6 +245,16 @@ print(cache[m])
 #: Ni!
 ```
 
+A frozen data class is not the only immutable record in the standard library.
+A `typing.NamedTuple` also rejects assignment and is also hashable.
+The two differ in equality.
+A frozen data class equals only another instance of its own class,
+while a `NamedTuple` equals any tuple holding the same values,
+a difference [Data Transfer Objects](22_Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
+covers.
+They differ again in what this chapter cares about most,
+shown in [When a Data Class Is the Wrong Tool](#when-a-data-class-is-the-wrong-tool).
+
 If an object cannot change after it is built,
 then validating it at construction makes it valid for its lifetime.
 
@@ -588,6 +598,63 @@ builds validation and parsing into the type,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type responsible for guaranteeing its own values.
+
+### A `NamedTuple` Cannot Take That Responsibility {#namedtuple-cannot-validate}
+
+A `NamedTuple` is the other immutable record,
+and it is tempting for a small type like `Stars`.
+It cannot hold a guarantee, because it has nowhere to put one.
+`typing.NamedTuple` forbids overriding the methods that build an instance,
+so validation must live in a factory function beside the type,
+where a caller can go around it:
+
+```python
+# test_namedtuple_no_hook.py
+from typing import NamedTuple
+import pytest
+from validation import TypeFailure, check
+
+class Stars(NamedTuple):
+    number: int
+
+def make_stars(number: int) -> Stars:  # Validation lives outside
+    check(1 <= number <= 10, f"Stars({number})")
+    return Stars(number)
+
+def test_the_factory_rejects_illegal_values() -> None:
+    assert make_stars(10).number == 10
+    with pytest.raises(TypeFailure):
+        make_stars(11)
+
+def test_the_type_accepts_them_anyway() -> None:
+    assert Stars(11).number == 11  # Calling the type skips the check
+
+def test_the_check_cannot_move_inside() -> None:
+    with pytest.raises(AttributeError, match="Cannot overwrite"):
+        class Validated(NamedTuple):
+            number: int
+
+            def __new__(cls, number: int) -> Validated:  # type: ignore
+                check(1 <= number <= 10, f"Stars({number})")
+                return tuple.__new__(cls, (number,))
+```
+
+The first two tests are `test_stars.py` inverted.
+There, no illegal `Stars` could exist.
+Here, `Stars(11)` builds one,
+because a factory function is advice rather than a gate.
+The third test shows why the check cannot move inside the type.
+`__new__()` is refused, `__init__()` is refused the same way,
+and the class never finishes being created:
+the error arrives while Python is still reading the `class` statement.
+A checker reports it as `invalid-named-tuple` before the program runs,
+which is what the `# type: ignore` silences.
+A frozen data class runs `__post_init__()` on every construction,
+including the ones you did not anticipate.
+That is the deciding difference whenever a type must guarantee its own values.
+When it need not, a `NamedTuple` is a fine immutable record,
+as [Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions)
+shows.
 
 ## Inheritance and the Generated `__init__` {#dataclass-inheritance}
 
