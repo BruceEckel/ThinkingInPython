@@ -355,7 +355,7 @@ if __name__ == "__main__":
 
 Now the factory methods are polymorphic:
 each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeFactory` is the dispatcher that finds and applies the right one.
+`ShapeFactory` is the dispatcher that finds and applies the correct one.
 The actual creation of shapes happens in `ShapeFactory.create_shape()`,
 a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,

@@ -2,12 +2,18 @@
 import json
 from dataclasses import dataclass
 
+@dataclass(eq=False)
 class TypeFailure(ValueError):
     "A value falls outside the type's allowed set."
+    subject: str
+    reason: str = ""
 
-def check(condition: bool, message: str, detail: str = "") -> None:
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str, reason: str = "") -> None:
     if not condition:
-        raise TypeFailure(f"{message} {detail}".rstrip())
+        raise TypeFailure(subject, reason)
 
 @dataclass(frozen=True)
 class FullName:

@@ -39,7 +39,7 @@ When it can claim nothing, it has reached a dead end and its task ends.
 When the last rat dies, the maze is fully mapped.
 
 The rat does not import the blackboard.
-It only needs an object with the right methods,
+It only needs an object with matching methods,
 so a `Protocol` describes what it expects.
 This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
@@ -93,7 +93,7 @@ class Rat:
 Initializing `number` requires calling `blackboard.next_number()`,
 a side-effecting method, not a static default.
 Marking it `field(init=False)` leaves it out of the generated `__init__`,
-and `__post_init__` runs right after that `__init__` finishes,
+and `__post_init__` runs immediately after that `__init__` finishes,
 so it can fill in `number` and log the rat's start, once `blackboard`, `x`,
 and `y` already hold their values.
 

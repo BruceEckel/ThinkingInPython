@@ -324,7 +324,7 @@ It need not live inside `Point`.
 When the function does not belong to a class,
 it can work on anything shaped like a point.
 A `Protocol` describes that shape,
-and any type with the right attributes satisfies it, without inheritance.
+and any type with matching attributes satisfies it, without inheritance.
 This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
 When someone hands you a type that does not fit, you adapt it by composition,
 not inheritance:
@@ -557,7 +557,7 @@ Dynamic typing and protocols are the same idea, checked at different times.
 An abstract base class is *nominal* (named): a type joins by inheriting from it.
 Membership is declared in the subclass's own source,
 and the base can carry shared implementation for its children.
-A protocol is *structural*: it works with any type that has the right members.
+A protocol is *structural*: it works with any type that has matching members.
 This includes types in libraries you cannot edit.
 The type's author never needs to hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
@@ -716,7 +716,7 @@ at the cost of a constructor call instead of a bare literal.
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not get you.
 Satisfying a protocol is a shape claim: the methods exist,
-with the right signatures, and the checker verifies that half of the contract.
+with the correct signatures, and the checker verifies that half of the contract.
 The other half is semantic.
 A method must also behave the way callers expect.
 For example, return a description rather than raise an exception,

@@ -1032,7 +1032,7 @@ A profiler is the only way to discover hot spots.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,
-stopping as soon as the program is fast enough:
+stopping when the program is fast enough:
 
 1. Run the straightforward version.
    It may be fast enough.

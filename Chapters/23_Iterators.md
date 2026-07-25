@@ -189,15 +189,14 @@ so `tee` delivers the second pass the generator could not.
 The second half prices it.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
 and draining `first` while `second` waits buffers the whole stream.
-That is the memory a list would have used,
-which the comparison confirms
+That is the memory a list would have used, which the comparison confirms
 (one machine measured 4,096,544 bytes buffered against 3,999,992 for the list).
-Reach for `tee` when two consumers advance together,
+Use `tee` when two consumers advance together,
 not when one finishes before the other starts.
 
-These tests collect each iterator into a list and compare,
-covering the sequences and their empty edge cases,
-confirming a custom iterable can be re-iterated,
+These tests collect each iterator into a list and compare them,
+covering the sequences and their empty edge cases.
+This confirms that a custom iterable can be re-iterated,
 and that `total()` works on every source:
 
 ```python
@@ -230,8 +229,8 @@ def test_total_over_any_iterable() -> None:
 
 ## Delegating with `yield from`
 
-A generator can delegate part of its work to another iterator with `yield from`.
-It yields every value produced by that iterator in turn,
+A generator can delegate part of its work to another iterator using `yield from`.
+This yields every value produced by that iterator in turn,
 as if the outer generator had written the loop itself:
 
 ```python
@@ -240,60 +239,75 @@ from collections.abc import Iterator, Sequence
 
 type Nested = int | Sequence[Nested]
 
+def flatten_loop(nested: Sequence[Nested]) -> Iterator[int]:
+    for item in nested:
+        if isinstance(item, int):
+            yield item
+        else:
+            for x in flatten_loop(item):  # Spelled out  # noqa: UP028
+                yield x
+
 def flatten(nested: Sequence[Nested]) -> Iterator[int]:
     for item in nested:
         if isinstance(item, int):
             yield item
         else:
-            yield from flatten(item)
+            yield from flatten(item)  # The same loop, delegated
 
-print(list(flatten([1, [2, 3], [4, [5, 6]], 7])))
+data: Sequence[Nested] = [1, [2, 3], [4, [5, 6]], 7]
+print(list(flatten_loop(data)))
+#: [1, 2, 3, 4, 5, 6, 7]
+print(list(flatten(data)))
 #: [1, 2, 3, 4, 5, 6, 7]
 ```
 
-`flatten()` calls itself on each nested sequence,
-and `yield from` threads the recursive call's values into the outer stream.
-Without it, you would write `for x in flatten(item): yield x`,
-which does the same thing but names the loop explicitly.
-`yield from` is that loop, spelled as a single delegation.
+Both functions call themselves on each nested sequence,
+and both thread the recursive call's values into the outer stream.
+`flatten_loop()` does it by hand: start the recursive call,
+then re-yield each value it produces.
+`flatten()` replaces those two lines with `yield from`,
+
+`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop that only re-yields and tells you to write `yield from` instead.
 
 The two spellings agree for a generator that only produces values,
 as `flatten()` does.
-They part ways beyond that.
-The `yield from` expression has a value:
-`result = yield from inner()` binds whatever `inner()` returned when it stopped,
-and the hand-written loop drops that value.
+However, the `yield from` expression has a value:
+`result = yield from inner()` binds whatever `inner()` returned when it stopped.
+The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
-which the loop cannot do at all.
+which the loop cannot do.
 
-This test checks a nested list and a flat one:
+This tests both a nested list and a flat one:
 
 ```python
 # test_yield_from.py
-from collections.abc import Sequence
+from collections.abc import Callable, Iterator, Sequence
 import pytest
-from yield_from import Nested, flatten
+from yield_from import Nested, flatten, flatten_loop
 
+type Flattener = Callable[[Sequence[Nested]], Iterator[int]]
+
+@pytest.mark.parametrize("flatten_with", [flatten, flatten_loop])
 @pytest.mark.parametrize("nested, expected", [
     ([1, [2, 3], [4, [5, 6]], 7], [1, 2, 3, 4, 5, 6, 7]),
     ([1, 2, 3], [1, 2, 3]),
 ])
 def test_flatten(
+    flatten_with: Flattener,
     nested: Sequence[Nested], expected: list[int]
 ) -> None:
-    assert list(flatten(nested)) == expected
+    assert list(flatten_with(nested)) == expected
 ```
 
 ## Reusable Algorithms
 
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
-`islice()`, `groupby()`, `takewhile()`, and more,
-each consuming and producing iterators.
-Combined with generator expressions
-([Comprehensions](16_Comprehensions.md#generator-expressions)),
+`islice()`, `groupby()`, `takewhile()`, and more.
+Each of these consumes and produces iterators.
+Combined with [generator expressions](16_Comprehensions.md#generator-expressions)
 such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
-This pipeline draws from an infinite source but computes only what the consumer takes.
+Such a pipeline draws from an infinite source but computes only what the consumer takes.
 Each stage pulls one item at a time,
 so an infinite source is fine as long as something downstream stops it:
 
@@ -302,27 +316,86 @@ so an infinite source is fine as long as something downstream stops it:
 from itertools import count, islice, takewhile
 
 numbers = count(1)  # Infinite: 1, 2, 3, ...
-# Square the odd numbers, lazily, then take just the first five:
+# The generator expression squares the odd numbers, lazily:
 odd_squares = (n * n for n in numbers if n % 2)
-print(list(islice(odd_squares, 5)))
+print(list(islice(odd_squares, 5)))  # Take the first five
 #: [1, 9, 25, 49, 81]
 
-# takewhile() stops as soon as its condition fails:
+# takewhile() stops when its condition fails:
 print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
 #: [1, 4, 9, 16, 25, 36, 49]
 ```
 
-Nothing runs until `list()` pulls values through,
-and `islice()` and `takewhile()` decide when to stop,
-so the infinite `count(1)` never runs away.
+Nothing runs until `list()` pulls the values.
+`islice()` and `takewhile()` decide when to stop.
+The infinite `count(1)` never runs away.
 
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
-(or `filter()`), and they part ways on an infinite source.
+(or `filter()`), and these behave differently with an infinite source.
 The `if` version *skips* nonmatching values but keeps looking forever,
-so once values stop matching for good, a `list()` around it never returns.
+so once values stop matching, a `list()` around it never returns.
 `takewhile()` *stops* at the first failure.
-Skipping and stopping look alike on finite data and behave nothing alike on infinite data.
+Skipping and stopping look the same on finite data and behave nothing alike on infinite data.
+
+A test can demonstrate that difference, but not by writing `list(count(1))`.
+That call never returns, and no test survives.
+In the following, `counter()` stands in for `count(1)`.
+It counts up the same way, then raises an exception once something has pulled `LIMIT` values.
+A consumer that would have run forever fails in a fraction of a second:
+
+```python
+# test_endless.py
+from collections.abc import Iterator
+from itertools import count, islice, takewhile
+import pytest
+
+LIMIT = 1000
+
+class Tripwire(Exception):
+    pass
+
+def counter(limit: int) -> Iterator[int]:
+    for n in count(1):
+        if n > limit:
+            raise Tripwire(f"pulled {limit} values and kept asking")
+        yield n
+
+def test_list_of_an_endless_source_never_returns() -> None:
+    with pytest.raises(Tripwire):
+        list(counter(LIMIT))
+
+def test_the_if_clause_skips_but_never_stops() -> None:
+    small = (n for n in counter(LIMIT) if n < 3)
+    with pytest.raises(Tripwire):
+        list(small)
+
+def test_takewhile_stops_at_the_first_failure() -> None:
+    assert list(takewhile(lambda n: n < 3, counter(LIMIT))) == [1, 2]
+
+def test_islice_stops_after_its_count() -> None:
+    assert list(islice(counter(LIMIT), 3)) == [1, 2, 3]
+```
+
+The first test is `list(count(1))` with a fuse in it.
+`list()` asks for value after value and never decides to stop,
+so the tripwire fires rather than the list being returned.
+The second test is the near-miss from the paragraph above.
+Nothing after `2` satisfies `n < 3`,
+yet `list()` keeps pulling in the hope of another match,
+and trips the same wire.
+The last two stop on their own and never reach it.
+Failing loudly at 1,000 values is a stand-in for a real program's failure,
+which is a process that stops responding or dies when it exhausts memory.
+
+No tool warns you first.
+`ty` accepts `list(count(1))`,
+and so does `ruff` with every one of its rules enabled.
+Whether an iterator ever ends is not something a checker can decide by reading the code,
+and a generator built from `while True` is indistinguishable from a finite one until it runs.
+The one rule that touches this code is a comprehension check that offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
+the same hang in fewer characters.
+Knowing which of your sources are endless is your job, not the toolchain's.
 
 ## A Type-Checking Iterator
 

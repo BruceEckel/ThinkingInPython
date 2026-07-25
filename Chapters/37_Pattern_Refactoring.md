@@ -75,7 +75,7 @@ def sum_value(items: list[Trash]) -> float:
 
 Python implicitly makes `__init_subclass__` a classmethod,
 so `cls` doesn't need an `@classmethod` decorator.
-It runs once per subclass, right after Python creates that subclass,
+It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 
 Each subclass's `value = ...` line creates its own class attribute,
@@ -94,7 +94,7 @@ It relies on polymorphism (`t.value`, `t.weight`)
 and never asks what type each piece is.
 
 We test that each subclass registers itself, `create()` builds one by name,
-the per-pound values are right, and `sum_value()` totals weight times value:
+the per-pound values are correct, and `sum_value()` totals weight times value:
 
 ```python
 # test_trash.py
@@ -337,7 +337,7 @@ print recycling instructions, and more later.
 Visitor is elaborate:
 a `Visitor` base class with one `visit()` overload per material,
 an `accept()` method added to every element,
-and *double dispatch* to route each piece to the right `visit()`.
+and *double dispatch* to route each piece to the correct `visit()`.
 It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation.
 The standard library provides `functools.singledispatch` which dispatches on the type of its first argument,

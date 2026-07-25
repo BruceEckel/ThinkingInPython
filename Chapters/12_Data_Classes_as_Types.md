@@ -23,13 +23,32 @@ a custom exception meaning a value falls outside the type's allowed set:
 
 ```python
 # validation.py
-class TypeFailure(ValueError):
-    pass
+from dataclasses import dataclass
 
-def check(condition: bool, message: str, detail: str = "") -> None:
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str, reason: str = "") -> None:
     if not condition:
-        raise TypeFailure(f"{message} {detail}".rstrip())
+        raise TypeFailure(subject, reason)
 ```
+
+An exception is a value like any other, and the values it carries deserve names.
+`subject` is the rejected value as the caller rendered it, such as `Stars(11)`.
+`reason` explains the rejection when the name alone does not,
+such as `needs an @`.
+A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
+
+`eq=False` turns off the generated `__eq__()`, which matters more than it appears.
+A data class that defines `__eq__()` sets `__hash__` to `None`,
+and an unhashable exception is a trap if you put it in a set.
+Identity is the correct comparison for an exception.
+Two failures carrying the same text are still two separate failures.
 
 ## A Value That Must Be Checked Everywhere
 

@@ -1,7 +1,14 @@
 # validation.py
-class TypeFailure(ValueError):
-    pass
+from dataclasses import dataclass
 
-def check(condition: bool, message: str, detail: str = "") -> None:
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str, reason: str = "") -> None:
     if not condition:
-        raise TypeFailure(f"{message} {detail}".rstrip())
+        raise TypeFailure(subject, reason)

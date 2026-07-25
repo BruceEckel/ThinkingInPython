@@ -784,7 +784,7 @@ then flattens or even reverses past it,
 as doubling from 32 to 64 tasks did here.
 `TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing:
 raise `TOTAL` for a slower, more dramatic slope on your own machine,
-or lower `CORE_MULTIPLIER` to stop the sweep right at the core count instead of past it.
+or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past it.
 
 ### Why Speedup Isn't Linear
 

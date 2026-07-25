@@ -389,7 +389,7 @@ If two keys share a value, the later entry wins, just as with any duplicate key.
 ## Generator Expressions {#generator-expressions}
 
 A comprehension evaluates eagerly,
-which means it builds the whole result in memory right away.
+which means it immediately builds the entire result in memory.
 For a large data set, that wastes time and space,
 especially if you consume the result only once.
 A *generator expression* uses the same syntax with parentheses instead of brackets,
@@ -449,7 +449,7 @@ print(max(len(str(n)) for n in nums))
 ```
 
 None of these builds an intermediate collection of a million items,
-and `any()` stops as soon as it finds a match.
+and `any()` stops when it finds a match.
 [Iterators](23_Iterators.md#generators) explores generators further.
 
 ## Unpacking in Comprehensions

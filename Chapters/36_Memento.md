@@ -33,7 +33,7 @@ print(copied)
 ```
 
 `saved = todo` binds a second name to the same list,
-so the "snapshot" mutates right along with the original.
+so the "snapshot" mutates along with the original.
 `list(todo)` makes a real copy, and later changes leave it alone.
 A one-level copy is enough here because the elements are immutable strings.
 When state nests mutable objects inside mutable objects,

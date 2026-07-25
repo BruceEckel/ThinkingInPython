@@ -328,7 +328,7 @@ Suppose a test starts failing intermittently.
 The test calls a function you wrote last week.
 By its name and parameters,
 that function calculates a total price for a list of items.
-The logic looks right.
+The logic looks correct.
 The math checks out.
 But sometimes the test is slow.
 Sometimes, run alongside another test, one of the two fails.
@@ -656,11 +656,11 @@ polysemy and effectful in Haskell, and Effect in TypeScript.
 ### Custom AI Languages with Effects
 
 At this writing the world is in the midst of an explosion of experimental languages designed for AI code generation.
-Designs attempt to find the right balance between improving code generation for the AI while maintaining human verifiability.
+Designs try to balance between improving code generation for the AI while maintaining human verifiability.
 One benefit these new languages have:
 there's no human-constrained adoption curve.
 AI Effect Languages don't need the extra affordances that benefit humans.
-If a language works, an AI can start using it right away.
+If a language works, an AI can start using it immediately.
 
 Most of these only **track** Effects, rather than providing a full EMS,
 for reasons the end of this section explains:
@@ -749,7 +749,7 @@ Each of these gives you the discipline of one part of an EMS.
 None of them gives you the guarantee,
 because the type checker does not participate.
 Nothing stops a function from calling `print()` directly,
-right next to its carefully declared `IO` container.
+adjacent to its carefully declared `IO` container.
 In Koka, that call would change the function's Effect row,
 and every caller's row.
 In Python, it changes nothing that any tool can see.

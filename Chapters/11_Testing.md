@@ -38,7 +38,7 @@ It assumes you are confident the design is correct,
 so that only implementation remains.
 You need that certainty to write tests first.
 Often, however, you are not sure what direction a program will take you.
-You are experimenting to see what the right approach is.
+You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
 Writing tests for exploratory programming is not practical.

@@ -409,7 +409,7 @@ Every channel also has a rough cost to send a message.
 
 The inheritance answer declares both operations as abstract methods on a base class.
 Each channel is a subclass that implements them,
-and dynamic binding picks the right implementation at each call:
+and dynamic binding picks the correct implementation at each call:
 
 ```python
 # notifications_oo.py

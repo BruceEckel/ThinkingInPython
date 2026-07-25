@@ -629,7 +629,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
 Writing this as a loop means building your own stack to track which sublists are still open,
-and getting the push and pop right at every depth.
+and getting the push and pop correct at every depth.
 The recursive version gets that bookkeeping from the call stack,
 which is why it stays three lines instead of growing with every level of nesting you support.
 
@@ -669,7 +669,7 @@ one at a time, the same way any `for` loop consumes a generator.
 Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
-because `islice()` stops asking as soon as it has delivered five.
+because `islice()` stops asking when it has delivered five.
 The [Performance](18_Performance.md)
 chapter looks at laziness from the perspective of memory and speed.
 

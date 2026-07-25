@@ -187,7 +187,7 @@ print(render(Square()))
 
 `Circle` and `Square` never mention `Drawable`.
 The checker accepts both because each has a `draw()`,
-so they are of the right shape.
+so they are of the correct shape.
 
 `Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.

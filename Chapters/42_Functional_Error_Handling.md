@@ -356,7 +356,7 @@ A `Failure` anywhere short-circuits to the end.
 Only the last input passes all three steps,
 so it's the only one that reaches `add()`.
 
-Testing confirms combining returns the right value,
+Testing confirms combining returns the correct value,
 or the first failure in the chain:
 
 ```python
@@ -507,7 +507,7 @@ the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.
 
 This style does not replace exceptions everywhere.
-Exceptions are still right for truly exceptional conditions,
+Exceptions are still appropriate for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
 Some languages call these errors "panics" and separate them from regular exceptions.
