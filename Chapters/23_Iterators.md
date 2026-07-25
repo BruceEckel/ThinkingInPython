@@ -500,8 +500,9 @@ from collections.abc import Iterator
 DONE = sentinel("DONE")
 
 def doubled(source: Iterator[int]) -> Iterator[int]:
+    # The exception escapes when the source runs out:
     while True:
-        yield next(source) * 2  # Escapes when source runs out
+        yield next(source) * 2
 
 def doubled_ok(source: Iterator[int]) -> Iterator[int]:
     for n in source:  # The loop absorbs the exception
@@ -536,16 +537,15 @@ Letting `StopIteration` escape a generator body does not end that generator poli
 Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
 turning an ordinary end of stream into a failure that reads like a bug elsewhere.
 
-Notice which spelling needs the guard.
-Forwarding values untouched has no such problem,
-since `yield from source` ends the delegation when the source runs out.
-Per-item work cannot be written that way,
-because `yield from` passes values through unchanged.
-`doubled_ok()` reaches the same place by letting `for` do the asking,
-which absorbs the exception the way every loop in this chapter has.
-Calling `next()` inside a loop you wrote yourself is the one spelling that hands you the exception to deal with,
-and the fix is almost never a `try`.
-It is to stop asking by hand.
+Only `next()` in a loop hands you that exception.
+The alternatives absorb it for you.
+`yield from source` ends its delegation when the source runs out,
+which includes forwarding values untouched.
+It cannot do per-item work, because it passes each value through unchanged.
+That is why `doubled_ok()` uses a `for` loop,
+which absorbs the exception as every loop in this chapter has.
+The fix is almost never a `try`.
+It is to let the loop do the asking.
 
 Both surprises earlier in this chapter come from the same fusion.
 `for` and `list()` catch the answer for you and report nothing,
