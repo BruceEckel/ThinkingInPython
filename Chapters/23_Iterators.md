@@ -137,11 +137,16 @@ far from the call that caused the problem.
 To validate eagerly,
 check the arguments in a plain function and have it return an inner generator.
 The second surprise is the second pass.
-An exhausted generator does not fail; it produces nothing,
+An exhausted generator does not fail.
+It produces nothing,
 so the empty `list(sq)` gives you no error to point at the bug.
 When data must be walked twice, collect it into a list once,
 or hand out an iterable like `Countdown` above,
 whose `__iter__()` builds a fresh generator for every pass.
+`itertools.tee(it, 2)` splits one iterator into two independent ones,
+which looks like a third option but is rarely cheaper.
+`tee` buffers every item the leading branch consumes until the trailing one catches up,
+so two passes over a long stream can cost the memory the list would have cost anyway.
 
 These tests collect each iterator into a list and compare,
 covering the sequences and their empty edge cases,
@@ -205,6 +210,15 @@ Without it, you would write `for x in flatten(item): yield x`,
 which does the same thing but names the loop explicitly.
 `yield from` is that loop, spelled as a single delegation.
 
+The two spellings agree for a generator that only produces values,
+as `flatten()` does.
+They part ways beyond that.
+The `yield from` expression has a value:
+`result = yield from inner()` binds whatever `inner()` returned when it stopped,
+and the hand-written loop drops that value.
+`yield from` also forwards `send()` and `throw()` into the inner generator,
+which the loop cannot do at all.
+
 This test checks a nested list and a flat one:
 
 ```python
@@ -266,8 +280,8 @@ Skipping and stopping look alike on finite data and behave nothing alike on infi
 ## A Type-Checking Iterator
 
 The [Decorator Pattern](14_Decorators.md#the-decorator-pattern)
-wraps an existing iterator and changes its behavior.
-This produces a new iterator with the same interface but added behavior.
+wraps an existing iterator,
+producing a new one with the same interface and added behavior.
 Here, we force every item to be of an expected type:
 
 ```python
@@ -297,7 +311,6 @@ A generator wraps an iterator just as well and in fewer lines:
 
 ```python
 # typed_generator.py
-# A generator that type-checks each item.
 from collections.abc import Iterable, Iterator
 
 def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
@@ -337,6 +350,26 @@ def test_typed_iterator_passes_and_rejects() -> None:
     with pytest.raises(TypeError):
         list(TypedIterator(iter([1, "two"]), int))
 ```
+
+## The Pattern That Disappeared
+
+*GoF Design Patterns* gives Iterator a class of its own,
+with separate methods to start a traversal, advance it,
+test whether it has finished, and read the current item.
+Nothing in this chapter looks like that.
+Four methods became two, `__iter__()` and `__next__()`,
+and the language calls both on your behalf.
+This is the dissolving that [The Pattern Concept](21_The_Pattern_Concept.md)
+describes, carried far enough that using the pattern stops feeling like a decision.
+
+What the absorption took with it was the explicit question.
+A GoF iterator is asked whether it is done,
+and the code doing the asking can act on the answer.
+Python moved that question inside the `for` loop,
+which is why both surprises in this chapter are quiet ones.
+An exhausted generator reports "finished" to a loop that keeps the news to itself,
+and a generator that has not started reports nothing at all.
+You get the protocol for free and pay for it in visibility.
 
 ## Exercises
 

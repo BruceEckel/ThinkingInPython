@@ -1,5 +1,4 @@
 # typed_generator.py
-# A generator that type-checks each item.
 from collections.abc import Iterable, Iterator
 
 def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:

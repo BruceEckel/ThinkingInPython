@@ -1,7 +1,7 @@
-# manual_protocol.py
+# basic_iteration.py
 nums = [1, 2]
-it = iter(nums)  # What a for loop calls first
-print(iter(nums) is iter(nums))  # A fresh iterator per pass
+it = iter(nums)  # Called by a for loop
+print(iter(nums) is iter(nums))
 #: False
 print(iter(it) is it)  # An iterator returns itself
 #: True
