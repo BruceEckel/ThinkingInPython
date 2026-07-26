@@ -124,14 +124,14 @@ where a getter hands back a reference to the internals it was meant to protect.
 It also turns out that the reachable class is useful when a test needs a fresh,
 uncached `Settings`.
 
-Three concurrency notes:
+Three implementation notes:
 
 1. A singleton is shared state, and shared state leaks between tests.
    The cached factory has an escape hatch the classic forms lack:
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
-2. Like every lazy singleton, it has a first-call race under threads:
-   concurrent first calls can each run the constructor,
+2. Every lazy singleton has a first-call race under threads.
+   Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
    This is not a narrow window.
@@ -148,7 +148,7 @@ Three concurrency notes:
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
    and the cache keeps whichever finished last.
-   The check must happen inside the lock, which the listing below shows.
+   The check must happen inside the lock, shown in the listing below.
 
 `@cache` is gone, because it is no longer what makes the object single:
 
@@ -183,8 +183,8 @@ print(len({id(s) for s in built}))
 #: 1
 ```
 
-Only one of the two module-level names is declared `global`,
-and the reason is the chapter's opening distinction seen from inside a function.
+In `settings()`, only one of the two module-level names is declared `global`.
+This is the chapter's opening distinction seen from inside a function.
 `global` governs rebinding, not use.
 `with _lock:` only looks the name up,
 even though acquiring and releasing genuinely changes that lock's state,
@@ -192,13 +192,13 @@ from unlocked to locked and back.
 Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
 Python decides at compile time that a name a function assigns anywhere is local everywhere in that function,
-so without the declaration,
+so without the `global` declaration,
 `if _instance is None` would read an unassigned local and raise `UnboundLocalError`.
 Mutate through any name.
 Declare only what you rebind.
 
 One thread finds `_instance` empty and builds it.
-The rest wait, and each finds the slot already filled.
+The rest wait on the lock, and each finds `_instance` already filled.
 The eight-thread race that produced eight objects from the cached version produces one here,
 which the printed count confirms.
 The sleep stands in for a constructor that does real work,
@@ -210,7 +210,7 @@ A window too narrow to reproduce is still a window.
 Every call now acquires the lock,
 including the thousands that arrive long after the object exists.
 That is the price of laziness under threads.
-Eager creation is a better answer whenever the object can be built at import time.
+Eager creation is a better answer when the object can be built at import time.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
