@@ -79,8 +79,8 @@ a = settings()
 b = settings()
 assert a is b
 a.data["theme"] = "dark"
-print(b.data)
-#: {'theme': 'dark'}
+print(b)
+#: Settings(data={'theme': 'dark'})
 ```
 
 You can't prevent a caller from writing `Settings()` and getting a second instance.
@@ -121,12 +121,16 @@ An underscore asks callers to stay out, and nothing makes them.
 [Rethinking Objects](20_Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data,
 where a getter hands back a reference to the internals it was meant to protect.
-It turns out that the reachable class is useful when a test needs a fresh,
+It also turns out that the reachable class is useful when a test needs a fresh,
 uncached `Settings`.
 
-Three practical notes on this form:
+Three concurrency notes:
 
-1. Like every lazy singleton, it has a first-call race under threads:
+1. A singleton is shared state, and shared state leaks between tests.
+   The cached factory has an escape hatch the classic forms lack:
+   `settings.cache_clear()` discards the instance, so each test can start fresh.
+
+2. Like every lazy singleton, it has a first-call race under threads:
    concurrent first calls can each run the constructor,
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
@@ -134,23 +138,18 @@ Three practical notes on this form:
    Eight threads calling `settings()` at once,
    with a constructor slow enough to widen it,
    ran that constructor eight times and handed back eight different objects.
-   When threads may arrive before the singleton exists,
+   When threads can arrive before the singleton exists,
    create it eagerly instead: call `settings()` once at import time,
    or use the module form, which the import system builds exactly once.
 
-2. A lock is the other fix for that race, and not the obvious one.
+3. A [lock](19_Concurrency.md#locks) is the other fix for that race,
+   and not the obvious one.
    Wrapping the cached function's body in a `threading.Lock` changes nothing,
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
    and the cache keeps whichever finished last.
    The check must happen inside the lock, which the listing below shows.
-   [Concurrency](19_Concurrency.md#locks) covers the machinery.
 
-3. A singleton is shared state, and shared state leaks between tests.
-   The cached factory has an escape hatch the classic forms lack:
-   `settings.cache_clear()` discards the instance, so each test can start fresh.
-
-Here is that fix.
 `@cache` is gone, because it is no longer what makes the object single:
 
 ```python
@@ -183,6 +182,20 @@ with ThreadPoolExecutor(max_workers=8) as pool:
 print(len({id(s) for s in built}))
 #: 1
 ```
+
+Only one of the two module-level names is declared `global`,
+and the reason is the chapter's opening distinction seen from inside a function.
+`global` governs rebinding, not use.
+`with _lock:` only looks the name up,
+even though acquiring and releasing genuinely changes that lock's state,
+from unlocked to locked and back.
+Changing an object is not rebinding a name.
+`_instance` differs because the function assigns to it.
+Python decides at compile time that a name a function assigns anywhere is local everywhere in that function,
+so without the declaration,
+`if _instance is None` would read an unassigned local and raise `UnboundLocalError`.
+Mutate through any name.
+Declare only what you rebind.
 
 One thread finds `_instance` empty and builds it.
 The rest wait, and each finds the slot already filled.
