@@ -196,8 +196,8 @@ A window too narrow to reproduce is still a window.
 
 Every call now acquires the lock,
 including the thousands that arrive long after the object exists.
-That is the price of laziness under threads,
-and it is why eager creation stays the better answer whenever the object can be built at import time.
+That is the price of laziness under threads.
+Eager creation is a better answer whenever the object can be built at import time.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
