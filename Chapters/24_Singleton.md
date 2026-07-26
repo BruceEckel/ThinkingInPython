@@ -64,11 +64,12 @@ so caching it constructs the instance once and returns that same object forever:
 
 ```python
 # cached_factory_singleton.py
+from dataclasses import dataclass, field
 from functools import cache
 
+@dataclass
 class Settings:
-    def __init__(self) -> None:
-        self.data: dict[str, str] = {}
+    data: dict[str, str] = field(default_factory=dict)
 
 @cache
 def settings() -> Settings:
@@ -82,30 +83,39 @@ print(b.data)
 #: {'theme': 'dark'}
 ```
 
-```python
-# test_cache.py
-import cached_factory_singleton
-
-def test_cache_factory_returns_same_instance() -> None:
-    assert (cached_factory_singleton.settings() is
-        cached_factory_singleton.settings())
-```
-
-Nothing stops a caller from writing `Settings()` and getting a second instance.
-You cannot prevent that.
+You can't prevent a caller from writing `Settings()` and getting a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
 which is the whole of what Python offers.
-It is a sign, not a lock.
+A second underscore is not a stronger version of that.
+At module level nothing is mangled, so it buys no privacy,
+and it breaks any reference written inside a class body,
+which rewrites `m.__Settings` into a lookup for `_TheClass__Settings`.
+
+This listing keeps the bare name for a reason that outlasts the convention.
+`settings()` returns a `Settings`,
+so the class already appears in the module's public signature.
+A caller who annotates the result must write that name,
+and a type outsiders must name is not private, whatever it starts with.
+Use `_Settings` when the type never leaves the module.
+
 Two stronger-looking moves fail the same way.
 Deleting the name after building the instance leaves the class reachable,
 because `type(settings())` hands it back.
 Defining the class inside `settings()` also looks airtight,
 and `@cache` runs that body only once,
-so there is still exactly one instance and no module-level name at all.
-`type(settings())` recovers it anyway,
-and the nesting costs you the return annotation:
-a class with no name outside the function cannot be named in the signature,
-so `settings()` must return a `Protocol` instead of the class.
+so there is exactly one instance and no module-level name at all.
+`type(settings())` recovers it anyway.
+
+Nesting costs the return annotation as well.
+Quoting the name, `def settings() -> "Settings"`, is the obvious approach.
+It parses and runs because an annotation is evaluated only when something reads it.
+A clean run is therefore no evidence, since nothing has looked the name up yet.
+When something does look, it searches the scope containing the function,
+not the function's own locals, and the class is not there.
+A checker reports an unresolved reference,
+and `inspect.get_annotations(eval_str=True)` raises a `NameError`.
+The signature must name something reachable, which means a `Protocol`.
+
 This is the advisory privacy that [Rethinking Objects](20_Rethinking_Objects.md#encapsulation-leaks)
 examines at length.
 The reachable class is also useful: a test that wants a fresh,

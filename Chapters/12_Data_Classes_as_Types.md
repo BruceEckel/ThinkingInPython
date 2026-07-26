@@ -607,6 +607,54 @@ so data classes reject mutable defaults outright.
 `field(default_factory=make_months)` supplies a function instead of a value.
 Each new `Months` calls `make_months()` and gets its own fresh list.
 
+`default_factory` accepts any callable that takes no arguments.
+A named function like `make_months` is one.
+A type is another, which is why `field(default_factory=list)` appears throughout this book:
+calling `list` builds an empty one.
+A subscripted generic is callable too,
+so `field(default_factory=dict[str, str])` is legal and does what it looks like.
+That form seems redundant,
+because the annotation on the left already names the type,
+and the subscript is erased at runtime.
+It buys one thing, which turns out not to be nothing:
+
+```python
+# factory_checking.py
+from dataclasses import dataclass, field
+
+@dataclass
+class Unchecked:
+    data: dict[str, str] = field(default_factory=set)  # A set
+
+@dataclass
+class Checked:
+    data: dict[str, str] = field(default_factory=dict[str, str])
+
+print(type(Unchecked().data).__name__)
+#: set
+try:
+    Unchecked().data["theme"] = "dark"
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+print(Checked().data)
+#: {}
+```
+
+Nothing objects to `Unchecked`.
+The type checker accepts it, the linter accepts it,
+and the field is declared `dict[str, str]`, so every reader expects a dict.
+What arrives is a `set`, and the mistake surfaces at the first item assignment,
+which can be far from the declaration that caused it.
+A bare `list`, `dict`,
+or `set` produces a type loose enough that a checker accepts it against any annotation,
+so it never compares the factory with the field.
+Subscripting makes the factory's return type concrete,
+and `field(default_factory=dict[int, int])` on this field is then a type error before the program runs.
+Use the bare form when the factory and the annotation obviously agree,
+which is most of the time.
+Subscript it when you want that agreement checked.
+
 Choose the tool that makes the legal set easiest to express.
 For a small fixed set, that is an `Enum`.
 

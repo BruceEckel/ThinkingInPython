@@ -1,6 +1,6 @@
 Chapter 20 might need "## What Is Polymorphism?"
 
-"happen" "is what" "does it" "ever" "at all" "only" "exactly"
+"happen" "is what" "does it" "ever" "at all" "only" "exactly" "has to"
 "was to" "in the first place" "already" "even" "honest" "buy" "ships" "lands" "fuse"
 "load-bearing" "never" "part ways" "anyway" "wants" "spelling" "rides on" "near-miss"
 

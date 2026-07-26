@@ -1,9 +1,10 @@
 # cached_factory_singleton.py
+from dataclasses import dataclass, field
 from functools import cache
 
+@dataclass
 class Settings:
-    def __init__(self) -> None:
-        self.data: dict[str, str] = {}
+    data: dict[str, str] = field(default_factory=dict)
 
 @cache
 def settings() -> Settings:
