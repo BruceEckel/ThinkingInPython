@@ -143,14 +143,61 @@ Three practical notes on this form:
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
    and the cache keeps whichever finished last.
-   The check must happen inside the lock,
-   which means an explicit slot to check,
-   and at that point `@cache` is no longer what makes the object single.
+   The check must happen inside the lock, which the listing below shows.
    [Concurrency](19_Concurrency.md#locks) covers the machinery.
 
 3. A singleton is shared state, and shared state leaks between tests.
    The cached factory has an escape hatch the classic forms lack:
    `settings.cache_clear()` discards the instance, so each test can start fresh.
+
+Here is that fix.
+`@cache` is gone, because it is no longer what makes the object single:
+
+```python
+# locked_settings.py
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        time.sleep(0.05)  # Widen the first-call window
+
+_lock: Final[threading.Lock] = threading.Lock()
+_instance: Settings | None = None
+
+def settings() -> Settings:
+    global _instance
+    with _lock:
+        if _instance is None:
+            _instance = Settings()
+    return _instance
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    built = list(pool.map(lambda _: settings(), range(8)))
+print(len({id(s) for s in built}))
+#: 1
+```
+
+One thread finds `_instance` empty and builds it.
+The rest wait, and each finds the slot already filled.
+The eight-thread race that produced eight objects from the cached version produces one here,
+which the printed count confirms.
+The sleep stands in for a constructor that does real work,
+such as opening a file or a connection.
+Without it, the cached version showed no duplicates across twenty trials,
+which is the more dangerous case.
+A window too narrow to reproduce is still a window.
+
+Every call now acquires the lock,
+including the thousands that arrive long after the object exists.
+That is the price of laziness under threads,
+and it is why eager creation stays the better answer whenever the object can be built at import time.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
