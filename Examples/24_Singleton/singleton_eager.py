@@ -8,7 +8,7 @@ class OnlyOne:
         val: list[str] = field(default_factory=list)
 
     # Created once, when the class is defined:
-    instance: ClassVar[Any] = __OnlyOne()
+    instance: ClassVar[__OnlyOne] = __OnlyOne()
 
     def __init__(self, arg: str) -> None:
         OnlyOne.instance.val.append(arg)

@@ -27,7 +27,7 @@ class WhatIWant:
     def f(self) -> None: ...
 
 class ProxyAdapter(WhatIWant):
-    def __init__(self, what_i_have: Any) -> None:
+    def __init__(self, what_i_have: WhatIHave) -> None:
         self.what_i_have = what_i_have
 
     @override
@@ -38,7 +38,7 @@ class ProxyAdapter(WhatIWant):
         self.what_i_have.h()
 
 class WhatIUse:
-    def op(self, what_i_want: Any, /) -> None:
+    def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
 
 # Approach 2: build adapter use into op():
@@ -57,7 +57,7 @@ class WhatIHave2(WhatIHave, WhatIWant):
 # Approach 4: use an inner class:
 class WhatIHave3(WhatIHave):
     class InnerAdapter(WhatIWant):
-        def __init__(self, outer: Any) -> None:
+        def __init__(self, outer: WhatIHave3) -> None:
             self.outer = outer
         @override
         def f(self) -> None:
@@ -104,6 +104,18 @@ The `/` in `WhatIUse.op()` makes its parameter positional-only,
 and it is load-bearing: `WhatIUse2.op()` renames the parameter to `what_i_have`,
 and renaming a keyword-callable parameter in an override breaks substitutability,
 so the checker rejects it without the `/`.
+The rename is the smaller half of that story.
+`WhatIUse2.op()` also changes the parameter's *type*.
+Its base accepts a `WhatIWant`, and it accepts a `WhatIHave`.
+Annotate both precisely and a checker rejects the override outright,
+reporting `invalid-method-override`,
+because narrowing what a method accepts breaks [substitutability](20_Rethinking_Objects.md#liskov-substitution).
+That is why this one parameter stays `Any` while the rest of the listing names real types.
+The `Any` is not laziness.
+It is what allows an override that cannot substitute for its base to compile.
+Approach 2 is a different operation wearing an inherited name.
+Code holding a `WhatIUse` cannot safely be handed a `WhatIUse2`,
+and that is the price of building the adapter into the operation.
 Second, the approaches split into two families *GoF Design Patterns* names.
 `ProxyAdapter` is an *object adapter*:
 it holds the adaptee and can wrap any instance handed to it at runtime.

@@ -12,7 +12,7 @@ class WhatIWant:
     def f(self) -> None: ...
 
 class ProxyAdapter(WhatIWant):
-    def __init__(self, what_i_have: Any) -> None:
+    def __init__(self, what_i_have: WhatIHave) -> None:
         self.what_i_have = what_i_have
 
     @override
@@ -23,7 +23,7 @@ class ProxyAdapter(WhatIWant):
         self.what_i_have.h()
 
 class WhatIUse:
-    def op(self, what_i_want: Any, /) -> None:
+    def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
 
 # Approach 2: build adapter use into op():
@@ -42,7 +42,7 @@ class WhatIHave2(WhatIHave, WhatIWant):
 # Approach 4: use an inner class:
 class WhatIHave3(WhatIHave):
     class InnerAdapter(WhatIWant):
-        def __init__(self, outer: Any) -> None:
+        def __init__(self, outer: WhatIHave3) -> None:
             self.outer = outer
         @override
         def f(self) -> None:

@@ -1,5 +1,6 @@
 # test_paper_scissors.py
-from typing import Any, Final
+from types import ModuleType
+from typing import Final
 import paper_scissors_rock as methods
 import paper_scissors_rock_table as table
 import pytest
@@ -18,14 +19,15 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Rock", "Rock"): Outcome.DRAW,
 }
 
-def compete(module: Any, player: str, opponent: str) -> Outcome:
+def compete(module: ModuleType, player: str,
+            opponent: str) -> Outcome:
     result: Outcome = getattr(module, player)().compete(
         getattr(module, opponent)())
     assert isinstance(result, Outcome)
     return result
 
 @pytest.mark.parametrize("module", [table, methods])
-def test_matches_expected(module: Any) -> None:
+def test_matches_expected(module: ModuleType) -> None:
     for (player, opponent), result in EXPECTED.items():
         assert compete(module, player, opponent) == result
 

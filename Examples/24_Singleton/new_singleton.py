@@ -7,7 +7,7 @@ class OnlyOne:
     class __OnlyOne:
         val: str | None = None
 
-    instance: ClassVar[Any] = None
+    instance: ClassVar[__OnlyOne | None] = None
 
     def __new__(cls) -> Any:  # __new__ is implicitly a staticmethod
         if OnlyOne.instance is None:

@@ -47,7 +47,7 @@ then `config.settings = {...}`.
 Mutate through any name.
 Rebind only through the module.
 
-## When You Want a Class: Cache the Instance
+## When You Want a Class, Cache the Instance
 
 Sometimes you do want a class,
 but every construction should return the same object.
@@ -166,7 +166,7 @@ class OnlyOne:
     class __OnlyOne:
         val: list[str] = field(default_factory=list)
 
-    instance: ClassVar[Any] = None
+    instance: ClassVar[__OnlyOne | None] = None
 
     def __init__(self, arg: str) -> None:
         if OnlyOne.instance is None:
@@ -223,7 +223,7 @@ class OnlyOne:
         val: list[str] = field(default_factory=list)
 
     # Created once, when the class is defined:
-    instance: ClassVar[Any] = __OnlyOne()
+    instance: ClassVar[__OnlyOne] = __OnlyOne()
 
     def __init__(self, arg: str) -> None:
         OnlyOne.instance.val.append(arg)
@@ -267,7 +267,7 @@ class OnlyOne:
     class __OnlyOne:
         val: str | None = None
 
-    instance: ClassVar[Any] = None
+    instance: ClassVar[__OnlyOne | None] = None
 
     def __new__(cls) -> Any:  # __new__ is implicitly a staticmethod
         if OnlyOne.instance is None:

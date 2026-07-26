@@ -7,7 +7,7 @@ class OnlyOne:
     class __OnlyOne:
         val: list[str] = field(default_factory=list)
 
-    instance: ClassVar[Any] = None
+    instance: ClassVar[__OnlyOne | None] = None
 
     def __init__(self, arg: str) -> None:
         if OnlyOne.instance is None:
