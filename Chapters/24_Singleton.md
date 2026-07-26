@@ -220,8 +220,8 @@ The rest of this chapter exists only because it demonstrates interesting techniq
 
 ## The Classic Implementations
 
-*GoF Design Patterns* builds the singleton with more apparatus,
-because it addresses languages like C++ and Java.
+To address languages like C++ and Java,
+*GoF Design Patterns* builds the singleton with more apparatus.
 The variations shown here are worth understanding,
 but notice that each does more work than the module or the cached factory above.
 
@@ -229,7 +229,11 @@ The classic approach takes control of creation by delegating to a single instanc
 
 ### Lazy Creation
 
-This version builds the inner instance on the first call:
+This version builds the inner instance on the first call.
+It is *lazy*.
+It builds the inner object on the first call,
+which is why it needs the `None` sentinel and the `if` guard.
+
 
 ```python
 # singleton_pattern.py
@@ -277,9 +281,6 @@ After that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
 `__getattr__()` delegates access.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
-It is *lazy*.
-It builds the inner object on the first call,
-which is why it needs the `None` sentinel and the `if` guard.
 
 ### Eager Creation
 
@@ -317,7 +318,7 @@ The bare `__OnlyOne()` works because the nested class is already defined at that
 The qualified `OnlyOne.__OnlyOne()` would fail,
 because the name `OnlyOne` stays unbound until its own class body finishes running.
 
-The two differ only in *when* they create the inner object.
+The two forms differ only in *when* they create the inner object.
 The lazy form defers it to the first `OnlyOne(...)` call,
 so it can wait for data not available at import time,
 but it carries the sentinel and the guard,
@@ -334,13 +335,13 @@ to return the same object every time:
 
 ```python
 # new_singleton.py
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
 class OnlyOne:
     @dataclass
     class __OnlyOne:
-        val: str | None = None
+        val: list[str] = field(default_factory=list)
 
     instance: ClassVar[__OnlyOne | None] = None
 
@@ -350,14 +351,14 @@ class OnlyOne:
         return OnlyOne.instance
 
 x = OnlyOne()
-x.val = "sausage"
+x.val.append("sausage")
 y = OnlyOne()
-y.val = "eggs"
+y.val.append("eggs")
 z = OnlyOne()
-z.val = "spam"
-# __new__ returns the one instance every time, so x.val is now spam:
+z.val.append("spam")
+# __new__ returns the one instance every time, so all three share val:
 print(x.val, x is y is z)
-#: spam True
+#: ['sausage', 'eggs', 'spam'] True
 ```
 
 ```python

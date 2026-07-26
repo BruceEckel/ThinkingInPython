@@ -203,7 +203,7 @@ def test_template_function_runs_steps_in_order() -> None:
     assert calls == ["a", "b", "a", "b"]
 ```
 
-Both the Template Method and Template Function have a fixed algorithm and varying steps.
+Both the Template Method and the function version have a fixed algorithm and varying steps.
 If they share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,

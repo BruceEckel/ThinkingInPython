@@ -79,3 +79,83 @@ returns a report of which words it found, rather than transforming the
 text itself. Nothing about `FileFramework.run()` or
 `run_file_framework()` needs to change to support it; only the step
 does, which is the entire point of the pattern.
+
+## 2. Two fixes for the premature engine
+
+The quick fix reorders the two lines so the subclass finishes its own
+setup before handing control to the base class:
+
+```python
+# exercise_2_reorder.py
+from typing import final, override
+
+class Framework:
+    def __init__(self) -> None:
+        self.run()
+
+    @final
+    def run(self) -> None:
+        self.step()
+
+    def step(self) -> None: ...
+
+class Greeter(Framework):
+    def __init__(self, name: str) -> None:
+        self.name = name  # Setup first...
+        super().__init__()  # ...then start the engine
+
+    @override
+    def step(self) -> None:
+        print(f"Hello, {self.name}!")
+
+Greeter("Bruce")
+#: Hello, Bruce!
+```
+
+The redesign removes the hazard instead of avoiding it. `Framework`
+no longer runs anything during construction, so the client builds a
+finished object and starts it:
+
+```python
+# exercise_2_redesign.py
+from typing import final, override
+
+class Framework:
+    @final
+    def run(self) -> None:  # No longer called from __init__
+        self.step()
+
+    def step(self) -> None: ...
+
+class Greeter(Framework):
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    @override
+    def step(self) -> None:
+        print(f"Hello, {self.name}!")
+
+greeter = Greeter("Bruce")  # Construction starts nothing
+greeter.run()  # The client starts the engine
+#: Hello, Bruce!
+```
+
+The redesign is the one that protects the next author. The reorder
+works, but it works only for the subclass that performs it, and it
+survives only as long as everyone remembers it. It asks every future
+subclass author to invert the convention they have used everywhere
+else, which is to call `super().__init__()` first. Nothing in the
+signature says so, no checker objects to the usual order, and the
+failure arrives as an `AttributeError` inside a base class the author
+did not write. A rule that must be remembered by people who have not
+read this chapter is not a fix.
+
+Separating construction from starting makes the mistake unavailable.
+There is no window in which the engine runs against half-built state,
+because construction runs no engine. The cost is one extra line at
+every call site, `greeter.run()`, and that line is worth it: it moves
+the decision about *when* the algorithm starts out of the base class
+and into the hands of the code that knows the object is ready. This
+is the same reasoning behind eager versus lazy construction in
+[Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance),
+where the timing of a hidden step is what makes the difference.
