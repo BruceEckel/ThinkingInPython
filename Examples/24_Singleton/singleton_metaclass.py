@@ -9,7 +9,7 @@ class SingletonMetaClass(type):
         klass: Any = cls
         original_new: Callable[..., Any] = klass.__new__
 
-        def my_new(c: Any, *args: Any, **kwds: Any) -> Any:
+        def my_new(c: Any, *args: Any, **kwargs: Any) -> Any:
             if c.instance is None:
                 c.instance = original_new(c)
             return c.instance

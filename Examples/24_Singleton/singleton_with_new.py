@@ -23,3 +23,4 @@ z.val.append("spam")
 # __new__ returns the one instance every time, so all three share val:
 print(x.val, x is y is z)
 #: ['sausage', 'eggs', 'spam'] True
+assert OnlyOne() is OnlyOne()

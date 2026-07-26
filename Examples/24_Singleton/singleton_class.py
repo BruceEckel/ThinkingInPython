@@ -1,26 +1,25 @@
 # singleton_class.py
 from typing import Any
 
-class SingletonClass:
+class singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
 
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if self.instance is None:
-            self.instance = self.klass(*args, **kwds)
+            self.instance = self.klass(*args, **kwargs)
         return self.instance
 
-@SingletonClass
-class Foo:
-    pass
+@singleton
+class Registry:
+    def __init__(self, name: str, *, limit: int = 10) -> None:
+        self.name = name
+        self.limit = limit
+        self.items: list[str] = []
 
-x = Foo()
-y = Foo()
-z = Foo()
-x.val = "sausage"
-y.val = "eggs"
-z.val = "spam"
-# One cached instance, so x.val is now spam:
-print(x.val, x is y is z)
-#: spam True
+first = Registry("primary", limit=3)
+first.items.append("sausage")
+second = Registry("ignored", limit=99)  # Arguments discarded
+print(first is second, second.name, second.limit, second.items)
+#: True primary 3 ['sausage']

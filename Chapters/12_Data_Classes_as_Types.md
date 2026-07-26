@@ -781,7 +781,7 @@ print(c.host, c.name)
 
 If a base `__init__` instead replaced `self.__dict__`,
 calling it from `__post_init__()` would discard the fields the data class just assigned.
-The [Borg singleton](24_Singleton.md#borg-share-state-instead-of-identity)
+The [Borg singleton](24_Singleton.md#borg-singleton-by-inheritance)
 is that case.
 
 When the base class is also a data class, you do not need this.

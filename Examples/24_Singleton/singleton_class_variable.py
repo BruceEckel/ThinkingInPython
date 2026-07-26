@@ -1,19 +1,20 @@
 # singleton_class_variable.py
-from typing import Any, ClassVar
+from typing import ClassVar
 
-class CVSingleton:
-    val: Any
-    __instance: ClassVar[CVSingleton | None] = None
+class SingletonClassVar:
+    val: list[str]
+    __instance: ClassVar[SingletonClassVar | None] = None
 
-    def __new__(cls, val: Any) -> CVSingleton:
-        if CVSingleton.__instance is None:
-            CVSingleton.__instance = object.__new__(cls)
-        CVSingleton.__instance.val = val
-        return CVSingleton.__instance
+    def __new__(cls, arg: str) -> SingletonClassVar:
+        if SingletonClassVar.__instance is None:
+            SingletonClassVar.__instance = object.__new__(cls)
+            SingletonClassVar.__instance.val = []
+        SingletonClassVar.__instance.val.append(arg)
+        return SingletonClassVar.__instance
 
-x = CVSingleton("sausage")
-y = CVSingleton("eggs")
-z = CVSingleton("spam")
-# Every construction returns the one instance; x.val is now spam:
-print(x.val, x is y is z)
-#: spam True
+if __name__ == "__main__":
+    x = SingletonClassVar("sausage")
+    y = SingletonClassVar("eggs")
+    z = SingletonClassVar("spam")
+    print(x.val, x is y is z)
+#: ['sausage', 'eggs', 'spam'] True

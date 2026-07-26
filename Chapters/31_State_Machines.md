@@ -198,7 +198,7 @@ class MouseTrap(StateMachine):
     holding: ClassVar[State] = Holding()
 
     def __init__(self) -> None:
-        StateMachine.__init__(self, MouseTrap.waiting)
+        super().__init__(MouseTrap.waiting)
 
 text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
@@ -303,7 +303,7 @@ class MouseTrap(StateMachine):
     holding: ClassVar[StateT] = Holding()
 
     def __init__(self) -> None:
-        StateMachine.__init__(self, MouseTrap.waiting)
+        super().__init__(MouseTrap.waiting)
 
 # Every state object now exists, so each table can name
 # its next states directly:

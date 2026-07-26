@@ -368,6 +368,7 @@ z.val.append("spam")
 # __new__ returns the one instance every time, so all three share val:
 print(x.val, x is y is z)
 #: ['sausage', 'eggs', 'spam'] True
+assert OnlyOne() is OnlyOne()
 ```
 
 Because `__new__()` returns the inner `__OnlyOne` object,
@@ -378,10 +379,9 @@ while the two versions above need one.
 Those return an `OnlyOne` wrapper that has no `val` of its own,
 so the lookup must be forwarded to the inner object.
 Here `x.val` is an ordinary attribute access on the object that owns it.
-The demos show the same split: `x is y` is `False` for the wrappers,
+Note that `x is y` is `False` for the wrappers,
 and `x is y is z` is `True` when the inner object is produced.
 
-A rule governs what happens after `__new__()`:
 Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
 Here it returns something else, the inner object, so no `__init__()` ever runs.
 That has a second consequence: `x` is not an `OnlyOne`,
@@ -389,71 +389,56 @@ so `isinstance(x, OnlyOne)` is `False`.
 The metaclass version at the end of this chapter returns the class's own instance,
 which puts it on the other side of the rule.
 
-```python
-# test_new.py
-from singleton_with_new import OnlyOne
-
-def test_new_returns_same_instance() -> None:
-    assert OnlyOne() is OnlyOne()
-```
-
 ### One Instance in a Class Variable
 
 The nested private class is not required.
-This version keeps the single instance in a class variable and builds it,
-when needed, out of the class being constructed:
+Here we keep the single instance in a class variable.
+`__new__` builds it, when needed, from the class being constructed:
 
 ```python
 # singleton_class_variable.py
-from typing import Any, ClassVar
+from typing import ClassVar
 
-class CVSingleton:
-    val: Any
-    __instance: ClassVar[CVSingleton | None] = None
+class SingletonClassVar:
+    val: list[str]
+    __instance: ClassVar[SingletonClassVar | None] = None
 
-    def __new__(cls, val: Any) -> CVSingleton:
-        if CVSingleton.__instance is None:
-            CVSingleton.__instance = object.__new__(cls)
-        CVSingleton.__instance.val = val
-        return CVSingleton.__instance
+    def __new__(cls, arg: str) -> SingletonClassVar:
+        if SingletonClassVar.__instance is None:
+            SingletonClassVar.__instance = object.__new__(cls)
+            SingletonClassVar.__instance.val = []
+        SingletonClassVar.__instance.val.append(arg)
+        return SingletonClassVar.__instance
 
-x = CVSingleton("sausage")
-y = CVSingleton("eggs")
-z = CVSingleton("spam")
-# Every construction returns the one instance; x.val is now spam:
-print(x.val, x is y is z)
-#: spam True
+if __name__ == "__main__":
+    x = SingletonClassVar("sausage")
+    y = SingletonClassVar("eggs")
+    z = SingletonClassVar("spam")
+    print(x.val, x is y is z)
+#: ['sausage', 'eggs', 'spam'] True
 ```
 
-```python
-# test_singleton_class_variable.py
-from singleton_class_variable import CVSingleton
+`object.__new__(cls)` builds a `SingletonClassVar`, not a foreign object,
+which puts this version on the other side of the rule from `singleton_with_new.py`.
+There, `__new__()` handed back the inner class,
+so `__init__()` never ran and `isinstance(x, OnlyOne)` was `False`.
+Here `isinstance(x, SingletonClassVar)` is `True`,
+and Python would call `__init__()` on the shared instance after every construction if the class defined one.
+`SingletonClassVar` defines none, so all the work happens in `__new__()`.
 
-def test_class_variable_returns_same_instance() -> None:
-    a = CVSingleton("a")
-    b = CVSingleton("b")
-    assert a is b
-    assert a.val == "b"  # Last write wins on the shared instance
-```
-
-`object.__new__(cls)` builds an instance of `CVSingleton` rather than a foreign object,
-which lands this version on the far side of the rule from `singleton_with_new.py`.
-`isinstance(x, CVSingleton)` is `True`,
-and if the class defined an `__init__()`,
-Python would run it on the shared instance after every construction.
-`CVSingleton` defines none, and assigns `val` inside `__new__()` instead,
-which is why the last construction's value is the one that survives.
-
-### Borg: Share State Instead of Identity
+### Borg: Singleton By Inheritance
 
 [Alex Martelli observes](http://www.aleax.it/Python/5ep.html)
 that what you usually want is not one *object* but one shared set of *state*.
-You can let people create as many objects as they like,
+People can create as many objects as they like,
 as long as they all share the same data.
-He called this the *Borg*^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."],
-and it points every instance's `__dict__` at the same storage:
+He called this the *Borg*.^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."]
+It points every instance's `__dict__` at the same storage:
 
 ![x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three](_images/borg_shared_state)
+
+In contrast with the previous singleton designs,
+you reuse *Borg* through inheritance:
 
 ```python
 # singleton_borg.py
@@ -467,7 +452,7 @@ class Borg:
 
 class Singleton(Borg):
     def __init__(self, arg: str) -> None:
-        Borg.__init__(self)
+        super().__init__()
         self.val = arg
 
     def __str__(self) -> str:
@@ -481,18 +466,14 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
 
-This has the same effect as the singleton,
-but where the singleton wires one-instance behavior into each class,
-you reuse *Borg* through inheritance.
-
 Unlike the nested-class examples above,
 `Singleton` should not be a `@dataclass`.
-Making it one still runs, but it quietly stops being a `Borg`.
-The shared state depends on `Borg.__init__` rebinding `self.__dict__` to `_shared_state`.
+Although that still runs, it quietly stops being a `Borg`.
+The shared state depends on `super().__init__` rebinding `self.__dict__` to `_shared_state`.
 A dataclass generates its own `__init__` that assigns the fields and [never calls the base `__init__`](12_Data_Classes_as_Types.md#dataclass-inheritance),
 so `self.__dict__` is never rebound and each instance keeps its own state.
 Moving the rebinding into `__post_init__` does not help either.
-It runs after `__init__` assigns the fields, so it discards them.
+That runs after `__init__` assigns the fields, so it discards them.
 The hand-written `__init__` is what makes the shared state work,
 and silently losing the sharing is worse than failing outright.
 
@@ -505,59 +486,57 @@ from singleton_borg import Singleton
 def test_borg_shares_state_but_not_identity() -> None:
     x = Singleton("first")
     y = Singleton("second")
-    assert x is not y  # Distinct objects...
-    assert x.val == y.val  # ...sharing one set of state
+    assert x is not y  # Distinct objects
+    assert x.val == y.val  # But sharing one set of state
     assert x.val == "second"
 ```
 
 ### Singleton Classes
 
 You can wrap a class so that calling it returns a cached instance.
-This is a *class decorator*
-(see [Decorators](14_Decorators.md#decorating-classes)):
+This is a [class decorator](14_Decorators.md#decorating-classes):
 
 ```python
 # singleton_class.py
 from typing import Any
 
-class SingletonClass:
+class singleton:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
 
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if self.instance is None:
-            self.instance = self.klass(*args, **kwds)
+            self.instance = self.klass(*args, **kwargs)
         return self.instance
 
-@SingletonClass
-class Foo:
-    pass
+@singleton
+class Registry:
+    def __init__(self, name: str, *, limit: int = 10) -> None:
+        self.name = name
+        self.limit = limit
+        self.items: list[str] = []
 
-x = Foo()
-y = Foo()
-z = Foo()
-x.val = "sausage"
-y.val = "eggs"
-z.val = "spam"
-# One cached instance, so x.val is now spam:
-print(x.val, x is y is z)
-#: spam True
+first = Registry("primary", limit=3)
+first.items.append("sausage")
+second = Registry("ignored", limit=99)  # Arguments discarded
+print(first is second, second.name, second.limit, second.items)
+#: True primary 3 ['sausage']
 ```
 
-```python
-# test_decorator.py
-from singleton_class import Foo
+`__call__()` forwards `*args` and `**kwargs` to the wrapped class,
+so `Registry("primary", limit=3)` reaches the real constructor unchanged.
+Only the first call does.
+Every later call returns the cached instance and drops its arguments,
+which is why `Registry("ignored", limit=99)` changes nothing.
+No error marks the discarded values.
+A caller who believes those arguments took effect is holding an object configured by someone else.
 
-def test_decorator_returns_same_instance() -> None:
-    assert Foo() is Foo()
-```
-
-Applying `@SingletonClass` to `Foo` runs `Foo = SingletonClass(Foo)`,
-so the name `Foo` now refers to the decorated instance rather than to the class.
-Calling `Foo()` returns the cached instance, which is what we want.
+Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`,
+so the name `Registry` now refers to the decorated instance rather than to the class.
+Calling `Registry(...)` returns the cached instance, which is what we want.
 But the name no longer points at a class.
-`isinstance(x, Foo)` and subclassing `Foo` no longer work.
+`isinstance(first, Registry)` and subclassing `Registry` no longer work.
 The `__new__()` versions above and the metaclass version below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
@@ -580,7 +559,7 @@ class SingletonMetaClass(type):
         klass: Any = cls
         original_new: Callable[..., Any] = klass.__new__
 
-        def my_new(c: Any, *args: Any, **kwds: Any) -> Any:
+        def my_new(c: Any, *args: Any, **kwargs: Any) -> Any:
             if c.instance is None:
                 c.instance = original_new(c)
             return c.instance

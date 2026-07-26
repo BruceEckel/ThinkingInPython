@@ -9,7 +9,7 @@ class Borg:
 
 class Singleton(Borg):
     def __init__(self, arg: str) -> None:
-        Borg.__init__(self)
+        super().__init__()
         self.val = arg
 
     def __str__(self) -> str:

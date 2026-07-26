@@ -61,6 +61,7 @@ Usage:
 """
 
 import argparse
+import re
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -186,13 +187,20 @@ def classify_strays(strays: list[str]) -> tuple[list[str], list[str]]:
     extracted; that needs a human to confirm it is truly unused, so it is
     reported but not treated as a failure. Orphaned means the name appears
     nowhere, so it is safe to delete outright.
+
+    The name must match whole, not as a substring. Renaming
+    ``locked_settings.py`` to ``singleton_locked_settings.py`` leaves a
+    stray whose name reads as "mentioned" inside the new one, and a
+    substring test reports that leftover as referenced forever, so the
+    most common source of strays would never be prunable.
     """
     book_text = "\n".join(
         md.read_text(encoding="utf-8") for md in md_files())
     orphaned, referenced = [], []
     for rel in strays:
-        name = Path(rel).name
-        (referenced if name in book_text else orphaned).append(rel)
+        name = re.escape(Path(rel).name)
+        mentioned = re.search(rf"\b{name}\b", book_text) is not None
+        (referenced if mentioned else orphaned).append(rel)
     return orphaned, referenced
 
 
