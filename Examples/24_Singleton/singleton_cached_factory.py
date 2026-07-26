@@ -1,4 +1,4 @@
-# cached_factory_singleton.py
+# singleton_cached_factory.py
 from dataclasses import dataclass, field
 from functools import cache
 

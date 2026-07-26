@@ -1,4 +1,4 @@
-# class_variable_singleton.py
+# singleton_class_variable.py
 from typing import Any, ClassVar
 
 class CVSingleton:

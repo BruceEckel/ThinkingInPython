@@ -1,4 +1,4 @@
-# new_singleton.py
+# singleton_with_new.py
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
 

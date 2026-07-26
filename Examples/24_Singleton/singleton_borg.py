@@ -1,4 +1,4 @@
-# borg_singleton.py
+# singleton_borg.py
 from typing import Any, ClassVar
 
 class Borg:

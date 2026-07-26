@@ -63,7 +63,7 @@ A constructor function with no arguments has only one possible call,
 so caching it constructs the instance once and returns that same object forever:
 
 ```python
-# cached_factory_singleton.py
+# singleton_cached_factory.py
 from dataclasses import dataclass, field
 from functools import cache
 
@@ -153,7 +153,7 @@ Three implementation notes:
 `@cache` is gone, because it is no longer what makes the object single:
 
 ```python
-# locked_settings.py
+# singleton_locked_settings.py
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -330,11 +330,11 @@ Either way, this is a lot of code for what a module does on its own.
 
 ### Overriding `__new__`
 
-A variation uses `__new__()`, the method that actually creates an instance,
+A variation uses `__new__()`, the method that creates an instance,
 to return the same object every time:
 
 ```python
-# new_singleton.py
+# singleton_with_new.py
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
@@ -363,10 +363,10 @@ print(x.val, x is y is z)
 
 ```python
 # test_new.py
-import new_singleton
+from singleton_with_new import OnlyOne
 
 def test_new_returns_same_instance() -> None:
-    assert new_singleton.OnlyOne() is new_singleton.OnlyOne()
+    assert OnlyOne() is OnlyOne()
 ```
 
 Because `__new__()` returns the inner `__OnlyOne` object,
@@ -391,7 +391,7 @@ This version keeps the single instance in a class variable and builds it,
 when needed, out of the class being constructed:
 
 ```python
-# class_variable_singleton.py
+# singleton_class_variable.py
 from typing import Any, ClassVar
 
 class CVSingleton:
@@ -415,18 +415,18 @@ print(x.val, x is y is z)
 ```
 
 ```python
-# test_class_variable.py
-import class_variable_singleton
+# test_singleton_class_variable.py
+from singleton_class_variable import CVSingleton
 
 def test_class_variable_returns_same_instance() -> None:
-    a = class_variable_singleton.CVSingleton("a")
-    b = class_variable_singleton.CVSingleton("b")
+    a = CVSingleton("a")
+    b = CVSingleton("b")
     assert a is b
     assert a.val == "b"  # Last write wins on the shared instance
 ```
 
 `object.__new__(cls)` builds an instance of `CVSingleton` rather than a foreign object,
-which lands this version on the far side of the rule from `new_singleton.py`.
+which lands this version on the far side of the rule from `singleton_with_new.py`.
 `isinstance(x, CVSingleton)` is `True`,
 and if the class defined an `__init__()`,
 Python would run it on the shared instance after every construction.
@@ -445,7 +445,7 @@ and it points every instance's `__dict__` at the same storage:
 ![x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three](_images/borg_shared_state)
 
 ```python
-# borg_singleton.py
+# singleton_borg.py
 from typing import Any, ClassVar
 
 class Borg:
@@ -488,12 +488,12 @@ and silently losing the sharing is worse than failing outright.
 Testing confirms the objects differ but share one set of state:
 
 ```python
-# test_borg.py
-import borg_singleton
+# test_singleton_borg.py
+from singleton_borg import Singleton
 
 def test_borg_shares_state_but_not_identity() -> None:
-    x = borg_singleton.Singleton("first")
-    y = borg_singleton.Singleton("second")
+    x = Singleton("first")
+    y = Singleton("second")
     assert x is not y  # Distinct objects...
     assert x.val == y.val  # ...sharing one set of state
     assert x.val == "second"
@@ -506,10 +506,10 @@ This is a *class decorator*
 (see [Decorators](14_Decorators.md#decorating-classes)):
 
 ```python
-# class_singleton.py
+# singleton_class.py
 from typing import Any
 
-class ClassSingleton:
+class SingletonClass:
     def __init__(self, klass: type) -> None:
         self.klass = klass
         self.instance: Any = None
@@ -519,7 +519,7 @@ class ClassSingleton:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
-@ClassSingleton
+@SingletonClass
 class Foo:
     pass
 
@@ -536,13 +536,13 @@ print(x.val, x is y is z)
 
 ```python
 # test_decorator.py
-import class_singleton
+from singleton_class import Foo
 
 def test_decorator_returns_same_instance() -> None:
-    assert class_singleton.Foo() is class_singleton.Foo()
+    assert Foo() is Foo()
 ```
 
-Applying `@ClassSingleton` to `Foo` runs `Foo = ClassSingleton(Foo)`,
+Applying `@SingletonClass` to `Foo` runs `Foo = SingletonClass(Foo)`,
 so the name `Foo` now refers to the decorated instance rather than to the class.
 Calling `Foo()` returns the cached instance, which is what we want.
 But the name no longer points at a class.
@@ -634,7 +634,7 @@ Python has that already, so most of the ceremony falls away.
     even if nothing ever uses it.
     Modify it to use *lazy initialization*,
     then compare your result with `singleton_pattern.py`.
-2.  Using `cached_factory_singleton.py` as a starting point,
+2.  Using `singleton_cached_factory.py` as a starting point,
     create a factory that manages a fixed pool of objects
     (say, database connections) and hands them out,
     rather than a single instance.
