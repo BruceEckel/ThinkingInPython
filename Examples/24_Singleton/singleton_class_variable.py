@@ -6,12 +6,10 @@ class CVSingleton:
     __instance: ClassVar[CVSingleton | None] = None
 
     def __new__(cls, val: Any) -> CVSingleton:
-        instance = CVSingleton.__instance
-        if instance is None:
-            instance = object.__new__(cls)
-            CVSingleton.__instance = instance
-        instance.val = val
-        return instance
+        if CVSingleton.__instance is None:
+            CVSingleton.__instance = object.__new__(cls)
+        CVSingleton.__instance.val = val
+        return CVSingleton.__instance
 
 x = CVSingleton("sausage")
 y = CVSingleton("eggs")

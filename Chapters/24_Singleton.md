@@ -318,6 +318,15 @@ The bare `__OnlyOne()` works because the nested class is already defined at that
 The qualified `OnlyOne.__OnlyOne()` would fail,
 because the name `OnlyOne` stays unbound until its own class body finishes running.
 
+`__getattr__()` returns `Any` in both versions, and unlike `instance`,
+that one cannot be tightened away.
+It answers for every name Python fails to find on the wrapper,
+so its return type is whatever the inner object happens to hold under that name.
+`instance` is a single declared field and can say `__OnlyOne`.
+`__getattr__()` covers an open set of names and cannot.
+Delegation trades static knowledge for reach,
+which is the cost [Surrogate](26_Surrogate.md#proxy) pays throughout.
+
 The two forms differ only in *when* they create the inner object.
 The lazy form defers it to the first `OnlyOne(...)` call,
 so it can wait for data not available at import time,
@@ -330,7 +339,7 @@ Either way, this is a lot of code for what a module does on its own.
 
 ### Overriding `__new__`
 
-A variation uses `__new__()`, the method that creates an instance,
+We can use `__new__()`, the method that creates an instance,
 to return the same object every time:
 
 ```python
@@ -345,7 +354,7 @@ class OnlyOne:
 
     instance: ClassVar[__OnlyOne | None] = None
 
-    def __new__(cls) -> Any:  # __new__ is implicitly a staticmethod
+    def __new__(cls) -> Any:  # Implicitly a staticmethod
         if OnlyOne.instance is None:
             OnlyOne.instance = OnlyOne.__OnlyOne()
         return OnlyOne.instance
@@ -361,6 +370,25 @@ print(x.val, x is y is z)
 #: ['sausage', 'eggs', 'spam'] True
 ```
 
+Because `__new__()` returns the inner `__OnlyOne` object,
+that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
+not a wrapper around it.
+This is why no `__getattr__()` appears here,
+while the two versions above need one.
+Those return an `OnlyOne` wrapper that has no `val` of its own,
+so the lookup must be forwarded to the inner object.
+Here `x.val` is an ordinary attribute access on the object that owns it.
+The demos show the same split: `x is y` is `False` for the wrappers,
+and `x is y is z` is `True` when the inner object is produced.
+
+A rule governs what happens after `__new__()`:
+Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
+Here it returns something else, the inner object, so no `__init__()` ever runs.
+That has a second consequence: `x` is not an `OnlyOne`,
+so `isinstance(x, OnlyOne)` is `False`.
+The metaclass version at the end of this chapter returns the class's own instance,
+which puts it on the other side of the rule.
+
 ```python
 # test_new.py
 from singleton_with_new import OnlyOne
@@ -368,21 +396,6 @@ from singleton_with_new import OnlyOne
 def test_new_returns_same_instance() -> None:
     assert OnlyOne() is OnlyOne()
 ```
-
-Because `__new__()` returns the inner `__OnlyOne` object,
-that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
-not a wrapper around it.
-No delegating `__getattr__()` or `__setattr__()` methods exist here.
-Attribute access goes straight to the one object.
-
-A rule governs what happens after `__new__()`:
-Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
-Here it returns something else, the inner object, so no `__init__()` ever runs.
-That has a second consequence: `x` is not an `OnlyOne` at all,
-so `isinstance(x, OnlyOne)` is `False`.
-The metaclass version at the end of this chapter returns the class's own instance,
-which puts it on the other side of the rule,
-with a behavior worth comparing when you get there.
 
 ### One Instance in a Class Variable
 
@@ -399,12 +412,10 @@ class CVSingleton:
     __instance: ClassVar[CVSingleton | None] = None
 
     def __new__(cls, val: Any) -> CVSingleton:
-        instance = CVSingleton.__instance
-        if instance is None:
-            instance = object.__new__(cls)
-            CVSingleton.__instance = instance
-        instance.val = val
-        return instance
+        if CVSingleton.__instance is None:
+            CVSingleton.__instance = object.__new__(cls)
+        CVSingleton.__instance.val = val
+        return CVSingleton.__instance
 
 x = CVSingleton("sausage")
 y = CVSingleton("eggs")
