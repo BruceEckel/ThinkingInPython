@@ -1,16 +1,15 @@
 # Stateless
 
-[Effect Management](44_Effect_Management.md) ended on a negative.
-Python has no Effect Management System.
-The libraries that supply pieces of one give you discipline without a guarantee,
-because the type checker does not participate.
+[Effect Management](44_Effect_Management.md#library-effect-management)
+introduced library Effect systems and named the Python one.
+This chapter builds it.
 
-[Stateless](https://github.com/suned/stateless) is the library where it does.
-It encodes an Effect's dependencies and failures into the return type of a function,
+[Stateless](https://github.com/suned/stateless)
+encodes an Effect's dependencies and failures into the return type of a function,
 and a type checker verifies that every caller carries them forward.
 Forget to declare a dependency and the check fails.
 Forget to supply one and the check fails.
-That is the third property from the previous chapter, delayed binding,
+That is delayed binding, the third property of a full Effect Management System,
 with the bookkeeping moved into the type system.
 
 This chapter builds up to that one step at a time.
@@ -275,7 +274,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |         `Generator[Need[Console], Any, None]`
 ```
 
-This is the guarantee the previous chapter said Python lacked.
+This is the guarantee, and it is the reason the chapter exists.
 A dependency that was never bound is a type error, not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
