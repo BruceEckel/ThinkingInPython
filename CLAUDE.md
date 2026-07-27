@@ -294,7 +294,19 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
   the user explicitly asks for that specific run, not to "verify" a change.
-  `make check-tools[-full]` is read-only and safe to run freely.
+  `make check-tools[-full]`, `make tool-status`, and `make sweep` are all
+  safe to run freely (the first two are read-only; `sweep` writes only
+  `build/`). The nag that `gate` prints when the tools are stale is a
+  reminder for the author, not an instruction to you: never act on it by
+  running an upgrade.
+- **`make gate` hides half its failures, and not the half you would guess.**
+  `solutions-gate` is a *prerequisite* of `gate`, so the entire Solutions
+  half runs before gate's own recipe starts. One red `gate` after a
+  wide-reaching change therefore shows the Solutions failures and hides
+  every `Chapters/` one behind them. Use `make sweep` (runs every check
+  over both trees, reports all failures, exits nonzero if any failed)
+  whenever the first failure is unlikely to be the only one. A tool
+  upgrade is the standard case, and `upgrade-tools` now ends with it.
 - **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
   line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`),
   enforced by `make reflow` (`CH=NN` for one chapter), not any gate.

@@ -8,11 +8,16 @@ def interview() -> Generator[str, str, str]:
 
 answers = {"name": "Alice", "town": "Portland"}
 conversation = interview()
+print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+#: <class 'generator'>: interview
 request = next(conversation)
 while True:
     try:
+        print(f"{request = }, {answers[request] = }")
         request = conversation.send(answers[request])
     except StopIteration as stop:
-        print(stop.value)
+        print(f"{stop.value = }")
         break
-#: Alice of Portland
+#: request = 'name', answers[request] = 'Alice'
+#: request = 'town', answers[request] = 'Portland'
+#: stop.value = 'Alice of Portland'

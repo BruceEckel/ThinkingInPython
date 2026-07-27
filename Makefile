@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -71,9 +71,17 @@ verify-targets:  ## Smoke-test every make target; mutating ones run in a disposa
 # through winget or Homebrew, whichever is on PATH.
 # make/git are left alone. Review `git diff uv.lock` before committing.
 # For the pinned Python version itself, use `make upgrade-python`.
+#
+# Ends by stamping the upgrade (so the gate can stop nagging) and running
+# `sweep`, which reports every check the new tools broke rather than
+# stopping at the first. A failing sweep here means the upgrade landed
+# and the book needs fixing, not that the upgrade failed; the stamp is
+# written first for that reason.
 upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/vale
 	$(PY) tools/upgrade_tools.py
 	$(MAKE) check-tools-full
+	$(PY) tools/tool_stamp.py --write
+	$(MAKE) sweep
 
 ##@ Everyday
 
@@ -128,6 +136,7 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(PY) tools/run_examples.py
 	$(PYTEST) $(PYTEST_N) build/examples
 	$(PY) tools/gate_stamp.py --write gate
+	$(PY) tools/tool_stamp.py --nag
 
 # When did the book last pass the gate, and has anything changed since?
 # The stamp records a hash per Chapters/ and Solutions/ file, so this
@@ -135,6 +144,25 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 # inherit it, since each runs `gate`.
 gate-status:  ## Report when the gate last passed and what changed since
 	$(PY) tools/gate_stamp.py
+
+# When were the dev tools last upgraded, and to what? `upgrade-tools`
+# writes this stamp; `gate` reads it and prints one line (nothing more,
+# and never a failure) once it is older than tool_stamp.py's threshold.
+# With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
+# correctly treated as current.
+tool-status:  ## Report when the dev tools were last upgraded, and to what
+	$(PY) tools/tool_stamp.py
+
+# `gate` stops at its first failure, and since `solutions-gate` is one of
+# its prerequisites, that half runs first and can hide every Chapters/
+# failure behind it. So one `gate` rarely shows the whole blast radius of
+# a tool upgrade. This runs every static check over both trees to
+# completion and summarizes which failed. `upgrade-tools` ends with it;
+# run it directly after any change wide enough that the first failure is
+# unlikely to be the only one. The #: markers are excluded on purpose
+# (see the script docstring).
+sweep:  ## Run every check over both trees, reporting all failures instead of the first
+	$(PY) tools/sweep_checks.py
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates

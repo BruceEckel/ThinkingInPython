@@ -37,24 +37,29 @@ def interview() -> Generator[str, str, str]:
 
 answers = {"name": "Alice", "town": "Portland"}
 conversation = interview()
+print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+#: <class 'generator'>: interview
 request = next(conversation)
 while True:
     try:
+        print(f"{request = }, {answers[request] = }")
         request = conversation.send(answers[request])
     except StopIteration as stop:
-        print(stop.value)
+        print(f"{stop.value = }")
         break
-#: Alice of Portland
+#: request = 'name', answers[request] = 'Alice'
+#: request = 'town', answers[request] = 'Portland'
+#: stop.value = 'Alice of Portland'
 ```
 
 Read `interview()` and notice what is missing.
-It does not know where answers come from.
+It does not know where the answers come from.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 The loop underneath decides how those needs are met.
 Swap the dictionary for a database and `interview()` does not change.
 
-That is Effect Management in miniature.
+That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
 The `Generator[str, str, str]` annotation reports the arrangement.
 The first parameter is what goes out, the second is what comes back,
@@ -73,6 +78,7 @@ from collections.abc import Generator
 
 def ask(question: str) -> Generator[str, str, str]:
     answer = yield question
+    print(f"ask({question = }) -> {answer = }")
     return answer
 
 def interview() -> Generator[str, str, str]:
@@ -87,9 +93,11 @@ while True:
     try:
         request = conversation.send(answers[request])
     except StopIteration as stop:
-        print(stop.value)
+        print(f"{stop.value = }")
         break
-#: Alice of Portland
+#: ask(question = 'name') -> answer = 'Alice'
+#: ask(question = 'town') -> answer = 'Portland'
+#: stop.value = 'Alice of Portland'
 ```
 
 The driver is unchanged, and it never learns that `ask()` exists.
