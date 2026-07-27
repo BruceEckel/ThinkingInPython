@@ -1,19 +1,15 @@
 # Stateless
 
 [Effect Management](44_Effect_Management.md#library-effect-management)
-introduced library Effect systems and named the Python one.
-This chapter builds it.
+introduced library Effect systems and named [Stateless](https://github.com/suned/stateless)
+as a library that implements an Effect Management System (EMS).
 
-[Stateless](https://github.com/suned/stateless)
-encodes an Effect's dependencies and failures into the return type of a function,
+Stateless encodes an Effect's dependencies and failures into the return type of a function,
 and a type checker verifies that every caller carries them forward.
 Forget to declare a dependency and the check fails.
 Forget to supply one and the check fails.
-That is the Effect tracking and the delayed binding of a full Effect Management System,
+That is the Effect tracking and the delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
-
-The chapter arrives there one step at a time.
-Each step adds a single idea, and every listing runs.
 
 ## A Generator Is a Description
 
@@ -356,7 +352,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-`Console` is now the second property of an Effect Management System:
+`Console` is now the second property of an EMS:
 an Effect's interface, separate from any implementation.
 `Terminal` is one implementation and `Recorder` would be another,
 and neither is named anywhere in `greet()`.
