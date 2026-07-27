@@ -8,13 +8,13 @@ Stateless encodes an Effect's dependencies and failures into the return type of 
 and a type checker verifies that every caller either absorbs the Effects or carries them forward.
 Forget to declare a dependency and the check fails.
 Forget to supply one and the check fails.
-That is the Effect tracking and the delayed binding of a full EMS,
+That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
 ## A Generator Is a Description
 
 Stateless is built on generators,
-so the mechanism is worth seeing before the library appears.
+so the mechanism is worth studying before we explore the library.
 [Effect Management](44_Effect_Management.md#effect-management-for-python)
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
@@ -22,7 +22,7 @@ A generator function behaves the same way.
 
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
-That reversal is what makes an Effect system possible.
+That reversal is what makes an EMS possible.
 The generator yields a *request*,
 and whoever is driving it supplies the *answer*:
 
@@ -63,7 +63,7 @@ and the third is the final result.
 ## `yield from` Composes Descriptions
 
 One generator alone is a curiosity.
-The reason generators can carry an Effect system is that they nest.
+The reason generators can carry an EMS is that they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down:
 
@@ -205,7 +205,7 @@ print(type(description).__name__)
 Nothing is printed except the type name.
 `greet("Alice")` builds a description of a greeting.
 This is the description/execution split from the previous chapter,
-and the reason a library Effect system needs one.
+and the reason a library EMS needs one.
 The library gets no chance to intercept `console.print()` as it happens.
 Its only power is over values, so the greeting must first become a value.
 
@@ -719,7 +719,7 @@ Stateless verifies that declared Effects propagate.
 It cannot verify that everything effectful was declared,
 because Python's `print()`, `open()`,
 and `requests.get()` are ordinary calls with ordinary types.
-A native Effect system computes a function's Effects from its body.
+A native EMS computes a function's Effects from its body.
 A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
 
@@ -834,7 +834,7 @@ which means it cannot also be a plain function,
 and calling it returns a description that somebody must run.
 Type errors from a library this generic are long and mention internals.
 And a third-party function that knows nothing about Effects must be wrapped in `@throws` or reached through a `need()` before it can participate.
-An Effect system is a decision about a whole codebase,
+An EMS is a decision about a whole codebase,
 not a utility you import for one module.
 
 ## What This Costs and What It Buys
