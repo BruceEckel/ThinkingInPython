@@ -185,7 +185,7 @@ Under the naive loop, `always: 1` would be missing:
 `once`'s self-removal would have skipped it.
 
 Two more realities of Observer deserve a sentence each.
-An observer that *raises* stops the loop,
+An observer that raises an exception stops the loop,
 and every observer after it never hears the change;
 decide whether `notify()` should catch, collect, and continue
 (exercise 3 makes this concrete).
@@ -432,8 +432,8 @@ is the model-view split made concrete.
     then all the squares in that patch take on the color you clicked.
     You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
     You may also restrict a player's color to the first one they chose.
-3.  Make `Observable.notify()` survive a raising observer:
+3.  Make `Observable.notify()` survive an observer that raises an exception:
     every other observer still hears the change,
     and the failures are re-raised afterward, together, as an `ExceptionGroup`
     (the container [Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup) introduced).
-    Write a test in which the first observer raises and the second still records its notification.
+    Write a test in which the first observer raises an exception and the second still records its notification.

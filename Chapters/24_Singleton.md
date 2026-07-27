@@ -501,17 +501,17 @@ This is a [class decorator](14_Decorators.md#decorating-classes):
 from typing import Any
 
 class singleton:
-    def __init__(self, klass: type) -> None:
-        self.klass = klass
+    def __init__(self, constructor: type) -> None:
+        self.constructor = constructor
         self.instance: Any = None
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
         if self.instance is None:
-            print(f"constructing {self.klass.__name__}")
-            self.instance = self.klass(*args, **kwargs)
+            print(f"constructing {self.constructor.__name__}")
+            self.instance = self.constructor(*args, **kwargs)
         else:
-            print(f"using cached {self.klass.__name__}")
+            print(f"using cached {self.constructor.__name__}")
             print(f"discarding {args}, {kwargs}")
         return self.instance
 
@@ -537,10 +537,20 @@ print(first is second, second.name, second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
 ```
 
-You might wonder whether the `Registry` constructor call is special and won't get intercepted by `__call__()`.
-But anything with parentheses is considered a call, even a constructor.
+You might wonder why constructing a `Registry` is intercepted by `__call__()`.
+A *call* is parentheses written after an expression.
+That expression can produce anything: a function, a class, or an instance.
+To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`.
+The result depends on that type.
+For an ordinary class, `type(Plain)` is `type`,
+and the parentheses run `type.__call__()`,
+the machinery that invokes `__new__()` and then `__init__()`.
+After decoration, `type(Registry)` is `singleton`,
+so the same parentheses run `singleton.__call__()` instead,
+and the wrapped class is constructed only when that method decides to call it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
+
 Only the first constructor call produces the construction of a `Registry` object.
 Every later constructor call returns the cached instance and discards the constructor arguments,
 which is why `Registry("secondary", limit=99)` changes nothing.
@@ -551,13 +561,20 @@ Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`,
 so the name `Registry` now refers to the decorated instance rather than to the class.
 Calling `Registry(...)` returns the cached instance, which is what we want.
 But the name no longer points at a class.
-`isinstance(first, Registry)` and subclassing `Registry` no longer work.
+Neither `isinstance(first, Registry)` nor subclassing `Registry` merely misbehaves.
+Both raise exceptions.
+`isinstance()` reports that its second argument must be a type,
+and `class Sub(Registry)` fails inside `singleton.__init__()`,
+complaining that it takes two positional arguments but got four: the name,
+bases, and namespace that a class statement passes to whatever it inherits from.
+That error names a class the author never wrote,
+which is the kind of confusion this trade buys.
 The `__new__()` versions above and the metaclass version below keep the name pointing at a real class,
 which is the reason to prefer them when you need that.
 
 ### Singleton Using Metaclasses
 
-Finally, a metaclass can intercept construction itself.
+Finally, a metaclass can intercept construction.
 [Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation)
 places a similar metaclass singleton beside the simpler hooks that usually replace it.
 This version is here for completeness:

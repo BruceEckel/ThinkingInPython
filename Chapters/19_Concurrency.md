@@ -313,7 +313,7 @@ asyncio.run(main())
 
 `tg.create_task()` schedules a task immediately,
 so all six are in flight together.
-`c` and `d` raise at the same 0.03-second mark,
+`c` and `d` raise exceptions at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.

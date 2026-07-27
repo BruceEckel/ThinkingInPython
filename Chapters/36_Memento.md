@@ -429,7 +429,8 @@ The stale name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
 while the renamed field is simply missing.
 The added-field drift above at least fails when something touches the gap.
-The removed-field drift never raises at all; the data is just quietly wrong.
+The removed-field drift never raises an exception.
+The data is just quietly wrong.
 
 Databases hit the same problem and gave it a name.
 A *schema migration* is the disciplined version of this drift, a versioned,

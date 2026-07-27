@@ -408,7 +408,7 @@ The abstract container types come from `collections.abc`.
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
-| `Never`, `NoReturn` | `NoReturn` marks a function that never returns (it always raises or exits); `Never` is the broader "impossible" type |
+| `Never`, `NoReturn` | `NoReturn` marks a function that never returns (it always raises an exception or exits); `Never` is the broader "impossible" type |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
 ### <a href="https://docs.python.org/3/library/stdtypes.html#generic-alias-type" target="_blank" rel="noopener">Containers</a>

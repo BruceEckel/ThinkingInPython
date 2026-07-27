@@ -363,7 +363,7 @@ Version 1's `case _` arms return the current state,
 so an input a state does not recognize is silently ignored,
 and the machine stays put.
 Version 2's table holds only the explicit transitions,
-and its `next()` raises on anything else.
+and its `next()` raises an exception on anything else.
 Neither is wrong, but the choice deserves to be deliberate.
 Ignoring suits a machine fed from a noisy source that includes events not meant for it.
 Failing fast suits a table you are still building,

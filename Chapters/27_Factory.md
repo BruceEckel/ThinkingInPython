@@ -481,7 +481,7 @@ The base classes `Obstacle`, `Character`, and `GameElementFactory`
 force every concrete class to inherit from them.
 Note what their `raise NotImplementedError` bodies do and do not enforce.
 They fail at *call* time:
-a concrete factory that forgets `make_obstacle()` constructs without complaint and raises only when the missing method finally runs.
+a concrete factory that forgets `make_obstacle()` constructs without complaint and raises an exception only when the missing method finally runs.
 An `@abstractmethod` fails at *instantiation*,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
 which catches the omission as early as possible.
