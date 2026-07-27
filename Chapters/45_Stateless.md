@@ -56,8 +56,8 @@ if __name__ == "__main__":
 #: stop.value = 'Alice of Portland'
 ```
 
-Read `interview()` and notice what is missing.
-It does not know where the answers come from.
+Notice what is missing in `interview()`:
+it does not know where the answers come from.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 `drive()` decides how those needs are met,
@@ -101,13 +101,13 @@ drive(interview(), {"name": "Alice", "town": "Portland"})
 ```
 
 `drive()` never learns that `ask()` exists.
-Only the generator half changed.
+Only the generator portion changed.
 
 The trace shows both directions of travel.
 A request raised two frames down inside `ask()` surfaces at `drive()`,
 which knows nothing about where it came from.
 The answer `drive()` sends back arrives inside `ask()`,
-which knows nothing about where it came from either.
+which also knows nothing about where it came from.
 A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
