@@ -135,13 +135,13 @@ The three parameters answer the three questions from the previous chapter:
 That leaves the second,
 which the previous section taught you to read as what comes back,
 and which is `Any` here.
-That `Any` is load-bearing,
+That `Any` is essential,
 and it explains an idiom the rest of the chapter uses.
 
 A generator has one send type for its whole life.
 An Effect does not.
 Request a `Need[Console]` and a `Console` should come back.
-Request a `Need[Log]` and a `Log` should.
+Request a `Need[Log]` and a `Log` should come back.
 The answer's type depends on which ability was requested,
 and no Python annotation can say that.
 Pinning the slot to one concrete type makes it lie.

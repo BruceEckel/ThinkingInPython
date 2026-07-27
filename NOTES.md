@@ -1,8 +1,9 @@
 
-"happen" "is what" "does it" "ever" "at all" "only" "exactly" "has to" "actually" "itself"
-"was to" "in the first place" "already" "even" "honest" "buy" "ships" "lands" "fuse" "hooks"
-"load-bearing" "never" "part ways" "anyway" "wants" "spelling" "rides on" "near-miss"
-"the way out"
+consider rewriting: "happen" "is what" "does it" "ever" "at all" "only" "exactly" "has to" "actually" "itself" "was to"
+
+avoid if possible:  "already" "even" "honest" "buy" "hooks" "never" "anyway"
+
+Don't use: "in the first place" "ships" "lands" "fuse" "load-bearing" "part ways" "rides on" "near-miss" "the way out" "wants" "spelling"
 
 lets this book's build pass
 passes the book build?
