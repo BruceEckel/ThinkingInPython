@@ -22,7 +22,7 @@ A generator function behaves the same way.
 
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
-That reversal is what makes an EMS possible.
+That reversal makes an EMS possible.
 The generator yields a *request*,
 and whoever is driving it supplies the *answer*:
 
@@ -67,8 +67,8 @@ so swapping the dictionary for a database changes one argument and leaves `inter
 That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
 The `Generator[str, str, str]` annotation reports the arrangement.
-The first parameter is what goes out, the second is what comes back,
-and the third is the final result.
+The first type parameter is the value going out,
+the second the value coming back, and the third the final result.
 
 ## `yield from` Composes Descriptions
 
@@ -125,13 +125,13 @@ type Effect[A: Ability, E: Exception, R] = Generator[A | E, Any, R]
 
 An `Effect` is a generator that yields either an *ability* or an exception,
 and eventually returns a result.
-The three parameters answer the three questions from the previous chapter:
+The three type parameters answer the three questions from the previous chapter:
 
 - `A` is what the computation *needs*.
 - `E` is how it can *fail*.
 - `R` is what it *produces*.
 
-`A` and `E` share the first slot, and `R` is the third.
+`A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
 which the previous section taught you to read as "what comes back".
 That `Any` is essential, and it explains an idiom the rest of the chapter uses.
@@ -142,25 +142,28 @@ Request a `Need[Console]` and a `Console` should come back.
 Request a `Need[Log]` and a `Log` should come back.
 The answer's type depends on which ability was requested,
 and no Python annotation can say that.
-Pinning the slot to one concrete type makes it lie.
+Pinning that type parameter to one concrete type makes it lie.
 Annotate the send type as `Console`,
 and `yield Need(Log)` hands you something the checker calls a `Console`.
 
 The solution is `yield from`.
 A bare `yield` produces the send type,
-which is the slot that had to become `Any`.
-`yield from` produces the inner generator's return type, the third slot.
-A single call returns a single type, so that slot has no such problem.
+the type parameter that had to become `Any`.
+That is not because any single answer is unknowable,
+but because one annotation has to cover every request the generator makes.
+`yield from` produces the inner generator's return type,
+the third type parameter.
+A single call returns a single type, so that type parameter has no such problem.
 It can name that specific type instead of `Any`.
 So a function that hands back a typed answer declares it as `R`.
 `need()` returns `Depend[Need[T], T]`, which is `Generator[Need[T], Any, T]`,
-and `console = yield from need(Console)` reads the `Console` out of that third slot without ever touching the `Any`.
+and `console = yield from need(Console)` reads the `Console` out of that third type parameter without touching the `Any`.
 
 That is why every request in this chapter is written as `yield from` rather than `yield`,
 and why custom abilities get a small function of their own later on.
 
 Three aliases name the common cases,
-each one filling in `Never` for a parameter that is not used:
+each one filling in `Never` for a type parameter that is not used:
 
 | Alias | Meaning |
 |---|---|
@@ -273,12 +276,12 @@ That line does three things, and separating them makes the shape clear:
 3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
    which `run()` executes.
 
-The interesting part is what happens to the type.
+Now compare the types.
 `greet` is `(str) -> Depend[Need[Console], None]`.
 `bound` is `(str) -> Success[None]`.
 Handling an ability *subtracts* it from the type.
 An Effect with every ability subtracted is a `Success`,
-and an unanswered ability is what `run()` refuses.
+and `run()` refuses an unanswered ability.
 Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
@@ -369,7 +372,7 @@ Its purpose is the annotation.
 and `greet()` asked for `Need[Console]`, which is a different ability.
 `as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
 so `supply()` builds the handler that `greet()` is waiting for.
-Supply an implementation for a declared interface and you will want this.
+Supply an implementation for a declared interface and you will need this.
 
 `supply()` matches an instance to a `Need` by `isinstance()`,
 which is why `Recorder` inherits from `Console`.
@@ -431,7 +434,7 @@ all the way to `supply()`.
 The difference is that you can declare as many abilities as you like,
 where Python hard-codes one.
 
-The `yield from` is load-bearing.
+The `yield from` is not optional.
 Write `greet(name)` alone, without it,
 and the program still type-checks and runs.
 It builds a description, immediately discards it,
@@ -532,7 +535,7 @@ Resist it here.
 Under `ty` (0.0.63 at this writing),
 a `type` alias as a generator's return annotation turns the yield check off,
 and everything this section demonstrated silently stops being verified.
-Spell Effect signatures out until your checker proves it sees through the alias.
+Write Effect signatures out in full until your checker proves it sees through the alias.
 
 ## The Error Channel
 
@@ -573,7 +576,7 @@ def announce(name: str) -> Effect[Need[Console], KeyError, None]:
     console.print(f"{name}: {value}")
 ```
 
-Here is where the full `Effect[A, E, R]` earns its three parameters.
+Here is where the full `Effect[A, E, R]` earns its three type parameters.
 `announce()` needs a `Console`, can fail with `KeyError`, and produces nothing.
 Every question the previous chapter asked about a function is answered by its first line.
 Drop the `KeyError` from the annotation and `ty` reports the same class of error it did before,
@@ -629,10 +632,10 @@ run(supply(Console())(report)("Carol"))
 
 `score` was `(str) -> Try[KeyError, int]`.
 `catch(KeyError)(score)` is `(str) -> Success[int | KeyError]`.
-The error left the error parameter and joined the result parameter,
+The error left the error type parameter and joined the result type parameter,
 so `value` is something you `match` on rather than an exception you catch.
 
-That relocation is what makes the failure impossible to ignore.
+That relocation makes the failure impossible to ignore.
 Skip the `KeyError` branch and use `value` as a number,
 and the checker reports it:
 
@@ -650,7 +653,7 @@ error[unsupported-operator]: Unsupported `+` operation
 This is the same guarantee a `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
 reached without rewriting the body of `score()`.
 
-`catch()` takes as many error types as you want to handle,
+`catch()` takes as many error types as you need to handle,
 and handling a subset is tracked as carefully as handling all of them.
 `catch(KeyError, ValueError)` applied to a function that declares both produces `Success[int | KeyError | ValueError]`,
 with every failure moved into the result and nothing left in the error channel.
@@ -662,7 +665,7 @@ Failures cannot be lost, only relocated.
 ## Abilities Are Not Special
 
 `Need` looks built-in, but it is an ordinary class, and you can write your own.
-An ability subclasses `Ability[T]`, where `T` is what handling it produces.
+An ability subclasses `Ability[T]`, where `T` is the type handling it produces.
 Here is the `Ask` and `Tell` program from the previous chapter, rebuilt:
 
 ```python
@@ -709,7 +712,7 @@ Inside `ask()`, `yield from Ask(prompt)` yields the ability object and returns w
 small functions that each wrap one ability and declare its answer type.
 `need()` has the same shape,
 and the previous chapter's ZIO listing had an accessor object doing the same job.
-The declared `Depend[Ask, str]` is what types `name` as `str` inside `greet()`.
+The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the ability directly,
 and the program still runs,
 but under `ty` 0.0.63 the answer comes back as `Unknown` and the checking quietly stops.
@@ -727,7 +730,7 @@ The by-hand version threaded two objects through every signature.
 This one threads nothing.
 `greet()` takes no arguments at all,
 and the two Effects live in the return type where a checker can follow them.
-That second channel in the signature is what the previous chapter said an EMS needs.
+That second channel in the signature is the one the previous chapter said an EMS needs.
 
 Return to `two_way_generator.py` and the whole library is visible.
 `yield` sends a request out, `handle()` is the driver loop that answers it,
@@ -737,7 +740,7 @@ a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 
 ## Where the Guarantee Stops
 
-An honest accounting needs the limits,
+A full accounting needs the limits,
 and there are four worth knowing before you commit a codebase to this.
 
 The first is that nothing stops an undeclared Effect.
@@ -808,7 +811,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |         `Generator[Need[Log], Any, None]`
 ```
 
-The `# type: ignore` is what lets the listing run far enough to show the matching runtime failure.
+The `# type: ignore` lets the listing run far enough to show the matching runtime failure.
 `catch()` behaves the same way.
 Catch one of two declared errors and the other stays in the error channel.
 
@@ -835,8 +838,8 @@ The library's types are asking the checker a hard inference question,
 and where the checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
 
-The third limit is what a handler can do,
-and naming the machinery honestly is the way in.
+The third limit constrains what a handler can do,
+and naming the machinery precisely shows why.
 `Effect` is a monad.
 `success()` lifts a value into it, `yield from` chains two of them together,
 and the generator body is syntax that hides the chaining.
@@ -853,7 +856,7 @@ and the driver resumes the Effect with that answer, once, always.
 A native handler instead receives the *continuation* and chooses what to do with it.
 Invoke it once and you have what Stateless has.
 Decline to invoke it and the handled scope produces the handler's value instead,
-which is what an exception is.
+which is how an exception behaves.
 Invoke it repeatedly and you have backtracking and search.
 Stateless offers only the first, a *tail-resumptive* handler.
 The ceiling is the substrate rather than the design.
@@ -861,13 +864,13 @@ A Python generator is one-shot, so there is nothing to resume twice.
 
 Two pieces of the library are evidence of that ceiling.
 `Effect[A, E, R]` carries a separate `E`, worked by `@throws` and `catch()`.
-Koka needs no such parameter,
+Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
-The extra parameter exists because a Stateless ability cannot fail,
+The extra type parameter exists because a Stateless ability cannot fail,
 and the previous chapter's `ZIO[R, E, A]` carries one for the same reason.
 `Async` is the other piece.
 Native systems demonstrate asynchronous execution derived from Effects,
-while Stateless ships `Async` as a built-in that `run()` interprets,
+while Stateless provides `Async` as a built-in that `run()` interprets,
 because the driver loop can await where a handler cannot.
 
 The fourth limit is the cost.
@@ -884,7 +887,7 @@ not a utility you import for one module.
 The previous chapter argued that Effects are the next scaling barrier,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
-which is the value of studying it even if you never ship it.
+which is the value of studying it, whether or not you use it in production.
 
 Read the signatures once more, in order:
 
@@ -901,14 +904,14 @@ and verification performed by reading code does not scale.
 
 What Stateless charges for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
-For most Python code that price is too high, which is the honest recommendation.
+For most Python code that price is too high.
 The techniques from the previous chapter, returning a `Result`,
 restricting a type so bad values cannot exist,
 and passing dependencies in rather than constructing them,
 capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
 and when the team will hold the line at every boundary.
-Below that scale, the discipline is what matters and the machinery is optional.
+Below that scale, the discipline matters and the machinery is optional.
 
 But the direction is worth watching.
 Python got one Effect tracked into its type system with `async`,
