@@ -1,4 +1,3 @@
-Chapter 20 might need "## What Is Polymorphism?"
 
 "happen" "is what" "does it" "ever" "at all" "only" "exactly" "has to" "actually" "itself"
 "was to" "in the first place" "already" "even" "honest" "buy" "ships" "lands" "fuse" "hooks"
@@ -37,7 +36,6 @@ Review all exercises to make sure they refer to existing examples and that all  
 - Is full polymorphism covered? (Not just inheritance-based). for example, @overload
 
 - Check order of examples in 37_Pattern_Refactoring.md
-- Chapter 42: investigate stateless library
 
 - "have to", "could" -> "can"
 - which was
@@ -46,9 +44,6 @@ Review all exercises to make sure they refer to existing examples and that all  
 - active voice: Ask gemini to create a claude skill and how to install it
 
 - Indexing using Leanpub format, before publishing to leanpub
-
-- Search feature on website?
-- Review chapter n and correct for semantic line breaks
 
 - Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better? Put the result
   at the root in ADVERSARIAL.md

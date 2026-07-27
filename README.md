@@ -101,6 +101,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 42_Functional_Error_Handling.md |X|X|
 | 43_Functional_Assurance.md      |X|X|
 | 44_Effect_Management.md         |🔴|🔴|
+| 45_Stateless.md                 |🔴|🔴|
 
 ### Serious Edit
 
@@ -152,3 +153,4 @@ The first serious edit pass.
 | 42_Functional_Error_Handling.md | |
 | 43_Functional_Assurance.md      | |
 | 44_Effect_Management.md         | |
+| 45_Stateless.md                 | |

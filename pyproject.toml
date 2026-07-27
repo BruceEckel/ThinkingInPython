@@ -26,6 +26,9 @@ dev = [
     "time-machine",
     "pyspellchecker",
     "hypothesis>=6.155.7",
+    # The effect system used by the Stateless chapter. Its examples are
+    # type-checked by the gate, so it must be installed, not illustrative.
+    "stateless>=0.6.1",
 ]
 
 [tool.uv]
