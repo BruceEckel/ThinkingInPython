@@ -35,18 +35,22 @@ def interview() -> Generator[str, str, str]:
     town = yield "town"
     return f"{name} of {town}"
 
-answers = {"name": "Alice", "town": "Portland"}
-conversation = interview()
-print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+def drive(conversation: Generator[str, str, str],
+          answers: dict[str, str]) -> None:
+    request = next(conversation)
+    while True:
+        try:
+            print(f"{request = }, {answers[request] = }")
+            request = conversation.send(answers[request])
+        except StopIteration as stop:
+            print(f"{stop.value = }")
+            return
+
+if __name__ == "__main__":
+    conversation = interview()
+    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+    drive(conversation, {"name": "Alice", "town": "Portland"})
 #: <class 'generator'>: interview
-request = next(conversation)
-while True:
-    try:
-        print(f"{request = }, {answers[request] = }")
-        request = conversation.send(answers[request])
-    except StopIteration as stop:
-        print(f"{stop.value = }")
-        break
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Portland'
 #: stop.value = 'Alice of Portland'
@@ -56,8 +60,9 @@ Read `interview()` and notice what is missing.
 It does not know where the answers come from.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
-The loop underneath decides how those needs are met.
-Swap the dictionary for a database and `interview()` does not change.
+`drive()` decides how those needs are met,
+and it takes the answers as a parameter rather than closing over them,
+so swapping the dictionary for a database changes one argument and leaves `interview()` alone.
 
 That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
@@ -75,6 +80,7 @@ passing every yielded request out to the outer driver and every sent answer back
 ```python
 # yield_from_delegates.py
 from collections.abc import Generator
+from two_way_generator import drive
 
 def ask(question: str) -> Generator[str, str, str]:
     answer = yield question
@@ -86,23 +92,23 @@ def interview() -> Generator[str, str, str]:
     town = yield from ask("town")
     return f"{name} of {town}"
 
-answers = {"name": "Alice", "town": "Portland"}
-conversation = interview()
-request = next(conversation)
-while True:
-    try:
-        request = conversation.send(answers[request])
-    except StopIteration as stop:
-        print(f"{stop.value = }")
-        break
+drive(interview(), {"name": "Alice", "town": "Portland"})
+#: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
+#: request = 'town', answers[request] = 'Portland'
 #: ask(question = 'town') -> answer = 'Portland'
 #: stop.value = 'Alice of Portland'
 ```
 
-The driver is unchanged, and it never learns that `ask()` exists.
-Requests from any depth surface at the top,
-so a single loop at the edge of the program interprets Effects raised anywhere inside it.
+`drive()` never learns that `ask()` exists.
+Only the generator half changed.
+
+The trace shows both directions of travel.
+A request raised two frames down inside `ask()` surfaces at `drive()`,
+which knows nothing about where it came from.
+The answer `drive()` sends back arrives inside `ask()`,
+which knows nothing about where it came from either.
+A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
 

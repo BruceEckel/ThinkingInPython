@@ -1,5 +1,6 @@
 # yield_from_delegates.py
 from collections.abc import Generator
+from two_way_generator import drive
 
 def ask(question: str) -> Generator[str, str, str]:
     answer = yield question
@@ -11,15 +12,9 @@ def interview() -> Generator[str, str, str]:
     town = yield from ask("town")
     return f"{name} of {town}"
 
-answers = {"name": "Alice", "town": "Portland"}
-conversation = interview()
-request = next(conversation)
-while True:
-    try:
-        request = conversation.send(answers[request])
-    except StopIteration as stop:
-        print(f"{stop.value = }")
-        break
+drive(interview(), {"name": "Alice", "town": "Portland"})
+#: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
+#: request = 'town', answers[request] = 'Portland'
 #: ask(question = 'town') -> answer = 'Portland'
 #: stop.value = 'Alice of Portland'

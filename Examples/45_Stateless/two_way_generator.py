@@ -6,18 +6,22 @@ def interview() -> Generator[str, str, str]:
     town = yield "town"
     return f"{name} of {town}"
 
-answers = {"name": "Alice", "town": "Portland"}
-conversation = interview()
-print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+def drive(conversation: Generator[str, str, str],
+          answers: dict[str, str]) -> None:
+    request = next(conversation)
+    while True:
+        try:
+            print(f"{request = }, {answers[request] = }")
+            request = conversation.send(answers[request])
+        except StopIteration as stop:
+            print(f"{stop.value = }")
+            return
+
+if __name__ == "__main__":
+    conversation = interview()
+    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+    drive(conversation, {"name": "Alice", "town": "Portland"})
 #: <class 'generator'>: interview
-request = next(conversation)
-while True:
-    try:
-        print(f"{request = }, {answers[request] = }")
-        request = conversation.send(answers[request])
-    except StopIteration as stop:
-        print(f"{stop.value = }")
-        break
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Portland'
 #: stop.value = 'Alice of Portland'
