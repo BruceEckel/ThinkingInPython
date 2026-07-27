@@ -22,7 +22,8 @@ def scripted(ask: Ask) -> str:
 def capture(tell: Tell) -> None:
     messages.append(tell.message)
 
-effect = handle(scripted)(handle(capture)(greet))
-run(effect())
+half = handle(capture)(greet)
+full = handle(scripted)(half)
+run(full())
 print(messages)
 #: ['Hello, Alice!']

@@ -15,7 +15,7 @@ def work() -> Depend[Need[Console] | Need[Log], None]:
 
 half = supply(Console())(work)
 try:
-    run(half())
+    run(half())  # type: ignore
 except MissingAbilityError as e:
     print(type(e).__name__)
 #: MissingAbilityError

@@ -14,11 +14,6 @@ with the bookkeeping moved into the type system.
 
 This chapter builds up to that one step at a time.
 Each step adds a single idea, and every listing runs.
-Install the library with:
-
-```text
-pip install stateless
-```
 
 ## A Generator Is a Description
 
@@ -299,19 +294,29 @@ class Recorder(Console):
 
 ```python
 # test_greeter.py
-from greeter import greet
+from greeter import Console, greet
 from recorder import Recorder
-from stateless import run, supply
+from stateless import as_type, run, supply
 
 def test_greet() -> None:
     recorder = Recorder()
-    run(supply(recorder)(greet)("Alice"))
+    console = as_type(Console)(recorder)
+    run(supply(console)(greet)("Alice"))
     assert recorder.messages == ["Hello, Alice!"]
 ```
 
 There is no `capsys`, no monkeypatching of `print`, and no mock.
 The test supplies a different `Console` and reads what the code produced.
 `greet()` is unchanged and unaware.
+
+`as_type()` needs explaining, because it looks like nothing.
+At runtime it is the identity function and returns the object it was given.
+Its purpose is the annotation.
+`supply(recorder)` would build a handler for `Need[Recorder]`,
+and `greet()` asked for `Need[Console]`, which is a different ability.
+`as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
+so `supply()` builds the handler that `greet()` is waiting for.
+Supply an implementation for a declared interface and you will want this.
 
 `supply()` matches an instance to a `Need` by `isinstance()`,
 which is why `Recorder` inherits from `Console`.
@@ -551,11 +556,13 @@ This is the same guarantee a `Result` type gives in [Error Handling](42_Function
 reached without rewriting the body of `score()`.
 
 `catch()` takes as many error types as you want to handle,
-and handling all of them is the case to aim for.
+and handling a subset is tracked as carefully as handling all of them.
 `catch(KeyError, ValueError)` applied to a function that declares both produces `Success[int | KeyError | ValueError]`,
 with every failure moved into the result and nothing left in the error channel.
-Handling only some of them is where the checking thins out,
-which the next section covers.
+`catch(KeyError)` on that same function produces `Try[ValueError, int | KeyError]`.
+The caught error moved to the result, the uncaught one stayed put,
+and the caller inherits it.
+Failures cannot be lost, only relocated.
 
 ## Abilities Are Not Special
 
@@ -588,8 +595,9 @@ def scripted(ask: Ask) -> str:
 def capture(tell: Tell) -> None:
     messages.append(tell.message)
 
-effect = handle(scripted)(handle(capture)(greet))
-run(effect())
+half = handle(capture)(greet)
+full = handle(scripted)(half)
+run(full())
 print(messages)
 #: ['Hello, Alice!']
 ```
@@ -598,6 +606,10 @@ print(messages)
 typed as `str` by `Ability[str]`.
 `handle()` reads the annotation on its argument to decide which ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
+Each `handle()` subtracts one ability,
+so `half` still needs an `Ask` and `full` needs nothing.
+Naming the two stages is not only for readability,
+for a reason the next section gives.
 
 Now compare this listing to `ask_tell.py` in the previous chapter.
 The by-hand version threaded two objects through every signature.
@@ -640,18 +652,10 @@ A native Effect system computes a function's Effects from its body.
 A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
 
-The second limit is that *partial* handling loses the type.
-Handle everything an Effect declares and the result is precise,
-as `supply(Console())(greet)` and `catch(KeyError)(score)` both were.
-Handle some of it and `ty` (version 0.0.58) infers the result as `Unknown`,
-because subtracting one member from a union inside a higher-order function is beyond what it can solve.
-This applies to `supply()`, `handle()`, and `catch()` alike.
-The stacked handlers in `ask_tell_effect.py` are an instance.
-The intermediate `handle(capture)(greet)` already yields `Unknown`,
-so the checker stops tracking whether `Ask` was ever answered.
-That listing is correct, but the correctness is yours to maintain,
-not the checker's.
-This program passes the check and fails at runtime:
+The second limit is about how much of the type survives *partial* handling,
+and it depends on your checker rather than on the library.
+Handling some of what an Effect declares works correctly under `ty` 0.0.63.
+Supply one of two abilities and the other stays in the signature:
 
 ```python
 # partial_handling.py
@@ -671,16 +675,44 @@ def work() -> Depend[Need[Console] | Need[Log], None]:
 
 half = supply(Console())(work)
 try:
-    run(half())
+    run(half())  # type: ignore
 except MissingAbilityError as e:
     print(type(e).__name__)
 #: MissingAbilityError
 ```
 
-The practical rule is to handle everything at one edge,
-which is the architecture the previous chapter recommended anyway.
-One `supply()` call at the boundary of the program keeps the checking intact.
-Splitting bindings across layers is where it goes quiet.
+`half` is `() -> Depend[Need[Log], None]`.
+The `Console` was subtracted and the `Log` was not,
+so `run()` rejects it before the program starts:
+
+```text
+error[invalid-argument-type]: Argument to function `run` is incorrect
+  --> partial_handling.py:18:9
+   |
+18 |     run(half())
+   |         ^^^^^^ Expected
+   |         `Generator[Async | Exception, Any, Unknown]`, found
+   |         `Generator[Need[Log], Any, None]`
+```
+
+The `# type: ignore` is what lets the listing run far enough to show the matching runtime failure.
+`catch()` behaves the same way.
+Catch one of two declared errors and the other stays in the error channel.
+
+What still defeats the checker is applying two handlers in one expression.
+Write `handle(scripted)(handle(capture)(greet))` and `ty` gives up on the nested inference and infers `Unknown`,
+which is permissive enough to hide a genuinely missing handler.
+Name the intermediate and the types come back:
+
+```python
+half = handle(capture)(greet)  # () -> Depend[Ask, None]
+full = handle(scripted)(half)  # () -> Success[None]
+```
+
+That is why `ask_tell_effect.py` binds `half` and `full` instead of nesting the calls.
+The habit is worth keeping generally.
+A named intermediate is where you read the ability that is left,
+which is the information this library exists to give you.
 
 The third limit is the cost.
 Every effectful function becomes a generator function,

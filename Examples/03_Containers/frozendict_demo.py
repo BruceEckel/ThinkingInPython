@@ -1,10 +1,10 @@
 # frozendict_demo.py
 
-prefs = frozendict(theme="dark", zoom=125)  # type: ignore
+prefs = frozendict(theme="dark", zoom=125)
 print(prefs["zoom"])
 #: 125
 # Equal contents compare equal; entry order is ignored:
-print(prefs == frozendict(zoom=125, theme="dark"))  # type: ignore
+print(prefs == frozendict(zoom=125, theme="dark"))
 #: True
 try:
     prefs["zoom"] = 150  # type: ignore

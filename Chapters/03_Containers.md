@@ -445,18 +445,16 @@ except TypeError as e:
 
 Where a `MappingProxyType` is only a read-only window onto a `dict` that still exists and can change,
 a `frozendict` owns its contents outright.
-It runs under Python 3.15.
-Type checkers need a release or two to catch up with a new built-in,
-which is why this example carries `# type: ignore` comments:
+It runs under Python 3.15:
 
 ```python
 # frozendict_demo.py
 
-prefs = frozendict(theme="dark", zoom=125)  # type: ignore
+prefs = frozendict(theme="dark", zoom=125)
 print(prefs["zoom"])
 #: 125
 # Equal contents compare equal; entry order is ignored:
-print(prefs == frozendict(zoom=125, theme="dark"))  # type: ignore
+print(prefs == frozendict(zoom=125, theme="dark"))
 #: True
 try:
     prefs["zoom"] = 150  # type: ignore
@@ -464,6 +462,10 @@ except TypeError as e:
     print(type(e).__name__)
 #: TypeError
 ```
+
+The one `# type: ignore` sits on the line that deliberately misbehaves.
+Assigning into a `frozendict` is a type error as well as a runtime one,
+so the comment lets the example demonstrate the `TypeError` it expects.
 
 Because a `frozendict` cannot change, it is hashable,
 so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.

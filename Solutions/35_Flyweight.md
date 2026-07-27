@@ -6,7 +6,7 @@
 # exercise_1.py
 from dataclasses import dataclass
 from functools import cache
-from typing import Final, Literal, cast
+from typing import Final, Literal
 
 type Symbol = Literal[".", "~", "#", "+", "T"]
 type TileSpec = tuple[str, bool]
@@ -33,7 +33,7 @@ def tile(symbol: Symbol) -> Tile:
 def to_symbol(char: str) -> Symbol:
     if char not in SPECS:
         raise KeyError(char)
-    return cast(Symbol, char)
+    return char
 
 def parse_map(text: str) -> list[list[Tile]]:
     return [[tile(to_symbol(s)) for s in line]
@@ -76,7 +76,7 @@ alone.
 import tracemalloc
 from dataclasses import dataclass
 from functools import cache
-from typing import Final, Literal, cast
+from typing import Final, Literal
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
@@ -105,7 +105,7 @@ def uncached_tile(symbol: Symbol) -> Tile:
 def to_symbol(char: str) -> Symbol:
     if char not in SPECS:
         raise KeyError(char)
-    return cast(Symbol, char)
+    return char
 
 def make_map(size: int) -> str:
     row = "".join(".~#"[i % 3] for i in range(size))

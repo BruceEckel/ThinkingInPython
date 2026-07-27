@@ -253,14 +253,29 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   and re-sync rather than fighting the build. See project memory for the
   numpy/numba case and the workaround for illustrating a chapter example
   anyway.
-- **`ty` does not narrow `str` to `Literal[...]` via `match`/`case` or an
-  `in` membership check.** Tried both (`match symbol: case "." | "~" | "#":`
-  and `if symbol not in (".", "~", "#"):`); `ty` still reports the narrowed
-  variable as plain `str` afterward, unlike pyright's literal-narrowing.
-  The only way to satisfy `ty` is an explicit `cast(Literal[...], value)`
-  after the runtime check has proven it safe. See project memory
-  (`typing-construct-hierarchy`) for the chapter-36 case and the
-  boundary-function idiom this led to.
+- **`ty` narrows `str` to `Literal[...]` as of 0.0.63,** so the `cast()`
+  that used to be required at a boundary function is now flagged as a
+  `redundant-cast` warning and fails the gate. `if char not in SPECS:
+  raise KeyError(char)` (where `SPECS` is keyed by the literal type) is
+  enough; `return char` then satisfies the declared return type.
+  Chapter 35's `to_symbol()` and `Solutions/35_Flyweight.md` were written
+  against the older behavior and were fixed when 0.0.63 landed. The
+  boundary-function idiom itself is still right, only the `cast()` inside
+  it went away. Project memory (`typing-construct-hierarchy`) has the
+  fuller case study.
+- **A `ty` upgrade is a book-wide event, not a tooling detail.** Both
+  directions bite. New narrowing power turns a once-necessary `cast()`
+  or `# type: ignore` into a `redundant-cast`/`unused-type-ignore-comment`
+  warning that fails the gate, and lost inference turns working listings
+  into errors. The 0.0.58 to 0.0.63 upgrade did all of these at once:
+  literal narrowing (ch35 + solutions), `frozendict` support arriving
+  (two of ch03's three ignores went unused), `filter(lambda ...)` no
+  longer narrowing its element type (ch16's `map`/`filter` listings broke),
+  and higher-order union subtraction starting to work (ch45's documented
+  limitation was half-obsolete). After `make upgrade-tools`, run
+  `uv run ty check build/examples` **and** `uv run ty check build/solutions`
+  before assuming the first failure is the only one: `make all` stops at
+  the first failing gate and `solutions-gate` runs last.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed

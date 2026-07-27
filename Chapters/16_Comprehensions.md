@@ -73,7 +73,7 @@ if __name__ == "__main__":
 # mapping.py
 from filtering import ints
 
-print(list(map(lambda e: e ** 2, ints)))
+print(list(map(lambda e: e ** 2, ints)))  # type: ignore
 #: [1, 81, 0, 16]
 ```
 
@@ -83,7 +83,7 @@ The two combine into a single expression:
 # map_and_filter.py
 from a_list import a_list
 
-print(list(map(lambda e: e ** 2,
+print(list(map(lambda e: e ** 2,  # type: ignore
                filter(lambda e: isinstance(e, int), a_list))))
 #: [1, 81, 0, 16]
 ```
@@ -91,6 +91,14 @@ print(list(map(lambda e: e ** 2,
 The nested form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression.
+
+The `# type: ignore` comments mark a third cost.
+`filter()` with a `lambda` predicate does not narrow the element type,
+so the checker still sees `int | str` coming out and rejects `e ** 2`.
+The comprehension's `if isinstance(e, int)` does narrow,
+which is why `list_comprehension.py` needs no such comment.
+`filter()` can narrow,
+but only when its predicate is a named function annotated to return `TypeIs[int]` rather than `bool`.
 
 List brackets (`[]`) enclose the list comprehension,
 so it is immediately evident that it produces a list.

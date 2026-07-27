@@ -93,7 +93,7 @@ so caching produces one shared instance per distinct symbol instead.
 # tile_map.py
 from dataclasses import dataclass
 from functools import cache
-from typing import Final, Literal, cast
+from typing import Final, Literal
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
@@ -118,7 +118,7 @@ def tile(symbol: Symbol) -> Tile:
 def to_symbol(char: str) -> Symbol:
     if char not in SPECS:
         raise KeyError(char)
-    return cast(Symbol, char)
+    return char
 
 def parse_map(text: str) -> list[list[Tile]]:
     return [[tile(to_symbol(s)) for s in line]
@@ -153,14 +153,16 @@ and the checker rejects the mismatch.
 `tile()` trusts its argument is already a `Symbol`,
 so the untrusted boundary is `to_symbol()`,
 the one place raw text meets the checked type.
-It checks membership in `SPECS` at runtime,
-then calls `cast()` to tell the checker what that check just proved.
-`cast()` changes nothing at runtime.
-It exists only for the checker and the reader
-(see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)),
-so use it only where, as here,
-you have already verified what the checker cannot:
-that `char` is one of the three symbols.
+It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
+The checker reads that guard.
+`SPECS` has key type `Symbol`,
+so `char not in SPECS` failing to raise an exception leaves `char` narrowed to `Symbol` on the line below,
+and `return char` satisfies the declared return type with nothing added.
+This is narrowing doing the work a `cast()` would otherwise do by assertion
+(see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
+Prefer a guard the checker can read.
+Keep `cast()` for the cases where no guard exists,
+because `cast()` is believed rather than verified.
 
 ```python
 # test_tile_map.py

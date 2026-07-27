@@ -1,9 +1,10 @@
 # test_greeter.py
-from greeter import greet
+from greeter import Console, greet
 from recorder import Recorder
-from stateless import run, supply
+from stateless import as_type, run, supply
 
 def test_greet() -> None:
     recorder = Recorder()
-    run(supply(recorder)(greet)("Alice"))
+    console = as_type(Console)(recorder)
+    run(supply(console)(greet)("Alice"))
     assert recorder.messages == ["Hello, Alice!"]
