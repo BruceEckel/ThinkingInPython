@@ -117,7 +117,7 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 
 ## The Effect Type
 
-Stateless defines one type, and everything else is built from it:
+Stateless builds everything atop one type:
 
 ```python
 type Effect[A: Ability, E: Exception, R] = Generator[A | E, Any, R]
@@ -130,6 +130,34 @@ The three parameters answer the three questions from the previous chapter:
 - `A` is what the computation *needs*.
 - `E` is how it can *fail*.
 - `R` is what it *produces*.
+
+`A` and `E` share the first slot, and `R` is the third.
+That leaves the second,
+which the previous section taught you to read as what comes back,
+and which is `Any` here.
+That `Any` is load-bearing,
+and it explains an idiom the rest of the chapter uses.
+
+A generator has one send type for its whole life.
+An Effect does not.
+Request a `Need[Console]` and a `Console` should come back.
+Request a `Need[Log]` and a `Log` should.
+The answer's type depends on which ability was requested,
+and no Python annotation can say that.
+Pinning the slot to one concrete type makes it lie.
+Annotate the send type as `Console`,
+and `yield Need(Log)` hands you something the checker calls a `Console`.
+
+`yield from` is the way out.
+A bare `yield` produces the send type, the slot that had to become `Any`.
+`yield from` produces the inner generator's return type, the third slot,
+which nothing forced into `Any`.
+So a function that wants to hand back a typed answer declares it as `R`.
+`need()` returns `Depend[Need[T], T]`, which is `Generator[Need[T], Any, T]`,
+and `console = yield from need(Console)` reads the `Console` out of that third slot without ever touching the `Any`.
+
+That is why every request in this chapter is spelled `yield from` rather than `yield`,
+and why custom abilities get a small function of their own later on.
 
 Three aliases name the common cases,
 each one filling in `Never` for a parameter that is not used:
@@ -168,7 +196,7 @@ and the annotation only promises that calling `double()` produces an Effect.
 Functions that request things are generator functions, and they arrive next.
 
 Nothing is gained yet, because `double()` was already pure.
-Effects become useful when a function needs something it should not create for itself.
+Effects become useful when a function needs something it doesn't create for itself.
 
 ## Declaring a Dependency
 
