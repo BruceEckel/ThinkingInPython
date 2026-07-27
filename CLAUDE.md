@@ -280,6 +280,16 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
   both at runtime and under `ty check`.
+- **A PEP 695 `type` alias as a generator's return annotation disables
+  `ty`'s invalid-yield check (0.0.63).** `type Greeting = Depend[...]` used
+  as a return annotation let an undeclared `Need[Log]` yield through with
+  zero diagnostics; spelling the same annotation out caught it at the
+  offending `yield from`. Old-style `TypeAlias` assignments (stateless's
+  own `Effect`/`Depend`) check fine. Chapter 45 wraps long Effect
+  signatures across lines instead of aliasing them, and warns the reader;
+  don't "clean up" those signatures into aliases. Re-test on each `ty`
+  upgrade (`stateless-partial-handling-ty-support` in project memory has
+  the probe).
 - **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when

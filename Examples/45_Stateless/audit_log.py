@@ -1,21 +1,24 @@
 # audit_log.py
+from dataclasses import dataclass, field
 from greeter import Console, greet
 from stateless import Depend, Need, need, run, supply
 
+@dataclass
 class Log:
-    def __init__(self) -> None:
-        self.entries: list[str] = []
+    entries: list[str] = field(default_factory=list)
     def write(self, entry: str) -> None:
         self.entries.append(entry)
 
-type Greeting = Depend[Need[Console] | Need[Log], None]
-
-def greet_logged(name: str) -> Greeting:
+def greet_logged(
+    name: str,
+) -> Depend[Need[Console] | Need[Log], None]:
     yield from greet(name)
     log = yield from need(Log)
     log.write(f"greeted {name}")
 
-def greet_all(names: list[str]) -> Greeting:
+def greet_all(
+    names: list[str],
+) -> Depend[Need[Console] | Need[Log], None]:
     for name in names:
         yield from greet_logged(name)
 

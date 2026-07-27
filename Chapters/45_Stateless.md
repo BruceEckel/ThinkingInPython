@@ -9,10 +9,10 @@ encodes an Effect's dependencies and failures into the return type of a function
 and a type checker verifies that every caller carries them forward.
 Forget to declare a dependency and the check fails.
 Forget to supply one and the check fails.
-That is delayed binding, the third property of a full Effect Management System,
+That is the Effect tracking and the delayed binding of a full Effect Management System,
 with the bookkeeping moved into the type system.
 
-This chapter builds up to that one step at a time.
+The chapter arrives there one step at a time.
 Each step adds a single idea, and every listing runs.
 
 ## A Generator Is a Description
@@ -60,7 +60,7 @@ Swap the dictionary for a database and `interview()` does not change.
 
 That is Effect Management in miniature.
 The generator declares Effects, the driver interprets them.
-The `Generator[str, str, str]` annotation even reports the arrangement.
+The `Generator[str, str, str]` annotation reports the arrangement.
 The first parameter is what goes out, the second is what comes back,
 and the third is the final result.
 
@@ -150,6 +150,13 @@ print(run(double(21)))
 
 `Success[int]` says `double()` is pure.
 It cannot read anything, and it cannot fail.
+
+Notice that `double()` contains no `yield`, so it is not a generator function.
+It does not need to be.
+`success()` returns an object that implements the generator protocol,
+and the annotation only promises that calling `double()` produces an Effect.
+Functions that request things are generator functions, and they arrive next.
+
 Nothing is gained yet, because `double()` was already pure.
 Effects become useful when a function needs something it should not create for itself.
 
@@ -180,8 +187,8 @@ That signature is a lie by omission.
 This one is not, and the rest of the chapter is about who enforces the difference.
 
 Two details deserve attention.
-`greet()` is a generator function, because it contains `yield from`.
-That is what makes it an Effect.
+`greet()` is a generator function, because it contains `yield from`,
+so calling it builds the Effect its signature declares.
 And `console` really is a `Console` to the type checker,
 so `console.print()` is checked the same as any other method call.
 The dependency is deferred without becoming untyped.
@@ -202,7 +209,7 @@ print(type(description).__name__)
 Nothing is printed except the type name.
 `greet("Alice")` builds a description of a greeting.
 This is the description/execution split from the previous chapter,
-and the reason a library Effect system has to have one.
+and the reason a library Effect system needs one.
 The library gets no chance to intercept `console.print()` as it happens.
 Its only power is over values, so the greeting must first become a value.
 
@@ -233,7 +240,7 @@ The interesting part is what happens to the type.
 `bound` is `(str) -> Success[None]`.
 Handling an ability *subtracts* it from the type.
 An Effect with every ability subtracted is a `Success`,
-and `run()` accepts nothing else.
+and an unanswered ability is what `run()` refuses.
 Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
@@ -274,6 +281,13 @@ A dependency that was never bound is a type error, not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
 
+The expected type in that message names two things this chapter has not covered.
+`Async` is a built-in ability for asynchronous work,
+which `run()` handles on its own.
+`Exception` is the error channel, which a later section fills.
+`run()` insists on every other ability being answered,
+and those two are what remain when they are.
+
 ## Swapping the Implementation
 
 Delayed binding earns its keep when the binding changes.
@@ -281,12 +295,13 @@ A test binds a `Console` that records instead of printing:
 
 ```python
 # recorder.py
+from dataclasses import dataclass, field
 from typing import override
 from greeter import Console
 
+@dataclass
 class Recorder(Console):
-    def __init__(self) -> None:
-        self.messages: list[str] = []
+    messages: list[str] = field(default_factory=list)
     @override
     def print(self, message: str) -> None:
         self.messages.append(message)
@@ -354,7 +369,7 @@ Give abilities distinct method names when that ambiguity is possible.
 ## Effects Propagate, and the Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
-`greet_all()` has to declare the `Console` it never touches:
+`greet_all()` must declare the `Console` it never touches:
 
 ```python
 # greet_all.py
@@ -377,6 +392,14 @@ A `Depend` function's callers must declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many abilities as you like,
 where Python hard-codes one.
+
+The `yield from` is load-bearing.
+Write `greet(name)` alone, without it,
+and the program still type-checks and runs.
+It builds a description, immediately discards it,
+and the greeting never happens.
+Neither the type checker nor the linter flags the dropped value.
+When an Effect seems not to happen, look for a missing `yield from`.
 
 Declaring the ability is still manual, and it is fair to ask what was gained.
 The gain is that the declaration is checked.
@@ -413,28 +436,31 @@ Here, the signature and the body cannot disagree.
 
 ## Adding an Effect Deep in the Stack
 
-The previous chapter's second exercise asks you to add a `Log` Effect underneath `greet()` and count the signatures you had to edit.
-Do that here:
+The previous chapter's second exercise has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
+Here is that experiment in Stateless:
 
 ```python
 # audit_log.py
+from dataclasses import dataclass, field
 from greeter import Console, greet
 from stateless import Depend, Need, need, run, supply
 
+@dataclass
 class Log:
-    def __init__(self) -> None:
-        self.entries: list[str] = []
+    entries: list[str] = field(default_factory=list)
     def write(self, entry: str) -> None:
         self.entries.append(entry)
 
-type Greeting = Depend[Need[Console] | Need[Log], None]
-
-def greet_logged(name: str) -> Greeting:
+def greet_logged(
+    name: str,
+) -> Depend[Need[Console] | Need[Log], None]:
     yield from greet(name)
     log = yield from need(Log)
     log.write(f"greeted {name}")
 
-def greet_all(names: list[str]) -> Greeting:
+def greet_all(
+    names: list[str],
+) -> Depend[Need[Console] | Need[Log], None]:
     for name in names:
         yield from greet_logged(name)
 
@@ -450,15 +476,25 @@ The signature count is the same as the by-hand version.
 Every function on the path to the new Effect gained a `Need[Log]`,
 and `supply()` gained an argument.
 Stateless does not remove that work.
-What it removes is the *searching*.
-The checker names every file and line that needs the change,
+What it removes is the searching.
+The checker names every line that needs the change,
 and the program does not build until the last one is fixed.
+To watch it do the naming, delete `| Need[Log]` from either annotation:
+the checker points at the yield that still carries the ability.
 With dependencies passed as parameters,
 a missed thread produces a runtime `TypeError` in whatever code path happens to reach it.
 
 Multiple abilities combine with `|`, which reads correctly.
 `greet_all()` needs a `Console` or a `Log` at each individual request,
 and both over its lifetime.
+
+The repeated union invites a `type` alias,
+and the book's own habits would normally endorse one.
+Resist it here.
+Under `ty` (0.0.63 at this writing),
+a `type` alias as a generator's return annotation turns the yield check off,
+and everything this section demonstrated silently stops being verified.
+Spell Effect signatures out until your checker proves it sees through the alias.
 
 ## The Error Channel
 
@@ -505,6 +541,27 @@ Every question the previous chapter asked about a function is answered by its fi
 Drop the `KeyError` from the annotation and `ty` reports the same class of error it did before,
 this time pointing at the `yield from score(name)` line.
 Declared exceptions cannot be dropped by forgetting them.
+
+A declared error can, however, ride all the way to the edge.
+`run()` accepts an Effect whose error channel is still occupied,
+and a failure that reaches it surfaces as an ordinary raised exception:
+
+```python
+# error_escapes.py
+from announce import announce
+from greeter import Console
+from stateless import run, supply
+
+try:
+    run(supply(Console())(announce)("Carol"))
+except KeyError as e:
+    print(type(e).__name__)
+#: KeyError
+```
+
+The channel tracks failures without forcing you to handle them,
+and at the boundary they turn back into normal Python exceptions.
+Handling one inside the system is the next section.
 
 ## Turning an Error Into a Value
 
@@ -583,17 +640,24 @@ class Ask(Ability[str]):
 class Tell(Ability[None]):
     message: str
 
+def ask(prompt: str) -> Depend[Ask, str]:
+    answer = yield from Ask(prompt)
+    return answer
+
+def tell(message: str) -> Depend[Tell, None]:
+    yield from Tell(message)
+
 def greet() -> Depend[Ask | Tell, None]:
-    name = yield from Ask("What is your name? ")
-    yield from Tell(f"Hello, {name}!")
+    name = yield from ask("What is your name? ")
+    yield from tell(f"Hello, {name}!")
 
 messages: list[str] = []
 
-def scripted(ask: Ask) -> str:
+def scripted(request: Ask) -> str:
     return "Alice"
 
-def capture(tell: Tell) -> None:
-    messages.append(tell.message)
+def capture(request: Tell) -> None:
+    messages.append(request.message)
 
 half = handle(capture)(greet)
 full = handle(scripted)(half)
@@ -602,13 +666,22 @@ print(messages)
 #: ['Hello, Alice!']
 ```
 
-`yield from Ask("What is your name? ")` yields the ability object and returns whatever the handler sends back,
-typed as `str` by `Ability[str]`.
+Inside `ask()`, `yield from Ask(prompt)` yields the ability object and returns whatever the handler sends back.
+`ask()` and `tell()` are *accessors*:
+small functions that each wrap one ability and declare its answer type.
+`need()` has the same shape,
+and the previous chapter's ZIO listing had an accessor object doing the same job.
+The declared `Depend[Ask, str]` is what types `name` as `str` inside `greet()`.
+You can skip the accessor and yield the ability directly,
+and the program still runs,
+but under `ty` 0.0.63 the answer comes back as `Unknown` and the checking quietly stops.
+The accessor pins it down.
+
 `handle()` reads the annotation on its argument to decide which ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
 Each `handle()` subtracts one ability,
 so `half` still needs an `Ask` and `full` needs nothing.
-Naming the two stages is not only for readability,
+Naming the two stages also matters to the checker,
 for a reason the next section gives.
 
 Now compare this listing to `ask_tell.py` in the previous chapter.
@@ -621,6 +694,8 @@ That second channel in the signature is what the previous chapter said an EMS ne
 Return to `two_way_generator.py` and the whole library is visible.
 `yield` sends a request out, `handle()` is the driver loop that answers it,
 and `run()` is the one at the bottom.
+`supply()` is `handle()` prepackaged for `Need`:
+a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 
 ## Where the Guarantee Stops
 
@@ -652,7 +727,7 @@ A native Effect system computes a function's Effects from its body.
 A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
 
-The second limit is about how much of the type survives *partial* handling,
+The second limit is about how much of the type survives partial handling,
 and it depends on your checker rather than on the library.
 Handling some of what an Effect declares works correctly under `ty` 0.0.63.
 Supply one of two abilities and the other stays in the signature:
@@ -713,13 +788,21 @@ That is why `ask_tell_effect.py` binds `half` and `full` instead of nesting the 
 The habit is worth keeping generally.
 A named intermediate is where you read the ability that is left,
 which is the information this library exists to give you.
+The chapter has now met three of these checker gaps:
+the nested handler expression here,
+the direct ability yield that types as `Unknown`,
+and the `type` alias that turns the yield check off.
+Each has the same shape.
+The library's types are asking the checker a hard inference question,
+and where the checker gives up, it gives up quietly.
+Trust a green check only where a red one has shown you it can appear.
 
 The third limit is the cost.
 Every effectful function becomes a generator function,
 which means it cannot also be a plain function,
-and calling it returns a description that somebody has to run.
+and calling it returns a description that somebody must run.
 Type errors from a library this generic are long and mention internals.
-And a third-party function that knows nothing about Effects has to be wrapped in `@throws` or reached through a `need()` before it can participate.
+And a third-party function that knows nothing about Effects must be wrapped in `@throws` or reached through a `need()` before it can participate.
 An Effect system is a decision about a whole codebase,
 not a utility you import for one module.
 
@@ -740,8 +823,8 @@ Read the signatures once more, in order:
 Each one answers what a function depends on, what it can produce,
 and how it can fail, before you read a single line of the body.
 That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
-Purity is valuable because it is *verifiable*,
-and verification you have to perform by reading code does not scale.
+Purity is valuable because it is verifiable,
+and verification performed by reading code does not scale.
 
 What Stateless charges for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
@@ -772,12 +855,13 @@ It is a language that does the encoding for you.
 2.  Take `undeclared_need.py`, remove the `# type: ignore`,
     and run `ty check` on it.
     Fix the error by changing only the annotation,
-    then check what `greet_all()`'s callers now have to declare.
+    then check what `greet_all()`'s callers must now declare.
 3.  Write `parse_score()`, which reads a `dict[str, str]` and returns an `int`,
     decorated with `@throws(KeyError, ValueError)`.
-    Print the type of `catch(KeyError, ValueError)(parse_score)` with `reveal_type()`,
-    then the type of `catch(KeyError)(parse_score)`.
-    Explain which of the two the chapter calls safe, and why.
+    Apply `reveal_type()` to `catch(KeyError, ValueError)(parse_score)` and run `ty check` to see its type,
+    then do the same for `catch(KeyError)(parse_score)`.
+    Explain which of the two leaves an obligation with the caller,
+    and where it went.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 5.  Write a `Clock` ability as an `Ability[datetime]` subclass,
@@ -788,3 +872,9 @@ It is a language that does the encoding for you.
 6.  `leaky_effect.py` type-checks while lying about its purity.
     Describe a review rule or a lint check that would catch it,
     and explain why a type checker cannot.
+7.  Break `greet_all.py` by removing the `yield from` in front of `greet(name)`.
+    Run `ty check`, `ruff check`, and the script,
+    and record what each reports and what the program prints.
+    Explain where the greetings went and why no tool objects.
+    Then explain why the same mistake in front of `need(Console)` inside `greet()` would be caught,
+    and by what.

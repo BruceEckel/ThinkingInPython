@@ -1,10 +1,11 @@
 # recorder.py
+from dataclasses import dataclass, field
 from typing import override
 from greeter import Console
 
+@dataclass
 class Recorder(Console):
-    def __init__(self) -> None:
-        self.messages: list[str] = []
+    messages: list[str] = field(default_factory=list)
     @override
     def print(self, message: str) -> None:
         self.messages.append(message)

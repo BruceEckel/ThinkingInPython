@@ -10,17 +10,24 @@ class Ask(Ability[str]):
 class Tell(Ability[None]):
     message: str
 
+def ask(prompt: str) -> Depend[Ask, str]:
+    answer = yield from Ask(prompt)
+    return answer
+
+def tell(message: str) -> Depend[Tell, None]:
+    yield from Tell(message)
+
 def greet() -> Depend[Ask | Tell, None]:
-    name = yield from Ask("What is your name? ")
-    yield from Tell(f"Hello, {name}!")
+    name = yield from ask("What is your name? ")
+    yield from tell(f"Hello, {name}!")
 
 messages: list[str] = []
 
-def scripted(ask: Ask) -> str:
+def scripted(request: Ask) -> str:
     return "Alice"
 
-def capture(tell: Tell) -> None:
-    messages.append(tell.message)
+def capture(request: Tell) -> None:
+    messages.append(request.message)
 
 half = handle(capture)(greet)
 full = handle(scripted)(half)
