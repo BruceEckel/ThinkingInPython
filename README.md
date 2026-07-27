@@ -131,7 +131,7 @@ The first serious edit pass.
 | 21_The_Pattern_Concept.md       |X|
 | 22_Data_Transfer_Objects.md     |X|
 | 23_Iterators.md                 |X|
-| 24_Singleton.md                 | |
+| 24_Singleton.md                 |X|
 | 25_Template_Method.md           | |
 | 26_Surrogate.md                 | |
 | 27_Factory.md                   | |

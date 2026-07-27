@@ -493,8 +493,8 @@ def test_borg_shares_state_but_not_identity() -> None:
 
 ### Singleton Classes
 
-You can wrap a class so that calling it returns a cached instance.
-This is a [class decorator](14_Decorators.md#decorating-classes):
+You can use a [class decorator](14_Decorators.md#decorating-classes)
+to wrap a class so that calling it returns a cached instance:
 
 ```python
 # singleton_class.py
@@ -537,7 +537,7 @@ print(first is second, second.name, second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
 ```
 
-You might wonder why constructing a `Registry` is intercepted by `__call__()`.
+You might wonder why the constructor for a `Registry` is intercepted by `__call__()`.
 A *call* is parentheses written after an expression.
 That expression can produce anything: a function, a class, or an instance.
 To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`.
@@ -553,30 +553,47 @@ so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
 Only the first constructor call produces the construction of a `Registry` object.
 Every later constructor call returns the cached instance and discards the constructor arguments,
-which is why `Registry("secondary", limit=99)` changes nothing.
-No error marks the discarded values.
+which is why `Registry("secondary", limit=99)` does not create a new object.
 A caller who believes those arguments took effect is holding an object configured by someone else.
 
-Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`,
-so the name `Registry` now refers to the decorated instance rather than to the class.
-Calling `Registry(...)` returns the cached instance, which is what we want.
-But the name no longer points at a class.
-Neither `isinstance(first, Registry)` nor subclassing `Registry` merely misbehaves.
-Both raise exceptions.
-`isinstance()` reports that its second argument must be a type,
-and `class Sub(Registry)` fails inside `singleton.__init__()`,
-complaining that it takes two positional arguments but got four: the name,
-bases, and namespace that a class statement passes to whatever it inherits from.
-That error names a class the author never wrote,
-which is the kind of confusion this trade buys.
+Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`.
+The name `Registry` now refers to the decorated instance rather than to the class.
+Calling `Registry(...)` returns the cached instance.
+
+Both `isinstance(first, Registry)` and subclassing `Registry` raise exceptions:
+
+```python
+# test_singleton_class.py
+import pytest
+from singleton_class import Registry
+
+def test_isinstance_rejects_the_decorated_name() -> None:
+    with pytest.raises(TypeError, match="arg 2 must be a type"):
+        isinstance(Registry("primary"), Registry)  # type: ignore
+
+def test_subclassing_the_decorated_name_fails() -> None:
+    with pytest.raises(TypeError, match="takes 2 positional"):
+        class Sub(Registry):  # type: ignore
+            pass
+```
+
+The type checker complains that defining `Sub` raises a `TypeError` at runtime.
+`singleton.__init__()` takes two positional arguments and receives four,
+because a class statement passes the name, bases,
+and namespace to whatever it inherits from.
+Nothing in `class Sub(Registry)` mentions `singleton`,
+so the error names a class that does not appear in the failing line.
+That is the confusion a class decorator costs you.
 The `__new__()` versions above and the metaclass version below keep the name pointing at a real class,
-which is the reason to prefer them when you need that.
+which is the reason to prefer those.
 
 ### Singleton Using Metaclasses
 
 Finally, a metaclass can intercept construction.
 [Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation)
-places a similar metaclass singleton beside the simpler hooks that usually replace it.
+shows another metaclass singleton, one that overrides `__call__()`.
+That chapter also covers `__init_subclass__()` and `__set_name__()`,
+the simpler hooks that replace most metaclasses.
 This version is here for completeness:
 
 ```python
@@ -614,14 +631,15 @@ print(x, x is y is z)
 #: spam True
 ```
 
-```python
-# test_singleton_metaclass.py
-import singleton_metaclass
-
-def test_metaclass_returns_same_instance() -> None:
-    assert (singleton_metaclass.Bar("x")
-            is singleton_metaclass.Bar("y"))
-```
+`cls` is the class being created,
+and the metaclass modifies it in ways no annotation describes.
+It attaches an `instance` attribute that does not exist yet,
+and it replaces `__new__()`.
+`klass: Any = cls` is the escape hatch that lets those assignments past the type checker.
+Annotating `klass` as `type` fails.
+That resolves `klass.__new__` to `type.__new__`,
+the constructor that builds classes,
+when the line actually captures `Bar.__new__`, which is `object.__new__`.
 
 This is the other side of the `__new__()` rule.
 `my_new()` returns an instance of `Bar` itself,
@@ -648,7 +666,7 @@ Use the lightest tool that fits:
 
 The elaborate *GoF Design Patterns* singleton is largely a workaround for languages where a module is not a first-class,
 single-instance namespace.
-Python has that already, so most of the ceremony falls away.
+In Python, most of the ceremony falls away.
 
 ## Exercises
 
