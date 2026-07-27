@@ -651,7 +651,10 @@ because the imperative part runs while the description is being built,
 not when the description is executed.
 
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
-polysemy and effectful in Haskell, and Effect in TypeScript.
+polysemy and effectful in Haskell, Effect in TypeScript,
+and Stateless in Python.
+[Stateless](45_Stateless.md) builds all three of these listings again,
+in the language this book is about.
 
 ### Custom AI Languages with Effects
 
@@ -699,7 +702,8 @@ the second and third properties of a full EMS.
 
 ## Effect Management for Python?
 
-Python has no Effect Management System, but it does not start from zero.
+Python has no Effect Management System in the language,
+but it does not start from zero.
 Python already tracks one Effect in function signatures,
 and enforces that tracking virally: `async`.
 
@@ -745,16 +749,31 @@ Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff)
 library models Effect handlers directly.
-Each of these gives you the discipline of one part of an EMS.
-None of them gives you the guarantee,
-because the type checker does not participate.
+Each of these gives you the discipline of one part of an EMS,
+but not the guarantee, because the type checker does not participate.
+
+One library goes the rest of the way.
+[Stateless](45_Stateless.md)
+encodes an Effect's dependencies and failures into the return type of every function that performs them,
+and a type checker verifies that each caller carries them forward.
+Declaring a dependency you never bind is a type error.
+Calling an effectful function from one annotated as pure is a type error.
+That is tracking, interface separation, and delayed binding,
+the three properties of a full EMS, inside Python's existing type system.
+The next chapter builds it up one step at a time.
+
+The guarantee has a boundary, and it is worth naming here.
+Stateless verifies that the Effects you *declare* propagate consistently.
 Nothing stops a function from calling `print()` directly,
-adjacent to its carefully declared `IO` container.
+adjacent to its carefully declared abilities.
 In Koka, that call would change the function's Effect row,
 and every caller's row.
 In Python, it changes nothing that any tool can see.
+A library checks the Effects you wrote down.
+Only the language can check the ones you didn't.
 
-Could Effect tracking be added to Python's type system?
+Could Effect tracking be added to Python itself,
+so that the declaring stops being manual?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
