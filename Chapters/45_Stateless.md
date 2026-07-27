@@ -133,10 +133,8 @@ The three parameters answer the three questions from the previous chapter:
 
 `A` and `E` share the first slot, and `R` is the third.
 That leaves the second,
-which the previous section taught you to read as what comes back,
-and which is `Any` here.
-That `Any` is essential,
-and it explains an idiom the rest of the chapter uses.
+which the previous section taught you to read as "what comes back".
+That `Any` is essential, and it explains an idiom the rest of the chapter uses.
 
 A generator has one send type for its whole life.
 An Effect does not.
@@ -148,15 +146,17 @@ Pinning the slot to one concrete type makes it lie.
 Annotate the send type as `Console`,
 and `yield Need(Log)` hands you something the checker calls a `Console`.
 
-`yield from` is the way out.
-A bare `yield` produces the send type, the slot that had to become `Any`.
-`yield from` produces the inner generator's return type, the third slot,
-which nothing forced into `Any`.
-So a function that wants to hand back a typed answer declares it as `R`.
+The solution is `yield from`.
+A bare `yield` produces the send type,
+which is the slot that had to become `Any`.
+`yield from` produces the inner generator's return type, the third slot.
+A single call returns a single type, so that slot has no such problem.
+It can name that specific type instead of `Any`.
+So a function that hands back a typed answer declares it as `R`.
 `need()` returns `Depend[Need[T], T]`, which is `Generator[Need[T], Any, T]`,
 and `console = yield from need(Console)` reads the `Console` out of that third slot without ever touching the `Any`.
 
-That is why every request in this chapter is spelled `yield from` rather than `yield`,
+That is why every request in this chapter is written as `yield from` rather than `yield`,
 and why custom abilities get a small function of their own later on.
 
 Three aliases name the common cases,
