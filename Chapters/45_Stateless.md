@@ -5,7 +5,7 @@ introduced library Effect systems and named [Stateless](https://github.com/suned
 as a library that implements an Effect Management System (EMS).
 
 Stateless encodes an Effect's dependencies and failures into the return type of a function,
-and a type checker verifies that every caller carries them forward.
+and a type checker verifies that every caller either absorbs the Effects or carries them forward.
 Forget to declare a dependency and the check fails.
 Forget to supply one and the check fails.
 That is the Effect tracking and the delayed binding of a full EMS,
@@ -352,8 +352,8 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-`Console` is now the second property of an EMS:
-an Effect's interface, separate from any implementation.
+`Console` is now the second property of an EMS: an Effect's interface,
+separate from any implementation.
 `Terminal` is one implementation and `Recorder` would be another,
 and neither is named anywhere in `greet()`.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
@@ -696,7 +696,7 @@ a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 ## Where the Guarantee Stops
 
 An honest accounting needs the limits,
-and there are three worth knowing before you commit a codebase to this.
+and there are four worth knowing before you commit a codebase to this.
 
 The first is that nothing stops an undeclared Effect.
 `Success[int]` promises purity, and this function breaks that promise:
@@ -793,7 +793,42 @@ The library's types are asking the checker a hard inference question,
 and where the checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
 
-The third limit is the cost.
+The third limit is what a handler can do,
+and naming the machinery honestly is the way in.
+`Effect` is a monad.
+`success()` lifts a value into it, `yield from` chains two of them together,
+and the generator body is syntax that hides the chaining.
+`Result` in [Error Handling](42_Functional_Error_Handling.md#composing-with-bind)
+had the same two operations, written out by hand.
+The library's documentation calls this an algebraic effect system,
+and both descriptions are right.
+A monad plus handlers is how you build algebraic effects in a language with no native support for them.
+The monad is the plumbing, and the handlers are the interface.
+
+What a library cannot copy is the handler's power.
+`handle()` passes a handler the ability and takes back an answer,
+and the driver resumes the Effect with that answer, once, always.
+A native handler instead receives the *continuation* and chooses what to do with it.
+Invoke it once and you have what Stateless has.
+Decline to invoke it and the handled scope produces the handler's value instead,
+which is what an exception is.
+Invoke it repeatedly and you have backtracking and search.
+Stateless offers only the first, a *tail-resumptive* handler.
+The ceiling is the substrate rather than the design.
+A Python generator is one-shot, so there is nothing to resume twice.
+
+Two pieces of the library are evidence of that ceiling.
+`Effect[A, E, R]` carries a separate `E`, worked by `@throws` and `catch()`.
+Koka needs no such parameter,
+because an exception there is an ordinary Effect whose handler declines to resume.
+The extra parameter exists because a Stateless ability cannot fail,
+and the previous chapter's `ZIO[R, E, A]` carries one for the same reason.
+`Async` is the other piece.
+Native systems demonstrate asynchronous execution derived from Effects,
+while Stateless ships `Async` as a built-in that `run()` interprets,
+because the driver loop can await where a handler cannot.
+
+The fourth limit is the cost.
 Every effectful function becomes a generator function,
 which means it cannot also be a plain function,
 and calling it returns a description that somebody must run.
