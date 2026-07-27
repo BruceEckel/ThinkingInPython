@@ -13,7 +13,7 @@ The steps, in order:
 1. ``extract_examples.py --write`` rebuilds ``build/examples/`` from the
    Markdown. This is whole-book (and cheap), because a chapter's listings
    import their siblings and the tree has to be consistent.
-2. ``validate_output.py`` on this chapter alone, checking (not rewriting)
+2. ``validate_output.py --update`` on this chapter alone, refreshing
    its ``#:`` markers. This is the step the full gate spends its time on,
    and the one worth narrowing.
 3. The Markdown-level listing gates: blank-line density, comment periods,
@@ -64,6 +64,31 @@ def run(label: str, command: list[str], ok: tuple[int, ...] = (0,)) -> bool:
     return passed
 
 
+def run_markers(md: Path) -> bool:
+    """Refresh this chapter's `#:` markers, the way `gate` does.
+
+    `gate` runs validate_output.py with --update, so a stale marker
+    self-heals rather than failing the build. This must match it: a
+    preview of the gate that fails on something the gate would quietly
+    fix is worse than no preview, because it sends you off to hand-edit
+    output that a tool generates. An exception raised where none was
+    expected still fails here, exactly as it fails there.
+    """
+    proc = subprocess.run(
+        [*PY, "tools/validate_output.py", "--update", str(md)],
+        cwd=ROOT, capture_output=True, text=True)
+    report = (proc.stdout + proc.stderr).strip()
+    passed = proc.returncode == 0
+    print(f"{'ok  ' if passed else 'FAIL'}  output markers")
+    if not passed:
+        print(report)
+    elif "updated" in report and not report.startswith("0 updated"):
+        print(f"      {report}")
+        print("      Markers were rewritten. Check `git diff Chapters/`,")
+        print("      especially any marker that depends on timing.")
+    return passed
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("chapter",
@@ -86,8 +111,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results = [
         True, True,  # extract and sync, already known to have passed
-        run("output markers",
-            [*PY, "tools/validate_output.py", str(md)]),
+        run_markers(md),
         run("listing format", [*PY, "tools/listing_format.py", str(md)]),
         run("comment periods", [*PY, "tools/comment_periods.py", str(md)]),
         run("comment spacing", [*PY, "tools/comment_spacing.py", str(md)]),
