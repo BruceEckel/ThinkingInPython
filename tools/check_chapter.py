@@ -37,9 +37,13 @@ import sys
 from pathlib import Path
 
 from tools_config import CHAPTERS_DIR, EXAMPLES_TREE, ROOT
+from tools_repo import run_capture
 
 PY = [sys.executable]
 NO_TESTS_COLLECTED = 5  # pytest's exit code for an empty directory
+# Generous: a chapter of asyncio examples takes seconds, not the 30 that
+# run_capture defaults to for a version probe.
+MARKER_TIMEOUT = 300
 
 
 def resolve(selector: str) -> Path:
@@ -73,17 +77,26 @@ def run_markers(md: Path) -> bool:
     fix is worse than no preview, because it sends you off to hand-edit
     output that a tool generates. An exception raised where none was
     expected still fails here, exactly as it fails there.
+
+    Whether a marker actually moved is decided by comparing the file,
+    not by reading the report. In --update mode validate_output.py
+    counts every file it processed as "updated" whether or not it
+    rewrote anything, so trusting that word would print the warning on
+    every run and teach you to ignore it.
     """
-    proc = subprocess.run(
+    before = md.read_bytes()
+    result = run_capture(
         [*PY, "tools/validate_output.py", "--update", str(md)],
-        cwd=ROOT, capture_output=True, text=True)
-    report = (proc.stdout + proc.stderr).strip()
-    passed = proc.returncode == 0
+        timeout=MARKER_TIMEOUT)
+    if result is None:
+        print("FAIL  output markers (validate_output.py would not start)")
+        return False
+    report, code = result
+    passed = code == 0
     print(f"{'ok  ' if passed else 'FAIL'}  output markers")
     if not passed:
-        print(report)
-    elif "updated" in report and not report.startswith("0 updated"):
-        print(f"      {report}")
+        print(report.strip())
+    elif md.read_bytes() != before:
         print("      Markers were rewritten. Check `git diff Chapters/`,")
         print("      especially any marker that depends on timing.")
     return passed

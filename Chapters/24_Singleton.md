@@ -508,30 +508,42 @@ class singleton:
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
         if self.instance is None:
+            print(f"constructing {self.klass.__name__}")
             self.instance = self.klass(*args, **kwargs)
+        else:
+            print(f"using cached {self.klass.__name__}")
+            print(f"discarding {args}, {kwargs}")
         return self.instance
 
 @singleton
 class Registry:
     def __init__(self, name: str, *, limit: int = 10) -> None:
+        print(f"Registry.__init__({name}, {limit})")
         self.name = name
         self.limit = limit
         self.items: list[str] = []
 
 first = Registry("primary", limit=3)
 #: singleton.__call__(('primary',), {'limit': 3})
-first.items.append("sausage")
-second = Registry("ignored", limit=99)  # Arguments discarded
+#: constructing Registry
+#: Registry.__init__(primary, 3)
+first.items.append("spam")
+first.items.append("eggs")
+second = Registry("secondary", limit=99)
+#: singleton.__call__(('secondary',), {'limit': 99})
+#: using cached Registry
+#: discarding ('secondary',), {'limit': 99}
 print(first is second, second.name, second.limit, second.items)
-#: singleton.__call__(('ignored',), {'limit': 99})
-#: True primary 3 ['sausage']
+#: True primary 3 ['spam', 'eggs']
 ```
 
-`__call__()` forwards `*args` and `**kwargs` to the wrapped class,
+You might wonder whether the `Registry` constructor call is special and won't get intercepted by `__call__()`.
+But anything with parentheses is considered a call, even a constructor.
+`__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
-Only the first call does.
-Every later call returns the cached instance and drops its arguments,
-which is why `Registry("ignored", limit=99)` changes nothing.
+Only the first constructor call produces the construction of a `Registry` object.
+Every later constructor call returns the cached instance and discards the constructor arguments,
+which is why `Registry("secondary", limit=99)` changes nothing.
 No error marks the discarded values.
 A caller who believes those arguments took effect is holding an object configured by someone else.
 
