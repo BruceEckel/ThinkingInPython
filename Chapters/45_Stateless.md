@@ -133,9 +133,8 @@ If you mistakenly annotate the generator as `Generator[Answer, Question, Result]
 Both `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
 Both `send(Answer(...))` calls pass an `Answer` where it expects a `Question`.
 Both assignments to `question` receive an `Answer` into a variable declared `Question`.
-The checker objects everywhere the generator meets its caller,
-because each channel now has its own type.
-Three `str` aliases would have accepted the reversal without complaint.
+The checker ensures proper arguments are used because each channel has its own type.
+`Generator[str, str, str]` would have accepted the reversal without complaint.
 
 A coroutine intentionally has the same three-part shape:
 `Coroutine[YieldType, SendType, ReturnType]`.
