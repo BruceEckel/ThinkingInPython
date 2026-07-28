@@ -212,34 +212,60 @@ passing every yielded request out to the outer driver and every sent answer back
 # yield_to_exhaustion.py
 from collections.abc import Generator
 
-def inner(chars: str) -> Generator[str, int, str]:
+def inner(chars: str) -> Generator[str, None, str]:
     result = "| "
     for c in chars:
         result += f"{c.upper()} | "
         yield c
     return result
 
-def outer(chars: str) -> Generator[str, int, str]:
+def outer(chars: str) -> Generator[str, None, str]:
     result = yield from inner(chars)
     return f"outer received [{result}]"
 
-print(outer("abcdefg"))
-#: <generator object outer at 0x0000021F3528D9A0>
+def top(chars: str) -> Generator[str, None, str]:
+    result = yield from outer(chars)
+    result2 = yield from inner(chars)
+    return f"top:\n[{result}]\n[{result2}]"
+
+def run(g: Generator[str, None, str]) -> tuple[list[str], str]:
+    yielded: list[str] = []
+    while True:
+        try:
+            yielded.append(next(g))
+        except StopIteration as stop:
+            return yielded, stop.value
+
+yields, returned = run(outer("abcd"))
+print(yields)
+#: ['a', 'b', 'c', 'd']
+print(returned)
+#: outer received [| A | B | C | D | ]
+yields, returned = run(top("abcd"))
+print(yields)
+#: ['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd']
+print(returned)
+#: top:
+#: [outer received [| A | B | C | D | ]]
+#: [| A | B | C | D | ]
 ```
 
-`outer()` has no `yield` of its own, only a `yield from`,
-yet the driver sees both of `inner()`'s requests.
+Neither `outer()` nor `top()` has a `yield` of its own, only a `yield from`,
+yet the driver receives every character `inner()` yields.
 That is what running to exhaustion means:
-control stays inside `inner()` until it returns.
-The numbers travel the other way,
-arriving inside `inner()` although they were sent to `outer()`.
-The two channels use different types here, `str` out and `int` in,
-so each direction is unmistakable.
+control stays inside `inner()` until it returns,
+and the generators above it contribute nothing to the stream in the meantime.
+The two runs produce an identical list of characters, one level apart.
 
-`inner()` returning does not end the whole conversation.
-`yield from` absorbs that `StopIteration` and produces the returned string as its value,
-which is how `summary` gets filled in.
-The driver sees `StopIteration` only when `outer()` returns.
+A `yield from` expression evaluates to the inner generator's return value,
+not its yielded values, which pass straight through to whoever is driving.
+`yield from` absorbs the `StopIteration` that ends the generator below it,
+which is how `result` gets filled in at each level.
+Each level sees only the level directly beneath it,
+so the strings nest one layer per delegation,
+and the driver receives the outermost one when the whole stack finishes.
+`run()` has to catch `StopIteration` to read it:
+`list(outer("abcdefg"))` would collect the yields and discard it.
 
 We can apply `yield from` to our `interview` example:
 
