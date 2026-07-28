@@ -23,4 +23,4 @@ def top() -> Iterator[str]:
 print(list(outer()))
 #: ['start', 'only', 'A', 'B', 'C', 'end']
 print(list(top()))
-#: ['top', 'start', 'only', 'A', 'B', 'C', 'end']
+#: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']

@@ -206,7 +206,13 @@ The generator declares Effects, the driver interprets them.
 
 The reason generators can carry an EMS is that they nest.
 `yield from` runs an inner generator to exhaustion,
-passing every yielded request out to the outer driver and every sent answer back down:
+passing every yielded request out to the outer driver and every sent answer back down.
+Each of the three channels crosses that boundary differently,
+so we take them one at a time.
+
+### Running to Exhaustion
+
+The simplest delegation targets generators that only yield:
 
 ```python
 # yield_to_exhaustion.py
@@ -251,12 +257,95 @@ and the driver still receives one flat sequence.
 A value yielded two levels down arrives without any level in between doing anything to forward it,
 and `top()`'s single `yield from` does not finish until every generator beneath it has.
 
+### The Return Channel
+
 A `yield from` expression evaluates to the inner generator's return value,
 not its yielded values, which pass straight through to whoever is driving.
-These three generators return nothing, so that value goes unused here.
-The next version puts it to work.
+The generators above return nothing, so that value goes unused there.
+A `ReturnType` puts it to work:
 
-We can apply `yield from` to our `interview` example:
+```python
+# yield_from_return.py
+from collections.abc import Generator, Iterator
+
+def emit(items: list[str]) -> Generator[str, None, int]:
+    total = 0
+    for item in items:
+        yield item
+        total += len(item)
+    return total
+
+def report(items: list[str]) -> Iterator[str]:
+    size = yield from emit(items)
+    yield f"({size} characters)"
+
+print(list(report(["red", "green", "blue"])))
+#: ['red', 'green', 'blue', '(12 characters)']
+```
+
+`emit()` is a `Generator[str, None, int]`: it yields strings,
+is never sent anything, and returns a total it accumulates while iterating.
+No driver ever sees that total.
+`yield from` hands it to `report()`,
+which turns it into one more yielded string.
+The return channel is how a generator reports to whichever generator delegated to it,
+so `report()` learns something `emit()` computed while neither of them knows who is driving.
+
+### The Send Channel
+
+The `SendType` works the same way in the other direction.
+A generator that only receives values needs no `ReturnType`:
+
+```python
+# yield_from_send.py
+from collections.abc import Generator
+
+def collect(name: str) -> Generator[str, int]:
+    first = yield f"{name} needs a value"
+    second = yield f"{name} needs another"
+    print(f"{name} got {first} and {second}")
+
+def both() -> Generator[str, int]:
+    yield from collect("alpha")
+    yield from collect("beta")
+
+g = both()
+print(next(g))
+#: alpha needs a value
+for value in [1, 2, 3]:
+    print(g.send(value))
+#: alpha needs another
+#: alpha got 1 and 2
+#: beta needs a value
+#: beta needs another
+try:
+    g.send(4)
+except StopIteration:
+    print("both() is exhausted")
+#: beta got 3 and 4
+#: both() is exhausted
+```
+
+`collect()` yields prompts, receives numbers, and returns nothing,
+which is `Generator[str, int, None]`.
+The omitted `ReturnType` defaults to `None`,
+so `Generator[str, int]` says it in two parameters instead of three.
+`both()` declares the same channels,
+because a delegating generator adopts the arrangement of whatever it delegates to.
+The numbers travel down to the `yield` that asked for them,
+so `g.send(1)` arrives inside `collect("alpha")`, two frames from the driver,
+with `both()` doing nothing to pass it along.
+
+`g.send(2)` is the interesting one.
+It supplies alpha's second value, which lets `collect("alpha")` finish,
+which completes the first `yield from`, which starts the second one.
+A single `send()` therefore ends one inner generator and produces the first prompt of the next.
+The driver sees `StopIteration` only when `both()` runs out of delegations.
+
+### All Three Channels
+
+We can apply `yield from` to our `interview` example,
+where every channel carries something:
 
 ```python
 # yield_from_delegates.py
