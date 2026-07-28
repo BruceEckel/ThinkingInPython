@@ -146,8 +146,8 @@ A coroutine intentionally has the same three-part shape:
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
 A generator function behaves the same way.
-Calling `interview()` runs none of its body; `next()` and `send()` does that work,
-one `yield` at a time.
+Calling `interview()` runs none of its body;
+`next()` and `send()` does that work, one `yield` at a time.
 
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
@@ -204,7 +204,6 @@ The generator declares Effects, the driver interprets them.
 
 ## `yield from` Composes Descriptions
 
-One generator alone is a curiosity.
 The reason generators can carry an EMS is that they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down:
@@ -237,6 +236,16 @@ drive(interview(), {Question("name"): Answer("Alice"),
 `drive()` never learns that `ask()` exists.
 Only the generator portion changed.
 
+`ask()` uses `Answer` in two of the three positions, for two different reasons.
+As the `SendType` it is the value the driver sends in,
+which arrives as the value of the `yield` expression and lands in `answer`.
+As the `ReturnType` it is the value `ask()` hands back when it finishes,
+which `yield from` produces as the value of the whole `yield from` expression.
+The inner generator asks one question and hands back one answer,
+so both channels carry an `Answer`.
+`interview()` keeps `Result` as its `ReturnType`,
+because the sentence it builds from two answers is not an answer to any one question.
+
 The trace shows both directions of travel.
 A request raised two frames down inside `ask()` surfaces at `drive()`,
 which knows nothing about where it came from.
@@ -245,8 +254,6 @@ which also knows nothing about where it came from.
 A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
-Their type comes from `ask()`'s `ReturnType`, an `Answer`,
-which `interview()` then composes into a `Result`.
 
 Every Effect in this chapter travels this path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
