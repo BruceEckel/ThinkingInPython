@@ -10,12 +10,12 @@ def inner(chars: str) -> Generator[str, None, str]:
 
 def outer(chars: str) -> Generator[str, None, str]:
     result = yield from inner(chars)
-    return f"outer received [{result}]"
+    result += yield from inner(chars[1:-1])
+    return f"outer: [{result}]"
 
 def top(chars: str) -> Generator[str, None, str]:
     result = yield from outer(chars)
-    result2 = yield from inner(chars)
-    return f"top:\n[{result}]\n[{result2}]"
+    return f"top: [{result}]]"
 
 def run(g: Generator[str, None, str]) -> tuple[list[str], str]:
     yielded: list[str] = []
@@ -27,13 +27,13 @@ def run(g: Generator[str, None, str]) -> tuple[list[str], str]:
 
 yields, returned = run(outer("abcd"))
 print(yields)
-#: ['a', 'b', 'c', 'd']
+#: ['a', 'b', 'c', 'd', 'b', 'c']
 print(returned)
-#: outer received [| A | B | C | D | ]
+#: outer received [| A | B | C | D | | B | C | ]
 yields, returned = run(top("abcd"))
 print(yields)
-#: ['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd']
+#: ['a', 'b', 'c', 'd', 'b', 'c', 'a', 'b', 'c', 'd']
 print(returned)
 #: top:
-#: [outer received [| A | B | C | D | ]]
+#: [outer received [| A | B | C | D | | B | C | ]]
 #: [| A | B | C | D | ]
