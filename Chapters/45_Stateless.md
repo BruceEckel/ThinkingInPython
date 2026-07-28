@@ -20,7 +20,10 @@ so we must study the full `Generator` annotation before exploring the library.
 annotated every generator using the short form `Iterator[int]`.
 That fits a generator that only yields values.
 
-A generator that also receives values needs the full annotation `Generator[YieldType, SendType, ReturnType]`.
+A generator that also receives values needs the full annotation:
+
+    `Generator[YieldType, SendType, ReturnType]`.
+
 This names the three things a generator exchanges with its caller:
 
 - `YieldType` is the value `yield` hands out, thus the value `next()` returns.
@@ -417,16 +420,16 @@ The three type parameters answer the three questions from the previous chapter:
 
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
-which the previous section taught you to read as "what comes back".
+which the previous section taught you to read as "what comes back from a `yield` call".
 That `Any` is essential, and it explains an idiom the rest of the chapter uses.
 
 A generator has one send type for its whole life.
 An Effect does not.
-Request a `Need[Console]` and a `Console` should come back.
-Request a `Need[Log]` and a `Log` should come back.
+Use `yield` to request a `Need[Console]` and a `Console` should come back.
+Use `yield` to request a `Need[Log]` and a `Log` should come back.
 The answer's type depends on which ability was requested,
 and no Python annotation can say that.
-Pinning that type parameter to one concrete type makes it lie.
+Thus we cannot pin that type parameter to one concrete type.
 Annotate the send type as `Console`,
 and `yield Need(Log)` hands you something the checker calls a `Console`.
 
