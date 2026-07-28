@@ -1,13 +1,9 @@
 # two_way_generator.py
 from collections.abc import Generator
+from generator_interview import Answer, Question, Result, interview
 
-def interview() -> Generator[str, str, str]:
-    name = yield "name"
-    town = yield "town"
-    return f"{name} of {town}"
-
-def drive(conversation: Generator[str, str, str],
-          answers: dict[str, str]) -> None:
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> None:
     request = next(conversation)
     while True:
         try:
@@ -20,8 +16,9 @@ def drive(conversation: Generator[str, str, str],
 if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    drive(conversation, {"name": "Alice", "town": "Portland"})
+    drive(conversation, {Question("name"): Answer("Alice"),
+                         Question("town"): Answer("Wonderland")})
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Portland'
-#: stop.value = 'Alice of Portland'
+#: request = 'town', answers[request] = 'Wonderland'
+#: stop.value = 'Alice of Wonderland'

@@ -11,83 +11,23 @@ Forget to supply one and the check fails.
 That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
-## A Generator Is a Description
-
 Stateless is built on generators,
-so the mechanism is worth studying before we explore the library.
-[Effect Management](44_Effect_Management.md#effect-management-for-python)
-showed that calling an `async def` function runs nothing.
-It returns a coroutine: a description of work.
-A generator function behaves the same way.
-
-A generator is more interesting than a coroutine here because `yield` is a two-way channel.
-The generator yields a value out, and the caller sends a value back in.
-That reversal makes an EMS possible.
-The generator yields a *request*,
-and whoever is driving it supplies the *answer*:
-
-```python
-# two_way_generator.py
-from collections.abc import Generator
-
-def interview() -> Generator[str, str, str]:
-    name = yield "name"
-    town = yield "town"
-    return f"{name} of {town}"
-
-def drive(conversation: Generator[str, str, str],
-          answers: dict[str, str]) -> None:
-    request = next(conversation)
-    while True:
-        try:
-            print(f"{request = }, {answers[request] = }")
-            request = conversation.send(answers[request])
-        except StopIteration as stop:
-            print(f"{stop.value = }")
-            return
-
-if __name__ == "__main__":
-    conversation = interview()
-    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    drive(conversation, {"name": "Alice", "town": "Portland"})
-#: <class 'generator'>: interview
-#: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Portland'
-#: stop.value = 'Alice of Portland'
-```
-
-Notice what is missing in `interview()`:
-it does not know where the answers come from.
-It has no dictionary, no `input()` call, and no network connection.
-It states what it needs and waits.
-`drive()` decides how those needs are met,
-and it takes the answers as a parameter rather than closing over them,
-so swapping the dictionary for a database changes one argument and leaves `interview()` alone.
-
-That is EMS in miniature.
-The generator declares Effects, the driver interprets them.
+so we must study the full `Generator` annotation before exploring the library.
 
 ## Annotating a Generator
 
 [Iterators](23_Iterators.md#generators)
-annotated every generator as `Iterator[int]`.
-That is the short form, and it fits a generator that only yields values.
-`interview()` needs the long form that allows values to travel both ways.
+annotated every generator using the short form `Iterator[int]`.
+That fits a generator that only yields values.
 
-The full annotation is `Generator[YieldType, SendType, ReturnType]`,
-naming the three things a generator exchanges with its caller:
+A generator that also receives values needs the full annotation `Generator[YieldType, SendType, ReturnType]`.
+This names the three things a generator exchanges with its caller:
 
 - `YieldType` is the value `yield` hands out, thus the value `next()` returns.
 - `SendType` is the value `send()` accepts,
   and the value the `yield` expression produces inside the generator.
 - `ReturnType` is the value `return` produces,
   delivered as `StopIteration.value`.
-
-`Generator[str, str, str]` describes `interview()` completely.
-It yields a question, receives an answer, and returns a sentence.
-`drive()` touches all three: `next()` produces the first,
-`send()`'s argument supplies the second,
-and `stop.value` in the `except` clause reads the third.
 
 The last two type parameters default to `None`:
 
@@ -109,15 +49,14 @@ print(list(countdown(3)), list(squares(3)))
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` says the same thing and reads better,
-so a one-way generator should use it.
-The long form earns its length when the other two channels carry something,
-which is why every annotation in this chapter uses it.
+`Iterator[int]` says the same thing and reads better for a one-way generator.
+The long form is necessary when the other two channels carry something,
+as they do in this chapter.
 
-We can make a more explicit version of `interview()`:
+This generator yields a question, receives an answer, and returns a sentence:
 
 ```python
-# explicit_interview.py
+# generator_interview.py
 from collections.abc import Generator
 from typing import NewType
 
@@ -126,32 +65,34 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")
-    town = yield Question("town")
+    name = yield Question("name")  # Ask the world for the name
+    town = yield Question("town")  # Ask the world for the town
     return Result(f"{name} of {town}")
 
-i = interview()
-question: Question = next(i)
-print(f"{question = }")
-#: question = 'name'
-question: Question = i.send(Answer("Alice"))
-print(f"{question = }")
-#: question = 'town'
-try:
-    i.send(Answer("Portland"))
-except StopIteration as stop:
-    result: Result = stop.value
+if __name__ == "__main__":
+    i = interview()
+    question1: Question = next(i)
+    print(f"{question1 = }")
+    question2: Question = i.send(Answer("Alice"))
+    print(f"{question2 = }")
+    try:
+        i.send(Answer("Wonderland"))
+    except StopIteration as stop:
+        result: Result = stop.value
     print(f"{result = }")
-#: result = 'Alice of Portland'
+#: question1 = 'name'
+#: question2 = 'town'
+#: result = 'Alice of Wonderland'
 ```
 
-`Generator[str, str, str]` does not say which `str` is which.
+Although `Generator[str, str, str]` describes `interview()` accurately,
+it does not say which `str` is which.
 `NewType` gives each channel a distinct type,
 so the annotation states the arrangement and a checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
 The distinction exists only for the checker.
-`Question("name")` returns the string unchanged.
+`Question("name")` produces the plain `str`.
 
 Driving the generator by hand shows one type parameter at a time.
 `next(i)` starts the generator and produces a `Question`.
@@ -162,11 +103,29 @@ A returning generator raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
 
 The first call must be `next()`.
-A just-started generator is paused before its first `yield`,
-so a sent value would have nowhere to arrive,
-and `i.send(Answer("Alice"))` at that point raises a `TypeError`.
-`next(i)` is equivalent to `i.send(None)`,
-which is why `drive()` in `two_way_generator.py` started with `next(conversation)`.
+A newly created generator pauses before its first `yield`,
+so a sent value would have nowhere to arrive.
+If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
+`next(i)` is equivalent to `i.send(None)`:
+
+```python
+# send_none_is_next.py
+from generator_interview import interview
+
+print(f"{interview().send(None) = }")  # type: ignore
+#: interview().send(None) = 'name'
+print(f"{next(interview()) = }")
+#: next(interview()) = 'name'
+```
+
+Each `interview()` call creates a new generator,
+so both lines start from the beginning and produce the first question.
+The `# type: ignore` is the interesting part.
+`interview()` declares `Answer` as its `SendType`,
+and `None` is not an `Answer`,
+so the checker rejects the priming `send()` even though the interpreter accepts it.
+The equivalence is a runtime fact the annotation cannot express,
+which is the practical reason a driver primes with `next()`.
 
 The `NewType` definitions prevent accidental transposition.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
@@ -182,6 +141,71 @@ A coroutine intentionally has the same three-part shape:
 `Coroutine[YieldType, SendType, ReturnType]`.
 `async def` and generator functions both build descriptions that something else drives.
 
+## A Generator Is a Description
+
+[Effect Management](44_Effect_Management.md#effect-management-for-python)
+showed that calling an `async def` function runs nothing.
+It returns a coroutine: a description of work.
+A generator function behaves the same way.
+Calling `interview()` ran none of its body; `next()` and `send()` did that work,
+one `yield` at a time.
+
+A generator is more interesting than a coroutine here because `yield` is a two-way channel.
+The generator yields a value out, and the caller sends a value back in.
+That reversal makes an EMS possible.
+The generator yields a *request*,
+and whoever is driving it supplies the *answer*.
+Stepping through it by hand was a demonstration;
+the stepping belongs in a driver:
+
+```python
+# two_way_generator.py
+from collections.abc import Generator
+from generator_interview import Answer, Question, Result, interview
+
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> None:
+    request = next(conversation)
+    while True:
+        try:
+            print(f"{request = }, {answers[request] = }")
+            request = conversation.send(answers[request])
+        except StopIteration as stop:
+            print(f"{stop.value = }")
+            return
+
+if __name__ == "__main__":
+    conversation = interview()
+    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+    drive(conversation, {Question("name"): Answer("Alice"),
+                         Question("town"): Answer("Wonderland")})
+#: <class 'generator'>: interview
+#: request = 'name', answers[request] = 'Alice'
+#: request = 'town', answers[request] = 'Wonderland'
+#: stop.value = 'Alice of Wonderland'
+```
+
+The generator is imported unchanged; only the driver is new.
+`drive()` touches all three type parameters:
+`next()` produces the first `Question`,
+`send()`'s argument supplies the `Answer`,
+and `stop.value` in the `except` clause reads the `Result`.
+The `answers` map is keyed by `Question` and holds `Answer`s,
+so a bare `{"name": "Alice"}` no longer type-checks:
+the table must be built from the same channel types as the conversation.
+Later sections import `drive()` for conversations of their own.
+
+Notice what is missing in `interview()`:
+it does not know where the answers come from.
+It has no dictionary, no `input()` call, and no network connection.
+It states what it needs and waits.
+`drive()` decides how those needs are met,
+and it takes the answers as a parameter rather than closing over them,
+so swapping the dictionary for a database changes one argument and leaves `interview()` alone.
+
+That is EMS in miniature.
+The generator declares Effects, the driver interprets them.
+
 ## `yield from` Composes Descriptions
 
 One generator alone is a curiosity.
@@ -192,24 +216,26 @@ passing every yielded request out to the outer driver and every sent answer back
 ```python
 # yield_from_delegates.py
 from collections.abc import Generator
+from generator_interview import Answer, Question, Result
 from two_way_generator import drive
 
-def ask(question: str) -> Generator[str, str, str]:
+def ask(question: Question) -> Generator[Question, Answer, Answer]:
     answer = yield question
     print(f"ask({question = }) -> {answer = }")
     return answer
 
-def interview() -> Generator[str, str, str]:
-    name = yield from ask("name")
-    town = yield from ask("town")
-    return f"{name} of {town}"
+def interview() -> Generator[Question, Answer, Result]:
+    name = yield from ask(Question("name"))
+    town = yield from ask(Question("town"))
+    return Result(f"{name} of {town}")
 
-drive(interview(), {"name": "Alice", "town": "Portland"})
+drive(interview(), {Question("name"): Answer("Alice"),
+                    Question("town"): Answer("Wonderland")})
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Portland'
-#: ask(question = 'town') -> answer = 'Portland'
-#: stop.value = 'Alice of Portland'
+#: request = 'town', answers[request] = 'Wonderland'
+#: ask(question = 'town') -> answer = 'Wonderland'
+#: stop.value = 'Alice of Wonderland'
 ```
 
 `drive()` never learns that `ask()` exists.
@@ -223,6 +249,8 @@ which also knows nothing about where it came from.
 A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
+Their type comes from `ask()`'s `ReturnType`, an `Answer`,
+which `interview()` then composes into a `Result`.
 
 Every Effect in this chapter travels this path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
