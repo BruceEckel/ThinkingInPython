@@ -146,7 +146,7 @@ A coroutine intentionally has the same three-part shape:
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
 A generator function behaves the same way.
-Calling `interview()` ran none of its body; `next()` and `send()` did that work,
+Calling `interview()` runs none of its body; `next()` and `send()` does that work,
 one `yield` at a time.
 
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
@@ -154,8 +154,8 @@ The generator yields a value out, and the caller sends a value back in.
 That reversal makes an EMS possible.
 The generator yields a *request*,
 and whoever is driving it supplies the *answer*.
-Stepping through it by hand was a demonstration;
-the stepping belongs in a driver:
+Stepping through it by hand was a demonstration.
+Typically, that stepping happens in a driver:
 
 ```python
 # two_way_generator.py
@@ -189,18 +189,15 @@ The generator is imported unchanged; only the driver is new.
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause reads the `Result`.
-The `answers` map is keyed by `Question` and holds `Answer`s,
-so a bare `{"name": "Alice"}` no longer type-checks:
-the table must be built from the same channel types as the conversation.
-Later sections import `drive()` for conversations of their own.
+The `answers` map is keyed by `Question` and holds `Answer`s.
 
 Notice what is missing in `interview()`:
 it does not know where the answers come from.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 `drive()` decides how those needs are met,
-and it takes the answers as a parameter rather than closing over them,
-so swapping the dictionary for a database changes one argument and leaves `interview()` alone.
+and it takes the answers as a parameter.
+Swapping the dictionary for a database changes a single argument.
 
 That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
