@@ -150,7 +150,7 @@ except StopIteration as stop:
 so the annotation states the arrangement and a checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
-The `NewType` definitions do not persist until runtime.
+The distinction exists only for the checker.
 `Question("name")` returns the string unchanged.
 
 Driving the generator by hand shows one type parameter at a time.
@@ -160,6 +160,13 @@ the two-way channel in a single expression.
 The last `send()` finds no further `yield`, so the generator returns.
 A returning generator raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
+
+The first call must be `next()`.
+A just-started generator is paused before its first `yield`,
+so a sent value would have nowhere to arrive,
+and `i.send(Answer("Alice"))` at that point raises a `TypeError`.
+`next(i)` is equivalent to `i.send(None)`,
+which is why `drive()` in `two_way_generator.py` started with `next(conversation)`.
 
 The `NewType` definitions prevent accidental transposition.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
@@ -222,10 +229,12 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 
 ## The Effect Type
 
-Stateless builds everything atop a single type:
+Stateless builds everything atop a single type.
+The library defines it with type variables,
+`A` bound to `Ability` and `E` bound to `Exception`:
 
 ```python
-type Effect[A: Ability, E: Exception, R] = Generator[A | E, Any, R]
+Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
 An `Effect` is a generator that yields either an *ability* or an exception,
@@ -478,9 +487,13 @@ and `greet()` asked for `Need[Console]`, which is a different ability.
 `as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
 so `supply()` builds the handler that `greet()` is waiting for.
 Supply an implementation for a declared interface and you will need this.
+`typing.cast(Console, recorder)` does the same job.
+`as_type()` is the library's named form of the cast.
 
 `supply()` matches an instance to a `Need` by `isinstance()`,
 which is why `Recorder` inherits from `Console`.
+Every matching request over the Effect's run receives that same instance,
+which is why the test can read the results back out of `recorder` afterward.
 Inheriting from a concrete class only to replace all of it is a poor arrangement,
 so make the ability an interface instead:
 
@@ -637,9 +650,12 @@ and both over its lifetime.
 The repeated union invites a `type` alias,
 and the book's own habits would normally endorse one.
 Resist it here.
-Under `ty` (0.0.63 at this writing),
+Under `ty` (0.0.64 at this writing),
 a `type` alias as a generator's return annotation turns the yield check off,
 and everything this section demonstrated silently stops being verified.
+Stateless avoids the trap in its own definitions:
+`Effect` and its aliases are older `TypeAlias` assignments rather than `type` statements,
+and those keep the check alive.
 Write Effect signatures out in full until your checker proves it sees through the alias.
 
 ## The Error Channel
@@ -667,7 +683,26 @@ arrived at from the other direction.
 There, you rewrote a function to return `Ok` or `Err`.
 Here, you leave the body alone and lift the exception into the signature.
 
-The error travels the same channel as an ability, so it propagates the same way:
+You can watch the failure travel.
+Calling `score()` still runs nothing.
+Drive the description one step and the `KeyError` arrives as a value,
+not as a raised exception:
+
+```python
+# error_is_yielded.py
+from scores import score
+
+effect = score("carol")
+print(repr(next(effect)))
+#: KeyError('carol')
+```
+
+The body raised the exception, the decorator caught it,
+and the exception object went out over the channel abilities use.
+That is why `Effect`'s first type parameter holds `A | E`:
+requests and failures are both values a description yields to its driver.
+
+Because errors and abilities share a channel, they propagate the same way:
 
 ```python
 # announce.py
@@ -820,7 +855,7 @@ and the previous chapter's ZIO listing had an accessor object doing the same job
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the ability directly,
 and the program still runs,
-but under `ty` 0.0.63 the answer comes back as `Unknown` and the checking quietly stops.
+but under `ty` 0.0.64 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
 
 `handle()` reads the annotation on its argument to decide which ability it answers,
@@ -838,9 +873,32 @@ and the two Effects live in the return type where a checker can follow them.
 That second channel in the signature is the one the previous chapter said an EMS needs.
 
 Return to `two_way_generator.py` and the whole library is visible.
-`yield` sends a request out, `handle()` is the driver loop that answers it,
-and `run()` is the one at the bottom.
-`supply()` is `handle()` prepackaged for `Need`:
+An Effect is a generator, so nothing stops you from driving one yourself:
+
+```python
+# effect_by_hand.py
+from greeter import Console, greet
+
+effect = greet("Alice")
+request = next(effect)
+print(f"{type(request).__name__}({request.t.__name__})")
+#: Need(Console)
+try:
+    effect.send(Console())
+except StopIteration:
+    print("returned")
+#: Hello, Alice!
+#: returned
+```
+
+`greet("Alice")` yields a `Need` object carrying the requested type,
+as `interview()` yielded `"name"`.
+Answering it with `send(Console())` resumes the body,
+which prints the greeting and finishes.
+Every tool in the library packages those two calls.
+`handle()` is `drive()` with a type lookup in place of the dictionary,
+`run()` is the loop at the bottom,
+and `supply()` is `handle()` prepackaged for `Need`:
 a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 
 ## Where the Guarantee Stops
@@ -875,7 +933,7 @@ The guarantee is about consistency, not completeness.
 
 The second limit is about how much of the type survives partial handling,
 and it depends on your checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.63.
+Handling some of what an Effect declares works correctly under `ty` 0.0.64.
 Supply one of two abilities and the other stays in the signature:
 
 ```python
