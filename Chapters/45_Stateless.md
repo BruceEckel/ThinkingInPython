@@ -255,7 +255,7 @@ The solution is `yield from`.
 A bare `yield` produces the send type,
 the type parameter that had to become `Any`.
 That is not because any single answer is unknowable,
-but because one annotation has to cover every request the generator makes.
+but because one annotation must cover every request the generator makes.
 `yield from` produces the inner generator's return type,
 the third type parameter.
 A single call returns a single type, so that type parameter has no such problem.
@@ -1029,10 +1029,10 @@ It is a language that does the encoding for you.
 
 ## Exercises
 
-1.  Add a `read()` method to the `Console` protocol in `console_protocol.py` and write `interview()`,
+1.  Add a `read()` method to the `Console` protocol in `console_protocol.py` and write `ask_and_greet()`,
     an Effect that asks for a name and greets the result.
     Supply a scripted `Console` in a test and a real one in a demo,
-    and confirm `interview()` is unchanged between them.
+    and confirm `ask_and_greet()` is unchanged between them.
 2.  Take `undeclared_need.py`, remove the `# type: ignore`,
     and run `ty check` on it.
     Fix the error by changing only the annotation,
