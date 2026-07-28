@@ -209,6 +209,41 @@ The reason generators can carry an EMS is that they nest.
 passing every yielded request out to the outer driver and every sent answer back down:
 
 ```python
+# yield_to_exhaustion.py
+from collections.abc import Generator
+
+def inner(chars: str) -> Generator[str, int, str]:
+    result = "| "
+    for c in chars:
+        result += f"{c.upper()} | "
+        yield c
+    return result
+
+def outer(chars: str) -> Generator[str, int, str]:
+    result = yield from inner(chars)
+    return f"outer received [{result}]"
+
+print(outer("abcdefg"))
+#: <generator object outer at 0x0000021F3528D9A0>
+```
+
+`outer()` has no `yield` of its own, only a `yield from`,
+yet the driver sees both of `inner()`'s requests.
+That is what running to exhaustion means:
+control stays inside `inner()` until it returns.
+The numbers travel the other way,
+arriving inside `inner()` although they were sent to `outer()`.
+The two channels use different types here, `str` out and `int` in,
+so each direction is unmistakable.
+
+`inner()` returning does not end the whole conversation.
+`yield from` absorbs that `StopIteration` and produces the returned string as its value,
+which is how `summary` gets filled in.
+The driver sees `StopIteration` only when `outer()` returns.
+
+We can apply `yield from` to our `interview` example:
+
+```python
 # yield_from_delegates.py
 from collections.abc import Generator
 from generator_interview import Answer, Question, Result
