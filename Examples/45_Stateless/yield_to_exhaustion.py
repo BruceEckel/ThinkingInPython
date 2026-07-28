@@ -1,39 +1,26 @@
 # yield_to_exhaustion.py
-from collections.abc import Generator
+from collections.abc import Iterator
 
-def inner(chars: str) -> Generator[str, None, str]:
-    result = "| "
-    for c in chars:
-        result += f"{c.upper()} | "
-        yield c
-    return result
+def one() -> Iterator[str]:
+    yield "only"
 
-def outer(chars: str) -> Generator[str, None, str]:
-    result = yield from inner(chars)
-    result += yield from inner(chars[1:-1])
-    return f"outer: [{result}]"
+def three() -> Iterator[str]:
+    yield "A"
+    yield "B"
+    yield "C"
 
-def top(chars: str) -> Generator[str, None, str]:
-    result = yield from outer(chars)
-    return f"top: [{result}]]"
+def outer() -> Iterator[str]:
+    yield "start"
+    yield from one()
+    yield from three()
+    yield "end"
 
-def run(g: Generator[str, None, str]) -> tuple[list[str], str]:
-    yielded: list[str] = []
-    while True:
-        try:
-            yielded.append(next(g))
-        except StopIteration as stop:
-            return yielded, stop.value
+def top() -> Iterator[str]:
+    yield "TOP"
+    yield from outer()
+    yield "END"
 
-yields, returned = run(outer("abcd"))
-print(yields)
-#: ['a', 'b', 'c', 'd', 'b', 'c']
-print(returned)
-#: outer received [| A | B | C | D | | B | C | ]
-yields, returned = run(top("abcd"))
-print(yields)
-#: ['a', 'b', 'c', 'd', 'b', 'c', 'a', 'b', 'c', 'd']
-print(returned)
-#: top:
-#: [outer received [| A | B | C | D | | B | C | ]]
-#: [| A | B | C | D | ]
+print(list(outer()))
+#: ['start', 'only', 'A', 'B', 'C', 'end']
+print(list(top()))
+#: ['top', 'start', 'only', 'A', 'B', 'C', 'end']
