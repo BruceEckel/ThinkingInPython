@@ -17,8 +17,10 @@ if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
     drive(conversation, {Question("name"): Answer("Alice"),
-                         Question("town"): Answer("Wonderland")})
+                         Question("town"): Answer("Wonderland"),
+                         Question("friend"): Answer("Rabbit")})
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
-#: stop.value = 'Alice of Wonderland'
+#: request = 'friend', answers[request] = 'Rabbit'
+#: stop.value = 'Alice of Wonderland with friend Rabbit'

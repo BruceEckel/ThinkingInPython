@@ -22,7 +22,7 @@ That fits a generator that only yields values.
 
 A generator that also receives values needs the full annotation:
 
-    `Generator[YieldType, SendType, ReturnType]`.
+    `Generator[YieldType, SendType, ReturnType]`
 
 This names the three things a generator exchanges with its caller:
 
@@ -47,8 +47,8 @@ def squares(n: int) -> Iterator[int]:
     for i in range(n):
         yield i * i
 
-print(list(countdown(3)), list(squares(3)))
-#: [3, 2, 1] [0, 1, 4]
+print(list(countdown(6)), list(squares(6)))
+#: [6, 5, 4, 3, 2, 1] [0, 1, 4, 9, 16, 25]
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
@@ -56,7 +56,8 @@ print(list(countdown(3)), list(squares(3)))
 The long form is necessary when the other two channels carry something,
 as they do in this chapter.
 
-This generator yields a question, receives an answer, and returns a sentence:
+The `interview()` generator yields a question, receives an answer,
+and returns a result:
 
 ```python
 # generator_interview.py
@@ -70,7 +71,8 @@ Result = NewType("Result", str)
 def interview() -> Generator[Question, Answer, Result]:
     name = yield Question("name")  # Ask the world for the name
     town = yield Question("town")  # Ask the world for the town
-    return Result(f"{name} of {town}")
+    friend = yield Question("friend")  # Ask for a friend
+    return Result(f"{name} of {town} with friend {friend}")
 
 if __name__ == "__main__":
     i = interview()
@@ -78,14 +80,17 @@ if __name__ == "__main__":
     print(f"{question1 = }")
     question2: Question = i.send(Answer("Alice"))
     print(f"{question2 = }")
+    question3: Question = i.send(Answer("Wonderland"))
+    print(f"{question3 = }")
     try:
-        i.send(Answer("Wonderland"))
+        i.send(Answer("Rabbit"))
     except StopIteration as stop:
         result: Result = stop.value
     print(f"{result = }")
 #: question1 = 'name'
 #: question2 = 'town'
-#: result = 'Alice of Wonderland'
+#: question3 = 'friend'
+#: result = 'Alice of Wonderland with friend Rabbit'
 ```
 
 Although `Generator[str, str, str]` describes `interview()` accurately,
@@ -101,8 +106,9 @@ Driving the generator by hand shows one type parameter at a time.
 `next(i)` starts the generator and produces a `Question`.
 `i.send(Answer("Alice"))` passes an answer in and produces the next question,
 the two-way channel in a single expression.
-The last `send()` finds no further `yield`, so the generator returns.
-A returning generator raises `StopIteration`,
+The last `send()` finds no further `yield`,
+so the generator returns its `Result`.
+A returning generator also raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
 
 The first call must be `next()`.
@@ -149,15 +155,14 @@ A coroutine intentionally has the same three-part shape:
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
 A generator function behaves the same way.
-Calling `interview()` runs none of its body;
-`next()` and `send()` does that work, one `yield` at a time.
+Calling `interview()` returns a generator object but doesn't run anything in the function body.
+`next()` and `send()` do that work, one `yield` at a time.
 
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
-That reversal makes an EMS possible.
+That conversation makes an EMS possible.
 The generator yields a *request*,
 and whoever is driving it supplies the *answer*.
-Stepping through it by hand was a demonstration.
 Typically, that stepping happens in a driver:
 
 ```python
@@ -180,11 +185,13 @@ if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
     drive(conversation, {Question("name"): Answer("Alice"),
-                         Question("town"): Answer("Wonderland")})
+                         Question("town"): Answer("Wonderland"),
+                         Question("friend"): Answer("Rabbit")})
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
-#: stop.value = 'Alice of Wonderland'
+#: request = 'friend', answers[request] = 'Rabbit'
+#: stop.value = 'Alice of Wonderland with friend Rabbit'
 ```
 
 The generator is imported unchanged; only the driver is new.
@@ -364,15 +371,19 @@ def ask(question: Question) -> Generator[Question, Answer, Answer]:
 def interview() -> Generator[Question, Answer, Result]:
     name = yield from ask(Question("name"))
     town = yield from ask(Question("town"))
-    return Result(f"{name} of {town}")
+    friend = yield from ask(Question("friend"))
+    return Result(f"{name} of {town} with friend {friend}")
 
 drive(interview(), {Question("name"): Answer("Alice"),
-                    Question("town"): Answer("Wonderland")})
+                    Question("town"): Answer("Wonderland"),
+                    Question("friend"): Answer("Rabbit")})
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
-#: stop.value = 'Alice of Wonderland'
+#: request = 'friend', answers[request] = 'Rabbit'
+#: ask(question = 'friend') -> answer = 'Rabbit'
+#: stop.value = 'Alice of Wonderland with friend Rabbit'
 ```
 
 `drive()` never learns that `ask()` exists.
@@ -386,7 +397,7 @@ which `yield from` produces as the value of the whole `yield from` expression.
 The inner generator asks one question and hands back one answer,
 so both channels carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
-because the sentence it builds from two answers is not an answer to any one question.
+because the sentence it builds from three answers is not an answer to any one question.
 
 The trace shows both directions of travel.
 A request raised two frames down inside `ask()` surfaces at `drive()`,

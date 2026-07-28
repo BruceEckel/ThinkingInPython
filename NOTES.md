@@ -57,6 +57,22 @@ If you run out of tokens during a chapter, resume when it resets.
 
 ******************
 
+With all the kinds of additions and changes we've made in 'tools', can you imagine
+an architecture that would be well-suited to making future changes easy?
+Consider what the common data structures might be, and common functions
+that could be reused across the tools.
+Also consider small pieces that could be assembled to produce larger results,
+and this might also produce common reusable functions.
+If functions can be run in parallel we might see speed improvements.
+Understandability is also a goal, in case a human wants to add or change something by hand.
+Perhaps some kind of plug-in architecture? (I'm just guessing here)
+I'm also not averse to considering a third-party library if one fits especially well,
+but my preference is to use standard library components if possible.
+Only provide me with an analysis, do not make changes. We are planning, not executing.
+
+
+******************
+
 Appendix perhaps containing learning resources, ask Claude to find the best ones
 
 - Introductory Python YouTube Playlists:
