@@ -148,6 +148,8 @@ except StopIteration as stop:
 `Generator[str, str, str]` does not say which `str` is which.
 `NewType` gives each channel a distinct type,
 so the annotation states the arrangement and a checker enforces it.
+`Question` fills the `YieldType` position, `Answer` the `SendType`,
+and `Result` the `ReturnType`.
 The `NewType` definitions do not persist until runtime.
 `Question("name")` returns the string unchanged.
 
@@ -159,20 +161,18 @@ The last `send()` finds no further `yield`, so the generator returns.
 A returning generator raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
 
-The three positions are easy to transpose, and now the mistake cannot hide.
-Annotate the generator as `Generator[Answer, Question, Result]`,
-and `ty` reports six errors in three pairs.
+The `NewType` definitions prevent accidental transposition.
+If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
+`ty` reports six errors in three pairs.
 Both `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
 Both `send(Answer(...))` calls pass an `Answer` where it expects a `Question`.
 Both assignments to `question` receive an `Answer` into a variable declared `Question`.
 The checker objects everywhere the generator meets its caller,
 because each channel now has its own type.
-
 Three `str` aliases would have accepted the reversal without complaint.
 
-A coroutine has the same three-part shape,
+A coroutine intentionally has the same three-part shape:
 `Coroutine[YieldType, SendType, ReturnType]`.
-The parallel is not a coincidence.
 `async def` and generator functions both build descriptions that something else drives.
 
 ## `yield from` Composes Descriptions
