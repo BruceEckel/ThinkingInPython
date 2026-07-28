@@ -51,6 +51,11 @@ You rarely write `__iter__()`/`__next__()` by hand.
 A *generator* writes them for you.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
+The generators in this chapter travel one way, so `Iterator[T]` annotates them.
+That is the short form of a three-part type that also describes what a generator receives and what it returns.
+[Stateless](45_Stateless.md#annotating-a-generator) covers the full form,
+which an Effect system needs.
+
 A class becomes iterable by writing `__iter__()` as a generator:
 
 ```python

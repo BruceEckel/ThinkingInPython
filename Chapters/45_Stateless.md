@@ -66,9 +66,114 @@ so swapping the dictionary for a database changes one argument and leaves `inter
 
 That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
-The `Generator[str, str, str]` annotation reports the arrangement.
-The first type parameter is the value going out,
-the second the value coming back, and the third the final result.
+
+## Annotating a Generator
+
+[Iterators](23_Iterators.md#generators)
+annotated every generator as `Iterator[int]`.
+That is the short form, and it fits a generator that only yields values.
+`interview()` needs the long form that allows values to travel both ways.
+
+The full annotation is `Generator[YieldType, SendType, ReturnType]`,
+naming the three things a generator exchanges with its caller:
+
+- `YieldType` is the value `yield` hands out, thus the value `next()` returns.
+- `SendType` is the value `send()` accepts,
+  and the value the `yield` expression produces inside the generator.
+- `ReturnType` is the value `return` produces,
+  delivered as `StopIteration.value`.
+
+`Generator[str, str, str]` describes `interview()` completely.
+It yields a question, receives an answer, and returns a sentence.
+`drive()` touches all three: `next()` produces the first,
+`send()`'s argument supplies the second,
+and `stop.value` in the `except` clause reads the third.
+
+The last two type parameters default to `None`:
+
+```python
+# generator_defaults.py
+from collections.abc import Generator, Iterator
+
+def countdown(n: int) -> Generator[int]:
+    while n > 0:
+        yield n
+        n -= 1
+
+def squares(n: int) -> Iterator[int]:
+    for i in range(n):
+        yield i * i
+
+print(list(countdown(3)), list(squares(3)))
+#: [3, 2, 1] [0, 1, 4]
+```
+
+`Generator[int]` means `Generator[int, None, None]`.
+`Iterator[int]` says the same thing and reads better,
+so a one-way generator should use it.
+The long form earns its length when the other two channels carry something,
+which is why every annotation in this chapter uses it.
+
+We can make a more explicit version of `interview()`:
+
+```python
+# explicit_interview.py
+from collections.abc import Generator
+from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
+
+def interview() -> Generator[Question, Answer, Result]:
+    name = yield Question("name")
+    town = yield Question("town")
+    return Result(f"{name} of {town}")
+
+i = interview()
+question: Question = next(i)
+print(f"{question = }")
+#: question = 'name'
+question: Question = i.send(Answer("Alice"))
+print(f"{question = }")
+#: question = 'town'
+try:
+    i.send(Answer("Portland"))
+except StopIteration as stop:
+    result: Result = stop.value
+    print(f"{result = }")
+#: result = 'Alice of Portland'
+```
+
+`Generator[str, str, str]` does not say which `str` is which.
+`NewType` gives each channel a distinct type,
+so the annotation states the arrangement and a checker enforces it.
+The `NewType` definitions do not persist until runtime.
+`Question("name")` returns the string unchanged.
+
+Driving the generator by hand shows one type parameter at a time.
+`next(i)` starts the generator and produces a `Question`.
+`i.send(Answer("Alice"))` passes an answer in and produces the next question,
+the two-way channel in a single expression.
+The last `send()` finds no further `yield`, so the generator returns.
+A returning generator raises `StopIteration`,
+and the `Result` arrives as that exception's `value`.
+
+The three positions are easy to transpose, and now the mistake cannot hide.
+Annotate the generator as `Generator[Answer, Question, Result]`,
+and `ty` reports six errors in three pairs.
+Both `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
+Both `send(Answer(...))` calls pass an `Answer` where it expects a `Question`.
+Both assignments to `question` receive an `Answer` into a variable declared `Question`.
+The checker objects everywhere the generator meets its caller,
+because each channel now has its own type.
+
+Three `str` aliases would have accepted the reversal without complaint.
+
+A coroutine has the same three-part shape,
+`Coroutine[YieldType, SendType, ReturnType]`.
+The parallel is not a coincidence.
+`async def` and generator functions both build descriptions that something else drives.
 
 ## `yield from` Composes Descriptions
 
@@ -117,7 +222,7 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 
 ## The Effect Type
 
-Stateless builds everything atop one type:
+Stateless builds everything atop a single type:
 
 ```python
 type Effect[A: Ability, E: Exception, R] = Generator[A | E, Any, R]
