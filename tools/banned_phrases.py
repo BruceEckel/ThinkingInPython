@@ -16,10 +16,12 @@ Usage:
     python tools/banned_phrases.py --phrases FILE  # use another phrases file
 """
 import argparse
+from collections.abc import Iterable, Iterator
 from pathlib import Path
 
 from tools_config import TOOLS_DIR
 from tools_repo import add_paths_arg, md_files
+from tools_report import Finding, report
 
 PHRASES_FILE = TOOLS_DIR / "banned_phrases.txt"
 
@@ -33,6 +35,25 @@ def load_phrases(path: Path) -> list[str]:
         if stripped and not stripped.startswith("#"):
             phrases.append(stripped)
     return phrases
+
+
+def check(paths: Iterable[Path], phrases: list[str]) -> Iterator[Finding]:
+    """Every occurrence of every phrase, as a literal substring.
+
+    Prose and code alike: a phrase the book has retired should not
+    survive inside a listing either.
+    """
+    for path in paths:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for lineno, line in enumerate(lines, 1):
+            for phrase in phrases:
+                col = line.find(phrase)
+                while col != -1:
+                    yield Finding(
+                        path, lineno, f'banned phrase: "{phrase}"',
+                        col=col + 1,
+                    )
+                    col = line.find(phrase, col + 1)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -49,24 +70,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"No banned phrases configured in {args.phrases}.")
         return 0
 
-    total = 0
-    for path in md_files(args.paths):
-        for lineno, line in enumerate(
-                path.read_text(encoding="utf-8").splitlines(), 1):
-            for phrase in phrases:
-                col = line.find(phrase)
-                while col != -1:
-                    print(f'{path}:{lineno}:{col + 1}: '
-                          f'banned phrase: "{phrase}"')
-                    total += 1
-                    col = line.find(phrase, col + 1)
-
-    if total:
-        print(f"\n{total} banned phrase occurrence(s). "
-              "Remove them or edit tools/banned_phrases.txt.")
-        return 1
-    print("No banned phrases found.")
-    return 0
+    return report(
+        check(md_files(args.paths), phrases),
+        clean="No banned phrases found.",
+        problem="{n} banned phrase occurrence(s). "
+                "Remove them or edit tools/banned_phrases.txt.",
+    )
 
 
 if __name__ == "__main__":

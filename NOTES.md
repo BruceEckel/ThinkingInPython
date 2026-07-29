@@ -1,3 +1,5 @@
+Can a generator be used to build a state machine?
+Possibly revisit that chapter.
 
 lets this book's build pass
 passes the book build?

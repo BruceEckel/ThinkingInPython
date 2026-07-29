@@ -115,6 +115,7 @@ The first call must be `next()`.
 A newly created generator pauses before its first `yield`,
 so a sent value would have nowhere to arrive.
 If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
+
 `next(i)` is equivalent to `i.send(None)`:
 
 ```python
