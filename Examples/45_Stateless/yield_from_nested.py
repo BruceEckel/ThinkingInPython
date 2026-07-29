@@ -9,10 +9,10 @@ def survey() -> Generator[Question, Answer, Result]:
     color = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
-drive(survey(), {Question("name"): Answer("Alice"),
-                 Question("town"): Answer("Wonderland"),
-                 Question("friend"): Answer("Rabbit"),
-                 Question("color"): Answer("blue")})
+print(drive(survey(), {Question("name"): Answer("Alice"),
+                       Question("town"): Answer("Wonderland"),
+                       Question("friend"): Answer("Rabbit"),
+                       Question("color"): Answer("blue")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
@@ -21,4 +21,4 @@ drive(survey(), {Question("name"): Answer("Alice"),
 #: ask(question = 'friend') -> answer = 'Rabbit'
 #: request = 'color', answers[request] = 'blue'
 #: ask(question = 'color') -> answer = 'blue'
-#: stop.value = 'Alice of Wonderland with friend Rabbit, color blue'
+#: Alice of Wonderland, friend Rabbit, color blue

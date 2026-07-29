@@ -28,4 +28,4 @@ if __name__ == "__main__":
 #: question1 = 'name'
 #: question2 = 'town'
 #: question3 = 'friend'
-#: result = 'Alice of Wonderland with friend Rabbit'
+#: result = 'Alice of Wonderland, friend Rabbit'

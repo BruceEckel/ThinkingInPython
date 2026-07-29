@@ -15,13 +15,13 @@ def interview() -> Generator[Question, Answer, Result]:
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    drive(interview(), {Question("name"): Answer("Alice"),
-                        Question("town"): Answer("Wonderland"),
-                        Question("friend"): Answer("Rabbit")})
+    print(drive(interview(), {Question("name"): Answer("Alice"),
+                              Question("town"): Answer("Wonderland"),
+                              Question("friend"): Answer("Rabbit")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
 #: request = 'friend', answers[request] = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
-#: stop.value = 'Alice of Wonderland with friend Rabbit'
+#: Alice of Wonderland, friend Rabbit

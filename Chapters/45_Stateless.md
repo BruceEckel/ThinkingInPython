@@ -172,34 +172,35 @@ from collections.abc import Generator
 from generator_interview import Answer, Question, Result, interview
 
 def drive(conversation: Generator[Question, Answer, Result],
-          answers: dict[Question, Answer]) -> None:
+          answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
         try:
             print(f"{request = }, {answers[request] = }")
             request = conversation.send(answers[request])
         except StopIteration as stop:
-            print(f"{stop.value = }")
-            return
+            return stop.value
 
 if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    drive(conversation, {Question("name"): Answer("Alice"),
-                         Question("town"): Answer("Wonderland"),
-                         Question("friend"): Answer("Rabbit")})
+    answers = {Question("name"): Answer("Alice"),
+               Question("town"): Answer("Wonderland"),
+               Question("friend"): Answer("Rabbit")}
+    result = drive(conversation, answers)
+    print(f"{result = }")
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: request = 'friend', answers[request] = 'Rabbit'
-#: stop.value = 'Alice of Wonderland, friend Rabbit'
+#: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
 The generator is imported unchanged; only the driver is new.
 `drive()` touches all three type parameters:
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
-and `stop.value` in the `except` clause reads the `Result`.
+and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
 
 Notice what is missing in `interview()`:
@@ -371,16 +372,16 @@ def interview() -> Generator[Question, Answer, Result]:
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    drive(interview(), {Question("name"): Answer("Alice"),
-                        Question("town"): Answer("Wonderland"),
-                        Question("friend"): Answer("Rabbit")})
+    print(drive(interview(), {Question("name"): Answer("Alice"),
+                              Question("town"): Answer("Wonderland"),
+                              Question("friend"): Answer("Rabbit")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
 #: request = 'friend', answers[request] = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
-#: stop.value = 'Alice of Wonderland, friend Rabbit'
+#: Alice of Wonderland, friend Rabbit
 ```
 
 `drive()` never learns that `ask()` exists.
@@ -423,10 +424,10 @@ def survey() -> Generator[Question, Answer, Result]:
     color = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
-drive(survey(), {Question("name"): Answer("Alice"),
-                 Question("town"): Answer("Wonderland"),
-                 Question("friend"): Answer("Rabbit"),
-                 Question("color"): Answer("blue")})
+print(drive(survey(), {Question("name"): Answer("Alice"),
+                       Question("town"): Answer("Wonderland"),
+                       Question("friend"): Answer("Rabbit"),
+                       Question("color"): Answer("blue")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
@@ -435,7 +436,7 @@ drive(survey(), {Question("name"): Answer("Alice"),
 #: ask(question = 'friend') -> answer = 'Rabbit'
 #: request = 'color', answers[request] = 'blue'
 #: ask(question = 'color') -> answer = 'blue'
-#: stop.value = 'Alice of Wonderland, friend Rabbit, color blue'
+#: Alice of Wonderland, friend Rabbit, color blue
 ```
 
 `interview()` is imported unchanged from the previous example.
@@ -457,9 +458,10 @@ and the request stops there.
 It relays the request upward and passes the reply back down untouched,
 so `survey()` has no idea what a `Question` means.
 `StopIteration` splits the same way.
-For `drive()` it ends the conversation and delivers the final `Result`.
-For `yield from` it ends one delegation and becomes the value of the expression,
-after which the outer generator keeps running.
+Both catch it and both take `stop.value`, but they hand it to different places.
+`drive()` returns the `Result` to its own caller, ending the conversation.
+`yield from` feeds it to the enclosing generator as the value of the expression,
+after which that generator keeps running.
 
 `yield from` composes descriptions and a driver interprets them.
 A program can hold any number of the first and needs one of the second,
