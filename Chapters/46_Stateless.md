@@ -19,8 +19,7 @@ and `yield from`, which composes generators and produces the inner one's return 
 Every Effect here travels that path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-My understanding of Effects came from work with Bill Frasure and James Ward as we created
-[Effect Oriented Programming](https://effectorientedprogramming.com/).
+My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
 Some of the examples in this chapter were derived from that book.
 
 ## The Effect Type
@@ -35,7 +34,8 @@ Effect: TypeAlias = Generator[A | E, Any, R]
 
 An `Effect` is a generator that yields either an *ability* `A` or an exception `E`,
 and eventually returns a result `R`.
-The three type parameters answer the three questions from the previous chapter:
+The three type parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
+asked of an Effect signature:
 
 - `A` is what the computation *needs*.
 - `E` is how it can *fail*.
@@ -43,7 +43,8 @@ The three type parameters answer the three questions from the previous chapter:
 
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
-which the previous section taught you to read as "what comes back from a `yield` call."
+which [Generators](45_Generators.md#annotating-a-generator)
+taught you to read as "what comes back from a `yield` call."
 That `Any` is essential, and it explains an idiom the rest of the chapter uses.
 
 A generator has one SendType for its whole life.
@@ -169,7 +170,7 @@ print(type(description).__name__)
 
 Nothing is printed except the type name.
 `greet("Alice")` builds a description of a greeting.
-This is the description/execution split from the previous chapter,
+This is the description/execution split from [Effect Management](44_Effect_Management.md#library-effect-management),
 and the reason a library EMS needs one.
 The library gets no chance to intercept `console.print()` as it happens.
 Its only power is over values, so the greeting must first become a value.
@@ -394,14 +395,15 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 A function cannot claim to be pure while calling something impure.
-Compare that to the by-hand version in the previous chapter,
+Compare that to `ask_tell.py` in [Effect Management](44_Effect_Management.md#effects-by-hand),
 where `greet(ask, tell)` took its dependencies as arguments.
 Nothing there stopped an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
 
 ## Adding an Effect Deep in the Stack
 
-The previous chapter's second exercise has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
+The second exercise in [Effect Management](44_Effect_Management.md#exercises)
+has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
 Here is that experiment in Stateless:
 
 ```python
@@ -524,7 +526,7 @@ def announce(name: str) -> Effect[Need[Console], KeyError, None]:
 
 Here is where the full `Effect[A, E, R]` earns its three type parameters.
 `announce()` needs a `Console`, can fail with `KeyError`, and produces nothing.
-Every question the previous chapter asked about a function is answered by its first line.
+All three questions are answered by its first line.
 Drop the `KeyError` from the annotation and `ty` reports the same class of error it did before,
 this time pointing at the `yield from score(name)` line.
 Declared exceptions cannot be dropped by forgetting them.
@@ -612,7 +614,8 @@ Failures cannot be lost, only relocated.
 
 `Need` looks built-in, but it is an ordinary class, and you can write your own.
 An ability subclasses `Ability[T]`, where `T` is the type handling it produces.
-Here is the `Ask` and `Tell` program from the previous chapter, rebuilt:
+Here is the `Ask` and `Tell` program from [Effect Management](44_Effect_Management.md#effects-by-hand),
+rebuilt:
 
 ```python
 # ask_tell_effect.py
@@ -657,7 +660,8 @@ Inside `ask()`, `yield from Ask(prompt)` yields the ability object and returns w
 `ask()` and `tell()` are *accessors*:
 small functions that each wrap one ability and declare its answer type.
 `need()` has the same shape,
-and the previous chapter's ZIO listing had an accessor object doing the same job.
+and the ZIO listing in [Effect Management](44_Effect_Management.md#library-effect-management)
+had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the ability directly,
 and the program still runs,
@@ -677,12 +681,12 @@ so `half` still needs an `Ask` and `full` needs nothing.
 Naming the two stages also matters to the checker,
 for a reason the next section gives.
 
-Now compare this listing to `ask_tell.py` in the previous chapter.
+Now compare this listing to `ask_tell.py` again.
 The by-hand version threaded two objects through every signature.
 This one threads nothing.
 `greet()` takes no arguments at all,
 and the two Effects live in the return type where a checker can follow them.
-That second channel in the signature is the one the previous chapter said an EMS needs.
+That second channel in the signature is the one that chapter said an EMS needs.
 
 Return to `two_way_generator.py` in [Generators](45_Generators.md#a-generator-is-a-description)
 and the whole library is visible.
@@ -778,17 +782,77 @@ because either answer arrives through the same `send()` channel.
 The scripted handler holds state, and that is the point.
 `next(script)` produces a different value at each request,
 which one supplied instance cannot do.
-Every scripted test double has this shape: a clock reporting a fixed time,
-a queue handing out canned responses,
-a network stub that fails twice and then succeeds.
+Every scripted test double has this shape: a queue handing out canned responses,
+a network stub that fails twice and then succeeds, or the clock below.
 
-`student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations)
-made randomness repeatable a different way, by taking a `seed` parameter.
+A clock is the other side cause every test trips over.
+`stamp()` puts the current time into its output,
+and `batch_due()` decides whether a day has passed since the last run.
+Against a real clock neither is testable.
+One produces a different string every minute,
+and the other needs you to wait a day to watch it return `True`:
+
+```python
+# frozen_clock.py
+from datetime import datetime, timedelta
+from typing import Final
+from stateless import Ability, Depend, handle, run
+
+class Now(Ability[datetime]):
+    pass
+
+def now() -> Depend[Now, datetime]:
+    moment: datetime = yield from Now()
+    return moment
+
+def stamp(message: str) -> Depend[Now, str]:
+    moment = yield from now()
+    return f"[{moment:%Y-%m-%d %H:%M}] {message}"
+
+def batch_due(last_run: datetime) -> Depend[Now, bool]:
+    moment = yield from now()
+    return moment - last_run >= timedelta(hours=24)
+
+LAUNCH: Final[datetime] = datetime(2026, 1, 1, 3, 0)
+
+def frozen(request: Now) -> datetime:
+    return LAUNCH
+
+def tomorrow(request: Now) -> datetime:
+    return LAUNCH + timedelta(hours=24)
+
+print(run(handle(frozen)(stamp)("started")))
+#: [2026-01-01 03:00] started
+print(run(handle(frozen)(batch_due)(LAUNCH)))
+#: False
+print(run(handle(tomorrow)(batch_due)(LAUNCH)))
+#: True
+```
+
+`frozen` reports one moment,
+so `stamp()` produces a fixed string a test can compare.
+`tomorrow` reports a moment a day later,
+and `batch_due()` returns `True` with no time having passed.
+The schedule logic runs against whatever moment the handler names,
+in microseconds rather than a day.
+`batch_due()` holds no `datetime.now()` call,
+so there is nothing to monkeypatch and nothing to wait for,
+and a production handler that returns `datetime.now()` leaves the function unchanged.
+
+Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
+which made randomness repeatable a different way, by taking a `seed` parameter.
 That works, and it charges a parameter to every function between the caller and the `random.Random` call.
 Here the source is named in the return type instead,
-and no signature between `handle()` and the toss mentions it.
-It is the trade this chapter keeps making,
-applied to a side cause rather than a side effect.
+and no signature between `handle()` and the request mentions it.
+
+Both abilities in this section are side causes,
+in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the-impure-portion):
+the function reads something from outside.
+`Recorder`, earlier in this chapter, stood in for a side effect,
+where the function writes something outward.
+The technique did not change between the two.
+Name the seam as an ability and bind it at the edge to whatever the context needs.
+What an EMS adds is that the seam cannot be skipped by accident.
 
 ## Where the Guarantee Stops
 
@@ -919,7 +983,8 @@ Two pieces of the library are evidence of that ceiling.
 Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
 The extra type parameter exists because a Stateless ability cannot fail,
-and the previous chapter's `ZIO[R, E, A]` carries one for the same reason.
+and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
+carries one for the same reason.
 `Async` is the other piece.
 Native systems demonstrate asynchronous execution derived from Effects,
 while Stateless provides `Async` as a built-in that `run()` interprets,
@@ -936,7 +1001,8 @@ not a utility you import for one module.
 
 ## What This Costs and What It Buys
 
-The previous chapter argued that Effects are the next scaling barrier,
+[Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
+argued that Effects are the next scaling barrier,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
 which is the value of studying it, whether or not you use it in production.
@@ -957,8 +1023,8 @@ and verification performed by reading code does not scale.
 What Stateless charges for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
 For most Python code that price is too high.
-The techniques from the previous chapter, returning a `Result`,
-restricting a type so bad values cannot exist,
+The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure),
+returning a `Result`, restricting a type so bad values cannot exist,
 and passing dependencies in rather than constructing them,
 capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
@@ -968,7 +1034,8 @@ Below that scale, the discipline matters and the machinery is optional.
 But the direction is worth watching.
 Python got one Effect tracked into its type system with `async`,
 and nobody now argues that was a mistake.
-The languages in the previous chapter's list track all of them.
+The languages listed under [Native Effect Management](44_Effect_Management.md#native-effect-management)
+track all of them.
 Stateless is the demonstration that Python's type system is expressive enough to do it,
 given a library willing to encode everything into return types.
 What is missing is not the capacity.
@@ -992,11 +1059,11 @@ It is a language that does the encoding for you.
     and where it went.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
-5.  Write a `Clock` ability as an `Ability[datetime]` subclass,
-    with a handler function that returns a fixed time,
-    and an Effect that stamps a greeting with it.
-    Explain why a fixed clock in a test is the same technique as `Recorder`,
-    and which of the three Effect categories from the previous chapter a clock belongs to.
+5.  `frozen` and `tomorrow` in `frozen_clock.py` each report a single moment.
+    Write an advancing handler for `Now` that reports a moment one hour later at each request,
+    then write an Effect that asks the time twice and returns the elapsed `timedelta`.
+    Say which of `coin_toss.py`'s two handlers yours resembles,
+    and why neither `frozen` nor `tomorrow` can test elapsed-time logic.
 6.  `leaky_effect.py` type-checks while lying about its purity.
     Describe a review rule or a lint check that would catch it,
     and explain why a type checker cannot.

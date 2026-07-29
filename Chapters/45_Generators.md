@@ -136,10 +136,10 @@ print(f"{next(interview()) = }")
 
 Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
-The `# type: ignore` is the interesting part.
+The `# type: ignore` is interesting.
 `interview()` declares `Answer` as its `SendType`,
-and `None` is not an `Answer`,
-so the checker rejects the priming `send()` even though the interpreter accepts it.
+and `None` is not of type `Answer`.
+The checker rejects the priming `send()` even though the interpreter accepts it.
 The equivalence is a runtime fact the annotation cannot express,
 which is the practical reason a driver primes with `next()`.
 
@@ -152,16 +152,14 @@ Both assignments to `question` receive an `Answer` into a variable declared `Que
 The checker ensures proper arguments are used because each channel has its own type.
 `Generator[str, str, str]` would have accepted the reversal without complaint.
 
-A coroutine intentionally has the same three-part shape:
-`Coroutine[YieldType, SendType, ReturnType]`.
-`async def` and generator functions both build descriptions that something else drives.
-
 ## A Generator Is a Description
 
 [Effect Management](44_Effect_Management.md#effect-management-for-python)
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
-A generator function behaves the same way.
+A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
+the same three-part shape, and the match is deliberate.
+`async def` and generator functions both build descriptions that something else drives.
 Calling `interview()` returns a generator object but doesn't run anything in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
