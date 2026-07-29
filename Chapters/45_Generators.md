@@ -166,8 +166,7 @@ Calling `interview()` returns a generator object but doesn't run anything in the
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
-The generator yields a *request*,
-and whatever drives it supplies the *answer*.
+The generator yields a *request*, and whatever drives it supplies the *answer*.
 Typically, that stepping happens in a driver:
 
 ```python

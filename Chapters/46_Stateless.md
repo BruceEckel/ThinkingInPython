@@ -1028,6 +1028,252 @@ The technique did not change between the two.
 Name the seam as an ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that the seam cannot be skipped by accident.
 
+## Composing the Whole Program
+
+Every listing so far made one point in one or two steps.
+A program is longer,
+and the claim this chapter has been building is about what a longer program's signature tells you.
+Here is a small application: fetch a headline,
+find a topic worth researching in it, and look that topic up.
+Each step needs something or can fail, and no step names an implementation:
+
+```python
+# research.py
+from typing import Final, Protocol, runtime_checkable
+from stateless import Effect, Need, need, throws
+
+class Unavailable(Exception):
+    pass
+
+class NotInteresting(Exception):
+    pass
+
+class NoArticle(Exception):
+    pass
+
+@runtime_checkable
+class Feed(Protocol):
+    def latest(self) -> str: ...
+
+@runtime_checkable
+class Encyclopedia(Protocol):
+    def article(self, topic: str) -> str: ...
+
+TOPICS: Final[tuple[str, ...]] = ("stock market", "genome")
+
+@throws(Unavailable)
+def fetch(feed: Feed) -> str:
+    return feed.latest()
+
+@throws(NotInteresting)
+def topic_of(headline: str) -> str:
+    for candidate in TOPICS:
+        if candidate in headline:
+            return candidate
+    raise NotInteresting(headline)
+
+@throws(NoArticle)
+def look_up(book: Encyclopedia, topic: str) -> str:
+    return book.article(topic)
+
+def research() -> Effect[
+    Need[Feed] | Need[Encyclopedia],
+    Unavailable | NotInteresting | NoArticle,
+    str,
+]:
+    feed = yield from need(Feed)
+    headline = yield from fetch(feed)
+    topic = yield from topic_of(headline)
+    book = yield from need(Encyclopedia)
+    article = yield from look_up(book, topic)
+    return article
+```
+
+Read `research()`'s signature and you have the program's whole surface.
+It reads two things from outside and can fail three ways,
+and that is a complete account, checked against the body.
+The three `@throws` functions are the pattern for reaching ordinary code:
+`fetch()` and `look_up()` call methods that know nothing about Effects,
+and the decorator lifts what they raise into the channel.
+`topic_of()` needs nothing and touches nothing, so it declares no ability.
+
+The signature is also the only place this information appears.
+Nothing in the body mentions a network, a file, or a print,
+and `research()` performs no work when called.
+Now supply the environment:
+
+```python
+# scenarios.py
+from dataclasses import dataclass
+from typing import Final
+from research import (
+    Encyclopedia,
+    Feed,
+    NoArticle,
+    NotInteresting,
+    Unavailable,
+    research,
+)
+from stateless import Depend, Need, catch, run, supply
+
+@dataclass
+class Wire:
+    headline: str
+    def latest(self) -> str:
+        print("feed: fetching")
+        return self.headline
+
+class DeadWire:
+    def latest(self) -> str:
+        raise Unavailable("offline")
+
+@dataclass
+class Library:
+    articles: dict[str, str]
+    def article(self, topic: str) -> str:
+        print(f"library: looking up {topic}")
+        if topic not in self.articles:
+            raise NoArticle(topic)
+        return self.articles[topic]
+
+def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+    caught = catch(Unavailable, NotInteresting, NoArticle)
+    outcome: str | Unavailable | NotInteresting | NoArticle
+    outcome = yield from caught(research)()
+    match outcome:
+        case Unavailable():
+            return "no headline today"
+        case NotInteresting():
+            return "nothing worth researching"
+        case NoArticle():
+            return "no article on that topic"
+        case _:
+            return outcome
+
+STOCKS: Final[Wire] = Wire("stock market rising")
+WEATHER: Final[Wire] = Wire("mild and cloudy")
+SHELF: Final[Library] = Library({"stock market": "a history"})
+EMPTY: Final[Library] = Library({})
+
+def outcome(feed: Feed, book: Encyclopedia) -> str:
+    return run(supply(feed, book)(report)())
+
+print(outcome(STOCKS, SHELF))
+print(outcome(WEATHER, SHELF))
+print(outcome(STOCKS, EMPTY))
+print(outcome(DeadWire(), SHELF))
+#: feed: fetching
+#: library: looking up stock market
+#: a history
+#: feed: fetching
+#: nothing worth researching
+#: feed: fetching
+#: library: looking up stock market
+#: no article on that topic
+#: no headline today
+```
+
+Four runs of one program, differing in what was supplied.
+The first finds its article.
+The second exercises `NotInteresting`, the third `NoArticle`,
+and the fourth `Unavailable`, so every failure the signature declares gets used.
+Each pair of bindings is what a full Effect system would call a *scenario*,
+and here a scenario is nothing more than arguments to `supply()`.
+
+The trace shows two things worth watching for.
+Every printed line comes from a supplied implementation,
+because the pipeline holds no output of its own.
+And the second run stops after `feed: fetching`.
+`topic_of()` yielded a `NotInteresting`,
+which ended `research()` where it stood,
+so the `need(Encyclopedia)` two lines below it never ran and no library was consulted.
+`catch()` received that failure and `report()` matched on it as a value,
+which is why the run still prints a message.
+A failure ends the remaining steps the way a raised exception would,
+and no step tested for it.
+The cut moves with the failure.
+The fourth run prints no trace,
+since `DeadWire.latest()` raises before printing,
+while the third reaches the library and fails there.
+
+`report()` is where the two channels come apart,
+and its annotation is worth reading twice.
+`catch()` emptied the error channel, so `report()` cannot fail.
+It still declares both abilities,
+because catching an error does nothing about a dependency.
+Annotate `report()` as `Success[str]` and `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
+`supply()` empties that half, and `run()` accepts what is left.
+
+`outcome()` also earns its annotations.
+`Wire` and `Library` are structural implementations,
+so `supply(Wire(...), Library(...))` would build handlers for `Need[Wire]` and `Need[Library]`,
+the mismatch `test_greeter.py` fixed with `as_type()`.
+Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
+without a cast.
+
+## The Success Path
+
+`research()` handles no errors.
+Its body is a straight run of six lines, each saying what should happen next,
+and no line tests whether the previous one worked.
+The error channel makes that possible.
+Here is the same pipeline with the failures handled where they arise:
+
+```python
+# research_by_hand.py
+from research import (
+    TOPICS,
+    Encyclopedia,
+    Feed,
+    NoArticle,
+    NotInteresting,
+    Unavailable,
+)
+
+def topic_of(headline: str) -> str:
+    for candidate in TOPICS:
+        if candidate in headline:
+            return candidate
+    raise NotInteresting(headline)
+
+def research(feed: Feed, book: Encyclopedia) -> str:
+    try:
+        headline = feed.latest()
+    except Unavailable:
+        return "no headline today"
+    try:
+        topic = topic_of(headline)
+    except NotInteresting:
+        return "nothing worth researching"
+    try:
+        return book.article(topic)
+    except NoArticle:
+        return "no article on that topic"
+```
+
+Three lines of work sit inside nine lines of handling.
+The pipeline is in there, but you have to look for it.
+The Effect version moved those nine lines into `report()`,
+one `match` over the failures instead of a `try` at each step.
+
+Both versions short-circuit.
+The by-hand one returns early, and the Effect one abandons the generator.
+The difference is who writes the branch that does it.
+
+Be fair about what this comparison shows.
+At this size the by-hand version is respectable,
+and a reader who prefers it is not making a mistake.
+Two differences outlast the size argument.
+Its signature, `(Feed, Encyclopedia) -> str`,
+mentions none of the three failures,
+so a fourth one can be added with nothing to tell the caller.
+And the handling is fused to the logic:
+this `research()` decides both what to do about a failure and what to say about it.
+The Effect version separates those,
+so a second caller can catch the same three failures and choose different messages,
+retry the whole pipeline, or let one failure through to the edge,
+without touching the pipeline.
+
 ## Where the Guarantee Stops
 
 A full accounting needs the limits,
