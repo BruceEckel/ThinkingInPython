@@ -149,3 +149,24 @@ def test_block_is_frozen() -> None:
     except AttributeError:
         return
     raise AssertionError("Block should be immutable")
+
+# ── headings and links ────────────────────────────────────────────────────────
+
+def test_headings_reports_line_and_text() -> None:
+    doc = Document.from_text("# One\n\ntext\n\n### Three\n")
+    assert list(doc.headings()) == [(1, "One"), (5, "Three")]
+
+def test_headings_keeps_an_explicit_id() -> None:
+    doc = Document.from_text("## Init {#init}\n")
+    assert list(doc.headings()) == [(1, "Init {#init}")]
+
+def test_headings_skip_hashes_inside_code() -> None:
+    # A comment in a listing must not be mistaken for a heading.
+    doc = Document.from_text("```python\n# not a heading\n```\n# Real\n")
+    assert list(doc.headings()) == [(4, "Real")]
+
+def test_outside_fences_keeps_headings_and_lists() -> None:
+    doc = Document.from_text("# H\n- item\n```python\nx\n```\ntail\n")
+    assert list(doc.outside_fences()) == [
+        (1, "# H"), (2, "- item"), (6, "tail"), (7, ""),
+    ]

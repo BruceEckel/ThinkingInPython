@@ -8,8 +8,9 @@ import pytest
 from check_all import CHECKS, apply_fixes, by_name, main, run, select
 from tools_markdown import Document
 
-# A listing that trips three checks at once: two blank lines between
-# imports, a trailing period, and a one-space inline comment gap.
+# A listing that trips four checks at once: two blank lines between
+# imports, a trailing period, a one-space inline comment gap, and an
+# uncapitalized prose comment.
 DIRTY = (
     "Text.\n"
     "\n"
@@ -54,7 +55,7 @@ def test_run_sorts_into_reading_order() -> None:
     findings = run(CHECKS, [doc])
     # Sorted by line even though different checks produced them.
     assert [f.line for f in findings] == sorted(f.line for f in findings)
-    assert len(findings) == 3
+    assert len(findings) == 4
 
 def test_run_with_one_check_finds_only_its_own() -> None:
     doc = Document.from_text(DIRTY, Path("a.md"))
@@ -63,7 +64,7 @@ def test_run_with_one_check_finds_only_its_own() -> None:
     assert "period" in findings[0].message
 
 def test_run_on_clean_text_finds_nothing() -> None:
-    doc = Document.from_text("```python\n# a.py\nx = 1  # fine\n```\n")
+    doc = Document.from_text("```python\n# a.py\nx = 1  # Fine\n```\n")
     assert run(CHECKS, [doc]) == []
 
 # ── fixing ────────────────────────────────────────────────────────────────────
@@ -77,7 +78,7 @@ def test_apply_fixes_converges_to_clean(tmp_path: Path) -> None:
     assert run(CHECKS, [Document.parse(p)]) == []
 
 def test_apply_fixes_leaves_a_clean_file_alone(tmp_path: Path) -> None:
-    text = "```python\n# a.py\nx = 1  # fine\n```\n"
+    text = "```python\n# a.py\nx = 1  # Fine\n```\n"
     p = tmp_path / "ch.md"
     p.write_text(text, encoding="utf-8")
     assert apply_fixes(CHECKS, [Document.parse(p)]) == 0
@@ -91,7 +92,7 @@ def test_main_reports_and_exits_one(
     (tmp_path / "ch.md").write_text(DIRTY, encoding="utf-8")
     assert main(["--paths", str(tmp_path)]) == 1
     out = capsys.readouterr().out
-    assert "3 issue(s) in 1 file(s) from 4 check(s)." in out
+    assert "4 issue(s) in 1 file(s) from 7 check(s)." in out
 
 def test_main_clean_exits_zero(
     tmp_path: Path, capsys: pytest.CaptureFixture[str],
@@ -112,3 +113,43 @@ def test_main_selects_a_single_check(
     (tmp_path / "ch.md").write_text(DIRTY, encoding="utf-8")
     assert main(["listings", "--paths", str(tmp_path)]) == 1
     assert "from 1 check(s)." in capsys.readouterr().out
+
+# ── the three later conversions ───────────────────────────────────────────────
+
+def test_anchors_check_finds_a_dangling_link(tmp_path: Path) -> None:
+    p = tmp_path / "ch.md"
+    p.write_text("# Real Heading\n\nSee [x](#no-such-thing).\n", encoding="utf-8")
+    findings = run(select(["anchors"]), [Document.parse(p)])
+    assert len(findings) == 1
+    assert "#no-such-thing" in findings[0].message
+
+def test_anchors_check_accepts_a_good_link(tmp_path: Path) -> None:
+    p = tmp_path / "ch.md"
+    p.write_text("# Real Heading\n\nSee [x](#real-heading).\n", encoding="utf-8")
+    assert run(select(["anchors"]), [Document.parse(p)]) == []
+
+def test_prose_lint_check_carries_code_and_column() -> None:
+    doc = Document.from_text("Two  spaces here.\n", Path("a.md"))
+    findings = run(select(["prose-lint"]), [doc])
+    assert findings[0].code == "MULTI-SPACE"
+    assert findings[0].col == 4
+
+def test_comment_caps_check_names_the_replacement(tmp_path: Path) -> None:
+    p = tmp_path / "ch.md"
+    p.write_text(
+        "T\n\n```python\n# demo.py\n# lowercase prose comment\nx = 1\n```\n",
+        encoding="utf-8",
+    )
+    findings = run(select(["comment-caps"]), [Document.parse(p)])
+    assert len(findings) == 1
+    assert "-> # Lowercase prose comment" in findings[0].message
+
+def test_check_names_match_their_make_targets() -> None:
+    # Each check is also its own `make <name>` target; keeping the names
+    # equal is what lets the runner's output be pasted back as a command.
+    makefile = (Path(__file__).parent.parent / "Makefile").read_text(
+        encoding="utf-8")
+    for check in CHECKS:
+        if check.name == "prose-lint":
+            continue  # `make prose` is Vale; this one has no target of its own
+        assert f"\n{check.name}:" in makefile, check.name

@@ -94,10 +94,17 @@ def anchors_of(path: Path) -> frozenset[str] | None:
 
 
 def find(doc: Document) -> Iterator[Finding]:
-    """Every anchor link in `doc` that resolves to no heading."""
+    """Every anchor link in `doc` that resolves to no heading.
+
+    A same-file anchor is resolved against `doc` itself rather than by
+    reopening its path, so the check works on a document built in memory
+    and never disagrees with the text it was handed. Only cross-file
+    links go to disk, through the cache.
+    """
+    own = frozenset(heading_anchors(doc))
     for lineno, stem, anchor in anchor_links(doc):
         if stem is None:
-            where, valid = "this file", anchors_of(doc.path.resolve())
+            where, valid = "this file", own
         else:
             target = doc.path.parent / f"{stem}.md"
             valid = anchors_of(target.resolve())

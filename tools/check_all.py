@@ -38,9 +38,12 @@ import argparse
 from collections.abc import Iterable
 
 import banned_phrases
+import capitalize_comments
+import check_anchors
 import comment_periods
 import comment_spacing
 import listing_format
+import prose_lint
 from tools_markdown import Document
 from tools_repo import md_files, write_text_lf
 from tools_report import Check, Finding
@@ -50,7 +53,10 @@ CHECKS: list[Check] = [
     listing_format.CHECK,
     comment_periods.CHECK,
     comment_spacing.CHECK,
+    capitalize_comments.CHECK,
     banned_phrases.CHECK,
+    check_anchors.CHECK,
+    prose_lint.CHECK,
 ]
 
 

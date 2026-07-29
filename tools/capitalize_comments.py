@@ -99,9 +99,17 @@ def transform_comment(line: str, hash_i: int) -> str | None:
     return prefix + "#" + new_after
 
 
-def process_file(path: Path, write: bool,
-                 allow: set[str]) -> list[tuple[int, str, str]]:
-    lines = path.read_text(encoding="utf-8").splitlines(keepends=False)
+def find_changes(
+    lines: list[str], allow: set[str],
+) -> tuple[list[tuple[int, str, str]], list[str]]:
+    """(changes, rewritten lines) for one file's lines.
+
+    Pure, so both the reporting path and the rewriting path derive from
+    one walk. That walk threads triple-quote state and a "the previous
+    comment left a sentence open" flag across the whole file, which is
+    why this is line-based rather than built on `doc.python_blocks()`:
+    both would have to be re-derived at every block boundary.
+    """
     changes: list[tuple[int, str, str]] = []
     in_python = False
     triple: str | None = None
@@ -110,8 +118,9 @@ def process_file(path: Path, write: bool,
     prev_comment_open = False
     out = []
     for idx, line in enumerate(lines, 1):
-        if FENCE.match(line):
-            lang = FENCE.match(line).group(1) or ""
+        fence = FENCE.match(line)
+        if fence:
+            lang = fence.group(1) or ""
             in_python = (lang == "python") if not in_python else False
             triple = None
             prev_comment_open = False
@@ -141,9 +150,17 @@ def process_file(path: Path, write: bool,
         else:
             prev_comment_open = False
         out.append(line)
+    return changes, out
+
+
+def process_file(path: Path, write: bool,
+                 allow: set[str]) -> list[tuple[int, str, str]]:
+    """Report (and optionally apply) one file's capitalization changes."""
+    original = path.read_text(encoding="utf-8")
+    changes, out = find_changes(original.splitlines(keepends=False), allow)
     if write and changes:
         text = "\n".join(out)
-        if path.read_text(encoding="utf-8").endswith("\n"):
+        if original.endswith("\n"):
             text += "\n"
         write_text_lf(path, text)
     return changes
@@ -158,22 +175,23 @@ def default_allowlist() -> frozenset[str]:
 def find(doc: Document) -> Iterator[Finding]:
     """Comments needing capitalization, one Finding each.
 
-    `process_file` keeps its own line walk instead of using
-    `doc.python_blocks()`: it threads triple-quote state and a
-    "previous comment left a sentence open" flag through the file, so a
-    continuation line is not capitalized mid-thought. Rebuilding that per
-    block would have to re-derive both at every block boundary for no
-    gain, so this reads the file and adapts the result.
-
-    The message carries the replacement, so the one-line report says as
-    much as this tool's own grouped diff does.
+    Reads `doc.lines` rather than reopening `doc.path`, so the check is a
+    function of the document it is handed and works on one built in
+    memory. The message carries the replacement, so the one-line report
+    says as much as this tool's own grouped diff does.
     """
-    for lineno, old, new in process_file(doc.path, False, set(
-            default_allowlist())):
+    changes, _ = find_changes(doc.lines, set(default_allowlist()))
+    for lineno, old, new in changes:
         yield Finding(
             doc.path, lineno,
             f"comment needs capitalizing: {old.strip()} -> {new.strip()}",
         )
+
+
+def fixed(doc: Document) -> str | None:
+    """The file with those comments capitalized, or None if none need it."""
+    changes, out = find_changes(doc.lines, set(default_allowlist()))
+    return doc.rendered(out) if changes else None
 
 
 CHECK = Check(
@@ -183,6 +201,7 @@ CHECK = Check(
     clean="Comment capitalization OK.",
     problem="{n} comment(s) need capitalizing. Capitalize them, "
             "or add the text to tools/comment_caps_allow.txt.",
+    fixer=fixed,
 )
 
 
