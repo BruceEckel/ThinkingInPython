@@ -336,11 +336,12 @@ except StopIteration:
 so its type is `Generator[str, int, None]`.
 An omitted `ReturnType` defaults to `None`,
 so the return signature becomes `Generator[str, int]`.
-`both()` declares the same channels,
-because a delegating generator adopts the arrangement of whatever it delegates to.
-The numbers travel down to the `yield` that asked for them,
-so `g.send(1)` arrives inside `collect("alpha")`, two frames from the driver,
-with `both()` doing nothing to pass it along.
+`both()` declares the same type,
+because `yield from` passes the inner generator's yield and send channels through to the driver.
+
+The numbers travel down to the `yield` that asked for them.
+`g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
+`both()` contains no code that forwards the value because `yield from` does that forwarding.
 
 `g.send(2)` is the interesting one.
 It supplies alpha's second value, which lets `collect("alpha")` finish,
