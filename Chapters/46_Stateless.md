@@ -507,6 +507,74 @@ Stateless avoids the trap in its own definitions:
 and those keep the check alive.
 Write Effect signatures out in full until your checker proves it sees through the alias.
 
+## One Effect, Many Environments
+
+`audit_log.py` supplied two abilities at one call site.
+A test suite usually needs many, one per environment.
+Because the dependencies live in the return type rather than the argument list,
+varying the environment means varying data:
+
+```python
+# nailer.py
+from dataclasses import dataclass
+from stateless import Depend, Need, need
+
+@dataclass(frozen=True)
+class Material:
+    brittleness: int
+
+@dataclass(frozen=True)
+class Nailer:
+    force: int
+
+def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
+    material = yield from need(Material)
+    nailer = yield from need(Nailer)
+    return nailer.force < material.brittleness
+```
+
+`holds()` decides whether a nailer's force stays under a material's brittleness.
+It requests both and names neither implementation.
+`Material` and `Nailer` are distinct types,
+so `supply()` matches each request to one of them without the ambiguity `ambiguous_supply.py` showed:
+
+```python
+# test_nailer.py
+from typing import Final
+import pytest
+from nailer import Material, Nailer, holds
+from stateless import run, supply
+
+WOOD: Final[Material] = Material(brittleness=5)
+PLASTIC: Final[Material] = Material(brittleness=10)
+HAND: Final[Nailer] = Nailer(force=4)
+ROBOTIC: Final[Nailer] = Nailer(force=11)
+
+@pytest.mark.parametrize("material, nailer, expected", [
+    (WOOD, HAND, True),
+    (PLASTIC, HAND, True),
+    (WOOD, ROBOTIC, False),
+    (PLASTIC, ROBOTIC, False),
+])
+def test_holds(
+    material: Material, nailer: Nailer, expected: bool
+) -> None:
+    assert run(supply(material, nailer)(holds)()) is expected
+```
+
+One test function covers four environments.
+The parameters are not inputs to `holds()`, which takes no arguments.
+They are the bindings `supply()` will make,
+so the table reads as a matrix of environments rather than a list of arguments.
+A new `Material` is a new row.
+
+Be honest about the size of the win here.
+Dependencies as parameters would serve this test as well,
+because `holds(material, nailer)` is easy to call four times.
+The difference appears when the dependency sits three calls deep.
+Then the parameter version threads two arguments through every function on the path,
+and this version changes nothing but the row.
+
 ## The Error Channel
 
 Dependencies are one half of the type.
