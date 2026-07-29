@@ -72,7 +72,7 @@ def interview() -> Generator[Question, Answer, Result]:
     name = yield Question("name")  # Ask the world for the name
     town = yield Question("town")  # Ask the world for the town
     friend = yield Question("friend")  # Ask for a friend
-    return Result(f"{name} of {town} with friend {friend}")
+    return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
     i = interview()
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 #: question1 = 'name'
 #: question2 = 'town'
 #: question3 = 'friend'
-#: result = 'Alice of Wonderland with friend Rabbit'
+#: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
 Although `Generator[str, str, str]` describes `interview()` accurately,
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 #: request = 'name', answers[request] = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: request = 'friend', answers[request] = 'Rabbit'
-#: stop.value = 'Alice of Wonderland with friend Rabbit'
+#: stop.value = 'Alice of Wonderland, friend Rabbit'
 ```
 
 The generator is imported unchanged; only the driver is new.
@@ -336,7 +336,7 @@ except StopIteration:
 so its type is `Generator[str, int, None]`.
 An omitted `ReturnType` defaults to `None`,
 so the return signature becomes `Generator[str, int]`.
-`both()` declares the same type,
+`both()` declares that same type,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
 
 The numbers travel down to the `yield` that asked for them.
@@ -351,8 +351,7 @@ The driver sees `StopIteration` only when `both()` runs out of delegations.
 
 ### All Three Channels
 
-We can apply `yield from` to our `interview` example,
-where every channel carries something:
+We can apply `yield from` to our `interview` example:
 
 ```python
 # yield_from_delegates.py
@@ -369,18 +368,19 @@ def interview() -> Generator[Question, Answer, Result]:
     name = yield from ask(Question("name"))
     town = yield from ask(Question("town"))
     friend = yield from ask(Question("friend"))
-    return Result(f"{name} of {town} with friend {friend}")
+    return Result(f"{name} of {town}, friend {friend}")
 
-drive(interview(), {Question("name"): Answer("Alice"),
-                    Question("town"): Answer("Wonderland"),
-                    Question("friend"): Answer("Rabbit")})
+if __name__ == "__main__":
+    drive(interview(), {Question("name"): Answer("Alice"),
+                        Question("town"): Answer("Wonderland"),
+                        Question("friend"): Answer("Rabbit")})
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
 #: request = 'friend', answers[request] = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
-#: stop.value = 'Alice of Wonderland with friend Rabbit'
+#: stop.value = 'Alice of Wonderland, friend Rabbit'
 ```
 
 `drive()` never learns that `ask()` exists.
@@ -404,6 +404,66 @@ which also knows nothing about where it came from.
 A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
+
+### Composing Is Not Interpreting
+
+`drive()` and `yield from` both step a generator and both finish at `StopIteration`,
+which makes them easy to confuse.
+Delegation can take over the job the previous listing gave to `drive()`:
+
+```python
+# yield_from_nested.py
+from collections.abc import Generator
+from generator_interview import Answer, Question, Result
+from two_way_generator import drive
+from yield_from_delegates import ask, interview
+
+def survey() -> Generator[Question, Answer, Result]:
+    profile = yield from interview()
+    color = yield from ask(Question("color"))
+    return Result(f"{profile}, color {color}")
+
+drive(survey(), {Question("name"): Answer("Alice"),
+                 Question("town"): Answer("Wonderland"),
+                 Question("friend"): Answer("Rabbit"),
+                 Question("color"): Answer("blue")})
+#: request = 'name', answers[request] = 'Alice'
+#: ask(question = 'name') -> answer = 'Alice'
+#: request = 'town', answers[request] = 'Wonderland'
+#: ask(question = 'town') -> answer = 'Wonderland'
+#: request = 'friend', answers[request] = 'Rabbit'
+#: ask(question = 'friend') -> answer = 'Rabbit'
+#: request = 'color', answers[request] = 'blue'
+#: ask(question = 'color') -> answer = 'blue'
+#: stop.value = 'Alice of Wonderland, friend Rabbit, color blue'
+```
+
+`interview()` is imported unchanged from the previous example.
+It was the generator `drive()` drove; now `survey()` delegates to it.
+Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
+and its questions surface three frames up rather than two.
+The driver sees one more question and the same shape of trace.
+
+`yield from` replaced `drive()` as the consumer of `interview()`,
+but not as its runner.
+Something must still call `next()` and `send()` at the top,
+which is why the example ends with a `drive()` call.
+Stack delegations as deep as you like and the number of drivers stays at one.
+
+What separates them is the response to a request.
+`drive()` answers it: a `Question` comes out, the driver looks it up,
+and the request stops there.
+`yield from` answers nothing.
+It relays the request upward and passes the reply back down untouched,
+so `survey()` has no idea what a `Question` means.
+`StopIteration` splits the same way.
+For `drive()` it ends the conversation and delivers the final `Result`.
+For `yield from` it ends one delegation and becomes the value of the expression,
+after which the outer generator keeps running.
+
+`yield from` composes descriptions and a driver interprets them.
+A program can hold any number of the first and needs one of the second,
+at its outermost edge.
 
 Every Effect in this chapter travels this path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.

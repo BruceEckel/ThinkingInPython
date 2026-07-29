@@ -12,11 +12,12 @@ def interview() -> Generator[Question, Answer, Result]:
     name = yield from ask(Question("name"))
     town = yield from ask(Question("town"))
     friend = yield from ask(Question("friend"))
-    return Result(f"{name} of {town} with friend {friend}")
+    return Result(f"{name} of {town}, friend {friend}")
 
-drive(interview(), {Question("name"): Answer("Alice"),
-                    Question("town"): Answer("Wonderland"),
-                    Question("friend"): Answer("Rabbit")})
+if __name__ == "__main__":
+    drive(interview(), {Question("name"): Answer("Alice"),
+                        Question("town"): Answer("Wonderland"),
+                        Question("friend"): Answer("Rabbit")})
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'

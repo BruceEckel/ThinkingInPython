@@ -10,7 +10,7 @@ def interview() -> Generator[Question, Answer, Result]:
     name = yield Question("name")  # Ask the world for the name
     town = yield Question("town")  # Ask the world for the town
     friend = yield Question("friend")  # Ask for a friend
-    return Result(f"{name} of {town} with friend {friend}")
+    return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
     i = interview()
