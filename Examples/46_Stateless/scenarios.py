@@ -33,9 +33,9 @@ class Library:
 
 def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
-    outcome: str | Unavailable | NotInteresting | NoArticle
-    outcome = yield from caught(research)()
-    match outcome:
+    found: str | Unavailable | NotInteresting | NoArticle
+    found = yield from caught(research)()
+    match found:
         case Unavailable():
             return "no headline today"
         case NotInteresting():
@@ -43,7 +43,7 @@ def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
         case NoArticle():
             return "no article on that topic"
         case _:
-            return outcome
+            return found
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")

@@ -250,6 +250,45 @@ which `run()` handles on its own.
 `run()` insists on every other ability being answered,
 and those two are what remain when they are.
 
+## Where `run()` Can Be Called
+
+`run()` handles `Async` because it is `asyncio.run(run_async(effect))` underneath.
+That has a consequence worth knowing before you wire Stateless into an existing application.
+`asyncio.run()` refuses to start a second event loop inside a running one,
+so `run()` cannot be called from any `async def`:
+
+```python
+# inside_a_loop.py
+import asyncio
+from greeter import Console, greet
+from stateless import run, run_async, supply
+
+bound = supply(Console())(greet)
+
+async def main() -> None:
+    try:
+        run(bound("Alice"))
+    except RuntimeError as e:
+        print(e)
+    await run_async(bound("Bob"))
+
+asyncio.run(main())
+#: asyncio.run() cannot be called from a running event loop
+#: Hello, Bob!
+```
+
+Running this prints a `RuntimeWarning` on standard error alongside the caught message.
+`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
+which then refuses, leaving that coroutine un-awaited.
+It is harmless and it tells you where the boundary is.
+
+`run_async()` is the same driver as a coroutine, so you `await` it instead.
+A synchronous program calls `run()` once at its outermost edge.
+A program that is already asynchronous, a web service or a bot,
+awaits `run_async()` at the edge of each request.
+Picking the wrong one is a runtime error rather than a type error,
+which makes it one of the few mistakes in this chapter the checker will not catch for you.
+
 ## Swapping the Implementation
 
 Delayed binding earns its keep when the binding changes.
@@ -327,6 +366,27 @@ separate from any implementation.
 `Terminal` is one implementation and `Recorder` would be another,
 and neither is named anywhere in `greet()`.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
+
+This is the form to write in production,
+and the rest of the chapter does not use it.
+The remaining listings keep importing `greeter.py`'s concrete `Console`,
+because every supply site in the `Protocol` version costs an `as_type()`:
+`supply(Console())` becomes `supply(as_type(Console)(Terminal()))`.
+That is a real price the interface charges, not only a shortcut for the book,
+and it is worth seeing before you decide.
+Everything the rest of the chapter shows about propagation, errors,
+and handlers works the same under either form.
+
+You may also not need to declare an ability at all.
+Stateless includes three of its own:
+a `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
+a `Files` in `stateless.files` that reads a whole file,
+and the `Time` that a later section supplies to `retry()`.
+The chapter builds its own `Console` because watching one get built is the point.
+In your own code, check what the library already declares first.
+
+## When Two Implementations Match
+
 A structural check matches on method names alone,
 so two supplied objects that both define `print()` are indistinguishable.
 Supply both and argument order decides which one answers:
@@ -567,7 +627,7 @@ def test_holds(
 ```
 
 One test function covers four environments.
-The parameters are not inputs to `holds()`, which takes no arguments.
+`holds()` takes no arguments, so `material` and `nailer` are not inputs to it.
 They are the bindings `supply()` will make,
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` is a new row.
@@ -1101,6 +1161,31 @@ The three `@throws` functions are the pattern for reaching ordinary code:
 and the decorator lifts what they raise into the channel.
 `topic_of()` needs nothing and touches nothing, so it declares no ability.
 
+`fetch()` and `look_up()` take their dependencies as parameters,
+which makes them ordinary functions rather than generator functions.
+That is a choice, not a requirement.
+`@throws` decorates a function returning an Effect just as readily,
+so the request and the failure can live in one function:
+
+```python
+# fetch_effectful.py
+from research import Feed, Unavailable
+from stateless import Depend, Need, need, throws
+
+@throws(Unavailable)
+def fetch_headline() -> Depend[Need[Feed], str]:
+    feed = yield from need(Feed)
+    return feed.latest()
+```
+
+Annotate the undecorated shape, `Depend[Need[Feed], str]`,
+and the decorator adds the error the same way it did for `score()`.
+`ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
+which is `Effect[Need[Feed], Unavailable, str]`.
+`research()` splits the two apart because a function that only transforms its arguments is easier to test on its own,
+and because the split keeps the ability requests collected in one place where you can read them.
+Either shape type-checks and either propagates correctly.
+
 The signature is also the only place this information appears.
 Nothing in the body mentions a network, a file, or a print,
 and `research()` performs no work when called.
@@ -1142,9 +1227,9 @@ class Library:
 
 def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
-    outcome: str | Unavailable | NotInteresting | NoArticle
-    outcome = yield from caught(research)()
-    match outcome:
+    found: str | Unavailable | NotInteresting | NoArticle
+    found = yield from caught(research)()
+    match found:
         case Unavailable():
             return "no headline today"
         case NotInteresting():
@@ -1152,7 +1237,7 @@ def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
         case NoArticle():
             return "no article on that topic"
         case _:
-            return outcome
+            return found
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
@@ -1240,7 +1325,9 @@ def topic_of(headline: str) -> str:
             return candidate
     raise NotInteresting(headline)
 
-def research(feed: Feed, book: Encyclopedia) -> str:
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
     try:
         headline = feed.latest()
     except Unavailable:
@@ -1259,6 +1346,8 @@ Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
 The Effect version moved those nine lines into `report()`,
 one `match` over the failures instead of a `try` at each step.
+The name says what the by-hand version cannot avoid being:
+`research()` and `report()` in one function.
 
 Both versions short-circuit.
 The by-hand one returns early, and the Effect one abandons the generator.
@@ -1271,8 +1360,8 @@ Two differences outlast the size argument.
 Its signature, `(Feed, Encyclopedia) -> str`,
 mentions none of the three failures,
 so a fourth one can be added with nothing to tell the caller.
-And the handling is fused to the logic:
-this `research()` decides both what to do about a failure and what to say about it.
+And the handling is interleaved with the logic:
+`research_and_report()` decides both what to do about a failure and what to say about it.
 The Effect version separates those,
 so a second caller can catch the same three failures and choose different messages,
 retry the whole pipeline, or let one failure through to the edge,
@@ -1281,8 +1370,7 @@ without touching the pipeline.
 ## Adding Behavior to an Existing Effect
 
 The previous section promised that a caller could retry a pipeline without touching it.
-Because an Effect is a value, behavior can be wrapped around one,
-and Stateless ships a few such wrappers.
+Stateless provides a few decorators that add such behavior.
 Retry is the one worth studying, because of what it does to the type.
 
 `Database` fails a fixed number of times before working,
@@ -1754,7 +1842,25 @@ It is a language that does the encoding for you.
 6.  `leaky_effect.py` type-checks while lying about its purity.
     Describe a review rule or a lint check that would catch it,
     and explain why a type checker cannot.
-7.  Break `greet_all.py` by removing the `yield from` in front of `greet(name)`.
+7.  Add a `Metal` material to `test_nailer.py` with a brittleness that survives the robotic nailer,
+    and add its two rows to the table.
+    Then explain why the test function body needed no change.
+8.  Add a fourth failure to `research()`:
+    a `TooLong` raised when an article exceeds some length.
+    Follow the checker's complaints until the program builds again,
+    and list every line you had to edit.
+    Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
+9.  `scenarios.py` supplies a `DeadWire` that fails before printing.
+    Write a `SlowWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
+    and predict the trace before running it.
+10. Wrap `research()` in `retry()` and supply a `Time()`.
+    Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
+    then say what an Effect system would need for you to retry only `Unavailable`.
+11. Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
+    and confirm `squares()` is unchanged.
+    Then try to fork an Effect that still declares a `Need`,
+    and record what `ty` says.
+12. Break `greet_all.py` by removing the `yield from` in front of `greet(name)`.
     Run `ty check`, `ruff check`, and the script,
     and record what each reports and what the program prints.
     Explain where the greetings went and why no tool objects.

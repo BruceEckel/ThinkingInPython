@@ -14,7 +14,9 @@ def topic_of(headline: str) -> str:
             return candidate
     raise NotInteresting(headline)
 
-def research(feed: Feed, book: Encyclopedia) -> str:
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
     try:
         headline = feed.latest()
     except Unavailable:
