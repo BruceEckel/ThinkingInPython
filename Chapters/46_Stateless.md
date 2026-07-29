@@ -406,6 +406,10 @@ and the program still type-checks and runs.
 It builds a description, immediately discards it,
 and the greeting never happens.
 Neither the type checker nor the linter flags the dropped value.
+The same trap exists in ZIO for the same reason.
+An Effect written as a bare statement is a discarded value there too,
+and the fix is `.run` where Python's is `yield from`.
+The hazard belongs to deferred execution rather than to generators.
 When an Effect seems not to happen, look for a missing `yield from`.
 
 Declaring the ability is still manual, and it is fair to ask what was gained.
@@ -1274,6 +1278,124 @@ so a second caller can catch the same three failures and choose different messag
 retry the whole pipeline, or let one failure through to the edge,
 without touching the pipeline.
 
+## Adding Behavior to an Existing Effect
+
+The previous section promised that a caller could retry a pipeline without touching it.
+Because an Effect is a value, behavior can be wrapped around one,
+and Stateless ships a few such wrappers.
+Retry is the one worth studying, because of what it does to the type.
+
+`Database` fails a fixed number of times before working,
+so the example is repeatable:
+
+```python
+# flaky.py
+from dataclasses import dataclass
+from stateless import Effect, Need, need, throws
+
+class Crashed(Exception):
+    pass
+
+@dataclass
+class Database:
+    failures: int
+    attempts: int = 0
+    def save(self, user: str) -> str:
+        self.attempts += 1
+        print(f"attempt {self.attempts}: saving {user}")
+        if self.attempts <= self.failures:
+            raise Crashed("database crashed")
+        return f"{user} saved"
+
+@throws(Crashed)
+def store(db: Database, user: str) -> str:
+    return db.save(user)
+
+def save_user(user: str) -> Effect[Need[Database], Crashed, str]:
+    db = yield from need(Database)
+    result = yield from store(db, user)
+    return result
+```
+
+`retry()` takes a `Schedule` and decorates a function that returns an Effect:
+
+```python
+# retrying.py
+from datetime import timedelta
+from flaky import Crashed, Database, save_user
+from stateless import catch, retry, run, supply
+from stateless.functions import RetryError
+from stateless.schedule import recurs, spaced
+from stateless.time import Time
+
+once = catch(Crashed)(save_user)
+print(run(supply(Database(failures=2))(once)("Morty")))
+#: attempt 1: saving Morty
+#: database crashed
+three = recurs(3, spaced(timedelta(milliseconds=1)))
+retried = retry(three)(save_user)
+print(run(supply(Database(failures=2), Time())(retried)("Morty")))
+#: attempt 1: saving Morty
+#: attempt 2: saving Morty
+#: attempt 3: saving Morty
+#: Morty saved
+caught = catch(RetryError)(retried)
+outcome = run(supply(Database(failures=9), Time())(caught)("Morty"))
+print(type(outcome).__name__)
+#: attempt 1: saving Morty
+#: attempt 2: saving Morty
+#: attempt 3: saving Morty
+#: RetryError
+```
+
+One attempt fails.
+Three attempts against a database that fails twice succeed on the third,
+and three attempts against one that always fails produce a `RetryError` holding every failure.
+`save_user()` was not edited for any of this.
+
+Notice that `retry()` decorates the *function*, not the Effect.
+`retry(three)(save_user("Morty"))` is not available,
+and the reason is the substrate.
+A Stateless Effect is a generator, so it runs once and is then spent.
+Re-running a spent Effect does not fail loudly:
+`run()` returns `None` where the signature promised a `str`,
+with no exception and no complaint from the checker.
+So a second attempt has to rebuild the description from the function,
+which is what `retry()` does internally.
+Where ZIO attaches `retryN` to an Effect value it can replay,
+Stateless attaches it one level up.
+
+Now read what the decoration did to the type.
+`save_user()` was `(str) -> Effect[Need[Database], Crashed, str]`.
+Under `reveal_type()`, `retried` is:
+
+```text
+(user: str) -> Generator[
+    Need[Database] | Need[Time] | Async | RetryError[Crashed],
+    Any,
+    str,
+]
+```
+
+Three changes, none of them silent.
+The error became `RetryError[Crashed]`,
+which is why the third run catches `RetryError` rather than `Crashed`.
+`Async` arrived because waiting between attempts is asynchronous,
+and `run()` answers that one on its own.
+And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
+Retrying is not free: it needs a clock, and the signature says so.
+Leave the `Time()` out and the program does not build.
+This is the chapter's thesis applied to a cross-cutting concern.
+Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
+here it changes a type, and every caller learns about the new dependency.
+
+`repeat()` runs an Effect on a schedule and collects the results,
+`memoize()` caches by argument,
+and `fork()` with `wait()` runs Effects in parallel through a supplied `Executor`.
+Each is a decorator over a function returning an Effect, for the reason above.
+One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
+so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
+
 ## Where the Guarantee Stops
 
 A full accounting needs the limits,
@@ -1439,6 +1561,31 @@ and how it can fail, before you read a single line of the body.
 That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
 Purity is valuable because it is verifiable,
 and verification performed by reading code does not scale.
+
+There is a second gain, and it shows when you put functions together.
+Python has a separate mechanism for each concern an Effect type carries.
+Absence is `T | None`.
+Failure is a raised exception,
+or the `Result` that [Error Handling](42_Functional_Error_Handling.md#a-result-type)
+built.
+Asynchrony is `async def` and `await`.
+A resource's lifetime is a `with` block.
+Each is reasonable alone, and they do not compose with each other.
+Some pairs cannot be converted.
+An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
+A `with` block's guarantee is lexical,
+so it cannot be handed to a caller as a value the way a `Result` can.
+A function that awaits, might fail,
+and holds a resource uses three of these mechanisms and returns a type that mentions one.
+
+`Effect[A, E, R]` is one type for the dependency, the failure, and the result,
+and `yield from` is one operator for joining two Effects.
+`research()` joined five steps of two kinds with that one operator,
+once `@throws` had brought the ordinary functions in at the boundary.
+`Async` is one more ability in the same channel rather than a second viral annotation.
+Resource lifetime is the concern this does not absorb.
+Stateless has no scoping mechanism,
+so `with` blocks stay where they are and stay nested.
 
 What Stateless charges for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
