@@ -498,14 +498,16 @@ which the previous section taught you to read as "what comes back from a `yield`
 That `Any` is essential, and it explains an idiom the rest of the chapter uses.
 
 A generator has one SendType for its whole life.
-An Effect does not.
-Use `yield` to request a `Need[Console]` and a `Console` should come back.
-Use `yield` to request a `Need[Log]` and a `Log` should come back.
-The answer's type depends on which ability was requested,
-and no Python annotation can say that.
-Thus we cannot pin that type parameter to one concrete type.
-Annotate the SendType as `Console`,
-and `yield Need(Log)` hands you something the checker calls a `Console`.
+An Effect does not:
+
+- Using `yield` to request a `Need[Console]` should get a `Console`.
+- Using `yield` to request a `Need[Log]` should get a `Log`.
+
+What comes back depends on which ability the `yield` requested,
+and one SendType cannot vary from one `yield` to the next.
+Pin it to `Console` and the checker still reads `yield Need(Log)` as producing a `Console`,
+because nothing in the annotation separates the two requests.
+`Any` is what remains: it makes no claim instead of a false one.
 
 The solution is `yield from`.
 A bare `yield` produces the SendType,
