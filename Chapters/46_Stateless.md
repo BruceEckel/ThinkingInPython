@@ -327,10 +327,51 @@ separate from any implementation.
 `Terminal` is one implementation and `Recorder` would be another,
 and neither is named anywhere in `greet()`.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
-Structural checks match on method names alone,
-so two supplied objects that both define `print()` are indistinguishable,
-and the first one wins.
-Give abilities distinct method names when that ambiguity is possible.
+A structural check matches on method names alone,
+so two supplied objects that both define `print()` are indistinguishable.
+Supply both and argument order decides which one answers:
+
+```python
+# ambiguous_supply.py
+from dataclasses import dataclass, field
+from console_protocol import Console, Terminal, greet
+from stateless import as_type, run, supply
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+    def print(self, message: str) -> None:
+        self.messages.append(message)
+
+capture = Capture()
+screen = as_type(Console)(Terminal())
+memory = as_type(Console)(capture)
+run(supply(screen, memory)(greet)("Alice"))
+#: Hello, Alice!
+print(capture.messages)
+#: []
+run(supply(memory, screen)(greet)("Bob"))
+print(capture.messages)
+#: ['Hello, Bob!']
+```
+
+`Terminal` and `Capture` share no base class and know nothing of each other.
+Both satisfy `Console` structurally, so `isinstance()` accepts either,
+and `supply()` hands over whichever it examines first.
+Alice's greeting reaches the screen and leaves `capture` empty.
+Swapping the two arguments sends Bob's greeting into `capture` and prints nothing.
+Neither `greet()` nor the type checker can tell the two runs apart,
+because both bindings have the same type.
+Both instances go through `as_type(Console)`,
+since neither is nominally a `Console`.
+
+This is a place where a library EMS gives up something a native one keeps.
+ZIO reports two implementations of one requirement as a compile-time error that names both,
+because its dependency graph is resolved by the compiler.
+`supply()` resolves at runtime by scanning its arguments,
+so the same mistake produces a program that runs and does the wrong thing.
+Give abilities distinct method names when that ambiguity is possible,
+and supply one implementation per ability.
 
 ## Effects Propagate, and the Checker Verifies It
 
@@ -603,11 +644,76 @@ reached without rewriting the body of `score()`.
 
 `catch()` takes as many error types as you need to handle,
 and handling a subset is tracked as carefully as handling all of them.
-`catch(KeyError, ValueError)` applied to a function that declares both produces `Success[int | KeyError | ValueError]`,
-with every failure moved into the result and nothing left in the error channel.
-`catch(KeyError)` on that same function produces `Try[ValueError, int | KeyError]`.
-The caught error moved to the result, the uncaught one stayed put,
-and the caller inherits it.
+A function that declares two failures shows the difference.
+`parse_score()` looks a name up and converts what it finds,
+so an unknown name raises a `KeyError` and an unreadable value raises a `ValueError`:
+
+```python
+# parse_score.py
+from typing import Final
+from stateless import throws
+
+RAW: Final[dict[str, str]] = {"alice": "42", "bob": "seven"}
+
+@throws(KeyError, ValueError)
+def parse_score(name: str) -> int:
+    return int(RAW[name.lower()])
+```
+
+`@throws(KeyError, ValueError)` makes it `(str) -> Try[KeyError | ValueError, int]`.
+Now catch both errors, then catch one of them:
+
+```python
+# catch_subset.py
+from parse_score import parse_score
+from stateless import Success, Try, catch, run
+
+both = catch(KeyError, ValueError)(parse_score)
+one = catch(KeyError)(parse_score)
+
+def all_handled(name: str) -> Success[str]:
+    value: int | KeyError | ValueError = yield from both(name)
+    match value:
+        case KeyError():
+            return f"{name}: unknown"
+        case ValueError():
+            return f"{name}: unreadable"
+        case _:
+            return f"{name}: {value}"
+
+def one_left(name: str) -> Try[ValueError, str]:
+    value: int | KeyError = yield from one(name)
+    match value:
+        case KeyError():
+            return f"{name}: unknown"
+        case _:
+            return f"{name}: {value}"
+
+for who in ["alice", "bob", "carol"]:
+    print(run(all_handled(who)))
+#: alice: 42
+#: bob: unreadable
+#: carol: unknown
+print(run(one_left("alice")))
+#: alice: 42
+try:
+    run(one_left("bob"))
+except ValueError as e:
+    print(type(e).__name__)
+#: ValueError
+```
+
+`both` is `(str) -> Success[int | KeyError | ValueError]`.
+Every failure moved into the result and nothing is left in the error channel,
+so `all_handled()` can promise `Success[str]`: no failure escapes it,
+and the three names exercise its three branches.
+
+`one` is `(str) -> Try[ValueError, int | KeyError]`.
+The caught error moved to the result and the uncaught one stayed put,
+so `one_left()` must declare a `ValueError` it never handles.
+Calling it on `"bob"` carries that failure to the edge,
+where `run()` raises it as an ordinary exception,
+the same escape `error_escapes.py` showed for a single error.
 Failures cannot be lost, only relocated.
 
 ## Abilities Are Not Special
@@ -1051,12 +1157,9 @@ It is a language that does the encoding for you.
     and run `ty check` on it.
     Fix the error by changing only the annotation,
     then check what `greet_all()`'s callers must now declare.
-3.  Write `parse_score()`, which reads a `dict[str, str]` and returns an `int`,
-    decorated with `@throws(KeyError, ValueError)`.
-    Apply `reveal_type()` to `catch(KeyError, ValueError)(parse_score)` and run `ty check` to see its type,
-    then do the same for `catch(KeyError)(parse_score)`.
-    Explain which of the two leaves an obligation with the caller,
-    and where it went.
+3.  Apply `reveal_type()` to `catch(ValueError)(one_left)` and run `ty check`.
+    Explain why its result type differs from `all_handled()`'s,
+    given that both have handled every error `parse_score()` declares.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 5.  `frozen` and `tomorrow` in `frozen_clock.py` each report a single moment.

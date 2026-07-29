@@ -158,7 +158,7 @@ The checker ensures proper arguments are used because each channel has its own t
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
-the same three-part shape, and the match is deliberate.
+the same three-part shape as a `Generator`, and the match is deliberate.
 `async def` and generator functions both build descriptions that something else drives.
 Calling `interview()` returns a generator object but doesn't run anything in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
@@ -167,7 +167,7 @@ A generator is more interesting than a coroutine here because `yield` is a two-w
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*,
-and whoever is driving it supplies the *answer*.
+and whatever drives it supplies the *answer*.
 Typically, that stepping happens in a driver:
 
 ```python
@@ -210,11 +210,8 @@ The generator is imported unchanged; only the driver is new.
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
-`ANSWERS` fills that role for the rest of the chapter,
-so the later examples import it instead of repeating the same three pairs.
 
-Notice what is missing in `interview()`:
-it does not know where the answers come from.
+Notice that `interview()` does not know where the answers come from.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 `drive()` decides how those needs are met,
@@ -229,12 +226,11 @@ The generator declares Effects, the driver interprets them.
 The reason generators can carry an EMS is that they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
-Each of the three channels crosses that boundary differently,
-so we take them one at a time.
+Each of the three channels cross that boundary differently.
 
 ### Running to Exhaustion
 
-The simplest delegation targets generators that only yield:
+The simplest `yield from` targets generators that only yield:
 
 ```python
 # yield_to_exhaustion.py
@@ -267,7 +263,7 @@ print(list(top()))
 
 Each `yield from` runs its target until that generator is exhausted,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-How many a delegation contributes is a property of the target.
+The number of contributions is a property of the target.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
