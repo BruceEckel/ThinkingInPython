@@ -19,7 +19,7 @@ fenced code, indented code, tables, headings, list items, blockquotes, HTML
 blocks, horizontal rules, and YAML front matter. Inline code spans and footnotes
 are masked before splitting so their internal punctuation never causes a break.
 The line and inline classification used to tell prose from the rest lives in
-`md_prose.py`, shared with the prose linter.
+`tools_prose.py`, shared with the prose linter.
 
 Safety: a file is rewritten only if its whitespace-normalized text is unchanged.
 The tool only moves newlines; it never adds, drops, or alters a word. If that
@@ -43,7 +43,8 @@ import re
 import sys
 from pathlib import Path
 
-from md_prose import (
+from tools_config import CHAPTERS_DIR
+from tools_prose import (
     BLOCKQUOTE,
     FENCE,
     HEADING,
@@ -58,7 +59,6 @@ from md_prose import (
     mask,
     unmask,
 )
-from tools_config import CHAPTERS_DIR
 from tools_repo import md_files, write_text_lf
 
 # Sentences wider than this are broken at clause punctuation. Roughly the

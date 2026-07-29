@@ -135,7 +135,7 @@ sequence is:
 7. `uv run pytest build/examples/NN_Chapter`                      # tests
 8. `uv run python tools/run_examples.py NN_Chapter`               # runs scripts, honors norun.txt
 
-Prose-only edits still need `check_anchors.py` (cross-references) and
+Prose-only edits still need `heading_links.py` (cross-references) and
 `banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
 runs `validate_output.py --update` over all of `Chapters/` now, so a stale
 `#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
@@ -235,7 +235,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   labels them "Appendix X".
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
-  (e.g. anything containing `type[...]` or `__init__`). `check_anchors.py` gates it.
+  (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
 - **`make help` is self-documenting, not hand-written.** A target needs a trailing
   `## text` comment on its own line (and to sit under the right `##@ Category`
   heading) or it will not appear in `make help`. Parsed by `tools/make_help.py`,

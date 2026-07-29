@@ -305,7 +305,7 @@ spectrum from chapter 40) would land the plane instead of parking it.
 
 ### 5.5 External links are ungated
 
-`check_anchors.py` covers internal cross-references, but nothing checks the
+`heading_links.py` covers internal cross-references, but nothing checks the
 book's many external URLs. Chapter 42 alone adds ten links to experimental
 AI-language sites, the category of link most likely to rot within a year.
 A periodic link-check target (even advisory, not gating) would protect the

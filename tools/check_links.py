@@ -11,7 +11,7 @@ This check is advisory and deliberately not part of ``make verify``.
 The network is flaky, sites rate-limit, and a dead external link should
 never block a build. Run it occasionally (``make links``) and prune or
 update what it reports. Internal cross-references are the job of
-``check_anchors.py``, not this script.
+``heading_links.py``, not this script.
 
 Usage:
     python tools/check_links.py                # scan Chapters/

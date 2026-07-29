@@ -39,9 +39,9 @@ from collections.abc import Iterable
 
 import banned_phrases
 import capitalize_comments
-import check_anchors
 import comment_periods
 import comment_spacing
+import heading_links
 import listing_format
 import prose_lint
 from tools_markdown import Document
@@ -55,7 +55,7 @@ CHECKS: list[Check] = [
     comment_spacing.CHECK,
     capitalize_comments.CHECK,
     banned_phrases.CHECK,
-    check_anchors.CHECK,
+    heading_links.CHECK,
     prose_lint.CHECK,
 ]
 

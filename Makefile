@@ -136,7 +136,7 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(PY) tools/comment_periods.py
 	$(PY) tools/capitalize_comments.py
 	$(PY) tools/comment_spacing.py
-	$(PY) tools/check_anchors.py
+	$(PY) tools/heading_links.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/validate_output.py --update Chapters
@@ -351,7 +351,7 @@ prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
 
 # Advisory only, and deliberately not part of `verify` or `ci`: the network
 # is flaky and a dead external site should never block a build. Run it now
-# and then to catch link rot; check_anchors.py covers internal links.
+# and then to catch link rot; heading_links.py covers internal links.
 links:  ## Check the book's external URLs for link rot (advisory, needs network)
 	$(PY) tools/check_links.py
 
@@ -413,7 +413,7 @@ fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
 
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
-	$(PY) tools/check_anchors.py
+	$(PY) tools/heading_links.py
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.

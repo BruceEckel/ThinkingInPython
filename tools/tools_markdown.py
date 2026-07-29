@@ -23,9 +23,9 @@ normal for this convention and is what comment_periods.py,
 comment_spacing.py and listing_format.py already assumed.
 
 Named tools_markdown for the same reason as tools_config/tools_repo/
-tools_pycode/tools_report: it must never collide with a book listing's
-own filename through Python's sys.modules cache. See tools_repo.py's
-docstring for the failure that caused those renames.
+tools_pycode/tools_report/tools_prose: it must never collide with a
+book listing's own filename through Python's sys.modules cache. See
+tools_repo.py's docstring for the failure that caused those renames.
 """
 
 import re
@@ -33,8 +33,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-from md_prose import is_prose_line
 from tools_config import PATH_LINE_RE, RUST_PATH_LINE_RE
+from tools_prose import is_prose_line
 
 # A fence opening or closing at any indent, capturing the language word.
 # Indent-tolerant because the book has one (chapter 17's indented ```cpp).
@@ -194,7 +194,7 @@ class Document:
     def prose_lines(self) -> Iterator[tuple[int, str]]:
         """(1-based line number, line) for each ordinary prose line.
 
-        Skips fenced blocks entirely, then applies md_prose's rule, so
+        Skips fenced blocks entirely, then applies tools_prose's rule, so
         headings, lists, tables, block quotes and indented code are left
         out along with the code.
         """

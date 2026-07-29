@@ -363,7 +363,7 @@ foreign-language quotes, deliberate code strings) are listed in
 knows only a curated list, `tools/spellcheck.py` (using the uv-managed
 `pyspellchecker`) checks every prose word against a real English dictionary, so
 a novel typo is caught. It checks prose only: code blocks, inline code,
-footnotes, and link URLs are stripped via `md_prose`, so identifiers do not
+footnotes, and link URLs are stripped via `tools_prose`, so identifiers do not
 flood it. Accepted terms (technical words, names, coined words) live in
 `tools/data/wordlist.txt`, one lowercase word per line. When it flags a real term,
 add it there; when it flags a typo, fix the prose. Use
@@ -378,7 +378,7 @@ alongside codespell and catches small mechanical slips a spell checker ignores:
 more than one space between words, a space before `.`/`,`/`;`/`!`/`?`, more than
 one blank line in a row, a period or comma left outside a closing quote, and
 trailing whitespace (a two-space hard break is allowed). It shares the
-`md_prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
+`tools_prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
 tables, blockquotes, and HTML are skipped, and inline code spans and footnotes
 are ignored inside a prose line; headings and list-item text are checked but
 their markers are not. It is report-only and exits non-zero on any finding. Run
@@ -494,7 +494,7 @@ make comment-spacing       # check (part of `make ci`)
 make fix-comment-spacing   # collapse the gaps to two spaces
 ```
 
-## check_anchors.py
+## heading_links.py
 
 Verifies that every heading-anchor link resolves to a real heading, so a typo
 does not ship as a dead in-page link. Markdown can link to a heading with

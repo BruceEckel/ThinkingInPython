@@ -18,7 +18,7 @@ record carries the URL and anchor needed to deep-link to it:
      "s": "Immutability",                   # section heading
      "t": "passing frozen=True makes ..."}  # searchable text
 
-Anchors come from `check_anchors.pandoc_anchor()`, so a link the gate accepts in
+Anchors come from `heading_links.pandoc_anchor()`, so a link the gate accepts in
 the Markdown and a link the search results produce resolve to the same heading.
 
 Code inside fenced blocks is indexed along with the prose: in a programming
@@ -39,7 +39,7 @@ import re
 from pathlib import Path
 from typing import NamedTuple
 
-from check_anchors import ATTR_BLOCK, EXPLICIT_ID, pandoc_anchor
+from heading_links import ATTR_BLOCK, EXPLICIT_ID, pandoc_anchor
 from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools_config import FENCE_ANY_RE as FENCE
 from tools_repo import md_files

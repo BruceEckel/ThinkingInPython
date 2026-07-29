@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Shared Markdown classification helpers.
 
 Tools that work on the book's prose (``reflow_prose.py`` and the prose linter)
@@ -13,6 +13,14 @@ opens or closes a block.
 
 ``mask``/``unmask`` replace inline code spans and footnotes with private-use
 characters, so their internal punctuation is invisible to text processing.
+
+The companion to tools_markdown.py, which parses a file's *structure* (its
+fences, blocks, and headings); this one classifies what is prose *within*
+a line. Named tools_prose for the same reason as tools_config/tools_repo/
+tools_markdown/tools_pycode/tools_report: a ``tools_`` prefix can never
+collide with a book listing's own filename through Python's sys.modules
+cache. See tools_repo.py's docstring for the failure that caused those
+renames.
 """
 
 import re

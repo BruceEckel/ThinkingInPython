@@ -7,7 +7,7 @@ dictionary (pyspellchecker) plus a project word list, so anything not a known
 word or an accepted term is reported.
 
 It checks prose only. Fenced and indented code, tables, blockquotes, and HTML
-are skipped via the md_prose classifier; inline code spans, footnotes, and link
+are skipped via the tools_prose classifier; inline code spans, footnotes, and link
 URLs are stripped from each line so identifiers and paths are not flagged.
 Headings and list-item text are checked; their markers are not.
 
@@ -40,8 +40,8 @@ from pathlib import Path
 
 from spellchecker import SpellChecker
 
-from md_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
 from tools_config import DATA_DIR
+from tools_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 WORDLIST = DATA_DIR / "wordlist.txt"

@@ -9,7 +9,7 @@ Checks the prose in `Chapters/*.md` for:
   QUOTE-PUNCT    a period or comma after a closing " (it belongs inside)
   TRAILING-WS    trailing whitespace (a two-space hard break is allowed)
 
-Code is skipped through the shared classifier in `md_prose`: fenced code,
+Code is skipped through the shared classifier in `tools_prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
 spans and footnotes are ignored within a prose line. Headings and list-item text
 are checked, but their markers are not.
@@ -27,8 +27,8 @@ import argparse
 import re
 from collections.abc import Iterator
 
-from md_prose import FENCE, HEADING, LIST_ITEM, code_spans, is_prose_line
 from tools_markdown import Document
+from tools_prose import FENCE, HEADING, LIST_ITEM, code_spans, is_prose_line
 from tools_repo import add_paths_arg, md_files
 from tools_report import Check, Finding, report
 
