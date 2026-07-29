@@ -111,6 +111,9 @@ Notice that `double()` contains no `yield`, so it is not a generator function.
 It does not need to be.
 `success()` returns an object that implements the generator protocol,
 and the annotation only promises that calling `double()` produces an Effect.
+`success()` exists for yield-free functions like this one.
+In a generator function, an ordinary `return` sets the result;
+wrap it in `success()` there and the checker reports a return-type mismatch.
 Functions that request things are generator functions, which we look at next.
 
 Nothing is gained yet, because `double()` was already pure.
@@ -200,6 +203,10 @@ That line does three things, and separating them makes the shape clear:
 Now compare the types.
 `greet` is `(str) -> Depend[Need[Console], None]`.
 `bound` is `(str) -> Success[None]`.
+To see a type yourself, add `reveal_type(bound)` and run `ty check`.
+The checker reports `(name: str) -> Generator[Never, Any, None]`,
+the expanded form of `Success[None]`,
+with `Never` in the channel the alias table promised.
 Handling an ability *subtracts* it from the type.
 An Effect with every ability subtracted is a `Success`,
 and `run()` refuses an unanswered ability.
@@ -249,45 +256,6 @@ which `run()` handles on its own.
 `Exception` is the error channel, which a later section fills.
 `run()` insists on every other ability being answered,
 and those two are what remain when they are.
-
-## Where `run()` Can Be Called
-
-`run()` handles `Async` because it is `asyncio.run(run_async(effect))` underneath.
-That has a consequence worth knowing before you wire Stateless into an existing application.
-`asyncio.run()` refuses to start a second event loop inside a running one,
-so `run()` cannot be called from any `async def`:
-
-```python
-# inside_a_loop.py
-import asyncio
-from greeter import Console, greet
-from stateless import run, run_async, supply
-
-bound = supply(Console())(greet)
-
-async def main() -> None:
-    try:
-        run(bound("Alice"))
-    except RuntimeError as e:
-        print(e)
-    await run_async(bound("Bob"))
-
-asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
-#: Hello, Bob!
-```
-
-Running this prints a `RuntimeWarning` on standard error alongside the caught message.
-`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
-which then refuses, leaving that coroutine un-awaited.
-It is harmless and it tells you where the boundary is.
-
-`run_async()` is the same driver as a coroutine, so you `await` it instead.
-A synchronous program calls `run()` once at its outermost edge.
-A program that is already asynchronous, a web service or a bot,
-awaits `run_async()` at the edge of each request.
-Picking the wrong one is a runtime error rather than a type error,
-which makes it one of the few mistakes in this chapter the checker will not catch for you.
 
 ## Swapping the Implementation
 
@@ -367,15 +335,16 @@ separate from any implementation.
 and neither is named anywhere in `greet()`.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
-This is the form to write in production,
-and the rest of the chapter does not use it.
-The remaining listings keep importing `greeter.py`'s concrete `Console`,
-because every supply site in the `Protocol` version costs an `as_type()`:
+This is the form to write in production.
+The smaller listings that follow keep importing `greeter.py`'s concrete `Console`,
+because a supply site for a `Protocol` ability needs help naming the interface:
 `supply(Console())` becomes `supply(as_type(Console)(Terminal()))`.
-That is a real price the interface charges, not only a shortcut for the book,
-and it is worth seeing before you decide.
-Everything the rest of the chapter shows about propagation, errors,
-and handlers works the same under either form.
+That is a real price the interface charges, not only a shortcut for the book.
+[Composing the Whole Program](#composing-the-whole-program)
+returns to `Protocol` abilities and shows the cheaper way to pay it:
+a boundary function whose parameters are annotated with the interface types,
+so the cast disappears into ordinary parameter annotations.
+Everything in between works the same under either form.
 
 You may also not need to declare an ability at all.
 Stateless includes three of its own:
@@ -425,9 +394,9 @@ because both bindings have the same type.
 Both instances go through `as_type(Console)`,
 since neither is nominally a `Console`.
 
-This is a place where a library EMS gives up something a native one keeps.
-ZIO reports two implementations of one requirement as a compile-time error that names both,
-because its dependency graph is resolved by the compiler.
+Here Stateless gives up something ZIO keeps.
+ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
+because its `provide` resolves the dependency graph during compilation.
 `supply()` resolves at runtime by scanning its arguments,
 so the same mistake produces a program that runs and does the wrong thing.
 Give abilities distinct method names when that ambiguity is possible,
@@ -504,6 +473,46 @@ Compare that to `ask_tell.py` in [Effect Management](44_Effect_Management.md#eff
 where `greet(ask, tell)` took its dependencies as arguments.
 Nothing there stopped an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
+
+## Where `run()` Can Be Called
+
+The error message in `unsupplied.py` said `run()` handles `Async` on its own.
+It can do that because `run()` is `asyncio.run(run_async(effect))` underneath.
+That has a consequence worth knowing before you wire Stateless into an existing application.
+`asyncio.run()` refuses to start a second event loop inside a running one,
+so `run()` cannot be called from any `async def`:
+
+```python
+# inside_a_loop.py
+import asyncio
+from greeter import Console, greet
+from stateless import run, run_async, supply
+
+bound = supply(Console())(greet)
+
+async def main() -> None:
+    try:
+        run(bound("Alice"))
+    except RuntimeError as e:
+        print(e)
+    await run_async(bound("Bob"))
+
+asyncio.run(main())
+#: asyncio.run() cannot be called from a running event loop
+#: Hello, Bob!
+```
+
+Running this prints a `RuntimeWarning` on standard error alongside the caught message.
+`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
+which then refuses, leaving that coroutine un-awaited.
+It is harmless and it tells you where the boundary is.
+
+`run_async()` is the same driver as a coroutine, so you `await` it instead.
+A synchronous program calls `run()` once at its outermost edge.
+A program that is already asynchronous, a web service or a bot,
+awaits `run_async()` at the edge of each request.
+Picking the wrong one is a runtime error rather than a type error,
+which makes it one of the few mistakes in this chapter the checker will not catch for you.
 
 ## Adding an Effect Deep in the Stack
 
@@ -728,7 +737,10 @@ Handling one inside the system is the next section.
 ## Turning an Error Into a Value
 
 `catch()` handles an error the way `supply()` handles an ability.
-It removes the error from the type and moves it into the result:
+It removes the error from the type and moves it into the result.
+`@throws` and `catch()` are two ends of one pipe:
+the decorator puts a raised exception into the channel,
+and `catch()` takes it back out:
 
 ```python
 # catch_score.py
@@ -851,7 +863,7 @@ Failures cannot be lost, only relocated.
 ## Abilities Are Not Special
 
 `Need` looks built-in, but it is an ordinary class, and you can write your own.
-An ability subclasses `Ability[T]`, where `T` is the type handling it produces.
+An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 Here is the `Ask` and `Tell` program from [Effect Management](44_Effect_Management.md#effects-by-hand),
 rebuilt:
 
@@ -911,6 +923,17 @@ so the annotation is an assertion the checker takes on faith rather than a type 
 `Ability[str]` is where the claim comes from,
 and writing it at the binding keeps the accessor's promise in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
+
+That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
+and the difference deserves a moment.
+`Ask` is an ability, so it sits in the channel bare.
+`Console` never was one.
+It is an ordinary class, and `Need[Console]` is the ability:
+a request object carrying the class it asks for.
+The bound the chapter opened with enforces the distinction.
+`Effect`'s first type parameter accepts only `Ability` subclasses,
+so writing `Depend[Console, None]` is rejected at the annotation,
+before any `yield` is examined: `Console` is not assignable to the bound.
 
 `handle()` reads the annotation on its argument to decide which ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
@@ -1584,6 +1607,32 @@ the library's own `Files` ability opens and closes a file inside a single `read_
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
 
+## The Toolkit in One Table
+
+That completes the toolkit.
+Every tool either builds a description, rewrites a description's type,
+or executes one, and the type column is the part worth memorizing:
+
+| Tool | Applied to | What it does to the type |
+|---|---|---|
+| `success(value)` | a value | wraps it as `Success[R]` |
+| `need(C)` | a class | builds `Depend[Need[C], C]`, producing an instance |
+| `supply(*instances)` | a function returning an Effect | subtracts each `Need[T]` matched by `isinstance()` |
+| `handle(handler)` | a function returning an Effect | subtracts the ability the handler's parameter names |
+| `@throws(*E)` | a function that can raise exceptions | adds each `E` to the error channel |
+| `catch(*E)` | a function returning an Effect | moves each `E` from the error channel into the result |
+| `retry(schedule)` | a function returning an Effect | adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
+| `repeat(schedule)` | a function returning an Effect | same additions; the result becomes a tuple of every run |
+| `memoize` | a function returning an Effect | type unchanged; the result is cached by argument |
+| `fork` | a function returning a supplied Effect | adds `Need[Executor]`; the result becomes `Task[R]` |
+| `wait(task)` | a `Task` | adds `Async`; produces the task's `R` |
+| `run(effect)` | an Effect with only `Async` and errors left | executes it; a leftover error is raised |
+| `await run_async(effect)` | the same | the same, from inside a running event loop |
+
+Everything above the last two rows transforms descriptions.
+Only `run()` and `run_async()` perform work,
+which is the description/execution split in table form.
+
 ## Where the Guarantee Stops
 
 A full accounting needs the limits,
@@ -1613,6 +1662,14 @@ and `requests.get()` are ordinary calls with ordinary types.
 A native EMS computes a function's Effects from its body.
 A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
+
+The same hole opens on the error side.
+`@throws` catches only the exception types it names,
+so an unlisted exception propagates as an ordinary raised exception, untracked.
+And `catch()` matches the values an Effect yields,
+not exceptions the body raises,
+so a failure that was never lifted by `@throws` goes past `catch()` untouched.
+The channel carries only what was put into it.
 
 The second limit is about how much of the type survives partial handling,
 and it depends on your checker rather than on the library.
@@ -1752,7 +1809,7 @@ rate limiting, bulkheads, and circuit breakers, none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 and that is a different thing from a platform to build a distributed system on.
 
-## What This Costs and What It Buys
+## Costs and Benefits
 
 [Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
 argued that Effects are the next scaling barrier,
@@ -1842,6 +1899,11 @@ It is a language that does the encoding for you.
 6.  `leaky_effect.py` type-checks while lying about its purity.
     Describe a review rule or a lint check that would catch it,
     and explain why a type checker cannot.
+    Then demonstrate the error-side twin:
+    write a function that raises a `KeyError` with no `@throws`,
+    wrap it in `catch(KeyError)`, and run it on a failing input.
+    Explain what the types claim, what the run does,
+    and which line restores the guarantee.
 7.  Add a `Metal` material to `test_nailer.py` with a brittleness that survives the robotic nailer,
     and add its two rows to the table.
     Then explain why the test function body needed no change.
