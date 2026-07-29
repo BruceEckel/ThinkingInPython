@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -329,14 +329,14 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 # Spell-check the book and lint it for small mechanical slips. codespell
 # catches known misspellings (prose and code comments); prose_lint catches
 # spacing/blank-line/punctuation slips; spellcheck.py is a full-dictionary check
-# of the prose, with accepted terms in tools/wordlist.txt. Run one chapter with
+# of the prose, with accepted terms in tools/data/wordlist.txt. Run one chapter with
 # CH= (e.g. `make spell CH=29`) or a path with DOCS=.
 spell:  ## codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)
 	$(SPELL) $(PROSE_FILES)
 	$(PY) tools/prose_lint.py $(PROSE_FILES)
 	$(PY) tools/spellcheck.py $(PROSE_FILES)
 
-# Accept every word spellcheck.py doesn't recognize into tools/wordlist.txt
+# Accept every word spellcheck.py doesn't recognize into tools/data/wordlist.txt
 # (sorted, deduplicated) instead of failing. It cannot tell a real term from
 # a typo, so always review the diff before committing; a real typo belongs
 # in the prose, not the wordlist.
@@ -382,8 +382,8 @@ listings:  ## Check python listings keep blank lines minimal
 fix-listings:  ## Remove the offending blank lines from listings
 	$(PY) tools/listing_format.py --fix
 
-# Fail if any phrase in tools/banned_phrases.txt appears anywhere in the book.
-banned:  ## Fail if any tools/banned_phrases.txt phrase is in the book
+# Fail if any phrase in tools/data/banned_phrases.txt appears anywhere in the book.
+banned:  ## Fail if any tools/data/banned_phrases.txt phrase is in the book
 	$(PY) tools/banned_phrases.py
 
 # A one-line listing comment ends without a period; only multiline comments use
@@ -395,7 +395,7 @@ fix-comment-periods:  ## Remove those trailing periods
 	$(PY) tools/comment_periods.py --fix
 
 # A prose comment starts with a capital. Heuristic, so false positives are
-# listed in tools/comment_caps_allow.txt. Run `make fix-comment-caps` to apply.
+# listed in tools/data/comment_caps_allow.txt. Run `make fix-comment-caps` to apply.
 comment-caps:  ## Fail if a prose comment is not capitalized (heuristic)
 	$(PY) tools/capitalize_comments.py
 

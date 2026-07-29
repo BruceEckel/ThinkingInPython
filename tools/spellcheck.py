@@ -11,20 +11,20 @@ are skipped via the md_prose classifier; inline code spans, footnotes, and link
 URLs are stripped from each line so identifiers and paths are not flagged.
 Headings and list-item text are checked; their markers are not.
 
-Accepted terms (technical words, names, coined words) go in tools/wordlist.txt,
+Accepted terms (technical words, names, coined words) go in tools/data/wordlist.txt,
 one lowercase word per line, with `#` comments allowed. Unknown words are
 reported as `path:line` and a non-zero exit makes it a gate.
 
 Whenever anything is unknown, the run ends with a paste-ready block: every
 unique unknown word, one per line, sorted, with no locations or counts, so
-the list can be pasted straight into tools/wordlist.txt after a quick skim
+the list can be pasted straight into tools/data/wordlist.txt after a quick skim
 for real typos.
 
 --add skips that paste step and writes the words into the wordlist file
 directly (merged with what's already there, deduplicated, resorted). It
 still exits 0 either way, since after --add the wordlist is caught up by
 definition. It does not distinguish a genuine term from a typo, so review
-the diff (`git diff tools/wordlist.txt`) before committing, and revert any
+the diff (`git diff tools/data/wordlist.txt`) before committing, and revert any
 line that is actually a typo rather than a fix in the prose.
 
 Usage:
@@ -41,10 +41,10 @@ from pathlib import Path
 from spellchecker import SpellChecker
 
 from md_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
-from tools_config import TOOLS_DIR
+from tools_config import DATA_DIR
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
-WORDLIST = TOOLS_DIR / "wordlist.txt"
+WORDLIST = DATA_DIR / "wordlist.txt"
 
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")   # [text](url) -> text
 _URL = re.compile(r"(?:https?://|www\.)\S+")
@@ -190,10 +190,10 @@ def main(argv: list[str] | None = None) -> int:
                     total += 1
         if total:
             print(f"\n{total} unknown word occurrence(s). "
-                  "Fix the typos or add terms to tools/wordlist.txt.")
+                  "Fix the typos or add terms to tools/data/wordlist.txt.")
 
     if unknown:
-        print("\nPaste into tools/wordlist.txt:")
+        print("\nPaste into tools/data/wordlist.txt:")
         for word in sorted(unknown):
             print(word)
         return 1

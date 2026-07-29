@@ -94,7 +94,7 @@ sync, gates, `make reflow CH=NN` on the new prose).
 
 Accrued notes from the chapters 18-38 review sweep:
 
-- "reach for" sits in `tools/banned_phrases.txt` and is an easy tic to
+- "reach for" sits in `tools/data/banned_phrases.txt` and is an easy tic to
   type when drafting new prose; the gate catches it, but check drafts
   for it before running the gate.
 - Cross-chapter threads now exist whose ends must stay consistent when
@@ -228,9 +228,9 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `(cd build/examples && uv run ty check NN_Chapter)`.
 - **`run_examples.py`: never pass a relative `--tree`.** It goes on `PYTHONPATH`
   and breaks once an example changes cwd. GUI/interactive examples are skipped via
-  `tools/norun.txt` (keep those paths current when chapters are renumbered).
+  `tools/data/norun.txt` (keep those paths current when chapters are renumbered).
 - **Renumbering a chapter** touches: `Chapters/` and `Examples/` filenames, every
-  `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/norun.txt`, and the
+  `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/data/norun.txt`, and the
   `README.md` tracking table. Appendices use letter prefixes (`A_...`); build_site
   labels them "Appendix X".
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`

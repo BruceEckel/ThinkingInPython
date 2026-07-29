@@ -322,7 +322,7 @@ and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green in turn,
 so you watch the pack move through the maze from the entry outward.
 Like every windowed view in this book, the harness skips it
-(`tools/norun.txt` lists all three of this chapter's views):
+(`tools/data/norun.txt` lists all three of this chapter's views):
 
 ```python
 # rats_and_mazes/rats_view.py

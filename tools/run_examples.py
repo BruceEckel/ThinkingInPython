@@ -12,7 +12,7 @@ input, or loop forever. Exclude those two ways:
 
   * inline marker: a line ``# extract: no-run`` anywhere in the file, or
   * skip list: glob patterns (one per line, ``#`` comments allowed) in
-    ``tools/norun.txt``.
+    ``tools/data/norun.txt``.
 
 Exit status is non-zero if any non-skipped example fails or times out.
 
@@ -21,7 +21,7 @@ publishing plan). A run that is red on every one of those is useless as a gate,
 so this script also supports a *baseline* of currently-known failures:
 
   * ``--write-baseline`` records the set of failing/timing-out examples to
-    ``tools/examples_baseline.txt``.
+    ``tools/data/examples_baseline.txt``.
   * ``--baseline`` runs, then fails only on *new* breakage (an example that
     fails but is not in the baseline). Examples that used to fail and now pass
     are reported as good news; trim them from the baseline as Phase 2 lands.
@@ -47,11 +47,11 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from tools_config import DATA_DIR, INLINE_NORUN_MARKER, NORUN_FILE
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TOOLS_DIR
 from tools_repo import jobs_arg, load_glob_list, write_text_lf
 
-BASELINE_FILE = TOOLS_DIR / "examples_baseline.txt"
+BASELINE_FILE = DATA_DIR / "examples_baseline.txt"
 
 
 def is_pytest_file(name: str) -> bool:
@@ -196,7 +196,7 @@ def main(argv: list[str] | None = None) -> int:
     ):
         print(f"{label:<22}{count}")
     if timed_out:
-        print("\nTimed out (consider adding to tools/norun.txt):")
+        print("\nTimed out (consider adding to tools/data/norun.txt):")
         for rel in timed_out:
             print(f"  T {rel}")
     if failed:
@@ -218,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
         fixed = sorted(baseline - current)
         if fixed:
             print(f"\n{len(fixed)} example(s) in the baseline now pass. "
-                  "Trim them from tools/examples_baseline.txt:")
+                  "Trim them from tools/data/examples_baseline.txt:")
             for rel in fixed:
                 print(f"  + {rel}")
         if regressions:

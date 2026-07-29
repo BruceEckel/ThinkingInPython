@@ -37,9 +37,9 @@ package = false
 # Spell checking for the book prose (and code comments). codespell uses a
 # curated misspelling dictionary, so it is low-noise even over code. Words it
 # flags wrongly (design-pattern terms, foreign quotes, deliberate code strings)
-# live in tools/codespell-ignore.txt. Run with `make spell`.
+# live in tools/data/codespell-ignore.txt. Run with `make spell`.
 [tool.codespell]
-ignore-words = "tools/codespell-ignore.txt"
+ignore-words = "tools/data/codespell-ignore.txt"
 skip = "./.git,./.venv,./build,./resources,./uv.lock,*.gif,*.png"
 
 # PEP 8 linting for the examples. line-length is 70 to match the book's HTML

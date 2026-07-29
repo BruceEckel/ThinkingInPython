@@ -154,7 +154,7 @@ jobs:
           enable-cache: true
 
       # Spelling: codespell is a uv-managed dev tool. Config lives in
-      # pyproject [tool.codespell]; the ignore list in tools/codespell-ignore.txt.
+      # pyproject [tool.codespell]; the ignore list in tools/data/codespell-ignore.txt.
       - name: Install tooling
         run: uv sync --locked
 

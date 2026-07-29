@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Fail the build if any banned phrase appears in the book.
 
-Reads phrases from `tools/banned_phrases.txt` (one per line) and searches every
+Reads phrases from `tools/data/banned_phrases.txt` (one per line) and searches every
 `Chapters/*.md` file, prose and code alike, for each as a literal,
 case-sensitive substring. Every occurrence is reported as `path:line:col`, and
 a non-zero exit makes it a gate. Use it to retire constructs the book has moved
@@ -20,12 +20,12 @@ from collections.abc import Iterable, Iterator
 from functools import cache
 from pathlib import Path
 
-from tools_config import TOOLS_DIR
+from tools_config import DATA_DIR
 from tools_markdown import Document
 from tools_repo import add_paths_arg, md_files
 from tools_report import Check, Finding, report
 
-PHRASES_FILE = TOOLS_DIR / "banned_phrases.txt"
+PHRASES_FILE = DATA_DIR / "banned_phrases.txt"
 
 
 def load_phrases(path: Path) -> list[str]:
@@ -69,11 +69,11 @@ def find(doc: Document) -> Iterator[Finding]:
 
 CHECK = Check(
     name="banned",
-    doc="no phrase from tools/banned_phrases.txt appears in the book",
+    doc="no phrase from tools/data/banned_phrases.txt appears in the book",
     run=find,
     clean="No banned phrases found.",
     problem="{n} banned phrase occurrence(s). "
-            "Remove them or edit tools/banned_phrases.txt.",
+            "Remove them or edit tools/data/banned_phrases.txt.",
 )
 
 

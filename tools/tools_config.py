@@ -25,11 +25,16 @@ TOOLS_DIR = ROOT / "tools"
 CHAPTERS_DIR = ROOT / "Chapters"
 PYVER = ROOT / ".python-version"
 
+# The word lists, allowlists, and glob lists the scripts read. Kept in
+# their own directory so tools/ lists code and nothing else; each script
+# still names its own file, next to the code that reads it.
+DATA_DIR = TOOLS_DIR / "data"
+
 BUILD_DIR = ROOT / "build"
 EXAMPLES_TREE = BUILD_DIR / "examples"
 BUILD_SITE_DIR = BUILD_DIR / "site"
 
-NORUN_FILE = TOOLS_DIR / "norun.txt"
+NORUN_FILE = DATA_DIR / "norun.txt"
 
 # A line marking a listing as unrunnable (GUI, interactive input, infinite
 # loop): skip it rather than execute it unattended.

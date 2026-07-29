@@ -143,7 +143,9 @@ def test_block_is_frozen() -> None:
     block = Document.from_text("```python\nx\n```\n").blocks[0]
     assert isinstance(block, Block)
     try:
-        block.lang = "text"  # type: ignore[misc]
+        # Suppressed twice on purpose: ty gates this repo, Pyright runs in
+        # the editor, and neither reads the other's pragma.
+        block.lang = "text"  # type: ignore[misc]  # ty: ignore[invalid-assignment]
     except AttributeError:
         return
     raise AssertionError("Block should be immutable")

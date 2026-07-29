@@ -246,7 +246,7 @@ Some examples open GUI windows, read stdin, or depend on dead frameworks. Skip
 them two ways:
 
 * an inline `# extract: no-run` line in the file, or
-* a glob pattern in `tools/norun.txt`.
+* a glob pattern in `tools/data/norun.txt`.
 
 Only skip examples that cannot run even when correct, such as ones needing a
 GUI or user input. A newly broken example should stay visible as a failure,
@@ -256,7 +256,7 @@ not be skipped.
 
 Most examples failed during the Phase 2 modernization, so a runner that was
 red on every one of them would have gated nothing.
-`tools/examples_baseline.txt` records the set of then-failing examples. Two
+`tools/data/examples_baseline.txt` records the set of then-failing examples. Two
 modes use it:
 
 ```
@@ -356,7 +356,7 @@ unusual typo that is not on its list ("fixted" for "fixed"); for that there is
 the full-dictionary check below. Configuration lives in `[tool.codespell]` in
 `pyproject.toml`; words it flags wrongly (design-pattern terms like `adaptee`,
 foreign-language quotes, deliberate code strings) are listed in
-`tools/codespell-ignore.txt`. Scope it with `CH=`, for example
+`tools/data/codespell-ignore.txt`. Scope it with `CH=`, for example
 `make spell CH=02`.
 
 **Full-dictionary spelling: spellcheck.py (`make spell`).** Where codespell
@@ -365,13 +365,13 @@ knows only a curated list, `tools/spellcheck.py` (using the uv-managed
 a novel typo is caught. It checks prose only: code blocks, inline code,
 footnotes, and link URLs are stripped via `md_prose`, so identifiers do not
 flood it. Accepted terms (technical words, names, coined words) live in
-`tools/wordlist.txt`, one lowercase word per line. When it flags a real term,
+`tools/data/wordlist.txt`, one lowercase word per line. When it flags a real term,
 add it there; when it flags a typo, fix the prose. Use
 `uv run python tools/spellcheck.py --summary` to see the unique unknowns by
 count, which makes seeding the word list quick. `make spell-add` automates the
 "add it there" step: it accepts every unknown word into the wordlist, sorted
 and deduplicated. It cannot tell a real term from a typo, so always review
-`git diff tools/wordlist.txt` before committing.
+`git diff tools/data/wordlist.txt` before committing.
 
 **Mechanical prose: prose_lint (`make spell`).** `tools/prose_lint.py` runs
 alongside codespell and catches small mechanical slips a spell checker ignores:
@@ -435,7 +435,7 @@ linter) only, which is happy with one blank line.
 
 ## banned_phrases.py
 
-Fails the build if any phrase listed in `tools/banned_phrases.txt` appears
+Fails the build if any phrase listed in `tools/data/banned_phrases.txt` appears
 anywhere in `Chapters/`, prose and code alike (unlike Vale, which only sees
 prose). Matching is a literal, case-sensitive substring; each occurrence is
 reported as `path:line:col`. Use it to retire a construct book-wide, for example
@@ -468,7 +468,7 @@ prose-vs-code judgment is a heuristic, so it skips code-identifier first words,
 single letters, and keywords, and continuation lines of a multiline comment. Its
 unavoidable false positives (program output like `# total = 7`, an identifier
 reference like `# n is the counter`, schematic notation like `# name -> subclass`)
-are listed by comment text in `tools/comment_caps_allow.txt` and skipped. It is
+are listed by comment text in `tools/data/comment_caps_allow.txt` and skipped. It is
 part of the `make ci` gate.
 
 ```
@@ -582,7 +582,7 @@ builds and publishes the site**. The workflow has these jobs:
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
 * **`prose` (opt-in only):** the same checks as `make spell` and `make prose`.
   codespell spell-checks `Chapters/` (config in `[tool.codespell]`, ignore list
-  in `tools/codespell-ignore.txt`) and fails on a spelling error. It then
+  in `tools/data/codespell-ignore.txt`) and fails on a spelling error. It then
   installs the Vale binary and runs the house-style rules in `styles/House/`;
   Vale fails the job on an em-dash (error level) and prints the filler
   findings as warnings. Shares the gates trigger.

@@ -384,7 +384,7 @@ A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 Run `box_view.py` to play.
 It opens a window, so the example harness does not run it
-(`tools/norun.txt` lists it).
+(`tools/data/norun.txt` lists it).
 
 ```python
 # box_view.py

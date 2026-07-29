@@ -13,7 +13,7 @@ comment are skipped so words are not capitalized mid-thought.
 The prose-vs-code call is a heuristic, so it has false positives: literal
 program output (`# total = 7`), an identifier reference (`# n is the counter`),
 schematic notation (`# name -> subclass`). Those are listed by their comment
-text in tools/comment_caps_allow.txt and skipped. Add a line there when the
+text in tools/data/comment_caps_allow.txt and skipped. Add a line there when the
 checker is wrong; capitalize the comment when it is right.
 
 Default is a check that lists comments needing capitalization and exits non-zero
@@ -28,14 +28,14 @@ from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
 
+from tools_config import DATA_DIR
 from tools_config import FENCE_RE as FENCE
-from tools_config import TOOLS_DIR
 from tools_markdown import Document
 from tools_pycode import scan_line as find_comment_hash
 from tools_repo import md_files, write_text_lf
 from tools_report import Check, Finding, report
 
-ALLOWLIST = TOOLS_DIR / "comment_caps_allow.txt"
+ALLOWLIST = DATA_DIR / "comment_caps_allow.txt"
 
 # Word = leading run of ASCII letters in the comment text.
 WORD = re.compile(r"^[A-Za-z]+")
@@ -200,7 +200,7 @@ CHECK = Check(
     run=find,
     clean="Comment capitalization OK.",
     problem="{n} comment(s) need capitalizing. Capitalize them, "
-            "or add the text to tools/comment_caps_allow.txt.",
+            "or add the text to tools/data/comment_caps_allow.txt.",
     fixer=fixed,
 )
 

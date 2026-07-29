@@ -32,7 +32,7 @@ The review as originally written follows.
 A hostile read of the entire book (chapters 01 through 42), plus cross-checks
 of the repository claims the prose makes. The mechanical layer is healthy:
 `make verify` passes end to end, all 174 tests pass, every referenced image
-exists, `tools/norun.txt` is current, and no `#:` marker drifted during a
+exists, `tools/data/norun.txt` is current, and no `#:` marker drifted during a
 fresh gate run on this machine. Everything below is therefore editorial,
 factual, or structural. Findings are grouped by severity.
 

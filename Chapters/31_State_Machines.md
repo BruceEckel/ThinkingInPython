@@ -677,7 +677,8 @@ and the GUI catches a click that the state machine rejects
 The button loop builds sixteen commands with `partial(select, r, c)`,
 not with a lambda: sixteen lambdas closing over `r` and `c` would all see the loop's final values,
 the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime).
-Because it requires user interaction the harness skips it (`tools/norun.txt`):
+Because it requires user interaction the harness skips it
+(`tools/data/norun.txt`):
 
 ```python
 # tabledriven/vending_view.py
