@@ -224,10 +224,12 @@ prune-examples:  ## Delete orphaned stray files under Examples/ (see `check`)
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
 
-local: site  ## Build the site, serve it, and open a browser
-	$(PY) tools/serve.py --open
+# --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
+# not a full site build), then the open page reloads itself.
+local: site  ## Build the site, serve it with live reload, open a browser
+	$(PY) tools/serve.py --open --watch
 
-serve:  ## Serve build/site/ at http://localhost:8000
+serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 	$(PY) tools/serve.py
 
 ##@ Examples (build/examples/)

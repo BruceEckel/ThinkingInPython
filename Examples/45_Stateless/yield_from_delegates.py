@@ -9,9 +9,9 @@ def ask(question: Question) -> Generator[Question, Answer, Answer]:
     return answer
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield from ask(Question("name"))
-    town = yield from ask(Question("town"))
-    friend = yield from ask(Question("friend"))
+    name: Answer = yield from ask(Question("name"))
+    town: Answer = yield from ask(Question("town"))
+    friend: Answer = yield from ask(Question("friend"))
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ class Tell(Ability[None]):
     message: str
 
 def ask(prompt: str) -> Depend[Ask, str]:
-    answer = yield from Ask(prompt)
+    answer: str = yield from Ask(prompt)
     return answer
 
 def tell(message: str) -> Depend[Tell, None]:

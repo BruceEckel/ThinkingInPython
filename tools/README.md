@@ -782,7 +782,14 @@ are left alone.
 Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
 use `-o DIR` to build elsewhere. `make serve` builds nothing and serves the
 existing `build/site/` at <http://localhost:8000>; `make local` builds, serves,
-and opens a browser at the site.
+watches for edits, and opens a browser at the site.
+
+`rebuild_chapter()` is the incremental entry point `serve.py --watch` uses:
+it re-renders one chapter (a single pandoc run, against the ~46 of a full
+build) plus the index page and the search index, both of which a changed
+heading affects and neither of which needs pandoc. It returns `False` for a
+path that is not a book chapter, or when `build/site/` does not exist yet,
+leaving the caller to do a full build.
 
 ## search_index.py
 
@@ -802,9 +809,22 @@ resolve to the same heading.
 ## serve.py
 
 Serves `build/site/` over HTTP for local preview. `make serve` runs it as-is;
-`make local` builds the site first, then runs it with `--open` to launch a
-browser. Use `--port N` for another port. It does not build anything, so run a
-site build first if `build/site/` is missing.
+`make local` builds the site first, then runs it with `--open --watch`. Use
+`--port N` for another port. It builds nothing on startup, so run a site build
+first if `build/site/` is missing.
+
+`--watch` turns it into an edit loop. A daemon thread compares modification
+times every second across `Chapters/*.md` and the few files the whole site
+renders from (`template.html`, the static assets, `build_site.py`,
+`search_index.py`). A changed chapter goes through
+`build_site.rebuild_chapter()`, roughly 0.3s here; a changed template or tool
+rebuilds every page, roughly 5s. Served pages carry an injected script that
+polls `/__reload` for a token the watcher bumps after each rebuild, so the
+open page refreshes on its own. A rebuild holds a lock the request handler
+also takes, so no request can read `build/site/` while a full build is
+deleting and rewriting it. Polling beats a filesystem-watch library here
+because it needs no new dependency, and 50-odd `stat()` calls a second cost
+nothing.
 
 ### Publishing to GitHub Pages
 

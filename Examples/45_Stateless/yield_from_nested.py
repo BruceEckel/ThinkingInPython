@@ -5,8 +5,8 @@ from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
-    profile = yield from interview()
-    color = yield from ask(Question("color"))
+    profile: Result = yield from interview()
+    color: Answer = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
 print(drive(survey(),

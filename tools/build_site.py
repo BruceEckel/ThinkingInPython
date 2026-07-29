@@ -286,6 +286,61 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
 # --------------------------------------------------------------------------- #
 # Driver
 # --------------------------------------------------------------------------- #
+def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
+               img_map: dict[str, str], missing: set[str],
+               chapter_toc: bool) -> set[str]:
+    """Render one chapter into out_dir; return the images it references."""
+    i = chapters.index(ch)
+    prev = chapters[i - 1] if i > 0 else None
+    nxt = chapters[i + 1] if i + 1 < len(chapters) else None
+    _, body = load_chapter(ch.md)
+    used = {m.group(2) for m in IMG_REF.finditer(body)}
+    body = rewrite_images(body, img_map, missing)
+    body = rewrite_md_links(body)
+    page = render_chapter(body, ch, prev, nxt, chapter_toc)
+    (out_dir / ch.out_name).write_text(page, encoding="utf-8")
+    return used
+
+
+def write_shared(chapters: list[Chapter], out_dir: Path) -> int:
+    """Write the index page and the search index. Returns sections indexed."""
+    (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
+    return search_index.write(
+        [search_index.Source(ch.md, ch.out_name, ch.title, ch.label)
+         for ch in chapters], out_dir)
+
+
+def rebuild_chapter(md: Path, out_dir: Path,
+                    chapter_toc: bool = CHAPTER_TOC) -> bool:
+    """Re-render one chapter page, plus the index and search index.
+
+    This is the incremental path `serve.py --watch` takes: one pandoc run
+    instead of the ~46 a full build spends. The index and search index are
+    rewritten too, since editing a heading changes both, and neither costs
+    a pandoc run. Returns False when `md` is not a book chapter or the site
+    has not been built yet, leaving the caller to do a full build.
+    """
+    if not out_dir.is_dir():
+        return False
+    chapters = discover()
+    # Callers may name the chapter relative to the repo root; discover()
+    # builds absolute paths.
+    target = md.resolve()
+    ch = next((c for c in chapters if c.md.resolve() == target), None)
+    if ch is None:
+        return False
+    img_map = build_image_map()
+    used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc)
+    images_out = out_dir / "images"
+    for name in sorted(used):
+        filename = img_map.get(name)
+        if filename and not (images_out / filename).exists():
+            images_out.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(IMAGES_SRC / filename, images_out / filename)
+    write_shared(chapters, out_dir)
+    return True
+
+
 def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
     check_pandoc()
     if not TEMPLATE.exists():
@@ -301,23 +356,13 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
     used_images: set[str] = set()
     missing: set[str] = set()
 
-    for i, ch in enumerate(chapters):
-        prev = chapters[i - 1] if i > 0 else None
-        nxt = chapters[i + 1] if i + 1 < len(chapters) else None
-        _, body = load_chapter(ch.md)
-        for m in IMG_REF.finditer(body):
-            used_images.add(m.group(2))
-        body = rewrite_images(body, img_map, missing)
-        body = rewrite_md_links(body)
-        page = render_chapter(body, ch, prev, nxt, chapter_toc)
-        (out_dir / ch.out_name).write_text(page, encoding="utf-8")
+    for ch in chapters:
+        used_images |= write_page(ch, chapters, out_dir, img_map, missing,
+                                  chapter_toc)
 
-    (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
-    sections = search_index.write(
-        [search_index.Source(ch.md, ch.out_name, ch.title, ch.label)
-         for ch in chapters], out_dir)
+    sections = write_shared(chapters, out_dir)
     for name in ("search.css", "search.js"):
         shutil.copy2(STATIC_SRC / name, out_dir / name)
 

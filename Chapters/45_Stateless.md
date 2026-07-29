@@ -290,7 +290,7 @@ def emit(items: list[str]) -> Generator[str, None, int]:
     return total
 
 def report(items: list[str]) -> Iterator[str]:
-    size = yield from emit(items)
+    size: int = yield from emit(items)
     yield f"({size} characters)"
 
 print(list(report(["red", "green", "blue"])))
@@ -372,9 +372,9 @@ def ask(question: Question) -> Generator[Question, Answer, Answer]:
     return answer
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield from ask(Question("name"))
-    town = yield from ask(Question("town"))
-    friend = yield from ask(Question("friend"))
+    name: Answer = yield from ask(Question("name"))
+    town: Answer = yield from ask(Question("town"))
+    friend: Answer = yield from ask(Question("friend"))
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
@@ -424,8 +424,8 @@ from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
-    profile = yield from interview()
-    color = yield from ask(Question("color"))
+    profile: Result = yield from interview()
+    color: Answer = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
 print(drive(survey(),
@@ -505,15 +505,13 @@ An Effect does not:
 
 What comes back depends on which ability the `yield` requested,
 and one SendType cannot vary from one `yield` to the next.
-Pin it to `Console` and the checker still reads `yield Need(Log)` as producing a `Console`,
-because nothing in the annotation separates the two requests.
-`Any` is what remains: it makes no claim instead of a false one.
+Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
+Anything must come back through the `send()` channel, so we give it type `Any`.
 
-The solution is `yield from`.
+`yield from` recovers the precision that `Any` gave up,
+so a request can produce an answer whose type the checker knows.
 A bare `yield` produces the SendType,
 the type parameter that had to become `Any`.
-That is not because any single answer is unknowable,
-but because one annotation must cover every request the generator makes.
 `yield from` produces the inner generator's return type,
 the third type parameter.
 A single call returns a single type, so that type parameter has no such problem.
@@ -538,8 +536,11 @@ each one filling in `Never` for a type parameter that is not used:
 so `Success[R]` promises there is no ability it can request and no error it can yield.
 The signature is the entire claim.
 
-Start with the smallest of them.
-`success()` wraps a value in an Effect, and `run()` executes one:
+Here, `success()` wraps a value in an Effect, and `run()` executes it.
+`run()` is the Stateless library's driver, replacing our earlier `drive()`.
+`run()` primes the generator, answers each request, and returns the result.
+Nothing computes until `run()` is called, and a program calls it once,
+at its outermost edge:
 
 ```python
 # simplest_effect.py
@@ -559,7 +560,7 @@ Notice that `double()` contains no `yield`, so it is not a generator function.
 It does not need to be.
 `success()` returns an object that implements the generator protocol,
 and the annotation only promises that calling `double()` produces an Effect.
-Functions that request things are generator functions, and they arrive next.
+Functions that request things are generator functions, which we look at next.
 
 Nothing is gained yet, because `double()` was already pure.
 Effects become useful when a function needs something it doesn't create for itself.
@@ -588,7 +589,13 @@ Read the signature as a sentence.
 Compare that to `def greet(name: str) -> None`,
 the version that calls `print()` directly.
 That signature is a lie by omission.
-This one is not, and the rest of the chapter is about who enforces the difference.
+`-> None` claims the function returns nothing and mentions nothing else,
+while the body writes to standard output.
+The only thing that version does is the thing its type leaves out,
+so a caller cannot see the dependency, redirect the output,
+or test the function without capturing stdout.
+`Depend[Need[Console], None]` states the dependency,
+and the rest of the chapter is about who enforces the difference.
 
 Two details deserve attention.
 `greet()` is a generator function, because it contains `yield from`,
@@ -649,7 +656,7 @@ Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
 
-Now break it.
+Let's break it and see what happens.
 Hand `run()` an Effect that still needs a `Console`:
 
 ```python
@@ -960,7 +967,7 @@ from scores import score
 from stateless import Effect, Need, need
 
 def announce(name: str) -> Effect[Need[Console], KeyError, None]:
-    value = yield from score(name)
+    value: int = yield from score(name)
     console = yield from need(Console)
     console.print(f"{name}: {value}")
 ```
@@ -1005,7 +1012,7 @@ from scores import score
 from stateless import Depend, Need, catch, need, run, supply
 
 def report(name: str) -> Depend[Need[Console], None]:
-    value = yield from catch(KeyError)(score)(name)
+    value: int | KeyError = yield from catch(KeyError)(score)(name)
     console = yield from need(Console)
     match value:
         case KeyError():
@@ -1071,7 +1078,7 @@ class Tell(Ability[None]):
     message: str
 
 def ask(prompt: str) -> Depend[Ask, str]:
-    answer = yield from Ask(prompt)
+    answer: str = yield from Ask(prompt)
     return answer
 
 def tell(message: str) -> Depend[Tell, None]:
@@ -1106,6 +1113,12 @@ You can skip the accessor and yield the ability directly,
 and the program still runs,
 but under `ty` 0.0.64 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
+That is what the `answer: str` inside `ask()` is doing.
+`yield from Ask(prompt)` produces `Unknown` there too,
+so the annotation is an assertion the checker takes on faith rather than a type it worked out.
+`Ability[str]` is where the claim comes from,
+and writing it at the binding keeps the accessor's promise in one place,
+one line above the `Depend[Ask, str]` that repeats it to callers.
 
 `handle()` reads the annotation on its argument to decide which ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
