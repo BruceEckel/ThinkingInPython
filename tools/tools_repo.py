@@ -17,6 +17,7 @@ block in a single process.
 """
 
 import argparse
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -40,6 +41,30 @@ def add_paths_arg(ap: argparse.ArgumentParser) -> None:
     ap.add_argument(
         "paths", nargs="*",
         help="Markdown files or directories (default: Chapters/)",
+    )
+
+
+def jobs_arg(value: str) -> int:
+    """Parse --jobs: a positive int, or "auto" for all available cores."""
+    if value == "auto":
+        return os.process_cpu_count() or 1
+    try:
+        n = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            "jobs must be a positive int or 'auto'"
+        ) from None
+    if n < 1:
+        raise argparse.ArgumentTypeError("jobs must be at least 1")
+    return n
+
+
+def add_jobs_arg(ap: argparse.ArgumentParser, what: str) -> None:
+    """The -j/--jobs option, worded for whatever `what` is parallelized."""
+    ap.add_argument(
+        "-j", "--jobs", type=jobs_arg, default="auto", metavar="N",
+        help=f"{what} to process concurrently: an int or 'auto' for all "
+             "cores (default: auto). Use -j 1 for serial.",
     )
 
 

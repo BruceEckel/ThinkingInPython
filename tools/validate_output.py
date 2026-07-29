@@ -23,28 +23,39 @@ from its extracted chapter directory (build/examples/<chapter>/), so imports of
 sibling files and relative data paths resolve the way the book assumes. Run
 `tools/extract_examples.py --write` first so that tree exists.
 
+Files are processed in parallel, one fresh interpreter per file. That is
+not only for speed: running every chapter in one shared process is what
+let an orphaned asyncio task wedge a later chapter's asyncio.run(), and
+what let a reference-cycled class's __del__ fire while an unrelated
+chapter's stdout was being captured. A file that gets its own process
+cannot do either. Use -j 1 to go back to one process for everything,
+which is the right setting when debugging a block that misbehaves.
+
 Usage:
     python tools/validate_output.py file.py        # check one file
     python tools/validate_output.py Examples/      # check directory
     python tools/validate_output.py chapter.md     # check Markdown listings
     python tools/validate_output.py --update file.py   # rewrite markers
     python tools/validate_output.py --update Chapters/ # rewrite the book
+    python tools/validate_output.py -j 1 Chapters/     # serial, one process
 """
 
 import argparse
 import contextlib
 import fnmatch
+import functools
 import gc
 import io
 import os
 import re
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
 from tools_config import INLINE_NORUN_MARKER, NORUN_FILE
 from tools_pycode import walk_fenced
-from tools_repo import block_slug, load_glob_list, write_text_lf
+from tools_repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
 
 # Matches #: or #: <content> at column 0 only.
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')
@@ -387,6 +398,31 @@ def process_md_block(
     return BlockResult(new_lines, ok, changed)
 
 
+def process_one(
+    path: Path, *, update: bool, tree: Path, skips: list[str],
+) -> tuple[bool | None, str]:
+    """Process one file, returning its result and everything it printed.
+
+    This is the unit of work a worker process runs, and the reason the
+    parallel path is a *process* pool rather than a thread pool: running a
+    block mutates interpreter-global state (cwd via ``run_location``,
+    ``sys.path``, ``sys.modules``), which threads would share and corrupt.
+
+    stdout is captured instead of printed so the parent can emit each
+    file's diagnostics as one contiguous group in a fixed order, whatever
+    order the workers happen to finish in.
+    """
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        if path.suffix == '.md':
+            result = process_markdown(
+                path, update=update, tree=tree, skips=skips
+            )
+        else:
+            result = process_file(path, update=update)
+    return result, buf.getvalue()
+
+
 def collect_files(targets: list[Path]) -> list[Path]:
     files: list[Path] = []
     for t in targets:
@@ -424,6 +460,7 @@ def main(argv: list[str] | None = None) -> int:
         '-v', '--verbose', action='store_true',
         help='print each file as it is processed',
     )
+    add_jobs_arg(ap, 'files')
     args = ap.parse_args(argv)
 
     files = collect_files(args.targets)
@@ -432,16 +469,33 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     skips = load_glob_list(NORUN_FILE)
+    work = functools.partial(
+        process_one, update=args.update, tree=args.tree, skips=skips
+    )
+
+    # One fresh process per file, not a pool of reused workers. Files are
+    # independent, but a worker that ran several would share what a block
+    # left behind: an orphaned asyncio task can wedge a later
+    # asyncio.run(), and a class caught in a reference cycle can have its
+    # __del__ fire while an unrelated file's stdout is captured. Both are
+    # documented traps of the old single-process run, and both stop
+    # existing when a file gets an interpreter to itself.
+    jobs = min(max(1, args.jobs), len(files))
+    if jobs == 1:
+        outcomes = map(work, files)
+    else:
+        pool = ProcessPoolExecutor(max_workers=jobs, max_tasks_per_child=1)
+        with pool:
+            # map() yields in submission order, so output stays in file
+            # order and the run is reproducible.
+            outcomes = list(pool.map(work, files))
+
     n_ok = n_fail = n_skip = 0
-    for path in files:
+    for path, (result, output) in zip(files, outcomes, strict=True):
         if args.verbose:
             print(path)
-        if path.suffix == '.md':
-            result = process_markdown(
-                path, update=args.update, tree=args.tree, skips=skips
-            )
-        else:
-            result = process_file(path, update=args.update)
+        if output:
+            print(output, end='')
         match result:
             case None:
                 n_skip += 1

@@ -49,7 +49,7 @@ from pathlib import Path
 
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
 from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TOOLS_DIR
-from tools_repo import load_glob_list, write_text_lf
+from tools_repo import jobs_arg, load_glob_list, write_text_lf
 
 BASELINE_FILE = TOOLS_DIR / "examples_baseline.txt"
 
@@ -81,17 +81,6 @@ def write_baseline(failing: list[str]) -> None:
     write_text_lf(BASELINE_FILE, header + body)
 
 
-def jobs_arg(value: str) -> int:
-    """Parse --jobs: a positive int, or "auto" for all available cores."""
-    if value == "auto":
-        return os.process_cpu_count() or 1
-    try:
-        n = int(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError("jobs must be a positive int or 'auto'")
-    if n < 1:
-        raise argparse.ArgumentTypeError("jobs must be at least 1")
-    return n
 
 
 def run_one(

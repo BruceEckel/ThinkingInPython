@@ -17,6 +17,7 @@ from validate_output import (
     process_block,
     process_file,
     process_markdown,
+    process_one,
     strip_trailing,
 )
 
@@ -691,3 +692,48 @@ def test_process_block_returns_new_lines() -> None:
     assert ok is True
     assert changed is True
     assert new_lines == ["print('hi')\n", "#: hi\n"]
+
+
+# ── process_one (the unit a worker process runs) ──────────────────────────────
+
+def test_process_one_captures_instead_of_printing(
+    tmp_path: Path, capsys: pytest.CaptureFixture,
+) -> None:
+    p = write(tmp_path, "ch.md", "```python\nprint('hi')\n#: bye\n```\n")
+    result, output = process_one(p, update=False, tree=tmp_path, skips=[])
+    assert result is False
+    assert r"want: '#: hi\n'" in output
+    # Nothing leaked to real stdout: the parent orders the output, not the
+    # worker, so a parallel run stays reproducible.
+    assert capsys.readouterr().out == ""
+
+def test_process_one_reports_skip_for_a_file_without_markers(
+    tmp_path: Path,
+) -> None:
+    p = write(tmp_path, "ch.md", "```python\nprint('hi')\n```\n")
+    result, output = process_one(p, update=False, tree=tmp_path, skips=[])
+    assert result is None
+    assert output == ""
+
+def test_process_one_handles_py_files_too(tmp_path: Path) -> None:
+    p = write(tmp_path, "demo.py", "print('hi')\n#: hi\n")
+    result, output = process_one(p, update=False, tree=tmp_path, skips=[])
+    assert result is True
+    assert output == ""
+
+def test_parallel_and_serial_agree(
+    tmp_path: Path, capsys: pytest.CaptureFixture,
+) -> None:
+    # Three files with three different outcomes, so the summary counts all
+    # three branches and the per-file output has something to order.
+    write(tmp_path, "a_ok.md", "```python\nprint('a')\n#: a\n```\n")
+    write(tmp_path, "b_bad.md", "```python\nprint('b')\n#: wrong\n```\n")
+    write(tmp_path, "c_none.md", "```python\nprint('c')\n```\n")
+
+    assert main([str(tmp_path), "-j", "1"]) == 1
+    serial = capsys.readouterr().out
+    assert main([str(tmp_path), "-j", "3"]) == 1
+    parallel = capsys.readouterr().out
+
+    assert serial == parallel
+    assert "1 ok, 1 failed, 1 skipped (no markers)." in serial
