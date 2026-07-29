@@ -84,6 +84,16 @@ hand-written field-assigning `__init__` for no reason, which is the
 drift this pass exists to catch. `grep "def __init__(self" Chapters/`
 is a cheap sweep for the most common case.
 
+When a chapter documents a third-party library, read that library's
+source before asserting anything about it. Its exports and docstrings
+are not enough. Reading `stateless`'s `functions.py` and `effect.py`
+overturned two claims I had already given the author: that `retry` had
+no equivalent (it exists, and its signature explains why it decorates a
+function rather than an Effect), and that `catch()` missing a raised
+exception was a library bug (it is correct behavior, since `catch()`
+matches yielded values). `.venv/Lib/site-packages/<pkg>/` is right there.
+Probe with `reveal_type()` for types and a scratch script for runtime.
+
 Implement confident, small fixes directly. For additions — new listings,
 new exercises, restructured explanations — propose first and let the
 author decide: additions change voice and pacing, and rejecting
@@ -190,6 +200,16 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   gaps between competing deadlines (0.01/0.05/0.25), widest where a
   cancellation must propagate, and treat any `git diff` on a timing
   marker as a red flag to investigate, not drift to accept.
+- **Chapter 19's `gil_threads.py` boolean flips under machine load, and
+  widening its threshold would be wrong.** `thr > seq * 0.9` asserts "threads
+  bought no speedup," and a `make verify` run during back-to-back gates
+  rewrote it to `False`, contradicting the prose one line below. Run standalone
+  it is stable (8 of 8 `True` when measured). Do not widen the band to make it
+  robust: at `0.7` a genuinely 30%-faster threaded run would still report "no
+  faster," hiding the exact regression the listing exists to catch. If it needs
+  hardening, harden the measurement in `thread_compare.py`'s `compare()`
+  (more iterations, or min-of-N instead of one timing), which the neighboring
+  I/O listing also uses. Revert the marker and move on.
 - **Thousands of live `asyncio` tasks in one process can wedge Windows'
   `ProactorEventLoop` for every later `asyncio.run()` call in that process.**
   Chapter 19's `task_vs_thread_memory.py` used to create and cancel 20,000
@@ -233,6 +253,19 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/data/norun.txt`, and the
   `README.md` tracking table. Appendices use letter prefixes (`A_...`); build_site
   labels them "Appendix X".
+- **Splitting a chapter silently invalidates every relative cross-reference in
+  the later half.** Nothing greps for prose, so no gate catches this. Splitting
+  Generators out of Stateless left chapter 46 with fourteen phrases
+  ("the previous chapter", "the previous chapter's second exercise",
+  "the previous section") that still meant 44, not the newly-inserted 45.
+  After any split, `grep -n "previous chapter\|previous section\|last chapter"`
+  the later half and check each hit against the content it names, since some
+  will legitimately point at the new neighbor. Prefer a named link
+  (`[Effect Management](44_Effect_Management.md#anchor)`) over a relative
+  phrase, so the next split fails loudly at `heading_links.py` instead of
+  quietly misleading a reader. Where three references cluster in one section,
+  resolve the later ones with "that chapter" against a nearby link rather than
+  repeating the same hyperlink.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.

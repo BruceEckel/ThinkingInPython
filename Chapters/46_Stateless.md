@@ -1,8 +1,9 @@
 # Stateless
 
 [Effect Management](44_Effect_Management.md#library-effect-management)
-introduced library Effect systems and named [Stateless](https://github.com/suned/stateless)
-as a library that implements an Effect Management System (EMS).
+introduced library Effect systems.
+[Stateless](https://github.com/suned/stateless)
+is a library that implements an Effect Management System (EMS).
 
 Stateless encodes an Effect's dependencies and failures into the return type of a function,
 and a type checker verifies that every caller either absorbs the Effects or carries them forward.
@@ -12,8 +13,8 @@ That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
 Stateless is built on generators.
-[Generators](45_Generators.md) covered what this chapter assumes:
-the three-parameter `Generator` annotation,
+[Generators](45_Generators.md)
+covered the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
 and `yield from`, which composes generators and produces the inner one's return value.
 Every Effect here travels that path.
@@ -24,9 +25,7 @@ Some of the examples in this chapter were derived from that book.
 
 ## The Effect Type
 
-Stateless builds everything atop a single type.
-The library defines it with type variables,
-`A` bound to `Ability` and `E` bound to `Exception`:
+Stateless builds everything atop a single type, defined with type variables:
 
 ```python
 Effect: TypeAlias = Generator[A | E, Any, R]
