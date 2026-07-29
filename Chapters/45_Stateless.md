@@ -169,7 +169,14 @@ Typically, that stepping happens in a driver:
 ```python
 # two_way_generator.py
 from collections.abc import Generator
+from typing import Final
 from generator_interview import Answer, Question, Result, interview
+
+ANSWERS: Final[dict[Question, Answer]] = {
+    Question("name"): Answer("Alice"),
+    Question("town"): Answer("Wonderland"),
+    Question("friend"): Answer("Rabbit"),
+}
 
 def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer]) -> Result:
@@ -184,10 +191,7 @@ def drive(conversation: Generator[Question, Answer, Result],
 if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    answers = {Question("name"): Answer("Alice"),
-               Question("town"): Answer("Wonderland"),
-               Question("friend"): Answer("Rabbit")}
-    result = drive(conversation, answers)
+    result = drive(conversation, ANSWERS)
     print(f"{result = }")
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
@@ -202,6 +206,8 @@ The generator is imported unchanged; only the driver is new.
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
+`ANSWERS` fills that role for the rest of the chapter,
+so the later examples import it instead of repeating the same three pairs.
 
 Notice what is missing in `interview()`:
 it does not know where the answers come from.
@@ -358,7 +364,7 @@ We can apply `yield from` to our `interview` example:
 # yield_from_delegates.py
 from collections.abc import Generator
 from generator_interview import Answer, Question, Result
-from two_way_generator import drive
+from two_way_generator import ANSWERS, drive
 
 def ask(question: Question) -> Generator[Question, Answer, Answer]:
     answer = yield question
@@ -372,9 +378,7 @@ def interview() -> Generator[Question, Answer, Result]:
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    print(drive(interview(), {Question("name"): Answer("Alice"),
-                              Question("town"): Answer("Wonderland"),
-                              Question("friend"): Answer("Rabbit")}))
+    print(drive(interview(), ANSWERS))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
@@ -416,7 +420,7 @@ Delegation can take over the job the previous listing gave to `drive()`:
 # yield_from_nested.py
 from collections.abc import Generator
 from generator_interview import Answer, Question, Result
-from two_way_generator import drive
+from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
@@ -424,10 +428,8 @@ def survey() -> Generator[Question, Answer, Result]:
     color = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
-print(drive(survey(), {Question("name"): Answer("Alice"),
-                       Question("town"): Answer("Wonderland"),
-                       Question("friend"): Answer("Rabbit"),
-                       Question("color"): Answer("blue")}))
+print(drive(survey(),
+            ANSWERS | {Question("color"): Answer("blue")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'
@@ -444,6 +446,8 @@ It was the generator `drive()` drove; now `survey()` delegates to it.
 Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
 and its questions surface three frames up rather than two.
 The driver sees one more question and the same shape of trace.
+`survey()` asks about a color,
+so the call merges one more pair into `ANSWERS` with the dictionary union operator.
 
 `yield from` replaced `drive()` as the consumer of `interview()`,
 but not as its runner.
@@ -480,8 +484,8 @@ The library defines it with type variables,
 Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
-An `Effect` is a generator that yields either an *ability* or an exception,
-and eventually returns a result.
+An `Effect` is a generator that yields either an *ability* `A` or an exception `E`,
+and eventually returns a result `R`.
 The three type parameters answer the three questions from the previous chapter:
 
 - `A` is what the computation *needs*.
@@ -490,7 +494,7 @@ The three type parameters answer the three questions from the previous chapter:
 
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
-which the previous section taught you to read as "what comes back from a `yield` call".
+which the previous section taught you to read as "what comes back from a `yield` call."
 That `Any` is essential, and it explains an idiom the rest of the chapter uses.
 
 A generator has one send type for its whole life.

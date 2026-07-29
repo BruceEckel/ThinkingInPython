@@ -1,7 +1,7 @@
 # yield_from_delegates.py
 from collections.abc import Generator
 from generator_interview import Answer, Question, Result
-from two_way_generator import drive
+from two_way_generator import ANSWERS, drive
 
 def ask(question: Question) -> Generator[Question, Answer, Answer]:
     answer = yield question
@@ -15,9 +15,7 @@ def interview() -> Generator[Question, Answer, Result]:
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    print(drive(interview(), {Question("name"): Answer("Alice"),
-                              Question("town"): Answer("Wonderland"),
-                              Question("friend"): Answer("Rabbit")}))
+    print(drive(interview(), ANSWERS))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'

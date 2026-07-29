@@ -1,7 +1,7 @@
 # yield_from_nested.py
 from collections.abc import Generator
 from generator_interview import Answer, Question, Result
-from two_way_generator import drive
+from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
@@ -9,10 +9,8 @@ def survey() -> Generator[Question, Answer, Result]:
     color = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 
-print(drive(survey(), {Question("name"): Answer("Alice"),
-                       Question("town"): Answer("Wonderland"),
-                       Question("friend"): Answer("Rabbit"),
-                       Question("color"): Answer("blue")}))
+print(drive(survey(),
+            ANSWERS | {Question("color"): Answer("blue")}))
 #: request = 'name', answers[request] = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
 #: request = 'town', answers[request] = 'Wonderland'

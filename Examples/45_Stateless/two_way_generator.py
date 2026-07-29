@@ -1,6 +1,13 @@
 # two_way_generator.py
 from collections.abc import Generator
+from typing import Final
 from generator_interview import Answer, Question, Result, interview
+
+ANSWERS: Final[dict[Question, Answer]] = {
+    Question("name"): Answer("Alice"),
+    Question("town"): Answer("Wonderland"),
+    Question("friend"): Answer("Rabbit"),
+}
 
 def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer]) -> Result:
@@ -15,10 +22,7 @@ def drive(conversation: Generator[Question, Answer, Result],
 if __name__ == "__main__":
     conversation = interview()
     print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    answers = {Question("name"): Answer("Alice"),
-               Question("town"): Answer("Wonderland"),
-               Question("friend"): Answer("Rabbit")}
-    result = drive(conversation, answers)
+    result = drive(conversation, ANSWERS)
     print(f"{result = }")
 #: <class 'generator'>: interview
 #: request = 'name', answers[request] = 'Alice'
