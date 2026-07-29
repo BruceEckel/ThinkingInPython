@@ -1,6 +1,6 @@
 # yield_from_nested.py
 from collections.abc import Generator
-from generator_interview import Answer, Question, Result
+from interview_generator import Answer, Question, Result
 from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 

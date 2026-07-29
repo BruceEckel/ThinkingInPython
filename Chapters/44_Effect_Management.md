@@ -653,7 +653,7 @@ not when the description is executed.
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-[Stateless](45_Stateless.md) builds all three of these listings again,
+[Stateless](46_Stateless.md) builds all three of these listings again,
 in the language this book is about.
 
 ### Custom AI Languages with Effects
@@ -753,7 +753,7 @@ Each of these gives you the discipline of one part of an EMS,
 but not the guarantee, because the type checker does not participate.
 
 One library goes the rest of the way.
-[Stateless](45_Stateless.md)
+[Stateless](46_Stateless.md)
 encodes an Effect's dependencies and failures into the return type of every function that performs them,
 and a type checker verifies that each caller carries them forward.
 Declaring a dependency you never bind is a type error.

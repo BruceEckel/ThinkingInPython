@@ -11,468 +11,17 @@ Forget to supply one and the check fails.
 That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
-Stateless is built on generators,
-so we must study the full `Generator` annotation before exploring the library.
-
-## Annotating a Generator
-
-[Iterators](23_Iterators.md#generators)
-annotated every generator using the short form `Iterator[int]`.
-That fits a generator that only yields values.
-
-A generator that also receives values needs the full annotation:
-
-    `Generator[YieldType, SendType, ReturnType]`
-
-This names the three things a generator exchanges with its caller:
-
-- `YieldType` is the value `yield` hands out, thus the value `next()` returns.
-- `SendType` is the value `send()` accepts,
-  and the value the `yield` expression produces inside the generator.
-- `ReturnType` is the value `return` produces,
-  delivered as `StopIteration.value`.
-
-The last two type parameters default to `None`:
-
-```python
-# generator_defaults.py
-from collections.abc import Generator, Iterator
-
-def countdown(n: int) -> Generator[int]:
-    while n > 0:
-        yield n
-        n -= 1
-
-def squares(n: int) -> Iterator[int]:
-    for i in range(n):
-        yield i * i
-
-print(list(countdown(6)), list(squares(6)))
-#: [6, 5, 4, 3, 2, 1] [0, 1, 4, 9, 16, 25]
-```
-
-`Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` says the same thing and reads better for a one-way generator.
-The long form is necessary when the other two channels carry something,
-as they do in this chapter.
-
-The `interview()` generator yields a question, receives an answer,
-and returns a result:
-
-```python
-# generator_interview.py
-from collections.abc import Generator
-from typing import NewType
-
-Question = NewType("Question", str)
-Answer = NewType("Answer", str)
-Result = NewType("Result", str)
-
-def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")  # Ask the world for the name
-    town = yield Question("town")  # Ask the world for the town
-    friend = yield Question("friend")  # Ask for a friend
-    return Result(f"{name} of {town}, friend {friend}")
-
-if __name__ == "__main__":
-    i = interview()
-    question1: Question = next(i)
-    print(f"{question1 = }")
-    question2: Question = i.send(Answer("Alice"))
-    print(f"{question2 = }")
-    question3: Question = i.send(Answer("Wonderland"))
-    print(f"{question3 = }")
-    try:
-        i.send(Answer("Rabbit"))
-    except StopIteration as stop:
-        result: Result = stop.value
-    print(f"{result = }")
-#: question1 = 'name'
-#: question2 = 'town'
-#: question3 = 'friend'
-#: result = 'Alice of Wonderland, friend Rabbit'
-```
-
-Although `Generator[str, str, str]` describes `interview()` accurately,
-it does not say which `str` is which.
-`NewType` gives each channel a distinct type,
-so the annotation states the arrangement and a checker enforces it.
-`Question` fills the `YieldType` position, `Answer` the `SendType`,
-and `Result` the `ReturnType`.
-The distinction exists only for the checker.
-`Question("name")` produces the plain `str`.
-
-Driving the generator by hand shows one type parameter at a time.
-`next(i)` starts the generator and produces a `Question`.
-`i.send(Answer("Alice"))` passes an answer in and produces the next question,
-the two-way channel in a single expression.
-The last `send()` finds no further `yield`,
-so the generator returns its `Result`.
-A returning generator also raises `StopIteration`,
-and the `Result` arrives as that exception's `value`.
-
-The first call must be `next()`.
-A newly created generator pauses before its first `yield`,
-so a sent value would have nowhere to arrive.
-If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
-
-`next(i)` is equivalent to `i.send(None)`:
-
-```python
-# send_none_is_next.py
-from generator_interview import interview
-
-print(f"{interview().send(None) = }")  # type: ignore
-#: interview().send(None) = 'name'
-print(f"{next(interview()) = }")
-#: next(interview()) = 'name'
-```
-
-Each `interview()` call creates a new generator,
-so both lines start from the beginning and produce the first question.
-The `# type: ignore` is the interesting part.
-`interview()` declares `Answer` as its `SendType`,
-and `None` is not an `Answer`,
-so the checker rejects the priming `send()` even though the interpreter accepts it.
-The equivalence is a runtime fact the annotation cannot express,
-which is the practical reason a driver primes with `next()`.
-
-The `NewType` definitions prevent accidental transposition.
-If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
-`ty` reports six errors in three pairs.
-Both `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
-Both `send(Answer(...))` calls pass an `Answer` where it expects a `Question`.
-Both assignments to `question` receive an `Answer` into a variable declared `Question`.
-The checker ensures proper arguments are used because each channel has its own type.
-`Generator[str, str, str]` would have accepted the reversal without complaint.
-
-A coroutine intentionally has the same three-part shape:
-`Coroutine[YieldType, SendType, ReturnType]`.
-`async def` and generator functions both build descriptions that something else drives.
-
-## A Generator Is a Description
-
-[Effect Management](44_Effect_Management.md#effect-management-for-python)
-showed that calling an `async def` function runs nothing.
-It returns a coroutine: a description of work.
-A generator function behaves the same way.
-Calling `interview()` returns a generator object but doesn't run anything in the function body.
-`next()` and `send()` do that work, one `yield` at a time.
-
-A generator is more interesting than a coroutine here because `yield` is a two-way channel.
-The generator yields a value out, and the caller sends a value back in.
-That conversation makes an EMS possible.
-The generator yields a *request*,
-and whoever is driving it supplies the *answer*.
-Typically, that stepping happens in a driver:
-
-```python
-# two_way_generator.py
-from collections.abc import Generator
-from typing import Final
-from generator_interview import Answer, Question, Result, interview
-
-ANSWERS: Final[dict[Question, Answer]] = {
-    Question("name"): Answer("Alice"),
-    Question("town"): Answer("Wonderland"),
-    Question("friend"): Answer("Rabbit"),
-}
-
-def drive(conversation: Generator[Question, Answer, Result],
-          answers: dict[Question, Answer]) -> Result:
-    request = next(conversation)
-    while True:
-        try:
-            print(f"{request = }, {answers[request] = }")
-            request = conversation.send(answers[request])
-        except StopIteration as stop:
-            return stop.value
-
-if __name__ == "__main__":
-    conversation = interview()
-    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
-    result = drive(conversation, ANSWERS)
-    print(f"{result = }")
-#: <class 'generator'>: interview
-#: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
-#: result = 'Alice of Wonderland, friend Rabbit'
-```
-
-The generator is imported unchanged; only the driver is new.
-`drive()` touches all three type parameters:
-`next()` produces the first `Question`,
-`send()`'s argument supplies the `Answer`,
-and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-The `answers` map is keyed by `Question` and holds `Answer`s.
-`ANSWERS` fills that role for the rest of the chapter,
-so the later examples import it instead of repeating the same three pairs.
-
-Notice what is missing in `interview()`:
-it does not know where the answers come from.
-It has no dictionary, no `input()` call, and no network connection.
-It states what it needs and waits.
-`drive()` decides how those needs are met,
-and it takes the answers as a parameter.
-Swapping the dictionary for a database changes a single argument.
-
-That is EMS in miniature.
-The generator declares Effects, the driver interprets them.
-
-## `yield from` Composes Descriptions
-
-The reason generators can carry an EMS is that they nest.
-`yield from` runs an inner generator to exhaustion,
-passing every yielded request out to the outer driver and every sent answer back down.
-Each of the three channels crosses that boundary differently,
-so we take them one at a time.
-
-### Running to Exhaustion
-
-The simplest delegation targets generators that only yield:
-
-```python
-# yield_to_exhaustion.py
-from collections.abc import Iterator
-
-def one() -> Iterator[str]:
-    yield "only"
-
-def three() -> Iterator[str]:
-    yield "A"
-    yield "B"
-    yield "C"
-
-def outer() -> Iterator[str]:
-    yield "start"
-    yield from one()
-    yield from three()
-    yield "end"
-
-def top() -> Iterator[str]:
-    yield "TOP"
-    yield from outer()
-    yield "END"
-
-print(list(outer()))
-#: ['start', 'only', 'A', 'B', 'C', 'end']
-print(list(top()))
-#: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
-```
-
-Each `yield from` runs its target until that generator is exhausted,
-so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-How many a delegation contributes is a property of the target.
-
-Exhaustion is transitive.
-`top()` delegates to `outer()`, which delegates to `one()` and `three()`,
-and the driver still receives one flat sequence.
-`top()`'s single `yield from` does not finish until every generator beneath it has.
-
-### The Return Channel
-
-A `yield from` expression evaluates to the inner generator's return value,
-not its yielded values.
-The yielded values pass through to whoever is driving.
-Here, `report()` captures the return value from `yield from emit(items)` into `size`.
-Note that `report()` doesn't return anything, it only yields:
-
-```python
-# yield_from_return.py
-from collections.abc import Generator, Iterator
-
-def emit(items: list[str]) -> Generator[str, None, int]:
-    total = 0
-    for item in items:
-        yield item
-        total += len(item)
-    return total
-
-def report(items: list[str]) -> Iterator[str]:
-    size: int = yield from emit(items)
-    yield f"({size} characters)"
-
-print(list(report(["red", "green", "blue"])))
-#: ['red', 'green', 'blue', '(12 characters)']
-```
-
-`emit()` is a `Generator[str, None, int]`: it yields strings,
-is never sent anything,
-and returns the `int` total it accumulates while iterating.
-
-The return channel is how a generator reports to whichever generator delegated to it,
-so `report()` learns something `emit()` computed while neither of them knows who is driving.
-
-### The Send Channel
-
-The `SendType` is for the user to `send()` information back into the generator.
-A generator that only receives values needs no `ReturnType`:
-
-```python
-# yield_from_send.py
-from collections.abc import Generator
-
-def collect(name: str) -> Generator[str, int]:
-    first = yield f"{name} needs a value"
-    second = yield f"{name} needs another"
-    print(f"{name} got {first} and {second}")
-
-def both() -> Generator[str, int]:
-    yield from collect("alpha")
-    yield from collect("beta")
-
-g = both()
-print(next(g))
-#: alpha needs a value
-for value in [1, 2, 3]:
-    print(g.send(value))
-#: alpha needs another
-#: alpha got 1 and 2
-#: beta needs a value
-#: beta needs another
-try:
-    g.send(4)
-except StopIteration:
-    print("both() is exhausted")
-#: beta got 3 and 4
-#: both() is exhausted
-```
-
-`collect()` yields prompts, receives numbers, and returns nothing,
-so its type is `Generator[str, int, None]`.
-An omitted `ReturnType` defaults to `None`,
-so the return signature becomes `Generator[str, int]`.
-`both()` declares that same type,
-because `yield from` passes the inner generator's yield and send channels through to the driver.
-
-The numbers travel down to the `yield` that asked for them.
-`g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
-`both()` contains no code that forwards the value because `yield from` does that forwarding.
-
-`g.send(2)` is the interesting one.
-It supplies alpha's second value, which lets `collect("alpha")` finish,
-which completes the first `yield from`, which starts the second one.
-A single `send()` therefore ends one inner generator and produces the first prompt of the next.
-The driver sees `StopIteration` only when `both()` runs out of delegations.
-
-### All Three Channels
-
-We can apply `yield from` to our `interview` example:
-
-```python
-# yield_from_delegates.py
-from collections.abc import Generator
-from generator_interview import Answer, Question, Result
-from two_way_generator import ANSWERS, drive
-
-def ask(question: Question) -> Generator[Question, Answer, Answer]:
-    answer = yield question
-    print(f"ask({question = }) -> {answer = }")
-    return answer
-
-def interview() -> Generator[Question, Answer, Result]:
-    name: Answer = yield from ask(Question("name"))
-    town: Answer = yield from ask(Question("town"))
-    friend: Answer = yield from ask(Question("friend"))
-    return Result(f"{name} of {town}, friend {friend}")
-
-if __name__ == "__main__":
-    print(drive(interview(), ANSWERS))
-#: request = 'name', answers[request] = 'Alice'
-#: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: ask(question = 'town') -> answer = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
-#: ask(question = 'friend') -> answer = 'Rabbit'
-#: Alice of Wonderland, friend Rabbit
-```
-
-`drive()` never learns that `ask()` exists.
-Only the generator portion changed.
-
-`ask()` uses `Answer` in two of the three positions, for two different reasons.
-As the `SendType` it is the value the driver sends in,
-which arrives as the value of the `yield` expression and lands in `answer`.
-As the `ReturnType` it is the value `ask()` hands back when it finishes,
-which `yield from` produces as the value of the whole `yield from` expression.
-The inner generator asks one question and hands back one answer,
-so both channels carry an `Answer`.
-`interview()` keeps `Result` as its `ReturnType`,
-because the sentence it builds from three answers is not an answer to any one question.
-
-The trace shows both directions of travel.
-A request raised two frames down inside `ask()` surfaces at `drive()`,
-which knows nothing about where it came from.
-The answer `drive()` sends back arrives inside `ask()`,
-which also knows nothing about where it came from.
-A single loop at the edge of the program interprets Effects raised anywhere inside it.
-`yield from` also returns the inner generator's value,
-which is why `name` and `town` read like ordinary assignments.
-
-### Composing Is Not Interpreting
-
-`drive()` and `yield from` both step a generator and both finish at `StopIteration`,
-which makes them easy to confuse.
-Delegation can take over the job the previous listing gave to `drive()`:
-
-```python
-# yield_from_nested.py
-from collections.abc import Generator
-from generator_interview import Answer, Question, Result
-from two_way_generator import ANSWERS, drive
-from yield_from_delegates import ask, interview
-
-def survey() -> Generator[Question, Answer, Result]:
-    profile: Result = yield from interview()
-    color: Answer = yield from ask(Question("color"))
-    return Result(f"{profile}, color {color}")
-
-print(drive(survey(),
-            ANSWERS | {Question("color"): Answer("blue")}))
-#: request = 'name', answers[request] = 'Alice'
-#: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: ask(question = 'town') -> answer = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
-#: ask(question = 'friend') -> answer = 'Rabbit'
-#: request = 'color', answers[request] = 'blue'
-#: ask(question = 'color') -> answer = 'blue'
-#: Alice of Wonderland, friend Rabbit, color blue
-```
-
-`interview()` is imported unchanged from the previous example.
-It was the generator `drive()` drove; now `survey()` delegates to it.
-Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
-and its questions surface three frames up rather than two.
-The driver sees one more question and the same shape of trace.
-`survey()` asks about a color,
-so the call merges one more pair into `ANSWERS` with the dictionary union operator.
-
-`yield from` replaced `drive()` as the consumer of `interview()`,
-but not as its runner.
-Something must still call `next()` and `send()` at the top,
-which is why the example ends with a `drive()` call.
-Stack delegations as deep as you like and the number of drivers stays at one.
-
-What separates them is the response to a request.
-`drive()` answers it: a `Question` comes out, the driver looks it up,
-and the request stops there.
-`yield from` answers nothing.
-It relays the request upward and passes the reply back down untouched,
-so `survey()` has no idea what a `Question` means.
-`StopIteration` splits the same way.
-Both catch it and both take `stop.value`, but they hand it to different places.
-`drive()` returns the `Result` to its own caller, ending the conversation.
-`yield from` feeds it to the enclosing generator as the value of the expression,
-after which that generator keeps running.
-
-`yield from` composes descriptions and a driver interprets them.
-A program can hold any number of the first and needs one of the second,
-at its outermost edge.
-
-Every Effect in this chapter travels this path.
+Stateless is built on generators.
+[Generators](45_Generators.md) covered what this chapter assumes:
+the three-parameter `Generator` annotation,
+a driver that answers a generator's requests one `send()` at a time,
+and `yield from`, which composes generators and produces the inner one's return value.
+Every Effect here travels that path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
+
+My understanding of Effects came from work with Bill Frasure and James Ward as we created
+[Effect Oriented Programming](https://effectorientedprogramming.com/).
+Some of the examples in this chapter were derived from that book.
 
 ## The Effect Type
 
@@ -537,7 +86,8 @@ so `Success[R]` promises there is no ability it can request and no error it can 
 The signature is the entire claim.
 
 Here, `success()` wraps a value in an Effect, and `run()` executes it.
-`run()` is the Stateless library's driver, replacing our earlier `drive()`.
+`run()` is the Stateless library's driver,
+replacing the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
 `run()` primes the generator, answers each request, and returns the result.
 Nothing computes until `run()` is called, and a program calls it once,
 at its outermost edge:
@@ -1134,7 +684,8 @@ This one threads nothing.
 and the two Effects live in the return type where a checker can follow them.
 That second channel in the signature is the one the previous chapter said an EMS needs.
 
-Return to `two_way_generator.py` and the whole library is visible.
+Return to `two_way_generator.py` in [Generators](45_Generators.md#a-generator-is-a-description)
+and the whole library is visible.
 An Effect is a generator, so nothing stops you from driving one yourself:
 
 ```python
@@ -1162,6 +713,82 @@ Every tool in the library packages those two calls.
 `run()` is the loop at the bottom,
 and `supply()` is `handle()` prepackaged for `Need`:
 a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
+
+## Scripting an Unpredictable Source
+
+Every handler so far gave the same answer each time it was asked.
+`supply()` binds one instance for the whole run,
+and `scripted` returned `"Alice"` however often `greet()` requested a name.
+A handler is an ordinary function, so it can answer differently at each request.
+That is what makes an unpredictable source testable.
+
+A coin toss is a side cause: the program reads something from outside,
+and the reading does not repeat.
+Turn it into an ability and the reading moves into a handler:
+
+```python
+# coin_toss.py
+import random
+from typing import Final
+from stateless import Ability, Depend, handle, run
+
+class Flip(Ability[bool]):
+    pass
+
+def flip() -> Depend[Flip, bool]:
+    result: bool = yield from Flip()
+    return result
+
+def count_heads(tosses: int) -> Depend[Flip, int]:
+    heads = 0
+    for _ in range(tosses):
+        if (yield from flip()):
+            heads += 1
+    return heads
+
+FLIPS: Final[tuple[bool, ...]] = (True, False, True, True, False)
+script = iter(FLIPS)
+
+def scripted(request: Flip) -> bool:
+    return next(script)
+
+def coin(request: Flip) -> bool:
+    return random.random() < 0.5
+
+print(run(handle(scripted)(count_heads)(5)))
+#: 3
+heads = run(handle(coin)(count_heads)(10_000))
+print(4_000 < heads < 6_000)
+#: True
+```
+
+`count_heads()` needs a `Flip` and produces an `int`.
+Its body contains no `random` call, no seed, and no parameter for either.
+`Flip` carries no data, so it needs no fields,
+where `Ask` and `Tell` each carried the payload the request had to deliver.
+The ability's whole content is its type and the `bool` it promises back.
+
+Two handlers answer the same function.
+`scripted` walks an iterator over a fixed sequence,
+so the five tosses are decided before the program runs and the count is `3`.
+`coin` calls `random.random()`, so ten thousand tosses come out near half heads.
+`count_heads()` cannot distinguish the two,
+because either answer arrives through the same `send()` channel.
+
+The scripted handler holds state, and that is the point.
+`next(script)` produces a different value at each request,
+which one supplied instance cannot do.
+Every scripted test double has this shape: a clock reporting a fixed time,
+a queue handing out canned responses,
+a network stub that fails twice and then succeeds.
+
+`student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations)
+made randomness repeatable a different way, by taking a `seed` parameter.
+That works, and it charges a parameter to every function between the caller and the `random.Random` call.
+Here the source is named in the return type instead,
+and no signature between `handle()` and the toss mentions it.
+It is the trade this chapter keeps making,
+applied to a side cause rather than a side effect.
 
 ## Where the Guarantee Stops
 

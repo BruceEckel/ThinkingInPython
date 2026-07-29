@@ -1,4 +1,4 @@
-# generator_interview.py
+# interview_generator.py
 from collections.abc import Generator
 from typing import NewType
 

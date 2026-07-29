@@ -1,6 +1,6 @@
 # yield_from_delegates.py
 from collections.abc import Generator
-from generator_interview import Answer, Question, Result
+from interview_generator import Answer, Question, Result
 from two_way_generator import ANSWERS, drive
 
 def ask(question: Question) -> Generator[Question, Answer, Answer]:
