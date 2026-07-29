@@ -17,11 +17,13 @@ Usage:
 """
 import argparse
 from collections.abc import Iterable, Iterator
+from functools import cache
 from pathlib import Path
 
 from tools_config import TOOLS_DIR
+from tools_markdown import Document
 from tools_repo import add_paths_arg, md_files
-from tools_report import Finding, report
+from tools_report import Check, Finding, report
 
 PHRASES_FILE = TOOLS_DIR / "banned_phrases.txt"
 
@@ -37,23 +39,42 @@ def load_phrases(path: Path) -> list[str]:
     return phrases
 
 
-def check(paths: Iterable[Path], phrases: list[str]) -> Iterator[Finding]:
+def scan(doc: Document, phrases: Iterable[str]) -> Iterator[Finding]:
     """Every occurrence of every phrase, as a literal substring.
 
     Prose and code alike: a phrase the book has retired should not
     survive inside a listing either.
     """
-    for path in paths:
-        lines = path.read_text(encoding="utf-8").splitlines()
-        for lineno, line in enumerate(lines, 1):
-            for phrase in phrases:
-                col = line.find(phrase)
-                while col != -1:
-                    yield Finding(
-                        path, lineno, f'banned phrase: "{phrase}"',
-                        col=col + 1,
-                    )
-                    col = line.find(phrase, col + 1)
+    for lineno, line in enumerate(doc.lines, 1):
+        for phrase in phrases:
+            col = line.find(phrase)
+            while col != -1:
+                yield Finding(
+                    doc.path, lineno, f'banned phrase: "{phrase}"',
+                    col=col + 1,
+                )
+                col = line.find(phrase, col + 1)
+
+
+@cache
+def default_phrases() -> tuple[str, ...]:
+    """The configured phrases, read once per process."""
+    return tuple(load_phrases(PHRASES_FILE))
+
+
+def find(doc: Document) -> Iterator[Finding]:
+    """The check as the runner calls it, against the configured phrases."""
+    return scan(doc, default_phrases())
+
+
+CHECK = Check(
+    name="banned",
+    doc="no phrase from tools/banned_phrases.txt appears in the book",
+    run=find,
+    clean="No banned phrases found.",
+    problem="{n} banned phrase occurrence(s). "
+            "Remove them or edit tools/banned_phrases.txt.",
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -70,12 +91,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"No banned phrases configured in {args.phrases}.")
         return 0
 
-    return report(
-        check(md_files(args.paths), phrases),
-        clean="No banned phrases found.",
-        problem="{n} banned phrase occurrence(s). "
-                "Remove them or edit tools/banned_phrases.txt.",
+    findings = (
+        f for p in md_files(args.paths)
+        for f in scan(Document.parse(p), phrases)
     )
+    return report(findings, clean=CHECK.clean, problem=CHECK.problem)
 
 
 if __name__ == "__main__":

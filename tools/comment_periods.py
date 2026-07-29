@@ -16,9 +16,11 @@ Default mode reports `path:line` and exits non-zero, so it is a gate. Pass --fix
 to remove the periods.
 """
 import argparse
-from pathlib import Path
+from collections.abc import Iterator
 
-from tools_pycode import iter_python_blocks, scan_line
+from tools_markdown import Document
+from tools_pycode import scan_line
+from tools_report import Check, Finding, report
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
@@ -57,19 +59,36 @@ def _strip_targets(block: list[str]) -> dict[int, str]:
     return fixes
 
 
-def check_file(path: Path, fix: bool) -> list[int]:
-    """Return the 1-based line numbers with a stray period; rewrite if `fix`."""
-    lines = path.read_text(encoding="utf-8").split("\n")
-    findings: list[int] = []
-    out = list(lines)
-    for start, block in iter_python_blocks(lines):
-        for idx, new_line in _strip_targets(block).items():
-            findings.append(start + idx + 1)
-            out[start + idx] = new_line
+def find(doc: Document) -> Iterator[Finding]:
+    """Every one-line comment in a python listing ending with a period."""
+    for block in doc.python_blocks():
+        for idx in sorted(_strip_targets(block.lines)):
+            yield Finding(
+                doc.path, block.line_number(idx),
+                "one-line comment ends with a period",
+            )
 
-    if fix and findings:
-        write_text_lf(path, "\n".join(out))
-    return findings
+
+def fixed(doc: Document) -> str | None:
+    """The file with those periods removed, or None if there are none."""
+    out = list(doc.lines)
+    changed = False
+    for block in doc.python_blocks():
+        for idx, new_line in _strip_targets(block.lines).items():
+            out[block.start + idx] = new_line
+            changed = True
+    return doc.rendered(out) if changed else None
+
+
+CHECK = Check(
+    name="comment-periods",
+    doc="one-line listing comments must not end with a period",
+    run=find,
+    clean="Comment periods OK.",
+    problem="{n} one-line comment(s) end with a period. "
+            "Fix with: python tools/comment_periods.py --fix",
+    fixer=fixed,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -81,22 +100,22 @@ def main(argv: list[str] | None = None) -> int:
                     help="remove the trailing periods in place")
     args = ap.parse_args(argv)
 
-    total = 0
-    for path in md_files(args.paths):
-        for lineno in check_file(path, args.fix):
-            if not args.fix:
-                print(f"{path}:{lineno}: one-line comment ends with a period")
-            total += 1
-
-    if total and args.fix:
-        print(f"Removed {total} trailing period(s).")
+    docs = [Document.parse(p) for p in md_files(args.paths)]
+    if args.fix:
+        total = 0
+        for doc in docs:
+            total += sum(1 for _ in find(doc))
+            new_text = fixed(doc)
+            if new_text is not None:
+                write_text_lf(doc.path, new_text)
+        if total:
+            print(f"Removed {total} trailing period(s).")
+            return 0
+        print(CHECK.clean)
         return 0
-    if total:
-        print(f"\n{total} one-line comment(s) end with a period. "
-              "Fix with: python tools/comment_periods.py --fix")
-        return 1
-    print("Comment periods OK.")
-    return 0
+
+    findings = (f for doc in docs for f in find(doc))
+    return report(findings, clean=CHECK.clean, problem=CHECK.problem)
 
 
 if __name__ == "__main__":

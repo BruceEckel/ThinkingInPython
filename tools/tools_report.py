@@ -27,9 +27,13 @@ book listing's own filename through Python's sys.modules cache. See
 tools_repo.py's docstring for the failure that caused those renames.
 """
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Iterator
+from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
+
+if TYPE_CHECKING:
+    from tools_markdown import Document
 
 
 class Finding(NamedTuple):
@@ -54,6 +58,40 @@ class Finding(NamedTuple):
             where += f":{self.col}"
         what = f"{self.code} {self.message}" if self.code else self.message
         return f"{where}: {what}"
+
+
+@dataclass(frozen=True)
+class Check:
+    """One named check: how to run it, and what to say about the result.
+
+    Bundling the messages with the function is what lets a check be run
+    two ways from one definition: as its own command (`make banned`), and
+    as one of many inside a single runner that parses each file once.
+    Without it the wording would have to be duplicated in both places and
+    would drift.
+    """
+
+    name: str
+    """The command-line name, matching the make target: "comment-periods"."""
+
+    doc: str
+    """One line describing what the check enforces, for --list."""
+
+    run: Callable[["Document"], Iterator[Finding]]
+    """Findings for one already-parsed document. Prints nothing."""
+
+    clean: str
+    """Printed when the check finds nothing."""
+
+    problem: str
+    """Printed when it does; may use `{n}` for the count. Carries advice."""
+
+    fixer: Callable[["Document"], str | None] | None = None
+    """Rewritten file text, or None if this check changes nothing.
+
+    A check with no automatic fix leaves this None, which is how the
+    runner knows whether --fix means anything for it.
+    """
 
 
 def report(

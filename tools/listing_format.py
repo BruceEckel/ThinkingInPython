@@ -19,9 +19,11 @@ them (run by `make fix-listings`).
 """
 
 import argparse
-from pathlib import Path
+from collections.abc import Iterator
 
-from tools_pycode import iter_python_blocks, scan_line
+from tools_markdown import Document
+from tools_pycode import scan_line
+from tools_report import Check, Finding, report
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 
@@ -73,20 +75,34 @@ def _removals(block: list[str]) -> list[tuple[int, str]]:
     return out
 
 
-def check_file(path: Path, fix: bool) -> list[tuple[int, str]]:
-    """Return (line_number, reason) findings; rewrite the file if `fix`."""
-    lines = path.read_text(encoding="utf-8").split("\n")
-    findings: list[tuple[int, str]] = []
-    drop: set[int] = set()  # absolute line indices to remove
-    for start, block in iter_python_blocks(lines):
-        for idx, reason in _removals(block):
-            findings.append((start + idx + 1, reason))  # 1-based line number
-            drop.add(start + idx)
+def find(doc: Document) -> Iterator[Finding]:
+    """Every blank line a listing should not have."""
+    for block in doc.python_blocks():
+        for idx, reason in _removals(block.lines):
+            yield Finding(doc.path, block.line_number(idx), reason)
 
-    if fix and drop:
-        kept = [ln for k, ln in enumerate(lines) if k not in drop]
-        write_text_lf(path, "\n".join(kept))
-    return findings
+
+def fixed(doc: Document) -> str | None:
+    """The file with those blank lines dropped, or None if there are none."""
+    drop: set[int] = set()
+    for block in doc.python_blocks():
+        drop.update(block.start + idx for idx, _ in _removals(block.lines))
+    if not drop:
+        return None
+    return doc.rendered(
+        [ln for k, ln in enumerate(doc.lines) if k not in drop]
+    )
+
+
+CHECK = Check(
+    name="listings",
+    doc="python listings keep blank lines minimal",
+    run=find,
+    clean="Listings OK: blank lines are minimal.",
+    problem="{n} blank-line issue(s). Fix with: "
+            "python tools/listing_format.py --fix",
+    fixer=fixed,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -98,23 +114,22 @@ def main(argv: list[str] | None = None) -> int:
                     help="remove the offending blank lines in place")
     args = ap.parse_args(argv)
 
-    files = md_files(args.paths)
-    total = 0
-    for path in files:
-        for lineno, reason in check_file(path, args.fix):
-            if not args.fix:
-                print(f"{path}:{lineno}: {reason}")
-            total += 1
-
-    if total and args.fix:
-        print(f"Removed {total} blank line(s).")
+    docs = [Document.parse(p) for p in md_files(args.paths)]
+    if args.fix:
+        total = 0
+        for doc in docs:
+            total += sum(1 for _ in find(doc))
+            new_text = fixed(doc)
+            if new_text is not None:
+                write_text_lf(doc.path, new_text)
+        if total:
+            print(f"Removed {total} blank line(s).")
+            return 0
+        print(CHECK.clean)
         return 0
-    if total:
-        print(f"\n{total} blank-line issue(s). Fix with: "
-              "python tools/listing_format.py --fix")
-        return 1
-    print("Listings OK: blank lines are minimal.")
-    return 0
+
+    findings = (f for doc in docs for f in find(doc))
+    return report(findings, clean=CHECK.clean, problem=CHECK.problem)
 
 
 if __name__ == "__main__":

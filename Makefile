@@ -406,6 +406,14 @@ fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
 anchors:  ## Fail if a heading-anchor link points at no real heading
 	$(PY) tools/check_anchors.py
 
+# Every Markdown check at once, parsing each file once instead of per tool.
+# The individual targets above still work; this is the fast whole-book answer.
+checks:  ## Run every Markdown check in one pass (ARGS=--list to see them)
+	$(PY) tools/check_all.py $(ARGS)
+
+fix-checks:  ## Apply every fix those checks can make
+	$(PY) tools/check_all.py --fix
+
 ##@ Cleanup
 
 clean-examples:  ## Remove build/examples/
