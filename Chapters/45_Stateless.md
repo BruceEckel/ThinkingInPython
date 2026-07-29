@@ -266,9 +266,10 @@ and the driver still receives one flat sequence.
 ### The Return Channel
 
 A `yield from` expression evaluates to the inner generator's return value,
-not its yielded values, which pass straight through to whoever is driving.
-The generators above return nothing, so that value goes unused there.
-A `ReturnType` puts it to work:
+not its yielded values.
+The yielded values pass through to whoever is driving.
+Here, `report()` captures the return value from `yield from emit(items)` into `size`.
+Note that `report()` doesn't return anything, it only yields:
 
 ```python
 # yield_from_return.py
@@ -290,10 +291,8 @@ print(list(report(["red", "green", "blue"])))
 ```
 
 `emit()` is a `Generator[str, None, int]`: it yields strings,
-is never sent anything, and returns a total it accumulates while iterating.
-No driver ever sees that total.
-`yield from` hands it to `report()`,
-which turns it into one more yielded string.
+is never sent anything, and returns the `int` total it accumulates while iterating.
+
 The return channel is how a generator reports to whichever generator delegated to it,
 so `report()` learns something `emit()` computed while neither of them knows who is driving.
 

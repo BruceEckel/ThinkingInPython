@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors clean-examples clean-site check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors checks fix-checks gate-checks clean-examples clean-site check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -119,6 +119,13 @@ verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line en
 # Same as verify, plus the site build at the end.
 sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
+# The Markdown checks the gate enforces, run together by check_all.py in one
+# process with one parse per file, rather than as six separate scripts. Names
+# come from `make checks ARGS=--list`. This is check_all's whole registry
+# except prose-lint, which reports findings the book has not cleaned up yet;
+# add it here once `make checks` is green and the gate covers all seven.
+GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing anchors
+
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest, plus the same checks for
 # Solutions/ (solutions-gate). `verify` runs `sync`/`solutions-sync` first;
@@ -131,12 +138,7 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
 	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
-	$(PY) tools/listing_format.py
-	$(PY) tools/banned_phrases.py
-	$(PY) tools/comment_periods.py
-	$(PY) tools/capitalize_comments.py
-	$(PY) tools/comment_spacing.py
-	$(PY) tools/heading_links.py
+	$(PY) tools/check_all.py $(GATE_CHECKS)
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/validate_output.py --update Chapters
@@ -422,6 +424,13 @@ checks:  ## Run every Markdown check in one pass (ARGS=--list to see them)
 
 fix-checks:  ## Apply every fix those checks can make
 	$(PY) tools/check_all.py --fix
+
+# The subset `gate` enforces (GATE_CHECKS above: everything but prose-lint).
+# `checks` is the one to run while editing, since it reports prose-lint too;
+# this one answers the narrower "will the gate pass?" and is what `sweep`
+# runs, so the sweep's verdict matches the gate's.
+gate-checks:  ## Run just the Markdown checks the gate enforces
+	$(PY) tools/check_all.py $(GATE_CHECKS)
 
 ##@ Cleanup
 

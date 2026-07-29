@@ -17,10 +17,11 @@ in fact moved five sites across three chapters as well.
 
 This runs each check to completion and summarizes:
 
+    gate-checks     ok
     ty              FAIL
     lint            ok
     ...
-    2 of 7 checks failed: ty, solutions-ty
+    2 of 8 checks failed: ty, solutions-ty
 
 `make upgrade-tools` ends with this, so an upgrade's damage arrives
 attached to the upgrade that caused it. It is worth running on its own
@@ -53,7 +54,14 @@ from tools_config import ROOT
 # likely to move first: ty and ruff are what a checker or linter release
 # actually changes, and seeing them before the slower run/test steps
 # means the interesting output is not scrolled away.
+#
+# gate-checks leads because it is the cheapest of all (one process, one
+# parse per file), so it cannot scroll anything away. It is `gate`'s own
+# Markdown selection rather than `checks`, which also runs prose-lint:
+# prose-lint reports findings the book has not cleaned up, and a row that
+# is permanently FAIL teaches you to stop reading the table.
 SWEEP_TARGETS: list[str] = [
+    "gate-checks",
     "ty",
     "lint",
     "solutions-ty",
