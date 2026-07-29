@@ -1389,17 +1389,117 @@ This is the chapter's thesis applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
 here it changes a type, and every caller learns about the new dependency.
 
-`repeat()` runs an Effect on a schedule and collects the results,
-`memoize()` caches by argument,
-and `fork()` with `wait()` runs Effects in parallel through a supplied `Executor`.
-Each is a decorator over a function returning an Effect, for the reason above.
 One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
 so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
+
+`repeat()` is the sibling that runs an Effect on a schedule and collects every result.
+`memoize()` is the one that answers the spent-generator problem head on:
+
+```python
+# memoizing.py
+from flaky import Database, save_user
+from stateless import memoize, run, supply
+
+db = Database(failures=0)
+bound = supply(db)(memoize(save_user))
+print(run(bound("Morty")))
+print(run(bound("Morty")))
+print(f"attempts: {db.attempts}")
+#: attempt 1: saving Morty
+#: Morty saved
+#: Morty saved
+#: attempts: 1
+```
+
+Two runs, one attempt, and the second run still produces the value.
+`memoize()` caches by argument the way `functools.lru_cache` does,
+and it wraps the Effect in an object that records the result and replays it rather than driving the spent generator again.
+That wrapper exists because a generator cannot be replayed,
+which is the same fact that made `retry()` decorate the function.
+
+## Running Effects in Parallel
+
+Effects can also run at the same time.
+`fork()` hands an Effect to an `Executor` and returns a `Task`,
+and `wait()` collects the result:
+
+```python
+# parallel.py
+import time
+from concurrent.futures import Executor, ThreadPoolExecutor
+from stateless import (
+    Async,
+    Depend,
+    Need,
+    Success,
+    Task,
+    as_type,
+    fork,
+    run,
+    success,
+    supply,
+    wait,
+)
+
+@fork
+def slow_square(n: int) -> Success[int]:
+    time.sleep(0.05)
+    return success(n * n)
+
+def squares(
+    count: int,
+) -> Depend[Need[Executor] | Async, list[int]]:
+    tasks: list[Task[int]] = []
+    for n in range(count):
+        task = yield from slow_square(n)
+        tasks.append(task)
+    results: list[int] = []
+    for task in tasks:
+        value = yield from wait(task)
+        results.append(value)
+    return results
+
+with ThreadPoolExecutor(max_workers=5) as pool:
+    start = time.perf_counter()
+    out = run(supply(as_type(Executor)(pool))(squares)(5))
+    elapsed = time.perf_counter() - start
+print(out)
+#: [0, 1, 4, 9, 16]
+print(f"five 50ms tasks under 150ms: {elapsed < 0.15}")
+#: five 50ms tasks under 150ms: True
+```
+
+Five tasks that each sleep 50 milliseconds finish in about the time of one.
+The pool is an ability, not a global,
+so `squares()` declares `Need[Executor]` and names no pool.
+Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
+with no change to `squares()`.
+`as_type(Executor)` appears for the reason it always does:
+`ThreadPoolExecutor` is the more specific type,
+and `squares()` asked for the general one.
+
+One restriction is worth understanding, because the checker enforces it.
+A forked Effect must have nothing left to supply.
+`fork()`'s four overloads accept an Effect whose ability channel holds `Never`,
+an exception type, or `Async`, and nothing else,
+because `fork()` runs the Effect with `run()` inside the worker.
+Decorate a function that still declares a `Need` and `ty` rejects it,
+listing the overloads it failed to match.
+Supply first, then fork.
+
+Notice where the pool's lifetime is managed.
+The `with` block sits outside `run()`, at the edge, in ordinary Python.
+Stateless has no scoping mechanism of its own,
+so a resource either lives in a `with` block outside the Effect,
+as the pool does here, or the ability method owns it:
+the library's own `Files` ability opens and closes a file inside a single `read_file()` call.
+What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
+which is the flat resource management a native Effect system provides.
 
 ## Where the Guarantee Stops
 
 A full accounting needs the limits,
-and there are four worth knowing before you commit a codebase to this.
+and there are five worth knowing before you commit a codebase to this.
 
 The first is that nothing stops an undeclared Effect.
 `Success[int]` promises purity, and this function breaks that promise:
@@ -1540,6 +1640,29 @@ Type errors from a library this generic are long and mention internals.
 And a third-party function that knows nothing about Effects must be wrapped in `@throws` or reached through a `need()` before it can participate.
 An EMS is a decision about a whole codebase,
 not a utility you import for one module.
+
+The fifth limit is how much of a mature Effect system is present.
+`supply()` binds instances that are already built,
+and `handle()` takes an ordinary function,
+so constructing a dependency can never be an Effect.
+ZIO's `ZLayer` is a constructor that can read configuration, fail,
+and be retried, and it resolves a dependency graph at compile time,
+reporting a cycle or a missing provider by name.
+Stateless has no equivalent,
+so the wiring at the edge is written by hand and a `supply()` call is checked for completeness but not for how it was assembled.
+The operator set is thin in the same way.
+There is `retry()` and `repeat()`,
+and `Schedule` offers a fixed interval and a repeat count,
+with no exponential backoff and no jitter.
+There is no timeout, no `race`, no fallback combinator, and no finalizer,
+which rules out the hedging strategy that races a delayed second request.
+Concurrency is `fork()` and `wait()` with no guarded mutable cell,
+so shared state between forked Effects is your problem and Python's,
+not something the type checker helps with.
+Above that sit the resilience patterns a production system eventually needs,
+rate limiting, bulkheads, and circuit breakers, none of which exist here.
+The library is a working demonstration of Effect tracking in Python's type system,
+and that is a different thing from a platform to build a distributed system on.
 
 ## What This Costs and What It Buys
 
