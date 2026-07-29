@@ -31,12 +31,53 @@ throwaway tree (git-ignored) regenerated from the Markdown for running.
 
 `Solutions/*.md` (worked exercise answers) go through the exact same
 extract/validate/ty/ruff/pytest pipeline, via a parallel set of tools and
-`make` targets described in [extract_solutions.py](#extract_solutionspy)
+`make` targets described in [extract_solutions.py](#extract_solutions.py)
 below. The one difference is that a Solutions code block is
 **self-contained**: it redeclares whatever small piece of book context it
 needs (a class, a helper function) rather than importing from `Examples/`,
 so the two trees never couple and a change to a book example cannot silently
 break a Solutions file.
+
+## How this directory is laid out
+
+`tools/` holds four kinds of thing, told apart by name:
+
+* **Entry points** (`extract_examples.py`, `validate_output.py`, ...) are run
+  as scripts, almost always through a `make` target. Each one's module
+  docstring is its reference, and `--help` prints it.
+* **Shared libraries** are exactly the `tools_*.py` files. They define no
+  command and are only imported. The `tools_` prefix is not decoration: an
+  entry point imports its siblings by bare name, and `validate_output.py`
+  execs every book listing in that same process, so a library named `config`
+  or `repo` would be found by a chapter's own `import config` through
+  Python's `sys.modules` cache. See `tools_repo.py`'s docstring.
+* **`data/`** holds the word lists, allowlists, and glob lists the checks
+  read (`wordlist.txt`, `norun.txt`, `banned_phrases.txt`, ...), so this
+  directory lists code and nothing else.
+* **`tests/`** holds the harness's own unit tests, run by `make test-tools`
+  and as the first step of `make gate`. They are separate from the book's
+  example tests, which live in the chapters and run from `build/examples/`.
+
+The libraries are worth knowing before reading any entry point, because
+together they are why a check is usually thirty lines:
+
+| Module | What it provides |
+| --- | --- |
+| `tools_config.py` | Paths and the convention regexes. Constants only, no behavior. |
+| `tools_repo.py` | Small shared behaviors: walking `Chapters/`, reading a glob list, running a subprocess. |
+| `tools_markdown.py` | `Document.parse()`: one parse of a Markdown file into lines, fenced `Block`s, and headings. |
+| `tools_prose.py` | Which lines are prose, and which inline spans (code, footnotes) to ignore within one. |
+| `tools_pycode.py` | Walking fenced Python and finding a real `#` comment in a line, string-aware. |
+| `tools_report.py` | `Finding` and `Check`, the shape every check produces and the reporter that prints them. |
+| `tools_extract.py` | Routing blocks to paths, conflict detection, and writing or checking a tree. |
+
+A check is a function from a `Document` to `Finding`s, which is what lets
+`check_all.py` run all of them over one parse, and what lets a test build a
+document in memory with no filesystem at all.
+
+This README covers the tools you invoke by hand and the conventions behind
+them. It is deliberately not an inventory of all forty files: `make help`
+lists every target, and each script's `--help` prints its own docstring.
 
 ## Commands
 
@@ -76,7 +117,7 @@ make ci         # the full local gate: check, ty, ruff, run, pytest, site
 `make all` is the loop to repeat after editing a chapter: every mutating
 fixer (`reflow`, the comment-style fixers, import sorting, blank-line
 cleanup), then a refresh of the `#:` output markers, then a sync of the
-generated trees, then the full gate; see [run_all.py](#run_allpy) below.
+generated trees, then the full gate; see [run_all.py](#run_all.py) below.
 `make verify` is the lighter everyday command: it skips the fixers and
 just refreshes markers and pushes your Markdown changes out to
 `Examples/` (so the drift check passes) and your `Solutions/` changes out
@@ -116,6 +157,79 @@ from that target's own `## text` comment in the Makefile (the same one
 make all               # run every target in ALL_TARGETS, in order
 make all ARGS=--help   # list them, with their doc text, without running
 ```
+
+## sweep_checks.py
+
+`make gate` stops at its first failing step, which is right when you broke
+one thing. It is wrong right after a tool upgrade, when the question is not
+whether something broke but how much did. Worse, `gate` declares
+`solutions-gate` as a *prerequisite*, so the whole Solutions half runs
+first and can hide every `Chapters/` failure behind it, the opposite of the
+order the recipe reads in.
+
+`make sweep` runs each check to completion and summarizes which failed:
+
+```
+make sweep     # every check over both trees, all failures, exit 1 if any
+```
+
+`make upgrade-tools` ends with it, so an upgrade's damage arrives attached
+to the upgrade that caused it. The list is `SWEEP_TARGETS` in the script,
+and each row's description is read from that target's own `## text` in the
+Makefile. It sweeps `gate-checks` (the gate's Markdown selection) rather
+than `checks`, since `checks` also runs `prose-lint`, and a row that is
+permanently FAIL teaches you to stop reading the table. The `#:` markers
+are deliberately not swept: `make verify` rewrites a stale marker instead
+of failing on it, so a nondeterministic listing would report a difference
+here every run.
+
+## verify_targets.py
+
+Smoke-tests every target in `make help`, so a target that broke stays
+broken for one run rather than until someone happens to use it. Read-only
+and idempotent targets run directly; a target that bakes `--fix`/`--write`
+into its recipe runs in a disposable git worktree, so this working tree is
+never touched. `upgrade-tools`, `upgrade-python`, `serve`, and `local`
+never run at all, being network or environment mutations or a server that
+blocks forever. Logs land in `build/target_test_logs/`.
+
+## check_chapter.py
+
+The full gate spends most of its time executing every listing in all 44
+chapters, almost none of which is about the chapter you just edited. This
+runs the same code-example checks scoped to one:
+
+```
+make check-ch CH=12     # or CH=12_Data_Classes_as_Types
+```
+
+It rebuilds `build/examples/` whole-book first (cheap, and necessary since
+a chapter's listings import their siblings), then narrows the expensive
+step, `validate_output.py --update`, to that chapter, and finishes with the
+listing gates plus `ty`, `ruff`, and `pytest` over that chapter's directory.
+
+## Status stamps: gate_stamp.py and tool_stamp.py
+
+Both write to `build/`, which is gitignored, so neither can enter a commit
+or dirty a diff.
+
+**`gate_stamp.py` (`make gate-status`)** records a pass of the gate along
+with a hash of every `Chapters/` and `Solutions/` file, so it answers the
+question that matters after an editing session, which is not "when did the
+gate run" but "has anything changed since it did":
+
+```
+gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
+3 files changed since: 23_Iterators.md, 24_Singleton.md, ...
+```
+
+**`tool_stamp.py` (`make tool-status`)** records when `make upgrade-tools`
+last ran. Upgrading is deliberately manual, since it rewrites the tracked
+`uv.lock` and can invoke winget or Homebrew, and the cost of that choice is
+drifting quietly for months and then meeting every breaking change at once.
+So the gate prints one line when the stamp is old. It never fails and never
+touches a tracked file, so it cannot turn a green gate red. That line is a
+reminder for the author; nothing should act on it automatically.
 
 ## check_tools.py
 
@@ -270,6 +384,49 @@ future bulk work (e.g. importing a batch of new, not-yet-fixed examples): record
 them with `--write-baseline`, gate only regressions with `--baseline`, then trim
 entries as you repair them.
 
+## validate_output.py
+
+Maintains the `#:` output markers. A listing states its own expected stdout
+in trailing `#:` comment lines, so a reader sees the result next to the code
+and the build can prove it is still true:
+
+```python
+print(2 ** 10)
+#: 1024
+```
+
+The tool runs each block from its extracted chapter directory (so imports and
+relative data paths resolve as they do for `run_examples.py`) and compares
+captured stdout against the markers. Default mode reports mismatches;
+`--update` rewrites the Markdown to match what ran. A block with no `#:`
+marker at all is left alone, but a lone bare `#:` is treated as a
+not-yet-filled-in placeholder and is always filled, even without `--update`.
+
+```
+make output-check   # verify markers, no rewrite
+make output         # rewrite stale markers in Chapters/
+```
+
+The gate runs `--update`, so a stale marker self-heals rather than failing
+the build, the same way `fix-eol` and `sync` do. Two consequences are worth
+knowing. First, **check `git diff Chapters/` after a gate run**: a marker
+that changed is the build telling you an example's output moved, which is
+sometimes the bug rather than the fix. A timing- or ordering-dependent
+listing can flip its marker between runs with nothing to flag it. Second,
+self-healing covers marker *text* only; an exception raised where none was
+expected still fails.
+
+Every block runs in one process, which is why the module drops each block's
+namespace and forces a `gc.collect()` before moving on: a class defined in a
+block forms a reference cycle with its own globals, so refcounting never
+frees it, and a `__del__` firing later would land in a different block's
+captured stdout. `-j` splits the work across processes; a block needing to
+stay unrun carries the same `# extract: no-run` marker `run_examples.py`
+honors.
+
+When pointed at `Solutions/`, `--tree` must be **absolute**; see
+[extract_solutions.py](#extract_solutions.py) below.
+
 ## extract_solutions.py
 
 The exact counterpart of `extract_examples.py`, pointed at `Solutions/`
@@ -397,6 +554,37 @@ only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
 To add the community packages for passive-voice and usage checks, list them in
 `.vale.ini` (`Packages = write-good, proselint`) and run `vale sync` once.
 
+## check_all.py
+
+The checks below each have their own script and their own `make` target,
+which is what you want when one thing is broken and you are iterating on
+it. Running them one at a time means an interpreter startup and a fresh
+parse of all 45 chapters per tool, and N summaries instead of one answer to
+the question "is the book clean?"
+
+This runs them together: every file is parsed once into a `Document` and
+handed to each check, and all findings land in one list sorted by file and
+line, so the report reads top to bottom through the book rather than
+grouped by which tool noticed.
+
+```
+make checks                # every Markdown check, one pass
+make checks ARGS=--list    # their names and descriptions
+make fix-checks            # apply every fix they can make
+make gate-checks           # just the subset `gate` enforces
+```
+
+The registry is the explicit `CHECKS` list in the script, deliberately not
+directory discovery: an explicit list is greppable, and it cannot surprise
+the interpreter that also execs book listings. Adding a check means
+importing it and adding it there, after which it appears in `--list`, in
+the default run, and as a selectable name.
+
+`gate` runs the selection named by `GATE_CHECKS` in the Makefile rather
+than the whole registry, because `prose-lint` reports findings the book has
+not cleaned up yet. Once `make checks` is green, fold it in there and the
+gate covers all seven.
+
 ## check_line_endings.py
 
 `.gitattributes` (`* text=auto eol=lf`) already keeps committed blobs LF on
@@ -432,6 +620,29 @@ make fix-listings   # remove the offending blank lines
 Do not run `ruff format` on the examples: it would re-expand to two blank lines
 between top-level defs and undo the density. The gate runs `ruff check` (the
 linter) only, which is happy with one blank line.
+
+## fix_imports.py
+
+Sorts the import block of each ```python listing and drops unused imports,
+writing back to the Markdown. ruff's import rules are already part of the
+lint gate, but that gate runs on `build/examples/`, which is regenerated
+from the Markdown, so an automatic fix has to land in the source.
+
+It runs ruff on the real extracted files rather than on each block in
+isolation, which matters: ruff's isort only classifies a listing's sibling
+imports as first-party when it can see those files on disk, so fixing the
+tree in place sorts the way the gate expects. Then it splices each fixed
+file back into the block it came from. It extracts nothing itself, so run
+it against a built tree (`make fix-imports` depends on `extract`).
+
+```
+make fix-imports    # rewrite the listings' import blocks
+```
+
+Deliberately-unused imports stay: `--select I,F401` respects the
+`per-file-ignores` in `pyproject.toml`, which is what keeps the chapter
+example that exists to show that importing a module runs its top-level code
+from having its unused import deleted.
 
 ## banned_phrases.py
 
@@ -512,6 +723,38 @@ make anchors    # check (part of `make ci`)
 To make an anchor stable against rewording, give the target heading an explicit
 id: `## Heading {#stable-id}`, then link `(chapter.md#stable-id)`.
 
+The gate checks `Chapters/` and this README (`GATE_DOCS` in the Makefile).
+Two links in here were dead for a while precisely because nothing looked
+outside `Chapters/`. Only the anchors check runs over this file: `banned`
+would fire on the worked example in
+[banned_phrases.py](#banned_phrases.py) above, which names a banned phrase
+in order to explain the tool.
+
+## Advisory checks: check_links.py and list_todos.py
+
+Neither is part of `verify`/`gate`/`ci`. Run them now and then.
+
+**`check_links.py` (`make links`)** requests every unique external
+`http(s)://` URL in the book and reports connection errors, timeouts, and
+statuses at or above 400. HEAD is tried first, with one GET retry for
+servers that treat HEAD differently. It stays out of the gate on purpose:
+the network is flaky, sites rate-limit, and a dead external link should
+never block a build. Internal cross-references are `heading_links.py`'s
+job, not this one.
+
+**`list_todos.py` (`make todos`)** lists `TODO(tag): ...` markers left in
+the Markdown. A marker is an HTML comment, so pandoc strips it from the
+rendered site while it stays greppable in the source:
+
+```
+<!-- TODO(py315-deps): NumPy has no Python 3.15 wheel yet. Once it
+does, convert this indented block to a real, fenced, tested example. -->
+```
+
+The tag groups related markers that share one underlying blocker, and
+doubles as a plain `grep -rn "TODO(py315-deps)" Chapters/` when you care
+about only one of them. It always exits 0, being informational.
+
 ## build_site.py
 
 Renders `Chapters/*.md` into a browsable site under `build/site/` (git-ignored).
@@ -540,6 +783,21 @@ Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
 use `-o DIR` to build elsewhere. `make serve` builds nothing and serves the
 existing `build/site/` at <http://localhost:8000>; `make local` builds, serves,
 and opens a browser at the site.
+
+## search_index.py
+
+Builds `search-index.json`, which the site's `search.js` fetches and
+searches in the browser. There is no server, so the whole index ships to
+the reader, fetched lazily the first time someone opens the search box.
+`build_site.py` calls this, so `make site` covers it.
+
+A record is one *section*: the text under a single `##` or `###` heading,
+plus the chapter's opening text, which sits under no heading and links to
+the page itself. Each carries the page, anchor, chapter title, and section
+heading needed to deep-link to it. Anchors come from
+`heading_links.pandoc_anchor()`, the same function the gate checks links
+with, so a link the gate accepts and a link a search result produces
+resolve to the same heading.
 
 ## serve.py
 

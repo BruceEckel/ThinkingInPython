@@ -126,6 +126,13 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 # add it here once `make checks` is green and the gate covers all seven.
 GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing anchors
 
+# Markdown outside Chapters/ that still carries intra-document links worth
+# gating. Only `anchors` runs over it: `banned` would fire on the tooling
+# README's own worked example of a banned phrase, and the listing checks
+# have no ```python blocks to inspect there. Two of these links were dead
+# for a while precisely because nothing looked outside Chapters/.
+GATE_DOCS = tools/README.md
+
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest, plus the same checks for
 # Solutions/ (solutions-gate). `verify` runs `sync`/`solutions-sync` first;
@@ -139,6 +146,7 @@ gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff,
 	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/check_all.py $(GATE_CHECKS)
+	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/validate_output.py --update Chapters
@@ -415,7 +423,7 @@ fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
 
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
-	$(PY) tools/heading_links.py
+	$(PY) tools/heading_links.py Chapters $(GATE_DOCS)
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.

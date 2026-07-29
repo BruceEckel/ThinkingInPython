@@ -291,14 +291,15 @@ print(list(report(["red", "green", "blue"])))
 ```
 
 `emit()` is a `Generator[str, None, int]`: it yields strings,
-is never sent anything, and returns the `int` total it accumulates while iterating.
+is never sent anything,
+and returns the `int` total it accumulates while iterating.
 
 The return channel is how a generator reports to whichever generator delegated to it,
 so `report()` learns something `emit()` computed while neither of them knows who is driving.
 
 ### The Send Channel
 
-The `SendType` works the same way in the other direction.
+The `SendType` is for the user to `send()` information back into the generator.
 A generator that only receives values needs no `ReturnType`:
 
 ```python
@@ -332,9 +333,9 @@ except StopIteration:
 ```
 
 `collect()` yields prompts, receives numbers, and returns nothing,
-which is `Generator[str, int, None]`.
-The omitted `ReturnType` defaults to `None`,
-so `Generator[str, int]` says it in two parameters instead of three.
+so its type is `Generator[str, int, None]`.
+An omitted `ReturnType` defaults to `None`,
+so the return signature becomes `Generator[str, int]`.
 `both()` declares the same channels,
 because a delegating generator adopts the arrangement of whatever it delegates to.
 The numbers travel down to the `yield` that asked for them,
