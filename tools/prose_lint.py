@@ -25,16 +25,19 @@ Usage:
 
 import argparse
 import re
+from collections.abc import Iterator
 
 from md_prose import FENCE, HEADING, LIST_ITEM, code_spans, is_prose_line
+from tools_markdown import Document
 from tools_repo import add_paths_arg, md_files
+from tools_report import Check, Finding, report
 
 _MULTI_SPACE = re.compile(r"(?<=\S) {2,}(?=\S)")
 _SPACE_BEFORE = re.compile(r" +([.,;!?])")
 _QUOTE_PUNCT = re.compile(r'"([.,])')
 _TRAILING_WS = re.compile(r"[ \t]+$")
 
-Finding = tuple[int, int, str, str]  # line, column, code, message
+Issue = tuple[int, int, str, str]  # line, column, code, message
 
 
 def _in_span(pos: int, spans: list[tuple[int, int]]) -> bool:
@@ -59,9 +62,9 @@ def _prose_text(line: str) -> tuple[str, int] | None:
     return None
 
 
-def lint_text(text: str) -> list[Finding]:
+def lint_text(text: str) -> list[Issue]:
     """Return every prose issue in one Markdown document."""
-    findings: list[Finding] = []
+    findings: list[Issue] = []
     lines = text.splitlines()
     n = len(lines)
     in_fence = False
@@ -138,6 +141,32 @@ def lint_text(text: str) -> list[Finding]:
     return findings
 
 
+def find(doc: Document) -> Iterator[Finding]:
+    """This document's prose issues, as Findings.
+
+    A thin adapter over `lint_text`, which keeps its own line walk rather
+    than using `doc.blocks`. That walk handles two things Document does
+    not: tilde fences (``~~~``), and matching a fence's closing marker to
+    its opener so a ``` inside a ~~~ block does not end it. It also skips
+    YAML front matter. Reimplementing that on top of Document would risk
+    the accuracy of the one check whose whole job is punctuation detail,
+    for no gain, so the text is what gets passed through.
+    """
+    for lineno, col, code, message in lint_text(doc.text):
+        yield Finding(doc.path, lineno, message, col=col, code=code)
+
+
+CHECK = Check(
+    # Not "prose": `make prose` already means the Vale house-style lint,
+    # and these are two different tools with two different rule sets.
+    name="prose-lint",
+    doc="prose has no double spaces, stray whitespace or misplaced punctuation",
+    run=find,
+    clean="No prose issues.",
+    problem="{n} prose issue(s).",
+)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -145,19 +174,10 @@ def main(argv: list[str] | None = None) -> int:
     add_paths_arg(ap)
     args = ap.parse_args(argv)
 
-    files = md_files(args.paths)
-    total = 0
-    for path in files:
-        for lineno, col, code, message in lint_text(
-                path.read_text(encoding="utf-8")):
-            print(f"{path}:{lineno}:{col}: {code} {message}")
-            total += 1
-
-    if total:
-        print(f"\n{total} prose issue(s).")
-        return 1
-    print("No prose issues.")
-    return 0
+    findings = (
+        f for p in md_files(args.paths) for f in find(Document.parse(p))
+    )
+    return report(findings, clean=CHECK.clean, problem=CHECK.problem)
 
 
 if __name__ == "__main__":

@@ -26,8 +26,9 @@ import argparse
 import shutil
 from pathlib import Path
 
-from extract_examples import check_against, extract, is_derived, write_tree
+from extract_examples import extract, is_derived
 from tools_config import BUILD_DIR, ROOT
+from tools_extract import check_against, report_conflicts, write_tree
 
 SOLUTIONS_DIR = ROOT / "Solutions"
 COMMITTED_DIR = ROOT / "SolutionsCode"
@@ -77,13 +78,9 @@ def main(argv: list[str] | None = None) -> int:
 
     result = extract(markdown_dir=SOLUTIONS_DIR)
     print(f"Scanned {SOLUTIONS_DIR.name}: "
-          f"{len(result.examples)} file-blocks, {result.fragments} fragments.")
+          f"{len(result.files)} file-blocks, {result.fragments} fragments.")
 
-    if result.conflicts:
-        print(f"\n{len(result.conflicts)} conflicting duplicate path(s) "
-              "(same path, differing content):")
-        for path, a, b in result.conflicts:
-            print(f"  ! {path}  ({a} vs {b})")
+    report_conflicts(result)
 
     if args.write:
         print()
@@ -95,6 +92,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if result.conflicts else 0
 
     missing, changed = check_against(result, COMMITTED_DIR)
+    # Worded "in Solutions" rather than report_drift's "in the book",
+    # since this tool's source is Solutions/*.md, not the chapters.
     if missing:
         print(f"\n{len(missing)} example(s) in Solutions but not under "
               f"{COMMITTED_DIR.name}/:")

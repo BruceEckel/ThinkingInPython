@@ -79,9 +79,19 @@ def test_slug_none_without_path_comment() -> None:
     doc = Document.from_text("```python\nimport os\n```\n")
     assert doc.blocks[0].slug is None
 
-def test_slug_uses_rust_comment_form_for_rust() -> None:
+def test_rust_slug_reads_the_slash_comment_form() -> None:
     doc = Document.from_text("```rust\n// fastcount/src/lib.rs\n```\n")
-    assert doc.blocks[0].slug == "fastcount/src/lib.rs"
+    assert doc.blocks[0].rust_slug == "fastcount/src/lib.rs"
+
+def test_slug_ignores_the_rust_comment_form() -> None:
+    # slug is the `#` form whatever the fence language. Making it switch on
+    # lang pulled a ```rust block into the Python examples tree.
+    doc = Document.from_text("```rust\n// fastcount/src/lib.rs\n```\n")
+    assert doc.blocks[0].slug is None
+
+def test_slug_read_from_a_non_python_fence() -> None:
+    doc = Document.from_text("```text\n# data.txt\nrows\n```\n")
+    assert doc.blocks[0].slug == "data.txt"
 
 def test_slug_backslashes_normalized() -> None:
     doc = Document.from_text("```python\n# mouse\\Move.py\n```\n")

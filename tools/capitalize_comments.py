@@ -24,12 +24,16 @@ applying, regenerate the Examples/ mirror:
 
 import argparse
 import re
+from collections.abc import Iterator
+from functools import cache
 from pathlib import Path
 
 from tools_config import FENCE_RE as FENCE
 from tools_config import TOOLS_DIR
+from tools_markdown import Document
 from tools_pycode import scan_line as find_comment_hash
 from tools_repo import md_files, write_text_lf
+from tools_report import Check, Finding, report
 
 ALLOWLIST = TOOLS_DIR / "comment_caps_allow.txt"
 
@@ -145,6 +149,43 @@ def process_file(path: Path, write: bool,
     return changes
 
 
+@cache
+def default_allowlist() -> frozenset[str]:
+    """The configured allowlist, read once per process."""
+    return frozenset(load_allowlist(ALLOWLIST))
+
+
+def find(doc: Document) -> Iterator[Finding]:
+    """Comments needing capitalization, one Finding each.
+
+    `process_file` keeps its own line walk instead of using
+    `doc.python_blocks()`: it threads triple-quote state and a
+    "previous comment left a sentence open" flag through the file, so a
+    continuation line is not capitalized mid-thought. Rebuilding that per
+    block would have to re-derive both at every block boundary for no
+    gain, so this reads the file and adapts the result.
+
+    The message carries the replacement, so the one-line report says as
+    much as this tool's own grouped diff does.
+    """
+    for lineno, old, new in process_file(doc.path, False, set(
+            default_allowlist())):
+        yield Finding(
+            doc.path, lineno,
+            f"comment needs capitalizing: {old.strip()} -> {new.strip()}",
+        )
+
+
+CHECK = Check(
+    name="comment-caps",
+    doc="prose comments in listings start with a capital",
+    run=find,
+    clean="Comment capitalization OK.",
+    problem="{n} comment(s) need capitalizing. Capitalize them, "
+            "or add the text to tools/comment_caps_allow.txt.",
+)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -168,10 +209,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\nApplied {total} change(s).")
         return 0
     if total:
-        print(f"\n{total} comment(s) need capitalizing. Capitalize them, "
-              "or add the text to tools/comment_caps_allow.txt.")
+        print(f"\n{CHECK.problem.format(n=total)}")
         return 1
-    print("\nComment capitalization OK.")
+    print(f"\n{CHECK.clean}")
     return 0
 
 

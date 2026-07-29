@@ -46,6 +46,9 @@ FENCE_CLOSE = re.compile(r"^\s*```")
 # accepted both, so both are accepted here rather than leaving two rules.
 PYTHON_LANGS = frozenset({"python", "py"})
 
+# An ATX heading, capturing its text without the leading #s.
+HEADING = re.compile(r"^#{1,6}\s+(.*?)\s*$")
+
 
 @dataclass(frozen=True)
 class Block:
@@ -72,20 +75,31 @@ class Block:
     def is_python(self) -> bool:
         return self.lang in PYTHON_LANGS
 
-    @property
-    def slug(self) -> str | None:
-        """The relative path this block's first content line names.
-
-        `# trace.py` for a Python block, `// fastcount/src/lib.rs` for a
-        Rust one. None when the first content line is not a path comment,
-        which is how a listing says it is a fragment rather than a file.
-        """
-        pattern = RUST_PATH_LINE_RE if self.lang == "rust" else PATH_LINE_RE
+    def _first_content_path(self, pattern: re.Pattern[str]) -> str | None:
         for line in self.lines:
             if line.strip():
                 m = pattern.match(line.rstrip("\n\r"))
                 return m.group(1).replace("\\", "/") if m else None
         return None
+
+    @property
+    def slug(self) -> str | None:
+        """The path a `# trace.py` first content line names, if any.
+
+        Deliberately independent of `lang`: the book's convention is the
+        `#` comment form whatever the fence says, and extract_examples.py
+        has always read it that way, so a ```text block naming a data file
+        extracts like any other. Rust's `//` form is a separate property
+        rather than an automatic switch on the language, because making
+        this one language-aware silently pulled a ```rust block into the
+        Python examples tree.
+        """
+        return self._first_content_path(PATH_LINE_RE)
+
+    @property
+    def rust_slug(self) -> str | None:
+        """The path a `// fastcount/src/lib.rs` first line names, if any."""
+        return self._first_content_path(RUST_PATH_LINE_RE)
 
     def line_number(self, index: int) -> int:
         """The file's 1-based line number for content line `index`."""
@@ -149,6 +163,33 @@ class Document:
     def end_of(block: Block) -> int:
         """One past the block's closing fence line."""
         return block.end + 1
+
+    def headings(self) -> Iterator[tuple[int, str]]:
+        """(1-based line number, heading text) for each ATX heading.
+
+        The text excludes the leading `#`s and surrounding whitespace but
+        keeps everything else, including a trailing `{#id}`, since a
+        caller checking anchors needs to see the explicit id.
+        """
+        fenced = self.in_fence()
+        for index, line in enumerate(self.lines):
+            if fenced[index]:
+                continue
+            m = HEADING.match(line)
+            if m:
+                yield index + 1, m.group(1)
+
+    def outside_fences(self) -> Iterator[tuple[int, str]]:
+        """(1-based line number, line) for every line not in a code block.
+
+        Unlike `prose_lines()` this keeps headings, lists and tables: a
+        link can appear in any of them, so a link checker wants all of it
+        and only needs the code excluded.
+        """
+        fenced = self.in_fence()
+        for index, line in enumerate(self.lines):
+            if not fenced[index]:
+                yield index + 1, line
 
     def prose_lines(self) -> Iterator[tuple[int, str]]:
         """(1-based line number, line) for each ordinary prose line.

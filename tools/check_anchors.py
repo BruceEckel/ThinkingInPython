@@ -18,12 +18,14 @@ correct the anchor, or give the target heading an explicit `{#id}`.
 """
 import argparse
 import re
+from collections.abc import Iterator
+from functools import cache
 from pathlib import Path
 
-from tools_config import FENCE_ANY_RE as FENCE
+from tools_markdown import Document
 from tools_repo import add_paths_arg, md_files
+from tools_report import Check, Finding, report
 
-HEADING = re.compile(r"^#{1,6}\s+(.*?)\s*$")
 EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
 ATTR_BLOCK = re.compile(r"\s*\{[^}]*\}\s*$")
 INLINE_CODE = re.compile(r"`[^`]*`")
@@ -49,21 +51,11 @@ def _slug(text: str) -> str:
     return kept[m.start():] if m else ""
 
 
-def heading_anchors(lines: list[str]) -> set[str]:
-    """Every anchor pandoc would assign to the headings in `lines`."""
+def heading_anchors(doc: Document) -> set[str]:
+    """Every anchor pandoc would assign to this document's headings."""
     anchors: set[str] = set()
     counts: dict[str, int] = {}
-    in_fence = False
-    for line in lines:
-        if FENCE.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        m = HEADING.match(line)
-        if not m:
-            continue
-        text = m.group(1)
+    for _, text in doc.headings():
         explicit = EXPLICIT_ID.search(text)
         if explicit:
             anchors.add(explicit.group(1))
@@ -77,20 +69,59 @@ def heading_anchors(lines: list[str]) -> set[str]:
     return anchors
 
 
-def anchor_links(lines: list[str]):
-    """Yield (lineno, target_stem_or_None, anchor) for #-anchor links."""
-    in_fence = False
-    for i, line in enumerate(lines, 1):
-        if FENCE.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
+def anchor_links(doc: Document) -> Iterator[tuple[int, str | None, str]]:
+    """(lineno, target_stem_or_None, anchor) for each #-anchor link."""
+    for lineno, line in doc.outside_fences():
         masked = INLINE_CODE.sub("", line)
         for target in LINK.findall(masked):
             m = ANCHOR_TARGET.match(target.strip())
             if m:
-                yield i, m.group(1), m.group(2)
+                yield lineno, m.group(1), m.group(2)
+
+
+@cache
+def anchors_of(path: Path) -> frozenset[str] | None:
+    """A file's anchors, or None if the file does not exist.
+
+    Cached because a chapter linking into another chapter would otherwise
+    reparse the target once per link. The cache is keyed by the resolved
+    path and lives for the process, which is right for a checker run but
+    is why a test that rewrites a file must clear it.
+    """
+    if not path.exists():
+        return None
+    return frozenset(heading_anchors(Document.parse(path)))
+
+
+def find(doc: Document) -> Iterator[Finding]:
+    """Every anchor link in `doc` that resolves to no heading."""
+    for lineno, stem, anchor in anchor_links(doc):
+        if stem is None:
+            where, valid = "this file", anchors_of(doc.path.resolve())
+        else:
+            target = doc.path.parent / f"{stem}.md"
+            valid = anchors_of(target.resolve())
+            where = f"{stem}.md"
+            if valid is None:
+                yield Finding(
+                    doc.path, lineno, f"link target not found: {stem}.md"
+                )
+                continue
+        if anchor not in (valid or frozenset()):
+            yield Finding(
+                doc.path, lineno,
+                f'no heading matches anchor "#{anchor}" in {where}',
+            )
+
+
+CHECK = Check(
+    name="anchors",
+    doc="every heading-anchor link points at a real heading",
+    run=find,
+    clean="Anchor links OK.",
+    problem="{n} broken anchor link(s). Fix the anchor, or give the "
+            "target heading an explicit {{#id}}.",
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -99,43 +130,11 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     add_paths_arg(ap)
     args = ap.parse_args(argv)
-    files = md_files(args.paths)
 
-    cache: dict[Path, set[str] | None] = {}
-
-    def anchors_of(path: Path) -> set[str] | None:
-        key = path.resolve()
-        if key not in cache:
-            cache[key] = (heading_anchors(
-                path.read_text(encoding="utf-8").splitlines())
-                if path.exists() else None)
-        return cache[key]
-
-    total = 0
-    for f in files:
-        lines = f.read_text(encoding="utf-8").splitlines()
-        for lineno, stem, anchor in anchor_links(lines):
-            if stem is None:
-                where, valid = "this file", anchors_of(f)
-            else:
-                target = f.parent / f"{stem}.md"
-                valid = anchors_of(target)
-                where = f"{stem}.md"
-                if valid is None:
-                    print(f"{f}:{lineno}: link target not found: {stem}.md")
-                    total += 1
-                    continue
-            if anchor not in (valid or set()):
-                print(f"{f}:{lineno}: no heading matches anchor "
-                      f"\"#{anchor}\" in {where}")
-                total += 1
-
-    if total:
-        print(f"\n{total} broken anchor link(s). Fix the anchor, or give the "
-              "target heading an explicit {#id}.")
-        return 1
-    print("Anchor links OK.")
-    return 0
+    findings = (
+        f for p in md_files(args.paths) for f in find(Document.parse(p))
+    )
+    return report(findings, clean=CHECK.clean, problem=CHECK.problem)
 
 
 if __name__ == "__main__":

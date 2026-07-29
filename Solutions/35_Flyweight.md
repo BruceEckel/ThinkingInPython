@@ -127,7 +127,7 @@ for size in (50, 100, 200):
 
     ratio = round(uncached_peak / cached_peak, 1)
     print(size, "ratio uncached/cached:", ratio)
-#: 50 ratio uncached/cached: 9.8
+#: 50 ratio uncached/cached: 9.9
 #: 100 ratio uncached/cached: 9.9
 #: 200 ratio uncached/cached: 11.1
 ```

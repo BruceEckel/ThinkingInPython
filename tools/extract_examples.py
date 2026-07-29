@@ -63,12 +63,19 @@ Usage:
 import argparse
 import re
 import shutil
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, ROOT
-from tools_pycode import walk_fenced
-from tools_repo import block_slug, md_files, write_text_lf
+from tools_extract import (
+    ExtractResult,
+    check_against,
+    extract as extract_blocks,
+    report_conflicts,
+    report_drift,
+    write_tree,
+)
+from tools_markdown import Block, Document
+from tools_repo import md_files
 
 COMMITTED_DIR = ROOT / "Examples"
 DEFAULT_OUT = EXAMPLES_TREE
@@ -78,45 +85,23 @@ DEFAULT_OUT = EXAMPLES_TREE
 NOISE_DIR_NAMES = {"__pycache__", ".idea"}
 
 
-@dataclass
-class Example:
-    path: str  # relative path, forward slashes
-    content: str  # verbatim block text, including the trailing newline
-    source_md: str  # chapter file the block came from
-    language: str  # fence language, e.g. "python" or "" if none
+def route(doc: Document, block: Block) -> str | None:
+    """Where a book block extracts to, or None if it is a fragment.
 
-
-@dataclass
-class ExtractResult:
-    examples: dict[str, Example] = field(default_factory=dict)
-    conflicts: list[tuple[str, str, str]] = field(default_factory=list)
-    fragments: int = 0
-
-
-def iter_blocks(lines: list[str]):
-    """Yield (language, block_lines) for each fenced block."""
-    for ev in walk_fenced(lines):
-        if ev.match is not None:
-            yield ev.match.group(1) or "", lines[ev.open_at + 1:ev.end]
+    A "utils/" slug keeps its path so it lands at the tree root and every
+    chapter can import it. A "rust/" slug is passed over entirely: it is a
+    caller for a compiled module extract_rust.py handles, and the module
+    does not exist in this build's environment.
+    """
+    slug = block.slug
+    if slug is None or slug.startswith("rust/"):
+        return None
+    return slug if slug.startswith("utils/") else f"{doc.path.stem}/{slug}"
 
 
 def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
-    result = ExtractResult()
-    for md in md_files([markdown_dir]):
-        text = md.read_text(encoding="utf-8")
-        for lang, block in iter_blocks(text.splitlines()):
-            slug = block_slug(block)
-            if slug is None or slug.startswith("rust/"):
-                result.fragments += 1
-                continue
-            rel = slug if slug.startswith("utils/") else f"{md.stem}/{slug}"
-            content = "\n".join(block).rstrip("\n") + "\n"
-            existing = result.examples.get(rel)
-            if existing and existing.content != content:
-                result.conflicts.append((rel, existing.source_md, md.name))
-                continue
-            result.examples[rel] = Example(rel, content, md.name, lang)
-    return result
+    docs = (Document.parse(md) for md in md_files([markdown_dir]))
+    return extract_blocks(docs, [route])
 
 
 def is_derived(out_dir: Path) -> bool:
@@ -135,29 +120,6 @@ def is_derived(out_dir: Path) -> bool:
         return False
 
 
-def write_tree(result: ExtractResult, out_dir: Path) -> int:
-    written = 0
-    for ex in result.examples.values():
-        dest = out_dir / ex.path
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        if not dest.exists() or dest.read_text(encoding="utf-8") != ex.content:
-            write_text_lf(dest, ex.content)
-            written += 1
-    return written
-
-
-def check_against(result: ExtractResult, committed: Path):
-    """Compare extracted examples to the committed tree. Returns drift lists."""
-    missing, changed = [], []
-    for ex in result.examples.values():
-        target = committed / ex.path
-        if not target.exists():
-            missing.append(ex.path)
-        elif target.read_text(encoding="utf-8") != ex.content:
-            changed.append(ex.path)
-    return missing, changed
-
-
 def find_strays(result: ExtractResult, committed: Path) -> list[str]:
     """Files under `committed` that no book block generates.
 
@@ -166,7 +128,7 @@ def find_strays(result: ExtractResult, committed: Path) -> list[str]:
     """
     if not committed.exists():
         return []
-    expected = set(result.examples)
+    expected = set(result.files)
     strays = []
     for path in committed.rglob("*"):
         if not path.is_file():
@@ -218,13 +180,9 @@ def main(argv: list[str] | None = None) -> int:
 
     result = extract()
     print(f"Scanned {CHAPTERS_DIR.name}: "
-          f"{len(result.examples)} file-blocks, {result.fragments} fragments.")
+          f"{len(result.files)} file-blocks, {result.fragments} fragments.")
 
-    if result.conflicts:
-        print(f"\n{len(result.conflicts)} conflicting duplicate path(s) "
-              "(same path, differing content):")
-        for path, a, b in result.conflicts:
-            print(f"  ! {path}  ({a} vs {b})")
+    report_conflicts(result)
 
     if args.write:
         print()
@@ -237,16 +195,8 @@ def main(argv: list[str] | None = None) -> int:
 
     # Default: check mode against the committed Examples/ tree.
     missing, changed = check_against(result, COMMITTED_DIR)
-    if missing:
-        print(f"\n{len(missing)} example(s) in the book but not under "
-              f"{COMMITTED_DIR.name}/:")
-        for p in missing:
-            print(f"  + {p}")
-    if changed:
-        print(f"\n{len(changed)} example(s) whose book text differs from "
-              f"{COMMITTED_DIR.name}/:")
-        for p in changed:
-            print(f"  ~ {p}")
+    report_drift(missing, changed, noun="example",
+                 where=COMMITTED_DIR.name)
 
     strays = find_strays(result, COMMITTED_DIR)
     orphaned, referenced = classify_strays(strays)

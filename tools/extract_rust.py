@@ -41,97 +41,46 @@ Usage:
 """
 
 import argparse
-from dataclasses import dataclass, field
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, ROOT, RUST_FENCE_RE, RUST_PATH_LINE_RE
-from tools_pycode import iter_python_blocks, walk_fenced
-from tools_repo import block_slug, md_files, write_text_lf
+from tools_config import CHAPTERS_DIR, ROOT
+from tools_extract import (
+    ExtractResult,
+    check_against,
+    extract as extract_blocks,
+    report_conflicts,
+    report_drift,
+    write_tree,
+)
+from tools_markdown import Block, Document
+from tools_repo import md_files
 
 RUST_DIR = ROOT / "rust"
 
 
-@dataclass
-class RustFile:
-    path: str  # relative to ROOT (starts with "rust/"), forward slashes
-    content: str  # verbatim block text, including the trailing newline
-    source_md: str  # chapter file the block came from
-    kind: str  # "rust" or "python"
+def route_rust(doc: Document, block: Block) -> str | None:
+    """A ```rust block naming its file with a `// path` first line."""
+    if block.lang != "rust":
+        return None
+    slug = block.rust_slug
+    return f"rust/{slug}" if slug else None
 
 
-@dataclass
-class ExtractResult:
-    files: dict[str, RustFile] = field(default_factory=dict)
-    conflicts: list[tuple[str, str, str]] = field(default_factory=list)
+def route_caller(doc: Document, block: Block) -> str | None:
+    """A ```python block whose `# rust/...` slug makes it a crate's caller.
 
-
-def _rust_slug(block: list[str]) -> str | None:
-    """The path a ```rust block's first content line names, if any."""
-    for line in block:
-        if line.strip():
-            m = RUST_PATH_LINE_RE.match(line.rstrip("\n\r"))
-            return m.group(1).replace("\\", "/") if m else None
-    return None
-
-
-def _iter_rust_blocks(lines: list[str]):
-    for ev in walk_fenced(lines, open_re=RUST_FENCE_RE):
-        if ev.match is not None:
-            yield lines[ev.open_at + 1:ev.end]
+    extract_examples.py passes over exactly these, since the compiled
+    module they import does not exist in the main build's environment.
+    """
+    if not block.is_python:
+        return None
+    slug = block.slug
+    return slug if slug and slug.startswith("rust/") else None
 
 
 def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
-    result = ExtractResult()
-
-    def add(rel: str, content: str, md_name: str, kind: str) -> None:
-        existing = result.files.get(rel)
-        if existing and existing.content != content:
-            result.conflicts.append((rel, existing.source_md, md_name))
-            return
-        result.files[rel] = RustFile(rel, content, md_name, kind)
-
-    for md in md_files([markdown_dir]):
-        text = md.read_text(encoding="utf-8")
-        lines = text.splitlines()
-
-        for block in _iter_rust_blocks(lines):
-            slug = _rust_slug(block)
-            if slug is None:
-                continue
-            content = "\n".join(block).rstrip("\n") + "\n"
-            add(f"rust/{slug}", content, md.name, "rust")
-
-        for _, block in iter_python_blocks(lines):
-            slug = block_slug(block)
-            if slug is None or not slug.startswith("rust/"):
-                continue
-            content = "\n".join(block).rstrip("\n") + "\n"
-            add(slug, content, md.name, "python")
-
-    return result
-
-
-def write_files(result: ExtractResult) -> int:
-    written = 0
-    for f in result.files.values():
-        dest = ROOT / f.path
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        if not dest.exists() or dest.read_text(encoding="utf-8") != f.content:
-            write_text_lf(dest, f.content)
-            written += 1
-    return written
-
-
-def check_against_tree(result: ExtractResult) -> tuple[list[str], list[str]]:
-    """Compare extracted files to what is currently under rust/."""
-    missing, changed = [], []
-    for f in result.files.values():
-        dest = ROOT / f.path
-        if not dest.exists():
-            missing.append(f.path)
-        elif dest.read_text(encoding="utf-8") != f.content:
-            changed.append(f.path)
-    return missing, changed
+    docs = (Document.parse(md) for md in md_files([markdown_dir]))
+    return extract_blocks(docs, [route_rust, route_caller])
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -145,28 +94,15 @@ def main(argv: list[str] | None = None) -> int:
     result = extract()
     print(f"Scanned {CHAPTERS_DIR.name}: {len(result.files)} rust/ file(s).")
 
-    if result.conflicts:
-        print(f"\n{len(result.conflicts)} conflicting duplicate path(s) "
-              "(same path, differing content):")
-        for path, a, b in result.conflicts:
-            print(f"  ! {path}  ({a} vs {b})")
+    report_conflicts(result)
 
     if args.write:
-        written = write_files(result)
+        written = write_tree(result, ROOT)
         print(f"\nWrote {written} changed file(s) under {RUST_DIR.name}/.")
         return 1 if result.conflicts else 0
 
-    missing, changed = check_against_tree(result)
-    if missing:
-        print(f"\n{len(missing)} file(s) in the book but not under "
-              f"{RUST_DIR.name}/:")
-        for p in missing:
-            print(f"  + {p}")
-    if changed:
-        print(f"\n{len(changed)} file(s) whose book text differs from "
-              f"{RUST_DIR.name}/:")
-        for p in changed:
-            print(f"  ~ {p}")
+    missing, changed = check_against(result, ROOT)
+    report_drift(missing, changed, noun="file", where=RUST_DIR.name)
 
     if not (missing or changed or result.conflicts):
         print(f"\nIn sync: every {RUST_DIR.name}/ file matches the book.")
