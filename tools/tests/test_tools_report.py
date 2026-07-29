@@ -1,8 +1,6 @@
 """Tests for tools/tools_report.py (Finding formatting and the reporter)."""
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 import pytest
 
 from tools_report import Finding, report

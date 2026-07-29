@@ -63,6 +63,14 @@ doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
 	$(PY) tools/verify_targets.py
 
+# The harness's own unit tests (tools/tests/), covering the shared library
+# modules and the pure logic inside the entry points. Distinct from `test`,
+# which runs the book's example tests under build/examples/. `gate` runs
+# this first: every later step trusts these tools, so a broken one makes
+# the rest of the gate's verdict meaningless.
+test-tools:  ## Run the harness's own unit tests (tools/tests/)
+	$(PYTEST) $(PYTEST_N) tools/tests
+
 # Updates uv itself (when it was installed via its standalone installer),
 # best-effort upgrades a globally installed `ty` (`uv tool upgrade ty`,
 # what bare `ty` on PATH resolves to), then upgrades every uv-managed dev
@@ -121,6 +129,7 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 # also fails on an orphaned stray under Examples/ (a file no block generates
 # and no chapter mentions); run `make prune-examples` to delete those.
 gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
+	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/listing_format.py
 	$(PY) tools/banned_phrases.py

@@ -1,11 +1,10 @@
 """Tests for tools/check_all.py (the registry and the combined runner)."""
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 import pytest
 
 from check_all import CHECKS, apply_fixes, by_name, main, run, select
+from tools_config import ROOT
 from tools_markdown import Document
 
 # A listing that trips four checks at once: two blank lines between
@@ -147,8 +146,7 @@ def test_comment_caps_check_names_the_replacement(tmp_path: Path) -> None:
 def test_check_names_match_their_make_targets() -> None:
     # Each check is also its own `make <name>` target; keeping the names
     # equal is what lets the runner's output be pasted back as a command.
-    makefile = (Path(__file__).parent.parent / "Makefile").read_text(
-        encoding="utf-8")
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
     for check in CHECKS:
         if check.name == "prose-lint":
             continue  # `make prose` is Vale; this one has no target of its own

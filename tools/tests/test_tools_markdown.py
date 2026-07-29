@@ -1,8 +1,6 @@
 """Tests for tools/tools_markdown.py (the parsed-Markdown Document)."""
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 from tools_markdown import Block, Document
 
 # ── parsing ───────────────────────────────────────────────────────────────────

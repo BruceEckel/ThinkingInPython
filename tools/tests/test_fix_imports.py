@@ -1,8 +1,6 @@
 """Tests for tools/fix_imports.py (the pure splicing logic)."""
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 from fix_imports import block_slug, collect_markdown, splice_markdown
 
 

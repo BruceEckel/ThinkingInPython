@@ -1,8 +1,6 @@
 """Tests for tools/tools_extract.py (routing, conflicts, write, check)."""
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 from tools_extract import (
     block_content,
     check_against,

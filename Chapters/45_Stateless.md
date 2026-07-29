@@ -254,19 +254,14 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-`outer()` contains four statements and the driver receives six values.
 Each `yield from` runs its target until that generator is exhausted,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-How many a delegation contributes is a property of the target,
-which the delegating generator has no way to know and no reason to.
-`"start"` and `"end"` bracket the whole sequence,
-so `outer()` clearly does not resume until the generator below it has finished.
+How many a delegation contributes is a property of the target.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
 and the driver still receives one flat sequence.
-A value yielded two levels down arrives without any level in between doing anything to forward it,
-and `top()`'s single `yield from` does not finish until every generator beneath it has.
+`top()`'s single `yield from` does not finish until every generator beneath it has.
 
 ### The Return Channel
 
