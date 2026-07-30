@@ -1,14 +1,8 @@
 # frozen_clock.py
 from datetime import datetime, timedelta
 from typing import Final
-from stateless import Ability, Depend, handle, run
-
-class Now(Ability[datetime]):
-    pass
-
-def now() -> Depend[Now, datetime]:
-    moment: datetime = yield from Now()
-    return moment
+from clock import Now, now
+from stateless import Depend, handle, run
 
 def stamp(message: str) -> Depend[Now, str]:
     moment = yield from now()

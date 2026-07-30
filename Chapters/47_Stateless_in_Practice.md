@@ -207,11 +207,13 @@ Against a real clock neither is testable.
 One produces a different string every minute,
 and the other needs you to wait a day to watch it return `True`:
 
+The ability and its accessor sit in their own file,
+because the next listing asks the same clock a different question:
+
 ```python
-# frozen_clock.py
-from datetime import datetime, timedelta
-from typing import Final
-from stateless import Ability, Depend, handle, run
+# clock.py
+from datetime import datetime
+from stateless import Ability, Depend
 
 class Now(Ability[datetime]):
     pass
@@ -219,6 +221,14 @@ class Now(Ability[datetime]):
 def now() -> Depend[Now, datetime]:
     moment: datetime = yield from Now()
     return moment
+```
+
+```python
+# frozen_clock.py
+from datetime import datetime, timedelta
+from typing import Final
+from clock import Now, now
+from stateless import Depend, handle, run
 
 def stamp(message: str) -> Depend[Now, str]:
     moment = yield from now()
@@ -253,6 +263,61 @@ in microseconds rather than a day.
 `batch_due()` holds no `datetime.now()` call,
 so there is nothing to monkeypatch and nothing to wait for,
 and a production handler that returns `datetime.now()` leaves the function unchanged.
+
+Skipping the wait is the obvious benefit and the smaller one.
+A handler also reaches moments a real clock hands you by luck.
+`archive()` reads the clock twice,
+once to name a file and once to stamp what goes in it:
+
+```python
+# midnight.py
+from datetime import datetime, timedelta
+from typing import Final
+from clock import Now, now
+from stateless import Depend, handle, run
+
+def archive(entry: str) -> Depend[Now, tuple[str, str]]:
+    opened = yield from now()
+    path = f"log-{opened:%Y-%m-%d}.txt"
+    stamped = yield from now()
+    return path, f"[{stamped:%Y-%m-%d}] {entry}"
+
+MIDDAY: Final[datetime] = datetime(2026, 1, 1, 12, 0)
+LATE: Final[datetime] = datetime(2026, 1, 1, 23, 59, 59)
+ticks = iter([LATE, LATE + timedelta(seconds=2)])
+
+def steady(request: Now) -> datetime:
+    return MIDDAY
+
+def crossing(request: Now) -> datetime:
+    return next(ticks)
+
+print(run(handle(steady)(archive)("backup ok")))
+#: ('log-2026-01-01.txt', '[2026-01-01] backup ok')
+print(run(handle(crossing)(archive)("backup ok")))
+#: ('log-2026-01-01.txt', '[2026-01-02] backup ok')
+```
+
+Under `steady` the two dates agree and the function looks correct.
+`crossing` answers the first request at one second before midnight and the second two seconds later.
+Now the file is named for January 1 and the entry inside it is dated January 2.
+A day of entries can end up in the wrong file,
+and the window where this happens is one second wide.
+
+Against a real clock you would wait for that window and probably miss it.
+Tests that run at nine in the morning never see it,
+and the bug report says the log file is occasionally short by a few lines.
+The seam is what makes the moment reachable.
+`archive()` does not read a clock, it asks for a moment,
+and a handler decides which moment that is.
+Both handlers here answer the same two requests;
+they differ in whether midnight falls between them.
+
+`crossing` is the scripted handler from `coin_toss.py` in different clothes.
+It walks a fixed list, so it holds state between requests,
+which is how it answers the same question two ways.
+A supplied instance could not do this, and neither could `frozen` or `tomorrow`,
+since each reports one moment however often it is asked.
 
 Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
 which made randomness repeatable a different way, by taking a `seed` parameter.
@@ -724,6 +789,15 @@ Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
 `save_user()` was not edited for any of this.
 
+Read the trace before you use this on real code.
+Each attempt line is `Database.save()` running again,
+so anything the decorated function does happens once per attempt.
+Retrying a charge or an append duplicates it.
+Nothing in the type says whether a retry is safe,
+because `Effect[A, E, R]` tracks what a function needs and how it fails,
+not whether running it twice means the same as running it once.
+That judgment stays with you.
+
 Notice that `retry()` decorates the *function*, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 and the reason is the substrate.
@@ -865,6 +939,10 @@ as the pool does here, or the ability method owns it:
 the library's own `Files` ability opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
+Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Context_Managers.md#combining-context-managers),
+which holds a set of managers decided at runtime and unwinds them together.
+It flattens the nesting without knowing anything about Effects,
+so this gap is narrower than it first appears.
 
 ## The Toolkit
 
@@ -1139,8 +1217,9 @@ and `yield from` is one operator for joining two Effects.
 once `@throws` had brought the ordinary functions in at the boundary.
 `Async` is one more ability in the same channel rather than a second viral annotation.
 Resource lifetime is the concern this does not absorb.
-Stateless has no scoping mechanism,
-so `with` blocks stay where they are and stay nested.
+Stateless has no scoping mechanism, so `with` blocks stay where they are.
+They need not stay nested, since `ExitStack` flattens them,
+but they remain a separate mechanism from the Effect type.
 
 What Stateless charges for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
@@ -1165,11 +1244,12 @@ It is a language that does the encoding for you.
 
 ## Exercises
 
-1.  `frozen` and `tomorrow` in `frozen_clock.py` each report a single moment.
-    Write an advancing handler for `Now` that reports a moment one hour later at each request,
-    then write an Effect that asks the time twice and returns the elapsed `timedelta`.
-    Say which of `coin_toss.py`'s two handlers yours resembles,
-    and why neither `frozen` nor `tomorrow` can test elapsed-time logic.
+1.  `crossing` in `midnight.py` walks a fixed list,
+    so it answers two requests and no more.
+    Write a handler that instead advances a stored moment by one second at each request,
+    and confirm `archive()` still crosses midnight under it.
+    Then rewrite `archive()` so the file name and the stamp cannot disagree,
+    and explain why no handler can reproduce the bug afterward.
 2.  `leaky_effect.py` type-checks while lying about its purity.
     Describe a review rule or a lint check that would catch it,
     and explain why a type checker cannot.
