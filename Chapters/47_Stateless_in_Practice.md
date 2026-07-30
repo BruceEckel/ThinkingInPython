@@ -540,9 +540,119 @@ so a second caller can catch the same three failures and choose different messag
 retry the whole pipeline, or let one failure through to the edge,
 without touching the pipeline.
 
+## Dependencies That Need Dependencies
+
+`research()` asked for two things, and both were leaves.
+Nothing had to be built before a `Feed` or an `Encyclopedia` could be supplied.
+Real graphs nest.
+Toast needs bread and a toaster, and bread needs dough and an oven.
+This example rebuilds the `Bread` sequence from [Effect Oriented Programming](https://effectorientedprogramming.com/),
+where ZIO wires the same graph with `ZLayer`s:
+
+```python
+# bakery.py
+from dataclasses import dataclass
+from stateless import Depend, Need, need, run, supply
+
+@dataclass(frozen=True)
+class Dough:
+    flour: str
+    def risen(self) -> str:
+        print("dough: risen")
+        return f"{self.flour} dough"
+
+@dataclass(frozen=True)
+class Oven:
+    celsius: int
+    def bake(self, dough: str) -> str:
+        print(f"oven: baking at {self.celsius}")
+        return f"loaf of {dough}"
+
+@dataclass(frozen=True)
+class Toaster:
+    setting: int
+    def brown(self, loaf: str) -> str:
+        print(f"toaster: setting {self.setting}")
+        return f"toasted {loaf}"
+
+def bread() -> Depend[Need[Dough] | Need[Oven], str]:
+    dough = yield from need(Dough)
+    oven = yield from need(Oven)
+    return oven.bake(dough.risen())
+
+def toast() -> Depend[
+    Need[Dough] | Need[Oven] | Need[Toaster], str
+]:
+    loaf = yield from bread()
+    toaster = yield from need(Toaster)
+    return toaster.brown(loaf)
+
+kitchen = supply(Dough("rye"), Oven(220), Toaster(3))
+print(run(kitchen(toast)()))
+#: dough: risen
+#: oven: baking at 220
+#: toaster: setting 3
+#: toasted loaf of rye dough
+```
+
+Appliances are supplied and products are produced,
+and the listing keeps the two apart.
+`Dough`, `Oven`, and `Toaster` are the leaves,
+so `supply()` binds one instance of each.
+The loaf is not a leaf.
+`bread()` is an Effect that produces a loaf,
+so `toast()` obtains one by writing `yield from bread()` rather than by asking for a `Need[Bread]`.
+Nothing supplies a loaf, because when `supply()` is called there is no loaf.
+
+The graph arrives in the signature, flattened into a union.
+`toast()` declares all three leaves although its body names one of them.
+`Need[Dough]` and `Need[Oven]` travel up through `yield from bread()`,
+which carries the inner Effect's abilities to its caller.
+The checker maintains that union.
+Declare `toast()` with `Need[Toaster]` alone and `ty` points at the delegation:
+
+```text
+error[invalid-yield]: Yield expression type does not match annotation
+  --> bakery.py:31:16
+   |
+31 |   def toast() -> Depend[
+   |  ________________-
+32 | |     Need[Toaster], str
+33 | | ]:
+   | |_- Function annotated with yield type
+   |     `Need[Toaster]` here
+34 |       loaf = yield from bread()
+   |                         ^^^^^^^ expression of type
+   |                         `Need[Dough] | Need[Oven]`,
+   |                         expected `Need[Toaster]`
+```
+
+The other end is checked too.
+Leave `Oven(220)` out of `supply()` and `run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty ability channel,
+the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
+showed, now arising from a dependency two levels down.
+`Oven` and `Toaster` are distinct types,
+so the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match)
+cannot arise here.
+ZIO makes both of them a `HeatSource` and has to report the clash.
+
+Here is what ZIO does that Stateless cannot.
+`Bread.homeMade` is a `ZLayer`: a constructor that is an Effect.
+It can print, it can fail, and it can be retried,
+and the compiler resolves it into a tree with `Oven` and `Dough` beneath it.
+You provide that layer rather than a finished loaf.
+Stateless has no such thing.
+`supply()` matches instances that exist,
+and `handle()` answers an ability with an ordinary function,
+so a constructor cannot be an Effect.
+That is the shape of the listing above.
+Leaves are bound at the edge, products come from an explicit `yield from`,
+and the graph you can read is the union in the signature.
+
 ## Adding Behavior to an Existing Effect
 
-The previous section promised that a caller could retry a pipeline without touching it.
+[The Success Path](#the-success-path)
+promised that a caller could retry a pipeline without touching it.
 Stateless provides a few decorators that add such behavior.
 Retry is the one worth studying, because of what it does to the type.
 
@@ -961,7 +1071,9 @@ not a utility you import for one module.
 
 ### 5. Much of a mature Effect system is missing
 
-Dependency wiring is the first gap.
+Dependency wiring is the first gap,
+and `bakery.py` in [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
+showed its shape.
 `supply()` binds instances that are already built,
 and `handle()` takes an ordinary function,
 so constructing a dependency can never be an Effect.
