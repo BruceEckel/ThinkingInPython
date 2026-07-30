@@ -23,7 +23,9 @@ Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
 
-Deep review chapter 20 as both editor and teacher: fix errors, but also propose additions — misconceptions left unaddressed, mechanisms shown only by outcome, lookalike constructs never contrasted, near-miss code a reader would write. Implement the ones you're confident in, report the rest.
+Deep review chapters 46 & 47 as both editor and teacher: fix errors, but also propose additions — misconceptions
+left unaddressed, mechanisms shown only by outcome, lookalike constructs never contrasted, near-miss code a reader
+would write. Implement the ones you're confident in, report the rest.
 
 Have we learned anything here that should be added to thinking-in-python-skill.md?
 
