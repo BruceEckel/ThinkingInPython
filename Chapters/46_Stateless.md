@@ -1263,13 +1263,10 @@ The technique did not change between the two.
 Name the seam as an ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that the seam cannot be skipped by accident.
 
-## Composing the Whole Program
+## Composing a Program
 
-Every listing so far made one point in one or two steps.
-A program is longer,
-and the claim this chapter has been building is about what a longer program's signature tells you.
 Here is a small application: fetch a headline,
-find a topic worth researching in it, and look that topic up.
+find a topic worth researching within that headline, and look up that topic.
 Each step needs something or can fail, and no step names an implementation:
 
 ```python
@@ -1324,9 +1321,8 @@ def research() -> Effect[
     return article
 ```
 
-Read `research()`'s signature and you have the program's whole surface.
-It reads two things from outside and can fail three ways,
-and that is a complete account, checked against the body.
+The `research()` signature tells you the program's entire surface.
+It reads two things from outside and can fail three ways.
 The three `@throws` functions are the pattern for reaching ordinary code:
 `fetch()` and `look_up()` call methods that know nothing about Effects,
 and the decorator lifts what they raise into the channel.
@@ -1335,7 +1331,7 @@ and the decorator lifts what they raise into the channel.
 `fetch()` and `look_up()` take their dependencies as parameters,
 which makes them ordinary functions rather than generator functions.
 That is a choice, not a requirement.
-`@throws` decorates a function returning an Effect just as readily,
+`@throws` decorates a function returning an Effect,
 so the request and the failure can live in one function:
 
 ```python
@@ -1349,12 +1345,11 @@ def fetch_headline() -> Depend[Need[Feed], str]:
     return feed.latest()
 ```
 
-Annotate the undecorated shape, `Depend[Need[Feed], str]`,
-and the decorator adds the error the same way it did for `score()`.
+The decorator adds the error the same way it did for `score()`.
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
-`research()` splits the two apart because a function that only transforms its arguments is easier to test on its own,
-and because the split keeps the ability requests collected in one place where you can read them.
+`research()` splits the two because a function that only transforms its arguments is easier to test on its own,
+and because the split keeps the ability requests collected in one place.
 Either shape type-checks and either propagates correctly.
 
 The signature is also the only place this information appears.
@@ -2039,8 +2034,7 @@ and when the team will hold the line at every boundary.
 Below that scale, the discipline matters and the machinery is optional.
 
 But the direction is worth watching.
-Python got one Effect tracked into its type system with `async`,
-and nobody now argues that was a mistake.
+Python got one Effect tracked into its type system with `async`.
 The languages listed under [Native Effect Management](44_Effect_Management.md#native-effect-management)
 track all of them.
 Stateless is the demonstration that Python's type system is expressive enough to do it,
