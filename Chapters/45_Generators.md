@@ -119,7 +119,7 @@ and the `Result` arrives as that exception's `value`.
 
 The first call made on a new generator object must be `next()`.
 A newly created generator pauses before its first `yield`,
-so a sent value would have nowhere to arrive.
+so there is no suspended `yield` expression to receive a sent value.
 If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
 
 `next(i)` is equivalent to `i.send(None)`:
@@ -145,11 +145,11 @@ which is the practical reason a driver primes with `next()`.
 
 The `NewType` definitions prevent accidental transposition.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
-`ty` reports six errors in three pairs.
-Both `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
-Both `send(Answer(...))` calls pass an `Answer` where it expects a `Question`.
-Both assignments to `question` receive an `Answer` into a variable declared `Question`.
-The checker ensures proper arguments are used because each channel has its own type.
+`ty` reports nine errors in three groups of three.
+All three `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
+All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
+All three `question` variables receive an `Answer` where they are declared `Question`.
+Each channel has its own type, so the checker catches every transposition.
 `Generator[str, str, str]` would have accepted the reversal without complaint.
 
 ## A Generator Is a Description
@@ -225,7 +225,7 @@ The generator declares Effects, the driver interprets them.
 The reason generators can carry an EMS is that they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
-Each of the three channels cross that boundary differently.
+Each of the three channels crosses that boundary differently.
 
 ### Running to Exhaustion
 
@@ -275,7 +275,7 @@ A `yield from` expression evaluates to the inner generator's return value,
 not its yielded values.
 The yielded values pass through to whoever is driving.
 Here, `report()` captures the return value from `yield from emit(items)` into `size`.
-Note that `report()` doesn't return anything, it only yields:
+Note that `report()` returns nothing and only yields:
 
 ```python
 # yield_from_return.py
@@ -305,7 +305,7 @@ so `report()` learns something `emit()` computed while neither of them knows who
 
 ### The Send Channel
 
-The `SendType` is for the user to `send()` information back into the generator.
+The `SendType` is the type of the information a caller sends back into the generator.
 A generator that only receives values needs no `ReturnType`:
 
 ```python
@@ -357,7 +357,7 @@ The driver sees `StopIteration` only when `both()` runs out of delegations.
 
 ### All Three Channels
 
-We can apply `yield from` to our `interview` example:
+We can apply `yield from` to our `interview()` example:
 
 ```python
 # yield_from_delegates.py
