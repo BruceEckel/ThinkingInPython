@@ -25,20 +25,58 @@ Some of the examples in this chapter were derived from that book.
 
 ## The Effect Type
 
-Stateless builds everything atop a single type, defined with type variables:
+Stateless builds everything atop a single type with three type parameters:
+
+```python
+Effect[A, E, R]
+```
+
+Those three parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
+asked of an Effect signature:
+
+- `A` is what the computation *needs*, an *ability*.
+- `E` is how it can *fail*.
+- `R` is what it *produces*.
+
+An annotation fills them in, in that order. For example:
+
+```python
+Effect[Need[Console], KeyError, None]
+```
+
+Read as a sentence, it needs a `Console`, it can fail with a `KeyError`,
+and it produces nothing.
+
+Although you can write the full `Effect` signature each time, three aliases are provided for the most common cases.
+Each one fills in `Never` for a type parameter that is not used:
+
+| Alias | Meaning |
+|---|---|
+| `Success[R]` | Needs nothing, cannot fail, produces `R` |
+| `Depend[A, R]` | Needs `A`, cannot fail, produces `R` |
+| `Try[E, R]` | Needs nothing, can fail with `E`, produces `R` |
+
+`Never` is the type with no values,
+so `Success[R]` promises there is no ability it can request and no error it can yield.
+The signature is the entire claim.
+
+## The Effect Definition
+
+`Effect` is not a new kind of object.
+It is an alias for a generator:
 
 ```python
 Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
-An `Effect` is a generator that yields either an *ability* `A` or an exception `E`,
+An Effect is a generator that yields either an ability `A` or an exception `E`,
 and eventually returns a result `R`.
-The three type parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
-asked of an Effect signature:
+Substituting the three parameters of the annotation above into that definition produces the type the checker works with.
+The two shapes look nothing alike:
 
-- `A` is what the computation *needs*.
-- `E` is how it can *fail*.
-- `R` is what it *produces*.
+```python
+Generator[Need[Console] | KeyError, Any, None]
+```
 
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
@@ -71,19 +109,6 @@ and `console = yield from need(Console)` reads the `Console` out of that third t
 
 That is why every request in this chapter is written as `yield from` rather than `yield`,
 and why custom abilities get a small function of their own later on.
-
-Three aliases name the common cases,
-each one filling in `Never` for a type parameter that is not used:
-
-| Alias | Meaning |
-|---|---|
-| `Success[R]` | Needs nothing, cannot fail, produces `R` |
-| `Depend[A, R]` | Needs `A`, cannot fail, produces `R` |
-| `Try[E, R]` | Needs nothing, can fail with `E`, produces `R` |
-
-`Never` is the type with no values,
-so `Success[R]` promises there is no ability it can request and no error it can yield.
-The signature is the entire claim.
 
 Here, `success()` wraps a value in an Effect, and `run()` executes it.
 `run()` is the Stateless library's driver,
@@ -993,7 +1018,6 @@ Turn it into an ability and the reading moves into a handler:
 ```python
 # coin_toss.py
 import random
-from typing import Final
 from stateless import Ability, Depend, handle, run
 
 class Flip(Ability[bool]):
@@ -1010,7 +1034,7 @@ def count_heads(tosses: int) -> Depend[Flip, int]:
             heads += 1
     return heads
 
-FLIPS: Final[tuple[bool, ...]] = (True, False, True, True, False)
+FLIPS = (True, False, True, True, False)
 script = iter(FLIPS)
 
 def scripted(request: Flip) -> bool:
@@ -1125,7 +1149,7 @@ Each step needs something or can fail, and no step names an implementation:
 
 ```python
 # research.py
-from typing import Final, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 from stateless import Effect, Need, need, throws
 
 class Unavailable(Exception):
@@ -1145,7 +1169,7 @@ class Feed(Protocol):
 class Encyclopedia(Protocol):
     def article(self, topic: str) -> str: ...
 
-TOPICS: Final[tuple[str, ...]] = ("stock market", "genome")
+TOPICS = ("stock market", "genome")
 
 @throws(Unavailable)
 def fetch(feed: Feed) -> str:
