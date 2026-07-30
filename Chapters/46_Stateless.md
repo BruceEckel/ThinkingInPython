@@ -38,16 +38,18 @@ asked of an Effect signature:
 - `E` is how it can *fail*.
 - `R` is what it *produces*.
 
-An annotation fills them in, in that order. For example:
+An annotation fills them in, in that order.
+For example:
 
 ```python
 Effect[Need[Console], KeyError, None]
 ```
 
-Read as a sentence, it needs a `Console`, it can fail with a `KeyError`,
+This particular Effect needs a `Console`, it can fail with a `KeyError`,
 and it produces nothing.
 
-Although you can write the full `Effect` signature each time, three aliases are provided for the most common cases.
+Although you can write the full `Effect` signature each time,
+three aliases are provided for the most common cases.
 Each one fills in `Never` for a type parameter that is not used:
 
 | Alias | Meaning |
@@ -58,7 +60,6 @@ Each one fills in `Never` for a type parameter that is not used:
 
 `Never` is the type with no values,
 so `Success[R]` promises there is no ability it can request and no error it can yield.
-The signature is the entire claim.
 
 ## The Effect Definition
 
@@ -69,10 +70,11 @@ It is an alias for a generator:
 Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
-An Effect is a generator that yields either an ability `A` or an exception `E`,
+An `Effect` is a `Generator` that yields either an ability `A` or an exception `E`,
 and eventually returns a result `R`.
 Substituting the three parameters of the annotation above into that definition produces the type the checker works with.
-The two shapes look nothing alike:
+The two shapes look nothing alike.
+Our example becomes:
 
 ```python
 Generator[Need[Console] | KeyError, Any, None]
@@ -93,29 +95,24 @@ An Effect does not:
 What comes back depends on which ability the `yield` requested,
 and one SendType cannot vary from one `yield` to the next.
 Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
-Anything must come back through the `send()` channel, so we give it type `Any`.
+Any type must come back through the `send()` channel, so we give it type `Any`.
 
-`yield from` recovers the precision that `Any` gave up,
+`yield from` recovers the precision that `Any` gives up,
 so a request can produce an answer whose type the checker knows.
-A bare `yield` produces the SendType,
-the type parameter that had to become `Any`.
-`yield from` produces the inner generator's return type,
-the third type parameter.
-A single call returns a single type, so that type parameter has no such problem.
-It can name that specific type instead of `Any`.
-So a function that hands back a typed answer declares it as `R`.
-`need()` returns `Depend[Need[T], T]`, which is `Generator[Need[T], Any, T]`,
-and `console = yield from need(Console)` reads the `Console` out of that third type parameter without touching the `Any`.
+A bare `yield` produces the SendType, the parameter forced to `Any`.
+`yield from` produces the inner generator's `ReturnType`,
+which has no such conflict.
+`need(Console)` builds a small generator that serves one request,
+and one request has one answer, so its `ReturnType` can name a specific type.
+`need()` returns `Depend[Need[T], T]`,
+which expands to `Generator[Need[T], Any, T]`.
+Calling `need(Console)` binds `T` to `Console`,
+so `console = yield from need(Console)` takes its value from that final `Console` and never consults the `Any`.
 
-That is why every request in this chapter is written as `yield from` rather than `yield`,
-and why custom abilities get a small function of their own later on.
+This is why every request in this chapter is written as `yield from` rather than `yield`,
+and why custom abilities get a small function of their own (introduced later).
 
-Here, `success()` wraps a value in an Effect, and `run()` executes it.
-`run()` is the Stateless library's driver,
-replacing the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
-`run()` primes the generator, answers each request, and returns the result.
-Nothing computes until `run()` is called, and a program calls it once,
-at its outermost edge:
+Here, `success()` wraps a value in an Effect, and `run()` executes it:
 
 ```python
 # simplest_effect.py
@@ -128,26 +125,31 @@ print(run(double(21)))
 #: 42
 ```
 
+`run()` is the Stateless library's driver,
+similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
+`run()` primes the generator, answers each request, and returns the result.
+Nothing computes until `run()` is called, and a program calls `run()` only once,
+at its outermost edge.
+
 `Success[int]` says `double()` is pure.
 It cannot read anything, and it cannot fail.
 
 Notice that `double()` contains no `yield`, so it is not a generator function.
 It does not need to be.
-`success()` returns an object that implements the generator protocol,
+`success()` creates an object that implements the generator protocol,
 and the annotation only promises that calling `double()` produces an Effect.
 `success()` exists for yield-free functions like this one.
 In a generator function, an ordinary `return` sets the result;
 wrap it in `success()` there and the checker reports a return-type mismatch.
-Functions that request things are generator functions, which we look at next.
 
-Nothing is gained yet, because `double()` was already pure.
+`double()` was already pure.
 Effects become useful when a function needs something it doesn't create for itself.
 
 ## Declaring a Dependency
 
-`Need` is the built-in ability for dependency injection.
+`Need` is dependency injection.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass`,
-without saying where the instance comes from:
+without saying where that instance comes from:
 
 ```python
 # greeter.py
@@ -162,29 +164,41 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-Read the signature as a sentence.
 `greet()` needs a `Console`, cannot fail, and produces nothing.
-Compare that to `def greet(name: str) -> None`,
-the version that calls `print()` directly.
+Compare that to the version that calls `print()` directly:
+
+```python
+# untyped_greet.py
+def greet(name: str) -> None:
+    print(f"Hello, {name}!")
+
+greet("Alice")
+#: Hello, Alice!
+```
+
 That signature is a lie by omission.
 `-> None` claims the function returns nothing and mentions nothing else,
 while the body writes to standard output.
-The only thing that version does is the thing its type leaves out,
-so a caller cannot see the dependency, redirect the output,
+That omission is not an unimportant detail:
+printing is everything the function does.
+The caller cannot see the dependency, redirect the output,
 or test the function without capturing stdout.
-`Depend[Need[Console], None]` states the dependency,
-and the rest of the chapter is about who enforces the difference.
+`Depend[Need[Console], None]` states the dependency.
+A caller must then supply a `Console` or declare the same need,
+and the type checker rejects one that does neither.
 
-Two details deserve attention.
-`greet()` is a generator function, because it contains `yield from`,
-so calling it builds the Effect its signature declares.
-And `console` really is a `Console` to the type checker,
-so `console.print()` is checked the same as any other method call.
-The dependency is deferred without becoming untyped.
+In `greeter.py`, two details deserve attention:
+
+1. `greet()` is a generator function, because it contains `yield from`,
+   so calling it builds the Effect its signature declares.
+2. `console` really is a `Console` to the type checker,
+   so `console.print()` is checked the same as any other method call.
+   The dependency is deferred without becoming untyped.
 
 ## Nothing Runs Yet
 
-Calling `greet()` performs no work at all:
+Calling `greet()` performs no work.
+It simply returns a `Generator`:
 
 ```python
 # describe_only.py
@@ -195,12 +209,16 @@ print(type(description).__name__)
 #: generator
 ```
 
-Nothing is printed except the type name.
 `greet("Alice")` builds a description of a greeting.
-This is the description/execution split from [Effect Management](44_Effect_Management.md#library-effect-management),
-and the reason a library EMS needs one.
-The library gets no chance to intercept `console.print()` as it happens.
-Its only power is over values, so the greeting must first become a value.
+This is the description/execution split from [Effect Management](44_Effect_Management.md#library-effect-management).
+A language with builtin Effects intercepts an Effect where it is performed.
+Stateless cannot, because it is ordinary Python:
+when a function body calls `console.print()`,
+nothing hands control to the library.
+A library's power is over values, so the request must first become a value.
+`yield from need(Console)` is a request that becomes a value.
+It suspends `greet()` and passes a `Need[Console]` out to whatever is driving the generator,
+which answers the request and resumes the function.
 
 ## Supplying the Dependency
 
