@@ -332,7 +332,8 @@ The expected type in that message names two things this chapter has not yet cove
 
 `run()` accepts an Effect whose ability channel has narrowed to those two,
 which is all that remains once every other ability has been supplied.
-`greet("Alice")` still carries `Need[Console]`, so it does not pass type checking.
+`greet("Alice")` still carries `Need[Console]`,
+so it does not pass type checking.
 
 ## Swapping the Implementation
 
@@ -380,8 +381,13 @@ You need `as_type()` when you supply an implementation for a declared interface.
 `typing.cast(Console, recorder)` does the same job.
 `as_type()` is the library's named form of that cast.
 
-`supply()` matches an instance to a `Need` by `isinstance()`,
-which is why `Recorder` inherits from `Console`.
+The matching happens inside the library, out of sight of the listing.
+The handler that `supply()` builds tests each request with `isinstance(instance, ability.t)`,
+where `ability.t` is the class inside the `Need`.
+`Recorder` inherits from `Console` to pass that test.
+So the two moves in the test serve two audiences:
+`as_type(Console)` satisfies the checker,
+and the inheritance satisfies the runtime match.
 Every matching request over the Effect's run receives that same instance,
 which is why the test can read the results back out of `recorder` afterward.
 Inheriting from a concrete class only to replace all of it is a poor arrangement,
@@ -590,6 +596,75 @@ awaits `run_async()` at the edge of each request.
 Picking the wrong one is a runtime error rather than a type error,
 which makes it one of the few mistakes in this chapter the checker will not catch for you.
 
+## Waiting on a Coroutine
+
+`Async` has appeared as something `run()` describes on its own.
+`wait()` is what puts it into a type.
+It accepts any awaitable and produces the value that awaitable produces:
+
+```python
+# await_coroutine.py
+import asyncio
+from stateless import Async, Depend, run, wait
+
+async def fetch(url: str) -> str:
+    await asyncio.sleep(0.01)
+    return f"body of {url}"
+
+def report(url: str) -> Depend[Async, int]:
+    body = yield from wait(fetch(url))
+    return len(body)
+
+print(run(report("http://example.com")))
+#: 26
+```
+
+`Depend[Async, int]` needs `Async`, cannot fail, and produces an `int`.
+There is nothing to supply, because `run()` answers `Async`.
+
+Notice what `report()` is not.
+It is not an `async def` and it contains no `await`,
+yet its result comes from a coroutine.
+`wait()` hands the coroutine out as a request and the driver awaits it,
+so the asynchrony stops at the ability channel instead of spreading to `report()` and to everything that calls it.
+
+`sleep()` pairs an `Async` request with a dependency:
+
+```python
+# sleep_effect.py
+import time
+from stateless import Async, Depend, Need, run, supply
+from stateless.time import Time, sleep
+
+def delayed_sum(
+    values: list[int],
+) -> Depend[Need[Time] | Async, int]:
+    total = 0
+    for value in values:
+        yield from sleep(0.01)
+        total += value
+    return total
+
+start = time.perf_counter()
+result = run(supply(Time())(delayed_sum)([1, 2, 3]))
+elapsed = time.perf_counter() - start
+print(result)
+#: 6
+print(f"waited 30ms or more: {elapsed >= 0.03}")
+#: waited 30ms or more: True
+```
+
+`sleep()` returns `Depend[Need[Time] | Async, None]`,
+so a function that calls it inherits both abilities.
+`Time` is an ability like `Console`, an object whose method the Effect calls,
+and `supply()` binds it the same way.
+The clock is a dependency rather than a global,
+so a test can supply a `Time` subclass whose `sleep()` returns at once,
+through the same `as_type(Time)` route `Recorder` took,
+and check the logic without waiting.
+This pair returns later: `retry()` waits between attempts,
+so it adds `Need[Time]` and `Async` to whatever it decorates.
+
 ## Adding an Effect Deep in the Stack
 
 The second exercise in [Effect Management](44_Effect_Management.md#exercises)
@@ -717,7 +792,6 @@ They are the bindings `supply()` will make,
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` is a new row.
 
-Be honest about the size of the win here.
 Dependencies as parameters would serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The difference appears when the dependency sits three calls deep.
@@ -1566,8 +1640,7 @@ Under `reveal_type()`, `retried` is:
 Three changes, none of them silent.
 The error became `RetryError[Crashed]`,
 which is why the third run catches `RetryError` rather than `Crashed`.
-`Async` arrived because waiting between attempts is asynchronous,
-and `run()` answers that one on its own.
+`Async` arrived because waiting between attempts is asynchronous.
 And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
 Retrying is not free: it needs a clock, and the signature says so.
 Leave the `Time()` out and the program does not build.
@@ -1579,7 +1652,7 @@ One rough edge: `RetryError` declares an `errors` attribute that `retry()` never
 so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
 
 `repeat()` is the sibling that runs an Effect on a schedule and collects every result.
-`memoize()` is the one that answers the spent-generator problem head on:
+`memoize()` solves the spent-generator problem:
 
 ```python
 # memoizing.py
@@ -1682,38 +1755,58 @@ the library's own `Files` ability opens and closes a file inside a single `read_
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
 
-## The Toolkit in One Table
+## The Toolkit
 
-That completes the toolkit.
 Every tool either builds a description, rewrites a description's type,
-or executes one, and the type column is the part worth memorizing:
+or executes one.
+The type column is the part worth memorizing.
+
+Three build a description:
 
 | Tool | Applied to | What it does to the type |
 |---|---|---|
-| `success(value)` | a value | wraps it as `Success[R]` |
-| `need(C)` | a class | builds `Depend[Need[C], C]`, producing an instance |
-| `supply(*instances)` | a function returning an Effect | subtracts each `Need[T]` matched by `isinstance()` |
-| `handle(handler)` | a function returning an Effect | subtracts the ability the handler's parameter names |
-| `@throws(*E)` | a function that can raise exceptions | adds each `E` to the error channel |
-| `catch(*E)` | a function returning an Effect | moves each `E` from the error channel into the result |
-| `retry(schedule)` | a function returning an Effect | adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
-| `repeat(schedule)` | a function returning an Effect | same additions; the result becomes a tuple of every run |
-| `memoize` | a function returning an Effect | type unchanged; the result is cached by argument |
-| `fork` | a function returning a supplied Effect | adds `Need[Executor]`; the result becomes `Task[R]` |
-| `wait(task)` | a `Task` | adds `Async`; produces the task's `R` |
-| `run(effect)` | an Effect with only `Async` and errors left | executes it; a leftover error is raised |
-| `await run_async(effect)` | the same | the same, from inside a running event loop |
+| `success(value)` | A value | Wraps it as `Success[R]` |
+| `need(C)` | A class | Builds `Depend[Need[C], C]`, producing an instance |
+| `wait(target)` | A `Task` or any awaitable | Adds `Async`; produces the awaited `R` |
 
-Everything above the last two rows transforms descriptions.
-Only `run()` and `run_async()` perform work,
+The rest decorate a function that returns an Effect,
+rewriting the type that function declares:
+
+| Tool | What it does to the type |
+|---|---|
+| `supply(*instances)` | Subtracts each `Need[T]` matched by `isinstance()` |
+| `handle(handler)` | Subtracts the ability the handler's parameter names |
+| `catch(*E)` | Moves each `E` from the error channel into the result |
+| `retry(schedule)` | Adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
+| `repeat(schedule)` | Same additions; the result becomes a tuple of every run |
+| `memoize` | Type unchanged; the result is cached by argument |
+| `fork` | Adds `Need[Executor]`; the result becomes `Task[R]` |
+| `@throws(*E)` | Adds each `E` to the error channel |
+
+Two rows carry a caveat.
+`fork` needs a function whose Effect has nothing left to supply,
+so supply first, then fork.
+`@throws` is the entry point rather than a transformation:
+it decorates an ordinary function that raises exceptions,
+turning it into one that returns an Effect.
+
+Two execute an Effect that has only `Async` and errors left,
+raising a leftover error rather than returning it:
+
+| Tool | Where it is called |
+|---|---|
+| `run(effect)` | From synchronous code |
+| `await run_async(effect)` | From inside a running event loop |
+
+These two are the only functions that perform work,
 which is the description/execution split in table form.
 
 ## Where the Guarantee Stops
 
-A full accounting needs the limits,
-and there are five worth knowing before you commit a codebase to this.
+There are five limits worth knowing.
 
-The first is that nothing stops an undeclared Effect.
+### 1. Nothing stops an undeclared Effect
+
 `Success[int]` promises purity, and this function breaks that promise:
 
 ```python
@@ -1746,8 +1839,9 @@ not exceptions the body raises,
 so a failure that was never lifted by `@throws` goes past `catch()` untouched.
 The channel carries only what was put into it.
 
-The second limit is about how much of the type survives partial handling,
-and it depends on your checker rather than on the library.
+### 2. The checker can give up quietly
+
+How much of a type survives partial handling depends on your checker rather than on the library.
 Handling some of what an Effect declares works correctly under `ty` 0.0.64.
 Supply one of two abilities and the other stays in the signature:
 
@@ -1816,8 +1910,9 @@ The library's types are asking the checker a hard inference question,
 and where the checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
 
-The third limit constrains what a handler can do,
-and naming the machinery precisely shows why.
+### 3. Handlers cannot capture the continuation
+
+Naming the machinery precisely shows where this limit comes from.
 `Effect` is a monad.
 `success()` lifts a value into it, `yield from` chains two of them together,
 and the generator body is syntax that hides the chaining.
@@ -1852,7 +1947,8 @@ Native systems demonstrate asynchronous execution derived from Effects,
 while Stateless provides `Async` as a built-in that `run()` interprets,
 because the driver loop can await where a handler cannot.
 
-The fourth limit is the cost.
+### 4. Cost
+
 Every effectful function becomes a generator function,
 which means it cannot also be a plain function,
 and calling it returns a description that somebody must run.
@@ -1861,7 +1957,9 @@ And a third-party function that knows nothing about Effects must be wrapped in `
 An EMS is a decision about a whole codebase,
 not a utility you import for one module.
 
-The fifth limit is how much of a mature Effect system is present.
+### 5. Much of a mature Effect system is missing
+
+Dependency wiring is the first gap.
 `supply()` binds instances that are already built,
 and `handle()` takes an ordinary function,
 so constructing a dependency can never be an Effect.
@@ -1892,14 +1990,14 @@ and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
 which is the value of studying it, whether or not you use it in production.
 
-Read the signatures once more, in order:
+Consider the signatures once more:
 
 - `Success[int]`: pure.
 - `Depend[Need[Console], None]`: prints, somehow,
   through something supplied later.
 - `Effect[Need[Console], KeyError, None]`: prints, might not find the name.
 
-Each one answers what a function depends on, what it can produce,
+Each one describes what a function depends on, what it can produce,
 and how it can fail, before you read a single line of the body.
 That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
 Purity is valuable because it is verifiable,
