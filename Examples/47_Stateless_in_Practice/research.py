@@ -1,5 +1,5 @@
 # research.py
-from typing import Protocol, runtime_checkable
+from typing import Final, Protocol, runtime_checkable
 from stateless import Effect, Need, need, throws
 
 class Unavailable(Exception):
@@ -19,7 +19,7 @@ class Feed(Protocol):
 class Encyclopedia(Protocol):
     def article(self, topic: str) -> str: ...
 
-TOPICS = ("stock market", "genome")
+TOPICS: Final[tuple[str, ...]] = ("stock market", "genome")
 
 @throws(Unavailable)
 def fetch(feed: Feed) -> str:

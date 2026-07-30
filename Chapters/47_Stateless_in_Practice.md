@@ -149,6 +149,7 @@ Turn it into an ability and the reading moves into a handler:
 ```python
 # coin_toss.py
 import random
+from typing import Final
 from stateless import Ability, Depend, handle, run
 
 class Flip(Ability[bool]):
@@ -165,7 +166,7 @@ def count_heads(tosses: int) -> Depend[Flip, int]:
             heads += 1
     return heads
 
-FLIPS = (True, False, True, True, False)
+FLIPS: Final[tuple[bool, ...]] = (True, False, True, True, False)
 script = iter(FLIPS)
 
 def scripted(request: Flip) -> bool:
@@ -205,10 +206,9 @@ A clock is the other side cause every test trips over.
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
 One produces a different string every minute,
-and the other needs you to wait a day to watch it return `True`:
-
+and the other needs you to wait a day to watch it return `True`.
 The ability and its accessor sit in their own file,
-because the next listing asks the same clock a different question:
+because two listings in this section ask the same clock different questions:
 
 ```python
 # clock.py
@@ -305,7 +305,7 @@ A day of entries can end up in the wrong file,
 and the window where this happens is one second wide.
 
 Against a real clock you would wait for that window and probably miss it.
-Tests that run at nine in the morning never see it,
+Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
 The seam is what makes the moment reachable.
 `archive()` does not read a clock, it asks for a moment,
@@ -342,7 +342,7 @@ Each step needs something or can fail, and no step names an implementation:
 
 ```python
 # research.py
-from typing import Protocol, runtime_checkable
+from typing import Final, Protocol, runtime_checkable
 from stateless import Effect, Need, need, throws
 
 class Unavailable(Exception):
@@ -362,7 +362,7 @@ class Feed(Protocol):
 class Encyclopedia(Protocol):
     def article(self, topic: str) -> str: ...
 
-TOPICS = ("stock market", "genome")
+TOPICS: Final[tuple[str, ...]] = ("stock market", "genome")
 
 @throws(Unavailable)
 def fetch(feed: Feed) -> str:
@@ -801,12 +801,31 @@ That judgment stays with you.
 Notice that `retry()` decorates the *function*, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 and the reason is the substrate.
-A Stateless Effect is a generator, so it runs once and is then spent.
-Re-running a spent Effect does not fail loudly:
-`run()` returns `None` where the signature promised a `str`,
+A Stateless Effect is a generator, so it runs once and is then spent:
+
+```python
+# spent.py
+from flaky import Database, save_user
+from stateless import run, supply
+
+effect = supply(Database(failures=0))(save_user)("Morty")
+print(repr(run(effect)))
+#: attempt 1: saving Morty
+#: 'Morty saved'
+print(repr(run(effect)))
+#: None
+```
+
+Re-running the spent Effect does not fail loudly.
+The exhausted generator has nothing left to do,
+so the second `run()` returns `None` where the signature promised a `str`,
 with no exception and no complaint from the checker.
-So a second attempt has to rebuild the description from the function,
+A retry therefore has to rebuild the description from the function,
 which is what `retry()` does internally.
+The exemption is `success()`: it builds a constant rather than a generator,
+and a constant answers every `run()` with the same value.
+The one-shot behavior belongs to any Effect that contains a `yield`,
+which is any Effect that does work.
 Where ZIO attaches `retryN` to an Effect value it can replay,
 Stateless attaches it one level up.
 
@@ -833,10 +852,44 @@ This is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
 here it changes a type, and every caller learns about the new dependency.
 
+The renamed error invites a mistake the checker accepts.
+Write `catch(Crashed)(retried)`, catching the error you started with,
+and nothing complains.
+The result type gains a `Crashed` branch that cannot occur,
+`RetryError[Crashed]` stays in the error channel,
+and at runtime the failure passes the useless `catch()` and escapes at the edge.
+`catch()` must name what the channel holds at the point of decoration,
+and after `retry()` that is `RetryError[Crashed]`, not `Crashed`.
+
 One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
 so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
 
-`repeat()` is the sibling that runs an Effect on a schedule and collects every result.
+`repeat()` is the sibling that runs an Effect on a schedule and collects every result:
+
+```python
+# repeating.py
+from datetime import timedelta
+from flaky import Database, save_user
+from stateless import repeat, run, supply
+from stateless.schedule import recurs, spaced
+from stateless.time import Time
+
+three = recurs(3, spaced(timedelta(milliseconds=1)))
+repeated = repeat(three)(save_user)
+env = supply(Database(failures=0), Time())
+print(run(env(repeated)("Morty")))
+#: attempt 1: saving Morty
+#: attempt 2: saving Morty
+#: attempt 3: saving Morty
+#: ('Morty saved', 'Morty saved', 'Morty saved')
+```
+
+The same schedule that governed three attempts now governs three runs,
+and the tuple holds every result in order.
+Where `retry()` stops at the first success,
+`repeat()` continues until the schedule is exhausted,
+and a failure on any run propagates unchanged rather than becoming a `RetryError`.
+
 `memoize()` solves the spent-generator problem:
 
 ```python
@@ -865,7 +918,9 @@ which is the same fact that made `retry()` decorate the function.
 
 Effects can also run at the same time.
 `fork()` hands an Effect to an `Executor` and returns a `Task`,
-and `wait()` collects the result:
+and `wait()` collects the result.
+This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine);
+it accepts a `Task` as readily as an awaitable:
 
 ```python
 # parallel.py
