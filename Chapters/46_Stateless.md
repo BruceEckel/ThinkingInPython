@@ -307,8 +307,8 @@ except MissingAbilityError as e:
 #: MissingAbilityError
 ```
 
-This raises a `MissingAbilityError`, but if we
-remove the `# type: ignore`, `ty` rejects the program before it runs:
+This raises a `MissingAbilityError`, but if we remove the `# type: ignore`,
+`ty` rejects the program before it runs:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
@@ -324,17 +324,20 @@ A dependency that was never bound is a type error, not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
 
-The expected type in that message names two things this chapter has not covered.
-`Async` is a built-in ability for asynchronous work,
-which `run()` handles on its own.
-`Exception` is the error channel, which a later section fills.
-`run()` insists on every other ability being answered,
-and those two are what remain when they are.
+The expected type in that message names two things this chapter has not yet covered:
+
+- `Async` is a built-in ability for asynchronous work,
+  which `run()` handles on its own.
+- `Exception` is the error channel.
+
+`run()` accepts an Effect whose ability channel has narrowed to those two,
+which is all that remains once every other ability has been supplied.
+`greet("Alice")` still carries `Need[Console]`, so it does not pass type checking.
 
 ## Swapping the Implementation
 
-Delayed binding earns its keep when the binding changes.
-A test binds a `Console` that records instead of printing:
+The delayed binding created by a `Need` earns its keep when that binding changes.
+For example, a test can bind a `Console` that records instead of printing:
 
 ```python
 # recorder.py
@@ -367,16 +370,15 @@ There is no `capsys`, no monkeypatching of `print`, and no mock.
 The test supplies a different `Console` and reads what the code produced.
 `greet()` is unchanged and unaware.
 
-`as_type()` needs explaining, because it looks like nothing.
-At runtime it is the identity function and returns the object it was given.
+At runtime, `as_type()` is the identity function and returns the object it was given.
 Its purpose is the annotation.
-`supply(recorder)` would build a handler for `Need[Recorder]`,
+`supply(recorder)` builds a handler for `Need[Recorder]`,
 and `greet()` asked for `Need[Console]`, which is a different ability.
 `as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
 so `supply()` builds the handler that `greet()` is waiting for.
-Supply an implementation for a declared interface and you will need this.
+You need `as_type()` when you supply an implementation for a declared interface.
 `typing.cast(Console, recorder)` does the same job.
-`as_type()` is the library's named form of the cast.
+`as_type()` is the library's named form of that cast.
 
 `supply()` matches an instance to a `Need` by `isinstance()`,
 which is why `Recorder` inherits from `Console`.
