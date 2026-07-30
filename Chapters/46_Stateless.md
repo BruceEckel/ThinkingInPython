@@ -222,7 +222,7 @@ which answers the request and resumes the function.
 
 ## Supplying the Dependency
 
-`supply()` binds an instance to the `Need` that asked for it:
+`supply()` provides an instance to the `Need` that asked for it:
 
 ```python
 # supply_console.py
@@ -234,21 +234,56 @@ run(bound("Alice"))
 #: Hello, Alice!
 ```
 
-That line does three things, and separating them makes the shape clear:
+The `bound` assignment does three things:
 
 1. `supply(Console())` builds a *handler*,
    an object that knows how to answer `Need[Console]`.
-2. Calling the handler on `greet` returns a new function that answers the requests `greet()` makes.
+2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
    which `run()` executes.
 
-Now compare the types.
-`greet` is `(str) -> Depend[Need[Console], None]`.
-`bound` is `(str) -> Success[None]`.
-To see a type yourself, add `reveal_type(bound)` and run `ty check`.
-The checker reports `(name: str) -> Generator[Never, Any, None]`,
-the expanded form of `Success[None]`,
-with `Never` in the channel the alias table promised.
+Supplying the `Console` changes the type:
+
+```python
+# reveal_bound.py
+from typing import reveal_type
+from greeter import Console, greet
+from stateless import supply
+
+bound = supply(Console())(greet)
+reveal_type(greet)
+reveal_type(bound)
+```
+
+`reveal_type()` is a message to the type checker.
+Running the script tells you nothing useful,
+because at runtime it reports the class of its argument (`function`, here)
+on standard error.
+The answer comes from `ty check reveal_bound.py`:
+
+```text
+info[revealed-type]: Revealed type
+ --> reveal_bound.py:7:13
+  |
+7 | reveal_type(greet)
+  |             ^^^^^ `def greet(name: str) ->
+  |                   Generator[Need[Console], Any, None]`
+  |
+
+info[revealed-type]: Revealed type
+ --> reveal_bound.py:8:13
+  |
+8 | reveal_type(bound)
+  |             ^^^^^ `(name: str) -> Generator[Never, Any, None]`
+  |
+```
+
+`greet` is a function `ty` knows by name, so it reports the definition;
+`bound` is a function `supply()` built, described by its signature alone.
+Those are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
+`Need[Console]` sat in the first type parameter of `greet` and is gone from `bound`,
+replaced by the `Never` the alias table promised.
+
 Handling an ability *subtracts* it from the type.
 An Effect with every ability subtracted is a `Success`,
 and `run()` refuses an unanswered ability.
@@ -256,7 +291,7 @@ Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
 
-Let's break it and see what happens.
+Let's see what happens when we break it.
 Hand `run()` an Effect that still needs a `Console`:
 
 ```python
@@ -272,10 +307,8 @@ except MissingAbilityError as e:
 #: MissingAbilityError
 ```
 
-At runtime this raises a `MissingAbilityError`,
-which the listing catches so it can print something.
-But the runtime failure is not the point.
-Remove the `# type: ignore` and `ty` rejects the program before it runs:
+This raises a `MissingAbilityError`, but if we
+remove the `# type: ignore`, `ty` rejects the program before it runs:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
@@ -287,7 +320,6 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |         `Generator[Need[Console], Any, None]`
 ```
 
-This is the guarantee, and it is the reason the chapter exists.
 A dependency that was never bound is a type error, not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
