@@ -95,7 +95,7 @@ An Effect does not:
 What comes back depends on which ability the `yield` requested,
 and one SendType cannot vary from one `yield` to the next.
 Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
-Any type must come back through the `send()` channel, so we give it type `Any`.
+The `send()` channel must be able to carry any type, so the SendType is `Any`.
 
 `yield from` recovers the precision that `Any` gives up,
 so a request can produce an answer whose type the checker knows.
@@ -179,8 +179,7 @@ greet("Alice")
 That signature is a lie by omission.
 `-> None` claims the function returns nothing and mentions nothing else,
 while the body writes to standard output.
-That omission is not an unimportant detail:
-printing is everything the function does.
+That omission matters: printing is everything the function does.
 The caller cannot see the dependency, redirect the output,
 or test the function without capturing stdout.
 `Depend[Need[Console], None]` states the dependency.
@@ -428,7 +427,7 @@ a boundary function whose parameters are annotated with the interface types,
 so the cast disappears into ordinary parameter annotations.
 Everything in between works the same under either form.
 
-You may also not need to declare an ability at all.
+You might not need to declare an ability at all.
 Stateless includes three of its own:
 a `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
 a `Files` in `stateless.files` that reads a whole file,
@@ -509,7 +508,7 @@ all the way to `asyncio.run()`.
 A `Depend` function's callers must declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many abilities as you like,
-where Python hard-codes one.
+while Python hard-codes one.
 
 The `yield from` is not optional.
 Write `greet(name)` alone, without it,
@@ -1080,7 +1079,7 @@ and the difference deserves a moment.
 `Console` never was one.
 It is an ordinary class, and `Need[Console]` is the ability:
 a request object carrying the class it asks for.
-The bound the chapter opened with enforces the distinction.
+A type bound enforces the distinction.
 `Effect`'s first type parameter accepts only `Ability` subclasses,
 so writing `Depend[Console, None]` is rejected at the annotation,
 before any `yield` is examined: `Console` is not assignable to the bound.
@@ -1133,7 +1132,7 @@ a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 
 Every handler so far gave the same answer each time it was asked.
 `supply()` binds one instance for the whole run,
-and `scripted` returned `"Alice"` however often `greet()` requested a name.
+and `scripted` returned `"Alice"` no matter how many times `greet()` requested a name.
 A handler is an ordinary function, so it can answer differently at each request.
 That is what makes an unpredictable source testable.
 
@@ -1179,7 +1178,7 @@ print(4_000 < heads < 6_000)
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
-where `Ask` and `Tell` each carried the payload the request had to deliver.
+while `Ask` and `Tell` each carried the payload the request had to deliver.
 The ability's whole content is its type and the `bool` it promises back.
 
 Two handlers answer the same function.
@@ -1441,7 +1440,7 @@ and the fourth `Unavailable`, so every failure the signature declares gets used.
 Each pair of bindings is what a full Effect system would call a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
-The trace shows two things worth watching for.
+The trace shows two things worth noticing.
 Every printed line comes from a supplied implementation,
 because the pipeline holds no output of its own.
 And the second run stops after `feed: fetching`.
@@ -1901,7 +1900,7 @@ That is why `ask_tell_effect.py` binds `half` and `full` instead of nesting the 
 The habit is worth keeping generally.
 A named intermediate is where you read the ability that is left,
 which is the information this library exists to give you.
-The chapter has now met three of these checker gaps:
+You have now seen three of these checker gaps:
 the nested handler expression here,
 the direct ability yield that types as `Unknown`,
 and the `type` alias that turns the yield check off.
@@ -2016,8 +2015,8 @@ Some pairs cannot be converted.
 An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
 A `with` block's guarantee is lexical,
 so it cannot be handed to a caller as a value the way a `Result` can.
-A function that awaits, might fail,
-and holds a resource uses three of these mechanisms and returns a type that mentions one.
+Consider a function that awaits, might fail, and holds a resource.
+It uses three of these mechanisms, and its return type mentions one.
 
 `Effect[A, E, R]` is one type for the dependency, the failure, and the result,
 and `yield from` is one operator for joining two Effects.
@@ -2086,7 +2085,7 @@ It is a language that does the encoding for you.
     and list every line you had to edit.
     Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
 9.  `scenarios.py` supplies a `DeadWire` that fails before printing.
-    Write a `SlowWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
+    Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
     and predict the trace before running it.
 10. Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
@@ -2100,4 +2099,4 @@ It is a language that does the encoding for you.
     and record what each reports and what the program prints.
     Explain where the greetings went and why no tool objects.
     Then explain why the same mistake in front of `need(Console)` inside `greet()` would be caught,
-    and by what.
+    and name the tool that catches it.
