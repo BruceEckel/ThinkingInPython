@@ -1,0 +1,1083 @@
+# Stateless in Practice
+
+[Stateless](46_Stateless.md)
+established the two channels an `Effect[A, E, R]` carries.
+A dependency is a `Need` that `supply()` answers.
+A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
+A type checker verifies that every caller either absorbs an Effect or declares it.
+
+Every ability so far has been a `Need`.
+This chapter opens by writing one from scratch,
+which shows that `Need` is an ordinary class rather than a special form.
+The rest applies the machinery:
+handlers that make an unpredictable source testable,
+a program whose signature is its own documentation,
+decorators that add retry and parallelism to code they never edit,
+and an account of what the guarantee does not cover.
+
+## Abilities Are Not Special
+
+`Need` looks built-in, but it is an ordinary class, and you can write your own.
+An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
+Here is the `Ask` and `Tell` program from [Effect Management](44_Effect_Management.md#effects-by-hand),
+rebuilt:
+
+```python
+# ask_tell_effect.py
+from dataclasses import dataclass
+from stateless import Ability, Depend, handle, run
+
+@dataclass(frozen=True)
+class Ask(Ability[str]):
+    prompt: str
+
+@dataclass(frozen=True)
+class Tell(Ability[None]):
+    message: str
+
+def ask(prompt: str) -> Depend[Ask, str]:
+    answer: str = yield from Ask(prompt)
+    return answer
+
+def tell(message: str) -> Depend[Tell, None]:
+    yield from Tell(message)
+
+def greet() -> Depend[Ask | Tell, None]:
+    name = yield from ask("What is your name? ")
+    yield from tell(f"Hello, {name}!")
+
+messages: list[str] = []
+
+def scripted(request: Ask) -> str:
+    return "Alice"
+
+def capture(request: Tell) -> None:
+    messages.append(request.message)
+
+half = handle(capture)(greet)
+full = handle(scripted)(half)
+run(full())
+print(messages)
+#: ['Hello, Alice!']
+```
+
+Inside `ask()`, `yield from Ask(prompt)` yields the ability object and returns whatever the handler sends back.
+`ask()` and `tell()` are *accessors*:
+small functions that each wrap one ability and declare its answer type.
+`need()` has the same shape,
+and the ZIO listing in [Effect Management](44_Effect_Management.md#library-effect-management)
+had an accessor object doing the same job.
+The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
+You can skip the accessor and yield the ability directly,
+and the program still runs,
+but under `ty` 0.0.64 the answer comes back as `Unknown` and the checking quietly stops.
+The accessor pins it down.
+That is what the `answer: str` inside `ask()` is doing.
+`yield from Ask(prompt)` produces `Unknown` there too,
+so the annotation is an assertion the checker takes on faith rather than a type it worked out.
+`Ability[str]` is where the claim comes from,
+and writing it at the binding keeps the accessor's promise in one place,
+one line above the `Depend[Ask, str]` that repeats it to callers.
+
+That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
+and the difference deserves a moment.
+`Ask` is an ability, so it sits in the channel bare.
+`Console` never was one.
+It is an ordinary class, and `Need[Console]` is the ability:
+a request object carrying the class it asks for.
+A type bound enforces the distinction.
+`Effect`'s first type parameter accepts only `Ability` subclasses,
+so writing `Depend[Console, None]` is rejected at the annotation,
+before any `yield` is examined: `Console` is not assignable to the bound.
+
+`handle()` reads the annotation on its argument to decide which ability it answers,
+which is why `scripted` and `capture` must annotate their parameters.
+Each `handle()` subtracts one ability,
+so `half` still needs an `Ask` and `full` needs nothing.
+Naming the two stages also matters to the checker,
+for a reason the next section gives.
+
+Now compare this listing to `ask_tell.py` again.
+The by-hand version threaded two objects through every signature.
+This one threads nothing.
+`greet()` takes no arguments at all,
+and the two Effects live in the return type where a checker can follow them.
+That second channel in the signature is the one that chapter said an EMS needs.
+
+Return to `two_way_generator.py` in [Generators](45_Generators.md#a-generator-is-a-description)
+and the whole library is visible.
+An Effect is a generator, so nothing stops you from driving one yourself:
+
+```python
+# effect_by_hand.py
+from greeter import Console, greet
+
+effect = greet("Alice")
+request = next(effect)
+print(f"{type(request).__name__}({request.t.__name__})")
+#: Need(Console)
+try:
+    effect.send(Console())
+except StopIteration:
+    print("returned")
+#: Hello, Alice!
+#: returned
+```
+
+`greet("Alice")` yields a `Need` object carrying the requested type,
+as `interview()` yielded `"name"`.
+Answering it with `send(Console())` resumes the body,
+which prints the greeting and finishes.
+Every tool in the library packages those two calls.
+`handle()` is `drive()` with a type lookup in place of the dictionary,
+`run()` is the loop at the bottom,
+and `supply()` is `handle()` prepackaged for `Need`:
+a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
+
+## Scripting an Unpredictable Source
+
+Every handler so far gave the same answer each time it was asked.
+`supply()` binds one instance for the whole run,
+and `scripted` returned `"Alice"` no matter how many times `greet()` requested a name.
+A handler is an ordinary function, so it can answer differently at each request.
+That is what makes an unpredictable source testable.
+
+A coin toss is a side cause: the program reads something from outside,
+and the reading does not repeat.
+Turn it into an ability and the reading moves into a handler:
+
+```python
+# coin_toss.py
+import random
+from stateless import Ability, Depend, handle, run
+
+class Flip(Ability[bool]):
+    pass
+
+def flip() -> Depend[Flip, bool]:
+    result: bool = yield from Flip()
+    return result
+
+def count_heads(tosses: int) -> Depend[Flip, int]:
+    heads = 0
+    for _ in range(tosses):
+        if (yield from flip()):
+            heads += 1
+    return heads
+
+FLIPS = (True, False, True, True, False)
+script = iter(FLIPS)
+
+def scripted(request: Flip) -> bool:
+    return next(script)
+
+def coin(request: Flip) -> bool:
+    return random.random() < 0.5
+
+print(run(handle(scripted)(count_heads)(5)))
+#: 3
+heads = run(handle(coin)(count_heads)(10_000))
+print(4_000 < heads < 6_000)
+#: True
+```
+
+`count_heads()` needs a `Flip` and produces an `int`.
+Its body contains no `random` call, no seed, and no parameter for either.
+`Flip` carries no data, so it needs no fields,
+while `Ask` and `Tell` each carried the payload the request had to deliver.
+The ability's whole content is its type and the `bool` it promises back.
+
+Two handlers answer the same function.
+`scripted` walks an iterator over a fixed sequence,
+so the five tosses are decided before the program runs and the count is `3`.
+`coin` calls `random.random()`, so ten thousand tosses come out near half heads.
+`count_heads()` cannot distinguish the two,
+because either answer arrives through the same `send()` channel.
+
+The scripted handler holds state, and that is the point.
+`next(script)` produces a different value at each request,
+which one supplied instance cannot do.
+Every scripted test double has this shape: a queue handing out canned responses,
+a network stub that fails twice and then succeeds, or the clock below.
+
+A clock is the other side cause every test trips over.
+`stamp()` puts the current time into its output,
+and `batch_due()` decides whether a day has passed since the last run.
+Against a real clock neither is testable.
+One produces a different string every minute,
+and the other needs you to wait a day to watch it return `True`:
+
+```python
+# frozen_clock.py
+from datetime import datetime, timedelta
+from typing import Final
+from stateless import Ability, Depend, handle, run
+
+class Now(Ability[datetime]):
+    pass
+
+def now() -> Depend[Now, datetime]:
+    moment: datetime = yield from Now()
+    return moment
+
+def stamp(message: str) -> Depend[Now, str]:
+    moment = yield from now()
+    return f"[{moment:%Y-%m-%d %H:%M}] {message}"
+
+def batch_due(last_run: datetime) -> Depend[Now, bool]:
+    moment = yield from now()
+    return moment - last_run >= timedelta(hours=24)
+
+LAUNCH: Final[datetime] = datetime(2026, 1, 1, 3, 0)
+
+def frozen(request: Now) -> datetime:
+    return LAUNCH
+
+def tomorrow(request: Now) -> datetime:
+    return LAUNCH + timedelta(hours=24)
+
+print(run(handle(frozen)(stamp)("started")))
+#: [2026-01-01 03:00] started
+print(run(handle(frozen)(batch_due)(LAUNCH)))
+#: False
+print(run(handle(tomorrow)(batch_due)(LAUNCH)))
+#: True
+```
+
+`frozen` reports one moment,
+so `stamp()` produces a fixed string a test can compare.
+`tomorrow` reports a moment a day later,
+and `batch_due()` returns `True` with no time having passed.
+The schedule logic runs against whatever moment the handler names,
+in microseconds rather than a day.
+`batch_due()` holds no `datetime.now()` call,
+so there is nothing to monkeypatch and nothing to wait for,
+and a production handler that returns `datetime.now()` leaves the function unchanged.
+
+Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
+which made randomness repeatable a different way, by taking a `seed` parameter.
+That works, and it charges a parameter to every function between the caller and the `random.Random` call.
+Here the source is named in the return type instead,
+and no signature between `handle()` and the request mentions it.
+
+Both abilities in this section are side causes,
+in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the-impure-portion):
+the function reads something from outside.
+The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+stood in for a side effect, where the function writes something outward.
+The technique did not change between the two.
+Name the seam as an ability and bind it at the edge to whatever the context needs.
+What an EMS adds is that the seam cannot be skipped by accident.
+
+## Composing a Program
+
+Here is a small application: fetch a headline,
+find a topic worth researching within that headline, and look up that topic.
+Each step needs something or can fail, and no step names an implementation:
+
+```python
+# research.py
+from typing import Protocol, runtime_checkable
+from stateless import Effect, Need, need, throws
+
+class Unavailable(Exception):
+    pass
+
+class NotInteresting(Exception):
+    pass
+
+class NoArticle(Exception):
+    pass
+
+@runtime_checkable
+class Feed(Protocol):
+    def latest(self) -> str: ...
+
+@runtime_checkable
+class Encyclopedia(Protocol):
+    def article(self, topic: str) -> str: ...
+
+TOPICS = ("stock market", "genome")
+
+@throws(Unavailable)
+def fetch(feed: Feed) -> str:
+    return feed.latest()
+
+@throws(NotInteresting)
+def topic_of(headline: str) -> str:
+    for candidate in TOPICS:
+        if candidate in headline:
+            return candidate
+    raise NotInteresting(headline)
+
+@throws(NoArticle)
+def look_up(book: Encyclopedia, topic: str) -> str:
+    return book.article(topic)
+
+def research() -> Effect[
+    Need[Feed] | Need[Encyclopedia],
+    Unavailable | NotInteresting | NoArticle,
+    str,
+]:
+    feed = yield from need(Feed)
+    headline = yield from fetch(feed)
+    topic = yield from topic_of(headline)
+    book = yield from need(Encyclopedia)
+    article = yield from look_up(book, topic)
+    return article
+```
+
+The `research()` signature tells you the program's entire surface.
+It reads two things from outside and can fail three ways.
+The three `@throws` functions are the pattern for reaching ordinary code:
+`fetch()` and `look_up()` call methods that know nothing about Effects,
+and the decorator lifts what they raise into the channel.
+`topic_of()` needs nothing and touches nothing, so it declares no ability.
+
+`fetch()` and `look_up()` take their dependencies as parameters,
+which makes them ordinary functions rather than generator functions.
+That is a choice, not a requirement.
+`@throws` decorates a function returning an Effect,
+so the request and the failure can live in one function:
+
+```python
+# fetch_effectful.py
+from research import Feed, Unavailable
+from stateless import Depend, Need, need, throws
+
+@throws(Unavailable)
+def fetch_headline() -> Depend[Need[Feed], str]:
+    feed = yield from need(Feed)
+    return feed.latest()
+```
+
+The decorator adds the error the same way it did for `score()` in [The Error Channel](46_Stateless.md#the-error-channel).
+`ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
+which is `Effect[Need[Feed], Unavailable, str]`.
+`research()` splits the two because a function that only transforms its arguments is easier to test on its own,
+and because the split keeps the ability requests collected in one place.
+Either shape type-checks and either propagates correctly.
+
+The signature is also the only place this information appears.
+Nothing in the body mentions a network, a file, or a print,
+and `research()` performs no work when called.
+Now supply the environment:
+
+```python
+# scenarios.py
+from dataclasses import dataclass
+from typing import Final
+from research import (
+    Encyclopedia,
+    Feed,
+    NoArticle,
+    NotInteresting,
+    Unavailable,
+    research,
+)
+from stateless import Depend, Need, catch, run, supply
+
+@dataclass
+class Wire:
+    headline: str
+    def latest(self) -> str:
+        print("feed: fetching")
+        return self.headline
+
+class DeadWire:
+    def latest(self) -> str:
+        raise Unavailable("offline")
+
+@dataclass
+class Library:
+    articles: dict[str, str]
+    def article(self, topic: str) -> str:
+        print(f"library: looking up {topic}")
+        if topic not in self.articles:
+            raise NoArticle(topic)
+        return self.articles[topic]
+
+def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+    caught = catch(Unavailable, NotInteresting, NoArticle)
+    found: str | Unavailable | NotInteresting | NoArticle
+    found = yield from caught(research)()
+    match found:
+        case Unavailable():
+            return "no headline today"
+        case NotInteresting():
+            return "nothing worth researching"
+        case NoArticle():
+            return "no article on that topic"
+        case _:
+            return found
+
+STOCKS: Final[Wire] = Wire("stock market rising")
+WEATHER: Final[Wire] = Wire("mild and cloudy")
+SHELF: Final[Library] = Library({"stock market": "a history"})
+EMPTY: Final[Library] = Library({})
+
+def outcome(feed: Feed, book: Encyclopedia) -> str:
+    return run(supply(feed, book)(report)())
+
+print(outcome(STOCKS, SHELF))
+print(outcome(WEATHER, SHELF))
+print(outcome(STOCKS, EMPTY))
+print(outcome(DeadWire(), SHELF))
+#: feed: fetching
+#: library: looking up stock market
+#: a history
+#: feed: fetching
+#: nothing worth researching
+#: feed: fetching
+#: library: looking up stock market
+#: no article on that topic
+#: no headline today
+```
+
+Four runs of one program, differing in what was supplied.
+The first finds its article.
+The second exercises `NotInteresting`, the third `NoArticle`,
+and the fourth `Unavailable`, so every failure the signature declares gets used.
+Each pair of bindings is what a full Effect system would call a *scenario*,
+and here a scenario is nothing more than arguments to `supply()`.
+
+The trace shows two things worth noticing.
+Every printed line comes from a supplied implementation,
+because the pipeline holds no output of its own.
+And the second run stops after `feed: fetching`.
+`topic_of()` yielded a `NotInteresting`,
+which ended `research()` where it stood,
+so the `need(Encyclopedia)` two lines below it never ran and no library was consulted.
+`catch()` received that failure and `report()` matched on it as a value,
+which is why the run still prints a message.
+A failure ends the remaining steps the way a raised exception would,
+and no step tested for it.
+The cut moves with the failure.
+The fourth run prints no trace,
+since `DeadWire.latest()` raises before printing,
+while the third reaches the library and fails there.
+
+`report()` is where the two channels come apart,
+and its annotation is worth reading twice.
+`catch()` emptied the error channel, so `report()` cannot fail.
+It still declares both abilities,
+because catching an error does nothing about a dependency.
+Annotate `report()` as `Success[str]` and `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
+`supply()` empties that half, and `run()` accepts what is left.
+
+`outcome()` also earns its annotations.
+`Wire` and `Library` are structural implementations,
+so `supply(Wire(...), Library(...))` would build handlers for `Need[Wire]` and `Need[Library]`,
+the mismatch that `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+fixed with `as_type()`.
+Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
+without a cast.
+
+## The Success Path
+
+`research()` handles no errors.
+Its body is a straight run of six lines, each saying what should happen next,
+and no line tests whether the previous one worked.
+The error channel makes that possible.
+Here is the same pipeline with the failures handled where they arise:
+
+```python
+# research_by_hand.py
+from research import (
+    TOPICS,
+    Encyclopedia,
+    Feed,
+    NoArticle,
+    NotInteresting,
+    Unavailable,
+)
+
+def topic_of(headline: str) -> str:
+    for candidate in TOPICS:
+        if candidate in headline:
+            return candidate
+    raise NotInteresting(headline)
+
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
+    try:
+        headline = feed.latest()
+    except Unavailable:
+        return "no headline today"
+    try:
+        topic = topic_of(headline)
+    except NotInteresting:
+        return "nothing worth researching"
+    try:
+        return book.article(topic)
+    except NoArticle:
+        return "no article on that topic"
+```
+
+Three lines of work sit inside nine lines of handling.
+The pipeline is in there, but you have to look for it.
+The Effect version moved those nine lines into `report()`,
+one `match` over the failures instead of a `try` at each step.
+The name says what the by-hand version cannot avoid being:
+`research()` and `report()` in one function.
+
+Both versions short-circuit.
+The by-hand one returns early, and the Effect one abandons the generator.
+The difference is who writes the branch that does it.
+
+Be fair about what this comparison shows.
+At this size the by-hand version is respectable,
+and a reader who prefers it is not making a mistake.
+Two differences outlast the size argument.
+Its signature, `(Feed, Encyclopedia) -> str`,
+mentions none of the three failures,
+so a fourth one can be added with nothing to tell the caller.
+And the handling is interleaved with the logic:
+`research_and_report()` decides both what to do about a failure and what to say about it.
+The Effect version separates those,
+so a second caller can catch the same three failures and choose different messages,
+retry the whole pipeline, or let one failure through to the edge,
+without touching the pipeline.
+
+## Adding Behavior to an Existing Effect
+
+The previous section promised that a caller could retry a pipeline without touching it.
+Stateless provides a few decorators that add such behavior.
+Retry is the one worth studying, because of what it does to the type.
+
+`Database` fails a fixed number of times before working,
+so the example is repeatable:
+
+```python
+# flaky.py
+from dataclasses import dataclass
+from stateless import Effect, Need, need, throws
+
+class Crashed(Exception):
+    pass
+
+@dataclass
+class Database:
+    failures: int
+    attempts: int = 0
+    def save(self, user: str) -> str:
+        self.attempts += 1
+        print(f"attempt {self.attempts}: saving {user}")
+        if self.attempts <= self.failures:
+            raise Crashed("database crashed")
+        return f"{user} saved"
+
+@throws(Crashed)
+def store(db: Database, user: str) -> str:
+    return db.save(user)
+
+def save_user(user: str) -> Effect[Need[Database], Crashed, str]:
+    db = yield from need(Database)
+    result = yield from store(db, user)
+    return result
+```
+
+`retry()` takes a `Schedule` and decorates a function that returns an Effect:
+
+```python
+# retrying.py
+from datetime import timedelta
+from flaky import Crashed, Database, save_user
+from stateless import catch, retry, run, supply
+from stateless.functions import RetryError
+from stateless.schedule import recurs, spaced
+from stateless.time import Time
+
+once = catch(Crashed)(save_user)
+print(run(supply(Database(failures=2))(once)("Morty")))
+#: attempt 1: saving Morty
+#: database crashed
+three = recurs(3, spaced(timedelta(milliseconds=1)))
+retried = retry(three)(save_user)
+print(run(supply(Database(failures=2), Time())(retried)("Morty")))
+#: attempt 1: saving Morty
+#: attempt 2: saving Morty
+#: attempt 3: saving Morty
+#: Morty saved
+caught = catch(RetryError)(retried)
+outcome = run(supply(Database(failures=9), Time())(caught)("Morty"))
+print(type(outcome).__name__)
+#: attempt 1: saving Morty
+#: attempt 2: saving Morty
+#: attempt 3: saving Morty
+#: RetryError
+```
+
+One attempt fails.
+Three attempts against a database that fails twice succeed on the third,
+and three attempts against one that always fails produce a `RetryError` holding every failure.
+`save_user()` was not edited for any of this.
+
+Notice that `retry()` decorates the *function*, not the Effect.
+`retry(three)(save_user("Morty"))` is not available,
+and the reason is the substrate.
+A Stateless Effect is a generator, so it runs once and is then spent.
+Re-running a spent Effect does not fail loudly:
+`run()` returns `None` where the signature promised a `str`,
+with no exception and no complaint from the checker.
+So a second attempt has to rebuild the description from the function,
+which is what `retry()` does internally.
+Where ZIO attaches `retryN` to an Effect value it can replay,
+Stateless attaches it one level up.
+
+Now read what the decoration did to the type.
+`save_user()` was `(str) -> Effect[Need[Database], Crashed, str]`.
+Under `reveal_type()`, `retried` is:
+
+```text
+(user: str) -> Generator[
+    Need[Database] | Need[Time] | Async | RetryError[Crashed],
+    Any,
+    str,
+]
+```
+
+Three changes, none of them silent.
+The error became `RetryError[Crashed]`,
+which is why the third run catches `RetryError` rather than `Crashed`.
+`Async` arrived because waiting between attempts is asynchronous.
+And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
+Retrying is not free: it needs a clock, and the signature says so.
+Leave the `Time()` out and the program does not build.
+This is the thesis of both chapters applied to a cross-cutting concern.
+Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
+here it changes a type, and every caller learns about the new dependency.
+
+One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
+so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
+
+`repeat()` is the sibling that runs an Effect on a schedule and collects every result.
+`memoize()` solves the spent-generator problem:
+
+```python
+# memoizing.py
+from flaky import Database, save_user
+from stateless import memoize, run, supply
+
+db = Database(failures=0)
+bound = supply(db)(memoize(save_user))
+print(run(bound("Morty")))
+print(run(bound("Morty")))
+print(f"attempts: {db.attempts}")
+#: attempt 1: saving Morty
+#: Morty saved
+#: Morty saved
+#: attempts: 1
+```
+
+Two runs, one attempt, and the second run still produces the value.
+`memoize()` caches by argument the way `functools.lru_cache` does,
+and it wraps the Effect in an object that records the result and replays it rather than driving the spent generator again.
+That wrapper exists because a generator cannot be replayed,
+which is the same fact that made `retry()` decorate the function.
+
+## Running Effects in Parallel
+
+Effects can also run at the same time.
+`fork()` hands an Effect to an `Executor` and returns a `Task`,
+and `wait()` collects the result:
+
+```python
+# parallel.py
+import time
+from concurrent.futures import Executor, ThreadPoolExecutor
+from stateless import (
+    Async,
+    Depend,
+    Need,
+    Success,
+    Task,
+    as_type,
+    fork,
+    run,
+    success,
+    supply,
+    wait,
+)
+
+@fork
+def slow_square(n: int) -> Success[int]:
+    time.sleep(0.05)
+    return success(n * n)
+
+def squares(
+    count: int,
+) -> Depend[Need[Executor] | Async, list[int]]:
+    tasks: list[Task[int]] = []
+    for n in range(count):
+        task = yield from slow_square(n)
+        tasks.append(task)
+    results: list[int] = []
+    for task in tasks:
+        value = yield from wait(task)
+        results.append(value)
+    return results
+
+with ThreadPoolExecutor(max_workers=5) as pool:
+    start = time.perf_counter()
+    out = run(supply(as_type(Executor)(pool))(squares)(5))
+    elapsed = time.perf_counter() - start
+print(out)
+#: [0, 1, 4, 9, 16]
+print(f"five 50ms tasks under 150ms: {elapsed < 0.15}")
+#: five 50ms tasks under 150ms: True
+```
+
+Five tasks that each sleep 50 milliseconds finish in about the time of one.
+The pool is an ability, not a global,
+so `squares()` declares `Need[Executor]` and names no pool.
+Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
+with no change to `squares()`.
+`as_type(Executor)` appears for the reason it always does:
+`ThreadPoolExecutor` is the more specific type,
+and `squares()` asked for the general one.
+
+One restriction is worth understanding, because the checker enforces it.
+A forked Effect must have nothing left to supply.
+`fork()`'s four overloads accept an Effect whose ability channel holds `Never`,
+an exception type, or `Async`, and nothing else,
+because `fork()` runs the Effect with `run()` inside the worker.
+Decorate a function that still declares a `Need` and `ty` rejects it,
+listing the overloads it failed to match.
+Supply first, then fork.
+
+Notice where the pool's lifetime is managed.
+The `with` block sits outside `run()`, at the edge, in ordinary Python.
+Stateless has no scoping mechanism of its own,
+so a resource either lives in a `with` block outside the Effect,
+as the pool does here, or the ability method owns it:
+the library's own `Files` ability opens and closes a file inside a single `read_file()` call.
+What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
+which is the flat resource management a native Effect system provides.
+
+## The Toolkit
+
+Here is every tool from both chapters.
+Each one builds a description, rewrites a description's type, or executes one.
+The type column is the part worth memorizing.
+
+Three build a description:
+
+| Tool | Applied to | What it does to the type |
+|---|---|---|
+| `success(value)` | A value | Wraps it as `Success[R]` |
+| `need(C)` | A class | Builds `Depend[Need[C], C]`, producing an instance |
+| `wait(target)` | A `Task` or any awaitable | Adds `Async`; produces the awaited `R` |
+
+The rest decorate a function that returns an Effect,
+rewriting the type that function declares:
+
+| Tool | What it does to the type |
+|---|---|
+| `supply(*instances)` | Subtracts each `Need[T]` matched by `isinstance()` |
+| `handle(handler)` | Subtracts the ability the handler's parameter names |
+| `catch(*E)` | Moves each `E` from the error channel into the result |
+| `retry(schedule)` | Adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
+| `repeat(schedule)` | Same additions; the result becomes a tuple of every run |
+| `memoize` | Type unchanged; the result is cached by argument |
+| `fork` | Adds `Need[Executor]`; the result becomes `Task[R]` |
+| `@throws(*E)` | Adds each `E` to the error channel |
+
+Two rows carry a caveat.
+`fork` needs a function whose Effect has nothing left to supply,
+so supply first, then fork.
+`@throws` is the entry point rather than a transformation:
+it decorates an ordinary function that raises exceptions,
+turning it into one that returns an Effect.
+
+Two execute an Effect that has only `Async` and errors left,
+raising a leftover error rather than returning it:
+
+| Tool | Where it is called |
+|---|---|
+| `run(effect)` | From synchronous code |
+| `await run_async(effect)` | From inside a running event loop |
+
+These two are the only functions that perform work,
+which is the description/execution split in table form.
+
+## Where the Guarantee Stops
+
+There are five limits worth knowing.
+
+### 1. Nothing stops an undeclared Effect
+
+`Success[int]` promises purity, and this function breaks that promise:
+
+```python
+# leaky_effect.py
+from stateless import Success, run, success
+
+def double(n: int) -> Success[int]:
+    print(f"doubling {n}")
+    return success(n * 2)
+
+print(run(double(21)))
+#: doubling 21
+#: 42
+```
+
+That listing type-checks.
+Stateless verifies that declared Effects propagate.
+It cannot verify that everything effectful was declared,
+because Python's `print()`, `open()`,
+and `requests.get()` are ordinary calls with ordinary types.
+A native EMS computes a function's Effects from its body.
+A library can only check the ones you wrote down.
+The guarantee is about consistency, not completeness.
+
+The same hole opens on the error side.
+`@throws` catches only the exception types it names,
+so an unlisted exception propagates as an ordinary raised exception, untracked.
+And `catch()` matches the values an Effect yields,
+not exceptions the body raises,
+so a failure that was never lifted by `@throws` goes past `catch()` untouched.
+The channel carries only what was put into it.
+
+### 2. The checker can give up quietly
+
+How much of a type survives partial handling depends on your checker rather than on the library.
+Handling some of what an Effect declares works correctly under `ty` 0.0.64.
+Supply one of two abilities and the other stays in the signature:
+
+```python
+# partial_handling.py
+from greeter import Console
+from stateless import Depend, Need, need, run, supply
+from stateless.errors import MissingAbilityError
+
+class Log:
+    def write(self, entry: str) -> None:
+        print(f"log: {entry}")
+
+def work() -> Depend[Need[Console] | Need[Log], None]:
+    console = yield from need(Console)
+    log = yield from need(Log)
+    console.print("working")
+    log.write("worked")
+
+half = supply(Console())(work)
+try:
+    run(half())  # type: ignore
+except MissingAbilityError as e:
+    print(type(e).__name__)
+#: MissingAbilityError
+```
+
+`half` is `() -> Depend[Need[Log], None]`.
+The `Console` was subtracted and the `Log` was not,
+so `run()` rejects it before the program starts:
+
+```text
+error[invalid-argument-type]: Argument to function `run` is incorrect
+  --> partial_handling.py:18:9
+   |
+18 |     run(half())
+   |         ^^^^^^ Expected
+   |         `Generator[Async | Exception, Any, Unknown]`, found
+   |         `Generator[Need[Log], Any, None]`
+```
+
+The `# type: ignore` lets the listing run far enough to show the matching runtime failure.
+`catch()` behaves the same way.
+Catch one of two declared errors and the other stays in the error channel.
+
+What still defeats the checker is applying two handlers in one expression.
+Write `handle(scripted)(handle(capture)(greet))` and `ty` gives up on the nested inference and infers `Unknown`,
+which is permissive enough to hide a genuinely missing handler.
+Name the intermediate and the types come back:
+
+```python
+half = handle(capture)(greet)  # () -> Depend[Ask, None]
+full = handle(scripted)(half)  # () -> Success[None]
+```
+
+That is why `ask_tell_effect.py` binds `half` and `full` instead of nesting the calls.
+The habit is worth keeping generally.
+A named intermediate is where you read the ability that is left,
+which is the information this library exists to give you.
+You have now seen three of these checker gaps:
+the nested handler expression here,
+the direct ability yield that types as `Unknown`,
+and the `type` alias in [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+that turns the yield check off.
+Each has the same shape.
+The library's types are asking the checker a hard inference question,
+and where the checker gives up, it gives up quietly.
+Trust a green check only where a red one has shown you it can appear.
+
+### 3. Handlers cannot capture the continuation
+
+Naming the machinery precisely shows where this limit comes from.
+`Effect` is a monad.
+`success()` lifts a value into it, `yield from` chains two of them together,
+and the generator body is syntax that hides the chaining.
+`Result` in [Error Handling](42_Functional_Error_Handling.md#composing-with-bind)
+had the same two operations, written out by hand.
+The library's documentation calls this an algebraic effect system,
+and both descriptions are right.
+A monad plus handlers is how you build algebraic effects in a language with no native support for them.
+The monad is the plumbing, and the handlers are the interface.
+
+What a library cannot copy is the handler's power.
+`handle()` passes a handler the ability and takes back an answer,
+and the driver resumes the Effect with that answer, once, always.
+A native handler instead receives the *continuation* and chooses what to do with it.
+Invoke it once and you have what Stateless has.
+Decline to invoke it and the handled scope produces the handler's value instead,
+which is how an exception behaves.
+Invoke it repeatedly and you have backtracking and search.
+Stateless offers only the first, a *tail-resumptive* handler.
+The ceiling is the substrate rather than the design.
+A Python generator is one-shot, so there is nothing to resume twice.
+
+Two pieces of the library are evidence of that ceiling.
+`Effect[A, E, R]` carries a separate `E`, worked by `@throws` and `catch()`.
+Koka needs no such type parameter,
+because an exception there is an ordinary Effect whose handler declines to resume.
+The extra type parameter exists because a Stateless ability cannot fail,
+and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
+carries one for the same reason.
+`Async` is the other piece.
+Native systems demonstrate asynchronous execution derived from Effects,
+while Stateless provides `Async` as a built-in that `run()` interprets,
+because the driver loop can await where a handler cannot.
+
+### 4. Cost
+
+Every effectful function becomes a generator function,
+which means it cannot also be a plain function,
+and calling it returns a description that somebody must run.
+Type errors from a library this generic are long and mention internals.
+And a third-party function that knows nothing about Effects must be wrapped in `@throws` or reached through a `need()` before it can participate.
+An EMS is a decision about a whole codebase,
+not a utility you import for one module.
+
+### 5. Much of a mature Effect system is missing
+
+Dependency wiring is the first gap.
+`supply()` binds instances that are already built,
+and `handle()` takes an ordinary function,
+so constructing a dependency can never be an Effect.
+ZIO's `ZLayer` is a constructor that can read configuration, fail,
+and be retried, and it resolves a dependency graph at compile time,
+reporting a cycle or a missing provider by name.
+Stateless has no equivalent,
+so the wiring at the edge is written by hand and a `supply()` call is checked for completeness but not for how it was assembled.
+The operator set is thin in the same way.
+There is `retry()` and `repeat()`,
+and `Schedule` offers a fixed interval and a repeat count,
+with no exponential backoff and no jitter.
+There is no timeout, no `race`, no fallback combinator, and no finalizer,
+which rules out the hedging strategy that races a delayed second request.
+Concurrency is `fork()` and `wait()` with no guarded mutable cell,
+so shared state between forked Effects is your problem and Python's,
+not something the type checker helps with.
+Above that sit the resilience patterns a production system eventually needs,
+rate limiting, bulkheads, and circuit breakers, none of which exist here.
+The library is a working demonstration of Effect tracking in Python's type system,
+and that is a different thing from a platform to build a distributed system on.
+
+## Costs and Benefits
+
+[Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
+argued that Effects are the next scaling barrier,
+and that the tracking will eventually move into the language.
+Stateless shows what that looks like inside Python today,
+which is the value of studying it, whether or not you use it in production.
+
+Consider the signatures once more:
+
+- `Success[int]`: pure.
+- `Depend[Need[Console], None]`: prints, somehow,
+  through something supplied later.
+- `Effect[Need[Console], KeyError, None]`: prints, might not find the name.
+
+Each one describes what a function depends on, what it can produce,
+and how it can fail, before you read a single line of the body.
+That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
+Purity is valuable because it is verifiable,
+and verification performed by reading code does not scale.
+
+There is a second gain, and it shows when you put functions together.
+Python has a separate mechanism for each concern an Effect type carries.
+Absence is `T | None`.
+Failure is a raised exception,
+or the `Result` that [Error Handling](42_Functional_Error_Handling.md#a-result-type)
+built.
+Asynchrony is `async def` and `await`.
+A resource's lifetime is a `with` block.
+Each is reasonable alone, and they do not compose with each other.
+Some pairs cannot be converted.
+An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
+A `with` block's guarantee is lexical,
+so it cannot be handed to a caller as a value the way a `Result` can.
+Consider a function that awaits, might fail, and holds a resource.
+It uses three of these mechanisms, and its return type mentions one.
+
+`Effect[A, E, R]` is one type for the dependency, the failure, and the result,
+and `yield from` is one operator for joining two Effects.
+`research()` joined five steps of two kinds with that one operator,
+once `@throws` had brought the ordinary functions in at the boundary.
+`Async` is one more ability in the same channel rather than a second viral annotation.
+Resource lifetime is the concern this does not absorb.
+Stateless has no scoping mechanism,
+so `with` blocks stay where they are and stay nested.
+
+What Stateless charges for that property is the generator discipline,
+the description/execution split, and an ecosystem that has never heard of it.
+For most Python code that price is too high.
+The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure),
+returning a `Result`, restricting a type so bad values cannot exist,
+and passing dependencies in rather than constructing them,
+capture much of the benefit at a fraction of the cost.
+Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
+and when the team will hold the line at every boundary.
+Below that scale, the discipline matters and the machinery is optional.
+
+But the direction is worth watching.
+Python got one Effect tracked into its type system with `async`.
+The languages listed under [Native Effect Management](44_Effect_Management.md#native-effect-management)
+track all of them.
+Stateless is the demonstration that Python's type system is expressive enough to do it,
+given a library willing to encode everything into return types.
+What is missing is not the capacity.
+It is a language that does the encoding for you.
+
+
+## Exercises
+
+1.  `frozen` and `tomorrow` in `frozen_clock.py` each report a single moment.
+    Write an advancing handler for `Now` that reports a moment one hour later at each request,
+    then write an Effect that asks the time twice and returns the elapsed `timedelta`.
+    Say which of `coin_toss.py`'s two handlers yours resembles,
+    and why neither `frozen` nor `tomorrow` can test elapsed-time logic.
+2.  `leaky_effect.py` type-checks while lying about its purity.
+    Describe a review rule or a lint check that would catch it,
+    and explain why a type checker cannot.
+    Then demonstrate the error-side twin:
+    write a function that raises a `KeyError` with no `@throws`,
+    wrap it in `catch(KeyError)`, and run it on a failing input.
+    Explain what the types claim, what the run does,
+    and which line restores the guarantee.
+3.  Add a fourth failure to `research()`:
+    a `TooLong` raised when an article exceeds some length.
+    Follow the checker's complaints until the program builds again,
+    and list every line you had to edit.
+    Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
+4.  `scenarios.py` supplies a `DeadWire` that fails before printing.
+    Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
+    and predict the trace before running it.
+5.  Wrap `research()` in `retry()` and supply a `Time()`.
+    Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
+    then say what an Effect system would need for you to retry only `Unavailable`.
+6.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
+    and confirm `squares()` is unchanged.
+    Then try to fork an Effect that still declares a `Need`,
+    and record what `ty` says.

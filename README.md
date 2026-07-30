@@ -103,6 +103,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 44_Effect_Management.md         |🔴|🔴|
 | 45_Generators.md                |🔴|🔴|
 | 46_Stateless.md                 |🔴|🔴|
+| 47_Stateless_in_Practice.md     |🔴|🔴|
 
 ### Serious Edit
 
@@ -156,3 +157,4 @@ The first serious edit pass.
 | 44_Effect_Management.md         | |
 | 45_Generators.md                | |
 | 46_Stateless.md                 | |
+| 47_Stateless_in_Practice.md     | |
