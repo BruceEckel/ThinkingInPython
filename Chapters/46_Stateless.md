@@ -1018,6 +1018,34 @@ where `run()` raises it as an ordinary exception,
 the same escape `error_escapes.py` showed for a single error.
 Failures cannot be lost, only relocated.
 
+## Emptying the Channels
+
+The two halves of this chapter taught two vocabularies.
+A dependency is a `Need`, and `supply()` answers it.
+A failure is an exception, `@throws` lifts it into the type,
+and `catch()` takes it back out.
+The vocabularies differ.
+The operation underneath them does not.
+Both subtract from the type.
+`supply()` removes an ability and leaves `Never` in its place.
+`catch()` removes an error and moves it into the result,
+where a `match` must account for it.
+An Effect with both channels emptied is a `Success`, which `run()` accepts.
+
+The channels do not end the same way.
+`unsupplied.py` showed `run()` refusing an Effect that still declares an ability,
+before the program starts.
+`error_escapes.py` showed `run()` accepting one that still declares a failure,
+then raising that failure at the edge.
+The difference is not an inconsistency.
+An unbound dependency has no answer anywhere in the program,
+so a driver that met one could do nothing but stop.
+An unhandled failure has a clear meaning at the boundary: raise it,
+which is what Python would have done without the Effect type.
+The two guarantees are therefore different.
+A dependency must be resolved before anything runs.
+A failure must be declared, and you choose where to handle it.
+Both are checked, and neither can be dropped by forgetting it.
 
 ## Exercises
 
