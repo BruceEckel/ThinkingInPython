@@ -64,6 +64,14 @@ file passes a strict type checker and linter.
   `type Symbol = str`. The right side is lazily evaluated (PEP 695),
   so it can name a class defined later in the file without quotes.
 
+- Exception: do not use a `type` alias as a generator function's
+  return annotation when the yield type carries a guarantee you want
+  verified. Under `ty` (through 0.0.64), the alias turns the
+  invalid-yield check off, so a wrong `yield` passes silently. Write
+  the `Generator[...]` annotation out in full (an old-style
+  `TypeAlias` assignment also keeps the check alive) until your
+  checker demonstrably sees through the `type` form.
+
 **Constants.**
 
 - Named constants get the full typed `Final` form:
@@ -131,6 +139,20 @@ legal value** (PEP 661, Python 3.15+).
 - Types imported only under `if TYPE_CHECKING:` are safe in any
   annotation, including bare class-body declarations. Use this to
   break import cycles.
+
+**Two-way generators get the full three-parameter annotation.**
+
+- `Iterator[T]` fits a generator that only produces values. One that
+  also receives or returns gets
+  `Generator[YieldType, SendType, ReturnType]`.
+
+- When the channels share a base type (three `str`s), wrap each in a
+  `NewType` (`Question`, `Answer`, `Result`) so a transposed
+  annotation fails the checker instead of unifying silently.
+
+- Prime with `next(g)`, not `g.send(None)`. The two are equivalent at
+  runtime, but a declared SendType rejects the `None`, so only the
+  `next()` form type-checks.
 
 **Union syntax.**
 
@@ -210,6 +232,15 @@ legal value** (PEP 661, Python 3.15+).
   the specific exception type(s) you can handle. When raising a
   different exception in response to one you caught, use
   `raise NewException(...) from original` to preserve the chain.
+
+- **Derive related values from one reading of a changing source.** A
+  function that reads the clock twice to build two parts of one
+  result has a window where the parts disagree: a file named for one
+  day holding an entry stamped the next. Read once, bind the value,
+  derive everything from it. The same applies to any non-repeatable
+  read (an RNG, a counter, file state), and injecting the source
+  (parameter, ability, fixture) is what makes the disagreement window
+  testable at all.
 
 - **Default a mutable argument to `None`,** then build the object
   inside the function body. A default argument is evaluated once, at
@@ -380,6 +411,14 @@ legal value** (PEP 661, Python 3.15+).
   with `encoding=` set explicitly. Pass `newline="\n"` whenever the
   file must stay LF-only, such as a script rewriting a tracked source
   file in place.
+
+- A generator object is single-use, and exhaustion is silent. A
+  second `for` loop over a spent generator runs zero iterations, and
+  a driver that reads `StopIteration.value` from one gets `None`, in
+  both cases with no exception. When something must iterate or run
+  twice, materialize with `list()` or rebuild by calling the
+  generator function again; a hidden instance of this rule is any
+  API that accepts a generator and may traverse it more than once.
 
 - A module already in `sys.modules` is never re-resolved from
   `sys.path`, even when a later `import` of the same name happens
