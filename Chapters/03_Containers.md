@@ -288,7 +288,7 @@ for kind, name in pets:
     plain[kind].append(name)
 print(plain["dog"])
 #: ['Rex', 'Fido']
-# A defaultdict creates the missing list for you:
+# A defaultdict creates the missing list:
 by_kind = defaultdict(list)
 for kind, name in pets:
     by_kind[kind].append(name)

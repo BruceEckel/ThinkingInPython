@@ -803,7 +803,7 @@ so combining them is impossible in any context.
 The `# type: ignore` comment is there because ty knows this rule statically.
 Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
 A checker that predicts a crash before the program ever runs is static typing at its best;
-the comment suppresses the diagnostic only because raising that crash is the point.
+the comment suppresses the diagnostic only because raising that crash is educational.
 
 A metaclass can multiply inherit like any other class,
 as long as the extra class is a plain mixin with no competing layout:

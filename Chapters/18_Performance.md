@@ -588,7 +588,7 @@ except AttributeError as e:
 #: AttributeError
 ```
 
-A data class can generate the slots for you.
+A data class can generate the slots.
 `@dataclass(slots=True)` turns the field declarations into `__slots__` and still writes `__init__()`,
 `__repr__()`, and `__eq__()`:
 
@@ -1075,5 +1075,6 @@ not just where it sits on that curve:
     and confirm `heap[0]` is the smallest remaining value every time.
     Why does the list still look unsorted after a correct pop?
 6.  In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
-    Confirm that an instance accepts an attribute `Point` refuses,
-    such as `p.z = 3`, and find where the storage for it came from.
+    Confirm that an instance accepts `p.z = 3`,
+    which `Point` rejects with an `AttributeError`,
+    and find where the storage for it came from.

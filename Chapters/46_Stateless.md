@@ -356,7 +356,8 @@ so it does not pass type checking.
 
 ## Swapping the Implementation
 
-`Need` creates a delayed binding. This means we can change that binding.
+`Need` creates a delayed binding.
+This means we can change that binding.
 For example, a test can bind to a `Console` that records instead of printing:
 
 ```python
@@ -387,7 +388,8 @@ def test_greet() -> None:
 ```
 
 There is no `capsys`, no monkeypatching of `print`, and no mock.
-The test supplies a different `Console`, while `greet()` is unchanged and unaware.
+The test supplies a different `Console`,
+while `greet()` is unchanged and unaware.
 
 At runtime, `as_type()` is the identity function and returns the object it was given.
 Its purpose is the annotation.
@@ -423,8 +425,7 @@ Nothing of the parent survives but the name that `isinstance()` looks for.
 The cost arrives later.
 Add a `read_line()` method to `Console`,
 and `Recorder` inherits the real one without a word of warning,
-so a test meant to record instead performs live console I/O.
-Make the ability an interface and there is no implementation to inherit by accident:
+so a test meant to record instead performs live console I/O. Make the ability an interface and there is no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -444,8 +445,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-The second of the three things
-[a full EMS does](44_Effect_Management.md#effect-management-systems)
+The second of the three things [a full EMS does](44_Effect_Management.md#effect-management-systems)
 is separate each Effect's interface from its implementation.
 `Console` is now that interface and holds no implementation.
 `Terminal` is one implementation and `Recorder` is another,
@@ -455,7 +455,7 @@ Because a `Protocol` matches on structure,
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
 This is the form to write in production.
-The smaller listings that follow keep importing `greeter.py`'s concrete `Console`,
+The smaller listings that follow continue importing `greeter.py`'s concrete `Console`,
 because a supply site for a `Protocol` ability needs help naming the interface:
 `supply(Console())` becomes `supply(as_type(Console)(Terminal()))`.
 That is a real cost of using the interface, not only a shortcut for the book.
@@ -463,24 +463,27 @@ That is a real cost of using the interface, not only a shortcut for the book.
 declares its abilities as `Protocol`s and shows how to stop repeating that cost:
 write one boundary function whose parameters are annotated with the interface types,
 and call `supply()` inside it.
-The parameter annotation performs the upcast,
-so no call site needs `as_type()`.
+The parameter annotation performs the upcast, so no call site needs `as_type()`.
 Everything in between works the same under either form.
+
+### Builtin Abilities
 
 You might not need to declare an ability.
 Stateless includes three of its own:
-a `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
-a `Files` in `stateless.files` that reads a whole file,
-and the `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
-supplies to `retry()`.
-The chapter builds its own `Console` because watching one get built is the point.
+
+- `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
+- `Files` in `stateless.files` that reads a whole file,
+- `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
+  supplies to `retry()`.
+
+This chapter builds its own `Console` for illustration.
 In your own code, check what the library already declares first.
 
 ## When Two Implementations Match
 
 A structural check matches on method names alone,
 so two supplied objects that both define `print()` are indistinguishable.
-Supply both and argument order decides which one answers:
+If you supply both, argument order decides which one answers the request:
 
 ```python
 # ambiguous_supply.py
@@ -527,49 +530,58 @@ and supply one implementation per ability.
 ## Effects Propagate, and the Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
+`Console` and `greet()` reappear here from [Declaring a Dependency](#declaring-a-dependency),
+with `Console` as the concrete class rather than the `Protocol` shown since.
 `greet_all()` must declare the `Console` it never touches:
 
 ```python
 # greet_all.py
-from greeter import Console, greet
-from stateless import Depend, Need, run, supply
+from stateless import Depend, Need, need, run, supply
+
+class Console:
+    def print(self, message: str) -> None:
+        print(message)
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    console = yield from need(Console)
+    console.print(f"Hello, {name}!")
 
 def greet_all(names: list[str]) -> Depend[Need[Console], None]:
     for name in names:
         yield from greet(name)
 
-run(supply(Console())(greet_all)(["Alice", "Bob"]))
+if __name__ == "__main__":
+    run(supply(Console())(greet_all)(["Alice", "Bob"]))
 #: Hello, Alice!
 #: Hello, Bob!
 ```
 
 This is the same virality `async` has.
-An `async` function's callers must become `async`,
+An `async` function's callers must also be `async`,
 all the way to `asyncio.run()`.
-A `Depend` function's callers must declare the dependency,
+A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
-The difference is that you can declare as many abilities as you like,
-while Python hard-codes one.
+The difference is that you can declare as many abilities as you like.
 
 The `yield from` is not optional.
 Write `greet(name)` alone, without it,
 and the program still type-checks and runs.
 It builds a description, immediately discards it,
-and the greeting never happens.
+and no greeting is printed.
 Neither the type checker nor the linter flags the dropped value.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too,
-and the fix is `.run` where Python's is `yield from`.
+and the ZIO fix is `.run` where Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
-When an Effect seems not to happen, look for a missing `yield from`.
+When an Effect appears to do nothing, look for a missing `yield from`.
 
-Declaring the ability is still manual, and it is fair to ask what was gained.
-The gain is that the declaration is checked.
-Annotate `greet_all()` as pure and `ty` refuses:
+Declaring the ability is still manual.
+The benefit is that the declaration is checked.
+Annotate `greet_all()` as pure and `ty` flags the problem:
 
 ```python
 # undeclared_need.py
-from greeter import greet
+from greet_all import greet
 from stateless import Success
 
 def greet_all(names: list[str]) -> Success[None]:
@@ -599,8 +611,8 @@ Here, the signature and the body cannot disagree.
 ## Where `run()` Can Be Called
 
 The error message in `unsupplied.py` said `run()` handles `Async` on its own.
-It can do that because `run()` is `asyncio.run(run_async(effect))` underneath.
-That has a consequence worth knowing before you wire Stateless into an existing application.
+It can do that because its entire body is `return asyncio.run(run_async(effect))`.
+That has a consequence worth knowing before you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so `run()` cannot be called from any `async def`:
 
@@ -624,17 +636,21 @@ asyncio.run(main())
 #: Hello, Bob!
 ```
 
-Running this prints a `RuntimeWarning` on standard error alongside the caught message.
+This also prints a `RuntimeWarning` to standard error,
+so it does not appear in the output above, which shows standard output only.
 `run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
-which then refuses, leaving that coroutine un-awaited.
-It is harmless and it tells you where the boundary is.
+which raises a `RuntimeError` because a loop is already running,
+leaving that coroutine un-awaited.
+The warning is harmless, because that coroutine never started.
+It is also a reliable sign of this mistake,
+appearing whenever `run()` is called from asynchronous code.
 
-`run_async()` is the same driver as a coroutine, so you `await` it instead.
+`run_async()` is the same driver packaged as a coroutine, so you `await` it.
 A synchronous program calls `run()` once at its outermost edge.
 A program that is already asynchronous, a web service or a bot,
 awaits `run_async()` at the edge of each request.
 Picking the wrong one is a runtime error rather than a type error,
-which makes it one of the few mistakes in this chapter the checker will not catch for you.
+which makes it one of the few mistakes in this chapter the type checker will not catch.
 
 ## Waiting on a Coroutine
 

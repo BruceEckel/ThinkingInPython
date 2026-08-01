@@ -79,7 +79,7 @@ You described the what, not a fixed sequence of moves.
 
 The `match` statement, covered in [Pattern Matching](13_Pattern_Matching.md),
 is a declarative tool for taking data apart.
-You describe the structures you expect, and Python binds the pieces for you.
+You describe the structures you expect, and Python binds the pieces.
 One `match` collapses a stack of `isinstance()` tests, length checks,
 and key or index lookups into a single readable description of each shape.
 The test and the extraction happen together,

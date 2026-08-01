@@ -310,7 +310,7 @@ which then decorates the function.
 A generator-based manager recreates its generator on each use,
 so the decorated function can be called any number of times,
 each with a fresh enter and exit.
-The machinery even applies `functools.wraps` for you,
+The machinery even applies `functools.wraps`,
 so `report` keeps its name and docstring
 (see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
 

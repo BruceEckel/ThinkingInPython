@@ -304,7 +304,7 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
 
 1.  *Remote proxy*.
     This proxies for an object in a different address space.
-    Distributed-object systems generate these for you.
+    Distributed-object systems generate these.
     In Python, remote procedure call (RPC) libraries play this role.
 2.  *Virtual proxy*.
     This provides "lazy initialization" to create expensive objects on demand.

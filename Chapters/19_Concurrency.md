@@ -506,8 +506,7 @@ asyncio.run(main())
 ```
 
 Five awaited sleeps finish together in about the time of one.
-Five blocking sleeps cannot overlap:
-each stalls the loop for its full duration,
+Five blocking sleeps cannot overlap: each stalls the loop for its full duration,
 so the total is never less than their sum.
 
 Notice that you cannot `await time.sleep()`,

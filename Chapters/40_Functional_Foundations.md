@@ -150,7 +150,7 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-The annotation is a promise the checker keeps for you,
+The annotation is a promise the checker keeps,
 even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error caught before the program runs.

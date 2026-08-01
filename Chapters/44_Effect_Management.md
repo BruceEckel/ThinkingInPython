@@ -31,7 +31,7 @@ To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
 This rapidly becomes tedious and error-prone.
-It would be great if the type checking system could perform purity verification for you.
+It would be great if the type checking system could perform purity verification.
 This is called an *Effect Management System*,
 and this chapter explores aspects of Effect Management.
 

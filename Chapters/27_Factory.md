@@ -10,7 +10,7 @@ You must still create an object of your new type,
 and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
-You must still chase down all the points of your code where type matters.
+You must still chase down all the places in your code where type matters.
 It happens to be the creation of the type that matters here rather than the use of the type
 (which polymorphism takes care of).
 The effect is the same.

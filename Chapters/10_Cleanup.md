@@ -1,6 +1,6 @@
 # Cleanup
 
-Python manages memory for you, so most objects need no explicit cleanup.
+Python manages memory, so most objects do not need explicit cleanup.
 However, when an object owns an outside resource (a file, a socket, a lock),
 you must release it.
 The Python garbage collector calls an object's `__del__()` method when it collects that object.

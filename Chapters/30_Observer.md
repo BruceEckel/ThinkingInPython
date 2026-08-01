@@ -290,7 +290,7 @@ is the same fan-out, routed by event type.
 This is the model-view split from the chapter's opening,
 made visible with `tkinter`
 (in the standard library, so there is nothing to install),
-and split across two files to make the point.
+and split across two files.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
 It holds no display code.

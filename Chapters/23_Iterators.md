@@ -18,7 +18,7 @@ An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere an iterable is expected.
-The `for` loop calls these for you, so you almost never call them directly.
+The `for` loop calls these so you almost never call them directly.
 Every container uses this protocol,
 so a function written against an iterable automatically stays decoupled from the container.
 
@@ -48,7 +48,7 @@ The second `is` shows that an iterator returns itself.
 ## Generators {#generators}
 
 You rarely write `__iter__()`/`__next__()` by hand.
-A *generator* writes them for you.
+A *generator* writes them.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
 The generators in this chapter travel one way, so `Iterator[T]` annotates them.
@@ -636,7 +636,7 @@ Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
 turning an ordinary end of stream into a failure that reads like a bug elsewhere.
 
 Only `next()` in a loop hands you that exception.
-The alternatives absorb it for you.
+The alternatives absorb it.
 `yield from source` ends its delegation when the source runs out,
 which covers forwarding values untouched.
 It cannot do per-item work, because it passes each value through unchanged.
@@ -646,7 +646,7 @@ The fix is almost never a `try`.
 It is to let the loop do the asking.
 
 Both surprises earlier in this chapter come from the same fusion.
-`for` and `list()` catch the answer for you and report nothing,
+`for` and `list()` catch the answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol is free, and quiet.
 

@@ -410,7 +410,7 @@ and choosing the lightest construct that isolates it.
 This chapter discovered its vectors the honest way, one requirement at a time,
 rather than predicting them up front.
 In Python that construct is often a language feature, not a multi-class pattern.
-The honest measure of a pattern is whether it is still useful once the language does part of the work for you.
+The honest measure of a pattern is whether it is still useful once the language does part of the work.
 
 ## Exercises
 

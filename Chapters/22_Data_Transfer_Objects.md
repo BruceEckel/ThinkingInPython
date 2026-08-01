@@ -200,7 +200,7 @@ but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 This refines the selection rule.
-Choose `NamedTuple` when tuple behavior is the point: unpacking,
+Choose `NamedTuple` when tuple behavior is the goal: unpacking,
 multiple return values, compatibility with code that expects a tuple.
 Choose a [frozen dataclass](12_Data_Classes_as_Types.md#immutability)
 when a record should be a distinct type that equals nothing but its own kind.

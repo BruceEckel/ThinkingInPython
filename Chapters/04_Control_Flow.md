@@ -299,7 +299,7 @@ Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.
 When simply reading or writing a file,
-`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file for you.
+`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file.
 
 ## Comprehensions
 

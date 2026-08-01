@@ -195,7 +195,7 @@ so the five tosses are decided before the program runs and the count is `3`.
 `count_heads()` cannot distinguish the two,
 because either answer arrives through the same `send()` channel.
 
-The scripted handler holds state, and that is the point.
+The scripted handler holds state.
 `next(script)` produces a different value at each request,
 which one supplied instance cannot do.
 Every scripted test double has this shape: a queue handing out canned responses,
@@ -321,8 +321,7 @@ since each reports one moment however often it is asked.
 
 Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
 which made randomness repeatable a different way, by taking a `seed` parameter.
-That works, but every function between the caller and the `random.Random` call
-must declare the parameter and pass it along.
+That works, but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
 Here the source is named in the return type instead,
 and no signature between `handle()` and the request mentions it.
 
