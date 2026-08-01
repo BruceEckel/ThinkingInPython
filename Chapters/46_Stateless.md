@@ -356,8 +356,8 @@ so it does not pass type checking.
 
 ## Swapping the Implementation
 
-The delayed binding created by a `Need` earns its keep when that binding changes.
-For example, a test can bind a `Console` that records instead of printing:
+`Need` creates a delayed binding. This means we can change that binding.
+For example, a test can bind to a `Console` that records instead of printing:
 
 ```python
 # recorder.py
@@ -387,30 +387,44 @@ def test_greet() -> None:
 ```
 
 There is no `capsys`, no monkeypatching of `print`, and no mock.
-The test supplies a different `Console` and reads what the code produced.
-`greet()` is unchanged and unaware.
+The test supplies a different `Console`, while `greet()` is unchanged and unaware.
 
 At runtime, `as_type()` is the identity function and returns the object it was given.
 Its purpose is the annotation.
-`supply(recorder)` builds a handler for `Need[Recorder]`,
-and `greet()` asked for `Need[Console]`, which is a different ability.
+Handing `recorder` straight to `supply()` would build a handler for `Need[Recorder]`,
+but `greet()` asks for `Need[Console]`, a different ability.
 `as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
 so `supply()` builds the handler that `greet()` is waiting for.
 You need `as_type()` when you supply an implementation for a declared interface.
-`typing.cast(Console, recorder)` does the same job.
-`as_type()` is the library's named form of that cast.
+`typing.cast(Console, recorder)` produces the same result here,
+but the two are not interchangeable.
+`cast()` is an unchecked assertion,
+believed by the type checker even when the object has no relation to `Console`.
+`as_type(Console)` returns a function annotated `(Console) -> Console`,
+so an object that does not implement `Console` is an argument-type error at that call.
+It can widen a type to a supertype and nothing more.
 
-The matching happens inside the library, out of sight of the listing.
+When `greet()` yields a `Need[Console]`,
+the library decides which supplied instance answers that request.
+This pairing happens out of sight of the listing.
 The handler that `supply()` builds tests each request with `isinstance(instance, ability.t)`,
 where `ability.t` is the class inside the `Need`.
-`Recorder` inherits from `Console` to pass that test.
+Here `ability.t` is `Console` and `instance` is `recorder`,
+so the check is `isinstance(recorder, Console)`.
+It succeeds because `Recorder` inherits from `Console`.
 So the two moves in the test serve two audiences:
-`as_type(Console)` satisfies the checker,
-and the inheritance satisfies the runtime match.
+`as_type(Console)` satisfies the type checker,
+and the inheritance satisfies the `isinstance()` check.
 Every matching request over the Effect's run receives that same instance,
 which is why the test can read the results back out of `recorder` afterward.
-Inheriting from a concrete class only to replace all of it is a poor arrangement,
-so make the ability an interface instead:
+
+`Recorder` inherits `Console`'s printing implementation and overrides all of it.
+Nothing of the parent survives but the name that `isinstance()` looks for.
+The cost arrives later.
+Add a `read_line()` method to `Console`,
+and `Recorder` inherits the real one without a word of warning,
+so a test meant to record instead performs live console I/O.
+Make the ability an interface and there is no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -430,24 +444,30 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-`Console` is now the second property of an EMS: an Effect's interface,
-separate from any implementation.
-`Terminal` is one implementation and `Recorder` would be another,
+The second of the three things
+[a full EMS does](44_Effect_Management.md#effect-management-systems)
+is separate each Effect's interface from its implementation.
+`Console` is now that interface and holds no implementation.
+`Terminal` is one implementation and `Recorder` is another,
 and neither is named anywhere in `greet()`.
+Because a `Protocol` matches on structure,
+`Recorder` qualifies without inheriting from anything.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
 This is the form to write in production.
 The smaller listings that follow keep importing `greeter.py`'s concrete `Console`,
 because a supply site for a `Protocol` ability needs help naming the interface:
 `supply(Console())` becomes `supply(as_type(Console)(Terminal()))`.
-That is a real price the interface charges, not only a shortcut for the book.
+That is a real cost of using the interface, not only a shortcut for the book.
 [Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
-returns to `Protocol` abilities and shows the cheaper way to pay it:
-a boundary function whose parameters are annotated with the interface types,
-so the cast disappears into ordinary parameter annotations.
+declares its abilities as `Protocol`s and shows how to stop repeating that cost:
+write one boundary function whose parameters are annotated with the interface types,
+and call `supply()` inside it.
+The parameter annotation performs the upcast,
+so no call site needs `as_type()`.
 Everything in between works the same under either form.
 
-You might not need to declare an ability at all.
+You might not need to declare an ability.
 Stateless includes three of its own:
 a `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
 a `Files` in `stateless.files` that reads a whole file,
@@ -1082,5 +1102,5 @@ Both are checked, and neither can be dropped by forgetting it.
     Run `ty check`, `ruff check`, and the script,
     and record what each reports and what the program prints.
     Explain where the greetings went and why no tool objects.
-    Then explain why the same mistake in front of `need(Console)` inside `greet()` would be caught,
+    Then explain why the same mistake in front of `need(Console)` inside `greet()` is caught,
     and name the tool that catches it.

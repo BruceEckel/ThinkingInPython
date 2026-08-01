@@ -712,7 +712,7 @@ A class is an object, an instance of its metaclass,
 so `ClassName()` invokes `__call__()` on the metaclass the same way.
 It is the first thing that runs when you create an instance of the class.
 The only reason `__new__()` and `__init__()` normally run is because the default `type.__call__()` calls them.
-A metaclass that overrides `__call__()` sits above that step and decides whether to call them at all.
+A metaclass that overrides `__call__()` sits above that step and decides whether to call them.
 That lets it skip building a new instance,
 for example by returning one it already cached.
 This is one way to build a [Singleton](24_Singleton.md):

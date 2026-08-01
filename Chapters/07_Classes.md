@@ -315,8 +315,8 @@ so there's no cost if the attribute is not accessed.
 The stored value lives on the instance.
 `del n.total` discards it, and the next access recomputes.
 
-`cached_property` trades freshness for speed, so if `n.values` changed,
-`total` would be stale.
+`cached_property` trades freshness for speed, so if `n.values` changes,
+`total` becomes stale.
 A plain `@property` recomputes every time and is never wrong.
 Cache only what cannot change.
 

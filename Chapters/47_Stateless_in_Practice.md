@@ -100,7 +100,7 @@ for a reason the next section gives.
 Now compare this listing to `ask_tell.py` again.
 The by-hand version threaded two objects through every signature.
 This one threads nothing.
-`greet()` takes no arguments at all,
+`greet()` takes no arguments,
 and the two Effects live in the return type where a checker can follow them.
 That second channel in the signature is the one that chapter said an EMS needs.
 
@@ -321,7 +321,8 @@ since each reports one moment however often it is asked.
 
 Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
 which made randomness repeatable a different way, by taking a `seed` parameter.
-That works, and it charges a parameter to every function between the caller and the `random.Random` call.
+That works, but every function between the caller and the `random.Random` call
+must declare the parameter and pass it along.
 Here the source is named in the return type instead,
 and no signature between `handle()` and the request mentions it.
 
@@ -1276,7 +1277,7 @@ Stateless has no scoping mechanism, so `with` blocks stay where they are.
 They need not stay nested, since `ExitStack` flattens them,
 but they remain a separate mechanism from the Effect type.
 
-What Stateless charges for that property is the generator discipline,
+What Stateless requires for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
 For most Python code that price is too high.
 The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure),

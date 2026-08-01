@@ -506,7 +506,7 @@ asyncio.run(main())
 ```
 
 Five awaited sleeps finish together in about the time of one.
-Five blocking sleeps cannot overlap at all:
+Five blocking sleeps cannot overlap:
 each stalls the loop for its full duration,
 so the total is never less than their sum.
 
@@ -1172,7 +1172,7 @@ so nothing can add or remove an item while this loop runs.
 That guarantee is specific to this listing.
 While other threads are still adding or removing items,
 `empty()`'s answer can be true the instant it returns and already wrong by the time the loop acts on it.
-A live consumer does not poll `empty()` at all;
+A live consumer does not poll `empty()`;
 it calls `get()` directly and lets the block do the waiting.
 
 Python provides three queue classes with near-identical interfaces,
@@ -1380,7 +1380,7 @@ because the libraries it calls still block.
 Free threading, however, does not affect I/O-bound work.
 It solves a narrower problem: without the GIL,
 a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
-paying no pickling cost at all.
+paying no pickling cost.
 This is something neither a GIL-bound thread nor a process pool offers.
 
 Under the standard build, then, a thread no longer structures your concurrency.
@@ -1727,7 +1727,7 @@ asyncio.run(main())
 Each round, `a` checks `b_wants` and `b` checks `a_wants`,
 and both still see the other wanting the resource, so both give.
 Thus both still want it on the next round.
-Being polite when interacting with a task that is equally polite produces no progress at all,
+Being polite when interacting with a task that is equally polite produces no progress,
 even though the event loop keeps both tasks busy the whole time.
 
 A real livelock looks busy on a monitor,

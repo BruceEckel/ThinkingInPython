@@ -694,7 +694,7 @@ for reasons the end of this section explains:
 
 By the definition above,
 most of these are Effect-tracking systems rather than full EMSs.
-For their purpose the other two parts would be liabilities,
+For their purpose the other two parts are liabilities,
 since a host that fixes the implementations can guarantee what generated code is able to do.
 Pact and Lumen are exceptions.
 Each separates an effect's interface from its implementation and binds the implementation later,
@@ -778,7 +778,7 @@ Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
 A type checker would need to compute the Effect row of every function from the functions it calls,
-across every library on PyPI, almost all of which would be unannotated.
+across every library on PyPI, almost all of which are unannotated.
 `async` succeeded because it arrived with the language and split the world visibly.
 An Effect row would need to spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.

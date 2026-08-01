@@ -201,7 +201,7 @@ Modern CPython already caches a repeated attribute lookup like `out.append` insi
 so it costs little more than the local variable would have.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
-so a claim about a small difference would be measuring the machine's mood.
+so a claim about a small difference measures the machine's mood.
 A hoist worth writing would beat that margin without argument.
 The measurement proves the point because it catches a "classic" optimization that no longer works,
 just as readily as it would catch one that does.

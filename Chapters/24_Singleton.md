@@ -103,7 +103,7 @@ Deleting the name after building the instance leaves the class reachable,
 because `type(settings())` hands it back.
 Defining the class inside `settings()` also looks airtight,
 and `@cache` runs that body only once,
-so there is exactly one instance and no module-level name at all.
+so there is exactly one instance and no module-level name.
 `type(settings())` recovers it anyway.
 
 Nesting costs the return annotation as well.
@@ -648,7 +648,7 @@ on the same shared object.
 Each `Bar(...)` call therefore overwrites `val`,
 which is why `x` prints as `spam`.
 The [Overriding `__new__`](#overriding-__new__)
-version returned a foreign object, so its `__init__()` never ran at all.
+version returned a foreign object, so its `__init__()` never ran.
 Same pattern, opposite `__init__()` behavior,
 and the difference is only what `__new__()` returns.
 
