@@ -189,14 +189,15 @@ greet("Alice")
 ```
 
 That signature is a lie by omission.
-`-> None` claims the function returns nothing and mentions nothing else,
-while the body writes to standard output.
+`-> None` claims the function returns nothing and mentions nothing else.
+However, the body writes to standard output, which is a side effect.
 That omission matters: printing is everything the function does.
 The caller cannot see the dependency, redirect the output,
 or test the function without capturing stdout.
 `Depend[Need[Console], None]` states the dependency.
-A caller must then supply a `Console` or declare the same need,
-and the type checker rejects one that does neither.
+A caller now has two options: supply a `Console`,
+or declare the same need in its own signature and pass the requirement to its own caller.
+A caller that does neither fails the type check.
 
 In `greeter.py`, two details deserve attention:
 
@@ -226,10 +227,12 @@ A language with builtin Effects intercepts an Effect where it is performed.
 Stateless cannot, because it is ordinary Python:
 when a function body calls `console.print()`,
 nothing hands control to the library.
-A library's power is over values, so the request must first become a value.
-`yield from need(Console)` is a request that becomes a value.
-It suspends `greet()` and passes a `Need[Console]` out to whatever is driving the generator,
-which answers the request and resumes the function.
+A library can act on objects handed to it, and on nothing else.
+For Stateless to see the request for a `Console`,
+that request must be an object: the `Need[Console]` that `need(Console)` builds.
+`yield from` then hands that object out of the function body.
+It suspends `greet()` and passes the `Need[Console]` to whatever is driving the generator,
+which answers with a `Console` and resumes the function.
 
 ## Supplying the Dependency
 
@@ -296,14 +299,19 @@ Those are the expanded forms of `Depend[Need[Console], None]` and `Success[None]
 replaced by the `Never` the alias table promised.
 
 Handling an ability *subtracts* it from the type.
-An Effect with every ability subtracted is a `Success`,
-and `run()` refuses an unanswered ability.
+Here the subtraction leaves nothing behind:
+`greet()` declares one ability and cannot fail, so `bound` produces a `Success`.
+That `Success` is a consequence, not a requirement.
+What `run()` refuses is an unanswered ability.
+It accepts an Effect that can still fail,
+and raises the failure as an ordinary exception
+([The Error Channel](46_Stateless.md#the-error-channel)).
 Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
 
 Let's see what happens when we break it.
-Hand `run()` an Effect that still needs a `Console`:
+Give `run()` an Effect that still needs a `Console`:
 
 ```python
 # unsupplied.py
