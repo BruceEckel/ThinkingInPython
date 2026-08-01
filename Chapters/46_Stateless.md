@@ -23,7 +23,7 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 This chapter covers the two channels an Effect declares:
 the dependencies it needs and the ways it can fail.
 [Stateless in Practice](47_Stateless_in_Practice.md)
-takes those channels and builds with them.
+builds examples using those channels.
 
 My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
 Some of the examples in these two chapters were derived from that book.
@@ -39,11 +39,10 @@ Effect[A, E, R]
 Those three parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
 asked of an Effect signature:
 
-- `A` is what the computation *needs*, an *ability*.
-- `E` is how it can *fail*.
-- `R` is what it *produces*.
+- `A` is what the computation needs, an ability.
+- `E` is how it can fail.
+- `R` is what it produces.
 
-An annotation fills them in, in that order.
 For example:
 
 ```python
@@ -63,22 +62,20 @@ Each one fills in `Never` for a type parameter that is not used:
 | `Depend[A, R]` | Needs `A`, cannot fail, produces `R` |
 | `Try[E, R]` | Needs nothing, can fail with `E`, produces `R` |
 
-`Never` is the type with no values,
-so `Success[R]` promises there is no ability it can request and no error it can yield.
+`Never` is Python's *bottom type*:
+it has no values and is a subtype of every other type.
+`Success[R]` promises there is no ability it can request and no error it can yield.
 
 ## The Effect Definition
 
-`Effect` is not a new kind of object.
-It is an alias for a generator:
+`Effect` is an alias for a `Generator`:
 
 ```python
 Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
-An `Effect` is a `Generator` that yields either an ability `A` or an exception `E`,
+The `Generator` yields either an ability `A` or an exception `E`,
 and eventually returns a result `R`.
-Substituting the three parameters of the annotation above into that definition produces the type the checker works with.
-The two shapes look nothing alike.
 Our example becomes:
 
 ```python
@@ -97,8 +94,8 @@ An Effect does not:
 - Using `yield` to request a `Need[Console]` should get a `Console`.
 - Using `yield` to request a `Need[Log]` should get a `Log`.
 
-What comes back depends on which ability the `yield` requested,
-and one SendType cannot vary from one `yield` to the next.
+What comes back depends on which ability the `yield` requested.
+One SendType cannot vary from one `yield` to the next.
 Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
 The `send()` channel must be able to carry any type, so the SendType is `Any`.
 
@@ -106,9 +103,9 @@ The `send()` channel must be able to carry any type, so the SendType is `Any`.
 so a request can produce an answer whose type the checker knows.
 A bare `yield` produces the SendType, the parameter forced to `Any`.
 `yield from` produces the inner generator's `ReturnType`,
-which has no such conflict.
+which does not have that conflict.
 `need(Console)` builds a small generator that serves one request,
-and one request has one answer, so its `ReturnType` can name a specific type.
+so its `ReturnType` can name a specific type.
 `need()` returns `Depend[Need[T], T]`,
 which expands to `Generator[Need[T], Any, T]`.
 Calling `need(Console)` binds `T` to `Console`,
@@ -142,14 +139,22 @@ It cannot read anything, and it cannot fail.
 
 Notice that `double()` contains no `yield`, so it is not a generator function.
 It does not need to be.
-`success()` creates an object that implements the generator protocol,
-and the annotation only promises that calling `double()` produces an Effect.
+Python decides generator-function status from the body alone:
+`yield` in the body makes a function a generator function,
+and nothing else does, not the return annotation and not the object returned.
+The object that implements the generator protocol is the Effect that `success()` builds.
+`double()` calls `success()` and returns that Effect,
+which no more makes `double()` a generator than returning a list would make it a list.
+The annotation promises that calling `double()` produces an Effect,
+and `run()` can drive anything that keeps that promise.
 `success()` exists for yield-free functions like this one.
 In a generator function, an ordinary `return` sets the result;
 wrap it in `success()` there and the checker reports a return-type mismatch.
 
-`double()` was already pure.
-Effects become useful when a function needs something it doesn't create for itself.
+`double()` needs nothing beyond its argument,
+so it gains nothing from being an Effect.
+The gain appears when a function depends on something created elsewhere,
+such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
