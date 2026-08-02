@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class Success[A]:
+class Ok[A]:
     answer: A
 
     def unwrap(self) -> A:
@@ -15,27 +15,27 @@ class Success[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
-    def map_error(self, func: Callable[..., object]) -> Success[A]:
-        return self  # A Success has no error to transform
+    def map_error(self, func: Callable[..., object]) -> Ok[A]:
+        return self  # An Ok has no error to transform
 
 @dataclass(frozen=True)
-class Failure[E]:
+class Err[E]:
     error: E
 
     def bind[B](
         self, func: Callable[..., Result[B, E]]
-    ) -> Failure[E]:
+    ) -> Err[E]:
         return self
 
-    def map_error[F](self, func: Callable[[E], F]) -> Failure[F]:
-        return Failure(func(self.error))
+    def map_error[F](self, func: Callable[[E], F]) -> Err[F]:
+        return Err(func(self.error))
 
-type Result[A, E] = Success[A] | Failure[E]
+type Result[A, E] = Ok[A] | Err[E]
 
 def prefix(msg: str) -> str:
     return f"error: {msg}"
 
-print(Success(5).map_error(prefix))
-#: Success(answer=5)
-print(Failure("boom").map_error(prefix))
-#: Failure(error='error: boom')
+print(Ok(5).map_error(prefix))
+#: Ok(answer=5)
+print(Err("boom").map_error(prefix))
+#: Err(error='error: boom')

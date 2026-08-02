@@ -1,7 +1,7 @@
 # utils/safe.py
 from collections.abc import Callable
 from functools import wraps
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 
 def safe[**P, A](
     func: Callable[P, A],
@@ -11,9 +11,9 @@ def safe[**P, A](
         *args: P.args, **kwargs: P.kwargs
     ) -> Result[A, Exception]:
         try:
-            return Success(func(*args, **kwargs))
+            return Ok(func(*args, **kwargs))
         except Exception as e:
-            return Failure(e)
+            return Err(e)
     return wrapper
 
 @safe
@@ -23,9 +23,9 @@ def parse(text: str) -> int:
 if __name__ == "__main__":
     for text in ("42", "oops"):
         match parse(text):
-            case Success(answer):
+            case Ok(answer):
                 print(f"{text}: parsed {answer}")
-            case Failure(error):
+            case Err(error):
                 print(f"{text}: {type(error).__name__}")
 #: 42: parsed 42
 #: oops: ValueError

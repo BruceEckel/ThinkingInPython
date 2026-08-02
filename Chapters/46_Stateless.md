@@ -793,8 +793,7 @@ It saves you from hunting for the functions that need them:
 the checker names each place that needs changing,
 and the program does not build until the last one is fixed.
 To see that, delete `| Need[Log]` from either annotation.
-Remove it from `greet_all()` and `ty` reports an `invalid-yield`
-at `yield from greet_logged(name)`,
+Remove it from `greet_all()` and `ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
 since `Need[Log]` is not assignable to what the signature now declares.
 
 Dependencies passed as parameters are checked too.
@@ -803,11 +802,12 @@ The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts an object it does not use.
 A new ability changes the signatures alone:
-`yield from greet_logged(name)` stays as it is,
-and the instance appears once, at `supply()`.
+`yield from greet_logged(name)` stays as it is, and the instance appears once,
+at `supply()`.
 
 Multiple abilities combine with `|` because the union describes one request at a time.
-Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`, not both at once.
+Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`,
+not both at once.
 Over the whole run it makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
 
@@ -911,15 +911,14 @@ def score(name: str) -> int:
 but the decorator changes its type to `(str) -> Try[KeyError, int]`.
 This carries the idea of the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
 though the two are not the same construct.
-A `Result` is a wrapper the function returns at once, and the caller matches on it.
+A `Result` is a wrapper the function returns at once,
+and the caller matches on it.
 A `Try` is a description that runs nothing until it is driven,
 and it carries the failure in the yield channel rather than the return value.
 A `Result`-shaped value appears only after `catch()`,
 as the bare union `int | KeyError` in place of a wrapper object.
-There, you rewrote the body to return one of two wrappers.
+There, you rewrote the body to return an `Ok` or an `Err`.
 Here, you leave the body alone and lift the exception into the signature.
-That chapter names its success wrapper `Success`,
-unrelated to the `Success[R]` alias earlier in this chapter.
 
 You can watch the failure travel.
 Calling `score()` still runs nothing.

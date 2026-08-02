@@ -172,7 +172,7 @@ and each subdivision produces its own benefit:
 - **Exceptions** become data,
   via [Error Handling](42_Functional_Error_Handling.md).
   Failures turn into values the type checker can see,
-  and a test checks for a `Failure` as easily as a `Success`.
+  and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
   A test substitutes a fixed clock for the real one,
   or a seeded generator for true randomness,
@@ -210,7 +210,7 @@ and every exception it raises becomes a value instead of a crash:
 
 ```python
 # slope_result.py
-from result import Failure, Success
+from result import Err, Ok
 from safe import safe
 
 @safe
@@ -219,9 +219,9 @@ def slope(rise: int, run: int) -> float:
 
 for args in [(10, 2), (10, 0)]:
     match slope(*args):
-        case Success(answer):
+        case Ok(answer):
             print(f"slope{args} = {answer}")
-        case Failure(error):
+        case Err(error):
             print(f"slope{args}: {type(error).__name__}")
 #: slope(10, 2) = 5.0
 #: slope(10, 0): ZeroDivisionError

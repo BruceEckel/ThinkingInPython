@@ -1,5 +1,5 @@
 # matching_errors.py
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 from safe import safe
 
 @safe
@@ -13,13 +13,13 @@ def reciprocal(n: int) -> float:
 def describe(text: str) -> str:
     result: Result[float, Exception] = parse(text).bind(reciprocal)
     match result:
-        case Success(answer):
+        case Ok(answer):
             return f"{text}: {answer}"
-        case Failure(ValueError()):
+        case Err(ValueError()):
             return f"{text}: Not a number"
-        case Failure(ZeroDivisionError()):
+        case Err(ZeroDivisionError()):
             return f"{text}: Cannot divide by zero"
-        case Failure(error):
+        case Err(error):
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":

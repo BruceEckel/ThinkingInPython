@@ -100,7 +100,7 @@ We need something that says "success" or "failure" no matter what types they car
 ## A Result Type
 
 Make success and failure explicit by defining them as types.
-`Success` wraps an answer, `Failure` wraps an error,
+`Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
 Both are frozen data classes,
 parameterized over the answer type and the error type.
@@ -117,7 +117,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class Success[A]:
+class Ok[A]:
     answer: A
 
     def unwrap(self) -> A:
@@ -129,15 +129,15 @@ class Success[A]:
         return func(self.answer)
 
 @dataclass(frozen=True)
-class Failure[E]:
+class Err[E]:
     error: E
 
     def bind[B](
         self, func: Callable[..., Result[B, E]]
-    ) -> Failure[E]:
+    ) -> Err[E]:
         return self  # Pass the failure forward unchanged
 
-type Result[A, E] = Success[A] | Failure[E]
+type Result[A, E] = Ok[A] | Err[E]
 ```
 
 Ignore `bind()` for the moment.
@@ -147,25 +147,25 @@ The signature tells the story:
 
 ```python
 # returning_result.py
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 
 def func_a(i: int) -> Result[int, str]:
     if i == 1:
-        return Failure(f"func_a({i})")
-    return Success(i)
+        return Err(f"func_a({i})")
+    return Ok(i)
 
 if __name__ == "__main__":
     for i in range(5):
         print(i, func_a(i))
-#: 0 Success(answer=0)
-#: 1 Failure(error='func_a(1)')
-#: 2 Success(answer=2)
-#: 3 Success(answer=3)
-#: 4 Success(answer=4)
+#: 0 Ok(answer=0)
+#: 1 Err(error='func_a(1)')
+#: 2 Ok(answer=2)
+#: 3 Ok(answer=3)
+#: 4 Ok(answer=4)
 ```
 
-A function reports failure by returning a `Failure` object,
-success by returning a `Success` object.
+A function reports failure by returning an `Err` object,
+success by returning an `Ok` object.
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value.
@@ -175,7 +175,7 @@ put the meaning in the type.
 Python's humbler spelling of the same idea is `int | None`,
 and the comparison locates `Result`'s value.
 Both force the caller to unpack, but `None` says only "no answer,"
-while a `Failure` carries *why*.
+while an `Err` carries *why*.
 Use `| None` when absence is the whole story, a lookup that found nothing.
 Use `Result` when the caller may need to act on the reason,
 or when several different failures must stay distinguishable,
@@ -198,17 +198,17 @@ and that `bind()` chains a success and short-circuits a failure:
 
 ```python
 # test_result.py
-from result import Failure, Success
+from result import Err, Ok
 
 def test_success_unwrap() -> None:
-    assert Success(5).unwrap() == 5
+    assert Ok(5).unwrap() == 5
 
 def test_bind_chains_a_success() -> None:
-    assert Success(1).bind(lambda x: Success(x + 1)) == Success(2)
+    assert Ok(1).bind(lambda x: Ok(x + 1)) == Ok(2)
 
 def test_bind_short_circuits_a_failure() -> None:
-    failure: Failure[str] = Failure("boom")
-    assert failure.bind(lambda x: Success(x + 1)) is failure
+    failure: Err[str] = Err("boom")
+    assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
 
 ## Composing by Hand
@@ -216,58 +216,58 @@ def test_bind_short_circuits_a_failure() -> None:
 Real programs chain steps.
 With a `Result`, each step can fail,
 so you must check each call before the next one runs.
-You can catch an exception from existing code and turn it into a `Failure`,
+You can catch an exception from existing code and turn it into an `Err`,
 so the failure becomes data rather than control flow:
 
 ```python
 # composing.py
 # Composing functions that return Results, by hand.
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 from returning_result import func_a
 
 def func_b(i: int) -> Result[int, str]:
     if i == 2:
-        return Failure(f"func_b({i})")
-    return Success(i)
+        return Err(f"func_b({i})")
+    return Ok(i)
 
 def func_c(i: int) -> Result[int, str]:
     try:
         1 / (i - 3)  # A probe: raises an exception when i == 3
     except ZeroDivisionError as e:
         # The exception becomes a value:
-        return Failure(f"func_c({i}): {e}")
-    return Success(i)
+        return Err(f"func_c({i}): {e}")
+    return Ok(i)
 
 def composed(i: int) -> Result[int, str]:
     a = func_a(i)
-    if isinstance(a, Failure):
+    if isinstance(a, Err):
         return a
     b = func_b(a.unwrap())
-    if isinstance(b, Failure):
+    if isinstance(b, Err):
         return b
     return func_c(b.unwrap())
 
 if __name__ == "__main__":
     for i in range(5):
         print(i, composed(i))
-#: 0 Success(answer=0)
-#: 1 Failure(error='func_a(1)')
-#: 2 Failure(error='func_b(2)')
-#: 3 Failure(error='func_c(3): division by zero')
-#: 4 Success(answer=4)
+#: 0 Ok(answer=0)
+#: 1 Err(error='func_a(1)')
+#: 2 Err(error='func_b(2)')
+#: 3 Err(error='func_c(3): division by zero')
+#: 4 Ok(answer=4)
 ```
 
-Each step returns early when it encounters a `Failure`.
+Each step returns early when it encounters an `Err`.
 This works, and it keeps errors as values, but every step is the same dance:
-call, check for `Failure`, return early, unwrap, go on.
+call, check for `Err`, return early, unwrap, go on.
 
 ## Composing With bind
 
 `bind()` captures the dance.
 Look again at the `bind()` method on `Result`.
-On a `Success`, it feeds the answer to the next function.
-On a `Failure`, it ignores the function and returns the failure unchanged.
-A `Failure` anywhere in a chain skips the rest of the steps and falls through to the end:
+On an `Ok`, it feeds the answer to the next function.
+On an `Err`, it ignores the function and returns the failure unchanged.
+An `Err` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
 # composing_with_bind.py
@@ -281,11 +281,11 @@ def composed(i: int) -> Result[int, str]:
 if __name__ == "__main__":
     for i in range(5):
         print(i, composed(i))
-#: 0 Success(answer=0)
-#: 1 Failure(error='func_a(1)')
-#: 2 Failure(error='func_b(2)')
-#: 3 Failure(error='func_c(3): division by zero')
-#: 4 Success(answer=4)
+#: 0 Ok(answer=0)
+#: 1 Err(error='func_a(1)')
+#: 2 Err(error='func_b(2)')
+#: 3 Err(error='func_c(3): division by zero')
+#: 4 Ok(answer=4)
 ```
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
@@ -293,7 +293,7 @@ then `func_c()`.
 Bind removes the boilerplate by chaining the steps.
 The error checking has not gone away.
 It moved into `bind()`, where it appears once.
-A `Failure` anywhere short-circuits the whole thing.
+An `Err` anywhere short-circuits the whole thing.
 
 A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
 You do not need to know that word to use functional error handling.
@@ -303,8 +303,7 @@ One near-miss to expect when you start chaining:
 Feed it a plain function, `.bind(str)` say,
 and the chain now holds a bare `str` where a `Result` belongs,
 which the checker flags at the next `bind()`.
-To chain a plain function, wrap its return value:
-`.bind(lambda x: Success(str(x)))`.
+To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that cannot fail,
 and exercise 2's `map_error()` is the same idea aimed at the error side.
@@ -330,7 +329,7 @@ nest the binds so each answer stays in scope for the next step:
 ```python
 # combining.py
 from composing import func_b, func_c
-from result import Result, Success
+from result import Ok, Result
 from returning_result import func_a
 
 def add(a: int, b: int, c: int) -> str:
@@ -340,19 +339,19 @@ def combined(i: int, j: int) -> Result[str, str]:
     return func_a(i).bind(
         lambda a: func_b(j).bind(
             lambda b: func_c(i + j).bind(
-                lambda c: Success(add(a, b, c)))))
+                lambda c: Ok(add(a, b, c)))))
 
 if __name__ == "__main__":
     for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
         print(args, combined(*args))
-#: (1, 5) Failure(error='func_a(1)')
-#: (7, 2) Failure(error='func_b(2)')
-#: (2, 1) Failure(error='func_c(3): division by zero')
-#: (7, 5) Success(answer='add(7 + 5 + 12): 24')
+#: (1, 5) Err(error='func_a(1)')
+#: (7, 2) Err(error='func_b(2)')
+#: (2, 1) Err(error='func_c(3): division by zero')
+#: (7, 5) Ok(answer='add(7 + 5 + 12): 24')
 ```
 
 Nested binds carry each answer inward.
-A `Failure` anywhere short-circuits to the end.
+An `Err` anywhere short-circuits to the end.
 Only the last input passes all three steps,
 so it's the only one that reaches `add()`.
 
@@ -363,12 +362,12 @@ or the first failure in the chain:
 # test_combining.py
 import pytest
 from combining import combined
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 
 @pytest.mark.parametrize("a, b, expected", [
-    (7, 5, Success("add(7 + 5 + 12): 24")),
-    (1, 5, Failure("func_a(1)")),
-    (2, 1, Failure("func_c(3): division by zero")),
+    (7, 5, Ok("add(7 + 5 + 12): 24")),
+    (1, 5, Err("func_a(1)")),
+    (2, 1, Err("func_c(3): division by zero")),
 ])
 def test_combined(
     a: int, b: int, expected: Result[str, str]
@@ -378,17 +377,17 @@ def test_combined(
 
 ## Turning Exceptions into Results
 
-In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned a `Failure` by hand.
+In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned an `Err` by hand.
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
-with the exception as the `Failure` value.
+with the exception as the `Err` value.
 Like `result.py`, it lives in `utils/` and any chapter can import it:
 
 ```python
 # utils/safe.py
 from collections.abc import Callable
 from functools import wraps
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 
 def safe[**P, A](
     func: Callable[P, A],
@@ -398,9 +397,9 @@ def safe[**P, A](
         *args: P.args, **kwargs: P.kwargs
     ) -> Result[A, Exception]:
         try:
-            return Success(func(*args, **kwargs))
+            return Ok(func(*args, **kwargs))
         except Exception as e:
-            return Failure(e)
+            return Err(e)
     return wrapper
 
 @safe
@@ -410,9 +409,9 @@ def parse(text: str) -> int:
 if __name__ == "__main__":
     for text in ("42", "oops"):
         match parse(text):
-            case Success(answer):
+            case Ok(answer):
                 print(f"{text}: parsed {answer}")
-            case Failure(error):
+            case Err(error):
                 print(f"{text}: {type(error).__name__}")
 #: 42: parsed 42
 #: oops: ValueError
@@ -431,12 +430,12 @@ The [Decorators](14_Decorators.md)
 chapter explains how to write decorators like `@safe`,
 including `functools.wraps`.
 
-To test `@safe`, a good input becomes a `Success`,
-and a raised exception becomes a `Failure` holding that exception:
+To test `@safe`, a good input becomes an `Ok`,
+and a raised exception becomes an `Err` holding that exception:
 
 ```python
 # test_safe.py
-from result import Failure, Success
+from result import Err, Ok
 from safe import safe
 
 @safe
@@ -444,14 +443,14 @@ def parse(text: str) -> int:
     return int(text)
 
 def test_safe_wraps_a_success() -> None:
-    assert parse("42") == Success(42)
+    assert parse("42") == Ok(42)
 
 def test_safe_captures_the_exception() -> None:
     match parse("oops"):
-        case Failure(error):
+        case Err(error):
             assert isinstance(error, ValueError)
         case _:
-            raise AssertionError("expected a Failure")
+            raise AssertionError("expected an Err")
 ```
 
 ## Matching on the Error
@@ -462,7 +461,7 @@ Each kind of failure gets its own branch:
 
 ```python
 # matching_errors.py
-from result import Failure, Result, Success
+from result import Err, Ok, Result
 from safe import safe
 
 @safe
@@ -476,13 +475,13 @@ def reciprocal(n: int) -> float:
 def describe(text: str) -> str:
     result: Result[float, Exception] = parse(text).bind(reciprocal)
     match result:
-        case Success(answer):
+        case Ok(answer):
             return f"{text}: {answer}"
-        case Failure(ValueError()):
+        case Err(ValueError()):
             return f"{text}: Not a number"
-        case Failure(ZeroDivisionError()):
+        case Err(ZeroDivisionError()):
             return f"{text}: Cannot divide by zero"
-        case Failure(error):
+        case Err(error):
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":
@@ -495,14 +494,14 @@ if __name__ == "__main__":
 
 `parse()` and `reciprocal()` are both wrapped with `@safe`,
 so `bind()` chains them.
-A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Failure` values,
+A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Err` values,
 and the `match` tells them apart.
 
 ## The returns Library
 
 You need not build `Result` yourself.
 The [returns](https://github.com/dry-python/returns)
-library provides a `Result` type with `Success` and `Failure`,
+library provides a `Result` type whose two cases it calls `Success` and `Failure`,
 the same `@safe` decorator we just built,
 and do-notation that makes combining multiple results read more directly than nested binds.
 
@@ -521,10 +520,10 @@ They are expected, and the type should say so.
 
 1.  Add a `func_e()` that returns a `Result[int, str]`,
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
-    Confirm a `Failure` from `func_e()` still short-circuits.
-2.  Give `Failure` a `map_error()` method that transforms the error it holds,
-    leaving a `Success` untouched
-    (for chains to keep working, `Success` needs its own `map_error()` that returns `self`).
+    Confirm an `Err` from `func_e()` still short-circuits.
+2.  Give `Err` a `map_error()` method that transforms the error it holds,
+    leaving an `Ok` untouched
+    (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).
     Use it to add a prefix to every error.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
