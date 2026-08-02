@@ -936,12 +936,11 @@ print(repr(next(effect)))
 
 The body raised the exception.
 `@throws` wraps that body in an ordinary `try`/`except`,
-so the wrapper catches the `KeyError` and yields the exception object
-over the same channel that carries ability requests.
+so the wrapper catches the `KeyError` and yields the exception object over the same channel that carries ability requests.
 That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter:
 requests and failures are both values a description yields to its driver.
 
-Because errors and abilities share a channel, they propagate the same way:
+Errors propagate through the `Effect` type, just like abilities:
 
 ```python
 # announce.py
@@ -955,14 +954,12 @@ def announce(name: str) -> Effect[Need[Console], KeyError, None]:
     console.print(f"{name}: {value}")
 ```
 
-Here is where the full `Effect[A, E, R]` earns its three type parameters.
+This uses all three parameters of `Effect[A, E, R]`.
 `announce()` needs a `Console`, can fail with `KeyError`, and produces nothing.
-All three questions are answered by its first line.
-Drop the `KeyError` from the annotation and `ty` reports the same class of error it did before,
-this time pointing at the `yield from score(name)` line.
-Declared exceptions cannot be dropped by forgetting them.
+Drop the `KeyError` from the annotation and `ty` points at the `yield from score(name)` line.
+Declared exceptions cannot be forgotten.
 
-A declared error can, however, ride all the way to the edge.
+Declaring an error does not oblige you to handle it.
 `run()` accepts an Effect whose error channel is still occupied,
 and a failure that reaches it surfaces as an ordinary raised exception:
 
@@ -979,9 +976,9 @@ except KeyError as e:
 #: KeyError
 ```
 
-The channel tracks failures without forcing you to handle them,
-and at the boundary they turn back into normal Python exceptions.
-Handling one inside the system is the next section.
+The error channel records those failures that can occur,
+without forcing you to handle them.
+`run()` turns any that reach it back into normal Python exceptions.
 
 ## Turning an Error Into a Value
 
