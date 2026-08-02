@@ -37,6 +37,7 @@ Review all exercises to make sure they refer to existing examples and that all  
 
 - Check order of examples in 37_Pattern_Refactoring.md
 
+- "happens"
 - "have to", "could" -> "can"
 - which was
 - which will be

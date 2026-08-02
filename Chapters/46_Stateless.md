@@ -566,8 +566,7 @@ The difference is that you can declare as many abilities as you like.
 The `yield from` is not optional.
 Write `greet(name)` alone, without it,
 and the program still type-checks and runs.
-It builds a description, immediately discards it,
-and no greeting is printed.
+It builds a description, immediately discards it, and no greeting is printed.
 Neither the type checker nor the linter flags the dropped value.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too,
@@ -656,7 +655,7 @@ which makes it one of the few mistakes in this chapter the type checker will not
 
 `Async` has appeared as something `run()` describes on its own.
 `wait()` is what puts it into a type.
-It accepts any awaitable and produces the value that awaitable produces:
+`yield from wait()` accepts any awaitable and produces the value that awaitable produces:
 
 ```python
 # await_coroutine.py
@@ -665,18 +664,24 @@ from stateless import Async, Depend, run, wait
 
 async def fetch(url: str) -> str:
     await asyncio.sleep(0.01)
-    return f"body of {url}"
+    return f"fetched {url}"
 
-def report(url: str) -> Depend[Async, int]:
+def report(url: str) -> Depend[Async, str]:
     body = yield from wait(fetch(url))
-    return len(body)
+    return f"{body = }, {len(body) = }"
 
 print(run(report("http://example.com")))
-#: 26
+#: body = 'fetched http://example.com', len(body) = 26
 ```
 
-`Depend[Async, int]` needs `Async`, cannot fail, and produces an `int`.
-There is nothing to supply, because `run()` answers `Async`.
+`Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
+There is nothing to supply, because `Async` asks for no object
+(there's no `Need`).
+A `Need[Console]` asks for a `Console` instance, which someone must bind.
+An `Async` request carries the coroutine and asks for it to be awaited,
+and `run()` does that with the event loop it already owns.
+So `Async` is answered rather than supplied,
+and it is the one ability in this chapter that never reaches `supply()`.
 
 Notice what `report()` is not.
 It is not an `async def` and it contains no `await`,
@@ -684,7 +689,11 @@ yet its result comes from a coroutine.
 `wait()` hands the coroutine out as a request and the driver awaits it,
 so the asynchrony stops at the ability channel instead of spreading to `report()` and to everything that calls it.
 
-`sleep()` pairs an `Async` request with a dependency:
+`wait()` is required at the boundary where a coroutine enters the Effect world.
+A function that already returns an Effect needs no `wait()`,
+because `yield from` composes the two directly.
+The library's own `sleep()` is such a function,
+and it pairs an `Async` request with a dependency:
 
 ```python
 # sleep_effect.py
@@ -712,13 +721,26 @@ print(f"waited 30ms or more: {elapsed >= 0.03}")
 
 `sleep()` returns `Depend[Need[Time] | Async, None]`,
 so a function that calls it inherits both abilities.
+It declares both because `sleep()` makes both requests,
+`need(Time)` for the clock and `wait()` for the await:
+
+```python
+def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
+    time = yield from need(Time)
+    yield from wait(time.sleep(seconds))
+```
+
+The `async def` is `Time.sleep()`, the method on the ability,
+so the boundary crosses there rather than in `delayed_sum()`.
 `Time` is an ability like `Console`, an object whose method the Effect calls,
 and `supply()` binds it the same way.
-The clock is a dependency rather than a global,
-so a test can supply a `Time` subclass whose `sleep()` returns at once,
-through the same `as_type(Time)` route `Recorder` took,
-and check the logic without waiting.
-This pair returns in [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect):
+Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
+and `Need[Time]` moves that reading into the ability channel.
+A test can then supply a `Time` subclass whose `sleep()` returns at once,
+and check the logic without waiting for real time to pass.
+That subclass goes through `as_type(Time)`,
+for the same reason `Recorder` went through `as_type(Console)`.
+In [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
 `retry()` waits between attempts,
 so it adds `Need[Time]` and `Async` to whatever it decorates.
 
@@ -726,7 +748,7 @@ so it adds `Need[Time]` and `Async` to whatever it decorates.
 
 The second exercise in [Effect Management](44_Effect_Management.md#exercises)
 has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
-Here is that experiment in Stateless:
+Here it is in Stateless:
 
 ```python
 # audit_log.py
@@ -761,21 +783,33 @@ print(log.entries)
 #: ['greeted Alice', 'greeted Bob']
 ```
 
-The signature count is the same as the by-hand version.
-Every function on the path to the new Effect gained a `Need[Log]`,
-and `supply()` gained an argument.
-Stateless does not remove that work.
-What it removes is the searching.
-The checker names every line that needs the change,
+The new Effect is the `Log` write inside `greet_logged()`.
+Every function on the path to it gained a `Need[Log]`,
+here `greet_logged()` and its caller `greet_all()`,
+while `greet()` is unchanged.
+`supply()` now provides both a `Console` and a `Log`.
+Stateless does not save you those edits.
+It saves you from hunting for the functions that need them:
+the checker names each place that needs changing,
 and the program does not build until the last one is fixed.
-To watch it do the naming, delete `| Need[Log]` from either annotation:
-the checker points at the yield that still carries the ability.
-With dependencies passed as parameters,
-a missed thread produces a runtime `TypeError` in whatever code path happens to reach it.
+To see that, delete `| Need[Log]` from either annotation.
+Remove it from `greet_all()` and `ty` reports an `invalid-yield`
+at `yield from greet_logged(name)`,
+since `Need[Log]` is not assignable to what the signature now declares.
 
-Multiple abilities combine with `|`, which reads correctly.
-`greet_all()` needs a `Console` or a `Log` at each individual request,
-and both over its lifetime.
+Dependencies passed as parameters are checked too.
+Forget the new argument at a call and `ty` reports a `missing-argument`.
+The difference is how many places you edit.
+A new parameter changes every call site along with every signature,
+and each function in between accepts an object it does not use.
+A new ability changes the signatures alone:
+`yield from greet_logged(name)` stays as it is,
+and the instance appears once, at `supply()`.
+
+Multiple abilities combine with `|` because the union describes one request at a time.
+Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`, not both at once.
+Over the whole run it makes both kinds of request,
+so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union invites a `type` alias,
 and the book's own habits would normally endorse one.
@@ -786,7 +820,7 @@ and everything this section demonstrated silently stops being verified.
 Stateless avoids the trap in its own definitions:
 `Effect` and its aliases are older `TypeAlias` assignments rather than `type` statements,
 and those keep the check alive.
-Write Effect signatures out in full until your checker proves it sees through the alias.
+Write Effect signatures out in full until your checker proves that it sees through the alias.
 
 ## One Effect, Many Environments
 
@@ -844,16 +878,16 @@ def test_holds(
 ```
 
 One test function covers four environments.
-`holds()` takes no arguments, so `material` and `nailer` are not inputs to it.
-They are the bindings `supply()` will make,
+`holds()` takes no arguments, so `material` and `nailer` are not inputs.
+`supply()` binds them instead,
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` is a new row.
 
 Dependencies as parameters would serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The difference appears when the dependency sits three calls deep.
-Then the parameter version threads two arguments through every function on the path,
-and this version changes nothing but the row.
+Then the parameter version threads two arguments through every function on the path.
+This version changes nothing but the row.
 
 ## The Error Channel
 
@@ -875,10 +909,17 @@ def score(name: str) -> int:
 
 `score()` looks like an ordinary function that raises a `KeyError`,
 but the decorator changes its type to `(str) -> Try[KeyError, int]`.
-This is the `Result` type of [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
-arrived at from the other direction.
-There, you rewrote a function to return `Ok` or `Err`.
+This carries the idea of the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
+though the two are not the same construct.
+A `Result` is a wrapper the function returns at once, and the caller matches on it.
+A `Try` is a description that runs nothing until it is driven,
+and it carries the failure in the yield channel rather than the return value.
+A `Result`-shaped value appears only after `catch()`,
+as the bare union `int | KeyError` in place of a wrapper object.
+There, you rewrote the body to return one of two wrappers.
 Here, you leave the body alone and lift the exception into the signature.
+That chapter names its success wrapper `Success`,
+unrelated to the `Success[R]` alias earlier in this chapter.
 
 You can watch the failure travel.
 Calling `score()` still runs nothing.

@@ -1076,12 +1076,47 @@ A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
 
 The same hole opens on the error side.
-`@throws` catches only the exception types it names,
-so an unlisted exception propagates as an ordinary raised exception, untracked.
-And `catch()` matches the values an Effect yields,
-not exceptions the body raises,
+Here `Success[float]` promises that `ratio()` cannot fail:
+
+```python
+# undeclared_failure.py
+from stateless import Success, catch, run, success
+
+def ratio(a: int, b: int) -> Success[float]:
+    return success(a / b)
+
+def caller() -> Success[float | ZeroDivisionError]:
+    out: float | ZeroDivisionError
+    out = yield from catch(ZeroDivisionError)(ratio)(1, 0)
+    return out
+
+try:
+    run(caller())
+except ZeroDivisionError as e:
+    print(type(e).__name__)
+#: ZeroDivisionError
+```
+
+`@throws` lifts only the exception types it names, and `ratio()` names none,
+so the `ZeroDivisionError` propagates as an ordinary raised exception,
+untracked.
+`catch()` matches the values an Effect yields, not exceptions the body raises,
 so a failure that was never lifted by `@throws` goes past `catch()` untouched.
+That is the version of this hole to watch for,
+because `catch(ZeroDivisionError)` type-checks and then does nothing:
+the protection appears to be there.
 The channel carries only what was put into it.
+
+ZIO does not catch this at compile time either.
+Its own documentation uses the same example:
+`def divide(a: Int, b: Int): ZIO[Any, Nothing, Int] = ZIO.succeed(a / b)` declares an error type of `Nothing`,
+and a zero denominator still throws.
+The difference is at runtime.
+An exception thrown inside a computation ZIO runs becomes a *defect*,
+recorded on the `Cause` beside the typed error channel,
+where `sandbox()` can recover it and the runtime logs it as a dying fiber.
+Stateless has no defect channel,
+so the exception leaves `run()` as an ordinary Python exception.
 
 ### 2. The checker can give up quietly
 

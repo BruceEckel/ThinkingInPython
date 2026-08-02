@@ -211,7 +211,7 @@ because the name is misspelled or the base method is gone,
 the checker reports an error.
 
 At runtime `@override` does nothing but return the method unchanged.
-All the verification happens in the type checker, before the program runs.
+The type checker performs all verification before the program runs.
 
 Apply `@override` to any method that replaces an inherited method,
 except constructors, which are undecorated by convention.

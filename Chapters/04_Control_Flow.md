@@ -284,7 +284,7 @@ from pathlib import Path
 
 path = Path(tempfile.gettempdir()) / "demo.txt"
 with path.open("w") as f:
-    f.write("one\ntwo\n")  # f.close() happens automatically
+    f.write("one\ntwo\n")  # Automatic f.close()
 
 with path.open() as f:
     for line in f:
