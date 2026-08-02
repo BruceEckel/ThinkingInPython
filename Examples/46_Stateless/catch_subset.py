@@ -1,9 +1,9 @@
 # catch_subset.py
-from parse_score import parse_score
+from read_score import read_score
 from stateless import Success, Try, catch, run
 
-both = catch(KeyError, ValueError)(parse_score)
-one = catch(KeyError)(parse_score)
+both = catch(KeyError, ValueError)(read_score)
+one = catch(KeyError)(read_score)
 
 def all_handled(name: str) -> Success[str]:
     value: int | KeyError | ValueError = yield from both(name)

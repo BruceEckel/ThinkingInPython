@@ -993,8 +993,7 @@ without forcing you to handle them.
 
 `catch()` handles an error the way `supply()` handles an ability.
 It removes the error from the type and moves it into the result.
-`@throws` and `catch()` are two ends of one pipe:
-the decorator puts a raised exception into the channel,
+`@throws` puts a raised exception into the channel,
 and `catch()` takes it back out:
 
 ```python
@@ -1021,11 +1020,11 @@ run(supply(Console())(report)("Carol"))
 `score` was `(str) -> Try[KeyError, int]`.
 `catch(KeyError)(score)` is `(str) -> Success[int | KeyError]`.
 The error left the error type parameter and joined the result type parameter,
-so `value` is something you `match` on rather than an exception you catch.
+so `value` is now something you `match` on rather than an exception you catch.
 
 That relocation makes the failure impossible to ignore.
-Skip the `KeyError` branch and use `value` as a number,
-and the checker reports it:
+If you drop the `match` entirely and use `value` directly as a number,
+the checker catches it:
 
 ```text
 error[unsupported-operator]: Unsupported `+` operation
@@ -1041,22 +1040,25 @@ error[unsupported-operator]: Unsupported `+` operation
 This is the same guarantee a `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
 reached without rewriting the body of `score()`.
 
-`catch()` takes as many error types as you need to handle,
-and handling a subset is tracked as carefully as handling all of them.
-A function that declares two failures shows the difference.
-`parse_score()` looks a name up and converts what it finds,
-so an unknown name raises a `KeyError` and an unreadable value raises a `ValueError`:
+`catch()` can track multiple error types.
+`SCORES` stored its values as `int`s,
+so looking a name up was the only step and `KeyError` the only failure.
+`RAW` stores the text a scoreboard hands you, before anyone has interpreted it,
+which puts two steps in `read_score()` and one failure in each.
+The lookup raises a `KeyError` for an unknown name,
+and the conversion raises a `ValueError` for text that is not a number, like Bob's `"seven"`:
 
 ```python
-# parse_score.py
+# read_score.py
 from typing import Final
 from stateless import throws
 
 RAW: Final[dict[str, str]] = {"alice": "42", "bob": "seven"}
 
 @throws(KeyError, ValueError)
-def parse_score(name: str) -> int:
-    return int(RAW[name.lower()])
+def read_score(name: str) -> int:
+    text = RAW[name.lower()]  # KeyError
+    return int(text)  # ValueError
 ```
 
 `@throws(KeyError, ValueError)` makes it `(str) -> Try[KeyError | ValueError, int]`.
@@ -1064,11 +1066,11 @@ Now catch both errors, then catch one of them:
 
 ```python
 # catch_subset.py
-from parse_score import parse_score
+from read_score import read_score
 from stateless import Success, Try, catch, run
 
-both = catch(KeyError, ValueError)(parse_score)
-one = catch(KeyError)(parse_score)
+both = catch(KeyError, ValueError)(read_score)
+one = catch(KeyError)(read_score)
 
 def all_handled(name: str) -> Success[str]:
     value: int | KeyError | ValueError = yield from both(name)
@@ -1156,7 +1158,7 @@ Both are checked, and neither can be dropped by forgetting it.
     then check what `greet_all()`'s callers must now declare.
 3.  Apply `reveal_type()` to `catch(ValueError)(one_left)` and run `ty check`.
     Explain why its result type differs from `all_handled()`'s,
-    given that both have handled every error `parse_score()` declares.
+    given that both have handled every error `read_score()` declares.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 5.  Add a `Metal` material to `test_nailer.py` with a brittleness that survives the robotic nailer,
