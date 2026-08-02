@@ -564,10 +564,19 @@ all the way to `supply()`.
 The difference is that you can declare as many abilities as you like.
 
 The `yield from` is not optional.
-Write `greet(name)` alone, without it,
-and the program still type-checks and runs.
-It builds a description, immediately discards it, and no greeting is printed.
-Neither the type checker nor the linter flags the dropped value.
+Remove it here and `ty` objects with an `invalid-return-type`:
+"Function always implicitly returns `None`."
+That looks like protection, but read it again.
+It was the only `yield` in `greet_all()`,
+so deleting it turned `greet_all()` into an ordinary function,
+and the checker caught the function's changed shape, not the discarded Effect.
+Keep any other request in the body and the same mistake is silent.
+`greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
+makes two requests.
+Strip the `yield from` in front of its `greet(name)` and every check passes:
+`ty` and `ruff` report nothing, the program runs, the log gains both entries,
+and no greeting is printed.
+Each `greet(name)` builds a description, which the loop discards unrun.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too,
 and the ZIO fix is `.run` where Python's is `yield from`.
@@ -590,7 +599,7 @@ def greet_all(names: list[str]) -> Success[None]:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
- --> undeclared_need.py:5:36
+ --> undeclared_need.py:7:20
   |
 5 | def greet_all(names: list[str]) -> Success[None]:
   |                                    ------------- Function annotated
@@ -814,7 +823,7 @@ so `supply()` must provide a `Console` and a `Log`.
 The repeated union invites a `type` alias,
 and the book's own habits would normally endorse one.
 Resist it here.
-Under `ty` (0.0.64 at this writing),
+Under `ty` (0.0.65 at this writing),
 a `type` alias as a generator's return annotation turns the yield check off,
 and everything this section demonstrated silently stops being verified.
 Stateless avoids the trap in its own definitions:
@@ -1153,9 +1162,11 @@ Both are checked, and neither can be dropped by forgetting it.
 5.  Add a `Metal` material to `test_nailer.py` with a brittleness that survives the robotic nailer,
     and add its two rows to the table.
     Then explain why the test function body needed no change.
-6.  Break `greet_all.py` by removing the `yield from` in front of `greet(name)`.
+6.  Break `audit_log.py` by removing the `yield from` in front of `greet(name)` in `greet_logged()`.
     Run `ty check`, `ruff check`, and the script,
     and record what each reports and what the program prints.
     Explain where the greetings went and why no tool objects.
-    Then explain why the same mistake in front of `need(Console)` inside `greet()` is caught,
-    and name the tool that catches it.
+    Then restore it, and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
+    This time `ty` produces two diagnostics.
+    Explain what each one caught,
+    and why assigning a dropped request is caught when discarding one is not.
