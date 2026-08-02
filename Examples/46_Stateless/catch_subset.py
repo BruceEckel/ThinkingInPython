@@ -23,15 +23,15 @@ def one_left(name: str) -> Try[ValueError, str]:
         case _:
             return f"{name}: {value}"
 
-for who in ["alice", "bob", "carol"]:
+for who in ["Alice", "Bob", "Carol"]:
     print(run(all_handled(who)))
-#: alice: 42
-#: bob: unreadable
-#: carol: unknown
-print(run(one_left("alice")))
-#: alice: 42
+#: Alice: 42
+#: Bob: unreadable
+#: Carol: unknown
+print(run(one_left("Alice")))
+#: Alice: 42
 try:
-    run(one_left("bob"))
+    run(one_left("Bob"))
 except ValueError as e:
     print(type(e).__name__)
 #: ValueError

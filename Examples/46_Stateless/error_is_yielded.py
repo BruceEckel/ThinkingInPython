@@ -1,6 +1,6 @@
 # error_is_yielded.py
 from scores import score
 
-effect = score("carol")
+effect = score("Carol")
 print(repr(next(effect)))
-#: KeyError('carol')
+#: KeyError('Carol')

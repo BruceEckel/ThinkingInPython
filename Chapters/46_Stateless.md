@@ -909,11 +909,11 @@ The other half is failure.
 from typing import Final
 from stateless import throws
 
-SCORES: Final[dict[str, int]] = {"alice": 42, "bob": 7}
+SCORES: Final[dict[str, int]] = {"Alice": 42, "Bob": 7}
 
 @throws(KeyError)
 def score(name: str) -> int:
-    return SCORES[name.lower()]
+    return SCORES[name]
 ```
 
 `score()` looks like an ordinary function that raises a `KeyError`,
@@ -938,9 +938,9 @@ not as a raised exception:
 # error_is_yielded.py
 from scores import score
 
-effect = score("carol")
+effect = score("Carol")
 print(repr(next(effect)))
-#: KeyError('carol')
+#: KeyError('Carol')
 ```
 
 The body raised the exception.
@@ -991,8 +991,10 @@ without forcing you to handle them.
 
 ## Turning an Error Into a Value
 
-`catch()` handles an error the way `supply()` handles an ability.
-It removes the error from the type and moves it into the result.
+`catch()` empties the error channel the way `supply()` empties the ability channel,
+but the two do different things with what they remove.
+`supply()` binds the ability inside the Effect and leaves `Never` behind.
+`catch()` hands the error back to you as a value in the result.
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out:
 
@@ -1017,12 +1019,20 @@ run(supply(Console())(report)("Carol"))
 #: Carol: unknown
 ```
 
-`score` was `(str) -> Try[KeyError, int]`.
-`catch(KeyError)(score)` is `(str) -> Success[int | KeyError]`.
-The error left the error type parameter and joined the result type parameter,
-so `value` is now something you `match` on rather than an exception you catch.
+The signature for `score()` is `(str) -> Try[KeyError, int]`.
+`catch(KeyError)(score)` changes it to `(str) -> Success[int | KeyError]`.
+The error leaves the error type parameter, which becomes `Never`,
+and joins the result type parameter.
+That makes `value` something you `match` on rather than an exception you catch.
 
-That relocation makes the failure impossible to ignore.
+`Success` describes the Effect, not the lookup.
+It means both channels are empty: nothing left to supply,
+and no failure that `run()` must raise.
+The Effect succeeds at producing either a score or a `KeyError` indicating there is no score.
+A raised `KeyError` is a failure.
+The same object returned is data like any other value.
+
+Moving the error into the result makes it impossible to ignore.
 If you drop the `match` entirely and use `value` directly as a number,
 the checker catches it:
 
@@ -1042,22 +1052,23 @@ reached without rewriting the body of `score()`.
 
 `catch()` can track multiple error types.
 `SCORES` stored its values as `int`s,
-so looking a name up was the only step and `KeyError` the only failure.
-`RAW` stores the text a scoreboard hands you, before anyone has interpreted it,
+so looking up a name was the only step and `KeyError` the only failure.
+`RAW` stores the scoreboard as text, before anyone has interpreted it,
 which puts two steps in `read_score()` and one potential failure in each.
 The lookup raises a `KeyError` for an unknown name,
-and the conversion raises a `ValueError` for text that is not a number, like Bob's `"seven"`:
+and the conversion raises a `ValueError` for text that is not a number,
+like Bob's `"seven"`:
 
 ```python
 # read_score.py
 from typing import Final
 from stateless import throws
 
-RAW: Final[dict[str, str]] = {"alice": "42", "bob": "seven"}
+RAW: Final[dict[str, str]] = {"Alice": "42", "Bob": "seven"}
 
 @throws(KeyError, ValueError)
 def read_score(name: str) -> int:
-    text = RAW[name.lower()]  # KeyError
+    text = RAW[name]  # KeyError
     return int(text)  # ValueError
 ```
 
@@ -1090,29 +1101,29 @@ def one_left(name: str) -> Try[ValueError, str]:
         case _:
             return f"{name}: {value}"
 
-for who in ["alice", "bob", "carol"]:
+for who in ["Alice", "Bob", "Carol"]:
     print(run(all_handled(who)))
-#: alice: 42
-#: bob: unreadable
-#: carol: unknown
-print(run(one_left("alice")))
-#: alice: 42
+#: Alice: 42
+#: Bob: unreadable
+#: Carol: unknown
+print(run(one_left("Alice")))
+#: Alice: 42
 try:
-    run(one_left("bob"))
+    run(one_left("Bob"))
 except ValueError as e:
     print(type(e).__name__)
 #: ValueError
 ```
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
-Every failure moved into the result and nothing is left in the error channel,
-so `all_handled()` can promise `Success[str]`: no failure escapes it,
-and the three names exercise its three branches.
+Every failure has been moved into the result so nothing is left in the error channel.
+`all_handled()` returns `Success[str]` which means that no failure can escape it.
+The three names exercise its three branches.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moved to the result and the uncaught one stayed put,
 so `one_left()` must declare a `ValueError` it never handles.
-Calling it on `"bob"` carries that failure to the edge,
+Calling it on `"Bob"` carries that failure to the edge,
 where `run()` raises it as an ordinary exception,
 the same escape `error_escapes.py` showed for a single error.
 Failures cannot be lost, only relocated.
