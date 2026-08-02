@@ -1044,7 +1044,7 @@ reached without rewriting the body of `score()`.
 `SCORES` stored its values as `int`s,
 so looking a name up was the only step and `KeyError` the only failure.
 `RAW` stores the text a scoreboard hands you, before anyone has interpreted it,
-which puts two steps in `read_score()` and one failure in each.
+which puts two steps in `read_score()` and one potential failure in each.
 The lookup raises a `KeyError` for an unknown name,
 and the conversion raises a `ValueError` for text that is not a number, like Bob's `"seven"`:
 
@@ -1062,7 +1062,7 @@ def read_score(name: str) -> int:
 ```
 
 `@throws(KeyError, ValueError)` makes it `(str) -> Try[KeyError | ValueError, int]`.
-Now catch both errors, then catch one of them:
+We can catch both errors with `both`, and one error with `one`:
 
 ```python
 # catch_subset.py
