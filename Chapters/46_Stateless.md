@@ -909,12 +909,12 @@ def score(name: str) -> int:
 
 `score()` looks like an ordinary function that raises a `KeyError`,
 but the decorator changes its type to `(str) -> Try[KeyError, int]`.
-This carries the idea of the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
+This carries the same idea as the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
 though the two are not the same construct.
 A `Result` is a wrapper the function returns at once,
 and the caller matches on it.
 A `Try` is a description that runs nothing until it is driven,
-and it carries the failure in the yield channel rather than the return value.
+and its failure arrives as a yielded value rather than a returned one.
 A `Result`-shaped value appears only after `catch()`,
 as the bare union `int | KeyError` in place of a wrapper object.
 There, you rewrote the body to return an `Ok` or an `Err`.
@@ -922,7 +922,7 @@ Here, you leave the body alone and lift the exception into the signature.
 
 You can watch the failure travel.
 Calling `score()` still runs nothing.
-Drive the description one step and the `KeyError` arrives as a value,
+Advance the Effect one step with `next()` and the `KeyError` arrives as a value,
 not as a raised exception:
 
 ```python
@@ -934,9 +934,11 @@ print(repr(next(effect)))
 #: KeyError('carol')
 ```
 
-The body raised the exception, the decorator caught it,
-and the exception object went out over the channel abilities use.
-That is why `Effect`'s first type parameter holds `A | E`:
+The body raised the exception.
+`@throws` wraps that body in an ordinary `try`/`except`,
+so the wrapper catches the `KeyError` and yields the exception object
+over the same channel that carries ability requests.
+That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter:
 requests and failures are both values a description yields to its driver.
 
 Because errors and abilities share a channel, they propagate the same way:
