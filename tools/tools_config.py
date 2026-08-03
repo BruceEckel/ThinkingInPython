@@ -33,6 +33,7 @@ DATA_DIR = TOOLS_DIR / "data"
 BUILD_DIR = ROOT / "build"
 EXAMPLES_TREE = BUILD_DIR / "examples"
 BUILD_SITE_DIR = BUILD_DIR / "site"
+BUILD_EPUB_DIR = BUILD_DIR / "epub"
 
 NORUN_FILE = DATA_DIR / "norun.txt"
 

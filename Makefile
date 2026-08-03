@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors checks fix-checks gate-checks clean-examples clean-site check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -223,6 +223,15 @@ prune-examples:  ## Delete orphaned stray files under Examples/ (see `check`)
 
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
+
+# One EPUB from the same Chapters/, for e-readers. The site keeps one HTML
+# page per chapter, so a cross-reference stays a link between files; an EPUB
+# is a single document, so build_epub.py namespaces every heading id by
+# chapter (ch12-immutability) before merging. Without that, the 44 chapters
+# ending in `## Exercises` and the nine other repeated headings would collide
+# and pandoc would quietly retarget those links. Needs pandoc, like `site`.
+epub:  ## Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
+	$(PY) tools/build_epub.py
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.
@@ -452,3 +461,6 @@ clean-solutions:  ## Remove build/solutions/
 
 clean-site:  ## Remove build/site/
 	$(PY) -c "import shutil; shutil.rmtree('build/site', ignore_errors=True)"
+
+clean-epub:  ## Remove build/epub/
+	$(PY) -c "import shutil; shutil.rmtree('build/epub', ignore_errors=True)"

@@ -791,6 +791,50 @@ heading affects and neither of which needs pandoc. It returns `False` for a
 path that is not a book chapter, or when `build/site/` does not exist yet,
 leaving the caller to do a full build.
 
+## build_epub.py
+
+Renders the same `Chapters/*.md` into one EPUB at
+`build/epub/ThinkingInPython.epub` (git-ignored). Run `make epub`; `-o DIR`
+builds elsewhere, and `--keep-source` leaves the generated pandoc input under
+`<out>/src/` when you need to see what pandoc was handed. Needs `pandoc`, like
+`site`. `make clean-epub` removes the directory.
+
+Chapter discovery, titles, the Part dividers, and the image map all come from
+`build_site.py`, so the EPUB's contents match the site's rather than drifting
+from it. What differs is linking. The site keeps one HTML page per chapter, so
+a cross-reference stays a link between files and the builder only rewrites
+`.md` to `.html`. An EPUB is a single document, and merging the chapters makes
+the book's anchors ambiguous: 44 chapters end in `## Exercises`, and
+`#immutability`, `#generators`, `#lambdas` and six other anchors each appear in
+two to four chapters. Pandoc's own de-duplication numbers repeats in document
+order, so `[Immutability](12_Data_Classes_as_Types.md#immutability)` would
+quietly open chapter 3.
+
+So every heading gets an explicit id namespaced by chapter number, and every
+link is rewritten to match:
+
+| Markdown | In the EPUB |
+| --- | --- |
+| `## Immutability` | `## Immutability {#ch12-immutability}` |
+| `[x](12_Data_Classes_as_Types.md#immutability)` | `[x](#ch12-immutability)` |
+| `[x](#immutability)` (same chapter) | `[x](#ch12-immutability)` |
+| `[x](24_Singleton.md)` | `[x](#ch24)` |
+
+The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not start
+with a digit. The old ids come from `heading_links.pandoc_anchor()`, the
+function the `anchors` gate checks links with, so a link the gate accepts is a
+link this build resolves; its per-file de-duplication is mirrored too, so a
+chapter with two identical headings keeps pandoc's `-1` suffix inside its own
+namespace. A link naming a chapter's *own* title heading is aliased to the
+chapter's root id, since `load_chapter()` lifts that heading out into the
+title. Anything that still resolves to nothing is reported and left unlinked,
+which is a stricter check than the gate's: `heading_links.py` skips an anchor
+containing a period, and chapter 13 has one.
+
+Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
+a namespacing bug produces a valid EPUB whose links open the wrong chapter,
+with nothing in the build to show for it.
+
 ## search_index.py
 
 Builds `search-index.json`, which the site's `search.js` fetches and

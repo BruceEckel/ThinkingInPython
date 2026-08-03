@@ -53,7 +53,9 @@ REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
-COPYRIGHT = (f"© 2026 {BOOK_AUTHOR}. "
+# Also the EPUB's date and rights metadata; see build_epub.py.
+COPYRIGHT_YEAR = "2026"
+COPYRIGHT = (f"© {COPYRIGHT_YEAR} {BOOK_AUTHOR}. "
              f'<a href="{LICENSE_URL}" target="_blank" '
              f'rel="noopener">Licensed CC BY-NC-ND 4.0</a>.<br>'
              "Freely readable online. No reproduction without permission.")

@@ -197,13 +197,15 @@ def main(argv: list[str] | None = None) -> int:
                 print("ok" if result.ok else f"FAILED ({result.summary})",
                       f"[{result.seconds:.1f}s]")
 
-    if {"clean-examples", "clean-solutions", "clean-site"} & set(direct):
+    if {"clean-examples", "clean-solutions", "clean-site",
+            "clean-epub"} & set(direct):
         # Those targets are real, tested rmtree calls; leaving build/ empty
         # afterward would be a surprising side effect of running this sweep,
         # so put back what a normal `make ci` run leaves behind.
         print("\nRestoring build/ artifacts wiped by the clean-* targets...")
-        subprocess.run(["make", "extract", "solutions-extract", "site"],
-                        cwd=ROOT, check=False)
+        subprocess.run(
+            ["make", "extract", "solutions-extract", "site", "epub"],
+            cwd=ROOT, check=False)
 
     if skipped:
         print("\nNever run (see the module docstring for why):")
