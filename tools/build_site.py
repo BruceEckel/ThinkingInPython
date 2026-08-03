@@ -194,6 +194,7 @@ PARTS = {
     "11": ("II", "Techniques"),
     "20": ("III", "Patterns"),
     "40": ("IV", "Functional Programming"),
+    "44": ("V", "Effects"),
 }
 
 

@@ -490,8 +490,7 @@ It says "treat this recorder as a `Console`,"
 and at runtime it returns the object it was given.
 `supply()` requires it because it reads the ability from the static type of its argument,
 and `Recorder` inherits from `Console` to answer the same question at runtime.
-[Supplying an Interface](#supplying-an-interface)
-takes both halves apart,
+[Supplying an Interface](#supplying-an-interface) takes both halves apart,
 along with what changes when the ability is an interface rather than a class.
 
 `supply()` binds one instance for every matching request over the Effect's run,
@@ -561,8 +560,8 @@ That seems like protection, but look closer.
 That `yield from` was the only `yield` in `greet_all()`,
 so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
-A body that still makes another request stays a generator function,
-and there the same mistake is silent.
+A function with a second `yield` stays a generator function.
+Its shape does not change, so nothing objects.
 `greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
 makes two requests, one for the greeting and one for the log.
 Write its first line as a bare `greet(name)` and every check passes:
