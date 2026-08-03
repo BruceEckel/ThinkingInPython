@@ -149,8 +149,8 @@ which allows a small tolerance.
 ## Parametrizing Tests
 
 When the same logic should run against several inputs, do not copy the test.
-Mark it with `parametrize`, as `test_nonpositive_deposit_raises()` does,
-and `pytest` runs it once per case, reporting each separately.
+If you mark it with `parametrize`, as `test_nonpositive_deposit_raises()` does,
+`pytest` runs it once per case, reporting each separately.
 That single function becomes three independent tests,
 and a failure names the exact case that failed.
 
@@ -548,8 +548,8 @@ In Python the distinction between white-box and black-box remains one of discipl
 not of compiler enforcement.
 
 That makes black-box testing the sensible default.
-Test the public surface, the methods a caller is meant to use,
-and you can change the internals without rewriting the tests.
+If you test the public surface, the methods a caller is meant to use,
+you can change the internals without rewriting the tests.
 The `Account` tests are black-box.
 They never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,

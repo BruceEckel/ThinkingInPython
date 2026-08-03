@@ -760,29 +760,31 @@ while this version still changes nothing but the row.
 ## Supplying an Interface
 
 [Swapping the Implementation](#swapping-the-implementation)
-handed a `Recorder` to `as_type(Console)` and postponed the reason.
-Two questions are being answered there, and they have different audiences.
+substituted a `Recorder` for a `Console` but postponed the reason for using `as_type(Console)`.
+Two questions are being answered, with different audiences: static analysis,
+and runtime.
 
-The static question comes first.
+First, the static issue.
 `supply()` reads the ability from the declared type of its argument,
 so handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
 a different ability from the `Need[Console]` that `greet()` asks for.
-`as_type(Console)(recorder)` makes the argument's static type `Console`,
+`as_type(Console)(recorder)` converts the argument's static type into `Console`,
 so `supply()` builds the handler type `greet()` needs.
+
 At runtime `as_type()` is the identity function and returns the object it was given.
 Only the static type changes.
 
-`typing.cast(Console, recorder)` produces the same result here,
+`typing.cast(Console, recorder)` produces the same result,
 but the two are not interchangeable.
-`cast()` is an unchecked assertion,
-believed by the type checker even when the object has no relation to `Console`.
+`cast()` is an unchecked assertion.
+The type checker believes `cast()` even when the object has no relation to `Console`.
 `as_type(Console)` returns a function annotated `(Console) -> Console`,
 so an object that does not implement `Console` produces an error.
 `as_type()` widens a type to a supertype,
 `cast()` makes one type into another without constraint.
 
-The runtime question is answered by `isinstance()`, and no listing shows it.
-The handler that `supply()` builds tests each request using `isinstance(instance, ability.t)`,
+Second, the runtime issue, which the library decides using `isinstance()`.
+`supply()` builds a handler that checks each request with `isinstance(instance, ability.t)`,
 where `ability.t` is the class inside the `Need`.
 In `test_greeter.py`, `ability.t` is `Console` and `instance` is `recorder`,
 and `isinstance(recorder, Console)` succeeds because `Recorder` inherits from `Console`.
@@ -790,14 +792,14 @@ So two separate things make that test work:
 `as_type(Console)` satisfies the type checker,
 and the inheritance satisfies the runtime check.
 
-That inheritance costs something.
+The inheritance has a cost.
 `Recorder` inherits `Console`'s printing implementation and overrides all of it,
 so nothing of the parent survives except the name that `isinstance()` looks for.
-But anything added to `Console` later shows up in `Recorder` too.
-Add a `read_line()` method to `Console`,
-and `Recorder` inherits the real one without warning,
-so a test meant to record instead performs live console I/O.
-If the ability is an interface,
+But anything later added to `Console` shows up in `Recorder`.
+If you add a `read_line()` method to `Console`,
+`Recorder` inherits the real one without warning,
+so a test meant to record performs live console I/O instead.
+However, if the ability is an interface,
 there is no implementation to inherit by accident:
 
 ```python
@@ -820,15 +822,15 @@ def greet(name: str) -> Depend[Need[Console], None]:
 
 The second of the three things [a full EMS does](44_Effect_Management.md#effect-management-systems)
 is separate each Effect's interface from its implementation.
-`Console` is now that interface and holds no implementation.
+`Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another,
 and neither is named anywhere in `greet()`.
 Because a `Protocol` matches on structure,
-`Recorder` qualifies without inheriting from anything.
+`Recorder` qualifies as a `Console` without inheriting from `Console`.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
 Structural matching does not remove the need for `as_type()`.
-Supply a `Terminal` both ways:
+Here, we supply a `Terminal` both ways:
 
 ```python
 # protocol_supply.py
@@ -841,7 +843,7 @@ run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
 #: Hello, Bob!
 ```
 
-Both lines print, because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
+Both lines print, because `isinstance()` accepts that `Terminal` matches `Console` structurally.
 If you remove the `# type: ignore`, `ty` rejects the first one:
 
 ```text
@@ -854,11 +856,11 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |     `Generator[Need[Console], Any, None]`
 ```
 
-Structure decides the runtime question and nothing else.
+Structural matching decides the runtime issue, not the static one.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
-which the type checker never connects to `greet()`'s `Need[Console]`.
-An interface needs the upcast more than a base class does, not less:
-a concrete `Console` can be instantiated and supplied directly,
+which the type checker never applies to `greet()`'s `Need[Console]`.
+An interface needs the `as_type()` upcast more than a base class does.
+A concrete `Console` can be instantiated and supplied directly,
 while an interface leaves nothing to supply but an implementation.
 
 `console_protocol.py` is the form to write in production.

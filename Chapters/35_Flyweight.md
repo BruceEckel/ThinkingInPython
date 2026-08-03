@@ -37,8 +37,8 @@ print(low is low2, high is high2)
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
 The `int("...")` spelling is load-bearing.
-Write the literals directly, `low, low2 = 256, 256`,
-and the demonstration silently breaks:
+If you write the literals directly, `low, low2 = 256, 256`,
+the demonstration silently breaks:
 the compiler pools equal constants within a code object,
 so even `100000 is 100000` prints `True`,
 sharing that comes from constant folding rather than from the integer cache.

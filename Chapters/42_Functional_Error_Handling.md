@@ -300,8 +300,8 @@ You do not need to know that word to use functional error handling.
 
 One near-miss to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
-Feed it a plain function, `.bind(str)` say,
-and the chain now holds a bare `str` where a `Result` belongs,
+If you feed it a plain function, `.bind(str)` say,
+the chain now holds a bare `str` where a `Result` belongs,
 which the checker flags at the next `bind()`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,

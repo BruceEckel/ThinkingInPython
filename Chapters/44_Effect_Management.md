@@ -205,8 +205,8 @@ the way [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into
 does.
 `result.py` and `safe.py` are shared helpers,
 so this chapter imports them directly instead of rebuilding them.
-Decorate the original `slope()`, unchanged,
-and every exception it raises becomes a value instead of a crash:
+If you decorate the original `slope()`, unchanged,
+every exception it raises becomes a value instead of a crash:
 
 ```python
 # slope_result.py
@@ -282,8 +282,8 @@ They leaked information and are generally considered a failure
 The third approach removes the failure instead of handling it.
 [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
 makes illegal values impossible to construct.
-Give `run` a type that cannot hold zero,
-and `slope()` never needs to check for zero:
+If you give `run` a type that cannot hold zero,
+`slope()` never needs to check for zero:
 
 ```python
 # slope_nonzero.py

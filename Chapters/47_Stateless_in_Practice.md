@@ -104,8 +104,7 @@ This one threads nothing.
 and the two Effects live in the return type where a checker can follow them.
 That second channel in the signature is the one that chapter said an EMS needs.
 
-Return to `two_way_generator.py` in [Generators](45_Generators.md#a-generator-is-a-description)
-and the whole library is visible.
+The whole library is visible in `two_way_generator.py` from [Generators](45_Generators.md#a-generator-is-a-description).
 An Effect is a generator, so nothing stops you from driving one yourself:
 
 ```python
@@ -1302,8 +1301,8 @@ Adding retry to a hundred call sites in a system with untracked Effects changes 
 here it changes a type, and every caller learns about the new dependency.
 
 The renamed error invites a mistake the checker accepts.
-Write `catch(Crashed)(retried)`, catching the error you started with,
-and nothing complains.
+If you write `catch(Crashed)(retried)`, catching the error you started with,
+nothing complains.
 The result type gains a `Crashed` branch that cannot occur,
 `RetryError[Crashed]` stays in the error channel,
 and at runtime the failure passes the useless `catch()` and escapes at the edge.

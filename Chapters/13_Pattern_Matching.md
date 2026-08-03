@@ -342,8 +342,8 @@ print(area(Square(2.0)))
 #: 4.0
 ```
 
-Add a `Triangle` to `Shape` without adding the appropriate `case`,
-and the checker flags `assert_never(shape)`.
+If you add a `Triangle` to `Shape` without adding the appropriate `case`,
+the checker flags `assert_never(shape)`.
 
 A `switch` in C, JavaScript, or traditional Java, cannot do this.
 Nothing forces you to add a case, and an unhandled value falls through silently.

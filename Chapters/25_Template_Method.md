@@ -91,8 +91,8 @@ then Python refuses to instantiate a subclass that forgot it.
 Starting the engine from the constructor carries a trap.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
-Call it first, in the usual style,
-and the engine runs against half-initialized state:
+If you call it first, in the usual style,
+the engine runs against half-initialized state:
 
 ```python
 # premature_engine.py

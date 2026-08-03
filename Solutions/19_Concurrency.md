@@ -224,9 +224,9 @@ through, so every other task suspends at `async with` until that task
 leaves. One read-modify-write is in progress at a time, exactly as with
 `asyncio.Lock`, and all 400 increments land.
 
-The equivalence is only as good as the count. Add one stray release
-before the tasks start and the semaphore admits two holders instead of
-one:
+The equivalence is only as good as the count. If you add one stray
+release before the tasks start, the semaphore admits two holders
+instead of one:
 
 ```python
 # exercise_5_stray_release.py

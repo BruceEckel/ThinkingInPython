@@ -103,5 +103,5 @@ A keyword argument and a later assignment both add one entry to the
 instance's `__dict__`, and `vars()` reads that dict. The two
 namespaces are indistinguishable afterward. Even the order matches,
 because a dict keeps insertion order and both routes add `extra`
-last. Assign the attributes in a different sequence and the dicts
+last. If you assign the attributes in a different sequence, the dicts
 still compare equal, since dict equality ignores order.

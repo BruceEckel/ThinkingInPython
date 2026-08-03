@@ -243,8 +243,8 @@ A module already presents a curated set of names over whatever tangle of classes
 and, as [Singleton](24_Singleton.md#a-module-is-already-a-singleton) notes,
 it loads once, and every importer shares the same module.
 At module level, put the friendly functions and the few classes to expose.
-Keep the messy internals private (using a leading underscore, by convention),
-and the `import` is the façade.
+If you keep the messy internals private
+(using a leading underscore, by convention), the `import` is the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module already gives you.
 
