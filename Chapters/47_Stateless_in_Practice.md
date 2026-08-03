@@ -764,7 +764,7 @@ Annotate `report()` as `Success[str]` and `ty` names the `yield from` that still
 `outcome()` also earns its annotations.
 `Wire` and `Library` are structural implementations,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
-the mismatch that `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+the mismatch that [Supplying an Interface](46_Stateless.md#supplying-an-interface)
 fixed with `as_type()`.
 Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
 without a cast.

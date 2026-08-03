@@ -484,121 +484,17 @@ There is no `capsys`, no monkeypatching of `print`, and no mock.
 The test supplies a different `Console`,
 while `greet()` is unchanged and unaware.
 
-`as_type()` allows you to supply an implementation for a declared interface.
-At runtime, `as_type()` is the identity function and returns the object it was given.
-Only the static type changes.
-`greet()` asks for `Need[Console]`,
-but handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
-a different ability.
-`as_type(Console)(recorder)` says "treat `recorder` as a `Console`,"
-so `supply()` builds the exact handler type that `greet()` needs.
-`typing.cast(Console, recorder)` produces the same result here,
-but the two are not interchangeable.
-`cast()` is an unchecked assertion,
-believed by the type checker even when the object has no relation to `Console`.
-`as_type(Console)` returns a function annotated `(Console) -> Console`,
-so an object that does not implement `Console` produces an error.
-`as_type()` widens a type to a supertype,
-`cast()` makes one type into another without constraint.
+`as_type(Console)` is the only ceremony in that test.
+It says "treat this recorder as a `Console`,"
+and at runtime it returns the object it was given.
+`supply()` requires it because it reads the ability from the static type of its argument,
+and `Recorder` inherits from `Console` to answer the same question at runtime.
+[Supplying an Interface](#supplying-an-interface)
+takes both halves apart,
+along with what changes when the ability is an interface rather than a class.
 
-The listing does not show how the library pairs a yielded `Need` with a supplied instance.
-The handler that `supply()` builds tests each request using `isinstance(instance, ability.t)`,
-where `ability.t` is the class inside the `Need`.
-Here `ability.t` is `Console` and `instance` is `recorder`.
-The check `isinstance(recorder, Console)` succeeds because `Recorder` inherits from `Console`.
-So two different things make this work, each for a different audience:
-`as_type(Console)` satisfies the type checker,
-and `Recorder` inheriting from `Console` satisfies the runtime `isinstance()` check.
-Every matching request over the Effect's run receives that same instance,
-which is why the test can read the results back out of `recorder` afterward.
-
-`Recorder` inherits `Console`'s printing implementation and overrides all of it.
-Nothing of the parent survives except the name that `isinstance()` looks for.
-But anything added to `Console` later shows up in `Recorder` too.
-Add a `read_line()` method to `Console`,
-and `Recorder` inherits the real one without warning,
-so a test meant to record instead performs live console I/O.
-If we make the ability an interface,
-there is no implementation to inherit by accident:
-
-```python
-# console_protocol.py
-from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, need
-
-@runtime_checkable
-class Console(Protocol):
-    def print(self, message: str) -> None: ...
-
-class Terminal:
-    def print(self, message: str) -> None:
-        print(message)
-
-def greet(name: str) -> Depend[Need[Console], None]:
-    console = yield from need(Console)
-    console.print(f"Hello, {name}!")
-```
-
-The second of the three things [a full EMS does](44_Effect_Management.md#effect-management-systems)
-is separate each Effect's interface from its implementation.
-`Console` is now that interface and holds no implementation.
-`Terminal` is one implementation and `Recorder` is another,
-and neither is named anywhere in `greet()`.
-Because a `Protocol` matches on structure,
-`Recorder` qualifies without inheriting from anything.
-`@runtime_checkable` is required because `supply()` uses `isinstance()`.
-
-Structural matching does not remove the need for `as_type()`.
-Supply a `Terminal` both ways:
-
-```python
-# protocol_supply.py
-from console_protocol import Console, Terminal, greet
-from stateless import as_type, run, supply
-
-run(supply(Terminal())(greet)("Alice"))  # type: ignore
-#: Hello, Alice!
-run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
-#: Hello, Bob!
-```
-
-Both lines print, because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
-Remove the `# type: ignore` and `ty` rejects the first one:
-
-```text
-error[invalid-argument-type]: Argument to function `run` is incorrect
- --> protocol_supply.py:5:5
-  |
-5 | run(supply(Terminal())(greet)("Alice"))
-  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Expected
-  |     `Generator[Async | Exception, Any, Unknown]`, found
-  |     `Generator[Need[Console], Any, None]`
-```
-
-Structural matching answers a runtime question,
-whether `isinstance()` accepts the object.
-`supply()` asks a static one.
-It names the ability from the declared type of its argument,
-so `supply(Terminal())` builds a handler for `Need[Terminal]`,
-which the type checker never connects to `greet()`'s `Need[Console]`.
-`as_type(Console)` is what makes that argument's static type `Console`.
-An interface needs the upcast more than a base class does, not less:
-a concrete `Console` can be instantiated and supplied directly,
-while an interface leaves nothing to supply but an implementation.
-
-`console_protocol.py` is the form to write in production.
-The smaller listings that follow continue importing `greeter.py`'s concrete `Console`,
-because under the interface every supply site grows that upcast.
-That is a real cost of using the interface, not only a shortcut for the book.
-[Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
-declares its abilities as `Protocol`s and shows how to stop repeating that cost:
-write one boundary function whose parameters are annotated with the interface types,
-and call `supply()` inside it.
-The parameter annotation performs the upcast, so no call site needs `as_type()`.
-An annotated local variable does not do the same job:
-`screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
-so `supply(screen)` builds a `Need[Terminal]` handler again.
-Everything in between works the same under either form.
+`supply()` binds one instance for every matching request over the Effect's run,
+which is why the test reads the messages back out of `recorder` afterward.
 
 ## Builtin Abilities
 
@@ -615,66 +511,19 @@ and the accessors name those classes,
 so `isinstance()` accepts an instance of the class or a subclass and nothing else.
 A structurally identical double fails with a `MissingAbilityError` no matter what `as_type()` claims.
 A double for the builtin `Console` must inherit from it,
-which brings back the accident from [Swapping the Implementation](#swapping-the-implementation):
-that `Console` implements `input()` as well as `print()`,
+and that `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
+[Supplying an Interface](#supplying-an-interface)
+returns to what inheriting an implementation drags along.
 
 This chapter builds its own `Console` for illustration.
 In your own code, check what the library already declares first.
-
-## When Two Implementations Match
-
-A structural check matches on method names alone,
-so two supplied objects that both define `print()` are indistinguishable.
-If you supply both, argument order decides which one answers the request:
-
-```python
-# ambiguous_supply.py
-from dataclasses import dataclass, field
-from console_protocol import Console, Terminal, greet
-from stateless import as_type, run, supply
-
-@dataclass
-class Capture:
-    messages: list[str] = field(default_factory=list)
-    def print(self, message: str) -> None:
-        self.messages.append(message)
-
-capture = Capture()
-screen = as_type(Console)(Terminal())
-memory = as_type(Console)(capture)
-run(supply(screen, memory)(greet)("Alice"))
-#: Hello, Alice!
-print(capture.messages)
-#: []
-run(supply(memory, screen)(greet)("Bob"))
-print(capture.messages)
-#: ['Hello, Bob!']
-```
-
-`Terminal` and `Capture` share no base class and know nothing of each other.
-Both satisfy `Console` structurally, so `isinstance()` accepts either,
-and `supply()` hands over whichever it examines first.
-Alice's greeting reaches the screen and leaves `capture` empty.
-Swapping the two arguments sends Bob's greeting into `capture` and prints nothing.
-Neither `greet()` nor the type checker can tell the two runs apart,
-because both bindings have the same type.
-Both instances must go through `as_type(Console)`,
-since neither is nominally a `Console`.
-
-Here Stateless gives up something ZIO keeps.
-ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
-because its `provide` resolves the dependency graph during compilation.
-`supply()` resolves at runtime by scanning its arguments,
-so the same mistake produces a program that runs and does the wrong thing.
-Give abilities distinct method names when that ambiguity is possible,
-and supply one implementation per ability.
 
 ## Effects Propagate, and the Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
 `Console` and `greet()` reappear here from [Declaring a Dependency](#declaring-a-dependency),
-with the concrete `Console` class rather than the `Protocol` version.
+with a concrete `Console` class of the file's own.
 `greet_all()` must declare the `Console` even though we don't see `Console` directly used within `greet_all()`:
 
 ```python
@@ -868,7 +717,9 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
 `holds()` decides whether a nailer's force stays under a material's brittleness.
 It requests both and names neither implementation.
 `Material` and `Nailer` are distinct types,
-so `supply()` matches each request to one of them without the ambiguity `ambiguous_supply.py` showed:
+so `supply()` matches each request to one of them,
+without the ambiguity that [When Two Implementations Match](#when-two-implementations-match)
+runs into below:
 
 ```python
 # test_nailer.py
@@ -905,6 +756,171 @@ because `holds(material, nailer)` is easy to call four times.
 The difference appears when the dependency sits three calls deep.
 Then the parameter version threads two arguments through every function on the path.
 This version changes nothing but the row.
+
+## Supplying an Interface
+
+[Swapping the Implementation](#swapping-the-implementation)
+handed a `Recorder` to `as_type(Console)` and postponed the reason.
+Two questions are being answered there, and they have different audiences.
+
+The static question comes first.
+`supply()` reads the ability from the declared type of its argument,
+so handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
+a different ability from the `Need[Console]` that `greet()` asks for.
+`as_type(Console)(recorder)` makes the argument's static type `Console`,
+so `supply()` builds the handler type `greet()` needs.
+At runtime `as_type()` is the identity function and returns the object it was given.
+Only the static type changes.
+
+`typing.cast(Console, recorder)` produces the same result here,
+but the two are not interchangeable.
+`cast()` is an unchecked assertion,
+believed by the type checker even when the object has no relation to `Console`.
+`as_type(Console)` returns a function annotated `(Console) -> Console`,
+so an object that does not implement `Console` produces an error.
+`as_type()` widens a type to a supertype,
+`cast()` makes one type into another without constraint.
+
+The runtime question is answered by `isinstance()`, and no listing shows it.
+The handler that `supply()` builds tests each request using `isinstance(instance, ability.t)`,
+where `ability.t` is the class inside the `Need`.
+In `test_greeter.py`, `ability.t` is `Console` and `instance` is `recorder`,
+and `isinstance(recorder, Console)` succeeds because `Recorder` inherits from `Console`.
+So two separate things make that test work:
+`as_type(Console)` satisfies the type checker,
+and the inheritance satisfies the runtime check.
+
+That inheritance costs something.
+`Recorder` inherits `Console`'s printing implementation and overrides all of it,
+so nothing of the parent survives except the name that `isinstance()` looks for.
+But anything added to `Console` later shows up in `Recorder` too.
+Add a `read_line()` method to `Console`,
+and `Recorder` inherits the real one without warning,
+so a test meant to record instead performs live console I/O.
+Make the ability an interface and there is no implementation to inherit by accident:
+
+```python
+# console_protocol.py
+from typing import Protocol, runtime_checkable
+from stateless import Depend, Need, need
+
+@runtime_checkable
+class Console(Protocol):
+    def print(self, message: str) -> None: ...
+
+class Terminal:
+    def print(self, message: str) -> None:
+        print(message)
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    console = yield from need(Console)
+    console.print(f"Hello, {name}!")
+```
+
+The second of the three things [a full EMS does](44_Effect_Management.md#effect-management-systems)
+is separate each Effect's interface from its implementation.
+`Console` is now that interface and holds no implementation.
+`Terminal` is one implementation and `Recorder` is another,
+and neither is named anywhere in `greet()`.
+Because a `Protocol` matches on structure,
+`Recorder` qualifies without inheriting from anything.
+`@runtime_checkable` is required because `supply()` uses `isinstance()`.
+
+Structural matching does not remove the need for `as_type()`.
+Supply a `Terminal` both ways:
+
+```python
+# protocol_supply.py
+from console_protocol import Console, Terminal, greet
+from stateless import as_type, run, supply
+
+run(supply(Terminal())(greet)("Alice"))  # type: ignore
+#: Hello, Alice!
+run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
+#: Hello, Bob!
+```
+
+Both lines print, because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
+Remove the `# type: ignore` and `ty` rejects the first one:
+
+```text
+error[invalid-argument-type]: Argument to function `run` is incorrect
+ --> protocol_supply.py:5:5
+  |
+5 | run(supply(Terminal())(greet)("Alice"))
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Expected
+  |     `Generator[Async | Exception, Any, Unknown]`, found
+  |     `Generator[Need[Console], Any, None]`
+```
+
+Structure decides the runtime question and nothing else.
+`supply(Terminal())` still builds a handler for `Need[Terminal]`,
+which the type checker never connects to `greet()`'s `Need[Console]`.
+An interface needs the upcast more than a base class does, not less:
+a concrete `Console` can be instantiated and supplied directly,
+while an interface leaves nothing to supply but an implementation.
+
+`console_protocol.py` is the form to write in production.
+Most listings in these two chapters use a concrete `Console` instead,
+because under the interface every supply site grows that upcast.
+That is a real cost of using the interface, not only a shortcut for the book.
+[Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
+declares its abilities as `Protocol`s and shows how to stop repeating that cost:
+write one boundary function whose parameters are annotated with the interface types,
+and call `supply()` inside it.
+The parameter annotation performs the upcast, so no call site needs `as_type()`.
+An annotated local variable does not do the same job:
+`screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
+so `supply(screen)` builds a `Need[Terminal]` handler again.
+Everything in between works the same under either form.
+
+## When Two Implementations Match
+
+A structural check matches on method names alone,
+so two supplied objects that both define `print()` are indistinguishable.
+If you supply both, argument order decides which one answers the request:
+
+```python
+# ambiguous_supply.py
+from dataclasses import dataclass, field
+from console_protocol import Console, Terminal, greet
+from stateless import as_type, run, supply
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+    def print(self, message: str) -> None:
+        self.messages.append(message)
+
+capture = Capture()
+screen = as_type(Console)(Terminal())
+memory = as_type(Console)(capture)
+run(supply(screen, memory)(greet)("Alice"))
+#: Hello, Alice!
+print(capture.messages)
+#: []
+run(supply(memory, screen)(greet)("Bob"))
+print(capture.messages)
+#: ['Hello, Bob!']
+```
+
+`Terminal` and `Capture` share no base class and know nothing of each other.
+Both satisfy `Console` structurally, so `isinstance()` accepts either,
+and `supply()` hands over whichever it examines first.
+Alice's greeting reaches the screen and leaves `capture` empty.
+Swapping the two arguments sends Bob's greeting into `capture` and prints nothing.
+Neither `greet()` nor the type checker can tell the two runs apart,
+because both bindings have the same type.
+Both instances must go through `as_type(Console)`,
+since neither is nominally a `Console`.
+
+Here Stateless gives up something ZIO keeps.
+ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
+because its `provide` resolves the dependency graph during compilation.
+`supply()` resolves at runtime by scanning its arguments,
+so the same mistake produces a program that runs and does the wrong thing.
+Give abilities distinct method names when that ambiguity is possible,
+and supply one implementation per ability.
 
 ## Dependency Injection
 
@@ -1154,7 +1170,7 @@ and `Need[Time]` moves that reading into the ability channel.
 A test can then supply a `Time` subclass whose `sleep()` returns at once,
 and check the logic without waiting for real time to pass.
 That subclass goes through `as_type(Time)`,
-for the same reason `Recorder` went through `as_type(Console)`.
+for the reason [Supplying an Interface](#supplying-an-interface) gives.
 In [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
 `retry()` waits between attempts,
 so it adds `Need[Time]` and `Async` to whatever it decorates.
