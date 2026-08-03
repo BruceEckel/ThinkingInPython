@@ -41,6 +41,7 @@ Review all exercises to make sure they refer to existing examples and that all  
 - "have to", "could" -> "can"
 - which was
 - which will be
+- would have
 
 - active voice: Ask gemini to create a claude skill and how to install it
 

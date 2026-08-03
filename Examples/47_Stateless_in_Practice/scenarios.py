@@ -1,6 +1,6 @@
 # scenarios.py
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, assert_never
 from research import (
     Encyclopedia,
     Feed,
@@ -42,8 +42,10 @@ def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
             return "nothing worth researching"
         case NoArticle():
             return "no article on that topic"
-        case _:
+        case str():
             return found
+        case _:
+            assert_never(found)
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")

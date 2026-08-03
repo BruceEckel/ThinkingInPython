@@ -158,7 +158,8 @@ such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
-`Need` is dependency injection.
+`Need` is how Stateless does dependency injection.
+A `Need` is a request for an instance, and something else answers it.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass`,
 without saying where that instance comes from:
 
@@ -232,7 +233,7 @@ For Stateless to see the request for a `Console`,
 that request must be an object: the `Need[Console]` that `need(Console)` builds.
 `yield from` then hands that object out of the function body.
 It suspends `greet()` and passes the `Need[Console]` to whatever is driving the generator,
-which answers with a `Console` and resumes the function.
+which provides a `Console` and resumes the function.
 
 ## Supplying the Dependency
 
@@ -407,7 +408,7 @@ so an object that does not implement `Console` is an argument-type error at that
 It can widen a type to a supertype and nothing more.
 
 When `greet()` yields a `Need[Console]`,
-the library decides which supplied instance answers that request.
+the library decides which supplied instance provides that `Need`.
 This pairing happens out of sight of the listing.
 The handler that `supply()` builds tests each request with `isinstance(instance, ability.t)`,
 where `ability.t` is the class inside the `Need`.
@@ -898,6 +899,102 @@ The difference appears when the dependency sits three calls deep.
 Then the parameter version threads two arguments through every function on the path.
 This version changes nothing but the row.
 
+## Dependency Injection
+
+Conventional dependency injection (DI) collects all bindings into a container.
+That container maps each type to the instance that satisfies it,
+and provides those instances during program execution:
+
+```python
+# dependency_injection.py
+from typing import Any, Final
+from greeter import Console
+
+DI_CONTAINER: Final[dict[type, Any]] = {}
+
+def register[T](t: type[T], instance: T) -> None:
+    DI_CONTAINER[t] = instance
+
+def get[T](t: type[T]) -> T:
+    return DI_CONTAINER[t]
+
+def greet(name: str) -> None:
+    console = get(Console)
+    console.print(f"Hello, {name}!")
+
+try:
+    greet("Alice")
+except KeyError:
+    print("KeyError: no Console registered")
+register(Console, Console())
+greet("Alice")
+#: KeyError: no Console registered
+#: Hello, Alice!
+```
+
+`register()` puts an instance in, and `get()` looks one up by type,
+at the point where the program needs it.
+The key is the type you register,
+so `register(Console, Recorder())` binds an implementation to the type its callers request.
+In Stateless, `supply()` takes the instances alone and pairs them by `isinstance()`,
+which is why two instances that satisfy one `Need` are ambiguous
+([When Two Implementations Match](46_Stateless.md#when-two-implementations-match)).
+That registration key also does the work `as_type(Console)` does for `supply()`,
+which reads each ability from its argument's static type:
+`supply(recorder)` is a `Handler[Need[Recorder]]`,
+and no `Need[Console]` matches it
+([Swapping the Implementation](46_Stateless.md#swapping-the-implementation)).
+
+The `Any` in `DI_CONTAINER` is unavoidable,
+because it holds instances of unrelated types.
+The type information is now held in the dictionary key,
+but a homogeneous `dict` has no annotation for "the value under key `type[T]` is a `T`."
+That invariant lives in `register()`'s signature rather than in the container.
+
+`greet()`'s body matches `greeter.py`'s `greet()` line for line,
+apart from `console = get(Console)` in place of `console = yield from need(Console)`.
+
+The first call to `greet("Alice")` fails at runtime because nothing has been registered yet.
+The second call succeeds because the binding now exists.
+The two calls are identical in the source,
+and nothing in their types records whether a `Console` has been registered,
+so `ty` accepts the file.
+
+Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](46_Stateless.md#declaring-a-dependency).
+Both read `(str) -> None`, and both hide a `Console`.
+A container relocates a side cause instead of declaring it,
+so the dependency becomes swappable without becoming visible.
+
+Stateless has no container.
+`supply()` is a function call, and its arguments are the bindings.
+This produces three consequences:
+
+1. The check happens before the program runs.
+   A container discovers a missing registration when something asks for it,
+   which can be at startup or much later, on a path no test exercised.
+   Remove the `# type: ignore` from `unsupplied.py` and `ty` reports the unsupplied `Need[Console]` before the program runs
+   ([Forgetting to Supply](46_Stateless.md#forgetting-to-supply)).
+
+2. Bindings are per call rather than per process.
+   A container usually holds one binding for a type for the life of the program.
+   `supply()` binds for one execution of one Effect,
+   so two bindings for the same type can be live at once,
+   as the screen and memory `Console`s were in [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
+   Nothing global has to be reset between test cases.
+
+3. What a function requires is in its type.
+   A container leaves that information in the bodies that ask for it,
+   so learning what a function needs means reading its implementation.
+   `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
+   and a caller that does not supply them inherits the requirement.
+
+That propagation is also the cost.
+Adding a dependency deep in the stack rewrites the return type of every function above it,
+which [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+demonstrated with `Need[Log]`.
+A container absorbs the same change in silence, and no signature records it.
+The better trade depends on whether you would rather meet the omission in a stack trace or in the checker.
+
 ## The Error Channel
 
 Dependencies are one half of the type.
@@ -993,13 +1090,16 @@ without forcing you to handle them.
 
 `catch()` empties the error channel the way `supply()` empties the ability channel,
 but the two do different things with what they remove.
-`supply()` binds the ability inside the Effect and leaves `Never` behind.
+`supply()` provides the ability inside the Effect,
+so the ability parameter becomes `Never` and the result type never mentions the `Console`
+([Supplying the Dependency](46_Stateless.md#supplying-the-dependency)).
 `catch()` hands the error back to you as a value in the result.
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out:
 
 ```python
 # catch_score.py
+from typing import assert_never
 from greeter import Console
 from scores import score
 from stateless import Depend, Need, catch, need, run, supply
@@ -1010,8 +1110,10 @@ def report(name: str) -> Depend[Need[Console], None]:
     match value:
         case KeyError():
             console.print(f"{name}: unknown")
-        case _:
+        case int():
             console.print(f"{name}: {value}")
+        case _:
+            assert_never(value)
 
 run(supply(Console())(report)("Alice"))
 run(supply(Console())(report)("Carol"))
@@ -1023,14 +1125,14 @@ The signature for `score()` is `(str) -> Try[KeyError, int]`.
 `catch(KeyError)(score)` changes it to `(str) -> Success[int | KeyError]`.
 The error leaves the error type parameter, which becomes `Never`,
 and joins the result type parameter.
-That makes `value` something you `match` on rather than an exception you catch.
+That makes `value` something you `match` on rather than an exception to catch.
 
 `Success` describes the Effect, not the lookup.
 It means both channels are empty: nothing left to supply,
 and no failure that `run()` must raise.
-The Effect succeeds at producing either a score or a `KeyError` indicating there is no score.
+The Effect "succeeds" at producing either a score or a `KeyError` indicating there is no score.
 A raised `KeyError` is a failure.
-The same object returned is data like any other value.
+A returned `KeyError` is data.
 
 Moving the error into the result makes it impossible to ignore.
 If you drop the `match` entirely and use `value` directly as a number,
@@ -1047,17 +1149,15 @@ error[unsupported-operator]: Unsupported `+` operation
   |                              Has type `int | KeyError`
 ```
 
-This is the same guarantee a `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
+This is the same guarantee the `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
 reached without rewriting the body of `score()`.
 
+### Multiple Errors
+
 `catch()` can track multiple error types.
-`SCORES` stored its values as `int`s,
-so looking up a name was the only step and `KeyError` the only failure.
-`RAW` stores the scoreboard as text, before anyone has interpreted it,
-which puts two steps in `read_score()` and one potential failure in each.
-The lookup raises a `KeyError` for an unknown name,
-and the conversion raises a `ValueError` for text that is not a number,
-like Bob's `"seven"`:
+`SCORES` stores its values as `int`s,
+so looking up a name is the only step and `KeyError` is the only failure.
+`RAW` stores the scoreboard as text, before anyone has interpreted it:
 
 ```python
 # read_score.py
@@ -1072,11 +1172,17 @@ def read_score(name: str) -> int:
     return int(text)  # ValueError
 ```
 
-`@throws(KeyError, ValueError)` makes it `(str) -> Try[KeyError | ValueError, int]`.
-We can catch both errors with `both`, and one error with `one`:
+There are two steps, and one potential failure in each.
+The lookup raises a `KeyError` for an unknown name,
+and the conversion raises a `ValueError` for text that is not a number,
+like Bob's `"seven"`.
+
+`@throws(KeyError, ValueError)` makes the `read_score` signature `(str) -> Try[KeyError | ValueError, int]`.
+We can catch `both` errors or just `one` error:
 
 ```python
 # catch_subset.py
+from typing import assert_never
 from read_score import read_score
 from stateless import Success, Try, catch, run
 
@@ -1090,26 +1196,30 @@ def all_handled(name: str) -> Success[str]:
             return f"{name}: unknown"
         case ValueError():
             return f"{name}: unreadable"
-        case _:
+        case int():
             return f"{name}: {value}"
+        case _:
+            assert_never(value)
 
-def one_left(name: str) -> Try[ValueError, str]:
+def one_unhandled(name: str) -> Try[ValueError, str]:
     value: int | KeyError = yield from one(name)
     match value:
         case KeyError():
             return f"{name}: unknown"
-        case _:
+        case int():
             return f"{name}: {value}"
+        case _:
+            assert_never(value)
 
 for who in ["Alice", "Bob", "Carol"]:
     print(run(all_handled(who)))
 #: Alice: 42
 #: Bob: unreadable
 #: Carol: unknown
-print(run(one_left("Alice")))
+print(run(one_unhandled("Alice")))
 #: Alice: 42
 try:
-    run(one_left("Bob"))
+    run(one_unhandled("Bob"))
 except ValueError as e:
     print(type(e).__name__)
 #: ValueError
@@ -1117,23 +1227,27 @@ except ValueError as e:
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure has been moved into the result so nothing is left in the error channel.
-`all_handled()` returns `Success[str]` which means that no failure can escape it.
+`all_handled()` returns `Success[str]` which means that no failure can escape as a thrown exception.
 The three names exercise its three branches.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
-The caught error moved to the result and the uncaught one stayed put,
-so `one_left()` must declare a `ValueError` it never handles.
-Calling it on `"Bob"` carries that failure to the edge,
-where `run()` raises it as an ordinary exception,
+The caught error moved to the result and the uncaught one remains.
+`one_unhandled()` never handles `ValueError` so that must be declared.
+Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
+which raises it as an ordinary exception,
 the same escape `error_escapes.py` showed for a single error.
 Failures cannot be lost, only relocated.
 
 ## Emptying the Channels
 
-The two halves of this chapter taught two vocabularies.
-A dependency is a `Need`, and `supply()` answers it.
-A failure is an exception, `@throws` lifts it into the type,
-and `catch()` takes it back out.
+The two halves of this chapter taught two vocabularies:
+
+1. A dependency is an object created elsewhere.
+   `need()` records the request as a `Need` in the type,
+   and `supply()` answers it with an instance.
+2. A failure is an exception: `@throws` lifts it into the type,
+   and `catch()` removes it from the equation.
+
 The vocabularies differ.
 The operation underneath them does not.
 Both subtract from the type.
@@ -1142,16 +1256,18 @@ Both subtract from the type.
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`, which `run()` accepts.
 
-The channels do not end the same way.
-`unsupplied.py` showed `run()` refusing an Effect that still declares an ability,
+The channels do not resolve in the same way:
+
+- `unsupplied.py` showed `run()` refusing an Effect that still declares an ability,
 before the program starts.
-`error_escapes.py` showed `run()` accepting one that still declares a failure,
+- `error_escapes.py` showed `run()` accepting an Effect that still declares a failure,
 then raising that failure at the edge.
+
 The difference is not an inconsistency.
 An unbound dependency has no answer anywhere in the program,
-so a driver that met one could do nothing but stop.
-An unhandled failure has a clear meaning at the boundary: raise it,
-which is what Python would have done without the Effect type.
+so a driver encountering one can do nothing but stop.
+An unhandled failure has a clear meaning at the boundary: raise the exception,
+which is what Python does without the Effect type.
 The two guarantees are therefore different.
 A dependency must be resolved before anything runs.
 A failure must be declared, and you choose where to handle it.
@@ -1167,7 +1283,7 @@ Both are checked, and neither can be dropped by forgetting it.
     and run `ty check` on it.
     Fix the error by changing only the annotation,
     then check what `greet_all()`'s callers must now declare.
-3.  Apply `reveal_type()` to `catch(ValueError)(one_left)` and run `ty check`.
+3.  Apply `reveal_type()` to `catch(ValueError)(one_unhandled)` and run `ty check`.
     Explain why its result type differs from `all_handled()`'s,
     given that both have handled every error `read_score()` declares.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
