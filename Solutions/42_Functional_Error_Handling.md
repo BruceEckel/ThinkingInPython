@@ -217,7 +217,7 @@ This version also trades away genericity on purpose. `func_a()`,
 `int` or an error string" (`IntResult | ErrorResult`), while
 `combined()` itself needs a different shape, "a finished `str` or a
 list of error strings." Reusing one generic `Ok[A]`/`Err[E]`
-pair for both would ask a type checker to recover a type parameter
+pair for both asks a type checker to recover a type parameter
 from a plain `isinstance()` check, which Python's runtime type
 erasure makes impossible in general; `ty` reports that gap as
 an error. Two small concrete classes sidestep the problem entirely,

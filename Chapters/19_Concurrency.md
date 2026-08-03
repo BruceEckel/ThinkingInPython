@@ -198,7 +198,7 @@ which is how all three are in flight during the first wait.
 
 Suspending also registers a wake-up condition with the event loop.
 `asyncio.sleep()` asks for a timer,
-but a real network request would ask the loop to watch a socket for the reply.
+but a real network request asks the loop to watch a socket for the reply.
 When the timer fires, the loop resumes that task where it paused,
 just after the `await`.
 
@@ -689,7 +689,7 @@ waiting for it to finish, and reassembling results that can arrive in any order
 Doing that after `join()` only works here because all five results are small enough for every worker to finish writing without needing a reader first.
 A queue carrying bulky data must be drained *before* joining:
 each worker's feeder thread blocks until its data is consumed,
-so the `join()` would deadlock.
+so the `join()` deadlocks.
 
 `ProcessPoolExecutor` is built on `multiprocessing`.
 It reuses a pool of workers instead of spawning one process per call,
@@ -857,7 +857,7 @@ def compare(
 ```
 
 Two timings of the same type come back from one call,
-so returning them as a bare `tuple[float, float]` would leave every caller remembering which float came first.
+so returning them as a bare `tuple[float, float]` leaves every caller remembering which float came first.
 `Times` names them, as [Data Transfer Objects](22_Data_Transfer_Objects.md#returning-multiple-values)
 describes.
 The two callers below use the two styles a `NamedTuple` allows,
@@ -1441,7 +1441,7 @@ async def bytes_per_task() -> float:
     for t in tasks:
         t.cancel()
     # Without "return_exceptions=True", the first CancelledError
-    # would raise an exception and exit the function:
+    # raises an exception and exits the function:
     await asyncio.gather(*tasks, return_exceptions=True)
     tracemalloc.stop()
     return grown / TASKS
@@ -1607,7 +1607,7 @@ asyncio.run(main())
 
 Five tasks start together, but `semaphore` admits only two at a time.
 `peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
-A threaded equivalent of this worker would need its own lock around `active += 1` and `peak = max(peak, active)`,
+A threaded equivalent of this worker needs its own lock around `active += 1` and `peak = max(peak, active)`,
 since a preemptive switch could land between them.
 Here, the first `await` comes after both updates,
 so the task keeps control through them and needs no lock.
@@ -1681,8 +1681,8 @@ Here, the timeout ensures that the example terminates.
 
 The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
-If both tasks had reached for `lock_a` first,
-whichever got there first would finish and release that lock before the other waited.
+If both tasks acquire `lock_a` first,
+whichever gets there first finishes and releases that lock before the other waits.
 
 ### Livelock
 

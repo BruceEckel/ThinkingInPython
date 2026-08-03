@@ -112,7 +112,7 @@ a brand-new instance attribute named `total` on `a`, which then
 shadows `Tally.total` for `a` specifically. `vars(a)` shows this
 directly: `a` now has its own `total` entry. `Tally.total`, read
 through the class, is completely untouched and still reports `2`.
-This is precisely the shadowing bug `ClassVar` exists to catch. Had
-`total` been declared `total: ClassVar[int] = 0`, the type checker
-would flag `a.total = 99` as an error before this line ever ran,
-because it can see this assignment would create this confusing shadow.
+This is precisely the shadowing bug `ClassVar` exists to catch. If
+`total` is declared `total: ClassVar[int] = 0`, the type checker
+flags `a.total = 99` as an error before this line ever runs,
+because it can see this assignment creates this confusing shadow.

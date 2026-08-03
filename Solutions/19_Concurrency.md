@@ -134,8 +134,8 @@ their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
 Move the loop above the `await` and the peak drops back to `1`. Each
-coroutine would then run its full million iterations before yielding,
-and the event loop would never get the chance to overlap them. What
+coroutine then runs its full million iterations before yielding,
+and the event loop never gets the chance to overlap them. What
 decides overlap is where the `await` sits relative to the computation,
 not that the function contains one somewhere.
 

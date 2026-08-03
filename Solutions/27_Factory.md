@@ -271,7 +271,7 @@ again: illegal values are unrepresentable.
 Placing the check in `topping()`, as above, gives `PizzaBuilder` the
 same guarantee: the fifth `.topping()` call raises before appending,
 so `self._toppings` itself never grows past four. Placing the check
-in `build()` instead would change this. The builder would then accept
+in `build()` instead changes this. The builder then accepts
 a fifth, sixth, or tenth `.topping()` call without complaint, silently
 accumulating an already-too-long list, and only discover the problem
 when `build()` finally runs. During that window, between the fifth

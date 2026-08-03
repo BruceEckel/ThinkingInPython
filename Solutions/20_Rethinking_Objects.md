@@ -181,8 +181,8 @@ for shape in shapes:
 
 `ty check` passes because every member of the `Shape` union now has a
 matching `case`. Commenting out the `Square` case makes the `match`
-non-exhaustive: the checker can prove that a `Square` argument would
-fall through every `case` to `case _`, which calls `assert_never(shape)`.
+non-exhaustive: the checker can prove that a `Square` argument
+falls through every `case` to `case _`, which calls `assert_never(shape)`.
 Since `shape` could genuinely be a `Square` at that point, the checker
 reports that `assert_never()`'s argument is not the `Never` type it
 requires, exactly the exhaustiveness check the union was added for. It

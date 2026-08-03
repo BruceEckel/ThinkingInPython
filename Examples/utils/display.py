@@ -25,7 +25,7 @@ def _type_name(annotation: object) -> str:
 def _redefined(name: str, value: object) -> bool:
     # Restricted to INTERESTING_DUNDERS: every class has __module__,
     # __dict__, and other bookkeeping dunders that always differ from
-    # object's, so comparing those would never filter anything out.
+    # object's, so comparing those never filters anything out.
     if name not in INTERESTING_DUNDERS:
         return False
     return getattr(object, name, None) is not value

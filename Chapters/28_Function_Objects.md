@@ -468,7 +468,7 @@ The `Any` covers the heterogeneous storage behind it.
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
 `publish` still calls `.get(type(event), [])` instead of indexing.
-Indexing on a read would insert an empty list as a side effect,
+Indexing on a read inserts an empty list as a side effect,
 leaving a stray entry behind for every published event type that happens to have no subscriber,
 such as `Closed`.
 

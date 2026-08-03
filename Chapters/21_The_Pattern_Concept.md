@@ -80,7 +80,7 @@ Generic code can work with any object that produces an iterator.
 
 A pattern is often a sign of something missing in a language.
 Enough programmers wrote the same scaffolding often enough to name it.
-That scaffolding exists only because the language would not write it for them.
+That scaffolding exists only because the language does not write it for them.
 When a language later absorbs the feature,
 the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language.].
 Python has absorbed several.

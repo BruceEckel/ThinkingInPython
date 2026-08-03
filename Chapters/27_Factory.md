@@ -4,7 +4,7 @@ When you discover that you need to add new types to a system,
 the most sensible first step is to use polymorphism to create a common interface to those new types.
 This separates the rest of the code in your system from the knowledge of the specific types that you are adding.
 You may add new types without disturbing existing code … or so it seems.
-At first it would appear that the only place you need to change the code in such a design is the place where you inherit a new type,
+At first it appears that the only place you need to change the code in such a design is the place where you inherit a new type,
 but that isn't the case.
 You must still create an object of your new type,
 and at the point of creation you must specify the exact constructor to use.
@@ -96,7 +96,7 @@ but a generator has an internal algorithm that tells it what to build.
 Inside `shape_name_gen()`,
 `Shape.__subclasses__()` produces a list of references to each direct subclass of `Shape`.
 It covers only the first level of inheritance,
-so a class inheriting from `Circle` would not show up in the list.
+so a class inheriting from `Circle` does not show up in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
 You can drive the generator by hand:
@@ -597,8 +597,8 @@ print(captain)
 The deep copy is the part that matters.
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
-A shallow copy would share that list,
-and editing one monster would corrupt the other.
+A shallow copy shares that list,
+and editing one monster corrupts the other.
 The `clone()` method simply wraps `copy.deepcopy()`.
 
 We can combine prototype with a registry.

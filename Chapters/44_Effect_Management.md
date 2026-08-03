@@ -741,7 +741,7 @@ opened with, and it can now be read with new eyes.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
-The tracking is enforced the way an EMS would enforce it.
+The tracking is enforced the way an EMS enforces it.
 `await` is a syntax error outside an `async def`,
 so any function that awaits a coroutine must become `async`,
 and so must its callers, all the way up to the edge.
@@ -778,7 +778,7 @@ The guarantee has a boundary, and it is worth naming here.
 Stateless verifies that the Effects you *declare* propagate consistently.
 Nothing stops a function from calling `print()` directly,
 adjacent to its carefully declared abilities.
-In Koka, that call would change the function's Effect row,
+In Koka, that call changes the function's Effect row,
 and every caller's row.
 In Python, it changes nothing that any tool can see.
 A library checks the Effects you wrote down.
@@ -789,10 +789,10 @@ so that the declaring stops being manual?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
-A type checker would need to compute the Effect row of every function from the functions it calls,
+A type checker needs to compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which are unannotated.
 `async` succeeded because it arrived with the language and split the world visibly.
-An Effect row would need to spread through an ecosystem of untracked code.
+An Effect row needs to spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, the ideas in this chapter are what it will contain.

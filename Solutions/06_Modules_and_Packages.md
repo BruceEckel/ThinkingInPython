@@ -97,9 +97,9 @@ the import site.
 
 On a case-sensitive filesystem, which is the default on Linux (and can
 be enabled on macOS), `Module.py` and `module.py` are two distinct,
-unrelated file names. `import module` would then raise
+unrelated file names. `import module` then raises
 `ModuleNotFoundError`, because no file matching that exact,
-lowercase name exists; only `import Module` would work. Relying on
+lowercase name exists; only `import Module` works. Relying on
 case-insensitive matching is a portability trap: code that imports
 happen to work on Windows can fail the moment it runs on Linux CI.
 This is also why [File Names](#file-names) recommends `snake_case` for

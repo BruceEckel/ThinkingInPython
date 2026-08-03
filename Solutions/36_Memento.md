@@ -203,7 +203,7 @@ translating into a shared, language-neutral format. The reconstruction
 has to compensate for what JSON lost: wrapping `data["strokes"]` back
 in `tuple(...)` before passing it to `Sketch`, since `Sketch.strokes`
 is declared `tuple[str, ...]` and a `Sketch` built with a `list`
-there would fail `ty check`, and would also no longer be hashable the
+there fails `ty check`, and is also no longer hashable the
 way the rest of the chapter relies on frozen dataclasses being.
 
 ## 4. `Memento` holding the list itself

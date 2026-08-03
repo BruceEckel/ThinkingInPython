@@ -311,7 +311,7 @@ When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
 instead of sending them to a named function defined elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
-Naming that one-liner would cost a line, a name to invent,
+Naming that one-liner costs a line, a name to invent,
 and a definition to look up, with nothing gained in clarity.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
@@ -375,9 +375,9 @@ so no accident can corrupt it.
 The `nonlocal` statement is what lets `increment()` *assign* to the captured variable.
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
-so `count += 1` alone would make `count` a fresh local,
+so `count += 1` alone makes `count` a fresh local,
 one referenced before assignment,
-and the call would fail with `UnboundLocalError`.
+and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 Forgetting it is the standard stumble when a closure first needs to write,
 and the error message, complaining about a local variable,

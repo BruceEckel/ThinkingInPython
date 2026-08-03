@@ -43,8 +43,8 @@ print(g.hello("Bob"))
 `vars(cls)`, the class's own namespace, wrapping every plain callable
 that is not a dunder. `make_wrapper` captures each method's `name` as
 a default argument (`name: str = name`), which freezes that
-particular loop iteration's value; without it, every wrapper would
-share the loop variable's final value instead of its own method's
+particular loop iteration's value; without it, every wrapper
+shares the loop variable's final value instead of its own method's
 name, the classic late-binding closure trap. This is
 [Decorating Classes](14_Decorators.md#decorating-classes)'s
 `register` idea taken further: instead of only recording the class,
@@ -160,5 +160,5 @@ the field into one color"; two-player competition follows the same
 whoever's move leaves the larger owned patch after a fixed number of
 rounds. `FloodGame` inheriting from `Observable`, the same as
 `BoxModel`, and calling `self.notify(self.grid)` at the end of a
-successful `click()` would let `box_view.py`'s existing view repaint
+successful `click()` lets `box_view.py`'s existing view repaint
 after every move with no changes to the view itself.

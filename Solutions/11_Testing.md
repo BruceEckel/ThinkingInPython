@@ -55,8 +55,8 @@ def test_transfer_overdraft_leaves_both_unchanged(
 touching `self.balance`, so an overdrafting transfer never reaches the
 `deposit()` call at all: both accounts are left exactly as they were.
 Writing the overdraft test first is what makes this ordering a
-deliberate decision rather than an accident; a version that deposited
-first and withdrew second would leave `other` credited even when the
+deliberate decision rather than an accident; a version that deposits
+first and withdraws second leaves `other` credited even when the
 transfer as a whole should fail.
 
 ## 2. Parametrized interest rates

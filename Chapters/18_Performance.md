@@ -202,9 +202,9 @@ so it costs little more than the local variable would have.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference measures the machine's mood.
-A hoist worth writing would beat that margin without argument.
+A hoist worth writing beats that margin without argument.
 The measurement proves the point because it catches a "classic" optimization that no longer works,
-just as readily as it would catch one that does.
+just as readily as it catches one that does.
 
 ## Choose Better Algorithms and Data Structures
 
@@ -243,7 +243,7 @@ print([grade(s) for s in (55, 65, 85, 95)])
 ```
 
 Because `scores` stays sorted, `bisect` locates a position in O(log n)
-instead of the O(n) scan a `list` would need.
+instead of the O(n) scan a `list` needs.
 Only the search is fast,
 because `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic consider the heap below instead.

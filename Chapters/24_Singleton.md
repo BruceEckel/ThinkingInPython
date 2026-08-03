@@ -193,7 +193,7 @@ Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
 Python decides at compile time that a name a function assigns anywhere is local everywhere in that function,
 so without the `global` declaration,
-`if _instance is None` would read an unassigned local and raise `UnboundLocalError`.
+`if _instance is None` reads an unassigned local and raises `UnboundLocalError`.
 Mutate through any name.
 Declare only what you rebind.
 
@@ -315,7 +315,7 @@ print(x.val, x is y, x.instance is y.instance)
 ```
 
 The bare `__OnlyOne()` works because the nested class is already defined at that point in the body.
-The qualified `OnlyOne.__OnlyOne()` would fail,
+The qualified `OnlyOne.__OnlyOne()` fails,
 because the name `OnlyOne` stays unbound until its own class body finishes running.
 
 `__getattr__()` returns `Any` in both versions, and unlike `instance`,
@@ -423,7 +423,7 @@ which puts this version on the other side of the rule from `singleton_with_new.p
 There, `__new__()` handed back the inner class,
 so `__init__()` never ran and `isinstance(x, OnlyOne)` was `False`.
 Here `isinstance(x, SingletonClassVar)` is `True`,
-and Python would call `__init__()` on the shared instance after every construction if the class defined one.
+and Python calls `__init__()` on the shared instance after every construction if the class defines one.
 `SingletonClassVar` defines none, so all the work happens in `__new__()`.
 
 ### Borg: Singleton By Inheritance

@@ -39,7 +39,7 @@ We could have gotten nearly the same effect by saying:
 
     class State: pass
 
-because we would still get exceptions if code called `run()` or `next()` on a derived type that hadn't implemented them.
+because we still get exceptions if code calls `run()` or `next()` on a derived type that hasn't implemented them.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -75,7 +75,7 @@ The constructor also runs the initial state,
 the construction-starts-the-engine choice that chapter warned about.
 It is safe here because the state objects are stateless singletons,
 fully formed before any machine exists.
-A `State` whose `run()` read attributes off the machine would revive the trap.
+A `State` whose `run()` reads attributes off the machine revives the trap.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
@@ -675,7 +675,7 @@ The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects
 (a selection before any money, say) and shows it rather than crashing.
 The button loop builds sixteen commands with `partial(select, r, c)`,
-not with a lambda: sixteen lambdas closing over `r` and `c` would all see the loop's final values,
+not with a lambda: sixteen lambdas closing over `r` and `c` all see the loop's final values,
 the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime).
 Because it requires user interaction the harness skips it
 (`tools/data/norun.txt`):

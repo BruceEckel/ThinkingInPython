@@ -522,7 +522,7 @@ When one consumer runs far ahead of the other,
 ### `product`
 
 The Cartesian product of the input iterables,
-the same pairs a nested `for` loop would build,
+the same pairs a nested `for` loop builds,
 without writing and re-testing that loop yourself.
 
 ```python

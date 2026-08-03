@@ -173,7 +173,7 @@ The constructor stored the caller's own list,
 so the caller's original reference still mutates the internals.
 A fully defensive class must copy on the way in as well.
 
-A `@dataclass` version of `Plugged` would trim the constructor,
+A `@dataclass` version of `Plugged` trims the constructor,
 but its generated `__repr__` prints `_numbers` and `_bob` directly,
 leaking the internals yet again.
 
@@ -183,8 +183,8 @@ which is safe here only because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references,
 the conservative choice when a field's own fields might be mutable.
-A shallow copy of a list of `Bob`s would plug nothing:
-the caller's copy of the list would still hold your actual `Bob`s.
+A shallow copy of a list of `Bob`s plugs nothing:
+the caller's copy of the list still holds your actual `Bob`s.
 
 Testing confirms the defensive copy holds.
 Mutating the returned list leaves the original untouched:
@@ -522,8 +522,8 @@ if __name__ == "__main__":
 
 `show()` accepts anything: `Any`, which is not `object`.
 Pass it something without a `display()` method and you'll get an exception when the line runs.
-If we used `t: object` (the safe top type),
-`show()` would fail the type checker because `object` has no `display()` method.
+If we use `t: object` (the safe top type),
+`show()` fails the type checker because `object` has no `display()` method.
 `Any` switches the checker off for `t`, and this permits any type.
 Each `Any` parameter moves you back into dynamic typing.
 
@@ -685,8 +685,8 @@ if __name__ == "__main__":
 
 Without the `# type: ignore`, `ty` rejects the second call.
 `UserId` and `int` are different types to the checker.
-The same distinction would separate `Priced` and `Weighted` in `protocol_collision.py`,
-if `total()` returned a `Price` or a `Weight` instead of a bare `float`.
+The same distinction separates `Priced` and `Weighted` in `protocol_collision.py`,
+if `total()` returns a `Price` or a `Weight` instead of a bare `float`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.

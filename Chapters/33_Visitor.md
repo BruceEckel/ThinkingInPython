@@ -117,7 +117,7 @@ the flower-side dispatch simply goes back to having nothing to say.
 One annotation in the listing is load-bearing.
 `accept()` types its visitor as `Any`,
 because the `Visitor` base class declares no `visit()` method,
-so `visitor.visit(self)` would fail the type checker under an honest `Visitor` annotation.
+so `visitor.visit(self)` fails the type checker under an honest `Visitor` annotation.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base;
 a Python version can give `Visitor` an abstract `visit()`,
 or describe visitors with a `Protocol`.

@@ -126,11 +126,11 @@ It states that instances of this class will carry a `label` attribute of type `s
 set somewhere.
 Here that somewhere is `__init__()`,
 whose `self.label = label` is what `display_object(a)` above actually found.
-Had `__init__()` never assigned it, no attribute would exist,
+If `__init__()` never assigns it, no attribute exists,
 on the instance or the class.
-The checker would not catch the omission,
+The checker does not catch the omission,
 because it trusts the annotation instead of verifying that every method actually sets it.
-The failure would surface later,
+The failure surfaces later,
 as an `AttributeError` from the first code that reads the missing `label`.
 
 The annotation on `label` is not required here.

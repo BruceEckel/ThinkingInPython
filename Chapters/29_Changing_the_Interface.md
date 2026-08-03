@@ -262,7 +262,7 @@ An *Adapter* changes the interface into the one you need.
 A *Façade* fronts a whole tangle of objects rather than one,
 narrowing many interfaces down to a comfortable few.
 When you cannot decide what to call your wrapper,
-ask what would break if you removed it: access control, added behavior,
+ask what breaks if you remove it: access control, added behavior,
 interface fit, or simplicity.
 
 ## Exercises

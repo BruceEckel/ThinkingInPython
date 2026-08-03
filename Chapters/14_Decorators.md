@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
 `functools.wraps` copies the original function's metadata onto the wrapper:
 its name, docstring, and other attributes.
-Without it, the decorated `add` would report its name as `wrapper` and lose its docstring,
+Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
 `wraps` is optional but there is rarely a reason to omit it.
 
@@ -137,8 +137,8 @@ as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters captured by `**P`,
 so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
-Without `**P` you would fall back to `*args: Any, **kwargs: Any`,
-and the wrapper would swallow any arguments,
+Without `**P` you fall back to `*args: Any, **kwargs: Any`,
+and the wrapper swallows any arguments,
 discarding the signature the decorator is meant to preserve.
 
 The `# type: ignore` comments mark where the checker cannot follow:
@@ -527,7 +527,7 @@ The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
 shows the descriptor protocol,
-which a class-based decorator would need to implement to work on methods.
+which a class-based decorator needs to implement to work on methods.
 
 A function needs none of this: it is already a descriptor,
 so `wrapper()` in the function form binds to an instance like any other method.
@@ -715,7 +715,7 @@ if __name__ == "__main__":
 and hands back whatever `greeting()` returned.
 `greeting` does not survive decoration as a function:
 the name now refers to the `str` that came out of it.
-Calling `greeting()` again would fail, since a `str` is not callable.
+Calling `greeting()` again fails, since a `str` is not callable.
 This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
 A module-level constant computed without a decorator is usually clearer for anything simpler.
 

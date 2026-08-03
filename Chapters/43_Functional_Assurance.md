@@ -100,7 +100,7 @@ and the answers do not change.
 Impure code has no such freedom.
 Recall `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions).
 Two parallel calls could both read `balance` before either writes it back,
-and one withdrawal would vanish.
+and one withdrawal vanishes.
 Making that safe means adding a lock,
 and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
@@ -211,7 +211,7 @@ Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
-including awkward ones a handwritten loop would miss,
+including awkward ones a handwritten loop misses,
 such as the empty string and unusual Unicode:
 
 ```python
@@ -246,7 +246,7 @@ obviously correct version matches the fast one,
 which is exactly what `parallel_pure.py`'s `assert parallel == serial` already claimed.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text[::-1]` tests nothing,
-because the test and the code would share any bug.
+because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's *behavior* without repeating its body.
 All of these lean on purity.

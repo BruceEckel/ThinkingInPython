@@ -129,7 +129,7 @@ checker resolves to whatever class `bump()` was actually called on.
 Called on a `LoudTally`, `Self` means `LoudTally`, so
 `t.bump().bump()` type-checks as a `LoudTally`, and `.report()` is
 available on it, resolving to `LoudTally.report()` since Python always
-starts method lookup from the actual (most derived) class. Had
-`bump()` been declared to return the fixed type `Tally` instead of
-`Self`, the checker would reject `.report()` on the chained result,
+starts method lookup from the actual (most derived) class. If
+`bump()` is declared to return the fixed type `Tally` instead of
+`Self`, the checker rejects `.report()` on the chained result,
 since plain `Tally` has no `report()` method.

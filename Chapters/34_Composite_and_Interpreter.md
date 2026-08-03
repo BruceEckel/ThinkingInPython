@@ -180,7 +180,7 @@ def test_empty_directory() -> None:
 The classic version is still useful when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that without touching your code,
-while a central `match` would need editing.
+while a central `match` needs editing.
 The guidance from [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 applies directly.
 Match over a closed set, use polymorphism for an open one.

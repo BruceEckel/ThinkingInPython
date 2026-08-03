@@ -71,7 +71,7 @@ blocks test different, mutually exclusive values of `n` (`6` and
 Since neither block's outcome depends on whether the other one ran
 first, checking them in either order produces the same result. Order
 only matters when two conditions could both be true for the same
-value and would send execution down different paths, which is not the
+value and send execution down different paths, which is not the
 case here.
 
 ## 4. A caught exception vs. one that escapes the handler
@@ -113,4 +113,4 @@ exception is in flight, but the `TypeError` itself is not caught
 there. It keeps propagating up past `demo_exceptions()`, which is why
 this listing wraps the call in its own `try`/`except TypeError` to
 show the exception actually escaping, the same thing an interactive
-session or an outer caller would see.
+session or an outer caller sees.

@@ -117,7 +117,7 @@ In Python it is a convention,
 though freezing the memento means the honest mistakes (mutating the snapshot)
 fail loudly.
 
-A `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
+A `type Memento = tuple[str, ...]` alias type-checks at every call site instead of the class.
 But an alias is *structural*, not *nominal*.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
@@ -155,9 +155,9 @@ def test_drawing_after_restore_spares_memento() -> None:
 ```
 
 The third test checks for the subtle bug.
-If the memento shared a mutable list with the sketch,
+If the memento shares a mutable list with the sketch,
 as in the variant exercise 4 explores,
-drawing after a restore would corrupt the snapshot.
+drawing after a restore corrupts the snapshot.
 Both `save()` and `restore()` must copy.
 
 ## Immutability
@@ -294,7 +294,7 @@ so it never interprets anything.
 That works for any state type, `int` to full `Sketch`, with one condition:
 states must be immutable.
 `History` cannot protect a list that someone mutates in place.
-It would be a stack of aliases, the bug with which this chapter opened.
+It is a stack of aliases, the bug with which this chapter opened.
 
 ```python
 # test_history.py

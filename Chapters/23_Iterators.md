@@ -440,8 +440,8 @@ so you need only supply `__next__()`.
 Note the `eq=False` in the `dataclass` decoration.
 A data class that generates `__eq__()` sets `__hash__` to `None`.
 Comparing iterators by field value is also incorrect.
-Two wrappers over one source would compare equal,
-no matter how far each had advanced.
+Two wrappers over one source compare equal,
+no matter how far each has advanced.
 Turning equality off restores the correct identity comparison for an iterator.
 
 A generator wraps an iterator just as well, and in fewer lines:
@@ -629,7 +629,7 @@ which is why a peekable iterator has to buffer,
 and why `tee` buffered a whole stream earlier in this chapter.
 `DONE` is a [sentinel](05_Functions.md#default-and-keyword-arguments),
 because the answer must be distinguishable from every value the source could yield.
-`None` would collapse an exhausted source and a source that yielded `None` into the same reply.
+`None` collapses an exhausted source and a source that yields `None` into the same reply.
 `doubled()` shows the other half of the price.
 Letting `StopIteration` escape a generator body does not end that generator politely.
 Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,

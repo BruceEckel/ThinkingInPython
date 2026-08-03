@@ -534,8 +534,8 @@ Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
 The underscore prefix is not decoration.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
-If `__get__()` asked `obj` for plain `"x"`,
-that lookup would route back to the descriptor and call `__get__()` again,
+If `__get__()` asks `obj` for plain `"x"`,
+that lookup routes back to the descriptor and calls `__get__()` again,
 forever.
 Storing under `"_x"`, a name no descriptor claims, breaks the loop.
 This is metaprogramming, but it needs no metaclass.
@@ -567,9 +567,9 @@ You attach it with the `metaclass=` keyword in the class header.
 Python then uses your metaclass, instead of `type`, to build the class.
 
 Since a metaclass is itself a subclass of `type`,
-writing `class Simple1(SimpleMeta1):` would mean something else.
+writing `class Simple1(SimpleMeta1):` means something else.
 That syntax makes `SimpleMeta1` an ordinary base class,
-so `Simple1` would become a metaclass-shaped class,
+so `Simple1` becomes a metaclass-shaped class,
 not a class built by `SimpleMeta1`.
 `metaclass=` is the particular mechanism for naming what builds a class,
 independent of its base classes.
@@ -754,7 +754,7 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
 so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
-Without it, every singleton would lose its type and a type checker could no longer catch a misspelled attribute access on the result.
+Without it, every singleton loses its type and a type checker can no longer catch a misspelled attribute access on the result.
 
 You might expect to parameterize[^parametrize] the class itself,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
@@ -762,7 +762,7 @@ That does not work.
 A `ClassVar` cannot depend on a type parameter of its own class,
 because `ClassVar` means one shared value for the whole class,
 not a different value per instantiation.
-Even ignoring that, a subclass would need to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
+Even ignoring that, a subclass needs to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finished defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
@@ -847,7 +847,7 @@ print(type(b).__name__)
 #: B
 ```
 
-The type checker rejects `class C(B): ...` because it would inherit a `final` class.
+The type checker rejects `class C(B): ...` because it inherits a `final` class.
 
 Type checkers such as ty, mypy, and pyright check `@final` statically.
 It states the intent and catches a violation before the code runs.
@@ -1035,7 +1035,7 @@ def _type_name(annotation: object) -> str:
 def _redefined(name: str, value: object) -> bool:
     # Restricted to INTERESTING_DUNDERS: every class has __module__,
     # __dict__, and other bookkeeping dunders that always differ from
-    # object's, so comparing those would never filter anything out.
+    # object's, so comparing those never filters anything out.
     if name not in INTERESTING_DUNDERS:
         return False
     return getattr(object, name, None) is not value
@@ -1185,7 +1185,7 @@ deliberately narrowing the comparison to those four.
 
 Every class, even an empty one, has its own `__module__`, `__dict__`,
 and a handful of other bookkeeping dunders that never match `object`'s,
-so comparing every dunder this way would show that bookkeeping instead of filtering it out.
+so comparing every dunder this way shows that bookkeeping instead of filtering it out.
 The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,
 not merely an equal one.
@@ -1193,7 +1193,7 @@ not merely an equal one.
 `exclude` drops specific names regardless of what `dunder` would otherwise show,
 and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
-minus `__hash__`, useful when a listing has already made that particular point and repeating it would only add noise.
+minus `__hash__`, useful when a listing has already made that particular point and repeating it only adds noise.
 The check runs first, before the `dunder` logic even sees the name,
 so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selected it.
 

@@ -74,4 +74,4 @@ the language level. But it breaks
 variables and functions should be `snake_case`
 (`total_sum`, not `totalSum`). CapWords is reserved for class names.
 `totalSum` is not a syntax error, only a style violation, one that
-ruff's PEP 8 checks would flag.
+ruff's PEP 8 checks flag.

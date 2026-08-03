@@ -210,7 +210,7 @@ def test_mutation_without_frozen_leaks_across_cells() -> None:
 ```
 
 Restoring `frozen=True` turns this same test into a demonstration of
-the fix: `field[0][0].walkable = False` would instead raise
+the fix: `field[0][0].walkable = False` instead raises
 `FrozenInstanceError` immediately, since a frozen `Tile` cannot be
 mutated at all, which is exactly what makes sharing it safe.
 

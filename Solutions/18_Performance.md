@@ -36,7 +36,7 @@ on average by a wide margin (thousands of times faster in this run),
 because most random targets still require scanning roughly half the
 `list` on average, which is already far more work than one hash
 lookup. The worst case and the average case tell the same story here;
-they would only diverge if most real lookups clustered very close to
+they only diverge if most real lookups cluster very close to
 the front of the list.
 
 ## 2. Finding the crossover size
@@ -163,8 +163,8 @@ children at positions `2i + 1` and `2i + 2`, which puts the smallest
 element at index 0 and says nothing about the order of the rest.
 `heappop()` maintains that weaker property, and maintaining it is
 cheap: the last element moves to the front and sinks back down through
-O(log n) comparisons. Sorting all of it on every pop would cost far
-more and buy nothing, since only the front element is ever read.
+O(log n) comparisons. Sorting all of it on every pop costs far
+more and buys nothing, since only the front element is ever read.
 
 ## 6. A subclass that forgets `__slots__`
 

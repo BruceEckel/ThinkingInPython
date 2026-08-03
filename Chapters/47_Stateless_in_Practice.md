@@ -305,7 +305,7 @@ Now the file is named for January 1 and the entry inside it is dated January 2.
 A day of entries can end up in the wrong file,
 and the window where this happens is one second wide.
 
-Against a real clock you would wait for that window and probably miss it.
+Against a real clock you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
 The seam is what makes the moment reachable.
@@ -729,7 +729,7 @@ Four runs of one program, differing in what was supplied.
 The first finds its article.
 The second exercises `NotInteresting`, the third `NoArticle`,
 and the fourth `Unavailable`, so every failure the signature declares gets used.
-Each pair of bindings is what a full Effect system would call a *scenario*,
+Each pair of bindings is what a full Effect system calls a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
 The trace shows two things worth noticing.
@@ -758,7 +758,7 @@ Annotate `report()` as `Success[str]` and `ty` names the `yield from` that still
 
 `outcome()` also earns its annotations.
 `Wire` and `Library` are structural implementations,
-so `supply(Wire(...), Library(...))` would build handlers for `Need[Wire]` and `Need[Library]`,
+so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
 the mismatch that `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 fixed with `as_type()`.
 Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
@@ -1567,7 +1567,7 @@ It is a language that does the encoding for you.
     Then rewrite `archive()` so the file name and the stamp cannot disagree,
     and explain why no handler can reproduce the bug afterward.
 2.  `leaky_effect.py` type-checks while lying about its purity.
-    Describe a review rule or a lint check that would catch it,
+    Describe a review rule or a lint check that catches it,
     and explain why a type checker cannot.
     Then demonstrate the error-side twin:
     write a function that raises a `KeyError` with no `@throws`,
@@ -1578,7 +1578,7 @@ It is a language that does the encoding for you.
     put it between solar and the battery in `controller()`,
     and confirm `run_load()` needs no change.
     Then shorten every source until some hour has no supplier, run it,
-    and say where the `Blackout` surfaces and why `catch(Blackout)` around `run_load()` would not intercept it.
+    and say where the `Blackout` surfaces and why `catch(Blackout)` around `run_load()` does not intercept it.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
     the way `scripted` handed out a fixed sequence of tosses.
     Use it to test that `run_load()` re-requests after a failure,
@@ -1594,7 +1594,7 @@ It is a language that does the encoding for you.
     and predict the trace before running it.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
-    then say what an Effect system would need for you to retry only `Unavailable`.
+    then say what an Effect system needs for you to retry only `Unavailable`.
 8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` is unchanged.
     Then try to fork an Effect that still declares a `Need`,

@@ -269,7 +269,7 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 
 Consider a function that returns the first element of a list.
 This function can be applied to a list holding any type.
-A useful annotation would return a type that matches the list's element type,
+A useful annotation returns a type that matches the list's element type,
 whatever that type is.
 
 `Any` cannot express that connection.
@@ -297,7 +297,7 @@ print(s.upper())
 `T` is a placeholder, filled in separately at each call.
 The checker infers `T` from the argument and then knows the return type.
 Both `n + 1` and `s.upper()` are successful,
-while `n.upper()` would fail the type check.
+while `n.upper()` fails the type check.
 
 A class declares type parameters the same way:
 
@@ -363,7 +363,7 @@ print(t.bump().bump().report())
 
 `t.bump()` runs on a `NamedTally`, so `Self` is `NamedTally`,
 and `report()` is available on the result.
-Had `bump()` declared `-> Tally`, the checker would reject `report()`,
+If `bump()` declares `-> Tally`, the checker rejects `report()`,
 which `Tally` does not have.
 Alternative constructors benefit the same way.
 A `@classmethod` that ends with `return cls(...)` returns `Self`.

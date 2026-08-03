@@ -364,8 +364,8 @@ with full access to `*args`, `**kwargs`, and the return value.
 (directly in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
 and that wrapper always makes one unchanged call,
 bracketed by setup and cleanup.
-Even if `report()` took arguments or returned a value,
-neither version of `banner` would see them.
+Even if `report()` takes arguments or returns a value,
+neither version of `banner` sees them.
 What `banner` offers instead is one definition,
 usable both as a `with` block and as a `@` decorator.
 Use it when setup and cleanup should be identical on every call,

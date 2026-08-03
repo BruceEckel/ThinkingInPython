@@ -257,7 +257,7 @@ except TypeFailure as e:
 
 `from_json()` never validates the email string itself. It hands the
 raw JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s
-own `__post_init__()` runs the same check it would run for any other
+own `__post_init__()` runs the same check it runs for any other
 caller. The validation written once, inside `EmailAddress`, protects
 every path that constructs a `Person`, including this one from
 untrusted JSON input, with no additional code in `from_json()` itself.

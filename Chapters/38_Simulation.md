@@ -494,7 +494,7 @@ def item_factory(symbol: str) -> Item:
 ```
 
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
-so `from world import Room` here would be circular.
+so `from world import Room` here is circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,
@@ -510,7 +510,7 @@ It is a declaration, not a placeholder.
 It declares to the type checker that a `Room` will be there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
-so reading it earlier would raise `AttributeError`,
+so reading it earlier raises `AttributeError`,
 and the builder runs first so that never happens.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
 so no code that reads `room` has to check for `None`.

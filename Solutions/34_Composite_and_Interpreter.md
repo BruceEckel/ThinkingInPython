@@ -117,7 +117,7 @@ for it as shown here. Deciding what a link should do is a judgment
 call, not something the type checker picks for you: `disk_usage()`
 counts a link as free, since the bytes it references already get
 counted wherever the real file lives; adding the target's size again
-would double-count it. `walk()` reports the link as its own entry,
+double-counts it. `walk()` reports the link as its own entry,
 `name -> target`, rather than following it into the target's subtree,
 since following it could loop forever if a link ever pointed back at
 one of its own ancestors.
@@ -415,10 +415,10 @@ rule; `Mul`'s is the product rule, and it must keep both the
 derivative *and* the original, undifferentiated subtree on each side,
 because the product rule genuinely needs both. Running the raw result
 through `simplify()` turns `1 * x + x * 1` into the much more readable
-`x + x` (it would take a further simplification rule, "combine like
+`x + x` (it takes a further simplification rule, "combine like
 terms," to reach `2 * x`, which this `simplify()` does not implement).
 A full `Expr` that also includes `Neg` and `Div` (exercise 3's
-additions) would need a quotient rule for `Div` too, which needs a
+additions) needs a quotient rule for `Div` too, which needs a
 squared denominator `simplify()`'s current rules do not yet know how
 to render tidily; left for a further exercise, the same way exercise
 3 leaves `Div`'s own derivative case unimplemented.

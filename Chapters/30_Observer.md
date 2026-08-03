@@ -181,8 +181,8 @@ print(seen)
 ```
 
 `once` hears the first change and detaches; `always` hears both.
-Under the naive loop, `always: 1` would be missing:
-`once`'s self-removal would have skipped it.
+Under the naive loop, `always: 1` is missing:
+`once`'s self-removal skips it.
 
 Two more realities of Observer deserve a sentence each.
 An observer that raises an exception stops the loop,
@@ -274,7 +274,7 @@ an observer must return an awaitable,
 which is exactly what calling an `async` function produces.
 
 The `alarm` is slower than the log, yet the log prints first.
-Awaiting the observers in sequence would print in subscribe order, alarm first.
+Awaiting the observers in sequence prints in subscribe order, alarm first.
 Concurrent fan-out lets each finish on its own schedule,
 so the faster observer reports first.
 The alarm also shows an observer that can decline to act.

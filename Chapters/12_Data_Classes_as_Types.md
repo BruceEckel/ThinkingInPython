@@ -601,7 +601,7 @@ if __name__ == "__main__":
 ```
 
 The `months` field needs a default value, but its default is a list.
-Every instance would share a single default object,
+Every instance shares a single default object,
 the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments),
 so data classes reject mutable defaults outright.
 `field(default_factory=make_months)` supplies a function instead of a value.
@@ -779,8 +779,8 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-If a base `__init__` instead replaced `self.__dict__`,
-calling it from `__post_init__()` would discard the fields the data class just assigned.
+If a base `__init__` instead replaces `self.__dict__`,
+calling it from `__post_init__()` discards the fields the data class just assigned.
 The [Borg singleton](24_Singleton.md#borg-singleton-by-inheritance)
 is that case.
 

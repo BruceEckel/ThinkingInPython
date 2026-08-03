@@ -147,8 +147,8 @@ print(mean, count)
 #: 2.0 2
 ```
 
-Without `Stats` you'd annotate the return as `tuple[float, int]` and return a bare tuple.
-Every caller would then own the knowledge that position 0 is the mean and position 1 is the count,
+Without `Stats` you annotate the return as `tuple[float, int]` and return a bare tuple.
+Every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
 knowledge the code no longer states anywhere.
 `Stats` names the slots and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.

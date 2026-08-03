@@ -1,8 +1,11 @@
 # Introduction
 
-This book is about cultivating the judgment to choose the smallest thing that works.
+This book is targeted to experienced programmers who can learn a programming language through an overview,
+and who wish to explore Python at an intermediate-to-advanced level.
+
+It is about cultivating the judgment to choose the smallest thing that works.
 You build that judgment through insights, idioms, and patterns.
-The book is also honest about design patterns.
+The book also questions design patterns.
 Most arose to work around the limits of static, inheritance-heavy languages,
 and in Python many of them diminish or dissolve.
 If an idiom or pattern is still useful, it stays.
@@ -89,7 +92,7 @@ either in another language or in Python itself.
 The goal is to move from writing Python that works to writing Python that is clear,
 idiomatic, and a pleasure to maintain.
 
-This is an intermediate book,
+This is an intermediate-to-advanced book,
 which removes two constraints that introductory books carry:
 
 1.  An introductory book must describe everything in lock step,
@@ -99,7 +102,6 @@ which removes two constraints that introductory books carry:
     This one chooses them by whether they are interesting and useful.
 
 If a language feature is new to you, look it up as you go.
-
 You should be comfortable with:
 
 - Functions, classes, objects, and inheritance.
@@ -149,9 +151,9 @@ and asks what Python could adopt.
 
 The book targets Python 3.15 and later, uses type hints throughout,
 and tests with `pytest`.
-Early chapters omit hints deliberately,
-introducing them once [Static Typing](08_Static_Typing.md) covers the syntax;
-every chapter from there on uses them.
+Early chapters omit type hints deliberately,
+waiting until [Static Typing](08_Static_Typing.md) introduces the syntax.
+Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete program.

@@ -237,10 +237,10 @@ and callers cannot tell they received a shared object
 The cost is bookkeeping by hand.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
-so an `__init__()` would re-run on the cached instance at every construction.
+so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore defines no `__init__()`.
 This rules out `@dataclass`,
-whose generated `__init__()` would reintroduce exactly that re-run.
+whose generated `__init__()` reintroduces exactly that re-run.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
 The missing `__eq__()` costs less than it appears:
@@ -376,7 +376,7 @@ so the member's value is its map symbol rather than the tuple.
 The customization must happen in `__new__()`.
 The lookup table behind `Tile(".")` keys on the value `__new__()` establishes,
 so setting `_value_` later, in `__init__()`,
-would leave that table keyed by the tuples.
+leaves that table keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,

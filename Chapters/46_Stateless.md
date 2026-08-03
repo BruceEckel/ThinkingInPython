@@ -777,7 +777,7 @@ Over the whole run it makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union invites a `type` alias,
-and the book's own habits would normally endorse one.
+and the book's own habits normally endorse one.
 Resist it here.
 Under `ty` (0.0.65 at this writing),
 a `type` alias as a generator's return annotation turns the yield check off,
@@ -848,7 +848,7 @@ One test function covers four environments.
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` is a new row.
 
-Dependencies as parameters would serve this test as well,
+Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The difference appears when the dependency sits three calls deep.
 Then the parameter version threads two arguments through every function on the path.

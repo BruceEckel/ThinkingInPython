@@ -42,8 +42,8 @@ matches two or more elements: the first `_` matches the first element,
 and `*_` collects everything after it, requiring the list to have at
 least that first element plus more. Order matters here: the more
 specific patterns (`[]`, `[_]`) must come before the more general one
-(`[_, *_]`), or the general one would match first and the specific
-cases would never run. `Point()` matches any `Point` instance without
+(`[_, *_]`), or the general one matches first and the specific
+cases never run. `Point()` matches any `Point` instance without
 binding its fields at all, since `classify()` doesn't need `x` or `y`.
 
 ## 2. Adding `Rectangle` without its `case`
@@ -81,7 +81,7 @@ info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 
 Once `Rectangle` joins the `Shape` union, the checker can prove that a
-`Rectangle` value would fall through both `case`s and reach `case _`.
+`Rectangle` value falls through both `case`s and reaches `case _`.
 `assert_never()` demands its argument have type `Never`, meaning "this
 code is unreachable," but the checker now knows `shape` could
 genuinely be a `Rectangle` at that point, so the two types disagree

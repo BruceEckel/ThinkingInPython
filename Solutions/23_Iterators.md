@@ -317,7 +317,7 @@ anything, which is what the *GoF* interface assumes a collection can
 do. `OverStream` builds `seen` to fake that ability.
 
 The endless source shows what the faking costs. After 50,000 steps
-`seen` holds 50,000 items, and it would hold a million after a million.
+`seen` holds 50,000 items, and it holds a million after a million.
 `first()` is only implementable if every value stays reachable, so on a
 source with no end, supporting it means unbounded memory. Python's
 `__next__()` has no such requirement, which is why `itertools.count()`

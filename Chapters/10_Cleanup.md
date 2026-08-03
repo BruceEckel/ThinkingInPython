@@ -160,13 +160,13 @@ and the dictionary drops its entry on its own.
 The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
-A plain `dict` or `list` as the registry would keep every instance alive forever,
-so the count could never fall.
+A plain `dict` or `list` as the registry keeps every instance alive forever,
+so the count can never fall.
 The weak reference allows the registry to prune itself.
 The immediate drop in the count is CPython's reference counting at work.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear only when its collector runs,
-so the counts would not fall promptly.
+so the counts do not fall promptly.
 Unlike the `__del__()` version, this reads the count during normal execution,
 so it never depends on the unreliable bookkeeping at interpreter shutdown.
 

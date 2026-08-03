@@ -155,6 +155,6 @@ Accessing `n.total` first runs its body once, prints the `"summing"`
 message, and stores `30` on the instance. When `average`'s body then
 reads `self.total`, it hits that stored value directly. No second
 `"summing"` message appears, because `total` was already computed and
-cached before `average` ever asked for it. Had `average` been accessed
-first, its own body would trigger `total`'s computation the same way,
+cached before `average` ever asked for it. If `average` is accessed
+first, its own body triggers `total`'s computation the same way,
 just on first use instead of in advance.
