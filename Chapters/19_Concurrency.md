@@ -605,7 +605,7 @@ just as the same race between threads needs a `threading.Lock`.
 ## Parallelism
 
 A CPU-bound task cannot overlap if only a single core is available.
-Give it several cores and it can.
+With several cores, it can.
 `ProcessPoolExecutor` runs each call in its own process,
 each with its own interpreter and GIL,
 so the operating system can place them on different cores and run them at the same time:
@@ -643,7 +643,8 @@ and both surface in this short listing:
    and that interpreter *imports* this module to find `cpu_price()`.
    During the import the module's name is not `"__main__"`,
    so the guard keeps each worker from running `main()` and building a pool of workers of its own.
-   Leave it out and Python detects the runaway spawning and raises `RuntimeError`.
+   If you leave it out,
+   Python detects the runaway spawning and raises `RuntimeError`.
 2. Work crosses the process boundary by *pickling*.
    Each argument and each return value is serialized in one process and rebuilt in the other.
    The function itself travels by name,
@@ -1218,7 +1219,7 @@ which wakes the waiting `consumer`.
 `asyncio.Queue` needs no locks,
 since the event loop lets only one coroutine touch it at a time.
 That guarantee holds only within the event loop's own thread.
-Call it from another thread and nothing protects it,
+If you call it from another thread, nothing protects it,
 which is why the class is not thread-safe.
 
 The similar queue interfaces hide a consequential difference.
@@ -1631,7 +1632,7 @@ Four conditions must all hold at once:
 3. No way to force a task to give up what it holds
 4. A cycle of tasks each waiting on the next
 
-Break any one of the four and deadlock becomes impossible.
+If you break any one of the four, deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
 which means we can also produce deadlock with `asyncio`.
 This example has two tasks and two `asyncio.Lock` objects.

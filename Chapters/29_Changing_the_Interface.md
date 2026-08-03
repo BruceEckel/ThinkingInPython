@@ -107,7 +107,7 @@ so the checker rejects it without the `/`.
 The rename is the smaller half of that story.
 `WhatIUse2.op()` also changes the parameter's *type*.
 Its base accepts a `WhatIWant`, and it accepts a `WhatIHave`.
-Annotate both precisely and a checker rejects the override outright,
+If you annotate both precisely, a checker rejects the override outright,
 reporting `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Rethinking_Objects.md#liskov-substitution).
 That is why this one parameter stays `Any` while the rest of the listing names real types.

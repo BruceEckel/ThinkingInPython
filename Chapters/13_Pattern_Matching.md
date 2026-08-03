@@ -476,7 +476,7 @@ print(round(email.cost() + sms.cost() + push.cost(), 4))
 `Notification` names the shape every channel must have.
 `@abstractmethod` forces `Email`, `Sms`,
 and `Push` to define both `render()` and `cost()`.
-Forget one and the class stays abstract, so you cannot instantiate it.
+If you forget one, the class stays abstract, so you cannot instantiate it.
 
 A type union with `match` takes the opposite shape.
 The channels become plain data,

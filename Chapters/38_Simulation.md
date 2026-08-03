@@ -518,7 +518,7 @@ so no code that reads `room` has to check for `None`.
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so adding a new kind of item needs no change here.
-Define the subclass with its symbol and the factory finds it.
+If you define the subclass with its symbol, the factory finds it.
 This is the registry idea from [Factory](27_Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 

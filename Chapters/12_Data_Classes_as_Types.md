@@ -854,7 +854,8 @@ print(Config("data.csv", retries=5))
 ## Serializing to JSON
 
 A data class has no built-in JSON support.
-Hand one to `json.dumps()` and it raises `TypeError: Object of type Person is not JSON serializable`.
+If you hand one to `json.dumps()`,
+it raises `TypeError: Object of type Person is not JSON serializable`.
 
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` knows how to serialize dictionaries.

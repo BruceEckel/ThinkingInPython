@@ -499,7 +499,8 @@ A data set that fits runs at full speed.
 One that no longer fits forces the operating system to swap pages to disk,
 turning microseconds into milliseconds, a thousandfold slowdown,
 not a modest one.
-Push further and the process fails outright, with `MemoryError` or an OS kill.
+If you push further, the process fails outright,
+with `MemoryError` or an OS kill.
 There is no middle ground between full speed and failure.
 
 That cliff is why it's worth building a lazy pipeline to handle a data set that could grow.

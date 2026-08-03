@@ -580,7 +580,7 @@ The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when data must be walked twice.
 Python dropped both methods rather than pay for them everywhere.
-Take them away and `advance()` has to return the value it moved to,
+If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
 You can ask a GoF iterator whether it is done multiple times without disturbing it.

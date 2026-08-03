@@ -7,8 +7,8 @@ is a library that implements an Effect Management System (EMS).
 
 Stateless encodes an Effect's dependencies and failures into the return type of a function,
 and a type checker verifies that every caller either absorbs the Effects or carries them forward.
-Forget to declare a dependency and the check fails.
-Forget to supply one and the check fails.
+If you forget to declare a dependency, the check fails.
+If you forget to supply one, the check fails.
 That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
@@ -206,7 +206,8 @@ An Effect does not:
 
 What comes back depends on which ability the `yield` requested.
 One SendType cannot vary from one `yield` to the next.
-Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
+If you pin it to `Console`,
+the checker reads `yield Need(Log)` as producing a `Console`.
 The `send()` channel must be able to carry any type, so the SendType is `Any`.
 
 Using `yield from`, a request can produce an answer whose type the checker knows.
@@ -554,7 +555,8 @@ all the way to `supply()`.
 The difference is that you can declare as many abilities as you like.
 
 The `yield from` inside `greet_all()` is not optional.
-Write that loop body as a bare `greet(name)` and `ty` objects with an `invalid-return-type`:
+If you write that loop body as a bare `greet(name)`,
+`ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
 That seems like protection, but look closer.
 That `yield from` was the only `yield` in `greet_all()`,
@@ -562,9 +564,9 @@ so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
 A function with a second `yield` stays a generator function.
 Its shape does not change, so nothing objects.
-`greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
+`greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
-Write its first line as a bare `greet(name)` and every check passes:
+If you write its first line as a bare `greet(name)`, every check passes:
 `ty` and `ruff` report nothing, the program runs, the log gains both entries,
 and no greeting is printed.
 The call still builds a description, and the body discards it unrun.
@@ -576,7 +578,7 @@ When an Effect appears to do nothing, look for a missing `yield from`.
 
 Declaring the ability is still manual.
 The benefit is that the declaration is checked.
-Annotate `greet_all()` as pure and `ty` flags the problem:
+If you annotate `greet_all()` as pure, `ty` flags the problem:
 
 ```python
 # undeclared_need.py
@@ -607,7 +609,7 @@ where `greet(ask, tell)` took its dependencies as arguments.
 Nothing there stopped an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
 
-## Adding an Effect Deep in the Stack
+## Retrofitting an Effect
 
 The second exercise in [Effect Management](44_Effect_Management.md#exercises)
 has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
@@ -656,11 +658,12 @@ It saves you from hunting for the functions that need them:
 the checker names each place that needs changing,
 and the program does not build until the last one is fixed.
 To see that, delete `| Need[Log]` from either annotation.
-Remove it from `greet_all()` and `ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
+If you remove it from `greet_all()`,
+`ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
 since `Need[Log]` is not assignable to what the signature now declares.
 
 Dependencies passed as parameters are checked too.
-Forget the new argument at a call and `ty` reports a `missing-argument`.
+If you forget the new argument at a call, `ty` reports a `missing-argument`.
 The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts an object it does not use.
@@ -687,9 +690,9 @@ Write Effect signatures out in full until your checker proves that it sees throu
 
 ## One Effect, Many Environments
 
-`audit_log.py` supplied two abilities at one call site.
+`audit_log.py` supplies two abilities at one call site.
 A test suite usually needs many, one per environment.
-Because the dependencies live in the return type rather than the argument list,
+Because dependencies live in the return type rather than the argument list,
 varying the environment means varying data:
 
 ```python
@@ -712,11 +715,11 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
 ```
 
 `holds()` decides whether a nailer's force stays under a material's brittleness.
-It requests both and names neither implementation.
 `Material` and `Nailer` are distinct types,
-so `supply()` matches each request to one of them,
-without the ambiguity that [When Two Implementations Match](#when-two-implementations-match)
-runs into below:
+so `supply()` matches each request to one of them.
+[When Two Implementations Match](#when-two-implementations-match)
+picks up the case where two supplied objects fit one ability.
+Here the test varies both:
 
 ```python
 # test_nailer.py
@@ -750,9 +753,9 @@ A new `Material` is a new row.
 
 Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
-The difference appears when the dependency sits three calls deep.
-Then the parameter version threads two arguments through every function on the path.
-This version changes nothing but the row.
+The two diverge when the dependency sits three calls deep.
+The parameter version then adds two parameters to every function on the path,
+while this version still changes nothing but the row.
 
 ## Supplying an Interface
 
@@ -794,7 +797,8 @@ But anything added to `Console` later shows up in `Recorder` too.
 Add a `read_line()` method to `Console`,
 and `Recorder` inherits the real one without warning,
 so a test meant to record instead performs live console I/O.
-Make the ability an interface and there is no implementation to inherit by accident:
+If the ability is an interface,
+there is no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -838,7 +842,7 @@ run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
 ```
 
 Both lines print, because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
-Remove the `# type: ignore` and `ty` rejects the first one:
+If you remove the `# type: ignore`, `ty` rejects the first one:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
@@ -997,7 +1001,8 @@ This produces three consequences:
 1. Stateless checks happen before the program runs.
    DI only discovers a missing registration when something asks for it.
    This can be at startup or much later, on a path no test exercised.
-   Remove the `# type: ignore` from `unsupplied.py` and `ty` reports the unsupplied `Need[Console]` before the program runs
+   If you remove the `# type: ignore` from `unsupplied.py`,
+   `ty` reports the unsupplied `Need[Console]` before the program runs
    ([Forgetting to Supply](46_Stateless.md#forgetting-to-supply)).
 
 2. Stateless bindings are per call rather than per process.
@@ -1022,8 +1027,8 @@ This produces three consequences:
    and a caller that does not supply them inherits the requirement.
 
 The requirement that callers inherit is also the cost.
-Adding a dependency deep in the stack rewrites the return type of every function above it,
-which [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+Adding a dependency to a function that already works rewrites the return type of every function above it,
+which [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
@@ -1207,8 +1212,8 @@ Here, you leave the body alone and lift the exception into the signature.
 
 You can watch the failure travel.
 Calling `score()` still runs nothing.
-Advance the Effect one step with `next()` and the `KeyError` arrives as a value,
-not as a raised exception:
+If you advance the Effect one step with `next()`,
+the `KeyError` arrives as a value, not as a raised exception:
 
 ```python
 # error_is_yielded.py
@@ -1241,7 +1246,8 @@ def announce(name: str) -> Effect[Need[Console], KeyError, None]:
 
 This uses all three parameters of `Effect[A, E, R]`.
 `announce()` needs a `Console`, can fail with `KeyError`, and produces nothing.
-Drop the `KeyError` from the annotation and `ty` points at the `yield from score(name)` line.
+If you drop the `KeyError` from the annotation,
+`ty` points at the `yield from score(name)` line.
 Declared exceptions cannot be forgotten.
 
 Declaring an error does not oblige you to handle it.

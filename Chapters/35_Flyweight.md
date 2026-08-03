@@ -148,8 +148,8 @@ That is the intrinsic/extrinsic split doing its work.
 
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and `SPECS` can only hold one of them.
-Add a kind to `SPECS` without adding it to `Symbol`, or the reverse,
-and the checker rejects the mismatch.
+If you add a kind to `SPECS` without adding it to `Symbol`, or the reverse,
+the checker rejects the mismatch.
 `tile()` trusts its argument is already a `Symbol`,
 so the untrusted boundary is `to_symbol()`,
 the one place raw text meets the checked type.
@@ -188,8 +188,8 @@ Because `Tile` is frozen, sharing is invisible to clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile.
 
-Remove `frozen=True` and the pattern fails.
-Mutate the grass tile in one cell and every grass cell in the map changes.
+If you remove `frozen=True`, the pattern fails.
+Mutating the grass tile in one cell changes every grass cell in the map.
 
 ## Interning in the Constructor
 

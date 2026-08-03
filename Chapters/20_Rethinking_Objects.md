@@ -203,7 +203,7 @@ def test_defensive_copy_prevents_the_leak() -> None:
 
 Encapsulation exists only because of mutability.
 If the data cannot change, there is nothing to protect.
-Freeze it, and the whole apparatus disappears.
+If you freeze it, the whole apparatus disappears.
 The fields are public, there are no getters, and there are no copies:
 
 ```python
@@ -246,7 +246,7 @@ Two quiet changes in the listing do as much work as `frozen=True`.
 `frozen=True` is shallow:
 it stops assignment to the fields of `Immutable` itself,
 but it cannot stop mutation inside a field that is itself mutable.
-Declare the field as a `list` instead and the leak reopens:
+If you declare the field as a `list` instead, the leak reopens:
 
 ```python
 # frozen_leaky.py
@@ -521,7 +521,8 @@ if __name__ == "__main__":
 ```
 
 `show()` accepts anything: `Any`, which is not `object`.
-Pass it something without a `display()` method and you'll get an exception when the line runs.
+If you pass it something without a `display()` method,
+you'll get an exception when the line runs.
 If we use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
 `Any` switches the checker off for `t`, and this permits any type.
@@ -772,7 +773,7 @@ if __name__ == "__main__":
 Adding a new shape is easier in the OOP version because you write one class.
 Adding a new operation over all shapes is easier in the pattern matching
 (functional) version.
-Modify one function, and the type checker tells you if you missed a case.
+If you modify one function, the type checker tells you if you missed a case.
 
 The OOP approach assumes you add types more often than operations,
 which is often not true.
@@ -883,8 +884,8 @@ But look at what the `None` branch does: nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
-Give the do-nothing case a class, and the optional parameter becomes required,
-with a default:
+If you give the do-nothing case a class,
+the optional parameter becomes required, with a default:
 
 ```python
 # null_logger.py

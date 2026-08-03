@@ -163,8 +163,8 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All of that copying defends against mutation.
-Remove the mutation and there is nothing left to prevent.
-Make the state a frozen data class and every state *is* a memento:
+If you remove the mutation, there is nothing left to prevent.
+Once the state is a frozen data class, every state *is* a memento:
 
 ```python
 # frozen_sketch.py
@@ -424,7 +424,7 @@ Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
 Drift in the other direction is quieter still.
-Delete or rename a field, and old bytes load with no error anywhere, ever.
+If you delete or rename a field, old bytes load with no error anywhere, ever.
 The stale name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
 while the renamed field is simply missing.

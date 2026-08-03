@@ -111,7 +111,7 @@ The last line of output shows both dispatches doing visible work.
 (chrysanthemums really do produce a natural insecticide),
 so that line depends on both unknown types at once:
 the worm's type chose `eat()`, and the flower's type chose *which* `eat()` runs.
-Delete the override and the program still runs;
+If you delete the override, the program still runs;
 the flower-side dispatch simply goes back to having nothing to say.
 
 One annotation in the listing is load-bearing.

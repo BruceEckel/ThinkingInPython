@@ -156,7 +156,8 @@ The `list()` copy inside `notify()` is a single word doing quiet work.
 An observer may react to a notification by unsubscribing,
 a one-shot listener detaching itself is the natural example,
 and that mutates `self._observers` in the middle of the loop walking it.
-Iterate the list directly and removing the current observer shifts every later one left,
+If you iterate the list directly,
+removing the current observer shifts every later one left,
 so the next observer is silently skipped, no error anywhere.
 The copy makes detaching during notification safe,
 and a newcomer subscribing mid-notification starts hearing from the next change:

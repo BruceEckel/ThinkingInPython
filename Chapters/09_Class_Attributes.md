@@ -134,7 +134,7 @@ The failure surfaces later,
 as an `AttributeError` from the first code that reads the missing `label`.
 
 The annotation on `label` is not required here.
-Delete it, and `ty` still infers `label: str` correctly from `self.label = label`,
+If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
 because the parameter's own type carries through to the attribute it initializes.
 It earns its place for symmetry with `total`,
 so the class's two attributes read together at the top instead of one hiding inside the constructor.

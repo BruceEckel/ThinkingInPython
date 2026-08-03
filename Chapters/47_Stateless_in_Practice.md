@@ -98,7 +98,7 @@ Naming the two stages also matters to the checker,
 for a reason the next section gives.
 
 Now compare this listing to `ask_tell.py` again.
-The by-hand version threaded two objects through every signature.
+The by-hand version put two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a checker can follow them.
@@ -144,7 +144,7 @@ That is what makes an unpredictable source testable.
 
 A coin toss is a side cause: the program reads something from outside,
 and the reading does not repeat.
-Turn it into an ability and the reading moves into a handler:
+If you turn it into an ability, the reading moves into a handler:
 
 ```python
 # coin_toss.py
@@ -758,7 +758,8 @@ and its annotation is worth reading twice.
 `catch()` emptied the error channel, so `report()` cannot fail.
 It still declares both abilities,
 because catching an error does nothing about a dependency.
-Annotate `report()` as `Success[str]` and `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
+If you annotate `report()` as `Success[str]`,
+`ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what is left.
 
 `outcome()` also earns its annotations.
@@ -905,7 +906,8 @@ The graph arrives in the signature, flattened into a union.
 `Need[Dough]` and `Need[Oven]` travel up through `yield from bread()`,
 which carries the inner Effect's abilities to its caller.
 The checker maintains that union.
-Declare `toast()` with `Need[Toaster]` alone and `ty` points at the delegation:
+If you declare `toast()` with `Need[Toaster]` alone,
+`ty` points at the delegation:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
@@ -924,7 +926,8 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 The other end is checked too.
-Leave `Oven(220)` out of `supply()` and `run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty ability channel,
+If you leave `Oven(220)` out of `supply()`,
+`run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty ability channel,
 the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
 showed, now arising from a dependency two levels down.
 `Oven` and `Toaster` are distinct types,
@@ -1005,7 +1008,7 @@ It also prints nothing, because output is an ability like the rest:
 so where the lines go is decided outside.
 The engine has no `GameEnvironment` to construct and no factory to hold,
 and the five-way union is written out rather than aliased,
-for the reason [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+for the reason [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 gives.
 
 Five abilities need five distinct shapes.
@@ -1293,7 +1296,7 @@ which is why the third run catches `RetryError` rather than `Crashed`.
 `Async` arrived because waiting between attempts is asynchronous.
 And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
 Retrying is not free: it needs a clock, and the signature says so.
-Leave the `Time()` out and the program does not build.
+If you leave the `Time()` out, the program does not build.
 This is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
 here it changes a type, and every caller learns about the new dependency.
@@ -1428,7 +1431,7 @@ A forked Effect must have nothing left to supply.
 `fork()`'s four overloads accept an Effect whose ability channel holds `Never`,
 an exception type, or `Async`, and nothing else,
 because `fork()` runs the Effect with `run()` inside the worker.
-Decorate a function that still declares a `Need` and `ty` rejects it,
+If you decorate a function that still declares a `Need`, `ty` rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
 
@@ -1568,7 +1571,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 
 How much of a type survives partial handling depends on your checker rather than on the library.
 Handling some of what an Effect declares works correctly under `ty` 0.0.64.
-Supply one of two abilities and the other stays in the signature:
+If you supply one of two abilities, the other stays in the signature:
 
 ```python
 # partial_handling.py
@@ -1610,12 +1613,13 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 The `# type: ignore` lets the listing run far enough to show the matching runtime failure.
 `catch()` behaves the same way.
-Catch one of two declared errors and the other stays in the error channel.
+If you catch one of two declared errors, the other stays in the error channel.
 
 What still defeats the checker is applying two handlers in one expression.
-Write `handle(scripted)(handle(capture)(greet))` and `ty` gives up on the nested inference and infers `Unknown`,
+If you write `handle(scripted)(handle(capture)(greet))`,
+`ty` gives up on the nested inference and infers `Unknown`,
 which is permissive enough to hide a genuinely missing handler.
-Name the intermediate and the types come back:
+If you name the intermediate, the types come back:
 
 ```python
 half = handle(capture)(greet)  # () -> Depend[Ask, None]
@@ -1629,7 +1633,7 @@ which is the information this library exists to give you.
 You have now seen three of these checker gaps:
 the nested handler expression here,
 the direct ability yield that types as `Unknown`,
-and the `type` alias in [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+and the `type` alias in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 that turns the yield check off.
 Each has the same shape.
 The library's types are asking the checker a hard inference question,
@@ -1653,10 +1657,10 @@ What a library cannot copy is the handler's power.
 `handle()` passes a handler the ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
 A native handler instead receives the *continuation* and chooses what to do with it.
-Invoke it once and you have what Stateless has.
-Decline to invoke it and the handled scope produces the handler's value instead,
+Invoking it once gives you what Stateless has.
+Declining to invoke it makes the handled scope produce the handler's value instead,
 which is how an exception behaves.
-Invoke it repeatedly and you have backtracking and search.
+Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first, a *tail-resumptive* handler.
 The ceiling is the substrate rather than the design.
 A Python generator is one-shot, so there is nothing to resume twice.

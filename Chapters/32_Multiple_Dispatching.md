@@ -152,7 +152,7 @@ and that is the outcome for the *scissors that started the duel*,
 not for the `Paper` whose code is running: scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the object named in the method's own name.
-Misread that convention and every result in the class appears backward.
+If you misread that convention, every result in the class appears backward.
 
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.

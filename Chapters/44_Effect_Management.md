@@ -459,7 +459,8 @@ The technique works, but the bookkeeping falls on you.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down,
 so parameters accumulate at every level of the call stack.
 Nothing propagates automatically.
-Add a `Log` Effect three levels down, and you edit every signature on the path.
+If you add a `Log` Effect three levels down,
+you edit every signature on the path.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but the injector still must be told what every function needs,
 and told again when that changes.
@@ -745,7 +746,8 @@ The tracking is enforced the way an EMS enforces it.
 `await` is a syntax error outside an `async def`,
 so any function that awaits a coroutine must become `async`,
 and so must its callers, all the way up to the edge.
-Replace "async" with "network access" or "database write" in that sentence and you have described Effect tracking.
+If you replace "async" with "network access" or "database write" in that sentence,
+you have described Effect tracking.
 Python demonstrates that the machinery can work.
 It just hard-codes the machinery to a single Effect, concurrency,
 rather than letting you declare your own.
@@ -862,7 +864,7 @@ and future programmers will regard a function with hidden Effects the way we reg
 2.  Feel the bookkeeping the chapter describes.
     Add a `Log` Effect (a protocol with `log(message)`)
     used by a new helper that `greet()` calls.
-    Count how many signatures you had to edit to thread it through,
+    Count how many signatures you had to edit to pass it down,
     then explain what an EMS would have done instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions),

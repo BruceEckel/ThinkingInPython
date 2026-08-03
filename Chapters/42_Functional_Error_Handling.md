@@ -184,7 +184,7 @@ as [Matching on the Error](#matching-on-the-error) shows below.
 A function like this is a *Total Function*:
 its return type accounts for every outcome it can produce, success or failure,
 with nothing left for an exception to sneak out through.
-Raise an exception instead, and the signature no longer tells the truth.
+If you raise an exception instead, the signature no longer tells the truth.
 A caller can't see the failure just by reading the return type.
 Python does not enforce totality.
 Nothing stops a `Result`-returning function from also raising an exception,

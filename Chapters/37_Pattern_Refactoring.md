@@ -151,7 +151,7 @@ Cardboard:12
 
 Parsing it into `Trash` objects goes through the registry,
 so the parser never mentions a concrete material.
-Add a new kind of trash and the parser keeps working unchanged:
+If you add a new kind of trash, the parser keeps working unchanged:
 
 ```python
 # parse_trash.py
@@ -321,7 +321,7 @@ Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class,
 the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
 and [Multiple Dispatching](32_Multiple_Dispatching.md).
-Derive `CrushedAluminum` from `Aluminum` and it sorts into its own bin,
+If you derive `CrushedAluminum` from `Aluminum`, it sorts into its own bin,
 not its parent's, which is what a sorter usually wants,
 but is worth knowing before you subclass a material.
 
