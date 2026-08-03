@@ -910,12 +910,17 @@ and provides those instances during program execution:
 from typing import Any, Final
 from greeter import Console
 
+class NotRegistered(Exception):
+    pass
+
 DI_CONTAINER: Final[dict[type, Any]] = {}
 
 def register[T](t: type[T], instance: T) -> None:
     DI_CONTAINER[t] = instance
 
 def get[T](t: type[T]) -> T:
+    if t not in DI_CONTAINER:
+        raise NotRegistered(t.__name__)
     return DI_CONTAINER[t]
 
 def greet(name: str) -> None:
@@ -924,17 +929,17 @@ def greet(name: str) -> None:
 
 try:
     greet("Alice")
-except KeyError:
-    print("KeyError: no Console registered")
+except NotRegistered as e:
+    print(f"{type(e).__name__}: {e}")
 register(Console, Console())
 greet("Alice")
-#: KeyError: no Console registered
+#: NotRegistered: Console
 #: Hello, Alice!
 ```
 
 `register()` puts an instance in, and `get()` looks one up by type,
 at the point where the program needs it.
-The key is the type you register,
+The type is the registraton key,
 so `register(Console, Recorder())` binds an implementation to the type its callers request.
 In Stateless, `supply()` takes the instances alone and pairs them by `isinstance()`,
 which is why two instances that satisfy one `Need` are ambiguous
