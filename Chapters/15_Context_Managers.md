@@ -238,7 +238,7 @@ from exceptions import ignore
 with ignore(ZeroDivisionError):
     print("before")
     1 / 0
-    print("after")  # Never runs: the error jumps straight to __exit__
+    print("after")  # Never runs: the error jumps to __exit__
 print("survived")
 #: before
 #: ZeroDivisionError('division by zero')

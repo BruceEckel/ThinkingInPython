@@ -372,7 +372,7 @@ This version leans on `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
 Because classes are already first-class objects,
 the registry shown above does the same job.
-It maps a name straight to a class and constructs it.
+It maps a name to a class and constructs it.
 Prefer that.
 A separate factory *class* becomes valuable when creating an object takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.

@@ -93,7 +93,7 @@ A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
 A `set` tests membership through hashing.
-`target in as_set` computes a hash of `target` and jumps straight to the bucket that value occupies.
+`target in as_set` computes a hash of `target` and jumps to the bucket that value occupies.
 Scanning gets slower as the list grows.
 Hashing stays fast no matter how many elements the set holds:
 

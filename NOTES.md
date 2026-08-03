@@ -1,5 +1,8 @@
-Build should generate the epub version (put in an 'epub' directory?).
-Add link info on README and bottom of index page.
+New book cover & favicon
+
+"would <create>" -> "creates"
+
+Add Epub link info on README and bottom of index page.
 
 lets this book's build pass
 passes the book build?

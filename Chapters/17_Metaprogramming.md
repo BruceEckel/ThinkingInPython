@@ -429,7 +429,7 @@ A *descriptor* is any object whose class defines at least one of `__get__()`,
 `__set__()`, or `__delete__()`.
 Most descriptors define `__get__()` and add the others as needed.
 Assigned to a class attribute, a descriptor takes over access to that attribute.
-Instead of going straight to the instance's `__dict__`,
+Instead of going to the instance's `__dict__`,
 `__get__()` is called on a read and `__set__()` on a write.
 [Decorators](14_Decorators.md#a-limitation-methods-need-a-descriptor)
 already relied on this without naming it.
@@ -521,7 +521,7 @@ The first two trace lines appear before any instance exists:
 Python calls `__set_name__()` as it finishes executing the `class Point` statement,
 once for each `Field`,
 handing each one the new class and its own attribute name.
-From then on, every read and write routes through the descriptor instead of going straight to the instance's `__dict__`.
+From then on, every read and write routes through the descriptor instead of going to the instance's `__dict__`.
 `p.x = 3` prints `x.__set__ = 3` before anything is stored.
 In `print(p.x, p.y)`, Python evaluates both arguments before calling `print()`,
 so both `__get__` lines appear ahead of `3 4`.

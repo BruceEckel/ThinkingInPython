@@ -450,7 +450,7 @@ which is all that remains once every other ability has been supplied.
 ## Swapping the Implementation
 
 `Need` creates a delayed binding.
-This means we can change that binding.
+This means we can select different bindings.
 For example, a test can bind to a `Console` that records instead of printing:
 
 ```python
@@ -485,8 +485,8 @@ The test supplies a different `Console`,
 while `greet()` is unchanged and unaware.
 
 At runtime, `as_type()` is the identity function and returns the object it was given.
-Its purpose is the annotation.
-Handing `recorder` straight to `supply()` would build a handler for `Need[Recorder]`,
+Only the static type changes.
+Handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
 but `greet()` asks for `Need[Console]`, a different ability.
 `as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
 so `supply()` builds the handler that `greet()` is waiting for.
