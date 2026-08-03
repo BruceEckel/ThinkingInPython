@@ -192,6 +192,40 @@ In `greeter.py`, two details deserve attention:
    so `console.print()` is checked the same as any other method call.
    The dependency is deferred without becoming untyped.
 
+### Why `yield from`
+
+The request in `greet()` is written `console = yield from need(Console)`,
+not `console = yield Need(Console)`.
+The reason is the `Any` in the Effect definition.
+
+A generator has one SendType for its whole life.
+An Effect does not:
+
+- Using `yield` to request a `Need[Console]` should get a `Console`.
+- Using `yield` to request a `Need[Log]` should get a `Log`.
+
+What comes back depends on which ability the `yield` requested.
+One SendType cannot vary from one `yield` to the next.
+Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
+The `send()` channel must be able to carry any type, so the SendType is `Any`.
+
+Using `yield from`, a request can produce an answer whose type the checker knows.
+A bare `yield` produces the SendType, the parameter forced to `Any`.
+`yield from` produces the inner generator's `ReturnType`,
+which does not have that conflict.
+`need(Console)` builds a small generator that serves one request,
+so its `ReturnType` can name a specific type.
+`need()` returns `Depend[Need[T], T]`,
+which expands to `Generator[Need[T], Any, T]`.
+Calling `need(Console)` binds `T` to `Console`,
+so `console` takes its type from that `ReturnType`,
+not from the `Any` in the SendType.
+
+This is why every request in this chapter is written as `yield from` rather than `yield`,
+and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
+get a small function of their own.
+
+
 ## Nothing Runs Yet
 
 Calling `greet()` performs no work.
@@ -243,39 +277,6 @@ because `greet()` is suspended inside `need()`.
 which prints its greeting and finishes, raising `StopIteration`.
 [Supplying the Dependency](#supplying-the-dependency)
 replaces this loop with `run()` and a handler that decides which object answers each request.
-
-## Why `yield from`
-
-The request in `greet()` is written `console = yield from need(Console)`,
-not `console = yield Need(Console)`.
-The reason is the `Any` in the Effect definition.
-
-A generator has one SendType for its whole life.
-An Effect does not:
-
-- Using `yield` to request a `Need[Console]` should get a `Console`.
-- Using `yield` to request a `Need[Log]` should get a `Log`.
-
-What comes back depends on which ability the `yield` requested.
-One SendType cannot vary from one `yield` to the next.
-Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
-The `send()` channel must be able to carry any type, so the SendType is `Any`.
-
-Using `yield from`, a request can produce an answer whose type the checker knows.
-A bare `yield` produces the SendType, the parameter forced to `Any`.
-`yield from` produces the inner generator's `ReturnType`,
-which does not have that conflict.
-`need(Console)` builds a small generator that serves one request,
-so its `ReturnType` can name a specific type.
-`need()` returns `Depend[Need[T], T]`,
-which expands to `Generator[Need[T], Any, T]`.
-Calling `need(Console)` binds `T` to `Console`,
-so `console` takes its type from that `ReturnType`,
-not from the `Any` in the SendType.
-
-This is why every request in this chapter is written as `yield from` rather than `yield`,
-and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
-get a small function of their own.
 
 ## Supplying the Dependency
 
@@ -498,7 +499,7 @@ which is why the test reads the messages back out of `recorder` afterward.
 
 ## Builtin Abilities
 
-You might not need to declare an ability.
+You might not need to define an ability.
 Stateless includes three of its own:
 
 - `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
@@ -516,14 +517,12 @@ so a double that overrides only `print()` reads live stdin.
 [Supplying an Interface](#supplying-an-interface)
 returns to what inheriting an implementation drags along.
 
-This chapter builds its own `Console` for illustration.
+For illustration, this chapter builds a `Console` rather than using the one from Stateless.
 In your own code, check what the library already declares first.
 
 ## Effects Propagate, and the Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
-`Console` and `greet()` reappear here from [Declaring a Dependency](#declaring-a-dependency),
-with a concrete `Console` class of the file's own.
 `greet_all()` must declare the `Console` even though we don't see `Console` directly used within `greet_all()`:
 
 ```python
@@ -555,22 +554,21 @@ A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many abilities as you like.
 
-The `yield from` is not optional.
-[[refers to greet or greet_all?]]
-Remove it here [[where?]] and `ty` objects with an `invalid-return-type`:
+The `yield from` inside `greet_all()` is not optional.
+Write that loop body as a bare `greet(name)` and `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
 That seems like protection, but look closer.
-It was the only `yield` in `greet_all()`,
+That `yield from` was the only `yield` in `greet_all()`,
 so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
-Keep any other request in the body and the same mistake is silent.
-[[In what body, what other requests?]]
+A body that still makes another request stays a generator function,
+and there the same mistake is silent.
 `greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
-makes two requests.
-Strip the `yield from` in front of its `greet(name)` and every check passes:
+makes two requests, one for the greeting and one for the log.
+Write its first line as a bare `greet(name)` and every check passes:
 `ty` and `ruff` report nothing, the program runs, the log gains both entries,
 and no greeting is printed.
-Each `greet(name)` builds a description, which the loop discards unrun.
+The call still builds a description, and the body discards it unrun.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too,
 and the ZIO fix is `.run` where Python's is `yield from`.
