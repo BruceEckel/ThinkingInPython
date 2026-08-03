@@ -858,17 +858,20 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 Structural matching decides the runtime issue, not the static one.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
-which the type checker never applies to `greet()`'s `Need[Console]`.
+which does not eliminate `greet()`'s `Need[Console]`.
+The unhandled request passes through to `run()`,
+which is where the error appears.
 An interface needs the `as_type()` upcast more than a base class does.
 A concrete `Console` can be instantiated and supplied directly,
 while an interface leaves nothing to supply but an implementation.
 
 `console_protocol.py` is the form to write in production.
 Most listings in these two chapters use a concrete `Console` instead,
-because under the interface every supply site grows that upcast.
-That is a real cost of using the interface, not only a shortcut for the book.
+because under the interface,
+supplying an implementation directly requires `as_type()`.
+That is a real cost of using an interface.
 [Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
-declares its abilities as `Protocol`s and shows how to stop repeating that cost:
+declares its abilities as `Protocol`s and shows how to avoid that cost:
 write one boundary function whose parameters are annotated with the interface types,
 and call `supply()` inside it.
 The parameter annotation performs the upcast, so no call site needs `as_type()`.
@@ -895,8 +898,8 @@ class Capture:
     def print(self, message: str) -> None:
         self.messages.append(message)
 
-capture = Capture()
 screen = as_type(Console)(Terminal())
+capture = Capture()
 memory = as_type(Console)(capture)
 run(supply(screen, memory)(greet)("Alice"))
 #: Hello, Alice!
