@@ -191,7 +191,8 @@ The ability's whole content is its type and the `bool` it produces.
 The parentheses in `if (yield from flip()):` are required.
 A `yield` expression is allowed on the right side of an assignment,
 as a statement of its own, or inside parentheses.
-An `if` condition is none of those, so `if yield from flip():` is a syntax error.
+An `if` condition is none of those,
+so `if yield from flip():` is a syntax error.
 
 Two handlers answer the same function.
 `scripted` walks an iterator over a fixed sequence,
@@ -1000,7 +1001,8 @@ def encounter() -> Depend[
 
 `encounter()` is the entire engine, and it names no implementation.
 It also prints nothing, because output is an ability like the rest:
-`Narrator` is one of the five requests, so where the lines go is decided outside.
+`Narrator` is one of the five requests,
+so where the lines go is decided outside.
 The engine has no `GameEnvironment` to construct and no factory to hold,
 and the five-way union is written out rather than aliased,
 for the reason [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
@@ -1011,7 +1013,8 @@ Five abilities need five distinct shapes.
 and then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
 the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
-A wide cast raises the odds of that collision, since every pair is a chance to collide.
+A wide cast raises the odds of that collision,
+since every pair is a chance to collide.
 
 The cast is a set of ordinary classes that inherit nothing:
 
@@ -1120,13 +1123,14 @@ One engine, four runs, and the only difference is what was supplied.
 The last two are the ones to study.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `NastyWeapon` across a `Wasteland`,
-it type-checks, and it runs.
+A `Kitty` bats at a `NastyWeapon` across a `Wasteland`, it type-checks,
+and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `NastyWeapon`,
 because the pairing is built into the class.
-`supply()` takes a flat list and checks each argument against one ability, never against the others.
+`supply()` takes a flat list and checks each argument against one ability,
+never against the others.
 The matched set comes back only if you write it down,
 which is what `kitties_and_puzzles()` does.
 The guarantee moved from a class hierarchy into a two-line function,
@@ -1150,9 +1154,8 @@ matches arguments
 
 The call still runs correctly, since the implementation is variadic,
 but the checking this chapter relies on is gone.
-Two chained handlers keep it:
-`supply()` the first five, apply that to the Effect,
-then `supply()` the rest to what remains,
+Two chained handlers keep it: `supply()` the first five,
+apply that to the Effect, then `supply()` the rest to what remains,
 which is the partial handling of [Emptying the Channels](46_Stateless.md#emptying-the-channels).
 Nine is also a fair warning about the design.
 An Effect that asks for ten separate things is usually two Effects.

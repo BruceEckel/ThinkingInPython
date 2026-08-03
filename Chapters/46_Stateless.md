@@ -518,7 +518,8 @@ But anything added to `Console` later shows up in `Recorder` too.
 Add a `read_line()` method to `Console`,
 and `Recorder` inherits the real one without warning,
 so a test meant to record instead performs live console I/O.
-If we make the ability an interface, there is no implementation to inherit by accident:
+If we make the ability an interface,
+there is no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -561,8 +562,7 @@ run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
 #: Hello, Bob!
 ```
 
-Both lines print,
-because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
+Both lines print, because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
 Remove the `# type: ignore` and `ty` rejects the first one:
 
 ```text
@@ -575,7 +575,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |     `Generator[Need[Console], Any, None]`
 ```
 
-Structural matching answers a runtime question, whether `isinstance()` accepts the object.
+Structural matching answers a runtime question,
+whether `isinstance()` accepts the object.
 `supply()` asks a static one.
 It names the ability from the declared type of its argument,
 so `supply(Terminal())` builds a handler for `Need[Terminal]`,
@@ -705,14 +706,16 @@ A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many abilities as you like.
 
-The `yield from` is not optional. [[refers to greet or greet_all?]]
+The `yield from` is not optional.
+[[refers to greet or greet_all?]]
 Remove it here [[where?]] and `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
 That seems like protection, but look closer.
 It was the only `yield` in `greet_all()`,
 so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
-Keep any other request in the body and the same mistake is silent. [[In what body, what other requests?]]
+Keep any other request in the body and the same mistake is silent.
+[[In what body, what other requests?]]
 `greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
 makes two requests.
 Strip the `yield from` in front of its `greet(name)` and every check passes:
