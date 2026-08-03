@@ -1,3 +1,6 @@
+Build should generate the epub version (put in an 'epub' directory?).
+Add link info on README and bottom of index page.
+
 Can a generator be used to build a state machine?
 Possibly revisit that chapter.
 
@@ -13,11 +16,20 @@ My goal is:
 - Avoid flourishes
 - Avoid writing that obscures
 
-
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
+
+Examples that demonstrate probability or statistics, very simply
+
+Fatal vs recoverable errors
+
+## Quotes to potentially insert
 
 That's the whole trick behind effect systems:
 the code that requests an effect is decoupled from the code that performs it (A handler sits in between).
+
+Effect tracking is the missing link. Without it you don't know what your function does. You don't know if you can safely parallelize it, or what happens if you call it multiple times in a row. You don't know enough to compose functions, especially at scale.
+
+---
 
 Review all the exercises and make sure they all have solutions that work.
 

@@ -102,7 +102,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 43_Functional_Assurance.md      |X|X|
 | 44_Effect_Management.md         |🔴|🔴|
 | 45_Generators.md                |🔴|🔴|
-| 46_Stateless.md                 |🔴|🔴|
+| 46_Stateless.md                 |X|X|
 | 47_Stateless_in_Practice.md     |🔴|🔴|
 
 ### Serious Edit

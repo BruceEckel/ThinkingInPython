@@ -51,6 +51,8 @@ Effect[Need[Console], KeyError, None]
 
 This particular Effect needs a `Console`, it can fail with a `KeyError`,
 and it produces nothing.
+`Need[Console]` is a request for a `Console` rather than the `Console` that answers it;
+[Nothing Runs Yet](#nothing-runs-yet) explains why the type names the request.
 
 Although you can write the full `Effect` signature each time,
 three aliases are provided for the most common cases.
@@ -86,36 +88,12 @@ Generator[Need[Console] | KeyError, Any, None]
 That leaves the second,
 which [Generators](45_Generators.md#annotating-a-generator)
 taught you to read as "what comes back from a `yield` call."
-That `Any` is essential, and it explains an idiom the rest of the chapter uses.
+That `Any` is deliberate; [Why `yield from`](#why-yield-from)
+explains it after you have seen a request in action.
 
-A generator has one SendType for its whole life.
-An Effect does not:
+## The Simplest Effect
 
-- Using `yield` to request a `Need[Console]` should get a `Console`.
-- Using `yield` to request a `Need[Log]` should get a `Log`.
-
-What comes back depends on which ability the `yield` requested.
-One SendType cannot vary from one `yield` to the next.
-Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
-The `send()` channel must be able to carry any type, so the SendType is `Any`.
-
-`yield from` recovers the precision that `Any` gives up,
-so a request can produce an answer whose type the checker knows.
-A bare `yield` produces the SendType, the parameter forced to `Any`.
-`yield from` produces the inner generator's `ReturnType`,
-which does not have that conflict.
-`need(Console)` builds a small generator that serves one request,
-so its `ReturnType` can name a specific type.
-`need()` returns `Depend[Need[T], T]`,
-which expands to `Generator[Need[T], Any, T]`.
-Calling `need(Console)` binds `T` to `Console`,
-so `console = yield from need(Console)` takes its value from that final `Console` and never consults the `Any`.
-
-This is why every request in this chapter is written as `yield from` rather than `yield`,
-and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
-get a small function of their own.
-
-Here, `success()` wraps a value in an Effect, and `run()` executes it:
+`success()` wraps a value in an Effect, and `run()` executes it:
 
 ```python
 # simplest_effect.py
@@ -234,6 +212,39 @@ that request must be an object: the `Need[Console]` that `need(Console)` builds.
 `yield from` then hands that object out of the function body.
 It suspends `greet()` and passes the `Need[Console]` to whatever is driving the generator,
 which provides a `Console` and resumes the function.
+
+## Why `yield from`
+
+The request in `greet()` is written `console = yield from need(Console)`,
+not `console = yield Need(Console)`.
+The reason is the `Any` in the Effect definition.
+
+A generator has one SendType for its whole life.
+An Effect does not:
+
+- Using `yield` to request a `Need[Console]` should get a `Console`.
+- Using `yield` to request a `Need[Log]` should get a `Log`.
+
+What comes back depends on which ability the `yield` requested.
+One SendType cannot vary from one `yield` to the next.
+Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
+The `send()` channel must be able to carry any type, so the SendType is `Any`.
+
+`yield from` recovers the precision that `Any` gives up,
+so a request can produce an answer whose type the checker knows.
+A bare `yield` produces the SendType, the parameter forced to `Any`.
+`yield from` produces the inner generator's `ReturnType`,
+which does not have that conflict.
+`need(Console)` builds a small generator that serves one request,
+so its `ReturnType` can name a specific type.
+`need()` returns `Depend[Need[T], T]`,
+which expands to `Generator[Need[T], Any, T]`.
+Calling `need(Console)` binds `T` to `Console`,
+so `console = yield from need(Console)` takes its value from that final `Console` and never consults the `Any`.
+
+This is why every request in this chapter is written as `yield from` rather than `yield`,
+and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
+get a small function of their own.
 
 ## Supplying the Dependency
 
@@ -354,7 +365,7 @@ because the function is what can produce a second description.
 The design rule that follows from this is to pass the function rather than the Effect.
 A Stateless Effect is a one-shot token: build it, run it, discard it.
 Storing one in a registry to run later, handing the same one to two consumers,
-or keeping one around to retry after a failure--these all fail quietly,
+or keeping one around to retry after a failure---these all fail quietly,
 returning `None` instead of raising an exception.
 Other Effect systems let you describe the work once and decide later how many times to perform it.
 In Stateless, that decision belongs to whoever still holds the function.
@@ -517,7 +528,7 @@ and call `supply()` inside it.
 The parameter annotation performs the upcast, so no call site needs `as_type()`.
 Everything in between works the same under either form.
 
-### Builtin Abilities
+## Builtin Abilities
 
 You might not need to declare an ability.
 Stateless includes three of its own:
@@ -666,143 +677,6 @@ Compare that to `ask_tell.py` in [Effect Management](44_Effect_Management.md#eff
 where `greet(ask, tell)` took its dependencies as arguments.
 Nothing there stopped an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
-
-## Where `run()` Can Be Called
-
-The error message in `unsupplied.py` said `run()` handles `Async` on its own.
-It can do that because its entire body is `return asyncio.run(run_async(effect))`.
-That has a consequence worth knowing before you incorporate Stateless into an existing application.
-`asyncio.run()` refuses to start a second event loop inside a running one,
-so `run()` cannot be called from any `async def`:
-
-```python
-# inside_a_loop.py
-import asyncio
-from greeter import Console, greet
-from stateless import run, run_async, supply
-
-bound = supply(Console())(greet)
-
-async def main() -> None:
-    try:
-        run(bound("Alice"))
-    except RuntimeError as e:
-        print(e)
-    await run_async(bound("Bob"))
-
-asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
-#: Hello, Bob!
-```
-
-This also prints a `RuntimeWarning` to standard error,
-so it does not appear in the output above, which shows standard output only.
-`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
-which raises a `RuntimeError` because a loop is already running,
-leaving that coroutine un-awaited.
-The warning is harmless, because that coroutine never started.
-It is also a reliable sign of this mistake,
-appearing whenever `run()` is called from asynchronous code.
-
-`run_async()` is the same driver packaged as a coroutine, so you `await` it.
-A synchronous program calls `run()` once at its outermost edge.
-A program that is already asynchronous, a web service or a bot,
-awaits `run_async()` at the edge of each request.
-Picking the wrong one is a runtime error rather than a type error,
-which makes it one of the few mistakes in this chapter the type checker will not catch.
-
-## Waiting on a Coroutine
-
-`Async` has appeared as something `run()` describes on its own.
-`wait()` is what puts it into a type.
-`yield from wait()` accepts any awaitable and produces the value that awaitable produces:
-
-```python
-# await_coroutine.py
-import asyncio
-from stateless import Async, Depend, run, wait
-
-async def fetch(url: str) -> str:
-    await asyncio.sleep(0.01)
-    return f"fetched {url}"
-
-def report(url: str) -> Depend[Async, str]:
-    body = yield from wait(fetch(url))
-    return f"{body = }, {len(body) = }"
-
-print(run(report("http://example.com")))
-#: body = 'fetched http://example.com', len(body) = 26
-```
-
-`Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
-There is nothing to supply, because `Async` asks for no object
-(there's no `Need`).
-A `Need[Console]` asks for a `Console` instance, which someone must bind.
-An `Async` request carries the coroutine and asks for it to be awaited,
-and `run()` does that with the event loop it already owns.
-So `Async` is answered rather than supplied,
-and it is the one ability in this chapter that never reaches `supply()`.
-
-Notice what `report()` is not.
-It is not an `async def` and it contains no `await`,
-yet its result comes from a coroutine.
-`wait()` hands the coroutine out as a request and the driver awaits it,
-so the asynchrony stops at the ability channel instead of spreading to `report()` and to everything that calls it.
-
-`wait()` is required at the boundary where a coroutine enters the Effect world.
-A function that already returns an Effect needs no `wait()`,
-because `yield from` composes the two directly.
-The library's own `sleep()` is such a function,
-and it pairs an `Async` request with a dependency:
-
-```python
-# sleep_effect.py
-import time
-from stateless import Async, Depend, Need, run, supply
-from stateless.time import Time, sleep
-
-def delayed_sum(
-    values: list[int],
-) -> Depend[Need[Time] | Async, int]:
-    total = 0
-    for value in values:
-        yield from sleep(0.01)
-        total += value
-    return total
-
-start = time.perf_counter()
-result = run(supply(Time())(delayed_sum)([1, 2, 3]))
-elapsed = time.perf_counter() - start
-print(result)
-#: 6
-print(f"waited 30ms or more: {elapsed >= 0.03}")
-#: waited 30ms or more: True
-```
-
-`sleep()` returns `Depend[Need[Time] | Async, None]`,
-so a function that calls it inherits both abilities.
-It declares both because `sleep()` makes both requests,
-`need(Time)` for the clock and `wait()` for the await:
-
-```python
-def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
-    time = yield from need(Time)
-    yield from wait(time.sleep(seconds))
-```
-
-The `async def` is `Time.sleep()`, the method on the ability,
-so the boundary crosses there rather than in `delayed_sum()`.
-`Time` is an ability like `Console`, an object whose method the Effect calls,
-and `supply()` binds it the same way.
-Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
-and `Need[Time]` moves that reading into the ability channel.
-A test can then supply a `Time` subclass whose `sleep()` returns at once,
-and check the logic without waiting for real time to pass.
-That subclass goes through `as_type(Time)`,
-for the same reason `Recorder` went through `as_type(Console)`.
-In [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
-`retry()` waits between attempts,
-so it adds `Need[Time]` and `Async` to whatever it decorates.
 
 ## Adding an Effect Deep in the Stack
 
@@ -1065,6 +939,143 @@ This is the same complaint that was made against Java's checked exceptions,
 and it is the reason [Effects Propagate, and the Checker Verifies It](46_Stateless.md#effects-propagate-and-the-checker-verifies-it)
 compares the spread to `async`.
 
+## Where `run()` Can Be Called
+
+The error message in `unsupplied.py` said `run()` handles `Async` on its own.
+It can do that because its entire body is `return asyncio.run(run_async(effect))`.
+That has a consequence worth knowing before you incorporate Stateless into an existing application.
+`asyncio.run()` refuses to start a second event loop inside a running one,
+so `run()` cannot be called from any `async def`:
+
+```python
+# inside_a_loop.py
+import asyncio
+from greeter import Console, greet
+from stateless import run, run_async, supply
+
+bound = supply(Console())(greet)
+
+async def main() -> None:
+    try:
+        run(bound("Alice"))
+    except RuntimeError as e:
+        print(e)
+    await run_async(bound("Bob"))
+
+asyncio.run(main())
+#: asyncio.run() cannot be called from a running event loop
+#: Hello, Bob!
+```
+
+This also prints a `RuntimeWarning` to standard error,
+so it does not appear in the output above, which shows standard output only.
+`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
+which raises a `RuntimeError` because a loop is already running,
+leaving that coroutine un-awaited.
+The warning is harmless, because that coroutine never started.
+It is also a reliable sign of this mistake,
+appearing whenever `run()` is called from asynchronous code.
+
+`run_async()` is the same driver packaged as a coroutine, so you `await` it.
+A synchronous program calls `run()` once at its outermost edge.
+A program that is already asynchronous, a web service or a bot,
+awaits `run_async()` at the edge of each request.
+Picking the wrong one is a runtime error rather than a type error,
+which makes it one of the few mistakes in this chapter the type checker will not catch.
+
+## Waiting on a Coroutine
+
+`Async` has appeared as something `run()` handles on its own.
+`wait()` is what puts it into a type.
+`yield from wait()` accepts any awaitable and produces the value that awaitable produces:
+
+```python
+# await_coroutine.py
+import asyncio
+from stateless import Async, Depend, run, wait
+
+async def fetch(url: str) -> str:
+    await asyncio.sleep(0.01)
+    return f"fetched {url}"
+
+def report(url: str) -> Depend[Async, str]:
+    body = yield from wait(fetch(url))
+    return f"{body = }, {len(body) = }"
+
+print(run(report("http://example.com")))
+#: body = 'fetched http://example.com', len(body) = 26
+```
+
+`Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
+There is nothing to supply, because `Async` asks for no object
+(there's no `Need`).
+A `Need[Console]` asks for a `Console` instance, which someone must bind.
+An `Async` request carries the coroutine and asks for it to be awaited,
+and `run()` does that with the event loop it already owns.
+So `Async` is answered rather than supplied,
+and it is the one ability in this chapter that never reaches `supply()`.
+
+Notice what `report()` is not.
+It is not an `async def` and it contains no `await`,
+yet its result comes from a coroutine.
+`wait()` hands the coroutine out as a request and the driver awaits it,
+so the asynchrony stops at the ability channel instead of spreading to `report()` and to everything that calls it.
+
+`wait()` is required at the boundary where a coroutine enters the Effect world.
+A function that already returns an Effect needs no `wait()`,
+because `yield from` composes the two directly.
+The library's own `sleep()` is such a function,
+and it pairs an `Async` request with a dependency:
+
+```python
+# sleep_effect.py
+import time
+from stateless import Async, Depend, Need, run, supply
+from stateless.time import Time, sleep
+
+def delayed_sum(
+    values: list[int],
+) -> Depend[Need[Time] | Async, int]:
+    total = 0
+    for value in values:
+        yield from sleep(0.01)
+        total += value
+    return total
+
+start = time.perf_counter()
+result = run(supply(Time())(delayed_sum)([1, 2, 3]))
+elapsed = time.perf_counter() - start
+print(result)
+#: 6
+print(f"waited 30ms or more: {elapsed >= 0.03}")
+#: waited 30ms or more: True
+```
+
+`sleep()` returns `Depend[Need[Time] | Async, None]`,
+so a function that calls it inherits both abilities.
+It declares both because `sleep()` makes both requests,
+`need(Time)` for the clock and `wait()` for the await:
+
+```python
+def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
+    time = yield from need(Time)
+    yield from wait(time.sleep(seconds))
+```
+
+The `async def` is `Time.sleep()`, the method on the ability,
+so the boundary crosses there rather than in `delayed_sum()`.
+`Time` is an ability like `Console`, an object whose method the Effect calls,
+and `supply()` binds it the same way.
+Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
+and `Need[Time]` moves that reading into the ability channel.
+A test can then supply a `Time` subclass whose `sleep()` returns at once,
+and check the logic without waiting for real time to pass.
+That subclass goes through `as_type(Time)`,
+for the same reason `Recorder` went through `as_type(Console)`.
+In [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
+`retry()` waits between attempts,
+so it adds `Need[Time]` and `Async` to whatever it decorates.
+
 ## The Error Channel
 
 Dependencies are one half of the type.
@@ -1085,6 +1096,8 @@ def score(name: str) -> int:
 
 `score()` looks like an ordinary function that raises a `KeyError`,
 but the decorator changes its type to `(str) -> Try[KeyError, int]`.
+`Try` is the alias from the table in [The Effect Type](#the-effect-type):
+it needs nothing, can fail with a `KeyError`, and produces an `int`.
 This carries the same idea as the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
 though the two are not the same construct.
 A `Result` is a wrapper the function returns at once,
