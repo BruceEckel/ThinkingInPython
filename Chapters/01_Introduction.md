@@ -21,6 +21,36 @@ Before using an idiom or pattern,
 this book asks whether the language already solves the problem,
 and adds the complexity only when the answer is no.
 
+## Who This Book Is For
+
+I am writing for the programmer who already knows how to program,
+either in another language or in Python itself.
+The goal is to move from writing Python that works to writing Python that is clear,
+idiomatic, and a pleasure to maintain.
+
+This is an intermediate-to-advanced book,
+which removes two constraints that introductory books carry:
+
+1.  An introductory book must describe everything in lock step,
+    never using an idea before it has been formally introduced.
+    This one does not.
+2.  An introductory book chooses topics by where they fall in a beginner's path.
+    This one chooses them by whether they are interesting and useful.
+
+If a language feature is new to you, look it up as you go.
+You should be comfortable with:
+
+- Functions, classes, objects, and inheritance.
+- Containers: lists, dictionaries, tuples, and sets.
+
+You do not need to know design patterns, metaclasses, or type checking.
+We cover them here.
+The book is about the language, not the tooling around it.
+Fortunately, `uv` and other tools greatly simplify setup,
+so you don't need to spend time on it.
+The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
+gives detailed setup instructions.
+
 ## AI Trigger Warning
 
 I started this book in 2008,
@@ -85,52 +115,24 @@ and that you will experience some of the same satisfaction that I've had while w
 If it's not already true, I think most programmers will regularly use AI.
 I have found that the knowledge contained in this book has helped me guide AIs towards better solutions.
 
-## Who This Book Is For
-
-I am writing for the programmer who already knows how to program,
-either in another language or in Python itself.
-The goal is to move from writing Python that works to writing Python that is clear,
-idiomatic, and a pleasure to maintain.
-
-This is an intermediate-to-advanced book,
-which removes two constraints that introductory books carry:
-
-1.  An introductory book must describe everything in lock step,
-    never using an idea before it has been formally introduced.
-    This one does not.
-2.  An introductory book chooses topics by where they fall in a beginner's path.
-    This one chooses them by whether they are interesting and useful.
-
-If a language feature is new to you, look it up as you go.
-You should be comfortable with:
-
-- Functions, classes, objects, and inheritance.
-- Containers: lists, dictionaries, tuples, and sets.
-
-You do not need to know design patterns, metaclasses, or type checking.
-We cover them here.
-The book is about the language, not the tooling around it.
-Fortunately, `uv` and other tools greatly simplify setup,
-so you don't need to spend time on it.
-The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
-gives detailed setup instructions.
-
 ## How the Book Is Organized
 
-Each chapter is largely self-contained, so you can read straight through,
-or jump to a chapter that interests you.
+Almost every chapter is largely self-contained,
+so you can read straight through, or jump to a chapter that interests you.
 The book is organized into four parts.
 
 Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
-functions, classes, and static typing.
+functions, modules, classes, and static typing.
 This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
 
 Part II, *Techniques*,
 covers the idioms and tools that give Python its character: testing,
-data classes as types, pattern matching, decorators, comprehensions,
-and metaprogramming.
+data classes as types, pattern matching, decorators, context managers,
+comprehensions, and metaprogramming.
+It closes with performance and concurrency,
+where the question changes from what the code says to how fast it runs.
 Many of these chapters came from presentations I've given, mostly at PyCon.
 
 Part III, *Patterns*,
@@ -140,12 +142,19 @@ The part then works through the classic design patterns,
 each reframed for Python and weighed against the language.
 I consistently ask what problem we are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
+The part ends by refactoring one problem through several designs,
+building a simulation out of the pieces,
+and cataloging the patterns that the literature added after the classic set.
 
 Part IV, *Functional Programming*, closes the book with pure functions,
+the `functools` and `itertools` toolkits,
 errors returned as values instead of raised exceptions,
-and systems that track a function's effects in its type.
-The final chapter looks at languages that already do this,
+and a spectrum of assurances that ends in property-based testing.
+It then takes up Effects, everything a program does that a pure function cannot.
+One chapter surveys the languages that track Effects in a function's type,
 and asks what Python could adopt.
+Another develops the full generator protocol on which such tracking depends.
+The last two put that idea to work with a library that brings Effect tracking to Python today.
 
 ## The Examples
 
@@ -161,10 +170,13 @@ These files live in the `Examples/` directory of the [source repository](https:/
 one folder per chapter,
 so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Decorators/tracer.py`.
+A helper that more than one chapter uses names a `utils/` path instead,
+like `# utils/result.py`,
+and lives in `Examples/utils/` rather than in a chapter folder.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
-The tooling extracts the book examples, then type-checks (with Astral's `ty`),
-runs, and tests them.
+The book's build system extracts the book examples, then type-checks
+(with Astral's `ty`), runs, and tests them.
 The code you read is the code that runs,
 and the output shown is the output it produces.
 
@@ -183,17 +195,22 @@ The point is to touch the code, predict what will happen, then run it and check.
 A few chapters in the Patterns part keep larger exercises,
 where a pattern only shows its value in a program you build yourself.
 
-Solutions live in the `Solutions/` directory of the source repository,
-one file per chapter,
-alongside a short explanation of what each exercise demonstrates.
+Solutions live in the `Solutions/` directory of the source repository.
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
 not in the code you end up with.
 
 ## Resources
 
+This book is freely readable at [thinkinginpython.com](https://thinkinginpython.com/),
+which always holds the current version.
+
 - [The official Python tutorial](https://docs.python.org/3/tutorial/)
 - [The Python Programming FAQ](https://docs.python.org/3/faq/programming.html)
+- [What's New in Python 3.15](https://docs.python.org/3.15/whatsnew/3.15.html),
+  the release notes for the version this book targets
+- [The Python type system specification](https://typing.python.org/en/latest/spec/),
+  the reference behind the annotations used throughout
 - [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
 - [Planet Python](https://planetpython.org/),
   an aggregator of Python articles from around the web

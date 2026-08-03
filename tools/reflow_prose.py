@@ -138,11 +138,18 @@ def _split_masked(masked: str) -> list[str]:
             stripped = token.rstrip(".").lower()
             next_char = masked[m.end():m.end() + 1]
             prev_char = masked[first_punct - 1] if first_punct > 0 else ""
+            tok_start = first_punct - len(token)
+            before_token = masked[tok_start - 1] if tok_start > 0 else ""
             # Abbreviation, single initial (e.g. "B."), or a decimal like
             # "3. 14": do not treat as a sentence boundary.
             if stripped in ABBREV:
                 continue
-            if len(token) == 1 and token.isupper() and token not in SINGLE_LETTER_WORDS:
+            # A slash before the letter means a compound like "I/O", whose
+            # token walk stops at the "/" and yields a bare "O". That ends a
+            # sentence; a real initial is preceded by a space, not a slash.
+            if (len(token) == 1 and token.isupper()
+                    and token not in SINGLE_LETTER_WORDS
+                    and before_token != "/"):
                 continue
             if prev_char.isdigit() and next_char.isdigit():
                 continue

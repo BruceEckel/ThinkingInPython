@@ -597,8 +597,7 @@ print(captain)
 The deep copy is the part that matters.
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
-A shallow copy shares that list,
-and editing one monster corrupts the other.
+A shallow copy shares that list, and editing one monster corrupts the other.
 The `clone()` method simply wraps `copy.deepcopy()`.
 
 We can combine prototype with a registry.

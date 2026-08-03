@@ -484,41 +484,41 @@ There is no `capsys`, no monkeypatching of `print`, and no mock.
 The test supplies a different `Console`,
 while `greet()` is unchanged and unaware.
 
+`as_type()` allows you to supply an implementation for a declared interface.
 At runtime, `as_type()` is the identity function and returns the object it was given.
 Only the static type changes.
-Handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
-but `greet()` asks for `Need[Console]`, a different ability.
-`as_type(Console)(recorder)` says "treat this as the `Console` it implements,"
-so `supply()` builds the handler that `greet()` is waiting for.
-You need `as_type()` when you supply an implementation for a declared interface.
+`greet()` asks for `Need[Console]`,
+but handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
+a different ability.
+`as_type(Console)(recorder)` says "treat `recorder` as a `Console`,"
+so `supply()` builds the exact handler type that `greet()` needs.
 `typing.cast(Console, recorder)` produces the same result here,
 but the two are not interchangeable.
 `cast()` is an unchecked assertion,
 believed by the type checker even when the object has no relation to `Console`.
 `as_type(Console)` returns a function annotated `(Console) -> Console`,
-so an object that does not implement `Console` is an argument-type error at that call.
-It can widen a type to a supertype and nothing more.
+so an object that does not implement `Console` produces an error.
+`as_type()` widens a type to a supertype,
+`cast()` makes one type into another without constraint.
 
-When `greet()` yields a `Need[Console]`,
-the library decides which supplied instance provides that `Need`.
-This pairing happens out of sight of the listing.
-The handler that `supply()` builds tests each request with `isinstance(instance, ability.t)`,
+The listing does not show how the library pairs a yielded `Need` with a supplied instance.
+The handler that `supply()` builds tests each request using `isinstance(instance, ability.t)`,
 where `ability.t` is the class inside the `Need`.
-Here `ability.t` is `Console` and `instance` is `recorder`,
-so the check is `isinstance(recorder, Console)`.
-It succeeds because `Recorder` inherits from `Console`.
-So the two moves in the test serve two audiences:
+Here `ability.t` is `Console` and `instance` is `recorder`.
+The check `isinstance(recorder, Console)` succeeds because `Recorder` inherits from `Console`.
+So two different things make this work, each for a different audience:
 `as_type(Console)` satisfies the type checker,
-and the inheritance satisfies the `isinstance()` check.
+and `Recorder` inheriting from `Console` satisfies the runtime `isinstance()` check.
 Every matching request over the Effect's run receives that same instance,
 which is why the test can read the results back out of `recorder` afterward.
 
 `Recorder` inherits `Console`'s printing implementation and overrides all of it.
-Nothing of the parent survives but the name that `isinstance()` looks for.
-The cost arrives later.
+Nothing of the parent survives except the name that `isinstance()` looks for.
+But anything added to `Console` later shows up in `Recorder` too.
 Add a `read_line()` method to `Console`,
-and `Recorder` inherits the real one without a word of warning,
-so a test meant to record instead performs live console I/O. Make the ability an interface and there is no implementation to inherit by accident:
+and `Recorder` inherits the real one without warning,
+so a test meant to record instead performs live console I/O.
+If we make the ability an interface, there is no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -547,16 +547,56 @@ Because a `Protocol` matches on structure,
 `Recorder` qualifies without inheriting from anything.
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
-This is the form to write in production.
+Structural matching does not remove the need for `as_type()`.
+Supply a `Terminal` both ways:
+
+```python
+# protocol_supply.py
+from console_protocol import Console, Terminal, greet
+from stateless import as_type, run, supply
+
+run(supply(Terminal())(greet)("Alice"))  # type: ignore
+#: Hello, Alice!
+run(supply(as_type(Console)(Terminal()))(greet)("Bob"))
+#: Hello, Bob!
+```
+
+Both lines print,
+because `Terminal` matches `Console` structurally and `isinstance()` accepts it.
+Remove the `# type: ignore` and `ty` rejects the first one:
+
+```text
+error[invalid-argument-type]: Argument to function `run` is incorrect
+ --> protocol_supply.py:5:5
+  |
+5 | run(supply(Terminal())(greet)("Alice"))
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Expected
+  |     `Generator[Async | Exception, Any, Unknown]`, found
+  |     `Generator[Need[Console], Any, None]`
+```
+
+Structural matching answers a runtime question, whether `isinstance()` accepts the object.
+`supply()` asks a static one.
+It names the ability from the declared type of its argument,
+so `supply(Terminal())` builds a handler for `Need[Terminal]`,
+which the type checker never connects to `greet()`'s `Need[Console]`.
+`as_type(Console)` is what makes that argument's static type `Console`.
+An interface needs the upcast more than a base class does, not less:
+a concrete `Console` can be instantiated and supplied directly,
+while an interface leaves nothing to supply but an implementation.
+
+`console_protocol.py` is the form to write in production.
 The smaller listings that follow continue importing `greeter.py`'s concrete `Console`,
-because a supply site for a `Protocol` ability needs help naming the interface:
-`supply(Console())` becomes `supply(as_type(Console)(Terminal()))`.
+because under the interface every supply site grows that upcast.
 That is a real cost of using the interface, not only a shortcut for the book.
 [Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
 declares its abilities as `Protocol`s and shows how to stop repeating that cost:
 write one boundary function whose parameters are annotated with the interface types,
 and call `supply()` inside it.
 The parameter annotation performs the upcast, so no call site needs `as_type()`.
+An annotated local variable does not do the same job:
+`screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
+so `supply(screen)` builds a `Need[Terminal]` handler again.
 Everything in between works the same under either form.
 
 ## Builtin Abilities
@@ -568,6 +608,15 @@ Stateless includes three of its own:
 - `Files` in `stateless.files` that reads a whole file,
 - `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
+
+All three are concrete classes rather than interfaces,
+and the accessors name those classes,
+so `isinstance()` accepts an instance of the class or a subclass and nothing else.
+A structurally identical double fails with a `MissingAbilityError` no matter what `as_type()` claims.
+A double for the builtin `Console` must inherit from it,
+which brings back the accident from [Swapping the Implementation](#swapping-the-implementation):
+that `Console` implements `input()` as well as `print()`,
+so a double that overrides only `print()` reads live stdin.
 
 This chapter builds its own `Console` for illustration.
 In your own code, check what the library already declares first.
@@ -609,7 +658,7 @@ Alice's greeting reaches the screen and leaves `capture` empty.
 Swapping the two arguments sends Bob's greeting into `capture` and prints nothing.
 Neither `greet()` nor the type checker can tell the two runs apart,
 because both bindings have the same type.
-Both instances go through `as_type(Console)`,
+Both instances must go through `as_type(Console)`,
 since neither is nominally a `Console`.
 
 Here Stateless gives up something ZIO keeps.
@@ -624,8 +673,8 @@ and supply one implementation per ability.
 
 A function that calls an effectful function becomes effectful.
 `Console` and `greet()` reappear here from [Declaring a Dependency](#declaring-a-dependency),
-with `Console` as the concrete class rather than the `Protocol` shown since.
-`greet_all()` must declare the `Console` it never touches:
+with the concrete `Console` class rather than the `Protocol` version.
+`greet_all()` must declare the `Console` even though we don't see `Console` directly used within `greet_all()`:
 
 ```python
 # greet_all.py
@@ -649,21 +698,21 @@ if __name__ == "__main__":
 #: Hello, Bob!
 ```
 
-This is the same virality `async` has.
+This has the same virality as `async`.
 An `async` function's callers must also be `async`,
 all the way to `asyncio.run()`.
 A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many abilities as you like.
 
-The `yield from` is not optional.
-Remove it here and `ty` objects with an `invalid-return-type`:
+The `yield from` is not optional. [[refers to greet or greet_all?]]
+Remove it here [[where?]] and `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
-That looks like protection, but read it again.
+That seems like protection, but look closer.
 It was the only `yield` in `greet_all()`,
 so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
-Keep any other request in the body and the same mistake is silent.
+Keep any other request in the body and the same mistake is silent. [[In what body, what other requests?]]
 `greet_logged()` in [Adding an Effect Deep in the Stack](#adding-an-effect-deep-in-the-stack)
 makes two requests.
 Strip the `yield from` in front of its `greet(name)` and every check passes:

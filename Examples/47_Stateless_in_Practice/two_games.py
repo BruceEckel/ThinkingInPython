@@ -1,0 +1,36 @@
+# two_games.py
+from casts import (
+    Kitty,
+    NastyWeapon,
+    Wasteland,
+    Yarn,
+    kitties_and_puzzles,
+    play,
+    warriors_and_weapons,
+)
+
+class Loud:
+    def say(self, line: str) -> None: print(line)
+
+class Script:
+    def __init__(self) -> None:
+        self.lines: list[str] = []
+    def say(self, line: str) -> None:
+        self.lines.append(line)
+
+kitties_and_puzzles(Loud())
+#: Kitty crosses the garden path
+#: and bats at the puzzle
+#: and wins a ball of yarn
+warriors_and_weapons(Loud())
+#: Warrior crosses the cracked wasteland
+#: and battles the nasty weapon
+#: and wins a chest of gold
+play(Loud(), Kitty(), NastyWeapon(), Wasteland(), Yarn())
+#: Kitty crosses the cracked wasteland
+#: and bats at the nasty weapon
+#: and wins a ball of yarn
+script = Script()
+kitties_and_puzzles(script)
+print(len(script.lines), script.lines[1])
+#: 3 and bats at the puzzle

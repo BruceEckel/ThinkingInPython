@@ -440,8 +440,7 @@ so you need only supply `__next__()`.
 Note the `eq=False` in the `dataclass` decoration.
 A data class that generates `__eq__()` sets `__hash__` to `None`.
 Comparing iterators by field value is also incorrect.
-Two wrappers over one source compare equal,
-no matter how far each has advanced.
+Two wrappers over one source compare equal, no matter how far each has advanced.
 Turning equality off restores the correct identity comparison for an iterator.
 
 A generator wraps an iterator just as well, and in fewer lines:

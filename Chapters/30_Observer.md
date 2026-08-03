@@ -181,8 +181,7 @@ print(seen)
 ```
 
 `once` hears the first change and detaches; `always` hears both.
-Under the naive loop, `always: 1` is missing:
-`once`'s self-removal skips it.
+Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
 
 Two more realities of Observer deserve a sentence each.
 An observer that raises an exception stops the loop,

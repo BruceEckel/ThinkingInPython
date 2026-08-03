@@ -18,10 +18,9 @@ and an account of what the guarantee does not cover.
 
 ## Abilities Are Not Special
 
-`Need` looks built-in, but it is an ordinary class, and you can write your own.
+`Need` is an ordinary class and you can write your own.
 An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
-Here is the `Ask` and `Tell` program from [Effect Management](44_Effect_Management.md#effects-by-hand),
-rebuilt:
+Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
 
 ```python
 # ask_tell_effect.py
@@ -188,6 +187,11 @@ Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
 while `Ask` and `Tell` each carried the payload the request had to deliver.
 The ability's whole content is its type and the `bool` it produces.
+
+The parentheses in `if (yield from flip()):` are required.
+A `yield` expression is allowed on the right side of an assignment,
+as a statement of its own, or inside parentheses.
+An `if` condition is none of those, so `if yield from flip():` is a syntax error.
 
 Two handlers answer the same function.
 `scripted` walks an iterator over a fixed sequence,
@@ -939,6 +943,219 @@ so a constructor cannot be an Effect.
 That is the shape of the listing above.
 Leaves are bound at the edge, products come from an explicit `yield from`,
 and the graph you can read is the union in the signature.
+
+## Supplying a Whole Cast
+
+The bakery graph went deep.
+Three appliances, one of them reached through another Effect.
+A game goes wide instead.
+[Abstract Factories](27_Factory.md#abstract-factories)
+built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
+and a `GameEnvironment` played whatever that factory produced.
+Widen the cast to five kinds of actor and request each one as an ability:
+
+```python
+# arena.py
+from typing import Protocol, runtime_checkable
+from stateless import Depend, Need, need
+
+@runtime_checkable
+class Narrator(Protocol):
+    def say(self, line: str) -> None: ...
+
+@runtime_checkable
+class Hero(Protocol):
+    def name(self) -> str: ...
+    def approach(self, obstacle: str) -> str: ...
+
+@runtime_checkable
+class Obstacle(Protocol):
+    def blocks(self) -> str: ...
+
+@runtime_checkable
+class Terrain(Protocol):
+    def underfoot(self) -> str: ...
+
+@runtime_checkable
+class Reward(Protocol):
+    def prize(self) -> str: ...
+
+def encounter() -> Depend[
+    Need[Narrator]
+    | Need[Hero]
+    | Need[Obstacle]
+    | Need[Terrain]
+    | Need[Reward],
+    None,
+]:
+    narrator = yield from need(Narrator)
+    hero = yield from need(Hero)
+    terrain = yield from need(Terrain)
+    obstacle = yield from need(Obstacle)
+    reward = yield from need(Reward)
+    narrator.say(f"{hero.name()} crosses the {terrain.underfoot()}")
+    narrator.say(hero.approach(obstacle.blocks()))
+    narrator.say(f"and wins {reward.prize()}")
+```
+
+`encounter()` is the entire engine, and it names no implementation.
+It also prints nothing, because output is an ability like the rest:
+`Narrator` is one of the five requests, so where the lines go is decided outside.
+The engine has no `GameEnvironment` to construct and no factory to hold,
+and the five-way union is written out rather than aliased,
+for the reason [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
+gives.
+
+Five abilities need five distinct shapes.
+`Obstacle.blocks()` and `Terrain.underfoot()` could each have been named `describe()`,
+and then any obstacle would satisfy `Terrain` as well,
+leaving argument order to decide which request each one answered,
+the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
+A wide cast raises the odds of that collision, since every pair is a chance to collide.
+
+The cast is a set of ordinary classes that inherit nothing:
+
+```python
+# casts.py
+from arena import Hero, Narrator, Obstacle, Reward, Terrain, encounter
+from stateless import run, supply
+
+class Kitty:
+    def name(self) -> str: return "Kitty"
+    def approach(self, obstacle: str) -> str:
+        return f"and bats at the {obstacle}"
+
+class Puzzle:
+    def blocks(self) -> str: return "puzzle"
+
+class Garden:
+    def underfoot(self) -> str: return "garden path"
+
+class Yarn:
+    def prize(self) -> str: return "a ball of yarn"
+
+class Warrior:
+    def name(self) -> str: return "Warrior"
+    def approach(self, obstacle: str) -> str:
+        return f"and battles the {obstacle}"
+
+class NastyWeapon:
+    def blocks(self) -> str: return "nasty weapon"
+
+class Wasteland:
+    def underfoot(self) -> str: return "cracked wasteland"
+
+class Gold:
+    def prize(self) -> str: return "a chest of gold"
+
+def play(
+    narrator: Narrator,
+    hero: Hero,
+    obstacle: Obstacle,
+    terrain: Terrain,
+    reward: Reward,
+) -> None:
+    cast = supply(narrator, hero, obstacle, terrain, reward)
+    run(cast(encounter)())
+
+def kitties_and_puzzles(narrator: Narrator) -> None:
+    play(narrator, Kitty(), Puzzle(), Garden(), Yarn())
+
+def warriors_and_weapons(narrator: Narrator) -> None:
+    play(narrator, Warrior(), NastyWeapon(), Wasteland(), Gold())
+```
+
+`play()` is the boundary function of [Composing a Program](#composing-a-program),
+grown from two parameters to five.
+Its annotations do the upcasting, so no actor needs `as_type()`,
+and its body is the one place in the program where an ability meets an implementation.
+`kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
+Each was a class with a method per product;
+each is now a function that hands `play()` a matched set.
+The parallel hierarchies are gone with them.
+`Kitty` does not extend a `Character` base class,
+`Puzzle` does not extend an `Obstacle` base class,
+and no class is named in the engine:
+
+```python
+# two_games.py
+from casts import (
+    Kitty,
+    NastyWeapon,
+    Wasteland,
+    Yarn,
+    kitties_and_puzzles,
+    play,
+    warriors_and_weapons,
+)
+
+class Loud:
+    def say(self, line: str) -> None: print(line)
+
+class Script:
+    def __init__(self) -> None:
+        self.lines: list[str] = []
+    def say(self, line: str) -> None:
+        self.lines.append(line)
+
+kitties_and_puzzles(Loud())
+#: Kitty crosses the garden path
+#: and bats at the puzzle
+#: and wins a ball of yarn
+warriors_and_weapons(Loud())
+#: Warrior crosses the cracked wasteland
+#: and battles the nasty weapon
+#: and wins a chest of gold
+play(Loud(), Kitty(), NastyWeapon(), Wasteland(), Yarn())
+#: Kitty crosses the cracked wasteland
+#: and bats at the nasty weapon
+#: and wins a ball of yarn
+script = Script()
+kitties_and_puzzles(script)
+print(len(script.lines), script.lines[1])
+#: 3 and bats at the puzzle
+```
+
+One engine, four runs, and the only difference is what was supplied.
+The last two are the ones to study.
+
+The third mixes the casts, and nothing objects.
+A `Kitty` bats at a `NastyWeapon` across a `Wasteland`,
+it type-checks, and it runs.
+That is a real loss against the Abstract Factory,
+whose purpose is families of matched products:
+`KittiesAndPuzzles.make_obstacle()` cannot return a `NastyWeapon`,
+because the pairing is built into the class.
+`supply()` takes a flat list and checks each argument against one ability, never against the others.
+The matched set comes back only if you write it down,
+which is what `kitties_and_puzzles()` does.
+The guarantee moved from a class hierarchy into a two-line function,
+and it is worth knowing which of those you are getting.
+
+The fourth run swaps one cast member and captures the output.
+`Script` records what it is told,
+so a test reads the lines back as a list with no `capsys` and no monkeypatching,
+the same swap `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+made with one ability rather than five.
+Printing was never in the engine to be intercepted.
+
+There is a ceiling on how wide the cast can get.
+`supply()` is declared with overloads for one through nine values,
+so a tenth argument matches none of them:
+
+```text
+error[no-matching-overload]: No overload of function `supply`
+matches arguments
+```
+
+The call still runs correctly, since the implementation is variadic,
+but the checking this chapter relies on is gone.
+Two chained handlers keep it:
+`supply()` the first five, apply that to the Effect,
+then `supply()` the rest to what remains,
+which is the partial handling of [Emptying the Channels](46_Stateless.md#emptying-the-channels).
+Nine is also a fair warning about the design.
+An Effect that asks for ten separate things is usually two Effects.
 
 ## Adding Behavior to an Existing Effect
 

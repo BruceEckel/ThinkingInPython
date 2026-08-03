@@ -535,8 +535,7 @@ The underscore prefix is not decoration.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
 If `__get__()` asks `obj` for plain `"x"`,
-that lookup routes back to the descriptor and calls `__get__()` again,
-forever.
+that lookup routes back to the descriptor and calls `__get__()` again, forever.
 Storing under `"_x"`, a name no descriptor claims, breaks the loop.
 This is metaprogramming, but it needs no metaclass.
 

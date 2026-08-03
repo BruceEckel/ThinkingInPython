@@ -1,6 +1,8 @@
 New book cover & favicon
 
-"would <create>" -> "creates"
+game that needs many different kinds of game actors, aquired using need()
+Demonstrates supplying lots of things.
+Contrast with earlier game examples in the book.
 
 Add Epub link info on README and bottom of index page.
 

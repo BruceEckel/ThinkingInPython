@@ -461,8 +461,7 @@ but it is the standard answer for code already steeped in `datetime`.
 ### Network Calls
 
 A test must never use a real network.
-The call is slow,
-it fails whenever the service or the connection does,
+The call is slow, it fails whenever the service or the connection does,
 and it ties the test to data you do not control.
 `monkeypatch` replaces the function that fetches data with one that returns a canned response,
 so the test runs offline and gives the same answer every time.

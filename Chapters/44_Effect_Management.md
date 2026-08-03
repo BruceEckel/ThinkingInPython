@@ -778,8 +778,7 @@ The guarantee has a boundary, and it is worth naming here.
 Stateless verifies that the Effects you *declare* propagate consistently.
 Nothing stops a function from calling `print()` directly,
 adjacent to its carefully declared abilities.
-In Koka, that call changes the function's Effect row,
-and every caller's row.
+In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, it changes nothing that any tool can see.
 A library checks the Effects you wrote down.
 Only the language can check the ones you didn't.

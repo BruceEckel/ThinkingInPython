@@ -376,8 +376,7 @@ The `nonlocal` statement is what lets `increment()` *assign* to the captured var
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
 so `count += 1` alone makes `count` a fresh local,
-one referenced before assignment,
-and the call fails with `UnboundLocalError`.
+one referenced before assignment, and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 Forgetting it is the standard stumble when a closure first needs to write,
 and the error message, complaining about a local variable,
