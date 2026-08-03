@@ -357,6 +357,12 @@ A function you understand today gets called by a function written next week,
 which gets called by code a colleague writes next month.
 Each step adds invisible dependencies, and no one has the full picture.
 
+What is missing is tracking.
+Without it you don't know what a function does.
+You don't know whether it is safe to run in parallel with another,
+or what happens when you call it twice in a row.
+You don't know enough to compose functions, which is how programs grow large.
+
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
 the EMS guarantees that your function also reports its Effects.
@@ -524,6 +530,12 @@ A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
 The compiler rejects a program that performs an Effect with no handler in scope,
 so no Effect reaches the runtime unaccounted for.
+
+This decoupling is the core of every Effect system.
+The code that requests an Effect is separated from the code that performs it,
+and a handler sits between them.
+`greet()` names `ask` and `tell` without deciding what either one means.
+The handler decides, and a different handler decides differently.
 
 Handlers can do more than `except` blocks can.
 When an operation is performed, the handler receives the *continuation*:
