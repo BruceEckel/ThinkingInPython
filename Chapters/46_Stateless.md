@@ -309,6 +309,56 @@ and raises the failure as an ordinary exception
 ([The Error Channel](46_Stateless.md#the-error-channel)).
 Binding an implementation and satisfying the type checker are the same act.
 
+## An Effect Runs Once
+
+A description you can hold as a value invites you to run it twice.
+In Stateless you cannot, because that description is a generator,
+and driving a generator consumes it:
+
+```python
+# effect_runs_once.py
+from greeter import Console, greet
+from stateless import run, success, supply
+
+bound = supply(Console())(greet)
+description = bound("Alice")
+run(description)
+#: Hello, Alice!
+print(repr(run(description)))
+#: None
+run(bound("Alice"))
+#: Hello, Alice!
+constant = success(42)
+print(run(constant), run(constant))
+#: 42 42
+```
+
+The second `run()` of the same object greets nobody and produces `None`.
+The generator is exhausted,
+so `run()` gets `StopIteration` immediately and reports the return value of a function that never resumed.
+Calling `bound("Alice")` again builds a fresh description, which works.
+`success()` is the exception because it is not a generator at all:
+it builds a small object whose `send()` reports its value every time,
+so a constant Effect replays.
+
+This is where Stateless departs from Effect systems in other languages.
+A ZIO or Effect-TS value is an immutable description that can be interpreted as often as you like,
+so their combinators are operations on that value:
+ZIO writes `action repeat policy`, repeating the effect the value describes.
+Stateless has `repeat()` and `retry()` too,
+but they are typed `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
+They decorate the function,
+because the function is what can produce a second description.
+`catch()`, `throws()`, and `supply()` take functions for the same reason.
+
+The design rule that follows from this is to pass the function rather than the Effect.
+A Stateless Effect is a one-shot token: build it, run it, discard it.
+Storing one in a registry to run later, handing the same one to two consumers,
+or keeping one around to retry after a failure--these all fail quietly,
+returning `None` instead of raising an exception.
+Other Effect systems let you describe the work once and decide later how many times to perform it.
+In Stateless, that decision belongs to whoever still holds the function.
+
 ## Forgetting to Supply
 
 Let's see what happens when we break it.
@@ -787,9 +837,9 @@ def greet_all(
 
 log = Log()
 run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
-print(log.entries)
 #: Hello, Alice!
 #: Hello, Bob!
+print(log.entries)
 #: ['greeted Alice', 'greeted Bob']
 ```
 
@@ -924,22 +974,22 @@ def get[T](t: type[T]) -> T:
     return DI_CONTAINER[t]
 
 def greet(name: str) -> None:
-    console = get(Console)
+    console: Console = get(Console)  # Exact type
     console.print(f"Hello, {name}!")
 
 try:
     greet("Alice")
 except NotRegistered as e:
     print(f"{type(e).__name__}: {e}")
+#: NotRegistered: Console
 register(Console, Console())
 greet("Alice")
-#: NotRegistered: Console
 #: Hello, Alice!
 ```
 
 `register()` puts an instance in, and `get()` looks one up by type,
 at the point where the program needs it.
-The type is the registraton key,
+The type is the registration key,
 so `register(Console, Recorder())` binds an implementation to the type its callers request.
 In Stateless, `supply()` takes the instances alone and pairs them by `isinstance()`,
 which is why two instances that satisfy one `Need` are ambiguous
@@ -957,48 +1007,63 @@ but a homogeneous `dict` has no annotation for "the value under key `type[T]` is
 That invariant lives in `register()`'s signature rather than in the container.
 
 `greet()`'s body matches `greeter.py`'s `greet()` line for line,
-apart from `console = get(Console)` in place of `console = yield from need(Console)`.
+apart from `console: Console = get(Console)` in place of `console = yield from need(Console)`.
 
-The first call to `greet("Alice")` fails at runtime because nothing has been registered yet.
+The first call to `greet("Alice")` fails at runtime because nothing has been registered.
 The second call succeeds because the binding now exists.
-The two calls are identical in the source,
+The two calls are identical,
 and nothing in their types records whether a `Console` has been registered,
 so `ty` accepts the file.
 
 Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](46_Stateless.md#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
-A container relocates a side cause instead of declaring it,
+DI relocates a side cause instead of declaring it,
 so the dependency becomes swappable without becoming visible.
 
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
 This produces three consequences:
 
-1. The check happens before the program runs.
-   A container discovers a missing registration when something asks for it,
-   which can be at startup or much later, on a path no test exercised.
+1. Stateless checks happen before the program runs.
+   DI only discovers a missing registration when something asks for it.
+   This can be at startup or much later, on a path no test exercised.
    Remove the `# type: ignore` from `unsupplied.py` and `ty` reports the unsupplied `Need[Console]` before the program runs
    ([Forgetting to Supply](46_Stateless.md#forgetting-to-supply)).
 
-2. Bindings are per call rather than per process.
-   A container usually holds one binding for a type for the life of the program.
+2. Stateless bindings are per call rather than per process.
+   DI usually holds one type binding for the life of the program.
    `supply()` binds for one execution of one Effect,
    so two bindings for the same type can be live at once,
    as the screen and memory `Console`s were in [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
-   Nothing global has to be reset between test cases.
+   No reset is needed between test cases.
 
-3. What a function requires is in its type.
-   A container leaves that information in the bodies that ask for it,
+   Handlers also layer.
+   An ability a handler cannot answer is yielded further out,
+   so `supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
+   and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
+   You can bind some abilities near the Effect and the others at the edge,
+   with the type recording what each layer left behind.
+   DI has one flat registry and no equivalent layering.
+
+3. Stateless function requirements are expressed in the function type.
+   DI leaves that information in the bodies that ask for it,
    so learning what a function needs means reading its implementation.
    `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
    and a caller that does not supply them inherits the requirement.
 
-That propagation is also the cost.
+The requirement that callers inherit is also the cost.
 Adding a dependency deep in the stack rewrites the return type of every function above it,
 which [Adding an Effect Deep in the Stack](46_Stateless.md#adding-an-effect-deep-in-the-stack)
 demonstrated with `Need[Log]`.
-A container absorbs the same change in silence, and no signature records it.
-The better trade depends on whether you would rather meet the omission in a stack trace or in the checker.
+DI absorbs the same change in silence, and no signature records it.
+
+The checker is the better place to meet an omission,
+so the trade is not about correctness, but churn and coupling.
+A function that never logs still names `Need[Log]` in its type,
+and taking that dependency back out later moves every signature on the path a second time.
+This is the same complaint that was made against Java's checked exceptions,
+and it is the reason [Effects Propagate, and the Checker Verifies It](46_Stateless.md#effects-propagate-and-the-checker-verifies-it)
+compares the spread to `async`.
 
 ## The Error Channel
 
@@ -1121,8 +1186,8 @@ def report(name: str) -> Depend[Need[Console], None]:
             assert_never(value)
 
 run(supply(Console())(report)("Alice"))
-run(supply(Console())(report)("Carol"))
 #: Alice: 42
+run(supply(Console())(report)("Carol"))
 #: Carol: unknown
 ```
 
@@ -1264,9 +1329,9 @@ An Effect with both channels emptied is a `Success`, which `run()` accepts.
 The channels do not resolve in the same way:
 
 - `unsupplied.py` showed `run()` refusing an Effect that still declares an ability,
-before the program starts.
+  before the program starts.
 - `error_escapes.py` showed `run()` accepting an Effect that still declares a failure,
-then raising that failure at the edge.
+  then raising that failure at the edge.
 
 The difference is not an inconsistency.
 An unbound dependency has no answer anywhere in the program,

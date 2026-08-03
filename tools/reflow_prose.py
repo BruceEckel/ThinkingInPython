@@ -360,8 +360,16 @@ def reflow(text: str, width: int = _DEFAULT_WIDTH) -> tuple[str, int]:
             out.extend(para_lines)
             continue
 
+        # A prose paragraph indented under a list item is a continuation of
+        # that item, separated from it by a blank line. Keep the indent:
+        # de-denting it would close the list and restart its numbering. Four
+        # or more columns is indented code, which `is_prose_line` already
+        # excluded, so this only ever restores one to three columns.
+        pad_len = min(len(pl) - len(pl.lstrip(" ")) for pl in para_lines)
+        pad = " " * pad_len
         joined = " ".join(pl.strip() for pl in para_lines)
-        new_lines = _reflow_text(joined, width) or para_lines
+        wrapped = _reflow_text(joined, max(20, width - pad_len))
+        new_lines = [pad + w for w in wrapped] or para_lines
         if new_lines != para_lines:
             reflowed += 1
         out.extend(new_lines)

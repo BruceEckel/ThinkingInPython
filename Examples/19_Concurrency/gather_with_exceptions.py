@@ -1,5 +1,6 @@
 # gather_with_exceptions.py
 import asyncio
+from typing import assert_never
 from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
@@ -11,8 +12,10 @@ async def main() -> None:
         match result:
             case BaseException():
                 print(f"{item}: raised {result!r}")
-            case _:
+            case str():
                 print(f"{item}: {result}")
+            case _:
+                assert_never(result)
 
 asyncio.run(main())
 #: a: started

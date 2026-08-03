@@ -115,9 +115,9 @@ print(game.show_maze())
 game.run(solution)
 if game.robot.finished:
     print("Game over!")
+#: Game over!
 print("\nfinal:")
 print(game.show_maze())
-#: Game over!
 #:
 #: final:
 #: ###############################

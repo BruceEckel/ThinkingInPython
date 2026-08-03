@@ -16,6 +16,6 @@ def report(name: str) -> Depend[Need[Console], None]:
             assert_never(value)
 
 run(supply(Console())(report)("Alice"))
-run(supply(Console())(report)("Carol"))
 #: Alice: 42
+run(supply(Console())(report)("Carol"))
 #: Carol: unknown

@@ -16,14 +16,14 @@ def get[T](t: type[T]) -> T:
     return DI_CONTAINER[t]
 
 def greet(name: str) -> None:
-    console = get(Console)
+    console: Console = get(Console)  # Exact type
     console.print(f"Hello, {name}!")
 
 try:
     greet("Alice")
 except NotRegistered as e:
     print(f"{type(e).__name__}: {e}")
+#: NotRegistered: Console
 register(Console, Console())
 greet("Alice")
-#: NotRegistered: Console
 #: Hello, Alice!

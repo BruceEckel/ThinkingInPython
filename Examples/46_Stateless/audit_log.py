@@ -24,7 +24,7 @@ def greet_all(
 
 log = Log()
 run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
-print(log.entries)
 #: Hello, Alice!
 #: Hello, Bob!
+print(log.entries)
 #: ['greeted Alice', 'greeted Bob']

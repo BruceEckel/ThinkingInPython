@@ -160,8 +160,8 @@ with suppress(ZeroDivisionError):
     print("before")
     1 / 0
     print("after")  # Never runs
-print("survived")
 #: before
+print("survived")
 #: survived
 ```
 

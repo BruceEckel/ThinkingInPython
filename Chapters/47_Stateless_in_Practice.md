@@ -487,17 +487,17 @@ def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())
 
 print(outcome(STOCKS, SHELF))
-print(outcome(WEATHER, SHELF))
-print(outcome(STOCKS, EMPTY))
-print(outcome(DeadWire(), SHELF))
 #: feed: fetching
 #: library: looking up stock market
 #: a history
+print(outcome(WEATHER, SHELF))
 #: feed: fetching
 #: nothing worth researching
+print(outcome(STOCKS, EMPTY))
 #: feed: fetching
 #: library: looking up stock market
 #: no article on that topic
+print(outcome(DeadWire(), SHELF))
 #: no headline today
 ```
 
@@ -902,11 +902,11 @@ from stateless import memoize, run, supply
 db = Database(failures=0)
 bound = supply(db)(memoize(save_user))
 print(run(bound("Morty")))
-print(run(bound("Morty")))
-print(f"attempts: {db.attempts}")
 #: attempt 1: saving Morty
 #: Morty saved
+print(run(bound("Morty")))
 #: Morty saved
+print(f"attempts: {db.attempts}")
 #: attempts: 1
 ```
 

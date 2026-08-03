@@ -36,10 +36,10 @@ threading.stack_size(default_stack)  # Restore the previous setting
 task_cost = asyncio.run(bytes_per_task())
 tasks_per_stack = configured_stack / task_cost
 print(f"one thread's stack reservation: {configured_stack:,} bytes")
-print(f"average bytes per task: {task_cost:.0f}")
-print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
-print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: one thread's stack reservation: 1,048,576 bytes
+print(f"average bytes per task: {task_cost:.0f}")
 #: average bytes per task: 1350
+print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
 #: tasks fitting in one thread's stack: 777
+print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: holds over 200 tasks: True
