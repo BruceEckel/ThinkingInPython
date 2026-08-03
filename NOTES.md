@@ -22,15 +22,6 @@ Examples that demonstrate probability or statistics, very simply
 
 Fatal vs recoverable errors
 
-## Quotes to potentially insert
-
-That's the whole trick behind effect systems:
-the code that requests an effect is decoupled from the code that performs it (A handler sits in between).
-
-Effect tracking is the missing link. Without it you don't know what your function does. You don't know if you can safely parallelize it, or what happens if you call it multiple times in a row. You don't know enough to compose functions, especially at scale.
-
----
-
 Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
