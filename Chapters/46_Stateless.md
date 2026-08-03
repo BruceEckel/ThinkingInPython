@@ -432,7 +432,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |         `Generator[Need[Console], Any, None]`
 ```
 
-In Stateless, an un-supplied dependency is a type error, not a production incident.
+In Stateless, an un-supplied dependency is a type error,
+not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
 
@@ -444,8 +445,7 @@ The expected type in that message names two things this chapter has not yet cove
 
 `run()` accepts an Effect whose ability channel has narrowed to those two,
 which is all that remains once every other ability has been supplied.
-`greet("Alice")` still has `Need[Console]`,
-so it does not pass type checking.
+`greet("Alice")` still has `Need[Console]`, so it does not pass type checking.
 
 ## Swapping the Implementation
 

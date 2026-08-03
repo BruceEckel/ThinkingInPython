@@ -11,6 +11,7 @@ This chapter opens by writing one from scratch,
 which shows that `Need` is an ordinary class rather than a special form.
 The rest applies the machinery:
 handlers that make an unpredictable source testable,
+a handler that swaps implementations while a program runs,
 a program whose signature is its own documentation,
 decorators that add retry and parallelism to code they never edit,
 and an account of what the guarantee does not cover.
@@ -333,6 +334,229 @@ stood in for a side effect, where the function writes something outward.
 The technique did not change between the two.
 Name the seam as an ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that the seam cannot be skipped by accident.
+
+## Switching Implementations Mid-Run
+
+Both handlers in the last section answered with a value.
+A handler can also answer with an object,
+and it can choose a different object at each request.
+That is what `supply()` cannot do,
+because it binds one instance for the whole run.
+When the implementation a program depends on has to change while the program is running,
+the choosing belongs in a handler.
+
+A building's power supply works this way.
+Solar carries the load while the sun is up.
+The battery carries it while the charge stays above a threshold.
+The utility grid carries it when neither can,
+and a diesel backup carries it when the grid is down too.
+Each stops for its own reason,
+and when one stops the building has to obtain another.
+
+Sources are ordinary objects.
+Each reports whether it can supply a given hour, and depletes when drawn from:
+
+```python
+# power.py
+from dataclasses import dataclass
+from typing import Protocol
+from stateless import Ability, Depend, throws
+
+class Drained(Exception):
+    pass
+
+class Source(Protocol):
+    def available(self, hour: int) -> bool: ...
+    def deplete(self) -> None: ...
+
+class Solar:
+    def available(self, hour: int) -> bool:
+        return 6 <= hour < 19
+    def deplete(self) -> None:
+        pass
+
+@dataclass
+class Battery:
+    charge: int
+    def available(self, hour: int) -> bool:
+        return self.charge >= 20
+    def deplete(self) -> None:
+        self.charge -= 20
+
+@dataclass
+class Grid:
+    outage: range
+    def available(self, hour: int) -> bool:
+        return hour not in self.outage
+    def deplete(self) -> None:
+        pass
+
+@dataclass
+class Backup:
+    fuel: int
+    def available(self, hour: int) -> bool:
+        return self.fuel > 0
+    def deplete(self) -> None:
+        self.fuel -= 1
+
+@dataclass(frozen=True)
+class Outlet(Ability[Source]):
+    hour: int
+
+def plug(hour: int) -> Depend[Outlet, Source]:
+    source: Source = yield from Outlet(hour)
+    return source
+
+@throws(Drained)
+def draw(source: Source, hour: int) -> None:
+    if not source.available(hour):
+        raise Drained(type(source).__name__)
+    source.deplete()
+```
+
+`Outlet` is an ability whose handler returns a `Source`,
+and it carries the hour so the handler can consult the conditions at that moment.
+`Ask` carried a prompt for the same reason.
+`draw()` is the boundary function:
+it asks the source whether it can still supply,
+and `@throws` lifts the refusal into the error channel.
+
+Now the consumer and the handler that feeds it:
+
+```python
+# microgrid.py
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from power import (
+    Backup,
+    Battery,
+    Drained,
+    Grid,
+    Outlet,
+    Solar,
+    Source,
+    draw,
+    plug,
+)
+from stateless import Depend, catch, handle, run
+
+class Blackout(Exception):
+    pass
+
+def controller(
+    order: tuple[Source, ...],
+) -> Callable[[Outlet], Source]:
+    def choose(request: Outlet) -> Source:
+        for source in order:
+            if source.available(request.hour):
+                return source
+        raise Blackout(request.hour)
+    return choose
+
+@contextmanager
+def connected(source: Source) -> Iterator[Source]:
+    name = type(source).__name__
+    print(f"{name} online")
+    try:
+        yield source
+    finally:
+        print(f"{name} offline")
+
+def run_load(start: int, hours: int) -> Depend[Outlet, None]:
+    caught = catch(Drained)
+    hour, remaining = start, hours
+    while remaining:
+        source = yield from plug(hour)
+        with connected(source) as power:
+            while remaining:
+                failure = yield from caught(draw)(power, hour)
+                if failure is not None:
+                    break
+                print(f"  {hour}:00")
+                hour += 1
+                remaining -= 1
+
+def site() -> tuple[Solar, Battery, Grid, Backup]:
+    return Solar(), Battery(40), Grid(range(22, 24)), Backup(3)
+
+solar, battery, grid, backup = site()
+sun_first = controller((solar, battery, grid, backup))
+run(handle(sun_first)(run_load)(17, 6))
+#: Solar online
+#:   17:00
+#:   18:00
+#: Solar offline
+#: Battery online
+#:   19:00
+#:   20:00
+#: Battery offline
+#: Grid online
+#:   21:00
+#: Grid offline
+#: Backup online
+#:   22:00
+#: Backup offline
+solar, battery, grid, backup = site()
+battery_first = controller((battery, solar, grid, backup))
+run(handle(battery_first)(run_load)(17, 4))
+#: Battery online
+#:   17:00
+#:   18:00
+#: Battery offline
+#: Grid online
+#:   19:00
+#:   20:00
+#: Grid offline
+```
+
+Read `run_load()` from the outside in.
+The outer loop obtains a source, the inner one draws from it hour after hour,
+and `connected()` brackets the pair.
+`draw()` returns `None` on success,
+so anything else at that binding is the `Drained` that ends the inner loop and sends the outer one back to `plug()` for a replacement.
+The hour does not advance on that path,
+so the replacement supplies the hour the failed source refused.
+
+The first trace is an evening.
+Solar covers two hours and stops at sunset.
+The battery covers two more and stops when its charge falls below the threshold.
+The grid covers one and stops when the outage begins at 22:00.
+The backup covers the last.
+Four implementations, one ability, one running program.
+
+`run_load()` names none of them,
+which is why the second run tells a different story from the same code.
+`battery_first` puts the battery ahead of the sun,
+so the charge is spent first and the grid picks up at 19:00.
+Reordering that tuple is the whole difference between the two runs.
+Priority, thresholds, and the outage schedule live in `controller()`,
+while `run_load()` decides when to give up on the source it holds.
+
+Now the part worth dwelling on.
+The load's declared dependency never changes.
+`Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
+and that type is written once.
+What changes is the object answering the need, four times, mid-run.
+Binding a dependency before the program starts cannot express this,
+because there is no single right answer to bind.
+Here the binding is a function call, so it reads the world at each request.
+[Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+swapped an implementation between runs.
+This swaps one during a run, and the consumer cannot tell.
+
+`connected()` is an ordinary context manager,
+and its `with` block sits inside the generator body.
+Acquiring and releasing within one Effect works,
+since the block opens and closes between two `yield from` expressions in the same function.
+What you cannot write is an acquisition in one Effect released after a later one finishes,
+a gap that [Running Effects in Parallel](#running-effects-in-parallel) revisits.
+
+One thing the types here do not carry.
+`choose()` raises a `Blackout` when no source can supply the hour,
+and that is ordinary code raising an ordinary exception.
+No `@throws` lifted it,
+so it travels through `run()` untracked and no signature mentions it.
+A handler sits outside the channel it feeds.
 
 ## Composing a Program
 
@@ -1350,18 +1574,28 @@ It is a language that does the encoding for you.
     wrap it in `catch(KeyError)`, and run it on a failing input.
     Explain what the types claim, what the run does,
     and which line restores the guarantee.
-3.  Add a fourth failure to `research()`:
+3.  Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
+    put it between solar and the battery in `controller()`,
+    and confirm `run_load()` needs no change.
+    Then shorten every source until some hour has no supplier, run it,
+    and say where the `Blackout` surfaces and why `catch(Blackout)` around `run_load()` would not intercept it.
+4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
+    the way `scripted` handed out a fixed sequence of tosses.
+    Use it to test that `run_load()` re-requests after a failure,
+    with no weather, no clock, and no battery model.
+    Then say what such a test cannot tell you about `controller()`.
+5.  Add a fourth failure to `research()`:
     a `TooLong` raised when an article exceeds some length.
     Follow the checker's complaints until the program builds again,
     and list every line you had to edit.
     Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
-4.  `scenarios.py` supplies a `DeadWire` that fails before printing.
+6.  `scenarios.py` supplies a `DeadWire` that fails before printing.
     Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
     and predict the trace before running it.
-5.  Wrap `research()` in `retry()` and supply a `Time()`.
+7.  Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
     then say what an Effect system would need for you to retry only `Unavailable`.
-6.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
+8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` is unchanged.
     Then try to fork an Effect that still declares a `Need`,
     and record what `ty` says.
