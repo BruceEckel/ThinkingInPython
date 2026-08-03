@@ -76,7 +76,7 @@ That is what the `answer: str` inside `ask()` is doing.
 `yield from Ask(prompt)` produces `Unknown` there too,
 so the annotation is an assertion the checker takes on faith rather than a type it worked out.
 `Ability[str]` is where the claim comes from,
-and writing it at the binding keeps the accessor's promise in one place,
+and writing it at the binding keeps the accessor's claim in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
@@ -186,7 +186,7 @@ print(4_000 < heads < 6_000)
 Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
 while `Ask` and `Tell` each carried the payload the request had to deliver.
-The ability's whole content is its type and the `bool` it promises back.
+The ability's whole content is its type and the `bool` it produces.
 
 Two handlers answer the same function.
 `scripted` walks an iterator over a fixed sequence,
@@ -719,7 +719,7 @@ and the graph you can read is the union in the signature.
 ## Adding Behavior to an Existing Effect
 
 [The Success Path](#the-success-path)
-promised that a caller could retry a pipeline without touching it.
+said that a caller could retry a pipeline without touching it.
 Stateless provides a few decorators that add such behavior.
 Retry is the one worth studying, because of what it does to the type.
 
@@ -820,7 +820,7 @@ print(repr(run(effect)))
 
 Re-running the spent Effect does not fail loudly.
 The exhausted generator has nothing left to do,
-so the second `run()` returns `None` where the signature promised a `str`,
+so the second `run()` returns `None` where the signature declares a `str`,
 with no exception and no complaint from the checker.
 A retry therefore has to rebuild the description from the function,
 which is what `retry()` does internally.
@@ -1053,7 +1053,7 @@ There are five limits worth knowing.
 
 ### 1. Nothing stops an undeclared Effect
 
-`Success[int]` promises purity, and this function breaks that promise:
+`Success[int]` claims purity, and this function breaks that claim:
 
 ```python
 # leaky_effect.py
@@ -1078,7 +1078,7 @@ A library can only check the ones you wrote down.
 The guarantee is about consistency, not completeness.
 
 The same hole opens on the error side.
-Here `Success[float]` promises that `ratio()` cannot fail:
+Here `Success[float]` claims that `ratio()` cannot fail:
 
 ```python
 # undeclared_failure.py

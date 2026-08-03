@@ -507,7 +507,7 @@ never a runtime lookup.
 The code only declares `room`, written as `room: Room` with no value.
 That line stores nothing, not even `None`.
 It is a declaration, not a placeholder.
-It promises the type checker that a `Room` will be there,
+It declares to the type checker that a `Room` will be there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
 so reading it earlier would raise `AttributeError`,

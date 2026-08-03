@@ -16,7 +16,7 @@ Stateless is built on generators.
 [Generators](45_Generators.md)
 covered the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
-and `yield from`, which composes generators and produces the inner one's return value.
+and `yield from`, which composes generators and produces the inner generator's return value.
 Every Effect here travels that path.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
@@ -49,10 +49,13 @@ For example:
 Effect[Need[Console], KeyError, None]
 ```
 
-This particular Effect needs a `Console`, it can fail with a `KeyError`,
-and it produces nothing.
-`Need[Console]` is a request for a `Console` rather than the `Console` that answers it;
-[Nothing Runs Yet](#nothing-runs-yet) explains why the type names the request.
+This particular Effect needs a `Console`, can fail with a `KeyError`,
+and produces nothing.
+Notice that the first parameter is `Need[Console]`, not `Console`.
+The Effect asks for a console; it does not carry one.
+Something else supplies the console later,
+and [Nothing Runs Yet](#nothing-runs-yet)
+explains why that request must be a value of its own.
 
 Although you can write the full `Effect` signature each time,
 three aliases are provided for the most common cases.
@@ -66,7 +69,6 @@ Each one fills in `Never` for a type parameter that is not used:
 
 `Never` is Python's *bottom type*:
 it has no values and is a subtype of every other type.
-`Success[R]` promises there is no ability it can request and no error it can yield.
 
 ## The Effect Definition
 
@@ -116,18 +118,25 @@ at its outermost edge.
 It cannot read anything, and it cannot fail.
 
 Notice that `double()` contains no `yield`, so it is not a generator function.
-It does not need to be.
 Python decides generator-function status from the body alone:
 `yield` in the body makes a function a generator function,
 and nothing else does, not the return annotation and not the object returned.
 The object that implements the generator protocol is the Effect that `success()` builds.
 `double()` calls `success()` and returns that Effect,
 which no more makes `double()` a generator than returning a list would make it a list.
-The annotation promises that calling `double()` produces an Effect,
-and `run()` can drive anything that keeps that promise.
+The annotation describes the object `double()` returns,
+not the way `double()` is written,
+and `run()` drives any object that implements the generator protocol.
+
+`success()` returns a `SuccessEffect`,
+a small class implementing that protocol directly:
+its `send()` raises `StopIteration` carrying the value,
+so `run()` gets the result on its first step.
 `success()` exists for yield-free functions like this one.
-In a generator function, an ordinary `return` sets the result;
-wrap it in `success()` there and the checker reports a return-type mismatch.
+A generator function does not need it:
+`return value` sets the Effect's `R` directly.
+Writing `return success(value)` instead produces a `Success[R]` where an `R` is expected,
+and the checker rejects it.
 
 `double()` needs nothing beyond its argument,
 so it gains nothing from being an Effect.
@@ -162,17 +171,14 @@ Compare that to the version that calls `print()` directly:
 # untyped_greet.py
 def greet(name: str) -> None:
     print(f"Hello, {name}!")
-
-greet("Alice")
-#: Hello, Alice!
 ```
 
 That signature is a lie by omission.
 `-> None` claims the function returns nothing and mentions nothing else.
 However, the body writes to standard output, which is a side effect.
-That omission matters: printing is everything the function does.
-The caller cannot see the dependency, redirect the output,
-or test the function without capturing stdout.
+That omission matters: the caller cannot see the dependency,
+redirect the output, or test the function without capturing stdout.
+
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
 or declare the same need in its own signature and pass the requirement to its own caller.
@@ -182,7 +188,7 @@ In `greeter.py`, two details deserve attention:
 
 1. `greet()` is a generator function, because it contains `yield from`,
    so calling it builds the Effect its signature declares.
-2. `console` really is a `Console` to the type checker,
+2. `console` is of type `Console`,
    so `console.print()` is checked the same as any other method call.
    The dependency is deferred without becoming untyped.
 
@@ -195,9 +201,8 @@ It simply returns a `Generator`:
 # describe_only.py
 from greeter import greet
 
-description = greet("Alice")
-print(type(description).__name__)
-#: generator
+print(type(greet("Alice")))
+#: <class 'generator'>
 ```
 
 `greet("Alice")` builds a description of a greeting.
@@ -207,11 +212,37 @@ Stateless cannot, because it is ordinary Python:
 when a function body calls `console.print()`,
 nothing hands control to the library.
 A library can act on objects handed to it, and on nothing else.
-For Stateless to see the request for a `Console`,
-that request must be an object: the `Need[Console]` that `need(Console)` builds.
-`yield from` then hands that object out of the function body.
-It suspends `greet()` and passes the `Need[Console]` to whatever is driving the generator,
-which provides a `Console` and resumes the function.
+So the request for a `Console` must be an object.
+Driving `greet()` by hand shows that object,
+the way [Generators](45_Generators.md#a-generator-is-a-description)
+drove `interview()`:
+
+```python
+# hand_driven.py
+from greeter import Console, greet
+
+description = greet("Alice")
+request = next(description)
+print(f"{type(request).__name__}, {request.t.__name__}")
+#: Need, Console
+try:
+    description.send(Console())
+except StopIteration:
+    print("greet() finished")
+#: Hello, Alice!
+#: greet() finished
+```
+
+`need(Console)` builds a `Need[Console]`,
+a frozen dataclass whose `t` field holds the requested class,
+and `yield from` hands it out of the function body.
+`next()` runs `greet()` up to that request and produces it.
+Nothing has printed at that point,
+because `greet()` is suspended inside `need()`.
+`send(Console())` answers the request and resumes the function,
+which prints its greeting and finishes, raising `StopIteration`.
+[Supplying the Dependency](#supplying-the-dependency)
+replaces this loop with `run()` and a handler that decides which object answers each request.
 
 ## Why `yield from`
 
@@ -230,8 +261,7 @@ One SendType cannot vary from one `yield` to the next.
 Pin it to `Console` and the checker reads `yield Need(Log)` as producing a `Console`.
 The `send()` channel must be able to carry any type, so the SendType is `Any`.
 
-`yield from` recovers the precision that `Any` gives up,
-so a request can produce an answer whose type the checker knows.
+Using `yield from`, a request can produce an answer whose type the checker knows.
 A bare `yield` produces the SendType, the parameter forced to `Any`.
 `yield from` produces the inner generator's `ReturnType`,
 which does not have that conflict.
@@ -240,7 +270,8 @@ so its `ReturnType` can name a specific type.
 `need()` returns `Depend[Need[T], T]`,
 which expands to `Generator[Need[T], Any, T]`.
 Calling `need(Console)` binds `T` to `Console`,
-so `console = yield from need(Console)` takes its value from that final `Console` and never consults the `Any`.
+so `console` takes its type from that `ReturnType`,
+not from the `Any` in the SendType.
 
 This is why every request in this chapter is written as `yield from` rather than `yield`,
 and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
@@ -266,7 +297,7 @@ The `bound` assignment does three things:
    an object that knows how to answer `Need[Console]`.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
-   which `run()` executes.
+   which `run()` can then execute.
 
 Supplying the `Console` changes the type:
 
@@ -284,8 +315,8 @@ reveal_type(bound)
 `reveal_type()` is a message to the type checker.
 Running the script tells you nothing useful,
 because at runtime it reports the class of its argument (`function`, here)
-on standard error.
-The answer comes from `ty check reveal_bound.py`:
+through standard error.
+The answer we want comes from `ty check reveal_bound.py`:
 
 ```text
 info[revealed-type]: Revealed type
@@ -304,11 +335,11 @@ info[revealed-type]: Revealed type
   |
 ```
 
-`greet` is a function `ty` knows by name, so it reports the definition;
-`bound` is a function `supply()` built, described by its signature alone.
-Those are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
+`greet` is a function `ty` knows by name,
+while `bound` is a function `supply()` built, described by its signature alone.
+What we see are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sat in the first type parameter of `greet` and is gone from `bound`,
-replaced by the `Never` the alias table promised.
+replaced by the `Never` as shown in the alias table.
 
 Handling an ability *subtracts* it from the type.
 Here the subtraction leaves nothing behind:
@@ -372,7 +403,7 @@ In Stateless, that decision belongs to whoever still holds the function.
 
 ## Forgetting to Supply
 
-Let's see what happens when we break it.
+Let's see what happens when we don't supply a required `Need`.
 Give `run()` an Effect that still needs a `Console`:
 
 ```python
@@ -401,7 +432,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |         `Generator[Need[Console], Any, None]`
 ```
 
-A dependency that was never bound is a type error, not a production incident.
+In Stateless, an un-supplied dependency is a type error, not a production incident.
 No test had to exercise the path.
 No reviewer had to notice the omission.
 
@@ -413,7 +444,7 @@ The expected type in that message names two things this chapter has not yet cove
 
 `run()` accepts an Effect whose ability channel has narrowed to those two,
 which is all that remains once every other ability has been supplied.
-`greet("Alice")` still carries `Need[Console]`,
+`greet("Alice")` still has `Need[Console]`,
 so it does not pass type checking.
 
 ## Swapping the Implementation

@@ -128,7 +128,7 @@ keep the static one.
 It captures the whole parameter list of the wrapped function as a single unit,
 names and types included.
 `func: Callable[P, R]` reads as "a function whose parameters are `P` and whose result is `R`,"
-and returning `Callable[P, R]` promises that the wrapper has that same signature.
+and returning `Callable[P, R]` declares that the wrapper has that same signature.
 
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of that captured list.
 `P.args` is the positional part and `P.kwargs` the keyword part.

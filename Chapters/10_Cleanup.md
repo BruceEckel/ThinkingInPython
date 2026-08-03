@@ -71,7 +71,7 @@ It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
 Whether `__del__()` runs before the program exits is a reference-counting detail,
 not a guarantee.
-The language does not promise when, or in what order, `__del__()` runs.
+The language does not specify when, or in what order, `__del__()` runs.
 Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order,
 or not run the finalizers before exit.

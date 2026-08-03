@@ -1,9 +1,6 @@
 Build should generate the epub version (put in an 'epub' directory?).
 Add link info on README and bottom of index page.
 
-Can a generator be used to build a state machine?
-Possibly revisit that chapter.
-
 lets this book's build pass
 passes the book build?
 

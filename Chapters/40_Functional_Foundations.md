@@ -150,7 +150,7 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-The annotation is a promise the checker keeps,
+The annotation is a constraint the checker enforces,
 even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error caught before the program runs.
@@ -165,7 +165,7 @@ For an immutable value, make the value's own type immutable,
 
 Immutability also unlocks abilities a mutable value lacks.
 An immutable object can be *hashable*.
-It can promise a stable hash for its whole life,
+It can guarantee a stable hash for its whole life,
 so it can serve as a dictionary key or a set member.
 You can also share it without a defensive copy,
 because no recipient can change it out from under you.

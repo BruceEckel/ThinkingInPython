@@ -122,6 +122,12 @@ A newly created generator pauses before its first `yield`,
 so there is no suspended `yield` expression to receive a sent value.
 If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
 
+A suspended generator holds its frame:
+the position in the body and every local variable.
+`interview()` remembers `name` and `town` across two `send()` calls with no storage of its own,
+because resuming continues an existing computation rather than starting a new one.
+The frame is the generator's state.
+
 `next(i)` is equivalent to `i.send(None)`:
 
 ```python
@@ -146,7 +152,7 @@ which is the practical reason a driver primes with `next()`.
 The `NewType` definitions prevent accidental transposition.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
 `ty` reports nine errors in three groups of three.
-All three `yield Question(...)` expressions offer a `Question` where the annotation promises an `Answer`.
+All three `yield Question(...)` expressions offer a `Question` where the annotation declares an `Answer`.
 All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
 All three `question` variables receive an `Answer` where they are declared `Question`.
 Each channel has its own type, so the checker catches every transposition.
@@ -520,3 +526,13 @@ That is the question the next chapter puts into the type system.
 6.  Explain why a driver must prime with `next()` rather than `send(None)`,
     given that the two are equivalent at runtime.
     `send_none_is_next.py` has the answer; state it in terms of the `SendType`.
+7.  [A Vending Machine](31_State_Machines.md#a-vending-machine)
+    keeps its current state in an attribute and looks up each transition in a table.
+    Write a simplified version as a single generator instead: it collects money,
+    takes two digits, then dispenses or refuses,
+    yielding its current state and receiving each event with `send()`,
+    so the position in the generator's body carries the state.
+    Notice that this generator's `yield` reports where the machine got to rather than requesting something the machine needs,
+    the opposite direction from `interview()`.
+    Say which of the two versions you would rather extend with a sixth state,
+    and why.
