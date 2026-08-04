@@ -9,8 +9,8 @@ class Capture:
     def print(self, message: str) -> None:
         self.messages.append(message)
 
-capture = Capture()
 screen = as_type(Console)(Terminal())
+capture = Capture()
 memory = as_type(Console)(capture)
 run(supply(screen, memory)(greet)("Alice"))
 #: Hello, Alice!

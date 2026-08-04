@@ -34,16 +34,24 @@ namespace.
 Part dividers come from `build_site.PARTS`, like the site's contents
 page, and become level-1 headings so each opens its own EPUB section.
 
+The book's diagrams are SVG, which the site serves as-is. Kindle's SVG
+support is unreliable, so this build rasterizes each one to PNG and
+points the EPUB at that instead. The conversion needs one of
+`rsvg-convert`, `magick`, or `inkscape`; with none of them installed the
+build still succeeds and keeps the SVGs, printing a note.
+
 Usage:
     python tools/build_epub.py              # build/epub/ThinkingInPython.epub
     python tools/build_epub.py -o DIR       # build somewhere else
     python tools/build_epub.py --keep-source  # leave build/epub/src/ in place
+    python tools/build_epub.py --keep-svg     # skip the PNG conversion
 
 Requires `pandoc` on PATH (`make check-tools-full` verifies it).
 """
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -61,6 +69,11 @@ COVER = ROOT / "resources" / "static" / "cover.png"
 IMAGES_SRC = build_site.IMAGES_SRC
 EPUB_NAME = "ThinkingInPython.epub"
 LANG = "en-US"
+# Wide enough to stay crisp on a Kindle Scribe (1860px) without paying
+# for it: the diagrams are flat line art, so a 256-color PNG at this
+# width is visually identical to 24-bit and about a tenth the size.
+SVG_PNG_WIDTH = 1600
+SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
@@ -206,6 +219,84 @@ def relink(text: str, prefix: str, ids: Ids, unresolved: set[str]) -> str:
     return outside_code(text, lambda part: LINK.sub(repl, part))
 
 
+# --------------------------------------------------------------------------- #
+# SVG diagrams to PNG, for readers that cannot draw SVG
+# --------------------------------------------------------------------------- #
+def svg_command(tool: str, src: Path, dst: Path) -> list[str]:
+    """The command line that rasterizes `src` to `dst` with `tool`.
+
+    Each one flattens onto white. The diagrams have no background of
+    their own and draw in near-black, so a transparent PNG would vanish
+    against a dark theme.
+    """
+    match tool:
+        case "rsvg-convert":
+            return [tool, "--width", str(SVG_PNG_WIDTH),
+                    "--keep-aspect-ratio", "--background-color", "white",
+                    "-o", str(dst), str(src)]
+        case "magick":
+            return [tool, "-density", "200", "-background", "white",
+                    str(src), "-flatten",
+                    "-resize", f"{SVG_PNG_WIDTH}x>", "-strip",
+                    f"PNG8:{dst}"]
+        case "inkscape":
+            return [tool, "--export-type=png",
+                    f"--export-width={SVG_PNG_WIDTH}",
+                    "--export-background=white", "--export-background-opacity=1",
+                    f"--export-filename={dst}", str(src)]
+        case _:
+            raise ValueError(f"unknown SVG tool: {tool}")
+
+
+def find_svg_tool() -> str | None:
+    """The first usable rasterizer on PATH, or None."""
+    for tool in SVG_TOOLS:
+        if shutil.which(tool):
+            return tool
+    return None
+
+
+def rasterize_svgs(img_map: dict[str, str],
+                   stage: Path) -> tuple[dict[str, str], list[str]]:
+    """Convert every SVG in `img_map` to a PNG under `stage`.
+
+    Returns the map with those entries repointed at the PNGs, plus any
+    notes for the caller to print. An SVG that cannot be converted stays
+    an SVG, so the build never fails over a diagram.
+    """
+    svgs = {stem: name for stem, name in img_map.items()
+            if name.lower().endswith(".svg")}
+    if not svgs:
+        return img_map, []
+    tool = find_svg_tool()
+    if tool is None:
+        return img_map, [
+            f"NOTE: {len(svgs)} diagram(s) stay SVG, which some readers "
+            "(Kindle among them) will not draw.",
+            f"      Install one of {', '.join(SVG_TOOLS)} to convert them.",
+        ]
+
+    stage.mkdir(parents=True, exist_ok=True)
+    out = dict(img_map)
+    failed: list[str] = []
+    for stem, name in sorted(svgs.items()):
+        dst = stage / f"{stem}.png"
+        proc = subprocess.run(svg_command(tool, IMAGES_SRC / name, dst),
+                              capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+        if proc.returncode != 0 or not dst.is_file():
+            failed.append(name)
+            continue
+        out[stem] = dst.name
+
+    notes = [f"Rasterized {len(svgs) - len(failed)} SVG diagram(s) to PNG "
+             f"with {tool}."]
+    if failed:
+        notes.append(f"WARNING: {len(failed)} SVG(s) could not be "
+                     f"converted and stay SVG: {', '.join(sorted(failed))}")
+    return out, notes
+
+
 def rewrite_images(text: str, img_map: dict[str, str],
                    missing: set[str]) -> str:
     """`_images/<name>` to the bare filename pandoc resolves via --resource-path."""
@@ -237,7 +328,8 @@ def part_markdown(roman: str, title: str) -> str:
 
 
 def book_markdown(chapters: list[Chapter], missing: set[str],
-                  unresolved: set[str]) -> str:
+                  unresolved: set[str],
+                  img_map: dict[str, str] | None = None) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
 
     Two passes: the first namespaces the headings and so learns every id
@@ -245,7 +337,8 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
     resolves from one that does not.
     """
     prefixes = {ch.md.stem: chapter_prefix(ch) for ch in chapters}
-    img_map = build_site.build_image_map()
+    if img_map is None:
+        img_map = build_site.build_image_map()
 
     prepared: list[tuple[Chapter, Document, list[str]]] = []
     known: set[str] = set()
@@ -308,7 +401,14 @@ def metadata_yaml() -> str:
 
 def epub_css() -> str:
     """A restrained stylesheet: readers override fonts and margins, so this
-    sets only what the book's structure needs."""
+    sets only what the book's structure needs.
+
+    Written for e-ink first. No fixed colors: a Kindle in dark mode keeps
+    a declared background or text color as given, so a light code-block
+    fill becomes a glaring panel and a gray blockquote becomes gray on
+    black. Code blocks are set off by indentation and a `currentColor`
+    rule instead, which follows whatever the reader's theme is.
+    """
     return """body { line-height: 1.5; }
 h1, h2, h3, h4 { line-height: 1.25; page-break-after: avoid; }
 h1 { font-size: 1.6em; margin: 1em 0 0.75em; }
@@ -316,8 +416,8 @@ h2 { font-size: 1.3em; margin: 1.5em 0 0.5em; }
 h3 { font-size: 1.1em; margin: 1.25em 0 0.5em; }
 pre {
   font-size: 0.8em; line-height: 1.35; white-space: pre-wrap;
-  overflow-wrap: break-word; padding: 0.5em 0.6em;
-  background: #f4f2ee; border-left: 3px solid #c8bfb0;
+  overflow-wrap: break-word; margin: 1em 0; padding: 0 0 0 0.6em;
+  border-left: 2px solid currentColor;
   page-break-inside: avoid;
 }
 code { font-size: 0.9em; overflow-wrap: break-word; }
@@ -325,18 +425,21 @@ pre code { font-size: inherit; }
 figure { margin: 1.5em 0; text-align: center; page-break-inside: avoid; }
 figure img { max-width: 100%; height: auto; }
 figcaption { font-size: 0.85em; font-style: italic; margin-top: 0.5em; }
-blockquote {
-  margin: 1em 1.5em; font-style: italic; color: #444;
-}
+blockquote { margin: 1em 1.5em; font-style: italic; }
 table { border-collapse: collapse; font-size: 0.9em; }
-th, td { border: 1px solid #c8bfb0; padding: 0.3em 0.5em; }
+th, td { border: 1px solid currentColor; padding: 0.3em 0.5em; }
 """
 
 
 # --------------------------------------------------------------------------- #
 # Driver
 # --------------------------------------------------------------------------- #
-def run_pandoc(src: Path, css: Path, meta: Path, epub: Path) -> None:
+def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
+               images: Path | None = None) -> None:
+    resources = [str(IMAGES_SRC)]
+    if images is not None and images.is_dir():
+        # First on the path, so a rasterized diagram wins over its SVG.
+        resources.insert(0, str(images))
     command = [
         "pandoc",
         "--from", "markdown+smart",
@@ -344,9 +447,15 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path) -> None:
         "--output", str(epub),
         "--metadata-file", str(meta),
         "--css", str(css),
-        "--resource-path", str(IMAGES_SRC),
-        # No --highlight-style: pygments is pandoc's default, and naming it
-        # explicitly draws a deprecation warning from pandoc 3.10 on.
+        "--resource-path", os.pathsep.join(resources),
+        # Highlighting off. It is invisible on e-ink, and pandoc pays for
+        # it in markup a Kindle handles badly: 73 lines of CSS inlined in
+        # every chapter file, one `<span id>` plus an empty `<a href>`
+        # anchor around every line of every listing, and a
+        # `pre > code.sourceCode { white-space: pre }` rule that outranks
+        # this build's `pre-wrap` and so stops code from wrapping.
+        # Turning it off halves the EPUB.
+        "--syntax-highlighting=none",
         "--toc", "--toc-depth=2",
         "--split-level=1",
     ]
@@ -361,20 +470,28 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path) -> None:
         print(proc.stderr.strip())
 
 
-def build(out_dir: Path, keep_source: bool = False) -> int:
+def build(out_dir: Path, keep_source: bool = False,
+          keep_svg: bool = False) -> int:
     build_site.check_pandoc()
     chapters = build_site.discover()
     if not chapters:
         sys.exit("error: no chapters found in Chapters/")
 
-    missing: set[str] = set()
-    unresolved: set[str] = set()
-    text = book_markdown(chapters, missing, unresolved)
-
     if out_dir.exists():
         shutil.rmtree(out_dir)
     src_dir = out_dir / "src"
     src_dir.mkdir(parents=True)
+    images = src_dir / "images"
+
+    img_map = build_site.build_image_map()
+    if not keep_svg:
+        img_map, notes = rasterize_svgs(img_map, images)
+        for note in notes:
+            print(note)
+
+    missing: set[str] = set()
+    unresolved: set[str] = set()
+    text = book_markdown(chapters, missing, unresolved, img_map)
 
     src = src_dir / "book.md"
     css = src_dir / "epub.css"
@@ -384,7 +501,7 @@ def build(out_dir: Path, keep_source: bool = False) -> int:
     meta.write_text(metadata_yaml(), encoding="utf-8")
 
     epub = out_dir / EPUB_NAME
-    run_pandoc(src, css, meta, epub)
+    run_pandoc(src, css, meta, epub, images)
 
     size = epub.stat().st_size / 1024
     print(f"Built {epub.relative_to(ROOT)} "
@@ -421,8 +538,10 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"output directory (default: {DEFAULT_OUT})")
     ap.add_argument("--keep-source", action="store_true",
                     help="leave the generated pandoc input under <out>/src/")
+    ap.add_argument("--keep-svg", action="store_true",
+                    help="skip converting SVG diagrams to PNG")
     args = ap.parse_args(argv)
-    return build(args.out, args.keep_source)
+    return build(args.out, args.keep_source, args.keep_svg)
 
 
 if __name__ == "__main__":

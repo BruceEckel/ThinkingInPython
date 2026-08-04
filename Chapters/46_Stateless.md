@@ -1131,13 +1131,12 @@ so the asynchrony stops at the ability channel instead of spreading to `report()
 `wait()` is required at the boundary where a coroutine enters the Effect world.
 A function that already returns an Effect needs no `wait()`,
 because `yield from` composes the two directly.
-The library's own `sleep()` is such a function,
+`stateless.time.sleep()` is such a function,
 and it pairs an `Async` request with a dependency:
 
 ```python
 # sleep_effect.py
-import time
-from stateless import Async, Depend, Need, run, supply
+from stateless import Async, Depend, Need
 from stateless.time import Time, sleep
 
 def delayed_sum(
@@ -1148,19 +1147,29 @@ def delayed_sum(
         yield from sleep(0.01)
         total += value
     return total
+```
+
+Supplying the library's own `Time` waits for real time:
+
+```python
+# real_clock.py
+import time
+from sleep_effect import delayed_sum
+from stateless import run, supply
+from stateless.time import Time
 
 start = time.perf_counter()
 result = run(supply(Time())(delayed_sum)([1, 2, 3]))
 elapsed = time.perf_counter() - start
 print(result)
 #: 6
-print(f"waited 30ms or more: {elapsed >= 0.03}")
-#: waited 30ms or more: True
+print(f"{elapsed >= 0.03 = }")
+#: elapsed >= 0.03 = True
 ```
 
 `sleep()` returns `Depend[Need[Time] | Async, None]`,
-so a function that calls it inherits both abilities.
-It declares both because `sleep()` makes both requests,
+so `delayed_sum()` inherits both abilities.
+`sleep()` makes two requests,
 `need(Time)` for the clock and `wait()` for the await:
 
 ```python
@@ -1171,14 +1180,47 @@ def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
 
 The `async def` is `Time.sleep()`, the method on the ability,
 so the boundary crosses there rather than in `delayed_sum()`.
-`Time` is an ability like `Console`, an object whose method the Effect calls,
-and `supply()` binds it the same way.
+`Time` has no special status in the library.
+It is an ordinary class whose one method is `async def sleep()`,
+and `supply(Time())` binds an instance the way `supply(Console())` did.
 Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
-and `Need[Time]` moves that reading into the ability channel.
-A test can then supply a `Time` subclass whose `sleep()` returns at once,
-and check the logic without waiting for real time to pass.
-That subclass goes through `as_type(Time)`,
+and `Need[Time]` moves that into the ability channel.
+A test can then supply a clock that never waits:
+
+```python
+# test_instant_clock.py
+import time
+from dataclasses import dataclass, field
+from typing import override
+from sleep_effect import delayed_sum
+from stateless import as_type, run, supply
+from stateless.time import Time
+
+@dataclass(frozen=True)
+class Instant(Time):
+    waited: list[float] = field(default_factory=list)
+    @override
+    async def sleep(self, seconds: float) -> None:
+        self.waited.append(seconds)
+
+def test_delayed_sum() -> None:
+    clock = Instant()
+    start = time.perf_counter()
+    supplied = supply(as_type(Time)(clock))
+    assert run(supplied(delayed_sum)([1, 2, 3])) == 6
+    assert clock.waited == [0.01, 0.01, 0.01]
+    assert time.perf_counter() - start < 0.03
+```
+
+`Instant.sleep()` records the request and returns,
+so the three sleeps that cost `real_clock.py` at least 30 milliseconds cost this test under one.
+The last assertion is the demo's threshold read from the other side.
+`delayed_sum()` is unchanged and cannot tell the two clocks apart.
+The subclass goes through `as_type(Time)`,
 for the reason [Supplying an Interface](#supplying-an-interface) gives.
+`waited` is a field rather than an attribute assigned in `__init__`,
+because `Time` is a frozen data class and a subclass of one must be frozen too.
+Freezing prevents rebinding `waited`, not appending to the list it holds.
 In [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
 `retry()` waits between attempts,
 so it adds `Need[Time]` and `Async` to whatever it decorates.

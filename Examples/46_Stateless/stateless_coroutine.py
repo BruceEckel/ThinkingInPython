@@ -1,4 +1,4 @@
-# await_coroutine.py
+# stateless_coroutine.py
 import asyncio
 from stateless import Async, Depend, run, wait
 
