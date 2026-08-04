@@ -1,7 +1,7 @@
 # catch_subset.py
 from typing import assert_never
 from read_score import read_score
-from stateless import Success, Try, catch, run
+from stateless import Success, Try, catch
 
 both = catch(KeyError, ValueError)(read_score)
 one = catch(KeyError)(read_score)
@@ -27,16 +27,3 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
             return f"{name}: {value}"
         case _:
             assert_never(value)
-
-for who in ["Alice", "Bob", "Carol"]:
-    print(run(all_handled(who)))
-#: Alice: 42
-#: Bob: unreadable
-#: Carol: unknown
-print(run(one_unhandled("Alice")))
-#: Alice: 42
-try:
-    run(one_unhandled("Bob"))
-except ValueError as e:
-    print(type(e).__name__)
-#: ValueError

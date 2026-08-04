@@ -74,6 +74,8 @@ LANG = "en-US"
 # width is visually identical to 24-bit and about a tenth the size.
 SVG_PNG_WIDTH = 1600
 SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
+# Code-listing font size, relative to the surrounding prose.
+CODE_FONT_SCALE = 0.5
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
@@ -403,25 +405,30 @@ def epub_css() -> str:
     """The bare minimum CSS, so the reader's own defaults do the rest.
 
     Every rule here fixes something that breaks without it, not
-    something that looks nicer with it. No font size, line height, or
-    margin is set anywhere: a Kindle's line-spacing control and its
-    default type ramp for `h1`-`h4` already do that, and a value set
-    here does not track a per-element override consistently, which
-    reads as spacing that drifts from paragraph to paragraph. `pre`'s
-    `white-space: pre-wrap` stays load-bearing: without it, a long code
-    line runs off the page instead of wrapping. No fixed colors either:
-    a Kindle in dark mode keeps a declared color as given, so a light
-    fill would become a glaring panel against black.
+    something that looks nicer with it. No line height or margin is
+    set anywhere: a Kindle's line-spacing control and its default type
+    ramp for `h1`-`h4` already do that, and a value set here does not
+    track a per-element override consistently, which reads as spacing
+    that drifts from paragraph to paragraph. The one font size this
+    sets, `CODE_FONT_SCALE` for listings, is set once here and inherited
+    by `pre code` rather than repeated, so a nested `<code>` inside a
+    `<pre>` does not compound the scale. `pre`'s `white-space: pre-wrap`
+    stays load-bearing: without it, a long code line runs off the page
+    instead of wrapping. No fixed colors either: a Kindle in dark mode
+    keeps a declared color as given, so a light fill would become a
+    glaring panel against black.
     """
-    return """pre {
+    return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
   page-break-inside: avoid;
-}
-h1, h2, h3, h4 { page-break-after: avoid; }
-figure { page-break-inside: avoid; }
-figure img { max-width: 100%; height: auto; }
-table { border-collapse: collapse; }
-th, td { border: 1px solid currentColor; padding: 0.3em 0.5em; }
+}}
+pre, code {{ font-size: {CODE_FONT_SCALE}em; }}
+pre code {{ font-size: inherit; }}
+h1, h2, h3, h4 {{ page-break-after: avoid; }}
+figure {{ page-break-inside: avoid; }}
+figure img {{ max-width: 100%; height: auto; }}
+table {{ border-collapse: collapse; }}
+th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 """
 
 

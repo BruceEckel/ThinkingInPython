@@ -1518,7 +1518,7 @@ We can `catch()` `both` errors or just `one` error:
 # catch_subset.py
 from typing import assert_never
 from read_score import read_score
-from stateless import Success, Try, catch, run
+from stateless import Success, Try, catch
 
 both = catch(KeyError, ValueError)(read_score)
 one = catch(KeyError)(read_score)
@@ -1544,25 +1544,31 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
             return f"{name}: {value}"
         case _:
             assert_never(value)
-
-for who in ["Alice", "Bob", "Carol"]:
-    print(run(all_handled(who)))
-#: Alice: 42
-#: Bob: unreadable
-#: Carol: unknown
-print(run(one_unhandled("Alice")))
-#: Alice: 42
-try:
-    run(one_unhandled("Bob"))
-except ValueError as e:
-    print(type(e).__name__)
-#: ValueError
 ```
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure has been moved into the result so nothing is left in the error channel.
 `all_handled()` returns `Success[str]` which means that no failure can escape as a thrown exception.
-The three names exercise its three branches.
+
+```python
+# test_catch_subset.py
+import pytest
+from catch_subset import all_handled, one_unhandled
+from stateless import run
+
+@pytest.mark.parametrize("name, expected", [
+    ("Alice", "Alice: 42"),
+    ("Bob", "Bob: unreadable"),
+    ("Carol", "Carol: unknown"),
+])
+def test_all_handled(name: str, expected: str) -> None:
+    assert run(all_handled(name)) == expected
+
+def test_one_unhandled() -> None:
+    assert run(one_unhandled("Alice")) == "Alice: 42"
+    with pytest.raises(ValueError):
+        run(one_unhandled("Bob"))
+```
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moved to the result and the uncaught one remains.
@@ -1570,6 +1576,8 @@ The caught error moved to the result and the uncaught one remains.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
 the same escape `error_escapes.py` showed for a single error.
+`pytest.raises(ValueError)` is the whole assertion:
+the failure the signature declares is the one the caller sees.
 Failures cannot be lost, only relocated.
 
 ## Emptying the Channels
