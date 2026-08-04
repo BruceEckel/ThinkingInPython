@@ -1350,8 +1350,8 @@ is the bookkeeping every class carries.
     class ASingleton : public Singleton<ASingleton> {};
     ```
 
-    C++ templates are instantiated by the compiler on demand,
-    not executed like Python's `class` statement.
+    The C++ compiler instantiates templates on demand,
+    rather than executing them the way Python executes a `class` statement.
     A C++ class name is a valid *incomplete type*
     the moment the compiler sees `class ASingleton`,
     before it reads a single member.

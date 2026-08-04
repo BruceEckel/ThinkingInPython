@@ -55,7 +55,7 @@ print(len(c))  # Still works after iterating
 #: 5
 ```
 
-`Countdown` can support `len()` because it is a reusable *iterable*,
+`Countdown` supports `len()` because it is a reusable *iterable*,
 not the iterator itself: each `for` loop or `list()` call gets a fresh
 generator from a fresh call to `__iter__()`, so `c.start` is
 untouched by iterating and `len(c)` can compute directly from it,

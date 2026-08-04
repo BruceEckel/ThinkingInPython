@@ -1412,7 +1412,7 @@ It does not change what `asyncio` is for.
 We can support the claim that a thread costs real memory while a task costs much less.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
-`tracemalloc` can measure a task's actual heap footprint directly,
+`tracemalloc` measures a task's actual heap footprint directly,
 since a task is made of ordinary Python objects.
 We can calculate the ratio between the two:
 

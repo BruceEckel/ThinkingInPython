@@ -88,7 +88,7 @@ They don't need to because the checker resolves `value` through the MRO and find
 It treats each subclass's assignment as filling in that same classvar rather than introducing a new one.
 
 Adding a new recyclable type is a single class definition.
-It registers itself, and `create()` can build it.
+It registers itself, and `create()` builds it.
 `sum_value()` is an ordinary function.
 It relies on polymorphism (`t.value`, `t.weight`)
 and never asks what type each piece is.

@@ -1,8 +1,9 @@
 # catch_score.py
+from collections.abc import Callable
 from typing import assert_never
 from greeter import Console
 from scores import score
-from stateless import Depend, Need, catch, need, run, supply
+from stateless import Depend, Need, Success, catch, need, run, supply
 
 def report(name: str) -> Depend[Need[Console], None]:
     value: int | KeyError = yield from catch(KeyError)(score)(name)
@@ -15,7 +16,8 @@ def report(name: str) -> Depend[Need[Console], None]:
         case _:
             assert_never(value)
 
-run(supply(Console())(report)("Alice"))
+reporter: Callable[[str], Success[None]] = supply(Console())(report)
+run(reporter("Alice"))
 #: Alice: 42
-run(supply(Console())(report)("Carol"))
+run(reporter("Carol"))
 #: Carol: unknown

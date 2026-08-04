@@ -189,7 +189,7 @@ print(greet.__name__, "-", greet.__doc__)
 ### `cmp_to_key`
 
 Wraps an old-style comparator, a function returning negative, zero, or positive,
-into a key function `sorted()` can use directly.
+into a key function `sorted()` uses directly.
 
 ```python
 # functools_cmp_to_key.py

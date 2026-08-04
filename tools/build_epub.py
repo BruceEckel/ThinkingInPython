@@ -400,33 +400,27 @@ def metadata_yaml() -> str:
 
 
 def epub_css() -> str:
-    """A restrained stylesheet: readers override fonts and margins, so this
-    sets only what the book's structure needs.
+    """The bare minimum CSS, so the reader's own defaults do the rest.
 
-    Written for e-ink first. No fixed colors: a Kindle in dark mode keeps
-    a declared background or text color as given, so a light code-block
-    fill becomes a glaring panel and a gray blockquote becomes gray on
-    black. Code blocks are set off by indentation and a `currentColor`
-    rule instead, which follows whatever the reader's theme is.
+    Every rule here fixes something that breaks without it, not
+    something that looks nicer with it. No font size, line height, or
+    margin is set anywhere: a Kindle's line-spacing control and its
+    default type ramp for `h1`-`h4` already do that, and a value set
+    here does not track a per-element override consistently, which
+    reads as spacing that drifts from paragraph to paragraph. `pre`'s
+    `white-space: pre-wrap` stays load-bearing: without it, a long code
+    line runs off the page instead of wrapping. No fixed colors either:
+    a Kindle in dark mode keeps a declared color as given, so a light
+    fill would become a glaring panel against black.
     """
-    return """body { line-height: 1.5; }
-h1, h2, h3, h4 { line-height: 1.25; page-break-after: avoid; }
-h1 { font-size: 1.6em; margin: 1em 0 0.75em; }
-h2 { font-size: 1.3em; margin: 1.5em 0 0.5em; }
-h3 { font-size: 1.1em; margin: 1.25em 0 0.5em; }
-pre {
-  font-size: 0.8em; line-height: 1.35; white-space: pre-wrap;
-  overflow-wrap: break-word; margin: 1em 0; padding: 0 0 0 0.6em;
-  border-left: 2px solid currentColor;
+    return """pre {
+  white-space: pre-wrap; overflow-wrap: break-word;
   page-break-inside: avoid;
 }
-code { font-size: 0.9em; overflow-wrap: break-word; }
-pre code { font-size: inherit; }
-figure { margin: 1.5em 0; text-align: center; page-break-inside: avoid; }
+h1, h2, h3, h4 { page-break-after: avoid; }
+figure { page-break-inside: avoid; }
 figure img { max-width: 100%; height: auto; }
-figcaption { font-size: 0.85em; font-style: italic; margin-top: 0.5em; }
-blockquote { margin: 1em 1.5em; font-style: italic; }
-table { border-collapse: collapse; font-size: 0.9em; }
+table { border-collapse: collapse; }
 th, td { border: 1px solid currentColor; padding: 0.3em 0.5em; }
 """
 

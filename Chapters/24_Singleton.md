@@ -541,7 +541,7 @@ print(first is second, second.name, second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
 ```
 
-You might wonder why the constructor for a `Registry` is intercepted by `__call__()`.
+You might wonder why `__call__()` intercepts the constructor for a `Registry`.
 A *call* is parentheses written after an expression.
 That expression can produce anything: a function, a class, or an instance.
 To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`.

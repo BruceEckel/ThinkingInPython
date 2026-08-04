@@ -299,7 +299,7 @@ The `bound` assignment does three things:
    an object that knows how to answer `Need[Console]`.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
-   which `run()` can then execute.
+   which `run()` then executes.
 
 Supplying the `Console` changes the type:
 
@@ -1365,7 +1365,7 @@ requests and failures are both values a description yields to its driver.
 
 ### Errors Propagate
 
-Errors propagate through the `Effect` type, just like abilities:
+Errors propagate via the `Effect` type, just like abilities:
 
 ```python
 # announce.py
@@ -1388,8 +1388,9 @@ Declared exceptions cannot be forgotten.
 ### Declaring Is Not Handling
 
 Declaring an error does not oblige you to handle it.
-`run()` accepts an Effect whose error channel is still occupied,
-and a failure that reaches it surfaces as an ordinary raised exception:
+`run()` accepts an Effect whose error channel is not empty.
+The driver throws an unhandled failure back into the generator,
+and with no `catch()` in the way it propagates out of `run()` as an ordinary exception:
 
 ```python
 # error_escapes.py
@@ -1413,18 +1414,18 @@ without forcing you to handle them.
 `catch()` empties the error channel the way `supply()` empties the ability channel,
 but the two do different things with what they remove.
 `supply()` provides the ability inside the Effect,
-so the ability parameter becomes `Never` and the result type never mentions the `Console`
+so the ability parameter becomes `Never` and the result type doesn't mention the `Console`
 ([Supplying the Dependency](46_Stateless.md#supplying-the-dependency)).
-`catch()` hands the error back to you as a value in the result.
 `@throws` puts a raised exception into the channel,
-and `catch()` takes it back out:
+and `catch()` takes it back out as a value in the result:
 
 ```python
 # catch_score.py
+from collections.abc import Callable
 from typing import assert_never
 from greeter import Console
 from scores import score
-from stateless import Depend, Need, catch, need, run, supply
+from stateless import Depend, Need, Success, catch, need, run, supply
 
 def report(name: str) -> Depend[Need[Console], None]:
     value: int | KeyError = yield from catch(KeyError)(score)(name)
@@ -1437,21 +1438,27 @@ def report(name: str) -> Depend[Need[Console], None]:
         case _:
             assert_never(value)
 
-run(supply(Console())(report)("Alice"))
+reporter: Callable[[str], Success[None]] = supply(Console())(report)
+run(reporter("Alice"))
 #: Alice: 42
-run(supply(Console())(report)("Carol"))
+run(reporter("Carol"))
 #: Carol: unknown
 ```
 
 The signature for `score()` is `(str) -> Try[KeyError, int]`.
 `catch(KeyError)(score)` changes it to `(str) -> Success[int | KeyError]`.
-The error leaves the error type parameter, which becomes `Never`,
+The error departs the error type parameter, which becomes `Never`,
 and joins the result type parameter.
-That makes `value` something you `match` on rather than an exception to catch.
+That makes `value` something to `match` on rather than an exception to catch.
 
-`Success` describes the Effect, not the lookup.
+`Success` describes the Effect, not whether `score()` found the name.
 It means both channels are empty: nothing left to supply,
 and no failure that `run()` must raise.
+`reporter` is not an Effect but a function that builds one,
+which its `Callable[[str], Success[None]]` annotation states:
+give it a `str` and it produces an Effect that needs nothing and cannot fail.
+`run()` drives that Effect,
+so `reporter("Alice")` comes first and `run()` second.
 The Effect "succeeds" at producing either a score or a `KeyError` indicating there is no score.
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
@@ -1476,10 +1483,10 @@ reached without rewriting the body of `score()`.
 
 ### Multiple Errors
 
-`catch()` can track multiple error types.
+`catch()` tracks multiple error types.
 `SCORES` stores its values as `int`s,
 so looking up a name is the only step and `KeyError` is the only failure.
-`RAW` stores the scoreboard as text, before anyone has interpreted it:
+`RAW` stores the scoreboard as text, before anyone interprets it:
 
 ```python
 # read_score.py
@@ -1499,8 +1506,13 @@ The lookup raises a `KeyError` for an unknown name,
 and the conversion raises a `ValueError` for text that is not a number,
 like Bob's `"seven"`.
 
-`@throws(KeyError, ValueError)` makes the `read_score` signature `(str) -> Try[KeyError | ValueError, int]`.
-We can catch `both` errors or just `one` error:
+`@throws(KeyError, ValueError)` makes the `read_score` signature:
+
+```python
+(str) -> Try[KeyError | ValueError, int]
+```
+
+We can `catch()` `both` errors or just `one` error:
 
 ```python
 # catch_subset.py

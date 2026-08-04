@@ -65,7 +65,7 @@ python use_module.py
 ```
 
 However, if another program imports `use_module.py` as a module,
-`__name__` will not be `"__main__"`, so its `"__main__"` code does not run.
+`__name__` is not `"__main__"`, so its `"__main__"` code does not run.
 Here is such a program, which does nothing but import `use_module`:
 
 ```python
@@ -243,8 +243,8 @@ or `weakref.py` can hide the stdlib one and break imports.
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
 The original solution to this was to set an environment variable called `PYTHONPATH`,
 which tells Python where to look for modules and packages.
-`PYTHONPATH` can take multiple paths,
-and Python will keep searching through those paths until it finds your module or package
+`PYTHONPATH` takes multiple paths,
+and Python keeps searching through those paths until it finds your module or package
 (or doesn't, and reports an error).
 
 `PYTHONPATH` still works,
