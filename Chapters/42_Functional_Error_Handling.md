@@ -295,7 +295,8 @@ The error checking has not gone away.
 It moved into `bind()`, where it appears once.
 An `Err` anywhere short-circuits the whole thing.
 
-A type that carries a value plus this chaining operation is what functional programmers call a *monad*.
+Functional programmers have a name for a type that carries a value plus this chaining operation:
+a *monad*.
 You do not need to know that word to use functional error handling.
 
 One near-miss to expect when you start chaining:

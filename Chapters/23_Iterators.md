@@ -194,7 +194,7 @@ so `tee` delivers the second pass the generator could not.
 The second half prices it.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
 and draining `first` while `second` waits buffers the whole stream.
-That is the memory a list would have used, which the comparison confirms
+That is the memory a list would use, which the comparison confirms
 (one machine measured 4,096,544 bytes buffered against 3,999,992 for the list).
 Use `tee` when two consumers advance together,
 not when one finishes before the other starts.
@@ -567,7 +567,7 @@ yet `first()` rewinds and `traverse()` produces the same three values.
 `is_done()` pulls from the source only when the cache cannot reach the current index,
 so every item read once stays read.
 `current_item()` then indexes the cache instead of touching the source,
-which is what lets it report a value without advancing.
+which lets it report a value without advancing.
 Look at the last line of output.
 By the time all four methods work, `seen` holds the entire stream.
 The interface did not merely need a buffer.

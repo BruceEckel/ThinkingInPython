@@ -222,7 +222,7 @@ so nothing overlaps and the delays add.
 Scheduling does not mean running.
 The task bodies execute only after `gather()` suspends
 (the event loop drives `gather()` too).
-Each runs until its first `await`, which is what the `a: started`, etc.,
+Each runs until its first `await`, which the `a: started`, etc.,
 lines in the trace show.
 The comprehension doesn't achieve multiple coroutines in flight:
 it does not start the next coroutine until the previous one has finished.
@@ -476,7 +476,7 @@ The event loop overlaps waiting, not computing.
 
 Notice that `asyncio.sleep()` in `io_price` is different from `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which is what let all five `io_price` tasks overlap.
+which let all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 

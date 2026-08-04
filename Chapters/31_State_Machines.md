@@ -439,7 +439,7 @@ The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 Note that the lookup keys on `type(event)` *exactly*: a dictionary probe,
 not an `isinstance()` walk.
-That is what lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
+That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
 and it cuts the other way too:
 define a further subclass of an event type and it matches none of its parent's rows.
 An event's dispatch class must appear in the table verbatim.

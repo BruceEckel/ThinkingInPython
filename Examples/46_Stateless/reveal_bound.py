@@ -4,5 +4,7 @@ from greeter import Console, greet
 from stateless import supply
 
 bound = supply(Console())(greet)
-reveal_type(greet)
-reveal_type(bound)
+
+if __name__ == "__main__":
+    reveal_type(greet)
+    reveal_type(bound)

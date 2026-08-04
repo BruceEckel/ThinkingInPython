@@ -158,4 +158,4 @@ the decision about *when* the algorithm starts out of the base class
 and into the hands of the code that knows the object is ready. This
 is the same reasoning behind eager versus lazy construction in
 [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance),
-where the timing of a hidden step is what makes the difference.
+where the timing of a hidden step makes the difference.

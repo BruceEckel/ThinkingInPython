@@ -73,7 +73,7 @@ Defined inside `add_behavior()`, it refers to `func`,
 a variable from the enclosing scope, not one of its own parameters.
 Python keeps `func` alive for as long as `wrapper()` exists,
 even after `add_behavior()` has already returned.
-That is what lets `cheese()`, called long after decoration finished,
+That lets `cheese()`, called long after decoration finished,
 still reach the original `cheese` function through `func`.
 [Closures](40_Functional_Foundations.md#closures) covers the general mechanism.
 
@@ -219,7 +219,7 @@ That wrapping happens when Python calls `decorate(greet)`,
 and only then does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
 call `wraps(func)` to get a decorator, then apply it to `wrapper`.
-Completing the outer decoration is what triggers the inner one,
+Completing the outer decoration triggers the inner one,
 but nothing calls itself.
 The nesting stops at two levels, matching the two nested `def`s in the source.
 

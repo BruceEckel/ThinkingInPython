@@ -716,7 +716,7 @@ The third test shows why the check cannot move inside the type.
 and the class never finishes being created:
 the error arrives while Python is still reading the `class` statement.
 A checker reports it as `invalid-named-tuple` before the program runs,
-which is what the `# type: ignore` silences.
+which the `# type: ignore` silences.
 A frozen data class runs `__post_init__()` on every construction,
 including the ones you did not anticipate.
 That is the deciding difference whenever a type must guarantee its own values.

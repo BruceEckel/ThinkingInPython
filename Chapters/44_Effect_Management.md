@@ -37,7 +37,7 @@ and this chapter explores aspects of Effect Management.
 
 ## What Is an Effect?
 
-An *Effect* is what causes impurity.
+An *Effect* causes impurity.
 We say that a function has *side effects* if calling it does anything other than returning a result.
 That is, if it modifies the environment outside the function.
 For example, it might:
@@ -865,7 +865,7 @@ and future programmers will regard a function with hidden Effects the way we reg
     Add a `Log` Effect (a protocol with `log(message)`)
     used by a new helper that `greet()` calls.
     Count how many signatures you had to edit to pass it down,
-    then explain what an EMS would have done instead.
+    then explain what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions),
     and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,

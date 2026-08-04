@@ -313,7 +313,7 @@ both satisfy it by having the four methods.
 
 `OverSequence` needs no `seen` list because the sequence already is
 one. It can be indexed repeatedly, in any order, without consuming
-anything, which is what the *GoF* interface assumes a collection can
+anything, which the *GoF* interface assumes a collection can
 do. `OverStream` builds `seen` to fake that ability.
 
 The endless source shows what the faking costs. After 50,000 steps

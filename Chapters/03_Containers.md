@@ -103,7 +103,7 @@ Tuples are the natural way to return several values from a function and to group
 # tuples.py
 
 point = (3, 4)
-point = 3, 4  # Also a tuple; the comma is what matters
+point = 3, 4  # Also a tuple; the comma matters
 empty = ()  # Empty tuple
 x, y = point  # Unpacking
 print(x, y)

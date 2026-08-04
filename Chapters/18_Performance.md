@@ -198,7 +198,7 @@ print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
 
 Here the hoist does not pay off.
 Modern CPython already caches a repeated attribute lookup like `out.append` inside a loop,
-so it costs little more than the local variable would have.
+so it costs little more than the local variable.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference measures the machine's mood.

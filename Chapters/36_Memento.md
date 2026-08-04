@@ -124,7 +124,7 @@ including one a caretaker builds or unpacks by hand.
 Wrapping the tuple in a one-field dataclass gives `Memento` an identity of its own.
 The only way to see the strokes is through `.strokes`,
 so reaching inside becomes visible in the code, not just a convention to honor.
-`frozen=True` is what makes reassigning `checkpoint.strokes` fail instead of silently succeeding.
+`frozen=True` makes reassigning `checkpoint.strokes` fail instead of silently succeeding.
 The tuple inside was already immutable, but the attribute was not.
 
 ```python

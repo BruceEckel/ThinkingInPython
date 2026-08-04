@@ -49,7 +49,7 @@ print(run(handle(ticking(LATE, SECOND))(archive_once)("ok")))
 
 `ticking()` is a handler factory.
 It stores a moment, and each request returns the current value and advances the stored one by `step`.
-`nonlocal` is what makes the handler stateful.
+`nonlocal` makes the handler stateful.
 Without it, `moment += step` binds a local name,
 and every request answers the same instant.
 `crossing` in `midnight.py` walks a two-element list and stops there,

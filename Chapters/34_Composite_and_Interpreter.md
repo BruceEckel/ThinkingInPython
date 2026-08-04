@@ -241,7 +241,7 @@ def wrap(value: Expr | int) -> Expr:
 
 The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
-`Add` and `Mul` hold expressions themselves, which is what makes it a composite.
+`Add` and `Mul` hold expressions themselves, which makes it a composite.
 
 The `Operators` base class is the clever part.
 Every node inherits `__add__()` and `__mul__()`,
@@ -506,7 +506,7 @@ and the escape is an iterative walk driving an explicit stack of pending nodes.
     using the sum rule and the product rule.
     Run its results through `simplify()` and compare.
 6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
-    an ill-typed tree the checker would have rejected in source it can see.
+    an ill-typed tree the checker rejects in source it can see.
     Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
     ([Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) shows the idiom),
     and confirm `"a" + x` now raises `TypeError`.

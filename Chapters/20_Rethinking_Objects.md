@@ -64,7 +64,7 @@ It accepts the same arguments, returns the same kinds of results,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
-This is what makes polymorphism,
+This makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override actually behaves the way the base class promises.

@@ -156,7 +156,7 @@ All three `yield Question(...)` expressions offer a `Question` where the annotat
 All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
 All three `question` variables receive an `Answer` where they are declared `Question`.
 Each channel has its own type, so the checker catches every transposition.
-`Generator[str, str, str]` would have accepted the reversal without complaint.
+`Generator[str, str, str]` accepts the reversal without complaint.
 
 ## A Generator Is a Description
 

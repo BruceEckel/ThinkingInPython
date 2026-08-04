@@ -98,7 +98,7 @@ print(Tally.total)
 
 `display_object(Tally)` shows what the class actually holds: `total`,
 and nothing called `label`.
-An assignment in the class body is what creates a class attribute,
+An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance is built.
@@ -125,7 +125,7 @@ is a promise rather than a placeholder.
 It states that instances of this class will carry a `label` attribute of type `str`,
 set somewhere.
 Here that somewhere is `__init__()`,
-whose `self.label = label` is what `display_object(a)` above actually found.
+and its `self.label = label` produced the attribute `display_object(a)` found above.
 If `__init__()` never assigns it, no attribute exists,
 on the instance or the class.
 The checker does not catch the omission,

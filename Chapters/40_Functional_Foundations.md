@@ -5,7 +5,7 @@ Here is what its ideas buy you, before the vocabulary arrives.
 A pure function cannot corrupt state you forgot about.
 It has fewer bugs to chase, and it needs no mock or fixture to test.
 A cache or a fold from `functools` or `itertools` is code you never write yourself,
-already correct on the edge case you would have missed at first.
+already correct on the edge case you would otherwise miss.
 A function with no shared state needs no lock,
 so it parallelizes with no new code.
 And code built from small,
@@ -372,7 +372,7 @@ Each call to `make_counter()` builds an independent counter with its own hidden 
 Nothing outside `increment()` can reach that state,
 so no accident can corrupt it.
 
-The `nonlocal` statement is what lets `increment()` *assign* to the captured variable.
+The `nonlocal` statement lets `increment()` *assign* to the captured variable.
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
 so `count += 1` alone makes `count` a fresh local,

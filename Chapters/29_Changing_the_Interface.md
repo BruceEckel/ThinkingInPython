@@ -112,7 +112,7 @@ reporting `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Rethinking_Objects.md#liskov-substitution).
 That is why this one parameter stays `Any` while the rest of the listing names real types.
 The `Any` is not laziness.
-It is what allows an override that cannot substitute for its base to compile.
+It allows an override that cannot substitute for its base to compile.
 Approach 2 is a different operation wearing an inherited name.
 Code holding a `WhatIUse` cannot safely be handed a `WhatIUse2`,
 and that is the price of building the adapter into the operation.

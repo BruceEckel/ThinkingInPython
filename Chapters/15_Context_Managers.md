@@ -44,7 +44,7 @@ The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
 The code before `yield` is the setup, and the code after it is the cleanup.
-The `finally` is what makes the cleanup dependable:
+The `finally` makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
 and `finally` runs the cleanup anyway, before the exception propagates.
 This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).

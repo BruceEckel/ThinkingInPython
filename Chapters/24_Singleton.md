@@ -33,7 +33,7 @@ print(settings)
 No class, no ceremony.
 For the majority of singleton needs, the module approach solves the problem.
 
-Mutation is what makes the sharing work.
+Mutation makes the sharing work.
 Rebinding is the mistake that quietly ends it.
 `from config import settings` gives your module its own name for the same `dict` object named by `config.settings`.
 Mutating through your name, `settings["theme"] = "dark"`,
@@ -474,7 +474,7 @@ A dataclass generates its own `__init__` that assigns the fields and [never call
 so `self.__dict__` is never rebound and each instance keeps its own state.
 Moving the rebinding into `__post_init__` does not help either.
 That runs after `__init__` assigns the fields, so it discards them.
-The hand-written `__init__` is what makes the shared state work,
+The hand-written `__init__` makes the shared state work,
 and silently losing the sharing is worse than failing outright.
 
 Testing confirms the objects differ but share one set of state:

@@ -261,7 +261,7 @@ This is a `match` over an open set,
 exactly what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 warned against.
 When the set is open, sorting must not enumerate it,
-which is what the next section arranges.
+which the next section arranges.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
 
@@ -322,7 +322,7 @@ The key is the *exact* class,
 the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
 and [Multiple Dispatching](32_Multiple_Dispatching.md).
 If you derive `CrushedAluminum` from `Aluminum`, it sorts into its own bin,
-not its parent's, which is what a sorter usually wants,
+not its parent's, which a sorter usually wants,
 but is worth knowing before you subclass a material.
 
 ## Adding Operations: Visitor, and Why Python Skips It

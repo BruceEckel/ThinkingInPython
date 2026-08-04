@@ -139,7 +139,7 @@ Every handler so far gave the same answer each time it was asked.
 `supply()` binds one instance for the whole run,
 and `scripted` returned `"Alice"` no matter how many times `greet()` requested a name.
 A handler is an ordinary function, so it can answer differently at each request.
-That is what makes an unpredictable source testable.
+That makes an unpredictable source testable.
 
 A coin toss is a side cause: the program reads something from outside,
 and the reading does not repeat.
@@ -312,7 +312,7 @@ and the window where this happens is one second wide.
 Against a real clock you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
-The seam is what makes the moment reachable.
+The seam makes the moment reachable.
 `archive()` does not read a clock, it asks for a moment,
 and a handler decides which moment that is.
 Both handlers here answer the same two requests;
@@ -733,7 +733,7 @@ Four runs of one program, differing in what was supplied.
 The first finds its article.
 The second exercises `NotInteresting`, the third `NoArticle`,
 and the fourth `Unavailable`, so every failure the signature declares gets used.
-Each pair of bindings is what a full Effect system calls a *scenario*,
+A full Effect system calls each pair of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
 The trace shows two things worth noticing.
@@ -1134,7 +1134,7 @@ because the pairing is built into the class.
 `supply()` takes a flat list and checks each argument against one ability,
 never against the others.
 The matched set comes back only if you write it down,
-which is what `kitties_and_puzzles()` does.
+which `kitties_and_puzzles()` does.
 The guarantee moved from a class hierarchy into a two-line function,
 and it is worth knowing which of those you are getting.
 
@@ -1269,7 +1269,7 @@ The exhausted generator has nothing left to do,
 so the second `run()` returns `None` where the signature declares a `str`,
 with no exception and no complaint from the checker.
 A retry therefore has to rebuild the description from the function,
-which is what `retry()` does internally.
+which `retry()` does internally.
 The exemption is `success()`: it builds a constant rather than a generator,
 and a constant answers every `run()` with the same value.
 The one-shot behavior belongs to any Effect that contains a `yield`,
