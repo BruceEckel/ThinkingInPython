@@ -173,7 +173,6 @@ If you turn it into an ability, the reading moves into a handler:
 ```python
 # coin_toss.py
 import random
-from typing import Final
 from stateless import Ability, Depend, handle, run
 
 class Flip(Ability[bool]):
@@ -190,8 +189,7 @@ def count_heads(tosses: int) -> Depend[Flip, int]:
             heads += 1
     return heads
 
-FLIPS: Final[tuple[bool, ...]] = (True, False, True, True, False)
-script = iter(FLIPS)
+script = iter((True, False, True, True, False))
 
 def scripted(request: Flip) -> bool:
     return next(script)
@@ -233,7 +231,8 @@ a network stub that fails twice and then succeeds, or the clock below.
 
 ### A Clock
 
-A clock is the other side cause every test trips over.
+A clock is another side cause that makes testing tricky.
+[[Start by describing the overview and clock.py. Move the stamp and batch_due material right before frozen_clock.py]]
 `stamp()` puts the current time into its output,
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
@@ -286,7 +285,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 #: True
 ```
 
-`frozen` reports one moment,
+`frozen()` reports a single moment over and over,
 so `stamp()` produces a fixed string a test can compare.
 `tomorrow` reports a moment a day later,
 and `batch_due()` returns `True` with no time having passed.
@@ -336,13 +335,13 @@ Now the file is named for January 1 and the entry inside it is dated January 2.
 A day of entries can end up in the wrong file,
 and the window where this happens is one second wide.
 
-Against a real clock you wait for that window and probably miss it.
+Using a real clock, you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
 The ability makes the moment reachable.
 `archive()` does not read a clock; it asks for a moment,
 and a handler decides which moment that is.
-Both handlers here answer the same two requests;
+Both handlers answer the same two requests;
 they differ in whether midnight falls between them.
 
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.

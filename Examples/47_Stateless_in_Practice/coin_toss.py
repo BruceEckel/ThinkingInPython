@@ -1,6 +1,5 @@
 # coin_toss.py
 import random
-from typing import Final
 from stateless import Ability, Depend, handle, run
 
 class Flip(Ability[bool]):
@@ -17,8 +16,7 @@ def count_heads(tosses: int) -> Depend[Flip, int]:
             heads += 1
     return heads
 
-FLIPS: Final[tuple[bool, ...]] = (True, False, True, True, False)
-script = iter(FLIPS)
+script = iter((True, False, True, True, False))
 
 def scripted(request: Flip) -> bool:
     return next(script)
