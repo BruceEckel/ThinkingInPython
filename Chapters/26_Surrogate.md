@@ -210,7 +210,7 @@ The type checker agrees, rejecting `len(p)` statically for the same reason,
 which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
-Identity has the same seam.
+Identity has the same gap.
 `isinstance(p, Words)` is `False`; delegation forwards the methods,
 not the type.
 But an `isinstance()` check against a `@runtime_checkable` `Protocol` passes,

@@ -7,14 +7,17 @@ A failure is an exception that `@throws` lifts into the type and `catch()` takes
 A type checker verifies that every caller either absorbs an Effect or declares it.
 
 Every ability so far has been a `Need`.
-This chapter opens by writing one from scratch,
-which shows that `Need` is an ordinary class rather than a special form.
-The rest applies the machinery:
-handlers that make an unpredictable source testable,
-a handler that swaps implementations while a program runs,
-a program whose signature is its own documentation,
-decorators that add retry and parallelism to code they never edit,
-and an account of what the guarantee does not cover.
+This chapter opens by writing a `Need` from scratch,
+which shows it is an ordinary class rather than a special form.
+The rest of the chapter applies the machinery:
+
+- Handlers that make an unpredictable source testable
+- A handler that swaps implementations while a program runs
+- A program whose signature is its own documentation,
+  and whose body is only the success path
+- Dependency graphs that go deep, and a cast of abilities that goes wide
+- Decorators that add retry and parallelism to code they never edit
+- An account of what the guarantee does not cover
 
 ## Abilities Are Not Special
 
@@ -23,7 +26,7 @@ An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
 
 ```python
-# ask_tell_effect.py
+# ask_tell_stateless.py
 from dataclasses import dataclass
 from stateless import Ability, Depend, handle, run
 
@@ -61,7 +64,24 @@ print(messages)
 #: ['Hello, Alice!']
 ```
 
-Inside `ask()`, `yield from Ask(prompt)` yields the ability object and returns whatever the handler sends back.
+Inside `ask()`, the operand of `yield from` is not a generator but the ability object.
+`yield from` accepts any iterable, and `Ability` supplies the iteration.
+Its `__iter__` is a one-request generator; stripped of error handling,
+the entire method is:
+
+```python
+def __iter__(self: Self) -> Generator[Self, T, T]:
+    v = yield self
+    return v
+```
+
+The ability yields itself out to the handler,
+and the value of the `yield from` is whatever the handler sends back.
+The ability produces nothing on its own.
+`prompt` is payload on the request, there for the handler to read,
+so the answer to an `Ask` is whatever `scripted()` returns.
+A `Tell` needs no answer,
+which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 `ask()` and `tell()` are *accessors*:
 small functions that each wrap one ability and declare its answer type.
 `need()` has the same shape,
@@ -70,7 +90,7 @@ had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the ability directly,
 and the program still runs,
-but under `ty` 0.0.64 the answer comes back as `Unknown` and the checking quietly stops.
+but under `ty` 0.0.65 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
 That is what the `answer: str` inside `ask()` is doing.
 `yield from Ask(prompt)` produces `Unknown` there too,
@@ -102,7 +122,8 @@ The by-hand version put two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a checker can follow them.
-That second channel in the signature is the one that chapter said an EMS needs.
+That second channel in the signature is the one [Effect Management](44_Effect_Management.md#effect-management-systems)
+said an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Generators.md#a-generator-is-a-description).
 An Effect is a generator, so nothing stops you from driving one yourself:
@@ -274,7 +295,7 @@ so there is nothing to monkeypatch and nothing to wait for,
 and a production handler that returns `datetime.now()` leaves the function unchanged.
 
 Skipping the wait is the obvious benefit and the smaller one.
-A handler also reaches moments a real clock hands you by luck.
+A handler also reaches moments a real clock hands you only by luck.
 `archive()` reads the clock twice,
 once to name a file and once to stamp what goes in it:
 
@@ -316,13 +337,13 @@ and the window where this happens is one second wide.
 Against a real clock you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
-The seam makes the moment reachable.
-`archive()` does not read a clock, it asks for a moment,
+The ability makes the moment reachable.
+`archive()` does not read a clock; it asks for a moment,
 and a handler decides which moment that is.
 Both handlers here answer the same two requests;
 they differ in whether midnight falls between them.
 
-`crossing` is the scripted handler from `coin_toss.py` in different clothes.
+`crossing` follows the same pattern as `scripted` in `coin_toss.py`.
 It walks a fixed list, so it holds state between requests,
 which is how it answers the same question two ways.
 A supplied instance could not do this, and neither could `frozen` or `tomorrow`,
@@ -340,8 +361,8 @@ the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
 The technique did not change between the two.
-Name the seam as an ability and bind it at the edge to whatever the context needs.
-What an EMS adds is that the seam cannot be skipped by accident.
+Name each contact with the outside as an ability and bind it at the edge to whatever the context needs.
+What an EMS adds is that the declaration cannot be skipped by accident.
 
 ## Switching Implementations Mid-Run
 
@@ -359,7 +380,7 @@ The battery carries it while the charge stays above a threshold.
 The utility grid carries it when neither can,
 and a diesel backup carries it when the grid is down too.
 Each stops for its own reason,
-and when one stops the building has to obtain another.
+and when one stops the building must obtain another.
 
 Sources are ordinary objects.
 Each reports whether it can supply a given hour, and depletes when drawn from:
@@ -540,7 +561,6 @@ Reordering that tuple is the whole difference between the two runs.
 Priority, thresholds, and the outage schedule live in `controller()`,
 while `run_load()` decides when to give up on the source it holds.
 
-Now the part worth dwelling on.
 The load's declared dependency never changes.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type is written once.
@@ -559,7 +579,7 @@ since the block opens and closes between two `yield from` expressions in the sam
 What you cannot write is an acquisition in one Effect released after a later one finishes,
 a gap that [Running Effects in Parallel](#running-effects-in-parallel) revisits.
 
-One thing the types here do not carry.
+One thing stays outside the types.
 `choose()` raises a `Blackout` when no source can supply the hour,
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifted it,
@@ -751,7 +771,7 @@ so the `need(Encyclopedia)` two lines below it never ran and no library was cons
 which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception would,
 and no step tested for it.
-The cut moves with the failure.
+Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
 since `DeadWire.latest()` raises before printing,
 while the third reaches the library and fails there.
@@ -819,7 +839,7 @@ Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
 The Effect version moved those nine lines into `report()`,
 one `match` over the failures instead of a `try` at each step.
-The name says what the by-hand version cannot avoid being:
+The name records the merge the by-hand version cannot avoid:
 `research()` and `report()` in one function.
 
 Both versions short-circuit.
@@ -936,7 +956,7 @@ showed, now arising from a dependency two levels down.
 `Oven` and `Toaster` are distinct types,
 so the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match)
 cannot arise here.
-ZIO makes both of them a `HeatSource` and has to report the clash.
+ZIO makes both of them a `HeatSource` and must report the clash.
 
 Here is what ZIO does that Stateless cannot.
 `Bread.homeMade` is a `ZLayer`: a constructor that is an Effect.
@@ -1088,6 +1108,7 @@ and no class is named in the engine:
 
 ```python
 # two_games.py
+from dataclasses import dataclass, field
 from casts import (
     Kitty,
     NastyWeapon,
@@ -1101,9 +1122,9 @@ from casts import (
 class Loud:
     def say(self, line: str) -> None: print(line)
 
+@dataclass
 class Script:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
+    lines: list[str] = field(default_factory=list)
     def say(self, line: str) -> None:
         self.lines.append(line)
 
@@ -1129,7 +1150,7 @@ One engine, four runs, and the only difference is what was supplied.
 The last two are the ones to study.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `NastyWeapon` across a `Wasteland`, it type-checks,
+A `Kitty` bats at a `NastyWeapon` across a `Wasteland`; it type-checks,
 and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
@@ -1236,6 +1257,9 @@ print(type(outcome).__name__)
 #: RetryError
 ```
 
+`three` is built from the only two schedule combinators the library has:
+`spaced()` yields a fixed interval forever,
+and `recurs()` stops it after `n` yields.
 One attempt fails.
 Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
@@ -1276,7 +1300,7 @@ so the second `run()` returns `None` where the signature declares a `str`,
 with no exception and no complaint from the checker.
 A retry therefore has to rebuild the description from the function,
 which `retry()` does internally.
-The exemption is `success()`: it builds a constant rather than a generator,
+The special case is `success()`: it builds a constant rather than a generator,
 and a constant answers every `run()` with the same value.
 The one-shot behavior belongs to any Effect that contains a `yield`,
 which is any Effect that does work.
@@ -1579,7 +1603,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The checker can give up quietly
 
 How much of a type survives partial handling depends on your checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.64.
+Handling some of what an Effect declares works correctly under `ty` 0.0.65.
 If you supply one of two abilities, the other stays in the signature:
 
 ```python
@@ -1635,7 +1659,7 @@ half = handle(capture)(greet)  # () -> Depend[Ask, None]
 full = handle(scripted)(half)  # () -> Success[None]
 ```
 
-That is why `ask_tell_effect.py` binds `half` and `full` instead of nesting the calls.
+That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
 The habit is worth keeping generally.
 A named intermediate is where you read the ability that is left,
 which is the information this library exists to give you.
@@ -1682,7 +1706,7 @@ The extra type parameter exists because a Stateless ability cannot fail,
 and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
 carries one for the same reason.
 `Async` is the other piece.
-Native systems demonstrate asynchronous execution derived from Effects,
+Native systems derive asynchronous execution from Effects,
 while Stateless provides `Async` as a built-in that `run()` interprets,
 because the driver loop can await where a handler cannot.
 
@@ -1717,11 +1741,11 @@ There is no timeout, no `race`, no fallback combinator, and no finalizer,
 which rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell,
 so shared state between forked Effects is your problem and Python's,
-not something the type checker helps with.
+with no help from the type checker.
 Above that sit the resilience patterns a production system eventually needs,
 rate limiting, bulkheads, and circuit breakers, none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
-and that is a different thing from a platform to build a distributed system on.
+and that is different from a platform for building distributed systems.
 
 ## Costs and Benefits
 

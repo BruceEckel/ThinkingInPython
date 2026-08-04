@@ -384,7 +384,7 @@ The second `run()` of the same object greets nobody and produces `None`.
 The generator is exhausted,
 so `run()` gets `StopIteration` immediately and reports the return value of a function that never resumed.
 Calling `bound("Alice")` again builds a fresh description, which works.
-`success()` is the exception because it is not a generator at all:
+`success()` is the special case because it is not a generator at all:
 it builds a small object whose `send()` reports its value every time,
 so a constant Effect replays.
 

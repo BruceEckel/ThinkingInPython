@@ -1,4 +1,4 @@
-# ask_tell_effect.py
+# ask_tell_stateless.py
 from dataclasses import dataclass
 from stateless import Ability, Depend, handle, run
 

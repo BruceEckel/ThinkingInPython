@@ -75,7 +75,7 @@ LANG = "en-US"
 SVG_PNG_WIDTH = 1600
 SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
 # Code-listing font size, relative to the surrounding prose.
-CODE_FONT_SCALE = 0.5
+CODE_FONT_SCALE = 0.7
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
@@ -417,6 +417,15 @@ def epub_css() -> str:
     instead of wrapping. No fixed colors either: a Kindle in dark mode
     keeps a declared color as given, so a light fill would become a
     glaring panel against black.
+
+    `#toc ol` is the one list-style rule here, and it is also a fix,
+    not a look: `chapter_heading()` already spells each chapter's
+    number into its title text ("3. Containers"), but pandoc's nav
+    document is still a plain `<ol>`, which every reader numbers on
+    its own. Left alone, the two numbers stack ("4. 3. Containers",
+    the "4." being the reader's count of nav entries so far, Parts
+    included, not the chapter number). Suppressing the list's own
+    marker leaves the chapter's real number as the only one shown.
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
@@ -429,6 +438,7 @@ figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}
 table {{ border-collapse: collapse; }}
 th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
+#toc ol {{ list-style: none; padding-left: 1em; }}
 """
 
 

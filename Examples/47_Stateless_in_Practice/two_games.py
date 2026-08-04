@@ -1,4 +1,5 @@
 # two_games.py
+from dataclasses import dataclass, field
 from casts import (
     Kitty,
     NastyWeapon,
@@ -12,9 +13,9 @@ from casts import (
 class Loud:
     def say(self, line: str) -> None: print(line)
 
+@dataclass
 class Script:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
+    lines: list[str] = field(default_factory=list)
     def say(self, line: str) -> None:
         self.lines.append(line)
 
