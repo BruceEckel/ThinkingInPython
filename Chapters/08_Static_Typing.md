@@ -321,6 +321,52 @@ so `get()` returns a `str` and the call to `upper()` checks.
 A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 
+### Type Parameter Defaults {#type-parameter-defaults}
+
+A type parameter can carry a default,
+which the checker uses when an annotation names the class without its brackets:
+
+```python
+# type_defaults.py
+
+class Stack[T = str]:
+    def __init__(self) -> None:
+        self.items: list[T] = []
+
+    def push(self, item: T) -> None:
+        self.items.append(item)
+
+    def top(self) -> T:
+        return self.items[-1]
+
+words: Stack = Stack()  # No brackets, so T is str
+words.push("beta")
+print(words.top().upper())
+#: BETA
+counts: Stack[int] = Stack()
+counts.push(2)
+print(counts.top() + 1)
+#: 3
+
+type Pair[T = int] = tuple[T, T]
+
+def is_origin(point: Pair) -> bool:  # Pair means Pair[int]
+    return point == (0, 0)
+
+print(is_origin((0, 0)))
+#: True
+```
+
+Without the default,
+`words: Stack` leaves `T` unsolved and the checker falls back to `Unknown`,
+so `words.top().upper()` goes unchecked.
+The default gives the bare form a meaning,
+which matters most for a class whose parameter has one common answer:
+callers who want that answer write nothing, and the annotation stays precise.
+The same applies to a `type` alias, as `Pair` shows.
+Defaulted parameters go last, the way defaulted function parameters do,
+so `class Table[K = str, V]` is a syntax error.
+
 A special form, `**P`, captures the types of an entire parameter list.
 [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
 uses this to give a wrapper the same signature as the function it wraps.
@@ -453,6 +499,7 @@ The abstract container types come from `collections.abc`.
 | `def f[T](x: T) -> T` | A generic function (the type parameter varies per call), see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `class Box[T]` | A generic class, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `[T = str]` | A type parameter default, used when the brackets are omitted, see [Type Parameter Defaults](#type-parameter-defaults) |
 | `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
@@ -515,3 +562,7 @@ The forms above are the modern ones.
 4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
     calling `super().report()` first.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
+5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
+    Remove the `= str` default and run it again.
+    Note that nothing is reported as an error either way,
+    and say what that means for a bare `Stack` annotation.

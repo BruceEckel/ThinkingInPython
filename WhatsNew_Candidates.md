@@ -29,33 +29,6 @@ A "not covered" note means the term appears nowhere in the book's prose or listi
 
 ## Top picks
 
-If you only take a handful, take these.
-They are the ones where a chapter currently teaches a topic and omits the stdlib answer to it.
-
-1. **`contextvars` / `ContextVar`** (3.7). Not covered anywhere.
-   Part V is about managing effects and passing context, and this is the stdlib mechanism
-   for context that follows a call chain across `await` boundaries without a parameter.
-2. **`BaseException.add_note()`** (3.11, PEP 678). Not covered.
-   Chapter 42 argues about carrying failure information; `add_note()` is the built-in way
-   to attach context to an exception you re-raise.
-3. **t-strings** (3.14, PEP 750). Not covered.
-   The first new string kind since f-strings, and the only one that hands you the
-   structure instead of a finished string.
-4. **`functools.Placeholder`** (3.14). Not covered.
-   Chapter 28's partial-application discussion can only bind leading arguments today.
-5. **`copy.replace()` and `__replace__`** (3.13, PEP 688). Barely covered.
-   The general protocol for "same object, one field different," which chapters 12 and 36 both need.
-6. **`warnings.deprecated()`** (3.13, PEP 702). Not covered.
-   Chapter 29 is titled "Changing the Interface" and does not show the decorator
-   that both a type checker and the runtime understand.
-7. **PEP 696 type parameter defaults** (3.13). Not covered.
-   Chapter 8 covers `TypeVar`, `ParamSpec`, and `TypeVarTuple` but not their defaults.
-8. **`sys.monitoring`** (3.12, PEP 669). Not covered.
-   Chapter 18 measures performance with timing; this is the low-overhead hook for
-   counting and tracing without `settrace()`'s cost.
-9. **`threading.synchronized_iterator()` and `concurrent_tee()`** (3.15). Not covered.
-   "A generator shared between threads is not safe" is a trap chapters 19, 23, and 45
-   all touch, and 3.15 is the first release with a stdlib answer.
 
 ---
 

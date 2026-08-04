@@ -465,6 +465,20 @@ Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but the injector still must be told what every function needs,
 and told again when that changes.
 Nothing verifies the wiring except a runtime failure.
+
+Python does have a mechanism that propagates on its own.
+A `ContextVar` ([Concurrency](19_Concurrency.md#context-that-follows-the-call-chain))
+holds a value for the current task,
+and anything below reads it without being handed it,
+which is the automatic propagation the parameter list lacks.
+It removes the parameter along with the one thing the parameter was good for.
+`greet(ask, tell)` states its Effects in its signature,
+and a `greet()` that reads two `ContextVar`s states nothing.
+Setting the wrong one, or forgetting to set one at all,
+surfaces as a failure at the moment of the read,
+in whatever frame happened to need it.
+The bookkeeping did not disappear.
+It stopped being something a checker can see.
 An EMS moves the bookkeeping into the type system, where it maintains itself.
 What that takes is a second channel in the signature,
 one that carries Effect information without occupying the argument list.

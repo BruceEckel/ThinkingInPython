@@ -248,6 +248,8 @@ If you keep the messy internals private
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module already gives you.
 
+## Telling the Wrappers Apart
+
 This chapter completes a family of wrappers that share one structure,
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
@@ -265,6 +267,63 @@ When you cannot decide what to call your wrapper,
 ask what breaks if you remove it: access control, added behavior, interface fit,
 or simplicity.
 
+## Retiring the Old Interface {#retiring-the-old-interface}
+
+Every interface change has a second half.
+Once the better interface exists, the old one is still there,
+and callers keep using it until something tells them not to.
+Deleting it breaks them; leaving it undocumented means nobody notices.
+`warnings.deprecated()` marks a function, method, or class as on its way out,
+and both a type checker and the runtime understand the mark:
+
+```python
+# deprecating.py
+import warnings
+
+class Report:
+    def render(self) -> str:
+        return "report"
+
+    @warnings.deprecated("Report.to_string() is replaced by render()")
+    def to_string(self) -> str:
+        return self.render()
+
+report = Report()
+print(report.render())
+#: report
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    print(report.to_string())  # type: ignore
+#: report
+print(caught[0].category.__name__)
+#: DeprecationWarning
+print(caught[0].message)
+#: Report.to_string() is replaced by render()
+```
+
+`to_string()` keeps working, which is the point: existing callers are warned,
+not broken.
+The `# type: ignore` is there because `ty` reports the deprecated call as a diagnostic,
+which is the half that reaches a caller before they run anything.
+The runtime half is a `DeprecationWarning`,
+which Python hides by default outside of `__main__` and test runners,
+so the listing records the warnings rather than letting them go to standard error.
+
+A message is optional but should say what to use instead.
+"Deprecated" tells a reader that a decision was made;
+"replaced by `render()`" tells them what to do about it.
+The decorator also applies to a class,
+where it warns on construction and on subclassing.
+
+`@overload` accepts it too, which is the finer instrument:
+you can deprecate one call signature while the rest stay current,
+so a function that used to take a string and now takes a `Path` can warn only the string callers.
+
+An Adapter and a Façade both add an interface without disturbing what is already there,
+which is why they are safe moves.
+Deprecation is the move that is not safe,
+and marking the old interface is how you make the risk visible on a schedule instead of discovering it at the moment you delete something.
+
 ## Exercises
 
 1.  Write a `PairsAdapter` that wraps a list of `(key, value)` tuples,
@@ -272,3 +331,6 @@ or simplicity.
     Give it a dictionary-style `__getitem__()` that finds a value by key,
     and forward every other attribute to the wrapped list with `__getattr__()`.
     Confirm `adapter["name"]` finds a value while `adapter.append(...)` still reaches the underlying list.
+2.  In `deprecating.py`,
+    deprecate the whole `Report` class instead of the method,
+    and show that constructing a `Report` warns while `render()` no longer does.

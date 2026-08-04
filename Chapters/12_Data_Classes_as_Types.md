@@ -210,6 +210,8 @@ which produces the class name and the named argument values.
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
 This copy-instead-of-mutate style reduces errors.
+`copy.replace()`, in [The General Form of `replace()`](#the-general-form-of-replace),
+does the same for anything immutable, not only for data classes.
 
 Notice the last two lines.
 A data class is mutable, so `m.name = "bar"` works.
@@ -850,6 +852,94 @@ class Config:
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
+
+## The General Form of `replace()` {#the-general-form-of-replace}
+
+`dataclasses.replace()` only works on data classes, but "same object,
+one field different" is not a data class idea.
+It is what you do with any immutable value.
+`copy.replace()` is the general version, and it works on a frozen data class,
+a `NamedTuple`, a `datetime`, a `SimpleNamespace`,
+and anything else that defines `__replace__()`:
+
+```python
+# copy_replace.py
+import copy
+from datetime import date
+from typing import NamedTuple
+from stars import Stars
+
+class Size(NamedTuple):
+    width: int
+    height: int
+
+print(copy.replace(Stars(4), number=9))
+#: Stars(number=9)
+print(copy.replace(Size(4, 3), height=9))
+#: Size(width=4, height=9)
+print(copy.replace(date(2026, 8, 4), day=1))
+#: 2026-08-01
+
+try:
+    copy.replace(Stars(4), number=99)
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: TypeFailure: Stars(99)
+```
+
+The last case matters more than the convenience.
+`copy.replace()` builds the new object through the constructor,
+so `Stars.__post_init__()` runs on the copy.
+A validated type stays validated across a replacement,
+which is what makes "transform one legal value into a new legal value" a safe thing to say.
+A copy that skipped the constructor would be a hole in the guarantee.
+
+`__replace__()` is a dunder like any other,
+so a class that is not a data class can join by defining it:
+
+```python
+# copy_replace_protocol.py
+import copy
+from typing import Final, Self
+
+SHIFTS: Final[dict[str, int]] = {"red": 16, "green": 8, "blue": 0}
+MASK: Final[int] = 0xFF
+
+class Color:
+    "Three channels packed into one int, so no data class fits."
+    def __init__(self, red: int, green: int, blue: int) -> None:
+        self.packed = (red << 16) | (green << 8) | blue
+
+    @property
+    def channels(self) -> dict[str, int]:
+        return {n: self.packed >> s & MASK for n, s in SHIFTS.items()}
+
+    def __repr__(self) -> str:
+        return f"Color({', '.join(map(str, self.channels.values()))})"
+
+    def __replace__(self, **changes: int) -> Self:
+        return type(self)(**(self.channels | changes))
+
+teal = Color(0, 128, 128)
+print(teal, hex(teal.packed))
+#: Color(0, 128, 128) 0x8080
+lighter = copy.replace(teal, red=64)
+print(lighter, hex(lighter.packed))
+#: Color(64, 128, 128) 0x408080
+```
+
+`Color` stores no separate fields at all,
+so `dataclasses.replace()` has nothing to work with.
+`__replace__()` unpacks the channels, applies the changes,
+and hands the result back through the constructor,
+which is the same shape every implementation takes:
+recover the constructor arguments, override the named ones, rebuild.
+Returning `Self` from `type(self)(...)` means a subclass gets a copy of its own class.
+
+The rule for deciding is short.
+Define `__replace__()` when your type is immutable and callers will want a variant of it.
+Skip it when the type is mutable,
+because the caller can assign to the attribute.
 
 ## Serializing to JSON
 

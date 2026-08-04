@@ -102,6 +102,10 @@ shout("hello")
 #: hello!
 ```
 
+`functools.Placeholder` reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
+[Leaving a Gap with `Placeholder`](40_Functional_Foundations.md#leaving-a-gap-with-placeholder)
+shows it.
+
 ### `partialmethod`
 
 The same idea as `partial()`, but for a method.

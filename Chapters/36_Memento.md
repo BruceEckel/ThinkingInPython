@@ -334,6 +334,49 @@ Snapshot-based undo is the one to try first,
 because immutable states make snapshots inexpensive.
 Each `Sketch` above shares almost all of its strokes with its neighbors in the history.
 
+## Restoring Part of a State {#restoring-part-of-a-state}
+
+A whole-state snapshot answers one question: what did everything look like then?
+Editors get asked a narrower one.
+Undo the drawing, but keep the rename.
+`History` cannot express that,
+because it moves whole states and never looks inside them.
+The state has to answer it,
+and `copy.replace()` is how any immutable value does:
+
+```python
+# partial_restore.py
+import copy
+from frozen_sketch import Sketch
+from history import History
+
+history = History(Sketch("Duck"))
+history.do(history.present.draw("circle"))
+checkpoint = history.present
+history.do(copy.replace(history.present, title="Goose"))
+history.do(history.present.draw("scribble"))
+print(history.present)
+#: Goose: circle scribble
+history.do(copy.replace(history.present, strokes=checkpoint.strokes))
+print(history.present)
+#: Goose: circle
+print(history.undo())
+#: Goose: circle scribble
+```
+
+`checkpoint` is nothing but a name bound to a past `Sketch`,
+which is the whole trick immutability buys.
+The restore takes the strokes from that past state and the title from the present one,
+producing a state that never existed before.
+It goes through `do()` like any other action,
+so the partial restore is itself undoable, as the last line shows.
+
+`copy.replace()` is the general version of `dataclasses.replace()`,
+described in [Data Classes as Types](12_Data_Classes_as_Types.md#the-general-form-of-replace).
+Using it here rather than the `dataclasses` one keeps the technique available to whatever state type a `History` happens to hold,
+since `NamedTuple`, `datetime`,
+and any class defining `__replace__()` all accept it.
+
 ## Mementos That Outlive the Process
 
 A snapshot in memory disappears when the process ends.

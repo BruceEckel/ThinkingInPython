@@ -303,6 +303,53 @@ as in `"val: {}".format(val)`.
 Both still work, and both use the same format mini-language.
 F-strings replaced them, so this book does not use them.
 
+### t-Strings {#t-strings}
+
+An f-string produces a finished `str`,
+and the decision about how each value becomes text is made before anything else sees it.
+A `t`-string produces a `Template` instead:
+the literal pieces and the interpolated values, kept apart,
+for a consumer to assemble:
+
+```python
+# tstrings.py
+from string.templatelib import Interpolation, Template
+
+name = "Alice"
+score = 91.5
+message: Template = t"{name} scored {score:.0f}%"
+print(message.strings)
+#: ('', ' scored ', '%')
+print([piece.expression for piece in message.interpolations])
+#: ['name', 'score']
+
+def shout(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            parts.append(format(piece.value, piece.format_spec))
+        else:
+            parts.append(piece.upper())
+    return "".join(parts)
+
+print(shout(message))
+#: Alice SCORED 92%
+```
+
+Iterating a `Template` produces the pieces in order,
+each either a `str` the author typed or an `Interpolation` carrying a value.
+An `Interpolation` also remembers the source text of the expression that produced it,
+which is what `piece.expression` reports.
+`shout()` uppercases only the literal text, leaving the values alone,
+which no amount of work on a finished f-string could do reliably.
+
+The reason to care is safety rather than shouting.
+A consumer that receives the parts separately knows which text came from the program and which came from a value,
+so it can quote, escape,
+or reject the values before they become part of the result.
+[Composite and Interpreter](34_Composite_and_Interpreter.md#a-template-is-a-tree)
+builds a query that way.
+
 ### Common String Operations
 
 Strings are immutable sequences.

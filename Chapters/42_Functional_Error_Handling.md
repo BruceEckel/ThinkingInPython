@@ -498,6 +498,94 @@ so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Err` values,
 and the `match` tells them apart.
 
+## Attaching Context to an Exception {#attaching-context-to-an-exception}
+
+An exception knows what went wrong and not where it came from.
+`invalid literal for int() with base 10: 'soon'` is accurate and unhelpful:
+which setting, which field, which row of the file?
+The frame that has that answer is rarely the frame that raised the exception,
+and by the time the exception reaches a handler high enough to report it,
+the local names that would explain it are gone.
+
+The usual repair is to catch the exception and raise a new one carrying a better message,
+which costs you the original type and gives every caller a wrapper to unwrap.
+`BaseException.add_note()` avoids the trade.
+It appends a line to the exception you already have,
+and the traceback prints it:
+
+```python
+# add_note.py
+import traceback
+
+def parse_seconds(text: str) -> int:
+    try:
+        return int(text)
+    except ValueError as e:
+        e.add_note(f"timeout was set to {text!r}")
+        e.add_note("expected a whole number of seconds")
+        raise
+
+try:
+    parse_seconds("soon")
+except ValueError as e:
+    print("".join(traceback.format_exception_only(e)), end="")
+#: ValueError: invalid literal for int() with base 10: 'soon'
+#: timeout was set to 'soon'
+#: expected a whole number of seconds
+```
+
+The bare `raise` re-raises the same object,
+so the type stays `ValueError` and the original traceback is undisturbed.
+Notes accumulate: each frame that knows something the raiser did not can add its own line as the exception passes through.
+They live in a list called `__notes__`,
+which is absent until the first `add_note()` call.
+`traceback.format_exception_only()` renders the message and the notes without the file paths,
+which is why the listing uses it instead of letting the traceback print.
+
+This matters more here than in ordinary exception code,
+because a `Result` keeps the exception as a value rather than propagating it.
+An `Err` sitting in a list has no traceback to explain it.
+Whatever context it needs, it needs to be carrying:
+
+```python
+# noted_result.py
+from result import Err, Ok, Result
+
+def parse_field(name: str, text: str) -> Result[int, Exception]:
+    try:
+        return Ok(int(text))
+    except ValueError as e:
+        e.add_note(f"field {name!r} received {text!r}")
+        return Err(e)
+
+for field, value in (("age", "42"), ("size", "oops")):
+    result = parse_field(field, value)
+    if isinstance(result, Ok):
+        print(f"{field} = {result.answer}")
+    else:
+        print(f"{field}: {type(result.error).__name__}")
+        for note in result.error.__notes__:
+            print(f"  {note}")
+#: age = 42
+#: size: ValueError
+#:   field 'size' received 'oops'
+```
+
+The note is attached before the exception becomes a value,
+in the one frame that knows both the failure and the field name.
+Everything downstream can report the failure without being told what it was reading.
+This is the same argument the chapter opened with, applied one level down:
+`Err` says a failure happened and the exception says what it was,
+and a note says which piece of work it belonged to.
+
+Notice that this listing narrows with `isinstance()` rather than `match`.
+`ty` loses the error's type through an `Err(...)` pattern and through `isinstance(result, Err)`,
+reporting `object` instead of `Exception`,
+so `result.error.__notes__` would not check.
+Asking about `Ok` and reading the error in the `else` branch gets the precise type.
+This is a checker limitation rather than a rule about which form to write:
+`match` is still the better fit whenever the branches do not need the captured value's type.
+
 ## The returns Library
 
 You need not build `Result` yourself.

@@ -308,7 +308,10 @@ The coarse strategy stops within a tenth and reports 1.406250.
 The fine one reports the root to six places.
 Both satisfy `RootFinder`, so either drops into `solve()`,
 or into the chain below, unchanged.
-`functools.partial` does the same job when the configurable version already exists with the setting as a parameter.
+`functools.partial` does the same job when the configurable version already exists with the setting as a parameter,
+including the case where the setting is a positional argument that comes after the one the caller supplies,
+which `Placeholder` ([Foundations](40_Functional_Foundations.md#leaving-a-gap-with-placeholder))
+handles.
 Save the strategy *class* for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
 

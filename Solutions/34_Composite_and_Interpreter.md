@@ -422,3 +422,44 @@ additions) needs a quotient rule for `Div` too, which needs a
 squared denominator `simplify()`'s current rules do not yet know how
 to render tidily; left for a further exercise, the same way exercise
 3 leaves `Div`'s own derivative case unimplemented.
+
+## 7. A third walker: `to_html()`
+
+```python
+from html import escape
+from string.templatelib import Interpolation, Template
+
+def to_html(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            parts.append(escape(str(piece.value)))
+        else:
+            parts.append(piece)
+    return "".join(parts)
+
+comment = "<script>steal()</script> & run"
+print(to_html(t"<p>{comment}</p>"))
+#: <p>&lt;script&gt;steal()&lt;/script&gt; &amp; run</p>
+print(f"<p>{comment}</p>")
+#: <p><script>steal()</script> & run</p>
+```
+
+`to_html()` is the third operation over `Template` and it changes
+nothing about the other two, which is the property the chapter keeps
+demonstrating on `Expr`. The whole walker is the same loop with a
+different body, because the structure already separates the two kinds
+of piece.
+
+`html.escape()` does the character replacement, so the exercise's
+real content is *where* it gets applied: to the interpolated values
+and nothing else. The `<p>` and `</p>` the author typed pass through
+untouched, which is what makes the output valid HTML rather than a
+document with its own tags escaped.
+
+The f-string on the last line is the comparison. It produces a
+`<script>` tag that a browser will run, and it does so with no way to
+intervene, because by the time any function receives that string the
+tag and the paragraph markup are the same kind of text. The template
+version never loses the distinction, so escaping is a decision the
+renderer can still make.

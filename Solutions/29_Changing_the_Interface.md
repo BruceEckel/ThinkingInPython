@@ -46,3 +46,40 @@ The lookup is a linear scan.
 If the pairs are many and the lookups frequent, convert to a real
 `dict` once (`dict(pairs)` does it) and adapt only when the object
 must keep being a list to someone else.
+
+## 2. Deprecating the class instead of the method
+
+```python
+# exercise_2.py
+import warnings
+
+@warnings.deprecated("Report is replaced by TextReport")
+class Report:
+    def render(self) -> str:
+        return "report"
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    report = Report()  # type: ignore
+    class Detailed(Report):  # type: ignore
+        pass
+print(report.render())
+#: report
+for entry in caught:
+    print(entry.category.__name__, entry.message)
+#: DeprecationWarning Report is replaced by TextReport
+#: DeprecationWarning Report is replaced by TextReport
+```
+
+Decorating the class moves the warning to the two places where a
+caller commits to the type: constructing an instance and subclassing.
+`render()` runs outside the recording block and adds nothing to
+`caught`, so code that already holds a `Report` runs without a word.
+That is the right split. The method is not what was replaced, the
+type is, and a caller who wants to act on the warning has to change
+where the object comes from, not where it is used.
+
+`ty` reports both lines, so both carry `# type: ignore`. The
+subclass warns at class-creation time, which means it fires on
+import rather than on any call, so a library that subclasses a
+deprecated class hears about it as soon as it is loaded.

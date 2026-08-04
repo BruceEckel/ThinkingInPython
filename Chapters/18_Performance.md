@@ -80,6 +80,124 @@ separates Python time from native time and profiles memory line by line.
 If you can narrow the problem down to a particular function,
 there may be techniques that speed up the algorithm used in that function.
 
+## Measuring One Function with `sys.monitoring` {#measuring-one-function-with-sys-monitoring}
+
+A profiler answers a broad question about the whole program.
+Sometimes you have a narrow one:
+how many times does this function run during a request,
+and is that branch reached at all?
+Editing the function to add a counter changes the code you are studying,
+and turning on a full profiler to answer it costs more than the answer is worth.
+
+`sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
+is the interpreter's own hook mechanism,
+the one profilers and debuggers now use.
+You claim a tool identifier, register a callback for an event,
+and say which code the event applies to.
+Registering nothing costs nothing:
+the interpreter specializes the bytecode that has no callback attached,
+so unmonitored code runs at full speed rather than paying the per-line toll that `sys.settrace()` imposes on everything:
+
+```python
+# monitoring_counts.py
+import sys
+from collections import Counter
+from types import CodeType
+from typing import Final
+
+monitoring = sys.monitoring
+TOOL: Final[int] = monitoring.PROFILER_ID
+PY_START: Final[int] = monitoring.events.PY_START
+NO_EVENTS: Final[int] = monitoring.events.NO_EVENTS
+counts: Counter[str] = Counter()
+
+def on_start(code: CodeType, offset: int) -> None:
+    counts[code.co_name] += 1
+
+def fib(n: int) -> int:
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
+
+def square(n: int) -> int:
+    return n * n
+
+monitoring.use_tool_id(TOOL, "call counter")
+monitoring.register_callback(TOOL, PY_START, on_start)
+monitoring.set_local_events(TOOL, fib.__code__, PY_START)
+print(fib(10), square(4))
+#: 55 16
+monitoring.set_local_events(TOOL, fib.__code__, NO_EVENTS)
+monitoring.free_tool_id(TOOL)
+print(counts)
+#: Counter({'fib': 177})
+```
+
+`fib()` and `square()` are untouched.
+The counting lives outside them, in `on_start()`,
+which the interpreter calls each time a monitored Python function begins.
+`set_local_events()` is the narrow instrument:
+it attaches the event to one code object,
+which is why `square()` is absent from the count even though it ran.
+Global attachment is `set_events()`, and the two differ in cost,
+because everything reached from monitored code is monitored too.
+When one function is the question,
+monitoring the whole program to answer it pays for data you discard and slows the run you are measuring.
+
+`set_local_events()` with `NO_EVENTS` detaches,
+and `free_tool_id()` releases the identifier.
+The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
+and `COVERAGE_ID` are named for their intended users,
+and claiming one another tool is holding raises a `ValueError`,
+which is how two profilers avoid silently fighting over the same hooks.
+
+For an answer you need once rather than continuously,
+the callback can turn its own event off:
+
+```python
+# monitoring_coverage.py
+import sys
+from collections import Counter
+from types import CodeType
+from typing import Final
+
+monitoring = sys.monitoring
+TOOL: Final[int] = monitoring.COVERAGE_ID
+PY_START: Final[int] = monitoring.events.PY_START
+NO_EVENTS: Final[int] = monitoring.events.NO_EVENTS
+calls: Counter[str] = Counter()
+
+def on_start(code: CodeType, offset: int) -> object:
+    calls[code.co_name] += 1
+    return monitoring.DISABLE
+
+def used(n: int) -> int:
+    return n + 1
+
+def unused(n: int) -> int:
+    return n - 1
+
+monitoring.use_tool_id(TOOL, "coverage")
+monitoring.register_callback(TOOL, PY_START, on_start)
+monitoring.set_events(TOOL, PY_START)
+print(sum(used(n) for n in range(1000)))
+#: 500500
+monitoring.set_events(TOOL, NO_EVENTS)
+monitoring.free_tool_id(TOOL)
+print(calls["used"], calls["unused"])
+#: 1 0
+```
+
+Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event *at this location*,
+permanently, until someone calls `restart_events()`.
+`used()` ran a thousand times and the callback ran once.
+That is what makes coverage measurement affordable:
+the question is "was this reached," so the second answer is worthless,
+and after the first hit the monitored code returns to full speed.
+
+The trade against a profiler is the usual one.
+A profiler gives you a ranked table with no code to write.
+`sys.monitoring` gives you one number about one function,
+which is the better tool when you already know which function you care about and the profiler's overhead would change the answer.
+
 ## Benchmark Alternatives with `timeit`
 
 A profiler tells you *where* the time goes.
@@ -1079,3 +1197,7 @@ not just where it sits on that curve:
     Confirm that an instance accepts `p.z = 3`,
     which `Point` rejects with an `AttributeError`,
     and find where the storage for it came from.
+7.  In `monitoring_counts.py`,
+    swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
+    Then get the same two counts back using two local attachments instead,
+    and explain what the two versions would stop agreeing about in a larger program.

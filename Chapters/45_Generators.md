@@ -169,6 +169,13 @@ the same three-part shape as a `Generator`, and the match is deliberate.
 Calling `interview()` returns a generator object but doesn't run anything in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
+One generator, one driver.
+That pairing is an assumption, not a guarantee,
+and a generator resumed from two threads at once raises a `ValueError` rather than interleaving.
+[Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
+shows the failure and `threading.synchronized_iterator()`,
+which serializes the conversation.
+
 A generator is more interesting than a coroutine here because `yield` is a two-way channel.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.

@@ -602,6 +602,108 @@ That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
 just as the same race between threads needs a `threading.Lock`.
 
+## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
+
+Some values are not the subject of the work, they are the circumstances of it:
+which request is being served, which user authorized it,
+which trace to log under.
+Everything deep in the call chain needs them and nothing in the middle uses them.
+Threading such a value through as a parameter puts it in signatures that have no business knowing about it,
+and every new caller has to remember to pass it along.
+
+A module-level global is the obvious shortcut and it fails as soon as anything overlaps.
+`async_race.py` showed why: whatever wrote last wins,
+and the readers resume to find a value that belongs to somebody else.
+A `ContextVar` is the same convenience without that failure.
+It holds a value per *context*,
+and every task starts with a copy of the context that created it,
+so one task's `set()` is invisible to its siblings and to its parent:
+
+```python
+# context_var.py
+import asyncio
+from contextvars import ContextVar
+
+request_id: ContextVar[str] = ContextVar("request_id", default="-")
+current = "-"  # The same idea as a plain global
+
+async def handle(name: str) -> None:
+    global current
+    current = name
+    request_id.set(name)
+    await asyncio.sleep(0)  # Stand-in for a database call
+    print(f"context {request_id.get()}, global {current}")
+
+async def main() -> None:
+    async with asyncio.TaskGroup() as group:
+        for name in ("req-1", "req-2", "req-3"):
+            group.create_task(handle(name))
+    print(f"after: context {request_id.get()}, global {current}")
+
+asyncio.run(main())
+#: context req-1, global req-3
+#: context req-2, global req-3
+#: context req-3, global req-3
+#: after: context -, global req-3
+```
+
+The two are written side by side because they behave differently for the same code.
+All three tasks assign both, then suspend at the `await`,
+then resume to read them back.
+Each task reads its own `request_id` and every task reads the same `current`,
+because by the time any of them resumes, the global holds `req-3`.
+The last line is the other half: `main()` created the tasks,
+so their contexts are copies of `main()`'s,
+and nothing they set is written back.
+`request_id` returns to its default while the global stays clobbered.
+
+Deleting the global and writing `handle(name)`'s value into a parameter would work here,
+and would keep working until the value is needed four calls down inside a logging helper.
+That is the case a `ContextVar` is for.
+
+Setting a variable for part of a call and restoring it afterward is common enough that `set()` returns a token usable as a context manager:
+
+```python
+# context_scope.py
+import asyncio
+import threading
+from contextvars import ContextVar
+
+request_id: ContextVar[str] = ContextVar("request_id", default="-")
+
+def audit(step: str) -> str:
+    main = threading.current_thread() is threading.main_thread()
+    where = "main thread" if main else "worker thread"
+    return f"[{request_id.get()}] {step} on the {where}"
+
+async def handle(name: str) -> None:
+    with request_id.set(name):
+        print(audit("start"))
+        print(await asyncio.to_thread(audit, "offloaded"))
+    print(audit("after the scope"))
+
+asyncio.run(handle("req-7"))
+#: [req-7] start on the main thread
+#: [req-7] offloaded on the worker thread
+#: [-] after the scope on the main thread
+```
+
+Leaving the `with` block calls `reset()` on the token,
+which puts back whatever the variable held before, not the default.
+That distinction matters when scopes nest.
+Before the token grew this protocol you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`,
+which is the same code the context manager now writes for you.
+
+The middle line is the reason `ContextVar` rather than `threading.local` is the modern answer.
+`threading.local` gives each *thread* its own value,
+which is the wrong unit twice over.
+Thousands of tasks share one event-loop thread, so they would share one value.
+And a value stored on a thread does not travel when work moves,
+while `asyncio.to_thread()` copies the current context into the worker,
+so the offloaded `audit()` still knows which request it belongs to.
+`contextvars.copy_context()` is the general form,
+letting you capture a context and run something else inside it later.
+
 ## Parallelism
 
 A CPU-bound task cannot overlap if only a single core is available.
@@ -1229,6 +1331,172 @@ As `blocking_the_loop.py` showed,
 a blocked thread freezes every task on an event loop,
 while a suspended task lets the rest keep running.
 Match the queue to the concurrency model.
+
+## Sharing an Iterator Between Threads {#sharing-an-iterator-between-threads}
+
+A queue is the push half of distributing work:
+a producer decides what each consumer gets.
+The pull half looks simpler.
+Hand every worker the same iterator and let each one take the next item when it is ready.
+Nothing in the language stops you, and nothing in the language makes it work.
+An iterator has never been thread-safe:
+
+```python
+# shared_iterator.py
+import threading
+import time
+from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
+from typing import Final
+
+LIMIT: Final[int] = 200
+
+class Tickets:
+    "Hands out each number once: read, pause, write back."
+    def __init__(self, limit: int) -> None:
+        self.limit = limit
+        self.next_number = 0
+
+    def __iter__(self) -> Iterator[int]:
+        return self
+
+    def __next__(self) -> int:
+        if self.next_number >= self.limit:
+            raise StopIteration
+        current = self.next_number
+        time.sleep(0.000_001)  # Let other threads run
+        self.next_number = current + 1
+        return current
+
+def report(label: str, source: Iterator[int]) -> None:
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(list, source) for _ in range(8)]
+        taken = [n for f in futures for n in f.result()]
+    print(f"{label}: {len(set(taken))} distinct, "
+          f"duplicates {len(taken) > len(set(taken))}")
+
+report("shared", Tickets(LIMIT))
+#: shared: 200 distinct, duplicates True
+report("serialized",
+       threading.serialize_iterator(Tickets(LIMIT)))
+#: serialized: 200 distinct, duplicates False
+```
+
+`Tickets.__next__()` is `gil_race.py` wearing a different hat.
+Read the counter, do something that releases the GIL, write the counter back.
+Eight threads read the same number and eight threads are handed it,
+so a ticket meant to go to one worker goes to several.
+The count of distinct values is still 200, which is what makes this dangerous:
+nothing is missing, so nothing looks wrong until you notice the same work was done eight times.
+
+`threading.serialize_iterator()` wraps an iterator so that `__next__()` runs under a lock,
+one thread at a time.
+The wrapped object is an iterator like any other,
+and the workers need no changes.
+If the iterator also defines `send()`, `throw()`, or `close()`,
+those are serialized too.
+
+A generator fails differently, and louder:
+
+```python
+# shared_generator.py
+import threading
+import time
+from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
+from typing import Final
+
+LIMIT: Final[int] = 200
+
+def numbers(limit: int) -> Iterator[int]:
+    for n in range(limit):
+        time.sleep(0.000_001)  # Let other threads run
+        yield n
+
+guarded = threading.synchronized_iterator(numbers)
+
+def outcome(source: Iterator[int]) -> str:
+    def take(_: int) -> int | None:
+        try:
+            return len(list(source))
+        except ValueError:
+            return None
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(take, range(8)))
+    taken = sum(r for r in results if r is not None)
+    failed = sum(r is None for r in results)
+    return f"{taken} taken, any thread failed: {failed > 0}"
+
+print("plain:      ", outcome(numbers(LIMIT)))
+#: plain:       200 taken, any thread failed: True
+print("synchronized:", outcome(guarded(LIMIT)))
+#: synchronized: 200 taken, any thread failed: False
+```
+
+A generator refuses to be resumed while it is already running,
+so the second thread through gets `ValueError: generator already executing`.
+A typical run loses seven of the eight workers to it while the first drains the whole sequence.
+That is better than silent duplication,
+but only in the way a crash is better than corruption.
+
+`threading.synchronized_iterator()` takes the generator *function*,
+not a generator, and returns a function whose generators are each serialized.
+It also works as a decorator on the `def`,
+which is the right form when no caller of that generator function should have to remember.
+The pairing is worth keeping straight:
+`serialize_iterator()` wraps one iterator you already have,
+and `synchronized_iterator()` wraps the callable that makes them.
+
+Serializing solves the case where the workers divide one stream.
+When each worker needs the whole stream, that is a different problem,
+and `itertools.tee()` is not the answer,
+because tee'd iterators share an internal buffer with no locking.
+`threading.concurrent_tee()` is:
+
+```python
+# concurrent_tee.py
+import threading
+import time
+from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
+from typing import Final
+
+READERS: Final[int] = 4
+
+def numbers(limit: int) -> Iterator[int]:
+    for n in range(limit):
+        time.sleep(0.000_001)  # Let other threads run
+        yield n
+
+streams = threading.concurrent_tee(numbers(100), READERS)
+with ThreadPoolExecutor(max_workers=READERS) as pool:
+    print(list(pool.map(sum, streams)))
+#: [4950, 4950, 4950, 4950]
+```
+
+Each of the four threads sees all one hundred values,
+and the underlying generator is advanced once per value, not four times.
+One caution carries over:
+a `concurrent_tee()` iterator is safe to hand to *one* thread,
+which is the point of making four of them.
+Sharing a single one across several threads needs `serialize_iterator()` on top.
+
+These three arrived in 3.15.
+Before that, the advice was to write the lock wrapper yourself,
+which is easy to get subtly wrong.
+The tempting fix is a lock inside the loop:
+
+```
+for item in shared:       # next() runs here, unguarded
+    with lock:
+        process(item)
+```
+
+That guards the work and leaves the race untouched,
+because `next()` is called by the `for` statement,
+outside the block the lock protects.
+Serializing an iterator means putting the lock inside `__next__()`,
+which is where these three wrappers put it.
 
 ## One Task, Many Backends
 

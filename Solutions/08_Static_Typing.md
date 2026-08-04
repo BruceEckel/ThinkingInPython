@@ -133,3 +133,36 @@ starts method lookup from the actual (most derived) class. If
 `bump()` is declared to return the fixed type `Tally` instead of
 `Self`, the checker rejects `.report()` on the chained result,
 since plain `Tally` has no `report()` method.
+
+## 5. What a missing type parameter default costs
+
+```python
+# exercise_5.py
+from typing import reveal_type
+
+class Stack[T = str]:
+    def __init__(self) -> None:
+        self.items: list[T] = []
+
+    def push(self, item: T) -> None:
+        self.items.append(item)
+
+    def top(self) -> T:
+        return self.items[-1]
+
+words: Stack = Stack()
+words.push("beta")
+reveal_type(words.top())  # ty: str
+print(words.top().upper())
+#: BETA
+```
+
+With `= str` in place, `ty check` reports `str` for
+`reveal_type(words.top())`. Remove the default and it reports
+`Unknown`, and `ty` still finds no errors in the file. That is the
+lesson: an unsolved type parameter does not fail the check, it
+switches the check off for every expression downstream of it.
+`words.top().upper()` passes either way, and so would
+`words.top().no_such_method()`. A default converts a silently
+unchecked annotation into a checked one, which is why it earns its
+place on a class whose parameter has one common answer.

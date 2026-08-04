@@ -199,6 +199,13 @@ That is the memory a list would use, which the comparison confirms
 Use `tee` when two consumers advance together,
 not when one finishes before the other starts.
 
+`tee` is also single-threaded.
+Its branches share one buffer with no lock,
+so handing them to separate threads corrupts it.
+[Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
+covers `threading.concurrent_tee()`, the thread-safe version,
+along with what goes wrong when two threads call `next()` on the same iterator.
+
 These tests collect each iterator into a list and compare them,
 covering the sequences and their empty edge cases.
 This confirms that a custom iterable can be re-iterated,

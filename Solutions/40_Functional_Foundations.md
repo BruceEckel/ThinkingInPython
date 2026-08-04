@@ -97,3 +97,34 @@ first, which computes `(3 + 1) * 2 = 8`, then feeds that `8` into
 `square`, giving `8 * 8 = 64`. `compose()` did not need to change at
 all to support a third stage; wrapping one composed function inside
 another `compose()` call is enough to extend the pipeline.
+
+## 5. Fixing a leading argument, and why the trailing one differs
+
+```python
+from functools import partial
+
+def clamp(low: int, value: int, high: int, /) -> int:
+    return max(low, min(value, high))
+
+at_least_ten = partial(clamp, 10)
+print(at_least_ten(3, 100), at_least_ten(50, 100))
+#: 10 50
+try:
+    partial(clamp, high=100)(0, 5)
+except TypeError as e:
+    print(f"{type(e).__name__}: {e}")
+#: TypeError: clamp() got some positional-only arguments passed as keyword arguments: 'high'
+```
+
+`at_least_ten` needs no `Placeholder`. `low` is the first parameter,
+and `partial()` already fills positional arguments from the left, so
+the two remaining parameters stay open in order.
+
+Fixing `high` alone is the case that has no answer without a
+`Placeholder`. `partial(clamp, high=100)` is accepted when you build
+it, since `partial()` does not inspect the signature, and fails only
+when you call it: `high` is positional-only, so it cannot arrive by
+name. Passing it positionally means passing `low` and `value` first,
+which is the opposite of leaving them to the caller.
+`partial(clamp, Placeholder, Placeholder, 100)` is the version that
+works, and it is what `Placeholder` exists for.

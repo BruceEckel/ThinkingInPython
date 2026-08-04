@@ -485,6 +485,73 @@ Realistic expressions never approach it.
 A machine-generated chain of thousands of nested nodes does,
 and the escape is an iterative walk driving an explicit stack of pending nodes.
 
+## A Template Is a Tree {#a-template-is-a-tree}
+
+Python has a composite of its own with no walker supplied,
+which is an invitation to write one.
+A `t`-string, introduced in [Tour](02_Tour.md#t-strings),
+evaluates to a `Template`: a sequence of two node kinds,
+the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
+The grammar is flat rather than nested,
+so the walk is a loop instead of a recursion,
+but everything else about it is this chapter's shape.
+The structure is data, and what it means is whatever a function decides:
+
+```python
+# template_query.py
+from string.templatelib import Interpolation, Template
+
+def to_query(template: Template) -> tuple[str, list[object]]:
+    sql: list[str] = []
+    values: list[object] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            sql.append("?")
+            values.append(piece.value)
+        else:
+            sql.append(piece)
+    return "".join(sql), values
+
+def to_shape(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            parts.append(f"<{piece.expression}>")
+        else:
+            parts.append(piece)
+    return "".join(parts)
+
+name = "Alice'; DROP TABLE users; --"
+minimum = 18
+query = t"SELECT name FROM users WHERE name={name} AND age>{minimum}"
+sql, values = to_query(query)
+print(sql)
+#: SELECT name FROM users WHERE name=? AND age>?
+print(values)
+#: ["Alice'; DROP TABLE users; --", 18]
+print(to_shape(query))
+#: SELECT name FROM users WHERE name=<name> AND age><minimum>
+```
+
+`to_query()` and `to_shape()` are the same relationship as `evaluate()` and `to_infix()`:
+two operations over one structure, neither of them known to the structure,
+and adding a third costs nothing that already exists.
+
+The first one earns its place.
+`name` holds an injection attempt,
+and it comes out as a value in the parameter list rather than as text in the query.
+The reason is structural rather than clever:
+`to_query()` receives the literal pieces and the values as separate things,
+so it never has the option of confusing them.
+Written as an f-string,
+the same line would arrive as one finished `str` with the attack already spliced in,
+and the only remaining defense would be inspecting the result to guess which characters the program wrote and which a user did.
+
+That is the general argument for handing a consumer the structure instead of the answer.
+A finished string has thrown away the distinction that the safety decision depends on.
+The Interpreter pattern is usually presented as a way to add operations to a language;
+here it is a way to keep a decision available to whoever is qualified to make it.
+
 ## Exercises
 
 1.  Add `find(entry, name)` to `filesystem.py`:
@@ -510,3 +577,7 @@ and the escape is an iterative walk driving an explicit stack of pending nodes.
     Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
     ([Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) shows the idiom),
     and confirm `"a" + x` now raises `TypeError`.
+7.  Write a third walker over `Template` in `template_query.py`, `to_html()`,
+    that emits the literal pieces unchanged and replaces `<`, `>`,
+    and `&` in every interpolated value with their HTML entities.
+    Show that `t"<p>{comment}</p>"` survives a `comment` containing a `<script>` tag.

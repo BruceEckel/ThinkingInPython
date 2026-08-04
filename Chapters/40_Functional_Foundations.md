@@ -415,6 +415,44 @@ and it binds their values when you build it.
 This avoids the late-binding surprise a lambda created in a loop can produce,
 demonstrated in [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py`.
 
+### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
+
+Binding `exponent` above worked because `power()` accepts it by keyword.
+Positional arguments have no such freedom: `partial()` fills them from the left,
+so fixing the third argument used to mean fixing the first two.
+A function whose parameters are positional-only
+(see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters))
+had no way out at all.
+`functools.Placeholder` is a marker that reserves a position for the caller:
+
+```python
+# placeholder.py
+from functools import Placeholder, partial
+
+def clamp(low: int, value: int, high: int, /) -> int:
+    return max(low, min(value, high))
+
+percent = partial(clamp, 0, Placeholder, 100)  # type: ignore
+print(percent(150), percent(-5), percent(42))  # type: ignore
+#: 100 0 42
+print(percent.args)
+#: (0, Placeholder, 100)
+```
+
+`percent` fixes the bounds and leaves the middle argument open,
+which is the specialization a caller wants and the one `partial()` could not previously express.
+A `Placeholder` is not a default.
+The caller must supply it:
+calling `percent()` with no argument raises a `TypeError`.
+Trailing placeholders are a syntax the library rejects for the same reason,
+since a gap at the end is just an unbound parameter.
+
+The `# type: ignore` comments mark a checker limitation rather than a code problem.
+`ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
+so the marker looks like an `int` in the wrong place and the resulting callable looks like it takes nothing.
+The runtime behaves correctly;
+the annotations for this feature have not caught up.
+
 ## Composing Functions
 
 *Function composition* builds a new function by feeding one function's output straight into the next.
@@ -470,3 +508,6 @@ The standard library ships these building blocks ready-made;
 4.  In `composing.py`, write a third small function, `square(n)`,
     and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
+5.  In `placeholder.py`, build a second partial, `at_least_ten`,
+    that fixes only `low` to 10 and leaves both other arguments to the caller.
+    Then try to fix only `high` without a `Placeholder` and explain why it cannot be done.
