@@ -75,7 +75,7 @@ LANG = "en-US"
 SVG_PNG_WIDTH = 1600
 SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
 # Code-listing font size, relative to the surrounding prose.
-CODE_FONT_SCALE = 0.7
+CODE_FONT_SCALE = 0.75
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
