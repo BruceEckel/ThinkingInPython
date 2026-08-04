@@ -21,7 +21,6 @@ The rest of the chapter applies the machinery:
 
 ## Abilities Are Not Special
 
-`Need` is an ordinary class and you can write your own.
 An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
 
@@ -51,11 +50,11 @@ def greet() -> Depend[Ask | Tell, None]:
 
 messages: list[str] = []
 
-def scripted(request: Ask) -> str:
-    return "Alice"
-
 def capture(request: Tell) -> None:
     messages.append(request.message)
+
+def scripted(request: Ask) -> str:
+    return "Alice"
 
 half = handle(capture)(greet)
 full = handle(scripted)(half)
@@ -65,9 +64,10 @@ print(messages)
 ```
 
 Inside `ask()`, the operand of `yield from` is not a generator but the ability object.
-`yield from` accepts any iterable, and `Ability` supplies the iteration.
-Its `__iter__` is a one-request generator; stripped of error handling,
-the entire method is:
+`yield from` calls `iter()` on its operand,
+and `Ability.__iter__` is a generator function,
+so the delegation target is an ordinary generator after all.
+Stripped of error handling, that method is:
 
 ```python
 def __iter__(self: Self) -> Generator[Self, T, T]:
@@ -75,8 +75,10 @@ def __iter__(self: Self) -> Generator[Self, T, T]:
     return v
 ```
 
-The ability yields itself out to the handler,
-and the value of the `yield from` is whatever the handler sends back.
+It yields once, so the handler receives one request.
+The `yield from` then evaluates to that generator's return value,
+the rule from [The Return Channel](45_Generators.md#the-return-channel),
+and here that value is whatever the handler sent back.
 The ability produces nothing on its own.
 `prompt` is payload on the request, there for the handler to read,
 so the answer to an `Ask` is whatever `scripted()` returns.

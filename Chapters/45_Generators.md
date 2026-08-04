@@ -309,6 +309,11 @@ and returns the `int` total it accumulates while iterating.
 The return channel is how a generator reports to whichever generator delegated to it,
 so `report()` learns something `emit()` computed while neither of them knows who is driving.
 
+Any iterable can follow `yield from`,
+but only a generator can answer with a value.
+A list has no return channel,
+so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
+
 ### The Send Channel
 
 The `SendType` is the type of the information a caller sends back into the generator.

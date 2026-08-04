@@ -266,6 +266,65 @@ exceptions(1, 1)
 The optional `else` runs when the `try` block raised no exception.
 The optional `finally` always runs, which makes it the place for cleanup.
 
+An exception raised while handling another one arrives with the first attached.
+Python reports both, and `from` decides how they are joined:
+
+| Form | What Python prints above the new exception |
+|---|---|
+| `raise X` | During handling of the above exception, another exception occurred: |
+| `raise X from e` | The above exception was the direct cause of the following exception: |
+| `raise X from None` | Nothing: only `X` appears |
+
+All three raise the same exception and differ only in that report:
+
+```python
+# exception_chaining.py
+
+class BadNumber(Exception):
+    pass
+
+def implicit(text):
+    try:
+        return int(text)
+    except ValueError:
+        raise BadNumber(text)
+
+def explicit(text):
+    try:
+        return int(text)
+    except ValueError as e:
+        raise BadNumber(text) from e
+
+def suppressed(text):
+    try:
+        return int(text)
+    except ValueError:
+        raise BadNumber(text) from None
+
+def earlier(e):
+    if e.__cause__ is not None:
+        return f"direct cause: {type(e.__cause__).__name__}"
+    if e.__context__ is not None and not e.__suppress_context__:
+        return f"during handling: {type(e.__context__).__name__}"
+    return "nothing earlier shown"
+
+for parse in (implicit, explicit, suppressed):
+    try:
+        parse("seven")
+    except BadNumber as e:
+        print(f"{parse.__name__}: {earlier(e)}")
+#: implicit: during handling: ValueError
+#: explicit: direct cause: ValueError
+#: suppressed: nothing earlier shown
+```
+
+`earlier()` states the rule Python follows.
+It shows the cause when `from` set one.
+Otherwise it shows the context, which Python records without being asked,
+unless `from None` marked that context hidden.
+Use `from e` when the earlier exception explains this one,
+and `from None` when it would only distract from your own message.
+
 Python's culture leans on "easier to ask forgiveness than permission."
 Try the operation and handle the exception,
 rather than checking every precondition first.

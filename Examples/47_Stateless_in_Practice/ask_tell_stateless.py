@@ -23,11 +23,11 @@ def greet() -> Depend[Ask | Tell, None]:
 
 messages: list[str] = []
 
-def scripted(request: Ask) -> str:
-    return "Alice"
-
 def capture(request: Tell) -> None:
     messages.append(request.message)
+
+def scripted(request: Ask) -> str:
+    return "Alice"
 
 half = handle(capture)(greet)
 full = handle(scripted)(half)
