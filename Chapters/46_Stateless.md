@@ -1009,11 +1009,11 @@ Both read `(str) -> None`, and both hide a `Console`.
 
 DI met its goal, because the `Console` is swappable.
 It *relocates* a side cause rather than declaring one.
-The dependency became swappable without becoming visible.
+The dependency is swappable but remains un-validated by the type checker.
 
 An EMS like Stateless sets a higher bar.
-The dependency must appear in the signature,
-which is why its `greet()` returns `Depend[Need[Console], None]` and this one returns `None`.
+The dependency must appear in the signature, to be type-checked,
+which is why the EMS version of `greet()` returns `Depend[Need[Console], None]` and the `greet()` in `dependency_injection.py` returns `None`.
 The foundation of EMS is tracking all dependencies.
 The goal is to catch errors during type checking,
 not reliance on programmer memory and exhaustive testing.
