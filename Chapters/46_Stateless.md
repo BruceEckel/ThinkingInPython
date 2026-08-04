@@ -39,7 +39,7 @@ Effect[A, E, R]
 Those three parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
 asked of an Effect signature:
 
-- `A` is what the computation needs, an ability.
+- `A` is what the computation needs, an *ability*.
 - `E` is how it can fail.
 - `R` is what it produces.
 
@@ -114,6 +114,9 @@ similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-descr
 Nothing computes until `run()` is called, and a program calls `run()` only once,
 at its outermost edge.
 
+The two names differ only in case:
+`success()` is a function that builds an Effect,
+and `Success` is the alias from the table, the type of that Effect.
 `Success[int]` says `double()` is pure.
 It cannot read anything, and it cannot fail.
 
@@ -269,7 +272,7 @@ except StopIteration:
 ```
 
 `need(Console)` builds a `Need[Console]`,
-a frozen dataclass whose `t` field holds the requested class,
+a frozen data class whose `t` field holds the requested class,
 and `yield from` hands it out of the function body.
 `next()` runs `greet()` up to that request and produces it.
 Nothing has printed at that point,
@@ -350,7 +353,7 @@ That `Success` is a consequence, not a requirement.
 What `run()` refuses is an unanswered ability.
 It accepts an Effect that can still fail,
 and raises the failure as an ordinary exception
-([The Error Channel](46_Stateless.md#the-error-channel)).
+([The Error Channel](#the-error-channel)).
 Binding an implementation and satisfying the type checker are the same act.
 
 ## An Effect Runs Once
@@ -767,7 +770,7 @@ and runtime.
 First, the static issue.
 `supply()` reads the ability from the declared type of its argument,
 so handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
-a different ability from the `Need[Console]` that `greet()` asks for.
+a different ability from the `Need[Console]` that `greet()` requests.
 `as_type(Console)(recorder)` converts the argument's static type into `Console`,
 so `supply()` builds the handler type `greet()` needs.
 
@@ -794,7 +797,7 @@ and the inheritance satisfies the runtime check.
 
 The inheritance has a cost.
 `Recorder` inherits `Console`'s printing implementation and overrides all of it,
-so nothing of the parent survives except the name that `isinstance()` looks for.
+so nothing of the parent survives except the name that `isinstance()` matches.
 But anything later added to `Console` shows up in `Recorder`.
 If you add a `read_line()` method to `Console`,
 `Recorder` inherits the real one without warning,
@@ -979,7 +982,7 @@ so `register(Console, Recorder())` binds an implementation to the type the calle
 In Stateless, `supply()` takes the instances, without keys,
 and matches a request using `isinstance()`,
 which is why two instances that satisfy one `Need` are ambiguous
-([When Two Implementations Match](46_Stateless.md#when-two-implementations-match)).
+([When Two Implementations Match](#when-two-implementations-match)).
 The DI registration key also does the work `as_type(Console)` does for `supply()`,
 which reads each ability from its argument's static type:
 `supply(recorder)` is a `Handler[Need[Recorder]]`,
@@ -1001,14 +1004,14 @@ The two `greet()` calls are identical.
 No type information indicates whether a `Console` has been registered.
 The type checker cannot tell us that something has gone wrong.
 
-Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](46_Stateless.md#declaring-a-dependency).
+Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
 
 DI met its goal, because the `Console` is swappable.
 It *relocates* a side cause rather than declaring one.
 The dependency became swappable without becoming visible.
 
-EMS's like Stateless sets a higher bar.
+An EMS like Stateless sets a higher bar.
 The dependency must appear in the signature,
 which is why its `greet()` returns `Depend[Need[Console], None]` and this one returns `None`.
 The foundation of EMS is tracking all dependencies.
@@ -1024,13 +1027,13 @@ This produces three consequences:
    This can be at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
    `ty` reports the unsupplied `Need[Console]` before the program runs
-   ([Forgetting to Supply](46_Stateless.md#forgetting-to-supply)).
+   ([Forgetting to Supply](#forgetting-to-supply)).
 
 2. Stateless bindings are per call rather than per process.
    DI usually holds one type binding for the life of the program.
    `supply()` binds for one execution of one Effect,
    so two bindings for the same type can be live at once,
-   as the screen and memory `Console`s were in [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
+   as the screen and memory `Console`s were in [When Two Implementations Match](#when-two-implementations-match).
    No reset is needed between test cases.
 
    Handlers also layer.
@@ -1049,7 +1052,7 @@ This produces three consequences:
 
 The requirement that callers inherit is also the cost.
 Adding a dependency to a function that already works rewrites the return type of every function above it,
-which [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
+which [Retrofitting an Effect](#retrofitting-an-effect)
 demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
@@ -1058,7 +1061,7 @@ The trade is not about correctness, but churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint that was made against Java's checked exceptions,
-and it is the reason [Effects Propagate, and the Checker Verifies It](46_Stateless.md#effects-propagate-and-the-checker-verifies-it)
+and it is the reason [Effects Propagate, and the Checker Verifies It](#effects-propagate-and-the-checker-verifies-it)
 compares the spread to `async`.
 
 ### A Default Binding
@@ -1409,13 +1412,17 @@ The error channel records those failures that can occur,
 without forcing you to handle them.
 `run()` turns any that reach it back into normal Python exceptions.
 
+The channel carries only the failures `@throws` lifted into it.
+An exception raised where no `@throws` wraps the body bypasses the type,
+a hole the next chapter examines in [Nothing stops an undeclared Effect](47_Stateless_in_Practice.md#nothing-stops-an-undeclared-effect).
+
 ## Turning an Error Into a Value
 
 `catch()` empties the error channel the way `supply()` empties the ability channel,
 but the two do different things with what they remove.
 `supply()` provides the ability inside the Effect,
 so the ability parameter becomes `Never` and the result type doesn't mention the `Console`
-([Supplying the Dependency](46_Stateless.md#supplying-the-dependency)).
+([Supplying the Dependency](#supplying-the-dependency)).
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out as a value in the result:
 
@@ -1572,10 +1579,11 @@ def test_one_unhandled() -> None:
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moved to the result and the uncaught one remains.
-`one_unhandled()` never handles `ValueError` so that must be declared.
+`one_unhandled()` does not handle `ValueError`,
+so that failure must be declared.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
-the same escape `error_escapes.py` showed for a single error.
+like `error_escapes.py` did for a single error.
 `pytest.raises(ValueError)` is the whole assertion:
 the failure the signature declares is the one the caller sees.
 Failures cannot be lost, only relocated.
@@ -1605,14 +1613,14 @@ The channels do not resolve in the same way:
 - `error_escapes.py` showed `run()` accepting an Effect that still declares a failure,
   then raising that failure at the edge.
 
-The difference is not an inconsistency.
+That difference is not an inconsistency.
 An unbound dependency has no answer anywhere in the program,
 so a driver encountering one can do nothing but stop.
 An unhandled failure has a clear meaning at the boundary: raise the exception,
 which Python does without the Effect type.
 The two guarantees are therefore different.
 A dependency must be resolved before anything runs.
-A failure must be declared, and you choose where to handle it.
+A declared failure travels in the type until you choose where to handle it.
 Both are checked, and neither can be dropped by forgetting it.
 
 ## Exercises

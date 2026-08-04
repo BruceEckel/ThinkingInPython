@@ -156,5 +156,5 @@ The first serious edit pass.
 | 43_Functional_Assurance.md      | |
 | 44_Effect_Management.md         | |
 | 45_Generators.md                | |
-| 46_Stateless.md                 | |
+| 46_Stateless.md                 |X|
 | 47_Stateless_in_Practice.md     | |
