@@ -966,18 +966,19 @@ greet("Alice")
 #: Hello, Alice!
 ```
 
-`register()` puts an instance in, and `get()` looks one up by type,
+`register()` puts an instance in, and `get()` looks up an instance by type,
 at the point where the program needs it.
 The type is the registration key,
-so `register(Console, Recorder())` binds an implementation to the type its callers request.
-In Stateless, `supply()` takes the instances alone and pairs them by `isinstance()`,
+so `register(Console, Recorder())` binds an implementation to the type the caller requests.
+In Stateless, `supply()` takes the instances, without keys,
+and matches a request using `isinstance()`,
 which is why two instances that satisfy one `Need` are ambiguous
 ([When Two Implementations Match](46_Stateless.md#when-two-implementations-match)).
-That registration key also does the work `as_type(Console)` does for `supply()`,
+The DI registration key also does the work `as_type(Console)` does for `supply()`,
 which reads each ability from its argument's static type:
 `supply(recorder)` is a `Handler[Need[Recorder]]`,
 and no `Need[Console]` matches it
-([Swapping the Implementation](46_Stateless.md#swapping-the-implementation)).
+([Supplying an Interface](#supplying-an-interface)).
 
 The `Any` in `DI_CONTAINER` is unavoidable,
 because it holds instances of unrelated types.
@@ -989,15 +990,15 @@ That invariant lives in `register()`'s signature rather than in the container.
 apart from `console: Console = get(Console)` in place of `console = yield from need(Console)`.
 
 The first call to `greet("Alice")` fails at runtime because nothing has been registered.
-The second call succeeds because the binding now exists.
-The two calls are identical,
-and nothing in their types records whether a `Console` has been registered,
-so `ty` accepts the file.
+The second call succeeds because now the binding exists.
+The two `greet()` calls are identical.
+No type information indicates whether a `Console` has been registered.
+The type checker cannot tell us that something has gone wrong.
 
 Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](46_Stateless.md#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
 DI relocates a side cause instead of declaring it,
-so the dependency becomes swappable without becoming visible.
+so the dependency is swappable without becoming visible.
 
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
@@ -1026,8 +1027,8 @@ This produces three consequences:
    DI has one flat registry and no equivalent layering.
 
 3. Stateless function requirements are expressed in the function type.
-   DI leaves that information in the bodies that ask for it,
-   so learning what a function needs means reading its implementation.
+   DI leaves that information in the bodies that ask for it.
+   You must read the implementation to learn what a DI function needs.
    `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
    and a caller that does not supply them inherits the requirement.
 
@@ -1037,8 +1038,8 @@ which [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
-The checker is the better place to meet an omission,
-so the trade is not about correctness, but churn and coupling.
+Type checking is where you want to discover errors.
+The trade is not about correctness, but churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint that was made against Java's checked exceptions,
@@ -1048,7 +1049,7 @@ compares the spread to `async`.
 ## Where `run()` Can Be Called
 
 The error message in `unsupplied.py` said `run()` handles `Async` on its own.
-It can do that because its entire body is `return asyncio.run(run_async(effect))`.
+`run()` can do that because its entire body is `return asyncio.run(run_async(effect))`.
 That has a consequence worth knowing before you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so `run()` cannot be called from any `async def`:
@@ -1074,7 +1075,7 @@ asyncio.run(main())
 ```
 
 This also prints a `RuntimeWarning` to standard error,
-so it does not appear in the output above, which shows standard output only.
+so it does not appear in the above output, which shows standard output only.
 `run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
 which raises a `RuntimeError` because a loop is already running,
 leaving that coroutine un-awaited.
@@ -1091,12 +1092,12 @@ which makes it one of the few mistakes in this chapter the type checker will not
 
 ## Waiting on a Coroutine
 
-`Async` has appeared as something `run()` handles on its own.
+`run()` handles `Async` on its own.
 `wait()` is what puts it into a type.
 `yield from wait()` accepts any awaitable and produces the value that awaitable produces:
 
 ```python
-# await_coroutine.py
+# stateless_coroutine.py
 import asyncio
 from stateless import Async, Depend, run, wait
 
