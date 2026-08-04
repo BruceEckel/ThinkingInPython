@@ -83,6 +83,8 @@ print(b)
 #: Settings(data={'theme': 'dark'})
 ```
 
+### Nothing Keeps the Class Private
+
 You can't prevent a caller from writing `Settings()` and getting a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
 which is the extent that Python offers.
@@ -123,6 +125,8 @@ makes the same case about hidden data,
 where a getter hands back a reference to the internals it was meant to protect.
 It also turns out that the reachable class is useful when a test needs a fresh,
 uncached `Settings`.
+
+### Tests, Threads, and Locks
 
 Three implementation notes:
 

@@ -141,6 +141,8 @@ and `scripted` returned `"Alice"` no matter how many times `greet()` requested a
 A handler is an ordinary function, so it can answer differently at each request.
 That makes an unpredictable source testable.
 
+### A Coin Toss
+
 A coin toss is a side cause: the program reads something from outside,
 and the reading does not repeat.
 If you turn it into an ability, the reading moves into a handler:
@@ -205,6 +207,8 @@ The scripted handler holds state.
 which one supplied instance cannot do.
 Every scripted test double has this shape: a queue handing out canned responses,
 a network stub that fails twice and then succeeds, or the clock below.
+
+### A Clock
 
 A clock is the other side cause every test trips over.
 `stamp()` puts the current time into its output,
@@ -1246,6 +1250,8 @@ because `Effect[A, E, R]` tracks what a function needs and how it fails,
 not whether running it twice means the same as running it once.
 That judgment stays with you.
 
+### Why `retry()` Decorates the Function
+
 Notice that `retry()` decorates the *function*, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 and the reason is the substrate.
@@ -1276,6 +1282,8 @@ The one-shot behavior belongs to any Effect that contains a `yield`,
 which is any Effect that does work.
 Where ZIO attaches `retryN` to an Effect value it can replay,
 Stateless attaches it one level up.
+
+### What Retry Costs the Signature
 
 Now read what the decoration did to the type.
 `save_user()` was `(str) -> Effect[Need[Database], Crashed, str]`.
@@ -1311,6 +1319,8 @@ and after `retry()` that is `RetryError[Crashed]`, not `Crashed`.
 
 One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
 so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
+
+### `repeat()` and `memoize()`
 
 `repeat()` is the sibling that runs an Effect on a schedule and collects every result:
 

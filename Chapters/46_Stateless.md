@@ -1312,7 +1312,7 @@ if __name__ == "__main__":
 ```
 
 `score()` looks like an ordinary function that raises a `KeyError`,
-but the decorator changes its type.
+but `@throws` changes its type.
 `ty check scores.py` reports what it became:
 
 ```text
@@ -1328,8 +1328,7 @@ This is `Try[KeyError, int]` with [the alias](#the-effect-type) expanded:
 it needs nothing, can fail with a `KeyError`, and produces an `int`.
 The `Generator`'s first parameter carries `A | E`
 ([The Effect Definition](#the-effect-definition)).
-`Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`,
-and the error appears there alone.
+`Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
 This carries the same idea as the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
 though the two are not the same construct.
@@ -1337,16 +1336,16 @@ A `Result` is a wrapper the function returns at once,
 and the caller matches on it.
 A `Try` is a description that runs nothing until it is driven,
 and its failure arrives as a yielded value rather than a returned one.
-A `Result`-shaped value appears in Stateless only after its own `catch()`
+A `Result`-shaped value appears in Stateless only after `stateless.catch()`
 ([Turning an Error Into a Value](#turning-an-error-into-a-value)),
 and even then it is the bare union `int | KeyError` rather than a wrapper object.
 For `Result`, you rewrite the body to return an `Ok` or an `Err`.
 With Stateless, you leave the body alone and lift the exception into the signature.
 
-### The Failure Travels as a Value
+### A Failure Travels as a Value
 
-Calling `score()` runs nothing.
-If you advance the Effect one step with `next()`,
+Calling `score()` runs nothing, it only returns an `Effect`.
+If you advance the `Effect` one step with `next()`,
 the `KeyError` arrives as a value, not as a raised exception:
 
 ```python
@@ -1364,7 +1363,7 @@ so the wrapper catches the `KeyError` and yields the exception object over the s
 That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter:
 requests and failures are both values a description yields to its driver.
 
-### Errors Propagate Too
+### Errors Propagate
 
 Errors propagate through the `Effect` type, just like abilities:
 

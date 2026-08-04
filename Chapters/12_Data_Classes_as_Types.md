@@ -983,6 +983,8 @@ not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes `__hash__` from these reports
 (`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
 
+### `A`: Annotations Only
+
 `A` is the plain case, with no defaults and no constructor,
 but with field declarations that look like class variables:
 
@@ -1018,6 +1020,8 @@ but nothing is actually stored anywhere until assigned in code.
 That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
 on the class or on the instance.
 
+### `B`: Class-Level Defaults
+
 `B` adds default values to `x` and `s`,
 which turn them from bare annotations into class variables,
 because the assignments allocate storage for those class variables:
@@ -1044,6 +1048,8 @@ print(B.__annotations__)
 `show(B())` indicates that both are class variables by tagging them as `[CV]`.
 `B` has no `__init__()` to copy them onto each instance,
 so every `B` object reads the same two values straight from the class attributes.
+
+### `C`: The Same Annotations, Decorated
 
 `C` is `A` decorated with `@dataclass`:
 
@@ -1089,6 +1095,8 @@ The promise is only fulfilled per instance,
 when the generated `__init__()` actually runs.
 That is the difference from `A`: not that `@dataclass` changes the annotations,
 but that it builds something to act on them.
+
+### `D`: A Real `ClassVar`
 
 `D` adds a real `ClassVar` alongside an ordinary field:
 

@@ -493,6 +493,8 @@ def item_factory(symbol: str) -> Item:
     return Teleport(symbol)  # Anything else is a teleport target
 ```
 
+### Rooms, Robots, and the Item Factory
+
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
 so `from world import Room` here is circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
@@ -569,6 +571,8 @@ class Doors:
 # Created once both classes exist; its own doors stay unset
 EDGE: Final[Room] = Room(Edge())
 ```
+
+### Building the Maze in Stages
 
 `GameBuilder` assembles the maze in three stages: a room for every character,
 then the connections between rooms, then the teleport pairs.
@@ -737,6 +741,8 @@ One iterator, referenced twice, is the whole trick.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
 
+### Testing the Walk
+
 The maze rendering, `show_maze()`, returns a string,
 so the model's correctness is something a test can pin down with no window in sight.
 Build the maze, run the solution,
@@ -874,6 +880,8 @@ When a grain lands on a still line, nothing kicks it away again.
 Within seconds the random motion sweeps the sand into sharp, symmetric curves.
 Bowing a different spot rings the plate in a different mode and draws a different figure.
 
+### The Model
+
 The model needs almost nothing.
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
 The formula is borrowed physics, an approximation for a plate with free edges.
@@ -1009,6 +1017,8 @@ print(plate.render())
 #:            #                       #                    .:##
 ```
 
+### What the Numbers Show
+
 Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
 Nothing steered them there.
@@ -1018,6 +1028,8 @@ Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
 The randomness is not fighting the order.
 It is the engine that produces it.
+
+### Testing a Random Process
 
 What can a test assert about a million random kicks?
 Not where any particular grain ends up.
@@ -1044,6 +1056,8 @@ def test_kicks_never_knock_grains_off_the_plate() -> None:
     assert all(0.0 <= g.x <= 1.0 and 0.0 <= g.y <= 1.0
                for g in plate.grains)
 ```
+
+### Watching It Happen
 
 The tkinter view shows what the text version cannot: the collapse as it happens,
 and the pattern surviving a change of rules.

@@ -1002,6 +1002,8 @@ The `ALL_DUNDERS` listing at the end of this chapter shows the machinery on a cl
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
+### Building `display_object()`
+
 Throughout the book we've been using `display_object()` to show the layout of an object.
 The `utils/` prefix makes it live in the shared `utils/` directory at the top of the `Examples` tree,
 and any chapter can import it:
@@ -1125,6 +1127,8 @@ not because Python searches other directories automatically.
 The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
 Without either, `from display import display_object` fails with `ModuleNotFoundError`.
 
+### Sorting Members into Attributes and Methods
+
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the object and its classes directly,
 without invoking descriptors, properties, or `__getattr__()`.
@@ -1157,6 +1161,8 @@ while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value actually lives,
 so it applies whether or not the attribute is declared with `typing.ClassVar`.
+
+### Choosing Which Dunders to Show
 
 `display_object()` hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones,
@@ -1195,6 +1201,8 @@ and it applies to any member, not just dunders.
 minus `__hash__`, useful when a listing has already made that particular point and repeating it only adds noise.
 The check runs first, before the `dunder` logic even sees the name,
 so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selected it.
+
+### The Tool in Use
 
 ```python
 # demo_display_object.py
