@@ -6,7 +6,7 @@ A dependency is a `Need` that `supply()` answers.
 A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
 A type checker verifies that every caller either absorbs an Effect or declares it.
 
-Every ability so far has been a `Need`.
+Every Ability so far has been a `Need`.
 This chapter opens by writing a `Need` from scratch,
 which shows it is an ordinary class rather than a special form.
 The rest of the chapter applies the machinery:
@@ -21,7 +21,7 @@ The rest of the chapter applies the machinery:
 
 ## Abilities Are Not Special
 
-An ability subclasses `Ability[T]`, where `T` is the type its handler returns.
+An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
 
 ```python
@@ -63,7 +63,7 @@ print(messages)
 #: ['Hello, Alice!']
 ```
 
-Inside `ask()`, the operand of `yield from` is not a generator but the ability object.
+Inside `ask()`, the operand of `yield from` is not a generator but the Ability object.
 `yield from` calls `iter()` on its operand,
 and `Ability.__iter__` is a generator function,
 so the delegation target is an ordinary generator after all.
@@ -79,18 +79,18 @@ It yields once, so the handler receives one request.
 The `yield from` then evaluates to that generator's return value,
 the rule from [The Return Channel](45_Generators.md#the-return-channel),
 and here that value is whatever the handler sent back.
-The ability produces nothing on its own.
+The Ability produces nothing on its own.
 `prompt` is payload on the request, there for the handler to read,
 so the answer to an `Ask` is whatever `scripted()` returns.
 A `Tell` needs no answer,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 `ask()` and `tell()` are *accessors*:
-small functions that each wrap one ability and declare its answer type.
+small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
 and the ZIO listing in [Effect Management](44_Effect_Management.md#library-effect-management)
 had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
-You can skip the accessor and yield the ability directly,
+You can skip the accessor and yield the Ability directly,
 and the program still runs,
 but under `ty` 0.0.65 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
@@ -103,18 +103,18 @@ one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
 and the difference deserves a moment.
-`Ask` is an ability, so it sits in the channel bare.
+`Ask` is an Ability, so it sits in the channel bare.
 `Console` never was one.
-It is an ordinary class, and `Need[Console]` is the ability:
+It is an ordinary class, and `Need[Console]` is the Ability:
 a request object carrying the class it asks for.
 A type bound enforces the distinction.
 `Effect`'s first type parameter accepts only `Ability` subclasses,
 so writing `Depend[Console, None]` is rejected at the annotation,
 before any `yield` is examined: `Console` is not assignable to the bound.
 
-`handle()` reads the annotation on its argument to decide which ability it answers,
+`handle()` reads the annotation on its argument to decide which Ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
-Each `handle()` subtracts one ability,
+Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
 Naming the two stages also matters to the checker,
 for a reason the next section gives.
@@ -168,7 +168,7 @@ That makes an unpredictable source testable.
 
 A coin toss is a side cause: the program reads something from outside,
 and the reading does not repeat.
-If you turn it into an ability, the reading moves into a handler:
+If you turn it into an Ability, the reading moves into a handler:
 
 ```python
 # coin_toss.py
@@ -208,7 +208,7 @@ print(4_000 < heads < 6_000)
 Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
 while `Ask` and `Tell` each carried the payload the request had to deliver.
-The ability's whole content is its type and the `bool` it produces.
+The Ability's whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are required.
 A `yield` expression is allowed on the right side of an assignment,
@@ -238,7 +238,7 @@ and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
 One produces a different string every minute,
 and the other needs you to wait a day to watch it return `True`.
-The ability and its accessor sit in their own file,
+The Ability and its accessor sit in their own file,
 because two listings in this section ask the same clock different questions:
 
 ```python
@@ -338,7 +338,7 @@ and the window where this happens is one second wide.
 Using a real clock, you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
-The ability makes the moment reachable.
+The Ability makes the moment reachable.
 `archive()` does not read a clock; it asks for a moment,
 and a handler decides which moment that is.
 Both handlers answer the same two requests;
@@ -362,7 +362,7 @@ the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
 The technique did not change between the two.
-Name each contact with the outside as an ability and bind it at the edge to whatever the context needs.
+Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that the declaration cannot be skipped by accident.
 
 ## Switching Implementations Mid-Run
@@ -444,7 +444,7 @@ def draw(source: Source, hour: int) -> None:
     source.deplete()
 ```
 
-`Outlet` is an ability whose handler returns a `Source`,
+`Outlet` is an Ability whose handler returns a `Source`,
 and it carries the hour so the handler can consult the conditions at that moment.
 `Ask` carried a prompt for the same reason.
 `draw()` is the boundary function:
@@ -552,7 +552,7 @@ Solar covers two hours and stops at sunset.
 The battery covers two more and stops when its charge falls below the threshold.
 The grid covers one and stops when the outage begins at 22:00.
 The backup covers the last.
-Four implementations, one ability, one running program.
+Four implementations, one Ability, one running program.
 
 `run_load()` names none of them,
 which is why the second run tells a different story from the same code.
@@ -650,7 +650,7 @@ It reads two things from outside and can fail three ways.
 The three `@throws` functions are the pattern for reaching ordinary code:
 `fetch()` and `look_up()` call methods that know nothing about Effects,
 and the decorator lifts what they raise into the channel.
-`topic_of()` needs nothing and touches nothing, so it declares no ability.
+`topic_of()` needs nothing and touches nothing, so it declares no Ability.
 
 `fetch()` and `look_up()` take their dependencies as parameters,
 which makes them ordinary functions rather than generator functions.
@@ -673,7 +673,7 @@ The decorator adds the error the same way it did for `score()` in [The Error Cha
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
 `research()` splits the two because a function that only transforms its arguments is easier to test on its own,
-and because the split keeps the ability requests collected in one place.
+and because the split keeps the Ability requests collected in one place.
 Either shape type-checks and either propagates correctly.
 
 The signature is also the only place this information appears.
@@ -951,7 +951,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 The other end is checked too.
 If you leave `Oven(220)` out of `supply()`,
-`run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty ability channel,
+`run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel,
 the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
 showed, now arising from a dependency two levels down.
 `Oven` and `Toaster` are distinct types,
@@ -966,7 +966,7 @@ and the compiler resolves it into a tree with `Oven` and `Dough` beneath it.
 You provide that layer rather than a finished loaf.
 Stateless has no such thing.
 `supply()` matches instances that exist,
-and `handle()` answers an ability with an ordinary function,
+and `handle()` answers an Ability with an ordinary function,
 so a constructor cannot be an Effect.
 That is the shape of the listing above.
 Leaves are bound at the edge, products come from an explicit `yield from`,
@@ -976,11 +976,11 @@ and the graph you can read is the union in the signature.
 
 The bakery graph went deep.
 Three appliances, one of them reached through another Effect.
-A game goes wide instead.
+Now we'll create a game that goes wide.
 [Abstract Factories](27_Factory.md#abstract-factories)
 built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
 and a `GameEnvironment` played whatever that factory produced.
-Here, we widen the cast to five kinds of actor and request each one as an ability:
+Here, we widen the cast to five kinds of actor and request each one as an Ability:
 
 ```python
 # arena.py
@@ -1026,14 +1026,17 @@ def encounter() -> Depend[
     narrator.say(f"and wins {reward.prize()}")
 ```
 
-`encounter()` is the entire engine, and it names no implementation.
-It also prints nothing, because output is an ability like the rest:
+`encounter()` is the entire engine,
+and the only types it mentions are the five Protocols.
+No concrete class appears in it, and it prints nothing.
+Output is an Ability like the other four:
 `Narrator` is one of the five requests,
-so where the lines go is decided outside.
-The engine has no `GameEnvironment` to construct and no factory to hold,
-and the five-way union is written out rather than aliased,
-for the reason [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
-gives.
+so the code that supplies it chooses whether a line is printed,
+collected in a list, or discarded.
+There is no `GameEnvironment` to construct and no factory to hold.
+The five-way union is written out in full rather than aliased,
+for the reason given in
+[Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect).
 
 Five abilities need five distinct shapes.
 `Obstacle.blocks()` and `Terrain.underfoot()` could each have been named `describe()`,
@@ -1098,7 +1101,7 @@ def warriors_and_weapons(narrator: Narrator) -> None:
 `play()` is the boundary function of [Composing a Program](#composing-a-program),
 grown from two parameters to five.
 Its annotations do the upcasting, so no actor needs `as_type()`,
-and its body is the one place in the program where an ability meets an implementation.
+and its body is the one place in the program where an Ability meets an implementation.
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
 Each was a class with a method per product;
 each is now a function that hands `play()` a matched set.
@@ -1157,7 +1160,7 @@ That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `NastyWeapon`,
 because the pairing is built into the class.
-`supply()` takes a flat list and checks each argument against one ability,
+`supply()` takes a flat list and checks each argument against one Ability,
 never against the others.
 The matched set comes back only if you write it down,
 which `kitties_and_puzzles()` does.
@@ -1168,7 +1171,7 @@ The fourth run swaps one cast member and captures the output.
 `Script` records what it is told,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching,
 the same swap `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
-made with one ability rather than five.
+made with one Ability rather than five.
 Printing was never in the engine to be intercepted.
 
 There is a ceiling on how wide the cast can get.
@@ -1452,7 +1455,7 @@ print(f"five 50ms tasks under 150ms: {elapsed < 0.15}")
 ```
 
 Five tasks that each sleep 50 milliseconds finish in about the time of one.
-The pool is an ability, not a global,
+The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
 Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
 with no change to `squares()`.
@@ -1462,7 +1465,7 @@ and `squares()` asked for the general one.
 
 One restriction is worth understanding, because the checker enforces it.
 A forked Effect must have nothing left to supply.
-`fork()`'s four overloads accept an Effect whose ability channel holds `Never`,
+`fork()`'s four overloads accept an Effect whose Ability channel holds `Never`,
 an exception type, or `Async`, and nothing else,
 because `fork()` runs the Effect with `run()` inside the worker.
 If you decorate a function that still declares a `Need`, `ty` rejects it,
@@ -1473,8 +1476,8 @@ Notice where the pool's lifetime is managed.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
 Stateless has no scoping mechanism of its own,
 so a resource either lives in a `with` block outside the Effect,
-as the pool does here, or the ability method owns it:
-the library's own `Files` ability opens and closes a file inside a single `read_file()` call.
+as the pool does here, or the Ability method owns it:
+the library's own `Files` Ability opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Context_Managers.md#combining-context-managers),
@@ -1502,7 +1505,7 @@ rewriting the type that function declares:
 | Tool | What it does to the type |
 |---|---|
 | `supply(*instances)` | Subtracts each `Need[T]` matched by `isinstance()` |
-| `handle(handler)` | Subtracts the ability the handler's parameter names |
+| `handle(handler)` | Subtracts the Ability the handler's parameter names |
 | `catch(*E)` | Moves each `E` from the error channel into the result |
 | `retry(schedule)` | Adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
 | `repeat(schedule)` | Same additions; the result becomes a tuple of every run |
@@ -1662,11 +1665,11 @@ full = handle(scripted)(half)  # () -> Success[None]
 
 That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
 The habit is worth keeping generally.
-A named intermediate is where you read the ability that is left,
+A named intermediate is where you read the Ability that is left,
 which is the information this library exists to give you.
 You have now seen three of these checker gaps:
 the nested handler expression here,
-the direct ability yield that types as `Unknown`,
+the direct Ability yield that types as `Unknown`,
 and the `type` alias in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 that turns the yield check off.
 Each has the same shape.
@@ -1688,7 +1691,7 @@ A monad plus handlers is how you build algebraic effects in a language with no n
 The monad is the plumbing, and the handlers are the interface.
 
 What a library cannot copy is the handler's power.
-`handle()` passes a handler the ability and takes back an answer,
+`handle()` passes a handler the Ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
 A native handler instead receives the *continuation* and chooses what to do with it.
 Invoking it once gives you what Stateless has.
@@ -1703,7 +1706,7 @@ Two pieces of the library are evidence of that ceiling.
 `Effect[A, E, R]` carries a separate `E`, worked by `@throws` and `catch()`.
 Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
-The extra type parameter exists because a Stateless ability cannot fail,
+The extra type parameter exists because a Stateless Ability cannot fail,
 and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
 carries one for the same reason.
 `Async` is the other piece.
@@ -1789,7 +1792,7 @@ It uses three of these mechanisms, and its return type mentions one.
 and `yield from` is one operator for joining two Effects.
 `research()` joined five steps of two kinds with that one operator,
 once `@throws` had brought the ordinary functions in at the boundary.
-`Async` is one more ability in the same channel rather than a second viral annotation.
+`Async` is one more Ability in the same channel rather than a second viral annotation.
 Resource lifetime is the concern this does not absorb.
 Stateless has no scoping mechanism, so `with` blocks stay where they are.
 They need not stay nested, since `ExitStack` flattens them,

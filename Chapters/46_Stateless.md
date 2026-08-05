@@ -39,7 +39,7 @@ Effect[A, E, R]
 Those three parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
 asked of an Effect signature:
 
-- `A` is what the computation needs, an *ability*.
+- `A` is what the computation needs, an *Ability*.
 - `E` is how it can fail.
 - `R` is what it produces.
 
@@ -78,9 +78,9 @@ it has no values and is a subtype of every other type.
 Effect: TypeAlias = Generator[A | E, Any, R]
 ```
 
-The `Generator` yields either an ability `A` or an exception `E`,
+The `Generator` yields either an Ability `A` or an exception `E`,
 and eventually returns a result `R`.
-Our example becomes:
+The example becomes:
 
 ```python
 Generator[Need[Console] | KeyError, Any, None]
@@ -207,7 +207,7 @@ An Effect does not:
 - Using `yield` to request a `Need[Console]` should get a `Console`.
 - Using `yield` to request a `Need[Log]` should get a `Log`.
 
-What comes back depends on which ability the `yield` requested.
+What comes back depends on which Ability the `yield` requested.
 One SendType cannot vary from one `yield` to the next.
 If you pin it to `Console`,
 the checker reads `yield Need(Log)` as producing a `Console`.
@@ -228,7 +228,6 @@ not from the `Any` in the SendType.
 This is why every request in this chapter is written as `yield from` rather than `yield`,
 and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
 get a small function of their own.
-
 
 ## Nothing Runs Yet
 
@@ -323,7 +322,7 @@ if __name__ == "__main__":
 Running the script tells you nothing useful,
 because at runtime it reports the class of its argument (`function`, here)
 through standard error.
-The answer we want comes from `ty check reveal_bound.py`:
+The answer comes from `ty check reveal_bound.py`:
 
 ```text
 info[revealed-type]: Revealed type
@@ -342,15 +341,15 @@ info[revealed-type]: Revealed type
 
 `greet` is a function `ty` knows by name,
 while `bound` is a function `supply()` built, described by its signature alone.
-What we see are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
+These are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sat in the first type parameter of `greet` and is gone from `bound`,
 replaced by the `Never` as shown in the alias table.
 
-Handling an ability *subtracts* it from the type.
+Handling an Ability *subtracts* it from the type.
 Here the subtraction leaves nothing behind:
-`greet()` declares one ability and cannot fail, so `bound` produces a `Success`.
+`greet()` declares one Ability and cannot fail, so `bound` produces a `Success`.
 That `Success` is a consequence, not a requirement.
-What `run()` refuses is an unanswered ability.
+What `run()` refuses is an unanswered Ability.
 It accepts an Effect that can still fail,
 and raises the failure as an ordinary exception
 ([The Error Channel](#the-error-channel)).
@@ -424,7 +423,7 @@ except MissingAbilityError as e:
 #: MissingAbilityError
 ```
 
-This raises a `MissingAbilityError`, but if we remove the `# type: ignore`,
+This raises a `MissingAbilityError`, but if you remove the `# type: ignore`,
 `ty` rejects the program before it runs:
 
 ```text
@@ -437,25 +436,24 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |         `Generator[Need[Console], Any, None]`
 ```
 
-In Stateless, an un-supplied dependency is a type error,
+In Stateless, an unsupplied dependency is a type error,
 not a production incident.
-No test had to exercise the path.
-No reviewer had to notice the omission.
+No test had to exercise the path, and no reviewer had to notice the omission.
 
 The expected type in that message names two things this chapter has not yet covered:
 
-- `Async` is a built-in ability for asynchronous work,
+- `Async` is a built-in Ability for asynchronous work,
   which `run()` handles on its own.
 - `Exception` is the error channel.
 
-`run()` accepts an Effect whose ability channel has narrowed to those two,
-which is all that remains once every other ability has been supplied.
+`run()` accepts an Effect whose Ability channel has narrowed to those two,
+which is all that remains once every other Ability has been supplied.
 `greet("Alice")` still has `Need[Console]`, so it does not pass type checking.
 
 ## Swapping the Implementation
 
 `Need` creates a delayed binding.
-This means we can select different bindings.
+You can therefore select different bindings.
 For example, a test can bind to a `Console` that records instead of printing:
 
 ```python
@@ -492,17 +490,17 @@ while `greet()` is unchanged and unaware.
 `as_type(Console)` is the only ceremony in that test.
 It says "treat this recorder as a `Console`,"
 and at runtime it returns the object it was given.
-`supply()` requires it because it reads the ability from the static type of its argument,
+`supply()` requires it because it reads the Ability from the static type of its argument,
 and `Recorder` inherits from `Console` to answer the same question at runtime.
 [Supplying an Interface](#supplying-an-interface) takes both halves apart,
-along with what changes when the ability is an interface rather than a class.
+along with what changes when the Ability is an interface rather than a class.
 
 `supply()` binds one instance for every matching request over the Effect's run,
 which is why the test reads the messages back out of `recorder` afterward.
 
 ## Builtin Abilities
 
-You might not need to define an ability.
+You might not need to define an Ability.
 Stateless includes three of its own:
 
 - `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
@@ -526,7 +524,7 @@ In your own code, check what the library already declares first.
 ## Effects Propagate, and the Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
-`greet_all()` must declare the `Console` even though we don't see `Console` directly used within `greet_all()`:
+`greet_all()` must declare the `Console` even though no `Console` appears in its body:
 
 ```python
 # greet_all.py
@@ -561,7 +559,7 @@ The `yield from` inside `greet_all()` is not optional.
 If you write that loop body as a bare `greet(name)`,
 `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
-That seems like protection, but look closer.
+That seems like protection, but it is accidental.
 That `yield from` was the only `yield` in `greet_all()`,
 so deleting it turned `greet_all()` into an ordinary function,
 and the checker caught the function's changed shape, not the discarded Effect.
@@ -579,7 +577,7 @@ and the ZIO fix is `.run` where Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
-Declaring the ability is still manual.
+Declaring the Ability is still manual.
 The benefit is that the declaration is checked.
 If you annotate `greet_all()` as pure, `ty` flags the problem:
 
@@ -670,7 +668,7 @@ If you forget the new argument at a call, `ty` reports a `missing-argument`.
 The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts an object it does not use.
-A new ability changes the signatures alone:
+A new Ability changes the signatures alone:
 `yield from greet_logged(name)` stays as it is, and the instance appears once,
 at `supply()`.
 
@@ -721,7 +719,7 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
 `Material` and `Nailer` are distinct types,
 so `supply()` matches each request to one of them.
 [When Two Implementations Match](#when-two-implementations-match)
-picks up the case where two supplied objects fit one ability.
+picks up the case where two supplied objects fit one Ability.
 Here the test varies both:
 
 ```python
@@ -764,13 +762,12 @@ while this version still changes nothing but the row.
 
 [Swapping the Implementation](#swapping-the-implementation)
 substituted a `Recorder` for a `Console` but postponed the reason for using `as_type(Console)`.
-Two questions are being answered, with different audiences: static analysis,
-and runtime.
+That call answers two questions, for two audiences: static analysis and runtime.
 
 First, the static issue.
-`supply()` reads the ability from the declared type of its argument,
+`supply()` reads the Ability from the declared type of its argument,
 so handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
-a different ability from the `Need[Console]` that `greet()` requests.
+a different Ability from the `Need[Console]` that `greet()` requests.
 `as_type(Console)(recorder)` converts the argument's static type into `Console`,
 so `supply()` builds the handler type `greet()` needs.
 
@@ -802,7 +799,7 @@ But anything later added to `Console` shows up in `Recorder`.
 If you add a `read_line()` method to `Console`,
 `Recorder` inherits the real one without warning,
 so a test meant to record performs live console I/O instead.
-However, if the ability is an interface,
+However, if the Ability is an interface,
 there is no implementation to inherit by accident:
 
 ```python
@@ -833,7 +830,7 @@ Because a `Protocol` matches on structure,
 `@runtime_checkable` is required because `supply()` uses `isinstance()`.
 
 Structural matching does not remove the need for `as_type()`.
-Here, we supply a `Terminal` both ways:
+This listing supplies a `Terminal` both ways:
 
 ```python
 # protocol_supply.py
@@ -929,7 +926,7 @@ because its `provide` resolves the dependency graph during compilation.
 `supply()` resolves at runtime by scanning its arguments,
 so the same mistake produces a program that runs and does the wrong thing.
 Give abilities distinct method names when that ambiguity is possible,
-and supply one implementation per ability.
+and supply one implementation per Ability.
 
 ## Dependency Injection
 
@@ -984,7 +981,7 @@ and matches a request using `isinstance()`,
 which is why two instances that satisfy one `Need` are ambiguous
 ([When Two Implementations Match](#when-two-implementations-match)).
 The DI registration key also does the work `as_type(Console)` does for `supply()`,
-which reads each ability from its argument's static type:
+which reads each Ability from its argument's static type:
 `supply(recorder)` is a `Handler[Need[Recorder]]`,
 and no `Need[Console]` matches it
 ([Supplying an Interface](#supplying-an-interface)).
@@ -1002,25 +999,24 @@ The first call to `greet("Alice")` fails at runtime because nothing has been reg
 The second call succeeds because now the binding exists.
 The two `greet()` calls are identical.
 No type information indicates whether a `Console` has been registered.
-The type checker cannot tell us that something has gone wrong.
+The type checker cannot report that something has gone wrong.
 
 Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
 
 DI met its goal, because the `Console` is swappable.
-It *relocates* a side cause rather than declaring one.
-The dependency is swappable but remains un-validated by the type checker.
+But it relocates a side cause rather than declaring one,
+so the type checker never validates the dependency.
 
 An EMS like Stateless sets a higher bar.
 The dependency must appear in the signature, to be type-checked,
 which is why the EMS version of `greet()` returns `Depend[Need[Console], None]` and the `greet()` in `dependency_injection.py` returns `None`.
 The foundation of EMS is tracking all dependencies.
-The goal is to catch errors during type checking,
-not reliance on programmer memory and exhaustive testing.
+The goal is to catch errors during type checking rather than relying on programmer memory and exhaustive testing.
 
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
-This produces three consequences:
+This has three consequences:
 
 1. Stateless checks happen before the program runs.
    DI only discovers a missing registration when something asks for it.
@@ -1037,7 +1033,7 @@ This produces three consequences:
    No reset is needed between test cases.
 
    Handlers also layer.
-   An ability a handler cannot answer is yielded further out,
+   An Ability a handler cannot answer is yielded further out,
    so `supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
    and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
    You can bind some abilities near the Effect and the others at the edge,
@@ -1097,7 +1093,7 @@ run(fallback(chosen)("Bob"))
 The first run has nothing between `greet()` and that edge,
 so the default answers.
 The second wraps `greet()` in its own `supply()` first,
-which empties the ability channel before `fallback` ever sees a request.
+which empties the Ability channel before `fallback` ever sees a request.
 The handler nearest the Effect wins,
 and the outer one answers only what is left.
 The type records this: `chosen` is already `(str) -> Success[None]`,
@@ -1141,7 +1137,7 @@ This also prints a `RuntimeWarning` to standard error,
 so it does not appear in the above output, which shows standard output only.
 `run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
 which raises a `RuntimeError` because a loop is already running,
-leaving that coroutine un-awaited.
+leaving that coroutine unawaited.
 The warning is harmless, because that coroutine never started.
 It is also a reliable sign of this mistake,
 appearing whenever `run()` is called from asynchronous code.
@@ -1188,14 +1184,14 @@ Notice what `report()` is not.
 It is not an `async def` and it contains no `await`,
 yet its result comes from a coroutine.
 `wait()` hands the coroutine out as a request and the driver awaits it,
-so the asynchrony stops at the ability channel instead of spreading to `report()` and everything that calls it.
+so the asynchrony stops at the Ability channel instead of spreading to `report()` and everything that calls it.
 
 `wait()` is required at the boundary where a coroutine enters the Effect world.
 A function that already returns an Effect needs no `wait()`,
 because `yield from` composes the two directly.
 `stateless.time.sleep()` is such a function,
 and it pairs an `Async` request with a dependency.
-Here we see `sleep()` used without a `wait()`:
+This listing uses `sleep()` without a `wait()`:
 
 ```python
 # sleep_effect.py
@@ -1251,7 +1247,7 @@ It is an ordinary class whose one method is `async def sleep()`.
 `supply(Time())` binds an instance the way `supply(Console())` did.
 
 Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
-and `Need[Time]` moves that into the ability channel.
+and `Need[Time]` moves that into the Ability channel.
 A test can then supply a clock that never waits:
 
 ```python
@@ -1362,13 +1358,13 @@ print(repr(next(effect)))
 
 The body raised the exception.
 `@throws` wraps that body in an ordinary `try`/`except`,
-so the wrapper catches the `KeyError` and yields the exception object over the same channel that carries ability requests.
+so the wrapper catches the `KeyError` and yields the exception object over the same channel that carries Ability requests.
 That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter:
 requests and failures are both values a description yields to its driver.
 
 ### Errors Propagate
 
-Errors propagate via the `Effect` type, just like abilities:
+The `Effect` type carries a failure the same way it carries an Ability:
 
 ```python
 # announce.py
@@ -1418,10 +1414,10 @@ a hole the next chapter examines in [Nothing stops an undeclared Effect](47_Stat
 
 ## Turning an Error Into a Value
 
-`catch()` empties the error channel the way `supply()` empties the ability channel,
+`catch()` empties the error channel the way `supply()` empties the Ability channel,
 but the two do different things with what they remove.
-`supply()` provides the ability inside the Effect,
-so the ability parameter becomes `Never` and the result type doesn't mention the `Console`
+`supply()` provides the Ability inside the Effect,
+so the Ability parameter becomes `Never` and the result type doesn't mention the `Console`
 ([Supplying the Dependency](#supplying-the-dependency)).
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out as a value in the result:
@@ -1466,7 +1462,7 @@ which its `Callable[[str], Success[None]]` annotation states:
 give it a `str` and it produces an Effect that needs nothing and cannot fail.
 `run()` drives that Effect,
 so `reporter("Alice")` comes first and `run()` second.
-The Effect "succeeds" at producing either a score or a `KeyError` indicating there is no score.
+The Effect "succeeds" at producing either a score or a `KeyError` that reports there is no score.
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
 
@@ -1519,7 +1515,7 @@ like Bob's `"seven"`.
 (str) -> Try[KeyError | ValueError, int]
 ```
 
-We can `catch()` `both` errors or just `one` error:
+You can catch both errors or only one:
 
 ```python
 # catch_subset.py
@@ -1601,14 +1597,14 @@ The two halves of this chapter taught two vocabularies:
 The vocabularies differ.
 The operation underneath them does not.
 Both subtract from the type.
-`supply()` removes an ability and leaves `Never` in its place.
+`supply()` removes an Ability and leaves `Never` in its place.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`, which `run()` accepts.
 
 The channels do not resolve in the same way:
 
-- `unsupplied.py` showed `run()` refusing an Effect that still declares an ability,
+- `unsupplied.py` showed `run()` refusing an Effect that still declares an Ability,
   before the program starts.
 - `error_escapes.py` showed `run()` accepting an Effect that still declares a failure,
   then raising that failure at the edge.
@@ -1646,7 +1642,7 @@ Both are checked, and neither can be dropped by forgetting it.
     `handle()` reads its handler's parameter annotation to decide what it answers,
     so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
     Run it against `greet()` and confirm the greeting prints.
-    Then declare a second ability and request that one too,
+    Then declare a second Ability and request that one too,
     and report which requests your handler answered at runtime and which ones `ty` believes it answered.
     Account for the difference,
     using `handle()`'s `t = get_origin(t) or t` as the evidence.
