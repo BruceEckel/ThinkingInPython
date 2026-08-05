@@ -56,6 +56,7 @@ import re
 import shutil
 import subprocess
 import sys
+from html import escape
 from pathlib import Path
 
 import build_site
@@ -76,6 +77,17 @@ SVG_PNG_WIDTH = 1600
 SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
 # Code-listing font size, relative to the surrounding prose.
 CODE_FONT_SCALE = 0.75
+# How far past its own start a wrapped code line hangs, in characters.
+CODE_HANG_CHARS = 2
+# A monospace character's advance width as a fraction of the em. Only
+# the hang depends on this, never a listing's own indentation, which
+# stays literal spaces the `pre` lays out on the real character grid.
+# So a font whose advance is not quite 0.6em moves a continuation a
+# fraction of a character, and never puts code off its grid.
+CHAR_EM = 0.6
+# Indents deeper than this share the deepest hang rule. The book's
+# listings reach 27, and a rule per column past that buys nothing.
+MAX_HANG_INDENT = 28
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
@@ -329,6 +341,68 @@ def part_markdown(roman: str, title: str) -> str:
     return f"# Part {roman} · {title} {{#part-{roman.lower()}}}\n"
 
 
+def listing_html(lines: list[str]) -> str:
+    """One fenced listing as a `<pre>` whose every line is its own block.
+
+    A code line too wide for the page wraps, and a wrapped line has to
+    read as the continuation of the line above rather than as the next
+    statement. That wants a hanging indent, and a hanging indent wants
+    each logical line to be its own block box: CSS `text-indent` applies
+    to the first line of a block, and the newlines inside a `<pre>` do
+    not start new ones. So `text-indent: -2em` on the `<pre>` would
+    outdent the listing's opening line and indent all 40 lines below it,
+    which is not a hanging indent at all. (`text-indent: ... each-line`
+    describes the wanted behavior, but no reader implements it.)
+
+    Hence a `<span>` per line. Its class carries that line's own indent,
+    so the continuation hangs past where its line starts instead of at a
+    fixed column: without that, a continuation of a line indented four
+    levels would begin to the *left* of the code it continues, reading
+    as a dedent. A third of the book's over-wide lines sit at indent 8
+    or deeper, so this is the common case, not the corner.
+
+    The spans are emitted with no newline between them. Each is already
+    `display: block`, and under `pre-wrap` a newline between two of them
+    would be a second line break, double-spacing every listing.
+    """
+    out = ["<pre>"]
+    for raw in lines:
+        line = raw.rstrip()
+        if not line.strip():
+            # An empty block box has no height; a space gives it one.
+            out.append('<span class="h0">&#160;</span>')
+            continue
+        indent = min(len(line) - len(line.lstrip()), MAX_HANG_INDENT)
+        text = escape(line, quote=False)
+        out.append(f'<span class="h{indent}">{text}</span>')
+    out.append("</pre>")
+    return "".join(out)
+
+
+def hang_listings(text: str) -> str:
+    """Rewrite every fenced block in `text` as a hanging-indent `<pre>`.
+
+    Pandoc passes a raw HTML block through to EPUB's XHTML untouched, so
+    this runs on the Markdown stream rather than on pandoc's output. The
+    whole `<pre>` goes on one line: a blank line inside it would end the
+    HTML block early and hand the rest back to the Markdown reader.
+
+    Every fence is rewritten, not only the Python ones. A ```text block
+    holding a program's output has the same wrapping problem.
+    """
+    doc = Document.from_text(text)
+    if not doc.blocks:
+        return text
+    out: list[str] = []
+    index = 0
+    for block in doc.blocks:
+        out.extend(doc.lines[index:block.open_at])
+        out.append(listing_html(block.lines))
+        index = block.end + 1
+    out.extend(doc.lines[index:])
+    return "\n".join(out)
+
+
 def book_markdown(chapters: list[Chapter], missing: set[str],
                   unresolved: set[str],
                   img_map: dict[str, str] | None = None) -> str:
@@ -374,6 +448,7 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
             if not fenced[index]:
                 lines[index] = relink(line, prefix, ids, unresolved)
         text = rewrite_images("\n".join(lines), img_map, missing)
+        text = hang_listings(text)
         head = f"# {chapter_heading(ch)} {{#{prefix}}}"
         parts.append(f"{head}\n\n{text.strip()}\n")
     return "\n".join(parts)
@@ -401,6 +476,23 @@ def metadata_yaml() -> str:
     return "---\n" + "\n".join(lines) + "\n---\n"
 
 
+def hang_css() -> str:
+    """One hanging-indent rule per indent column a listing can start at.
+
+    `listing_html()` tags each line with its own indent, so `h8` hangs a
+    line indented eight columns two characters past column eight. The
+    rules are generated rather than written out because they are one
+    arithmetic series, and they live in the single shared stylesheet,
+    not inlined per chapter the way pandoc's highlighting CSS was.
+    """
+    rules: list[str] = []
+    for column in range(MAX_HANG_INDENT + 1):
+        em = round((column + CODE_HANG_CHARS) * CHAR_EM, 2)
+        rules.append(f"pre .h{column} {{ padding-left: {em}em; "
+                     f"text-indent: -{em}em; }}")
+    return "\n".join(rules)
+
+
 def epub_css() -> str:
     """The bare minimum CSS, so the reader's own defaults do the rest.
 
@@ -418,6 +510,12 @@ def epub_css() -> str:
     keeps a declared color as given, so a light fill would become a
     glaring panel against black.
 
+    `pre span` and the per-indent rules from `hang_css()` are the
+    hanging indent for wrapped code lines. They need a `<span>` per
+    listing line, which `listing_html()` emits; the reasoning for paying
+    that markup is in its docstring. They are inert for a reader wide
+    enough that no line wraps.
+
     `#toc ol` is the one list-style rule here, and it is also a fix,
     not a look: `chapter_heading()` already spells each chapter's
     number into its title text ("3. Containers"), but pandoc's nav
@@ -433,6 +531,8 @@ def epub_css() -> str:
 }}
 pre, code {{ font-size: {CODE_FONT_SCALE}em; }}
 pre code {{ font-size: inherit; }}
+pre span {{ display: block; }}
+{hang_css()}
 h1, h2, h3, h4 {{ page-break-after: avoid; }}
 figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}

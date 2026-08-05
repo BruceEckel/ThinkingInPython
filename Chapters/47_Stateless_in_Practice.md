@@ -232,8 +232,8 @@ a network stub that fails twice and then succeeds, or the clock below.
 ### A Clock
 
 A clock is another side cause that makes testing tricky.
-[[Start by describing the overview and clock.py. Move the stamp and batch_due material right before frozen_clock.py]]
-`stamp()` puts the current time into its output,
+[[Start by describing the overview and clock.py.
+Move the stamp and batch_due material right before frozen_clock.py]] `stamp()` puts the current time into its output,
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
 One produces a different string every minute,
@@ -295,9 +295,9 @@ in microseconds rather than a day.
 so there is nothing to monkeypatch and nothing to wait for,
 and a production handler that returns `datetime.now()` leaves the function unchanged.
 
-Skipping the wait is the obvious benefit and the smaller one.
-A handler also reaches moments a real clock hands you only by luck.
-`archive()` reads the clock twice,
+Skipping the wait is the obvious benefit.
+A handler can also produce moments that are hard to get from a real clock.
+Here, `archive()` reads the clock twice,
 once to name a file and once to stamp what goes in it:
 
 ```python
@@ -451,7 +451,7 @@ and it carries the hour so the handler can consult the conditions at that moment
 it asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
 
-Now the consumer and the handler that feeds it:
+Here's the consumer and the handler that feeds it:
 
 ```python
 # microgrid.py
@@ -589,7 +589,7 @@ A handler sits outside the channel it feeds.
 
 ## Composing a Program
 
-Here is a small application: fetch a headline,
+In this small application, we fetch a headline,
 find a topic worth researching within that headline, and look up that topic.
 Each step needs something or can fail, and no step names an implementation:
 
@@ -980,7 +980,7 @@ A game goes wide instead.
 [Abstract Factories](27_Factory.md#abstract-factories)
 built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
 and a `GameEnvironment` played whatever that factory produced.
-Widen the cast to five kinds of actor and request each one as an ability:
+Here, we widen the cast to five kinds of actor and request each one as an ability:
 
 ```python
 # arena.py

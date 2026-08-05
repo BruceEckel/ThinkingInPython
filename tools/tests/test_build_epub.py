@@ -9,10 +9,14 @@ left to a reader to notice.
 from pathlib import Path
 
 from build_epub import (
+    MAX_HANG_INDENT,
     Ids,
     book_markdown,
     chapter_heading,
+    hang_css,
+    hang_listings,
     heading_ids,
+    listing_html,
     namespace_headings,
     outside_code,
     relink,
@@ -187,3 +191,56 @@ def test_missing_image_is_reported(tmp_path: Path) -> None:
     missing: set[str] = set()
     book_markdown(chapters, missing, set())
     assert missing == {"no_such_image"}
+
+# ── hanging indent for wrapped code lines ─────────────────────────────────────
+
+def test_each_line_becomes_its_own_block() -> None:
+    # The hanging indent needs a block box per line; a `<pre>` full of
+    # newlines is one block, and text-indent would only reach line one.
+    html = listing_html(["a = 1", "b = 2"])
+    assert html == ('<pre><span class="h0">a = 1</span>'
+                    '<span class="h0">b = 2</span></pre>')
+
+def test_line_carries_its_own_indent_as_its_class() -> None:
+    # h8 hangs past column 8, so the continuation of a line indented
+    # eight columns does not begin to the left of the code it continues.
+    html = listing_html(["def f():", "    if x:", "        pass"])
+    assert 'class="h0">def f():' in html
+    assert 'class="h4">    if x:' in html
+    assert 'class="h8">        pass' in html
+
+def test_indent_deeper_than_the_last_rule_is_clamped() -> None:
+    deep = " " * (MAX_HANG_INDENT + 6) + "x"
+    assert f'class="h{MAX_HANG_INDENT}"' in listing_html([deep])
+
+def test_every_class_a_listing_can_emit_has_a_rule() -> None:
+    css = hang_css()
+    for column in range(MAX_HANG_INDENT + 1):
+        assert f"pre .h{column} {{" in css
+
+def test_blank_line_keeps_its_height() -> None:
+    # An empty block box collapses to nothing, closing the gap the
+    # author put in the listing.
+    assert "&#160;" in listing_html(["a = 1", "", "b = 2"])
+
+def test_markup_characters_are_escaped() -> None:
+    html = listing_html(["if a < b & c:"])
+    assert "a &lt; b &amp; c" in html
+
+def test_no_newline_between_spans() -> None:
+    # Under pre-wrap a newline between two block spans is a second
+    # line break, double-spacing the listing.
+    assert "\n" not in listing_html(["a = 1", "b = 2"])
+
+def test_prose_around_a_fence_is_untouched() -> None:
+    out = hang_listings("Before.\n\n```python\nx = 1\n```\n\nAfter.\n")
+    assert out.startswith("Before.\n\n<pre>")
+    assert out.endswith("</pre>\n\nAfter.\n")
+    assert "```" not in out
+
+def test_a_text_fence_is_converted_too() -> None:
+    # Program output wraps the same way code does.
+    assert "<pre>" in hang_listings("```text\nsome output\n```\n")
+
+def test_text_with_no_fence_is_returned_unchanged() -> None:
+    assert hang_listings("Just prose.\n") == "Just prose.\n"
