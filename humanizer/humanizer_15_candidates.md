@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/15_Context_Managers.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -125,35 +126,7 @@ introduced in [Control Flow](04_Control_Flow.md#context-managers),
 runs setup before a block and cleanup after it,
 even if the block raises an exception.
 This chapter shows how to write your own context managers,
-and what `with` does.
-```
-
-### B2 — line 595 — italics on "production pool"
-
-Unlike `*context manager*`, `*suppresses*`, and `*Object Pool*` elsewhere
-in the chapter, "production pool" is not a term the book defines or reuses
-(it appears nowhere else in `Chapters/`). The italics read as emphasis
-contrasting this toy pool with a real one, not as a first-use term
-introduction. I lean toward dropping the italics, but it's arguable that
-naming the category is exactly the kind of "new concept" the italics
-convention exists for.
-
-CURRENT
-```text
-The second lease hands back the same object, not a new one.
-A *production pool* adds refinements on this skeleton,
-such as lazily creating items on first demand,
-validating an item before lending it out,
-and a timeout on `get()` so a starved borrower fails loudly instead of waiting forever.
-```
-
-PROPOSED
-```text
-The second lease hands back the same object, not a new one.
-A production pool adds refinements on this skeleton,
-such as lazily creating items on first demand,
-validating an item before lending it out,
-and a timeout on `get()` so a starved borrower fails loudly instead of waiting forever.
+and how `with` works.
 ```
 
 ## Housekeeping

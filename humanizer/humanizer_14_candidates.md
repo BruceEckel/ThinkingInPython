@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/14_Decorators.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -61,24 +62,6 @@ For simplicity, this first example uses an untyped `Callable`:
 
 Delete individual rows you want left alone.
 
-### A2 — line 392 — AI-vocabulary word ("valuable") plus copula avoidance
-
-"Valuable" is on the §7 watch list, and "provides a ... benefit" is the
-§8 pattern (elaborate construction standing in for a plain claim). The
-chapter already uses "pays off" the same way at line 719
-("This idiom pays off for a value that needs one-time setup logic"),
-so this proposal reuses that existing idiom instead of introducing a
-new one.
-
-CURRENT
-```text
-The class form provides a valuable benefit when the decorator takes arguments.
-```
-
-PROPOSED
-```text
-The class form pays off most when the decorator takes arguments.
-```
 
 ### A3 — line 851 — italics reused on an already-introduced term
 

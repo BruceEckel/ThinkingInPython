@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/13_Pattern_Matching.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -101,7 +102,7 @@ This is the static-typing payoff applied to control flow:
 PROPOSED
 ```text
 This error is caught during type checking rather than silently falling through.
-That is the static-typing payoff applied to control flow:
+That is the benefit of static-typing applied to control flow:
 ```
 
 ## Tier B

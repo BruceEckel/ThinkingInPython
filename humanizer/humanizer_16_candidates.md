@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/16_Comprehensions.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -61,7 +62,7 @@ where each sub-list represents a row.
 
 PROPOSED
 ```text
-In Python you represent such a matrix as a list of lists,
+Python represents such a matrix as a list of lists,
 where each sub-list represents a row.
 ```
 
@@ -186,7 +187,7 @@ Instead of `[]`, a set comprehension uses `{}`.
 
 PROPOSED
 ```text
-The same principles that build a list comprehension build a set, just with `{}` instead of `[]`.
+Set comprehensions use same principles as list comprehensions, with `{}` instead of `[]`.
 ```
 
 **Lines 365-366**
@@ -199,7 +200,8 @@ producing a key and a value for each element, with an optional filter.
 
 PROPOSED
 ```text
-The same construction builds a `dict`: each element produces a key and a value, with an optional filter.
+A dictionary comprehension builds a `dict`.
+Each element produces a key and a value, with an optional filter.
 ```
 
 ### B4 — line 522 — minor "already"
