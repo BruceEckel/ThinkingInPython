@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/20_Rethinking_Objects.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -118,7 +119,7 @@ not a function that runs.
 
 PROPOSED
 ```text
-Each `@overload` line is a declaration to the type checker,
+Each `@overload` line is a declaration for the type checker,
 not a function that runs.
 ```
 
@@ -137,31 +138,6 @@ PROPOSED
 OOP also normalized the idea of types,
 ```
 
-### A5 — lines 705-711 — choppy run of short sentences
-
-Seven short declaratives in a row. CLAUDE.md's own rule names this
-exact shape: "A run of five clipped sentences reads as choppy, so let
-one carry a second clause when the ideas belong together." Every
-fact survives; only the sentence boundaries move.
-
-CURRENT
-```text
-Nothing in that test can fail.
-The `NewType` protection lives in the checker alone.
-A caller who passes a raw `int` where `UserId` is expected raises no exception.
-The value doesn't change.
-There is nothing at runtime for a test to catch.
-Only the checker sees it, and only at edit time.
-Here, that diagnostic is silenced by the same `# type: ignore` that lets this book's build pass.
-```
-
-PROPOSED
-```text
-Nothing in that test can fail: the `NewType` protection lives in the checker alone.
-A caller who passes a raw `int` where `UserId` is expected raises no exception, the value doesn't change, and there is nothing at runtime for a test to catch.
-Only the checker sees it, and only at edit time; here, that diagnostic is silenced by the same `# type: ignore` that lets this book's build pass.
-```
-
 ### A6 — lines 54-55 — participle tail
 
 "Reducing duplication" is a real consequence, not filler, but it's
@@ -176,8 +152,8 @@ and they let code live outside classes, reducing duplication.
 
 PROPOSED
 ```text
-They compose data structures instead of inheriting implementation,
-and they let code live outside classes, which reduces duplication.
+They compose data structures instead of inheriting implementation.
+They let code live outside classes, which reduces duplication.
 ```
 
 ## Tier B

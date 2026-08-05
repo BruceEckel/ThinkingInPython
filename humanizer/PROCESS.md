@@ -1,6 +1,6 @@
 # The humanizer pass: process and format
 
-How to produce a `humanizer_NN_candidates.md` file for one chapter.
+How to produce a `humanizer/NN_Name.md` file for one chapter.
 Read this before starting. It carries the format, the accumulated
 precedents from chapters 46 and 47, and the things that are off limits.
 
@@ -12,7 +12,8 @@ He deletes the blocks he doesn't want, hands the file back, and
 someone else applies what survives.
 
 **You do not edit the chapter.** Not one character.
-Your only output is `humanizer/humanizer_NN_candidates.md`.
+Your only output is `humanizer/NN_Name.md`, matching the chapter's own
+filename under `Chapters/`.
 If you think a change is obviously right, it still goes in the document.
 
 ## Inputs
@@ -61,7 +62,7 @@ If you think a change is obviously right, it still goes in the document.
 
 ## Document format
 
-Write `humanizer/humanizer_NN_candidates.md` with these sections.
+Write `humanizer/NN_Name.md` with these sections.
 
     # Humanizer candidates: Chapters/NN_Name.md
 
@@ -180,7 +181,7 @@ structure: fragmented headers, announcements, echoes, parallels, person.
 
 Write the file and stop. Do not run `make verify`, do not sync
 `Examples/`, do not touch git. Nothing you do should change any file
-other than your own `humanizer/humanizer_NN_candidates.md`.
+other than your own `humanizer/NN_Name.md`.
 
 In your final report, give the counts (Tier A, Tier B, housekeeping),
 name the single most important finding in one sentence, and say whether
