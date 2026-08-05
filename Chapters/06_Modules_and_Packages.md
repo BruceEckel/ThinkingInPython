@@ -66,7 +66,7 @@ python use_module.py
 
 However, if another program imports `use_module.py` as a module,
 `__name__` is not `"__main__"`, so its `"__main__"` code does not run.
-Here is such a program, which does nothing but import `use_module`:
+Here is such a program, which only imports `use_module`:
 
 ```python
 # import_module.py
@@ -113,7 +113,7 @@ You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
 
-To demonstrate, we'll create a directory called `a_package` and give it an `__init__.py` containing nothing but a comment:
+To demonstrate, we'll create a directory called `a_package` and give it an `__init__.py` containing only a comment:
 
 ```python
 # a_package/__init__.py

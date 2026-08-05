@@ -210,7 +210,7 @@ If `Derived.show` does not actually override a method in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
 
-At runtime `@override` does nothing but return the method unchanged.
+At runtime `@override` returns the method unchanged.
 The type checker performs all verification before the program runs.
 
 Apply `@override` to any method that replaces an inherited method,

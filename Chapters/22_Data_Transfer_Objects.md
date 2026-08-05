@@ -32,7 +32,7 @@ and its output shows the attributes and the keyword arguments are one dict:
 `m.more = 11` adds a key, just as passing `more=11` to the constructor would.
 
 Because `**kwargs` is the only parameter,
-`Messenger` accepts nothing but keyword arguments.
+`Messenger` accepts only keyword arguments.
 `Messenger("Spam")` raises a `TypeError`.
 The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
@@ -203,7 +203,7 @@ This refines the selection rule.
 Choose `NamedTuple` when tuple behavior is the goal: unpacking,
 multiple return values, compatibility with code that expects a tuple.
 Choose a [frozen dataclass](12_Data_Classes_as_Types.md#immutability)
-when a record should be a distinct type that equals nothing but its own kind.
+when a record should be a distinct type that equals only its own kind.
 
 ## Exercises
 

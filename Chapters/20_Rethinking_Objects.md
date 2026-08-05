@@ -314,7 +314,7 @@ Fetched from the class instead of from an instance,
 `distance_to` is an ordinary function,
 and `p1` is passed to it as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
-The dot fills in `self`, nothing more.
+The dot fills in `self`.
 The function reads the same and computes the same.
 It is not worse, and it has an advantage.
 It need not live inside `Point`.
@@ -625,7 +625,7 @@ if __name__ == "__main__":
 #: Invoice for Ada
 ```
 
-`Invoice` inherits from nothing but `object`, yet `charge()`, `persist()`,
+`Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
 and `audit()` each accept it, because each only checks the one method it needs.
 
 That same structural check has a blind spot.

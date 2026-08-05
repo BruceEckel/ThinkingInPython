@@ -364,7 +364,7 @@ print(history.undo())
 #: Goose: circle scribble
 ```
 
-`checkpoint` is nothing but a name bound to a past `Sketch`,
+`checkpoint` is a name bound to a past `Sketch`,
 which is the whole trick immutability buys.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.

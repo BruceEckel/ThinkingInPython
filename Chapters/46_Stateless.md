@@ -756,7 +756,7 @@ Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The two diverge when the dependency sits three calls deep.
 The parameter version then adds two parameters to every function on the path,
-while this version still changes nothing but the row.
+while this version still changes only the row.
 
 ## Supplying an Interface
 

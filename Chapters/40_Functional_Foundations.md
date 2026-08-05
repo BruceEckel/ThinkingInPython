@@ -12,7 +12,7 @@ And code built from small,
 checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
 None of this asks you to abandon loops, classes, or mutation.
-It asks you to notice when a piece of code can depend on nothing but its arguments,
+It asks you to notice when a piece of code can depend on its arguments alone,
 and to write it that way when it can.
 
 This chapter builds the foundations: pure functions, immutable values,

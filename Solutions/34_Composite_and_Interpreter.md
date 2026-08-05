@@ -452,10 +452,10 @@ different body, because the structure already separates the two kinds
 of piece.
 
 `html.escape()` does the character replacement, so the exercise's
-real content is *where* it gets applied: to the interpolated values
-and nothing else. The `<p>` and `</p>` the author typed pass through
-untouched, which is what makes the output valid HTML rather than a
-document with its own tags escaped.
+real content is *where* it gets applied: to the interpolated values.
+The `<p>` and `</p>` the author typed pass through untouched, which
+is what makes the output valid HTML rather than a document with its
+own tags escaped.
 
 The f-string on the last line is the comparison. It produces a
 `<script>` tag that a browser will run, and it does so with no way to

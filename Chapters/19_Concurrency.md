@@ -1613,7 +1613,7 @@ or a process.
 Each of these two interfaces unifies one small piece of the backends,
 not the whole.
 `Executor` unifies backends that share a blocking, submit-and-wait shape.
-`await` unifies backends that share nothing but a result that arrives later.
+`await` unifies backends that share only a result that arrives later.
 Everything else about the backends stays different.
 Most of what concurrency asks of you is knowing what a shared interface hides,
 and what it leaves different underneath.

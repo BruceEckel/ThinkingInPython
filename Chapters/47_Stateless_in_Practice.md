@@ -166,7 +166,7 @@ That makes an unpredictable source testable.
 
 ### A Coin Toss
 
-A coin toss is a side cause: the program reads something from outside,
+Tossing a coin is a side cause: the program reads something from outside,
 and the reading does not repeat.
 If you turn it into an Ability, the reading moves into a handler:
 
@@ -231,13 +231,9 @@ a network stub that fails twice and then succeeds, or the clock below.
 
 ### A Clock
 
-A clock is another side cause that makes testing tricky.
-[[Start by describing the overview and clock.py.
-Move the stamp and batch_due material right before frozen_clock.py]] `stamp()` puts the current time into its output,
-and `batch_due()` decides whether a day has passed since the last run.
-Against a real clock neither is testable.
-One produces a different string every minute,
-and the other needs you to wait a day to watch it return `True`.
+Reading the current time is another side cause.
+A real clock answers with the present moment,
+so a test cannot ask it what happens at some critical time (midnight, tomorrow, etc.).
 The Ability and its accessor sit in their own file,
 because two listings in this section ask the same clock different questions:
 
@@ -253,6 +249,16 @@ def now() -> Depend[Now, datetime]:
     moment: datetime = yield from Now()
     return moment
 ```
+
+Like `Flip`, `Now` carries no data.
+Its answer type is its whole content: a handler for `Now` returns a `datetime`,
+and `now()` is the accessor that declares that type.
+
+`stamp()` puts the current time into its output,
+and `batch_due()` decides whether a day has passed since the last run.
+Against a real clock neither is testable.
+One produces a different string every minute,
+and the other needs you to wait a day to watch it return `True`.
 
 ```python
 # frozen_clock.py
@@ -451,7 +457,7 @@ and it carries the hour so the handler can consult the conditions at that moment
 it asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
 
-Here's the consumer and the handler that feeds it:
+Here is the consumer and the handler that feeds it:
 
 ```python
 # microgrid.py
@@ -589,8 +595,8 @@ A handler sits outside the channel it feeds.
 
 ## Composing a Program
 
-In this small application, we fetch a headline,
-find a topic worth researching within that headline, and look up that topic.
+This small application fetches a headline,
+finds a topic worth researching within that headline, and looks up that topic.
 Each step needs something or can fail, and no step names an implementation:
 
 ```python
@@ -761,10 +767,9 @@ and the fourth `Unavailable`, so every failure the signature declares gets used.
 A full Effect system calls each pair of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
-The trace shows two things worth noticing.
-Every printed line comes from a supplied implementation,
+Every printed line in that trace comes from a supplied implementation,
 because the pipeline holds no output of its own.
-And the second run stops after `feed: fetching`.
+The second run also stops after `feed: fetching`.
 `topic_of()` yielded a `NotInteresting`,
 which ended `research()` where it stood,
 so the `need(Encyclopedia)` two lines below it never ran and no library was consulted.
@@ -847,7 +852,7 @@ Both versions short-circuit.
 The by-hand one returns early, and the Effect one abandons the generator.
 The difference is who writes the branch that does it.
 
-Be fair about what this comparison shows.
+The comparison has limits.
 At this size the by-hand version is respectable,
 and a reader who prefers it is not making a mistake.
 Two differences outlast the size argument.
@@ -916,7 +921,7 @@ print(run(kitchen(toast)()))
 #: toasted loaf of rye dough
 ```
 
-Appliances are supplied and products are produced,
+Appliances are supplied and products are made,
 and the listing keeps the two apart.
 `Dough`, `Oven`, and `Toaster` are the leaves,
 so `supply()` binds one instance of each.
@@ -976,11 +981,11 @@ and the graph you can read is the union in the signature.
 
 The bakery graph went deep.
 Three appliances, one of them reached through another Effect.
-Now we'll create a game that goes wide.
+The next example goes wide.
 [Abstract Factories](27_Factory.md#abstract-factories)
 built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
 and a `GameEnvironment` played whatever that factory produced.
-Here, we widen the cast to five kinds of actor and request each one as an Ability:
+Here the cast widens to five kinds of actor, each requested as an Ability:
 
 ```python
 # arena.py
@@ -1035,16 +1040,14 @@ so the code that supplies it chooses whether a line is printed,
 collected in a list, or discarded.
 There is no `GameEnvironment` to construct and no factory to hold.
 The five-way union is written out in full rather than aliased,
-for the reason given in
-[Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect).
+for the reason given in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect).
 
 Five abilities need five distinct shapes.
 `Obstacle.blocks()` and `Terrain.underfoot()` could each have been named `describe()`,
 and then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
 the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
-A wide cast raises the odds of that collision,
-since every pair is a chance to collide.
+Every pair of abilities with a wide cast raises the odds of a collision.
 
 The cast is a set of ordinary classes that inherit nothing:
 
@@ -1280,7 +1283,7 @@ That judgment stays with you.
 
 ### Why `retry()` Decorates the Function
 
-Notice that `retry()` decorates the *function*, not the Effect.
+Notice that `retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 and the reason is the substrate.
 A Stateless Effect is a generator, so it runs once and is then spent:
@@ -1402,7 +1405,6 @@ which is the same fact that made `retry()` decorate the function.
 
 ## Running Effects in Parallel
 
-Effects can also run at the same time.
 `fork()` hands an Effect to an `Executor` and returns a `Task`,
 and `wait()` collects the result.
 This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine);
@@ -1463,10 +1465,10 @@ with no change to `squares()`.
 `ThreadPoolExecutor` is the more specific type,
 and `squares()` asked for the general one.
 
-One restriction is worth understanding, because the checker enforces it.
+The checker enforces one restriction.
 A forked Effect must have nothing left to supply.
 `fork()`'s four overloads accept an Effect whose Ability channel holds `Never`,
-an exception type, or `Async`, and nothing else,
+an exception type, or `Async`,
 because `fork()` runs the Effect with `run()` inside the worker.
 If you decorate a function that still declares a `Need`, `ty` rejects it,
 listing the overloads it failed to match.
@@ -1679,7 +1681,6 @@ Trust a green check only where a red one has shown you it can appear.
 
 ### 3. Handlers cannot capture the continuation
 
-Naming the machinery precisely shows where this limit comes from.
 `Effect` is a monad.
 `success()` lifts a value into it, `yield from` chains two of them together,
 and the generator body is syntax that hides the chaining.
@@ -1818,11 +1819,10 @@ given a library willing to encode everything into return types.
 What is missing is not the capacity.
 It is a language that does the encoding for you.
 
-
 ## Exercises
 
 1.  `crossing` in `midnight.py` walks a fixed list,
-    so it answers two requests and no more.
+    so it answers two requests.
     Write a handler that instead advances a stored moment by one second at each request,
     and confirm `archive()` still crosses midnight under it.
     Then rewrite `archive()` so the file name and the stamp cannot disagree,
