@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/19_Concurrency.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -58,7 +59,7 @@ Later in this chapter, we show two other approaches,
 
 PROPOSED
 ```text
-Later in this chapter, two other approaches follow,
+Two other approaches appear later in this chapter.
 ```
 
 **line 812**

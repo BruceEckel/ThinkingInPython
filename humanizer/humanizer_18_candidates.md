@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/18_Performance.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -43,8 +44,7 @@ which boasts a 4x to 10x speedup.
 
 PROPOSED
 ```text
-Alternative interpreters for Python exist, notably PyPy,
-which claims a 4x to 10x speedup.
+Alternative interpreters for Python exist, notably PyPy which claims a 4x to 10x speedup.
 ```
 
 ### A2 — line 46 — person consistency
@@ -61,7 +61,7 @@ we turn out to be bad at guessing this.
 PROPOSED
 ```text
 Although it is tempting to think you "have a pretty good idea where the slowdown is,"
-you turn out to be bad at guessing this.
+programmers turn out to be bad at guessing this.
 ```
 
 ### A3 — lines 189 and 203 — italics for emphasis, not term introduction
@@ -172,8 +172,9 @@ In addition, you can do things in Rust that might be much more difficult in Pyth
 PROPOSED
 ```text
 One effective technique is to move the hot function into a compiled language.
-Rust is excellent for this because its tooling makes the bridge nearly painless: you can hand the hot Python function to your AI for conversion, and it can walk you through the rest of the process.
-Once you're done, you import a module that looks from the outside like any other Python module, except that it runs faster, and lets you do things that are difficult in Python.
+Rust is excellent for this because its tooling makes the bridge nearly painless.
+Hand the hot Python function to your AI for conversion, and it can walk you through the rest of the process.
+Once you're done, you import a module that looks from the outside like any other Python module, except that it runs faster. It also lets you do things that are difficult in Python.
 ```
 
 ### B2 — line 149 — clarity, not a classic AI tell
@@ -182,6 +183,8 @@ Not on any watch list, but "claiming one another tool is holding"
 drops the relative pronoun ("that") in a spot dense enough to slow a
 reader down. Genuinely arguable: the terser original may be exactly
 the register Bruce wants here.
+
+[[both of these are garbled and need rewriting for clarity]]
 
 CURRENT
 ```text

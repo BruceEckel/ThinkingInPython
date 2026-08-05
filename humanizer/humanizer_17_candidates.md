@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/17_Metaprogramming.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -80,7 +81,7 @@ Throughout the book we've been using `display_object()` to show the layout of an
 
 PROPOSED
 ```text
-Throughout the book you've been using `display_object()` to show the layout of an object.
+Throughout the book you've been seeing `display_object()` to show the layout of an object.
 ```
 
 ### A2 — lines 530, 689 — "itself" adds nothing
@@ -214,7 +215,7 @@ So, classes are themselves objects.
 
 PROPOSED
 ```text
-So, classes are also objects.
+Classes are also objects.
 ```
 
 **line 54**
