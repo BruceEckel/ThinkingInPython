@@ -788,7 +788,7 @@ Declaring a dependency you never bind is a type error.
 Calling an effectful function from one annotated as pure is a type error.
 That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.
-The next chapter builds it up one step at a time.
+That chapter builds it up one step at a time.
 
 The guarantee has a boundary, and it is worth naming here.
 Stateless verifies that the Effects you *declare* propagate consistently.
