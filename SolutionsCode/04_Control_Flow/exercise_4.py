@@ -14,9 +14,6 @@ def demo_exceptions(a, b):
     finally:
         print("finally always runs")
 
-demo_exceptions(1, 2)
-#: no exception
-#: finally always runs
 try:
     demo_exceptions(1, "x")
 except TypeError as e:

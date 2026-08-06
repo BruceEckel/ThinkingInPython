@@ -7,3 +7,5 @@ if response == "yes":
 #: affirmative
 print("continuing...")
 #: continuing...
+print(val)
+#: 1

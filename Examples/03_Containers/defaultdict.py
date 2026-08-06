@@ -18,3 +18,5 @@ print(by_kind["dog"])
 #: ['Rex', 'Fido']
 print(by_kind["fish"])  # A missing key gets a fresh empty list
 #: []
+print("fish" in by_kind)  # Reading it added the key
+#: True

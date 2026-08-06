@@ -10,3 +10,8 @@ if length > 3:
 if (n := len(text)) > 3:
     print(f"{n} characters")
 #: 5 characters
+queue = ["a", "b", "c"]
+while queue and (item := queue.pop()) != "a":
+    print("processing", item)
+#: processing c
+#: processing b

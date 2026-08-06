@@ -3,6 +3,8 @@
 a = {1, 2, 3, 3}  # Duplicates collapse
 print(a)
 #: {1, 2, 3}
+print(type({}).__name__, type(set()).__name__)
+#: dict set
 b = {3, 4, 5}
 print(a & b)  # Intersection
 #: {3}

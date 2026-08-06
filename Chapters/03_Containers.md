@@ -1,10 +1,10 @@
 # Containers
 
-With languages like C++ and Java, containers are add-on libraries.
+In languages like C++ and Java, containers are add-on libraries.
 Python builds them into the core of the language.
 Lists, dictionaries, and sets are fundamental data types.
 
-## Lists and Iteration
+## Lists
 
 The `for` statement iterates through a list directly rather than counting through a sequence of numbers:
 
@@ -31,11 +31,6 @@ The first line creates a `list`.
 The `list` automatically resizes itself.
 The `for` statement iterates through `odds`,
 so `x` takes on each value in the `list`.
-
-This example has no type declarations.
-Each object carries its own type.
-
-## Lists and Slicing
 
 A `list` holds objects, of any kind, in an ordered, mutable sequence.
 Indexing starts at zero, and negative indices count from the end.
@@ -69,8 +64,32 @@ print(len(xs), 5 in xs)
 
 Slicing works on any sequence, including strings and tuples.
 
+`sorted()` builds a new sorted list from any iterable.
+`list.sort()` reorders a list in place and returns `None`:
+
+```python
+# sorting.py
+
+words = ["pear", "Fig", "apple"]
+print(sorted(words))  # A new list; words is untouched
+#: ['Fig', 'apple', 'pear']
+print(words)
+#: ['pear', 'Fig', 'apple']
+print(words.sort())  # Sorts in place and returns None
+#: None
+print(words)
+#: ['Fig', 'apple', 'pear']
+print(sorted(words, reverse=True))
+#: ['pear', 'apple', 'Fig']
+```
+
+`sorted(x)` returns the result,
+so `x = x.sort()` binds `None` and loses the list.
+Uppercase sorts before lowercase because the comparison is by code point;
+[Functions](05_Functions.md#lambdas) shows how `key=` changes that.
+
 A `list` does not restrict its elements to one type.
-Since each slot just holds a reference to whatever object you put there,
+Since each slot holds a reference to whatever object you put there,
 the same `list` can mix strings, numbers, `None`, and other containers:
 
 ```python
@@ -141,7 +160,9 @@ print(person[2], type(person[2]).__name__)
 #: 1.65 float
 ```
 
-Tuples are fixed-length immutable records where each position has a distinct meaning.
+A tuple used this way is a fixed-length immutable record,
+where each position has a distinct meaning.
+Used the other way, holding many values of one type, it is an immutable `list`.
 
 ## Dictionaries
 
@@ -149,7 +170,7 @@ A dictionary (`dict`) maps keys to values, with fast lookup.
 Lookup computes a hash from each key, so keys must be *hashable*.
 The mutable built-in containers (`list`, `dict`, `set`) are not hashable,
 so they cannot serve as keys.
-Strings, numbers, and tuples can.
+Strings, numbers, and tuples of hashable values can.
 
 ```python
 # dictionaries.py
@@ -173,6 +194,10 @@ for name, age in ages.items():
 
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
+A `dict` iterates in insertion order, which the language guarantees.
+A `set` makes no such guarantee: the order it prints is an artifact of hashing,
+so never write code, or a test, that depends on it.
+
 ## Sets
 
 A set is an unordered collection of unique items.
@@ -185,6 +210,8 @@ Sets also provide the expected set algebra:
 a = {1, 2, 3, 3}  # Duplicates collapse
 print(a)
 #: {1, 2, 3}
+print(type({}).__name__, type(set()).__name__)
+#: dict set
 b = {3, 4, 5}
 print(a & b)  # Intersection
 #: {3}
@@ -202,6 +229,9 @@ print(a >= c)  # Superset
 print(2 in a)
 #: True
 ```
+
+The `{}` literal was taken by `dict` first, so an empty set is `set()`.
+The order these sets print is CPython's hashing rather than a guarantee.
 
 Every operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
@@ -242,6 +272,28 @@ The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
 
+The speed is the reason to convert a `list` to a `set` before repeated lookups.
+A `list` compares against every element in turn;
+a `set` computes one hash and looks in one place.
+`timeit()` runs a callable and returns the elapsed seconds:
+
+```python
+# membership_cost.py
+from timeit import timeit
+
+n = 200_000
+items = list(range(n))
+lookup = set(items)
+missing = -1
+list_time = timeit(lambda: missing in items, number=20)
+set_time = timeit(lambda: missing in lookup, number=20)
+print(set_time * 100 < list_time)  # Not close
+#: True
+```
+
+Searching the `list` is O(n) and searching the `set` is O(1),
+so the gap widens without limit as `n` grows.
+
 ## Specialized Containers
 
 The `collections` module in the standard library includes container types built for specific jobs.
@@ -264,6 +316,8 @@ print(counts["the"])
 #: 3
 print(counts["dog"])
 #: 0
+print("dog" in counts)  # Reading it added nothing
+#: False
 print(counts.most_common(2))
 #: [('the', 3), ('cat', 2)]
 ```
@@ -297,11 +351,16 @@ print(by_kind["dog"])
 #: ['Rex', 'Fido']
 print(by_kind["fish"])  # A missing key gets a fresh empty list
 #: []
+print("fish" in by_kind)  # Reading it added the key
+#: True
 ```
 
 The `defaultdict` constructor argument is a *factory*,
 a callable that builds the default.
-Here, the `list` argument is a factory that produces a fresh empty list for each new key.
+The factory runs on the *read*, and the new value is stored,
+so touching a missing key grows the dictionary.
+Use `in` or `dict.get()` when you only want to look.
+Here, `list` produces a fresh empty list for each new key.
 
 ### `deque`
 
@@ -312,7 +371,6 @@ A `list` is fast only at its append end:
 ```python
 # deque.py
 from collections import deque
-from timeit import timeit
 
 dq = deque([1, 2, 3])
 dq.append(4)  # Add on the right
@@ -325,8 +383,13 @@ print(dq.pop())  # Remove from the right
 #: 4
 print(dq)
 #: deque([1, 2, 3])
+```
 
-# A plain list can act as a double-ended queue too:
+A `list` has an operation for each of those four:
+
+```python
+# list_as_deque.py
+
 lst = [1, 2, 3]
 lst.append(4)  # Add at the end
 lst.insert(0, 0)  # Add at the start
@@ -338,8 +401,18 @@ print(lst.pop())  # Remove from the end
 #: 4
 print(lst)
 #: [1, 2, 3]
+```
 
-# Time it to see the difference:
+A `list` can stand in for a `deque`,
+but `insert(0, x)` and `pop(0)` must shift every remaining element,
+so both are O(n) instead of O(1).
+Timing the two at the left end shows it:
+
+```python
+# deque_timing.py
+from collections import deque
+from timeit import timeit
+
 n = 20_000
 
 def list_left_ops():
@@ -362,9 +435,6 @@ print(deque_time < list_time)
 #: True
 ```
 
-A `list` can stand in for a `deque`,
-but `insert(0, x)` and `pop(0)` must shift every remaining element,
-so both are O(n) instead of O(1).
 Use a `deque` whenever you need a queue.
 
 ### `namedtuple`
@@ -445,9 +515,13 @@ except TypeError as e:
 #: TypeError
 ```
 
+Each `# type: ignore` sits on a line that deliberately misbehaves.
+Assigning into an immutable container is a type error as well as a runtime one,
+so the comment lets the example demonstrate the exception it expects.
+
 Where a `MappingProxyType` is only a read-only window onto a `dict` that still exists and can change,
 a `frozendict` owns its contents outright.
-It runs under Python 3.15:
+This listing requires Python 3.15:
 
 ```python
 # frozendict_demo.py
@@ -465,10 +539,6 @@ except TypeError as e:
 #: TypeError
 ```
 
-The one `# type: ignore` sits on the line that deliberately misbehaves.
-Assigning into a `frozendict` is a type error as well as a runtime one,
-so the comment lets the example demonstrate the `TypeError` it expects.
-
 Because a `frozendict` cannot change, it is hashable when its values are,
 so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
 A dictionary key must be hashable rather than immutable.
@@ -484,9 +554,40 @@ A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through.
 
+Immutability is also shallow.
+An immutable container fixes which objects it holds,
+not what those objects contain:
+
+```python
+# shallow_immutability.py
+
+nested = (1, [2, 3])
+nested[1].append(4)  # The tuple's element is still mutable
+print(nested)
+#: (1, [2, 3, 4])
+try:
+    hash(nested)  # So the tuple cannot be hashed
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+try:
+    nested[0] = 9  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+The `tuple` refuses to let go of the `list`,
+but nothing stops that `list` from changing,
+and a container holding an unhashable object is itself unhashable.
+Immutability pays off when it goes all the way down.
+[Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+shows the same leak inside a frozen data class.
+
 ## Exercises
 
-1.  In `deque.py`, change `n` from `20_000` to `2_000` and run the timing again.
+1.  In `deque_timing.py`,
+    change `n` from `20_000` to `2_000` and run the timing again.
     Does `deque_time < list_time` still hold?
     Change `n` to `200_000` and try again.
     Explain what changes about the comparison as `n` grows.
@@ -499,3 +600,10 @@ so changes to that underlying `dict` still show through.
     (a plain list, not a `frozenset`) and catch the exception it raises.
     Explain, in terms of hashability,
     why a `frozenset` works as a set member but a `list` does not.
+5.  Given `xs = [10, 20, 30, 40, 50]`, write one slice expression for each of:
+    the last two items, everything but the first and last,
+    and a reversed copy of the middle three.
+6.  Rewrite `counter.py`'s tally using a `defaultdict(int)` and no `Counter`.
+    Which parts of `Counter` did you have to write yourself?
+7.  Rewrite `heterogeneous.py` with a `namedtuple`.
+    Show that the unpacking line still works unchanged.

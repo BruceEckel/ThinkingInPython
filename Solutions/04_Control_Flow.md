@@ -74,7 +74,7 @@ only matters when two conditions could both be true for the same
 value and send execution down different paths, which is not the
 case here.
 
-## 4. A caught exception vs. one that escapes the handler
+## 4. An exception that escapes the handler
 
 ```python
 # exercise_4.py
@@ -93,9 +93,6 @@ def demo_exceptions(a, b):
     finally:
         print("finally always runs")
 
-demo_exceptions(1, 2)
-#: no exception
-#: finally always runs
 try:
     demo_exceptions(1, "x")
 except TypeError as e:
@@ -104,13 +101,61 @@ except TypeError as e:
 #: escaped: TypeError
 ```
 
-`demo_exceptions(1, 2)` divides cleanly, so `else` runs, then
-`finally`. `demo_exceptions(1, "x")` raises `TypeError` inside
-`checked_divide` (Python cannot divide an `int` by a `str`), and the
-`except` clause only catches `ValueError`. The `finally` block still
-runs, because `finally` always runs regardless of what kind of
-exception is in flight, but the `TypeError` itself is not caught
-there. It keeps propagating up past `demo_exceptions()`, which is why
-this listing wraps the call in its own `try`/`except TypeError` to
-show the exception actually escaping, the same thing an interactive
-session or an outer caller sees.
+`demo_exceptions(1, "x")` raises `TypeError` inside `checked_divide`
+(Python cannot divide an `int` by a `str`), and the `except` clause
+only catches `ValueError`. The `finally` block still runs, because
+`finally` always runs regardless of what kind of exception is in
+flight, but the `TypeError` itself is not caught there. It keeps
+propagating up past `demo_exceptions()`, which is why this listing
+wraps the call in its own `try`/`except TypeError` to show the
+exception actually escaping, the same thing an interactive session or
+an outer caller sees. Note that `else` never runs here: it belongs to
+the case where the `try` block finished cleanly.
+
+## 5. A three-item `case` in `pattern_matching.py`
+
+```python
+# exercise_5.py
+def run(command):
+    match command.split():
+        case ["go", direction, distance]:
+            return f"moving {direction} for {distance}"
+        case ["go", direction]:
+            return f"moving {direction}"
+        case ["quit"]:
+            return "goodbye"
+        case _:
+            return "unknown command"
+
+print(run("go north 3"))
+#: moving north for 3
+print(run("go north"))
+#: moving north
+```
+
+Before the new `case` exists, `run("go north 3")` returns `unknown
+command`. A list pattern matches on length as well as content, so
+`["go", direction]` matches a two-item list and nothing else; the
+three-item split falls through to `case _`. Adding the longer pattern
+gives that length somewhere to land. Order matters only between
+patterns that could both match the same value, which these two cannot,
+so either arrangement works here.
+
+## 6. The comprehension written as a loop
+
+```python
+# exercise_6.py
+evens = []
+for n in range(10):
+    if n % 2 == 0:
+        evens.append(n)
+print(evens)
+#: [0, 2, 4, 6, 8]
+```
+
+Four lines instead of one, and the name `evens` is bound to an empty
+list for three of them. The comprehension says what the list *is*;
+the loop says how to build it, and the reader has to run the loop in
+their head to find out. The loop version wins when the body grows
+past one condition and one expression, since a comprehension with two
+filters and a nested loop is harder to read than the code it replaced.

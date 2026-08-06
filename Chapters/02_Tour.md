@@ -2,7 +2,7 @@
 
 This chapter and the several that follow give a programmer's tour of Python:
 syntax and the scalar types here, then containers, control flow, functions,
-modules, classes, and static typing in the chapters after it.
+modules, classes, and static typing in the chapters that follow this one.
 It assumes you have programming experience.
 You can find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
@@ -36,7 +36,11 @@ if response == "yes":
 #: affirmative
 print("continuing...")
 #: continuing...
+print(val)
+#: 1
 ```
+
+## How to Read the Examples
 
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
@@ -58,10 +62,17 @@ which are the "then" part of the `if` statement.
 The `print()` function sends its argument to standard output.
 The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
+
+An indented block groups statements but does not create a scope.
+`val` is assigned inside the `if` and is still visible after it,
+unlike a variable declared inside braces in C++ or Java.
+Functions, classes, and modules introduce new scopes;
+an `if` or a `for` block does not.
+
 Indenting can nest to any level.
 Unlike the brace-placement debates of C++ or Java,
-there are no options with Python formatting.
-The language forces everyone to indent code the same way,
+the indentation is not a matter of taste: it is the structure.
+Python code from any two authors therefore lines up the same way,
 which is one of the main reasons for Python's consistent readability.
 
 Python normally has only one statement per line,
@@ -76,6 +87,8 @@ It does not copy.
 You need not declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
+Python also has a full static type system layered on top,
+which this book uses from [Static Typing](08_Static_Typing.md) onward.
 
 ```python
 # references.py
@@ -89,7 +102,7 @@ print(a)  # The same object: a and b
 #: [1, 2, 3, 4]
 print(a is b)  # Identical objects
 #: True
-c = a[:]  # A shallow copy
+c = a[:]  # Copies the list, not its contents
 print(a is c, a == c)  # Different object, equal value
 #: False True
 ```
@@ -97,6 +110,8 @@ print(a is c, a == c)  # Different object, equal value
 Use `==` to ask whether two objects have equal values.
 Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
+`a[:]` copies the list but not the objects inside it,
+so a nested list would still be shared between `a` and `c`.
 
 You can assign several names at once,
 which makes it easy to swap without a temporary:
@@ -113,6 +128,9 @@ print(first, rest)
 #: 10 [20, 30, 40]
 ```
 
+`*rest` collects whatever is left over.
+[Containers](03_Containers.md#tuples-and-unpacking) covers the general form.
+
 Numbers, strings, and tuples are *immutable*,
 which means that operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
@@ -126,9 +144,13 @@ Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
 `/` always produces a `float`, and `//` is floor division
 (divide, then round down to the nearest integer).
+Floor division rounds toward negative infinity, not toward zero,
+so `-7 // 2` is `-4` where C and Java give `-3`.
+The remainder follows from that: `-7 % 2` is `1` in Python and `-1` in C.
+The sign of `%` matches the divisor.
 
 ```python
-# numbers.py
+# arithmetic.py
 
 print(7 / 2)  # True division, always a float
 #: 3.5
@@ -136,6 +158,8 @@ print(7 // 2)  # Floor division
 #: 3
 print(7 % 2)  # Remainder
 #: 1
+print(-7 // 2, -7 % 2)  # Floors, not truncates toward zero
+#: -4 1
 print(2 ** 10)  # Exponentiation
 #: 1024
 print(10 ** 30)  # A 31-digit int, no overflow
@@ -146,6 +170,9 @@ total = 0
 total += 5  # Augmented assignment, like other languages
 print(total)
 #: 5
+scores = [90, 0, 71, 0, 55]
+print(sum(s > 60 for s in scores))  # True counts as 1
+#: 2
 ```
 
 Python has no `++` or `--`; use `+= 1` and `-= 1`.
@@ -153,14 +180,15 @@ Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
-This can be useful for counting.
+Summing a sequence of comparisons therefore counts how many were true.
 
 Integers also support the bitwise and shift operators,
-each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`):
+each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`).
+Binary literals, which start with `0b`, make the bit patterns readable:
 
 ```python
 # bitwise.py
-# Binary literals (starting with 0b) make the bit patterns readable
+
 print(bin(0b1100 & 0b1010))  # AND, bits set in both
 #: 0b1000
 print(bin(0b1100 | 0b1010))  # OR, bits set in either
@@ -186,6 +214,8 @@ The `bin()` function converts an integer to a binary string for display.
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
 The built-in numeric types do not implement it but array libraries such as NumPy do.
+The same character in front of a `def` or a `class` is unrelated:
+that is decorator syntax, covered in [Decorators](14_Decorators.md).
 
 ## Booleans, None, and Truthiness
 
@@ -195,7 +225,7 @@ It is the default return value of a function that returns nothing.
 You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
 and `None` is always false.
-Everything else is true.
+Everything else is true, unless an object says otherwise.
 This is *truthiness*,
 and it allows `if items:` instead of `if len(items) != 0:`.
 
@@ -217,8 +247,11 @@ if not []:
 #: empty
 
 name = "" or "default"  # 'or' returns the first truthy operand
-print(name)  # default
+print(name)
 #: default
+count = 0
+print(count or 10)  # 0 is falsy, so the fallback wins
+#: 10
 ```
 
 `repr()` returns a value's unambiguous representation,
@@ -227,6 +260,11 @@ so the empty string shows as `''` and not as blank.
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean.
 `x or default` is a common way to supply a fallback.
+It has a sharp edge.
+`x or default` replaces every falsy `x`, not only a missing one,
+so a legitimate `0` or `""` is thrown away.
+When zero or an empty string is a legal value, test for `None` instead:
+`default if x is None else x`.
 
 ## Strings
 
@@ -277,7 +315,7 @@ Python takes backslashes literally, so you don't need to double them.
 
 Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
-It is readable, fast, and preferred:
+It is readable and fast, and it is what modern code uses:
 
 ```python
 # fstrings.py
@@ -340,6 +378,9 @@ Iterating a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 which `piece.expression` reports.
+Iteration skips empty literal strings,
+so the leading `''` in `message.strings` never reaches the loop.
+A consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases only the literal text, leaving the values alone,
 which no amount of work on a finished f-string could do reliably.
 
@@ -352,8 +393,9 @@ builds a query that way.
 
 ### Common String Operations
 
-Strings are immutable sequences.
-You can use slicing to select portions and `in` to test membership:
+Strings are immutable sequences with a large set of methods.
+You can also use [slicing](03_Containers.md#lists)
+to select portions and `in` to test membership:
 
 ```python
 # string_methods.py
@@ -379,8 +421,8 @@ String methods return new strings rather than changing the original.
 
 ## Naming Conventions
 
-The basic strategy for naming is to use `snake_case` for identifiers, functions,
-and file names.
+The basic strategy for naming is to use `snake_case` for variables, functions,
+methods, and file names.
 This means lower case with words separated by underscores,
 as in `this_is_snake_case`.
 
@@ -416,7 +458,11 @@ Tools such as ruff can apply these to your code automatically
 3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero
     (change `{score:.0f}%` to show `{score:.2f}`),
     and a second line using the debug specifier, `f"{score = }"`.
-4.  Rename every identifier in `numbers.py` to camelCase
-    (`totalSum` instead of `total`, and so on), then explain,
-    using [Naming Conventions](#naming-conventions),
-    which renames break the convention and which merely look unfamiliar.
+4.  `arithmetic.py` and `bitwise.py` each define one variable,
+    `total` and `flags`.
+    Rename them to `totalSum` and `flagBits`,
+    then to `TOTAL_SUM` and `FLAG_BITS`.
+    Every version runs.
+    Using [Naming Conventions](#naming-conventions),
+    say what each form signals to a reader who did not write the code,
+    and which of the three a linter would object to.

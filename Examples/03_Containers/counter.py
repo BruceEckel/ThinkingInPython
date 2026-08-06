@@ -9,5 +9,7 @@ print(counts["the"])
 #: 3
 print(counts["dog"])
 #: 0
+print("dog" in counts)  # Reading it added nothing
+#: False
 print(counts.most_common(2))
 #: [('the', 3), ('cat', 2)]

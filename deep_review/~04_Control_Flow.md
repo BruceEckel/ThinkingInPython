@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Deep review: 04_Control_Flow.md
 
 **How to use this file:** delete a `##` block to reject that proposal, edit its text to change what gets implemented, leave it alone to accept it. Hand the file back when you are done.
@@ -325,17 +326,6 @@ which [Cleanup](10_Cleanup.md) contrasts with letting Python's garbage collector
 
 ---
 
-## 16. Section order: comprehensions sit two sections away from the loops they replace
-
-**Kind:** structure
-**Where:** section "Comprehensions" (line ~363)
-**Problem:** The comprehension section opens by defining a comprehension as a replacement for "a loop that builds up a result," but the loop material ended two sections earlier, with pattern matching and exceptions in between. The reader has to re-establish the comparison from memory.
-
-**Proposal:** Consider moving "Comprehensions" to directly follow the loop material, before "Pattern Matching." The chapter then runs statements-that-loop, then the expression form of the same idea, then the remaining statement forms.
-
-*Reason to reject:* the current order groups statements first and defers the expression forms, and the section is short enough that the gap costs little. This is offered because the order is worth a decision, not because it is clearly wrong.
-
-**Cost:** The `#comprehensions` anchor is unchanged, so [Comprehensions](16_Comprehensions.md)'s inbound link keeps working. No listing depends on the order.
 
 ---
 

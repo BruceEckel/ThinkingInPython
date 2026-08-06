@@ -94,3 +94,76 @@ because it is immutable: nothing can change its contents after
 creation, so its hash never goes stale. A `list` is mutable, so Python
 refuses to hash it at all, which is exactly why it cannot be a set
 member or a dictionary key.
+
+## 5. Four slices of one list
+
+```python
+# exercise_5.py
+xs = [10, 20, 30, 40, 50]
+print(xs[-2:])  # The last two items
+#: [40, 50]
+print(xs[1:-1])  # Everything but the first and last
+#: [20, 30, 40]
+print(xs[1:4][::-1])  # The middle three, reversed
+#: [40, 30, 20]
+print(xs[3:0:-1])  # The same three, in one slice
+#: [40, 30, 20]
+```
+
+A negative `start` counts from the end, so `xs[-2:]` needs no length.
+`xs[1:-1]` trims one from each end. The reversed middle can be written
+two ways: slice, then reverse the copy, or walk backwards with a
+negative `step`. The one-slice form is harder to read because the
+bounds swap roles: `3` is now the first index visited and `0` is the
+excluded stop, so the element at index `0` never appears.
+
+## 6. `defaultdict(int)` in place of `Counter`
+
+```python
+# exercise_6.py
+from collections import defaultdict
+
+words = "the cat sat on the mat the cat".split()
+counts: defaultdict[str, int] = defaultdict(int)
+for word in words:
+    counts[word] += 1
+print(dict(counts))
+#: {'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}
+print(counts["dog"])  # Missing keys still read as zero
+#: 0
+print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
+#: [('the', 3), ('cat', 2)]
+```
+
+The tally loop is the same length either way, since `defaultdict(int)`
+removes the same "does this key exist yet" check that `Counter` does.
+What has to be written by hand is everything else `Counter` supplies:
+`most_common()` becomes a `sorted()` call with a key function and a
+slice, and the `Counter({...})` repr becomes a `dict()` conversion.
+`Counter` also leaves the dictionary alone when a missing key is read,
+while `defaultdict(int)` stores a `0` for `"dog"`, so the two disagree
+about their own contents after the last line above.
+
+## 7. `heterogeneous.py` as a `namedtuple`
+
+```python
+# exercise_7.py
+from collections import namedtuple
+
+Person = namedtuple("Person", ["name", "age", "height"])
+person = Person("Alice", 30, 1.65)
+name, age, height = person  # Unchanged from the tuple version
+print(name, age, height)
+#: Alice 30 1.65
+print(person.name, person.height)  # Now also reachable by name
+#: Alice 1.65
+print(person[0], type(person[0]).__name__)
+#: Alice str
+```
+
+The unpacking line does not change, because a `namedtuple` is a tuple
+subclass: it unpacks by position like any other tuple. What the names
+add is the second line, where `person.height` says what `person[2]`
+meant. Nothing is given up, which is why a heterogeneous tuple that
+outlives one function is usually better as a `namedtuple` or a data
+class.

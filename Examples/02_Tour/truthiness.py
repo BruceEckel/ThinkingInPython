@@ -15,5 +15,8 @@ if not []:
 #: empty
 
 name = "" or "default"  # 'or' returns the first truthy operand
-print(name)  # default
+print(name)
 #: default
+count = 0
+print(count or 10)  # 0 is falsy, so the fallback wins
+#: 10

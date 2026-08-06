@@ -56,22 +56,41 @@ expression's source text and its value, which is why it is useful for
 quick debugging prints: no need to write `print("score", score)`
 separately.
 
-## 4. camelCase rename and the naming convention
+## 4. What a name signals
 
-Renaming `numbers.py`'s identifiers to camelCase:
+The camelCase versions of `total` and `flags`:
 
 ```python
 # exercise_4.py
 totalSum = 0  # noqa: N816 (deliberately non-idiomatic; see below)
 totalSum += 5  # noqa: N816
-print(totalSum)
-#: 5
+flagBits = 0b0010  # noqa: N816
+flagBits |= 0b1000  # noqa: N816
+print(totalSum, bin(flagBits))
+#: 5 0b1010
 ```
 
-This still runs, since Python does not enforce a naming convention at
-the language level. But it breaks
-[Naming Conventions](../Chapters/02_Tour.md#naming-conventions):
-variables and functions should be `snake_case`
-(`total_sum`, not `totalSum`). CapWords is reserved for class names.
-`totalSum` is not a syntax error, only a style violation, one that
-ruff's PEP 8 checks flag.
+And the all-uppercase versions:
+
+```python
+# exercise_4_constants.py
+TOTAL_SUM = 5
+FLAG_BITS = 0b1010
+print(TOTAL_SUM, bin(FLAG_BITS))
+#: 5 0b1010
+```
+
+All three forms run, since Python does not enforce a naming convention
+at the language level. What differs is what a reader infers.
+`total_sum` and `flag_bits` say "an ordinary variable that changes,"
+which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
+constant, fixed for the life of the program," so using that form for a
+running total misleads anyone who later tries to reuse the name.
+`totalSum` and `flagBits` say nothing about the value; they only say the
+author came from Java or JavaScript.
+
+Only the camelCase form breaks
+[Naming Conventions](../Chapters/02_Tour.md#naming-conventions), and it
+is the only one a linter objects to: ruff's PEP 8 checks report `N816`
+for a mixed-case global. The uppercase form is legal style, merely a
+false claim about the value. CapWords stays reserved for class names.
