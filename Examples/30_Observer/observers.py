@@ -1,25 +1,24 @@
 # observers.py
 from collections.abc import Callable
-from typing import Any
 
-type Observer = Callable[[Any], None]
+type Observer[T] = Callable[[T], None]
 
-class Observable:
+class Observable[T]:
     def __init__(self) -> None:
-        self._observers: list[Observer] = []
+        self._observers: list[Observer[T]] = []
 
-    def subscribe(self, observer: Observer) -> None:
+    def subscribe(self, observer: Observer[T]) -> None:
         self._observers.append(observer)
 
-    def unsubscribe(self, observer: Observer) -> None:
+    def unsubscribe(self, observer: Observer[T]) -> None:
         self._observers.remove(observer)
 
-    def notify(self, data: Any) -> None:
+    def notify(self, data: T) -> None:
         # Copy: observers may detach during notification
         for observer in list(self._observers):
             observer(data)
 
-class Thermometer(Observable):
+class Thermometer(Observable[float]):
     def __init__(self) -> None:
         super().__init__()
         self._celsius = 0.0

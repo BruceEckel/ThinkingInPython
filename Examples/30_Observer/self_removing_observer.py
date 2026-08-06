@@ -1,7 +1,7 @@
 # self_removing_observer.py
 from observers import Observable
 
-obs = Observable()
+obs = Observable[object]()
 seen: list[str] = []
 
 def once(data: object) -> None:

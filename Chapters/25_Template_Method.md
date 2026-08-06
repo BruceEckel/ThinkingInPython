@@ -10,9 +10,12 @@ some of which you override.
 Python's own `unittest` is an application framework of this kind.
 You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
-The framework's runner is the template method.
-It calls `setUp()`, then your test, then `tearDown()`, for each test,
+`TestCase.run()` is the template method.
+It calls `setUp()`, then your test method, then `tearDown()`,
 and you never call that sequence yourself.
+Constructing a `TestCase` runs nothing;
+the test runner calls `run()` on the finished object,
+a separation this chapter returns to below.
 
 ## The Fixed Algorithm
 
@@ -73,12 +76,18 @@ The base class calls code written after it, sometimes years after.
 Framework authors call this the *Hollywood Principle*: don't call us,
 we'll call you.
 Your code supplies the steps; the framework decides when they run.
+The general name for this reversal is *Inversion of Control*:
+the framework holds the flow of control and calls into your code,
+rather than your code calling into a library.
 
 A caution about the `@final` lock: it binds only under the type checker.
 At runtime Python ignores it,
 and a subclass override of `run()` replaces the fixed algorithm without complaint.
 The guarantee is real, but it is the checker's guarantee,
 one more reason to make `ty` or another checker part of the build.
+When you need the interpreter to refuse an override,
+the `__init_subclass__()` technique from [Making a Class Final](17_Metaprogramming.md#making-a-class-final)
+applies to a method too: raise an exception when `"run" in cls.__dict__`.
 
 The step methods default to `...`, doing nothing,
 so a subclass overrides only the steps it cares about,
@@ -87,6 +96,8 @@ When every subclass must supply a step,
 inherit from `ABC` and declare the step with `@abstractmethod`,
 as in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance);
 then Python refuses to instantiate a subclass that forgot it.
+
+### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 Starting the engine from the constructor carries a trap.
 `run()` calls methods the subclass supplies,
@@ -134,13 +145,20 @@ and the next subclass author will restore the usual order without thinking.
 The reliable fix changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
 
+### Substitutability
+
 This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
 A subclass must work wherever code expects its base class.
 The base `run()` calls `customize1()` and `customize2()` through `self`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
-An override that breaks that trust, doing nothing the flow relies on,
-or raising an exception where the base would not,
-corrupts the fixed algorithm even though the code still type-checks.
+An override that breaks that trust corrupts the fixed algorithm even though the code still type-checks:
+one that raises an exception where the base would not,
+or one that leaves a step empty when the flow depends on the work.
+That last case is the price of the `...` defaults above.
+They make a step optional,
+and nothing distinguishes "deliberately empty" from "forgotten."
+Where the algorithm cannot proceed without a step,
+`@abstractmethod` says so and Python enforces it.
 The Template Method works only when every subclass is a faithful substitute for its base.
 
 The test supplies a recording subclass and verifies the fixed flow:
@@ -204,10 +222,16 @@ def test_template_function_runs_steps_in_order() -> None:
 ```
 
 Both the Template Method and the function version have a fixed algorithm and varying steps.
-If they share state, build on each other, or come as a coherent group,
+If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
+
+The function version also closes the gap in `@final`.
+A caller supplies the steps and cannot replace the loop,
+because there is no subclass through which to replace it.
+The fixed algorithm is fixed by structure rather than by a decorator the runtime ignores.
+
 This is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
@@ -220,8 +244,13 @@ A hook that holds no state is usually better as a function than as a method to o
     Customize it two ways, once by subclassing and once by passing a function:
 
     1.  Convert all the letters in each file to uppercase.
-    2.  Search the files for words given in the first file.
+    2.  Treat the first file as a list of search words, one per line,
+        and report which of those words appear in each remaining input file.
 2.  Fix `premature_engine.py` both ways:
     first reorder the two lines in `Greeter.__init__()`,
     then instead redesign `Framework` so clients construct the object and call `run()` explicitly.
     Which fix still protects a second subclass author who has never read this chapter?
+3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
+    Run it, then run `ty` over it.
+    Which of the two, Python or `ty`, objects to the change?
+    What does that tell you about where the fixed algorithm's guarantee comes from?

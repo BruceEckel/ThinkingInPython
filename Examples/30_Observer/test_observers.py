@@ -3,19 +3,19 @@ from observers import Observable, Thermometer
 
 def test_notify_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
-    obs = Observable()
+    obs = Observable[int]()
     obs.subscribe(lambda d: received.append(("a", d)))
     obs.subscribe(lambda d: received.append(("b", d)))
     obs.notify(42)
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable().notify("anything")  # Must not raise
+    Observable[str]().notify("anything")  # Must not raise
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
-    obs = Observable()
-    record = received.append  # Named so it can be removed
+    obs = Observable[object]()
+    record = received.append  # A bound method: equal, not identical
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)

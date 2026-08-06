@@ -1,34 +1,22 @@
 # exercise_1.py
 from collections.abc import Callable
-from functools import wraps
 from typing import Any
 
-def trace_all(cls: type) -> type:
-    for name, value in vars(cls).copy().items():
-        if callable(value) and not name.startswith("__"):
-            def make_wrapper(
-                func: Callable, name: str = name
-            ) -> Callable:
-                @wraps(func)
-                def wrapper(*args: Any, **kwargs: Any) -> Any:
-                    print(f"-> {name}")
-                    result = func(*args, **kwargs)
-                    print(f"<- {name}")
-                    return result
-                return wrapper
-            setattr(cls, name, make_wrapper(value))
-    return cls
+class Observable:
+    def __init__(self) -> None:
+        self._observers: list[Callable] = []
 
-@trace_all
-class Greeter:
-    def hello(self, name: str) -> str:
-        return f"Hello, {name}"
+    def subscribe(self, observer: Callable) -> None:
+        self._observers.append(observer)
 
-    def bye(self) -> str:
-        return "Bye"
+    def notify(self, *args: Any) -> None:
+        for obs in self._observers:
+            obs(*args)
 
-g = Greeter()
-print(g.hello("Bob"))
-#: -> hello
-#: <- hello
-#: Hello, Bob
+calls: list[tuple[str, int]] = []
+observable = Observable()
+observable.subscribe(lambda v: calls.append(("A", v)))
+observable.subscribe(lambda v: calls.append(("B", v)))
+observable.notify(42)
+print(calls)
+#: [('A', 42), ('B', 42)]

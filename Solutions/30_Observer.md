@@ -1,59 +1,9 @@
 # Observer: Solutions
 
-## 1. A class decorator that traces every method
+## 1. A minimal Observer-Observable pair
 
 ```python
 # exercise_1.py
-from collections.abc import Callable
-from functools import wraps
-from typing import Any
-
-def trace_all(cls: type) -> type:
-    for name, value in vars(cls).copy().items():
-        if callable(value) and not name.startswith("__"):
-            def make_wrapper(
-                func: Callable, name: str = name
-            ) -> Callable:
-                @wraps(func)
-                def wrapper(*args: Any, **kwargs: Any) -> Any:
-                    print(f"-> {name}")
-                    result = func(*args, **kwargs)
-                    print(f"<- {name}")
-                    return result
-                return wrapper
-            setattr(cls, name, make_wrapper(value))
-    return cls
-
-@trace_all
-class Greeter:
-    def hello(self, name: str) -> str:
-        return f"Hello, {name}"
-
-    def bye(self) -> str:
-        return "Bye"
-
-g = Greeter()
-print(g.hello("Bob"))
-#: -> hello
-#: <- hello
-#: Hello, Bob
-```
-
-`trace_all` runs once, at class-definition time, over
-`vars(cls)`, the class's own namespace, wrapping every plain callable
-that is not a dunder. `make_wrapper` captures each method's `name` as
-a default argument (`name: str = name`), which freezes that
-particular loop iteration's value; without it, every wrapper
-shares the loop variable's final value instead of its own method's
-name, the classic late-binding closure trap. This is
-[Decorating Classes](14_Decorators.md#decorating-classes)'s
-`register` idea taken further: instead of only recording the class,
-this decorator reaches inside it and rewrites every method.
-
-## 2. A minimal Observer-Observable pair
-
-```python
-# exercise_2.py
 from collections.abc import Callable
 from typing import Any
 
@@ -83,10 +33,10 @@ observer. `subscribe()` collects them in a list, and `notify()` calls
 each one in turn with whatever arguments it was given, so every
 subscribed observer sees the same update, in subscription order.
 
-## 3. Turning `box_observer.py` into a flood-fill game
+## 2. Turning `box_observer.py` into a flood-fill game
 
 ```python
-# exercise_3.py
+# exercise_2.py
 from typing import Final
 
 COLORS: Final[tuple[str, str, str]] = (
@@ -158,7 +108,84 @@ single-player scoring the exercise asks for, "how many clicks to turn
 the field into one color"; two-player competition follows the same
 `click()` method, alternating whose turn supplies the next color, with
 whoever's move leaves the larger owned patch after a fixed number of
-rounds. `FloodGame` inheriting from `Observable`, the same as
+rounds. `FloodGame` inheriting from `Observable[Grid]`, the same as
 `BoxModel`, and calling `self.notify(self.grid)` at the end of a
 successful `click()` lets `box_view.py`'s existing view repaint
 after every move with no changes to the view itself.
+
+## 3. A `notify()` that survives a failing observer
+
+```python
+# exercise_3.py
+from collections.abc import Callable
+
+type Observer[T] = Callable[[T], None]
+
+class Observable[T]:
+    def __init__(self) -> None:
+        self._observers: list[Observer[T]] = []
+
+    def subscribe(self, observer: Observer[T]) -> None:
+        self._observers.append(observer)
+
+    def notify(self, data: T) -> None:
+        failures: list[Exception] = []
+        for observer in list(self._observers):
+            try:
+                observer(data)
+            except Exception as e:
+                failures.append(e)
+        if failures:
+            raise ExceptionGroup("observer failures", failures)
+
+received: list[int] = []
+
+def broken(data: int) -> None:
+    raise RuntimeError(f"cannot handle {data}")
+
+obs = Observable[int]()
+obs.subscribe(broken)
+obs.subscribe(received.append)
+try:
+    obs.notify(7)
+except* RuntimeError as group:
+    print(len(group.exceptions), received)
+#: 1 [7]
+```
+
+```python
+# test_resilient_notify.py
+import pytest
+from exercise_3 import Observable
+
+def test_later_observer_still_runs_after_a_failure() -> None:
+    received: list[int] = []
+
+    def broken(data: int) -> None:
+        raise RuntimeError("boom")
+
+    obs = Observable[int]()
+    obs.subscribe(broken)
+    obs.subscribe(received.append)
+    with pytest.raises(ExceptionGroup):
+        obs.notify(1)
+    assert received == [1]
+```
+
+The loop catches each failure and keeps going, so subscription order
+stops deciding who hears the change. Collecting the exceptions rather
+than discarding them is the other half: an observer that fails
+silently is worse than one that stops the loop, because nothing
+reports that a notification was lost.
+
+`ExceptionGroup` is the right container because more than one
+observer can fail on a single notification, and the caller needs all
+of them, not the first. `except*` then lets a caller handle one kind
+of failure and re-raise the rest, which a plain `except` on a single
+re-raised exception cannot do.
+
+Catching bare `Exception` here is deliberate: `notify()` has no idea
+what its observers do, so it cannot name their failure modes. It
+still lets `BaseException` through, so a `KeyboardInterrupt` or an
+`asyncio.CancelledError` passing through an observer stops the
+notification instead of being collected as data.

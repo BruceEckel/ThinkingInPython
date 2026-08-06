@@ -19,7 +19,7 @@ def recolored(grid: Grid, clicked: Coord) -> Grid:
     return {cell: color if adjacent(cell, clicked) else current
             for cell, current in grid.items()}
 
-class BoxModel(Observable):
+class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size

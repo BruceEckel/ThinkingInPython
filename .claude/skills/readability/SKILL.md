@@ -1673,6 +1673,12 @@ Bruce rejects a change by putting an `X` in the box, `[X] Reject`, instead of
 deleting the block. The rejected block stays in the file as a record, so a later
 review can see the suggestion was already considered and declined.
 
+Before writing findings, check for a completed review of the same chapter: the
+most recent `~`-prefixed file for it (see Successive reviews below).
+Any block marked `[X] Reject` there is a suggestion Bruce already declined, so
+do not raise it again. Carry those rejections forward, so a new review does not
+re-propose what a past one settled.
+
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
 
@@ -1691,13 +1697,25 @@ When Bruce hands the file back with an instruction like
    never touch a fenced ```python block,
    keep Semantic Line Breaks in the prose,
    and leave code, frontmatter, and link targets alone.
-3. Rename the review file to add a leading `~`
-   (`readability/~12_Data_Classes_as_Types.md`), as the file's own instruction
-   says. Use `git mv` when the file is tracked. The `~` marks it done.
+3. Rename the review file to the next name in the completed-review series (see
+   Successive reviews), which adds the leading `~` the file's own instruction
+   calls for. Use `git mv` when the file is tracked. The `~` marks it done.
 4. Remind Bruce to run `make verify`.
 
 A `~`-prefixed file in `readability/` is a completed review.
 Leave it alone unless Bruce asks.
+
+**Successive reviews.**
+The active review is always the unprefixed `readability/NN_name.md`, and there
+is at most one at a time. When a chapter is reviewed more than once, keep every
+completed review as history by numbering them.
+The first completed review is `readability/~12_Data_Classes_as_Types.md`,
+the second `readability/~12_Data_Classes_as_Types.r2.md`,
+the third `...r3.md`, and so on.
+On completion, rename the active file to the next free number in that series.
+The carry-forward step reads the most recent completed review, the
+highest-numbered one, which already accumulates every earlier review's
+`[X]` rejections.
 
 ## Process and Output
 

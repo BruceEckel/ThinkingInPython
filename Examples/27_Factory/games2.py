@@ -37,14 +37,17 @@ class WarriorsAndWeapons:
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
-        self.factory = factory
-        self.p = factory.make_character()
-        self.ob = factory.make_obstacle()
+        self.character = factory.make_character()
+        self.obstacle = factory.make_obstacle()
     def play(self) -> None:
-        self.p.interact_with(self.ob)
+        self.character.interact_with(self.obstacle)
+
+class BrokenFactory:
+    def make_character(self) -> Kitty: return Kitty()
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
+# GameEnvironment(BrokenFactory())  # ty: invalid-argument-type
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()

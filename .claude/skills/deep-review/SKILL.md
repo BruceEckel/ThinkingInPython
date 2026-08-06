@@ -223,6 +223,12 @@ Bruce rejects a change by putting an `X` in the box, `[X] Reject`, instead of
 deleting the block. The rejected block stays in the file as a record, so a later
 review can see the suggestion was already considered and declined.
 
+Before writing findings, check for a completed review of the same chapter: the
+most recent `~`-prefixed file for it (see Successive reviews below).
+Any block marked `[X] Reject` there is a suggestion Bruce already declined, so
+do not raise it again. Carry those rejections forward, so a new review does not
+re-propose what a past one settled.
+
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
 

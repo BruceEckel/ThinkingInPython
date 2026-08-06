@@ -280,3 +280,152 @@ internal state (though never a `Pizza` object) already violates the
 rule the finished `Pizza` is supposed to guarantee. Checking in
 `topping()` closes that window entirely; checking only in `build()`
 leaves it open for as long as the caller keeps adding toppings.
+
+## 6. A registry whose classes live somewhere else
+
+```python
+# shape_registry.py
+from typing import ClassVar
+
+class Shape:
+    registry: ClassVar[dict[str, type[Shape]]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        Shape.registry[cls.__name__] = cls
+
+    def draw(self) -> None: ...
+
+def make(kind: str) -> Shape:
+    return Shape.registry[kind]()
+```
+
+```python
+# extra_shapes.py
+from typing import override
+from shape_registry import Shape
+
+class Circle(Shape):
+    @override
+    def draw(self) -> None: print("Circle.draw")
+
+class Square(Shape):
+    @override
+    def draw(self) -> None: print("Square.draw")
+```
+
+```python
+# exercise_6.py
+import shape_registry
+
+print(shape_registry.Shape.registry)
+#: {}
+try:
+    shape_registry.make("Circle")
+except KeyError as e:
+    print("KeyError:", e)
+#: KeyError: 'Circle'
+
+import extra_shapes  # noqa: E402  (the import is the point)
+
+print(sorted(shape_registry.Shape.registry))
+#: ['Circle', 'Square']
+shape_registry.make("Circle").draw()
+#: Circle.draw
+print(extra_shapes.Circle.__name__)
+#: Circle
+```
+
+The registration happens on the `class Circle(Shape):` line in
+`extra_shapes.py`, and it runs while that `class` statement executes,
+which is while `extra_shapes` is being imported for the first time.
+Nothing else triggers it. `shape_registry` knows nothing about
+`extra_shapes` and never imports it, so until some other module does,
+`Shape.registry` is empty and every `make()` call raises `KeyError`.
+
+That is the plugin failure the chapter describes, reproduced in
+miniature. The registry is correct, the subclass is correct, and the
+program still fails, because registration is a side effect of import
+and nobody imported the module. Real systems solve this by importing
+the plugin package explicitly at startup, by walking a directory with
+`importlib`, or by declaring entry points that the packaging system
+imports for them.
+
+## 7. What `copy.copy()` costs a prototype registry
+
+```python
+# exercise_7.py
+import copy
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+    parts: dict[str, int] = field(default_factory=dict)
+
+PROTOTYPES: Final[dict[str, Monster]] = {
+    "goblin": Monster("Goblin", hp=10, powers=["bite"],
+                      parts={"arms": 2}),
+    "hydra": Monster("Hydra", hp=60, powers=["bite"],
+                     parts={"heads": 9}),
+}
+
+def shallow_spawn(kind: str) -> Monster:
+    return copy.copy(PROTOTYPES[kind])  # The bug
+
+a = shallow_spawn("hydra")
+a.parts["heads"] = 1  # Cut off eight heads
+print(PROTOTYPES["hydra"].parts)  # The prototype changed
+#: {'heads': 1}
+print(shallow_spawn("hydra").parts)  # So does every later spawn
+#: {'heads': 1}
+```
+
+With `copy.copy()`, `test_clone_is_independent()` fails first:
+`b.powers.append("curse")` appends to the one list both spawns share,
+so `a.powers` is `["bite", "curse"]` and the assertion that it equals
+`["bite"]` fails. `test_prototype_untouched()` still passes, because
+`spawned.hp = 1` rebinds an `int` field on the copy rather than
+mutating a shared object, and `int` is immutable anyway.
+
+That split is the whole lesson. A shallow copy duplicates the top
+object and shares everything it refers to, so the fields that break
+are exactly the mutable ones, and only when something mutates them
+in place. Assignment to a field is always safe; `append()`, `[k] = v`,
+and `.update()` are not.
+
+A test through `parts` would have caught it either way:
+
+```python
+# test_prototype_parts.py
+import copy
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    parts: dict[str, int] = field(default_factory=dict)
+
+PROTOTYPES: Final[dict[str, Monster]] = {
+    "hydra": Monster("Hydra", hp=60, parts={"heads": 9}),
+}
+
+def spawn(kind: str) -> Monster:
+    return copy.deepcopy(PROTOTYPES[kind])
+
+def test_nested_dict_is_copied() -> None:
+    spawned = spawn("hydra")
+    spawned.parts["heads"] = 1
+    assert PROTOTYPES["hydra"].parts == {"heads": 9}
+    assert spawn("hydra").parts == {"heads": 9}
+```
+
+The second assertion is the one worth writing. Checking that the
+prototype survived is good; checking that the *next* spawn is still
+correct is what a user of the registry actually depends on, and it
+fails loudly under `copy.copy()`.

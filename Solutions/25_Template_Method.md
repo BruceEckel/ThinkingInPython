@@ -159,3 +159,68 @@ and into the hands of the code that knows the object is ready. This
 is the same reasoning behind eager versus lazy construction in
 [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance),
 where the timing of a hidden step makes the difference.
+
+## 3. Who objects to a replaced `run()`
+
+```python
+# exercise_3.py
+from typing import final, override
+
+class ApplicationFramework:
+    def __init__(self) -> None:
+        self.run()
+
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+class Reversed(ApplicationFramework):
+    @override
+    def run(self) -> None:  # type: ignore
+        for _ in range(2):
+            self.customize2()
+            self.customize1()
+
+    @override
+    def customize1(self) -> None:
+        print("one")
+
+    @override
+    def customize2(self) -> None:
+        print("two")
+
+Reversed()
+#: two
+#: one
+#: two
+#: one
+```
+
+Python objects to nothing. The program runs, and the steps come out
+in the reversed order the subclass chose, which is the fixed algorithm
+no longer being fixed.
+
+`ty` is the one that complains, which is why the override carries a
+`# type: ignore` to keep this listing in the book's build:
+
+```
+error[invalid-override]: Cannot override final method `run`
+```
+
+The guarantee comes from the checker, not the language. `@final` sets
+`__final__ = True` on the function and does nothing else; no runtime
+check consults it. That places the Template Method's central promise
+in the same category as every other annotation in this book: enforced
+before the program runs, by a tool you have to actually run.
+
+The practical consequence is that `@final` protects a codebase whose
+build runs a checker and protects nothing in a codebase that does not.
+When the interpreter itself must refuse the override, use the
+`__init_subclass__()` technique the chapter points at, which raises a
+`TypeError` while the subclass's own class body is executing, long
+before anyone constructs one.

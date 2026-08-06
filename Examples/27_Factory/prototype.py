@@ -21,3 +21,7 @@ print(goblin)
 #: Monster(name='Goblin', hp=10, powers=['bite'])
 print(captain)
 #: Monster(name='Goblin Captain', hp=20, powers=['bite', 'rally'])
+shallow = copy.copy(goblin)
+shallow.powers.append("shared")
+print(goblin.powers)  # The original changed too
+#: ['bite', 'shared']

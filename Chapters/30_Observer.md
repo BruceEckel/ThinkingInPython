@@ -21,7 +21,55 @@ When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
 without the data having to know which views exist.
 
-Python expresses this with far less machinery than the classic design.
+The classic design says how to arrange it.
+An `Observer` interface every observer implements,
+an `Observable` base class carrying a `changed` flag,
+and a two-phase notification that sets the flag and then broadcasts:
+
+```python
+# classic_observer.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Observer(ABC):
+    @abstractmethod
+    def update(self, source: Observable, arg: object) -> None: ...
+
+class Observable:
+    def __init__(self) -> None:
+        self._observers: list[Observer] = []
+        self._changed = False
+
+    def add_observer(self, observer: Observer) -> None:
+        self._observers.append(observer)
+
+    def set_changed(self) -> None:
+        self._changed = True
+
+    def notify_observers(self, arg: object = None) -> None:
+        if not self._changed:
+            return
+        for observer in list(self._observers):
+            observer.update(self, arg)
+        self._changed = False
+
+class Display(Observer):
+    @override
+    def update(self, source: Observable, arg: object) -> None:
+        print(f"display: {arg}C")
+
+class Thermometer(Observable):
+    def set_celsius(self, value: float) -> None:
+        self.set_changed()
+        self.notify_observers(value)
+
+t = Thermometer()
+t.add_observer(Display())
+t.set_celsius(25)
+#: display: 25C
+```
+
+Python expresses this with far less machinery.
 This chapter shows the Pythonic version first,
 then extends it to async for I/O-bound observers.
 It closes with a visual model-view example built on the same callable observers.
@@ -37,26 +85,25 @@ A `@property` setter is a natural place to fire the notification when state chan
 ```python
 # observers.py
 from collections.abc import Callable
-from typing import Any
 
-type Observer = Callable[[Any], None]
+type Observer[T] = Callable[[T], None]
 
-class Observable:
+class Observable[T]:
     def __init__(self) -> None:
-        self._observers: list[Observer] = []
+        self._observers: list[Observer[T]] = []
 
-    def subscribe(self, observer: Observer) -> None:
+    def subscribe(self, observer: Observer[T]) -> None:
         self._observers.append(observer)
 
-    def unsubscribe(self, observer: Observer) -> None:
+    def unsubscribe(self, observer: Observer[T]) -> None:
         self._observers.remove(observer)
 
-    def notify(self, data: Any) -> None:
+    def notify(self, data: T) -> None:
         # Copy: observers may detach during notification
         for observer in list(self._observers):
             observer(data)
 
-class Thermometer(Observable):
+class Thermometer(Observable[float]):
     def __init__(self) -> None:
         super().__init__()
         self._celsius = 0.0
@@ -92,6 +139,17 @@ The observers here are lambdas, but any function or bound method works.
 No `Observer` base class needs inheriting,
 and no notification protocol needs implementing.
 Assigning to `celsius` notifies everyone.
+Four things from the classic version are gone: the interface,
+the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
+and a class per reaction.
+
+The type parameter carries the notification's type through to the observers,
+so subscribing a `list[str]`'s `append` to a `Thermometer` is a type error instead of a list of strings quietly collecting floats.
+
+`Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
+not because the pattern demands a base class.
+Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
+works the same and lets one object publish more than one kind of change.
 For event-heavy programs there are mature libraries
 (signal/slot systems, `asyncio` events),
 but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
@@ -107,6 +165,10 @@ and a subscriber sees only the changes that happen after it subscribes.
 It also verifies that an unsubscribed observer stops hearing changes.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
+A bound method is the exception.
+Writing `t.update` twice builds two objects that are not identical but do compare equal,
+since they share an instance and a function,
+so a bound-method observer detaches without being stashed.
 A list whose `append` is the observer records what arrived:
 
 ```python
@@ -115,19 +177,19 @@ from observers import Observable, Thermometer
 
 def test_notify_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
-    obs = Observable()
+    obs = Observable[int]()
     obs.subscribe(lambda d: received.append(("a", d)))
     obs.subscribe(lambda d: received.append(("b", d)))
     obs.notify(42)
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable().notify("anything")  # Must not raise
+    Observable[str]().notify("anything")  # Must not raise
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
-    obs = Observable()
-    record = received.append  # Named so it can be removed
+    obs = Observable[object]()
+    record = received.append  # A bound method: equal, not identical
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)
@@ -152,7 +214,8 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     assert readings == [20.0]
 ```
 
-The `list()` copy inside `notify()` is a single word doing quiet work.
+The `list()` copy inside `notify()` looks redundant.
+It is not.
 An observer may react to a notification by unsubscribing,
 a one-shot listener detaching itself is the natural example,
 and that mutates `self._observers` in the middle of the loop walking it.
@@ -166,7 +229,7 @@ and a newcomer subscribing mid-notification starts hearing from the next change:
 # self_removing_observer.py
 from observers import Observable
 
-obs = Observable()
+obs = Observable[object]()
 seen: list[str] = []
 
 def once(data: object) -> None:
@@ -184,7 +247,7 @@ print(seen)
 `once` hears the first change and detaches; `always` hears both.
 Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
 
-Two more realities of Observer deserve a sentence each.
+Two more things about Observer need saying.
 An observer that raises an exception stops the loop,
 and every observer after it never hears the change;
 decide whether `notify()` should catch, collect, and continue
@@ -280,6 +343,15 @@ so the faster observer reports first.
 The alarm also shows an observer that can decline to act.
 Below its threshold it returns without sending anything.
 
+A failing observer behaves differently here than in the synchronous version.
+`gather()` re-raises the first exception into `set_celsius()` right away,
+and the observers that have not finished keep running with nobody awaiting them.
+`gather(*coros, return_exceptions=True)` returns the failures as data instead,
+which is the async form of the catch-collect-continue that exercise 3 asks for.
+[Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
+but not here: it cancels its siblings when one task fails,
+so a single broken observer would stop the rest from hearing the change.
+
 Use this only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
 The type-keyed [event bus](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)
@@ -295,8 +367,8 @@ The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
 It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
-Click a box and every box touching it, diagonals included,
-repaints to the clicked box's color.
+Clicking a box repaints it and every box touching it, diagonals included,
+to the clicked box's color.
 
 The model is an `Observable`.
 `new_grid()` builds a size x size grid banded into three colors,
@@ -329,7 +401,7 @@ def recolored(grid: Grid, clicked: Coord) -> Grid:
     return {cell: color if adjacent(cell, clicked) else current
             for cell, current in grid.items()}
 
-class BoxModel(Observable):
+class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -391,23 +463,26 @@ It opens a window, so the example harness does not run it
 import tkinter as tk
 from box_observer import BoxModel, Grid
 
-def show(model: BoxModel, cell: int = 60) -> None:
+def show(model: BoxModel, cell_px: int = 60) -> None:
     root = tk.Tk()
     root.title("ColorBoxes")
     canvas = tk.Canvas(root, highlightthickness=0,
-                       width=model.size * cell,
-                       height=model.size * cell)
+                       width=model.size * cell_px,
+                       height=model.size * cell_px)
     canvas.pack()
 
     def draw(grid: Grid) -> None:
+        canvas.delete("all")  # Or the old rectangles accumulate
         for (x, y), color in grid.items():
             canvas.create_rectangle(
-                x * cell, y * cell, (x + 1) * cell, (y + 1) * cell,
+                x * cell_px, y * cell_px,
+                (x + 1) * cell_px, (y + 1) * cell_px,
                 fill=color, outline="white")
 
     model.subscribe(draw)  # Repaint on every model change
     canvas.bind("<Button-1>",
-                lambda e: model.click((e.x // cell, e.y // cell)))
+                lambda e: model.click(
+                    (e.x // cell_px, e.y // cell_px)))
     draw(model.grid)
     root.mainloop()
 
@@ -415,11 +490,30 @@ if __name__ == "__main__":
     show(BoxModel(8))
 ```
 
+`draw()` clears the canvas before repainting.
+Without that line each notification adds another `size * size` rectangles on top of the last set,
+which looks identical and grows without limit,
+the same quiet accumulation as a lapsed listener.
+`cell_px` is named for what it holds: the model's `cell` is a `Coord`,
+and this one is a pixel count.
+
 The model and the view share only the subscribe-and-notify contract,
 so the test can exercise the model without a display.
 You can also attach a second view to the same model and keep both in step.
 Showing that the model is correct, separately from how it is drawn,
 is the model-view split made concrete.
+
+## What Stayed Constant
+
+One `Observable` served three jobs in this chapter:
+a thermometer pushing a float, a fan-out awaiting network calls,
+and a GUI repainting a grid.
+In every case the observer was a callable and the observable was a list of them.
+Nothing in the pattern required an interface, a flag, or a class per reaction.
+[Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)
+takes the last step from here:
+one list becomes a dictionary of lists keyed by event type,
+and the Observer is an event bus.
 
 ## Exercises
 

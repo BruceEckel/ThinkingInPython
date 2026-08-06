@@ -83,3 +83,57 @@ where the object comes from, not where it is used.
 subclass warns at class-creation time, which means it fires on
 import rather than on any call, so a library that subclasses a
 deprecated class hears about it as soon as it is loaded.
+
+## 3. `facade.py` as a module
+
+```python
+# shop.py
+from dataclasses import dataclass
+
+@dataclass
+class _A:
+    x: object
+
+@dataclass
+class _B:
+    x: object
+
+def make_a(x: object) -> _A:
+    return _A(x)
+
+def make_b(x: object) -> _B:
+    return _B(x)
+```
+
+```python
+# exercise_3.py
+import shop
+from shop import make_a, make_b
+
+print(make_a(1), make_b(2))
+#: _A(x=1) _B(x=2)
+print([name for name in vars(shop) if not name.startswith("_")])
+#: ['dataclass', 'make_a', 'make_b']
+```
+
+The caller sees two functions. `_A` and `_B` are still reachable
+through `shop._A`, because Python enforces nothing, but the underscore
+says they are not part of the deal and `from shop import *` skips
+them. The listing prints the module's public names to make that
+concrete; `dataclass` appears because an import binds a name in the
+module too, which is why a real module either sets `__all__` or
+imports as `import dataclasses` and writes `@dataclasses.dataclass`.
+
+The class version differs in one way that matters. `Facade` is a
+namespace the language does not treat as one: `Facade.make_a` and
+`shop.make_a` read identically at the call site, but the class has to
+be defined, imported, and carried around, and `@staticmethod` exists
+only to stop Python passing `self` to functions that never wanted it.
+The module was already a namespace before anyone asked, and it comes
+with the underscore convention, `__all__`, and one-time initialization
+built in.
+
+What a caller can see is nearly the same in both versions, which is
+the point worth taking away. Neither is enforcement. The difference
+is how much ceremony you pay to express the same intent, and the
+module version pays none.

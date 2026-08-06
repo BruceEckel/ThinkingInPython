@@ -6,7 +6,8 @@ class Obstacle:
         raise NotImplementedError
 
 class Character:
-    def interact_with(self, obstacle: Obstacle) -> None: ...
+    def interact_with(self, obstacle: Obstacle) -> None:
+        raise NotImplementedError
 
 class Kitty(Character):
     @override
@@ -50,11 +51,10 @@ class WarriorsAndWeapons(GameElementFactory):
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
-        self.factory = factory
-        self.p = factory.make_character()
-        self.ob = factory.make_obstacle()
+        self.character = factory.make_character()
+        self.obstacle = factory.make_obstacle()
     def play(self) -> None:
-        self.p.interact_with(self.ob)
+        self.character.interact_with(self.obstacle)
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())

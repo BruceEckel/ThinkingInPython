@@ -2,14 +2,13 @@
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import Any, ClassVar, override
+from typing import ClassVar, Protocol, override
+
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
 
 class ShapeFactory:
-    factories: ClassVar[dict[str, Any]] = {}
-
-    @classmethod
-    def add_factory(cls, kind: str, shape_factory: Any) -> None:
-        cls.factories[kind] = shape_factory
+    factories: ClassVar[dict[str, ShapeMaker]] = {}
 
     # Build and cache each kind's factory on first request:
     @classmethod
