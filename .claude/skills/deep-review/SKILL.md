@@ -1,9 +1,9 @@
 ---
 name: deep-review
-description: Deep-review a book chapter: a correctness/editing pass, a teaching pass (misconceptions, lookalike pairs, mechanism vs. outcome, near-miss code, plus chapter-level pedagogical structure), and a house-style audit of listings. Use whenever asked to deep review, thoroughly review, or audit a chapter.
+description: Deep-review a book chapter: a correctness/editing pass, a teaching pass (misconceptions, lookalike pairs, mechanism vs. outcome, near-miss code, plus chapter-level pedagogical structure and whether the material is in the right order), a house-style audit of listings, and a prose pass for confusing, odd, or out-of-character wording. Use whenever asked to deep review, thoroughly review, or audit a chapter.
 ---
 
-# Deep-reviewing a chapter: two passes, not one
+# Deep-reviewing a chapter: four passes, not one
 
 A request to "deep review" a chapter means an editing pass *and* a
 teaching pass. The editing pass is correctness: verify every technical
@@ -57,6 +57,32 @@ meeting the topic for the first time, and ask:
   the smallest thing that makes the point, with complications added one
   at a time afterward. A section that opens at full complexity and then
   simplifies is inverted.
+- **Order is a choice, not a given.** The previous bullets check each
+  section against its neighbors. This one checks the sequence. Write
+  one line per section naming what it assumes and what it introduces,
+  then read the two columns down the page. Nothing later should appear
+  in an earlier "assumes" column, and a concept introduced far from its
+  first use is a candidate to move. A chapter often sits in the order it
+  was drafted, which is the order the author worked things out rather
+  than the order a reader needs.
+- **Where the question arises, where it is answered.** Mark the point a
+  reader first wants an explanation, and the point it arrives. A long
+  gap means moving the answer up or saying plainly that it is coming.
+  Two tells: a section that opens by re-establishing context from three
+  sections back, and an aside that exists to hold the reader off.
+- **Justify each transition.** For each section, say in one sentence why
+  it follows the one before. "It is also about this topic" is not a
+  reason, and a run of such answers means the chapter is a list of
+  sections rather than an argument. Sections that could be shuffled
+  freely usually should be merged or cut.
+- **Front-load the payoff.** If the most convincing listing is the last
+  one, consider a stripped-down version near the opening as motivation,
+  with the full version staying where it is. A reader who sees what the
+  chapter buys them decodes the machinery with a reason to care.
+- **Price the rearrangement.** A proposed move is not free. Check what
+  it breaks: terms the moved section defines, listings that build on its
+  code, cross-references from other chapters that name a section title.
+  Report the cost with the proposal and let the author decide.
 - **Exercises earn their place.** Each exercise should be answerable
   from this chapter, and the set should cover the chapter's main claims
   instead of clustering on whichever section was most fun to write.
@@ -74,6 +100,36 @@ prose says why, which is fine; chapter 19's `Meter` carried a
 hand-written field-assigning `__init__` for no reason, which is the
 drift this pass exists to catch. `grep "def __init__(self" Chapters/`
 is a cheap sweep for the most common case.
+
+A fourth pass reads the prose for language rather than content. Hunt for
+any word or phrasing that is confusing, odd, or out-of-character. The
+target the whole time is a simple, plain, clear explanation: short
+sentences that drop unnecessary words without going terse, no
+flourishes, nothing that obscures the point.
+
+- **Confusing:** a sentence that needs a second reading. The cause is
+  usually a buried subject, a pronoun with two possible referents, or a
+  clause order that gives the consequence before the condition.
+- **Odd:** a word that is technically correct but not the word this book
+  would use. A metaphor standing in for a literal statement is the
+  common case: "the check lands before the loop" means it runs before
+  the loop, and "the annotation's spelling" means how it is written.
+- **Out-of-character:** vocabulary or rhythm that doesn't match the
+  surrounding chapters. Newly drafted prose is the usual source, showing
+  up as inflated diction, a throat-clearing opener, or five clipped
+  sentences in a row.
+- **Obscuring:** prose that sounds explanatory but leaves out the reason
+  or the consequence. Cutting words is right only when the meaning
+  survives the cut, so restore the missing half instead of trimming
+  further.
+
+The style rules and watch list in the global `~/.claude/CLAUDE.md` are
+the standard for this pass. `banned_phrases.py` gates a handful of them;
+the rest are found by reading, and a word on the watch list is a prompt
+to reread the sentence rather than an automatic deletion. Rewriting
+usually beats deleting: a sentence that needed "actually" or "only"
+often had a vague subject or a buried contrast, and fixing that removes
+the word on its own.
 
 When a chapter documents a third-party library, read that library's
 source before asserting anything about it. Its exports and docstrings

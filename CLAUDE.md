@@ -31,7 +31,7 @@ Chapter 18's Rust section has real PyO3/maturin crates under `rust/`. The root
 ## Deep-reviewing a chapter
 
 The full deep-review procedure (editing pass, teaching pass, style
-audit, third-party-library rules, accrued review notes) now lives in
+audit, prose pass, third-party-library rules, accrued review notes) lives in
 the `deep-review` skill (`.claude/skills/deep-review/SKILL.md`).
 Invoke it for any chapter review request.
 
