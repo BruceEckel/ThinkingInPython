@@ -10,6 +10,10 @@
 # (e.g. 26_Simulation/rats_and_mazes/* or 17_State_Machines/*gui*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
 
+# Package submodule whose relative import needs a package context: running
+# it as a script is the failure chapter 6 documents (use `python -m`).
+06_Modules_and_Packages/a_package/module4.py
+
 # Tkinter views (the model + tests run and are checked headlessly).
 31_State_Machines/tabledriven/vending_view.py
 30_Observer/box_view.py

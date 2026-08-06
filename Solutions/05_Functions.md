@@ -96,3 +96,44 @@ which makes it keyword-only: callers must write `total=True`, and it
 can never be swallowed into `values` or `options` by accident. Adding
 the flag needed no change to how `report()` already collected its
 positional and keyword arguments.
+
+## 5. `apply_twice()` with a lambda
+
+```python
+# exercise_5.py
+def apply_twice(func, value):
+    return func(func(value))
+
+print(apply_twice(lambda s: s + "!", "hi"))
+#: hi!!
+print(apply_twice(lambda n: n * n, 3))
+#: 81
+```
+
+The lambda runs twice, on the original value and then on its own
+result, so `"hi"` gains two exclamation points rather than one. The
+second call shows the same shape with numbers: `3` squares to `9`,
+which squares to `81`, not `9`. A function that takes another function
+as an argument needs nothing special to say so; `func` is a parameter
+like any other, and the only requirement is that it be callable with
+one argument.
+
+## 6. Unpacking both containers at a call site
+
+```python
+# exercise_6.py
+def report(label, *values, **options):
+    print(label, values, options)
+
+args = ("point", 3, 4)
+opts = {"color": "red"}
+report(*args, **opts)
+#: point (3, 4) {'color': 'red'}
+```
+
+One `*` and one `**` do the whole job. `*args` spreads the tuple into
+three positional arguments, so `"point"` lands on `label` and the
+remaining two collect into `values`; `**opts` spreads the dictionary
+into keyword arguments, which `**options` collects again. The first
+element of `args` is not special to the caller: it becomes `label`
+only because of where it sits in the sequence.

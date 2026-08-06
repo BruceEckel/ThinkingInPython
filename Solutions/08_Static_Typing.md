@@ -166,3 +166,43 @@ switches the check off for every expression downstream of it.
 `words.top().no_such_method()`. A default converts a silently
 unchecked annotation into a checked one, which is why it earns its
 place on a class whose parameter has one common answer.
+
+## 6. A `Literal` that does not admit `"purple"`
+
+```python
+# exercise_6.py
+from typing import Literal
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, str]
+type Color = Literal["red", "blue", "green", "yellow", "purple"]
+
+def paint(grid: Grid, cell: Coord, color: Color) -> None:
+    grid[cell] = color
+
+grid: Grid = {}
+paint(grid, (2, 3), "purple")
+print(grid)
+#: {(2, 3): 'purple'}
+```
+
+Before `"purple"` joins `Color`, the call runs and stores the string,
+because a `Literal` constrains nothing at run time. `ty check`
+reports:
+
+```
+error[invalid-argument-type]: Argument to function `paint` is incorrect
+  --> type_aliases.py:14:21
+   |
+14 | paint(grid, (2, 3), "purple")
+   |                     ^^^^^^^^ Expected `Literal["red", "blue", "green", "yellow"]`,
+   |                              found `Literal["purple"]`
+```
+
+The expected type is spelled out in full, which is the practical
+argument for naming the union once as `Color` rather than repeating
+the four strings in every signature: the error message stays readable
+and the allowed set has one place to change. Adding `"purple"` to that
+one alias silences the error everywhere, and `grid[cell] = color`
+needed no change, since `Grid`'s values are plain `str` and every
+`Color` is one.

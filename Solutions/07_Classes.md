@@ -158,3 +158,39 @@ reads `self.total`, it hits that stored value directly. No second
 cached before `average` ever asked for it. If `average` is accessed
 first, its own body triggers `total`'s computation the same way,
 just on first use instead of in advance.
+
+## 5. `__repr__()` and `__str__()` on `Temperature`
+
+```python
+# exercise_5.py
+class Temperature:
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    def __repr__(self):
+        return f"Temperature({self.celsius})"
+
+    def __str__(self):
+        return f"{self.celsius}C"
+
+t = Temperature(21.0)
+print(t)
+#: 21.0C
+print([t, Temperature(0.0)])
+#: [Temperature(21.0), Temperature(0.0)]
+print(f"{t} is {t!r}")
+#: 21.0C is Temperature(21.0)
+```
+
+With only `__repr__()` defined, both lines show
+`Temperature(21.0)`: `print()` finds no `__str__()` and falls back.
+Adding `__str__()` splits them. `print(t)` and `f"{t}"` take the
+readable form, while the list keeps showing `Temperature(21.0)` for
+each element, because a container formats its elements with `repr()`
+and never with `str()`. `{t!r}` asks for the same developer form
+inside an f-string.
+
+The two forms answer different questions. `Temperature(21.0)` says
+what would rebuild this object, which is what you want in a traceback
+or a debugger. `21.0C` says what the value means, which is what you
+want in output a user reads.

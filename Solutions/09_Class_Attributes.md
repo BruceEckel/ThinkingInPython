@@ -116,3 +116,84 @@ This is precisely the shadowing bug `ClassVar` exists to catch. If
 `total` is declared `total: ClassVar[int] = 0`, the type checker
 flags `a.total = 99` as an error before this line ever runs,
 because it can see this assignment creates this confusing shadow.
+
+## 5. A per-instance list, via `default_factory`
+
+```python
+# exercise_5.py
+from dataclasses import dataclass, field
+
+@dataclass
+class Cart:
+    items: list[str] = field(default_factory=list)
+
+a, b = Cart(), Cart()
+a.items.append("apple")
+print(a.items, b.items)
+#: ['apple'] []
+```
+
+`default_factory=list` calls `list()` once per construction, so the
+generated `__init__()` assigns a brand-new list to `self.items` on
+every `Cart`. Each object owns its list from birth, and `a`'s append
+cannot reach `b`.
+
+Writing the same class with a bare `items: list[str] = []` does not
+produce the shared-list bug, because `@dataclass` refuses to build the
+class at all:
+
+```python
+# exercise_5_rejected.py
+from dataclasses import dataclass
+
+try:
+    @dataclass
+    class Cart:
+        items: list[str] = []
+
+except ValueError as e:
+    print(type(e).__name__)
+    print(str(e).partition(": ")[0])
+#: ValueError
+#: mutable default <class 'list'> for field items is not allowed
+```
+
+The full message ends with the remedy: `use default_factory`. The
+error arrives at class-definition time, not at first use, and it
+names the fix. `@dataclass` can detect the mistake because it inspects
+every default before generating the constructor; a plain class body,
+as `shared_mutable.py` showed, has nobody doing that inspection.
+
+## 6. `del` un-shadows, once
+
+```python
+# exercise_6.py
+class A:
+    x = 100
+
+a = A()
+a.x = 1
+print(vars(a), a.x)
+#: {'x': 1} 1
+del a.x
+print(vars(a), a.x)
+#: {} 100
+try:
+    del a.x
+except AttributeError as e:
+    print(type(e).__name__, e)
+#: AttributeError 'A' object has no attribute 'x'
+```
+
+`del a.x` removes the entry from the instance dictionary, which is
+the only place assignment ever wrote. `vars(a)` is empty again, and
+`a.x` reads `100`, because the lookup falls through to the class the
+way it did before any assignment. Nothing was lost: the class
+attribute was never touched in either direction.
+
+The second `del a.x` fails because there is nothing left on the
+instance to delete. `del` does not follow the same fallback path that
+reading does, so it never reaches `vars(A)["x"]`, which still holds
+`100`. Deleting a class attribute takes `del A.x`, naming the class,
+the same asymmetry as assignment: reads fall back to the class,
+writes and deletes do not.

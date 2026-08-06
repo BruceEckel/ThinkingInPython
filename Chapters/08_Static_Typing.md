@@ -23,6 +23,9 @@ This is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
 the tricky data, the code on which other people depend.
 An explicit `Any` indicates that a value is truly dynamic.
+`ty` calls this inferred form `Unknown` when it reports a type,
+to distinguish it from an `Any` you wrote yourself.
+They behave the same: both are compatible with everything.
 
 ## Type Hints
 
@@ -49,63 +52,50 @@ print(total)
 Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
+A function that returns nothing declares `-> None`,
+which is why every `__init__()` in this chapter's listings ends that way.
 
-## Narrowing {#narrowing}
+### Variance {#variance}
 
-A union type covers every case until you rule some out.
-Testing `is not None` on an `X | None` value proves it to the checker,
-not just to you:
-
-```python
-# narrowing.py
-
-def shout(text: str | None) -> str:
-    if text is not None:
-        return text.upper()
-    return "(nothing)"
-
-print(shout("hi"))
-#: HI
-print(shout(None))
-#: (nothing)
-```
-
-Inside the `if`, the checker *narrows* `text` from `str | None` to `str`,
-so `.upper()` needs no cast.
-Outside the `if`, `text` is still the full `str | None`.
-The same narrowing follows an `isinstance()` check, an equality test,
-or a comparison against a specific value such as `is not SOME_SENTINEL`.
-
-## Constants with Final
-
-Marking a value `Final` catches accidental reassignments during type checking.
-
-The naming convention shown earlier used ALL_CAPS to signal a constant,
-but that is only a hint to human readers.
-At runtime, a `Final` is still a variable,
-but attempts to reassign it produce type-checking errors:
+A `list[Circle]` is not a `list[Shape]`,
+which surprises most people the first time:
 
 ```python
-# final_constants.py
-from typing import Final
+# variance.py
+from collections.abc import Sequence
 
-MAX_RETRIES: Final = 3
-GREETING: Final[str] = "hello"
+class Shape:
+    pass
 
-# MAX_RETRIES = 5  # ty: cannot assign to final name "MAX_RETRIES"
+class Circle(Shape):
+    pass
 
-print(MAX_RETRIES, GREETING)
-#: 3 hello
+def draw_all(shapes: Sequence[Shape]) -> int:
+    return len(shapes)
+
+def add_square(shapes: list[Shape]) -> None:
+    shapes.append(Shape())
+
+circles: list[Circle] = [Circle(), Circle()]
+print(draw_all(circles))
+#: 2
+# ty: expected "list[Shape]", found "list[Circle]":
+# add_square(circles)
 ```
 
-You can give the type explicitly, as in `GREETING`,
-or let the checker infer it from the value, as with `MAX_RETRIES`.
+The reason is that a `list` can be written to.
+`add_square()` would append a `Shape` to a list its caller believes holds only circles.
+Refusing the call is what keeps that from happening.
+A read-only shape has no such problem,
+so `Sequence[Shape]` accepts a `list[Circle]`.
+Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
+and it accepts more callers as a result.
+A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ## The Checker: `ty`
 
 The hints do nothing on their own.
-You need a tool to check them.
-This book uses [`ty`](https://github.com/astral-sh/ty), Astral's fast checker:
+You need a tool to check them:
 
     ty check
 
@@ -138,6 +128,73 @@ The checker immediately discovers the problem.
 
 The `# type: ignore` comment tells the type checker to skip this line,
 which allows this book's build to complete successfully.
+Without it, `ty check` reports:
+
+```
+error[invalid-argument-type]: Argument to function `area` is incorrect
+ --> area.py:6:12
+  |
+6 | print(area("3", 4))
+  |            ^^^ Expected `int`, found `Literal["3"]`
+info: Function defined here
+```
+
+A diagnostic names the rule in brackets, points at the offending line,
+and pairs what the annotation expected with what the call supplied.
+
+## Narrowing {#narrowing}
+
+A union type covers every case until you rule some out.
+Testing `is not None` on an `X | None` value proves it to the checker,
+not just to you:
+
+```python
+# narrowing.py
+
+def shout(text: str | None) -> str:
+    if text is not None:
+        return text.upper()
+    return "(nothing)"
+
+print(shout("hi"))
+#: HI
+print(shout(None))
+#: (nothing)
+```
+
+Inside the `if`, the checker *narrows* `text` from `str | None` to `str`,
+so `.upper()` needs no cast.
+Outside the `if`, `text` is still the full `str | None`.
+The same narrowing follows an `isinstance()` check, an equality test,
+or a comparison against a specific value such as `is not SOME_SENTINEL`.
+
+## Constants with Final
+
+Marking a value `Final` catches accidental reassignments during type checking.
+
+The naming convention in [Tour](02_Tour.md#naming-conventions)
+used ALL_CAPS to signal a constant, but that is only a hint to human readers.
+At runtime, a `Final` is still a variable,
+but attempts to reassign it produce type-checking errors:
+
+```python
+# final_constants.py
+from typing import Final
+
+MAX_RETRIES: Final = 3
+GREETING: Final[str] = "hello"
+
+# MAX_RETRIES = 5  # ty: cannot assign to final name "MAX_RETRIES"
+
+print(MAX_RETRIES, GREETING)
+#: 3 hello
+```
+
+You can give the type explicitly, as in `GREETING`,
+or let the checker infer it from the value, as with `MAX_RETRIES`.
+The rest of the book uses the explicit `Final[T]` form,
+which declares the intended type instead of accepting whatever the initializer produces.
+The difference shows up when the initializer is a literal that the checker would otherwise narrow.
 
 ## Structural Typing with Protocols
 
@@ -188,6 +245,10 @@ print(render(Square()))
 `Circle` and `Square` never mention `Drawable`.
 The checker accepts both because each has a `draw()`,
 so they are of the correct shape.
+A `Protocol` is a checking-time construct,
+so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
+Decorating the Protocol with `@runtime_checkable` allows the call,
+at the cost of a weaker check: see [Surrogate](26_Surrogate.md#proxy).
 
 `Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
@@ -346,6 +407,19 @@ counts: Stack[int] = Stack()
 counts.push(2)
 print(counts.top() + 1)
 #: 3
+```
+
+Without the default,
+`words: Stack` leaves `T` unsolved and the checker falls back to `Unknown`,
+so `words.top().upper()` goes unchecked.
+The default gives the bare form a meaning,
+which matters most for a class whose parameter has one common answer:
+callers who want that answer write nothing, and the annotation stays precise.
+
+The same applies to a `type` alias, as `Pair` shows:
+
+```python
+# alias_default.py
 
 type Pair[T = int] = tuple[T, T]
 
@@ -356,13 +430,6 @@ print(is_origin((0, 0)))
 #: True
 ```
 
-Without the default,
-`words: Stack` leaves `T` unsolved and the checker falls back to `Unknown`,
-so `words.top().upper()` goes unchecked.
-The default gives the bare form a meaning,
-which matters most for a class whose parameter has one common answer:
-callers who want that answer write nothing, and the annotation stays precise.
-The same applies to a `type` alias, as `Pair` shows.
 Defaulted parameters go last, the way defaulted function parameters do,
 so `class Table[K = str, V]` is a syntax error.
 
@@ -460,13 +527,13 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Type Hints](#type-hints) |
+| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
 | `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
-| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Iterators](23_Iterators.md#iteration-is-built-in) |
+| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Variance](#variance) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
-| `type[C]` | The class object `C` is not an instance, see [Classes as Values](#classes-as-values-type) |
+| `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Unions, optionals, and literals</a>
 
@@ -522,7 +589,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `TypeGuard[T]`, `TypeIs[T]` | A boolean predicate that narrows a type when it returns `True` |
+| `TypeGuard[T]`, `TypeIs[T]` | A boolean predicate that narrows a type: `TypeGuard` narrows only where it returns `True`, `TypeIs` narrows both branches |
 
 ### <a href="https://docs.python.org/3/library/typing.html#typing.Self" target="_blank" rel="noopener">Self and forward references</a>
 
@@ -549,6 +616,23 @@ Older code spells some of them differently: `Optional[X]` for `X | None`,
 `Tuple` from `typing` for the lowercase built-ins.
 The forms above are the modern ones.
 
+## How Much to Annotate
+
+Gradual typing leaves the amount up to you,
+and the chapter's constructs do not say when each is worth the words.
+Annotate what crosses a boundary: function signatures, public attributes,
+anything another file imports.
+Those are the places where the reader of the code and the writer of the code are different people,
+and where a wrong assumption travels farthest before it fails.
+
+Let the checker infer the rest.
+A local variable whose type is obvious from its initializer gains nothing from an annotation,
+and `count: int = 0` says less than `count = 0` does, at greater length.
+The value of a hint is proportional to the distance between where a value is created and where it is used.
+A value that is born and consumed three lines later needs no help.
+A value that arrives from another module, through a container,
+is worth naming precisely.
+
 ## Exercises
 
 1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
@@ -565,3 +649,6 @@ The forms above are the modern ones.
     Remove the `= str` default and run it again.
     Note that nothing is reported as an error either way,
     and say what that means for a bare `Stack` annotation.
+6.  In `type_aliases.py`,
+    call `paint(grid, (2, 3), "purple")` and run `ty check`.
+    Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.

@@ -36,12 +36,15 @@ print(a.rating, b.rating)  # 'b' reads the class attribute
 
 An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
-Assigning always writes to the instance,
+Assigning through an instance always writes to the instance,
 creating the instance variable on first assignment.
+Assigning through the class name, as `Stars.rating = 9` did,
+changes the shared value.
 You can see this by inspecting the class with `vars(A)` and the instance with `vars(a)`:
 
 ```python
 # inside_objects.py
+
 class A:
     x = 100  # Class attribute
 
@@ -61,9 +64,43 @@ A class attribute seems like a default until someone assigns to an instance vari
 Changing the class attribute makes the "default" value seem different for every object that has not shadowed it.
 This produces bugs that surface far from their cause.
 
+The shadowing rule protects you only while the shared value is immutable:
+
+```python
+# shared_mutable.py
+
+class Cart:
+    items: list[str] = []  # One list, shared by every Cart
+
+a, b = Cart(), Cart()
+a.items.append("apple")  # Mutates, does not assign
+print(a.items, b.items)
+#: ['apple'] ['apple']
+a.items = ["pear"]  # Assignment shadows, as before
+print(a.items, b.items)
+#: ['pear'] ['apple']
+```
+
+`a.items.append("apple")` never assigns to `a.items`.
+It reads `items`, finds nothing on `a`, falls back to the class,
+and mutates the one list stored there.
+No instance variable is created, so `b` sees the apple too.
+The next line does assign,
+which creates `a.items` on the instance and shadows the class list,
+leaving `b` still reading the shared one.
+Reading is the dangerous half:
+an attribute read that ends in a method call can change shared state,
+and the shadowing rule offers no protection.
+A type checker cannot help here either,
+since `a.items.append("apple")` is a correct call on a `list[str]`.
+A mutable per-instance default belongs in a `@dataclass` field with a `default_factory`,
+covered in [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes).
+
+## Declaring Shared State with ClassVar
+
 When you genuinely want one shared value, say so with `ClassVar` from `typing`.
 The checker then treats it as class-wide,
-and stops you from accidentally creating an instance variable that shadows it:
+and rejects a direct assignment through an instance that would shadow it:
 
 ```python
 # class_var.py
@@ -96,7 +133,7 @@ print(Tally.total)
 # a.total = 99  # ty: cannot assign ClassVar "total" via instance
 ```
 
-`display_object(Tally)` shows what the class actually holds: `total`,
+`display_object(Tally)` shows what the class holds: `total`,
 and nothing called `label`.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
@@ -129,7 +166,7 @@ and its `self.label = label` produced the attribute `display_object(a)` found ab
 If `__init__()` never assigns it, no attribute exists,
 on the instance or the class.
 The checker does not catch the omission,
-because it trusts the annotation instead of verifying that every method actually sets it.
+because it trusts the annotation instead of verifying that some method sets it.
 The failure surfaces later,
 as an `AttributeError` from the first code that reads the missing `label`.
 
@@ -137,7 +174,7 @@ The annotation on `label` is not required here.
 If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
 because the parameter's own type carries through to the attribute it initializes.
 It earns its place for symmetry with `total`,
-so the class's two attributes read together at the top instead of one hiding inside the constructor.
+so both names read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
 There, an attribute is set from outside the class,
@@ -146,6 +183,40 @@ and a bare annotation is the checker's only way to know its type.
 `ClassVar` is a hint for the checker, not the runtime.
 It records that `total` belongs to the class,
 and it catches the accidental shadowing from the earlier example before it happens.
+
+It does not catch every form of it:
+
+```python
+# counter_near_miss.py
+from typing import ClassVar
+
+class Tally:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        self.total += 1
+
+a, b = Tally(), Tally()
+print(a.total, b.total, Tally.total)
+#: 1 1 0
+```
+
+`self.total += 1` expands to `self.total = self.total + 1`.
+The read falls back to the class and finds `0`;
+the write lands on the instance and creates a fresh `total` there.
+Every `Tally` counts itself once and the shared counter never moves,
+which is why `class_var.py` writes `Tally.total += 1` with the class name spelled out.
+`ClassVar` does not save you here.
+`ty` rejects a direct `self.total = 5`, but it passes the augmented form,
+so the one mistake you are most likely to make is the one the checker misses.
+
+Shared storage is not a mistake when sharing is the intent.
+A count of every object created, a registry mapping names to classes,
+and a constant that all instances read but none change are all class attributes,
+and all are clearer with `ClassVar` on them.
+`Tally.total` is the first of these.
+The bug is not the class attribute;
+it is writing one where you meant a per-object default.
 
 ## ClassVar and Inheritance
 
@@ -185,6 +256,11 @@ so it never sees changes made through `Base`.
 `ClassVar` doesn't change any of this.
 It only tells the checker that `shared` belongs to the class,
 not that subclasses share storage.
+`Right` writes `shared = 100` without repeating the annotation.
+A subclass overriding a `ClassVar` inherits the declaration along with the name,
+so restating `ClassVar[int]` adds nothing.
+
+## Real Per-Object Defaults
 
 For real per-object defaults, write a constructor with default arguments,
 or use a `@dataclass`,
@@ -201,7 +277,7 @@ class A:
 
 @dataclass
 class B:
-    x: int = 100  # Constructor default, not class attribute
+    x: int = 100  # Becomes a constructor default
 
 a = A()
 a.x = -1
@@ -209,9 +285,24 @@ print(a.x, A().x)  # The change in a does not leak
 #: -1 100
 print(B().x, B(7).x)
 #: 100 7
+print(vars(B)["x"], vars(B())["x"])
+#: 100 100
 ```
 
+Both listings define a class `A` whose `x` starts at `100`,
+and the two behave in opposite ways.
+In `inside_objects.py` the `100` lives on the class and every instance reads it;
+here it is a default argument, evaluated per call,
+and `self.x = x` gives each object its own storage before anything can read it.
+The difference is not the value but where it is written.
+
 A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
+The class attribute survives the decoration: `vars(B)` still holds `x = 100`.
+What changes is the generated `__init__()`,
+which assigns `self.x` on every instance,
+so each object shadows the class attribute the moment it is built and never reads the shared one.
+That is why `b.x = -1` cannot leak into a later `B()`,
+while `a.rating = 1` on `Stars` left `b` reading a value someone else could change.
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
 covers the details.
 
@@ -232,5 +323,13 @@ covers the details.
 4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`)
     class attribute instead,
     then have an instance assign to `self.total` directly and explain,
-    using `vars()` as in `inside_objects.py`,
-    what that assignment actually creates.
+    using `vars()` as in `inside_objects.py`, what that assignment creates,
+    and where.
+5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
+    then repeat the `append` and confirm `b.items` stays empty.
+    Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.
+6.  In `inside_objects.py`, add `del a.x` after the final `print`,
+    then print `vars(a)` and `a.x` again.
+    Predict both before running.
+    Then run `del a.x` a second time and explain the exception,
+    given what `vars(A)` still holds.

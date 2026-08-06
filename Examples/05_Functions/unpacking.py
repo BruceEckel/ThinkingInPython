@@ -20,3 +20,11 @@ nums = (1, 2, 3)
 opts = {"color": "red", "size": 10}
 report("point", *nums, **opts)
 #: point (1, 2, 3) {'color': 'red', 'size': 10}
+
+def trace(func, *args, **kwargs):
+    print("calling", func.__name__)
+    return func(*args, **kwargs)
+
+trace(report, "point", *nums, **opts)
+#: calling report
+#: point (1, 2, 3) {'color': 'red', 'size': 10}

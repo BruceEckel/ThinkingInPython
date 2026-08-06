@@ -8,6 +8,8 @@ print(bad_append(1))
 #: [1]
 print(bad_append(2))  # Surprise, the default kept the 1
 #: [1, 2]
+print(bad_append.__defaults__)
+#: ([1, 2],)
 
 def good_append(item, target=None):
     if target is None:

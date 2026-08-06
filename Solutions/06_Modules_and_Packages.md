@@ -33,15 +33,53 @@ of these spellings, finds the cached module and skips running its
 top-level code again; it only binds a name to the module already in
 the cache.
 
-## 2. Importing an already-imported module a second time
+## 2. A nested module, and a badly named package
 
-Adding a second `import a_package.module1` at the bottom of
-`using_packages.py` produces no new `"importing module1..."` message.
-This is the same caching behavior as exercise 1: the first `import
-a_package.module1` at the top of the file already ran `module1`'s
-top-level code and cached the result. Every subsequent `import
-a_package.module1` anywhere in the same process, even from a
-different file, finds the cached module and does nothing further.
+```python
+# a_package/b_package/module3.py
+print("importing module3 in b_package")
+
+def function3():
+    return "function3 in module3 in b_package"
+```
+
+```python
+# a_package/b_package/module4.py
+from a_package.b_package.module3 import function3
+
+print("importing module4 in b_package")
+
+def function4():
+    return f"function4 calls {function3()}"
+```
+
+```python
+# use_module4.py
+from a_package.b_package.module4 import function4
+
+print(function4())
+#: importing module3 in b_package
+#: importing module4 in b_package
+#: function4 calls function3 in module3 in b_package
+```
+
+`module3` loads before `module4` finishes loading, because `module4`'s
+own import runs while its body is executing, which is why the two
+loading messages print before anything the script itself does.
+`from .module3 import function3` works here as well, and is the better
+choice inside a package: the sibling is named without repeating the
+package path, so renaming `b_package` leaves the import alone.
+
+Renaming the directory to `bPackage` and updating the imports to
+`a_package.bPackage.module4` still runs. Nothing in the language
+objects, since a package name only has to be a valid identifier. What
+it costs is everything a convention buys:
+[File Names](../Chapters/06_Modules_and_Packages.md#file-names) calls
+for short, all-lowercase package names, so `bPackage` reads as a class
+to anyone scanning an import line, and its capital letter is a
+portability hazard on a case-insensitive filesystem, where
+`import a_package.bpackage` would also succeed on Windows and then
+fail on Linux.
 
 ## 3. Lazy imports load in use order, not declaration order
 
@@ -102,6 +140,8 @@ unrelated file names. `import module` then raises
 lowercase name exists; only `import Module` works. Relying on
 case-insensitive matching is a portability trap: code that imports
 happen to work on Windows can fail the moment it runs on Linux CI.
-This is also why [File Names](#file-names) recommends `snake_case` for
+This is also why
+[File Names](../Chapters/06_Modules_and_Packages.md#file-names)
+recommends `snake_case` for
 modules: it sidesteps the whole question by never mixing case in a
 module name to begin with.

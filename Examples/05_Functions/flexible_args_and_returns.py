@@ -10,3 +10,5 @@ print(flexible_args_and_returns(1))
 #: Hello
 print(flexible_args_and_returns("one"))
 #: 2
+print(flexible_args_and_returns(2))
+#: None

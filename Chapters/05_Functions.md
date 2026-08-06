@@ -44,9 +44,16 @@ print(flexible_args_and_returns(1))
 #: Hello
 print(flexible_args_and_returns("one"))
 #: 2
+print(flexible_args_and_returns(2))
+#: None
 ```
 
-Here, the same function applies the '`+`' operator to integers and strings:
+The third call matches neither test,
+so the function reaches its end without returning anything and produces `None`.
+Every Python function returns a value.
+A bare `return` and a missing `return` both produce `None`.
+
+Here, the same function applies the `+` operator to integers and strings:
 
 ```python
 # add.py
@@ -58,9 +65,16 @@ print(add(42, 47))
 #: 89
 print(add("spam ", "eggs"))
 #: spam eggs
+try:
+    add(42, "spam")
+except TypeError as e:
+    print(e)
+#: unsupported operand type(s) for +: 'int' and 'str'
 ```
 
 The only constraint on a function argument is that the function can apply its operations to that object.
+The failure comes from `+`, inside the call, not from the call itself.
+Nothing checks the arguments on the way in.
 
 ## Default and Keyword Arguments
 
@@ -82,6 +96,11 @@ print(connect(port=80, host="web.example.com"))  # Any order by name
 #: web.example.com:80 (timeout 30s)
 ```
 
+A parameter with a default cannot come before one without.
+`def f(a=1, b):` is a `SyntaxError`:
+`parameter without a default follows parameter with a default`.
+Keyword-only parameters are exempt, because the caller names them.
+
 Python evaluates a default value once, at function definition.
 This means a mutable default is shared across calls:
 
@@ -96,6 +115,8 @@ print(bad_append(1))
 #: [1]
 print(bad_append(2))  # Surprise, the default kept the 1
 #: [1, 2]
+print(bad_append.__defaults__)
+#: ([1, 2],)
 
 def good_append(item, target=None):
     if target is None:
@@ -110,9 +131,20 @@ print(good_append(2))
 ```
 
 A mutable default persists because it lives on the function object rather than being recreated on each call.
+`__defaults__` holds the tuple of default values stored on the function object,
+and it is the same list both calls appended to.
 This behavior commonly confuses newcomers to the language.
 
-You only need the `None` sentinel when the function modifies the argument.
+Underneath, a parameter is another name bound to the caller's object,
+the binding described in [Variables and References](02_Tour.md#variables-and-references).
+When that object is mutable,
+changes made inside the function are visible outside it.
+`bad_append()` combines this with a default built once,
+so each call mutates the object the next call will use.
+
+The `None` default in `good_append()` is a *sentinel*:
+a value chosen to mean "nothing was supplied" rather than to be used.
+You need one when the function modifies the argument.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
 Calls still share it, but sharing is harmless because it cannot change:
@@ -188,6 +220,10 @@ report("point", 3, 4, color="red", size=10)
 #: point (3, 4) {'color': 'red', 'size': 10}
 ```
 
+The names `args` and `kwargs` are convention;
+the `*` and `**` do the collecting,
+so `*values` and `**options` behave identically.
+
 ## Unpacking Arguments
 
 `*` and `**` also work in the other direction.
@@ -217,12 +253,21 @@ nums = (1, 2, 3)
 opts = {"color": "red", "size": 10}
 report("point", *nums, **opts)
 #: point (1, 2, 3) {'color': 'red', 'size': 10}
+
+def trace(func, *args, **kwargs):
+    print("calling", func.__name__)
+    return func(*args, **kwargs)
+
+trace(report, "point", *nums, **opts)
+#: calling report
+#: point (1, 2, 3) {'color': 'red', 'size': 10}
 ```
 
 Because collecting and unpacking are inverses,
-a function can gather arguments with `*args` and `**kwargs`,
-then pass them on unchanged, as seen in `report()`.
-This is the standard way to write a wrapper around another function.
+a function can gather arguments it knows nothing about and pass them on unchanged.
+`trace()` accepts any call and forwards it,
+which is the standard shape of a wrapper.
+[Decorators](14_Decorators.md) builds on this.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -231,11 +276,12 @@ A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, never by name.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
+A `*args` parameter does the same thing.
+It absorbs every remaining positional argument,
+so a parameter declared after it can only be passed by name.
 
 ```python
 # param_markers.py
-# `/` ends the positional-only parameters.
-# `*` begins the keyword-only parameters.
 
 def divide(a, b, /):
     return a / b
@@ -250,15 +296,40 @@ print(make_user("Bob"))
 #: Bob (admin=False)
 print(make_user("Sue", admin=True))
 #: Sue (admin=True)
+
+def tally(label, *values, total=False):
+    print(label, values, total)
+
+tally("nums", 1, 2, True)
+#: nums (1, 2, True) False
+tally("nums", 1, 2, total=True)
+#: nums (1, 2) True
+
+try:
+    divide(a=10, b=2)  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+try:
+    make_user("Sue", True)  # type: ignore
+except TypeError as e:
+    print(e)
+#: make_user() takes 1 positional argument but 2 were given
 ```
+
+The `True` in the first `tally()` call joins `values` like any other positional argument.
+Only the named form reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
+It reports `got some positional-only arguments passed as keyword arguments: 'a, b'`.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
+Both mistakes are visible without running the code,
+so each carries a `# type: ignore` telling the type checker the misuse is deliberate.
 
 In the standard library,
 many built-in functions and methods take positional-only parameters,
-such as `dict.get(key, default, /)`.
+such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method.
 Since the name is not part of the interface,
@@ -267,14 +338,21 @@ the subclass can rename the parameter, and a type checker will not object.
 ## Lambdas
 
 A `lambda` is a small anonymous function written as a single expression.
-It is useful for passing behavior to functions such as `sorted()`:
+It is useful for passing behavior to functions such as `sorted()`.
+`sorted()` calls `key` on each element and orders by the results.
+When a function already computes the key, pass it by name:
+`key=len` needs no lambda.
+Write a lambda when nothing existing computes what you want,
+such as ordering by a word's last letter:
 
 ```python
 # lambdas.py
 
 words = ["banana", "kiwi", "apple", "fig"]
-print(sorted(words, key=lambda w: len(w)))  # Sort by length
+print(sorted(words, key=len))
 #: ['fig', 'kiwi', 'apple', 'banana']
+print(sorted(words, key=lambda w: w[-1]))
+#: ['banana', 'apple', 'fig', 'kiwi']
 square = lambda n: n * n  # Usually prefer def
 print(square(9))
 #: 81
@@ -291,11 +369,16 @@ For anything more complicated, write a separate function.
     (hint: `target.append(item)` on a tuple).
 2.  In `sentinel_default.py`, add a third key to `prefs`, `"volume2": None`,
     and call `get(prefs, "volume2")` to confirm the sentinel still tells `None`-as-value apart from missing.
-3.  In `param_markers.py`,
-    add a parameter `label: str = "result"` to `divide()`, keyword-only,
-    so `divide(10, 2, label="half")` prints `"half: 5.0"`.
+3.  In `param_markers.py`, add a parameter `label="result"` to `divide()`,
+    keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
     Confirm that `divide(10, 2, "half")`, passing `label` positionally,
     is now a `TypeError`.
-4.  Rewrite `report()` from `var_args.py` so it also accepts a `total: bool = False` keyword-only flag that,
+4.  Rewrite `report()` from `var_args.py` so it also accepts a `total=False` keyword-only flag that,
     when true, additionally prints `sum(values)`.
     Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.
+5.  Write `apply_twice(func, value)` that returns `func(func(value))`,
+    then call it with a lambda that appends `"!"` to a string.
+    Predict the result of `apply_twice(lambda s: s + "!", "hi")` before running it.
+6.  Given `args = ("point", 3, 4)` and `opts = {"color": "red"}`,
+    call `report()` from `var_args.py` so it prints `point (3, 4) {'color': 'red'}`,
+    passing both containers without naming their contents.

@@ -67,6 +67,8 @@ This creates space for that field when the method runs.
 If you declare fields using the C++/Java style,
 they implicitly become class-level fields
 (similar to static fields in C++/Java).
+[Class Attributes](09_Class_Attributes.md)
+shows what that shared storage does when you assign to it.
 
 You can see the shape of an object with `display_object()`,
 a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
@@ -100,13 +102,18 @@ With inheritance in C++ or Java,
 you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
+Python does have a way to name an interface without inheritance,
+the `Protocol` in [Static Typing](08_Static_Typing.md),
+which describes the shape `f()` requires instead of demanding a base class.
 
 First import the base class the same way you import any name from a module
 (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class
 (or classes, since Python supports multiple inheritance)
 in parentheses after the name of the inheriting class.
-This example imports and subclasses `Simple`, from the `simple_class` module:
+This example imports and subclasses `Simple`, from the `simple_class` module.
+Ignore the `@override` decorator for now;
+the section after this one explains it:
 
 ```python
 # simple2.py
@@ -164,7 +171,6 @@ In the constructor, `super().__init__()` calls the base-class constructor.
 In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
-The next section explains the `@override` decorator on `show()`.
 
 The demo shows that the base-class constructor runs.
 You can also see that the inherited `show_twice()` method is available in the derived class.
@@ -209,8 +215,14 @@ A type checker now verifies the claim.
 If `Derived.show` does not override a method in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
+Python runs the program either way.
+Verification comes from a separate tool,
+introduced in [Static Typing](08_Static_Typing.md).
 
-At runtime `@override` returns the method unchanged.
+At run time `@override` adds no wrapper.
+It sets an `__override__` attribute on the method,
+for anything that wants to find overrides by introspection,
+and returns the same function object.
 The type checker performs all verification before the program runs.
 
 Apply `@override` to any method that replaces an inherited method,
@@ -244,7 +256,6 @@ do not preemptively add getters and setters.
 You can always add them later when you discover you need the logic.
 
 The default `@property` is read-only.
-It is only a getter.
 Assigning to it raises an `AttributeError`.
 To enable writing, add a *setter*,
 which allows you to validate the value before storing it:
@@ -276,6 +287,13 @@ except ValueError as e:
     print(f"Failed: {e}")
 #: Failed: radius cannot be negative
 ```
+
+The property owns the name `radius` on the class,
+so the value goes into a separate attribute.
+A single leading underscore marks `_radius` as internal to the class,
+a convention rather than a language rule.
+The name matters: assigning to `self.radius` inside the setter would call the setter again,
+and again, until the interpreter raises a `RecursionError`.
 
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
@@ -317,7 +335,7 @@ The stored value lives on the instance.
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale.
-A plain `@property` recomputes every time and is never wrong.
+A plain `@property` recomputes every time, so its answer is always current.
 Cache only what cannot change.
 
 ## String Representation
@@ -343,7 +361,38 @@ print([p, p])
 #: [Point(3, 4), Point(3, 4)]
 ```
 
-Define `__repr__()` on classes you debug.
+Adding `__str__()` to the same class separates the two forms:
+
+```python
+# representation_str.py
+
+class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return f"Point({self.x}, {self.y})"
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+p = Point(3, 4)
+print(p)  # print() prefers __str__
+#: (3, 4)
+print(repr(p))
+#: Point(3, 4)
+print([p])
+#: [Point(3, 4)]
+```
+
+`print()` and `str()` use `__str__()` when it exists and fall back to `__repr__()` when it does not.
+The fallback runs one way only, so `repr()` never consults `__str__()`.
+A container builds its own display from the `__repr__()` of its elements,
+which is why the list prints `Point(3, 4)` rather than the shorter form.
+In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
+
+Define `__repr__()` on classes you debug,
+and add `__str__()` only when users see the output.
 
 ## Static and Class Methods
 
@@ -372,6 +421,11 @@ print(round(t.celsius))
 print(Temperature.is_freezing(-4))
 #: True
 ```
+
+`from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
+Called on a subclass, `cls` is that subclass,
+so the alternative constructor produces the right kind of object without being rewritten.
+Naming the class directly would hard-code `Temperature` into every subclass.
 
 For classes that are primarily a bundle of typed data,
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
@@ -411,9 +465,8 @@ Because `f` is now an ordinary method, its first parameter is `self`,
 the `Compose` instance.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
-but composition, mixins,
-or a plain module-level function are almost always a clearer choice.
-You will rarely, if ever, want this in your own code.
+but composition or a module-level function is almost always a clearer choice.
+You will rarely need this in your own code.
 
 ## Exercises
 
@@ -434,3 +487,7 @@ You will rarely, if ever, want this in your own code.
 4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
     Access `n.total` and then `n.average`,
     and confirm `total` is not recomputed when `average` uses it.
+5.  Give `Temperature` in `class_methods.py` a `__repr__()` that returns `Temperature(21.0)` for a temperature of 21 degrees Celsius.
+    Print a single `Temperature` and a list of two of them,
+    and confirm the list shows the same form for each element.
+    Then add a `__str__()` returning `21.0C` and confirm which of the two `print()` uses for each case.

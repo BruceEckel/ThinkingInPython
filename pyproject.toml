@@ -93,5 +93,10 @@ lines-after-imports = 1
 [tool.pytest.ini_options]
 pythonpath = ["build/examples/utils"]
 
+# The second ty path is chapter 6's own directory. Its a_package/module4.py
+# uses a relative import (`from .module1 import ...`), which needs a_package
+# to be resolvable as a top-level package. The chapter directory is not a
+# package itself (and "06_..." is not an identifier), so ty cannot establish
+# module4's parent package without being handed the directory.
 [tool.ty.environment]
-extra-paths = ["build/examples/utils"]
+extra-paths = ["build/examples/utils", "build/examples/06_Modules_and_Packages"]
