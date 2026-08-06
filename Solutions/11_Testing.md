@@ -145,3 +145,52 @@ what either test does to the account, `never_negative`'s balance must
 still be non-negative once the test body returns control to the
 fixture. Both tests pass the same shared invariant check with no
 duplicated assertion in either test body.
+
+## 4. The environment variable, patched and then injected
+
+```python
+# settings.py
+import os
+from pathlib import Path
+
+def settings_path() -> Path:
+    return Path(os.environ["APP_CONFIG"]) / "settings.ini"
+
+def settings_path_in(directory: Path) -> Path:
+    return directory / "settings.ini"
+```
+
+```python
+# test_ch11_settings.py
+from pathlib import Path
+import pytest
+import settings
+
+def test_settings_path_reads_the_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("APP_CONFIG", str(tmp_path))
+    assert settings.settings_path() == tmp_path / "settings.ini"
+
+def test_settings_path_in_takes_the_directory(tmp_path: Path) -> None:
+    expected = tmp_path / "settings.ini"
+    assert settings.settings_path_in(tmp_path) == expected
+```
+
+The first test has to know two things about the implementation: that
+the function reads an environment variable, and that the variable is
+spelled `APP_CONFIG`. Renaming it to `APP_SETTINGS_DIR` breaks the
+test even though the behavior is unchanged, and the failure is a
+`KeyError` from inside the function rather than a message about the
+name. The second test knows only what the function promises: give it a
+directory, get the settings file inside it. That test survives the
+rename, and it survives dropping the environment variable entirely.
+
+`tmp_path` is still worth taking in the second test, even though
+nothing touches the disk, because it supplies a real, valid path
+without hard-coding one that would differ across operating systems.
+
+The trade is that injection moves the decision outward: somebody has
+to read `APP_CONFIG` and pass the directory in. That somebody is
+usually one function at the program's edge, which is the one place a
+patching test is worth writing.

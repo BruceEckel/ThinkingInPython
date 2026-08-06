@@ -10,7 +10,7 @@ def test_deposit_increases_balance() -> None:
     account.deposit(100)
     assert account.balance == 100
 
-# Make three tests, replacing "bad" with each list value:
+# Make three tests, replacing "bad" with each list value
 @pytest.mark.parametrize("bad", [0, -1, -100])
 def test_nonpositive_deposit_raises(bad: float) -> None:
     with pytest.raises(ValueError):

@@ -80,12 +80,32 @@ print(Counter.live_count())
 
 `counters.clear()` empties the existing list in place, dropping its
 references to all three `Counter` objects. `counters = []` does
-something different but reaches the same result: it points the name
-`counters` at a brand-new, empty list, abandoning the old list
-entirely. Since nothing else refers to that old list, it (and every
-reference it held) becomes collectible immediately. Either way, the
-three `Counter` instances lose their last strong reference at the same
-moment, so `live_count()` falls to `0` right after.
+something different: it points the name `counters` at a brand-new,
+empty list and abandons the old one. Here nothing else refers to that
+old list, so it (and every reference it held) becomes collectible
+immediately, and both spellings reach `live_count() == 0`.
+
+They stop agreeing the moment a second name enters the picture:
+
+```python
+# exercise_2_alias.py
+counters = [1, 2, 3]
+other = counters  # A second name for the same list
+counters = []  # Rebinding: 'other' still sees the old list
+print(other)
+#: [1, 2, 3]
+counters = [1, 2, 3]
+other = counters
+counters.clear()  # Clearing: 'other' sees the emptied list
+print(other)
+#: []
+```
+
+`clear()` changes the object every name can see. Rebinding changes
+only which object this one name points at. The two coincide in
+`weak_value.py` because that list has exactly one reference; with two,
+rebinding would leave the `Counter` objects alive and `live_count()`
+stuck at `3`.
 
 ## 3. Listing the names of every live instance
 
@@ -161,3 +181,46 @@ unbinds the name `c`; it does not touch the list. Nothing about how
 the list gets built changes when its contents get destroyed, so the
 `deleted` messages still only appear at interpreter shutdown, after
 `End of delete loop` has already printed.
+
+## 5. A strong registry that never lets go
+
+```python
+# exercise_5.py
+from typing import ClassVar
+
+class Counter:
+    _instances: ClassVar[dict[int, Counter]] = {}
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self._instances[id(self)] = self
+
+    @classmethod
+    def live_count(cls) -> int:
+        return len(cls._instances)
+
+counters = [Counter(name) for name in ("First", "Second", "Third")]
+print(Counter.live_count())
+#: 3
+counters.pop()
+print(Counter.live_count())
+#: 3
+counters.pop()
+print(Counter.live_count())
+#: 3
+counters.clear()
+print(Counter.live_count())
+#: 3
+```
+
+The count never falls. A `dict` holds a strong reference to each
+value, so `_instances` alone keeps every `Counter` alive no matter
+what `counters` does. `pop()` removes one reference and the registry
+still holds another, so the object's reference count never reaches
+zero and nothing is ever collected.
+
+The registry has become the leak it was meant to observe:
+`live_count()` now reports how many `Counter` objects were ever
+created, which is exactly the number it can never report correctly. A
+`WeakValueDictionary` holds its values weakly, so it can answer the
+question without changing the answer.

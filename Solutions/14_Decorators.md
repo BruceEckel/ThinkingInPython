@@ -1,47 +1,42 @@
 # Decorators: Solutions
 
-## 1. A `Syrup` extra
+## 1. A class decorator that reports and returns
 
 ```python
 # exercise_1.py
-class Cappuccino:
-    cost = 1.75
-    description = "Cappuccino"
+def slots_report[T: type](cls: T) -> T:
+    print(f"decorating {cls.__name__}")
+    return cls
 
-class Extra:
-    add_cost = 0.0
-    name = ""
+@slots_report
+class Point:
+    x: int
+    y: int
 
-    def __init__(self, drink) -> None:
-        self.drink = drink
+@slots_report
+class Empty:
+    pass
 
-    @property
-    def cost(self) -> float:
-        return self.drink.cost + self.add_cost
-
-    @property
-    def description(self) -> str:
-        return f"{self.drink.description} + {self.name}"
-
-class Decaf(Extra):
-    add_cost = 0.0
-    name = "Decaf"
-
-class Syrup(Extra):
-    add_cost = 0.30
-    name = "Syrup"
-
-order = Syrup(Decaf(Cappuccino()))
-print(f"{order.description}: ${order.cost:.2f}")
-#: Cappuccino + Decaf + Syrup: $2.05
+print(Point.__name__, Empty.__name__)
+#: decorating Point
+#: decorating Empty
+#: Point Empty
 ```
 
-`Syrup` needs nothing beyond the two class attributes `Extra` already
-reads: `add_cost` and `name`. `cost` and `description` are inherited
-unchanged from `Extra`, which forwards to whatever it wraps and adds
-its own contribution. Wrapping in any order still works: `Syrup` here
-wraps a `Decaf`, which wraps a `Cappuccino`, and each layer only knows
-about the one directly inside it.
+Both `decorating` lines print before anything else, because a class
+decorator runs when the `class` statement finishes, not when an
+instance is made. `slots_report` returns `cls` unchanged, so `Point`
+is the same class object it would have been without the decorator;
+the only effect is the side effect.
+
+That is also what `register` does, and the comparison is the point: a
+class decorator that returns its argument can observe and record, and
+that covers most real uses (a registry, a plugin table, a validation
+pass at import time). What it cannot do is change the class into
+something else, which is what `@dataclass` does when it returns a
+class with generated methods, and what `@singleton` does when it
+returns a function instead of a class. The return value decides which
+kind of decorator you have written.
 
 ## 2. A `timing` decorator stacked with `@trace`
 
@@ -97,67 +92,69 @@ number that changes every run), then control returns outward to
 mirrors the wrapping order: outermost decorator prints first and
 last, and each inner layer's output appears nested in between.
 
-## 3. A pizza shop, object *Decorator* pattern
+## 3. A coffee shop, object *Decorator* pattern
 
 ```python
 # exercise_3.py
-class Pizza:
+from typing import ClassVar, Protocol
+
+class Drink(Protocol):
+    @property
+    def cost(self) -> float: ...
+    @property
+    def description(self) -> str: ...
+
+class Espresso:
+    cost = 2.50
+    description = "Espresso"
+
+class Cappuccino:
+    cost = 3.25
+    description = "Cappuccino"
+
+class Extra:
+    add_cost: ClassVar[float] = 0.0
+
+    def __init__(self, drink: Drink) -> None:
+        self.drink = drink
+        self.name = type(self).__name__
+
+    @property
     def cost(self) -> float:
-        raise NotImplementedError
+        return self.drink.cost + self.add_cost
 
+    @property
     def description(self) -> str:
-        raise NotImplementedError
+        return f"{self.drink.description} + {self.name}"
 
-class Margherita(Pizza):
-    def cost(self) -> float:
-        return 8.0
+class Whipped(Extra):
+    add_cost = 0.75
 
-    def description(self) -> str:
-        return "Margherita"
+class Decaf(Extra):
+    add_cost = 0.0
 
-class Hawaiian(Pizza):
-    def cost(self) -> float:
-        return 9.0
+class ExtraShot(Extra):
+    add_cost = 0.90
 
-    def description(self) -> str:
-        return "Hawaiian"
-
-class ToppingDecorator(Pizza):
-    def __init__(self, pizza: Pizza) -> None:
-        self.pizza = pizza
-
-class Garlic(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 0.5
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Garlic"
-
-class Olives(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 0.75
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Olives"
-
-class Feta(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 1.0
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Feta"
-
-pizza = Feta(Olives(Margherita()))
-print(f"{pizza.description()}: ${pizza.cost():.2f}")
-#: Margherita + Olives + Feta: $9.75
+order = Whipped(ExtraShot(Espresso()))
+print(f"{order.description}: ${order.cost:.2f}")
+#: Espresso + ExtraShot + Whipped: $4.15
+decaf = Decaf(Cappuccino())
+print(f"{decaf.description}: ${decaf.cost:.2f}")
+#: Cappuccino + Decaf: $3.25
 ```
 
-This is `coffee.py`'s shape exactly, renamed: a base `Pizza`, plain
-pizza types with their own `cost()`/`description()`, and a
-`ToppingDecorator` base that every topping subclasses, wrapping one
-`Pizza` and forwarding through the same two-method interface. Adding
-a fourth topping needs one more small class, not a new class for every
-pizza-and-toppings combination.
+This is `pizza_decorator.py`'s shape with the menu changed: a `Drink`
+`Protocol` naming the two readable properties, plain drinks that
+satisfy it with class attributes, and an `Extra` base that wraps one
+`Drink` and forwards through the same interface. Nothing inherits from
+`Drink`, and nothing needs to; the `Protocol` is checked structurally.
+
+`Decaf` is worth noticing. Its `add_cost` is `0.0`, so it changes the
+description without changing the price, which a class-per-combination
+design would still force you to enumerate. Adding a fourth extra means
+one class with one number in it, and the extras compose in any order,
+since each layer knows only about the drink directly inside it.
 
 ## 4. A class-level counter shared across every decorated function
 
@@ -209,3 +206,72 @@ the same class-attribute-versus-instance-attribute distinction from
 nothing and lives per-instance, while `total_calls`, read and written
 through the class name, is one value the whole family of decorated
 functions shares.
+
+## 6. `retry(times)` in the function form
+
+```python
+# exercise_6.py
+from collections.abc import Callable
+from functools import wraps
+
+def retry[**P, R](
+        times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorate(func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            for attempt in range(1, times):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    print(f"attempt {attempt} failed: {e}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorate
+
+attempts = 0
+
+@retry(times=3)
+def flaky() -> str:
+    global attempts
+    attempts += 1
+    if attempts < 3:
+        raise ValueError(f"not yet ({attempts})")
+    return "succeeded"
+
+print(flaky())
+#: attempt 1 failed: not yet (1)
+#: attempt 2 failed: not yet (2)
+#: succeeded
+print(flaky.__name__)
+#: flaky
+
+@retry(times=2)
+def always_fails() -> str:
+    raise RuntimeError("no luck")
+
+try:
+    always_fails()
+except RuntimeError as e:
+    print("escaped:", e)
+#: attempt 1 failed: no luck
+#: escaped: no luck
+```
+
+The loop runs `times - 1` attempts inside a `try`, and the final
+attempt sits outside it, with no handler. That last call is what
+satisfies both requirements at once: it returns `R` on success, so the
+function has a return value on every path the checker can see, and it
+lets the last exception propagate untouched rather than re-raising a
+copy. Re-raising from inside the loop with `raise` would also work,
+but then the checker cannot tell that the function always either
+returns or raises.
+
+`@wraps(func)` keeps the identity: `flaky.__name__` reports the
+wrapped function's name, not `wrapper`. Without it, every retried
+function in a traceback or a log would report itself as `wrapper`,
+which is precisely when you least want the name to be wrong.
+
+Catching bare `Exception` is deliberate here and worth flagging: a
+real `retry` should take the exception types it retries, since
+retrying a `TypeError` from a bad call signature just fails three
+times more slowly.

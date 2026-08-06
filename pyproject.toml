@@ -83,6 +83,9 @@ lines-after-imports = 1
 "**/import_module.py" = ["F401"]
 # This example deliberately demonstrates assigning a lambda to a name.
 "**/lambdas.py" = ["E731"]
+# This example deliberately captures into a name that looks like a
+# constant, which is the mistake it exists to show.
+"**/value_patterns.py" = ["N806"]
 
 # Examples run with cwd set to their chapter dir; adding the tree's utils/
 # directory to the import path lets test files import shared helpers

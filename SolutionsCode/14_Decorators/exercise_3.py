@@ -1,50 +1,47 @@
 # exercise_3.py
-class Pizza:
+from typing import ClassVar, Protocol
+
+class Drink(Protocol):
+    @property
+    def cost(self) -> float: ...
+    @property
+    def description(self) -> str: ...
+
+class Espresso:
+    cost = 2.50
+    description = "Espresso"
+
+class Cappuccino:
+    cost = 3.25
+    description = "Cappuccino"
+
+class Extra:
+    add_cost: ClassVar[float] = 0.0
+
+    def __init__(self, drink: Drink) -> None:
+        self.drink = drink
+        self.name = type(self).__name__
+
+    @property
     def cost(self) -> float:
-        raise NotImplementedError
+        return self.drink.cost + self.add_cost
 
+    @property
     def description(self) -> str:
-        raise NotImplementedError
+        return f"{self.drink.description} + {self.name}"
 
-class Margherita(Pizza):
-    def cost(self) -> float:
-        return 8.0
+class Whipped(Extra):
+    add_cost = 0.75
 
-    def description(self) -> str:
-        return "Margherita"
+class Decaf(Extra):
+    add_cost = 0.0
 
-class Hawaiian(Pizza):
-    def cost(self) -> float:
-        return 9.0
+class ExtraShot(Extra):
+    add_cost = 0.90
 
-    def description(self) -> str:
-        return "Hawaiian"
-
-class ToppingDecorator(Pizza):
-    def __init__(self, pizza: Pizza) -> None:
-        self.pizza = pizza
-
-class Garlic(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 0.5
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Garlic"
-
-class Olives(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 0.75
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Olives"
-
-class Feta(ToppingDecorator):
-    def cost(self) -> float:
-        return self.pizza.cost() + 1.0
-
-    def description(self) -> str:
-        return self.pizza.description() + " + Feta"
-
-pizza = Feta(Olives(Margherita()))
-print(f"{pizza.description()}: ${pizza.cost():.2f}")
-#: Margherita + Olives + Feta: $9.75
+order = Whipped(ExtraShot(Espresso()))
+print(f"{order.description}: ${order.cost:.2f}")
+#: Espresso + ExtraShot + Whipped: $4.15
+decaf = Decaf(Cappuccino())
+print(f"{decaf.description}: ${decaf.cost:.2f}")
+#: Cappuccino + Decaf: $3.25

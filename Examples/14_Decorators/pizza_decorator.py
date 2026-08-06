@@ -1,5 +1,5 @@
 # pizza_decorator.py
-from typing import Protocol
+from typing import ClassVar, Protocol
 
 class Pizza(Protocol):
     @property
@@ -16,7 +16,7 @@ class Hawaiian:
     description = "Hawaiian"
 
 class Topping:
-    add_cost = 0.0
+    add_cost: ClassVar[float] = 0.0
 
     def __init__(self, pizza: Pizza) -> None:
         self.pizza = pizza

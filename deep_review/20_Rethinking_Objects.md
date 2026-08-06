@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Deep review: 20_Rethinking_Objects.md
 
 **How to use this file:** delete a `##` block to reject that proposal, edit its text to change what gets implemented, leave it alone to accept it. Hand the file back when you are done.
@@ -320,8 +321,7 @@ Each bullet is independent; strike any you disagree with.
   The book runs about 50 "at runtime" to 4 "at run time", so make the two odd ones out match.
   (Line 35's "run-time world" is an adjective and can stay.)
 - **line ~436: "What you buy is the last two lines."** `buy` is on the watch list,
-  and the cleft delays the verb. Suggest: "The last two lines are what that arrangement pays back."
-  Or plainer: "The last two lines are the payoff."
+  and the cleft delays the verb. Suggest: "The last two lines are the payoff."
 - **line ~664: "The mismatch lives entirely in what the number means."**
   `entirely` is doing intensifier work here; the contrast with the matched shape is already
   carried by the sentence before it. Suggest dropping the word.

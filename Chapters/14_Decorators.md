@@ -36,8 +36,9 @@ The `@hijack` above `cheese()` means:
 
 `hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
 so `cheese` now refers to `doesnt_matter`.
-Calling `cheese()` runs `doesnt_matter` which never calls `func` and prints its own message instead.
-The original `cheese()` behavior never happens.
+Calling `cheese()` runs `doesnt_matter`,
+which never calls `func` and prints its own message instead.
+The original body of `cheese()` never runs.
 
 Since decoration binds the local function to the name `cheese`, the local name
 (`doesnt_matter()`) can be anything.
@@ -67,6 +68,40 @@ cheese()
 #: Wensleydale
 #: Some more work
 ```
+
+A decorator that forgets its `return wrapper` binds `cheese` to `None`,
+and the failure surfaces at the next call to `cheese()`,
+not at the decoration that caused it.
+
+The decorator runs when Python executes the `def`,
+not when the decorated function is called:
+
+```python
+# decoration_time.py
+from collections.abc import Callable
+
+def announce(func: Callable) -> Callable:
+    print("Decorating")
+    def wrapper() -> None:
+        print("Calling")
+        func()
+    return wrapper
+
+@announce
+def cheese() -> None:
+    print("Wensleydale")
+
+print("Definitions done")
+cheese()
+#: Decorating
+#: Definitions done
+#: Calling
+#: Wensleydale
+```
+
+`Decorating` prints before `Definitions done`,
+so `announce` ran while Python was still executing the `def` above `cheese`.
+Only the body of `wrapper()` waits for the call.
 
 `wrapper()` is a *closure*.
 Defined inside `add_behavior()`, it refers to `func`,
@@ -118,6 +153,9 @@ its name, docstring, and other attributes.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
 `wraps` is optional but there is rarely a reason to omit it.
+It also sets `__wrapped__` on the wrapper, pointing at the original,
+so `add.__wrapped__(2, 3)` calls the function without the tracing,
+and `inspect.signature()` follows that chain automatically.
 
 `wraps` keeps the runtime interface.
 The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
@@ -142,10 +180,10 @@ and the wrapper swallows any arguments,
 discarding the signature the decorator is meant to preserve.
 
 The `# type: ignore` comments mark where the checker cannot follow:
-a bare `Callable` is not guaranteed to have a `__name__` attribute,
+a `Callable` is not guaranteed to have a `__name__` attribute,
 though every actual function does.
 
-Testing verifies that the wrapper reports the original function's name,
+The tests verify two things: the wrapper reports the original function's name,
 and it still returns the original result:
 
 ```python
@@ -220,8 +258,15 @@ and only then does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
 call `wraps(func)` to get a decorator, then apply it to `wrapper`.
 Completing the outer decoration triggers the inner one,
-but nothing calls itself.
+so the two `@` lines are two separate calls, not one recursive one.
 The nesting stops at two levels, matching the two nested `def`s in the source.
+
+Forgetting the parentheses is the common mistake here.
+`@repeat` without them binds `greet` to `decorate`,
+so calling `greet("Bob")` passes `"Bob"` where `decorate` expects a function and hands back a wrapper instead of printing anything.
+Nothing raises an exception, so the only symptom is missing output.
+The annotations catch it:
+`ty` reports that `greet` expected a callable and got a `str`.
 
 Inside `wrapper()`, the first call to `func` happens before the loop,
 so `result` always holds a value of type `R` to return;
@@ -260,6 +305,11 @@ A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
 at decoration, and `__call__()` runs on every call to the decorated function.
+
+These classes are named in lowercase, against the usual `PascalCase` rule,
+because a decorator is used like a function at the call site.
+`property`, `staticmethod`,
+and `functools.partial` are all lowercase classes for that reason.
 
 ### A Stateless Class Decorator
 
@@ -389,7 +439,7 @@ def test_counts_are_independent_per_function() -> None:
 
 ### A Class Decorator with Arguments
 
-The class form provides a valuable benefit when the decorator takes arguments.
+The class form pays off when the decorator takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
@@ -453,37 +503,6 @@ def test_repeat_call_count(times: int, expected: int) -> None:
     assert len(calls) == expected
 ```
 
-### Function Form or Class Form?
-
-Compare the two cases.
-`@trace` with no arguments calls `trace(add)`.
-The function goes straight to the constructor.
-`@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
-then applies that instance to `greet`.
-The arguments go to the constructor, and the function arrives later,
-at `__call__()`.
-The function form hides this shift inside an extra nested `def`.
-The class form makes it visible.
-The function moves from `__init__()` to `__call__()` when the decorator gains arguments.
-
-The form you choose is mostly a matter of taste.
-Both forms preserve the wrapped function's exact signature for the type checker,
-using the same `**P` and `R` type parameters.
-The function form is more compact.
-The class form reads better when the decorator carries state or grows complicated,
-because the phases are separate methods instead of nested closures.
-That argument-capturing class-based decorator scales up to small frameworks.
-A build tool or task runner can offer a `@rule(target, *deps)` decorator.
-Its constructor records the target and dependencies.
-Its `__call__()` registers the decorated function in a class-level table with that metadata.
-A driver later walks the table to run things in order.
-The decorator becomes the registration mechanism for the whole system.
-
-A context manager can also act as a decorator,
-bracketing every call with its setup and cleanup code.
-[Context Managers](15_Context_Managers.md#context-manager-as-decorator)
-shows `contextlib.ContextDecorator`.
-
 ### A Limitation: Methods Need a Descriptor
 
 The class form has one real limitation:
@@ -538,6 +557,42 @@ A fully typed class decorator, like `trace_class.trace`,
 even gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
 catching the same problem before the program runs.
+
+### Function Form or Class Form?
+
+Compare the two cases.
+`@trace` with no arguments calls `trace(add)`.
+The function goes straight to the constructor.
+`@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
+then applies that instance to `greet`.
+The arguments go to the constructor, and the function arrives later,
+at `__call__()`.
+The function form hides this shift inside an extra nested `def`.
+The class form makes it visible.
+The function moves from `__init__()` to `__call__()` when the decorator gains arguments.
+
+Outside of methods, the form you choose is mostly a matter of taste.
+Both forms preserve the wrapped function's exact signature for the type checker,
+using the same `**P` and `R` type parameters.
+The function form is more compact.
+The class form reads better when the decorator carries state or grows complicated,
+because the phases are separate methods instead of nested closures.
+That argument-capturing class-based decorator scales up to small frameworks.
+A build tool or task runner can offer a `@rule(target, *deps)` decorator.
+Its constructor records the target and dependencies.
+Its `__call__()` registers the decorated function in a class-level table with that metadata.
+A driver later walks the table to run things in order.
+The decorator becomes the registration mechanism for the whole system.
+
+The descriptor limitation above is the one hard reason to choose the function form.
+A decorator meant for methods either returns a function,
+as the function form and `repeat_class.repeat` both do,
+or implements `__get__()`.
+
+A context manager can also act as a decorator,
+bracketing every call with its setup and cleanup code.
+[Context Managers](15_Context_Managers.md#context-manager-as-decorator)
+shows `contextlib.ContextDecorator`.
 
 ## Stacking Decorators
 
@@ -720,7 +775,8 @@ and hands back whatever `greeting()` returned.
 the name now refers to the `str` that came out of it.
 Calling `greeting()` again fails, since a `str` is not callable.
 This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
-A module-level constant computed without a decorator is usually clearer for anything simpler.
+For anything simpler,
+a module-level constant computed the ordinary way reads better.
 
 The same collapse happens to classes.
 [Singleton](24_Singleton.md#singleton-classes)
@@ -751,7 +807,7 @@ Because a topping is a pizza, you can wrap a topping in another topping.
 
 ```python
 # pizza_decorator.py
-from typing import Protocol
+from typing import ClassVar, Protocol
 
 class Pizza(Protocol):
     @property
@@ -768,7 +824,7 @@ class Hawaiian:
     description = "Hawaiian"
 
 class Topping:
-    add_cost = 0.0
+    add_cost: ClassVar[float] = 0.0
 
     def __init__(self, pizza: Pizza) -> None:
         self.pizza = pizza
@@ -808,6 +864,10 @@ The `Pizza` `Protocol` describes that interface.
 Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
 This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
+A read-only `@property` in a `Protocol` requires that reading the name produce that type,
+and says nothing about how.
+`Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property;
+both read as a `float`, so both match.
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
@@ -848,8 +908,8 @@ def test_single_topping() -> None:
 ## Decorators You Already Know
 
 Several decorators from earlier chapters use this mechanism.
-`@property`, `cached_property`, `@staticmethod`, and `@classmethod`
-(see [Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods))
+`@property`, `@cached_property`, `@staticmethod`, and `@classmethod`
+(see [Properties](07_Classes.md#properties) and [Static and Class Methods](07_Classes.md#static-and-class-methods))
 each wrap a function the same way `trace` does,
 but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
@@ -859,18 +919,19 @@ where a `__call__`-based class, like `Logged` above, does not.
 is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,
 adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
-`functools.cache` and `functools.lru_cache`
+`@functools.cache` and `@functools.lru_cache`
 (see [Performance](18_Performance.md#caching))
 wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
-None of these needed new syntax to understand.
+Understanding any of these needs no new syntax.
 They are ordinary decorators,
 built from the closures and callables this chapter covered.
 
 ## Exercises
 
-1.  Add a `Mushroom` topping (cost 0.60)
-    and use it to build a Hawaiian with mushroom and feta.
+1.  Write a class decorator `slots_report` that prints the name of each class it decorates and returns it unchanged,
+    then apply it to two small classes.
+    Compare what it can do to what `register` does.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
@@ -884,3 +945,6 @@ built from the closures and callables this chapter covered.
     Note where the shared state lives compared to the per-instance `count` in `count_calls`.
 5.  Give `trace_class.trace` a `__get__()` method so it works correctly when applied to an instance method.
     Apply it to a method on a small class and confirm `self` arrives correctly.
+6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
+    up to `times` attempts, and re-raises the last exception when they all fail.
+    Check that `__name__` survives.

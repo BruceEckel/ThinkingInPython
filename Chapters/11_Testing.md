@@ -2,7 +2,9 @@
 
 One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
-Tests extend the language.
+A type checker verifies the claims you can write as annotations.
+Tests verify the rest: that a withdrawal reduces the balance,
+that an overdraft is refused.
 They state what the code is supposed to do, and check it.
 
 Tests give you a safety net.
@@ -30,7 +32,7 @@ When you write the tests first, you:
 3.  Get a clear definition of done: the code is finished when the tests pass.
 
 Testing then becomes a design tool,
-not a verification step you skip when you happen to feel good about the code you just wrote.
+not a verification step you skip when the code looks right to you.
 
 That said, TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
@@ -41,8 +43,8 @@ You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
 Writing tests for exploratory programming is not practical.
-AI makes generating tests far more viable once you have found a good path,
-and makes a thorough test suite easier to produce.
+Once you have found a good path,
+AI makes a thorough test suite far cheaper to produce.
 
 ## pytest
 
@@ -100,7 +102,7 @@ def test_deposit_increases_balance() -> None:
     account.deposit(100)
     assert account.balance == 100
 
-# Make three tests, replacing "bad" with each list value:
+# Make three tests, replacing "bad" with each list value
 @pytest.mark.parametrize("bad", [0, -1, -100])
 def test_nonpositive_deposit_raises(bad: float) -> None:
     with pytest.raises(ValueError):
@@ -126,19 +128,64 @@ def test_interest_uses_approx(funded: Account) -> None:
 ```
 
 Run the test suite by typing `pytest` in the project directory.
+`pytest` puts each test file's own directory at the front of `sys.path`,
+which is why `from account import Account` works with no packaging and no path setup,
+as long as `account.py` sits beside `test_account.py`.
 It discovers every `test_*.py` file, collects every `test_` function, runs them,
 and reports success and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
+
+Change the expected value in `test_deposit_increases_balance()` to `10` and the report names the line,
+the expression, and both sides:
+
+```text
+______________ test_deposit_increases_balance ______________
+
+    def test_deposit_increases_balance() -> None:
+        account = Account()
+        account.deposit(100)
+>       assert account.balance == 10
+E       assert 100.0 == 10
+E        +  where 100.0 = <account.Account object>.balance
+
+test_account.py:6: AssertionError
+```
+
+The `where` line is the rewriting at work:
+`pytest` kept the sub-expression `account.balance` and its value,
+which a bare `assert` statement would have discarded.
 
 ## Testing for Exceptions and Floating Point
 
 Two situations come up repeatedly in testing,
 and both appear in `test_account.py`.
 
-The first is "this call should cause an exception."
+The first is "this call should raise an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.
 The test passes only if the block raises the expected exception.
+
+Keep the `with` block down to the single call that should fail.
+Any statement inside it that raises the expected type passes the test,
+including one that fails for an unrelated reason.
+`match=` takes a regular expression checked against the exception's message,
+so the test can confirm which failure occurred and not just its type:
+
+```python
+# test_overdraft_message.py
+import pytest
+from account import Account, InsufficientFunds
+
+def test_overdraft_reports_the_shortfall() -> None:
+    account = Account(100)
+    with pytest.raises(InsufficientFunds, match="less than 250"):
+        account.withdraw(250)
+    assert account.balance == 100
+```
+
+The assertion after the block belongs outside it:
+a failed withdrawal must leave the balance alone,
+and that check has nothing to do with the exception.
 
 The second is comparing floating-point numbers,
 where testing for exact equality is unreliable.
@@ -204,9 +251,9 @@ from account import Account
 @pytest.fixture
 def open_account() -> Iterator[Account]:
     account = Account()
-    account.deposit(100)  # Setup, before the yield
-    yield account  # The test runs with this value
-    account.withdraw(account.balance)  # Teardown, after the test
+    account.deposit(100)
+    yield account
+    account.withdraw(account.balance)
     assert account.balance == 0
 
 def test_spend_some(open_account: Account) -> None:
@@ -225,7 +272,7 @@ You can automatically invoke a fixture for every test
     @pytest.fixture(autouse=True)
 
 Fixtures eliminate duplicated setup.
-Less code generally makes tests easier to read and verify.
+A test that names `funded` states what it needs and nothing about how to build it.
 
 ## Sharing Fixtures with conftest.py
 
@@ -252,6 +299,11 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 
 `pytest` builds the `scope="session"` fixture once and reuses it,
 which is useful for expensive resources.
+The reuse is the risk as well as the point: every test receives the same object,
+so one test that mutates it changes what the next test sees.
+Keep session fixtures to values nothing modifies, like `bank_name`,
+or to a resource with its own reset,
+and leave anything a test writes to at the default per-test scope.
 `pytest` rebuilds the `preloaded` fixture for each parameter,
 so a test that uses it automatically runs at every starting balance:
 
@@ -351,7 +403,10 @@ def test_roll_returns_known_value(
     assert dice.roll() == 4
 ```
 
-Patching the function gives you the value you want.
+`import random` binds the one module object every importer shares,
+so `dice.random` and `random` are the same object and the patch replaces `randint()` process-wide.
+`monkeypatch` restores the original when the test ends,
+which is what keeps that safe.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -455,7 +510,7 @@ def test_current_year_is_frozen() -> None:
 `travel` sets the clock to the given moment for the test,
 and `tick=False` holds it there so every reading is identical.
 Unlike the prior tools it is a third-party dependency,
-but it is the standard answer for code already steeped in `datetime`.
+but it is the standard answer for code built around `datetime`.
 
 ### Network Calls
 
@@ -491,11 +546,21 @@ def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
     assert weather.current_temp("denver") == "21C"
 ```
 
-Patch the name at its point of use, `weather.urlopen()`,
-rather than the original in `urllib`,
-so the patch redirects only this module's lookups.
+`weather` imports the function with `from urllib.request import urlopen`,
+which copies it into `weather`'s own namespace,
+so `weather.urlopen` is the name the call site reads and the name to patch.
+Patching `urllib.request.urlopen` instead would leave `weather`'s copy untouched.
+The rule covers both cases: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
+
+A stand-in like `fake_urlopen()` is called a *stub*:
+it answers with a canned value and records nothing.
+The standard library's `unittest.mock` builds stubs for you,
+along with *mocks* that also record how they were called,
+and you will meet it in most existing code.
+This book patches with `monkeypatch` and prefers injection where the code can be changed,
+because a function that takes its clock or its fetcher as an argument needs no patching library at all.
 
 ## White-Box and Black-Box Tests
 
@@ -536,8 +601,7 @@ print(v._Vault__pin)  # type: ignore
 `vars(v)` shows what actually got stored: `_balance` under its own name,
 and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
-so `v._Vault__pin` reads it successfully,
-even though `ty` cannot see that the rewrite happened and reports the line as an error.
+so `v._Vault__pin` reads it successfully.
 Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
 not to hide the attribute.
 Anyone who knows the class name can still reach the attribute,
@@ -571,6 +635,15 @@ It runs plain programs and reports their failures.
 It hands files named `test_*.py` and `conftest.py` to `pytest` instead,
 and a failing test fails the build.
 
+You can now take an untested function and make it testable.
+Name what it depends on: the clock, randomness, the filesystem, the environment,
+the network.
+Replace those at the boundary,
+by injection where you can change the code and with `monkeypatch` where you cannot.
+Then pin the behavior that is left with a handful of parametrized cases.
+The work is mostly in the first step,
+since a function that is hard to test is usually one that goes looking for something it was never handed.
+
 ## Exercises
 
 1.  Add a `transfer(other: Account, amount: float)` method to `Account` and write its tests first:
@@ -580,3 +653,8 @@ and a failing test fails the build.
 3.  Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
     that the balance is never negative.
     Use it in two tests.
+4.  Write `settings_path()`,
+    which returns `Path(os.environ["APP_CONFIG"]) / "settings.ini"`,
+    and test it with `monkeypatch` and `tmp_path`.
+    Then rewrite the function to take the directory as an argument and test it again.
+    Which test would survive a change to the environment variable's name?

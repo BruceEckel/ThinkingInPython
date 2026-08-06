@@ -1,5 +1,6 @@
 # notifications_oo.py
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import override
 
 class Notification(ABC):
@@ -9,9 +10,9 @@ class Notification(ABC):
     @abstractmethod
     def cost(self) -> float: ...
 
+@dataclass(frozen=True)
 class Email(Notification):
-    def __init__(self, subject: str) -> None:
-        self.subject = subject
+    subject: str
 
     @override
     def render(self, recipient: str) -> str:
@@ -21,9 +22,9 @@ class Email(Notification):
     def cost(self) -> float:
         return 0.001
 
+@dataclass(frozen=True)
 class Sms(Notification):
-    def __init__(self, body: str) -> None:
-        self.body = body
+    body: str
 
     @override
     def render(self, recipient: str) -> str:
@@ -33,9 +34,9 @@ class Sms(Notification):
     def cost(self) -> float:
         return 0.02
 
+@dataclass(frozen=True)
 class Push(Notification):
-    def __init__(self, title: str) -> None:
-        self.title = title
+    title: str
 
     @override
     def render(self, recipient: str) -> str:
