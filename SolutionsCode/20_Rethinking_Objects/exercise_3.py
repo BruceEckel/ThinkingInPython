@@ -1,35 +1,18 @@
 # exercise_3.py
-from dataclasses import dataclass
-from math import sqrt
-from typing import Protocol
+from typing import NewType, Protocol
 
-class Coord(Protocol):
-    @property
-    def x(self) -> float: ...
-    @property
-    def y(self) -> float: ...
+Price = NewType("Price", float)
+Weight = NewType("Weight", float)
 
-def distance(a: Coord, b: Coord) -> float:
-    return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
+class Priced(Protocol):
+    def total(self) -> Price: ...
 
-@dataclass(frozen=True)
-class Triple:
-    a: float
-    b: float
-    c: float
+class Package:
+    def total(self) -> Weight:
+        return Weight(2.5)
 
-@dataclass(frozen=True)
-class TripleCoord:
-    triple: Triple
+def charge(item: Priced) -> str:
+    return f"${item.total():.2f}"
 
-    @property
-    def x(self) -> float:
-        return self.triple.a
-
-    @property
-    def y(self) -> float:
-        return self.triple.b
-
-print(distance(TripleCoord(Triple(3, 0, 99)),
-               TripleCoord(Triple(0, 4, -1))))
-#: 5.0
+print(charge(Package()))  # type: ignore
+#: $2.50

@@ -59,41 +59,87 @@ caller now mutates a throwaway copy, and `plugged`'s real `_tags` is
 untouched. Every new mutable field needs this same defensive copy
 repeated. This is the tedium that motivates freezing the data instead.
 
-## 2. A third point confirming both versions agree
+## 2. A mutable field in a frozen data class
 
 ```python
 # exercise_2.py
 from dataclasses import dataclass
-from math import sqrt
 
 @dataclass(frozen=True)
-class Point:
-    x: float
-    y: float
+class Immutable:
+    numbers: list[int]
 
-    def distance_to(self, other: Point) -> float:
-        return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
-
-def distance(a: Point, b: Point) -> float:
-    return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
-
-p1, p2 = Point(3, 0), Point(0, 4)
-p3 = Point(6, 8)
-print(distance(p1, p3))
-#: 8.54400374531753
-print(p1.distance_to(p3))
-#: 8.54400374531753
+data = Immutable([1, 2])
+data.numbers.append(999)  # No error, from ty or from Python
+print(data)
+#: Immutable(numbers=[1, 2, 999])
+try:
+    data.numbers = [3]  # type: ignore
+except Exception as e:
+    print(type(e).__name__)
+#: FrozenInstanceError
 ```
 
-The free function and the method compute the identical formula on the
-identical data, so they agree on any pair of points, not only the
-original `3-4-5` example. Nothing about adding a third point requires
-touching either `distance()` or `distance_to()`.
+`ty` reports nothing. `frozen=True` blocks rebinding a field, which is
+why the assignment raises `FrozenInstanceError`, and it says nothing at
+all about what the field refers to. The `append()` never assigns to
+`data.numbers`, so nothing the decorator generated is involved.
 
-## 3. A `Triple`, adapted by composition
+Nobody enforces it, which is the answer: making immutability go all the
+way down is the author's job, one field at a time. Declare `tuple`
+rather than `list`, `frozenset` rather than `set`, `frozendict` rather
+than `dict`, and a frozen data class rather than a mutable one for any
+nested value. The type checker will hold you to those declarations once
+you write them; it will not choose them for you.
+
+## 3. `NewType` at the protocol boundary
 
 ```python
 # exercise_3.py
+from typing import NewType, Protocol
+
+Price = NewType("Price", float)
+Weight = NewType("Weight", float)
+
+class Priced(Protocol):
+    def total(self) -> Price: ...
+
+class Package:
+    def total(self) -> Weight:
+        return Weight(2.5)
+
+def charge(item: Priced) -> str:
+    return f"${item.total():.2f}"
+
+print(charge(Package()))  # type: ignore
+#: $2.50
+```
+
+`ty` now rejects the call:
+
+```
+error[invalid-argument-type]: Argument to function `charge` is incorrect
+info: type `Package` is not assignable to protocol `Priced`
+info: └── protocol member `total` is incompatible
+info:     └── incompatible return types: `Weight` is not assignable to `Price`
+```
+
+The structural match is unchanged: `Package.total()` still takes no
+arguments and still returns a float at runtime. What the two `NewType`
+declarations add is a distinction the shapes never carried, so the
+checker can finally see that a weight is not a price.
+
+Delete the annotations and the program behaves exactly as it does now.
+It prints `$2.50` and charges the customer for a number of kilograms,
+because `NewType` exists only for the checker: `Weight(2.5)` returns the
+`float` `2.5` and no wrapper survives to run time. The distinction is
+real in the source and absent in the process, which is the whole bargain
+the chapter describes.
+
+## 4. A `Triple`, adapted by composition
+
+```python
+# exercise_4.py
 from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
@@ -137,10 +183,10 @@ entirely. `distance()` itself never changes: it only ever asked for
 `.x` and `.y`, and `TripleCoord` supplies that shape, the same
 way `PairCoord` adapted `Pair`.
 
-## 4. Adding `Square` to the closed `Shape` union
+## 5. Adding `Square` to the closed `Shape` union
 
 ```python
-# exercise_4.py
+# exercise_5.py
 import math
 from dataclasses import dataclass
 from typing import assert_never
@@ -189,10 +235,10 @@ requires, exactly the exhaustiveness check the union was added for. It
 turns a missed case into a caught type error instead of a silent
 `None` or a runtime crash.
 
-## 5. A `NullCache`, following `NullLogger`'s shape
+## 6. A `NullCache`, following `NullLogger`'s shape
 
 ```python
-# exercise_5.py
+# exercise_6.py
 from typing import Protocol
 
 class Cache(Protocol):

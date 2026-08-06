@@ -1,18 +1,37 @@
 # exercise_5.py
-from typing import Protocol
+import math
+from dataclasses import dataclass
+from typing import assert_never
 
-class Cache(Protocol):
-    def get(self, key: str) -> object | None: ...
-    def set(self, key: str, value: object) -> None: ...
+@dataclass(frozen=True)
+class Rectangle:
+    length: float
+    width: float
 
-class NullCache:
-    def get(self, key: str) -> object | None:
-        return None
+@dataclass(frozen=True)
+class Circle:
+    radius: float
 
-    def set(self, key: str, value: object) -> None:
-        pass
+@dataclass(frozen=True)
+class Square:
+    side: float
 
-nc = NullCache()
-nc.set("a", 1)
-print(nc.get("a"))
-#: None
+type Shape = Rectangle | Circle | Square
+
+def area(shape: Shape) -> float:
+    match shape:
+        case Rectangle(length=length, width=width):
+            return length * width
+        case Circle(radius=radius):
+            return math.pi * radius**2
+        case Square(side=side):
+            return side * side
+        case _:
+            assert_never(shape)
+
+shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0), Square(5.0)]
+for shape in shapes:
+    print(round(area(shape), 4))
+#: 3.1416
+#: 12.0
+#: 25.0

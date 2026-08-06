@@ -1061,9 +1061,10 @@ or whether immutable data, a function, and a protocol already solve the problem.
     the checker sees nothing wrong with a mutable field in a frozen class.
     Demonstrate the leak with an `append()`, then restore the `tuple`.
     Who, then, is responsible for making immutability go all the way down?
-3.  In `protocol_collision.py`, define `Price = NewType("Price", float)`
-    and `Weight = NewType("Weight", float)`,
-    change `Priced.total()` to return a `Price`, `Weighted.total()` to return a `Weight`,
+3.  In `protocol_collision.py`,
+    define `Price = NewType("Price", float)` and `Weight = NewType("Weight", float)`,
+    change `Priced.total()` to return a `Price`,
+    `Weighted.total()` to return a `Weight`,
     and `Package.total()` to return a `Weight`.
     Run `ty check` and read the error it reports for `charge(package)`.
     Then say what still goes wrong at runtime if someone deletes the annotations.
