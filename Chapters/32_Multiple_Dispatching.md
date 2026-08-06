@@ -384,8 +384,8 @@ not when a test imports it.
     which means adding an `eval_lizard()` method to every existing class,
     plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
     Compare how much code this took versus adding `Lizard` to the table version.
-3.  In `test_paper_scissors.py`,
-    add `Lizard`'s seven matchups to `EXPECTED`, taking it from nine entries to sixteen,
+3.  In `test_paper_scissors.py`, add `Lizard`'s seven matchups to `EXPECTED`,
+    taking it from nine entries to sixteen,
     and confirm both versions still agree with each other and with `EXPECTED`.
 4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
     while still yielding `(item1, item2)` pairs so existing calls need no change.

@@ -590,7 +590,8 @@ If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
 You can ask a GoF iterator whether it is done multiple times without disturbing it.
-Python makes that question part of `__next__()`, so the only way to ask is to take.
+Python makes that question part of `__next__()`,
+so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
 You can catch that exception yourself,
 or hand `next()` a default and compare against it,

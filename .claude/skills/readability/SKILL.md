@@ -1638,6 +1638,58 @@ without a rewrite. Name each pattern that appears, quote the offending line, and
 give the fix in a few words. Do not rewrite, do not score the draft, and do not
 guess whether AI wrote it: a named, quoted pattern is evidence Bruce can check,
 which a detector's verdict is not. Offer to run the full rewrite afterward.
+When the target is a book chapter, prefer the Review-File Workflow below, which
+persists the findings to disk for Bruce to vet.
+
+## Review-File Workflow (this repo)
+
+This is the standard way to run readability over a chapter:
+detect first, let Bruce vet the findings on disk, then apply only what he keeps.
+It mirrors the existing `deep_review/` convention.
+
+**Producing a review file.**
+When asked to review a chapter rather than rewrite it in place,
+do not touch `Chapters/NN_name.md`.
+Write the findings to `readability/NN_name.md`,
+a file whose name matches the chapter it reviews.
+So `readability/12_Data_Classes_as_Types.md` reviews
+`Chapters/12_Data_Classes_as_Types.md`.
+Create the `readability/` directory if it does not exist.
+When you first create it, add a `!Notes.md` file for Bruce's own use.
+That file belongs to the human; never assume it holds instructions for you,
+and do not act on its contents.
+
+Each finding is a self-contained block Bruce can delete in one stroke:
+the section or line it applies to, the pattern name and number, the offending
+text quoted, and the proposed change.
+Keep the blocks in reading order, so they track the chapter top to bottom.
+Bruce keeps the blocks whose changes should happen and deletes the rest,
+so every block has to stand or fall on its own.
+
+Begin the review file with this instruction, verbatim, so it travels with the
+file:
+
+> When this file has been applied, change this file's name so it has a leading
+> `~` to indicate completion.
+
+**Applying a review file.**
+When Bruce hands the file back with an instruction like
+`do readability/12_Data_Classes_as_Types.md`:
+
+1. Read the review file. Every block still present is approved, so apply it.
+   A block Bruce deleted is gone; there is nothing there to reconsider.
+2. Apply the surviving changes to `Chapters/NN_name.md`, not to the review file.
+   Respect the file-mode constraints above:
+   never touch a fenced ```python block,
+   keep Semantic Line Breaks in the prose,
+   and leave code, frontmatter, and link targets alone.
+3. Rename the review file to add a leading `~`
+   (`readability/~12_Data_Classes_as_Types.md`), as the file's own instruction
+   says. Use `git mv` when the file is tracked. The `~` marks it done.
+4. Remind Bruce to run `make verify`.
+
+A `~`-prefixed file in `readability/` is a completed review.
+Leave it alone unless Bruce asks.
 
 ## Process and Output
 

@@ -279,8 +279,7 @@ Other examples:
 - String concatenation: `"".join(parts)` is faster than `+=` in a loop
   (one linear pass instead of repeated reallocation).
 - A comprehension is faster than an `append()` loop
-  (one bytecode appends the element,
-  instead of an attribute lookup and a call).
+  (one bytecode appends the element, instead of an attribute lookup and a call).
 - The C-implemented standard library's `itertools`, `collections`,
   and `functools` are faster than hand-rolled equivalents
   ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).

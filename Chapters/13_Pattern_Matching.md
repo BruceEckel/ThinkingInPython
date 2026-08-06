@@ -201,8 +201,7 @@ print(describe(Point(3, 4)))
 `Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
 A positional pattern can leave fields unchecked too:
 `Point(0)` supplies fewer sub-patterns than `__match_args__` names,
-so it ignores `y`,
-and `Point(_, 0)` uses the wildcard to skip `x`.
+so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
 Naming the attribute is clearer,
 and it survives a change to the field order that would silently redefine every position.
 `Point()` with no arguments matches any `Point` instance, keyword or positional,

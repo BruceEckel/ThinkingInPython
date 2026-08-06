@@ -607,8 +607,7 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 3.  Add a third manager to the `with` statement in `multiple.py`,
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.
-4.  In `test_object_pool.py`, add a test
-    that leases both connections at once,
+4.  In `test_object_pool.py`, add a test that leases both connections at once,
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.

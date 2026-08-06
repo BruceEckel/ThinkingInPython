@@ -195,3 +195,43 @@ Accrued notes from the chapters 18-38 review sweep:
   with the wrapper disambiguation map (Proxy/Decorator/Adapter/Façade)
   that leans on 26 and 14; 21's dissolves-into-the-language thesis
   (Norvig footnote) is what 23/24/27/28's "Pythonic" sections cash in.
+
+## Review-file workflow
+
+The findings you report rather than implement go into a review file on disk,
+so Bruce can vet them before any change lands.
+
+All review files live in a directory called `deep_review`.
+When you first create that directory, add a file named `!Notes.md`.
+That file is for Bruce's own use; never assume it holds instructions for you,
+and do not act on its contents.
+
+Each review file has the same name as the chapter it reviewed, so
+`deep_review/12_Data_Classes_as_Types.md` reviews
+`Chapters/12_Data_Classes_as_Types.md`.
+It holds the reported findings for Bruce to check and modify.
+He keeps the entries whose changes should happen and deletes the rest,
+so write each finding as a self-contained block that stands or falls on its own:
+the section or line it applies to, what is wrong or missing, and the proposed
+change with its reasoning. Keep the blocks in reading order.
+
+Begin the review file with this instruction, verbatim, so it travels with the
+file:
+
+> When this file has been applied, change this file's name so it has a leading
+> `~` to indicate completion.
+
+When Bruce finishes editing, he hands the file back with an instruction like
+`do deep_review/12_Data_Classes_as_Types.md`. Then:
+
+1. Read the review file. Every block still present is approved, so apply it.
+   A block Bruce deleted is gone; there is nothing there to reconsider.
+2. Apply the surviving changes to `Chapters/NN_name.md`, following the same
+   verify loop any new listing or prose edit follows in `CLAUDE.md`.
+3. Rename the review file to add a leading `~`
+   (`deep_review/~12_Data_Classes_as_Types.md`), as the file's own instruction
+   says. Use `git mv` when the file is tracked. The `~` marks it done.
+4. Remind Bruce to run `make verify`.
+
+A `~`-prefixed file in `deep_review/` is a completed review.
+Leave it alone unless Bruce asks.

@@ -396,9 +396,8 @@ For records with defaults, methods, or type annotations, prefer a data class
 The standard library has more specialized containers.
 For compact homogeneous storage (`array`),
 a zero-copy view onto another object's memory (`memoryview`),
-binary search in a sorted `list` (`bisect`),
-and a heap-backed priority queue (`heapq`),
-see [Performance](18_Performance.md).
+binary search in a sorted `list` (`bisect`), and a heap-backed priority queue
+(`heapq`), see [Performance](18_Performance.md).
 
 ## Immutability
 
@@ -476,7 +475,8 @@ A dictionary key must be hashable rather than immutable.
 Immutability is how a container produces a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
-Neither you nor code you pass it to can add, remove, or replace an element by accident,
+Neither you nor code you pass it to can add, remove,
+or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
 It is safe to use as a default argument,
 unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).

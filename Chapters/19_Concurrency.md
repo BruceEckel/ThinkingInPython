@@ -124,7 +124,8 @@ I/O-bound work overlaps within a single process,
 with `asyncio` or a thread pool.
 CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
-Two other approaches appear later in this chapter, each running inside a single process.
+Two other approaches appear later in this chapter,
+each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 

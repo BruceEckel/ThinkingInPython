@@ -318,9 +318,8 @@ Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
 To make every import lazy without editing source,
 run with `-X lazy_imports=all` or set `PYTHON_LAZY_IMPORTS=all`.
-Both require a value:
-`all` defers every module-level import,
-and `normal`, the default, defers only the imports you marked `lazy`.
+Both require a value: `all` defers every module-level import, and `normal`,
+the default, defers only the imports you marked `lazy`.
 
 ## Exercises
 
