@@ -3,7 +3,7 @@
 When you discover that you need to add new types to a system,
 the most sensible first step is to use polymorphism to create a common interface to those new types.
 This separates the rest of the code in your system from the knowledge of the specific types that you are adding.
-You may add new types without disturbing existing code … or so it seems.
+You may add new types without disturbing existing code ... or so it seems.
 At first it appears that the only place you need to change the code in such a design is the place where you inherit a new type,
 but that isn't the case.
 You must still create an object of your new type,

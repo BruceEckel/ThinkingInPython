@@ -303,15 +303,15 @@ The difference between *Proxy* and *State* is in the problems that are solved.
 The common uses for *Proxy* as described in *GoF Design Patterns* are:
 
 1.  *Remote proxy*.
-    This proxies for an object in a different address space.
+    Proxies for an object in a different address space.
     Distributed-object systems generate these.
     In Python, remote procedure call (RPC) libraries play this role.
 2.  *Virtual proxy*.
-    This provides "lazy initialization" to create expensive objects on demand.
+    Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
     Used when you don't want the client programmer to have full access to the proxied object.
 4.  *Smart reference*.
-    To add actions when code accesses the proxied object.
+    Adds actions when code accesses the proxied object.
     For example, to keep track of the number of references that are held for a particular object,
     to implement the *copy-on-write* idiom and prevent object aliasing.
     A simpler example is keeping track of the number of calls to a particular method.

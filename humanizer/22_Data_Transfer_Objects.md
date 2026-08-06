@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/22_Data_Transfer_Objects.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).

@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/26_Surrogate.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -141,20 +142,6 @@ PROPOSED
 ```text
 3.  *Protection proxy*.
     This is used when you don't want the client programmer to have full access to the proxied object.
-```
-
-**line 314**
-
-CURRENT
-```text
-4.  *Smart reference*.
-    To add actions when code accesses the proxied object.
-```
-
-PROPOSED
-```text
-4.  *Smart reference*.
-    This adds actions when code accesses the proxied object.
 ```
 
 ## Housekeeping

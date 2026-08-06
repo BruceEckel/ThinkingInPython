@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/23_Iterators.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).

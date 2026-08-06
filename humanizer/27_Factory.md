@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/27_Factory.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -58,7 +59,7 @@ A separate factory *class* becomes valuable when creating an object takes real w
 
 PROPOSED
 ```text
-A separate factory class is worth writing when creating an object takes real work beyond calling a constructor,
+A separate factory class is worth writing when object creation takes real work beyond calling a constructor,
 ```
 
 ### A3 — line 554 — stranded preposition
@@ -149,7 +150,7 @@ When construction genuinely is a process.
 
 PROPOSED
 ```text
-Builder survives in Python when construction genuinely is a process.
+Builder survives in Python when construction is genuinely a process.
 ```
 
 ### A9 — line 792 — stock idiom
@@ -288,23 +289,6 @@ Thus, the simplest factory is a dictionary that maps names to classes.
 There is no factory method and no factory class; the `dict` is the factory.
 ```
 
-### B2 — lines 375-376 — two-word imperative fragment
-
-"Prefer that." is the manufactured-punchline shape (§31), though it is
-also just terse advice. I lean mildly toward folding it in.
-
-CURRENT
-```text
-It maps a name to a class and constructs it.
-Prefer that.
-```
-
-PROPOSED
-```text
-It maps a name to a class and constructs it,
-so prefer that version.
-```
-
 ### B3 — line 363 — §7 word plus hedging
 
 `intricacies` is on the §7 list and "it seems that" is hedging, but this
@@ -366,8 +350,8 @@ and the stored prototype never changes:
 
 PROPOSED
 ```text
-These tests show that each spawn is independent
-and that the stored prototype does not change:
+These tests show that Prototypes are safe.
+Each spawn is independent, and the stored prototype never changes:
 ```
 
 ### B6 — line 235 — §28 forward announcement
@@ -399,7 +383,7 @@ so each call to `factory()` defines fresh `Circle` and `Square` classes.
 PROPOSED
 ```text
 The nested `class` statements run again on every call,
-so `factory()` defines fresh `Circle` and `Square` classes each time.
+so every `factory()` defines fresh `Circle` and `Square` classes.
 ```
 
 ### B8 — lines 782-783 — §27 authority trope
@@ -434,7 +418,7 @@ a string, through a mutable intermediate, which is Builder's essence.
 PROPOSED
 ```text
 a string, through a mutable intermediate.
-That is the structure Builder describes.
+That is the Builder structure.
 ```
 
 ### B10 — line 816 — "exactly"

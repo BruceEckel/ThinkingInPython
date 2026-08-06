@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/25_Template_Method.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).

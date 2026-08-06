@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/21_The_Pattern_Concept.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -93,8 +94,8 @@ Generic code can work with any object that produces an iterator.
 
 PROPOSED
 ```text
-You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
-That code works with any object that produces an iterator.
+You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
+The code works with any object that produces an iterator.
 ```
 
 ### A5 — lines 82-83 — "enough" twice in one sentence, "scaffolding" twice in two
@@ -181,27 +182,6 @@ PROPOSED
 
 ## Tier B
 
-### B1 — line 29 — §32 aphorism, third statement of one point
-
-Line 27 says a pattern needs its problem present, line 28 gives the
-concrete case, and line 29 says line 27 again in aphorism form
-("A pattern without its problem is just overhead").
-I lean toward cutting it: the paragraph has already landed twice.
-Against cutting: it is the paragraph's closing beat, and you may want
-the beat more than the economy.
-The PROPOSED fence is line 28 unchanged, so this deletes line 29 only.
-
-CURRENT
-```text
-If nothing varies, you do not need machinery for isolating variation.
-A pattern without its problem is just overhead.
-```
-
-PROPOSED
-```text
-If nothing varies, you do not need machinery for isolating variation.
-```
-
 ### B2 — lines 38-39 — missing contrast connective
 
 "you might expect it to appear no earlier than low-level design" sets up
@@ -238,25 +218,6 @@ PROPOSED
 ```text
 posed: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
-```
-
-### B4 — lines 113-114 — broken parallel punctuation
-
-The two halves of this comparison are built the same way, then punctuated
-differently: "an idiom, stage one," with a comma tail, "a design pattern,
-stage four:" with a colon tail. I lean toward applying, since it also
-leaves the paragraph one colon instead of two.
-
-CURRENT
-```text
-[Template Method](25_Template_Method.md) is a design pattern, stage four:
-a shape of solution you could build in any language with polymorphism.
-```
-
-PROPOSED
-```text
-[Template Method](25_Template_Method.md) is a design pattern, stage four,
-a shape of solution you could build in any language with polymorphism.
 ```
 
 ### B5 — line 169 — §3 infinitive tail
