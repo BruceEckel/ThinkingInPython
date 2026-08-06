@@ -120,31 +120,59 @@ Calling `CSingleton()` twice returns the same object both times, but
 that object is unrelated to `ASingleton`'s instance, since they live
 under different keys in the same dictionary.
 
-## 4. A second, unrelated subclass of the non-final base
+## 4. Declaring finality with a keyword in the class header
 
 ```python
 # exercise_4.py
+from typing import ClassVar
+
 class A:
+    _final: ClassVar[set[type]] = set()
+
+    def __init_subclass__(cls, final: bool = False,
+                          **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        for base in cls.__mro__[1:]:
+            if base in A._final:
+                raise TypeError(
+                    f"{base.__name__} is final;"
+                    " you cannot subclass it")
+        if final:
+            A._final.add(cls)
+
+class B(A, final=True):
     pass
 
-class B(A):
-    def __init_subclass__(cls, **kwargs: object) -> None:
-        raise TypeError(
-            f"{B.__name__} is final; you cannot subclass it")
-
-class D(A):
+class Open(A):  # A sibling that says nothing
     pass
-print(issubclass(D, A))
+
+class Sub(Open):
+    pass
+print(issubclass(Sub, A))
 #: True
+
+try:
+    class C(B):
+        pass
+except TypeError as error:
+    print(error)
+#: B is final; you cannot subclass it
 ```
 
-`B`'s `__init_subclass__()` only runs when something subclasses `B`
-itself; it has no effect on `A`, which declares no such restriction.
-`D(A)` is a plain, ordinary subclass of `A`, exactly like `B` was, and
-it succeeds the same way `Ok(A)` does in `test_final.py`. Trying to
-subclass `B`, on the other hand, still raises, because that
-`__init_subclass__()` lives on `B` and runs for any class that
-inherits from it.
+The keywords in a class header travel to `__init_subclass__()`, so
+`final=True` in `class B(A, final=True):` arrives as a parameter of
+the hook that `B`'s creation triggers. Declaring it with a default,
+`final: bool = False`, lets every other subclass omit it. The
+remaining `**kwargs` go on to `super().__init_subclass__()`, which is
+what turns a misspelled keyword into a `TypeError` instead of a silent
+no-op.
+
+The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own
+`__init_subclass__()`. This version moves the decision into a set that
+`A` owns, so the hook has to walk `cls.__mro__` to ask whether any
+ancestor declared itself final. `Open` and `Sub` show that the rest of
+the hierarchy is unaffected: only the classes named in `A._final`
+refuse to be subclassed.
 
 ## 5. A small `inspect`-based `describe()` helper
 
@@ -173,3 +201,84 @@ describe(lambda x: x * 2)
 printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 `func.__name__` works uniformly on both a `def`-based function and a
 `lambda`, with no special case needed to tell them apart.
+
+## 7. Building a `float` subclass with `type()`
+
+```python
+# exercise_7.py
+from typing import Any
+
+def describe(self: Any) -> str:
+    return f"{self} degrees {self.unit}"
+
+Celsius = type("Celsius", (float,),
+               {"unit": "C", "describe": describe})
+
+c = Celsius(21.5)
+print(c.describe())
+#: 21.5 degrees C
+print(type(Celsius) is type)
+#: True
+print(c + 0.5, isinstance(c, float))
+#: 22.0 True
+```
+
+The three arguments are the name, the bases, and the namespace, which
+is what a `class` statement assembles for you. A function defined at
+module level becomes a method by landing in that namespace dict: no
+decoration is needed, since a function is a descriptor and binding
+happens on lookup.
+
+`type(Celsius)` is `type` because `type()` was called as a
+constructor, not subclassed. Nothing here involves a metaclass of your
+own. `Celsius` inherits `float`'s arithmetic, so `c + 0.5` works,
+though it returns a `float` rather than a `Celsius`: `float.__add__()`
+builds its result from `float`, which is the usual reason a numeric
+subclass also overrides the operators it wants to keep its own type.
+
+`describe()` annotates `self` as `Any` because the type checker has no
+way to know that this loose function will end up on a class carrying a
+`unit` attribute. That is the cost of building a class from data
+rather than from a `class` statement.
+
+## 8. Moving `bases += (Tag,)` into `__init__()`
+
+The prediction: nothing happens. The base is not added, and no error
+is reported either.
+
+```python
+# exercise_8.py
+from typing import Any
+
+class Tag:
+    pass
+
+class Meta(type):
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 nmspc: dict[str, Any]) -> None:
+        bases += (Tag,)  # Rebinds a local name, nothing else
+        super().__init__(name, bases, nmspc)
+
+class Demo(metaclass=Meta):
+    pass
+
+print(Demo.__bases__)
+#: (<class 'object'>,)
+print(Tag in Demo.__bases__)
+#: False
+```
+
+By the time `__init__()` runs, the class object is finished. `type`
+built it inside `__new__()`, using the bases it was given there, and
+laid out its `__mro__` from them. The `bases` parameter of `__init__()`
+is a tuple that describes what was used, not a control that decides
+what will be used, so `bases += (Tag,)` rebinds a local name and
+throws it away. Passing the longer tuple on to `type.__init__()`
+changes nothing either, since `type.__init__()` only validates its
+arguments.
+
+This is the same lesson `added_in_init` teaches in `new_vs_init.py`,
+seen from the other side. Anything that decides *what the class is*,
+its name, its bases, or the namespace it is built from, has to happen
+in `__new__()`. `__init__()` can only modify the object that already
+exists, which is why `setattr(cls, ...)` still works there.

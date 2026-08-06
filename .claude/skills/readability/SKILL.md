@@ -70,6 +70,16 @@ When given text to humanize:
    Fit the intended tone (formal, casual, technical).
    Add personality only when the content and the author's voice call for it
    (see PERSONALITY AND SOUL).
+5. **Make the minimum effective edit.**
+   Fix the patterns, errors, and tangled passages; leave strong human sentences
+   alone. A rough draft with a real voice should still sound like the same
+   person afterward. Cutting proportional to the actual slop, never aggressive
+   compression that strips character.
+6. **Protect the specific fact.**
+   Don't smooth a useful detail into generic importance.
+   "The tool significantly improves productivity" degrades a real number into
+   vague praise; if the source has "cut review time from 30 minutes to 8," keep
+   the number. Specificity is the thing being defended, not the casualty.
 
 How you're invoked changes what you deliver (see Invocation Modes).
 The draft, audit, final loop is defined under Process and Output, below.
@@ -117,7 +127,7 @@ underscores/highlights its importance/significance, reflects broader,
 symbolizing its ongoing/enduring/lasting, contributing to the,
 setting the stage for, marking/shaping the, represents/marks a shift,
 key turning point, evolving landscape, focal point, indelible mark,
-deeply rooted
+deeply rooted, this is huge, this changes everything
 
 **Problem:** LLM writing puffs up importance by adding statements about how
 arbitrary aspects represent or contribute to a broader topic.
@@ -302,6 +312,8 @@ Claimed to appear several times more often in machine text.
 | synergy / synergies | (describe the combined effect) |
 | interplay | relationship, connection, interaction |
 | embrace (metaphor) | adopt, accept, use, switch to |
+| beacon | (rewrite entirely) |
+| supercharge | boost, speed up, improve |
 
 **Tier 1B, clarity edits (same fix, weaker claim).**
 Wordiness, not evidence of machine authorship.
@@ -637,6 +649,16 @@ Or omit the section.
 - "The system has the ability to process" becomes "The system can process"
 - "It is important to note that the data shows" becomes "The data shows"
 
+**Often-empty adverbs.** Cut these when they add nothing:
+*just, literally, simply, actually, truly, fundamentally, importantly,
+crucially, inherently, inevitably.*
+Keep one when it carries real emphasis, contrast, or the writer's spoken rhythm.
+The test is deletion: if the sentence means the same without it, it was filler.
+
+**Make verbs do the work.** Replace a weak verb phrase with a direct verb.
+"Made a decision" becomes "decided"; "has the ability to" becomes "can";
+"came to the realization" becomes "realized."
+
 ### 24. Excessive Hedging
 
 **Problem:** Over-qualifying statements.
@@ -786,11 +808,17 @@ Replace the formula with the concrete claim it is gesturing at.
 > Symmetric layouts often feel more predictable to users. Teams can
 > over-optimize workflows and miss how people actually use them.
 
+**Fake-profound kicker endings:** the same formula placed as the final line,
+a metaphor or aphorism engineered as a mic-drop.
+Delete it; do not rewrite it into a better metaphor and do not keep the rhythm.
+End on the clearest concrete sentence already in the draft
+(see §25 on generic conclusions, §49 on future-narrative closers).
+
 ### 33. Conversational Rhetorical Openers
 
 **Phrases to watch:** Honestly?, Look, Here's the thing, The thing is,
-Let's be honest, Real talk, when used as standalone hooks or fake-candid pauses
-before an ordinary point.
+Let's be honest, Let me be clear, The uncomfortable truth is, Real talk,
+when used as standalone hooks or fake-candid pauses before an ordinary point.
 
 **Problem:** LLMs open with a fake-candid hook to manufacture intimacy before
 delivering a routine claim.
@@ -803,6 +831,558 @@ A person being honest usually just says the thing.
 
 **After:**
 > Whether it's worth the price depends on how often you'll use it.
+
+## MORE CONTENT PATTERNS
+
+### 34. Real/Actual Adjective Inflation
+
+**Words to watch:** real, actual, genuine, true, used as intensifiers on
+abstract nouns (real utility, genuine insight, true understanding).
+
+**Problem:** Calling a thing "real" or "genuine" implies the rest of the field
+is fake, without naming what makes this instance different.
+The adjective does no work.
+
+**Before:**
+> This gives you real type safety and genuine performance gains.
+
+**After:**
+> This catches type errors at compile time and cuts the hot loop from 40ms to
+> 6ms.
+
+**Carve-out, named contrast:** "real type checking, not runtime asserts" is
+honest contrastive writing. The tell is the bare intensifier with no contrast
+named.
+
+### 35. Moral-Adjective Category Errors
+
+**Words to watch:** honest, genuine, faithful, truthful, applied to
+non-agentic technical nouns (an honest shape, a faithful number, a truthful
+curve).
+
+**Problem:** AI glues a moral adjective onto a noun that cannot hold one.
+A shape is not a moral agent, so "an honest shape" is a category error.
+State the concrete property instead.
+
+**Before:**
+> The chart gives an honest picture of the data.
+
+**After:**
+> The chart plots every outlier instead of clipping the axis.
+
+Related: "the assumption stops being true." Assumptions do not flip
+truth-values; they stop holding. Write "the assumption breaks down" or
+"no longer holds." Also cut gratuitous universal quantifiers:
+"taught in every first-year course" becomes "taught in introductory courses."
+
+### 36. Narrated Candor
+
+**Phrases to watch:** I want to be upfront, To be fully transparent,
+Rather than bury this, Being honest about the limitations here,
+caveats I would rather flag than let you discover later.
+
+**Problem:** The model advertises its own forthrightness instead of just
+disclosing. The content is "two caveats"; the rest performs the disclosure.
+
+**Deletion test:** cut the frame. If the sentence loses no information, it was
+never content.
+
+**Before:**
+> Two caveats I would rather flag now than let you discover later: the
+> benchmark ran on one machine, and the sample size was small.
+
+**After:**
+> Two caveats: the benchmark ran on one machine, and the sample was small.
+
+**Carve-out:** the disclosure itself stays. "I haven't tested this on Windows"
+carries information. A conflict-of-interest label ("I own shares in the company
+discussed") is conventional, not narrated candor. The tell is the separable
+clause *about* disclosing.
+
+### 37. Emotional Flatline
+
+**Phrases to watch:** What surprised me most, I was fascinated to discover,
+What struck me was, The most interesting part, and bare headers like
+"Interesting aspect:".
+
+**Problem:** The writer claims an emotion instead of making the reader feel it.
+If the thing is surprising, the content should show it.
+These also pile up as list introductions, filler wearing an emotion costume.
+
+**Before:**
+> What surprised me most was how fast the cache warmed up.
+
+**After:**
+> The cache warmed up in three requests, not the fifty I expected.
+
+Also a sign of lazy human writing on autopilot. Flag it either way.
+
+### 38. Lingering-Attention Claims
+
+**Phrases to watch:** the line I keep coming back to, I can't stop thinking
+about this, still thinking about this one, been rattling around in my head.
+
+**Problem:** The claim is about the writer's attention, not the thing, and it
+arrives before the reader has any reason to care. It is unfalsifiable.
+
+**Before:**
+> The idea I keep coming back to: interfaces should be small.
+
+**After:**
+> Small interfaces compose better, because each caller depends on less.
+
+**Carve-out, reason attached:** "I keep coming back to exit-voice framing
+because it predicts which engineers quit" is a claim about explanatory reach.
+The tell is the bare frame with the reason missing.
+
+### 39. Self-Labeling Significance
+
+**Phrases to watch:** That last one is the contrarian one, This is the
+interesting part, Here's where it gets clever, That third point is the real
+story.
+
+**Problem:** The label does the work the content was supposed to do.
+If a move is genuinely surprising, the reader sees it;
+if not, the label is unearned.
+
+**Before:**
+> Of the three, that last approach is the clever one.
+
+**After:**
+> The third approach reuses the parser's own error table, so a new token type
+> needs no extra code.
+
+### 40. Recap-Flattery Opener
+
+**Problem:** Replying to someone by summarizing their own work back at them
+with praise before getting to the point. They already know what they did;
+the recap performs appreciation instead of conveying information.
+
+**Before:**
+> Thanks for all the legwork here, the migration script and the rollback plan
+> you worked through are what made this possible. One thing I noticed:
+
+**After:**
+> Thanks for the legwork, this looks right. One thing I noticed:
+
+Distinct from a genuine thank-you (short, then moves on) and from acknowledgment
+loops (§41, which restate the prompt).
+
+### 41. Acknowledgment Loops
+
+**Phrases to watch:** You're asking about, To answer your question,
+The question of whether, That's a great question. The...
+
+**Problem:** The model restates the prompt before answering.
+In writing this is pure filler; the reader knows what they asked.
+Same move: opening a section by summarizing the previous one when the structure
+is already clear.
+
+**Before:**
+> To answer your question about retries: retries help with transient failures.
+
+**After:**
+> Retries help with transient failures.
+
+### 42. Confidence Calibration Phrases
+
+**Phrases to watch:** Notably, Interestingly, Surprisingly, Importantly,
+Significantly, Certainly, Undoubtedly, Without a doubt, Here's what's
+interesting.
+
+**Problem:** The word signals how the reader should feel instead of letting the
+fact do it. One "notably" in 2,000 words is fine; three in 500 is AI-style
+stacking. Flag by density.
+
+**Before:**
+> Interestingly, the parser is faster on malformed input than on valid input.
+
+**After:**
+> The parser is faster on malformed input than on valid input, because it bails
+> at the first bad token.
+
+Related to persuasive-authority tropes (§27), which assert depth rather than
+feeling. This front-loads a feeling cue.
+
+### 43. Rhetorical Question Openers
+
+**Phrases to watch:** But what does this mean for you?, So why should you care?,
+What's next?, What if I told you...?, Think about it:, used as section
+transitions, along with self-answered "Question? Answer." pairs.
+
+**Problem:** AI drops a rhetorical question to stall before the point.
+If you know the answer, say it. A rhetorical question is earned by strong setup,
+not used as a transition.
+
+**Before:**
+> So why does this matter? It matters because latency compounds.
+
+**After:**
+> Latency compounds: a 10ms delay per call becomes 1s across a hundred calls.
+
+### 44. Parenthetical Hedging
+
+**Phrases to watch:** (and, increasingly, X), (or, more precisely, Y),
+(and perhaps more importantly, Z).
+
+**Problem:** AI inserts a parenthetical aside to sound nuanced without
+committing. If the aside matters, give it a sentence. If not, cut it.
+
+**Before:**
+> The approach scales well (and, increasingly, to other domains).
+
+**After:**
+> The approach scales well. It also transfers to image and audio pipelines.
+
+### 45. Speculative Scenario Openers
+
+**Phrases to watch:** Imagine a world where, Picture a future in which,
+Envision a world where.
+
+**Problem:** AI opens with a hypothetical that lists desirable outcomes instead
+of making a claim. The scenario does the persuading; no evidence is offered.
+
+**Before:**
+> Imagine a world where every deploy is instant.
+
+**After:**
+> Instant deploys would cut our release cycle from a day to minutes.
+
+**Carve-out:** fiction, thought experiments with a stated payoff, and
+instructional framing ("imagine you have a sorted array") are fine. Flag only
+the world/future opener that stands in for an argument.
+
+### 46. False Concession Structure
+
+**Problem:** "While X is impressive, Y remains a challenge" sounds balanced
+without weighing anything, because both halves are vague.
+Make the concession specific, or pick a side and argue it.
+
+**Before:**
+> While the framework is powerful, some challenges remain.
+
+**After:**
+> The framework handles routing well, but its error messages point at generated
+> code the user never wrote.
+
+### 47. Invented Contrast-Pair Mirroring
+
+**Problem:** One half of a contrast is a real term of art; the other is AI
+inventing a mirror to balance the sentence.
+"False precision rather than genuine accuracy": "false precision" is a real
+statistical term, "genuine accuracy" is phantom.
+
+**Fix:** if you need a contrast, use an actual opposite.
+If none exists, drop the contrast and state the positive claim.
+
+**Before:**
+> This measures false precision, not genuine accuracy.
+
+**After:**
+> This measures precision but says nothing about accuracy.
+
+### 48. Hedge-Stacked Predictions
+
+**Phrases to watch:** could potentially, may eventually unlock, might ultimately
+transform.
+
+**Problem:** A modal stacked with a hedge adverb. Each word cancels the next,
+so nothing is asserted while the sentence sounds cautious.
+Sharper than plain over-hedging (§24): here two hedges collide.
+
+**Before:**
+> This could potentially unlock new use cases.
+
+**After:**
+> This enables batch inference, which the streaming API could not do.
+
+Pick one hedge, not both: "could unlock" or "potentially unlocks."
+
+### 49. Generic Future-Narrative Closers
+
+**Phrases to watch:** may become one of the most important trends, could become
+the defining story of the decade, is poised to become the next chapter in X.
+
+**Problem:** Modal plus "become" plus superlative plus a narrative noun equals a
+testable-sounding but empty prediction. A sharper cousin of the generic
+conclusion (§25).
+
+**Fix:** pick the falsifiable version, or cut. "May exceed the current baseline
+by 2027" is a prediction; "may become an important story" is not.
+
+### 50. Novelty Inflation
+
+**Phrases to watch:** He coined the phrase, She introduced a term, a concept
+nobody's naming, a failure mode nobody talks about.
+
+**Problem:** AI treats an established idea as if the speaker invented it.
+Most ideas in a conversation apply existing concepts rather than inventing them.
+Claiming novelty for something with a Wikipedia page reads as uninformed.
+
+**Fix:** describe what the person *did with* the concept, not that they
+discovered it.
+
+**Before:**
+> She introduced a term I hadn't heard: back-pressure.
+
+**After:**
+> She showed how back-pressure applies to our queue: slow consumers stall
+> producers instead of dropping messages.
+
+Also flag invented labels: pseudo-analytical compounds coined mid-sentence and
+never defined ("the supervision paradox"). Naming is not explaining.
+
+### 51. Vague Third-Party Validation
+
+**Phrases to watch:** independent testing confirms, third-party benchmarks show
+we lead, an outside party put us on top.
+
+**Problem:** Credibility from an *unnamed* authority plus a generic superlative.
+The reader cannot verify it.
+Distinct from vague attributions (§5), which hide the source of an *opinion*;
+this manufactures external *proof*.
+
+**Fix:** name the source, test, and result.
+
+**Before:**
+> Independent benchmarks confirm we're the fastest.
+
+**After:**
+> On the HELM leaderboard (April 2026 run) we ranked first on reasoning latency.
+
+**Carve-out:** a named benchmark, linked report, or dated audit is legitimate.
+The tell is the vagueness, not the act of citing outside proof.
+
+### 52. Infomercial Engagement Hooks
+
+**Phrases to watch:** The catch?, The kicker?, The best part?, Plot twist:,
+But here's the kicker:, The result?
+
+**Problem:** A punchy fragment tees up a reveal to fake momentum around ordinary
+information. Delete the hook and state the thing.
+Distinct from the fake-candid opener (§33): this stages a reveal, that stages
+intimacy.
+
+**Before:**
+> The catch? It only works on POSIX systems.
+
+**After:**
+> It only works on POSIX systems.
+
+### 53. Social Endorsement Closers
+
+**Phrases to watch:** worth your time, a must-read, do yourself a favor and
+read this, bookmark this, don't sleep on this one.
+
+**Problem:** A recommendation with no reason to act. The endorsement is generic
+and could sit under any link.
+
+**Fix:** say what the thing is and who it is for, then drop the call to action.
+
+**Before:**
+> Great write-up on caching. Worth your time.
+
+**After:**
+> A clear walkthrough of cache invalidation, useful if you are debugging stale
+> reads in a CDN.
+
+### 54. Numbered List Inflation
+
+**Phrases to watch:** Three key takeaways, Five things to know, the top seven.
+
+**Problem:** AI defaults to numbered lists because they feel safe.
+Use a number only when the content has that many discrete, parallel items.
+Padding to hit a number means the list should not exist.
+
+### 55. Reasoning Chain Artifacts
+
+**Phrases to watch:** Let me think step by step, Breaking this down,
+To approach this systematically, Here's my thought process, First, let's
+consider.
+
+**Problem:** Chain-of-thought scaffolding leaking into finished prose.
+The reader does not need the internal monologue. State the conclusion, then the
+evidence.
+
+### 56. Wall-of-Text Replies
+
+**Problem:** In conversational registers (issue and PR comments, chat, casual
+email) a person breaks a reply at thought boundaries.
+LLMs default to one dense block. The tell: a short reply (under ~150 words)
+with four or more sentences delivered as a single unbroken paragraph.
+
+**Fix:** break at thought boundaries, one idea per group.
+
+**Carve-out:** a single dense paragraph is correct in formal long-form prose
+(a blog intro, a docs paragraph). This fires only in conversational replies.
+
+### 57. Excessive Structure
+
+**Signs to watch:** more than three headings in under 300 words; eight or more
+bullets in under 200 words; formulaic section headers (Overview, Key Points,
+Summary, Introduction, Conclusion).
+
+**Problem:** AI over-structures short text to look organized.
+Merge sections, convert padded lists to prose, and give headers that say
+something specific about what follows.
+Fragmented headers are covered in §29.
+
+### 58. List-Label Periods
+
+**Problem:** In a bulleted list, LLMs end a bold label with a period and run the
+gloss as a separate sentence. A person uses a colon.
+
+**Before:**
+> - **Intros.** Years of conferences and an operator network.
+
+**After:**
+> - **Intros:** years of conferences and an operator network.
+
+**Carve-out:** when the label is a full sentence rather than a label introducing
+a gloss, the period is correct.
+
+### 59. Bullet Lists of Bare Noun Phrases
+
+**Problem:** Five or more consecutive bullets, each a short adjective-plus-noun
+phrase with no verb, none checkable.
+The tell is the symmetry: every item the same grammatical shape and length.
+
+**Before:**
+> - Stable connection handling
+> - Optimized query performance
+> - Reliable failover behavior
+> - Consistent memory use
+
+**After:**
+> Connections survive a broker restart, queries under 1KB return in under a
+> millisecond, and memory stays flat across a 12-hour run.
+
+**Carve-out:** genuine list content (changelog entries, parameter docs,
+ingredient lists) where bare noun phrases are correct.
+
+### 60. Excessive Bullet Lists
+
+**Problem:** AI converts prose that should flow into bullet-heavy sections.
+Use bullets for genuine list content: comparisons, step-by-step instructions,
+API parameters. Otherwise write prose.
+
+### 61. Template and Slot-Fill Phrases
+
+**Problem:** Constructions that generate the same sentence when the noun
+changes:
+
+- "a [adjective] step toward [adjective] X" becomes: describe the specific
+  capability or outcome.
+- "Whether you're X or Y" is false breadth; pick the actual audience or cut.
+- "I recently had the pleasure of [verb]-ing" becomes: say what happened
+  ("I talked to," "I read," "I attended").
+
+### 62. Transition-Phrase Openers
+
+**Phrases to watch:** Moreover, Furthermore, Additionally, In today's X,
+In an era where, When it comes to, At the end of the day, That said.
+
+**Problem:** These stall or pad instead of connecting.
+Restructure so the connection is obvious, or use plain connectors (and, also,
+but). "When it comes to X" becomes writing about X directly.
+"At the end of the day" is cut. One "however" is fine; a pile is the tell.
+(See the false-positive note on transition words in isolation.)
+
+### 63. Unfilled Placeholders
+
+**Signs to watch:** `[Your Name]`, `[INSERT SOURCE URL]`,
+`[Describe the section]`, `2025-XX-XX`, `<!-- Add citation -->`.
+
+**Problem:** Bracketed slot-fillers meant to be replaced before publishing,
+strong evidence that boilerplate was pasted without editing.
+Fill it or delete the sentence.
+
+**Note for this repo:** Bruce's own `[[ ]]` double-bracket draft notes are
+deliberate placeholders (see project memory). Leave those for him; flag
+single-bracket AI slot-fillers.
+
+### 64. Chatbot Citation Markup Leaks
+
+**Signs to watch:** `citeturn0search0`, `contentReference[oaicite:0]`,
+`oai_citation`, `[attached_file:1]`, `grok_card`.
+
+**Problem:** Internal citation tokens that leak through when text is pasted from
+a chat UI. These are fingerprints, not style. Strip every one.
+If a citation was meaningful, replace it with a real reference.
+
+### 65. AI-Tool URL Parameters
+
+**Signs to watch:** `utm_source=chatgpt.com`, `utm_source=claude.ai`,
+`utm_source=perplexity.ai`, `referrer=grok.com`.
+
+**Problem:** Tracking parameters auto-appended by AI tools that survive
+copy-paste. Strip the AI-referrer parameter; keep functional ones
+(`?page=2`, `?v=4`).
+
+### 66. Hashtag Stuffing
+
+**Problem:** A long trailing block of hashtags (six or more on a short post) is
+near-universal in AI social content and rare in thoughtful human posts.
+Use two or three specific tags, or none.
+Issue references (`#88`), hex colors (`#1a2b3c`), preprocessor directives
+(`#include`), and channel names do not count.
+
+### 67. Immaculate Typography in Casual Registers
+
+**Problem:** Perfect spacing and punctuation in a fast-typed context (a code
+comment, a chat message, a DM) is a weak, register-scoped signal.
+Corroborating, never conclusive. Judge it alongside other tells, never alone.
+
+### 68. Faux-Insight Setups
+
+**Phrases to watch:** What most people get wrong, Here's what nobody tells you,
+This is the part everyone skips, The part everyone misses, What they don't want
+you to know.
+
+**Problem:** The setup flatters the writer as the lone expert who sees what
+others cannot. Cut it and let the claim stand on its own.
+Distinct from self-labeling significance (§39), which back-points at an item
+already stated; this front-loads a "you're about to learn a secret" frame.
+
+**Before:**
+> The part everyone misses: distribution is the real moat.
+
+**After:**
+> Distribution is the moat.
+
+### 69. Colon Reveals
+
+**Problem:** A noun phrase, a colon, then a dramatic lowercase reveal, staged
+for suspense: "The detail that makes it work: a separate pass grades the
+output." Rewrite as a plain sentence.
+Use a colon for a list, a label, or a quote, not for fake drama.
+Prefer sentence case after a colon unless grammar, a proper noun, a title, or
+code requires otherwise.
+
+**Before:**
+> The best part: it caches the result.
+
+**After:**
+> It caches the result, so the second call is free.
+
+### 70. Interpretive Metadiscourse
+
+**Phrases to watch:** As you can see, In other words (when the first phrasing
+was already clear), The key point is, This distinction matters, That last part
+matters more than it sounds.
+
+**Problem:** The sentence steps outside the subject to tell the reader what to
+notice or how much weight to give it. If the point is clear, the aside is
+redundant; delete it. If it is not clear, replace the aside with the support or
+fact that would make it clear. Related to confidence-calibration cues (§42) and
+self-labeling (§39); this one is the redundant gloss and the "here is how to
+read what I just wrote" aside.
+
+**Before:**
+> The cache holds 10,000 entries. In other words, it stores a lot of data.
+
+**After:**
+> The cache holds 10,000 entries.
 
 ## DETECTION GUIDANCE
 
@@ -884,6 +1464,145 @@ and over-editing will destroy what makes the piece sound human:
   ChatGPT's public launch.
   Anything older than that is, with very rare exceptions, not AI-written.
 
+## STRUCTURE AND RHYTHM TESTS
+
+Individual word and phrase fixes are only half the work.
+The stronger signal is *how the text flows*.
+AI prose is metronomic; human prose has varied rhythm.
+Consistent sentence construction and symmetrical phrasing are harder to mask
+than a flagged word, so treat these as the deeper check.
+
+**Sentence-length uniformity.**
+If most sentences run 15 to 25 words, the text sounds robotic.
+Mix short (3 to 8 words) with long (20+). Fragments work. A question breaks
+monotony. This is the single strongest structural tell.
+
+**Paragraph-length uniformity.**
+If every paragraph is three to five sentences and roughly the same size, vary it
+deliberately. Some paragraphs should be one sentence, some longer.
+
+**Read-aloud test.**
+If the text could be read by text-to-speech without sounding odd, it is probably
+too uniform. Human writing has a rhythm that resists flat delivery.
+
+**Vocabulary diversity (type-token ratio).**
+In a longer piece (200+ words), look at distinct word types over total words.
+Human prose usually lands around 0.50 to 0.65; AI text trends flatter,
+sometimes under 0.40 when the model locks onto a small vocabulary loop.
+A low ratio is not proof: narrow topics, technical reference, and
+second-language writing all compress vocabulary legitimately.
+The fix is rarely to thesaurus the text. Broaden the *what*: name specific
+things, cite specific cases, replace a reused abstract noun with the concrete
+instance behind it.
+
+**Paragraph-reshuffle immunity.**
+Can you swap two body paragraphs without breaking the piece?
+If the order does not matter, you have a list of points, not an argument that
+builds. AI prose often fails this: each paragraph is a self-contained module
+with no load-bearing link to its neighbors.
+Establish a through-line where each paragraph depends on the one before, or
+decide the piece should be an explicit list.
+
+**Treadmill effect (low information density).**
+Read each paragraph and ask what is actually new here.
+AI prose restates the premise in fresh words instead of advancing it: motion
+without distance. The tell: you could cut 40 to 60 percent and lose no
+information. For each paragraph, name the one fact, claim, or turn it adds.
+If there is none, cut it. If there is, lead with it.
+
+**Portability test.**
+If a sentence could move unchanged to another person, company, product, or
+country, it is probably filler. Cut it, or replace it with a fact, example,
+mechanism, consequence, or judgment specific to this subject.
+"The integration improved efficiency" ports anywhere;
+"the integration cut deploy time from 40 minutes to 4" does not.
+
+**When to rewrite from scratch instead of patching.**
+If the text has five or more flagged vocabulary hits across categories, three or
+more distinct pattern categories triggered, and uniform sentence and paragraph
+length, patching individual phrases will not fix it: the structure is the
+problem. State the core point in one sentence and rebuild from there.
+
+## SEVERITY TIERS
+
+When triaging a large document or doing a quick pass, prioritize:
+
+**P0, credibility killers (fix first).**
+Cutoff disclaimers (§21), chatbot artifacts (§20), vague attributions with no
+source (§5), significance inflation on routine events (§1), citation-markup
+leaks (§64), unfilled placeholders (§63).
+
+**P1, obvious AI smell (fix before publishing).**
+Tier 1A vocabulary (§7), template and slot-fill phrases (§61), "let's" openers
+(§28), synonym cycling (§11), formulaic openings, boldface overuse (§15),
+future-narrative closers (§49), social endorsement closers (§53), narrated
+candor (§36), lingering-attention claims (§38), hedge-stacked predictions (§48),
+real/actual inflation (§34), moral-adjective category errors (§35), invented
+contrast-pair mirroring (§47), bare-noun-phrase bullet lists (§59).
+
+**P2, stylistic polish (fix when time allows).**
+Generic conclusions (§25), rule-of-three overuse (§10), uniform paragraph
+length, copula avoidance (§8), transition-phrase openers (§62).
+
+A quick pass covers P0 and P1. A full audit covers all three.
+
+## NEVER INJECT THESE
+
+Removal is half the job. A rewrite that clears every flag but reads sterile,
+with even sentence lengths and no stance where one belongs, is still recognizably
+machine output. But the cure is never to invent. Each of the following is a
+rewrite failure even when the result scores clean:
+
+- **Fake first person.**
+  "I've seen this a hundred times" dropped into prose that had no author
+  presence. If the source has no "I," the rewrite has no "I."
+- **Manufactured stakes.**
+  "Now more than ever," "the stakes have never been higher." Legitimate only
+  when the source actually argued it.
+- **Forced contrarianism.**
+  "Everyone says X, but they're wrong." Only when the source argued it.
+- **Performed candor.**
+  "Let's be honest," "real talk," "here's the thing." Adding one fails two rules
+  at once (see §33, §36).
+- **Em-dash theatrics.**
+  Never add an em dash for drama. (In Bruce's prose, never add or remove one at
+  all; see §14.)
+- **Staccato conversion.**
+  Chopping ordinary sentences into fragments to fake rhythm. Vary sentences by
+  varying sentences, not by breaking them (see §31).
+- **Invented specifics.**
+  A number, name, date, tool, or mechanism the source never contained.
+  A fabricated specific is worse than vague phrasing. If the detail is missing,
+  flag the gap and leave it.
+
+The test: for each edit, ask whether the information came from the source.
+Subtraction and sharpening are in scope. Addition of stance, personality, or
+fact is not.
+
+## Register Affects Strictness
+
+The upstream skill carries a full profile matrix (LinkedIn, investor email, and
+so on). That machinery is dropped here, but the underlying idea is worth keeping:
+how hard to enforce a rule depends on register.
+
+- **Long-form prose (essays, blog posts, chapters).** Full strength.
+- **Technical writing (docs, READMEs, API reference).** Clarity over voice.
+  Terms of art get a pass; the passive is often correct (see §13). Do not inject
+  first person or opinion.
+- **Casual replies (chat, issue comments, DMs).** Catch only the worst
+  offenders: chatbot artifacts, sycophancy, wall-of-text blocks. Leave the rest.
+
+Register sets how strict; voice sets how the prose should sound.
+They are separate axes, and a writing sample (see Voice Calibration) outranks
+both.
+
+## Self-Reference Escape Hatch
+
+When the text is *about* AI-writing patterns (this skill, a blog post on the
+subject, a tutorial), quoted examples are exempt.
+Text inside quotation marks, code blocks, or marked as illustrative is not
+rewritten. Flag patterns in the author's own prose, not in cited examples.
+
 ## Invocation Modes
 
 **Pasted text (default).**
@@ -912,6 +1631,13 @@ Another task or agent is using this skill as one step of a larger job
 (a PR description, a commit message, a doc).
 Run the loop internally and output only the final text.
 No draft, no audit bullets, no summary.
+
+**Detect-only.**
+Bruce asks whether a piece reads as AI, or asks to audit, scan, or flag it
+without a rewrite. Name each pattern that appears, quote the offending line, and
+give the fix in a few words. Do not rewrite, do not score the draft, and do not
+guess whether AI wrote it: a named, quoted pattern is evidence Bruce can check,
+which a detector's verdict is not. Offer to run the full rewrite afterward.
 
 ## Process and Output
 
@@ -942,6 +1668,22 @@ which is based on
 maintained by WikiProject AI Cleanup.
 The patterns documented there come from observations of thousands of instances
 of AI-generated text on Wikipedia.
+
+Sections 34 to 67, the tiered vocabulary tables in §7, and the structure,
+severity, and never-inject sections are folded in from
+[conorbronsdon/avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing)
+(MIT license), adapted to neutral examples and Bruce's local rules.
+The upstream skill's profile and tolerance matrix, its `--style` config engine,
+and its Node detector are not included.
+
+Sections 68 to 70, the portability test, the minimum-effective-edit and
+protect-the-specific-fact principles, the empty-adverb and verb-strengthening
+notes, the detect-only mode, and the fake-profound-kicker note are folded in from
+[petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop)
+(MIT license), adapted to Bruce's rules.
+Its patterns that readability already covered (binary contrasts, importance
+puffery, weasel attribution, copula avoidance, synonym cycling, dramatic
+fragmentation, formatting slop) were not duplicated.
 
 Key insight from Wikipedia:
 "LLMs use statistical algorithms to guess what should come next.

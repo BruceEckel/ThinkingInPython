@@ -5,20 +5,22 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 type EventMaker = Callable[[int, int], Event]
-NOT_CREATED: EventMaker = cast(EventMaker, sentinel("NOT_CREATED"))
+NOT_CREATED = sentinel("NOT_CREATED")
 
-class EventMakers(dict[str, EventMaker]):
+class EventMakers(dict[str, EventMaker | NOT_CREATED]):
     def __getitem__(self, class_name: str) -> EventMaker:
         if class_name not in self:
-            raise ValueError(f"Unknown event class: {class_name!r}")
-        if super().__getitem__(class_name) is NOT_CREATED:
+            raise KeyError(f"Unknown event class: {class_name!r}")
+        maker = super().__getitem__(class_name)
+        if maker is NOT_CREATED:
             print(f"Creating {class_name}")
             # Local function to pass to type constructor:
             def init(self: Event, hour: int, minute: int) -> None:
                 Event.__init__(self, class_name, hour, minute)
             new_cls = type(class_name, (Event,), {"__init__": init})
-            self[class_name] = cast(EventMaker, new_cls)
-        return super().__getitem__(class_name)
+            maker = cast(EventMaker, new_cls)
+            self[class_name] = maker
+        return maker
 
 @dataclass
 class Event:
