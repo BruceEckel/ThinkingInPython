@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/28_Function_Objects.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -60,7 +61,7 @@ We use strategies-as-functions constantly in Python without naming it as a patte
 
 PROPOSED
 ```text
-You use strategies-as-functions constantly in Python without naming it as a pattern.
+Strategies-as-functions are used constantly in Python without naming it as a pattern.
 ```
 
 **line 357**

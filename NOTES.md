@@ -9,9 +9,6 @@ Contrast with earlier game examples in the book.
 
 Add Epub link info on README and bottom of index page.
 
-lets this book's build pass
-passes the book build?
-
 Look for places display_object could be replaced with print(vars(obj))
 
 Add to the "deep review" skill:

@@ -707,7 +707,7 @@ A caller who passes a raw `int` where `UserId` is expected raises no exception.
 The value doesn't change.
 There is nothing at runtime for a test to catch.
 Only the checker sees it, and only at edit time.
-Here, that diagnostic is silenced by the same `# type: ignore` that lets this book's build pass.
+Here, that diagnostic is silenced by the same `# type: ignore` that passes the book build.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen dataclass with a validating `__post_init__` enforces the distinction at runtime too,
