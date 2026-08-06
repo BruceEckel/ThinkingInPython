@@ -126,6 +126,10 @@ if __name__ == "__main__":
 #: root/data.csv
 ```
 
+`Node` is named in `Directory` before it is defined below,
+which works because annotations and `type` aliases are both evaluated lazily
+(see [Static Typing](08_Static_Typing.md)).
+
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
@@ -145,6 +149,10 @@ and any consumer of that stream stays decoupled from the tree structure
 (see [Iterators](23_Iterators.md#delegating-with-yield-from)).
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
+A `list` there would not do: `frozen=True` stops the field from being rebound,
+not the object it holds from being mutated,
+which [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+demonstrates.
 The demo builds `src` first, then places it inside `root`.
 Nothing can modify `src` afterward, so sharing subtrees is safe
 (see [Foundations](40_Functional_Foundations.md#immutability)).
@@ -188,6 +196,8 @@ Match over a closed set, use polymorphism for an open one.
 ## Interpreter
 
 A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
+Python's own compiler builds one of these for every source file,
+and `ast.parse()` hands it to you as node objects that `ast.NodeVisitor` walks in the style of [Visitor](33_Visitor.md).
 Interpreter is Composite applied to language.
 Representing each construct as a node type turns evaluation into a tree walk.
 
@@ -243,17 +253,30 @@ The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
 `Add` and `Mul` hold expressions themselves, which makes it a composite.
 
+`Operators` is a base class but not a member of `Expr`,
+and the split is on purpose.
+Every node shares the operator methods,
+so those live on a base and are inherited.
+No node shares its meaning, so meaning lives in the walkers,
+which need the union to know when they are done.
+`Expr` is the contract:
+annotate `evaluate()` with `Operators` and `assert_never()` stops working,
+because a base class is an open set and any new subclass silently belongs to it.
+
 The `Operators` base class is the clever part.
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
 They build nodes.
+Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)` type-check.
+`Self` would mean "some subclass of `Operators`,"
+and the checker cannot know that every such subclass is in the `Expr` union.
+The annotation says so.
 Writing `x + 1` on two `Expr` values produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
 and `wrap()` promotes integers to `Num` nodes,
 so `2 * x + 1` is a valid sentence in the little language.
-Python has already parsed it, honoring precedence,
-before the interpreter ever runs.
+Python has parsed it, honoring precedence, before the interpreter ever runs.
 
 The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many):
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
@@ -281,7 +304,7 @@ Variables need values, supplied here as keyword arguments:
 from typing import assert_never
 from expr import Add, Expr, Mul, Num, Var
 
-def evaluate(e: Expr, **env: int) -> int:
+def evaluate(e: Expr, /, **env: int) -> int:
     match e:
         case Num(value):
             return value
@@ -312,6 +335,9 @@ Building `2 * x + 1` did not compute a number.
 It built a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises `KeyError`, naming the variable.
+The `/` makes the tree positional-only
+(see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)),
+which keeps the parameter name `e` out of the variable namespace so an expression can use `e` as a variable.
 
 ```python
 # test_evaluate.py
@@ -403,6 +429,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e  # Share the unchanged subtree
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -414,6 +442,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
         case _:
             assert_never(e)
@@ -430,11 +460,15 @@ if __name__ == "__main__":
 
 The patterns read like the algebra they implement.
 `(Num(0), other) | (other, Num(0))` says "zero on either side,
-keep the other side," with the alternatives binding the same name.
+keep the other side."
+Both alternatives bind `other`, and they have to:
+every alternative in a `|` must bind the same set of names,
+so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
+(see [Alternatives and Capture](13_Pattern_Matching.md#alternatives-and-capture)).
 `(Num(a), Num(b))` captures two constants for folding.
 Because every node is frozen, `simplify()` never edits the input.
-It returns a new tree,
-and the leaves it keeps are the same objects as in the input.
+It returns a new tree that shares unchanged subtrees with the original:
+the `is` guard in each `case _` hands back the node it was given when neither child simplified to anything different.
 
 ```python
 # test_simplify.py
@@ -473,7 +507,7 @@ def test_already_simple_is_unchanged() -> None:
     assert simplify(2 * x + 1) == Add(Mul(Num(2), x), Num(1))
 ```
 
-The full shape of the two patterns is now visible.
+Three walkers over one set of nodes is the pattern pair in full.
 Composite is the data: a union of node types, some holding others.
 Interpreter is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into frozen data classes, a union,
@@ -493,6 +527,9 @@ which is an invitation to write one.
 A `t`-string, introduced in [Tour](02_Tour.md#t-strings),
 evaluates to a `Template`: a sequence of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
+Iteration skips the empty literal pieces,
+so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
+`template.strings` keeps the empty slots when the alternation matters.
 The grammar is flat rather than nested,
 so the walk is a loop instead of a recursion,
 but everything else about it is this chapter's shape.
@@ -536,7 +573,7 @@ print(to_shape(query))
 
 `to_query()` and `to_shape()` are the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure, neither of them known to the structure,
-and adding a third costs nothing that already exists.
+and adding a third changes nothing that already exists.
 
 The first one earns its place.
 `name` holds an injection attempt,

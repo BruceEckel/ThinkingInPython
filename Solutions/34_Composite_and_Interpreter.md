@@ -423,6 +423,92 @@ squared denominator `simplify()`'s current rules do not yet know how
 to render tidily; left for a further exercise, the same way exercise
 3 leaves `Div`'s own derivative case unimplemented.
 
+## 6. Declining with `NotImplemented`
+
+```python
+# exercise_6.py
+from dataclasses import dataclass
+from typing import Any
+
+class Operators:
+    def __add__(self: Expr, other: Expr | int) -> Any:
+        if isinstance(other, Operators | int):
+            return Add(self, wrap(other))
+        return NotImplemented
+
+    def __radd__(self: Expr, other: int) -> Any:
+        if isinstance(other, int):
+            return Add(Num(other), self)
+        return NotImplemented
+
+    def __mul__(self: Expr, other: Expr | int) -> Any:
+        if isinstance(other, Operators | int):
+            return Mul(self, wrap(other))
+        return NotImplemented
+
+    def __rmul__(self: Expr, other: int) -> Any:
+        if isinstance(other, int):
+            return Mul(Num(other), self)
+        return NotImplemented
+
+@dataclass(frozen=True)
+class Num(Operators):
+    value: int
+
+@dataclass(frozen=True)
+class Var(Operators):
+    name: str
+
+@dataclass(frozen=True)
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@dataclass(frozen=True)
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    return Num(value) if isinstance(value, int) else value
+
+x = Var("x")
+print(type(2 * x + 1).__name__, (2 * x + 1).right)
+#: Add Num(value=1)
+try:
+    "a" + x  # type: ignore
+except TypeError as e:
+    print(type(e).__name__, e)
+#: TypeError can only concatenate str (not "Var") to str
+```
+
+Before the change, `"a" + x` produced `Add(Num("a"), Var("x"))`: a
+`Num` whose `value` is a string, which every walker then mishandles.
+`str.__add__` declines a `Var`, Python falls back to
+`Var.__radd__("a")`, and the old version accepted anything, wrapping
+the string in a `Num` without looking at it.
+
+Returning `NotImplemented` puts the decision back where it belongs.
+`__radd__()` now answers only for an `int`, so both sides decline and
+Python raises the `TypeError` it would have raised for any other
+mismatched pair. The message comes from `str`, which is right: the
+left operand is what the caller wrote first, and nothing in this
+expression language ever claimed to extend it.
+
+The return annotations widen to `Any` for the reason
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+gives: the precise type is `Add | NotImplementedType`, and declaring
+that makes every downstream `.left` a checker error, even though the
+sentinel never reaches a caller.
+
+Note what this does not fix. `ty` already rejected `"a" + x` in source
+it can see, which is why the line above carries a `# type: ignore` to
+keep this listing in the build; the runtime hole was the gap between
+the two. Closing it matters when the expression is built from data the
+checker never sees, which is the case an interpreter is written for.
+
 ## 7. A third walker: `to_html()`
 
 ```python

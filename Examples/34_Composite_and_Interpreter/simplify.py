@@ -14,6 +14,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e  # Share the unchanged subtree
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -25,6 +27,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
         case _:
             assert_never(e)

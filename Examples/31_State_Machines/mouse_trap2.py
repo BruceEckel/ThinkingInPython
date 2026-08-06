@@ -6,42 +6,44 @@ from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class StateT(State):
+class TableState(State):
     def __init__(self) -> None:
         self.transitions: dict[object, State] = {}
 
     @override
     def next(self, event: object) -> State:
-        if event in self.transitions:
+        try:
             return self.transitions[event]
-        raise RuntimeError(
-            "Input not supported for current state")
+        except KeyError:
+            raise RuntimeError(
+                f"{type(self).__name__} has no transition "
+                f"for {event}") from None
 
-class Waiting(StateT):
+class Waiting(TableState):
     @override
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-class Luring(StateT):
+class Luring(TableState):
     @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-class Trapping(StateT):
+class Trapping(TableState):
     @override
     def run(self) -> None:
         print("Trapping: Closing door")
 
-class Holding(StateT):
+class Holding(TableState):
     @override
     def run(self) -> None:
         print("Holding: Mouse caught")
 
 class MouseTrap(StateMachine):
-    waiting: ClassVar[StateT] = Waiting()
-    luring: ClassVar[StateT] = Luring()
-    trapping: ClassVar[StateT] = Trapping()
-    holding: ClassVar[StateT] = Holding()
+    waiting: ClassVar[TableState] = Waiting()
+    luring: ClassVar[TableState] = Luring()
+    trapping: ClassVar[TableState] = Trapping()
+    holding: ClassVar[TableState] = Holding()
 
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)

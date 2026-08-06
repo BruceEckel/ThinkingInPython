@@ -1,3 +1,9 @@
+Apply the "readability" skill to each chapter.
+As this skill processes each chapter in isolation,
+you should be able to parallelize many tasks at once, one per chapter.
+If a chapter needs to modify another chapter,
+it should only write that into the review file, so parallelizing isn't compromised.
+
 New book cover & favicon
 
 Add Epub link info on README and bottom of index page.

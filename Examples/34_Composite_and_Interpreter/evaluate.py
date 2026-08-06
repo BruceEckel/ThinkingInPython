@@ -2,7 +2,7 @@
 from typing import assert_never
 from expr import Add, Expr, Mul, Num, Var
 
-def evaluate(e: Expr, **env: int) -> int:
+def evaluate(e: Expr, /, **env: int) -> int:
     match e:
         case Num(value):
             return value

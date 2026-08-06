@@ -52,9 +52,9 @@ class Worm(Predator):
         flower.eat(self)
 
 def flower_gen(n: int) -> Iterator[Flower]:
-    flwrs = Flower.__subclasses__()
-    for i in range(n):
-        yield random.choice(flwrs)()
+    flowers = Flower.__subclasses__()
+    for _ in range(n):
+        yield random.choice(flowers)()
 
 # Now perform Bug operations on the flowers:
 bee = Bee()

@@ -245,3 +245,124 @@ logic, only indexes into a dictionary. This is
 [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)'s
 own conclusion: the table is both shorter to write and easier to
 audit for a ruleset that is fundamentally a fixed set of answers.
+
+## 5. `flower_visitors.py` with `singledispatch`
+
+```python
+# exercise_5.py
+from functools import singledispatch
+
+class Flower:
+    def __str__(self) -> str:
+        return type(self).__name__
+
+class Gladiolus(Flower):
+    pass
+class Ranunculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
+
+@singledispatch
+def pollinate(flower: Flower, agent: str) -> str:
+    return f"{flower} pollinated by {agent}"
+
+@singledispatch
+def eat(flower: Flower) -> str:
+    return f"{flower} eaten by Worm"
+
+@eat.register
+def _(flower: Chrysanthemum) -> str:
+    return f"{flower} is toxic to Worm"
+
+for flower in (Ranunculus(), Chrysanthemum()):
+    print(pollinate(flower, "Bee"))
+    print(eat(flower))
+#: Ranunculus pollinated by Bee
+#: Ranunculus eaten by Worm
+#: Chrysanthemum pollinated by Bee
+#: Chrysanthemum is toxic to Worm
+```
+
+Everything on the visitor side disappears: the `Visitor` base, `Bee`,
+`Fly`, and `Worm`, and the three `visit()` methods. So does `accept()`
+on `Flower`, and with it the `Any` annotation the chapter had to
+explain. What remains is two functions and one registration.
+
+The `Bug` classes were never carrying state; each existed to name one
+operation and to be a type the second dispatch could resolve. Once the
+operation is a function, naming it at the call site does that
+selection, so `pollinate(flower, "Bee")` says what `flower.accept(bee)`
+said with a class and a method.
+
+The one thing lost is the ability to hold a visitor in a variable and
+pass it around as an object. When that matters, the function is still
+a value: `op = eat` works, and a `dict[str, Callable[[Flower], str]]`
+keyed by operation name recovers the "choose an operation at runtime"
+half of what the `Visitor` hierarchy provided, without the classes.
+
+## 6. Adding a type against adding an operation
+
+```python
+# exercise_6.py
+from functools import singledispatch
+
+class Flower:
+    def __str__(self) -> str:
+        return type(self).__name__
+
+class Gladiolus(Flower):
+    pass
+class Ranunculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
+class Rose(Flower):  # The new type: 2 lines
+    pass
+
+@singledispatch
+def nectar(flower: Flower) -> str:
+    return f"{flower}: no nectar"
+
+@nectar.register
+def _(flower: Rose) -> str:  # 3 lines
+    return f"{flower}: abundant nectar"
+
+@singledispatch
+def fragrance(flower: Flower) -> str:
+    return "faint"
+
+@fragrance.register
+def _(flower: Rose) -> str:  # 3 lines
+    return "strong"
+
+@singledispatch  # The new operation: 3 lines
+def thorns(flower: Flower) -> str:
+    return "none"
+
+@thorns.register
+def _(flower: Rose) -> str:  # 3 lines
+    return "sharp"
+
+rose = Rose()
+print(nectar(rose), "/", fragrance(rose), "/", thorns(rose))
+#: Rose: abundant nectar / strong / sharp
+print(thorns(Gladiolus()))
+#: none
+```
+
+Adding `Rose` cost two lines for the class plus one registration per
+operation that needed a non-default answer, and nothing existing was
+touched. Adding `thorns()` cost one new function plus one registration
+for the flower that differs, and again nothing existing was touched.
+
+`@singledispatch` makes adding an *operation* the cheaper of the two,
+because an operation is a whole function and lives in one place. Adding
+a type is cheap here only because most flowers accept the default; a
+type that needs a distinct answer from every operation costs one
+registration per operation, scattered across the file. That is the
+expression problem from
+[Pattern Matching](13_Pattern_Matching.md#dynamic-binding-vs.-pattern-matching):
+methods on a class make adding a type cheap, functions over a hierarchy
+make adding an operation cheap, and no arrangement makes both cheap at
+once.

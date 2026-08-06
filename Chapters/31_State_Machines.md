@@ -8,7 +8,7 @@ The current implementation represents the state that a system is in,
 and the system behaves differently from one state to the next
 (because it uses *State*).
 
-The code that moves the system from one state to the next is often a *Template Method*,
+The code that moves the system from one state to the next is often a [*Template Method*](25_Template_Method.md),
 as seen in the following framework for a basic state machine.
 Each state can be `run()` to perform its behavior, and (in this design)
 you can also pass it an "input" object so it can tell you what new state to move to.
@@ -17,7 +17,9 @@ each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
 Another way to put it is that here,
 each `State` object has its own little `State` table,
-and in the subsequent design there is a single master state transition table for the whole system:
+and in the subsequent design there is a single master state transition table for the whole system.
+
+## Each State Decides
 
 ```python
 # state.py
@@ -39,6 +41,13 @@ You could get nearly the same effect by saying:
     class State: pass
 
 because calling `run()` or `next()` on a derived type that hasn't implemented them still raises an exception.
+Without the base, the failure is an `AttributeError` at the call.
+With it, a `NotImplementedError` that names what is missing.
+[Surrogate](26_Surrogate.md#proxy) shows the third option:
+make `State` an `ABC` with `@abstractmethod` on both methods,
+and an incomplete subclass cannot be constructed at all.
+The version here fails later than that, at the call rather than at construction,
+which is enough for a design where every state is created once at module level.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -67,13 +76,15 @@ class StateMachine:
 `run_all()` is the template method: it fixes the flow
 (report the input, transition, run the new state),
 while the varying behavior lives in each `State`'s `run()` and `next()`.
-As [Template Method](25_Template_Method.md) puts it,
-subclasses supply the steps, not the flow.
+[Template Method](25_Template_Method.md) puts the varying steps in a subclass;
+here they come from the `State` objects the machine holds.
+The flow is fixed either way, and only where the steps live changes.
 The constructor also runs the initial state,
 the construction-starts-the-engine choice that drew a warning in that chapter.
 It is safe here because the state objects are stateless singletons,
 fully formed before any machine exists.
-A `State` whose `run()` reads attributes off the machine revives the trap.
+A `State` whose `run()` reads attributes off the machine revives the trap,
+which is worth remembering during exercise 3.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
@@ -94,8 +105,9 @@ class MouseAction(StrEnum):
 
 Each possible move by a mouse is a member of the `MouseAction` enumeration
 ([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
-Because it is a `StrEnum`, each member is its string value.
-Members also compare equal to their equivalent string.
+Because it is a `StrEnum`, each member *is* a `str`,
+and compares equal to and prints as its value.
+That is why `print(i)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
 which is how the code below parses the test input.
@@ -248,7 +260,7 @@ In Python that is no obstacle.
 Define the classes first, then fill in the tables at module level,
 after all the state objects exist.
 
-The `StateT` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
+The `TableState` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
 (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
 The subclasses now define only their `run()` behavior.
@@ -263,42 +275,44 @@ from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class StateT(State):
+class TableState(State):
     def __init__(self) -> None:
         self.transitions: dict[object, State] = {}
 
     @override
     def next(self, event: object) -> State:
-        if event in self.transitions:
+        try:
             return self.transitions[event]
-        raise RuntimeError(
-            "Input not supported for current state")
+        except KeyError:
+            raise RuntimeError(
+                f"{type(self).__name__} has no transition "
+                f"for {event}") from None
 
-class Waiting(StateT):
+class Waiting(TableState):
     @override
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-class Luring(StateT):
+class Luring(TableState):
     @override
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-class Trapping(StateT):
+class Trapping(TableState):
     @override
     def run(self) -> None:
         print("Trapping: Closing door")
 
-class Holding(StateT):
+class Holding(TableState):
     @override
     def run(self) -> None:
         print("Holding: Mouse caught")
 
 class MouseTrap(StateMachine):
-    waiting: ClassVar[StateT] = Waiting()
-    luring: ClassVar[StateT] = Luring()
-    trapping: ClassVar[StateT] = Trapping()
-    holding: ClassVar[StateT] = Holding()
+    waiting: ClassVar[TableState] = Waiting()
+    luring: ClassVar[TableState] = Luring()
+    trapping: ClassVar[TableState] = Trapping()
+    holding: ClassVar[TableState] = Holding()
 
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
@@ -354,6 +368,8 @@ If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
 
+### An Unexpected Input
+
 The two versions also answer a question this input file never asks:
 what happens on an unexpected input?
 They answer it differently.
@@ -389,7 +405,18 @@ Python functions are first-class, so those hierarchies vanish.
 A condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
 
-![Vending machine state diagram](_images/stateMachine)
+The inputs change shape too.
+The mousetrap's inputs were `MouseAction` members, names with nothing attached.
+A vending machine's inputs carry values: what a coin is worth,
+which digit was pressed.
+So each input becomes an object of its own class,
+and the table keys on that class rather than on a value.
+An enum member has no room for the twenty-five cents.
+
+The names restart here.
+`tabledriven/state_machine.py` holds a different `StateMachine` from the one above,
+and `State` is now an `Enum` of names rather than a base class with behavior.
+The states in this design do nothing; the table holds all the behavior.
 
 ### The Engine
 
@@ -441,6 +468,11 @@ and it cuts the other way too:
 define a further subclass of an event type and it matches none of its parent's rows.
 An event's dispatch class must appear in the table verbatim.
 
+Both callables receive the event, whether they need it or not,
+which is why `refund()` takes an argument it ignores.
+The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
+and no one signature covers them all.
+
 ### A Vending Machine
 
 The machine is now completely defined by a table.
@@ -448,6 +480,9 @@ It collects money, takes a two-digit selection, then either dispenses the item,
 reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are plain methods, stored directly in the table.
+
+![Five states, QUIESCENT, COLLECTING, SELECTING, UNAVAILABLE, and WANT_MORE; money loops COLLECTING back on itself, a first digit moves to SELECTING, and a second digit branches three ways on price and stock, while Quit refunds from any state back to QUIESCENT](_images/stateMachine)
+
 The states are an `Enum`,
 so the type checker catches a misspelled state name instead of letting it fail silently at runtime:
 
@@ -540,8 +575,6 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions record a message instead of printing, so the model does
-    # not touch the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
         self.message = f"Total = {self.amount}"
@@ -569,29 +602,34 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy it again
-        FirstDigit("C", 2), SecondDigit("three", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("one", 0),  # Sold out
+        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy it again
+        FirstDigit("C", 2), SecondDigit("col 2", 2),  # Too expensive
+        FirstDigit("D", 3), SecondDigit("col 0", 0),  # Sold out
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message}")  # Text view
-#: quarter: Total = 25
-#: quarter: Total = 50
-#: dollar: Total = 150
-#: A: Row A
-#: two: Dispensing; remaining 100
-#: A: Row A
-#: two: Dispensing; remaining 50
-#: C: Row C
-#: three: Clearing selection: costs 75, quantity 5
-#: D: Row D
-#: one: Clearing selection: costs 25, quantity 0
-#: Quit: Returning 50
+        print(f"{event}: {machine.message} [{machine.state.name}]")
+#: quarter: Total = 25 [COLLECTING]
+#: quarter: Total = 50 [COLLECTING]
+#: dollar: Total = 150 [COLLECTING]
+#: A: Row A [SELECTING]
+#: col 1: Dispensing; remaining 100 [WANT_MORE]
+#: A: Row A [SELECTING]
+#: col 1: Dispensing; remaining 50 [WANT_MORE]
+#: C: Row C [SELECTING]
+#: col 2: Clearing selection: costs 75, quantity 5 [COLLECTING]
+#: D: Row D [SELECTING]
+#: col 0: Clearing selection: costs 25, quantity 0 [UNAVAILABLE]
+#: Quit: Returning 50 [QUIESCENT]
 ```
+
+The two `Clearing selection` lines read alike and end in different states:
+too expensive returns to `COLLECTING` with the money still in,
+while sold out goes to `UNAVAILABLE`.
+The condition that fired is visible only in the state.
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.
@@ -665,6 +703,11 @@ Because the actions set `vm.message` instead of printing,
 the model never draws anything,
 and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
+Contrast `run_all()` in the first design,
+which prints its input from inside the framework.
+That is convenient for a book listing and wrong for a reusable machine:
+it fixes one output device into the engine.
+Recording a message instead pushes the choice out to whoever is watching.
 
 Using `tkinter`, you can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen.
@@ -673,7 +716,8 @@ and the GUI catches a click that the state machine rejects
 (a selection before any money, say) and shows it rather than crashing.
 The button loop builds sixteen commands with `partial(select, r, c)`,
 not with a lambda: sixteen lambdas closing over `r` and `c` all see the loop's final values,
-the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime).
+the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)
+(the three fixed buttons above use lambdas safely, since they close over nothing that varies).
 Because it requires user interaction the harness skips it
 (`tools/data/norun.txt`):
 
@@ -750,6 +794,8 @@ if __name__ == "__main__":
     make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add an additional kind of `Mood` called `Prozac`.
 2.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
+    Give one `(state, input)` pair two rows told apart by a condition,
+    such as a load too heavy for the fast spin.
 3.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
     Each state stores a reference back to the controller object so that it can request the state change.
     Use a `dict` to map a `str` naming a state to its state object.
@@ -758,12 +804,13 @@ if __name__ == "__main__":
     The input to `next_state()` is a single word read from a text file containing one word per line.
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
 5.  Modify the "mood" exercise (exercise 1)
-    so that it becomes a state machine using `state_machine.py`.
-6.  Create an elevator state machine system using `state_machine.py`.
-7.  Create a heating/air-conditioning system using `state_machine.py`.
-8.  A *generator* produces objects, like a factory but taking no arguments.
-    Write a `mouse_move_generator()` (using `yield`)
-    that produces correct `MouseAction` moves in sequence,
+    so that it becomes a state machine using `state_machine.py`,
+    the first design, where each state decides the next one.
+6.  Create an elevator state machine system using `tabledriven/state_machine.py`,
+    whose transitions can carry conditions.
+7.  Create a heating/air-conditioning system using `tabledriven/state_machine.py`.
+8.  Write a `mouse_move_generator()` ([Iterators](23_Iterators.md#generators))
+    that yields valid `MouseAction` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

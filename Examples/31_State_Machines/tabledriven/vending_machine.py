@@ -86,8 +86,6 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions record a message instead of printing, so the model does
-    # not touch the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
         self.message = f"Total = {self.amount}"
@@ -115,25 +113,25 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("two", 1),  # Buy it again
-        FirstDigit("C", 2), SecondDigit("three", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("one", 0),  # Sold out
+        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy it again
+        FirstDigit("C", 2), SecondDigit("col 2", 2),  # Too expensive
+        FirstDigit("D", 3), SecondDigit("col 0", 0),  # Sold out
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message}")  # Text view
-#: quarter: Total = 25
-#: quarter: Total = 50
-#: dollar: Total = 150
-#: A: Row A
-#: two: Dispensing; remaining 100
-#: A: Row A
-#: two: Dispensing; remaining 50
-#: C: Row C
-#: three: Clearing selection: costs 75, quantity 5
-#: D: Row D
-#: one: Clearing selection: costs 25, quantity 0
-#: Quit: Returning 50
+        print(f"{event}: {machine.message} [{machine.state.name}]")
+#: quarter: Total = 25 [COLLECTING]
+#: quarter: Total = 50 [COLLECTING]
+#: dollar: Total = 150 [COLLECTING]
+#: A: Row A [SELECTING]
+#: col 1: Dispensing; remaining 100 [WANT_MORE]
+#: A: Row A [SELECTING]
+#: col 1: Dispensing; remaining 50 [WANT_MORE]
+#: C: Row C [SELECTING]
+#: col 2: Clearing selection: costs 75, quantity 5 [COLLECTING]
+#: D: Row D [SELECTING]
+#: col 0: Clearing selection: costs 25, quantity 0 [UNAVAILABLE]
+#: Quit: Returning 50 [QUIESCENT]

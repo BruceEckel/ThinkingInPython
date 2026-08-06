@@ -9,7 +9,7 @@ and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
 The answer starts with something you probably never consider.
-Python only performs single dispatching.
+Python dispatches on one type at a time.
 That is, if you are performing an operation on more than one object whose type is unknown,
 Python can invoke the dynamic binding mechanism on only one of those types.
 You end up detecting some types manually and effectively producing your own dynamic binding behavior.
@@ -26,10 +26,9 @@ That is why one method call can resolve only one unknown type.
 
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
-The following example names its methods `compete()` and `eval_*()`,
-and all belong to the same hierarchy.
-Here there will be only two dispatches.
-This is *double dispatching*.
+The following example dispatches through methods named `compete()` and `eval_*()`,
+with both of the interacting objects drawn from a single hierarchy.
+Two unknown types means two dispatches, which is *double dispatching*.
 If you are working with two different type hierarchies that are interacting,
 then you'll need a dispatching method call for each hierarchy.
 
@@ -154,6 +153,14 @@ Every `eval_*()` method answers for the original caller,
 the object named in the method's own name.
 If you misread that convention, every result in the class appears backward.
 
+Note what the `Any` annotations cost.
+`Item` declares neither `compete()` nor any `eval_*()` method,
+so nothing more precise would let `item.eval_scissors(self)` type-check.
+That also means a checker cannot tell you when a class is missing one of the nine methods;
+the gap surfaces as an `AttributeError` during whichever duel first needs it.
+This is the maintenance problem the table version solves,
+where the same nine answers sit in one place and a missing one raises `KeyError`.
+
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
 It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
@@ -215,7 +222,7 @@ The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction,
-which is what you want while adding `Lizard` in exercise 1.
+as you will see while adding `Lizard` in exercise 1.
 
 ## One Type or Many
 
@@ -228,19 +235,26 @@ the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` is then a matter of adding rows to the table,
 with no methods to edit across the classes.
 
+The two match types differently.
+`singledispatch` resolves through the MRO,
+so registering a base class catches every subclass,
+while the table matches the class exactly, as the paragraph above notes.
+Swapping one for the other changes which pairings are covered,
+not just how many types are considered.
+
 The version most programmers write first is neither of these:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
-It works, and it is the worst of both worlds,
-type tests scattered through every class like the method version,
+It works, and it is the worst of both worlds.
+The type tests are scattered through every class as in the method version,
 with none of dispatch's automatic resolution,
 and every new `Item` forces an edit to every ladder.
 Both patterns in this chapter exist to avoid writing it.
 
 The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
-is a workaround for languages that cannot store types in a table and look a behavior up by them.
-Python can, so the table is both shorter and easier to maintain.
+belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
+Python makes the table cheap, so it is both shorter and easier to maintain.
 Use the spread-out method version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
 
@@ -263,14 +277,12 @@ Here is the machinery, with each dispatch traced:
 
 ```python
 # radd_dispatch.py
+from dataclasses import dataclass
 from typing import Any
 
+@dataclass(frozen=True)
 class Meters:
-    def __init__(self, n: float) -> None:
-        self.n = n
-
-    def __repr__(self) -> str:
-        return f"Meters({self.n})"
+    n: float
 
     def __add__(self, other: object) -> Any:
         print(f"__add__({self!r}, {other!r})")
@@ -287,19 +299,19 @@ class Meters:
         return NotImplemented
 
 print(Meters(3) + Meters(4))
-#: __add__(Meters(3), Meters(4))
-#: Meters(7)
+#: __add__(Meters(n=3), Meters(n=4))
+#: Meters(n=7)
 print(Meters(3) + 4)  # The left operand handles it
-#: __add__(Meters(3), 4)
-#: Meters(7)
+#: __add__(Meters(n=3), 4)
+#: Meters(n=7)
 print(4 + Meters(3))  # Int declines; the right operand handles it
-#: __radd__(Meters(3), 4)
-#: Meters(7)
+#: __radd__(Meters(n=3), 4)
+#: Meters(n=7)
 try:
     Meters(3) + "four"  # Both sides decline
 except TypeError as e:
     print(type(e).__name__)
-#: __add__(Meters(3), 'four')
+#: __add__(Meters(n=3), 'four')
 #: TypeError
 ```
 
@@ -314,6 +326,25 @@ The last case shows what the sentinel is for.
 `Meters.__add__` runs, declines the string, `str` has no `__radd__` to consult,
 and only after both sides have declined does Python raise `TypeError`.
 Declining is not failing; the error appears only when nobody volunteers.
+
+Two details of the fallback are easy to get wrong.
+Raising `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
+The exception propagates immediately, so the right operand never gets its turn;
+only the sentinel keeps the second dispatch alive.
+Python also skips the reflected call when both operands have the same type,
+so `Meters + Meters` is settled inside `__add__()`.
+A class that implements only `__radd__()` cannot add itself to its own kind.
+One case reverses the order:
+when the right operand's type is a subclass of the left's and overrides the reflected method,
+Python tries that reflected method first,
+so the more specific type can answer before its base does.
+
+The `Any` return annotations are the honest choice here.
+The precise type is `Meters | NotImplementedType`,
+and a checker then rejects `(Meters(1) + Meters(2)).n`,
+since the sentinel branch has no `n`.
+The sentinel is a signal to the interpreter rather than a value a caller ever sees,
+so the annotation that describes it accurately describes the wrong thing.
 
 The win/lose/draw result is pure logic,
 which makes it easy to validate through testing.
@@ -389,4 +420,11 @@ not when a test imports it.
     and confirm both versions still agree with each other and with `EXPECTED`.
 4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
     while still yielding `(item1, item2)` pairs so existing calls need no change.
-    Pass in your own `Counter` and print how many times `Lizard` appeared across `item_pair_gen(Item, 100, counts)`.
+    Pass in your own `Counter` and print how many times `Lizard` appeared after iterating over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
+    since the counter fills only as you consume the generator.
+5.  Give `Meters` a `__sub__()` and a `__rsub__()`,
+    each returning `NotImplemented` for anything but a `Meters`, an `int`,
+    or a `float`.
+    Subtraction does not commute, so the reflected form must undo the swap:
+    check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
+    Then confirm that `"ten" - Meters(3)` raises `TypeError` rather than building anything.

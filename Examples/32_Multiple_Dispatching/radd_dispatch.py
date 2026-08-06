@@ -1,12 +1,10 @@
 # radd_dispatch.py
+from dataclasses import dataclass
 from typing import Any
 
+@dataclass(frozen=True)
 class Meters:
-    def __init__(self, n: float) -> None:
-        self.n = n
-
-    def __repr__(self) -> str:
-        return f"Meters({self.n})"
+    n: float
 
     def __add__(self, other: object) -> Any:
         print(f"__add__({self!r}, {other!r})")
@@ -23,17 +21,17 @@ class Meters:
         return NotImplemented
 
 print(Meters(3) + Meters(4))
-#: __add__(Meters(3), Meters(4))
-#: Meters(7)
+#: __add__(Meters(n=3), Meters(n=4))
+#: Meters(n=7)
 print(Meters(3) + 4)  # The left operand handles it
-#: __add__(Meters(3), 4)
-#: Meters(7)
+#: __add__(Meters(n=3), 4)
+#: Meters(n=7)
 print(4 + Meters(3))  # Int declines; the right operand handles it
-#: __radd__(Meters(3), 4)
-#: Meters(7)
+#: __radd__(Meters(n=3), 4)
+#: Meters(n=7)
 try:
     Meters(3) + "four"  # Both sides decline
 except TypeError as e:
     print(type(e).__name__)
-#: __add__(Meters(3), 'four')
+#: __add__(Meters(n=3), 'four')
 #: TypeError
