@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/33_Visitor.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -52,7 +53,7 @@ The *Visitor* assumption is that you have a primary class hierarchy you cannot c
 Perhaps it's from another vendor and you can't touch its source.
 However, you'd like to add new polymorphic methods to it.
 Normally you'd add something to the base class interface,
-but that's off the table.
+but that's not an option.
 How do you get around this?
 ```
 

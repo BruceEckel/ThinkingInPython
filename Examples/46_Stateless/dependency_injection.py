@@ -16,7 +16,7 @@ def get[T](t: type[T]) -> T:
     return DI_CONTAINER[t]
 
 def greet(name: str) -> None:
-    console: Console = get(Console)  # Exact type
+    console: Console = get(Console)
     console.print(f"Hello, {name}!")
 
 try:

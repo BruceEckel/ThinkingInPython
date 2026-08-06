@@ -4,7 +4,7 @@ from stateless import Depend, Need, need
 
 @dataclass(frozen=True)
 class Material:
-    brittleness: int
+    strength: int
 
 @dataclass(frozen=True)
 class Nailer:
@@ -13,4 +13,4 @@ class Nailer:
 def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
     material = yield from need(Material)
     nailer = yield from need(Nailer)
-    return nailer.force < material.brittleness
+    return nailer.force < material.strength

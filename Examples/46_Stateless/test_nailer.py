@@ -4,8 +4,8 @@ import pytest
 from nailer import Material, Nailer, holds
 from stateless import run, supply
 
-WOOD: Final[Material] = Material(brittleness=5)
-PLASTIC: Final[Material] = Material(brittleness=10)
+WOOD: Final[Material] = Material(strength=5)
+PLASTIC: Final[Material] = Material(strength=10)
 HAND: Final[Nailer] = Nailer(force=4)
 ROBOTIC: Final[Nailer] = Nailer(force=11)
 

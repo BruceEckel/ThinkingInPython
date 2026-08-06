@@ -15,6 +15,6 @@ def greet(name: str) -> Depend[Need[Console], None]:
 fallback = supply(Console("default"))
 run(fallback(greet)("Alice"))
 #: [default] Hello, Alice!
-chosen = supply(Console("chosen"))(greet)  # Added '(greet)'
+chosen = supply(Console("chosen"))(greet)
 run(fallback(chosen)("Bob"))
 #: [chosen] Hello, Bob!

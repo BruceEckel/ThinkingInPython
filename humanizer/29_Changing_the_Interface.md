@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/29_Changing_the_Interface.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -66,8 +67,8 @@ providing a more comfortable way to deal with a library or bundle of resources.
 
 PROPOSED
 ```text
-*Façade* creates an interface to a set of classes:
-a more comfortable way to deal with a library or bundle of resources.
+*Façade* creates an interface to a set of classes.
+This is a more comfortable way to deal with a library or bundle of resources.
 ```
 
 ### A3 — line 108 — emphasis italic
@@ -131,8 +132,8 @@ The only requirement is to produce a *that*,
 
 PROPOSED
 ```text
-When you've got this, and you need that, *Adapter* solves the problem.
-The only requirement is to produce a that,
+When you've got "this", and you need "that", *Adapter* solves the problem.
+The only requirement is to produce a "that",
 ```
 
 ### B2 — line 169 — "precisely because" intensifier
@@ -153,27 +154,6 @@ PROPOSED
 ```text
 an adapter as a frozen dataclass with two properties,
 built because the handed-to-you type did not fit.
-```
-
-### B3 — line 201 — restates the heading right after the epigraph
-
-This is the §29 "fragmented header" pattern PROCESS.md flags as a
-per-instance call (accepted in 47, declined in 46). "That is what *Façade*
-accomplishes" arrives right after the "## Façade" heading and its epigraph
-quote, and it mostly just says "Façade" again. My lean is to keep it: the
-sentence is doing real work bridging the epigraph to the pattern name, not
-padding. Flagging for the call since the shape matches.
-
-CURRENT
-```text
-That is what *Façade* accomplishes.
-If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
-then you can create an interface that is useful for the client programmer and that only presents what's necessary.
-```
-
-PROPOSED
-```text
-*Façade* accomplishes this: if you have a confusing collection of classes and interactions that the client programmer doesn't really need to see, you can create an interface that is useful for the client programmer and that only presents what's necessary.
 ```
 
 ## Housekeeping

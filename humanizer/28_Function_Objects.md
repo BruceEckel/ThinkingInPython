@@ -48,7 +48,7 @@ a value where `f(x)` is zero.
 
 PROPOSED
 ```text
-The following examples use three real algorithms that find a *root* of a function `f`,
+The following examples use three algorithms that find a *root* of a function `f`,
 a value where `f(x)` is zero.
 ```
 
@@ -86,7 +86,7 @@ a later finder rescues one that fails, and an empty chain returns `None`:
 
 PROPOSED
 ```text
-The tests below confirm that the first finder that converges wins,
+These tests confirm that the first finder that converges wins,
 a later finder rescues one that fails, and an empty chain returns `None`:
 ```
 

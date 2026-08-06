@@ -131,28 +131,12 @@ That second channel in the signature is the one [Effect Management](44_Effect_Ma
 said an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Generators.md#a-generator-is-a-description).
-An Effect is a generator, so nothing stops you from driving one yourself:
-
-```python
-# effect_by_hand.py
-from greeter import Console, greet
-
-effect = greet("Alice")
-request = next(effect)
-print(f"{type(request).__name__}({request.t.__name__})")
-#: Need(Console)
-try:
-    effect.send(Console())
-except StopIteration:
-    print("returned")
-#: Hello, Alice!
-#: returned
-```
-
-`greet("Alice")` yields a `Need` object carrying the requested type,
-as `interview()` yielded `"name"`.
-Answering it with `send(Console())` resumes the body,
-which prints the greeting and finishes.
+An Effect is a generator, so nothing stops you from driving one yourself,
+which is what `hand_driven.py` in [Nothing Runs Yet](46_Stateless.md#nothing-runs-yet)
+did.
+`next()` on `greet("Alice")` produced a `Need` object carrying the requested type,
+as `interview()` yielded `"name"`, and `send(Console())` resumed the body,
+which printed the greeting and finished.
 Every tool in the library packages those two calls.
 `handle()` is `drive()` with a type lookup in place of the dictionary,
 `run()` is the loop at the bottom,
