@@ -12,9 +12,8 @@ class SingletonClassVar:
         SingletonClassVar.__instance.val.append(arg)
         return SingletonClassVar.__instance
 
-if __name__ == "__main__":
-    x = SingletonClassVar("sausage")
-    y = SingletonClassVar("eggs")
-    z = SingletonClassVar("spam")
-    print(x.val, x is y is z)
+x = SingletonClassVar("sausage")
+y = SingletonClassVar("eggs")
+z = SingletonClassVar("spam")
+print(x.val, x is y is z)
 #: ['sausage', 'eggs', 'spam'] True

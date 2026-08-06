@@ -20,7 +20,7 @@ An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere an iterable is expected.
 The `for` loop calls these so you almost never call them directly.
 Every container uses this protocol,
-so a function written against an iterable automatically stays decoupled from the container.
+so a function written against an iterable stays decoupled from the container.
 
 ```python
 # basic_iteration.py
@@ -44,6 +44,13 @@ then calls `next()` until `StopIteration` occurs.
 A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` creates a new iterator.
 The second `is` shows that an iterator returns itself.
+
+One legacy path bypasses `__iter__()`.
+A class that defines only `__getitem__()` taking integers from zero is still iterable:
+`iter()` builds an iterator that indexes it until `IndexError`.
+Such a class works with `for` while failing `isinstance(obj, Iterable)` and failing an `Iterable[T]` annotation,
+which is the one case where the loop and the checker disagree.
+Write `__iter__()` in new code.
 
 ## Generators {#generators}
 
@@ -109,7 +116,7 @@ Generators are lazy.
 and produces one value at a time,
 so it works on streams too large to hold in memory.
 
-A generator can even be *infinite*.
+A generator can be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
@@ -146,7 +153,29 @@ a `raise` meant to reject a bad argument fires at first use,
 far from the call that caused the problem.
 
 To validate eagerly,
-check the arguments in a plain function and have it return an inner generator.
+check the arguments in a plain function and have it return an inner generator:
+
+```python
+# eager_validation.py
+from collections.abc import Iterator
+
+def squares(n: int) -> Iterator[int]:
+    if n < 0:
+        raise ValueError(f"n must not be negative: {n}")
+    def produce() -> Iterator[int]:
+        for i in range(n):
+            yield i * i
+    return produce()
+
+try:
+    squares(-1)  # Raises now, not at first next()
+except ValueError as e:
+    print(e)
+#: n must not be negative: -1
+```
+
+`squares()` has no `yield`, so calling it runs the check immediately.
+Only `produce()` is deferred.
 
 The second surprise is the second call to `list(sq)`.
 An exhausted generator does not fail.
@@ -156,6 +185,37 @@ so the empty `list(sq)` gives you no error to point at the bug.
 When data must be walked twice, collect it into a list once,
 or hand out an iterable like `Countdown` above,
 whose `__iter__()` builds a fresh generator for every pass.
+
+The annotation cannot warn you.
+`Iterable[T]` describes a list and a half-spent generator equally well,
+so a function that walks its argument twice type-checks and then returns a wrong answer on the second pass:
+
+```python
+# walked_twice.py
+from collections.abc import Collection, Iterable, Iterator
+
+def gen(n: int) -> Iterator[int]:
+    yield from range(n)
+
+def twice_iterable(xs: Iterable[int]) -> tuple[int, int]:
+    return sum(xs), sum(xs)
+
+def twice_collection(xs: Collection[int]) -> tuple[int, int]:
+    return sum(xs), sum(xs)
+
+print(twice_iterable(gen(3)))  # Ty sees nothing wrong
+#: (3, 0)
+print(twice_collection([0, 1, 2]))  # The same values, in a list
+#: (3, 3)
+```
+
+When a function iterates more than once, say so in the signature.
+`Collection[T]` and `Sequence[T]` ask for more than iteration,
+and no iterator supplies it,
+so the checker rejects the generator at the call instead of letting it run wrong.
+`twice_collection(gen(3))` is the call `ty` refuses,
+which is why the listing cannot show it: a chapter listing must type-check.
+`total()` above stays `Iterable[int]` because it sums once.
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones,
 which looks like a third option but is rarely cheaper:
@@ -290,6 +350,8 @@ However, the `yield from` expression has a value:
 The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
 which the loop cannot do.
+[Generators](45_Generators.md#yield-from-composes-descriptions)
+works all three channels.
 
 This tests both a nested list and a flat one:
 
@@ -353,7 +415,7 @@ so once values stop matching, a `list()` around it never returns.
 Skipping and stopping look the same on finite data and behave nothing alike on infinite data.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
-That call never returns, and no test survives.
+That call never returns, and the test never finishes.
 In the following, `counter()` stands in for `count(1)`.
 It counts up the same way,
 then raises an exception once something has pulled `LIMIT` values:
@@ -392,7 +454,7 @@ def test_islice_stops_after_its_count() -> None:
     assert list(islice(counter(LIMIT), 3)) == [1, 2, 3]
 ```
 
-The first test is `list(count(1))` but with a builtin termination.
+The first test is `list(count(1))` with a stopping point built into the source.
 `list()` asks for value after value and never stops,
 so the tripwire fires rather than the list being returned.
 The second test is the lookalike described previously.
@@ -445,10 +507,13 @@ Subclassing `collections.abc.Iterator` provides `__iter__()` automatically,
 so you need only supply `__next__()`.
 
 Note the `eq=False` in the `dataclass` decoration.
-A data class that generates `__eq__()` sets `__hash__` to `None`.
-Comparing iterators by field value is also incorrect.
-Two wrappers over one source compare equal, no matter how far each has advanced.
-Turning equality off restores the correct identity comparison for an iterator.
+A data class that generates `__eq__()` sets `__hash__` to `None`,
+so the wrapper can no longer go in a set or serve as a dict key,
+which every other iterator in Python can do.
+Field-by-field comparison is also the wrong question to ask about a cursor:
+two wrappers sharing one source compare equal even though they have consumed different numbers of items,
+and two wrappers over separate iterators of the same list compare unequal.
+Turning equality off restores the identity comparison an iterator should have.
 
 A generator wraps an iterator just as well, and in fewer lines:
 
@@ -500,7 +565,7 @@ test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
 Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
-This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md).
+This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
 
 Writing the four GoF Iterator methods in Python shows what the other two were doing.
 Over a list they are unremarkable.
@@ -585,7 +650,7 @@ so honoring them over a stream means recreating one item by item.
 The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when data must be walked twice.
-Python dropped both methods rather than pay for them everywhere.
+Python dropped both methods rather than paying for them everywhere.
 If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
@@ -641,8 +706,9 @@ Letting `StopIteration` escape a generator body does not end that generator poli
 Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
 turning an ordinary end of stream into a failure that reads like a bug elsewhere.
 
-Only `next()` in a loop hands you that exception.
-The alternatives absorb it.
+Only a bare `next()` hands you that exception.
+Given a default it returns the default,
+and every other construct here absorbs it.
 `yield from source` ends its delegation when the source runs out,
 which covers forwarding values untouched.
 It cannot do per-item work, because it passes each value through unchanged.
@@ -651,8 +717,11 @@ which absorbs the exception as every loop in this chapter has.
 The fix is almost never a `try`.
 It is to let the loop do the asking.
 
-Both surprises earlier in this chapter come from the same cause.
-`for` and `list()` catch the answer and report nothing,
+Both surprises earlier in this chapter come from the same rule:
+the protocol answers no question for free.
+The only way to find out whether the body accepts its arguments is to pull a value and let it run,
+and the only way to find out whether the source is spent is to pull and be told nothing came back.
+`for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol is free, and quiet.
 

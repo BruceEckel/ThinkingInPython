@@ -10,15 +10,40 @@ For the singleton, Python does.
 Python imports each module once and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
 A module is a singleton, and anything defined at module level is shared,
-with one copy for the whole program.
+with one copy for the whole interpreter.
+One interpreter, not one machine.
+A process pool or an [`InterpreterPoolExecutor`](19_Concurrency.md#subinterpreters)
+gives each worker its own `sys.modules`,
+so each builds its own copy and a write in one is invisible to the rest.
+A singleton is only single inside the interpreter that holds it,
+and that is true of every form in this chapter, not only the module.
+
 Put the state in a module:
 
 ```python
 # config.py
+print("config body runs")
 settings: dict[str, str] = {}
 ```
 
-Then every import of `settings`, from anywhere, hands back the same `dict`.
+```python
+# import_once.py
+import config
+import config as again
+
+print(config is again, config.settings is again.settings)
+#: config body runs
+#: True True
+```
+
+Two `import` statements, one printed line.
+The first one runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
+The second finds it there and skips the work,
+so the body never runs twice and only one `settings` dict is ever built.
+That is the singleton: not a rule the class enforces,
+but a lookup the import system performs.
+
+Every import of `settings`, from anywhere, hands back that same `dict`.
 Mutating it through one import is visible through every other:
 
 ```python
@@ -27,6 +52,7 @@ from config import settings
 
 settings["theme"] = "dark"
 print(settings)
+#: config body runs
 #: {'theme': 'dark'}
 ```
 
@@ -86,11 +112,11 @@ print(b)
 
 You can't prevent a caller from writing `Settings()` and getting a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
-which is the extent that Python offers.
+which is as far as Python goes.
 A second underscore is not a stronger version of that.
-At module level nothing is mangled, so it buys no privacy,
-and it breaks any reference written inside a class body,
-which rewrites `m.__Settings` into a lookup for `_TheClass__Settings`.
+At module level nothing is mangled, so it hides nothing,
+and inside a class body the compiler rewrites `m.__Settings` into a lookup for `_TheClass__Settings`,
+which breaks the reference.
 
 This listing keeps the bare name for a reason that outlasts the convention.
 `settings()` returns a `Settings`,
@@ -153,7 +179,37 @@ Three implementation notes:
    and the cache keeps whichever finished last.
    The check must happen inside the lock, shown in the listing below.
 
-`@cache` is gone, because it no longer makes the object single:
+The race is easy to see with a wide enough window:
+
+```python
+# singleton_cached_race.py
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from functools import cache
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        time.sleep(0.05)  # Widen the first-call window
+
+@cache
+def settings() -> Settings:
+    return Settings()
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    built = list(pool.map(lambda _: settings(), range(8)))
+print(len({id(s) for s in built}) > 1)
+#: True
+```
+
+Eight threads, more than one object.
+Every thread checked the cache before any of them had filled it,
+so each ran the constructor and seven results were thrown away.
+
+`@cache` is gone below, because it no longer makes the object single:
 
 ```python
 # singleton_locked_settings.py
@@ -190,7 +246,7 @@ In `settings()`, only one of the two module-level names is declared `global`.
 This is the chapter's opening distinction seen from inside a function.
 `global` governs rebinding, not use.
 `with _lock:` only looks the name up,
-even though acquiring and releasing genuinely changes that lock's state,
+even though acquiring and releasing changes that lock's state,
 from unlocked to locked and back.
 Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
@@ -213,13 +269,22 @@ A window too narrow to reproduce is still a window.
 Every call now acquires the lock,
 including the thousands that arrive long after the object exists.
 That is the price of laziness under threads.
+
+The classic escape is *double-checked locking*:
+test `_instance` before taking the lock,
+take it only when the test says the object is missing, then test again inside.
+The second test is the one note 3 insists on;
+the first exists to skip the lock once the object is there.
+It works, and it asks the reader to reason about which reads an interpreter may reorder,
+which is a bad trade for saving a lock acquisition.
 Eager creation is a better answer when the object can be built at import time.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
 Modules and cached factories should cover your singleton needs.
-The rest of this chapter exists only because it demonstrates interesting techniques and insights.
+The rest of this chapter is here for the techniques it demonstrates,
+not because you need these forms.
 
 ## The Classic Implementations
 
@@ -280,6 +345,9 @@ The first time you create an `OnlyOne` it initializes `instance`.
 After that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
 `__getattr__()` delegates access.
+Python calls it only when ordinary attribute lookup fails,
+so a name the wrapper does not have, such as `val`,
+falls through to the inner object.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 
 ### Eager Creation
@@ -379,8 +447,9 @@ while the two versions above need one.
 Those return an `OnlyOne` wrapper that has no `val` of its own,
 so the lookup must be forwarded to the inner object.
 Here `x.val` is an ordinary attribute access on the object that owns it.
-Note that `x is y` is `False` for the wrappers,
-and `x is y is z` is `True` when the inner object is produced.
+In the two wrapper versions above, `x is y` is `False`.
+Here, where `__new__()` produces the inner object directly,
+`x is y is z` is `True`.
 
 Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
 Here it returns something else, the inner object, so no `__init__()` ever runs.
@@ -410,11 +479,10 @@ class SingletonClassVar:
         SingletonClassVar.__instance.val.append(arg)
         return SingletonClassVar.__instance
 
-if __name__ == "__main__":
-    x = SingletonClassVar("sausage")
-    y = SingletonClassVar("eggs")
-    z = SingletonClassVar("spam")
-    print(x.val, x is y is z)
+x = SingletonClassVar("sausage")
+y = SingletonClassVar("eggs")
+z = SingletonClassVar("spam")
+print(x.val, x is y is z)
 #: ['sausage', 'eggs', 'spam'] True
 ```
 
@@ -491,7 +559,7 @@ def test_borg_shares_state_but_not_identity() -> None:
     assert x.val == "second"
 ```
 
-### Singleton Classes
+### Singleton by Class Decorator
 
 You can use a [class decorator](14_Decorators.md#decorating-classes)
 to wrap a class so that calling it returns a cached instance:
@@ -551,7 +619,7 @@ and the wrapped class is constructed only when that method decides to call it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
-Only the first constructor call produces the construction of a `Registry` object.
+Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
 which is why `Registry("secondary", limit=99)` does not create a new object.
 A caller who believes those arguments took effect is holding an object configured by someone else.
@@ -638,11 +706,11 @@ and it replaces `__new__()`.
 `klass: Any = cls` is the escape hatch that lets those assignments past the type checker.
 Annotating `klass` as `type` fails.
 That resolves `klass.__new__` to `type.__new__`,
-the constructor that builds classes,
-when the line actually captures `Bar.__new__`, which is `object.__new__`.
+the constructor that builds classes, when the line captures `Bar.__new__`,
+which is `object.__new__`.
 
 This is the other side of the `__new__()` rule.
-`my_new()` returns an instance of `Bar` itself,
+`my_new()` returns an instance of `Bar`,
 so Python calls `__init__()` after every construction,
 on the same shared object.
 Each `Bar(...)` call therefore overwrites `val`,

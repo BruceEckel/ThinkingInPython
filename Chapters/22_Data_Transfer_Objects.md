@@ -28,7 +28,7 @@ print(vars(m))
 
 The constructor replaces the object's `__dict__` with the `dict` the `**kwargs` argument automatically creates.
 `vars(m)` returns that same `__dict__`,
-and its output shows the attributes and the keyword arguments are one dict:
+and its output shows that the attributes and the keyword arguments are one dict:
 `m.more = 11` adds a key, just as passing `more=11` to the constructor would.
 
 Because `**kwargs` is the only parameter,
@@ -58,12 +58,23 @@ m = SimpleNamespace(info="Spam", b=["x", "y"])
 print(vars(m))
 #: {'info': 'Spam', 'b': ['x', 'y']}
 m.more = 11
-print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
+print(m)
+#: namespace(info='Spam', b=['x', 'y'], more=11)
+print(m == SimpleNamespace(info="Spam", b=["x", "y"], more=11))
+#: True
 ```
+
+The first `print()` shows the same instance `__dict__` the hand-rolled version had.
+The rest is what `SimpleNamespace` adds:
+a readable `repr()` and equality by contents.
+`Messenger` prints as `<Messenger object at 0x...>`,
+and two `Messenger`s with identical attributes compare unequal,
+because it inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
 so no checker can know which names to expect.
+Its type declaration says so: reading any attribute yields `Any`,
+which is why this listing needs no annotation to type-check and why `m.inof` goes unreported here as well.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
@@ -87,6 +98,10 @@ print(p)
 ```
 
 A `NamedTuple` declares its fields the same way but produces an immutable record.
+`typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Containers.md#namedtuple).
+Both build a subclass of `tuple` whose positions also have names,
+but the class form declares a type for each field,
+so a checker knows `Color.r` is an `int` while the functional form leaves it unknown.
 Because it is a tuple underneath, each field is readable by name or by position:
 
 ```python
@@ -112,6 +127,15 @@ print(red._asdict(), Color._fields)
 Printing a `NamedTuple` gives the same readable output a data class gives.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Since the fields cannot be mutated, `_replace()` produces an updated copy.
+`copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
+does the same job for any immutable record, including a frozen data class.
+
+The guarantee reaches the fields, not the objects they refer to.
+A `NamedTuple` holding a list still lets that list be changed,
+and the record is then unhashable,
+the same leak [`frozen=True` has](20_Rethinking_Objects.md#the-immutability-solution).
+An immutable record needs immutable fields.
+
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` does not mean private.
 `NamedTuple` marks its own members that way so they cannot collide with a field you name.
@@ -120,7 +144,11 @@ A record is free to declare a field called `replace` or `fields`.
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
 a `@dataclass` for a typed mutable record,
 and a `NamedTuple` for a typed immutable one.
-Write the hand-rolled `Messenger` only to show how `SimpleNamespace` works underneath.
+The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
+When the data must stay a dict,
+because it arrives as JSON or goes back out as JSON,
+a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
+names the keys and their types for the checker while the value stays a real dict.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
@@ -149,8 +177,13 @@ print(mean, count)
 Without `Stats` you annotate the return as `tuple[float, int]` and return a bare tuple.
 Every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
 knowledge the code no longer states anywhere.
-`Stats` names the slots and documents itself at each call site,
+`Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
+
+A data class cannot do that last part.
+`mean, count = summarize(data)` against a `@dataclass` version of `Stats` raises a `TypeError`,
+since a data class is not iterable.
+`dataclasses.astuple()` converts one when you need the positional form.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -217,7 +250,7 @@ when a record should be a distinct type that equals only its own kind.
     and confirm an instance still unpacks and indexes like a tuple.
 4.  In `display_namespace.py`,
     add a fourth attribute to `m` by passing it to the constructor,
-    then add it by assignment instead.
+    then add it by assignment after the existing `m.more = 11` instead.
     Confirm `vars(m)` reports the same four attributes, in the same order,
     either way.
 5.  In `fetch_stats.py`,

@@ -779,7 +779,7 @@ For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
 The same collapse happens to classes.
-[Singleton](24_Singleton.md#singleton-classes)
+[Singleton](24_Singleton.md#singleton-by-class-decorator)
 decorates a class with a callable that replaces it with one cached instance,
 so the name that followed `class` ends up bound to an object, not a type.
 

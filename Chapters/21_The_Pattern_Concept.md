@@ -10,8 +10,8 @@ and use *design patterns* for the concept.
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
-A significant portion of those examples provides inspiration for much of this part of the book.
-I introduce the basic concepts of design patterns, along with examples.
+Many of those examples inspired the ones in this part of the book.
+This chapter introduces the concepts; the chapters after it supply the code.
 
 ## What Is a Pattern?
 
@@ -33,7 +33,8 @@ they aren't tied to the realm of design.
 Patterns seem to stand apart from the traditional way of thinking about analysis,
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
-Thus it can sometimes appear at the analysis phase or high-level design phase.
+It can therefore appear at the analysis phase or high-level design phase,
+where you are still describing what the system does rather than how it is built.
 Because a pattern has a direct implementation in code,
 you might expect it to appear no earlier than low-level design.
 But it appears at every level,
@@ -61,9 +62,9 @@ The second time a requirement shifts the same part of the design,
 you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
-You've already seen some design patterns in this book.
+You have seen some design patterns in this book.
 For example, inheritance can be thought of as a design pattern
-(albeit one built into the language).
+(albeit one built into the language, which is a case worth returning to).
 It allows you to express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
 Composition also qualifies as a pattern, since it allows you to change,
@@ -77,16 +78,29 @@ An iterator allows you to hide the particular implementation of the container as
 You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
 The code works with any object that produces an iterator.
 
+## When a Pattern Dissolves
+
 A pattern is often a sign of something missing in a language.
 Programmers wrote the same scaffolding often enough that it acquired a name.
 It exists only because the language does not write it for them.
-When a language later absorbs the feature,
-the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language.].
-Python has absorbed several.
-Iterator became the machinery of the `for` loop,
-and *Strategy* and *Command* shrank to passing a function
+
+The missing piece can arrive in two ways.
+Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, and [Singleton](24_Singleton.md)
+shows that a Python module already is one.].
+Iterator is the clear case.
+It was implicit in the `for` loop from the start,
+and Python 2.2 made it a protocol the language calls on your behalf.
+More often the language had the piece all along,
+and the pattern was written for one that didn't.
+*Strategy* and *Command* shrink to passing a function,
+because a Python function is an object
 ([Function Objects](28_Function_Objects.md) shows both).
-This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md)
+A [Factory](27_Factory.md) becomes a dictionary,
+because a class is an object too.
+[Singleton](24_Singleton.md) becomes a module,
+because Python imports each module once and caches it.
+
+This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md#guidelines)
 posed: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
@@ -109,6 +123,11 @@ A pattern arrives in stages, each more general than the last:
 
 In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
 meaningless outside a language that provides `with`.
+A dictionary mapping one program's shape names to its shape classes is a specific design,
+stage two.
+The same dictionary,
+filled by each subclass as it is defined so that adding a type never edits the factory,
+is a standard design, stage three ([Factory](27_Factory.md) builds both).
 [Template Method](25_Template_Method.md) is a design pattern, stage four:
 a shape of solution you could build in any language with polymorphism.
 
@@ -116,6 +135,11 @@ This progression doesn't say that one stage is better than another.
 It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
 You can't force the discovery of patterns that way.
 They tend to be subtle and appear over time.
+
+The ladder runs downward too.
+A pattern a language builds in drops back to stage one,
+and the programmers who arrive next learn it as syntax rather than as a design.
+Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
 
 ## Pattern Taxonomy
 
@@ -127,10 +151,14 @@ The three purposes are:
 1.  **Creational**: how to create an object.
     By isolating the details of object creation,
     your code isn't dependent on what types of objects there are and thus won't change when you add a new type of object.
-    [Singleton](24_Singleton.md) counts as a creational pattern,
-    and later in this book you'll see examples of [factories](27_Factory.md).
+    [Singleton](24_Singleton.md) counts as a *Creational* pattern,
+    and later in this book you'll see [Factory](27_Factory.md)
+    methods and factory classes.
 2.  **Structural**: designing objects to satisfy particular project constraints.
     How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
+    [Surrogate](26_Surrogate.md),
+    [Changing the Interface](29_Changing_the_Interface.md),
+    and [Flyweight](35_Flyweight.md) cover the structural patterns in this book.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
@@ -185,6 +213,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     Express independent ideas independently.
     This complements separating what varies from what stays the same,
     and is part of the Low-Coupling-High-Cohesion message.
+    [Rethinking Objects](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
+    makes the composition case for it.
 -   *Managed Coupling*.
     Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, and the important issue is to acknowledge it and control it,
@@ -199,6 +229,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     The best route to generality is through understanding well-defined specific examples.
     This principle acts as the tie breaker between otherwise equally viable design alternatives.
     The simpler solution may also turn out to be the more general one.
+    [Pattern Refactoring](37_Pattern_Refactoring.md#choosing-the-lightest-construct)
+    works through a case of this, one requirement at a time.
 -   *Reflexivity*.
     One abstraction per class, one class per abstraction.
     Also goes by Isomorphism.
@@ -207,6 +239,36 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     i.e., where both pieces of code express the same intent for the same reason.
 -   *Make things as immutable as possible*,
     as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
--   *Make functions pure whenever you can*.
+-   *Make functions pure whenever you can*,
+    as described in [Pure Functions](40_Functional_Foundations.md#pure-functions).
 
-This is a small handful of fundamental ideas that you can hold in your head while walking through and analyzing your design.
+This is a small handful of fundamental ideas that you can hold in your head while analyzing a design.
+
+## Reading the Chapters Ahead
+
+Each chapter in this part takes one pattern and asks three questions of it.
+What varies and what stays the same?
+That names the problem the pattern exists to solve.
+How much of the answer does Python supply on its own?
+That decides how much is left for you to write.
+What remains after you subtract the rest?
+That remainder is worth learning,
+and it is usually the intent rather than the structure.
+
+A pattern that subtracts to nothing was not a mistake.
+It was the right answer for a language missing the piece Python has.
+
+## Exercises
+
+1.  Pick a program you have written that changed more than once.
+    Name its vector of change: the thing that shifted every time.
+    Say which part of the design absorbed the change,
+    and which parts you edited by hand.
+2.  Take a pattern you know from another language and list its parts:
+    the classes, the interfaces, and the methods its usual form requires.
+    Cross out every part Python supplies without your writing it.
+    Describe what is left in one sentence.
+3.  Apply *Subtraction* to a design of your own.
+    Remove one class, one interface, or one level of inheritance,
+    and say what stopped working.
+    If nothing did, leave it out.
