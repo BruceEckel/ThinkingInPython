@@ -1659,12 +1659,19 @@ When you first create it, add a `!Notes.md` file for Bruce's own use.
 That file belongs to the human; never assume it holds instructions for you,
 and do not act on its contents.
 
-Each finding is a self-contained block Bruce can delete in one stroke:
+Each finding is a self-contained block that stands or falls on its own:
 the section or line it applies to, the pattern name and number, the offending
 text quoted, and the proposed change.
 Keep the blocks in reading order, so they track the chapter top to bottom.
-Bruce keeps the blocks whose changes should happen and deletes the rest,
-so every block has to stand or fall on its own.
+
+Begin every block with a reject checkbox on its own line:
+
+> `[] Reject`
+
+An empty `[]` means the change is live and will be applied.
+Bruce rejects a change by putting an `X` in the box, `[X] Reject`, instead of
+deleting the block. The rejected block stays in the file as a record, so a later
+review can see the suggestion was already considered and declined.
 
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
@@ -1676,9 +1683,10 @@ file:
 When Bruce hands the file back with an instruction like
 `do readability/12_Data_Classes_as_Types.md`:
 
-1. Read the review file. Every block still present is approved, so apply it.
-   A block Bruce deleted is gone; there is nothing there to reconsider.
-2. Apply the surviving changes to `Chapters/NN_name.md`, not to the review file.
+1. Read the review file. Apply every block whose checkbox is empty (`[]`).
+   Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
+   record, not a change to make. Leave the rejected blocks in the file.
+2. Apply the live changes to `Chapters/NN_name.md`, not to the review file.
    Respect the file-mode constraints above:
    never touch a fenced ```python block,
    keep Semantic Line Breaks in the prose,

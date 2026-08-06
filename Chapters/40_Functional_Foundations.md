@@ -1,7 +1,7 @@
 # Foundations
 
 This chapter begins the book's exploration of functional programming.
-Here is what its ideas buy you, before the vocabulary arrives.
+The ideas pay off before the vocabulary arrives.
 A pure function cannot corrupt state you forgot about.
 It has fewer bugs to chase, and it needs no mock or fixture to test.
 A cache or a fold from `functools` or `itertools` is code you never write yourself,
@@ -34,10 +34,7 @@ It has no *side effects*: no printing, no file or network access,
 no mutation of anything outside the function.
 
 Purity is the foundation on which everything else in these chapters builds.
-You can test a pure function in isolation,
-because what you pass in fully determines its behavior.
-You can cache its result, because the answer never changes.
-You can reason about it the way you reason about an equation:
+You can reason about a pure function the way you reason about an equation:
 
 ```python
 # pure_functions.py
@@ -118,11 +115,10 @@ print(moved)
 #: Point(x=11, y=2)
 ```
 
-The demonstration spells the assignment `setattr(p, "x", 5)` because the direct spelling `p.x = 5` never gets to run:
+The demonstration writes the assignment as `setattr(p, "x", 5)` because the direct form `p.x = 5` never gets to run:
 the type checker rejects it statically, as it should.
-`setattr()` slips past the static check so the listing can show the *runtime* rejection too.
-The original `p` is untouched.
-`moved` is a separate value.
+`setattr()` slips past the static check so the listing can show the runtime rejection too.
+The original `p` is untouched, and `moved` is a separate value.
 When values never change underneath you,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
@@ -155,9 +151,9 @@ even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error caught before the program runs.
 Mind what `Final` does and does not freeze.
-It locks the *binding*, not the object:
-declare `CONFIG: Final[list[int]] = [...]` and `CONFIG.append(...)` still succeeds,
-for the checker and at runtime alike.
+It locks the binding, not the object:
+if you declare `CONFIG: Final[list[int]] = [...]`,
+`CONFIG.append(...)` still succeeds, for the checker and at runtime alike.
 This is the shallow-freezing lesson of [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 in another costume.
 For an immutable value, make the value's own type immutable,
@@ -200,8 +196,7 @@ A function in Python is an object like any other.
 This is what *first-class* means.
 You can bind a function to a name, store it in a container,
 pass it as an argument, and return it from another function.
-A function value is not special syntax.
-It is data you can move around.
+A function value is data you can move around.
 
 ```python
 # first_class.py
@@ -279,11 +274,11 @@ Returning a function is the other half of the definition,
 covered under [Closures](#closures), below.
 
 The lambdas above exist to show the machinery,
-and for exactly these cases Python offers a lookalike you should usually prefer:
+and for these cases Python offers a lookalike you should usually prefer:
 the comprehension ([Comprehensions](16_Comprehensions.md)).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
-`map()` and `filter()` earn their keep when the function *already exists*:
+`map()` and `filter()` earn their keep when the function already exists:
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
 The rule of thumb: existing function, use the higher-order form;
 expression you are writing on the spot, use the comprehension.
@@ -304,7 +299,7 @@ This is what a decorator does in [Decorators](14_Decorators.md).
 
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Functions.md#lambdas).
-The examples above already used lambdas as inline arguments,
+The examples above used lambdas as inline arguments,
 which is where they fit best.
 Their value is locality.
 When a transformation is one short expression,
@@ -372,7 +367,7 @@ Each call to `make_counter()` builds an independent counter with its own hidden 
 Nothing outside `increment()` can reach that state,
 so no accident can corrupt it.
 
-The `nonlocal` statement lets `increment()` *assign* to the captured variable.
+The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
 so `count += 1` alone makes `count` a fresh local,
@@ -422,7 +417,7 @@ Positional arguments have no such freedom: `partial()` fills them from the left,
 so fixing the third argument used to mean fixing the first two.
 A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters))
-had no way out at all.
+had no recourse.
 `functools.Placeholder` is a marker that reserves a position for the caller:
 
 ```python
@@ -440,12 +435,12 @@ print(percent.args)
 ```
 
 `percent` fixes the bounds and leaves the middle argument open,
-which is the specialization a caller wants and the one `partial()` could not previously express.
+which is the specialization a caller needs and the one `partial()` could not previously express.
 A `Placeholder` is not a default.
 The caller must supply it:
 calling `percent()` with no argument raises a `TypeError`.
-Trailing placeholders are a syntax the library rejects for the same reason,
-since a gap at the end is just an unbound parameter.
+The library rejects trailing placeholders for the same reason:
+a gap at the end is an unbound parameter.
 
 The `# type: ignore` comments mark a checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
@@ -487,13 +482,13 @@ Each piece stays small and pure,
 and you combine them without touching their internals.
 
 Composition scales by addition.
-Each stage stays small, pure, and testable on its own,
+Each stage is also testable on its own,
 and you build larger behavior by naming a new composition rather than writing new logic.
 Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs.
 When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 
-The standard library ships these building blocks ready-made;
+The standard library provides these building blocks ready-made;
 [Toolkits](41_Functional_Toolkits.md) tours them.
 
 ## Exercises

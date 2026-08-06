@@ -66,7 +66,7 @@ The loop that filters and appends says *how*.
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
 which is "the squares of the even numbers."
 It leaves the looping to Python.
-This is the broader "functionality" we want.
+This is the broader "functionality" you want.
 Describe the result, and let the machine arrange the steps.
 Declarative code says less and means more.
 By naming the result instead of the steps,
@@ -136,7 +136,7 @@ The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
 Notice there are no locks, no queues, no shared state,
-and no changes to `count_primes()` itself.
+and no changes to `count_primes()`.
 The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
 `ProcessPoolExecutor`,
@@ -248,7 +248,7 @@ The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text[::-1]` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
-constrains the function's *behavior* without repeating its body.
+constrains the function's behavior without repeating its body.
 All of these lean on purity.
 Hypothesis can rerun and shrink freely only because each call is independent of every other.
 
@@ -280,7 +280,7 @@ is the "functionality" the introduction set out to find.
     an invariant (every adjacent pair of the output is ordered) and idempotence
     (sorting a sorted list changes nothing).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
-3.  State a law that is *false* and watch Hypothesis falsify it:
+3.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
     and explain what it reveals about Unicode case mapping.

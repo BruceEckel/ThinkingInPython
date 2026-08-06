@@ -210,10 +210,18 @@ Each review file has the same name as the chapter it reviewed, so
 `deep_review/12_Data_Classes_as_Types.md` reviews
 `Chapters/12_Data_Classes_as_Types.md`.
 It holds the reported findings for Bruce to check and modify.
-He keeps the entries whose changes should happen and deletes the rest,
-so write each finding as a self-contained block that stands or falls on its own:
+Write each finding as a self-contained block that stands or falls on its own:
 the section or line it applies to, what is wrong or missing, and the proposed
 change with its reasoning. Keep the blocks in reading order.
+
+Begin every block with a reject checkbox on its own line:
+
+> `[] Reject`
+
+An empty `[]` means the change is live and will be applied.
+Bruce rejects a change by putting an `X` in the box, `[X] Reject`, instead of
+deleting the block. The rejected block stays in the file as a record, so a later
+review can see the suggestion was already considered and declined.
 
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
@@ -224,9 +232,10 @@ file:
 When Bruce finishes editing, he hands the file back with an instruction like
 `do deep_review/12_Data_Classes_as_Types.md`. Then:
 
-1. Read the review file. Every block still present is approved, so apply it.
-   A block Bruce deleted is gone; there is nothing there to reconsider.
-2. Apply the surviving changes to `Chapters/NN_name.md`, following the same
+1. Read the review file. Apply every block whose checkbox is empty (`[]`).
+   Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
+   record, not a change to make. Leave the rejected blocks in the file.
+2. Apply the live changes to `Chapters/NN_name.md`, following the same
    verify loop any new listing or prose edit follows in `CLAUDE.md`.
 3. Rename the review file to add a leading `~`
    (`deep_review/~12_Data_Classes_as_Types.md`), as the file's own instruction

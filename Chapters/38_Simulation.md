@@ -11,7 +11,7 @@ introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 The problem has three types.
 
-A *maze* knows its own layout and little else.
+A *maze* knows its own layout.
 Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
 and it can hand out an entry point.
 The maze never decides anything.
@@ -31,7 +31,7 @@ A *rat* explores.
 Each rat runs as its own task.
 From its current cell it looks at the four neighbors and tries to claim the open ones.
 By claiming a cell, a rat both marks it visited and reserves it.
-This way, no two rats ever cover the same ground.
+This way, no two rats cover the same ground.
 When a rat finds more than one open neighbor,
 it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.
@@ -314,11 +314,11 @@ def test_rats_map_every_reachable_cell() -> None:
     assert blackboard.visited == flood(maze, maze.entry())
 ```
 
-We can create a GUI demonstration using the same model.
+You can create a GUI demonstration using the same model.
 `rats_view.py` runs the exploration to completion,
 records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
-then each claimed cell turning green in turn,
+then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
 Like every windowed view in this book, the harness skips it
 (`tools/data/norun.txt` lists all three of this chapter's views):
@@ -396,7 +396,7 @@ and each type of occupant answers for itself.
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
 and the return value is the room in which the robot ends up.
-A wall keeps the robot where it is, food is eaten and the robot moves in,
+A wall keeps the robot where it is, food gets eaten and lets the robot in,
 a teleport returns a distant room.
 No `if` or `elif` on the type of occupant appears anywhere:
 
@@ -499,7 +499,7 @@ so `from world import Room` here is circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
 It is `True` only for a type checker reading the file,
-which is the only thing `Room` is for.
+which is `Room`'s sole purpose here.
 Every use below is an annotation (`room: Room`, `-> Room`),
 never a runtime lookup.
 
@@ -507,12 +507,11 @@ never a runtime lookup.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
 The code only declares `room`, written as `room: Room` with no value.
 That line stores nothing, not even `None`.
-It is a declaration, not a placeholder.
-It declares to the type checker that a `Room` will be there,
+It is a declaration: it tells the type checker that a `Room` will be there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
-so reading it earlier raises `AttributeError`,
-and the builder runs first so that never happens.
+so reading it earlier raises `AttributeError`, and the builder runs first,
+so nothing reads it earlier.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
 so no code that reads `room` has to check for `None`.
 
@@ -732,18 +731,17 @@ The robot eats the food along its path, jumps through both teleports
 Stage 3 pairs the teleports with a small idiom worth decoding.
 `pairs = iter(teleports)` makes one iterator,
 and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
-so each pass consumes two rooms: the first and second `a`, then the two `b`s,
-with the sort by target letter lining the partners up beforehand.
-The near-miss is `zip(teleports, teleports)`,
+so each pass consumes two rooms: the first and second `a`, then the two `b`s.
+The sort by target letter lines those partners up beforehand.
+The mistake to avoid is `zip(teleports, teleports)`,
 which walks two independent passes over the list and pairs every room with itself.
-One iterator, referenced twice, is the whole trick.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
 
 ### Testing the Walk
 
 The maze rendering, `show_maze()`, returns a string,
-so the model's correctness is something a test can pin down with no window in sight.
+so a test can check the model's correctness without opening a window.
 Build the maze, run the solution,
 and check that the robot finished on the `!` square and that the final rendering matches,
 food eaten and all:
@@ -863,11 +861,11 @@ Neither needs concurrency.
 The two simulations so far confirm designs.
 The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
-In each case we knew what should happen and ran the program to check it.
+In each case you knew the outcome in advance and ran the program to confirm it.
 This final example is different.
 Its result appears in no line of its code.
-That is simulation's other purpose.
-It discovers behavior instead of confirming it.
+That is simulation's other purpose,
+to discover behavior instead of confirming it.
 
 In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 The bow made the plate ring.
@@ -891,8 +889,7 @@ A `Grain` is a position.
 `step()` is the entire simulation.
 Every grain takes one random step,
 scaled by how strongly the plate vibrates at that grain's location.
-Grains never look at each other.
-They remember nothing.
+Grains never look at each other and remember nothing.
 Nothing in the code knows the pattern exists.
 
 ```python
@@ -965,7 +962,7 @@ One number summarizes how settled the sand is.
 `render()` draws grain density as characters,
 in the same spirit as `Blackboard.render()`,
 so the model can show its state without a window.
-The demo shakes the plate 1200 times and lets the numbers tell the story:
+The demo shakes the plate 1200 times and displays the agitation as it happens:
 
 ```python
 # chladni_plate/chladni_demo.py
@@ -1021,20 +1018,17 @@ print(plate.render())
 Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
 Nothing steered them there.
-A loud region flings its grains around until a random wander happens to cross a quiet line,
+A loud region flings its grains around until a random wander crosses a quiet line,
 where the kicks shrink toward nothing.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
-The randomness is not fighting the order.
-It is the engine that produces it.
+The randomness is not fighting the order but producing it.
 
 ### Testing a Random Process
 
-What can a test assert about a million random kicks?
-Not where any particular grain ends up.
+A test cannot guess where a particular grain lands after a million random kicks.
 It pins down the aggregate instead.
-Shaking must collapse agitation,
-and no kick may ever throw a grain off the plate.
+Shaking must collapse agitation, and no kick may throw a grain off the plate.
 Seeding `random.Random` makes any failure reproducible.
 
 ```python
@@ -1117,7 +1111,7 @@ if __name__ == "__main__":
 
 `itertools.cycle()` constructs an infinite iterator from any finite iterable.
 It yields elements from the source item in sequence and cycles back to the beginning when it reaches the end.
-`itertools.count()` creates an infinite iterator yielding evenly spaced numerical values.
+`itertools.count()` constructs an infinite iterator of evenly spaced numbers.
 The first argument is the starting point, the second is the step size
 (defaults to one).
 
@@ -1125,7 +1119,7 @@ The chapter began by defining a simulation as objects that act on their own and 
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.
 They never sense each other.
-Even so, structure the agents never encode appears in the aggregate.
+Even so, structure that no agent encodes appears in the aggregate.
 This is *emergence*:
 global order arising from local rules that never mention it.
 The three simulations form a progression.

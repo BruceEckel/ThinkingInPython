@@ -7,7 +7,7 @@ def squares() -> Iterator[int]:
         print(f"computing square {n}")  # Proves this runs on demand
         yield n * n
 
-# count() is infinite; islice() pulls only what we ask for:
+# count() is infinite; islice() pulls only what's needed:
 first_five = list(islice(squares(), 5))
 print(first_five)
 #: computing square 1

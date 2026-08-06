@@ -2,14 +2,14 @@
 
 This chapter follows one problem through several designs.
 A first solution solves it,
-then we ask "what will change?" and reshape the design to absorb that change cheaply.
+then you ask "what will change?" and reshape the design to absorb that change cheaply.
 This is the spirit of Martin Fowler's *Refactoring*,
 applied to patterns rather than single statements.
 
 It is also a Python lesson.
 Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages without multiple dispatch.
 Python lacks those limitations, so some of those patterns become unnecessary.
-We will point that out as it happens.
+This chapter points that out as it happens.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
 an initial solution, then successive redesigns as new requirements appear.
@@ -84,7 +84,7 @@ The `ClassVar` annotation just tells type checkers it belongs to the class rathe
 It doesn't share storage across subclasses.
 
 None of the subclasses redeclare `value: ClassVar[float]`.
-They don't need to because the checker resolves `value` through the MRO and finds it already declared `ClassVar[float]` on `Trash`.
+They don't need to because the checker resolves `value` through the MRO and finds it declared `ClassVar[float]` on `Trash`.
 It treats each subclass's assignment as filling in that same classvar rather than introducing a new one.
 
 Adding a new recyclable type is a single class definition.
@@ -93,8 +93,9 @@ It registers itself, and `create()` builds it.
 It relies on polymorphism (`t.value`, `t.weight`)
 and never asks what type each piece is.
 
-We test that each subclass registers itself, `create()` builds one by name,
-the per-pound values are correct, and `sum_value()` totals weight times value:
+The tests confirm that each subclass registers itself,
+`create()` builds one by name, the per-pound values are correct,
+and `sum_value()` totals weight times value:
 
 ```python
 # test_trash.py
@@ -248,7 +249,7 @@ for kind, items in bins.items():
 ```
 
 This satisfies the requirement, but it has a classic flaw.
-It tests for *every type in the system*.
+It tests for every type in the system.
 When a new material joins the system, `Plastic` say,
 you must find every `case` statement that enumerates specific types.
 Any you miss will silently drop trash on the floor.
@@ -258,7 +259,7 @@ and here it cannot help: exhaustiveness checking needs a *closed* union,
 and the registry keeps `Trash` deliberately open,
 so no checker can know the set is complete.
 This is a `match` over an open set,
-exactly what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
+which is what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 warned against.
 When the set is open, sorting must not enumerate it,
 which the next section arranges.
@@ -267,7 +268,7 @@ Testing for all of them means you are doing polymorphism's job by hand.
 
 ## Let a Dictionary Do the Sorting
 
-We can use a dictionary keyed by type:
+You can use a dictionary keyed by type:
 
 ```python
 # recycle_dict.py
@@ -316,20 +317,21 @@ for kind, items in bins.items():
 ```
 
 `type(t)` is the perfect key because it adapts to new types,
-even ones added at runtime.
+including ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class,
 the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
 and [Multiple Dispatching](32_Multiple_Dispatching.md).
 If you derive `CrushedAluminum` from `Aluminum`, it sorts into its own bin,
-not its parent's, which a sorter usually wants,
+not its parent's, which a sorter usually needs,
 but is worth knowing before you subclass a material.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-We have changed *types* cheaply so far.
-The other axis of change is adding new *operations*.
-Suppose the `Trash` hierarchy is fixed (maybe it ships from a vendor)
+This chapter has changed *types* cheaply so far.
+The other axis of change is adding new operations.
+Suppose the `Trash` hierarchy is fixed
+(maybe it comes from a third-party library)
 and you want to add new behaviors to it without editing it: price it, weigh it,
 print recycling instructions, and more later.
 
@@ -392,8 +394,7 @@ Compare this to a Visitor implementation.
 No `Visitor` class exists, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
-When the operation is the same for every type,
-you do not even need single dispatch.
+When the operation is the same for every type, you do not need single dispatch.
 `sum_value()` earlier was a function.
 Use `singledispatch` only when the behavior genuinely differs by type.
 For operations that belong on the objects and vary by type,
@@ -401,16 +402,16 @@ For operations that belong on the objects and vary by type,
 
 ## Choosing the Lightest Construct
 
-Design patterns are about *separating things that change from things that stay the same*.
+Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that, but it is not the only one.
 The deeper skill is spotting the *vector of change*
 ([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
 in a problem (here, new types versus new operations)
 and choosing the lightest construct that isolates it.
-This chapter discovered its vectors the honest way, one requirement at a time,
+This chapter discovered its vectors one requirement at a time,
 rather than predicting them up front.
 In Python that construct is often a language feature, not a multi-class pattern.
-The honest measure of a pattern is whether it is still useful once the language does part of the work.
+The true measure of a pattern is whether it is still useful once the language does part of the work.
 
 ## Exercises
 

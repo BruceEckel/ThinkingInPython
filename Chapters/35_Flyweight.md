@@ -14,7 +14,7 @@ First, split each object's state in two.
 so it can live in the shared object.
 *Extrinsic state* varies per use, so it must live outside,
 supplied by the context.
-Second, route construction through a factory that returns the already-existing instance for a given value.
+Second, route construction through a factory that returns the existing instance for a given value.
 
 Handing out one object under many names is only safe when nobody can change it,
 so a flyweight must be immutable
@@ -22,9 +22,7 @@ so a flyweight must be immutable
 
 ## Python Uses Flyweights
 
-CPython flyweights its most common values.
-
-It creates small integers once and shares them:
+CPython creates small integers once and shares them:
 
 ```python
 # small_integer_flyweights.py
@@ -36,14 +34,14 @@ print(low is low2, high is high2)
 
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
-The `int("...")` spelling is load-bearing.
+Calling `int("...")` on a string, not a literal, matters here.
 If you write the literals directly, `low, low2 = 256, 256`,
 the demonstration silently breaks:
 the compiler pools equal constants within a code object,
 so even `100000 is 100000` prints `True`,
 sharing that comes from constant folding rather than from the integer cache.
 Parsing the value out of a string at runtime defeats the compiler's pooling and leaves only the cache to explain any sharing.
-(Python warns about `is` on a literal for exactly this reason: the compiler makes the answer misleading.)
+(Python warns about `is` on a literal because the compiler makes the answer misleading.)
 
 String *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
@@ -72,7 +70,7 @@ Do not write code that depends on them, but notice the technique.
 ## Intrinsic and Extrinsic State
 
 A map can hold millions of cells, but only a handful of tile kinds.
-Here, we'll limit it to grass, water, and rock.
+Here, the map is limited to grass, water, and rock.
 
 The tile's symbol, name, and walkability are intrinsic,
 so they go in a frozen data class.
@@ -193,7 +191,7 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 ## Interning in the Constructor
 
-A factory function like `tile()` is an honest extra name.
+A factory function like `tile()` is a visibly different name.
 Its different syntax warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
@@ -240,12 +238,12 @@ Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore defines no `__init__()`.
 This rules out `@dataclass`,
-whose generated `__init__()` reintroduces exactly that re-run.
+whose generated `__init__()` reintroduces that re-run.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
 The missing `__eq__()` costs less than it appears:
-for a perfectly interned type, equal values *are* the same object,
-so the default identity comparison already answers correctly.
+for a perfectly interned type, equal values are the same object,
+so the default identity comparison answers correctly.
 (`@dataclass(init=False)` could restore those two generated methods, at the price of still more care with the by-hand field assignment.)
 A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
@@ -395,7 +393,6 @@ exploits the same property, using members as shared, comparable states.
 
 ## Flyweights in the Wild
 
-The pattern is easy to spot once you know its shape.
 Compilers and interpreters intern identifiers so that scope lookups compare pointers instead of characters.
 Column stores such as Pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes into a pool of distinct strings.

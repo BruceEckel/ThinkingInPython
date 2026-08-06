@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/41_Functional_Toolkits.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -99,30 +100,6 @@ uses `singledispatch()` as an alternative to the Visitor pattern,
 
 ## Tier B
 
-### B1 — lines 612-615 — restates a point already made twice
-
-Three consecutive-ish paragraphs land on the same claim: recursion pays off
-on self-similar, tree-shaped data. Line 602 says it obliquely ("once the
-problem branches"), line 605 says it directly ("naturally self-similar,
-such as walking a tree"), and this paragraph says it a third time before
-finally moving to new material (the code walkthrough). I lean toward
-cutting the redundant opening sentence; the tree/nested-data point already
-lives in the paragraph above it.
-
-CURRENT
-```text
-Recursion is beneficial when the data is recursive.
-Code that walks a tree, nested data,
-or a directory reads most clearly when its shape matches the data's shape.
-The function handles one node and trusts itself for the rest:
-```
-
-PROPOSED
-```text
-Code that walks a tree, nested data,
-or a directory reads most clearly when its shape matches the data's shape.
-The function handles one node and trusts itself for the rest:
-```
 
 ### B2 — lines 602-603 — passive tail
 

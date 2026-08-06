@@ -164,7 +164,7 @@ Both `save()` and `restore()` must copy.
 
 All of that copying defends against mutation.
 If you remove the mutation, there is nothing left to prevent.
-Once the state is a frozen data class, every state *is* a memento:
+Once the state is a frozen data class, every state is a memento:
 
 ```python
 # frozen_sketch.py
@@ -225,7 +225,7 @@ def test_equal_states_compare_equal() -> None:
 
 ## The Caretaker: a Generic History
 
-With states as plain immutable values,
+With states as immutable values,
 the caretaker no longer needs to know anything about them.
 Undo and redo are two stacks of past and future states,
 generic over the state type
@@ -369,7 +369,7 @@ which is the whole trick immutability buys.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
 It goes through `do()` like any other action,
-so the partial restore is itself undoable, as the last line shows.
+so the partial restore is undoable, as the last line shows.
 
 `copy.replace()` is the general version of `dataclasses.replace()`,
 described in [Data Classes as Types](12_Data_Classes_as_Types.md#the-general-form-of-replace).
@@ -467,7 +467,7 @@ Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
 Drift in the other direction is quieter still.
-If you delete or rename a field, old bytes load with no error anywhere, ever.
+If you delete or rename a field, old bytes load with no error anywhere.
 The stale name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
 while the renamed field is simply missing.

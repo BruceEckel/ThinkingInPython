@@ -97,7 +97,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Repository | Mediate the domain and data with a collection-like query interface. |
 | Unit of Work | Track changes in a transaction and commit them together. |
 | Identity Map | Load each object only once per session. |
-| Lazy Load | Defer loading data until it is actually needed. |
+| Lazy Load | Defer loading data until it is needed. |
 | [Data Transfer Object](22_Data_Transfer_Objects.md) | Carry data between processes in one batched object. |
 | [Value Object](12_Data_Classes_as_Types.md#immutability) | A small immutable object compared by value, not identity. |
 | Service Layer | Define an application boundary as a set of operations. |

@@ -60,7 +60,6 @@ flags as a problem.
 
 ## Return the Error as a Value
 
-The alternative is to return the error.
 The function's return type becomes a union of the answer type and the error type.
 A union like this is a *sum type*: a value that is one thing or another.
 Nothing disappears, because the error is just another return value:
@@ -93,9 +92,9 @@ for r in outputs:
 This keeps every result, and `match`
 (see [Pattern Matching](13_Pattern_Matching.md#matching-values))
 tells the two cases apart.
-But the distinction rides on the types `int` and `str`, which is fragile.
+But the distinction depends on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases collide.
-We need something that says "success" or "failure" no matter what types they carry.
+You need something that says "success" or "failure" no matter what types they carry.
 
 ## A Result Type
 
@@ -172,10 +171,10 @@ The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
-Python's humbler spelling of the same idea is `int | None`,
+Python's humbler form of the same idea is `int | None`,
 and the comparison locates `Result`'s value.
 Both force the caller to unpack, but `None` says only "no answer,"
-while an `Err` carries *why*.
+while an `Err` carries the reason for the failure.
 Use `| None` when absence is the whole story, a lookup that found nothing.
 Use `Result` when the caller may need to act on the reason,
 or when several different failures must stay distinguishable,
@@ -299,7 +298,7 @@ Functional programmers have a name for a type that carries a value plus this cha
 a *monad*.
 You do not need to know that word to use functional error handling.
 
-One near-miss to expect when you start chaining:
+One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, `.bind(str)` say,
 the chain now holds a bare `str` where a `Result` belongs,
@@ -591,7 +590,7 @@ This is a checker limitation rather than a rule about which form to write:
 You need not build `Result` yourself.
 The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases it calls `Success` and `Failure`,
-the same `@safe` decorator we just built,
+the same `@safe` decorator built earlier in the chapter,
 and do-notation that makes combining multiple results read more directly than nested binds.
 
 This style does not replace exceptions everywhere.

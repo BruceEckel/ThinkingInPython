@@ -12,7 +12,7 @@ and closes with a case study that puts several of the pieces to work on one prob
 
 ## The `functools` Toolkit
 
-The standard library ships the building blocks of functional Python under `functools`,
+The standard library provides the building blocks of functional Python under `functools`,
 from a single fold to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table,
@@ -34,7 +34,7 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
-For addition specifically, `sum()` is the built-in spelling,
+For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` earns its keep for every other fold,
 where no dedicated built-in exists.
@@ -61,7 +61,7 @@ print(fib(30))
 Because `fib()` is recursive, the values up to and including 30 are now cached.
 This accelerates future calls to `fib()`.
 
-One trap: decorating a *method* with `@cache` keys every entry on `self`,
+One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
 the lapsed-listener leak of [Observer](30_Observer.md) in cache form.
 For the usual case, one expensive value per instance,
@@ -245,7 +245,7 @@ or when the ordering is not simply the fields in declaration order.
 Turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered separately.
 [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
-uses `singledispatch()` as an alternative to the *Visitor* pattern,
+uses `singledispatch()` as an alternative to the Visitor pattern,
 including why the registered function below is named `_`.
 
 ```python
@@ -600,7 +600,7 @@ A `for` loop computes this same factorial in about the same number of lines,
 with no risk of hitting that limit.
 Recursion is not a faster or shorter way to count down to zero.
 Its payoff shows up once the problem branches, not just repeats,
-which is shown in the next example.
+as the next example shows.
 
 Recursion suits problems that are naturally self-similar,
 such as walking a tree.
@@ -655,7 +655,7 @@ def squares() -> Iterator[int]:
         print(f"computing square {n}")  # Proves this runs on demand
         yield n * n
 
-# count() is infinite; islice() pulls only what we ask for:
+# count() is infinite; islice() pulls only what's needed:
 first_five = list(islice(squares(), 5))
 print(first_five)
 #: computing square 1
@@ -686,7 +686,6 @@ means no upstream work for the items it never reaches.
 
 ## Case Study: Pairing Rotations
 
-Here is a recurring practical problem.
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has had a turn.
 This is a good place to see these chapters' ideas working together on one small,

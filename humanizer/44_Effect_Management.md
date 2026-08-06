@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/44_Effect_Management.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -51,7 +52,7 @@ we have emphasized the benefits of pure functions:
 
 PROPOSED
 ```text
-This book has emphasized the benefits of pure functions in many places:
+This book has emphasized the benefits of pure functions in numerous places:
 ```
 
 **line 41** (also fixes "other than returning" to "other than return",
@@ -173,8 +174,7 @@ and the hidden life makes code hard to understand:
 
 PROPOSED
 ```text
-Most functions in most programs have this hidden life,
-and it makes code hard to understand:
+Most functions in most programs have this hidden life which makes code hard to understand:
 ```
 
 ### A6 — line 474 — stranded preposition
@@ -241,19 +241,6 @@ PROPOSED
    A function declares which Effects it uses, not how they are fulfilled.
 ```
 
-**line 794** — the weakest of the three: line 800's "the ones you didn't"
-leans on this contrast, so the italic is closer to load-bearing here
-
-CURRENT
-```text
-Stateless verifies that the Effects you *declare* propagate consistently.
-```
-
-PROPOSED
-```text
-Stateless verifies that the Effects you declare propagate consistently.
-```
-
 ## Tier B
 
 ### B1 — lines 846, 847, 852, 869 — the closing section's collective "we"
@@ -264,32 +251,6 @@ depends on the collective reading, and line 869 contrasts "we" now with
 "future programmers" later. I lean toward converting the first three rows
 and leaving line 869, but the whole cluster is defensible as written.
 Delete individual rows you want left alone.
-
-**line 846**
-
-CURRENT
-```text
-Effects are the barrier we are inside right now, which is why it is hard to see.
-```
-
-PROPOSED
-```text
-Effects are the barrier you are inside right now, which is why it is hard to see.
-```
-
-**lines 847-848**
-
-CURRENT
-```text
-We build programs from other people's code,
-and we don't know what that code does.
-```
-
-PROPOSED
-```text
-You build programs from other people's code,
-and you don't know what that code does.
-```
 
 **lines 852-856**
 
@@ -386,30 +347,6 @@ but to isolate them so the rest of the program can stay pure
 "effortlessly" and "a cascade of value" are both vaguer than the sentences
 around them. I lean toward applying both. Delete individual rows you want
 left alone.
-
-**line 157**
-
-CURRENT
-```text
-A function with no Effects touches nothing shared and effortlessly runs in parallel.
-```
-
-PROPOSED
-```text
-A function with no Effects touches nothing shared and runs in parallel.
-```
-
-**line 162**
-
-CURRENT
-```text
-Isolating Effects produces a cascade of value beyond that first split.
-```
-
-PROPOSED
-```text
-Isolating Effects produces benefits beyond that first split.
-```
 
 ### B5 — line 371 — "for sure" and "or not"
 

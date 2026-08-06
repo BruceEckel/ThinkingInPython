@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/38_Simulation.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -89,7 +90,7 @@ which is the only thing `Room` is for.
 PROPOSED
 ```text
 It is `True` only for a type checker reading the file,
-which is the sole purpose `Room` serves here.
+which `Room`'s sole purpose here.
 ```
 
 ### A4 — lines 399-400 — broken parallel
@@ -124,7 +125,7 @@ It pins down the aggregate instead.
 
 PROPOSED
 ```text
-A test cannot assert where any particular grain ends up after a million random kicks.
+A test cannot guess where a particular grain lands after a million random kicks.
 It pins down the aggregate instead.
 ```
 
@@ -158,7 +159,7 @@ The demo shakes the plate 1200 times and lets the numbers tell the story:
 
 PROPOSED
 ```text
-The demo shakes the plate 1200 times and prints the agitation along the way:
+The demo shakes the plate 1200 times and displays the agitation as it happens:
 ```
 
 ### A8 — line 740 — §31 manufactured punchline
@@ -196,23 +197,6 @@ A *maze* knows its own layout and little else.
 PROPOSED
 ```text
 A *maze* knows its own layout.
-```
-
-### B2 — lines 17-18 — staccato pair, two watch words
-
-A negative and its positive restatement in two one-clause sentences, carrying
-a "never" and an "only" that the sentences don't need. I lean toward applying,
-but the pair does have a rhythm.
-
-CURRENT
-```text
-The maze never decides anything.
-It only answers questions.
-```
-
-PROPOSED
-```text
-The maze decides nothing. It answers questions.
 ```
 
 ### B3 — lines 510-512 — staccato run with stacked tailing negations
@@ -268,7 +252,8 @@ It discovers behavior instead of confirming it.
 
 PROPOSED
 ```text
-This final example is different: its result appears in no line of its code.
+This final example is different.
+Its result appears in no line of its code.
 That is simulation's other purpose, to discover behavior instead of confirming it.
 ```
 

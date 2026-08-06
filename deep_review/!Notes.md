@@ -2,7 +2,14 @@ Only done through 34 because I'm not finished with the "humanizer" chapters
 
 Chapters 28 have the highest-value proposals.
 
+--------------------
+Add to both deep-review and readability skills:
+At the beginning of each suggested change there should an easy way to reject a change, for example:
+[] Reject
 
+If the [] contains an X: [X], then do not implement this. That way we can keep track in future reviews.
+
+(This means the rules should be modified regarding the human deleting things they don't want implemented)
 
 --------------------
 (done)

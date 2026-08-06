@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/42_Functional_Error_Handling.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
@@ -80,7 +81,7 @@ while an `Err` carries *why*.
 PROPOSED
 ```text
 Both force the caller to unpack, but `None` says only "no answer,"
-while an `Err` carries why.
+while an `Err` carries the reason for the failure.
 ```
 
 ### A3 — line 96 — banned metaphor "rides on"
