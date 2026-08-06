@@ -243,10 +243,22 @@ When Bruce finishes editing, he hands the file back with an instruction like
    record, not a change to make. Leave the rejected blocks in the file.
 2. Apply the live changes to `Chapters/NN_name.md`, following the same
    verify loop any new listing or prose edit follows in `CLAUDE.md`.
-3. Rename the review file to add a leading `~`
-   (`deep_review/~12_Data_Classes_as_Types.md`), as the file's own instruction
-   says. Use `git mv` when the file is tracked. The `~` marks it done.
+3. Rename the review file to the next name in the completed-review series (see
+   Successive reviews), which adds the leading `~` the file's own instruction
+   calls for. Use `git mv` when the file is tracked. The `~` marks it done.
 4. Remind Bruce to run `make verify`.
 
 A `~`-prefixed file in `deep_review/` is a completed review.
 Leave it alone unless Bruce asks.
+
+**Successive reviews.**
+The active review is always the unprefixed `deep_review/NN_name.md`, and there
+is at most one at a time. When a chapter is reviewed more than once, keep every
+completed review as history by numbering them.
+The first completed review is `deep_review/~12_Data_Classes_as_Types.md`,
+the second `deep_review/~12_Data_Classes_as_Types.r2.md`,
+the third `...r3.md`, and so on.
+On completion, rename the active file to the next free number in that series.
+The carry-forward step reads the most recent completed review, the
+highest-numbered one, which already accumulates every earlier review's
+`[X]` rejections.
