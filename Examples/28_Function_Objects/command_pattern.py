@@ -2,7 +2,8 @@
 from typing import override
 
 class Command:
-    def execute(self) -> None: ...
+    def execute(self) -> None:
+        raise NotImplementedError
 
 class Loony(Command):
     @override

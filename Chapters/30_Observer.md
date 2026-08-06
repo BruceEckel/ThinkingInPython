@@ -99,7 +99,7 @@ but for most cases the *Observer* pattern amounts to nothing more than a list of
 An observer returns `None`.
 Notification runs one way, from observable to observers, and nothing comes back.
 Collecting a value from each observer is a different pattern,
-such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility)
+such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 for the first handler that answers.
 
 Testing confirms that every subscriber receives the new value,

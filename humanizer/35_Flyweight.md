@@ -94,7 +94,7 @@ CURRENT
 
 PROPOSED
 ```text
-(Python warns about `is` on a literal for this reason: the compiler makes the answer misleading.)
+(Python warns about `is` on a literal because the compiler makes the answer misleading.)
 ```
 
 ### A5 — line 243 — "exactly" as intensifier

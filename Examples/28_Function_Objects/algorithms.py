@@ -19,7 +19,7 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
             b = mid
         else:
             a = mid
-    return mid
+    return None
 
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b

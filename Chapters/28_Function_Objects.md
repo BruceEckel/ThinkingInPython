@@ -8,14 +8,15 @@ In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 These three patterns are largely unnecessary in Python.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function.
-Each pattern below appears twice: first as a function,
+*Command* and *Strategy* each appear twice below, first as a function,
 then as the classic class-based form for contrast.
+*Chain of Responsibility* needs only the function form:
+its class version is the same idea with the list written as a linked chain.
 
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
-In Python the action is just a function,
-and a "macro" is just a list of actions:
+In Python the action is just a function, and a "macro" is a list of actions:
 
 ```python
 # command.py
@@ -45,7 +46,8 @@ The classic object form wraps each action in a `Command` subclass with an `execu
 from typing import override
 
 class Command:
-    def execute(self) -> None: ...
+    def execute(self) -> None:
+        raise NotImplementedError
 
 class Loony(Command):
     @override
@@ -86,11 +88,47 @@ Both do the same thing.
 The class version is four classes and a wrapper to say what one list of functions says directly.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 In Python a callback is just a function, so the replacement is unnecessary.
-Use the object form when a command must also carry state or support extra operations such as undo.
+Use the object form when a command must support extra operations such as undo.
 Halfway between the two, a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance already attached,
 so it drops into a command list alongside plain functions,
 carrying its state without any `Command` class.
+
+An object can be callable too.
+Give a class `__call__()`
+([Decorators](14_Decorators.md#a-stateless-class-decorator))
+and its instances carry state and still satisfy `Callable[[], None]`:
+
+```python
+# callable_command.py
+from collections.abc import Callable
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Repeat:
+    text: str
+    times: int
+    def __call__(self) -> None:
+        for _ in range(self.times):
+            print(self.text)
+
+macro: list[Callable[[], None]] = [
+    Repeat("You're a loony.", 1),
+    Repeat("Say no more.", 2),
+]
+for command in macro:
+    command()
+#: You're a loony.
+#: Say no more.
+#: Say no more.
+```
+
+`Repeat` holds configuration and drops into the same list as `loony`,
+with no `Command` base class to derive from.
+That is the rung the classic form skips.
+The `Command` class earns its keep only at the next step,
+when the command needs a *second* operation, `undo()`,
+which no single callable can express.
 
 Building commands in a loop springs Python's best-known closure trap:
 
@@ -122,9 +160,11 @@ The two comprehensions look alike and differ in when they read `n`.
 A lambda's body runs when the command is called, not when it is created,
 and all three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
-`functools.partial` ([Foundations](40_Functional_Foundations.md#partial-application))
-evaluates its arguments at construction time,
-so each command captures the value `n` had on its own iteration.
+The argument to `functools.partial`
+([Foundations](40_Functional_Foundations.md#partial-application))
+is an ordinary expression, evaluated where it is written,
+so each command stores the string built from that iteration's `n`.
+Nothing is left to look up later.
 The older form `lambda n=n: ...` does the same job with a default argument.
 When commands built in a loop all behave like the last one, this is why.
 
@@ -135,8 +175,13 @@ The following examples use three algorithms that find a *root* of a function `f`
 a value where `f(x)` is zero.
 Each takes the function and two hints and returns the root,
 or `None` when it cannot find one.
-The hints are a bracket for bisection and two starting points for the open methods.
-They share one signature, so they are interchangeable:
+Bisection reads the two hints as a bracket,
+an interval whose ends straddle the root.
+The secant method reads them as two starting points,
+and Newton's method averages them into one.
+Those two are *open* methods: they need somewhere to start, not a bracket,
+which is why the chain below can fall back on them.
+All three share one signature, so they are interchangeable:
 
 ```python
 # algorithms.py
@@ -160,7 +205,7 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
             b = mid
         else:
             a = mid
-    return mid
+    return None
 
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
@@ -212,6 +257,11 @@ for finder in (bisection, newton, secant):
 #: 1.414214
 #: 1.414214
 ```
+
+Three identical lines is the point:
+the caller does not change when the algorithm does.
+The algorithms are not equivalent, though,
+and the chain below turns the difference between them into a fallback.
 
 The classic form makes each algorithm a class deriving from a common interface,
 and adds a "Context" object to hold the current strategy:
@@ -267,7 +317,7 @@ for algorithm in (Bisection(), Newton(), Secant()):
 #: 1.414214
 ```
 
-Strategies-as-functions are used constantly in Python without naming it as a pattern.
+Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
 
@@ -305,17 +355,17 @@ print(f"{r1:.6f} {r2:.6f}")
 
 Each call to `bisection_within()` returns a new finder with its tolerance sealed inside.
 The coarse strategy stops within a tenth and reports 1.406250.
-The fine one reports the root to six places.
+The fine one agrees with the true root to six places.
 Both satisfy `RootFinder`, so either drops into `solve()`,
 or into the chain below, unchanged.
-`functools.partial` does the same job when the configurable version already exists with the setting as a parameter,
-including the case where the setting is a positional argument that comes after the one the caller supplies,
-which `Placeholder` ([Foundations](40_Functional_Foundations.md#leaving-a-gap-with-placeholder))
-handles.
+`functools.partial` does the same job when a configurable version already exists with the setting as a parameter.
+If that setting is a positional argument sitting after the one the caller supplies,
+`Placeholder` ([Foundations](40_Functional_Foundations.md#leaving-a-gap-with-placeholder))
+fills the gap.
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
 
-## Chain of Responsibility
+## Chain of Responsibility: Choosing the Handler at Runtime
 
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked structure,
@@ -353,12 +403,19 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 
 Each handler is a *Strategy* function, the chain is the list,
 and success is a non-`None` return.
+The test is `root is not None`, not `if root`.
+A function with a root at zero returns `0.0`, which is falsy,
+so a truthiness test would throw away a correct answer and hand the problem to the next finder.
+Any sentinel-versus-value check on a numeric result has this hazard.
+
 Adding, removing, or reordering handlers means editing a list.
-This is the fall-through: bisection cannot bracket a root.
-It returns `None`, and the chain continues looking for a method that can.
+The second call shows the fall-through.
+The interval `[1.0, 1.3]` does not straddle the root,
+so bisection declines by returning `None` and the chain moves on to a method that needs no bracket.
 
 These tests confirm that the first finder that converges wins,
-a later finder rescues one that fails, and an empty chain returns `None`:
+a later finder rescues one that fails, an empty chain returns `None`,
+and a chain where every finder fails returns `None` too:
 
 ```python
 # test_chain.py
@@ -457,9 +514,9 @@ bus.publish(Withdraw(30))
 bus.publish(Closed("inactivity"))  # No handler: nothing happens
 ```
 
-`subscribe` is generic on the event type `E`.
-The checker reads `E` from the first argument and requires the handler to accept that exact type,
-so `subscribe(Deposit, on_withdraw)` is a type error.
+`subscribe` is generic on the event type `E`, which appears in both parameters,
+so the checker must find one `E` that satisfies the class and the handler together.
+No such `E` exists for `subscribe(Deposit, on_withdraw)` and it is a type error.
 The safety check happens once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
@@ -474,6 +531,11 @@ letting the `defaultdict` build each event type's list on first use.
 Indexing on a read inserts an empty list as a side effect,
 leaving a stray entry behind for every published event type that happens to have no subscriber,
 such as `Closed`.
+
+The lookup uses `type(event)`, which matches the class and no ancestor.
+A subclass of `Deposit` published to this bus finds no handler and vanishes as quietly as `Closed` does.
+Walking `type(event).__mro__` and calling every handler along it gives subclass events their parent's handlers,
+at the cost of an event type no longer naming its audience by itself.
 
 For testing, publishing calls every handler registered for a type,
 a handler hears only its own event type,
@@ -503,8 +565,9 @@ def test_no_handler_is_a_noop() -> None:
     EventBus().publish(Closed("done"))  # Must not raise
 ```
 
-This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables),
-narrowed to a single subject.
+This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)
+with one shared subject: instead of every observable holding its own list,
+one bus holds them all and the event type picks the audience.
 The subscribers are functions,
 and the bus routes each event to them by its type.
 Here a type may have many handlers.
@@ -528,3 +591,9 @@ and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-an
     add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
     with a closure, and with `functools.partial`.
     Confirm both drop into `chain.py`'s `solve()` with no change to `solve()`.
+5.  `EventBus.publish()` looks up `type(event)`,
+    so a subclass of `Deposit` finds no handler.
+    Change `publish()` to walk `type(event).__mro__` and call every handler registered along it,
+    parents last.
+    Then add `unsubscribe()`.
+    Which of the two changes can break an existing caller, and why?

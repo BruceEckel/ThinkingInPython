@@ -41,7 +41,7 @@ An unlinked name means the pattern appears only in this catalog.
 
 | Pattern | Intent |
 |---------|--------|
-| [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility) | Pass a request along a chain until a handler processes it. |
+| [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | Pass a request along a chain until a handler processes it. |
 | [Command](28_Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
 | [Interpreter](34_Composite_and_Interpreter.md#interpreter) | Represent a grammar and evaluate sentences written in it. |
 | [Iterator](23_Iterators.md) | Access the elements of a collection in order without exposing its structure. |
