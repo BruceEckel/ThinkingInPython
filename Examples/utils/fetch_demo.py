@@ -1,7 +1,8 @@
 # utils/fetch_demo.py
 import asyncio
+from typing import Final
 
-PAIRS = [
+PAIRS: Final[list[tuple[str, float]]] = [
     ("a", 0.01),
     ("b", 0.02),
     ("c", 0.03),

@@ -278,7 +278,7 @@ def test_unknown_name_raises() -> None:
 
 ## Polymorphic Factories
 
-The static `factory()` method in the previous example forces all the creation operations into one spot,
+The static `factory()` method in `shape_factory1.py` forces all the creation operations into one spot,
 so that's the only place you need to change the code.
 However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that you can subclass different types of factories from the basic factory
 (the above design is a special case).
@@ -798,7 +798,7 @@ keyword arguments and a data class are the builder.
 
 1.  Add a class `Triangle` to `shape_factory1.py`.
 2.  Add a class `Triangle` to `shape_factory2.py`.
-3.  Add a new type of `GameEnvironment` called `GnomesAndFairies` to `games.py`.
+3.  Add a new type of `GameElementFactory` called `GnomesAndFairies` to `games.py`.
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes
     (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.

@@ -153,7 +153,7 @@ Three implementation notes:
    and the cache keeps whichever finished last.
    The check must happen inside the lock, shown in the listing below.
 
-`@cache` is gone, because it is no longer what makes the object single:
+`@cache` is gone, because it no longer makes the object single:
 
 ```python
 # singleton_locked_settings.py
@@ -273,7 +273,7 @@ Because the inner class's name starts with a double underscore,
 Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
 This is [name mangling](11_Testing.md#white-box-and-black-box-tests).
 `OnlyOne.__OnlyOne`, written from outside the class,
-names an attribute that was never stored under that spelling,
+asks for an attribute that was never stored under that name,
 so it fails at runtime with `AttributeError`, not at type-checking time.
 The outer class controls creation through its constructor.
 The first time you create an `OnlyOne` it initializes `instance`.
@@ -372,7 +372,7 @@ assert OnlyOne() is OnlyOne()
 ```
 
 Because `__new__()` returns the inner `__OnlyOne` object,
-that is what `OnlyOne()` hands back, so `x` is the shared instance itself,
+that is what `OnlyOne()` hands back, so `x` is the shared instance,
 not a wrapper around it.
 This is why no `__getattr__()` appears here,
 while the two versions above need one.

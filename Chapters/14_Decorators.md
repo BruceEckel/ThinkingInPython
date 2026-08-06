@@ -255,7 +255,7 @@ def test_repeat_call_count(times: int, expected: int) -> None:
 
 ## Decorators as Classes
 
-A decorator must be a callable that takes a function and returns a callable.
+A decorator is any callable that accepts one argument.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
@@ -486,10 +486,10 @@ shows `contextlib.ContextDecorator`.
 
 ### A Limitation: Methods Need a Descriptor
 
-The class form has one real limitation: it does not work on methods.
-None of `trace`, `count_calls`,
-or `repeat_class` above was ever applied to a method, only to a bare function,
-and that was not an accident:
+The class form has one real limitation:
+an instance that replaces the function does not work on methods.
+Neither `trace` nor `count_calls` above was applied to a method,
+only to a bare function, and that was not an accident:
 
 ```python
 # method_decoration.py
@@ -531,6 +531,9 @@ which a class-based decorator needs to implement to work on methods.
 
 A function needs none of this: it is already a descriptor,
 so `wrapper()` in the function form binds to an instance like any other method.
+For the same reason, `repeat_class.repeat` escapes the limitation:
+its `__call__()` returns `wrapper`, an ordinary function,
+so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class decorator, like `trace_class.trace`,
 even gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,

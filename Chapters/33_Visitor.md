@@ -105,7 +105,7 @@ for flower in flower_gen(4):
 The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` resolves the flower's type,
 then `visit()` resolves the visitor's type,
-and the `pollinate()` or `eat()` call inside `visit()` lands back on the flower's type.
+and the `pollinate()` or `eat()` call inside `visit()` dispatches on the flower's type.
 The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),

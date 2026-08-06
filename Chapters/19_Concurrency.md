@@ -124,7 +124,7 @@ I/O-bound work overlaps within a single process,
 with `asyncio` or a thread pool.
 CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
-Two other approaches appear later in this chapter. each running inside a single process.
+Two other approaches appear later in this chapter, each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
@@ -239,8 +239,9 @@ The following two examples use common code:
 ```python
 # utils/fetch_demo.py
 import asyncio
+from typing import Final
 
-PAIRS = [
+PAIRS: Final[list[tuple[str, float]]] = [
     ("a", 0.01),
     ("b", 0.02),
     ("c", 0.03),
@@ -595,7 +596,7 @@ so eight additions collapse into one.
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
 shows the identical failure with threads.
 A thread switch is preemptive,
-landing at points the interpreter picks and you did not choose,
+occurring at points the interpreter picks and you did not choose,
 while a coroutine switch happens only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
@@ -743,7 +744,7 @@ and both surface in this short listing:
    To create a worker, the operating system starts a fresh Python interpreter,
    and that interpreter *imports* this module to find `cpu_price()`.
    During the import the module's name is not `"__main__"`,
-   so the guard keeps each worker from running `main()` and building a pool of workers of its own.
+   so the guard keeps each worker from running the guarded block and building a pool of workers of its own.
    If you leave it out,
    Python detects the runaway spawning and raises `RuntimeError`.
 2. Work crosses the process boundary by *pickling*.
@@ -1056,7 +1057,7 @@ A tracing garbage collector would have broken every extension.
 In rejecting that 1996 patch,
 Guido van Rossum set the bar that stood for three decades:
 remove the GIL without slowing single-threaded code.
-Attempts kept failing to clear it, so workarounds shipped instead.
+Attempts kept failing to clear it, so workarounds appeared instead.
 `multiprocessing` arrived in 2008, `asyncio` in 2014,
 and the per-interpreter GIL of the next section in 2023.
 
@@ -1142,7 +1143,7 @@ non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts never change.
-Immortality landed in 3.12 for every build but pays off most here,
+Immortality arrived in 3.12 for every build but pays off most here,
 since it removes the one atomic operation every thread would otherwise contest.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
@@ -1750,8 +1751,9 @@ A similar difference shows up in time:
 import asyncio
 import threading
 import time
+from typing import Final
 
-COUNT = 3000
+COUNT: Final[int] = 3000
 
 def noop() -> None:
     pass
@@ -1876,7 +1878,7 @@ asyncio.run(main())
 Five tasks start together, but `semaphore` admits only two at a time.
 `peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
 A threaded equivalent of this worker needs its own lock around `active += 1` and `peak = max(peak, active)`,
-since a preemptive switch could land between them.
+since a preemptive switch could fall between them.
 Here, the first `await` comes after both updates,
 so the task keeps control through them and needs no lock.
 
@@ -2130,7 +2132,7 @@ Here are a few of the topics beyond it:
     and explain why a semaphore initialized to `1` stands in for a lock here.
     Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
-    calling `main()` unconditionally, and run it.
+    so its body runs unconditionally, and run it.
     Read the error, then explain it with the import mechanics described in [Parallelism](#parallelism):
     what did each worker process do when it imported the module?
 7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.

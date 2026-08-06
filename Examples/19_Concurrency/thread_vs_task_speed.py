@@ -2,8 +2,9 @@
 import asyncio
 import threading
 import time
+from typing import Final
 
-COUNT = 3000
+COUNT: Final[int] = 3000
 
 def noop() -> None:
     pass

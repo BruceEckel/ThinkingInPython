@@ -395,7 +395,7 @@ def test_islice_stops_after_its_count() -> None:
 The first test is `list(count(1))` but with a builtin termination.
 `list()` asks for value after value and never stops,
 so the tripwire fires rather than the list being returned.
-The second test is the near-miss described previously.
+The second test is the lookalike described previously.
 Nothing after `2` satisfies `n < 3`,
 yet `list()` keeps pulling in the hope of another match,
 and trips the same wire.
@@ -590,7 +590,7 @@ If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
 You can ask a GoF iterator whether it is done multiple times without disturbing it.
-Python fuses that question into `__next__()`, so the only way to ask is to take.
+Python makes that question part of `__next__()`, so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
 You can catch that exception yourself,
 or hand `next()` a default and compare against it,
@@ -650,7 +650,7 @@ which absorbs the exception as every loop in this chapter has.
 The fix is almost never a `try`.
 It is to let the loop do the asking.
 
-Both surprises earlier in this chapter come from the same fusion.
+Both surprises earlier in this chapter come from the same cause.
 `for` and `list()` catch the answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol is free, and quiet.

@@ -45,7 +45,7 @@ print(y)  # type: ignore  # noqa: F821
 ```
 
 This is rarely useful on its own,
-but it matters whenever code needs to define a module-level name whose spelling isn't known until runtime,
+but it matters whenever code needs to define a module-level name that isn't known until runtime,
 such as a class built dynamically and registered under a computed name.
 
 The code at the end of the file starts with an `if` clause that checks whether the standard variable `__name__` is equal to the string `"__main__"`.
@@ -317,7 +317,10 @@ the error surfaces at that first use rather than at the import line.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
 To make every import lazy without editing source,
-use the `-X lazy_imports` command-line option or the `PYTHON_LAZY_IMPORTS` environment variable.
+run with `-X lazy_imports=all` or set `PYTHON_LAZY_IMPORTS=all`.
+Both require a value:
+`all` defers every module-level import,
+and `normal`, the default, defers only the imports you marked `lazy`.
 
 ## Exercises
 

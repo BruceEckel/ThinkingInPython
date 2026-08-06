@@ -16,7 +16,7 @@ You end up detecting some types manually and effectively producing your own dyna
 
 The solution is *Multiple Dispatching*.
 Polymorphism broadly means that a function accepts arguments of more than one type
-(see [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)).
+(see [Rethinking Objects](20_Rethinking_Objects.md#what-is-polymorphism)).
 It takes several forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
@@ -252,7 +252,7 @@ Python turns around and tries `type(b).__radd__(b, a)`,
 the *reflected* form of `__add__()`.
 The first call dispatches on `a`'s type, the fallback on `b`'s:
 double dispatching, built into the language.
-Every binary operator has a reflected form,
+Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 This is how an `int` on the left can learn to add itself to a type written decades after `int` was.
@@ -384,8 +384,8 @@ not when a test imports it.
     which means adding an `eval_lizard()` method to every existing class,
     plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
     Compare how much code this took versus adding `Lizard` to the table version.
-3.  In `test_paper_scissors.py`, add `Lizard` to `EXPECTED` with its nine
-    (now sixteen) matchups,
+3.  In `test_paper_scissors.py`,
+    add `Lizard`'s seven matchups to `EXPECTED`, taking it from nine entries to sixteen,
     and confirm both versions still agree with each other and with `EXPECTED`.
 4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
     while still yielding `(item1, item2)` pairs so existing calls need no change.

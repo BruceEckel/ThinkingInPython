@@ -210,6 +210,7 @@ not only a set, and they can take several arguments at once.
 
 ```python
 # set_methods.py
+
 a = {1, 2, 3}
 b = {3, 4, 5}
 
@@ -393,8 +394,10 @@ For records with defaults, methods, or type annotations, prefer a data class
 (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 
 The standard library has more specialized containers.
-For compact homogeneous storage (`array`, `memoryview`)
-and algorithms over a sorted `list` (`bisect`, `heapq`),
+For compact homogeneous storage (`array`),
+a zero-copy view onto another object's memory (`memoryview`),
+binary search in a sorted `list` (`bisect`),
+and a heap-backed priority queue (`heapq`),
 see [Performance](18_Performance.md).
 
 ## Immutability
@@ -467,14 +470,14 @@ The one `# type: ignore` sits on the line that deliberately misbehaves.
 Assigning into a `frozendict` is a type error as well as a runtime one,
 so the comment lets the example demonstrate the `TypeError` it expects.
 
-Because a `frozendict` cannot change, it is hashable,
+Because a `frozendict` cannot change, it is hashable when its values are,
 so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
 A dictionary key must be hashable rather than immutable.
 Immutability is how a container produces a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
-Neither you nor code you pass it to can modify an immutable container by accident,
-so you never need a defensive copy before sharing it.
+Neither you nor code you pass it to can add, remove, or replace an element by accident,
+so a container of immutable elements needs no defensive copy before you share it.
 It is safe to use as a default argument,
 unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 A `MappingProxyType` is the one exception to watch.

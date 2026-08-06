@@ -125,7 +125,7 @@ which holds 2 by the time anything calls them.
 `functools.partial` ([Foundations](40_Functional_Foundations.md#partial-application))
 evaluates its arguments at construction time,
 so each command captures the value `n` had on its own iteration.
-The older spelling `lambda n=n: ...` does the same job with a default argument.
+The older form `lambda n=n: ...` does the same job with a default argument.
 When commands built in a loop all behave like the last one, this is why.
 
 ## Strategy: Choosing the Algorithm at Runtime

@@ -32,7 +32,7 @@ starting with the simplest techniques and growing successively more complex.
 ## Try a Faster Platform
 
 Alternative interpreters for Python exist,
-notably PyPy which claims a 4x to 10x speedup.
+notably PyPy which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you rely on.
 
@@ -250,7 +250,7 @@ and an optimization tuned to toy input can behave badly in production.
 ## Write Idiomatic Python
 
 The interpreter is written in C.
-Built-in functions and comprehensions run their loops in C,
+A built-in like `sum()` runs its loop in C,
 so the more of your loop you hand to the interpreter,
 the less bytecode runs per element.
 The idiomatic version of a loop is usually also the fast one:
@@ -278,7 +278,9 @@ Other examples:
 
 - String concatenation: `"".join(parts)` is faster than `+=` in a loop
   (one linear pass instead of repeated reallocation).
-- A comprehension is faster than an `append()` loop.
+- A comprehension is faster than an `append()` loop
+  (one bytecode appends the element,
+  instead of an attribute lookup and a call).
 - The C-implemented standard library's `itertools`, `collections`,
   and `functools` are faster than hand-rolled equivalents
   ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).

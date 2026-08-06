@@ -105,7 +105,8 @@ for the first handler that answers.
 Testing confirms that every subscriber receives the new value,
 and a subscriber sees only the changes that happen after it subscribes.
 It also verifies that an unsubscribed observer stops hearing changes.
-Removal is by identity, so a detachable observer needs a named reference,
+`unsubscribe()` matches by equality, and a lambda equals only itself,
+so a detachable observer needs a named reference,
 not an inline lambda.
 A list whose `append` is the observer records what arrived:
 

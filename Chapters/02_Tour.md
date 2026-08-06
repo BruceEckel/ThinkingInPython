@@ -23,7 +23,7 @@ and simple programs with Python scripts.
 
 Python is clean to write.
 You will find it easy to read your own code long after you've written it.
-A major factor in code readability is that indentation determines scoping in Python.
+A major factor in code readability is that indentation determines how statements group into blocks.
 Here is a script that runs with `python if.py`:
 
 ```python
@@ -55,7 +55,7 @@ although it won't complain if you use them.
 The conditional clause ends with a colon.
 This indicates that what follows will be a group of indented statements,
 which are the "then" part of the `if` statement.
-The `print()` statement sends the result to standard output.
+The `print()` function sends its argument to standard output.
 The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 Indenting can nest to any level.

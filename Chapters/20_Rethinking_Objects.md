@@ -677,7 +677,7 @@ def lookup(uid: UserId) -> str:
 
 if __name__ == "__main__":
     print(lookup(UserId(42)))
-    # ty: expected "UserId", found "int":
+    # ty: expected "UserId", found "Literal[42]":
     print(lookup(42))  # type: ignore
 #: user-42
 #: user-42
@@ -923,7 +923,7 @@ The parameter's type also improved.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
-The standard library ships this idea as `logging.NullHandler`,
+The standard library includes this idea as `logging.NullHandler`,
 and the maze in [Simulation](38_Simulation.md)
 points every doorless direction at one shared `EDGE` room,
 so movement code never checks for `None`.

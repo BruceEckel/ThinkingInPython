@@ -272,7 +272,7 @@ while a `NamedTuple` equals any tuple holding the same values,
 a difference [Data Transfer Objects](22_Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
 covers.
 They differ again in what this chapter cares about most,
-shown in [When a Data Class Is the Wrong Tool](#when-a-data-class-is-the-wrong-tool).
+shown in [A `NamedTuple` Cannot Take That Responsibility](#namedtuple-cannot-validate).
 
 If an object cannot change after it is built,
 then validating it at construction makes it valid for its lifetime.

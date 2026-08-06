@@ -425,7 +425,8 @@ def test_stamp() -> None:
     assert clock.stamp(lambda: 100.0) == 100.0
 ```
 
-`datetime.now()` is harder to patch, because `datetime` is a built-in type,
+`datetime.now()` is harder to patch,
+because `datetime` is an immutable C type that rejects attribute assignment,
 so the injection approach is worth the small effort.
 
 If you cannot change the code,
@@ -547,7 +548,8 @@ not of compiler enforcement.
 That makes black-box testing the sensible default.
 If you test the public surface, the methods a caller is meant to use,
 you can change the internals without rewriting the tests.
-The `Account` tests are black-box which means they never read a private attribute.
+The `Account` tests are black-box,
+which means they never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 

@@ -197,8 +197,6 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 
 A class is also a value, so you can pass it to a function,
 store it in a variable, and call it to make an instance.
-You can pass it to a function, store it in a variable,
-and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an instance of `SomeType`.
@@ -455,7 +453,7 @@ The abstract container types come from `collections.abc`.
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
-| `Never`, `NoReturn` | `NoReturn` marks a function that never returns (it always raises an exception or exits); `Never` is the broader "impossible" type |
+| `Never`, `NoReturn` | The "impossible" type, which no value has; `NoReturn` marks a function that never returns (it always raises an exception or exits), and `Never` is the same type under a name that also suits other positions |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
 ### <a href="https://docs.python.org/3/library/stdtypes.html#generic-alias-type" target="_blank" rel="noopener">Containers</a>

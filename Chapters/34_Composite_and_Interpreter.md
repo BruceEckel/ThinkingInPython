@@ -139,7 +139,7 @@ because `entry` could be a `Symlink` that no case handles.
 The checker flags each function that still needs a new case,
 so none can be forgotten.
 
-`walk()` is a generator, so a composite is also iterable.
+`walk()` is a generator, so traversing a composite is lazy.
 The `yield from` flattens the recursion into a single stream of paths,
 and any consumer of that stream stays decoupled from the tree structure
 (see [Iterators](23_Iterators.md#delegating-with-yield-from)).
@@ -433,7 +433,8 @@ The patterns read like the algebra they implement.
 keep the other side," with the alternatives binding the same name.
 `(Num(a), Num(b))` captures two constants for folding.
 Because every node is frozen, `simplify()` never edits the input.
-It returns a new tree that shares unchanged subtrees with the original.
+It returns a new tree,
+and the leaves it keeps are the same objects as in the input.
 
 ```python
 # test_simplify.py

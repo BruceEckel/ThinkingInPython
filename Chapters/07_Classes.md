@@ -56,7 +56,7 @@ since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
 Python calls the constructor automatically during object creation.
-At the bottom of the example you can see that the creation of an object looks like a function call,
+In the demo you can see that the creation of an object looks like a function call,
 but using the class name.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.

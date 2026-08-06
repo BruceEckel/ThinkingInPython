@@ -348,7 +348,7 @@ MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
 The demonstration stops after the first nine moves,
 which between them exercise every transition in the trap.
 The rest of the input file only repeats them,
-so the output continues exactly as in the first version.
+so the output continues as in the first version.
 
 If you must create and maintain many `State` classes,
 this approach is an improvement,
@@ -384,7 +384,7 @@ As a table:
 
 The original Java version of this example needed two extra class hierarchies,
 `Condition` and `Transition`,
-because in Java a method is not a value you can store in a table.
+because the Java of the time had no way to store a method as a value.
 Python functions are first-class, so those hierarchies vanish.
 A condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
@@ -403,7 +403,6 @@ runs that transition's action, and moves to the next state:
 # A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
 # A state is an Enum member, so a misspelled state is a type error
@@ -418,7 +417,7 @@ class StateMachine:
         self.state = initial
         self.table = table
 
-    def handle(self, event: Any) -> None:
+    def handle(self, event: object) -> None:
         for condition, action, next_state in self.table.get(
                 (self.state, type(event)), []):
             if condition is None or condition(event):
@@ -601,7 +600,7 @@ or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those patterns existed to provide.
 
 Because the machine is deterministic,
-a test can drive it through a sequence of events and check where it lands.
+a test can drive it through a sequence of events and check which state it reaches.
 The cases worth pinning down are a successful purchase,
 the two conditional branches (too expensive and sold out), a refund,
 and the error when no transition matches:

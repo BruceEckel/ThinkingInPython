@@ -199,8 +199,12 @@ print(describe(Point(3, 4)))
 ```
 
 `Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
-A positional pattern cannot do this:
-it must supply a sub-pattern for every position that `__match_args__` defines.
+A positional pattern can leave fields unchecked too:
+`Point(0)` supplies fewer sub-patterns than `__match_args__` names,
+so it ignores `y`,
+and `Point(_, 0)` uses the wildcard to skip `x`.
+Naming the attribute is clearer,
+and it survives a change to the field order that would silently redefine every position.
 `Point()` with no arguments matches any `Point` instance, keyword or positional,
 and works as a type-only check or a final catch-all.
 
@@ -309,7 +313,7 @@ When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.
 This error is caught during type checking rather than silently falling through.
-That is the benefit of static-typing applied to control flow:
+That is the benefit of static typing applied to control flow:
 
 ```python
 # exhaustive.py
@@ -391,7 +395,7 @@ print(describe(301))
 ```
 
 When the set of types is *open* (anyone can add a new one),
-inheritance and dynamic binding works better than `match`.
+inheritance and dynamic binding work better than `match`.
 Each type carries its own behavior,
 so adding a type needs no change to a central `match`.
 Use `match` when the set of cases is closed and you want to handle them in one place,

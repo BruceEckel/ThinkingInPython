@@ -213,12 +213,15 @@ A proxy that must forward special methods defines them explicitly.
 Identity has the same gap.
 `isinstance(p, Words)` is `False`; delegation forwards the methods,
 not the type.
-But an `isinstance()` check against a `@runtime_checkable` `Protocol` passes,
-because its probe for each method is ordinary attribute access,
-which `__getattr__()` answers like any other lookup.
-Code that checks surrogates structurally keeps working;
-code that demands the implementation's class does not.
-One more reason structural typing suits this pattern.
+A `@runtime_checkable` `Protocol` does not close that gap either.
+Since Python 3.12 that check uses `inspect.getattr_static()`,
+which reads the class and instance dictionaries directly
+and does not call `__getattr__()`,
+so a proxy whose methods all arrive through delegation fails it too.
+Ordinary attribute access still finds those methods,
+so `hasattr(p, "f")` is `True` and `p.f()` runs.
+Code that calls the method, or probes with `hasattr()`, works on a surrogate;
+code that asks `isinstance()` sees only the proxy's own class.
 
 ## State
 

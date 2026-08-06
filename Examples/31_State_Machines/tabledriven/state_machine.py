@@ -2,7 +2,6 @@
 # A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
 
 # (condition, action, next_state); condition and action may be None.
 # A state is an Enum member, so a misspelled state is a type error
@@ -17,7 +16,7 @@ class StateMachine:
         self.state = initial
         self.table = table
 
-    def handle(self, event: Any) -> None:
+    def handle(self, event: object) -> None:
         for condition, action, next_state in self.table.get(
                 (self.state, type(event)), []):
             if condition is None or condition(event):

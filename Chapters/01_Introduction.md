@@ -117,7 +117,7 @@ I have found that the knowledge in this book has helped me guide AIs toward bett
 
 Most chapters are self-contained, so you can read straight through,
 or jump to a chapter that interests you.
-The book is organized into four parts.
+The book is organized into five parts.
 
 Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
 functions, modules, classes, and static typing.
@@ -143,11 +143,12 @@ The part ends by refactoring one problem through several designs,
 building a simulation out of the pieces,
 and cataloging the patterns that the literature added after the classic set.
 
-Part IV, *Functional Programming*, closes the book with pure functions,
+Part IV, *Functional Programming*, covers pure functions,
 the `functools` and `itertools` toolkits,
 errors returned as values instead of raised exceptions,
 and a spectrum of assurances that ends in property-based testing.
-It then takes up Effects, everything a program does that a pure function cannot.
+
+Part V, *Effects*, closes the book with everything a program does that a pure function cannot.
 One chapter surveys the languages that track Effects in a function's type,
 and asks what Python could adopt.
 Another develops the full generator protocol on which such tracking depends.
