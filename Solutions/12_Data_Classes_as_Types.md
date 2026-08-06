@@ -196,11 +196,11 @@ explicit `self._validate()` call after mutating `self._number`, its
 postcondition written out by hand. Here `f1()` just returns
 `Stars(self.number + 5)`. Building that new `Stars` runs
 `__post_init__()` automatically, so the postcondition is enforced by
-construction rather than a separate call, and there is no precondition
-to write either: any `Stars` passed in is already known legal, since
-it could not exist otherwise. The check moves from "written in every
-method, easy to forget" to "run once, in the constructor, impossible
-to skip."
+construction rather than a separate call. A version taking a second
+rating would need no precondition either: any `Stars` handed to it is
+already known legal, since it could not exist otherwise. The check
+moves from "written in every method, easy to forget" to "run once, in
+the constructor, impossible to skip."
 
 ## 4. `from_json()` rejects a bad email
 
@@ -261,3 +261,122 @@ own `__post_init__()` runs the same check it runs for any other
 caller. The validation written once, inside `EmailAddress`, protects
 every path that constructs a `Person`, including this one from
 untrusted JSON input, with no additional code in `from_json()` itself.
+
+## 5. `__replace__()` on an ordinary class
+
+```python
+# exercise_5.py
+import copy
+from dataclasses import dataclass
+from typing import Self
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    "A value falls outside the type's allowed set."
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str, reason: str = "") -> None:
+    if not condition:
+        raise TypeFailure(subject, reason)
+
+class Stars:
+    def __init__(self, number: int) -> None:
+        check(1 <= number <= 10, f"Stars({number})")
+        self.number = number
+
+    def __repr__(self) -> str:
+        return f"Stars({self.number})"
+
+    def __replace__(self, **changes: int) -> Self:
+        return type(self)(**({"number": self.number} | changes))
+
+s = Stars(4)
+print(copy.replace(s, number=9))
+#: Stars(9)
+try:
+    copy.replace(s, number=99)
+except TypeFailure as e:
+    print(f"{type(e).__name__}: {e}")
+#: TypeFailure: Stars(99)
+```
+
+`copy.replace()` looks for `__replace__()` and calls it with the
+keyword changes. This implementation recovers the constructor
+arguments (`{"number": self.number}`), overrides the named ones with
+`|`, and rebuilds through `type(self)(...)`. The validation runs
+because the rebuild goes through `__init__()`, which is the same
+reason a frozen data class stays validated across a replacement. Any
+`__replace__()` that restored the state directly, the way
+`copy.copy()` does, would skip the check.
+
+## 6. A `ClassVar` counter on a frozen `Stars`
+
+```python
+# exercise_6.py
+import inspect
+from dataclasses import dataclass, fields
+from typing import ClassVar
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    "A value falls outside the type's allowed set."
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str, reason: str = "") -> None:
+    if not condition:
+        raise TypeFailure(subject, reason)
+
+@dataclass(frozen=True)
+class Stars:
+    number: int
+    built: ClassVar[int] = 0
+
+    def __post_init__(self) -> None:
+        check(1 <= self.number <= 10, f"Stars({self.number})")
+        Stars.built += 1
+
+print([f.name for f in fields(Stars)])
+#: ['number']
+print(inspect.signature(Stars.__init__))
+#: (self, number: int) -> None
+
+for n in (3, 4, 5):
+    Stars(n)
+print(Stars.built)
+#: 3
+
+@dataclass(frozen=True)
+class Wrong:
+    number: int
+    built: ClassVar[int] = 0
+
+    def __post_init__(self) -> None:
+        self.built += 1
+
+try:
+    Wrong(1)
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: FrozenInstanceError: cannot assign to field 'built'
+```
+
+`built` never reaches `__init__()`. `dataclasses.fields()` reports
+only `number`, and the generated signature takes only `number`, so a
+`ClassVar` is invisible to construction: `@dataclass` reads the
+annotation, sees `ClassVar`, and leaves the name alone as an ordinary
+class attribute.
+
+`Stars.built += 1` works on a frozen class because it assigns to the
+class, and `frozen=True` installs its rejecting `__setattr__()` on
+instances. `Wrong` writes the same intent a different way, and fails.
+`self.built += 1` reads the class attribute, adds one, and then tries
+to store the result on the instance, which is the assignment
+`frozen=True` refuses.

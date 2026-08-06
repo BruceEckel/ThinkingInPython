@@ -1,4 +1,4 @@
-# dunder_bypass.py
+# exercise_6.py
 from typing import Any
 
 class Words:
@@ -15,14 +15,9 @@ class Proxy:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
+    def __len__(self) -> int:
+        return len(self.__implementation)
+
 p = Proxy()
-print(p.__len__())  # The explicit call delegates
+print(len(p))
 #: 2
-try:
-    # Special-method lookup skips the instance:
-    len(p)  # type: ignore
-except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
-print("Proxy object at" in str(p))
-#: True

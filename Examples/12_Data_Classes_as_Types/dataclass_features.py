@@ -7,9 +7,9 @@ class Point:
     y: int
 
 p = Point(10, 20)
-print(asdict(p))  # Nested dict
+print(asdict(p))
 #: {'x': 10, 'y': 20}
-print(astuple(p))  # Nested tuple
+print(astuple(p))
 #: (10, 20)
 
 @dataclass(frozen=True)

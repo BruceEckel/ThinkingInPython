@@ -12,6 +12,9 @@ def f2(stars: int) -> int:
     check(1 <= stars <= 10, f"f2({stars})")
     return stars * 5
 
+def f3(stars: int) -> int:  # The check is missing here
+    return stars * 100
+
 rating = 6
 print(rating)
 #: 6
@@ -19,3 +22,5 @@ print(f1(rating))
 #: 11
 print(f2(rating))
 #: 30
+print(f3(11))
+#: 1100

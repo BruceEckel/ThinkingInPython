@@ -138,3 +138,176 @@ one of its owners), and then appends to its own copy. `a`, which never
 mutated, still points at the original, untouched `Box`. The cost of
 copying is deferred until the moment a write actually happens, and
 paid only by the list that writes, exactly what "copy-on-write" means.
+
+## 4. Why the typo reports as `RecursionError`
+
+```python
+# exercise_4.py
+from typing import Any
+
+class Implementation:
+    def f(self) -> None: print("f()")
+
+class BrokenProxy:
+    def __init__(self, impl: Any) -> None:
+        self._impl = impl
+        self.calls = 0
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self._imp, name)  # Typo: _imp
+        if callable(attr):
+            def counted(*args: Any, **kwargs: Any) -> Any:
+                self.calls += 1
+                return attr(*args, **kwargs)
+            return counted
+        return attr
+
+p = BrokenProxy(Implementation())
+try:
+    p.f()
+except RecursionError as e:
+    print(type(e).__name__)
+#: RecursionError
+```
+
+`p.f` is not found on the instance or on `BrokenProxy`, so Python
+calls `__getattr__("f")`. Its first act is to read `self._imp`, which
+does not exist either, so Python calls `__getattr__("_imp")`, whose
+first act is to read `self._imp`. Each attempt to report the missing
+attribute creates another missing-attribute lookup, and the stack runs
+out before any `AttributeError` is raised.
+
+The trap is specific to the fallback hook. `__getattr__()` runs only
+when normal lookup fails, so any name it touches that is also missing
+re-enters it. Reading `self._impl`, which `__init__()` did assign,
+resolves normally and never reaches `__getattr__()`. That is why the
+chapter's working version is safe and this one is not, and why a proxy
+whose `__init__()` never ran (an instance built through
+`object.__new__()`, for example) fails the same way on its first
+attribute access.
+
+## 5. A connection pool that hands out proxies
+
+```python
+# exercise_5.py
+from typing import Any, Final, Self
+
+POOL_SIZE: Final[int] = 2
+
+class PoolExhausted(RuntimeError):
+    "No connection is free."
+
+class Connection:
+    def __init__(self, number: int) -> None:
+        self.number = number
+
+    def query(self, sql: str) -> str:
+        return f"connection {self.number}: {sql}"
+
+class Pool:
+    def __init__(self, size: int) -> None:
+        self._free = [Connection(n) for n in range(size)]
+
+    def available(self) -> int:
+        return len(self._free)
+
+    def acquire(self) -> ConnectionProxy:
+        if not self._free:
+            raise PoolExhausted(f"all {POOL_SIZE} in use")
+        return ConnectionProxy(self, self._free.pop(0))
+
+    def release(self, connection: Connection) -> None:
+        self._free.append(connection)
+
+class ConnectionProxy:
+    def __init__(self, pool: Pool, connection: Connection) -> None:
+        self._pool = pool
+        self._connection: Connection | None = connection
+
+    def __getattr__(self, name: str) -> Any:
+        if self._connection is None:
+            raise RuntimeError("connection already released")
+        return getattr(self._connection, name)
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *exception: object) -> None:
+        if self._connection is not None:
+            self._pool.release(self._connection)
+            self._connection = None
+
+pool = Pool(POOL_SIZE)
+with pool.acquire() as c1:
+    print(c1.query("select 1"))
+    with pool.acquire() as c2:
+        print(c2.query("select 2"))
+        try:
+            pool.acquire()
+        except PoolExhausted as e:
+            print(type(e).__name__, e, pool.available())
+    print("inner released:", pool.available())
+print("outer released:", pool.available())
+#: connection 0: select 1
+#: connection 1: select 2
+#: PoolExhausted all 2 in use 0
+#: inner released: 1
+#: outer released: 2
+```
+
+The client never holds a `Connection`. `acquire()` hands back a
+`ConnectionProxy`, which forwards `query()` through `__getattr__()`
+and owns the one job the connection cannot do for itself: giving
+itself back. Making the proxy a context manager
+([Context Managers](15_Context_Managers.md)) is what turns "must check
+it back in" into a guarantee, since `__exit__()` runs whether the
+block ends normally or raises an exception.
+
+`__exit__()` also drops the proxy's reference to the connection, so a
+released proxy cannot keep using a connection that now belongs to
+someone else. The check in `__getattr__()` reports that misuse instead
+of letting two clients share one connection. This is a *protection
+proxy* and a *smart reference* at once: it controls access, and it
+adds an action (the check-in) around the object's lifetime.
+
+## 6. Forwarding `__len__()` explicitly
+
+```python
+# exercise_6.py
+from typing import Any
+
+class Words:
+    def __init__(self) -> None:
+        self.items = ["spam", "eggs"]
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+class Proxy:
+    def __init__(self) -> None:
+        self.__implementation = Words()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+    def __len__(self) -> int:
+        return len(self.__implementation)
+
+p = Proxy()
+print(len(p))
+#: 2
+```
+
+`__getattr__()` could not have supplied `__len__()` because `len()`
+does not perform an attribute lookup on the instance. It asks
+`type(p)` for `__len__()` and calls what it finds there, skipping the
+instance dictionary and therefore skipping `__getattr__()`, which only
+runs when an instance lookup fails. Python treats every implicit
+special-method invocation this way, so the method has to exist on the
+proxy's class.
+
+`__len__()` here delegates with `len(self.__implementation)` rather
+than `self.__implementation.__len__()`, which reads better and gives
+the same answer. A proxy that must forward many dunders writes one
+such method per dunder, or generates them in a loop over a list of
+names and assigns them onto the class.

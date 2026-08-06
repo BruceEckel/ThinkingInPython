@@ -4,6 +4,7 @@ from dataclasses import dataclass
 class Connection:
     def __init__(self, host: str) -> None:
         self.host = host
+        self.url = f"tcp://{host}:5432"
 
 @dataclass
 class Logged(Connection):
@@ -14,5 +15,5 @@ class Logged(Connection):
         super().__init__(self.host)  # Run the base initializer
 
 c = Logged("localhost", "db")
-print(c.host, c.name)
-#: localhost db
+print(c.url, c.name)
+#: tcp://localhost:5432 db

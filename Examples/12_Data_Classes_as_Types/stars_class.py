@@ -16,15 +16,14 @@ class Stars:
     def __str__(self) -> str:
         return f"Stars({self._number})"
 
-    def f1(self, n: int) -> int:
-        check(1 <= n <= 10, f"f1({n})")  # Precondition
-        self._number = n + 5
+    def f1(self) -> int:
+        self._number = self._number + 5
         self._validate()  # Postcondition
         return self._number
 
 if __name__ == "__main__":
     rating = Stars(4)
     print(rating)
-    print(rating.f1(3))
+    print(rating.f1())
 #: Stars(4)
-#: 8
+#: 9

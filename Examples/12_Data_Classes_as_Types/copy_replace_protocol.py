@@ -6,7 +6,6 @@ SHIFTS: Final[dict[str, int]] = {"red": 16, "green": 8, "blue": 0}
 MASK: Final[int] = 0xFF
 
 class Color:
-    "Three channels packed into one int, so no data class fits."
     def __init__(self, red: int, green: int, blue: int) -> None:
         self.packed = (red << 16) | (green << 8) | blue
 

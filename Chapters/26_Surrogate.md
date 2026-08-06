@@ -11,11 +11,15 @@ From a base class, you derive the surrogate along with the class or classes that
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
+That is the shape *GoF Design Patterns* draws.
+Python does not need the shared base, as the listings below show,
+but it is the clearest way to see what a surrogate is.
+
 A surrogate object acquires an implementation,
 either constructing one or receiving one.
 The surrogate forwards all method calls to that implementation.
 
-Structurally, the difference between *Proxy* and *State* is simple.
+Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has only one implementation, while *State* has more than one.
 *GoF Design Patterns* considers the applications of the two patterns distinct.
 *Proxy* is used to control access to its implementation,
@@ -59,6 +63,12 @@ It isn't necessary that `Implementation` have the same interface as `Proxy`.
 As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea
 (this statement is at odds with the definition for *Proxy* in *GoF Design Patterns*).
+The loose reading is about what the pattern requires,
+not about how to name your wrapper.
+When you are choosing between *Proxy* and *Adapter*,
+the interface is still the question that separates them:
+[Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+
 However, it is convenient to have a common interface that forces `Implementation` to fulfill all the methods that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
@@ -96,7 +106,8 @@ except TypeError as e:
 
 `Complete` implements both methods and works.
 `Partial` omits `g()`, so constructing it raises `TypeError` at once,
-instead of failing later when the `Proxy` tries to delegate a call it cannot.
+instead of failing later,
+when the `Proxy` delegates a call the implementation cannot answer.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 is the structural alternative.
@@ -166,6 +177,9 @@ p.h()
 
 The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
 and not tied to any particular implementation.
+The double underscore on `self.__implementation` earns its place here:
+the name mangles to `_Proxy2__implementation`,
+so it cannot collide with an attribute the implementation carries.
 
 One limit: special methods bypass `__getattr__()`.
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
@@ -199,6 +213,8 @@ try:
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
+print("Proxy object at" in str(p))
+#: True
 ```
 
 The two calls look interchangeable and are not.
@@ -210,18 +226,86 @@ The type checker agrees, rejecting `len(p)` statically for the same reason,
 which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
+`len(p)` reports the miss because nothing supplies a default `__len__()`.
+`print(p)` cannot: `object` already defines `__str__()`,
+so the lookup on `type(p)` finds that one and the proxy prints as itself.
+A bypassed dunder that `object` defines fails silently, which is the worse case.
+
+Delegation forwards reads, not writes:
+
+```python
+# proxy_writes.py
+from typing import Any
+
+class Settings:
+    def __init__(self) -> None:
+        self.level = "low"
+
+class Proxy4:
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+settings = Settings()
+p = Proxy4(settings)
+print(p.level)
+#: low
+p.level = "high"  # type: ignore
+print(p.level, settings.level)
+#: high low
+```
+
+`__getattr__()` is a read hook.
+The assignment stores `level` on the proxy, where the next lookup finds it,
+so the proxy stops consulting the implementation and the two disagree.
+The type checker objects to the assignment,
+because `Proxy4` declares no `level` and no `__setattr__()` to accept one,
+which is the static half of the same warning.
+A surrogate that must forward writes defines `__setattr__()` as well,
+and that method has to let the proxy's own attributes through or the assignment in `__init__()` recurses.
+
 Identity has the same gap.
 `isinstance(p, Words)` is `False`; delegation forwards the methods,
 not the type.
 A `@runtime_checkable` `Protocol` does not close that gap either.
 Since Python 3.12 that check uses `inspect.getattr_static()`,
-which reads the class and instance dictionaries directly
-and does not call `__getattr__()`,
+which reads the class and instance dictionaries directly and does not call `__getattr__()`,
 so a proxy whose methods all arrive through delegation fails it too.
 Ordinary attribute access still finds those methods,
 so `hasattr(p, "f")` is `True` and `p.f()` runs.
 Code that calls the method, or probes with `hasattr()`, works on a surrogate;
 code that asks `isinstance()` sees only the proxy's own class.
+
+```python
+# proxy_identity.py
+from typing import Any, Protocol, runtime_checkable
+
+@runtime_checkable
+class Service(Protocol):
+    def f(self) -> None: ...
+
+class Implementation3:
+    def f(self) -> None: print("Implementation.f()")
+
+class Proxy3:
+    def __init__(self) -> None:
+        self.__implementation = Implementation3()
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+p = Proxy3()
+p.f()
+#: Implementation.f()
+print(hasattr(p, "f"))
+#: True
+print(isinstance(p, Implementation3), isinstance(p, Service))
+#: False False
+```
+
+The call works and `hasattr()` finds the method,
+yet neither check recognizes the proxy.
+A surrogate is verified by using it, not by asking what it is.
 
 ## State
 
@@ -280,6 +364,13 @@ run(b)
 The demo uses the first implementation for a while,
 then swaps in the second and uses that.
 
+Every annotation here is `Any`, which the Proxy section argued against.
+The reason is `__getattr__()`: whatever it returns is unknown at the type level,
+so `b.f()` cannot be checked no matter how the surrogate is annotated.
+Declaring the implementations against a `Protocol` still pays,
+because the checker then verifies each one has the methods `run()` calls.
+The hop through the surrogate is where the guarantee is lost.
+
 Testing hands the State surrogate a small stand-in and confirms calls reach the current implementation,
 and that `change_to()` swaps it:
 
@@ -301,6 +392,8 @@ def test_state_delegates_and_change_swaps() -> None:
     s.change_to(StateB())
     assert s.name() == "B"
 ```
+
+## Kinds of Proxy
 
 The difference between *Proxy* and *State* is in the problem each one solves.
 The common uses for *Proxy* as described in *GoF Design Patterns* are:
@@ -355,7 +448,7 @@ print("calls:", p.calls)
 #: calls: 3
 ```
 
-Because `__getattr__()` intercepts only the lookups not found directly on the proxy,
+Because `__getattr__()` intercepts only the lookups not found on the proxy or its class,
 one generic proxy can add lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*) to any object,
 with no per-method code.
@@ -368,7 +461,7 @@ which is why `self._impl` and `self.calls` inside it resolve normally.
 including each `self.` access in its own body,
 so the naive version calls itself forever.
 Writing one means routing every internal access through `object.__getattribute__(self, "_impl")`,
-machinery a surrogate almost never needs.
+machinery a surrogate rarely needs.
 The fallback hook has a related trap of its own:
 if `__getattr__()`'s body touches a proxy attribute that does not exist,
 a misspelled `self._imp`,
@@ -376,16 +469,6 @@ or any attribute on an instance built without `__init__()`,
 that failed lookup calls `__getattr__()` again,
 and the error surfaces as `RecursionError`,
 not the `AttributeError` that would point at the typo.
-
-*GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
-But both are really a *Surrogate*:
-a front object that passes method calls through to an implementation.
-*Proxy* fronts for one implementation to control access to it.
-*State* swaps among several to change behavior over time.
-In Python both are the same few lines of `__getattr__()` delegation,
-with *State* adding a method to change the implementation.
-You need the separate implementation hierarchy that *GoF Design Patterns* uses only when you do not control the implementing code.
-When you do, the single generic surrogate above is simpler and just as flexible.
 
 Testing hands the counting proxy a small stand-in and confirms the proxy forwards the call with its result,
 and counts only callable accesses:
@@ -416,6 +499,18 @@ def test_proxy_counts_only_calls() -> None:
     assert p2.calls == 2
 ```
 
+## One Surrogate, Two Intents
+
+*GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
+But both are really a *Surrogate*:
+a front object that passes method calls through to an implementation.
+*Proxy* fronts for one implementation to control access to it.
+*State* swaps among several to change behavior over time.
+In Python both are the same few lines of `__getattr__()` delegation,
+with *State* adding a method to change the implementation.
+The separate implementation hierarchy that *GoF Design Patterns* uses earns its keep when you do not control the implementing code.
+When you do, the single generic surrogate above is simpler and just as flexible.
+
 ## Exercises
 
 1.  Create an example of the "virtual proxy."
@@ -433,3 +528,7 @@ def test_proxy_counts_only_calls() -> None:
     the system must check that connection back in for reuse.
     To guarantee this, hand out a proxy instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
+6.  `dunder_bypass.py`'s `Proxy` cannot answer `len(p)`.
+    Give it a `__len__()` that forwards to the implementation,
+    and confirm `len(p)` returns 2.
+    Then explain why `__getattr__()` could not have supplied it.
