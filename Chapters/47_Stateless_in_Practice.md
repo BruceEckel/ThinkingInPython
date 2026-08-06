@@ -13,8 +13,11 @@ The rest of the chapter applies the machinery:
 
 - Handlers that make an unpredictable source testable
 - A handler that swaps implementations while a program runs
+- A cell of shared state that programs read and write through the channel
 - A program whose signature is its own documentation,
   and whose body is only the success path
+- A failure that enters the channel as a value,
+  and a catch that takes the whole channel
 - Dependency graphs that go deep, and a cast of abilities that goes wide
 - Decorators that add retry and parallelism to code they never edit
 - An account of what the guarantee does not cover
@@ -235,12 +238,17 @@ Reading the current time is another side cause.
 A real clock answers with the present moment,
 so a test cannot ask it what happens at some critical time
 (midnight, tomorrow, etc.).
-The Ability and its accessor sit in their own file,
-because two listings in this section ask the same clock different questions:
+`stamp()` puts the current time into its output,
+and `batch_due()` decides whether a day has passed since the last run.
+Against a real clock neither is testable.
+One produces a different string every minute,
+and the other needs you to wait a day to watch it return `True`.
+Both sit in one file with the Ability and its accessor,
+because two more listings and a test ask the same clock different questions:
 
 ```python
-# clock.py
-from datetime import datetime
+# timekeeping.py
+from datetime import datetime, timedelta
 from stateless import Ability, Depend
 
 class Now(Ability[datetime]):
@@ -249,24 +257,6 @@ class Now(Ability[datetime]):
 def now() -> Depend[Now, datetime]:
     moment: datetime = yield from Now()
     return moment
-```
-
-Like `Flip`, `Now` carries no data.
-Its answer type is its whole content: a handler for `Now` returns a `datetime`,
-and `now()` is the accessor that declares that type.
-
-`stamp()` puts the current time into its output,
-and `batch_due()` decides whether a day has passed since the last run.
-Against a real clock neither is testable.
-One produces a different string every minute,
-and the other needs you to wait a day to watch it return `True`.
-
-```python
-# frozen_clock.py
-from datetime import datetime, timedelta
-from typing import Final
-from clock import Now, now
-from stateless import Depend, handle, run
 
 def stamp(message: str) -> Depend[Now, str]:
     moment = yield from now()
@@ -275,6 +265,19 @@ def stamp(message: str) -> Depend[Now, str]:
 def batch_due(last_run: datetime) -> Depend[Now, bool]:
     moment = yield from now()
     return moment - last_run >= timedelta(hours=24)
+```
+
+Like `Flip`, `Now` carries no data.
+Its answer type is its whole content: a handler for `Now` returns a `datetime`,
+and `now()` is the accessor that declares that type.
+The handlers decide which moment `stamp()` and `batch_due()` receive:
+
+```python
+# frozen_clock.py
+from datetime import datetime, timedelta
+from typing import Final
+from stateless import handle, run
+from timekeeping import Now, batch_due, stamp
 
 LAUNCH: Final[datetime] = datetime(2026, 1, 1, 3, 0)
 
@@ -302,6 +305,47 @@ in microseconds rather than a day.
 so there is nothing to monkeypatch and nothing to wait for,
 and a production handler that returns `datetime.now()` leaves the function unchanged.
 
+Those three runs are claims about testability, so here they are as tests.
+The handler moves inside each test, and every test names the moment it needs:
+
+```python
+# test_timekeeping.py
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from typing import Final
+import pytest
+from stateless import handle, run
+from timekeeping import Now, batch_due, stamp
+
+MOMENT: Final[datetime] = datetime(2026, 3, 14, 9, 30)
+
+def at(moment: datetime) -> Callable[[Now], datetime]:
+    def fixed(request: Now) -> datetime:
+        return moment
+    return fixed
+
+def test_stamp_names_the_supplied_moment() -> None:
+    stamped = run(handle(at(MOMENT))(stamp)("started"))
+    assert stamped == "[2026-03-14 09:30] started"
+
+@pytest.mark.parametrize("elapsed, due", [
+    (timedelta(hours=23, minutes=59), False),
+    (timedelta(hours=24), True),
+])
+def test_batch_due(elapsed: timedelta, due: bool) -> None:
+    moment = MOMENT + elapsed
+    is_due = run(handle(at(moment))(batch_due)(MOMENT))
+    assert is_due is due
+```
+
+`at()` builds a handler from a moment,
+so each test freezes its own clock in one line.
+The parametrized case one minute short of a day is the reading a real clock cannot produce on demand:
+getting it live means starting the test at the right minute,
+while here the margin is a `timedelta`.
+No fixture patches `datetime`, nothing sleeps,
+and each assertion compares values the test chose.
+
 Skipping the wait is the obvious benefit.
 A handler can also produce moments that are hard to get from a real clock.
 Here, `archive()` reads the clock twice,
@@ -311,8 +355,8 @@ once to name a file and once to stamp what goes in it:
 # midnight.py
 from datetime import datetime, timedelta
 from typing import Final
-from clock import Now, now
 from stateless import Depend, handle, run
+from timekeeping import Now, now
 
 def archive(entry: str) -> Depend[Now, tuple[str, str]]:
     opened = yield from now()
@@ -594,6 +638,108 @@ No `@throws` lifted it,
 so it travels through `run()` untracked and no signature mentions it.
 A handler sits outside the channel it feeds.
 
+## State as an Ability
+
+Each Ability so far moves information in one direction.
+`Flip` and `Now` read from outside: side causes.
+`Tell` wrote outward: a side effect.
+Shared mutable state is both at once,
+because whoever holds it must read it and write it back.
+An Ability declares one answer type,
+so a cell of state becomes a pair of abilities:
+reading answers with the stored value,
+and writing carries a new value and answers with nothing.
+
+```python
+# wallet.py
+from dataclasses import dataclass
+from stateless import Ability, Depend, handle, run
+
+class Get(Ability[int]):
+    pass
+
+@dataclass(frozen=True)
+class Put(Ability[None]):
+    amount: int
+
+def get() -> Depend[Get, int]:
+    amount: int = yield from Get()
+    return amount
+
+def put(amount: int) -> Depend[Put, None]:
+    yield from Put(amount)
+
+def purchase(price: int) -> Depend[Get | Put, bool]:
+    funds = yield from get()
+    if funds < price:
+        return False
+    yield from put(funds - price)
+    return True
+
+def spree(prices: tuple[int, ...]) -> Depend[Get | Put, int]:
+    bought = 0
+    for price in prices:
+        if (yield from purchase(price)):
+            bought += 1
+    return bought
+
+@dataclass
+class Cell:
+    amount: int
+
+cell = Cell(100)
+
+def read(request: Get) -> int:
+    return cell.amount
+
+def write(request: Put) -> None:
+    cell.amount = request.amount
+
+half = handle(read)(spree)
+shop = handle(write)(half)
+print(run(shop((60, 50, 30, 20))))
+#: 2
+print(f"remaining: {cell.amount}")
+#: remaining: 10
+```
+
+`Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
+`Put` has `Tell`'s: payload out, nothing back.
+`purchase()` is where the pair earns its keep.
+It reads, decides, and writes, and the decision sits between the two requests,
+in code that mentions no cell.
+Its signature announces the shared state:
+`Depend[Get | Put, bool]` tells a caller this function touches something that outlives it.
+`spree()` composes purchases, and the union travels up unchanged.
+
+The handlers own the cell.
+`read()` and `write()` are two functions closed over one `Cell`,
+chained through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
+After the run, the cell shows what the program did to it:
+two purchases went through, and 10 remained.
+A test does the same, supplying a fresh `Cell` and asserting on what remains,
+with no global to reset between tests.
+
+For a number one function owns, a local variable is the right tool,
+and `count_heads()` kept its count in one.
+The pair pays off when separate functions share the cell,
+as `purchase()` and any other spender would,
+without a parameter threaded through every signature between them.
+
+This pattern has a name.
+Treatments of algebraic effects open with the *State effect*,
+`get` and `put` as its two operations,
+and this section built that effect on Stateless's machinery.
+One warning comes with it,
+and [Where the Guarantee Stops](#where-the-guarantee-stops)
+returns to the theme.
+Nothing guards the cell.
+Forking two Effects that share a `Cell` interleaves their reads and writes,
+and no type reports the race.
+ZIO's `Ref` is this cell with atomic update built in;
+Stateless has no equivalent,
+so under `fork()` the cell is as exposed as any Python global.
+
 ## Composing a Program
 
 This small application fetches a headline,
@@ -866,6 +1012,160 @@ The Effect version separates those,
 so a second caller can catch the same three failures and choose different messages,
 retry the whole pipeline, or let one failure through to the edge,
 without touching the pipeline.
+
+## Two More Doors
+
+The error channel you have seen has one entrance and one exit.
+`@throws` lifts what ordinary code raises,
+and `catch()` takes named errors back out as values.
+The library provides a second door on each side.
+
+### Failing from Inside an Effect
+
+`throw()` is the counterpart of `success()`.
+Where `success(value)` builds a description that produces a value,
+`throw(reason)` builds one that fails.
+Its type is `Try[E, Never]`,
+the alias from [The Effect Type](46_Stateless.md#the-effect-type),
+with `Never` recording that no value can come out of it.
+`yield from` sends that failure into the channel of the Effect that contains it:
+
+```python
+# fetch_guarded.py
+from dataclasses import dataclass
+from research import Feed, Unavailable, fetch
+from stateless import Effect, Need, catch, need, run, supply, throw
+
+class Empty(Exception):
+    pass
+
+def fetch_nonempty() -> Effect[
+    Need[Feed], Unavailable | Empty, str
+]:
+    feed = yield from need(Feed)
+    headline = yield from fetch(feed)
+    if not headline:
+        yield from throw(Empty())
+    return headline
+
+@dataclass
+class Ticker:
+    headline: str
+    def latest(self) -> str:
+        return self.headline
+
+def edge(feed: Feed) -> str | Unavailable | Empty:
+    guarded = catch(Unavailable, Empty)(fetch_nonempty)
+    return run(supply(feed)(guarded)())
+
+print(edge(Ticker("markets close mixed")))
+#: markets close mixed
+print(type(edge(Ticker(""))).__name__)
+#: Empty
+```
+
+`fetch_nonempty()` fails through both doors.
+`Unavailable` originates in ordinary code: `latest()` raises it,
+and the `@throws` on `fetch()` lifts it.
+`Empty` originates here, in the generator,
+where the headline is available to inspect.
+No decorator is involved and nothing is raised.
+`throw(Empty())` yields the failure the way `Ask(prompt)` yielded a request,
+and the driver takes it from there.
+Execution does not come back: a driver that receives a failure stops sending,
+so anything after a `yield from throw(...)` is unreachable,
+which is what the `Never` in its type records.
+
+The difference between the doors is what the checker can see.
+If you change `Empty()` to some undeclared exception,
+`ty` flags the `yield from` where it stands,
+because the yielded type no longer fits the declared channel,
+the `invalid-yield` that [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
+shows in full.
+A `raise` gets no such check.
+`@throws` lifts the types it names, anything else escapes untracked,
+and no diagnostic connects the decorator's list to what the body raises.
+A failure that enters through `throw()` is in the type system from the moment it exists.
+
+### Catching the Whole Channel
+
+`catch()` names what it takes.
+`catch_all()` takes whatever the channel declares:
+
+```python
+# catch_everything.py
+from dataclasses import dataclass
+from research import (
+    Encyclopedia,
+    Feed,
+    NoArticle,
+    NotInteresting,
+    Unavailable,
+    research,
+)
+from stateless import run, supply
+from stateless.effect import catch_all
+
+@dataclass
+class Bulletin:
+    headline: str
+    def latest(self) -> str:
+        return self.headline
+
+class BareShelf:
+    def article(self, topic: str) -> str:
+        raise NoArticle(topic)
+
+def outcome(
+    feed: Feed, book: Encyclopedia
+) -> str | Unavailable | NotInteresting | NoArticle:
+    bound = supply(feed, book)(research)
+    return run(catch_all(bound)())
+
+dull = outcome(Bulletin("mild and cloudy"), BareShelf())
+print(type(dull).__name__)
+#: NotInteresting
+missing = outcome(Bulletin("genome mapped"), BareShelf())
+print(type(missing).__name__)
+#: NoArticle
+```
+
+`outcome()` is the boundary function `scenarios.py` used,
+with the same upcasting annotations.
+Its result type is the union `report()` earned by naming all three errors,
+and this listing names none of them at the catch.
+Two failures from two different sources come back as values through one undecorated call.
+
+`outcome()` supplies first and catches second, the reverse of `scenarios.py`,
+and the order is for the checker rather than the runtime.
+`catch()` is a stack of overloads where `catch_all()` is one signature,
+and under `ty` 0.0.65 that one signature cannot split a channel that still holds abilities:
+applied to `research()` directly, the call is rejected.
+Applied after `supply()` has emptied the Ability half, the inference comes back,
+and the named `bound` is where you read it.
+The runtime does not care about the order,
+since a handler passes error values upward untouched,
+so the failures travel through `supply()`'s driver to the catch either way.
+
+Choosing between the two decides what a new failure does.
+When `research()` gains a fourth error,
+`report()`'s named `catch()` leaves it in the channel,
+so `report()`'s declared type no longer matches and `ty` points at the `yield from`:
+you decide whether to catch the newcomer or declare it.
+`catch_all()` absorbs it into the result union instead,
+so the guard has to sit downstream, in an annotation that spells the union out,
+as `outcome()`'s return type does,
+or in a `match` that ends with `assert_never()`.
+Without such a guard, the new failure becomes a value that flows on unexamined.
+`catch()` makes each failure an explicit decision;
+`catch_all()` decides for all of them at once.
+
+Two cautions.
+`catch_all` comes from `stateless.effect`,
+since the package root does not export it.
+And it widens nothing about the guarantee:
+a failure that `@throws` did not lift is not in the channel,
+so `catch_all()` passes it by as readily as `catch()` does.
 
 ## Dependencies That Need Dependencies
 
@@ -1494,11 +1794,12 @@ Here is every tool from both chapters.
 Each one builds a description, rewrites a description's type, or executes one.
 The type column is the part worth memorizing.
 
-Three build a description:
+Four build a description:
 
 | Tool | Applied to | What it does to the type |
 |---|---|---|
 | `success(value)` | A value | Wraps it as `Success[R]` |
+| `throw(reason)` | An exception instance | Wraps it as `Try[E, Never]` |
 | `need(C)` | A class | Builds `Depend[Need[C], C]`, producing an instance |
 | `wait(target)` | A `Task` or any awaitable | Adds `Async`; produces the awaited `R` |
 
@@ -1510,18 +1811,22 @@ rewriting the type that function declares:
 | `supply(*instances)` | Subtracts each `Need[T]` matched by `isinstance()` |
 | `handle(handler)` | Subtracts the Ability the handler's parameter names |
 | `catch(*E)` | Moves each `E` from the error channel into the result |
+| `catch_all` | Moves every declared error into the result |
 | `retry(schedule)` | Adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
 | `repeat(schedule)` | Same additions; the result becomes a tuple of every run |
 | `memoize` | Type unchanged; the result is cached by argument |
 | `fork` | Adds `Need[Executor]`; the result becomes `Task[R]` |
 | `@throws(*E)` | Adds each `E` to the error channel |
 
-Two rows carry a caveat.
+Three rows carry a caveat.
 `fork` needs a function whose Effect has nothing left to supply,
 so supply first, then fork.
-`@throws` is the entry point rather than a transformation:
+`@throws` is an entry point rather than a transformation:
 it decorates an ordinary function that raises exceptions,
-turning it into one that returns an Effect.
+turning it into one that returns an Effect,
+where `throw()` builds the failure as a description directly.
+And `catch_all` is imported from `stateless.effect`,
+since the package root does not export it.
 
 Two execute an Effect that has only `Async` and errors left,
 raising a leftover error rather than returning it:
@@ -1745,7 +2050,9 @@ and `Schedule` offers a fixed interval and a repeat count,
 with no exponential backoff and no jitter.
 There is no timeout, no `race`, no fallback combinator, and no finalizer,
 which rules out the hedging strategy that races a delayed second request.
-Concurrency is `fork()` and `wait()` with no guarded mutable cell,
+Concurrency is `fork()` and `wait()` with no guarded mutable cell.
+Forking two Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
+produces a race no type reports,
 so shared state between forked Effects is your problem and Python's,
 with no help from the type checker.
 Above that sit the resilience patterns a production system eventually needs,
@@ -1860,3 +2167,17 @@ It is a language that does the encoding for you.
     and confirm `squares()` is unchanged.
     Then try to fork an Effect that still declares a `Need`,
     and record what `ty` says.
+9.  `wallet.py` runs `spree()` against a `Cell`.
+    Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
+    the way `scripted` fed `Flip`.
+    Assert that `spree()` attempts every price and writes once per purchase.
+    Then say what this test cannot detect that the `Cell` version can.
+10. `fetch_nonempty()` puts `Empty` into the channel with `throw()`.
+    Rewrite it to raise `Empty` in the body and lift it with `@throws(Empty)`,
+    and confirm the two versions type-check and behave identically.
+    Then make each version fail with an undeclared exception type and compare what `ty` reports for each.
+11. Exercise 5 added a `TooLong` failure to `research()`.
+    Repeat it with `catch_everything.py` in the build:
+    predict what `ty` reports in `outcome()`, then confirm.
+    Remove `outcome()`'s return annotation and rerun `ty`,
+    and explain what stopped being checked.

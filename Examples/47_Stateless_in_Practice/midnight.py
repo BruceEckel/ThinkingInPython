@@ -1,8 +1,8 @@
 # midnight.py
 from datetime import datetime, timedelta
 from typing import Final
-from clock import Now, now
 from stateless import Depend, handle, run
+from timekeeping import Now, now
 
 def archive(entry: str) -> Depend[Now, tuple[str, str]]:
     opened = yield from now()

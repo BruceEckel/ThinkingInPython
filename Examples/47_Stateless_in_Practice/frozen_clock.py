@@ -1,16 +1,8 @@
 # frozen_clock.py
 from datetime import datetime, timedelta
 from typing import Final
-from clock import Now, now
-from stateless import Depend, handle, run
-
-def stamp(message: str) -> Depend[Now, str]:
-    moment = yield from now()
-    return f"[{moment:%Y-%m-%d %H:%M}] {message}"
-
-def batch_due(last_run: datetime) -> Depend[Now, bool]:
-    moment = yield from now()
-    return moment - last_run >= timedelta(hours=24)
+from stateless import handle, run
+from timekeeping import Now, batch_due, stamp
 
 LAUNCH: Final[datetime] = datetime(2026, 1, 1, 3, 0)
 
