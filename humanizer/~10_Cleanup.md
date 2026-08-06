@@ -28,81 +28,10 @@ The largest finding is a near-verbatim word echo three lines apart
 A second Tier A item fixes a stranded preposition in Exercise 2
 under Bruce's own house style, not a humanizer category.
 
-## Tier A
-
-### A1 — lines 57-58 — word echo
-
-"Destroyed nothing" (line 55) and "destroys nothing" (line 58) restate
-the same claim three lines apart. The fix rewords only the second
-occurrence.
-
-CURRENT
-```text
-The `End of delete loop` line, printed before any deletion,
-confirms that the loop destroys nothing.
-```
-
-PROPOSED
-```text
-The `End of delete loop` line, printed before any deletion,
-confirms that no object is destroyed before the loop ends.
-```
-
-### A2 — lines 179-180 — stranded preposition
-
-"What `counters` refers to" strands "to." CLAUDE.md's rule is to front
-the preposition when that reads naturally, which it does here.
-
-CURRENT
-```text
-    Explain, in terms of what `counters` refers to,
-    why rebinding has the same effect as clearing.
-```
-
-PROPOSED
-```text
-    Explain, in terms of the object to which `counters` refers,
-    why rebinding has the same effect as clearing.
-```
-
-## Tier B
-
-### B1 — lines 49-58 — redundant restatement
-
-The paragraph makes one point (nothing is deleted during the loop) and
-restates the conclusion three times, once per piece of evidence: the
-missing `deleted` lines, the `__repr__()` count, and the shutdown-time
-`End of delete loop` print. Each restatement does tie to a distinct
-line of output, so this may be deliberate thoroughness rather than
-padding (CLAUDE.md asks for "explain enough," not brevity for its own
-sake) — I'd understand declining this one. If you want it tighter,
-this folds the three observations into one sentence and cuts the
-standalone "Python has destroyed nothing yet..." restatement.
-
-CURRENT
-```text
-`del c` inside the loop does not delete the object.
-It only unbinds the name `c`.
-The `counters` list still references each `Counter`,
-so its reference count never reaches zero during the loop.
-That is why no `deleted` lines appear while the loop runs,
-and why every `__repr__()` prints `3`.
-Python has destroyed nothing yet,
-so the class attribute `count` is still `3` for all three.
-The `End of delete loop` line, printed before any deletion,
-confirms that the loop destroys nothing.
-```
-
-PROPOSED
-```text
-`del c` inside the loop does not delete the object.
-It only unbinds the name `c`.
-The `counters` list still references each `Counter`,
-so its reference count never reaches zero during the loop.
-That is why no `deleted` lines appear while the loop runs,
-why every `__repr__()` prints `3`,
-and why `End of delete loop` prints before any deletion happens.
-```
+A2 (stranded preposition) has been applied. A1 and B1 both targeted
+the same passage (the word echo); B1's full-paragraph rewrite already
+resolves what A1 fixed, so B1 was applied and A1 was superseded rather
+than applied on top of it.
 
 ## Housekeeping
 

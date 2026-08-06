@@ -157,7 +157,7 @@ print(locate(Point(3, 4)))
 ```
 
 `Point(0, 0)` matches a point whose fields are both zero.
-`Point(0, y)` matches when `x` is zero and *captures* `y`.
+`Point(0, y)` matches when `x` is zero and captures `y`.
 The literal and the capture combine in one pattern.
 
 Positional matching depends on `__match_args__`,
@@ -170,8 +170,8 @@ a positional pattern raises a `TypeError`.
 Keyword patterns work differently.
 `Point(x=0, y=y)` matches by attribute name directly, through attribute access,
 not through `__match_args__`.
-Keyword patterns work on any object with the named attributes, dataclass or not,
-and they let you match a subset of attributes while ignoring the rest:
+They also work on any object with the named attributes, dataclass or not,
+and let you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -309,7 +309,7 @@ When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.
 This error is caught during type checking rather than silently falling through.
-This is the static-typing payoff applied to control flow:
+That is the benefit of static-typing applied to control flow:
 
 ```python
 # exhaustive.py
@@ -345,7 +345,7 @@ print(area(Square(2.0)))
 If you add a `Triangle` to `Shape` without adding the appropriate `case`,
 the checker flags `assert_never(shape)`.
 
-A `switch` in C, JavaScript, or traditional Java, cannot do this.
+A `switch` in C, JavaScript, or traditional Java cannot do this.
 Nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions do check this,
@@ -371,8 +371,6 @@ def test_exhaustive_area() -> None:
 ```
 
 ## When Not to Match
-
-`match` is not a replacement for everything.
 
 For a value-to-value lookup, a dictionary is shorter and faster:
 
@@ -580,7 +578,7 @@ explore it further.
 1.  Write `classify(value)` that uses `match` to return `"empty list"`,
     `"singleton"`, or `"longer list"` for lists, `"point"` for a `Point`,
     and `"other"` for anything else.
-2.  Add a `Rectangle` type to `exhaustive.py`'s `Shape` union *without* adding its `case`.
+2.  Add a `Rectangle` type to `exhaustive.py`'s `Shape` union without adding its `case`.
     Run `ty` and read the error it reports at `assert_never`.
 3.  Rewrite `mapping_patterns.handle()` to also accept a nested shape,
     such as `{"type": "click", "at": {"x": x, "y": y}}`,

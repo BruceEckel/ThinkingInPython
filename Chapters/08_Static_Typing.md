@@ -2,7 +2,7 @@
 
 C++ and Java require type declarations,
 and they check those types during compilation.
-The Python runtime checks types only when an operation is actually attempted.
+The Python runtime checks types only when an operation is attempted.
 The examples up to this point have no type declarations,
 which you might not miss on small programs.
 
@@ -153,8 +153,8 @@ Instead of waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*.
 "Shape" means the methods and attributes required by that type's consumer.
 Dynamic typing and structural typing are the same idea checked at different moments.
-Dynamic typing trusts the object when the code runs.
-Structural typing proves the shape before the code runs.
+Dynamic typing trusts the object once the code is running,
+while structural typing proves the shape beforehand.
 
 A *Protocol* expresses shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
@@ -195,12 +195,13 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 
-A class is also a value.
+A class is also a value, so you can pass it to a function,
+store it in a variable, and call it to make an instance.
 You can pass it to a function, store it in a variable,
 and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
 
-A plain `SomeType` annotation means an *instance* of `SomeType`.
+A plain `SomeType` annotation means an instance of `SomeType`.
 The form `type[SomeType]` means the class object, or any subclass of it.
 `type[C]` annotates the class, not an instance:
 
@@ -255,7 +256,7 @@ so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate, use `NewType`, listed in the summary below.)
 
 `Color` names a union of literal values instead of a union of types.
-`Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings and no others.
+`Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
 Passing `"purple"` to `paint()` is a type error,
 even though `"purple"` is a valid `str`.
 The alias also documents the allowed values in one place,
@@ -427,7 +428,7 @@ library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev)
 validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
-The hints themselves are for the tools and for the reader.
+The hints are for the tools and for the reader.
 
 ## Type Hint Summary
 
@@ -473,15 +474,15 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `X` \| `Y` | A *union*: either type, see [Type Hints](#type-hints) |
-| `X` \| `None` | *Optional*: `X` or `None`, see [Type Hints](#type-hints) |
+| `X` \| `Y` | A union: either type, see [Type Hints](#type-hints) |
+| `X` \| `None` | Optional: `X` or `None`, see [Type Hints](#type-hints) |
 | `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#type-aliases" target="_blank" rel="noopener">Aliases and distinct types</a>
 
 | Construct | Meaning |
 |-----------|---------|
-| `type Name = ...` | A *type alias* for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
+| `type Name = ...` | A type alias for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
 | `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 

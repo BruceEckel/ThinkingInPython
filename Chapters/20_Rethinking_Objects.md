@@ -9,7 +9,7 @@ it is not an outsider's complaint.
 
 This part of the book is about design patterns,
 most of which assume objects and inheritance.
-First, however, I want to question how much of that machinery we actually need.
+First, however, I want to question how much of that machinery you need.
 This chapter adapts my PyCon 2023 talk,
 [Rethinking Objects](https://github.com/BruceEckel/RethinkingObjects),
 and my StrangeLoop presentation [Polymorphism Unbound](https://github.com/BruceEckel/PolymorphismUnbound).
@@ -51,8 +51,8 @@ They favor immutability.
 Rust makes bindings immutable by default.
 Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
-They compose data structures instead of inheriting implementation,
-and they let code live outside classes, reducing duplication.
+They compose data structures instead of inheriting implementation.
+They let code live outside classes, which reduces duplication.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
@@ -165,9 +165,8 @@ if __name__ == "__main__":
 #: [1, 2] Bob(name='Bob')
 ```
 
-Now the internals are safe, but look at what we are doing.
-We add private fields, getters, and defensive copies,
-all to stop other code from changing our data.
+Now the internals are safe, but at a cost: private fields, getters,
+and defensive copies, all to stop other code from changing your data.
 And these copies plug only the outbound leak.
 The constructor stored the caller's own list,
 so the caller's original reference still mutates the internals.
@@ -279,7 +278,7 @@ makes the fuller case for frozen data classes.
 
 ## Methods or Functions?
 
-The second OOP promise is that behavior belongs inside the object, as methods.
+The second OOP promise is behavior inside the object, as methods.
 But a method is only a function whose first argument is the object.
 Compare a method `distance_to()` to a function `distance()` that does the same thing:
 
@@ -523,7 +522,7 @@ if __name__ == "__main__":
 `show()` accepts anything: `Any`, which is not `object`.
 If you pass it something without a `display()` method,
 you'll get an exception when the line runs.
-If we use `t: object` (the safe top type),
+If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
 `Any` switches the checker off for `t`, and this permits any type.
 Each `Any` parameter moves you back into dynamic typing.
@@ -833,7 +832,7 @@ if __name__ == "__main__":
 #: ['1', '2', '3']
 ```
 
-Each `@overload` line is a promise to the type checker,
+Each `@overload` line is a declaration for the type checker,
 not a function that runs.
 Only the last, unmarked definition executes.
 `stringify(42)` checks as returning `str`,
@@ -880,7 +879,7 @@ if __name__ == "__main__":
 
 The checker correctly insists on the guard.
 Without it, a `None` eventually meets `.log()` and the call fails.
-But look at what the `None` branch does: nothing.
+The `None` branch does nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
@@ -948,7 +947,7 @@ A class is a clean namespace with dot-completion.
 A class guarantees initialization and, as a data class, generates equality,
 representation, and, when frozen, hashing.
 
-OOP also normalized the crucial idea of types,
+OOP also normalized the idea of types,
 as seen in [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 If you simply avoid implementation inheritance,
 the payoff for using types is tremendous.

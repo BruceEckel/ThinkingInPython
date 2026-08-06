@@ -22,77 +22,12 @@ Housekeeping is not humanizer output; separate list at the end.
 This is a short, plain chapter and it is clean.
 No em dashes, no first-person plural, no curly quotes, no boldface,
 no AI-vocabulary hits, no promotional or hedging language anywhere in it.
-The one real finding is a single participle tail ("producing a mutable
+The one real finding was a single participle tail ("producing a mutable
 record") of the kind chapters 46 and 47 already flagged and applied.
-A second item, a one-line callback right after a heading, is a
-per-instance judgment call rather than a clear defect, so it sits in
-Tier B. Nothing else in the chapter warranted a block.
+A second item, a one-line callback right after a heading, was a
+per-instance judgment call rather than a clear defect.
 
-## Tier A
-
-### A1 — line 69-70 — participle tail
-
-"producing a mutable record" tacks a present-participle clause onto the
-sentence the way §3 describes. Coordinating it with "generates" as a
-second finite verb reads the same and drops the tail.
-
-CURRENT
-```text
-A `@dataclass` generates `__init__()`, `__repr__()`,
-and equality from those declarations, producing a mutable record:
-```
-
-PROPOSED
-```text
-A `@dataclass` generates `__init__()`, `__repr__()`,
-and equality from those declarations, and produces a mutable record:
-```
-
-## Tier B
-
-### B1 — line 127-130 — fragmented header
-
-The heading is followed by a one-line callback before the real content
-starts, the §29 shape. Chapter 46 declined this pattern, 47 accepted
-it, so it is genuinely a coin flip. Here the callback line does
-connect back to the chapter's opening promise ("The most typical use
-is for function return values," line 4), which is a point in its
-favor; without it the section drops straight into the example with no
-bridge. I'd lean toward keeping it, so this is here mainly so the call
-is on record.
-
-CURRENT
-```text
-## Returning Multiple Values
-
-This is the return-value use promised at the start.
-Here, a function computes two results, returned in a `NamedTuple`:
-```
-
-PROPOSED
-```text
-## Returning Multiple Values
-
-Here, a function computes two results, returned in a `NamedTuple`:
-```
-
-### B2 — line 5 — passive voice
-
-"Tuples and dictionaries are often used for that" hides the actor,
-the §13 pattern (advisory here, not absolute). An active rewrite fits
-the book's second-person voice, but the passive also isn't wrong: it
-keeps tuples and dictionaries as the subject, which is what the rest
-of the paragraph is about. I'd understand leaving this alone.
-
-CURRENT
-```text
-Tuples and dictionaries are often used for that, but both rely on indexing.
-```
-
-PROPOSED
-```text
-You often use tuples and dictionaries for that, but both rely on indexing.
-```
+All Tier A and Tier B edits have been applied.
 
 ## Housekeeping
 

@@ -25,7 +25,7 @@ the two fit neatly together.
 
 ## Proxy
 
-If we implement *Proxy* by following the above diagram, it looks like this:
+If you implement *Proxy* by following the above diagram, it looks like this:
 
 ```python
 # proxy_1.py
@@ -56,9 +56,9 @@ p.h()
 ```
 
 It isn't necessary that `Implementation` have the same interface as `Proxy`.
-As long as `Proxy` is somehow "speaking for" the class it forwards method calls to,
+As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea
-(this statement is at odds with the definition for Proxy in *GoF Design Patterns*).
+(this statement is at odds with the definition for *Proxy* in *GoF Design Patterns*).
 However, it is convenient to have a common interface that forces `Implementation` to fulfill all the methods that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
@@ -168,7 +168,7 @@ The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
 and not tied to any particular implementation.
 
 One limit: special methods bypass `__getattr__()`.
-Python looks up dunders like `__len__()` and `__str__()` on the proxy's *type*,
+Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
 not on the instance, so `len(p)` and `print(p)` do not delegate,
 even though an explicit `p.__len__()` would:
 
@@ -299,7 +299,7 @@ def test_state_delegates_and_change_swaps() -> None:
     assert s.name() == "B"
 ```
 
-The difference between *Proxy* and *State* is in the problems that are solved.
+The difference between *Proxy* and *State* is in the problem each one solves.
 The common uses for *Proxy* as described in *GoF Design Patterns* are:
 
 1.  *Remote proxy*.
@@ -309,7 +309,7 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
 2.  *Virtual proxy*.
     Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
-    Used when you don't want the client programmer to have full access to the proxied object.
+    This is used when you don't want the client programmer to have full access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
     For example, to keep track of the number of references that are held for a particular object,
@@ -361,7 +361,7 @@ Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
 The one used here is the *fallback* hook:
 Python calls it only after normal lookup fails,
 which is why `self._impl` and `self.calls` inside it resolve normally.
-`__getattribute__()` intercepts *every* attribute access,
+`__getattribute__()` intercepts every attribute access,
 including each `self.` access in its own body,
 so the naive version calls itself forever.
 Writing one means routing every internal access through `object.__getattribute__(self, "_impl")`,

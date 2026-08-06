@@ -28,58 +28,7 @@ No housekeeping issues: no double blank lines, no SLB drift, no draft
 notes, no em dashes to worry about (there are none in this chapter at
 all, spaced or otherwise).
 
-## Tier A
-
-### A1 — line 309 — stranded preposition
-
-"the end you append to" strands the preposition at the clause end;
-the object ("the end") was fronted. A noun-phrase rewrite drops it
-without changing the meaning.
-
-CURRENT
-```text
-A `deque` (double-ended queue)
-adds and removes items at either end in constant time.
-A `list` is fast only at the end you append to:
-```
-
-PROPOSED
-```text
-A `deque` (double-ended queue)
-adds and removes items at either end in constant time.
-A `list` is fast only at its append end:
-```
-
-## Tier B
-
-### B1 — line 4 — inflated opening phrasing
-
-"acknowledges the essential nature of containers by building them into
-the core of the language" is a §1-flavored significance claim (compare
-"underscores its importance") where a plainer sentence says the same
-thing. This is the chapter's opening line, so it may be a deliberate
-authorial flourish rather than padding; I lean toward proposing it but
-would understand declining it.
-
-CURRENT
-```text
-With languages like C++ and Java, containers are add-on libraries.
-Python acknowledges the essential nature of containers by building them into the core of the language.
-Lists, dictionaries, and sets are fundamental data types.
-```
-
-PROPOSED
-```text
-With languages like C++ and Java, containers are add-on libraries.
-Python builds them into the core of the language.
-Lists, dictionaries, and sets are fundamental data types.
-```
-
-## Housekeeping
-
-None found. No double blank lines, no Semantic Line Break drift, no
-`[[ ]]` draft notes, and no spaced ` -- `. The chapter has no em dashes
-of any form to check.
+Both Tier A and Tier B edits have been applied.
 
 ## Considered and not flagged
 

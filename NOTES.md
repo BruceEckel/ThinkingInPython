@@ -1,3 +1,6 @@
+Fable: Are there ideas/features that chapter 47 hasn't covered but should?
+What prose and examples would demonstrate these ideas/features?
+
 New book cover & favicon
 
 game that needs many different kinds of game actors, aquired using need()

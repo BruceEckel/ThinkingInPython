@@ -21,185 +21,26 @@ Housekeeping is not humanizer output; separate list at the end.
 
 Mostly clean. No AI vocabulary, no curly quotes, no em-dash issues,
 no boldface-header lists, no signposting, no chatbot artifacts, no
-`[[ ]]` notes. The chapter's real findings are small and specific: one
+`[[ ]]` notes. The chapter's real findings were small and specific: one
 direct hit on the promotional-language watch list ("boasts a"), one
 banned word ("wants"), one leftover "we" in an otherwise second-person
 chapter, an "is what" cleft, and two italics used for emphasis instead
-of term introduction. The single biggest finding is "boasts a" at
+of term introduction. The single biggest finding was "boasts a" at
 line 35, a verbatim match against §4/§8's watch list, the kind of hit
 chapters 46 and 47 didn't have at all.
 
-## Tier A
-
-### A1 — line 35 — promotional language / copula avoidance
-
-"Boasts a" is a verbatim hit on both the §4 (promotional language) and
-§8 (copula avoidance) watch lists.
-
-CURRENT
-```text
-Alternative interpreters for Python exist, notably PyPy,
-which boasts a 4x to 10x speedup.
-```
-
-PROPOSED
-```text
-Alternative interpreters for Python exist, notably PyPy which claims a 4x to 10x speedup.
-```
-
-### A2 — line 46 — person consistency
-
-The book is second person, but this sentence starts in "you" and
-finishes in "we" mid-thought.
-
-CURRENT
-```text
-Although it is tempting to think you "have a pretty good idea where the slowdown is,"
-we turn out to be bad at guessing this.
-```
-
-PROPOSED
-```text
-Although it is tempting to think you "have a pretty good idea where the slowdown is,"
-programmers turn out to be bad at guessing this.
-```
-
-### A3 — lines 189 and 203 — italics for emphasis, not term introduction
-
-CLAUDE.md's rule: italics only introduce a new term on first use. Neither
-"at this location" nor "where" is a term being introduced; both are
-emphasis, the misuse the rule exists to catch. Delete individual rows
-you want left alone.
-
-**line 189**
-
-CURRENT
-```text
-Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event *at this location*,
-```
-
-PROPOSED
-```text
-Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location,
-```
-
-**line 203**
-
-CURRENT
-```text
-A profiler tells you *where* the time goes.
-```
-
-PROPOSED
-```text
-A profiler tells you where the time goes.
-```
-
-### A4 — line 192 — "is what" cleft
-
-Deleting "is what" changes nothing: "That makes coverage measurement
-affordable" reads the same.
-
-CURRENT
-```text
-That is what makes coverage measurement affordable:
-```
-
-PROPOSED
-```text
-That makes coverage measurement affordable:
-```
-
-### A5 — line 612 — banned word "wants"
-
-"Wants" is on CLAUDE.md's "Don't use" tier ("the function wants a
-string" means it takes or requires one). It also sits one line below
-"needs the same thing," so swapping to "needs" would create a new echo;
-"requires" avoids both problems.
-
-CURRENT
-```text
-It wants a whole array in memory, not values arriving one at a time.
-```
-
-PROPOSED
-```text
-It requires a whole array in memory, not values arriving one at a time.
-```
-
-### A6 — lines 1005-1006 — word echo in adjacent sentences
-
-"Your AI" opens one sentence and closes the previous one. A pronoun in
-the second sentence removes the echo without losing the antecedent.
-
-CURRENT
-```text
-More importantly, you can pass the hot Python function to your AI for conversion to Rust.
-Your AI can also walk you through the process.
-```
-
-PROPOSED
-```text
-More importantly, you can pass the hot Python function to your AI for conversion to Rust.
-It can also walk you through the process.
-```
-
-## Tier B
-
-### B1 — lines 1003-1009 — choppy run of short sentences with filler transitions
-
-Seven sentences in a row, several of them clipped ("It just runs
-faster."), bookended by "More importantly" and "In addition," two
-transition words doing no real work. I lean toward tightening this:
-it reads like a bullet list unrolled into prose rather than a
-paragraph someone spoke aloud. But it's also the chapter's most
-conversational stretch, right where it pitches an unusual workflow
-(asking your AI to port a function to Rust), so some of the looseness
-may be deliberate voice. Taking this supersedes A6 above, since the
-rewrite removes the "your AI"/"Your AI" echo along with everything else.
-
-CURRENT
-```text
-One effective technique is to move the hot function into a compiled language.
-Rust is excellent for this because its tooling makes the bridge nearly painless.
-More importantly, you can pass the hot Python function to your AI for conversion to Rust.
-Your AI can also walk you through the process.
-Once you're done, you import a module that looks from the outside like any other Python module.
-It just runs faster.
-In addition, you can do things in Rust that might be much more difficult in Python.
-```
-
-PROPOSED
-```text
-One effective technique is to move the hot function into a compiled language.
-Rust is excellent for this because its tooling makes the bridge nearly painless.
-Hand the hot Python function to your AI for conversion, and it can walk you through the rest of the process.
-Once you're done, you import a module that looks from the outside like any other Python module, except that it runs faster. It also lets you do things that are difficult in Python.
-```
-
-### B2 — line 149 — clarity, not a classic AI tell
-
-Not on any watch list, but "claiming one another tool is holding"
-drops the relative pronoun ("that") in a spot dense enough to slow a
-reader down. Genuinely arguable: the terser original may be exactly
-the register Bruce wants here.
-
-[[both of these are garbled and need rewriting for clarity]]
-
-CURRENT
-```text
-and claiming one another tool is holding raises a `ValueError`,
-```
-
-PROPOSED
-```text
-and claiming one that another tool already holds raises a `ValueError`,
-```
+A1-A5 have been applied. B1 (the seven-sentence AI/Rust paragraph
+rewrite) has been applied in place of A6, which it supersedes. B2
+(line 148, the garbled `ValueError` sentence Bruce flagged) has now
+been rewritten and applied:
+"and trying to claim one that another tool already holds raises a
+`ValueError`, which is how two profilers avoid quietly fighting over
+the same hooks."
 
 ## Housekeeping
 
 None found. No double blank lines before headings, no `[[ ]]` draft
-notes, no spaced ` -- `, and no em dashes anywhere in the chapter. The
+notes elsewhere, no spaced ` -- `, and no em dashes anywhere in the chapter. The
 long lines a raw column-width scan flags (e.g. line 39, line 99) are
 each a single clause with no internal comma or colon to break at, so
 they're already compliant with Semantic Line Breaks rather than drift.

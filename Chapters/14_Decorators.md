@@ -3,11 +3,11 @@
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
-Most decorators are applied to functions, so that is where we start.
+Most decorators are applied to functions, so that is where this chapter begins.
 
 To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
-For simplicity, we use an untyped `Callable` here:
+For simplicity, this first example uses an untyped `Callable`:
 
 ```python
 # simple_decoration.py
@@ -848,7 +848,7 @@ Several decorators from earlier chapters use this mechanism.
 `@property`, `cached_property`, `@staticmethod`, and `@classmethod`
 (see [Classes](07_Classes.md#properties), [Classes](07_Classes.md#static-and-class-methods))
 each wrap a function the same way `trace` does,
-but return a *descriptor* instead of a plain wrapper.
+but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
 and it also makes them work correctly on methods,
 where a `__call__`-based class, like `Logged` above, does not.

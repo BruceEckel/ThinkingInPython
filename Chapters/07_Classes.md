@@ -38,7 +38,7 @@ x.show_twice()
 ```
 
 Python methods require a reference to the current object.
-When you *define* a method you must explicitly specify the reference as the first parameter.
+When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
 but you can use any identifier
 (however, anything other than `self` will probably confuse people).
@@ -50,10 +50,10 @@ Python passes the object reference automatically.
 
 The first method, `__init__()`, is the *initializer*.
 The double underscores (a.k.a. "dunder") indicate a special name.
-The `__new__()` method is the *constructor*, but we hardly ever use that.
+The `__new__()` method is the *constructor*, which you rarely use.
 It has become common practice to call `__init__()` the constructor,
 since it does the job of constructors in other OOP languages.
-We follow that practice in this book.
+This book follows that practice.
 
 Python calls the constructor automatically during object creation.
 At the bottom of the example you can see that the creation of an object looks like a function call,
@@ -106,7 +106,7 @@ First import the base class the same way you import any name from a module
 Then inherit by listing the class
 (or classes, since Python supports multiple inheritance)
 in parentheses after the name of the inheriting class.
-Here, we import and subclass `Simple`, from the `simple_class` module:
+This example imports and subclasses `Simple`, from the `simple_class` module:
 
 ```python
 # simple2.py
@@ -206,7 +206,7 @@ Derived().show()
 ```
 
 A type checker now verifies the claim.
-If `Derived.show` does not actually override a method in a base class,
+If `Derived.show` does not override a method in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
 
@@ -243,7 +243,7 @@ Because the change is invisible at the call site,
 do not preemptively add getters and setters.
 You can always add them later when you discover you need the logic.
 
-The default `@property` is *read-only*.
+The default `@property` is read-only.
 It is only a getter.
 Assigning to it raises an `AttributeError`.
 To enable writing, add a *setter*,
@@ -389,7 +389,7 @@ def f(self):
     print(f"utility.f() called on {self}")
 ```
 
-Here we compose that method into a class:
+This example composes that method into a class:
 
 ```python
 # compose.py

@@ -1,7 +1,7 @@
 # Containers
 
 With languages like C++ and Java, containers are add-on libraries.
-Python acknowledges the essential nature of containers by building them into the core of the language.
+Python builds them into the core of the language.
 Lists, dictionaries, and sets are fundamental data types.
 
 ## Lists and Iteration
@@ -306,7 +306,7 @@ Here, the `list` argument is a factory that produces a fresh empty list for each
 
 A `deque` (double-ended queue)
 adds and removes items at either end in constant time.
-A `list` is fast only at the end you append to:
+A `list` is fast only at its append end:
 
 ```python
 # deque.py

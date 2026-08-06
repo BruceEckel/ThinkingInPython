@@ -25,99 +25,10 @@ fragmented headers, aphorism formulas, false ranges, and em-dash misuse
 all came back empty. Two real findings: a single first-person-plural
 slip ("we force"), and two spots where italics mark emphasis rather
 than a first-use term, one of them a matched pair in the same sentence.
-The largest finding is the "we" at line 421, the only person slip in
+The largest finding was the "we" at line 421, the only person slip in
 the whole chapter.
 
-## Tier A
-
-### A1 — line 421 — person consistency
-
-The book is second person throughout this chapter ("you rarely write",
-"you take only as many as you need"). This is the one spot that slips
-into first-person plural.
-
-CURRENT
-```text
-Here, we force every item to be of an expected type:
-```
-
-PROPOSED
-```text
-Here, you force every item to be of an expected type:
-```
-
-### A2 — line 565 — italics as emphasis, not term introduction
-
-"GoF" is plain text everywhere else in the chapter (lines 505, 519, 548,
-567, 593, 598, and in the section heading's neighborhood). Italicizing
-it once, mid-chapter, reads as emphasis, not a first-use term the rule
-allows.
-
-CURRENT
-```text
-`traverse()` is the loop a *GoF* caller writes,
-```
-
-PROPOSED
-```text
-`traverse()` is the loop a GoF caller writes,
-```
-
-### A3 — lines 350, 352 — italics as emphasis on ordinary verbs
-
-"Stop" already appears plain at lines 326, 338 (a code comment), and
-344, all before this pair. "Skip" has no prior use. Both read as
-emphasis added to sharpen a contrast, not as terms being defined for
-the first time, and line 353 immediately drops back to plain
-"Skipping and stopping." Delete either row independently.
-
-**line 350**
-
-CURRENT
-```text
-The `if` version *skips* nonmatching values but keeps looking forever,
-```
-
-PROPOSED
-```text
-The `if` version skips nonmatching values but keeps looking forever,
-```
-
-**line 352**
-
-CURRENT
-```text
-`takewhile()` *stops* at the first failure.
-```
-
-PROPOSED
-```text
-`takewhile()` stops at the first failure.
-```
-
-## Tier B
-
-### B1 — lines 580-581 — borderline negative-parallelism / punchline
-
-"Did not merely need X. It Y'd instead" is close to the "not
-just...it's..." formula the skill flags, and the two short sentences
-in a row read a little like a manufactured closer. Against that: it's
-only two sentences, both carry full subject-verb content (not clipped
-fragments), and it lands the chapter's recurring point (the same cost
-shows up three times: here, in `tee`'s buffering, and in the "collect
-into a list" advice) cleanly. I lean toward leaving this alone, but it
-is the closest thing to a real punchline-cluster in the chapter.
-
-CURRENT
-```text
-The interface did not merely need a buffer.
-It rebuilt the list.
-```
-
-PROPOSED
-```text
-The interface needed more than a buffer: it rebuilt the list.
-```
+All Tier A and Tier B edits have been applied.
 
 ## Housekeeping
 
@@ -170,6 +81,5 @@ generic positive conclusions (§25), hyphenated-pair overuse (§26),
 persuasive-authority tropes (§27), signposting/announcements (§28),
 fragmented headers (§29), diff-anchored writing (§30), and aphorism
 formulas (§32). No em dash, spaced en dash, or `[[ ]]` note anywhere in
-the file. Person consistency and italics-for-emphasis are the only
-categories that found anything; a rerun can skip straight to those two
-plus a fresh look at any new prose.
+the file. Person consistency and italics-for-emphasis were the only
+categories that found anything.

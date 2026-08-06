@@ -31,8 +31,8 @@ starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
 
-Alternative interpreters for Python exist, notably PyPy,
-which boasts a 4x to 10x speedup.
+Alternative interpreters for Python exist,
+notably PyPy which claims a 4x to 10x speedup.
 PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you rely on.
 
@@ -43,7 +43,7 @@ If it's noticeably less, then buying new hardware might be a quick win.
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
 Although it is tempting to think you "have a pretty good idea where the slowdown is,"
-we turn out to be bad at guessing this.
+programmers turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library includes two profilers.
@@ -146,8 +146,8 @@ monitoring the whole program to answer it pays for data you discard and slows th
 and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` are named for their intended users,
-and claiming one another tool is holding raises a `ValueError`,
-which is how two profilers avoid silently fighting over the same hooks.
+and trying to claim one that another tool already holds raises a `ValueError`,
+which is how two profilers avoid quietly fighting over the same hooks.
 
 For an answer you need once rather than continuously,
 the callback can turn its own event off:
@@ -186,11 +186,11 @@ print(calls["used"], calls["unused"])
 #: 1 0
 ```
 
-Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event *at this location*,
+Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location,
 permanently, until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran once.
-That is what makes coverage measurement affordable:
-the question is "was this reached," so the second answer is worthless,
+That makes coverage measurement affordable: the question is "was this reached,"
+so the second answer is worthless,
 and after the first hit the monitored code returns to full speed.
 
 The trade against a profiler is the usual one.
@@ -200,7 +200,7 @@ which is the better tool when you already know which function you care about and
 
 ## Benchmark Alternatives with `timeit`
 
-A profiler tells you *where* the time goes.
+A profiler tells you where the time goes.
 Once you discover a hot spot, `timeit` tells you which rewrite wins.
 It runs a small snippet many times and reports the total,
 insulating the measurement from startup cost and clock granularity.
@@ -609,7 +609,7 @@ and the `bisect` searches from earlier in this chapter all need an indexable str
 not a stream of values that arrive once and disappear.
 NumPy's vectorized arithmetic, covered later in this chapter,
 needs the same thing.
-It wants a whole array in memory, not values arriving one at a time.
+It requires a whole array in memory, not values arriving one at a time.
 
 The risk is the cliff at the edge of that memory.
 Performance does not degrade in proportion to how close the data gets to available RAM.
@@ -1002,11 +1002,11 @@ both ship, convert this indented block to a real, fenced, tested example. -->
 
 One effective technique is to move the hot function into a compiled language.
 Rust is excellent for this because its tooling makes the bridge nearly painless.
-More importantly, you can pass the hot Python function to your AI for conversion to Rust.
-Your AI can also walk you through the process.
-Once you're done, you import a module that looks from the outside like any other Python module.
-It just runs faster.
-In addition, you can do things in Rust that might be much more difficult in Python.
+Hand the hot Python function to your AI for conversion,
+and it can walk you through the rest of the process.
+Once you're done, you import a module that looks from the outside like any other Python module,
+except that it runs faster.
+It also lets you do things that are difficult in Python.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
 and [maturin](https://www.maturin.rs)

@@ -64,9 +64,9 @@ The only constraint on a function argument is that the function can apply its op
 
 ## Default and Keyword Arguments
 
-Parameters can have default values.
-Keyword arguments let callers pass arguments by name, in any order.
-Keyword arguments make a call self-documenting:
+Parameters can have default values,
+and keyword arguments let callers pass them by name, in any order,
+which makes a call self-documenting:
 
 ```python
 # default_args.py
@@ -109,8 +109,7 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object.
-Python does not recreate it on each call.
+A mutable default persists because it lives on the function object rather than being recreated on each call.
 This behavior commonly confuses newcomers to the language.
 
 You only need the `None` sentinel when the function modifies the argument.
@@ -153,7 +152,7 @@ def get(data, key, default=MISSING):
     if key in data:
         return data[key]
     if default is MISSING:
-        return MISSING  # Normally raise exception here
+        return MISSING  # Normally raises an exception here
     return default
 
 prefs = {"volume": 3, "mute": None}

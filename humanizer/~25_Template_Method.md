@@ -24,42 +24,11 @@ The word-level scan (§7 AI vocabulary, hedging, filler, rule of three,
 aphorism formulas, curly quotes, emojis, boldface lists) found nothing.
 There are no em dashes at all in the file, no `[[ ]]` draft notes,
 and no double-blank-line drift.
-The one real finding is an italic used for emphasis rather than to
-introduce a term, on `*shape*` at line 19, and it stands alone: nothing
+The one real finding was an italic used for emphasis rather than to
+introduce a term, on `*shape*` at line 19, and it stood alone: nothing
 else in the chapter needed a second look after it.
 
-## Tier A
-
-### A1 — line 19 — italic used for emphasis, not term introduction
-
-`*Template Method*` (line 5) and `*Hollywood Principle*` (line 73) are
-both italicized on first use and never again, the correct pattern.
-`*shape*` breaks that pattern: it isn't a named term, and the same word
-recurs unitalicized at line 140 ("still fits the algorithm's shape"),
-which is the giveaway that the first instance was emphasis, not a
-definition.
-
-CURRENT
-```text
-The defining trait of a Template Method is that the base class fixes the *shape* of the algorithm.
-```
-
-PROPOSED
-```text
-The defining trait of a Template Method is that the base class fixes the shape of the algorithm.
-```
-
-## Tier B
-
-None. Nothing else surfaced was strong enough to include without
-padding the section; see below for the near-misses and why they were
-left out.
-
-## Housekeeping
-
-None found. Blank-line spacing before headings, Semantic Line Breaks,
-and the listing comments inside all four ```python blocks (checked all
-six comments) are all clean.
+The one Tier A edit has been applied.
 
 ## Considered and not flagged
 
@@ -82,8 +51,8 @@ six comments) are all clean.
   Considered fixing the inconsistency by italicizing the second
   occurrence instead of de-italicizing the first, but line 19 is the
   one that reads as emphasis, and "shape" is never established as
-  chapter terminology anywhere else. The fix goes the other direction
-  (see A1).
+  chapter terminology anywhere else. The fix went the other direction
+  (A1).
 
 ## Scan coverage
 

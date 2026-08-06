@@ -27,62 +27,12 @@ no person problems, no filler phrases. The largest finding is the
 "Keyword arguments... Keyword arguments..." subject echo that opens
 the Default and Keyword Arguments section.
 
-## Tier A
-
-### A1 — lines 67-69 — subject echo / vapid heading restatement
-
-The section opens by restating half the heading ("Parameters can
-have default values") in its own sentence, then repeats "Keyword
-arguments" as the subject of two sentences in a row.
-
-CURRENT
-```text
-Parameters can have default values.
-Keyword arguments let callers pass arguments by name, in any order.
-Keyword arguments make a call self-documenting:
-```
-
-PROPOSED
-```text
-Parameters can have default values, and keyword arguments let
-callers pass them by name, in any order, which makes a call
-self-documenting:
-```
-
-### A2 — lines 112-114 — staccato triplet, last line adds nothing
-
-Three short declaratives in a row: the first two restate the same
-fact twice (persists / not recreated), and the third tacks on an
-unsupported generalization about newcomers. Merging keeps every
-claim but drops the choppy rhythm.
-
-CURRENT
-```text
-A mutable default persists because it lives on the function object.
-Python does not recreate it on each call.
-This behavior commonly confuses newcomers to the language.
-```
-
-PROPOSED
-```text
-A mutable default persists because it lives on the function object
-rather than being recreated on each call.
-This behavior commonly confuses newcomers to the language.
-```
-
-## Tier B
-
-None. Nothing else in the chapter cleared the bar for even an
-arguable finding; see Considered and not flagged.
+Both Tier A edits and the listing-comment Housekeeping fix have been
+applied (the latter needs `make sync` to reach `Examples/`).
 
 ## Housekeeping
 
-1. **Listing comment, line 156:** `# Normally raise exception here`
-   is missing its article ("raise an exception"). Fix would be
-   `# Normally raises an exception here`. This is a code comment,
-   so applying it needs a re-sync (`make verify` does that); the
-   code itself (`return MISSING`) stays untouched.
-2. **Semantic Line Break drift, line 258:** the sentence
+1. **Semantic Line Break drift, line 258:** the sentence
    `Calling `make_user("Sue", True)` is an error, because `admin`
    is keyword-only.` sits on one line, while its structural twin two
    lines above (`Calling `divide(a=10, b=2)` is an error, / because
@@ -136,4 +86,4 @@ formulas (§32), conversational rhetorical openers (§33), and
 first-person-plural slips. Structural review (echoes, staccato runs,
 fragmented headers, parallels) is where both real findings surfaced;
 a re-run can skip straight to spot-checking A1/A2's resolution and
-the two Housekeeping items.
+the remaining Housekeeping item.

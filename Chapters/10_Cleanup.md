@@ -51,11 +51,8 @@ It only unbinds the name `c`.
 The `counters` list still references each `Counter`,
 so its reference count never reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
-and why every `__repr__()` prints `3`.
-Python has destroyed nothing yet,
-so the class attribute `count` is still `3` for all three.
-The `End of delete loop` line, printed before any deletion,
-confirms that the loop destroys nothing.
+why every `__repr__()` prints `3`,
+and why `End of delete loop` prints before any deletion happens.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
@@ -176,7 +173,7 @@ so it never depends on the unreliable bookkeeping at interpreter shutdown.
     then pop entries from that `dict` one at a time and confirm `live_count()` still falls correctly.
 2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
     (rebinding the name) and confirm `live_count()` still reaches `0`.
-    Explain, in terms of what `counters` refers to,
+    Explain, in terms of the object to which `counters` refers,
     why rebinding has the same effect as clearing.
 3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
     by reading `cls._instances.values()`.

@@ -4,12 +4,11 @@ The `with` statement,
 introduced in [Control Flow](04_Control_Flow.md#context-managers),
 runs setup before a block and cleanup after it,
 even if the block raises an exception.
-This chapter shows how to write your own context managers,
-and what `with` actually does.
+This chapter shows how to write your own context managers, and how `with` works.
 
 A context manager marks out a span of execution that determines when initialization and cleanup happen.
 This is far more reliable than using `__del__()`,
-as we saw in [Cleanup](10_Cleanup.md).
+as shown in [Cleanup](10_Cleanup.md).
 
 ## A Basic Context Manager
 
@@ -169,9 +168,8 @@ print("survived")
 See [Naming Conventions](02_Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
 
-We can write a version with more features:
-reporting which exception it swallowed,
-and accepting no argument to mean "ignore everything."
+A version with more features reports which exception it swallowed,
+and accepts no argument to mean "ignore everything."
 It turns out to be useful enough to reuse elsewhere in the book,
 so it lives in `utils/`, where any chapter can import it:
 
@@ -225,7 +223,7 @@ which includes both its type and its arguments, not just `exc_type.__name__`.
 
 The annotations use `type[BaseException]`,
 a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
-which means the exception *class* itself, such as `ZeroDivisionError`,
+which means the exception class, such as `ZeroDivisionError`,
 not an instance of it.
 `exc_type` is that class,
 and `issubclass(exc_type, self.types)` checks it against `self.types`,

@@ -28,73 +28,7 @@ and a term ("descriptor") re-italicized on its third mention after
 already being properly de-italicized once. The largest single finding
 is the person slip, since it sits in the chapter's opening paragraph.
 
-## Tier A
-
-### A1 — lines 6, 10 — first-person plural ("we")
-
-The book is second person throughout.
-Both instances sit in the opening section,
-before the voice settles into "you."
-
-**line 6**
-
-CURRENT
-```text
-Most decorators are applied to functions, so that is where we start.
-```
-
-PROPOSED
-```text
-Most decorators are applied to functions, so that is where this chapter begins.
-```
-
-**line 10**
-
-CURRENT
-```text
-For simplicity, we use an untyped `Callable` here:
-```
-
-PROPOSED
-```text
-For simplicity, this first example uses an untyped `Callable`:
-```
-
-Delete individual rows you want left alone.
-
-
-### A3 — line 851 — italics reused on an already-introduced term
-
-"Descriptor" is italicized once at line 520 to introduce the term
-(correct), then appears plain at line 533 (correct), then gets
-italicized again here on its third mention. The chapter's own pattern
-(and chapter 17's parallel treatment of the same term) is to italicize
-only on first use.
-
-CURRENT
-```text
-each wrap a function the same way `trace` does,
-but return a *descriptor* instead of a plain wrapper.
-```
-
-PROPOSED
-```text
-each wrap a function the same way `trace` does,
-but return a descriptor instead of a plain wrapper.
-```
-
-## Tier B
-
-None. Nothing else in the chapter cleared the bar for a real finding;
-see "Considered and not flagged" for near-misses.
-
-## Housekeeping
-
-None to report. No double blank lines, no Semantic Line Break drift
-(long lines checked all correspond to single clauses with no internal
-comma to break at, consistent with `reflow_prose.py`'s behavior), no
-`[[ ]]` draft notes, no spaced ` -- `, and no watch-list words inside
-listing comments.
+All Tier A edits have been applied.
 
 ## Considered and not flagged
 

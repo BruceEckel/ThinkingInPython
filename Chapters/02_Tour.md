@@ -105,7 +105,7 @@ which makes it easy to swap without a temporary:
 # multiple_assignment.py
 
 a, b = 1, 2
-a, b = b, a  # Swap, no temporary needed
+a, b = b, a  # Swap without a temporary
 print(a, b)
 #: 2 1
 first, *rest = [10, 20, 30, 40]
@@ -339,7 +339,7 @@ print(shout(message))
 Iterating a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
-which is what `piece.expression` reports.
+which `piece.expression` reports.
 `shout()` uppercases only the literal text, leaving the values alone,
 which no amount of work on a finished f-string could do reliably.
 

@@ -5,7 +5,6 @@ You build tests into the code you write and run them on every change.
 Tests extend the language.
 They state what the code is supposed to do, and check it.
 
-Unit testing is a development practice.
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
 
@@ -42,9 +41,8 @@ You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
 Writing tests for exploratory programming is not practical.
-With the advent of AI,
-generating tests once you have found a good path becomes far more viable.
-AI also makes a thorough test suite easier to produce.
+AI makes generating tests far more viable once you have found a good path,
+and makes a thorough test suite easier to produce.
 
 ## pytest
 
@@ -60,7 +58,7 @@ No base class needs inheriting,
 and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-We will test the `Account` class:
+The tests that follow check the `Account` class:
 
 ```python
 # account.py
@@ -142,7 +140,8 @@ The first is "this call should cause an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.
 The test passes only if the block raises the expected exception.
 
-The second is comparing floating-point numbers, where exact equality is a trap.
+The second is comparing floating-point numbers,
+where testing for exact equality is unreliable.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
 which allows a small tolerance.
 
@@ -150,9 +149,9 @@ which allows a small tolerance.
 
 When the same logic should run against several inputs, do not copy the test.
 If you mark it with `parametrize`, as `test_nonpositive_deposit_raises()` does,
-`pytest` runs it once per case, reporting each separately.
+`pytest` runs it once per case and reports each separately.
 That single function becomes three independent tests,
-and a failure names the exact case that failed.
+and a failure names the case that failed.
 
 Nothing limits you to one variable.
 You can give `parametrize` several names and a list of tuples,
@@ -184,8 +183,8 @@ The names in the string line up, in order, with the values in each tuple.
 
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 `pytest` replaces both with *fixtures*: functions that build what a test needs.
-You declare fixtures as parameters to the test functions,
-which tells `pytest` to call the fixture function and pass its result to the test function.
+You declare fixtures as parameters to a test,
+which tells `pytest` to call the fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
 A test that names `funded` as an argument receives the value the fixture returns.
@@ -194,8 +193,7 @@ Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
-For example, this fixture builds an account, `yield`s it to the test,
-then runs teardown once the test returns:
+For example:
 
 ```python
 # test_teardown.py
@@ -277,7 +275,7 @@ Nothing imports either fixture.
 
 Good tests do not depend on the real filesystem, environment,
 random number generation, clock, or network.
-`pytest` ships built-in fixtures for this.
+`pytest` includes built-in fixtures for this.
 `tmp_path` gives each test a private temporary directory.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
@@ -353,7 +351,7 @@ def test_roll_returns_known_value(
     assert dice.roll() == 4
 ```
 
-Patching the function gives you the exact value you want.
+Patching the function gives you the value you want.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -417,7 +415,7 @@ def stamp(now: Callable[[], float]) -> float:
     return now()
 ```
 
-In the test we provide a fixed value for `now`:
+The test provides a fixed value for `now`:
 
 ```python
 # test_clock.py
@@ -505,14 +503,13 @@ A *black-box* test treats the code as an opaque box and exercises only its publi
 the way a client would.
 
 A language with access control enforces the two differently.
-Python has no access control.
-Every attribute is reachable.
+Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
 It is stored under that exact name and reachable like any other attribute.
 It is only a convention that says, "this is private, do not rely on it."
 
-A leading *double* underscore does something real,
+A leading double underscore does something real,
 though it is still not access control.
 Python's compiler rewrites `self.__pin`, written inside a class body,
 into `self._ClassName__pin`, a transformation called *name mangling*.
@@ -542,16 +539,15 @@ so `v._Vault__pin` reads it successfully,
 even though `ty` cannot see that the rewrite happened and reports the line as an error.
 Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
 not to hide the attribute.
-Anyone who knows the class name can still reach it, so it changes the spelling,
-not the reachability.
+Anyone who knows the class name can still reach the attribute,
+because the rewrite changes only the name.
 In Python the distinction between white-box and black-box remains one of discipline,
 not of compiler enforcement.
 
 That makes black-box testing the sensible default.
 If you test the public surface, the methods a caller is meant to use,
 you can change the internals without rewriting the tests.
-The `Account` tests are black-box.
-They never read a private attribute.
+The `Account` tests are black-box which means they never read a private attribute.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 

@@ -347,9 +347,9 @@ The infinite `count(1)` never runs away.
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
 (or `filter()`), and these behave differently with an infinite source.
-The `if` version *skips* nonmatching values but keeps looking forever,
+The `if` version skips nonmatching values but keeps looking forever,
 so once values stop matching, a `list()` around it never returns.
-`takewhile()` *stops* at the first failure.
+`takewhile()` stops at the first failure.
 Skipping and stopping look the same on finite data and behave nothing alike on infinite data.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
@@ -418,7 +418,7 @@ Nothing in the toolchain (except an AI) will discover problems like this.
 The [Decorator Pattern](14_Decorators.md#the-decorator-pattern)
 wraps an existing iterator,
 producing a new one with the same interface and added behavior.
-Here, we force every item to be of an expected type:
+Here, you force every item to be of an expected type:
 
 ```python
 # typed_iterator.py
@@ -562,7 +562,7 @@ print(stream.seen)
 #: [2, 4, 6]
 ```
 
-`traverse()` is the loop a *GoF* caller writes,
+`traverse()` is the loop a GoF caller writes,
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
 rather than a base class.
@@ -577,8 +577,7 @@ so every item read once stays read.
 which lets it report a value without advancing.
 Look at the last line of output.
 By the time all four methods work, `seen` holds the entire stream.
-The interface did not merely need a buffer.
-It rebuilt the list.
+The interface needed more than a buffer: it rebuilt the list.
 
 That is the cost the pattern hides.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,

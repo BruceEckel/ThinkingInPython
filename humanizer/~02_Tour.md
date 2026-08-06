@@ -30,38 +30,8 @@ that looked promising on a first pass (parallel constructions,
 short-sentence pairs, a relative clause attributing significance)
 held up as legitimate technical prose on a closer read.
 
-## Tier A
-
-### A1 — line 342 — "is what" cleft
-
-Deleting "is what" leaves the same meaning with a verb right after it
-("reports"), the exact pattern `CLAUDE.md` names for cutting.
-
-CURRENT
-```text
-An `Interpolation` also remembers the source text of the expression that produced it,
-which is what `piece.expression` reports.
-```
-
-PROPOSED
-```text
-An `Interpolation` also remembers the source text of the expression that produced it,
-which `piece.expression` reports.
-```
-
-## Tier B
-
-None. Nothing else in this chapter cleared the bar for a genuinely
-arguable finding; see "Considered and not flagged" for the near-misses.
-
-## Housekeeping
-
-1. **Listing comment** (line 108, `multiple_assignment.py`): the
-   comment `# Swap, no temporary needed` is a tailing-negation
-   fragment ("no X needed" tacked on rather than written as a clause,
-   §9). A plainer form would be `# Swap without a temporary`. This is
-   inside a fenced Python block, so applying it needs a re-sync
-   (`make verify` does it); the code itself is unchanged.
+All Tier A edits and the listing-comment Housekeeping fix have been
+applied (the latter needs `make sync` to reach `Examples/`).
 
 ## Considered and not flagged
 

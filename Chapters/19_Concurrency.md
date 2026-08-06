@@ -14,7 +14,7 @@ then the OS stops it and switches to a different program for another time slice.
 Later came a finer-grained unit of scheduling that lives inside a program:
 the *thread of execution*.
 A modern OS schedules threads, not whole programs.
-We say that each task (unit of work) is allocated its own thread,
+Each task (unit of work) is allocated its own thread,
 and the OS performs *context switching* from one thread to the next.
 The OS controls everything: allocating threads,
 deciding how long a time slice is, performing the context switch,
@@ -124,8 +124,7 @@ I/O-bound work overlaps within a single process,
 with `asyncio` or a thread pool.
 CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
-Later in this chapter, we show two other approaches,
-each running inside a single process.
+Two other approaches appear later in this chapter. each running inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
@@ -790,7 +789,7 @@ waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result is tagged with its `order`).
 *Draining* a queue means reading every item out of it until it is empty.
 Doing that after `join()` only works here because all five results are small enough for every worker to finish writing without needing a reader first.
-A queue carrying bulky data must be drained *before* joining:
+A queue carrying bulky data must be drained before joining:
 each worker's feeder thread blocks until its data is consumed,
 so the `join()` deadlocks.
 
@@ -809,7 +808,7 @@ Use `multiprocessing` when the job is a different shape:
   or `Array`.
   `ProcessPoolExecutor` does not expose these.
 
-We can test the claim that wall-clock time falls toward a single task's time as we add more cores.
+You can test the claim that wall-clock time falls toward a single task's time as you add more cores.
 Split a fixed amount of work into a growing number of tasks,
 keep the pool warm across every measurement,
 and watch what happens once task count passes the number of cores:
@@ -1109,7 +1108,7 @@ print(f"lost updates: {counter < 8 * 50}")
 ```
 
 Eight threads each add 50, so `counter` should reach 400.
-A typical run lands near 50.
+A typical run settles near 50.
 Each sleep releases the GIL between a read and its write,
 so all eight threads read the same value,
 and their eight writes store the same result.
@@ -1281,7 +1280,7 @@ A live consumer does not poll `empty()`;
 it calls `get()` directly and lets the block do the waiting.
 
 Python provides three queue classes with near-identical interfaces,
-the first two of which we've already seen:
+the first two of which already appeared in this chapter:
 
 - `queue.Queue` (and its sibling `PriorityQueue`)
   coordinates threads within one interpreter,
@@ -1386,7 +1385,7 @@ report("serialized",
 Read the counter, do something that releases the GIL, write the counter back.
 Eight threads read the same number and eight threads are handed it,
 so a ticket meant to go to one worker goes to several.
-The count of distinct values is still 200, which is what makes this dangerous:
+The count of distinct values is still 200, which makes this dangerous:
 nothing is missing, so nothing looks wrong until you notice the same work was done eight times.
 
 `threading.serialize_iterator()` wraps an iterator so that `__next__()` runs under a lock,
@@ -1477,7 +1476,7 @@ with ThreadPoolExecutor(max_workers=READERS) as pool:
 Each of the four threads sees all one hundred values,
 and the underlying generator is advanced once per value, not four times.
 One caution carries over:
-a `concurrent_tee()` iterator is safe to hand to *one* thread,
+a `concurrent_tee()` iterator is safe to hand to one thread,
 which is the point of making four of them.
 Sharing a single one across several threads needs `serialize_iterator()` on top.
 
@@ -1677,12 +1676,12 @@ It does not change what `asyncio` is for.
 
 ### Measuring the Difference
 
-We can support the claim that a thread costs real memory while a task costs much less.
+You can support the claim that a thread costs real memory while a task costs much less.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint directly,
 since a task is made of ordinary Python objects.
-We can calculate the ratio between the two:
+You can calculate the ratio between the two:
 
 ```python
 # task_vs_thread_memory.py
@@ -1744,7 +1743,7 @@ The stack figure is address space set aside whether every byte is touched or not
 The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one.
 
-We see a similar difference in time:
+A similar difference shows up in time:
 
 ```python
 # thread_vs_task_speed.py
@@ -1896,13 +1895,13 @@ so neither can proceed.
 Four conditions must all hold at once:
 
 1. Exclusive access to each resource
-2. A task holds one resource while it waits for another
+2. Holding one resource while waiting for another
 3. No way to force a task to give up what it holds
 4. A cycle of tasks each waiting on the next
 
 If you break any one of the four, deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
-which means we can also produce deadlock with `asyncio`.
+which means `asyncio` can also produce deadlock.
 This example has two tasks and two `asyncio.Lock` objects.
 The two locks are acquired in opposite order:
 
@@ -2050,20 +2049,18 @@ for example letting only the task with the lower ID give.
 
 ## Concurrency is Not Easy
 
-Concurrency is neither simple nor solved.
-
 There are ongoing arguments about what the term even means.
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
-As we've seen in this chapter,
+As this chapter has shown,
 concurrency means "operating or occurring at the same time."
 This works for both asynchrony and parallelism.
 
-Also, notice how much we've talked about the OS in this chapter.
+Also, notice how much this chapter has talked about the OS.
 The comfortable abstraction provided by normal programming is pierced to tatters by concurrency.
 Sometimes you even need to go beyond the OS-level abstraction,
-all the way to hardware, in order to understand a particular bug.
+all the way to hardware, to understand a particular bug.
 
 Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
 This chapter makes concurrency look (somewhat)

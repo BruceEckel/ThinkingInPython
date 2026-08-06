@@ -216,8 +216,7 @@ class Blackboard:
 ```
 
 The maze layout lives in a text file.
-The loader skips blank lines and the path comment,
-so the file is the maze.
+The loader skips blank lines and the path comment, so the file is the maze.
 
 ```text
 # rats_and_mazes/amaze.txt

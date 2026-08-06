@@ -24,7 +24,7 @@ but your solution probably doesn't have the kind of completeness you'll see embo
 That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
-A pattern earns its place only when the problem it solves is actually present.
+A pattern earns its place only when the problem it solves is present.
 If nothing varies, you do not need machinery for isolating variation.
 A pattern without its problem is just overhead.
 
@@ -36,7 +36,7 @@ Instead, a pattern embodies a complete idea within a program.
 Thus it can sometimes appear at the analysis phase or high-level design phase.
 Because a pattern has a direct implementation in code,
 you might expect it to appear no earlier than low-level design.
-It appears at every level,
+But it appears at every level,
 and you often discover that you need one only once you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
@@ -54,9 +54,8 @@ which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
-Notice that a vector of change is discovered, not predicted.
-Guessing at it up front often builds flexibility in a direction that doesn't get used.
-This creates complexity to produce generality that never pays off.
+A vector of change is discovered, not predicted.
+Guessing at it up front often builds complexity for flexibility in a direction that doesn't get used.
 Let real changes reveal it.
 The second time a requirement shifts the same part of the design,
 you have evidence.
@@ -75,27 +74,27 @@ Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Itera
 which has been implicitly available in `for` loops from the beginning of the language,
 and became an explicit feature in Python 2.2.
 An iterator allows you to hide the particular implementation of the container as you're stepping through it.
-You can write generic code that performs an operation on all of the elements in a sequence without regard to the sequence's construction.
-Generic code can work with any object that produces an iterator.
+You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
+The code works with any object that produces an iterator.
 
 A pattern is often a sign of something missing in a language.
-Enough programmers wrote the same scaffolding often enough to name it.
-That scaffolding exists only because the language does not write it for them.
+Programmers wrote the same scaffolding often enough that it acquired a name.
+It exists only because the language does not write it for them.
 When a language later absorbs the feature,
 the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language.].
 Python has absorbed several.
 Iterator became the machinery of the `for` loop,
-and *Strategy* and *Command* shrink to passing a function
+and *Strategy* and *Command* shrank to passing a function
 ([Function Objects](28_Function_Objects.md) shows both).
 This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md)
 posed: how much of each pattern's machinery does Python still need,
-and how much dissolves into functions, data, and protocols?
+and how much of it becomes functions, data, and protocols?
 
 ## Pattern Evolution
 
 A pattern arrives in stages, each more general than the last:
 
-1.  **Idiom**: how we write code in a particular language to do this particular type of thing.
+1.  **Idiom**: how you write code in a particular language to do this particular type of thing.
     This could be something as common as the way that you code the process of stepping through an array in C
     (and not running off the end).
 2.  **Specific Design**:
@@ -166,9 +165,9 @@ and the remaining difference is intent.
 
 Design principles are at least as important as design structures,
 but for a different reason.
-Principles ask questions about your proposed design, to apply tests for quality.
-Most hold for any code.
-*Reflexivity* and the *Law of Demeter* assume classes and objects.
+Principles ask questions about your proposed design and test it for quality.
+Most hold for any code,
+but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*.
@@ -187,7 +186,7 @@ Most hold for any code.
     This complements separating what varies from what stays the same,
     and is part of the Low-Coupling-High-Cohesion message.
 -   *Managed Coupling*.
-    Simply declaring that we should have "low coupling" in a design is usually too vague.
+    Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
 -   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de Saint-Exupéry, from *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].

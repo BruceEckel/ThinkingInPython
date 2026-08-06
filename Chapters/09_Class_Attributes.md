@@ -15,7 +15,7 @@ that instance variable *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
 
-Here's an example showing why it can be confusing:
+This example shows why it can be confusing:
 
 ```python
 # class_attribute_confusion.py
@@ -38,7 +38,7 @@ An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
 Assigning always writes to the instance,
 creating the instance variable on first assignment.
-To show this we can inspect the class with `vars(A)` and the instance with `vars(a)`:
+You can see this by inspecting the class with `vars(A)` and the instance with `vars(a)`:
 
 ```python
 # inside_objects.py
@@ -106,7 +106,7 @@ so it exists on `Tally` before any instance is built.
 so nothing is stored under that name anywhere on the class.
 The annotation only records, in `Tally.__annotations__`,
 that a `Tally` will eventually carry a `label`.
-That promise is invisible to `display_object()`,
+That declaration is invisible to `display_object()`,
 which reports attributes that exist,
 not annotations that merely describe one to come.
 
@@ -121,7 +121,7 @@ then falls back to the class,
 the same rule `Stars` demonstrated earlier in this chapter.
 
 A *bare annotation*, one with no assigned value,
-is a promise rather than a placeholder.
+is a declaration rather than a placeholder.
 It states that instances of this class will carry a `label` attribute of type `str`,
 set somewhere.
 Here that somewhere is `__init__()`,

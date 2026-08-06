@@ -11,8 +11,8 @@ With a loop you describe how to build the result: make an empty list,
 walk the input, test each item, and append the ones you want.
 With a comprehension you describe what the result is, as a single expression,
 and let Python build it.
-A comprehension is shorter,
-it reads like the definition of the result rather than a recipe for it,
+A comprehension is shorter.
+It reads like the definition of the result rather than a recipe for it,
 and one line replaces several lines of loop bookkeeping.
 
 ## List Comprehensions
@@ -24,7 +24,7 @@ A list comprehension consists of:
 -   An optional predicate expression.
 -   An output expression producing elements of the output list from members of the input sequence that satisfy the predicate.
 
-Let's select the integers from a mixed list and square them.
+Select the integers from a mixed list and square them.
 Several examples in this chapter use the same input list:
 
 ```python
@@ -47,13 +47,13 @@ print(squared_ints)
 
 In this comprehension:
 
--   The iterator part iterates through each member `e` of the input sequence `a_list`.
+-   The iterator walks through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
 -   If the member is an integer,
     the output expression squares it and appends it to the output list.
 
 You can achieve the same results using the built-in functions `map()` and `filter()` with an anonymous `lambda`.
-`filter()` applies a predicate to a sequence and retains the members that satisfy the predicate.
+`filter()` applies a predicate to a sequence and retains the members that pass it.
 It produces a lazy iterator, which `list()` expands into a `list`:
 
 ```python
@@ -108,7 +108,7 @@ with no `lambda` wrappers in the way.
 ## Nested Comprehensions
 
 An identity matrix of size `n` is an `n` by `n` square matrix with ones on the main diagonal and zeros elsewhere.
-In Python we can represent such a matrix by a list of lists,
+Python represents such a matrix as a list of lists,
 where each sub-list represents a row.
 The following comprehension generates an identity matrix:
 
@@ -202,9 +202,9 @@ A `with` block, unlike a function body, does not create a new scope.
 `py_paths` is assigned inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
-By then the directory is already deleted.
+By then the directory is gone.
 The comprehension already finished building `py_paths` as plain strings while the directory still existed,
-so nothing later needs the files themselves.
+so nothing later needs the files.
 
 ## Breaking Up a Complex Comprehension
 
@@ -321,9 +321,8 @@ for n in [1, 2, 3]:
 #: 3
 ```
 
-Same effect, no wasted list.
-The `for` loop reads honestly.
-It executes code rather than building a collection.
+The `for` loop has the same effect without building a wasted list.
+It reads honestly and executes code rather than building a collection.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
 If a comprehension's result is never assigned or used,
@@ -331,8 +330,8 @@ that's a sign it should be a loop instead.
 
 ## Set Comprehensions
 
-Set comprehensions construct sets using the same principles as list comprehensions.
-Instead of `[]`, a set comprehension uses `{}`.
+Set comprehensions use the same principles as list comprehensions,
+with `{}` instead of `[]`.
 
 The following set comprehension normalizes each name
 (capital first letter, the rest lower case),
@@ -362,8 +361,8 @@ the set comprehension is more efficient.
 
 ## Dictionary Comprehensions
 
-A dictionary comprehension builds a `dict`,
-producing a key and a value for each element, with an optional filter.
+A dictionary comprehension builds a `dict`.
+Each element produces a key and a value, with an optional filter.
 Here each name becomes an upper-case key mapped to its length,
 keeping only the names longer than three characters:
 
@@ -519,7 +518,7 @@ The set form `{*s for s in sets}` and the asynchronous generator form
     given the `len(name) > 3` filter.
 4.  In `generator_expression.py`,
     replace `islice(squares, 3)` with `islice(squares, 5)` and predict which five values it produces,
-    given that `next(squares)` was already called twice before that line.
+    given that `next(squares)` was called twice before that line.
 5.  In `unpacking_comprehensions.py`,
     add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,
     paying attention to which value wins for the key `"a"`.

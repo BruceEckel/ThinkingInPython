@@ -233,7 +233,8 @@ a network stub that fails twice and then succeeds, or the clock below.
 
 Reading the current time is another side cause.
 A real clock answers with the present moment,
-so a test cannot ask it what happens at some critical time (midnight, tomorrow, etc.).
+so a test cannot ask it what happens at some critical time
+(midnight, tomorrow, etc.).
 The Ability and its accessor sit in their own file,
 because two listings in this section ask the same clock different questions:
 
@@ -1821,8 +1822,7 @@ It is a language that does the encoding for you.
 
 ## Exercises
 
-1.  `crossing` in `midnight.py` walks a fixed list,
-    so it answers two requests.
+1.  `crossing` in `midnight.py` walks a fixed list, so it answers two requests.
     Write a handler that instead advances a stored moment by one second at each request,
     and confirm `archive()` still crosses midnight under it.
     Then rewrite `archive()` so the file name and the stamp cannot disagree,

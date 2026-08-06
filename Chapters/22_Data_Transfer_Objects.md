@@ -2,7 +2,7 @@
 
 The *Messenger* or *Data Transfer Object* is a way to pass a package of information around.
 The most typical use is for function return values.
-Tuples and dictionaries are often used for that, but both rely on indexing.
+You often use tuples and dictionaries for that, but both rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
 
@@ -67,7 +67,7 @@ so no checker can know which names to expect.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
-and equality from those declarations, producing a mutable record:
+and equality from those declarations, and produces a mutable record:
 
 ```python
 # point_dataclass.py
@@ -126,7 +126,6 @@ see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-value
 
 ## Returning Multiple Values
 
-This is the return-value use promised at the start.
 Here, a function computes two results, returned in a `NamedTuple`:
 
 ```python

@@ -16,7 +16,7 @@ and you never call that sequence yourself.
 
 ## The Fixed Algorithm
 
-The defining trait of a Template Method is that the base class fixes the *shape* of the algorithm.
+The defining trait of a Template Method is that the base class fixes the shape of the algorithm.
 Subclasses complete the individual steps.
 The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
 (see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).

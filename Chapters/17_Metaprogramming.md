@@ -1,10 +1,10 @@
 # Metaprogramming
 
 Objects are created by other (special) objects.
-These special objects are called *classes* and we configure them to produce desired objects.
+These special objects are called *classes* and you configure them to produce desired objects.
 
-So, classes are themselves objects.
-We can modify objects:
+Classes are also objects.
+You can modify objects:
 
 ```python
 # modify_class.py
@@ -51,7 +51,7 @@ display_object(x)
 ```
 
 Note that `x` sees the changes made to the class *after* `x` was created.
-The instance itself never changed; its `__dict__` is as empty as before.
+The instance never changed; its `__dict__` is as empty as before.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
 even ones already created.
@@ -527,7 +527,7 @@ In `print(p.x, p.y)`, Python evaluates both arguments before calling `print()`,
 so both `__get__` lines appear ahead of `3 4`.
 The final access, `Point.x`, goes through the class rather than an instance,
 so `__get__()` receives `obj=None` and reports `via class`.
-That branch returns `self`, the descriptor object itself,
+That branch returns `self`, the descriptor object,
 which is why `isinstance(Point.x, Field)` is `True`.
 
 Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
@@ -560,8 +560,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 
 ## Writing a Metaclass
 
-When the simpler hooks are not enough, write a metaclass.
-A metaclass is a subclass of `type`.
+A metaclass is a subclass of `type`, used when the simpler hooks are not enough.
 You attach it with the `metaclass=` keyword in the class header.
 Python then uses your metaclass, instead of `type`, to build the class.
 
@@ -686,7 +685,7 @@ print("has Tag base:", Tag in Demo.__bases__)
 `added_in_init` never appears because `type.__new__()` copies `nmspc` into the new class's own `__dict__` as it builds the class.
 By the time `__init__()` runs, the two mappings are independent,
 so mutating the original dict changes nothing the class can see.
-`setattr(cls, ...)` still works because it modifies the class object itself.
+`setattr(cls, ...)` still works because it modifies the class object.
 
 Override `__new__()` when you must change `name`, `bases`, or the namespace
 (including special members like `__slots__`) before Python builds the class.
@@ -755,7 +754,7 @@ The `[T]` on `__call__()` ties its return type to `cls`,
 so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
 Without it, every singleton loses its type and a type checker can no longer catch a misspelled attribute access on the result.
 
-You might expect to parameterize[^parametrize] the class itself,
+You might expect to parameterize[^parametrize] the class,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That does not work.
 A `ClassVar` cannot depend on a type parameter of its own class,
@@ -907,8 +906,7 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
 ## When You Still Need a Metaclass
 
-After all this, when is a metaclass the right tool?
-When you need to change the class object rather than react to its creation:
+Use a metaclass when you need to change the class object rather than react to its creation:
 
 - Adding methods *to the class*
   (metamethods such as a custom `__iter__()` or `__call__()` on the class, shown above).
@@ -950,7 +948,7 @@ unless you truly need them.
 
 ## The `inspect` Module
 
-Up to now we've been modifying classes.
+Up to now, you've been modifying classes.
 `type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
 The `inspect` module is the other half of metaprogramming.
 `inspect` reads the structure of live objects.
@@ -1004,7 +1002,7 @@ and `__annotations_cache__` holds the result after the first request.
 
 ### Building `display_object()`
 
-Throughout the book we've been using `display_object()` to show the layout of an object.
+Throughout the book you've been seeing `display_object()` to show the layout of an object.
 The `utils/` prefix makes it live in the shared `utils/` directory at the top of the `Examples` tree,
 and any chapter can import it:
 
@@ -1097,7 +1095,7 @@ def display_object(
     max_width: int = 65,
     exclude: Sequence[str] = (),
 ) -> None:
-    # For a class, the class itself; for an instance, its class:
+    # For a class, the class; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
     annotations = _annotations(cls)
     attributes: list[str] = []
@@ -1290,7 +1288,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 ```
 
 The first two calls show the same class from two angles.
-`display_object(Fraggle)` inspects the class object itself.
+`display_object(Fraggle)` inspects the class object.
 It lists `y` and `z`, the fields with defaults.
 `x` is declared as `x: int` with no default,
 so on the class it is only an annotation, not a bound attribute,
@@ -1307,8 +1305,10 @@ A `@dataclass` produces many of these:
 - `__match_args__`
 - `__replace__`
 - `__hash__`, set to `None`
-- The generated `__init__`, `__eq__`, and `__repr__`,
-  which give `Fraggle` a constructor, equality, and a `repr()` for free.
+- `__init__`, `__eq__`, and `__repr__`
+
+The generated `__init__`, `__eq__`, and `__repr__` give `Fraggle` a constructor,
+equality, and a `repr()` for free.
 
 The rest, from `__class__` to `__static_attributes__`,
 is the bookkeeping every class carries.

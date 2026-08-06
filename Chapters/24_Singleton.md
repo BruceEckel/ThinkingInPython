@@ -49,8 +49,7 @@ Rebind only through the module.
 
 ## When You Want a Class, Cache the Instance
 
-Sometimes you do want a class,
-but every construction should return the same object.
+Every construction should return the same object.
 The simplest solution is to hide construction behind a cached factory.
 This applies `functools.cache` to a *constructor function*,
 which is an ordinary function whose only job is to build and return an instance of a class.
@@ -98,7 +97,7 @@ This listing keeps the bare name for a reason that outlasts the convention.
 so the class already appears in the module's public signature.
 A caller who annotates the result must write that name,
 and a type outsiders must name is not private, whatever it starts with.
-Only if the type never left the module would we use `_Settings`.
+Only if the type never left the module would you use `_Settings`.
 
 Two stronger-looking moves fail the same way.
 Deleting the name after building the instance leaves the class reachable,
@@ -233,11 +232,8 @@ The classic approach takes control of creation by delegating to a single instanc
 
 ### Lazy Creation
 
-This version builds the inner instance on the first call.
-It is *lazy*.
-It builds the inner object on the first call,
+It is *lazy*: it builds the inner object on the first call,
 which is why it needs the `None` sentinel and the `if` guard.
-
 
 ```python
 # singleton_pattern.py
@@ -331,7 +327,7 @@ so its return type is whatever the inner object happens to hold under that name.
 Delegation trades static knowledge for reach,
 which is the cost [Surrogate](26_Surrogate.md#proxy) pays throughout.
 
-The two forms differ only in *when* they create the inner object.
+The two forms differ only in when they create the inner object.
 The lazy form defers it to the first `OnlyOne(...)` call,
 so it can wait for data not available at import time,
 but it carries the sentinel and the guard,
@@ -343,7 +339,7 @@ Either way, this is a lot of code for what a module does on its own.
 
 ### Overriding `__new__`
 
-We can use `__new__()`, the method that creates an instance,
+You can use `__new__()`, the method that creates an instance,
 to return the same object every time:
 
 ```python
@@ -396,7 +392,7 @@ which puts it on the other side of the rule.
 ### One Instance in a Class Variable
 
 The nested private class is not required.
-Here we keep the single instance in a class variable.
+Here you keep the single instance in a class variable.
 `__new__` builds it, when needed, from the class being constructed:
 
 ```python
@@ -433,7 +429,7 @@ and Python calls `__init__()` on the shared instance after every construction if
 ### Borg: Singleton By Inheritance
 
 [Alex Martelli observes](http://www.aleax.it/Python/5ep.html)
-that what you usually want is not one *object* but one shared set of *state*.
+that what you usually want is not one object but one shared set of state.
 People can create as many objects as they like,
 as long as they all share the same data.
 He called this the *Borg*.^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."]
@@ -660,7 +656,7 @@ and the difference is only what `__new__()` returns.
 
 Use the lightest tool that fits:
 
-- For almost everything, use a *module* with module-level state.
+- For almost everything, use a module with module-level state.
   It is the default Python singleton and needs no class.
 - If you want a class, hide construction behind a cached factory (`@cache`),
   or override `__new__()`.

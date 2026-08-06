@@ -4,10 +4,9 @@ A *type* is a set of values.
 The type `int` is the set of whole numbers.
 A type you define, like a rating from one to ten, is a smaller set:
 the allowed values.
-We have historically been bad at keeping objects inside that set.
-We let code construct an object in an illegal state,
-or we let later code mutate it into one,
-and then we scatter checks everywhere to defend against the mess.
+Programmers have historically been bad at keeping objects inside that set.
+It's too easy to construct or mutate an object in an illegal state.
+Checks to defend against the mess become scattered throughout your code.
 
 This chapter shows a better approach, built from frozen data classes.
 You validate the value once, at construction,
@@ -44,8 +43,7 @@ An exception is a value like any other, and the values it carries deserve names.
 such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
-`eq=False` turns off the generated `__eq__()`,
-which matters more than it appears.
+`eq=False` turns off the generated `__eq__()`, for two reasons.
 A data class that defines `__eq__()` sets `__hash__` to `None`,
 and an unhashable exception is a trap if you put it in a set.
 Identity is the correct comparison for an exception.
@@ -84,7 +82,7 @@ print(f2(rating))
 
 Each function duplicates the check, the check is easy to forget,
 and the type system is no help.
-The `int` annotation says "any integer," which is not what we mean.
+The `int` annotation says "any integer," which is not what you mean.
 
 ## A Class Is Not a Type
 
@@ -152,7 +150,7 @@ class Messenger:
     depth: float = 0.0  # Default value
 ```
 
-We can see what `@dataclass` generates using `display_object()`,
+You can see what `@dataclass` generates using `display_object()`,
 the inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module):
 
 ```python
@@ -213,8 +211,7 @@ This copy-instead-of-mutate style reduces errors.
 `copy.replace()`, in [The General Form of `replace()`](#the-general-form-of-replace),
 does the same for anything immutable, not only for data classes.
 
-Notice the last two lines.
-A data class is mutable, so `m.name = "bar"` works.
+The last two lines show that a data class is mutable, so `m.name = "bar"` works.
 
 `display_object()` shows the attributes with their declared types:
 
@@ -282,10 +279,9 @@ then validating it at construction makes it valid for its lifetime.
 
 ## A Type Is a Set of Values
 
-If we make `Stars` a frozen data class,
-we can guarantee that every `Stars` object is legal.
-To validate it after the fields receive their values,
-we define `__post_init__()`.
+If you make `Stars` a frozen data class,
+you can guarantee that every `Stars` object is legal.
+To validate it after the fields receive their values, define `__post_init__()`.
 The generated `__init__()` calls this automatically:
 
 ```python
@@ -338,7 +334,7 @@ Instead of checking a changeable value everywhere and hoping you never miss a sp
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
 No other code repeats the check, because it cannot fail.
-An illegal value can never produce a `Stars` in the first place.
+An illegal value never produces a `Stars`.
 Illegal values are unrepresentable.
 
 This is one aspect of functional programming
@@ -350,7 +346,7 @@ argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 
 Testing demonstrates that illegal values cannot exist.
-`pytest.raises()` ensures that the constructor rejects every value outside the set:
+`pytest.raises()` confirms that the constructor rejects values outside the set:
 
 ```python
 # test_stars.py
@@ -447,7 +443,7 @@ def test_email_needs_at_sign(bad: str) -> None:
 ## Enums Are Types Too
 
 When the set of values is small and fixed, an `Enum` is the clearest type.
-As an example, we'll create a `BirthDate` containing a month, day, and year.
+As an example, a `BirthDate` contains a month, day, and year.
 A year has twelve months, so `Month` is an `Enum`.
 Each month carries its length, and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields.
@@ -618,7 +614,7 @@ so `field(default_factory=dict[str, str])` is legal and does what it looks like.
 That form seems redundant,
 because the annotation on the left already names the type,
 and the subscript is erased at runtime.
-It buys one thing, which turns out not to be nothing:
+It gains one small but real thing:
 
 ```python
 # factory_checking.py
@@ -673,7 +669,6 @@ Make the type responsible for guaranteeing its own values.
 
 A `NamedTuple` is the other immutable record,
 and it is tempting for a small type like `Stars`.
-It cannot hold a guarantee, because it has nowhere to put one.
 `typing.NamedTuple` forbids overriding the methods that build an instance,
 so validation must live in a factory function beside the type,
 where a caller can go around it:
@@ -807,10 +802,10 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-A data class assembles its `__init__` from a field list which includes its own fields plus any inherited from data class bases.
-It builds the body by assigning those fields, not by chaining to the base.
-It has no way to know what arguments a non-data-class base constructor expects,
+A data class has no way to know what arguments a non-data-class base constructor expects,
 so it does not call it.
+Its field list covers its own fields plus any inherited from data class bases,
+and it builds the body by assigning those fields.
 
 ## More Data Class Tools
 
@@ -891,7 +886,7 @@ The last case matters more than the convenience.
 `copy.replace()` builds the new object through the constructor,
 so `Stars.__post_init__()` runs on the copy.
 A validated type stays validated across a replacement,
-which is what makes "transform one legal value into a new legal value" a safe thing to say.
+which makes "transform one legal value into a new legal value" a safe thing to say.
 A copy that skipped the constructor would be a hole in the guarantee.
 
 `__replace__()` is a dunder like any other,
@@ -928,7 +923,7 @@ print(lighter, hex(lighter.packed))
 #: Color(64, 128, 128) 0x408080
 ```
 
-`Color` stores no separate fields at all,
+`Color` stores no separate fields,
 so `dataclasses.replace()` has nothing to work with.
 `__replace__()` unpacks the channels, applies the changes,
 and hands the result back through the constructor,
@@ -936,8 +931,7 @@ which is the same shape every implementation takes:
 recover the constructor arguments, override the named ones, rebuild.
 Returning `Self` from `type(self)(...)` means a subclass gets a copy of its own class.
 
-The rule for deciding is short.
-Define `__replace__()` when your type is immutable and callers will want a variant of it.
+Define `__replace__()` when your type is immutable and callers will need variants of it.
 Skip it when the type is mutable,
 because the caller can assign to the attribute.
 
@@ -1048,9 +1042,8 @@ reconstructing nested types from the parsed JSON and validating as they go.
 
 ## Comparing Ordinary Classes and Data Classes
 
-Now we can look at the differences between these two types of classes.
-In addition, we can add some insight to [Class Attributes](09_Class_Attributes.md).
-Four small classes make the differences concrete:
+Four small classes make the differences concrete,
+and add some insight to [Class Attributes](09_Class_Attributes.md):
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
@@ -1102,11 +1095,12 @@ and `show(A())` reports none as redefined.
 
 `x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
 As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values)
-puts it, a bare annotation is a promise rather than a placeholder.
+puts it, a bare annotation is a declaration rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
-but nothing is actually stored anywhere until assigned in code.
-`A` has no `__init__()` to make that assignment, so the promise never gets kept.
+but nothing is stored anywhere until assigned in code.
+`A` has no `__init__()` to make that assignment,
+so the declaration never gets fulfilled.
 That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
 on the class or on the instance.
 
@@ -1114,7 +1108,7 @@ on the class or on the instance.
 
 `B` adds default values to `x` and `s`,
 which turn them from bare annotations into class variables,
-because the assignments allocate storage for those class variables:
+because the assignments allocate storage:
 
 ```python
 # class_with_defaults.py
@@ -1168,7 +1162,7 @@ print(C.__annotations__)
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
-As a `@dataclass`, `C`s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
+As a `@dataclass`, `C`'s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment it is constructed.
 `B` runs nothing like that.
 With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
@@ -1179,10 +1173,9 @@ tagged `[CV]`, no matter how many `B` instances exist.
 to learn what fields exist and in what order,
 then uses that to write `__init__`'s parameter list and the assignments inside it.
 `@dataclass` stores nothing on the class:
-`x` is still absent from `C.__dict__` after decoration,
-exactly as it was before.
-The promise is only fulfilled per instance,
-when the generated `__init__()` actually runs.
+`x` is still absent from `C.__dict__` after decoration, as it was before.
+The declaration is only fulfilled per instance,
+when the generated `__init__()` runs.
 That is the difference from `A`: not that `@dataclass` changes the annotations,
 but that it builds something to act on them.
 
@@ -1245,9 +1238,8 @@ so no constructor call can ever assign one.
 `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
 
 `f: ClassVar[float]` never appears in either report.
-It has no initializer,
-so it is a bare annotation exactly like `x` and `s` were back in `A`:
-a promise recorded in `D.__annotations__`,
+It has no initializer, so it is a bare annotation,
+as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
 `D.f` raises `AttributeError`, for the same reason `A().x` would.
 Declaring a field `ClassVar` does not, by itself, create anything.

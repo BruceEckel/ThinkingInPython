@@ -22,118 +22,18 @@ Housekeeping is not humanizer output; separate list at the end.
 This chapter is close to clean. The scan found two small first-person-plural
 slips ("we saw," "We can write") of the kind chapters 46 and 47 already
 converted to impersonal phrasing, and one clear filler "itself" paired with
-an italics-for-emphasis misuse on the word "class." Two more items are
-genuinely arguable and belong in Tier B. Everything else on the pattern
+an italics-for-emphasis misuse on the word "class." One more item was
+genuinely arguable and belonged in Tier B. Everything else on the pattern
 list, promotional language, rule-of-three padding, signposting, fragmented
 headers, staccato drama, curly quotes, came back clean.
 
-## Tier A
-
-### A1 — lines 12, 172 — first-person plural ("we")
-
-The book is second person throughout; both sites drop into "we," the same
-pattern flagged and converted in chapters 46 and 47. Neither is a genuine
-authorial aside worth keeping.
-
-**line 12**
-
-CURRENT
-```text
-This is far more reliable than using `__del__()`,
-as we saw in [Cleanup](10_Cleanup.md).
-```
-
-PROPOSED
-```text
-This is far more reliable than using `__del__()`,
-as shown in [Cleanup](10_Cleanup.md).
-```
-
-**line 172**
-
-This one also announces what the prose is about to do ("We can write...")
-instead of just presenting it, so the rewrite drops both the person slip
-and the announcement in one pass.
-
-CURRENT
-```text
-We can write a version with more features:
-reporting which exception it swallowed,
-and accepting no argument to mean "ignore everything."
-It turns out to be useful enough to reuse elsewhere in the book,
-so it lives in `utils/`, where any chapter can import it:
-```
-
-PROPOSED
-```text
-A version with more features reports which exception it swallowed,
-and accepts no argument to mean "ignore everything."
-It turns out to be useful enough to reuse elsewhere in the book,
-so it lives in `utils/`, where any chapter can import it:
-```
-
-Delete individual rows you want left alone.
-
-### A2 — line 228 — "class itself" (filler + emphasis italics)
-
-This is close to the exact case `CLAUDE.md` calls out by name: "the class
-itself" reads the same with "itself" cut. The italics on `class` add
-emphasis rather than introducing a new term (`class` has been used
-pervasively since chapter 1), and the sentence's own trailing "not an
-instance of it" already carries the contrast the italics were reaching for.
-
-CURRENT
-```text
-The annotations use `type[BaseException]`,
-a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
-which means the exception *class* itself, such as `ZeroDivisionError`,
-not an instance of it.
-```
-
-PROPOSED
-```text
-The annotations use `type[BaseException]`,
-a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
-which means the exception class, such as `ZeroDivisionError`,
-not an instance of it.
-```
-
-## Tier B
-
-### B1 — line 8 — "actually"
-
-On the watch list, but it may be earning its place: the sentence sets up a
-contrast between "how to write your own context managers" and what `with`
-"actually" does underneath, and the chapter goes on to reveal that
-mechanism. A single watched word in isolation is weak evidence either way.
-I lean toward cutting it since the sentence reads identically without it,
-but this is closer to a coin flip than A1/A2.
-
-CURRENT
-```text
-The `with` statement,
-introduced in [Control Flow](04_Control_Flow.md#context-managers),
-runs setup before a block and cleanup after it,
-even if the block raises an exception.
-This chapter shows how to write your own context managers,
-and what `with` actually does.
-```
-
-PROPOSED
-```text
-The `with` statement,
-introduced in [Control Flow](04_Control_Flow.md#context-managers),
-runs setup before a block and cleanup after it,
-even if the block raises an exception.
-This chapter shows how to write your own context managers,
-and how `with` works.
-```
+All Tier A and Tier B edits have been applied.
 
 ## Housekeeping
 
 No `[[ ]]` draft notes, no curly quotes, no spaced ` -- `, and no double
 blank lines before a heading anywhere in the chapter. Semantic Line Breaks
-look intact throughout: every long line I checked (§10, §50, §202, §210,
+look intact throughout: every long line checked (§10, §50, §202, §210,
 §221) is one clause with no internal comma to break at, not drift. Nothing
 to report.
 

@@ -23,7 +23,7 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
-Importing a module creates a *namespace* within the importing file.
+Importing a module creates a *namespace* within the file that imports it.
 This automatically prevents name clashes between the imported module's names and the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
@@ -113,13 +113,13 @@ You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
 
-To demonstrate, we'll create a directory called `a_package` and give it an `__init__.py` containing only a comment:
+To explore this, create a directory called `a_package` and give it an `__init__.py` containing only a comment:
 
 ```python
 # a_package/__init__.py
 ```
 
-Now we'll add two modules to the package:
+Now add two modules to the package:
 
 ```python
 # a_package/module1.py
@@ -185,7 +185,7 @@ print(function2())
 #: function2 in module2 in a_package
 ```
 
-We can even put a second package underneath the first one:
+You can even put a second package underneath the first one:
 
 ```python
 # a_package/b_package/__init__.py
@@ -200,7 +200,7 @@ def function3():
     return "function3 in module3 in b_package"
 ```
 
-To import `module3` we must specify both packages:
+To import `module3` you must specify both packages:
 
 ```python
 # two_levels.py
@@ -265,7 +265,7 @@ that eager work slows startup.
 Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
 adds the `lazy` soft keyword.
 A `lazy import` defers loading the module until the first time you use the imported name,
-so you pay the cost only for what you actually use,
+so you only pay the cost for what you actually need,
 while still declaring all imports at the top of the file:
 
 ```python

@@ -6,7 +6,7 @@ def get(data, key, default=MISSING):
     if key in data:
         return data[key]
     if default is MISSING:
-        return MISSING  # Normally raise exception here
+        return MISSING  # Normally raises an exception here
     return default
 
 prefs = {"volume": 3, "mute": None}

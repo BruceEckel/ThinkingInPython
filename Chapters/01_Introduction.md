@@ -3,7 +3,7 @@
 This book is targeted to experienced programmers who can learn a programming language through an overview,
 and who wish to explore Python at an intermediate-to-advanced level.
 
-It is about cultivating the judgment to choose the smallest thing that works.
+It is about developing the judgment to choose the smallest thing that works.
 You build that judgment through insights, idioms, and patterns.
 The book also questions design patterns.
 Most arose to work around the limits of static, inheritance-heavy languages,
@@ -24,7 +24,7 @@ and adds the complexity only when the answer is no.
 ## Who This Book Is For
 
 I am writing for the programmer who already knows how to program,
-either in another language or in Python itself.
+either in another language or in Python.
 The goal is to move from writing Python that works to writing Python that is clear,
 idiomatic, and a pleasure to maintain.
 
@@ -44,7 +44,7 @@ You should be comfortable with:
 - Containers: lists, dictionaries, tuples, and sets.
 
 You do not need to know design patterns, metaclasses, or type checking.
-We cover them here.
+This book covers them.
 The book is about the language, not the tooling around it.
 Fortunately, `uv` and other tools greatly simplify setup,
 so you don't need to spend time on it.
@@ -61,7 +61,7 @@ Eventually I even wrote a message confirming I was not going to complete it.
 In June of 2026, after having people mention the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
 The experience was amazing, and I began adding material from talks, writing,
-and presentations (mostly at PyCon).
+and presentations.
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
 
 This book never would have happened without the help of Claude,
@@ -81,22 +81,20 @@ I would get a good idea about something
 (for example, automatically interleaving commented output in the listings).
 But I was either unable to implement it, or it seemed too hard,
 so I didn't do it.
-But with AI I've been able to explore and often implement every whim,
+But with AI I can explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter to ones as daunting as that commented-output system.
-The result is much better than I've been able to achieve in the past.
-I'm able to keep going until I've tweaked everything that occurs to me.
+The result is much better than anything I managed before.
+I keep going until I've tweaked everything that occurs to me.
 
 For things that I have generated rather than written from scratch,
 I've become the director of the movie instead of an actor in it.
 This book is what I've always wanted to create,
-but have never had the capacity to fully flesh out in all its myriad detail.
-With Claude and my directing, rewriting, and editing,
-I'm able to build my ideal book.
+but have never had the capacity to flesh out in all its myriad detail.
+With Claude and my directing and rewriting, I can build my ideal book.
 
-To be clear, using Claude greatly simplified and sped the writing process.
+Using Claude greatly simplified and sped the writing process.
 It did not make it trivial.
-Once Claude had incorporated,
-translated and integrated my own work into the book,
+Once Claude had translated and integrated my own work into the book,
 and once it had made initial generations of new material,
 I went through line by line and concept by concept,
 inevitably rewriting and asking for clarification,
@@ -113,12 +111,12 @@ My only hope is that this book will be engaging to read,
 and that you will experience some of the same satisfaction that I've had while writing it.
 
 If it's not already true, I think most programmers will regularly use AI.
-I have found that the knowledge contained in this book has helped me guide AIs towards better solutions.
+I have found that the knowledge in this book has helped me guide AIs toward better solutions.
 
 ## How the Book Is Organized
 
-Almost every chapter is largely self-contained,
-so you can read straight through, or jump to a chapter that interests you.
+Most chapters are self-contained, so you can read straight through,
+or jump to a chapter that interests you.
 The book is organized into four parts.
 
 Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
@@ -135,8 +133,7 @@ It closes with performance and concurrency,
 where the question changes from what the code says to how fast it runs.
 Many of these chapters came from presentations I've given, mostly at PyCon.
 
-Part III, *Patterns*,
-opens by stepping back to question object orientation itself,
+Part III, *Patterns*, opens by stepping back to question object orientation,
 because several of the patterns that follow exist to manage problems that objects create.
 The part then works through the classic design patterns,
 each reframed for Python and weighed against the language.
@@ -161,7 +158,7 @@ The last two put that idea to work with a library that brings Effect tracking to
 The book targets Python 3.15 and later, uses type hints throughout,
 and tests with `pytest`.
 Early chapters omit type hints deliberately,
-waiting until [Static Typing](08_Static_Typing.md) introduces the syntax.
+until [Static Typing](08_Static_Typing.md) introduces the syntax.
 Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
@@ -175,12 +172,12 @@ like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
 The repository's `tools/README.md` explains how to build the book and run the examples yourself.
 
-The book's build system extracts the book examples, then type-checks
+The book's build system extracts the examples, then type-checks
 (with Astral's `ty`), runs, and tests them.
 The code you read is the code that runs,
 and the output shown is the output it produces.
 
-If you find a mistake, corrections are welcome.
+If you find a mistake, please send a correction.
 See `CONTRIBUTING.md` in the source repository.
 
 ## Exercises
@@ -188,7 +185,7 @@ See `CONTRIBUTING.md` in the source repository.
 Most chapters end with a short "Exercises" section.
 These are meant for a workshop, worked in pairs at a keyboard,
 not left for solitary homework.
-Most ask you to change a small,
+They usually ask you to change a small,
 already-working example from that chapter and observe the result: add a class,
 break an invariant on purpose, extend a table, rewrite one function two ways.
 The point is to touch the code, predict what will happen, then run it and check.
@@ -198,7 +195,7 @@ where a pattern only shows its value in a program you build yourself.
 Solutions live in the `Solutions/` directory of the source repository.
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
-not in the code you end up with.
+not in the code you produce.
 
 ## Resources
 

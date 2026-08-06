@@ -17,7 +17,7 @@ The effect is the same.
 Adding a new type can cause problems.
 
 The solution is to encapsulate object creation.
-We force the creation of objects to go through a common *factory* rather than spreading creational code throughout the system.
+You force the creation of objects to go through a common *factory* rather than spreading creational code throughout the system.
 If your program must go through this factory whenever it needs to create one of your objects,
 then all you must do when you add a new object is to modify the factory.
 
@@ -27,8 +27,8 @@ Factory might be the most common design pattern.
 
 ## Simple Factory Method
 
-As an example, let's revisit the `Shape` system.
-We can make the factory a `@staticmethod` of the base class:
+As an example, revisit the `Shape` system.
+The factory can be a `@staticmethod` of the base class:
 
 ```python
 # shapefact1/shape_factory1.py
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
 The privacy has a price.
 The nested `class` statements run again on every call,
-so each call to `factory()` defines fresh `Circle` and `Square` classes.
+so every `factory()` defines fresh `Circle` and `Square` classes.
 Two shapes from different calls share behavior but not a class:
 `type(a) is type(b)` is `False`,
 and `isinstance()` comparisons across calls fail with it.
@@ -191,8 +191,7 @@ In Python a class is a first-class object.
 You can store it in a variable and call it to make an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
-No factory method or factory class exists.
-The `dict` is the factory.
+There is no factory method and no factory class; the `dict` is the factory.
 You can go one step further,
 so the factory never needs editing when you add a type,
 by letting each subclass register itself through `__init_subclass__()`:
@@ -232,9 +231,10 @@ Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler),
 and it is the most common form of factory in idiomatic Python.
-The sections below show the classic object-oriented factories for contrast.
+The remaining sections cover the classic object-oriented factories,
+for contrast.
 
-Know *when* the registration happens:
+Know when the registration happens:
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 In one file that timing is invisible,
 but a subclass defined in another module joins the registry only when that module is imported.
@@ -360,7 +360,7 @@ The actual creation of shapes happens in `ShapeFactory.create_shape()`,
 a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,
 but you could imagine a more complex problem where the caller receives the appropriate factory object and then uses it to create an object in a more sophisticated way.
-However, it seems that much of the time you don't need the intricacies of the polymorphic factory method,
+However, much of the time you don't need the complexity of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`)
 will work fine.
 
@@ -374,12 +374,12 @@ Because classes are already first-class objects,
 the registry shown above does the same job.
 It maps a name to a class and constructs it.
 Prefer that.
-A separate factory *class* becomes valuable when creating an object takes real work beyond calling a constructor,
+A separate factory class is worth writing when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
 
 ## Abstract Factories
 
-The *Abstract Factory* pattern looks like the factory objects we've seen previously,
+The *Abstract Factory* pattern looks like the factory objects shown previously,
 with not one but several factory methods.
 Each factory method creates a different kind of object.
 At the point of creation of the factory object,
@@ -479,13 +479,13 @@ This also contains examples of [Multiple Dispatching](32_Multiple_Dispatching.md
 The base classes `Obstacle`, `Character`, and `GameElementFactory`
 (translated from the Java version)
 force every concrete class to inherit from them.
-Note what their `raise NotImplementedError` bodies do and do not enforce.
-They fail at *call* time:
+Those `raise NotImplementedError` bodies enforce less than the listing suggests.
+They fail at call time:
 a concrete factory that forgets `make_obstacle()` constructs without complaint and raises an exception only when the missing method finally runs.
-An `@abstractmethod` fails at *instantiation*,
+An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
 which catches the omission as early as possible.
-The two spellings look interchangeable in a listing and fail at different moments.
+The two forms look interchangeable in a listing and fail at different moments.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -551,10 +551,8 @@ A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `action()`.
 This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
-It preserves what the interfaces were for,
+It preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
-Python's version of interface inheritance is a `Protocol`,
-not a shared base class.
 
 ## Prototype
 
@@ -598,9 +596,9 @@ The deep copy is the part that matters.
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
 A shallow copy shares that list, and editing one monster corrupts the other.
-The `clone()` method simply wraps `copy.deepcopy()`.
+The `clone()` method wraps `copy.deepcopy()`.
 
-We can combine prototype with a registry.
+You can combine prototype with a registry.
 Instead of a registry of classes,
 keep a registry of prototypical instances and clone the chosen one:
 
@@ -640,8 +638,8 @@ There the table holds classes and calls a constructor.
 Here it holds instances and copies them.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
-These tests show that Prototypes are safe because each spawn is independent,
-and the stored prototype never changes:
+These tests show that Prototypes are safe.
+Each spawn is independent, and the stored prototype never changes:
 
 ```python
 # test_prototype.py
@@ -718,8 +716,7 @@ Each setter returns `self`,
 annotated with `Self` from [Static Typing](08_Static_Typing.md#the-self-type),
 so the calls chain.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
-The class works, and it reads well.
-It also solves a problem Python does not have.
+The class works and reads well, but it solves a problem Python does not have.
 Keyword arguments with defaults are the built-in builder:
 
 ```python
@@ -744,7 +741,7 @@ if __name__ == "__main__":
 Every combination of settings is a single call,
 the call site names each option just as the chain did,
 and the defaults live on the fields instead of inside a second class.
-`dataclasses.replace()` covers the other thing builder chains are used for:
+`dataclasses.replace()` covers the other use of builder chains:
 starting from an existing configuration and varying it.
 For a frozen data class,
 `replace()` is Prototype and Builder rolled into one function,
@@ -775,12 +772,10 @@ def test_replace_varies_one_field() -> None:
 modeling toppings as wrapper objects instead of builder-collected fields,
 to illustrate the unrelated Decorator pattern.
 
-When does Builder survive in Python?
-When construction genuinely is a process.
+Builder survives in Python when construction is genuinely a process.
 The steps must happen in an order, later steps depend on earlier ones,
 and rules span the steps.
-`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze)
-is the real thing.
+`GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze) qualifies.
 It assembles a maze in three stages, creating rooms, connecting doors,
 then placing the robot,
 and each stage relies on what the previous stage established.
@@ -789,14 +784,15 @@ The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 
-The humblest builder in Python hides in plain sight.
+The humblest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable product,
-a string, through a mutable intermediate, which is Builder's essence.
+a string, through a mutable intermediate.
+That is the Builder structure.
 `PizzaBuilder` collecting toppings in a list and freezing them into a tuple at `build()` is the same move.
 Reserve the pattern, and the name,
 for construction that is a process with intermediate state and rules of its own.
 When the "steps" are just optional values,
-keyword arguments and a data class already are the builder.
+keyword arguments and a data class are the builder.
 
 ## Exercises
 
@@ -813,5 +809,5 @@ keyword arguments and a data class already are the builder.
 6.  Move `Circle` and `Square` out of `registry.py` into a new module,
     `extra_shapes.py`.
     Confirm that `make("Circle")` now raises `KeyError` until `extra_shapes` is imported,
-    and explain exactly which line of which file performs the registration,
+    and explain which line of which file performs the registration,
     and when it runs.

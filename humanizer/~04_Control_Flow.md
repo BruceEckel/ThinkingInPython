@@ -28,27 +28,7 @@ reading"); everything else considered below is a deliberate near-miss that
 I judged to be real, legitimate technical prose rather than an AI tell.
 This is a short reference chapter with almost nothing to fix.
 
-## Tier A
-
-None. Nothing rose to the level of "I'd apply this."
-
-## Tier B
-
-### B1 — line 360 — unnecessary intensifier
-
-"Simply" doesn't earn its place; the sentence means the same without it.
-
-CURRENT
-```text
-When simply reading or writing a file,
-`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file.
-```
-
-PROPOSED
-```text
-When reading or writing a file,
-`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file.
-```
+The one Tier B edit has been applied.
 
 ## Housekeeping
 

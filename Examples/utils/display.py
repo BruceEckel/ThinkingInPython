@@ -86,7 +86,7 @@ def display_object(
     max_width: int = 65,
     exclude: Sequence[str] = (),
 ) -> None:
-    # For a class, the class itself; for an instance, its class:
+    # For a class, the class; for an instance, its class:
     cls = obj if inspect.isclass(obj) else type(obj)
     annotations = _annotations(cls)
     attributes: list[str] = []
