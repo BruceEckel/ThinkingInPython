@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Humanizer candidates: Chapters/45_Generators.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).

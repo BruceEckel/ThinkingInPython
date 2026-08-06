@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 Although `Generator[str, str, str]` describes `interview()` accurately,
 it does not say which `str` is which.
-With `NewType` we can give each channel a distinct type,
+With `NewType` you can give each channel a distinct type,
 so the annotation states the arrangement and a checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
@@ -223,7 +223,7 @@ The generator is imported unchanged; only the driver is new.
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
 
-Notice that `interview()` does not know where the answers come from.
+Notice that `interview()` does not know where the answers originate.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 `drive()` decides how those needs are met,
@@ -375,7 +375,7 @@ The driver sees `StopIteration` only when `both()` runs out of delegations.
 
 ### All Three Channels
 
-We can apply `yield from` to our `interview()` example:
+You can apply `yield from` to the `interview()` example:
 
 ```python
 # yield_from_delegates.py
@@ -420,9 +420,9 @@ because the sentence it builds from three answers is not an answer to any one qu
 
 The trace shows both directions of travel.
 A request raised two frames down inside `ask()` surfaces at `drive()`,
-which knows nothing about where it came from.
+which knows nothing about where it originated.
 The answer `drive()` sends back arrives inside `ask()`,
-which also knows nothing about where it came from.
+which also knows nothing about where it originated.
 A single loop at the edge of the program interprets Effects raised anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
@@ -510,7 +510,7 @@ which is why an `await` in a function makes every caller `async` in turn:
 the requests have to reach the loop.
 
 Once you see a program that way,
-the question stops being what a function does and becomes what it asks for.
+the question stops being what a function does and becomes what it requests.
 That is the question the next chapter puts into the type system.
 
 ## Exercises

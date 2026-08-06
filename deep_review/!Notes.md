@@ -3,6 +3,7 @@ Only done through 34 because I'm not finished with the "humanizer" chapters
 Chapters 28 have the highest-value proposals.
 
 --------------------
+(done)
 Add to both deep-review and readability skills:
 At the beginning of each suggested change there should an easy way to reject a change, for example:
 [] Reject

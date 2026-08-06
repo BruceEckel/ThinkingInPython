@@ -235,7 +235,7 @@ It shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
 
-The roundtrip law is one member of a small family of reusable property shapes,
+The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
 An *invariant* states a fact about every output:
 sorting produces an ordered list.

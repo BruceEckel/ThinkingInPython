@@ -18,6 +18,8 @@ Have we learned anything here that should be added to thinking-in-python-skill.m
 
 Run 'make prose' on each chapter
 
+Update thinking-in-python skill
+
 Review all exercises to make sure they refer to existing examples and that all  exercises have solutions
 
 - Is full polymorphism covered? (Not just inheritance-based). for example, @overload
