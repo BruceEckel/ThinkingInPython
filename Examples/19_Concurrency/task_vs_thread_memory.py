@@ -2,9 +2,11 @@
 import asyncio
 import threading
 import tracemalloc
+from typing import Final
 
-TASKS = 5_000
-STACK_SIZE = 1024 * 1024  # 1 MiB, a common thread stack reservation
+TASKS: Final[int] = 5_000
+# 1 MiB, a common thread stack reservation:
+STACK_SIZE: Final[int] = 1024 * 1024
 
 async def parked() -> None:
     await asyncio.sleep(999)  # Suspended, never resumes

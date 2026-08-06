@@ -33,7 +33,7 @@ fit naturally.
 and the only thing you do is send messages to objects, always late-bound.
 It was an emphatically dynamic,
 run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
-That style makes no substitutability promises.
+That style guarantees no substitutability.
 
 *C++* drew from Simula.
 Objects were optional,
@@ -67,17 +67,60 @@ code written against the base class works unchanged on any of them.
 This makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
-It cannot check whether the override actually behaves the way the base class promises.
+It cannot check whether the override actually behaves the way the base class declares.
 The base class calls a method and trusts every subclass to stand in for it.
 
-Python has no compiler, but this is not the boundary you might expect.
+Python has no compiler,
+but the line between what a tool checks and what it cannot falls in the same place.
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Classes.md#marking-overrides-with-override)
 marks the intent.
 What no tool reads is the behavior behind the signature.
 Nothing stops a subclass from breaking the base class contract while matching it perfectly.
 The interpreter runs code that violates the LSP without objection.
-That code may or may not fail at run time.
+That code may or may not fail at runtime:
+
+```python
+# lsp_violation.py
+from dataclasses import dataclass, field
+from typing import ClassVar, override
+
+@dataclass
+class Stack:
+    items: list[int] = field(default_factory=list)
+
+    def push(self, item: int) -> None:
+        self.items.append(item)
+
+@dataclass
+class BoundedStack(Stack):
+    limit: ClassVar[int] = 2
+
+    @override
+    def push(self, item: int) -> None:
+        if len(self.items) >= self.limit:
+            raise OverflowError("Stack is full")
+        super().push(item)
+
+def fill(stack: Stack, count: int) -> int:
+    for n in range(count):
+        stack.push(n)
+    return len(stack.items)
+
+print(fill(Stack(), 5))
+#: 5
+try:
+    fill(BoundedStack(), 5)
+except OverflowError as e:
+    print(type(e).__name__)
+#: OverflowError
+```
+
+`BoundedStack.push()` takes the same argument and returns the same type,
+so `@override` is satisfied and `ty` reports nothing.
+`fill()` was written against `Stack`, which never refuses a `push()`,
+and a `BoundedStack` handed to it raises an exception on the third item.
+The subclass matched the signature and broke the contract behind it.
 
 ## Encapsulation Leaks
 
@@ -374,11 +417,44 @@ if __name__ == "__main__":
 
 `Point` and `PairCoord` share no base class.
 They both have `x` and `y`, which is all `distance()` requires.
+`Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
+A bare annotation in a protocol is a read-write attribute,
+so an implementer must allow assignment to it.
+`PairCoord` computes `x` from its `Pair` and cannot be assigned to,
+so it satisfies the property form and fails the annotation form.
+Declare a protocol member read-only unless callers really do write to it.
 
 ## Prefer Composition to Inheritance
 
 The third OOP promise is reuse through inheritance.
-In practice, implementation inheritance couples a subclass to its base in ways that are hard to undo.
+In practice, implementation inheritance couples a subclass to its base in ways that are hard to undo:
+
+```python
+# counting_list.py
+from typing import override
+
+class CountingList(list[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self.appends = 0
+
+    @override
+    def append(self, item: int, /) -> None:
+        self.appends += 1
+        super().append(item)
+
+counted = CountingList()
+counted.append(1)
+counted.extend([2, 3])
+print(len(counted), counted.appends)
+#: 3 1
+```
+
+`list.extend()` appends its items without calling `append()`,
+so the count is wrong the moment anyone uses the base class's other method.
+Nothing in the subclass is incorrect.
+It inherited an implementation and now depends on how that implementation is written,
+which is a fact about `list` that no signature records and no checker reports.
 
 Before inheritance, there was composition.
 A type holds other types as fields.
@@ -433,7 +509,7 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 It holds a `Name` and an `Address`, and those types stay usable on their own.
 The nested `replace()` shows the cost of that arrangement:
 changing a city means rebuilding the `Address` and then the `Contact`.
-What you buy is the last two lines.
+The last two lines are the payoff.
 Two contacts built from equal parts are equal, and the whole structure hashes,
 because value equality and hashing follow from the fields rather than from a base class.
 
@@ -661,7 +737,7 @@ if __name__ == "__main__":
 `ty` accepts `package` as a `Priced` argument without complaint,
 and `charge()` returns `4.5`, silently treating a weight as a price.
 The checker matched the shape correctly.
-The mismatch lives entirely in what the number means, and no checker sees that.
+The mismatch lives in what the number means, and no checker sees that.
 
 A distinct type per concept could close this gap.
 `typing.NewType` looks like the natural fix:
@@ -771,8 +847,11 @@ if __name__ == "__main__":
 
 Adding a new shape is easier in the OOP version because you write one class.
 Adding a new operation over all shapes is easier in the pattern matching
-(functional) version.
-If you modify one function, the type checker tells you if you missed a case.
+(functional) version,
+where the operation is one new function rather than a method added to every class.
+The exhaustiveness check covers the other direction.
+Adding a member to the `Shape` union leaves every existing `match` incomplete,
+and `assert_never()` turns each one into a checker error naming the shape you missed.
 
 The OOP approach assumes you add types more often than operations,
 which is often not true.
@@ -808,7 +887,7 @@ With *ad-hoc polymorphism* (typically *function overloading*),
 a different implementation handles each type, chosen by that type.
 Python's version of ad-hoc polymorphism is `@overload`,
 which lets one function name have multiple typed signatures,
-backed by a single implementation that branches at run time:
+backed by a single implementation that branches at runtime:
 
 ```python
 # overload_example.py
@@ -982,8 +1061,12 @@ or whether immutable data, a function, and a protocol already solve the problem.
     the checker sees nothing wrong with a mutable field in a frozen class.
     Demonstrate the leak with an `append()`, then restore the `tuple`.
     Who, then, is responsible for making immutability go all the way down?
-3.  In `point_distance.py`,
-    add a third point `p3 = Point(6, 8)` and confirm `distance(p1, p3)` and `p1.distance_to(p3)` still agree.
+3.  In `protocol_collision.py`, define `Price = NewType("Price", float)`
+    and `Weight = NewType("Weight", float)`,
+    change `Priced.total()` to return a `Price`, `Weighted.total()` to return a `Weight`,
+    and `Package.total()` to return a `Weight`.
+    Run `ty check` and read the error it reports for `charge(package)`.
+    Then say what still goes wrong at runtime if someone deletes the annotations.
 4.  In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
     `b`, `c` (no `x` or `y`),
     and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,

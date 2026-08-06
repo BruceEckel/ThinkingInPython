@@ -10,9 +10,18 @@ def tag(name: str) -> Iterator[str]:
     finally:
         print(f"close {name}")
 
-with ExitStack() as stack:
-    names = [stack.enter_context(tag(n)) for n in ("a", "b", "c")]
-    print("using", names)
+def wrap(names: list[str]) -> None:
+    with ExitStack() as stack:
+        open_tags = [stack.enter_context(tag(n)) for n in names]
+        print("using", open_tags)
+
+wrap(["a", "b"])
+#: open a
+#: open b
+#: using ['a', 'b']
+#: close b
+#: close a
+wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: open c

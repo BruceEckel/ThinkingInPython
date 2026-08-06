@@ -2,15 +2,15 @@
 import tracemalloc
 from itertools import islice
 
-N = 1_000_000
+n = 1_000_000
 
 def eager_first_evens() -> list[int]:
-    squares = [x * x for x in range(N)]
+    squares = [x * x for x in range(n)]
     evens = [s for s in squares if s % 2 == 0]
     return evens[:5]
 
 def lazy_first_evens() -> list[int]:
-    squares = (x * x for x in range(N))
+    squares = (x * x for x in range(n))
     evens = (s for s in squares if s % 2 == 0)
     return list(islice(evens, 5))
 

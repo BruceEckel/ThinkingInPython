@@ -52,7 +52,7 @@ In this comprehension:
 -   If the member is an integer,
     the output expression squares it and appends it to the output list.
 
-You can achieve the same results using the built-in functions `map()` and `filter()` with an anonymous `lambda`.
+You can achieve the same results using the built-in functions `map()` and `filter()` with a `lambda`.
 `filter()` applies a predicate to a sequence and retains the members that pass it.
 It produces a lazy iterator, which `list()` expands into a `list`:
 
@@ -92,7 +92,7 @@ The nested form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression.
 
-The `# type: ignore` comments mark a third cost.
+The `# type: ignore` comments mark a cost the reading test does not show.
 `filter()` with a `lambda` predicate does not narrow the element type,
 so the checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
@@ -104,6 +104,100 @@ List brackets (`[]`) enclose the list comprehension,
 so it is immediately evident that it produces a list.
 The `if` clause names `isinstance()` directly and the output expression squares directly,
 with no `lambda` wrappers in the way.
+
+A comprehension has a scope of its own:
+
+```python
+# comprehension_scope.py
+e = "outer"
+squares = [e ** 2 for e in range(4)]
+print(squares, e)
+#: [0, 1, 4, 9] outer
+total = 0
+running = [(total := total + n) for n in range(5)]
+print(running, total)
+#: [0, 1, 3, 6, 10] 10
+```
+
+A comprehension's loop variable belongs to the comprehension.
+The `e` inside the brackets is a different name from the `e` outside them,
+so the outer `e` survives untouched.
+A `for` loop behaves the opposite way:
+its loop variable is left behind in the enclosing scope after the loop ends.
+
+The walrus operator is the exception.
+`total := total + n` assigns in the enclosing scope,
+so `total` holds the running sum after the comprehension finishes.
+That is deliberate, and it is the reason a comprehension can accumulate a value without a separate loop.
+
+## Set Comprehensions
+
+Set comprehensions use the same principles as list comprehensions,
+with `{}` instead of `[]`.
+Braces build a set when the comprehension produces one value per element,
+and a dict when it produces a `key: value` pair.
+The colon decides which.
+There is no empty-set literal, since `{}` is an empty dict; write `set()`.
+
+The following set comprehension normalizes each name
+(capital first letter, the rest lower case),
+keeps the names longer than one character,
+and collapses the duplicates and case variants:
+
+```python
+# set_comprehension.py
+names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
+
+unique = {name[0].upper() + name[1:].lower()
+          for name in names if len(name) > 1}
+
+print(sorted(unique))  # Sorted for stable display
+#: ['Alice', 'Bob', 'John']
+
+same = set([name[0].upper() + name[1:].lower()
+            for name in names if len(name) > 1])
+
+print(unique == same)
+#: True
+```
+
+`same` builds a list with a list comprehension, then passes it to `set()`.
+This produces the same result, but because it builds a throwaway list first,
+the set comprehension is more efficient.
+
+## Dictionary Comprehensions
+
+A dictionary comprehension builds a `dict`.
+Each element produces a key and a value, with an optional filter.
+Here each name becomes an upper-case key mapped to its length,
+keeping only the names longer than three characters:
+
+```python
+# dict_comprehension.py
+names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin"]
+
+lengths = {name.upper(): len(name) for name in names if len(name) > 3}
+print(lengths)
+#: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}
+```
+
+The three parts mirror the list comprehension:
+the `for` clause supplies each `name`, the `if` clause drops `"Ni"`,
+and the `key: value` expression before `for` produces each entry.
+
+A common variant swaps a dictionary's keys and values to invert a lookup:
+
+```python
+# invert_dict.py
+seat_of = {"Arthur": 1, "Galahad": 2, "Robin": 3}
+
+name_at = {seat: name for name, seat in seat_of.items()}
+print(name_at)
+#: {1: 'Arthur', 2: 'Galahad', 3: 'Robin'}
+```
+
+Inverting assumes the values are unique.
+If two keys share a value, the later entry wins, just as with any duplicate key.
 
 ## Nested Comprehensions
 
@@ -131,7 +225,20 @@ for row in matrix:
 #: [0, 0, 0, 0, 0, 1]
 ```
 
-## Techniques
+Read the `for` clauses left to right,
+in the order the equivalent nested loops would appear.
+The outer comprehension supplies `row`; for each `row`,
+the inner comprehension runs the full `col` loop and produces one sub-list.
+The output expression sits first but runs last, once per innermost iteration.
+
+Nesting one comprehension inside another builds a list of lists.
+Writing two `for` clauses in one comprehension flattens instead,
+producing a single list.
+
+## Feeding the Iterator Clause
+
+Everything to the right of `for` is an ordinary iterable expression,
+so anything that produces one works there.
 
 Use `zip()` to walk two sequences together, taking one element from each:
 
@@ -197,13 +304,16 @@ without touching any real files or leaving anything behind.
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
 flattening the tree into one list of paths.
+The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`,
+which avoids constructing a `Path` for every file in the tree,
+including the ones being skipped.
 
 A `with` block, unlike a function body, does not create a new scope.
 `py_paths` is assigned inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
 By then the directory is gone.
-The comprehension already finished building `py_paths` as plain strings while the directory still existed,
+The comprehension finished building `py_paths` as strings while the directory still existed,
 so nothing later needs the files.
 
 ## Breaking Up a Complex Comprehension
@@ -322,76 +432,11 @@ for n in [1, 2, 3]:
 ```
 
 The `for` loop has the same effect without building a wasted list.
-It reads honestly and executes code rather than building a collection.
+The brackets no longer suggest a collection the code never uses.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
 If a comprehension's result is never assigned or used,
 that's a sign it should be a loop instead.
-
-## Set Comprehensions
-
-Set comprehensions use the same principles as list comprehensions,
-with `{}` instead of `[]`.
-
-The following set comprehension normalizes each name
-(capital first letter, the rest lower case),
-keeps the names longer than one character,
-and collapses the duplicates and case variants:
-
-```python
-# set_comprehension.py
-names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
-
-unique = {name[0].upper() + name[1:].lower()
-          for name in names if len(name) > 1}
-
-print(sorted(unique))  # Sorted for stable display
-#: ['Alice', 'Bob', 'John']
-
-same = set([name[0].upper() + name[1:].lower()
-            for name in names if len(name) > 1])
-
-print(unique == same)
-#: True
-```
-
-`same` builds a list with a list comprehension, then passes it to `set()`.
-This produces the same result, but because it builds a throwaway list first,
-the set comprehension is more efficient.
-
-## Dictionary Comprehensions
-
-A dictionary comprehension builds a `dict`.
-Each element produces a key and a value, with an optional filter.
-Here each name becomes an upper-case key mapped to its length,
-keeping only the names longer than three characters:
-
-```python
-# dict_comprehension.py
-names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin"]
-
-lengths = {name.upper(): len(name) for name in names if len(name) > 3}
-print(lengths)
-#: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}
-```
-
-The three parts mirror the list comprehension:
-the `for` clause supplies each `name`, the `if` clause drops `"Ni"`,
-and the `key: value` expression before `for` produces each entry.
-
-A common variant swaps a dictionary's keys and values to invert a lookup:
-
-```python
-# invert_dict.py
-seat_of = {"Arthur": 1, "Galahad": 2, "Robin": 3}
-
-name_at = {seat: name for name, seat in seat_of.items()}
-print(name_at)
-#: {1: 'Arthur', 2: 'Galahad', 3: 'Robin'}
-```
-
-Inverting assumes the values are unique.
-If two keys share a value, the later entry wins, just as with any duplicate key.
 
 ## Generator Expressions {#generator-expressions}
 
@@ -434,7 +479,7 @@ print(initials)
 #: {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
-No lazy `set` or `dict` exists, though.
+There is no lazy `set` or `dict`.
 A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
 Neither saves anything over the set comprehension `{len(w) for w in words}` or the dict comprehension `{w: w[0] for w in words}`,
@@ -457,7 +502,36 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
-[Iterators](23_Iterators.md#generators) explores generators further.
+
+A generator expression needs no parentheses of its own when it is a function's only argument.
+Add a second argument and it does:
+`sum(n * n for n in nums, 0)` is a `SyntaxError`,
+and `sum((n * n for n in nums), 0)` is the fix.
+
+`genexp_consumers.py` iterates `nums` three times because `range` is re-iterable:
+each `for` over it starts again at zero.
+A generator expression is not:
+
+```python
+# spent_generator.py
+nums = (n for n in range(10))
+print(sum(n * n for n in nums))
+#: 285
+print(any(n == 5 for n in nums))
+#: False
+print(list(nums))
+#: []
+```
+
+It runs once, and once its values are consumed it is empty.
+`sum()` drained `nums`,
+so `any()` saw no elements and reported `False` instead of `True`,
+with no exception to say the question was never asked.
+When something must be traversed twice,
+either materialize it with `list()` or write the generator expression again.
+[Iterators](23_Iterators.md#generators) explores generators further,
+and [Generators](45_Generators.md)
+covers the values they receive as well as the ones they produce.
 
 ## Unpacking in Comprehensions
 
@@ -501,6 +575,21 @@ not `[1, 2, 3, 4]`.
 merging each mapping with later keys winning.
 The set form `{*s for s in sets}` and the asynchronous generator form
 (`(*a async for a in agen())`) work the same way.
+
+## Choosing a Form
+
+The four forms are one expression with different delimiters,
+which is why learning the list form teaches all four.
+Brackets when you want a list.
+Braces for a set, or for a dict when a colon separates a key from a value.
+Parentheses when the consumer takes values one at a time and never needs them all.
+A `for` loop when you want the side effect rather than the collection.
+
+The delimiters also decide when the work happens.
+Every form but the parenthesized one runs to completion before the next statement,
+so the cost of a comprehension is paid where you wrote it.
+A generator expression defers that cost to whoever consumes it,
+and pays it only for the values they ask for.
 
 ## Exercises
 

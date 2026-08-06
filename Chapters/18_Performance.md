@@ -8,7 +8,7 @@ Performance means at least two things when it comes to computing:
 Python addresses the first issue with clear syntax and extensive power and flexibility.
 As to the second issue, Python is commonly considered to be slow.
 
-## Is It Actually Too Slow?
+## Is It Too Slow?
 
 Computer programming projects have a long history of *premature optimization*.
 This means optimizing before any measurement shows where the time goes.
@@ -30,6 +30,11 @@ What follows is an approach to solving performance problems,
 starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
+
+The cheapest platform change is a newer CPython.
+The interpreter has grown substantially faster since 3.10,
+and moving a project forward two or three point releases costs a test run rather than a rewrite.
+It is the only entry on this whole ladder that requires no code change at all.
 
 Alternative interpreters for Python exist,
 notably PyPy which claims about a 3x speedup on average.
@@ -54,6 +59,26 @@ sometimes enough to distort the behavior you are measuring.
 Here's how you run `cProfile` on `my_program.py`:
 
     python -m cProfile -s cumulative my_program.py
+
+The report is a table, one row per function:
+
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+            1    0.000    0.000    0.007    0.007 {built-in method builtins.exec}
+            1    0.000    0.000    0.007    0.007 prof_demo.py:1(<module>)
+            1    0.006    0.006    0.006    0.006 prof_demo.py:1(slow)
+            1    0.000    0.000    0.001    0.001 prof_demo.py:7(helper)
+            1    0.001    0.001    0.001    0.001 {built-in method builtins.sum}
+        10001    0.000    0.000    0.000    0.000 prof_demo.py:8(<genexpr>)
+
+`tottime` is the time spent inside that function alone.
+`cumtime` adds the time spent in everything it called.
+Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing:
+they call everything, so they contain everything.
+Scan down to the first row where `tottime` is large.
+That is the function to attack.
+`ncalls` decides how to attack it:
+one call burning six milliseconds needs a better algorithm,
+ten thousand calls burning a microsecond each need fewer calls.
 
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
@@ -236,6 +261,14 @@ That first argument is a `lambda` here rather than a string of code,
 since a `lambda` can close over `target`, `as_list`, and `as_set` directly,
 with no separate `setup` argument needed to build them.
 `number` sets how many times `timeit` calls the lambda, 100 in this case.
+One machine measured the `set` at about 22,000 times faster than the list scan.
+
+A single measurement includes whatever else the machine was doing.
+`timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
+and the smallest of them is the run that was interrupted least.
+Report `min(...)`, not the mean: a slow run means something stole the CPU,
+so averaging folds that theft into your answer,
+while the fastest run is the closest you got to measuring only your code.
 
 A single lookup costs little either way.
 A million lookups is the difference between instant and minutes.
@@ -246,6 +279,11 @@ A million lookups is the difference between instant and minutes.
 Do your benchmarks using data that is shaped like production data.
 A `list` of ten elements can beat a `set`,
 and an optimization tuned to toy input can behave badly in production.
+
+`timeit` also turns the garbage collector off while it measures,
+so its runs stay repeatable.
+For a benchmark that allocates heavily, that hides a cost production pays,
+so pass `setup="gc.enable()"` when collection pauses are part of what you are comparing.
 
 ## Write Idiomatic Python
 
@@ -274,12 +312,16 @@ print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
 #: sum() at least twice as fast: True
 ```
 
+One machine measured `sum()` at about five times faster than the hand-written loop.
+
 Other examples:
 
 - String concatenation: `"".join(parts)` is faster than `+=` in a loop
   (one linear pass instead of repeated reallocation).
-- A comprehension is faster than an `append()` loop
+- A comprehension is faster than an `append()` loop,
+  though the margin is now small
   (one bytecode appends the element, instead of an attribute lookup and a call).
+  Write it for the readability; the speed is a rounding error.
 - The C-implemented standard library's `itertools`, `collections`,
   and `functools` are faster than hand-rolled equivalents
   ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
@@ -413,6 +455,8 @@ one per halving of the remaining range, which is why moving from O(n)
 to O(log n) shows up as orders of magnitude here rather than a modest improvement.
 Hashing wins again over `bisect`,
 since it needs only one hash and one equality check no matter how large `as_set` grows.
+One machine measured `bisect` at about 2,000 times faster than the scan,
+and hashing at about five times faster than `bisect`.
 
 ### Heap
 
@@ -544,6 +588,7 @@ so extracting 100 smallest items costs roughly O(100n).
 so the same 100 extractions cost roughly O(n + 100 log n).
 That gap is why the heap wins by more than an order of magnitude here,
 and the gap widens as `n` grows.
+One machine measured the heap at about 50 times faster.
 
 The immutable containers from [Containers](03_Containers.md#immutability)
 are not a speed upgrade.
@@ -569,15 +614,15 @@ and no work happens past the point where the consumer stops.
 import tracemalloc
 from itertools import islice
 
-N = 1_000_000
+n = 1_000_000
 
 def eager_first_evens() -> list[int]:
-    squares = [x * x for x in range(N)]
+    squares = [x * x for x in range(n)]
     evens = [s for s in squares if s % 2 == 0]
     return evens[:5]
 
 def lazy_first_evens() -> list[int]:
-    squares = (x * x for x in range(N))
+    squares = (x * x for x in range(n))
     evens = (s for s in squares if s % 2 == 0)
     return list(islice(evens, 5))
 
@@ -620,7 +665,9 @@ turning microseconds into milliseconds, a thousandfold slowdown,
 not a modest one.
 If you push further, the process fails outright,
 with `MemoryError` or an OS kill.
-There is no middle ground between full speed and failure.
+The slowdown is a cliff, not a slope:
+nothing warns you as the data approaches the limit,
+and everything changes the moment it crosses.
 
 That cliff is why it's worth building a lazy pipeline to handle a data set that could grow.
 If a data set can ever outgrow memory, stream it from the start,
@@ -676,6 +723,12 @@ For an expensive attribute computed once per object,
 Caching is only correct when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
 and caching a function that reads outside state can replay a stale answer.
+
+A method is the usual trap.
+`@cache` keys on every argument including `self`,
+so the cache holds a reference to each instance it has seen and none of them can be collected.
+For a value computed once per object, use `functools.cached_property`,
+which stores the result on the instance and dies with it.
 
 ## Reduce Memory Overhead
 
@@ -896,7 +949,7 @@ does, convert this indented block to a real, fenced, tested example. -->
 Sometimes the loop cannot become an array expression,
 because each step depends on the previous one, or the control flow is irregular.
 The `@njit` decorator from [Numba](https://numba.pydata.org/)
-compiles such a function to machine code on its first call, in place:
+compiles such a function to machine code on its first call:
 
     import timeit
     from numba import njit
@@ -921,7 +974,8 @@ compiles such a function to machine code on its first call, in place:
     print(f"Numba speedup: {t_python / t_numba:.1f}x")
     # Sample run: Numba speedup: 15.9x
 
-`njit(count_primes)` compiles the same function `@njit` would decorate.
+`njit(count_primes)` wraps the same function `@njit` would decorate,
+and returns something that compiles itself the first time it is called.
 Calling it once first pays the compilation and warm-up cost outside the timed region.
 Thus the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
@@ -1111,13 +1165,14 @@ print(f"collatz_lengths Rust speedup: {t_python / t_rust:.1f}x")
 # Sample run: collatz_lengths Rust speedup: 34.3x
 ```
 
-`rust/README.md` at the repository root explains how to build and run it yourself.
+The repository's `rust/README.md` explains how to build and run it yourself.
 `cd rust && make` compiles both functions, installs the module,
 and runs this same comparison, printing your machine's own numbers.
 The main book build never does this and never requires a Rust toolchain;
 building `rust/` is a separate, opt-in step.
 
-This closes the loop on the four ways this chapter speeds up the same computation.
+That closes the arc this chapter has been building:
+one baseline and three ways past it.
 The plain Python loop, timed in the Numba example above, is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
@@ -1148,7 +1203,7 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
-A profiler is the only way to discover hot spots.
+A profiler is how you find them without guessing.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,
@@ -1156,7 +1211,7 @@ stopping when the program is fast enough:
 
 1. Run the straightforward version.
    It may be fast enough.
-2. Try a faster platform: PyPy, or better hardware.
+2. Try a faster platform: a newer CPython, PyPy, or better hardware.
 3. Write idiomatic Python and let the interpreter's C loops do the work.
 4. Fix the algorithm and the data structures.
    This can produce order-of-magnitude improvements.
@@ -1202,3 +1257,10 @@ not just where it sits on that curve:
     swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
     Then get the same two counts back using two local attachments instead,
     and explain what the two versions would stop agreeing about in a larger program.
+8.  Profile a script of your own with `python -m cProfile -s cumulative`.
+    Name the function with the largest `tottime` and the one with the largest `cumtime`,
+    and explain why they are usually not the same function.
+9.  `compact_array.py` compares an `array` against a `list` of the same floats.
+    Time an element-by-element sum over each with `timeit`.
+    The `array` uses a quarter of the memory: is it also faster to iterate,
+    and why not?

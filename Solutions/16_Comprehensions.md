@@ -36,26 +36,31 @@ Only the literal in the conditional expression changes, from `1` to
 of lists, does the same work either way; only the value placed on the
 diagonal is different.
 
-## 3. A fourth entry in `mcase`
+## 3. Adding `"Galahad"` to `names`
 
 ```python
 # exercise_3.py
-mcase = {"a": 10, "b": 34, "A": 7, "Z": 3, "z": 12}
+names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin", "Galahad"]
 
-mcase_frequency = {
-    k.lower(): mcase.get(k.lower(), 0) + mcase.get(k.upper(), 0)
-    for k in mcase
-}
-print(mcase_frequency)
-#: {'a': 17, 'b': 34, 'z': 15}
+lengths = {name.upper(): len(name) for name in names if len(name) > 3}
+print(sorted(lengths))
+#: ['ARTHUR', 'BEDEVERE', 'GALAHAD', 'LANCELOT', 'ROBIN']
+print(lengths["GALAHAD"], "NI" in lengths)
+#: 7 False
 ```
 
-Adding `"z": 12` means the comprehension now visits `"Z"` and `"z"` as
-two separate keys, but both map to the same lower-case key `"z"` in
-the result, so their combined tally, `12 + 3 = 15`, is computed twice
-(once from each key) and lands in the dictionary once. The redundant
-work the chapter already calls out just grew from one repeated pair
-to two.
+`"Galahad"` is seven characters, so it passes the `len(name) > 3`
+filter and adds one entry. `"Ni"` is still the only name the filter
+drops. The filter tests the original name, not the upper-cased key, so
+a name is judged before the output expression ever runs; that ordering
+matters when the output expression changes the length, as `name * 2`
+would.
+
+Two names that upper-case to the same string would collide, since the
+comprehension builds a `dict` and a later key overwrites an earlier
+one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
+not two, and the value comes from whichever name appears last in the
+list.
 
 ## 4. Predicting `islice()` after two `next()` calls
 

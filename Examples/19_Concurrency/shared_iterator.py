@@ -8,7 +8,6 @@ from typing import Final
 LIMIT: Final[int] = 200
 
 class Tickets:
-    "Hands out each number once: read, pause, write back."
     def __init__(self, limit: int) -> None:
         self.limit = limit
         self.next_number = 0

@@ -6,14 +6,19 @@ runs setup before a block and cleanup after it,
 even if the block raises an exception.
 This chapter shows how to write your own context managers, and how `with` works.
 
-A context manager marks out a span of execution that determines when initialization and cleanup happen.
+A context manager marks out a span of execution,
+running setup at its start and cleanup at its end.
 This is far more reliable than using `__del__()`,
 as shown in [Cleanup](10_Cleanup.md).
 
 ## A Basic Context Manager
 
 The simplest way to write a context manager is a generator function with a single `yield`,
-turned into a context manager by the `contextlib.contextmanager` decorator:
+turned into a context manager by the `contextlib.contextmanager` decorator.
+The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown):
+everything before it is setup, everything after it is teardown.
+[Iterators](23_Iterators.md#generators) covers generators in full;
+nothing beyond that shape is needed here.
 
 ```python
 # trace_gen.py
@@ -45,10 +50,38 @@ When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 The code before `yield` is the setup, and the code after it is the cleanup.
 The `finally` makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
-and `finally` runs the cleanup anyway, before the exception propagates.
-This is the same setup-then-teardown shape as a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown).
+and `finally` still runs the cleanup before the exception propagates.
 It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
 and [Iterators](23_Iterators.md#generators).
+
+Leaving the `try`/`finally` out is the common mistake:
+
+```python
+# no_finally.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def careless(name: str) -> Iterator[str]:
+    print(f"enter {name}")
+    yield name
+    print(f"exit {name}")
+
+try:
+    with careless("A"):
+        raise ValueError("boom")
+except ValueError as error:
+    print("caught:", error)
+#: enter A
+#: caught: boom
+```
+
+Without the `try`/`finally`,
+an exception in the block resumes the generator by raising at the `yield`,
+so the code after the `yield` never runs and `exit A` never prints.
+Nothing warns you: the cleanup is skipped silently on the one path where it matters most.
+Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator,
+without exception.
 
 One caution: the manager object `trace("A")` returns is single-use.
 Its generator runs once,
@@ -62,7 +95,9 @@ It knows nothing about generators or `@contextmanager`.
 A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
-Writing the class by hand shows the machinery directly:
+Writing the class by hand shows the machinery directly.
+`__init__()` stays in its longhand form here rather than becoming a `@dataclass`,
+so nothing between the class statement and the two protocol methods needs decoding:
 
 ```python
 # trace_cm.py
@@ -128,9 +163,39 @@ except ValueError as error:
 #: caught: boom
 ```
 
-`exit A` prints before `caught`, so the cleanup happens on the way out.
+`exit A` prints before `caught`, so the cleanup runs on the way out.
 This is the same guarantee a `try`/`finally` gives,
 packaged as a reusable object.
+
+The guarantee covers the block, not the setup:
+
+```python
+# enter_fails.py
+
+class Fragile:
+    def __enter__(self) -> None:
+        print("enter fails")
+        raise RuntimeError("no resource")
+
+    def __exit__(self, *exc: object) -> bool:
+        print("exit runs")
+        return False
+
+try:
+    with Fragile():
+        print("body")
+except RuntimeError as error:
+    print("caught:", error)
+#: enter fails
+#: caught: no resource
+```
+
+`exit runs` never prints,
+because Python only registers the cleanup once `__enter__()` returns.
+An `__enter__()` that acquires several things must clean up its own partial work before it raises an exception.
+In a `with` naming several managers this is per-manager:
+the ones that entered successfully still exit,
+and only the failing one is left unwound.
 
 ## The `__exit__()` Arguments
 
@@ -147,6 +212,36 @@ this includes the implicit `None` of a method with no `return`,
 so propagation is the default.
 A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block.
+
+A generator manager suppresses by catching:
+
+```python
+# suppress_in_generator.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def ignoring(kind: type[BaseException]) -> Iterator[None]:
+    try:
+        yield
+    except kind as error:
+        print(f"swallowed {error!r}")
+
+with ignoring(ZeroDivisionError):
+    print("before")
+    1 / 0
+    print("after")
+print("survived")
+#: before
+#: swallowed ZeroDivisionError('division by zero')
+#: survived
+```
+
+In a generator manager there is no return value to set.
+The exception arrives at the `yield`,
+so catching it there and not re-raising is the equivalent of `__exit__()` returning `True`.
+Letting it out of the `except` clause, or omitting the clause,
+is the equivalent of returning a falsy value.
 
 The standard library provides this behavior ready-made,
 as `contextlib.suppress`:
@@ -168,7 +263,7 @@ print("survived")
 See [Naming Conventions](02_Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
 
-A version with more features reports which exception it swallowed,
+A fuller version of the same idea reports which exception it swallowed,
 and accepts no argument to mean "ignore everything."
 It turns out to be useful enough to reuse elsewhere in the book,
 so it lives in `utils/`, where any chapter can import it:
@@ -203,10 +298,12 @@ This makes `ignore()` with no argument catch all exceptions.
 `ignore((ZeroDivisionError, TypeError))` restricts it to several.
 
 `__enter__()` returns `None` because `ignore` is not meant to be used with `as`.
-You can still use `as` but it will just bind to `None`.
+You can still write `as`, but it binds `None`.
 
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
 or `None` when the block finished cleanly.
+[`type[...]`](08_Static_Typing.md#classes-as-values-type) means the class,
+such as `ZeroDivisionError`, not an instance of it.
 
 `issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it.
 It also accepts a tuple of classes for `classinfo`,
@@ -220,14 +317,6 @@ and the earlier `if exc_type is None: return False` has confirmed `exc_type` is 
 
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
-
-The annotations use `type[BaseException]`,
-a [`type[...]`](08_Static_Typing.md#classes-as-values-type) annotation,
-which means the exception class, such as `ZeroDivisionError`,
-not an instance of it.
-`exc_type` is that class,
-and `issubclass(exc_type, self.types)` checks it against `self.types`,
-the suppressed classes.
 
 ```python
 # demo_exceptions.py
@@ -305,10 +394,11 @@ if __name__ == "__main__":
 `banner` works as both a decorator for `report` and in a `with` in `__main__`.
 Note the parentheses in `@banner("report")`: the call constructs the manager,
 which then decorates the function.
-A generator-based manager recreates its generator on each use,
-so the decorated function can be called any number of times,
-each with a fresh enter and exit.
-The machinery even applies `functools.wraps`,
+Each call of the decorated function builds a fresh manager,
+so `report()` can be called any number of times,
+each with its own enter and exit.
+The single-use caution from earlier still holds for the manager object you name in a `with`.
+The machinery applies `functools.wraps`,
 so `report` keeps its name and docstring
 (see [Maintaining the Wrapped Interface](14_Decorators.md#maintaining-the-wrapped-interface)).
 
@@ -348,6 +438,8 @@ if __name__ == "__main__":
 
 Like `suppress` and `ignore`,
 the class version of `banner` uses a lowercase name because you use it like a function.
+`__exit__(self, *exc: object)` collects the three arguments into a tuple that is never read,
+which is the shorter way to write a cleanup that does not care why the block ended.
 Unlike the generator form,
 the class form re-enters the same instance on every call to `report()`,
 so any state the instance holds is shared across calls.
@@ -419,9 +511,18 @@ def tag(name: str) -> Iterator[str]:
     finally:
         print(f"close {name}")
 
-with ExitStack() as stack:
-    names = [stack.enter_context(tag(n)) for n in ("a", "b", "c")]
-    print("using", names)
+def wrap(names: list[str]) -> None:
+    with ExitStack() as stack:
+        open_tags = [stack.enter_context(tag(n)) for n in names]
+        print("using", open_tags)
+
+wrap(["a", "b"])
+#: open a
+#: open b
+#: using ['a', 'b']
+#: close b
+#: close a
+wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: open c
@@ -430,6 +531,9 @@ with ExitStack() as stack:
 #: close b
 #: close a
 ```
+
+`wrap()` does not know how many managers it will enter until it runs,
+which is the case a comma-separated `with` cannot express.
 
 ## The `contextlib` Toolkit
 
@@ -446,43 +550,50 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `nullcontext(value)` is a do-nothing manager that yields `value`,
   useful when a `with` is optional and you want one code path.
 
-A function might take an optional output file that defaults to standard output.
-A caller-supplied file should be closed when the function is done.
-The default, `sys.stdout`, must stay open.
-Wrapping `sys.stdout` in `nullcontext` lets a single `with` block serve both cases:
+A function might write to a path it opens itself,
+to a stream the caller hands it, or to standard output by default.
+Only the first of those should be closed when the function is done.
+`nullcontext` lets a single `with` block serve all three cases:
 
 ```python
 # nullcontext_demo.py
 import sys
-from contextlib import nullcontext
+import tempfile
+from contextlib import AbstractContextManager, nullcontext
 from io import StringIO
+from pathlib import Path
 from typing import IO
 
-def emit(lines: list[str], out: IO[str] | None = None) -> None:
-    manager = out if out is not None else nullcontext(sys.stdout)
+def emit(lines: list[str], out: IO[str] | Path | None = None) -> None:
+    manager: AbstractContextManager[IO[str]]
+    match out:
+        case Path():
+            manager = out.open("w")
+        case None:
+            manager = nullcontext(sys.stdout)
+        case _:
+            manager = nullcontext(out)
     with manager as stream:
         for line in lines:
             print(line, file=stream)
 
-emit(["alpha", "beta"])  # Defaults to stdout, left open
+emit(["alpha", "beta"])  # Default: stdout, left open
 #: alpha
 #: beta
 buffer = StringIO()
-emit(["gamma"], buffer)  # A managed resource, closed on exit
-try:
-    print(buffer.read())
-except ValueError as e:
-    print("ValueError:", e)
-#: ValueError: I/O operation on closed file
-print(buffer.closed)
-#: True
+emit(["gamma"], buffer)  # Caller's stream, left open
+print(buffer.getvalue().strip(), buffer.closed)
+#: gamma False
+path = Path(tempfile.gettempdir()) / "emit.txt"
+emit(["delta"], path)  # emit() opened it, so emit() closes it
+print(path.read_text().strip())
+#: delta
+path.unlink()
 ```
 
-A real file should close on the way out.
-`stdout` should not.
-With a real resource the `with` closes it, shown by `buffer.closed`.
-With the default, `nullcontext` hands back `sys.stdout` and does nothing on exit,
-so the stream stays open.
+`emit()` closes only the file it opened.
+A stream the caller handed over stays open, which is what the caller expects;
+the `nullcontext` wrapper is what lets one `with` block serve both cases without an `if` around the whole body.
 
 ## An Object Pool
 
@@ -561,7 +672,12 @@ This differs from [Flyweight](35_Flyweight.md), its nearest neighbor.
 A flyweight is immutable and shared by everyone at once.
 A pooled object is usually mutable or stateful,
 so the pool lends it to one borrower at a time,
-and the lease exists to take it back:
+and the lease exists to take it back.
+
+Three tests pin down what the lease guarantees:
+the item leaves the pool and comes back,
+it comes back even when the block raises an exception,
+and the pool hands out the same object rather than a new one:
 
 ```python
 # test_object_pool.py
@@ -590,10 +706,16 @@ def test_objects_reused_not_recreated() -> None:
 ```
 
 The second lease hands back the same object, not a new one.
-A *production pool* adds refinements on this skeleton,
+A production pool adds refinements to this skeleton,
 such as lazily creating items on first demand,
 validating an item before lending it out,
 and a timeout on `get()` so a starved borrower fails loudly instead of waiting forever.
+
+Each of those refinements is a change inside `lease()`,
+invisible to every `with pool.lease()` in the codebase.
+That is what the protocol buys:
+the borrower's contract is two lines long and cannot be got wrong,
+and everything hard about custody lives on the other side of the `yield`.
 
 ## Exercises
 
@@ -611,3 +733,9 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
+6.  Write a context manager `retrying` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
+    without using `contextlib.suppress`.
+    Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
+7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
+    run it with no arguments and with three,
+    and confirm the close order reverses the open order in both cases.

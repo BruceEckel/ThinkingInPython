@@ -259,3 +259,74 @@ specialized and full speed. Global monitoring answers "what ran";
 local monitoring answers "how often did *this* run," which is the
 question you already had when you opened `sys.monitoring` instead of
 a profiler.
+
+## 8. Reading `tottime` against `cumtime`
+
+Any script works; this one makes the two columns disagree on purpose:
+
+```python
+# exercise_8.py
+def inner() -> int:
+    return sum(i * i for i in range(100_000))
+
+def outer() -> int:
+    return inner() + inner()
+
+print(outer() > 0)
+#: True
+```
+
+Run `python -m cProfile -s cumulative exercise_8.py`. The largest
+`cumtime` belongs to `exec`, then `<module>`, then `outer`. The
+largest `tottime` belongs to the generator expression inside
+`inner()`, where the arithmetic happens.
+
+They differ because the two columns measure different things.
+`cumtime` is the time from entering a function to leaving it,
+including everything it called, so a caller can never have a smaller
+`cumtime` than the work beneath it: every caller on the path
+accumulates the same time. `tottime` excludes the callees, so it
+attributes time to the frame that was actually executing.
+
+A function high on `cumtime` and near zero on `tottime` is a
+pass-through: it is slow only because of what it calls, and rewriting
+it changes nothing. The two coincide only for a leaf function, one
+that calls nothing else, which is why the bottom of a call chain is
+where the two lists finally meet.
+
+## 9. A compact `array` is not a faster `array`
+
+```python
+# exercise_9.py
+import timeit
+from array import array
+
+n = 200_000
+as_list = [float(i) for i in range(n)]
+as_array = array("d", as_list)
+
+def best(f: object) -> float:
+    return min(timeit.repeat(f, number=20, repeat=5))  # type: ignore
+
+t_list = best(lambda: sum(as_list))
+t_array = best(lambda: sum(as_array))
+print(f"array is slower to iterate: {t_array > t_list}")
+#: array is slower to iterate: True
+```
+
+Not faster: on one machine the `array` took about 1.3 times as long
+as the `list`. The memory saving is real (the chapter measures
+325,176 bytes against 80,080) and the speed saving does not exist.
+
+A `list` of floats stores pointers to `float` objects that already
+exist, so reading one hands back a reference. An `array` stores raw
+eight-byte doubles with no objects at all, so reading one has to
+build a fresh `float` object to hand to Python. That allocation, on
+every single element, is the cost that eats the advantage of the
+tighter layout.
+
+This is the chapter's NumPy lesson arriving early: a compact layout
+pays off when the loop over it leaves Python. `sum()` over an
+`array` stays in Python and boxes every element; a NumPy `sum` over
+the same bytes never creates a Python object at all, which is why
+vectorizing wins where `array` alone does not.

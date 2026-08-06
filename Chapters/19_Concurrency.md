@@ -217,13 +217,13 @@ Beware a list comprehension that awaits.
 `[await c for c in coroutines]` becomes the sequential version of `gather()`.
 Each `await` runs its coroutine to completion before the next one starts,
 so nothing overlaps and the delays add.
-`gather()` is concurrent because it wraps and *schedules* every coroutine as a task before it waits for any of them.
+`gather()` is concurrent because it wraps and schedules every coroutine as a task before it waits for any of them.
 
 Scheduling does not mean running.
 The task bodies execute only after `gather()` suspends
 (the event loop drives `gather()` too).
-Each runs until its first `await`, which the `a: started`, etc.,
-lines in the trace show.
+Each runs until its first `await`,
+which is what the `started` lines in the trace record.
 The comprehension doesn't achieve multiple coroutines in flight:
 it does not start the next coroutine until the previous one has finished.
 
@@ -314,6 +314,11 @@ asyncio.run(main())
 
 `tg.create_task()` schedules a task immediately,
 so all six are in flight together.
+Holding the task objects is not optional bookkeeping.
+The event loop keeps only weak references to its tasks,
+so a task whose last strong reference is discarded can be collected mid-execution and stop with nothing printed and nothing raised.
+A `TaskGroup` holds its own references until the block exits.
+Outside one, keep the returned task in a variable or a set that outlives it.
 `c` and `d` raise exceptions at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
@@ -335,6 +340,18 @@ so `task.exception()` returns the `ValueError` instead of raising it.
 so `task.cancelled()` is `True` for both.
 A partial failure cancels whatever was still in flight.
 It does not erase what already succeeded.
+
+Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
+at whichever `await` it is suspended on.
+That exception derives from `BaseException` rather than `Exception`,
+which is deliberate.
+A `try`/`except Exception` written inside a task to log and continue does not catch cancellation,
+so the task still stops the way the group intended.
+The mistake runs the other way:
+a bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
+which is how a `TaskGroup` block ends up waiting on a task that was told to stop.
+If a task must clean up on the way out, catch `asyncio.CancelledError` by name,
+do the cleanup, and re-raise it.
 
 When failure is not termination but data,
 `gather(..., return_exceptions=True)` handles the situation differently:
@@ -602,6 +619,7 @@ while a coroutine switch happens only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
 just as the same race between threads needs a `threading.Lock`.
+[Locks](#locks) returns to this listing and adds one.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -662,7 +680,8 @@ Deleting the global and writing `handle(name)`'s value into a parameter would wo
 and would keep working until the value is needed four calls down inside a logging helper.
 That is the case a `ContextVar` is for.
 
-Setting a variable for part of a call and restoring it afterward is common enough that `set()` returns a token usable as a context manager:
+Setting a variable for part of a call and restoring it afterward is common enough that `set()` returns a token usable as a context manager
+(3.14):
 
 ```python
 # context_scope.py
@@ -692,7 +711,7 @@ asyncio.run(handle("req-7"))
 Leaving the `with` block calls `reset()` on the token,
 which puts back whatever the variable held before, not the default.
 That distinction matters when scopes nest.
-Before the token grew this protocol you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`,
+Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`,
 which is the same code the context manager now writes for you.
 
 The middle line is the reason `ContextVar` rather than `threading.local` is the modern answer.
@@ -707,11 +726,16 @@ letting you capture a context and run something else inside it later.
 
 ## Parallelism
 
+Everything so far has overlapped waiting on one thread.
+Computing is the other half, and it needs a second mechanism.
 A CPU-bound task cannot overlap if only a single core is available.
 With several cores, it can.
 `ProcessPoolExecutor` runs each call in its own process,
-each with its own interpreter and GIL,
-so the operating system can place them on different cores and run them at the same time:
+each with its own interpreter and its own *Global Interpreter Lock* (GIL),
+the interpreter-wide lock that lets only one thread run Python bytecode at a time.
+[The GIL and Free Threading](#the-gil-and-free-threading) takes the lock apart;
+what matters here is that there is one per interpreter,
+so the operating system can place these processes on different cores and run them at the same time:
 
 ```python
 # parallel_cpu.py
@@ -738,8 +762,8 @@ The work has been distributed across multiple interpreters,
 each on its own core.
 With enough cores the wall-clock time falls toward the time of a single task.
 
-Two issues separate a process pool from every in-process tool in this chapter,
-and both surface in this short listing:
+Three issues separate a process pool from the in-process tools in this chapter,
+and all three surface in this short listing:
 
 1. The `if __name__ == "__main__"` guard is not decoration.
    To create a worker, the operating system starts a fresh Python interpreter,
@@ -748,6 +772,9 @@ and both surface in this short listing:
    so the guard keeps each worker from running the guarded block and building a pool of workers of its own.
    If you leave it out,
    Python detects the runaway spawning and raises `RuntimeError`.
+   This used to be a Windows and macOS concern only,
+   because Linux forked the parent process instead of importing anything.
+   Since 3.14 no platform forks by default, so the guard is required everywhere.
 2. Work crosses the process boundary by *pickling*.
    Each argument and each return value is serialized in one process and rebuilt in the other.
    The function itself travels by name,
@@ -755,6 +782,12 @@ and both surface in this short listing:
    Passing a `lambda` to `pool.map()` fails with a pickling error.
    This echoes [Performance](18_Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule:
    a million tiny results can cost more to pickle than the parallelism saved.
+3. `pool.map()` raises nothing itself.
+   It returns a generator,
+   and a worker's exception is re-raised in the calling process when you consume that worker's result.
+   The `list(...)` around the call is what turns a failure in any worker into an exception here,
+   at a point you can catch it.
+   That third point is true of every `Executor`, not only a process pool.
 
 `ProcessPoolExecutor` is not the only way to get separate processes.
 The `multiprocessing` module underneath it exposes the raw pieces:
@@ -909,7 +942,7 @@ As *n* → ∞, that ceiling approaches 1 / *s* and stops climbing.
 A job that spends 10 percent of its time in serial overhead never speeds up more than tenfold,
 on 16 cores or 1,600.
 
-Splitting into more, smaller tasks buys real gains up to a point,
+Splitting into more, smaller tasks yields real gains up to a point,
 since finer chunks even out the load across workers, as described above.
 Past that point, though,
 each additional task adds its own slice of the same serial overhead:
@@ -923,8 +956,8 @@ which is why adding cores is not, by itself, a scaling strategy.
 ## The GIL and Free Threading
 
 Threads don't help with the previous section's CPU-bound work.
-The standard CPython build has a *Global Interpreter Lock* (GIL).
-With the GIL, only one thread runs Python bytecode at a time,
+The standard CPython build has one GIL for the whole process,
+so only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
 
 However, a thread waiting on I/O releases the GIL.
@@ -1125,8 +1158,13 @@ or a queue like the one in [Coordinating Threads with Queues](#coordinating-thre
 Since 3.13, CPython also provides a *free-threaded* build,
 tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 (`python3.15t` rather than `python3.15`).
+[PEP 779](https://peps.python.org/pep-0779/)
+removed its "experimental" label in 3.14,
+so it is a supported build now rather than a preview,
+still optional and still installed alongside the default one.
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
-Running `gil_threads.py` under a free-threaded interpreter turns the ratio around:
+Under a free-threaded interpreter `gil_threads.py`'s boolean flips to `False`.
+Replacing its last line with `print(f"threads speedup: {seq / thr:.1f}x")` reports the size of the win instead of the fact of it:
 
     threads speedup: 3.8x
 
@@ -1353,7 +1391,6 @@ from typing import Final
 LIMIT: Final[int] = 200
 
 class Tickets:
-    "Hands out each number once: read, pause, write back."
     def __init__(self, limit: int) -> None:
         self.limit = limit
         self.next_number = 0
@@ -1383,6 +1420,7 @@ report("serialized",
 #: serialized: 200 distinct, duplicates False
 ```
 
+`Tickets` hands out each number once: read, pause, write back.
 `Tickets.__next__()` is `gil_race.py` wearing a different hat.
 Read the counter, do something that releases the GIL, write the counter back.
 Eight threads read the same number and eight threads are handed it,
@@ -1554,6 +1592,17 @@ An `Executor` blocks a worker and hands back a result.
 A coroutine does the opposite.
 It is a suspended function that runs only when the event loop resumes it.
 
+The two models give their result-that-arrives-later the same name,
+which invites one specific mistake.
+`pool.submit()` hands back a `concurrent.futures.Future`,
+and you wait on it by calling `result()`, which blocks the calling thread.
+Awaiting it raises `TypeError: 'Future' object can't be awaited`.
+`asyncio` has its own `Future`, and `Task` is a subclass of it,
+so both are awaitable and neither blocks anything.
+`loop.run_in_executor()` is the bridge between the two:
+it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
+That is why `process_price()` below calls it instead of `pool.submit()`.
+
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
 and a `run_in_executor()` call all produce an *awaitable*.
@@ -1690,9 +1739,11 @@ You can calculate the ratio between the two:
 import asyncio
 import threading
 import tracemalloc
+from typing import Final
 
-TASKS = 5_000
-STACK_SIZE = 1024 * 1024  # 1 MiB, a common thread stack reservation
+TASKS: Final[int] = 5_000
+# 1 MiB, a common thread stack reservation:
+STACK_SIZE: Final[int] = 1024 * 1024
 
 async def parked() -> None:
     await asyncio.sleep(999)  # Suspended, never resumes
@@ -2036,7 +2087,7 @@ for example letting only the task with the lower ID give.
   a worker that runs continuously,
   or processes that share state through a `Manager`.
 - **More cores only speed up the parallel fraction of the work.**
-  Splitting past the number of cores sometimes buys a little more.
+  Splitting past the number of cores sometimes yields a little more.
   Then the per-task cost of pickling and reassembling catches up,
   and the gains flatten (Amdahl's Law).
 - **For CPU-bound work, try a subinterpreter first, a process pool second,
@@ -2045,6 +2096,19 @@ for example letting only the task with the lower ID give.
   `queue.Queue` blocks a thread,
   `multiprocessing.Queue` pickles across processes,
   `asyncio.Queue` suspends a task and needs no locking.
+- **An iterator handed to several threads is not thread-safe,
+  and it fails quietly.**
+  Wrap one you have with `threading.serialize_iterator()`,
+  wrap the generator function that makes them with `threading.synchronized_iterator()`,
+  and use `threading.concurrent_tee()` when every worker needs the whole stream.
+  A lock inside the loop body guards the wrong thing:
+  the `for` statement calls `next()` outside it.
+- **Pass request-scoped values in a `ContextVar`, not a global.**
+  Each task starts from a copy of the context that created it,
+  and `asyncio.to_thread()` carries that copy into the worker thread.
+- **Cancellation is a `BaseException`, not an `Exception`.**
+  `except Exception:` inside a task lets it through, which is what you want.
+  Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.
 - **A shared lock only prevents deadlock if every user agrees on the order.**
   Acquire shared locks in the same sequence everywhere.
   When two units keep yielding to each other instead,
@@ -2143,6 +2207,25 @@ Here are a few of the topics beyond it:
 8.  In `priority_queue.py`,
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
+9.  In `utils/fetch_demo.py`,
+    change `("e", 0.2)` in `PAIRS` to `("e", 0.005)` so `e` finishes before `c` and `d` fail,
+    then run `task_group.py`.
+    Predict which of the six report `cancelled` and which report a result,
+    then run it and explain what a `TaskGroup` can and cannot undo.
+    Change `PAIRS` back afterward,
+    since `gather_with_exceptions.py` uses it too.
+10. In `gather_with_exceptions.py`,
+    delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.
+    Predict how many `fetched` lines still print,
+    and explain what became of the tasks the `gather()` call never reported on.
+11. In `context_var.py`,
+    move `request_id.set(name)` out of `handle()` and into `main()` above the `TaskGroup`.
+    Predict what each task prints,
+    then explain the result with "every task starts with a copy of the context that created it."
+12. In `subinterpreters.py`,
+    replace `InterpreterPoolExecutor` with `ThreadPoolExecutor`.
+    The assertion still passes and the printed boolean flips.
+    Explain both, using [The GIL and Free Threading](#the-gil-and-free-threading).
 
 [^concurrency-def]: Pike's definition from that talk clarifies what he meant.
     Concurrency is the composition of independently executing computations.
@@ -2169,7 +2252,7 @@ Here are a few of the topics beyond it:
     A couple of academic prototypes exist (PSTM, TraM),
     but neither is a maintained library suited to real code.
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
-    are where STM actually succeeded as a practical, widely used tool.
+    are where STM succeeded as a practical, widely used tool.
 
 [^libraries]: Libraries worth exploring:
 
