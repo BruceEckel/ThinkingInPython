@@ -86,8 +86,8 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions record a message instead of printing, so the model never
-    # touches the screen; a view reads vm.message and displays it.
+    # Actions record a message instead of printing, so the model does
+    # not touch the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
         self.message = f"Total = {self.amount}"

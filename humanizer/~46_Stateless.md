@@ -38,6 +38,8 @@ Recorded so a later pass doesn't re-flag them.
   Kept as the section's topic sentence.
 - **B1**, "Type checking is the optimal time to discover errors."
   The proposed "earliest" narrowed the claim. Kept as written: optimal.
+  A deep-review pass on 2026-08-05 re-proposed it a second time ("cheapest")
+  without checking this file, and the change was reverted. The word stands.
 - **B3**, "In `greeter.py`, two details deserve attention:". Kept.
 - **B4**, "The two halves of this chapter taught two vocabularies:". Kept.
 

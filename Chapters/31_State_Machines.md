@@ -11,10 +11,9 @@ and the system behaves differently from one state to the next
 The code that moves the system from one state to the next is often a *Template Method*,
 as seen in the following framework for a basic state machine.
 Each state can be `run()` to perform its behavior, and (in this design)
-you can also pass it an "input" object so it can tell you what new state to move to based on that "input."
+you can also pass it an "input" object so it can tell you what new state to move to.
 The key distinction between this design and the next is that here,
-each `State` object decides what other states it can move to,
-based on the "input,"
+each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
 Another way to put it is that here,
 each `State` object has its own little `State` table,
@@ -33,19 +32,18 @@ class State:
 ```
 
 This class is unnecessary.
-However, it allows us to say that something is a `State` object in code,
+However, it lets you say that something is a `State` object in code,
 and provide a slightly different error message when a derived class fails to implement all the methods.
-We could have gotten nearly the same effect by saying:
+You could get nearly the same effect by saying:
 
     class State: pass
 
-because we still get exceptions if code calls `run()` or `next()` on a derived type that hasn't implemented them.
+because calling `run()` or `next()` on a derived type that hasn't implemented them still raises an exception.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
-This method not only moves to the next state,
-but it also calls `run()` for each state object.
+This method moves to the next state and calls `run()` for each state object.
 Thus you can see it's an expansion of the idea of the `State` pattern,
 since `run()` does something different depending on the state that the system is in:
 
@@ -72,7 +70,7 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 As [Template Method](25_Template_Method.md) puts it,
 subclasses supply the steps, not the flow.
 The constructor also runs the initial state,
-the construction-starts-the-engine choice that chapter warned about.
+the construction-starts-the-engine choice that drew a warning in that chapter.
 It is safe here because the state objects are stateless singletons,
 fully formed before any machine exists.
 A `State` whose `run()` reads attributes off the machine revives the trap.
@@ -244,7 +242,7 @@ While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
 You cannot write a table inside its class,
-because its entries name the *other* states,
+because its entries name the other states,
 which do not all exist until every class definition runs.
 In Python that is no obstacle.
 Define the classes first, then fill in the tables at module level,
@@ -357,7 +355,7 @@ this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
 
 The two versions also answer a question this input file never asks:
-what happens on an *unexpected* input?
+what happens on an unexpected input?
 They answer it differently.
 Version 1's `case _` arms return the current state,
 so an input a state does not recognize is silently ignored,
@@ -367,19 +365,19 @@ and its `next()` raises an exception on anything else.
 Neither is wrong, but the choice deserves to be deliberate.
 Ignoring suits a machine fed from a noisy source that includes events not meant for it.
 Failing fast suits a table you are still building,
-where a missing entry is a bug you want to hear about,
+where a missing entry is a bug you want flagged,
 and it is the policy the table-driven engine below adopts as well.
 
 ## Table-Driven State Machine
 
 The previous design keeps each state's transitions inside the state class.
-A pure state machine can go further and represent the *entire* machine as a single transition table.
+A pure state machine can go further and represent the entire machine as a single transition table.
 All the behavior then lives in one place,
 so you can build and maintain it directly from a state-transition diagram.
 
 For a given current state and input, a transition row answers three questions:
-is there a condition to check, what action runs during the transition,
-and what state do we move to next.
+whether a condition must pass, what action runs during the transition,
+and what state comes next.
 As a table:
 
     {(current_state, InputType): [(condition, action, next_state), ...]}
@@ -437,7 +435,7 @@ Several candidate transitions can share one `(state, input)` key,
 told apart by their conditions.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
-Note that the lookup keys on `type(event)` *exactly*: a dictionary probe,
+Note that the lookup keys on `type(event)` exactly: a dictionary probe,
 not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
 and it cuts the other way too:
@@ -543,8 +541,8 @@ class VendingMachine(StateMachine):
     def sold_out(self, col: SecondDigit) -> bool:
         return self._slot(col).quantity == 0
 
-    # Actions record a message instead of printing, so the model never
-    # touches the screen; a view reads vm.message and displays it.
+    # Actions record a message instead of printing, so the model does
+    # not touch the screen; a view reads vm.message and displays it.
     def add_money(self, money: Money) -> None:
         self.amount += money.value
         self.message = f"Total = {self.amount}"
@@ -669,7 +667,7 @@ the model never draws anything,
 and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 
-Using `tkinter` we can create a GUI representation of the vending machine.
+Using `tkinter`, you can create a GUI representation of the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects

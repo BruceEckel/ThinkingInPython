@@ -1062,7 +1062,7 @@ which [Retrofitting an Effect](#retrofitting-an-effect)
 demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
-Type checking is the cheapest time to discover errors.
+Type checking is the optimal time to discover errors.
 The trade is not about correctness, but churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.

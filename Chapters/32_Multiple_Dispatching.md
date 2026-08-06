@@ -26,7 +26,6 @@ That is why one method call can resolve only one unknown type.
 
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
-Each unknown type needs its own dispatching method call.
 The following example names its methods `compete()` and `eval_*()`,
 and all belong to the same hierarchy.
 Here there will be only two dispatches.
@@ -50,7 +49,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-We also need two small helper functions, one to generate random pairs of items,
+You'll also need two small helper functions,
+one to generate random pairs of items,
 and one to play a pair off and print the result:
 
 ```python
@@ -68,7 +68,7 @@ def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
-Here we demonstrate *Multiple Dispatching*:
+Here is Multiple Dispatching in action:
 
 ```python
 # paper_scissors_rock.py
@@ -86,13 +86,13 @@ class Paper(Item):
         # First dispatch: self was Paper
         return item.eval_paper(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Paper
+        # Item was Paper; this is Paper's case
         return Outcome.DRAW
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Paper
+        # Item was Scissors; this is Paper's case
         return Outcome.WIN
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Paper
+        # Item was Rock; this is Paper's case
         return Outcome.LOSE
 
 class Scissors(Item):
@@ -100,13 +100,13 @@ class Scissors(Item):
         # First dispatch: self was Scissors
         return item.eval_scissors(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Scissors
+        # Item was Paper; this is Scissors' case
         return Outcome.LOSE
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Scissors
+        # Item was Scissors; this is Scissors' case
         return Outcome.DRAW
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Scissors
+        # Item was Rock; this is Scissors' case
         return Outcome.WIN
 
 class Rock(Item):
@@ -114,13 +114,13 @@ class Rock(Item):
         # First dispatch: self was Rock
         return item.eval_rock(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Rock
+        # Item was Paper; this is Rock's case
         return Outcome.WIN
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Rock
+        # Item was Scissors; this is Rock's case
         return Outcome.LOSE
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Rock
+        # Item was Rock; this is Rock's case
         return Outcome.DRAW
 
 if __name__ == "__main__":
@@ -148,7 +148,7 @@ That call is the second dispatch: it resolves `paper`,
 landing in `Paper.eval_scissors()`, the one method that knows both types.
 Now note whose result it returns.
 `Paper.eval_scissors()` returns `WIN`,
-and that is the outcome for the *scissors that started the duel*,
+and that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running: scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the object named in the method's own name.
@@ -211,11 +211,11 @@ if __name__ == "__main__":
 Notice the flexibility of dictionaries.
 A tuple serves as a key just as easily as a single object.
 Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
-The match is on classes *exactly*,
+The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction,
-which is exactly what you want while adding `Lizard` in exercise 1.
+which is what you want while adding `Lizard` in exercise 1.
 
 ## One Type or Many
 

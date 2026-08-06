@@ -133,8 +133,8 @@ so a new operation is a new function, and the nodes never change.
 This is the same trade explored in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
 a closed set of types, with operations gathered in one place each.
 The `assert_never()` in each `case _` makes that closed set pay off.
-Add a `Symlink` class to the `Node` union.
-Every function whose `case _` calls `assert_never()` now fails type checking,
+If you add a `Symlink` class to the `Node` union,
+every function whose `case _` calls `assert_never()` fails type checking,
 because `entry` could be a `Symlink` that no case handles.
 The checker flags each function that still needs a new case,
 so none can be forgotten.
@@ -188,8 +188,8 @@ Match over a closed set, use polymorphism for an open one.
 ## Interpreter
 
 A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
-*Interpreter* is Composite applied to language.
-Represent each construct as a node type, and evaluation becomes a tree walk.
+Interpreter is Composite applied to language.
+Representing each construct as a node type turns evaluation into a tree walk.
 
 In most languages the pattern has a reputation for heaviness,
 because you must write a class per construct and a parser to build the trees.
@@ -255,7 +255,7 @@ so `2 * x + 1` is a valid sentence in the little language.
 Python has already parsed it, honoring precedence,
 before the interpreter ever runs.
 
-The reflected methods ride the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many):
+The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many):
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods trust their operand completely.
@@ -477,7 +477,7 @@ Composite is the data: a union of node types, some holding others.
 Interpreter is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into frozen data classes, a union,
 operator methods that build nodes, and `match` functions that walk them.
-One practical limit rides along:
+One practical limit applies:
 every function here recurses once per level of tree,
 and Python's recursion limit (roughly a thousand frames)
 caps how deep a tree they can walk.
@@ -548,7 +548,7 @@ the same line would arrive as one finished `str` with the attack already spliced
 and the only remaining defense would be inspecting the result to guess which characters the program wrote and which a user did.
 
 That is the general argument for handing a consumer the structure instead of the answer.
-A finished string has thrown away the distinction that the safety decision depends on.
+A finished string has thrown away the distinction on which the safety decision depends.
 The Interpreter pattern is usually presented as a way to add operations to a language;
 here it is a way to keep a decision available to whoever is qualified to make it.
 

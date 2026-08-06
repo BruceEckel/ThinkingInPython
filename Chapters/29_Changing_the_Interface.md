@@ -3,13 +3,13 @@
 Sometimes the problem you're solving is as simple as "I don't have the interface that I want."
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
-*Façade* creates an interface to a set of classes,
-providing a more comfortable way to deal with a library or bundle of resources.
+*Façade* creates an interface to a set of classes.
+This is a more comfortable way to deal with a library or bundle of resources.
 
 ## Adapter
 
-When you've got *this*, and you need *that*, *Adapter* solves the problem.
-The only requirement is to produce a *that*,
+When you've got "this", and you need "that", *Adapter* solves the problem.
+The only requirement is to produce a "that",
 and there are a number of ways to accomplish this adaptation:
 
 ```python
@@ -101,11 +101,12 @@ because *GoF Design Patterns* asserts that a Proxy must have an identical interf
 
 Two details in the listing repay attention.
 The `/` in `WhatIUse.op()` makes its parameter positional-only,
-and it is load-bearing: `WhatIUse2.op()` renames the parameter to `what_i_have`,
+and removing it breaks the override below:
+`WhatIUse2.op()` renames the parameter to `what_i_have`,
 and renaming a keyword-callable parameter in an override breaks substitutability,
 so the checker rejects it without the `/`.
 The rename is the smaller half of that story.
-`WhatIUse2.op()` also changes the parameter's *type*.
+`WhatIUse2.op()` also changes the parameter's type.
 Its base accepts a `WhatIWant`, and it accepts a `WhatIHave`.
 If you annotate both precisely, a checker rejects the override outright,
 reporting `invalid-method-override`,
@@ -166,7 +167,7 @@ You have already seen one in earnest:
 `PairCoord` in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
 adapts a `Pair` to the `Coord` protocol,
 an adapter as a frozen dataclass with two properties,
-built precisely because the handed-to-you type did not fit.
+built because the handed-to-you type did not fit.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
 special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders itself,
@@ -246,7 +247,7 @@ At module level, put the friendly functions and the few classes to expose.
 If you keep the messy internals private
 (using a leading underscore, by convention), the `import` is the façade.
 A `Facade` class full of static methods only reproduces, with more ceremony,
-what a module already gives you.
+what a module gives you.
 
 ## Telling the Wrappers Apart
 

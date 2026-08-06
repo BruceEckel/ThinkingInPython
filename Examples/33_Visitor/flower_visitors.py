@@ -36,17 +36,17 @@ class Pollinator(Bug):
 class Predator(Bug):
     pass
 
-# Add the ability to do "Bee" activities:
+# Bee pollinates:
 class Bee(Pollinator):
     def visit(self, flower: Flower) -> None:
         flower.pollinate(self)
 
-# Add the ability to do "Fly" activities:
+# Fly also pollinates:
 class Fly(Pollinator):
     def visit(self, flower: Flower) -> None:
         flower.pollinate(self)
 
-# Add the ability to do "Worm" activities:
+# Worm eats instead:
 class Worm(Predator):
     def visit(self, flower: Flower) -> None:
         flower.eat(self)
@@ -56,7 +56,7 @@ def flower_gen(n: int) -> Iterator[Flower]:
     for i in range(n):
         yield random.choice(flwrs)()
 
-# Now we can perform Bug operations on Flowers:
+# Now perform Bug operations on the flowers:
 bee = Bee()
 fly = Fly()
 worm = Worm()

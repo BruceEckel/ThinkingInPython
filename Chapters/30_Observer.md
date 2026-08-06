@@ -158,7 +158,7 @@ a one-shot listener detaching itself is the natural example,
 and that mutates `self._observers` in the middle of the loop walking it.
 If you iterate the list directly,
 removing the current observer shifts every later one left,
-so the next observer is silently skipped, no error anywhere.
+so the next observer is silently skipped, and nothing signals the loss.
 The copy makes detaching during notification safe,
 and a newcomer subscribing mid-notification starts hearing from the next change:
 
@@ -193,7 +193,7 @@ And subscriptions are strong references:
 an observable that outlives its observers keeps each subscribed bound method's instance alive,
 the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
-or weak references (`weakref.WeakMethod`) doing the forgetting automatically.
+or weak references (`weakref.WeakMethod`), which forget automatically.
 
 ## Observer and I/O
 
@@ -213,7 +213,7 @@ so an assignment cannot be awaited.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).
-For this example, we only need a coroutine to pause at `await` while others run:
+For this example, you only need a coroutine that pauses at `await` while others run:
 
 ```python
 # async_observers.py
@@ -271,7 +271,7 @@ asyncio.run(main())
 
 The `AsyncObserver` alias makes the checker reject a plain function as an observer:
 an observer must return an awaitable,
-which is exactly what calling an `async` function produces.
+which is what calling an `async` function produces.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence prints in subscribe order, alarm first.
@@ -304,7 +304,7 @@ The model is an `Observable`.
 and `recolored()` computes the grid that results from a click: values in,
 values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
-`tkinter` plays no part here, so we can test the model without a GUI.
+`tkinter` plays no part here, so you can test the model without a GUI.
 It reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python

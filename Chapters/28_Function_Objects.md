@@ -8,8 +8,8 @@ In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 These three patterns are largely unnecessary in Python.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function.
-The sections below show the function form first,
-then the classic object form for contrast.
+Each pattern below appears twice: first as a function,
+then as the classic class-based form for contrast.
 
 ## Command: Choosing the Operation at Runtime
 
@@ -118,7 +118,7 @@ for command in fixed:
 #: step 2
 ```
 
-The two comprehensions look alike and differ in *when* they read `n`.
+The two comprehensions look alike and differ in when they read `n`.
 A lambda's body runs when the command is called, not when it is created,
 and all three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
@@ -130,8 +130,8 @@ When commands built in a loop all behave like the last one, this is why.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
-A *Strategy* is an interchangeable algorithm chosen at runtime.
-For the following examples we will use three real algorithms that find a *root* of a function `f`,
+A *Strategy* is an interchangeable algorithm.
+The following examples use three algorithms that find a *root* of a function `f`,
 a value where `f(x)` is zero.
 Each takes the function and two hints and returns the root,
 or `None` when it cannot find one.
@@ -267,7 +267,7 @@ for algorithm in (Bisection(), Newton(), Secant()):
 #: 1.414214
 ```
 
-We use strategies-as-functions constantly in Python without naming it as a pattern.
+Strategies-as-functions are used constantly in Python without naming it as a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
 
@@ -312,7 +312,7 @@ or into the chain below, unchanged.
 including the case where the setting is a positional argument that comes after the one the caller supplies,
 which `Placeholder` ([Foundations](40_Functional_Foundations.md#leaving-a-gap-with-placeholder))
 handles.
-Save the strategy *class* for an algorithm that carries several related methods or mutable state.
+Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
 
 ## Chain of Responsibility
@@ -354,10 +354,10 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 Each handler is a *Strategy* function, the chain is the list,
 and success is a non-`None` return.
 Adding, removing, or reordering handlers means editing a list.
-We see the fall-through when bisection cannot bracket a root.
+This is the fall-through: bisection cannot bracket a root.
 It returns `None`, and the chain continues looking for a method that can.
 
-We test that the first finder that converges wins,
+These tests confirm that the first finder that converges wins,
 a later finder rescues one that fails, and an empty chain returns `None`:
 
 ```python

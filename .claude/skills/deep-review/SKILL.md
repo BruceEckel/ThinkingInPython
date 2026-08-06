@@ -1,12 +1,15 @@
 ---
 name: deep-review
-description: Deep-review a book chapter: a correctness/editing pass, a teaching pass (misconceptions, lookalike pairs, mechanism vs. outcome, near-miss code, plus chapter-level pedagogical structure and whether the material is in the right order), a house-style audit of listings, and a prose pass for confusing, odd, or out-of-character wording. Use whenever asked to deep review, thoroughly review, or audit a chapter.
+description: Deep-review a book chapter as both editor and teacher: a correctness/editing pass, a teaching pass (misconceptions, lookalike pairs, mechanism vs. outcome, near-miss code, plus chapter-level pedagogical structure and whether the material is in the right order), a house-style audit of listings, and a prose pass for confusing, odd, or out-of-character wording. Fixes and additions you are confident in get implemented; the rest are reported. Use whenever asked to deep review, thoroughly review, or audit a chapter.
 ---
 
 # Deep-reviewing a chapter: four passes, not one
 
-A request to "deep review" a chapter means an editing pass *and* a
-teaching pass. The editing pass is correctness: verify every technical
+A request to "deep review" a chapter puts you in two roles at once,
+editor and teacher. The editor fixes what is wrong. The teacher supplies
+what is absent. A review that does only the first is a proofread.
+
+The editing pass is correctness: verify every technical
 claim (web-search anything post-cutoff or version-dependent), run the
 chapter's gates, execute the extracted scripts directly and compare
 against their `#:` markers — repeatedly for timing-comparison booleans,
@@ -141,10 +144,23 @@ exception was a library bug (it is correct behavior, since `catch()`
 matches yielded values). `.venv/Lib/site-packages/<pkg>/` is right there.
 Probe with `reveal_type()` for types and a scratch script for runtime.
 
-Implement confident, small fixes directly. For additions — new listings,
-new exercises, restructured explanations — propose first and let the
-author decide: additions change voice and pacing, and rejecting
-candidates that would bloat the chapter is part of the author's role.
+Split the findings by confidence, not by kind. Implement everything you
+are confident in, including the teaching additions: a lookalike pair that
+needs contrasting, a near-miss the reader would write, a mechanism the
+listing shows only by its outcome. Report the rest, and say what you
+would do and why so the author can decide in one reading rather than
+asking you what you meant.
+
+Confidence here means you know the fix is right, not that the fix is
+small. A missing warning about a construct you have verified is a
+confident addition; the same warning is not confident when the chapter's
+silence might be deliberate. Deciding where a new listing goes, cutting a
+section, and anything that changes the chapter's voice or pacing stay
+proposals whatever your confidence: rejecting candidates that would bloat
+the chapter is part of the author's role. When one finding admits several
+reasonable fixes, recommend one and report the alternatives rather than
+picking silently.
+
 Any new listing follows the full verify loop in `CLAUDE.md` (fenced
 block with `# slug.py` first line, deterministic markers or wide-margin
 threshold booleans, sync, gates, `make reflow CH=NN` on the new prose).

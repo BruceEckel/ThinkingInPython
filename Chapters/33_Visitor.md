@@ -3,11 +3,11 @@
 The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
-The *Visitor* assumption is that you have a primary class hierarchy that is unchangeable.
-Perhaps it's from another vendor and you can't make changes to that hierarchy.
-However, you'd like to add new polymorphic methods to that hierarchy.
-Normally you'd need to add something to the base class interface,
-but that's unchangeable.
+The *Visitor* assumption is that you have a primary class hierarchy you cannot change.
+Perhaps it's from another vendor and you can't touch its source.
+However, you'd like to add new polymorphic methods to it.
+Normally you'd add something to the base class interface,
+but that's not an option.
 How do you get around this?
 
 *Visitor*, the final pattern in *GoF Design Patterns*,
@@ -59,17 +59,17 @@ class Pollinator(Bug):
 class Predator(Bug):
     pass
 
-# Add the ability to do "Bee" activities:
+# Bee pollinates:
 class Bee(Pollinator):
     def visit(self, flower: Flower) -> None:
         flower.pollinate(self)
 
-# Add the ability to do "Fly" activities:
+# Fly also pollinates:
 class Fly(Pollinator):
     def visit(self, flower: Flower) -> None:
         flower.pollinate(self)
 
-# Add the ability to do "Worm" activities:
+# Worm eats instead:
 class Worm(Predator):
     def visit(self, flower: Flower) -> None:
         flower.eat(self)
@@ -79,7 +79,7 @@ def flower_gen(n: int) -> Iterator[Flower]:
     for i in range(n):
         yield random.choice(flwrs)()
 
-# Now we can perform Bug operations on Flowers:
+# Now perform Bug operations on the flowers:
 bee = Bee()
 fly = Fly()
 worm = Worm()
@@ -110,14 +110,14 @@ The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),
 so that line depends on both unknown types at once:
-the worm's type chose `eat()`, and the flower's type chose *which* `eat()` runs.
+the worm's type chose `eat()`, and the flower's type chose which `eat()` runs.
 If you delete the override, the program still runs;
 the flower-side dispatch simply goes back to having nothing to say.
 
-One annotation in the listing is load-bearing.
+One annotation in the listing is required for the code to type-check.
 `accept()` types its visitor as `Any`,
 because the `Visitor` base class declares no `visit()` method,
-so `visitor.visit(self)` fails the type checker under an honest `Visitor` annotation.
+so declaring that parameter as `Visitor` instead of `Any` fails the type checker.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base;
 a Python version can give `Visitor` an abstract `visit()`,
 or describe visitors with a `Protocol`.
@@ -129,9 +129,9 @@ paid for its attribute bag.
 
 Python can add a method to a fixed hierarchy from outside,
 using `functools.singledispatch`.
-This turns a plain function into one that dispatches on the type of its first argument,
+It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-This is how *Visitor* works,
+That's how *Visitor* works,
 but without the `accept()` hook or the `Visitor` class hierarchy:
 
 ```python

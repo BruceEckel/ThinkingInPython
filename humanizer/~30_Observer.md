@@ -1,125 +1,48 @@
-[[Reviewed]]
 # Humanizer candidates: Chapters/30_Observer.md
 
 Run date: 2026-08-05. Source: `humanizer` skill (blader/humanizer, adapted).
 
-## How to use this
+All accepted edits were applied on 2026-08-05 and removed from this file.
+What remains is the record: what was applied, one housekeeping item that
+turned out not to be actionable, and what was never flagged.
+This is a changelog now, not a worklist.
 
-Each edit is a `###` block with a CURRENT and a PROPOSED fence.
-Delete any block you don't want, save the file, and hand it back to me.
-I apply what survives, verbatim, and run `make verify`.
+## Applied
 
-The CURRENT fences are exact copies from the chapter,
-so don't hand-edit inside them or the match will fail.
-If you want a different wording, edit the PROPOSED fence instead
-and I will use yours.
+Every block survived review. Five prose edits:
 
-Tier A is what I'd apply. Tier B is genuinely arguable, delete freely.
-Housekeeping is not humanizer output; separate list at the end.
+- A1, the tailing negation fragment at line 161 ("no error anywhere")
+  written out as a clause.
+- A2, two first-person-plural sites converted to second person
+  (lines 216, 307).
+- B1, the participle tail at line 196 ("doing the forgetting
+  automatically") turned into a relative clause.
+- B2, "exactly" at line 274.
 
-## Verdict
+The review leaned toward keeping B2, reading it as the precise-logical-match
+carve-out. It stayed in the file and was applied; recorded here so a later
+pass does not read the lean as the decision.
 
-This chapter is close to clean. Two Tier A findings, two Tier B, three
-housekeeping notes. The word-level half of the skill found nothing at
-all: no §7 vocabulary, no em dashes, no curly quotes, no boldface, no
-promotional or sycophantic language. The largest real finding is the
-two-site `we` slip in the async and visual-example sections; everything
-else is a single small instance.
+## Housekeeping: not actionable as written
 
-## Tier A
+**Semantic Line Break drift, exercise lines 433 and 439.** The finding said
+`make reflow CH=30` fixes both. It does not. `reflow_prose.py` reports zero
+paragraphs for this chapter, and breaking the two lines by hand at the points
+named produces a diff the tool then reverts: it re-joins them into single
+long lines.
 
-### A1 — line 161 — tailing negation fragment
+The reason is the tool's own rule. Both sentences run long without a
+top-level comma, semicolon, or colon, so `_clause_segments()` finds no
+boundary and refuses to break mid-clause rather than hard-wrapping to a
+column. Under the repo's Semantic Line Break convention these lines are
+compliant despite their length, and a manual break puts the file *out* of
+compliance. Left as they are.
 
-"no error anywhere" is tacked onto the end of the sentence as a
-verbless fragment rather than written as a clause, the same shape as
-the skill's "no guessing" example.
+A later pass should not re-flag these two lines, and should treat "long line
+in a list item with no clause marker" as a non-finding generally.
 
-CURRENT
-```text
-so the next observer is silently skipped, no error anywhere.
-```
-
-PROPOSED
-```text
-so the next observer is silently skipped, and nothing signals the loss.
-```
-
-### A2 — two sites — first person plural
-
-The book is second person. Both are plain editorial `we`, not the kind
-of deliberate first-person aside the earlier chapters kept. Delete
-either row you want left alone.
-
-**line 216**
-
-CURRENT
-```text
-For this example, we only need a coroutine to pause at `await` while others run:
-```
-
-PROPOSED
-```text
-For this example, you only need a coroutine that pauses at `await` while others run:
-```
-
-**line 307**
-
-CURRENT
-```text
-`tkinter` plays no part here, so we can test the model without a GUI.
-```
-
-PROPOSED
-```text
-`tkinter` plays no part here, so you can test the model without a GUI.
-```
-
-## Tier B
-
-### B1 — line 196 — participle tail
-
-"doing the forgetting automatically" reads as a reduced relative clause
-tacked onto the sentence rather than written out. Mild; the meaning is
-already clear either way.
-
-CURRENT
-```text
-or weak references (`weakref.WeakMethod`) doing the forgetting automatically.
-```
-
-PROPOSED
-```text
-or weak references (`weakref.WeakMethod`), which forget automatically.
-```
-
-### B2 — line 274 — "exactly"
-
-On the watch list, but it states a real logical identity (calling an
-`async` function produces exactly an awaitable, nothing looser), which
-is the carve-out `CLAUDE.md` allows. I lean toward keeping it, same
-call as the equivalent hit in chapter 27.
-
-CURRENT
-```text
-which is exactly what calling an `async` function produces.
-```
-
-PROPOSED
-```text
-which is what calling an `async` function produces.
-```
-
-## Housekeeping
-
-1. **Semantic Line Break drift.** Line 433 runs to 168 characters with
-   an unused break point at "between players / or to keep track of...",
-   and line 439 runs to 111 with an unused break at "an exception /
-   and the second...". `make reflow CH=30` fixes both; no gate catches
-   this.
-2. **No double blank lines.** Heading spacing is uniform throughout
-   (one blank line before each of the four `##` headings).
-3. **No `[[ ]]` draft notes, no spaced ` -- `, and no em dashes at all.**
-   §14 had nothing to preserve and nothing to flag.
+The other two housekeeping notes needed nothing: heading spacing is uniform,
+and there are no `[[ ]]` draft notes, no spaced ` -- `, and no em dashes.
 
 ## Considered and not flagged
 
@@ -179,5 +102,5 @@ the chapter, no promotional or sycophantic language, no filler phrases,
 no hedging stacks, no false ranges, no elegant variation, no copula
 avoidance, no predicate hyphenation, no generic upbeat conclusion, and
 no em dashes to consider. No stranded prepositions found. Everything
-above is structural: one tailing negation, one person slip (two
+above was structural: one tailing negation, one person slip (two
 sites), and two mild Tier B calls.

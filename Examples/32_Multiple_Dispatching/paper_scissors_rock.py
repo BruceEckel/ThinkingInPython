@@ -13,13 +13,13 @@ class Paper(Item):
         # First dispatch: self was Paper
         return item.eval_paper(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Paper
+        # Item was Paper; this is Paper's case
         return Outcome.DRAW
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Paper
+        # Item was Scissors; this is Paper's case
         return Outcome.WIN
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Paper
+        # Item was Rock; this is Paper's case
         return Outcome.LOSE
 
 class Scissors(Item):
@@ -27,13 +27,13 @@ class Scissors(Item):
         # First dispatch: self was Scissors
         return item.eval_scissors(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Scissors
+        # Item was Paper; this is Scissors' case
         return Outcome.LOSE
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Scissors
+        # Item was Scissors; this is Scissors' case
         return Outcome.DRAW
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Scissors
+        # Item was Rock; this is Scissors' case
         return Outcome.WIN
 
 class Rock(Item):
@@ -41,13 +41,13 @@ class Rock(Item):
         # First dispatch: self was Rock
         return item.eval_rock(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Item was Paper, we're in Rock
+        # Item was Paper; this is Rock's case
         return Outcome.WIN
     def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors, we're in Rock
+        # Item was Scissors; this is Rock's case
         return Outcome.LOSE
     def eval_rock(self, item: Any) -> Outcome:
-        # Item was Rock, we're in Rock
+        # Item was Rock; this is Rock's case
         return Outcome.DRAW
 
 if __name__ == "__main__":
