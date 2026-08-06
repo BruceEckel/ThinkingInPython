@@ -1,3 +1,4 @@
+[[Reviewed]]
 # Deep review: 01_Introduction.md
 
 **How to use this file:** delete a `##` block to reject that proposal, edit its text to change what gets implemented, leave it alone to accept it. Hand the file back when you are done.
@@ -94,16 +95,6 @@ Alternative: move it to the end, before "Resources," treating it as an afterword
 **Problem:** "These are meant for a workshop, worked in pairs at a keyboard, not left for solitary homework" reads as a dismissal to the reader most likely to be holding the book, who is alone. The next paragraph then addresses that same solo reader ("Try the exercise yourself before reading the solution"), so the intent is clearly to describe the exercises' origin, not to exclude anyone.
 **Proposal:** "These come from workshops, where they are worked in pairs at a keyboard. They are short enough to do on your own, and they are worth doing that way."
 **Cost:** none.
-
----
-
-## 9. Say where the abandonment message appeared
-
-**Kind:** prose
-**Where:** section "AI Trigger Warning" (line 59)
-**Problem:** "Eventually I even wrote a message confirming I was not going to complete it." The reader cannot tell whether this was a blog post, a note on the book's page, or a mailing-list reply, and a reader who followed the original project may have seen it.
-**Proposal:** Name the place, e.g. "wrote a note on the book's web site confirming I was not going to complete it."
-**Cost:** none. Only the author knows the actual venue, so this one needs a fact rather than a rewrite.
 
 ---
 
