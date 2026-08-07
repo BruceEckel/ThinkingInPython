@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -274,7 +275,7 @@ leaves the reader unable to say why the book prefers it.
 Recommended replacement, which is demonstrable under `ty` and states the
 consequence:
 
-    The difference shows up when the initializer's own type is not the type you
+    The difference emerges when the initializer's own type is not the type you
     mean.
     `CACHE: Final = []` infers `list[Unknown]`,
     so nothing that goes into the list is checked;
@@ -329,7 +330,7 @@ nothing and reads like a distinct type to anyone skimming.
 
 Proposed sentence, appended to the "A `type` alias is a new name" paragraph:
 
-    That is why an alias earns its place on a compound shape and not on a bare
+    That is why an alias belongs on a compound shape and not on a bare
     rename: `type UserId = int` looks like a new type in a signature while
     behaving exactly like `int`.
 

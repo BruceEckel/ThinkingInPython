@@ -96,7 +96,7 @@ had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
 and the program still runs,
-but under `ty` 0.0.65 the answer comes back as `Unknown` and the checking quietly stops.
+but under `ty` 0.0.69 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
 That is what the `answer: str` inside `ask()` is doing.
 `yield from Ask(prompt)` produces `Unknown` there too,
@@ -1145,7 +1145,7 @@ Two failures from two different sources come back as values through one undecora
 and neither the runtime nor the checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.65 both orders infer the same result type.
+and under `ty` 0.0.69 both orders infer the same result type.
 What both orders need is the intermediate name.
 Written as one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
@@ -1928,7 +1928,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The checker can give up quietly
 
 How much of a type survives partial handling depends on your checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.65.
+Handling some of what an Effect declares works correctly under `ty` 0.0.69.
 If you supply one of two abilities, the other stays in the signature:
 
 ```python

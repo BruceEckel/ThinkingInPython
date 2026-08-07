@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -320,8 +321,8 @@ Rule"), so a short closer is in character for this part of the book.
 Proposed change: keep line 232-233 where it is, and add a two-or-three
 sentence close after line 334, along the lines of:
 
-> Every attribute question in this chapter reduces to one: which dictionary
-> did the value land in. Assignment answers it, and assignment through `self`
+> Every attribute question reduces to "which dictionary
+> did the value land in?" Assignment answers it, and assignment through `self`
 > and assignment through the class name give different answers. Decide which
 > you want, then write the spelling that says so: `ClassVar` for shared,
 > a constructor default or a `@dataclass` field for per-object.

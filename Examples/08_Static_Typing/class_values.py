@@ -7,7 +7,7 @@ class Circle(Shape):
     pass
 
 def make(kind: type[Shape]) -> Shape:
-    return kind()  # Instantiate the class
+    return kind()
 
 shape = make(Circle)
 print(type(shape).__name__)

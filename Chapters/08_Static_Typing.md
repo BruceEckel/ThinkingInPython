@@ -3,12 +3,13 @@
 C++ and Java require type declarations,
 and they check those types during compilation.
 The Python runtime checks types only when an operation is attempted.
-The examples up to this point have no type declarations,
+The examples up to this point have gone almost entirely without type declarations,
 which you might not miss on small programs.
 
 Python 3.5 (2015) introduced *type hints*,
 which look like static type checking in other languages.
-The Python runtime ignores type hints, as long as they are properly formed.
+The Python runtime ignores type hints;
+it does not even evaluate them until something asks for them.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool
 (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -26,6 +27,13 @@ An explicit `Any` indicates that a value is truly dynamic.
 `ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
 They behave the same: both are compatible with everything.
+
+`Any` is not the same as `object`.
+Both accept every value,
+but `object` promises nothing about the value once you have it,
+so the checker rejects every operation you try on it.
+`Any` accepts every value and then permits every operation,
+which is what makes it an opt-out rather than a wide type.
 
 ## Type Hints
 
@@ -55,49 +63,15 @@ and `str | None` for "a string or nothing."
 A function that returns nothing declares `-> None`,
 which is why every `__init__()` in this chapter's listings ends that way.
 
-### Variance {#variance}
-
-A `list[Circle]` is not a `list[Shape]`,
-which surprises most people the first time:
-
-```python
-# variance.py
-from collections.abc import Sequence
-
-class Shape:
-    pass
-
-class Circle(Shape):
-    pass
-
-def draw_all(shapes: Sequence[Shape]) -> int:
-    return len(shapes)
-
-def add_square(shapes: list[Shape]) -> None:
-    shapes.append(Shape())
-
-circles: list[Circle] = [Circle(), Circle()]
-print(draw_all(circles))
-#: 2
-# ty: expected "list[Shape]", found "list[Circle]":
-# add_square(circles)
-```
-
-The reason is that a `list` can be written to.
-`add_square()` would append a `Shape` to a list its caller believes holds only circles.
-Refusing the call is what keeps that from happening.
-A read-only container has no such problem,
-so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
-and it accepts more callers as a result.
-A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
-
 ## The Checker: `ty`
 
 The hints do nothing on their own.
 You need a tool to check them:
 
     ty check
+
+`uvx ty check` runs it without installing anything,
+and `uv tool install ty@latest` puts it on your path.
 
 It complains where the hints and the code disagree,
 and is quiet when they agree.
@@ -201,7 +175,11 @@ You can give the type explicitly, as in `GREETING`,
 or let the checker infer it from the value, as with `MAX_RETRIES`.
 The rest of the book uses the explicit `Final[T]` form,
 which declares the intended type instead of accepting whatever the initializer produces.
-The difference shows up when the initializer is a literal that the checker would otherwise narrow.
+The difference emerges when the initializer's own type is not the type you mean.
+`CACHE: Final = []` infers `list[Unknown]`,
+so nothing that goes into the list is checked;
+`CACHE: Final[list[str]] = []` says what the list holds,
+and the checker enforces it.
 
 ## Structural Typing with Protocols
 
@@ -240,13 +218,19 @@ class Square:
     def draw(self) -> str:
         return "square"
 
-def render(shape: Drawable) -> str:  # Accepts anything with draw()
+def render(shape: Drawable) -> str:
     return shape.draw()
+
+class Blob:
+    def paint(self) -> str:
+        return "blob"
 
 print(render(Circle()))
 #: circle
 print(render(Square()))
 #: square
+# ty: expected "Drawable", found "Blob":
+# render(Blob())
 ```
 
 `Circle` and `Square` never mention `Drawable`.
@@ -261,6 +245,9 @@ at the cost of a weaker check: see [Surrogate](26_Surrogate.md#proxy).
 
 `Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
+`Blob` is the case worth watching: it draws, in the everyday sense,
+but its method is called `paint()`,
+and a protocol matches on names and signatures rather than on intent.
 Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
@@ -282,7 +269,7 @@ class Circle(Shape):
     pass
 
 def make(kind: type[Shape]) -> Shape:
-    return kind()  # Instantiate the class
+    return kind()
 
 shape = make(Circle)
 print(type(shape).__name__)
@@ -321,6 +308,8 @@ A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate, use `NewType`, listed in the summary below.)
+That is why an alias belongs on a compound shape and not on a bare rename:
+`type UserId = int` looks like a new type in a signature while behaving exactly like `int`.
 
 `Color` names a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
@@ -328,6 +317,12 @@ Passing `"purple"` to `paint()` is a type error,
 even though `"purple"` is a valid `str`.
 The alias also documents the allowed values in one place,
 instead of scattering the literal list across every function that accepts a `Color`.
+
+A `Literal` union is the lightest way to close a set of values.
+Once those values need behavior or an identity of their own,
+an `Enum` is the better fit;
+[Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too)
+makes the comparison.
 
 An alias can also name a union of types.
 [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching)
@@ -387,6 +382,43 @@ so `get()` returns a `str` and the call to `upper()` checks.
 A bound constrains the parameter.
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 
+### Variance {#variance}
+
+A `list[Circle]` is not a `list[Shape]`,
+which surprises most people the first time:
+
+```python
+# variance.py
+from collections.abc import Sequence
+
+class Shape:
+    pass
+
+class Circle(Shape):
+    pass
+
+def count(shapes: Sequence[Shape]) -> int:
+    return len(shapes)
+
+def add_square(shapes: list[Shape]) -> None:
+    shapes.append(Shape())
+
+circles: list[Circle] = [Circle(), Circle()]
+print(count(circles))
+#: 2
+# ty: expected "list[Shape]", found "list[Circle]":
+# add_square(circles)
+```
+
+The reason is that a `list` can be written to.
+`add_square()` would append a `Shape` to a list its caller believes holds only circles.
+Refusing the call is what keeps that from happening.
+A read-only container has no such problem,
+so `Sequence[Shape]` accepts a `list[Circle]`.
+Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
+and it accepts more callers as a result.
+A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
+
 ### Type Parameter Defaults {#type-parameter-defaults}
 
 A type parameter can carry a default,
@@ -438,6 +470,8 @@ print(is_origin((0, 0)))
 
 Defaulted parameters go last, the way defaulted function parameters do,
 so `class Table[K = str, V]` is a syntax error.
+Type parameter defaults arrived in Python 3.13,
+one release after the bracket syntax itself.
 
 A special form, `**P`, captures the types of an entire parameter list.
 [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
@@ -501,6 +535,23 @@ validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
 The hints are for the tools and for the reader.
 
+## How Much to Annotate
+
+Gradual typing leaves the amount up to you,
+and the chapter's constructs do not say when each is worth the words.
+Annotate what crosses a boundary: function signatures, public attributes,
+anything another file imports.
+Those are the places where the reader of the code and the writer of the code are different people,
+and where a wrong assumption travels farthest before it fails.
+
+Let the checker infer the rest.
+A local variable whose type is obvious from its initializer gains nothing from an annotation,
+and `count: int = 0` says less than `count = 0` does, at greater length.
+The value of a hint is proportional to the distance between where a value is created and where it is used.
+A value that is born and consumed three lines later needs no help.
+A value that arrives from another module, through a container,
+is worth naming precisely.
+
 ## Type Hint Summary
 
 These are the type hints you will encounter, in their modern forms.
@@ -522,7 +573,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter (`bytes` and `complex` are not used elsewhere in this book) |
+| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; an `int` is accepted where a `float` is declared, and an `int` or `float` where a `complex` is, but not the reverse (`bytes` and `complex` are not used elsewhere in this book) |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
@@ -538,6 +589,7 @@ The abstract container types come from `collections.abc`.
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
 | `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Variance](#variance) |
+| `Generator[Y, S, R]` | A generator's yield, send, and return types; `Iterator[T]` is enough when it only produces values, see [Generators](45_Generators.md#annotating-a-generator) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
 
@@ -622,23 +674,6 @@ Older code spells some of them differently: `Optional[X]` for `X | None`,
 `Tuple` from `typing` for the lowercase built-ins.
 The forms above are the modern ones.
 
-## How Much to Annotate
-
-Gradual typing leaves the amount up to you,
-and the chapter's constructs do not say when each is worth the words.
-Annotate what crosses a boundary: function signatures, public attributes,
-anything another file imports.
-Those are the places where the reader of the code and the writer of the code are different people,
-and where a wrong assumption travels farthest before it fails.
-
-Let the checker infer the rest.
-A local variable whose type is obvious from its initializer gains nothing from an annotation,
-and `count: int = 0` says less than `count = 0` does, at greater length.
-The value of a hint is proportional to the distance between where a value is created and where it is used.
-A value that is born and consumed three lines later needs no help.
-A value that arrives from another module, through a container,
-is worth naming precisely.
-
 ## Exercises
 
 1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
@@ -658,3 +693,7 @@ is worth naming precisely.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
     Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.
+7.  In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
+    Explain why `ty` now accepts the call and why `shapes.append(...)` no longer type-checks.
+8.  In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
+    Explain why the empty string now takes the other branch even though the checker is satisfied either way.

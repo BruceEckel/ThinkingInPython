@@ -14,3 +14,8 @@ print({**d for d in dicts})
 flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
+
+print([*row for row in [[1, [2, 3]], [4]]])  # Shallow: one level
+#: [1, [2, 3], 4]
+print({*s for s in [{1, 2}, {3}]})  # Braces plus * build a set
+#: {1, 2, 3}

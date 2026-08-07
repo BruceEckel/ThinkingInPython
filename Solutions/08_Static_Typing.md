@@ -206,3 +206,86 @@ and the allowed set has one place to change. Adding `"purple"` to that
 one alias silences the error everywhere, and `grid[cell] = color`
 needed no change, since `Grid`'s values are plain `str` and every
 `Color` is one.
+
+## 7. Widening `add_square()` to `Sequence[Shape]`
+
+```python
+# exercise_7.py
+from collections.abc import Sequence
+
+class Shape:
+    pass
+
+class Circle(Shape):
+    pass
+
+def count(shapes: Sequence[Shape]) -> int:
+    return len(shapes)
+
+def add_square(shapes: Sequence[Shape]) -> None:
+    # ty: object of type "Sequence[Shape]" has no attribute "append":
+    # shapes.append(Shape())
+    print("would add a square to", len(shapes), "shapes")
+
+circles: list[Circle] = [Circle(), Circle()]
+add_square(circles)  # Now accepted
+#: would add a square to 2 shapes
+print(count(circles))
+#: 2
+```
+
+The call is accepted because `Sequence` is covariant in its element
+type. A `Sequence[Shape]` promises only that you can read `Shape`s out
+of it, and every `Circle` you read out is a `Shape`, so a
+`list[Circle]` satisfies that promise. `list[Shape]` refused the same
+argument because `list` is invariant.
+
+`shapes.append(...)` stops type-checking for the reason the widening
+worked. `Sequence` has no `append()` at all: it is the read-only
+abstract shape, so the diagnostic is `unresolved-attribute` rather
+than an argument-type error. The checker is not saying "you may not
+append a `Shape` here," it is saying there is no such operation on
+what you declared.
+
+That pairing is the whole of variance in one edit. Invariance is the
+price of being able to write; covariance is what you get when you give
+that up. The practical rule follows: annotate a parameter with the
+weakest shape the body actually needs, because every capability you
+declare is a caller you turn away.
+
+## 8. Truthiness in place of `is not None`
+
+```python
+# exercise_8.py
+
+def shout(text: str | None) -> str:
+    if text:
+        return text.upper()
+    return "(nothing)"
+
+print(shout("hi"))
+#: HI
+print(shout(None))
+#: (nothing)
+print(shout(""))  # The empty string is falsy
+#: (nothing)
+```
+
+`ty` is satisfied either way, and for a good reason: truthiness
+narrows too. An empty `str` is falsy and so is `None`, so inside
+`if text:` the checker can rule out `None` exactly as `is not None`
+did, and `.upper()` is safe under both spellings.
+
+What changed is which values reach which branch. `is not None` asks
+one question, whether the value is missing. `if text:` asks a
+different one, whether the value is missing *or* empty, and answers
+both with `"(nothing)"`. An empty string that a caller passed on
+purpose is now indistinguishable from no string at all.
+
+Whether that matters depends on the caller, and that is the point of
+the exercise: the checker cannot tell you, because both versions are
+type-correct. This is the same trap as `if not target:` on a mutable
+default in [Functions](../Chapters/05_Functions.md), and the same
+answer applies. Test for the condition you mean. Use `is None` when
+you mean "was anything supplied," and truthiness only when an empty
+value genuinely belongs with the missing one.

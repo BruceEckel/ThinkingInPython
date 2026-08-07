@@ -12,10 +12,16 @@ class Square:
     def draw(self) -> str:
         return "square"
 
-def render(shape: Drawable) -> str:  # Accepts anything with draw()
+def render(shape: Drawable) -> str:
     return shape.draw()
+
+class Blob:
+    def paint(self) -> str:
+        return "blob"
 
 print(render(Circle()))
 #: circle
 print(render(Square()))
 #: square
+# ty: expected "Drawable", found "Blob":
+# render(Blob())

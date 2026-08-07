@@ -575,20 +575,22 @@ print({**d for d in dicts})
 flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
+
+print([*row for row in [[1, [2, 3]], [4]]])  # Shallow: one level
+#: [1, [2, 3], 4]
+print({*s for s in [{1, 2}, {3}]})  # Braces plus * build a set
+#: {1, 2, 3}
 ```
 
 `[*row for row in rows]` reads as "splice each `row` in,"
 and produces the same flat list as the two-`for` `[x for row in rows for x in row]`,
 while saying what it does more directly.
-This is a shallow flatten: it splices only the outer iterable,
-so a nested list inside a row stays nested.
-`[*row for row in [[1, [2, 3]], [4]]]` produces `[1, [2, 3], 4]`,
-not `[1, 2, 3, 4]`.
+It is a shallow flatten, splicing only the outer iterable,
+so the nested `[2, 3]` above comes through unflattened.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
-Braces plus `*` build a set instead:
-`{*s for s in sets}` produces `{1, 2, 3}` from `[{1, 2}, {3}]`.
-This is the one place where the colon does not decide between a set and a dict,
+Braces plus `*` build a set instead,
+which is the one place where the colon does not decide between a set and a dict,
 because neither form has one; the unpacking operator decides instead.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way.
