@@ -202,6 +202,62 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 `func.__name__` works uniformly on both a `def`-based function and a
 `lambda`, with no special case needed to tell them apart.
 
+## 6. The static diagnostic beside the runtime `TypeError`
+
+Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
+the class header bare:
+
+```python
+with ignore(TypeError):
+    class Singleton(type, dict[type, Any]):
+        pass
+```
+
+`uv run ty check metaclass_layout_conflict.py` then reports:
+
+```text
+error[instance-layout-conflict]: Class will raise `TypeError` at runtime
+due to incompatible bases
+ --> metaclass_layout_conflict.py:6:11
+  |
+6 |     class Singleton(type, dict[type, Any]):
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Bases `type` and `dict`
+  |           cannot be combined in multiple inheritance
+info: Two classes cannot coexist in a class's MRO if their instances
+have incompatible memory layouts
+  |
+6 |     class Singleton(type, dict[type, Any]):
+  |                     ----  --------------- `dict` instances have a
+  |                     |                     distinct memory layout
+  |                     |                     because of the way `dict`
+  |                     |                     is implemented in a C
+  |                     |                     extension
+  |                     `type` instances have a distinct memory layout
+  |                     because of the way `type` is implemented in a C
+  |                     extension
+```
+
+Running the same file prints
+`TypeError('multiple bases have instance lay-out conflict')`.
+
+The two describe one collision. `ty`'s summary line even names the
+consequence, "Class will raise `TypeError` at runtime," and its `info`
+block explains the rule the interpreter enforces without explaining:
+`type` and `dict` are both implemented in C, each with its own instance
+layout, so no single object can be both. CPython discovers this while
+executing the `class` statement and reports it as the terse "instance
+lay-out conflict". `ty` reaches the same conclusion from the class
+header alone, before anything runs, and points at both bases to say
+which pair is at fault.
+
+That is the difference worth taking from this exercise. The runtime
+message tells you something collided; the static one tells you which
+two things collided and why, at the moment you type the header rather
+than the moment the module is first imported. The `# type: ignore` is
+in the chapter's version because this listing exists to show the
+`TypeError`, and a suppressed diagnostic is the cost of demonstrating a
+crash on purpose.
+
 ## 7. Building a `float` subclass with `type()`
 
 ```python

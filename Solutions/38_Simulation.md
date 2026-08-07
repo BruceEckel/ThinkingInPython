@@ -541,3 +541,247 @@ what `run()` already expects, the same as the previously hard-coded
 `solution`, so `game.run(solution)` and the assertion that follows are
 unchanged from `test_robot.py`. Unlike the pre-computed `solution`
 string, this one adapts automatically if the maze layout changes.
+
+## 6, 7, and 8: the Chladni plate
+
+The last three exercises all shake the same plate, so the chapter's
+`chladni.py` is repeated here once, with one change: `Plate` takes the
+field function as a constructor argument instead of calling the
+module-level `amplitude()` directly. That makes exercise 7's different
+physics a second function rather than an edit, so both can run side by
+side in one program.
+
+```python
+# chladni.py
+import math
+import random
+from collections.abc import Callable
+from dataclasses import dataclass
+
+type Mode = tuple[int, int]  # Vibration pattern (m, n)
+type Field = Callable[[float, float, Mode], float]
+
+def amplitude(x: float, y: float, mode: Mode) -> float:
+    m, n = mode
+    return abs(
+        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+
+def membrane(x: float, y: float, mode: Mode) -> float:
+    m, n = mode
+    return abs(
+        math.sin(m * math.pi * x) * math.sin(n * math.pi * y))
+
+def bounce(v: float) -> float:
+    if v < 0.0:
+        return -v
+    if v > 1.0:
+        return 2.0 - v
+    return v
+
+@dataclass
+class Grain:
+    x: float
+    y: float
+
+class Plate:
+    def __init__(self, grains: int, mode: Mode,
+                 seed: int | None = None,
+                 field: Field = amplitude) -> None:
+        self.rng = random.Random(seed)
+        self.mode = mode
+        self.field = field
+        self.grains = [
+            Grain(self.rng.random(), self.rng.random())
+            for _ in range(grains)]
+
+    def step(self, kick: float = 0.05) -> None:
+        for g in self.grains:
+            a = self.field(g.x, g.y, self.mode)
+            g.x = bounce(
+                g.x + self.rng.uniform(-kick, kick) * a)
+            g.y = bounce(
+                g.y + self.rng.uniform(-kick, kick) * a)
+
+    def agitation(self) -> float:
+        return sum(
+            self.field(g.x, g.y, self.mode)
+            for g in self.grains) / len(self.grains)
+
+    def render(self, width: int = 60, height: int = 30) -> str:
+        counts: list[list[int]] = [
+            [0] * width for _ in range(height)]
+        for g in self.grains:
+            col = min(int(g.x * width), width - 1)
+            row = min(int(g.y * height), height - 1)
+            counts[row][col] += 1
+        shades = " .:*#"
+        return "\n".join(
+            "".join(shades[min(c, len(shades) - 1)]
+                    for c in row).rstrip()
+            for row in counts)
+```
+
+## 6. Freezing the plate
+
+```python
+# exercise_6.py
+from chladni import Plate, amplitude
+
+print(amplitude(0.31, 0.79, (2, 2)))
+#: 0.0
+plate = Plate(grains=2000, mode=(2, 2), seed=42)
+before = [(g.x, g.y) for g in plate.grains]
+for _ in range(1200):
+    plate.step()
+after = [(g.x, g.y) for g in plate.grains]
+print(f"agitation {plate.agitation():.3f}, moved {before != after}")
+#: agitation 0.000, moved False
+print(amplitude(0.37, 0.37, (1, 2)))
+#: 0.0
+```
+
+With `m == n`, `amplitude()` returns zero everywhere. Its two terms
+become `cos(mπx)cos(mπy)` and `cos(mπx)cos(mπy)`, the same product
+written twice, and the function subtracts one from the other. Not
+approximately zero: the two multiplications produce identical floats,
+so the difference is exactly `0.0` at every point on the plate.
+
+A zero field means a zero kick. `step()` scales each grain's random
+displacement by the amplitude under it, so `uniform(-kick, kick) * 0.0`
+moves nothing, and 1200 steps leave every grain exactly where the
+constructor scattered it. The result is neither chaos nor a figure
+because there is no motion at all: what you see is the initial random
+scatter, frozen. Agitation reads `0.000` from the first step, which is
+the same number a perfectly settled plate reports, so the summary
+statistic cannot tell "finished" from "never started."
+
+The diagonal follows from the same symmetry. Swapping `x` and `y`
+turns the first term into the second and the second into the first, so
+`amplitude(y, x, mode)` is `amplitude(x, y, mode)` with the
+subtraction reversed. The absolute value hides the sign, but on the
+line `x == y` the swap changes nothing, so a value that equals its own
+negation must be zero. Every mode this plate can ring in therefore has
+a nodal line straight down the main diagonal, which is why the figures
+all share that one feature no matter which `(m, n)` produced them.
+
+## 7. Changing the physics
+
+```python
+# exercise_7.py
+from chladni import Plate, membrane
+
+plate = Plate(grains=2000, mode=(2, 3), seed=42, field=membrane)
+steps = 0
+for target in (0, 100, 400, 1200):
+    for _ in range(target - steps):
+        plate.step()
+    steps = target
+    print(f"steps {target:4}: agitation {plate.agitation():.3f}")
+#: steps    0: agitation 0.406
+#: steps  100: agitation 0.100
+#: steps  400: agitation 0.014
+#: steps 1200: agitation 0.002
+print(plate.render(width=40, height=20))
+#: #:**# ######:#####..#:##*###############
+#: #                  ##                  #
+#: #                  ##                 .#
+#: #    .             ##                  #
+#: #                  ##                  #
+#: #                  #*                  #
+#: ######################*#################
+#: #                  ##                  #
+#: #                  ##                  #
+#: #                  ##                  #
+#: #                  ##                  #
+#: #                  ##                  #
+#: *                 .##   .             .#
+#: ########################################
+#: #                  ##                  #
+#: #                  ##                  #
+#: #                  ##                  #
+#: #                  ##                  #
+#: #               .  ##                  #
+#: ##############**##:##.#:##############.#
+```
+
+The figure is a grid: one vertical line down the middle of the plate
+and two horizontal lines cutting it into thirds, with the four edges
+filled in as well.
+
+The nodal lines are straight because the new field is a product of one
+function of `x` and one function of `y`. It vanishes when either factor
+does, and `sin(mπx)` is zero at `x = 0, 1/2, 1` for `m = 2`, regardless
+of `y`. That gives vertical lines at those three values of `x`.
+`sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1` for `n = 3`, regardless of
+`x`, giving horizontal lines. Every nodal point lies on one of those
+seven lines, and the number of interior lines is `m - 1` vertical and
+`n - 1` horizontal, so the mode numbers are readable straight off the
+picture.
+
+The plate's own field factors the other way. Its two terms mix `x` and
+`y` in both, and subtracting them creates zeros along curves where the
+two products happen to agree, which is why the original figures are
+diagonals, crosses, and rings rather than a grid. Fixing a real plate
+at its edges only, rather than at a rim, is what produces those mixed
+terms. The simulation machinery does not change at all between the two:
+same grains, same random walk, same rule that a grain moves in
+proportion to the vibration under it. Only the field changed, and with
+it every pattern the model produces.
+
+## 8. Tuning the noise
+
+```python
+# exercise_8.py
+from chladni import Plate
+
+for kick in (0.005, 0.05, 0.5):
+    plate = Plate(grains=2000, mode=(2, 3), seed=42)
+    steps = 0
+    readings = []
+    for target in (0, 100, 400, 1200):
+        for _ in range(target - steps):
+            plate.step(kick=kick)
+        steps = target
+        readings.append(f"{plate.agitation():.3f}")
+    print(f"kick {kick:<5}: {' '.join(readings)}")
+#: kick 0.005: 0.585 0.560 0.494 0.380
+#: kick 0.05 : 0.585 0.073 0.005 0.000
+#: kick 0.5  : 0.585 0.106 0.012 0.000
+```
+
+`kick=0.005` produces order too slowly. Each step displaces a grain by
+at most half a percent of the plate, so a grain starting in the middle
+of a bright region needs hundreds of steps to walk anywhere near a
+nodal line. After 1200 steps agitation has fallen from `0.585` to
+`0.380`, roughly a third of the way, where the default kick reached
+`0.000` in a quarter of the time. Rendered, this run still looks like
+noise with a faint grain of structure in it. Nothing is wrong with the
+physics; the run is simply not finished, and finishing it means more
+steps than anyone wants to watch.
+
+`kick=0.5` fails differently, and the agitation column is what makes
+it interesting: it collapses to `0.000` as convincingly as the default
+does. The figure never appears anyway. A half-unit displacement can
+throw a grain across the plate in one step, so a grain never traces a
+descent toward the nearest nodal line; it jumps somewhere unrelated and
+stays only if that spot happens to be quiet. Grains accumulate in
+whichever quiet regions they land in first, mostly the corners, and the
+lines between them stay empty. The plate reports settled sand in the
+wrong places.
+
+That is worth keeping. Agitation measures whether the grains are
+sitting where the field is weak, not whether the figure is right, so
+one number cannot distinguish a sharp pattern from three blobs. The
+render is the check the number cannot perform.
+
+An intermediate kick avoids both failures because the amplitude scaling
+in `step()` is a feedback loop, and the loop only works within a range
+of step sizes. A grain in a loud region gets a large kick and moves
+fast; as it nears a nodal line the amplitude shrinks and so does its
+step, so it slows down and stops without overshooting. Too small a kick
+starves the loop's first half, and the grain never travels. Too large a
+kick breaks the second half, since even a heavily scaled step is still
+big enough to leave the neighborhood the grain was settling into. The
+default `0.05` sits where both halves work: about a twentieth of the
+plate at full amplitude, and vanishingly small once a grain arrives.

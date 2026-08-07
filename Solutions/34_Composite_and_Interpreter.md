@@ -498,7 +498,7 @@ left operand is what the caller wrote first, and nothing in this
 expression language ever claimed to extend it.
 
 The return annotations widen to `Any` for the reason
-[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+[Multiple Dispatching](../Chapters/32_Multiple_Dispatching.md#one-type-or-many)
 gives: the precise type is `Add | NotImplementedType`, and declaring
 that makes every downstream `.left` a checker error, even though the
 sentinel never reaches a caller.

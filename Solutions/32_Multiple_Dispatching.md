@@ -288,3 +288,62 @@ generator then updates that same object in place on every pair it
 produces, one increment per item, so the caller can read
 `counts["Lizard"]` at any point during or after the loop, without
 `item_pair_gen()` needing to change what it yields.
+
+## 5. `__sub__()` and `__rsub__()` on `Meters`
+
+```python
+# exercise_5.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Meters:
+    n: float
+
+    def __sub__(self, other: object) -> Meters:
+        if isinstance(other, Meters):
+            return Meters(self.n - other.n)
+        if isinstance(other, int | float):
+            return Meters(self.n - other)
+        return NotImplemented
+
+    def __rsub__(self, other: object) -> Meters:
+        if isinstance(other, int | float):
+            return Meters(other - self.n)  # Not self.n - other
+        return NotImplemented
+
+print(Meters(10) - Meters(3), Meters(10) - 3)
+#: Meters(n=7) Meters(n=7)
+print(10 - Meters(3))
+#: Meters(n=7)
+try:
+    "ten" - Meters(3)
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+`__sub__()` is `__add__()` with the sign changed, and the three cases
+line up the same way: a `Meters`, a number, or `NotImplemented` for
+anything else. `__rsub__()` needs only the numeric case, because
+Python asks the left operand first and `Meters(10) - Meters(3)` is
+answered there. The reflected form is reached only when the left
+operand declined, which two `Meters` never do.
+
+The swap is where subtraction differs from addition. Python calls
+`Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
+so `self` is the right operand and `other` is the left one, and the
+method has to put them back in the order the source wrote them.
+`Meters(other - self.n)` gives `Meters(7)`. Writing
+`Meters(self.n - other)`, the same body `__sub__()` uses, would give
+`Meters(-7)`: a correct-looking method that quietly returns the
+negative of every reflected subtraction. `__radd__()` hides this
+because addition commutes, so the mistake costs nothing there and
+costs the wrong answer here.
+
+`"ten" - Meters(3)` finds no `str.__sub__` at all, so Python goes
+straight to `Meters.__rsub__`, which returns `NotImplemented` for a
+`str`. With both sides declining, Python raises the `TypeError`, and
+the message names both types. Returning `NotImplemented` rather than
+raising an exception is what makes that message possible: an exception
+raised inside `__rsub__()` would report `Meters`'s complaint instead of
+Python's account of which pair of types has no defined subtraction.

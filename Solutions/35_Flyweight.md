@@ -423,7 +423,7 @@ The check runs first in `__new__()`, before the pool lookup, so an
 out-of-range component is rejected before either finding a cached
 instance or building a new one; no invalid `Color` is ever pooled or
 returned. This is the same *parse, don't validate* move
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+[Data Classes as Types](../Chapters/12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes with `__post_init__()`, applied to a class that validates in
 `__new__()` instead because it needs to intercept construction for
 interning.

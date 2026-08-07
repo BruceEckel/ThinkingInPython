@@ -1,38 +1,25 @@
 # exercise_4.py
-from __future__ import annotations
+TRANSITIONS: dict[tuple[str, str], str] = {
+    ("locked", "coin"): "unlocked",
+    ("locked", "push"): "locked",
+    ("unlocked", "push"): "locked",
+    ("unlocked", "coin"): "unlocked",
+}
 
-class Controller:
-    def __init__(self, initial: str) -> None:
-        self.states: dict[str, WordState] = {}
+class TableController:
+    def __init__(self, initial: str,
+                 table: dict[tuple[str, str], str]) -> None:
         self.current = initial
-
-    def register(self, name: str, state: WordState) -> None:
-        self.states[name] = state
+        self.table = table
 
     def process(self, word: str) -> None:
-        state = self.states[self.current]
-        self.current = state.next_state(word)
-
-class WordState:
-    TRANSITIONS: dict[str, str] = {}
-
-    def next_state(self, word: str) -> str:
-        return self.TRANSITIONS.get(word, self.TRANSITIONS["*"])
-
-class Locked(WordState):
-    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
-
-class Unlocked(WordState):
-    TRANSITIONS = {"push": "locked", "*": "unlocked"}
-
-controller = Controller("locked")
-controller.register("locked", Locked())
-controller.register("unlocked", Unlocked())
+        self.current = self.table[self.current, word]
 
 words = ["push", "coin", "push", "coin", "coin", "push"]
-history = [controller.current]
+tc = TableController("locked", TRANSITIONS)
+history = [tc.current]
 for word in words:
-    controller.process(word)
-    history.append(controller.current)
+    tc.process(word)
+    history.append(tc.current)
 print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked

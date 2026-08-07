@@ -323,12 +323,23 @@ solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must
 solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
 	$(PYTEST) $(PYTEST_N) build/solutions
 
-# Mirrors `gate`, but for Solutions/: drift check, output markers, ty, ruff,
-# pytest. No run_examples.py equivalent: every extractable Solutions block
-# already carries a #: marker (checked by solutions-output above), and a
-# block with none is a deliberately-unrun illustrative fragment (no `# file.py`
-# slug), so there is nothing further to execute.
-solutions-gate:  ## The Solutions gate: check, output, ty, ruff, pytest
+# The one correspondence neither tree's own checks can see: whether the
+# `## N.` headings here answer the exercises the chapter asks. Pure prose
+# on both sides, so extract_solutions.py (code) and heading_links.py
+# (anchors) both look straight past it. Takes chapter numbers to check
+# one, e.g. `make solutions-numbering ARGS=19`.
+solutions-numbering:  ## Verify each chapter's exercises have matching solutions
+	$(PY) tools/check_solutions.py $(ARGS)
+
+# Mirrors `gate`, but for Solutions/: numbering, drift check, output
+# markers, ty, ruff, pytest. No run_examples.py equivalent: every
+# extractable Solutions block already carries a #: marker (checked by
+# solutions-output above), and a block with none is a deliberately-unrun
+# illustrative fragment (no `# file.py` slug), so there is nothing further
+# to execute. The numbering check runs first because it is the cheapest and
+# reports a missing answer, which no later step here would notice.
+solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, pytest
+	$(PY) tools/check_solutions.py
 	$(PY) tools/extract_solutions.py
 	$(PY) tools/extract_solutions.py --write
 	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions

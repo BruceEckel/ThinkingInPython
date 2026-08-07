@@ -1,9 +1,3 @@
-Apply the "xxx" skill to each chapter.
-As this skill processes each chapter in isolation,
-you should be able to parallelize many tasks at once, one per chapter.
-If a chapter needs to modify another chapter,
-it should only write that into the review file, so parallelizing isn't compromised.
-
 New book cover & favicon
 
 Add Epub link info on README and bottom of index page.
@@ -19,6 +13,9 @@ Fatal vs recoverable errors
 Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
+
+Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
+Put the result at the root in ADVERSARIAL.md
 
 Have we learned anything here that should be added to thinking-in-python-skill.md?
 
@@ -42,10 +39,7 @@ Review all exercises to make sure they refer to existing examples and that all  
 
 - Indexing using Leanpub format, before publishing to leanpub
 
-- Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better? Put the result
-  at the root in ADVERSARIAL.md
-
-- Potential example: A task runner based on decorators
+- Potential example: A task runner based on decorators and generators
 
 /loop through the chapters in the book and look for correctness, style and voice issues.
 Fix any obvious issues, and put all the rest in CORRECTNESS_STYLE_AND_VOICE.md, demarking each chapter in the file.
@@ -55,6 +49,14 @@ I will review CORRECTNESS_STYLE_AND_VOICE.md and hand it back to you.
 If I haven't deleted a suggested fix, it means I want you to do it.
 I may also make further notes next to a suggested fix, inside [[]], giving instructions about the fix.
 If you run out of tokens during a chapter, resume when it resets.
+
+******************
+
+Apply the "xxx" skill to each chapter.
+As this skill processes each chapter in isolation,
+you should be able to parallelize many tasks at once, one per chapter.
+If a chapter needs to modify another chapter,
+it should only write that into the review file, so parallelizing isn't compromised.
 
 ******************
 

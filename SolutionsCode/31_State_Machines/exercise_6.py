@@ -2,45 +2,58 @@
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
-class MoodState(Enum):
-    HAPPY = auto()
-    GRUMPY = auto()
-    PROZAC = auto()
+class ElevatorState(Enum):
+    IDLE = auto()
+    MOVING_UP = auto()
+    MOVING_DOWN = auto()
+    DOORS_OPEN = auto()
 
-class TakePill:
+class CallButton:
+    def __init__(self, floor: int) -> None:
+        self.floor = floor
+
+class ArrivedAtFloor:
     pass
-class Annoy:
-    pass
-class Calm:
+class DoorsClosed:
     pass
 
-class MoodMachine(StateMachine):
-    def __init__(self) -> None:
-        self.message = ""
-        happy_takes_pill = (
-            None, self.say("Everything is wonderful."),
-            MoodState.PROZAC)
+class Elevator(StateMachine):
+    def __init__(self, floor: int = 0) -> None:
+        self.floor = floor
+        self.target = floor
         table: Table = {
-            (MoodState.HAPPY, Annoy): [(
-                None, self.say("What do you want?"),
-                MoodState.GRUMPY)],
-            (MoodState.GRUMPY, Calm): [(
-                None, self.say("Great to see you!"),
-                MoodState.HAPPY)],
-            (MoodState.HAPPY, TakePill): [happy_takes_pill],
-            (MoodState.GRUMPY, TakePill): [happy_takes_pill],
+            (ElevatorState.IDLE, CallButton): [
+                (self.above, self.set_target,
+                 ElevatorState.MOVING_UP),
+                (self.below, self.set_target,
+                 ElevatorState.MOVING_DOWN),
+                (None, self.open_doors, ElevatorState.DOORS_OPEN),
+            ],
+            (ElevatorState.MOVING_UP, ArrivedAtFloor):
+                [(None, self.open_doors, ElevatorState.DOORS_OPEN)],
+            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
+                [(None, self.open_doors, ElevatorState.DOORS_OPEN)],
+            (ElevatorState.DOORS_OPEN, DoorsClosed):
+                [(None, None, ElevatorState.IDLE)],
         }
-        super().__init__(MoodState.HAPPY, table)
+        super().__init__(ElevatorState.IDLE, table)
 
-    def say(self, msg: str):
-        def action(event: object) -> None:
-            self.message = msg
-        return action
+    def above(self, call: CallButton) -> bool:
+        return call.floor > self.floor
 
-mm = MoodMachine()
-mm.handle(Annoy())
-print(mm.state, mm.message)
-#: MoodState.GRUMPY What do you want?
-mm.handle(TakePill())
-print(mm.state, mm.message)
-#: MoodState.PROZAC Everything is wonderful.
+    def below(self, call: CallButton) -> bool:
+        return call.floor < self.floor
+
+    def set_target(self, call: CallButton) -> None:
+        self.target = call.floor
+
+    def open_doors(self, event: object) -> None:
+        self.floor = self.target
+
+elevator = Elevator(floor=0)
+elevator.handle(CallButton(3))
+print(elevator.state, elevator.floor)
+#: ElevatorState.MOVING_UP 0
+elevator.handle(ArrivedAtFloor())
+print(elevator.state, elevator.floor)
+#: ElevatorState.DOORS_OPEN 3

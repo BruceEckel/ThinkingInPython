@@ -265,7 +265,7 @@ momentarily. `__post_init__()` runs immediately after all fields are
 assigned and raises before the constructor call returns, so the
 five-topping combination is rejected atomically, before any code
 anywhere could hold a reference to a `Pizza` carrying it. This is
-[A Type Is a Set of Values](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+[A Type Is a Set of Values](../Chapters/12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
 Placing the check in `topping()`, as above, gives `PizzaBuilder` the

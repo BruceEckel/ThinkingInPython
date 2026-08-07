@@ -95,8 +95,8 @@ generator's body only runs as far as the next `yield` each time
 something asks it for a value. `islice(..., 10)` asks for exactly ten,
 so only the first ten iterations of `fibonacci()`'s loop ever run; the
 other 999,990 are never computed, the same laziness
-[Comprehensions](16_Comprehensions.md#generator-expressions) and
-[Performance](18_Performance.md) both rely on.
+[Comprehensions](../Chapters/16_Comprehensions.md#generator-expressions) and
+[Performance](../Chapters/18_Performance.md) both rely on.
 
 ## 4. Two fixes for a spent generator
 
@@ -139,7 +139,7 @@ holds only `n`, and each pass recomputes from scratch.
 
 For a stream of a million items, choose `Squares`. Memory is the
 resource that fails catastrophically, as
-[Performance](18_Performance.md#lazy-evaluation-with-generators)
+[Performance](../Chapters/18_Performance.md#lazy-evaluation-with-generators)
 describes: a data set that fits runs at full speed and one that does
 not falls off a cliff into swapping or a `MemoryError`. Recomputation
 merely costs time, in proportion. The list wins only when a pass is

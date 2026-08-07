@@ -447,6 +447,7 @@ make solutions-output         # rewrite them
 make solutions-ty             # type-check build/solutions/
 make solutions-lint           # ruff-check build/solutions/
 make solutions-test           # pytest build/solutions/ (test_*.py)
+make solutions-numbering      # every exercise has a solution (below)
 make solutions-gate           # all of the above in one go
 ```
 
@@ -465,6 +466,39 @@ and a relative tree argument stops resolving once cwd changes underneath it
 (the `run_location()` gotcha `run_examples.py`'s own `--tree` warning
 already describes). The Makefile passes `$(CURDIR)` for this reason; do the
 same when invoking `validate_output.py --tree` on `Solutions/` by hand.
+
+## check_solutions.py
+
+`extract_solutions.py` gates the code in `Solutions/`, and `heading_links.py`
+gates its anchors, but whether a chapter's exercises have answers is prose on
+both sides, so nothing watched it. Editing an exercise, deleting one, or adding
+one at the end left the solutions silently answering a different question. A
+2026 sweep found fifteen chapters out of step, including five with no
+`Solutions/` file at all.
+
+This compares two numberings: the top-level ordered-list items under a
+chapter's last `## Exercises` heading, and the `## N. ...` headings in the
+matching `Solutions/` file. It reports a chapter with exercises and no
+solutions file, an exercise with no solution, a solution answering no exercise,
+and either list numbered anything but 1..N in order.
+
+```
+make solutions-numbering            # every chapter
+make solutions-numbering ARGS=19    # only chapter 19
+```
+
+Two conventions it knows about. A chapter whose Exercises section holds only
+prose (chapter 1 describes the convention rather than setting any) has no
+exercises and needs no `Solutions/` file. And one heading may answer several
+exercises at once, written `## 1 & 2. ...`, `## 1, 2. ...`, or `## 1-3. ...`,
+which is the right form when two exercises share one worked answer; a heading
+with no leading number at all (`## Shared code: the microgrid`) is a preamble
+and counts as no answer.
+
+What it cannot see is a solution that answers the wrong exercise under the
+right number, which still needs a human reading the two side by side. It runs
+first in `solutions-gate`, being the cheapest step and the only one that
+notices a missing answer.
 
 ## reflow_prose.py
 

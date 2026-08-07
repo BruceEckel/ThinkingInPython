@@ -1,36 +1,56 @@
 # exercise_2.py
-class Mood:
-    def hello(self) -> str:
-        raise NotImplementedError
+from enum import Enum, auto
+from state_machine import StateMachine, Table
 
-class Happy(Mood):
-    def hello(self) -> str:
-        return "Great to see you!"
+class WashState(Enum):
+    IDLE = auto()
+    FILLING = auto()
+    WASHING = auto()
+    RINSING = auto()
+    SPINNING = auto()
+    DONE = auto()
 
-class Grumpy(Mood):
-    def hello(self) -> str:
-        return "What do you want?"
+class Start:
+    pass
+class Full:
+    pass
+class WashDone:
+    pass
+class RinseDone:
+    pass
+class SpinDone:
+    pass
+class Reset:
+    pass
 
-class Prozac(Mood):
-    def hello(self) -> str:
-        return "Everything is wonderful. Just wonderful."
+class WashingMachine(StateMachine):
+    def __init__(self) -> None:
+        self.log: list[str] = []
+        table: Table = {
+            (WashState.IDLE, Start):
+                [(None, self.log_msg("filling"), WashState.FILLING)],
+            (WashState.FILLING, Full):
+                [(None, self.log_msg("washing"), WashState.WASHING)],
+            (WashState.WASHING, WashDone):
+                [(None, self.log_msg("rinsing"), WashState.RINSING)],
+            (WashState.RINSING, RinseDone): [(
+                None, self.log_msg("spinning"), WashState.SPINNING)],
+            (WashState.SPINNING, SpinDone):
+                [(None, self.log_msg("done"), WashState.DONE)],
+            (WashState.DONE, Reset):
+                [(None, self.log_msg("idle"), WashState.IDLE)],
+        }
+        super().__init__(WashState.IDLE, table)
 
-class UnpredictablePerson:
-    def __init__(self, mood: Mood) -> None:
-        self._mood = mood
+    def log_msg(self, msg: str):
+        def action(event: object) -> None:
+            self.log.append(msg)
+        return action
 
-    def change_to(self, mood: Mood) -> None:
-        self._mood = mood
-
-    def hello(self) -> str:
-        return self._mood.hello()
-
-person = UnpredictablePerson(Happy())
-print(person.hello())
-#: Great to see you!
-person.change_to(Grumpy())
-print(person.hello())
-#: What do you want?
-person.change_to(Prozac())
-print(person.hello())
-#: Everything is wonderful. Just wonderful.
+wm = WashingMachine()
+events = [
+    Start(), Full(), WashDone(), RinseDone(), SpinDone(), Reset()]
+for event in events:
+    wm.handle(event)
+print(wm.log)
+#: ['filling', 'washing', 'rinsing', 'spinning', 'done', 'idle']

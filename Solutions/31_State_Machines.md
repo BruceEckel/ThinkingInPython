@@ -32,79 +32,10 @@ class StateMachine:
             f"on {type(event).__name__}")
 ```
 
-## 1. A connection limiter, with a proxy that releases on check-in
+## 1. `UnpredictablePerson` with a `Prozac` mood
 
 ```python
 # exercise_1.py
-from __future__ import annotations
-
-class RealConnection:
-    def __init__(self, number: int) -> None:
-        self.number = number
-
-    def query(self, sql: str) -> str:
-        return f"connection {self.number}: {sql}"
-
-class ConnectionManager:
-    def __init__(self, limit: int) -> None:
-        self._limit = limit
-        self._in_use = 0
-        self._next_number = 1
-
-    def checkout(self) -> ConnectionProxy:
-        if self._in_use >= self._limit:
-            raise RuntimeError("no connections available")
-        self._in_use += 1
-        conn = RealConnection(self._next_number)
-        self._next_number += 1
-        return ConnectionProxy(conn, self)
-
-    def _check_in(self) -> None:
-        self._in_use -= 1
-
-class ConnectionProxy:
-    def __init__(self, real: RealConnection,
-                 manager: ConnectionManager) -> None:
-        self._real = real
-        self._manager = manager
-        self._checked_in = False
-
-    def query(self, sql: str) -> str:
-        if self._checked_in:
-            raise RuntimeError("connection already checked in")
-        return self._real.query(sql)
-
-    def check_in(self) -> None:
-        if not self._checked_in:
-            self._checked_in = True
-            self._manager._check_in()
-
-manager = ConnectionManager(limit=2)
-c1 = manager.checkout()
-c2 = manager.checkout()
-try:
-    manager.checkout()
-except RuntimeError as e:
-    print("caught:", e)
-#: caught: no connections available
-c1.check_in()
-c3 = manager.checkout()  # Succeeds: c1's slot was released
-print(c3.query("SELECT 2"))
-#: connection 3: SELECT 2
-```
-
-`ConnectionManager` never hands out a bare `RealConnection`. Every
-caller gets a `ConnectionProxy` instead, so the manager, not the
-caller, controls when a connection counts as "in use." `check_in()`
-is the only path back to `_in_use -= 1`, and it can only run once per
-proxy, guarded by `_checked_in`; querying a checked-in proxy raises
-instead of silently succeeding against a connection the manager
-already considers returned.
-
-## 2. `UnpredictablePerson` with a `Prozac` mood
-
-```python
-# exercise_2.py
 class Mood:
     def hello(self) -> str:
         raise NotImplementedError
@@ -147,12 +78,12 @@ print(person.hello())
 mood by name, so adding a third one changes nothing about the
 surrogate itself, only which `Mood` object gets swapped in through
 `change_to()`. This is the *State* surrogate from
-[Surrogate](26_Surrogate.md#state), applied to a new domain.
+[Surrogate](../Chapters/26_Surrogate.md#state), applied to a new domain.
 
-## 3. A washing machine, table-driven
+## 2. A washing machine, table-driven
 
 ```python
-# exercise_3.py
+# exercise_2.py
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
@@ -216,10 +147,10 @@ transitions. The washing machine still uses the exact same
 `state_machine.py` engine; only the table and the small marker event
 classes are specific to washing laundry.
 
-## 4. A word-driven state machine with per-state transition tables
+## 3. A word-driven state machine with per-state transition tables
 
 ```python
-# exercise_4.py
+# exercise_3.py
 from __future__ import annotations
 
 class Controller:
@@ -269,15 +200,15 @@ the same delegation `state.py`'s `next()` method uses. Reading a
 sequence of words from a file one per line is a one-line change:
 `words = Path("moves.txt").read_text().split()`.
 
-## 5. Configuring the machine from one transition table
+## 4. Configuring the machine from one transition table
 
-The per-state design in exercise 4 spreads the turnstile's rules
+The per-state design in exercise 3 spreads the turnstile's rules
 across two classes, one dictionary each. Collecting both into a single
 table, keyed by `(state, word)`, makes the whole machine's behavior
 editable in one place:
 
 ```python
-# exercise_5.py
+# exercise_4.py
 TRANSITIONS: dict[tuple[str, str], str] = {
     ("locked", "coin"): "unlocked",
     ("locked", "push"): "locked",
@@ -309,13 +240,13 @@ Both versions produce the same history. The per-state design (exercise
 state's behavior involves more than a lookup. The single-table design
 puts every rule for the whole machine in one dictionary, which is
 easier to audit and edit as a unit, the same trade-off the chapter's
-own [table-driven state machine](#table-driven-state-machine) makes
+own [table-driven state machine](../Chapters/31_State_Machines.md#table-driven-state-machine) makes
 over the per-state `mouse_trap.py`.
 
-## 6. The mood machine, rebuilt on `state_machine.py`
+## 5. The mood machine, rebuilt on `state_machine.py`
 
 ```python
-# exercise_6.py
+# exercise_5.py
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
@@ -363,7 +294,7 @@ print(mm.state, mm.message)
 #: MoodState.PROZAC Everything is wonderful.
 ```
 
-Where exercise 2's `UnpredictablePerson` swaps in a whole `Mood`
+Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
 object through `change_to()`, this version drives the same mood
 transitions through events and a table. Both model "a thing that
 changes behavior over time"; the *State* surrogate suits it when each
@@ -371,10 +302,10 @@ mood needs real per-mood logic, and the table-driven machine suits it
 when the transitions themselves, not the mood behaviors, are the part
 worth making explicit and easy to audit.
 
-## 7. An elevator, table-driven
+## 6. An elevator, table-driven
 
 ```python
-# exercise_7.py
+# exercise_6.py
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
@@ -443,10 +374,10 @@ the first whose condition passes wins. `above()`/`below()` pick
 through both conditions to the unconditional last entry, opening the
 doors immediately with no travel at all.
 
-## 8. A heating/air-conditioning system, table-driven
+## 7. A heating/air-conditioning system, table-driven
 
 ```python
-# exercise_8.py
+# exercise_7.py
 from enum import Enum, auto
 from state_machine import StateMachine, Table
 
@@ -498,10 +429,10 @@ possible table-driven machine and confirms that `condition` and
 `action` are genuinely optional per transition, not required
 boilerplate.
 
-## 9. `mouse_move_generator()`
+## 8. `mouse_move_generator()`
 
 ```python
-# exercise_9.py
+# exercise_8.py
 import random
 from collections.abc import Iterator
 from enum import StrEnum

@@ -62,6 +62,7 @@ from tools_config import ROOT
 # is permanently FAIL teaches you to stop reading the table.
 SWEEP_TARGETS: list[str] = [
     "gate-checks",
+    "solutions-numbering",
     "ty",
     "lint",
     "solutions-ty",

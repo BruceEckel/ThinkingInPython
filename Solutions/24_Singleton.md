@@ -100,7 +100,7 @@ change is what that one object *is*: instead of holding a single
 value, it holds a fixed collection of `Connection`s and tracks which
 are checked out. `acquire()` and `release()` replace the "get the
 instance" idea with "borrow one member of a pool and give it back,"
-similar in spirit to [Context Managers](15_Context_Managers.md#an-object-pool)'s
+similar in spirit to [Context Managers](../Chapters/15_Context_Managers.md#an-object-pool)'s
 `Pool.lease()`, but without the automatic return a context manager
 guarantees; here a caller must remember to call `release()`.
 
@@ -133,7 +133,7 @@ module itself is already the single shared object Python caches in
 
 For real code, prefer the module. It is less code, has no indirection
 to read through, and gets the same guarantee for free, the same
-argument [A Module Is Already a Singleton](#a-module-is-already-a-singleton)
+argument [A Module Is Already a Singleton](../Chapters/24_Singleton.md#a-module-is-already-a-singleton)
 makes at the top of the chapter. The class-based versions only earn
 their complexity when something genuinely needs the shape of a class,
 such as participating in an interface other code expects, or needing

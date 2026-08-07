@@ -202,10 +202,82 @@ increments the same shared counter through `trace_counting.total_calls
 += 1`, so it accumulates across every function decorated with
 `@trace_counting`, reaching `3` after the three calls above. This is
 the same class-attribute-versus-instance-attribute distinction from
-[Class Attributes](09_Class_Attributes.md): `self.count` shadows
+[Class Attributes](../Chapters/09_Class_Attributes.md): `self.count` shadows
 nothing and lives per-instance, while `total_calls`, read and written
 through the class name, is one value the whole family of decorated
 functions shares.
+
+## 5. `trace` with a `__get__()` so it works on methods
+
+```python
+# trace_descriptor.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import update_wrapper
+from types import MethodType
+
+class trace[**P, R]:
+    __name__: str  # Set by update_wrapper(), not __init__
+
+    def __init__(self, func: Callable[P, R]) -> None:
+        self.func = func
+        update_wrapper(self, func)
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        positional = [repr(a) for a in args]
+        named = [f"{k}={v!r}" for k, v in kwargs.items()]
+        arglist = ", ".join(positional + named)
+        print(f"-> {self.__name__}({arglist})")
+        result = self.func(*args, **kwargs)
+        print(f"<- {self.__name__} = {result!r}")
+        return result
+
+    def __get__(
+            self, obj: object, owner: type | None = None
+    ) -> Callable[..., R]:
+        if obj is None:
+            return self  # Through the class, so nothing to bind
+        return MethodType(self, obj)
+
+@dataclass
+class Greeter:
+    name: str
+
+    @trace
+    def greet(self, greeting: str) -> str:
+        return f"{greeting}, {self.name}"
+
+print(Greeter("Bob").greet("Hello"))
+#: -> greet(Greeter(name='Bob'), 'Hello')
+#: <- greet = 'Hello, Bob'
+#: Hello, Bob
+```
+
+`Greeter.greet` is a `trace` instance stored as a class attribute.
+Without `__get__()`, `Greeter("Bob").greet("Hello")` passes only
+`"Hello"`, and the missing `self` shows up as the confusing `TypeError`
+the chapter's `Logged` example produces. Adding `__get__()` makes
+`trace` a descriptor, so attribute access on an instance now runs
+`trace.__get__(greeter_instance, Greeter)` instead of handing back the
+decorator unchanged.
+
+`MethodType(self, obj)` builds the same kind of bound object Python
+builds for an ordinary method: a callable that remembers `obj` and
+prepends it to every later call. So `__call__()` receives
+`(greeter, "Hello")`, and the trace line shows `self` arriving as the
+first argument. `Greeter` is a dataclass so that argument prints as
+`Greeter(name='Bob')` rather than an address that changes every run.
+
+The `obj is None` branch covers `Greeter.greet`, the access through the
+class rather than an instance. There is no instance to bind, so
+returning `self` leaves the decorator reachable as a normal function,
+which is how an ordinary method behaves too.
+
+The return type is `Callable[..., R]` rather than the exact signature.
+`MethodType` drops the first parameter, and `**P` names the whole
+parameter list with no way to subtract its head, so the checker keeps
+the return type and gives up on the arguments. The runtime binding is
+correct either way; the annotation is where the loss shows.
 
 ## 6. `retry(times)` in the function form
 

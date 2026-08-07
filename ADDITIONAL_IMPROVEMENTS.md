@@ -3,9 +3,6 @@ Here's what I'd suggest, in the order I think pays off most. The first one I jus
 1. Close the exercise/solution gaps, then gate them.
 Comparing every chapter's exercise numbers against its solution headings: 15 chapters have a gap. Five have no Solutions/ file at all (21, 44, 45, 46, 47), and others are partial — 47 has one solution for eleven exercises, 19 is missing four (the ones I added), 43 missing three, 38 missing three, 15 missing three, 31 has a solution 9 for a chapter with eight exercises. Some of that drift I introduced this week; most predates it. Project memory already records this as a known ungated problem. I can write the answers, and add a tools/check_solutions.py to make gate so it can never drift silently again.
 
-2. Deep-review chapters 35-47 and the appendices.
-deep_review/ stops at 34. The whole functional arc (40-43) and the Effects part (44-47) have never had the four-pass treatment, and 46-47 lean on a third-party library, where the skill's "read the library's source" rule has caught real errors before.
-
 3. Audit cross-chapter claims, not just anchors.
 heading_links.py proves a target exists; nothing proves the target says what the sentence claims. In four chapters this week I found links pointing at real sections that describe something else (33 → 37's "price-and-weight example" that is actually a recycling note; 27's "previous example" naming the wrong listing; 21's dissolution thesis cited by chapters where the mechanism didn't match). A sweep of every "see [Chapter]" sentence against its target would catch the rest.
 

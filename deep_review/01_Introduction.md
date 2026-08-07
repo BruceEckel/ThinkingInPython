@@ -166,7 +166,7 @@ the two chapter titles opaque to a reader scanning the map. Proposed:
 
 ---
 
-[] Reject
+[X] Reject
 
 **"AI Trigger Warning" (lines 93-152): consider moving this section to the end
 of the chapter.**
@@ -187,7 +187,7 @@ terms, which is why this is a proposal and not an applied fix.
 
 ---
 
-[] Reject
+[X] Reject
 
 **Line 98: "wrote a message" is vague.**
 

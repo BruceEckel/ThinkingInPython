@@ -394,3 +394,259 @@ before `3`, and within a priority, alphabetically by the description
 (the tuple's second field): `"alert"` before `"page oncall"` before
 `"zzz"`, and `"aaa"` before `"backup"`. Which thread happened to submit
 a job first never affects the final order.
+
+## 9. A task that finishes before the failures land
+
+```python
+# exercise_9.py
+import asyncio
+from typing import Final
+
+PAIRS: Final[list[tuple[str, float]]] = [
+    ("a", 0.01),
+    ("b", 0.02),
+    ("c", 0.03),
+    ("d", 0.03),
+    ("e", 0.005),  # Was 0.2, so e now finishes first
+    ("f", 0.3),
+]
+
+async def fetch(item: str, delay: float) -> str:
+    print(f"{item}: started")
+    await asyncio.sleep(delay)
+    if item in ("c", "d"):
+        raise ValueError(f"fetch({item!r}) failed")
+    print(f"{item}: fetched")
+    return item.upper()
+
+async def main() -> None:
+    try:
+        async with asyncio.TaskGroup() as tg:
+            tasks = {
+                item: tg.create_task(fetch(item, delay))
+                for item, delay in PAIRS
+            }
+    except* ValueError as group:
+        for exc in group.exceptions:
+            print(f"caught: {exc}")
+    for item, task in tasks.items():
+        if task.cancelled():
+            print(f"{item}: cancelled")
+        elif (exc := task.exception()) is not None:
+            print(f"{item}: raised {exc!r}")
+        else:
+            print(f"{item}: {task.result()}")
+
+asyncio.run(main())
+#: a: started
+#: b: started
+#: c: started
+#: d: started
+#: e: started
+#: f: started
+#: e: fetched
+#: a: fetched
+#: b: fetched
+#: caught: fetch('c') failed
+#: caught: fetch('d') failed
+#: a: A
+#: b: B
+#: c: raised ValueError("fetch('c') failed")
+#: d: raised ValueError("fetch('d') failed")
+#: e: E
+#: f: cancelled
+```
+
+Only `f` reports `cancelled` now. With `e` at `0.005` its timer fires
+long before `c` and `d` fail at `0.03`, so `e` prints `fetched`,
+returns `"E"`, and is a completed task by the time the group starts
+cancelling. `f` still sleeps for `0.3`, so cancellation reaches it
+while it is suspended and its task ends cancelled.
+
+That is the line between what a `TaskGroup` can and cannot undo. It
+cancels what is still running, which is why the original `PAIRS` had
+both `e` and `f` cancelled. It cannot reach into a task that already
+returned, and it cannot unprint `e: fetched` or undo whatever a real
+`fetch()` wrote to a database on its way out. Structured concurrency
+guarantees that no task outlives the block, not that no task had an
+effect before the failure.
+
+The distinction matters when the tasks do more than sleep. A group of
+six writes where two fail leaves the successful writes in place, so
+recovery is your problem, not the `TaskGroup`'s. That is what
+[Context Managers](../Chapters/15_Context_Managers.md) and the Effect chapters
+address from different directions: pairing an action with the cleanup
+that undoes it, so "already finished" still means "still reversible."
+
+## 10. `gather()` without `return_exceptions`
+
+```python
+# exercise_10.py
+import asyncio
+from typing import Final
+
+PAIRS: Final[list[tuple[str, float]]] = [
+    ("a", 0.01),
+    ("b", 0.02),
+    ("c", 0.03),
+    ("d", 0.03),
+    ("e", 0.2),
+    ("f", 0.3),
+]
+
+async def fetch(item: str, delay: float) -> str:
+    print(f"{item}: started")
+    await asyncio.sleep(delay)
+    if item in ("c", "d"):
+        raise ValueError(f"fetch({item!r}) failed")
+    print(f"{item}: fetched")
+    return item.upper()
+
+async def main() -> None:
+    try:
+        results = await asyncio.gather(
+            *(fetch(item, delay) for item, delay in PAIRS),
+        )
+    except ValueError as e:
+        print(f"gather raised {e!r}")
+        return
+    print(results)
+
+asyncio.run(main())
+#: a: started
+#: b: started
+#: c: started
+#: d: started
+#: e: started
+#: f: started
+#: a: fetched
+#: b: fetched
+#: gather raised ValueError("fetch('c') failed")
+```
+
+Two `fetched` lines print, `a` and `b`, the two whose timers fire
+before `c` fails at `0.03`. `e` and `f` never print one, and neither
+does the `results` list, because the `await` no longer returns a value.
+
+Without `return_exceptions=True`, the first child exception propagates
+out of the `await` immediately, and `gather()` reports that one
+exception rather than a list of six outcomes. `d` fails in the same
+tick, but the `gather()` future is resolved by then, so `d`'s failure
+is retrieved and discarded rather than raised. The four results the
+call was collecting are lost, including `a` and `b`, which had already
+succeeded.
+
+The other tasks are the interesting part. `gather()` does not cancel
+them when it propagates, unlike a `TaskGroup`, so `e` and `f` are still
+sleeping when `main()` returns. `asyncio.run()` then cancels whatever
+is left as it shuts the loop down, which is why they print nothing
+further. Had `main()` gone on to other work, they would have run to
+completion in the background with nobody waiting on their results.
+
+That combination, results discarded and siblings left running, is why
+`return_exceptions=True` and `TaskGroup` exist. One keeps every outcome
+so partial success stays visible; the other guarantees nothing outlives
+the block. Bare `gather()` gives you neither.
+
+## 11. Setting the `ContextVar` in the parent
+
+```python
+# exercise_11.py
+import asyncio
+from contextvars import ContextVar
+
+request_id: ContextVar[str] = ContextVar("request_id", default="-")
+current = "-"  # The same idea as a plain global
+
+async def handle(name: str) -> None:
+    global current
+    current = name
+    await asyncio.sleep(0)  # Stand-in for a database call
+    print(f"context {request_id.get()}, global {current}")
+
+async def main() -> None:
+    request_id.set("main")  # Set once, before any task exists
+    async with asyncio.TaskGroup() as group:
+        for name in ("req-1", "req-2", "req-3"):
+            group.create_task(handle(name))
+    print(f"after: context {request_id.get()}, global {current}")
+
+asyncio.run(main())
+#: context main, global req-3
+#: context main, global req-3
+#: context main, global req-3
+#: after: context main, global req-3
+```
+
+All three tasks print `context main`. Every task starts with a copy of
+the context that created it, and that context already carried
+`request_id = "main"`, so each copy inherits the same value. No task
+writes to the variable afterward, so all three copies stay identical
+and the per-request identity the original version tracked is gone.
+
+The `after:` line changes too. In the chapter's version it printed
+`context -`, the default, because each `set()` happened inside a task's
+own copy and none of them could reach `main()`'s context. Here the
+`set()` is in `main()`, so it lands in `main()`'s own context and is
+still there once the group finishes. Copying runs one way: a child sees
+what the parent had at creation, and the parent sees nothing a child
+did.
+
+`current` behaves as before, reaching `req-3` everywhere, which is the
+contrast the example exists to draw. A `global` is one cell shared by
+every task, so the last writer wins and the other two tasks read a
+value meant for someone else. A `ContextVar` is per-task storage that
+happens to be reachable by one name.
+
+## 12. Threads in place of subinterpreters
+
+```python
+# exercise_12.py
+import timeit
+from concurrent.futures import ThreadPoolExecutor
+
+def cpu_price(order: int) -> int:
+    total = 0
+    for _ in range(1_000_000):  # Processor work
+        total += 1
+    return order * 10
+
+def sequential(orders: list[int]) -> list[int]:
+    return [cpu_price(o) for o in orders]
+
+orders = [1, 2, 3, 4, 5]
+t_seq = timeit.timeit(lambda: sequential(orders), number=5)
+
+with ThreadPoolExecutor() as pool:
+    parallel = list(pool.map(cpu_price, orders))
+    assert parallel == sequential(orders)
+    t_thr = timeit.timeit(
+        lambda: list(pool.map(cpu_price, orders)), number=5
+    )
+
+print(f"threads at least 1.5x faster: {t_seq > t_thr * 1.5}")
+#: threads at least 1.5x faster: False
+```
+
+The assertion passes because correctness never depended on the
+executor. `cpu_price()` reads its argument and returns a number,
+touching nothing shared, so five of them produce the same five results
+whether they run one after another, in five threads, or in five
+subinterpreters. Swapping the executor changes when the work runs, not
+what it computes.
+
+The boolean flips because threads in one interpreter share one GIL.
+`cpu_price()` is a counting loop with no I/O and no `sleep`, so it
+holds the GIL except at the interpreter's periodic switch points. Five
+such threads take turns on one processor and finish in about the time
+five sequential calls take, so `t_seq` and `t_thr` come out close
+together and `t_seq > t_thr * 1.5` is `False`.
+
+`InterpreterPoolExecutor` wins the same benchmark because each
+subinterpreter has its own GIL. The work spreads across processors
+rather than time-slicing on one, which is the distinction from
+[The GIL and Free Threading](../Chapters/19_Concurrency.md#the-gil-and-free-threading):
+the GIL is per interpreter, not per process, so more interpreters mean
+more locks and real parallelism. A free-threaded build reaches the same
+end by removing the GIL instead of multiplying it, letting ordinary
+threads do what this listing's threads cannot.

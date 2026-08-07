@@ -259,7 +259,7 @@ The client never holds a `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`
 and owns the one job the connection cannot do for itself: giving
 itself back. Making the proxy a context manager
-([Context Managers](15_Context_Managers.md)) is what turns "must check
+([Context Managers](../Chapters/15_Context_Managers.md)) is what turns "must check
 it back in" into a guarantee, since `__exit__()` runs whether the
 block ends normally or raises an exception.
 

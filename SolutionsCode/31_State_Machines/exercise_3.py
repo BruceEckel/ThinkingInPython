@@ -1,56 +1,38 @@
 # exercise_3.py
-from enum import Enum, auto
-from state_machine import StateMachine, Table
+from __future__ import annotations
 
-class WashState(Enum):
-    IDLE = auto()
-    FILLING = auto()
-    WASHING = auto()
-    RINSING = auto()
-    SPINNING = auto()
-    DONE = auto()
+class Controller:
+    def __init__(self, initial: str) -> None:
+        self.states: dict[str, WordState] = {}
+        self.current = initial
 
-class Start:
-    pass
-class Full:
-    pass
-class WashDone:
-    pass
-class RinseDone:
-    pass
-class SpinDone:
-    pass
-class Reset:
-    pass
+    def register(self, name: str, state: WordState) -> None:
+        self.states[name] = state
 
-class WashingMachine(StateMachine):
-    def __init__(self) -> None:
-        self.log: list[str] = []
-        table: Table = {
-            (WashState.IDLE, Start):
-                [(None, self.log_msg("filling"), WashState.FILLING)],
-            (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"), WashState.WASHING)],
-            (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"), WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [(
-                None, self.log_msg("spinning"), WashState.SPINNING)],
-            (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"), WashState.DONE)],
-            (WashState.DONE, Reset):
-                [(None, self.log_msg("idle"), WashState.IDLE)],
-        }
-        super().__init__(WashState.IDLE, table)
+    def process(self, word: str) -> None:
+        state = self.states[self.current]
+        self.current = state.next_state(word)
 
-    def log_msg(self, msg: str):
-        def action(event: object) -> None:
-            self.log.append(msg)
-        return action
+class WordState:
+    TRANSITIONS: dict[str, str] = {}
 
-wm = WashingMachine()
-events = [
-    Start(), Full(), WashDone(), RinseDone(), SpinDone(), Reset()]
-for event in events:
-    wm.handle(event)
-print(wm.log)
-#: ['filling', 'washing', 'rinsing', 'spinning', 'done', 'idle']
+    def next_state(self, word: str) -> str:
+        return self.TRANSITIONS.get(word, self.TRANSITIONS["*"])
+
+class Locked(WordState):
+    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
+
+class Unlocked(WordState):
+    TRANSITIONS = {"push": "locked", "*": "unlocked"}
+
+controller = Controller("locked")
+controller.register("locked", Locked())
+controller.register("unlocked", Unlocked())
+
+words = ["push", "coin", "push", "coin", "coin", "push"]
+history = [controller.current]
+for word in words:
+    controller.process(word)
+    history.append(controller.current)
+print(" ".join(history))
+#: locked locked unlocked locked unlocked unlocked locked

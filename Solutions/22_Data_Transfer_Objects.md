@@ -23,7 +23,7 @@ print(hasattr(m1, "name"), hasattr(m2, "info"))
 Each `Messenger()` call assigns a fresh `dict` (the one `**kwargs`
 built from that call's own arguments) to that instance's `__dict__`.
 Every instance gets its own independent dictionary, unlike a class
-attribute from [Class Attributes](09_Class_Attributes.md), which is
+attribute from [Class Attributes](../Chapters/09_Class_Attributes.md), which is
 one object shared by every instance until something shadows it. `m1`
 and `m2` share nothing: `m1` has no `name`, and `m2` has no `info`.
 
@@ -105,3 +105,99 @@ namespaces are indistinguishable afterward. Even the order matches,
 because a dict keeps insertion order and both routes add `extra`
 last. If you assign the attributes in a different sequence, the dicts
 still compare equal, since dict equality ignores order.
+
+## 5. Returning a bare `tuple[float, int]`
+
+```python
+# exercise_5.py
+def summarize(data: list[float]) -> tuple[float, int]:
+    return (sum(data) / len(data), len(data))
+
+print(summarize([2.0, 4.0, 6.0]))
+#: (4.0, 3)
+mean, count = summarize([1.0, 3.0])
+print(mean, count)
+#: 2.0 2
+```
+
+Every caller still runs, because a `NamedTuple` was a tuple all along.
+Unpacking works, indexing works, and printing works. What changed is
+everything above the mechanics.
+
+The call sites lost the names. `summarize([2.0, 4.0, 6.0])` now prints
+`(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
+says which number is which, and a reader of the call site has to open
+`summarize()` to find out. They also lost attribute access:
+`result.mean` becomes `result[0]`, which is the same information
+written in a form that stops carrying its meaning. And they lost the
+type as a name. Nothing can be annotated `Stats` anymore, so a function
+accepting a summary now advertises `tuple[float, int]`, which any pair
+of a float and an int satisfies.
+
+The checker still catches a fair amount. Unpacking into the wrong
+number of names fails, since the tuple's length is part of its type.
+Passing `mean` where an `int` is expected fails, since the element
+types are still known positionally. Indexing past the end fails, and
+so does calling a `str` method on `count`.
+
+What it cannot catch is the mistake this exercise is about: swapping
+the two. `mean, count = summarize(data)` and `count, mean =
+summarize(data)` are both `tuple[float, int]` destructured into two
+names, and the second one type-checks cleanly while being wrong in
+every use afterward. With `Stats`, that mistake either does not arise
+(you write `result.count`) or fails immediately, because `Stats` and a
+reversed `tuple[int, float]` are different types. Position is
+something the checker can verify and a reader cannot; a name is
+something both can.
+
+## 6. Structural equality across three-field types
+
+```python
+# exercise_6.py
+from dataclasses import dataclass
+from typing import NamedTuple
+
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+class Point3(NamedTuple):
+    x: int
+    y: int
+    z: int
+
+print(Color(1, 2, 3) == Point3(1, 2, 3))
+#: True
+
+@dataclass(frozen=True)
+class FrozenColor:
+    r: int
+    g: int
+    b: int
+
+print(FrozenColor(1, 2, 3) == (1, 2, 3))
+#: False
+```
+
+`Color(1, 2, 3) == Point3(1, 2, 3)` is `True`, the same answer
+`Dimensions` gives, and for the same reason: a `NamedTuple` inherits
+`tuple.__eq__`, which compares length and elements and consults neither
+class. Adding a third `NamedTuple` adds a third type that compares
+equal to the other two, so the family of things that equal `(1, 2, 3)`
+grows with every three-int `NamedTuple` in the program. The field names
+are for you, not for `==`.
+
+`FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen dataclass's
+generated `__eq__()` starts by checking `other.__class__ is
+self.__class__` and returns `NotImplemented` when it is not, so Python
+falls back to the tuple's own comparison, which also declines, and
+`==` settles on identity, which fails. A dataclass is not a tuple and
+never pretends to be one.
+
+That is the choice the two constructs offer. A `NamedTuple` is a tuple
+with labels, so it interoperates with everything expecting a tuple and
+accepts equality with anything of the same shape. A frozen dataclass is
+a distinct type, so it refuses those comparisons and catches the
+mismatch instead. Which one is right depends on whether you want your
+three numbers to travel as data or to mean something.
