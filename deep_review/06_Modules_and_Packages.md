@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -318,13 +319,7 @@ break imports" is true, but *why* it can is `sys.path` ordering, which is the
 first sentence of the next section. The reader meets the consequence one section
 before the mechanism.
 
-Two options:
-
-1. Move the `PYTHONPATH` section (or just its first paragraph, "Python searches
-   `sys.path` ... installed packages sit further down") ahead of File Names. Cost:
-   `PYTHONPATH` then opens the chapter's post-package material with machinery
-   rather than motivation, which is the trade the current order avoids.
-2. Cheaper, and my recommendation: leave the order and add the reason inline —
+my recommendation: leave the order and add the reason inline —
    "...can hide the stdlib one and break imports, because the directory of the
    script you ran is searched before the standard library (see
    [`PYTHONPATH`](06_Modules_and_Packages.md#pythonpath) below)."

@@ -3,11 +3,12 @@
 MISSING = sentinel("MISSING")
 
 def get(data, key, default=MISSING):
-    if key in data:
+    try:
         return data[key]
-    if default is MISSING:
-        return MISSING  # Normally raises an exception here
-    return default
+    except KeyError:
+        if default is MISSING:
+            return MISSING  # Normally re-raises here
+        return default
 
 prefs = {"volume": 3, "mute": None}
 print(get(prefs, "volume"))

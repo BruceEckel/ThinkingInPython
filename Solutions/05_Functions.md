@@ -137,3 +137,54 @@ remaining two collect into `values`; `**opts` spreads the dictionary
 into keyword arguments, which `**options` collects again. The first
 element of `args` is not special to the caller: it becomes `label`
 only because of where it sits in the sequence.
+
+## 7. `describe(name, /, **facts)`
+
+```python
+# exercise_7.py
+
+def describe(name, /, **facts):
+    print(name)
+    for key, value in facts.items():
+        print(f"{key}={value}")
+
+describe("Bob", role="editor", years=12)
+#: Bob
+#: role=editor
+#: years=12
+try:
+    describe(name="Bob")  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+The `/` caused it. `name` is positional-only, so `name="Bob"` cannot
+reach it. Where the argument goes instead is the part worth tracing:
+`**facts` accepts any keyword the parameters do not claim, and after
+the `/` the name `name` is not one of them, so `"Bob"` lands in
+`facts` and the positional `name` is left unfilled. The message is
+therefore `describe() missing 1 required positional argument: 'name'`,
+which points at the parameter the caller thought they were filling.
+The mistake is visible without running the code, so the call carries a
+`# type: ignore` telling the checker it is deliberate, the same way
+`param_markers.py` marks its two.
+
+Take the `**facts` away and the same call reports the mismatch
+directly: `divide(a=1, b=2)` against `def divide(a, b, /)` gives
+`got some positional-only arguments passed as keyword arguments:
+'a, b'`. Catch-all keywords hide that message, because there is now
+somewhere for the stray name to go. Without the `/`, the call
+succeeds and `facts` stays empty.
+
+`**facts` is the opposite direction from exercise 6. There, a
+dictionary at the call site was spread into separate keyword
+arguments; here, separate keyword arguments are collected back into a
+dictionary inside the function. The two forms use the same `**` and
+are inverses of each other, which is why a function declaring
+`**kwargs` can forward them to another call as `**kwargs` unchanged.
+
+The pair is also why the two markers are worth using together. `/`
+fixes what `name` is called, so a later rename breaks no caller, while
+`**facts` accepts names the function has never heard of. One parameter
+is closed to the caller's vocabulary and the rest is open to it.

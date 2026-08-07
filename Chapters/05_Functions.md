@@ -53,6 +53,14 @@ so the function reaches its end without returning anything and produces `None`.
 Every Python function returns a value.
 A bare `return` and a missing `return` both produce `None`.
 
+A `return` with several expressions produces a tuple,
+which the caller usually unpacks:
+
+    def minmax(values):
+        return min(values), max(values)
+
+    low, high = minmax([3, 1, 4])
+
 Here, the same function applies the `+` operator to integers and strings:
 
 ```python
@@ -134,7 +142,7 @@ print(good_append(2))
 A mutable default persists because it lives on the function object rather than being recreated on each call.
 `__defaults__` holds the tuple of default values,
 and it is the same list both calls append to.
-This behavior commonly confuses newcomers.
+The default looks like an expression the call evaluates, and it is not.
 
 Underneath, a parameter is another name bound to the caller's object,
 the binding described in [Variables and References](02_Tour.md#variables-and-references).
@@ -142,6 +150,33 @@ When that object is mutable,
 changes made inside the function are visible outside it.
 `bad_append()` combines this with a default built once,
 so each call mutates the object the next call will use.
+
+```python
+# mutating_arguments.py
+
+def append_all(target, extras):
+    target.extend(extras)
+
+mine = [1, 2]
+append_all(mine, [3, 4])
+print(mine)  # The caller's list changed
+#: [1, 2, 3, 4]
+
+def rebind(target):
+    target = ["replaced"]  # Rebinds the local name only
+    print(target)
+
+rebind(mine)
+#: ['replaced']
+print(mine)
+#: [1, 2, 3, 4]
+```
+
+`append_all()` calls a method on the object the caller passed,
+so the caller sees the change.
+`rebind()` assigns to the parameter,
+which points the local name at a new list and leaves the caller's list alone.
+Mutating an argument reaches outside the function; rebinding one does not.
 
 The `None` default in `good_append()` is a *sentinel*:
 a value chosen to mean "nothing was supplied" rather than to be used.
@@ -185,11 +220,12 @@ adds a `sentinel` builtin that creates a unique self-describing value for this p
 MISSING = sentinel("MISSING")
 
 def get(data, key, default=MISSING):
-    if key in data:
+    try:
         return data[key]
-    if default is MISSING:
-        return MISSING  # Normally raises an exception here
-    return default
+    except KeyError:
+        if default is MISSING:
+            return MISSING  # Normally re-raises here
+        return default
 
 prefs = {"volume": 3, "mute": None}
 print(get(prefs, "volume"))
@@ -210,6 +246,45 @@ A stored `None` comes back untouched.
 Create a sentinel once and share that name.
 Each `sentinel()` call builds a new object, even for the same name,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
+
+## Names Inside a Function
+
+A function can read a module-level name,
+but assigning to that name anywhere in the function makes it local for the whole function.
+`global` says the assignment should rebind the module-level name instead:
+
+```python
+# function_scope.py
+
+count = 0
+
+def read_only():
+    print(count)
+
+def rebinds():
+    count = 99  # A local, unrelated to the module-level count
+    print(count)
+
+def writes_global():
+    global count
+    count += 1
+
+read_only()
+#: 0
+rebinds()
+#: 99
+writes_global()
+print(count)
+#: 1
+```
+
+`rebinds()` never touches the module-level `count`.
+Drop the `global` from `writes_global()` and `count += 1` reads a local that was never assigned,
+so the call raises an `UnboundLocalError`.
+`global` governs rebinding, not reading,
+which is why `read_only()` needs nothing.
+[Closures](40_Functional_Foundations.md#closures) covers `nonlocal`,
+the same idea one scope in.
 
 ## Variable Argument Lists
 
@@ -249,7 +324,6 @@ f(*x)
 #: 1 2 3
 f(*(4, 5, 6))
 #: 4 5 6
-# ** unpacks a dictionary into keyword arguments:
 d = {"a": 3.14, "b": 1.62, "c": 2.72}
 f(**d)
 #: 3.14 1.62 2.72
@@ -283,7 +357,9 @@ and `func.__name__` reads the name of whatever function arrived
 
 ## Positional-Only and Keyword-Only Parameters
 
-Two markers in a parameter list control how callers may pass arguments.
+Two markers in a parameter list control how callers may pass arguments,
+which decides how much of a signature you are committed to keeping.
+A parameter a caller can name is part of the contract; one it cannot is not.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, never by name.
 A `*` begins the *keyword-only* parameters.
@@ -291,6 +367,8 @@ You must pass every parameter after it by name.
 A `*args` parameter has the same effect as a bare `*`.
 It absorbs every remaining positional argument,
 so a parameter declared after it can only be passed by name.
+A signature can use every form at once, in one fixed order: positional-only,
+positional-or-keyword, `*args`, keyword-only, `**kwargs`.
 
 ```python
 # param_markers.py
@@ -334,10 +412,23 @@ Only the named form reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
-It reports `got some positional-only arguments passed as keyword arguments: 'a, b'`.
+The full message reports `got some positional-only arguments passed as keyword arguments: 'a, b'`.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 Both mistakes are visible without running the code,
 so each carries a `# type: ignore` telling the type checker the misuse is deliberate.
+
+```python
+# all_markers.py
+
+def f(a, /, b, *args, c, **kwargs):
+    print(a, b, args, c, kwargs)
+
+f(1, 2, 3, 4, c=5, d=6)
+#: 1 2 (3, 4) 5 {'d': 6}
+```
+
+`a` can only arrive positionally, `c` can only arrive by name,
+and `b` can do either.
 
 In the standard library,
 many built-in functions and methods take positional-only parameters,
@@ -393,3 +484,7 @@ For anything more complicated, write a separate function.
 6.  Given `args = ("point", 3, 4)` and `opts = {"color": "red"}`,
     call `report()` from `var_args.py` so it prints `point (3, 4) {'color': 'red'}`,
     passing both containers without naming their contents.
+7.  Write `describe(name, /, **facts)` that prints `name` followed by each keyword argument as `key=value`,
+    one per line.
+    Confirm that `describe(name="Bob")` is a `TypeError`,
+    and explain which marker caused it.
