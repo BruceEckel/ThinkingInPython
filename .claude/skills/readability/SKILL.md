@@ -1171,8 +1171,8 @@ intimacy.
 
 ### 53. Social Endorsement Closers
 
-**Phrases to watch:** worth your time, a must-read, do yourself a favor and
-read this, bookmark this, don't sleep on this one.
+**Phrases to watch:** worth knowing, worth your time, a must-read, do yourself
+a favor and read this, bookmark this, don't sleep on this one.
 
 **Problem:** A recommendation with no reason to act. The endorsement is generic
 and could sit under any link.
@@ -1185,6 +1185,25 @@ and could sit under any link.
 **After:**
 > A clear walkthrough of cache invalidation, useful if you are debugging stale
 > reads in a CDN.
+
+"Worth knowing" is the same move aimed at a fact rather than a link, and it is
+the one to watch for in explanatory writing: it rates the information instead
+of using it. The whole family goes with it, since the endorsement is in the
+frame rather than the adjective: worth learning, worth remembering, worth
+understanding, worth the trouble, and the passive "X is worth a mention."
+Cut the frame and state the fact, or say what it lets the reader do.
+
+**Before:**
+> The distinction between `is` and `==` is worth knowing.
+
+**After:**
+> `is` compares identity and `==` compares value, so two equal lists can fail
+> an `is` test.
+
+Two constructions survive. "Worth" carrying a real comparison stays: "worth the
+extra allocation," "worth it only past a thousand rows," where something is
+being weighed against a stated cost. So does an instruction to the reader:
+"this one is worth running yourself" tells them to do something.
 
 ### 54. Numbered List Inflation
 
