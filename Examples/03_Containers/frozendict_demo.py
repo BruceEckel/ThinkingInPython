@@ -6,6 +6,9 @@ print(prefs["zoom"])
 # Equal contents compare equal; entry order is ignored:
 print(prefs == frozendict(zoom=125, theme="dark"))
 #: True
+cache = {prefs: "rendered"}  # Usable as a dict key
+print(cache[frozendict(zoom=125, theme="dark")])
+#: rendered
 try:
     prefs["zoom"] = 150  # type: ignore
 except TypeError as e:

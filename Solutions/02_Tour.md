@@ -94,3 +94,49 @@ Only the camelCase form breaks
 is the only one a linter objects to: ruff's PEP 8 checks report `N816`
 for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
+
+## 5. A second `Template` consumer
+
+```python
+# exercise_5.py
+from string.templatelib import Interpolation, Template
+
+name = "Alice"
+score = 91.5
+message: Template = t"{name} scored {score:.0f}%"
+
+def quoted(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            value = format(piece.value, piece.format_spec)
+            parts.append(f"'{value}'")
+        else:
+            parts.append(piece)
+    return "".join(parts)
+
+print(quoted(message))
+#: 'Alice' scored '92'%
+```
+
+`quoted()` is `shout()` with the two branches swapped over: the
+`Interpolation` branch is the one that changes something, and the
+literal branch passes its text through. The `isinstance()` test is the
+whole mechanism. Each piece arrives already labelled as text the author
+typed or as a value the program supplied, so deciding what to do with
+each is a two-line `if` rather than a parsing problem.
+
+An f-string cannot be post-processed this way because the label is gone
+by the time you have one. `f"{name} scored {score:.0f}%"` evaluates to
+the single string `Alice scored 92%`, and nothing in that string records
+that `Alice` came from a variable and ` scored ` came from the source.
+A post-processor has only the characters, so it would have to guess
+which spans to quote by matching them against the values, and the guess
+fails as soon as a literal happens to look like a value: with
+`name = "scored"`, the finished string reads `scored scored 92%` and no
+rule can tell the first word from the second.
+
+That is the argument for `Template` in one example. Quoting is a
+harmless demonstration, but the same reasoning covers escaping a value
+before it enters SQL or HTML, which is the case where guessing wrong is
+a security hole rather than a typo.

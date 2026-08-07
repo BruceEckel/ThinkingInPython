@@ -21,3 +21,8 @@ print(total)
 scores = [90, 0, 71, 0, 55]
 print(sum(s > 60 for s in scores))  # True counts as 1
 #: 2
+items = [1, 2]
+alias = items
+items += [3]  # In place, so alias sees it
+print(alias)
+#: [1, 2, 3]

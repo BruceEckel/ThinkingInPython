@@ -34,19 +34,16 @@ which removes two constraints that introductory books carry:
 2.  An introductory book chooses topics by where they fall in a beginner's path.
     This one chooses them by whether they are interesting and useful.
 
-If a language feature is new to you, look it up as you go.
 You should be comfortable with:
 
 - Functions, classes, objects, and inheritance.
 - Containers: lists, dictionaries, tuples, and sets.
 
+If a language feature is new to you, look it up as you go.
+
 You do not need to know design patterns, metaclasses, or type checking.
 This book covers them.
 The book is about the language, not the tooling around it.
-Fortunately, `uv` and other tools greatly simplify setup,
-so you don't need to spend time on it.
-The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
-gives detailed setup instructions.
 
 ## How the Book Is Organized
 
@@ -60,6 +57,9 @@ and object cleanup.
 This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
+If you skip Part I, come back for [Static Typing](08_Static_Typing.md):
+every chapter after it annotates its examples,
+and it is the one Part I chapter the rest of the book assumes.
 
 Part II, *Techniques*,
 covers the idioms and tools that give Python its character: testing,
@@ -71,9 +71,11 @@ Many of these chapters came from presentations I've given, mostly at PyCon.
 
 Part III, *Patterns*, opens by stepping back to question object orientation,
 because several of the patterns that follow exist to manage problems that objects create.
+A short chapter then introduces the design-patterns movement itself,
+and the question the rest of the part keeps asking.
 The part then works through the classic design patterns,
 each reframed for Python and weighed against the language.
-I consistently ask what problem we are solving and whether the language already does the pattern's job.
+I ask what problem you are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
 building a simulation out of the pieces,
@@ -84,11 +86,12 @@ the `functools` and `itertools` toolkits,
 errors returned as values instead of raised exceptions,
 and a spectrum of assurances that runs from local reasoning up to machine-checked proof.
 
-Part V, *Effects*, closes the book with everything a program does that a pure function cannot.
+Part V, *Effects*, closes the book by covering everything a program does that a pure function cannot.
 One chapter surveys the languages that track Effects in a function's type,
 and asks what Python could adopt.
 Another develops the full generator protocol on which such tracking depends.
-The last two put that idea to work with a library that brings Effect tracking to Python today.
+The last two put that idea to work with `stateless`,
+a library that brings Effect tracking to Python today.
 
 ## AI Trigger Warning
 
@@ -100,7 +103,7 @@ Eventually I even wrote a message confirming I was not going to complete it.
 In June of 2026, after people mentioned the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
 The experience was amazing,
-and I began adding material from writing and presentations.
+and I began adding material from my blog posts and presentations.
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
 
 This book never would have happened without the help of Claude.
@@ -117,8 +120,7 @@ please ignore this book.
 Using Claude made me realize how many compromises I've made on books in the past.
 I would get a good idea about something
 (for example, automatically interleaving commented output in the listings).
-But I was either unable to implement it, or it seemed too hard,
-so I didn't do it.
+I was either unable to implement it, or it seemed too hard, so I didn't do it.
 But with AI I can explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter to ones as daunting as that commented-output system.
 The result is much better than anything I managed before.
@@ -170,10 +172,14 @@ is the file `Examples/14_Decorators/tracer.py`.
 A helper that more than one chapter uses names a `utils/` path instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
-The repository's `tools/README.md` explains how to build the book and run the examples yourself.
+
+`uv` and other tools make setup short.
+The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
+has the instructions,
+and `tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's build system extracts the examples, then type-checks
-(with Astral's `ty`), runs, and tests them.
+(with Astral's `ty`), lints, runs, and tests them.
 The code you read is the code that runs,
 and the output shown is the output it produces.
 
@@ -181,6 +187,9 @@ Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
 A run of markers shows everything the code above it printed since the previous run,
 in order.
+Output produced inside a loop, or by an `import`,
+therefore appears in the run of markers below the block,
+not next to the line that produced it.
 A `print("affirmative")` followed by a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build regenerates these markers from a real run,
 so they cannot drift from what the code prints.
@@ -188,7 +197,7 @@ so they cannot drift from what the code prints.
 If you find a mistake, please send a correction.
 See `CONTRIBUTING.md` in the source repository.
 
-## Exercises
+## The Exercises
 
 Most chapters end with a short "Exercises" section.
 These come from workshops, where they are worked in pairs at a keyboard.
@@ -211,6 +220,8 @@ This book is freely readable at [thinkinginpython.com](https://thinkinginpython.
 which always holds the current version.
 The text is licensed [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/);
 the source repository's `CONTRIBUTING.md` has the details.
+
+Places worth knowing about:
 
 - [The official Python tutorial](https://docs.python.org/3/tutorial/)
 - [The Python Programming FAQ](https://docs.python.org/3/faq/programming.html)

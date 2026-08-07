@@ -20,5 +20,5 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
-print(deque_time < list_time)
+print(deque_time * 20 < list_time)  # Not close
 #: True

@@ -522,7 +522,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter |
+| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter (`bytes` and `complex` are not used elsewhere in this book) |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |

@@ -1,8 +1,9 @@
 # Tour
 
 This chapter and the several that follow give a programmer's tour of Python:
-syntax and the scalar types here, then containers, control flow, functions,
-modules, classes, and static typing.
+syntax and the built-in numbers, strings, and `None` here, then containers,
+control flow, functions, modules, classes, static typing, class attributes,
+and object cleanup.
 It assumes you have programming experience.
 You can find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
@@ -44,13 +45,9 @@ print(val)
 
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
-In this book, the first line of an example is the name of the file containing that example.
-That file lives in the chapter's `Examples` subdirectory,
-so the above example is `Examples/02_Tour/if.py`.
+The filename first line and the `#:` output markers are explained in [The Examples](01_Introduction.md#the-examples).
 
-The `#:` comments are particular to this book.
-They show the console output for the example.
-The book tooling validates that this output is correct.
+## Indentation and Blocks
 
 A C/C++ `if` requires parentheses around the conditional.
 Parentheses are not necessary in Python,
@@ -146,7 +143,7 @@ Integers have unlimited precision, so they never overflow.
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
 `/` always produces a `float`, and `//` is floor division
-(divide, then round down to the nearest integer).
+(divide, then round down to a whole number; the result's type follows the operands, so `7.0 // 2` is `3.0`).
 Floor division rounds toward negative infinity, not toward zero,
 so `-7 // 2` is `-4` where C and Java give `-3`.
 The remainder follows from that: `-7 % 2` is `1` in Python and `-1` in C.
@@ -176,7 +173,18 @@ print(total)
 scores = [90, 0, 71, 0, 55]
 print(sum(s > 60 for s in scores))  # True counts as 1
 #: 2
+items = [1, 2]
+alias = items
+items += [3]  # In place, so alias sees it
+print(alias)
+#: [1, 2, 3]
 ```
+
+Augmented assignment on a mutable object changes it in place,
+so every other name for it sees the change.
+`items = items + [3]` would instead build a new list and leave `alias` alone.
+For an `int`, both forms rebind,
+which is why `total += 5` above looks like augmented assignment in any other language.
 
 `round()` breaks a tie to the nearest even value,
 so `round(0.5)` is `0` and `round(1.5)` is `2`,
@@ -210,8 +218,8 @@ print(bin(~0b1100))  # NOT, inverts every bit
 #: -0b1101
 print(bin(1 << 4))  # Left shift, same as 1 * 2 ** 4
 #: 0b10000
-print(bin(64 >> 2))  # Right shift, same as 64 // 2 ** 2
-#: 0b10000
+print(bin(0b110000 >> 2))  # Right shift, same as 48 // 2 ** 2
+#: 0b1100
 
 flags = 0
 flags |= 0b0010  # Set bits with the augmented form
@@ -332,6 +340,34 @@ Python takes backslashes literally, so you don't need to double them.
 A raw string still cannot end with a backslash,
 because the backslash escapes the closing quote even here.
 
+### Common String Operations
+
+Strings are immutable sequences with a large set of methods.
+You can also use [slicing](03_Containers.md#lists)
+to select portions and `in` to test membership:
+
+```python
+# string_methods.py
+
+s = "  Hello, World  "
+print(s.strip())
+#: Hello, World
+print(s.strip().lower())
+#: hello, world
+print("World" in s)
+#: True
+print("a,b,c".split(","))
+#: ['a', 'b', 'c']
+print("-".join(["2024", "06", "15"]))
+#: 2024-06-15
+print("ababab".replace("a", "X"))
+#: XbXbXb
+print(s.strip()[0:5])
+#: Hello
+```
+
+String methods return new strings rather than changing the original.
+
 ### f-Strings
 
 Modern Python uses *f-strings*.
@@ -352,9 +388,12 @@ print(f"{name!r} has {len(name)} letters")
 total = 7
 print(f"{total = }")  # Useful for debugging
 #: total = 7
+print(f"|{name:>10}|{score:<8.1f}|")
+#: |     Alice|91.5    |
 ```
 
 The format spec after a colon controls width, precision, and alignment.
+`>` right-aligns and `<` left-aligns within the given width.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
 
@@ -370,7 +409,14 @@ An f-string produces a finished `str`,
 and the decision about how each value becomes text is made before anything else sees it.
 A `t`-string produces a `Template` instead:
 the literal pieces and the interpolated values, kept apart,
-for a consumer to assemble:
+for a consumer to assemble.
+
+The reason to care is safety.
+A consumer that receives the parts separately knows which text came from the program and which came from a value,
+so it can quote, escape,
+or reject the values before they become part of the result.
+
+Here is what the parts look like:
 
 ```python
 # tstrings.py
@@ -406,41 +452,9 @@ so the leading `''` in `message.strings` never reaches the loop.
 A consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases only the literal text, leaving the values alone,
 which no amount of work on a finished f-string could do reliably.
-
-The reason to care is safety rather than shouting.
-A consumer that receives the parts separately knows which text came from the program and which came from a value,
-so it can quote, escape,
-or reject the values before they become part of the result.
+Uppercasing is only a demonstration;
 [Composite and Interpreter](34_Composite_and_Interpreter.md#a-template-is-a-tree)
-builds a query that way.
-
-### Common String Operations
-
-Strings are immutable sequences with a large set of methods.
-You can also use [slicing](03_Containers.md#lists)
-to select portions and `in` to test membership:
-
-```python
-# string_methods.py
-
-s = "  Hello, World  "
-print(s.strip())
-#: Hello, World
-print(s.strip().lower())
-#: hello, world
-print("World" in s)
-#: True
-print("a,b,c".split(","))
-#: ['a', 'b', 'c']
-print("-".join(["2024", "06", "15"]))
-#: 2024-06-15
-print("ababab".replace("a", "X"))
-#: XbXbXb
-print(s.strip()[0:5])
-#: Hello
-```
-
-String methods return new strings rather than changing the original.
+builds a query from the parts that way.
 
 ## Naming Conventions
 
@@ -489,3 +503,7 @@ Tools such as ruff can apply these to your code automatically
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
     and which of the three a linter would object to.
+5.  In `tstrings.py`, write a second consumer, `quoted(template)`,
+    that wraps every interpolated value in single quotes and leaves the literal text alone,
+    then print `quoted(message)`.
+    Explain why an f-string cannot be post-processed the same way.

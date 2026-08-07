@@ -12,3 +12,8 @@ print(dq.pop())  # Remove from the right
 #: 4
 print(dq)
 #: deque([1, 2, 3])
+window = deque(maxlen=3)  # A bounded sliding window
+for i in range(5):
+    window.append(i)
+print(window)
+#: deque([2, 3, 4], maxlen=3)

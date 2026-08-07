@@ -1,7 +1,9 @@
 # Containers
 
-In languages like C++ and Java, containers are add-on libraries.
-Python builds them into the core of the language.
+In C++ and Java a container is a library class you name and construct.
+Python builds its containers into the grammar: `[1, 2]`, `{"a": 1}`,
+and `{1, 2}` are literals, and `in`, `len()`,
+and slicing work on them without importing anything.
 Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
@@ -52,17 +54,30 @@ print(xs[::2])  # Every second item
 #: [10, 30, 50]
 print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
-xs.append(60)
-print(xs)
-#: [10, 20, 30, 40, 50, 60]
-xs.insert(3, 5)
-print(xs)
-#: [10, 20, 30, 5, 40, 50, 60]
-print(len(xs), 5 in xs)
-#: 7 True
 ```
 
 Slicing works on any sequence, including strings and tuples.
+
+Lists grow, shrink, and answer questions about themselves:
+
+```python
+# list_ops.py
+
+xs = [10, 20, 30]
+xs.append(40)  # Add one item at the end
+xs.extend([50, 60])  # Add every item of an iterable
+xs.insert(1, 15)  # Insert before index 1
+print(xs, len(xs))
+#: [10, 15, 20, 30, 40, 50, 60] 7
+xs.remove(15)  # Remove the first item equal to 15
+del xs[0]  # Remove by index
+print(xs, 30 in xs)
+#: [20, 30, 40, 50, 60] True
+```
+
+`append()` adds its argument as a single element,
+so `xs.append([1, 2])` puts a `list` inside the `list`.
+`extend()` adds each item of its argument instead.
 
 `sorted()` builds a new sorted list from any iterable.
 `list.sort()` reorders a list in place and returns `None`:
@@ -111,6 +126,37 @@ A `list` of mixed types usually means each element needs different handling,
 which is often better expressed with a `tuple`,
 a [data class](12_Data_Classes_as_Types.md#data-classes), or distinct lists,
 each holding a single type.
+
+Two ways of building a `list` produce surprises.
+`*` repeats a reference rather than copying what it points at,
+so a grid built that way has one row under three names:
+
+```python
+# list_traps.py
+
+grid = [[0]] * 3  # Three names for one inner list
+grid[0][0] = 1
+print(grid)
+#: [[1], [1], [1]]
+grid = [[0] for _ in range(3)]  # Three separate lists
+grid[0][0] = 1
+print(grid)
+#: [[1], [0], [0]]
+```
+
+This is [Variables and References](02_Tour.md#variables-and-references) again:
+`*` binds the same object into every slot, and assignment never copies.
+
+Removing items from a `list` while iterating over it has the same flavor.
+The loop advances an index as the list shrinks under it,
+so it skips the element after every one you remove,
+with no exception to tell you.
+Build a new list instead, or iterate over a copy with `for x in xs[:]`.
+
+A loop with `append()` is not the usual way to build a list from another one.
+[Control Flow](04_Control_Flow.md#comprehensions) introduces the comprehension,
+which does it in a single expression, and [Comprehensions](16_Comprehensions.md)
+covers the dict and set forms.
 
 ## Tuples and Unpacking
 
@@ -242,8 +288,30 @@ so `for name, age in ages` is a common slip:
 it iterates the keys and tries to unpack each one.
 
 A `dict` iterates in insertion order, which the language guarantees.
-A `set` makes no such guarantee: the order it prints is an artifact of hashing,
-so never write code, or a test, that depends on it.
+
+Entries come out as easily as they go in, and two dictionaries combine:
+
+```python
+# dict_ops.py
+
+a = {"x": 1, "y": 2}
+b = {"y": 20, "z": 3}
+print(a | b)  # Merge; the right side wins a collision
+#: {'x': 1, 'y': 20, 'z': 3}
+print(a.pop("x"), a)  # Remove and return
+#: 1 {'y': 2}
+del b["z"]
+print(b)
+#: {'y': 20}
+print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
+#: {'a': 1, 'b': 2, 'c': 3}
+```
+
+`|` builds a merged `dict` and `|=` updates in place,
+the same job `update()` does.
+The next section uses `|` for set union, where the operands are symmetric.
+They are not symmetric here: on a key both dictionaries hold,
+the right operand's value wins, which is why `"y"` comes out as `20`.
 
 ## Sets
 
@@ -278,9 +346,10 @@ print(2 in a)
 ```
 
 The `{}` literal was taken by `dict` first, so an empty set is `set()`.
-The order these sets print comes from CPython's hashing and is not a guarantee.
+The order these sets print comes from CPython's hashing, not from any guarantee,
+so never write code, or a test, that depends on it.
 
-Every operator above has a named method.
+Every set-algebra operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
 not only a set, and they can take several arguments at once.
 `isdisjoint()` is also available, with no operator form:
@@ -437,6 +506,11 @@ print(dq.pop())  # Remove from the right
 #: 4
 print(dq)
 #: deque([1, 2, 3])
+window = deque(maxlen=3)  # A bounded sliding window
+for i in range(5):
+    window.append(i)
+print(window)
+#: deque([2, 3, 4], maxlen=3)
 ```
 
 A `list` has an operation for each of those four:
@@ -485,11 +559,16 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
-print(deque_time < list_time)
+print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
 
-Use a `deque` whenever you need a queue.
+Use a `deque` for a single-threaded queue.
+A `deque(maxlen=n)` additionally caps its length,
+discarding from the far end when a new item overflows it,
+which is the sliding window a `list` has no equivalent for.
+For a queue shared between threads, use `queue.Queue`
+(see [Concurrency](19_Concurrency.md)), and for a priority queue, `heapq`.
 
 ### `namedtuple`
 
@@ -560,6 +639,9 @@ settings = {"debug": False, "level": 3}
 config = MappingProxyType(settings)
 print(config["level"])
 #: 3
+settings["level"] = 4  # The view is live, not a copy
+print(config["level"])
+#: 4
 
 # Mutating any of them is an error:
 try:
@@ -591,6 +673,9 @@ print(prefs["zoom"])
 # Equal contents compare equal; entry order is ignored:
 print(prefs == frozendict(zoom=125, theme="dark"))
 #: True
+cache = {prefs: "rendered"}  # Usable as a dict key
+print(cache[frozendict(zoom=125, theme="dark")])
+#: rendered
 try:
     prefs["zoom"] = 150  # type: ignore
 except TypeError as e:
@@ -611,7 +696,8 @@ It is safe to use as a default argument,
 unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
-so changes to that underlying `dict` still show through.
+so changes to that underlying `dict` still show through,
+as `immutability.py` showed when writing to `settings` changed what `config` reports.
 
 Immutability is also shallow.
 An immutable container fixes which objects it holds,
@@ -643,12 +729,21 @@ Immutability pays off when it goes all the way down.
 [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 shows the same leak inside a frozen data class.
 
+Choosing a container is mostly one question: what do you do with it most?
+Ordered items you walk through are a `list`;
+a fixed record whose positions mean different things is a `tuple` or a `namedtuple`;
+lookup by key is a `dict`; uniqueness and membership are a `set`.
+Go past those four only when a measurement or a specific job says to,
+and freeze whichever you pick as soon as it stops changing.
+
 ## Exercises
 
 1.  In `deque_timing.py`,
     change `n` from `20_000` to `2_000` and run the timing again.
     Does `deque_time < list_time` still hold?
     Change `n` to `200_000` and try again.
+    The list version takes several seconds at that size,
+    and much longer on a slow machine; that is the point.
     Explain what changes about the comparison as `n` grows.
 2.  In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
     change the loop to count occurrences of each `kind` instead of collecting names,
@@ -666,3 +761,11 @@ shows the same leak inside a frozen data class.
     Which parts of `Counter` did you have to write yourself?
 7.  Rewrite `heterogeneous.py` with a `namedtuple`.
     Show that the unpacking line still works unchanged.
+8.  Given `pairs = [("a", 1), ("b", 2), ("c", 3)]`, build a `dict` from it,
+    then print its keys, its values,
+    and the result of merging it with `{"c": 30, "d": 4}`.
+    Which value ends up under `"c"`, and why?
+9.  Using one unpacking assignment each, and no indexing,
+    pull the first element, the last element,
+    and everything in between out of `row = [1, 2, 3, 4, 5]`.
+    Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.

@@ -167,3 +167,78 @@ add is the second line, where `person.height` says what `person[2]`
 meant. Nothing is given up, which is why a heterogeneous tuple that
 outlives one function is usually better as a `namedtuple` or a data
 class.
+
+## 8. Building and merging a `dict`
+
+```python
+# exercise_8.py
+
+pairs = [("a", 1), ("b", 2), ("c", 3)]
+counts = dict(pairs)
+print(counts)
+#: {'a': 1, 'b': 2, 'c': 3}
+print(list(counts.keys()), list(counts.values()))
+#: ['a', 'b', 'c'] [1, 2, 3]
+print(counts | {"c": 30, "d": 4})
+#: {'a': 1, 'b': 2, 'c': 30, 'd': 4}
+print(counts)  # The merge built a new dict
+#: {'a': 1, 'b': 2, 'c': 3}
+```
+
+`dict()` accepts any iterable of two-item pairs, so a list of tuples
+becomes a dictionary with no loop. `dict(zip(names, values))` is the
+same constructor fed from two parallel sequences.
+
+`30` ends up under `"c"`, because `|` resolves a collision in favor of
+the right operand. The rule follows from what a merge has to be: the
+result is one value per key, and the two dictionaries disagree about
+`"c"`, so one of them has to lose. Reading `a | b` as "start from `a`,
+then apply `b`" gives the right intuition, and it matches `a.update(b)`,
+which has always worked that way.
+
+That makes `|` on dictionaries asymmetric, unlike `|` on sets, where
+`a | b` and `b | a` are the same set. The operator is spelled the same
+because both mean "combine," but only one of them commutes. `|=`
+updates the left dictionary in place instead of building a new one,
+which the last line above confirms is what `|` did not do.
+
+## 9. Unpacking without indexing
+
+```python
+# exercise_9.py
+
+row = [1, 2, 3, 4, 5]
+first, *rest = row
+print(first, rest)
+#: 1 [2, 3, 4, 5]
+*most, last = row
+print(most, last)
+#: [1, 2, 3, 4] 5
+first, *middle, last = row
+print(first, middle, last)
+#: 1 [2, 3, 4] 5
+try:
+    a, b = row
+except ValueError as e:
+    print(e)
+#: too many values to unpack (expected 2, got 5)
+```
+
+A starred target absorbs however many items are left over, so one
+assignment reaches any of the three positions without an index. The
+star may appear anywhere in the target list, which is what makes the
+third line work: `first` and `last` each take one item and `middle`
+takes the rest, however many that is.
+
+`a, b = row` fails because an unstarred target list states an exact
+count. Five values cannot fill two names, and Python raises a
+`ValueError` rather than dropping the extras, since silently discarding
+data is never the intent. The same error appears in the other
+direction, as `too few values to unpack`, when the list is shorter than
+the target.
+
+`a, *b = row` states a minimum instead: at least one item for `a`, and
+the rest, possibly none, for `b`. That is why it accepts a five-item
+list, a one-item list, and everything between, and fails only on an
+empty one. The star turns a fixed-shape assertion into a flexible one,
+which is the same reason `*args` works in a function signature.

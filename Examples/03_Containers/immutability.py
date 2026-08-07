@@ -18,6 +18,9 @@ settings = {"debug": False, "level": 3}
 config = MappingProxyType(settings)
 print(config["level"])
 #: 3
+settings["level"] = 4  # The view is live, not a copy
+print(config["level"])
+#: 4
 
 # Mutating any of them is an error:
 try:

@@ -11,3 +11,5 @@ print(f"{name!r} has {len(name)} letters")
 total = 7
 print(f"{total = }")  # Useful for debugging
 #: total = 7
+print(f"|{name:>10}|{score:<8.1f}|")
+#: |     Alice|91.5    |

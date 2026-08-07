@@ -10,8 +10,8 @@ print(bin(~0b1100))  # NOT, inverts every bit
 #: -0b1101
 print(bin(1 << 4))  # Left shift, same as 1 * 2 ** 4
 #: 0b10000
-print(bin(64 >> 2))  # Right shift, same as 64 // 2 ** 2
-#: 0b10000
+print(bin(0b110000 >> 2))  # Right shift, same as 48 // 2 ** 2
+#: 0b1100
 
 flags = 0
 flags |= 0b0010  # Set bits with the augmented form
