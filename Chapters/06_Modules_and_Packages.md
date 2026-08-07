@@ -38,7 +38,7 @@ connect your class to the language's operators and built-in functions
 The reason for the `if` is that you can also use any file as a library module within another program.
 In that case, you only want its definitions,
 but you don't want the code at the bottom of the file to run.
-This particular `if` statement is only true when you are running this file directly.
+This particular `if` condition is only true when you are running this file directly.
 That is, `__name__` is `"__main__"` when you use the command line:
 
 ```
@@ -121,7 +121,8 @@ The two directives on the `print(y)` line silence the type checker and the linte
 neither of which can see a name that appears only as a dict key.
 That is the cost of creating names this way, and a reason to keep it rare.
 Assigning into `globals()` matters whenever code needs to define a module-level name that isn't known until runtime,
-such as a class built dynamically and registered under a computed name.
+such as a class built dynamically and registered under a computed name
+(see [Metaprogramming](17_Metaprogramming.md)).
 
 ## Packages
 
@@ -312,7 +313,7 @@ Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
 Its first entry is the directory of the script you ran,
 which is why `use_module.py` could `import module` with no setup at all;
-`PYTHONPATH` prepends its entries after that,
+the entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
@@ -399,10 +400,22 @@ the error surfaces at that first use rather than at the import line.
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
-To make every import lazy without editing source,
-run with `-X lazy_imports=all` or set `PYTHON_LAZY_IMPORTS=all`.
-Both require a value: `all` defers every module-level import, and `normal`,
-the default, defers only the imports you marked `lazy`.
+To change the setting for a whole run without editing source,
+run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
+Both require one of three values.
+`normal`, the default, defers only the imports you marked `lazy`.
+`all` defers every module-level import.
+`none` defers nothing, including the imports you marked `lazy`,
+which is the quickest way to find out whether laziness is behind a bug.
+
+Don't make an import lazy when you import the module for what its body *does* rather than for a name it defines.
+A module that registers a plugin, installs a codec,
+or fills a table does that work as it loads,
+and a lazily imported name nobody touches never loads.
+The failure is silent: no error, just a table with a row missing.
+That is also why `all` is an experiment to run rather than a setting to leave on,
+since it defers ordinary `import` statements too,
+including the ones whose only purpose is to run the module.
 
 ## Exercises
 

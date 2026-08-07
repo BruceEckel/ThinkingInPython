@@ -6,8 +6,9 @@ A dependency is a `Need` that `supply()` answers.
 A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
 A type checker verifies that every caller either absorbs an Effect or declares it.
 
-Every Ability so far has been a `Need`.
-This chapter opens by writing a `Need` from scratch,
+Every Ability so far came from the library: the `Need` that `supply()` answers,
+and the `Async` that `run()` awaits.
+This chapter opens by writing an Ability from scratch,
 which shows it is an ordinary class rather than a special form.
 The rest of the chapter applies the machinery:
 
@@ -116,10 +117,13 @@ before any `yield` is examined: `Console` is not assignable to the bound.
 
 `handle()` reads the annotation on its argument to decide which Ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
+Leave the annotation off and `handle()` raises a `ValueError` at the point of decoration,
+since there is nothing to match a request against.
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
 Naming the two stages also matters to the checker,
-for a reason the next section gives.
+for a reason [The checker can give up quietly](#the-checker-can-give-up-quietly)
+gives.
 
 Now compare this listing to `ask_tell.py` again.
 The by-hand version put two objects in every signature.
@@ -138,7 +142,7 @@ as `interview()` yielded `"name"`, and `send(Console())` resumed the body,
 which printed the greeting and finished.
 Every tool in the library packages those two calls.
 `handle()` is `drive()` with a type lookup in place of the dictionary,
-`run()` is the loop at the bottom,
+`run()` is that loop sitting at the bottom of the stack of handlers,
 and `supply()` is `handle()` prepackaged for `Need`:
 a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 
@@ -202,7 +206,7 @@ as a statement of its own, or inside parentheses.
 An `if` condition is none of those,
 so `if yield from flip():` is a syntax error.
 
-Two handlers answer the same function.
+Two handlers feed the same function.
 `scripted` walks an iterator over a fixed sequence,
 so the five tosses are decided before the program runs and the count is `3`.
 `coin` calls `random.random()`, so ten thousand tosses come out near half heads.
@@ -214,6 +218,17 @@ The scripted handler holds state.
 which one supplied instance cannot do.
 Every scripted test double has this shape: a queue handing out canned responses,
 a network stub that fails twice and then succeeds, or the clock below.
+
+That state brings one trap, and it is silent.
+`next(script)` raises `StopIteration` once the sequence runs out,
+and `StopIteration` is how a driver learns that an Effect has finished,
+so `handle()` reads the exhausted script as the end of the program.
+Ask `count_heads()` for six tosses from this five-value script and `run()` produces `None` instead of a count,
+with no exception, the same silent `None` that [Why `retry()` Decorates the Function](#why-retry-decorates-the-function)
+shows for a spent Effect.
+Every other exception a handler raises travels out of `run()` normally;
+this one collides with the protocol.
+Indexing a list rather than walking an iterator turns the mistake into an `IndexError` you can see.
 
 ### A Clock
 
@@ -401,9 +416,10 @@ What an EMS adds is that the declaration cannot be skipped by accident.
 
 ## Switching Implementations Mid-Run
 
-Both handlers in the last section answered with a value.
-A handler can also answer with an object,
-and it can choose a different object at each request.
+Every handler so far answered with data: a name, a `bool`, a `datetime`.
+A handler can also answer with an implementation,
+an object whose methods the program then calls,
+and it can choose a different one at each request.
 That is what `supply()` cannot do,
 because it binds one instance for the whole run.
 When the implementation a program depends on has to change while the program is running,
@@ -481,6 +497,12 @@ def draw(source: Source, hour: int) -> None:
 `Outlet` is an Ability whose handler returns a `Source`,
 and it carries the hour so the handler can consult the conditions at that moment.
 `Ask` carried a prompt for the same reason.
+`Source` carries no `@runtime_checkable`,
+because nothing calls `isinstance()` against it.
+That decorator is needed where `supply()` matches an instance to a requested class
+([Supplying an Interface](46_Stateless.md#supplying-an-interface)),
+and here `handle()` matches on the Ability's own type, `Outlet`,
+while the `Source` that comes back is only a return value.
 `draw()` is the boundary function:
 it asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
@@ -700,7 +722,8 @@ The handlers own the cell.
 chained through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
 After the run, the cell shows what the program did to it:
 two purchases went through, and 10 remained.
-A test does the same, supplying a fresh `Cell` and asserting on what remains,
+A test builds its own pair from a fresh `Cell`,
+the way `at()` built a clock from a moment, and asserts on what remains,
 with no global to reset between tests.
 
 For a number one function owns, a local variable is the right tool,
@@ -783,7 +806,7 @@ def research() -> Effect[
 
 The `research()` signature tells you the program's entire surface.
 It reads two things from outside and can fail three ways.
-The three `@throws` functions are the pattern for reaching ordinary code:
+The three `@throws` functions are the pattern for bringing ordinary code in:
 `fetch()` and `look_up()` call methods that know nothing about Effects,
 and the decorator lifts what they raise into the channel.
 `topic_of()` needs nothing and touches nothing, so it declares no Ability.
@@ -1119,15 +1142,17 @@ and this listing names none of them at the catch.
 Two failures from two different sources come back as values through one undecorated call.
 
 `outcome()` supplies first and catches second, the reverse of `scenarios.py`,
-and the order is for the checker rather than the runtime.
-`catch()` is a stack of overloads where `catch_all()` is one signature,
-and under `ty` 0.0.65 that one signature cannot split a channel that still holds abilities:
-applied to `research()` directly, the call is rejected.
-Applied after `supply()` has emptied the Ability half, the inference comes back,
-and the named `bound` is where you read it.
-The runtime does not care about the order,
-since a handler passes error values upward untouched,
-so the failures travel through `supply()`'s driver to the catch either way.
+and neither the runtime nor the checker minds.
+A handler passes error values upward untouched,
+so the failures travel through `supply()`'s driver to the catch either way,
+and under `ty` 0.0.65 both orders infer the same result type.
+What both orders need is the intermediate name.
+Written as one nested expression the inference collapses:
+`supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
+and `catch_all(supply(feed, book)(research))` fails with a `no-matching-overload` and infers `Unknown`.
+That is why `bound` has a name,
+and it is the gap [The checker can give up quietly](#the-checker-can-give-up-quietly)
+takes apart.
 
 Choosing between the two decides what a new failure does.
 When `research()` gains a fourth error,
@@ -1223,7 +1248,7 @@ If you declare `toast()` with `Need[Toaster]` alone,
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
-  --> bakery.py:31:16
+  --> bakery.py:34:23
    |
 31 |   def toast() -> Depend[
    |  ________________-
@@ -1547,10 +1572,10 @@ print(type(outcome).__name__)
 #: RetryError
 ```
 
+The first run is the baseline: one attempt, no retry, and it fails.
 `three` is built from the only two schedule combinators the library has:
 `spaced()` yields a fixed interval forever,
 and `recurs()` stops it after `n` yields.
-One attempt fails.
 Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
 `save_user()` was not edited for any of this.
@@ -1739,6 +1764,11 @@ print(f"five 50ms tasks under 150ms: {elapsed < 0.15}")
 ```
 
 Five tasks that each sleep 50 milliseconds finish in about the time of one.
+That comes from the two loops.
+`squares()` forks every task before it waits for any of them,
+so the five sleeps overlap.
+Fork and wait inside a single loop and each `wait()` blocks on the task the same iteration just created,
+which runs the sleeps one after another and takes about five times as long.
 The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
 Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
@@ -1760,8 +1790,8 @@ Notice where the pool's lifetime is managed.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
 Stateless has no scoping mechanism of its own,
 so a resource either lives in a `with` block outside the Effect,
-as the pool does here, or the Ability method owns it:
-the library's own `Files` Ability opens and closes a file inside a single `read_file()` call.
+as the pool does here, or the supplied object owns it:
+the library's own `Files` class opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Context_Managers.md#combining-context-managers),
@@ -1771,8 +1801,11 @@ so this gap is narrower than it first appears.
 
 ## The Toolkit
 
-Here is every tool from both chapters.
-Each one builds a description, rewrites a description's type, or executes one.
+Here is every tool from both chapters that acts on a description:
+each one builds a description, rewrites a description's type, or executes one.
+Three sit outside the tables.
+`as_type()` relabels a value for the checker and does nothing at runtime,
+while `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 
 Four build a description:
 

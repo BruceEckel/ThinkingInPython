@@ -1,9 +1,10 @@
 # functools_partialmethod.py
+from dataclasses import dataclass
 from functools import partialmethod
 
+@dataclass
 class Text:
-    def __init__(self, value: str) -> None:
-        self.value = value
+    value: str
 
     def pad(self, width: int, fill: str = " ") -> str:
         return self.value.rjust(width, fill)

@@ -7,3 +7,5 @@ def fib(n: int) -> int:
 
 print(fib(30))
 #: 832040
+print(fib.cache_info())
+#: CacheInfo(hits=28, misses=31, maxsize=None, currsize=31)

@@ -42,8 +42,8 @@ except StopIteration:
 A `for` loop makes one `iter()` call,
 then calls `next()` until `StopIteration` occurs.
 A loop absorbs `StopIteration` as the normal end rather than an error.
-The first `is` shows that calling `iter()` creates a new iterator.
-The second `is` shows that an iterator returns itself.
+The first `is` shows that calling `iter()` on a list creates a new iterator each time.
+The second `is` shows that calling `iter()` on an iterator returns that iterator.
 
 One legacy path bypasses `__iter__()`.
 A class that defines only `__getitem__()` taking integers from zero is still iterable:
@@ -148,6 +148,8 @@ print(list(sq))  # Exhausted: empty, and no error
 
 Calling `squares(6)` runs none of its body.
 The `print` at the top fires only when the first value is demanded.
+It fires once, not on every value.
+Each later `next()` resumes the body just after the `yield` instead of restarting it.
 Any validation at the top of a generator inherits this delay:
 a `raise` meant to reject a bad argument fires at first use,
 far from the call that caused the problem.
@@ -225,6 +227,7 @@ which looks like a third option but is rarely cheaper:
 import tracemalloc
 from collections.abc import Iterator
 from itertools import tee
+from typing import Final
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
@@ -233,7 +236,7 @@ a, b = tee(squares(5))  # Two independent readers, one source
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
 
-N = 100_000
+N: Final[int] = 100_000
 first, second = tee(squares(N))
 tracemalloc.start()
 for _ in first:  # Drain one branch; second has not started
@@ -404,6 +407,9 @@ print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
 Nothing runs until `list()` pulls the values.
 `islice()` and `takewhile()` decide when to stop.
 The infinite `count(1)` never runs away.
+`islice()` is also how you slice an iterator.
+A generator defines no `__getitem__()`,
+so the list habit `odd_squares[:5]` raises `TypeError` instead.
 
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
@@ -462,8 +468,8 @@ yet `list()` keeps pulling in the hope of another match,
 and trips the same wire.
 The last two stop on their own and never reach the tripwire.
 
-Failing at 1,000 values is a stand-in for a real program's failure,
-which stops responding or dies when it exhausts memory.
+Failing at 1,000 values stands in for how a real program fails:
+it stops responding, or it dies when it exhausts memory.
 No tool warns you first.
 `ty` accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
@@ -536,6 +542,12 @@ Use the class when the wrapper needs its own state or extra methods.
 Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because they all use the same protocol.
+Their inputs differ, though.
+`typed()` takes an `Iterable[object]`, so a list is fine.
+`TypedIterator` calls `next()` on what it stores,
+so it needs an `Iterator[object]`: write `TypedIterator(iter(items), int)`,
+not `TypedIterator(items, int)`.
+The checker rejects the second form.
 Both take `expected: type[T]`, so the checker carries the element type through.
 This way, `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
@@ -566,7 +578,7 @@ Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
 This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
 
-Writing the four GoF Iterator methods in Python shows what the other two were doing.
+Writing the four GoF Iterator methods in Python shows what `first()` and `current_item()` were doing.
 Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
@@ -630,7 +642,7 @@ print(stream.seen)
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
 rather than a base class.
-The generator was spent by the end of the first one,
+The generator was spent by the end of the first pass,
 yet `first()` rewinds and `traverse()` produces the same three values.
 
 `seen` is how.
@@ -746,8 +758,9 @@ The protocol is free, and quiet.
     Write `OverSequence` over a `Sequence[T]`,
     confirm `traverse()` drives it with no changes to `traverse()`,
     and explain why it needs no `seen` list.
-    Then build an `OverStream` over `itertools.count(1)`, traverse 50,000 items,
-    and report `len(stream.seen)`.
+    Then build an `OverStream` over `itertools.count(1)`.
+    `traverse()` never returns on an endless source,
+    so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
     What has `first()` cost you on an endless source?
 8.  Write `peek(it)` that reports an iterator's next value without consuming it.
     You cannot, so write a `Peekable` wrapper that can,

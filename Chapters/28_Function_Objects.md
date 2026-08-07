@@ -3,15 +3,23 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of several patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
+The three differ in what they defer.
+*Command* defers *what* to do, so the action can be stored and run later.
+*Strategy* defers *how* to do a job the caller already has.
+*Chain of Responsibility* defers *which* handler takes the job,
+trying candidates until one accepts.
 
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
-These three patterns are largely unnecessary in Python.
-Where *GoF Design Patterns* builds a hierarchy, Python uses a function.
+That makes all three patterns largely unnecessary.
+Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
+the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
 *Command* and *Strategy* each appear twice below, first as a function,
 then as the classic class-based form for contrast.
 *Chain of Responsibility* needs only the function form:
 its class version is the same idea with the list written as a linked chain.
+A closing section keys the chain's handlers by event type instead of by position,
+which turns the list into an *event bus*.
 
 ## Command: Choosing the Operation at Runtime
 
@@ -201,7 +209,7 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
         mid = (a + b) / 2
         if abs(f(mid)) < TOLERANCE:
             return mid
-        if f(a) * f(mid) < 0:
+        if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid
@@ -317,6 +325,10 @@ for algorithm in (Bisection(), Newton(), Secant()):
 #: 1.414214
 ```
 
+Five classes produce the same three lines that one function argument produced.
+The Context earns its keep when something has to hold the current algorithm between calls,
+which a parameter cannot do.
+
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
@@ -396,6 +408,8 @@ r1 = solve(f, 0.0, 2.0, chain)
 print(f"{r1:.6f}" if r1 is not None else "no root")
 #: 1.414214
 # [1.0, 1.3] does not bracket it; bisection fails, secant finds it:
+print(bisection(f, 1.0, 1.3))
+#: None
 r2 = solve(f, 1.0, 1.3, chain)
 print(f"{r2:.6f}" if r2 is not None else "no root")
 #: 1.414214
@@ -455,7 +469,8 @@ The events are values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.
 The handlers are ordinary functions,
-so there is no `Handler` interface to implement and no registration ceremony:
+so there is no base class to inherit from and no registration ceremony.
+`Handler` below names their signature, not an interface:
 
 ```python
 # event_bus.py
@@ -515,7 +530,7 @@ bus.publish(Closed("inactivity"))  # No handler: nothing happens
 ```
 
 `subscribe` is generic on the event type `E`, which appears in both parameters,
-so the checker must find one `E` that satisfies the class and the handler together.
+so the checker must find one `E` that satisfies the event type and the handler together.
 No such `E` exists for `subscribe(Deposit, on_withdraw)` and it is a type error.
 The safety check happens once, at registration.
 The stored `defaultdict`, though,

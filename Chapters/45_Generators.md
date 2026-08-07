@@ -17,7 +17,7 @@ This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
 which composes generators without any of them learning who drives.
 The next chapter builds an Effect system on all three,
-but nothing here is specific to that library.
+but nothing here depends on it.
 
 ## Annotating a Generator
 
@@ -38,7 +38,7 @@ This names the three things a generator exchanges with its caller:
   delivered as `StopIteration.value`.
 
 The default value for the last two type parameters is `None`.
-An `Iterator` is the simplest form of a `Generator`:
+A generator that only produces values can use either form:
 
 ```python
 # generator_defaults.py
@@ -58,7 +58,9 @@ print(list(countdown(6)), list(squares(6)))
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` says the same thing and reads better for a one-way generator.
+`Iterator[int]` describes the same one-way generator and reads better,
+at the cost of saying nothing about the other two channels:
+a checker rejects `send()` on anything annotated `Iterator`.
 The long form is necessary when the other two channels carry something,
 as they do in this chapter.
 
@@ -116,11 +118,16 @@ The last `send()` finds no further `yield`,
 so the generator returns its `Result`.
 A returning generator also raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
+A `for` loop never sees that value,
+because `for` catches the `StopIteration` and discards it along with its `value`.
+Getting at the `ReturnType` means catching the exception yourself,
+as this listing does.
 
-The first call made on a new generator object must be `next()`.
+The first call on a new generator object cannot carry a value.
 A newly created generator pauses before its first `yield`,
 so there is no suspended `yield` expression to receive a sent value.
-If you call `i.send(Answer("Alice"))` at that point, it raises a `TypeError`.
+If you call `i.send(Answer("Alice"))` at that point,
+it raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
@@ -169,8 +176,8 @@ Calling `interview()` returns a generator object but doesn't run anything in the
 `next()` and `send()` do that work, one `yield` at a time.
 
 One generator, one driver.
-That pairing is an assumption, not a guarantee,
-and a generator resumed from two threads at once raises a `ValueError` rather than interleaving.
+Nothing states that pairing, but the runtime protects it:
+a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
 shows the failure and `threading.synchronized_iterator()`,
 which serializes the conversation.
@@ -197,8 +204,8 @@ def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
+        print(f"{request = }, {answers[request] = }")
         try:
-            print(f"{request = }, {answers[request] = }")
             request = conversation.send(answers[request])
         except StopIteration as stop:
             return stop.value
@@ -216,11 +223,25 @@ if __name__ == "__main__":
 ```
 
 The generator is imported unchanged; only the driver is new.
+The first line of output is `interview()`'s product:
+an ordinary `generator` object that still carries the function's name.
+That `__name__` exists on the object at runtime but not in the `Generator` type,
+which is what the `# type: ignore` on that line suppresses.
+
 `drive()` touches all three type parameters:
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
+Only the `send()` call sits inside the `try`.
+Here `StopIteration` means the conversation finished,
+so any other code that could raise it, such as an exhausted answer source,
+belongs outside.
+
+Only two of those three parameters are checked.
+`StopIteration.value` is typed `Any`,
+so a checker accepts `return stop.value` whatever `drive()` declares it returns.
+The `Result` in `drive()`'s signature states the intent; nothing verifies it.
 
 `interview()` does not know where the answers originate.
 It has no dictionary, no `input()` call, and no network connection.
@@ -275,6 +296,8 @@ print(list(top()))
 Each `yield from` runs its target until that generator is exhausted,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The number of contributions is a property of the target.
+The `from` is what makes this delegation:
+`yield one()` would hand the generator object itself to the driver as one value.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -323,7 +346,7 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 ### The Send Channel
 
 The `SendType` is the type of the information a caller sends back into the generator.
-A generator that only receives values needs no `ReturnType`:
+A generator that receives values but produces no final result needs no `ReturnType`:
 
 ```python
 # yield_from_send.py
@@ -358,7 +381,7 @@ except StopIteration:
 `collect()` yields prompts, receives numbers, and returns nothing,
 so its type is `Generator[str, int, None]`.
 An omitted `ReturnType` defaults to `None`,
-so the return signature becomes `Generator[str, int]`.
+so the annotation shortens to `Generator[str, int]`.
 `both()` declares that same type,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
 
@@ -417,11 +440,11 @@ so both channels carry an `Answer`.
 because the sentence it builds from three answers is not an answer to any one question.
 
 The trace shows both directions of travel.
-A request raised two frames down inside `ask()` surfaces at `drive()`,
+A request yielded two frames down inside `ask()` surfaces at `drive()`,
 which knows nothing about where it originated.
 The answer `drive()` sends back arrives inside `ask()`,
 which also knows nothing about where it originated.
-A single loop at the edge of the program interprets Effects raised anywhere inside it.
+A single loop at the edge of the program interprets Effects yielded anywhere inside it.
 `yield from` also returns the inner generator's value,
 which is why `name` and `town` read like ordinary assignments.
 
@@ -524,7 +547,7 @@ That is the question the next chapter puts into the type system.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,
-    leaving `profile = interview()`.
+    leaving `profile: Result = interview()`.
     Run `ty check` and the script, and explain both results.
     Which one told you more,
     and what would the checker have said if `profile` carried no annotation?

@@ -1,12 +1,11 @@
 # radd_dispatch.py
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass(frozen=True)
 class Meters:
     n: float
 
-    def __add__(self, other: object) -> Any:
+    def __add__(self, other: object) -> Meters:
         print(f"__add__({self!r}, {other!r})")
         if isinstance(other, Meters):
             return Meters(self.n + other.n)
@@ -14,7 +13,7 @@ class Meters:
             return Meters(self.n + other)
         return NotImplemented
 
-    def __radd__(self, other: object) -> Any:
+    def __radd__(self, other: object) -> Meters:
         print(f"__radd__({self!r}, {other!r})")
         if isinstance(other, int | float):
             return Meters(other + self.n)

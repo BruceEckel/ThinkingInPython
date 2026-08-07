@@ -184,8 +184,8 @@ Two shapes from different calls share behavior but not a class:
 and `isinstance()` comparisons across calls fail with it.
 `shape_gen()` also has to name the shapes as strings.
 `Shape.__subclasses__()` no longer identifies the two kinds:
-it grows by two entries on every `factory()` call,
-one per class the call defined.
+each call adds the two classes it just defined,
+and those disappear again once the shapes built from them are collected.
 When that matters, the practical compromise is module-level classes with a leading underscore:
 discouraged by convention rather than hidden, but defined once.
 
@@ -234,7 +234,8 @@ Adding a `Triangle` means one new class and one new line in `SHAPES`.
 
 You can go one step further,
 so the factory never needs editing when you add a type,
-by letting each subclass register itself through `__init_subclass__()`:
+by letting each subclass register itself through `__init_subclass__()`
+(see [Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses)):
 
 ```python
 # registry.py
@@ -260,6 +261,8 @@ class Square(Shape):
 def make(kind: str) -> Shape:
     return Shape.registry[kind]()
 
+print(sorted(Shape.registry))
+#: ['Circle', 'Square']
 for kind in ["Circle", "Square", "Circle"]:
     make(kind).draw()
 #: Circle.draw
@@ -267,6 +270,9 @@ for kind in ["Circle", "Square", "Circle"]:
 #: Circle.draw
 ```
 
+Nothing in the listing calls a register function.
+The two `class` statements filled `Shape.registry` on their own,
+which is what the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler),
@@ -281,6 +287,13 @@ In one file that timing is invisible,
 but a subclass defined in another module joins the registry only when that module is imported.
 The classic failure is a plugin that "never registered": the class is fine,
 the registry is fine, and nothing ever imported the module that defines it.
+A [lazy import](06_Modules_and_Packages.md#lazy-imports)
+produces that same failure from an import statement sitting right there in the file.
+The module body, and with it the registration,
+waits for the first use of the imported name,
+and an import written only to trigger registration never uses that name.
+Running with `-X lazy_imports=all` does this to ordinary imports too.
+Import a plugin module eagerly when the import exists for its side effect.
 The registry also keys on `cls.__name__` alone,
 so two classes that share a name, from different modules,
 silently overwrite each other.
@@ -326,9 +339,10 @@ However, *GoF Design Patterns* emphasizes that the reason for the *Factory Metho
 *GoF Design Patterns* provides no example of this,
 instead repeating the example used for the *Abstract Factory*
 (you'll see this in the next section).
-Here is `shape_factory1.py` modified so the factory methods are in a separate class as virtual functions.
-Notice also that the code loads the specific `Shape` classes dynamically,
-on demand:
+Here is `shape_factory1.py` modified so the factory methods live in separate classes,
+called polymorphically.
+Notice also that each kind's factory object is built the first time that kind is asked for,
+rather than up front:
 
 ```python
 # shapefact2/shape_factory2.py
@@ -530,7 +544,7 @@ They fail at call time:
 a concrete factory that forgets `make_obstacle()` constructs without complaint and raises an exception only when the missing method finally runs.
 An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
-which catches the omission as early as possible.
+which at least catches the omission before anything calls the missing method.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -652,7 +666,7 @@ print(goblin.powers)  # The original changed too
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
 The `clone()` method wraps `copy.deepcopy()`.
-The last two lines are the trap, not the recommendation:
+The last three lines are the trap, not the recommendation:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so a change through one object is visible through the other,
 with no error to point at.

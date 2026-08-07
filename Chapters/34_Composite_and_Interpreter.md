@@ -258,7 +258,7 @@ and the split is on purpose.
 Every node shares the operator methods,
 so those live on a base and are inherited.
 No node shares its meaning, so meaning lives in the walkers,
-which need the union to know when they are done.
+which need the union to know they have covered every case.
 `Expr` is the contract:
 annotate `evaluate()` with `Operators` and `assert_never()` stops working,
 because a base class is an open set and any new subclass silently belongs to it.
@@ -292,6 +292,17 @@ Pandas and Polars column arithmetic, and SQLAlchemy filter conditions.
 Overloaded operators build an expression tree,
 and a library interprets that tree later, symbolically, over a whole column,
 or as SQL.
+
+Python's grammar sets the limit of the technique.
+The arithmetic, bitwise, and comparison operators can all be overloaded,
+so an expression written with them builds nodes instead of computing.
+`and`, `or`, and `not` cannot be: Python asks the operand for a truth value,
+then `and` and `or` hand back one of the two objects and `not` hands back a `bool`.
+`x and y` evaluates to `y`, builds nothing, and reports no error.
+An expression language that needs boolean operators borrows `&` and `|` instead,
+which is why a Pandas filter is written `(a > 1) & (b > 2)` with parentheses that look unnecessary.
+They are not: `&` binds tighter than `>`,
+so without them Python parses `1 & b` first.
 
 ## Evaluation Is a Tree Walk
 
@@ -362,6 +373,9 @@ def test_one_tree_many_environments() -> None:
 def test_unbound_variable_raises() -> None:
     with pytest.raises(KeyError):
         evaluate(Var("y"), x=1)
+
+def test_e_is_available_as_a_variable() -> None:
+    assert evaluate(Var("e"), e=5) == 5
 ```
 
 ## New Operations, Same Tree
@@ -465,6 +479,15 @@ every alternative in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
 (see [Alternatives and Capture](13_Pattern_Matching.md#alternatives-and-capture)).
 `(Num(a), Num(b))` captures two constants for folding.
+
+Matching the pair of simplified children, rather than the original node,
+is what lets the rules compose.
+A `case Add(Num(0), other)` at the top of the function would test the tree as the caller wrote it,
+and `(0 * y) + x` would keep its zero:
+the left child is a `Mul` and only becomes a `Num` once something simplifies it.
+Simplifying both children first and matching the results catches the identity the recursion just exposed,
+which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
+
 Because every node is frozen, `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
 the `is` guard in each `case _` hands back the node it was given when neither child simplified to anything different.
@@ -504,6 +527,10 @@ def test_rewriting_reaches_every_level() -> None:
 def test_already_simple_is_unchanged() -> None:
     x = Var("x")
     assert simplify(2 * x + 1) == Add(Mul(Num(2), x), Num(1))
+
+def test_unchanged_subtrees_are_shared() -> None:
+    keep = Var("w") * Var("h")
+    assert simplify(keep + 0 * Var("z")) is keep
 ```
 
 Three walkers over one set of nodes is the pattern pair in full.
@@ -532,6 +559,9 @@ so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
 The grammar is flat rather than nested,
 so the walk is a loop instead of a recursion,
 but everything else about it is this chapter's shape.
+Iterating a `Template` produces `str | Interpolation`,
+a closed union like `Node` with only two members,
+so an `isinstance` test narrows it as well as a `match` would and the `else` branch is the `str` case.
 The structure is data, and what it means is whatever a function decides:
 
 ```python

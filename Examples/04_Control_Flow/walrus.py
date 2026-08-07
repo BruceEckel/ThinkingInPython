@@ -10,8 +10,8 @@ if length > 3:
 if (n := len(text)) > 3:
     print(f"{n} characters")
 #: 5 characters
-queue = ["a", "b", "c"]
-while queue and (item := queue.pop()) != "a":
+stack = ["a", "b", "c"]
+while stack and (item := stack.pop()) != "a":
     print("processing", item)
 #: processing c
 #: processing b

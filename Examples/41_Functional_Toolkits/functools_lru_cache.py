@@ -8,5 +8,7 @@ def square(n: int) -> int:
 square(1)
 square(2)
 square(3)  # Evicts 1, the least recently used
+square(2)
+square(1)
 print(square.cache_info())
-#: CacheInfo(hits=0, misses=3, maxsize=2, currsize=2)
+#: CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)

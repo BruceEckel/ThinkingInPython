@@ -7,7 +7,7 @@ Two of the patterns in *GoF Design Patterns* solve this problem.
 This is a more comfortable way to deal with a library or bundle of resources.
 Both wrap something that already exists,
 which puts them next to Proxy and Decorator,
-and the chapter ends by sorting the four apart.
+and a later section sorts the four apart.
 Adding an interface is the safe half of the job.
 The other half is telling callers that the interface they have been using is going away.
 
@@ -135,9 +135,13 @@ and that is the price of building the adapter into the operation.
 ### Adapter in Python
 
 The four variations above are Java habits.
-Python is dynamically typed.
-`WhatIUse.op()` only calls `f()`, so it accepts any object that has an `f()`.
-You do not need a shared base class or a declared interface, only the method.
+At runtime `WhatIUse.op()` only calls `f()`,
+so any object with an `f()` works and no shared base class is involved.
+A type checker still holds you to the annotation,
+so name the requirement with a [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+listing `f()` instead of a base class to inherit,
+the same substitution [Surrogate](26_Surrogate.md#proxy)
+makes for a proxy's implementation.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
 `__getattr__()` does the forwarding, so the adapter is tiny:
@@ -170,11 +174,11 @@ print(a.g())  # Forwarded to the adaptee unchanged
 `__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
-You have already seen one in earnest:
+You have already seen a real one:
 `PairCoord` in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
-adapts a `Pair` to the `Coord` protocol,
-an adapter as a frozen dataclass with two properties,
-built because the handed-to-you type did not fit.
+adapts a `Pair` to the `Coord` protocol.
+It is a frozen dataclass with two properties,
+written because the type it was handed did not fit the function it had to call.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
 special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders itself,
@@ -211,8 +215,8 @@ def test_forwarding_targets_the_wrapped_object() -> None:
 > If something is ugly, hide it inside an object.
 
 That is what *Façade* accomplishes.
-If you have a confusing collection of classes and interactions that the client programmer doesn't really need to see,
-then you can create an interface that is useful for the client programmer and that only presents what's necessary.
+If you have a confusing collection of classes and interactions the client programmer doesn't need to see,
+create an interface that presents only what's necessary.
 
 A Façade often takes the form of a [Singleton](24_Singleton.md)
 [Abstract Factory](27_Factory.md#abstract-factories).
@@ -260,10 +264,10 @@ class _TaxRule:
 class _Discount:
     fraction: float
 
+@dataclass(frozen=True)
 class _PriceEngine:
-    def __init__(self, tax: _TaxRule, cut: _Discount) -> None:
-        self.tax = tax
-        self.cut = cut
+    tax: _TaxRule
+    cut: _Discount
 
     def compute(self, amount: float) -> float:
         net = amount * (1 - self.cut.fraction)
@@ -285,6 +289,11 @@ print(f"{checkout.total(100.0):.2f}")
 The caller imports one name.
 Three classes and the order they must be assembled in stay behind the underscore,
 and the façade can rearrange them without touching a caller.
+The underscore is a convention, not a barrier.
+`checkout._PriceEngine` still resolves for anyone who types it.
+What the underscore does mechanically is keep the name out of `from checkout import *`,
+and an `__all__` list of the public names states the same boundary explicitly.
+A façade is an agreement about which names to call, not a lock on the rest.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module gives you.
 
@@ -310,6 +319,10 @@ ask what breaks if you remove it:
 a surrogate speaking for its implementation is a Proxy whether or not the interfaces match.
 Under that reading the Adapter is what a Proxy becomes once you stop insisting on the interface,
 which is why the `ProxyAdapter` above answers to both names.
+That leaves the "What it adds" column to separate them:
+a Proxy controls access to one implementation,
+an Adapter makes one type fit a caller that expects another.
+Name a wrapper for why it is there, not for its shape.
 
 ## Retiring the Old Interface {#retiring-the-old-interface}
 
@@ -352,6 +365,8 @@ the half that reaches a caller before they run anything.
 The runtime half is a `DeprecationWarning`.
 Python hides those by default outside `__main__` and test runners,
 which is the trap: the caller who most needs the warning is the least likely to see it.
+Run with `-W default::DeprecationWarning` to see them all,
+or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
 so the listing records the warnings instead of printing them.
 
@@ -361,10 +376,13 @@ A message is optional but should say what to use instead.
 The decorator also applies to a class,
 where it warns on construction and on subclassing.
 
-`@overload` accepts it too, the finer instrument:
-you can deprecate one call signature while the rest stay current,
+The finer instrument is to deprecate a single `@overload`,
+warning about one call signature while the rest stay current,
 so a function that used to take a string and now takes a `Path` can warn only the string callers.
-Checker support for the per-overload form lags the whole-function form,
+That form is static only.
+Python discards the overload declarations at runtime,
+so the `DeprecationWarning` half never fires,
+and checker support for it lags the whole-function form,
 so verify your checker reports it before relying on it.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,

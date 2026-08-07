@@ -45,13 +45,13 @@ This book covers them.
 The book is about the language, not the tooling around it.
 Fortunately, `uv` and other tools greatly simplify setup,
 so you don't need to spend time on it.
-The repository's [README](https://github.com/BruceEckel/ThinkingInPython#thinking-in-python)
+The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
 gives detailed setup instructions.
 
 ## How the Book Is Organized
 
-Most chapters are self-contained, so you can read straight through,
-or jump to a chapter that interests you.
+You can read straight through, or jump to a chapter that interests you,
+since most chapters are self-contained.
 The book is organized into five parts.
 
 Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
@@ -97,7 +97,7 @@ with the idea of taking the design patterns work I had done in Java and translat
 In 2011 I abandoned the project with many of the design patterns still in Java.
 Eventually I even wrote a message confirming I was not going to complete it.
 
-In June of 2026, after having people mention the online book to me at recent PyCons,
+In June of 2026, after people mentioned the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
 The experience was amazing,
 and I began adding material from writing and presentations.
@@ -148,12 +148,12 @@ If I need something, I ask AI.
 My only hope is that this book will be engaging to read,
 and that you will experience some of the same satisfaction that I've had while writing it.
 
-If it's not already true, I think most programmers will regularly use AI.
+I think most programmers will regularly use AI, if they don't already.
 I have found that the knowledge in this book has helped me guide AIs toward better solutions.
 
 ## The Examples
 
-The book targets Python 3.15 and later, uses type hints throughout,
+The book targets Python 3.15 and later, uses type hints,
 and tests with `pytest`.
 Early chapters mostly omit type hints,
 until [Static Typing](08_Static_Typing.md) introduces the syntax.
@@ -178,8 +178,9 @@ The code you read is the code that runs,
 and the output shown is the output it produces.
 
 Output appears inside the listings as comments beginning with `#:`,
-one line of output per marker,
-placed directly after the statement that produced it.
+one line of output per marker.
+A run of markers shows everything the code above it printed since the previous run,
+in order.
 A `print("affirmative")` followed by a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build regenerates these markers from a real run,
 so they cannot drift from what the code prints.

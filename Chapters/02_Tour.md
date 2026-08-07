@@ -44,7 +44,7 @@ print(val)
 
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
-In this book, the first line of an example will be the name of the file containing that example.
+In this book, the first line of an example is the name of the file containing that example.
 That file lives in the chapter's `Examples` subdirectory,
 so the above example is `Examples/02_Tour/if.py`.
 
@@ -70,6 +70,8 @@ Functions, classes, and modules introduce new scopes;
 an `if` or a `for` block does not.
 
 Indenting can nest to any level.
+Four spaces per level is the convention,
+and mixing tabs and spaces inside one block is a `TabError`.
 Unlike the brace-placement debates of C++ or Java,
 the indentation is not a matter of taste: it is the structure.
 Python code from any two authors therefore lines up the same way,
@@ -110,7 +112,8 @@ print(a is c, a == c)  # Different object, equal value
 Use `==` to ask whether two objects have equal values.
 Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
-`a[:]` copies the list but not the objects inside it,
+`a[:]` is a *shallow* copy:
+it duplicates the list but not the objects inside it,
 so a nested list would still be shared between `a` and `c`.
 
 You can assign several names at once,
@@ -175,12 +178,20 @@ print(sum(s > 60 for s in scores))  # True counts as 1
 #: 2
 ```
 
+`round()` breaks a tie to the nearest even value,
+so `round(0.5)` is `0` and `round(1.5)` is `2`,
+rather than rounding half away from zero as C does.
+An f-string's format spec rounds the same way.
+
 Python has no `++` or `--`; use `+= 1` and `-= 1`.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Summing a sequence of comparisons therefore counts how many were true.
+The argument to `sum()` is a *generator expression*,
+which hands over one value at a time instead of building a list first;
+[Comprehensions](16_Comprehensions.md#generator-expressions) covers the form.
 
 Integers also support the bitwise and shift operators,
 each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`).
@@ -210,6 +221,12 @@ print(bin(flags))
 ```
 
 The `bin()` function converts an integer to a binary string for display.
+Because Python integers have no fixed width,
+`~` has no fixed number of bits to flip.
+It produces `-x - 1`,
+the value that flipping every bit gives in two's complement,
+and `bin()` prints that as a sign followed by a magnitude,
+so `~0b1100` reads as `-0b1101` rather than a row of ones.
 
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
@@ -225,9 +242,11 @@ It is the default return value of a function that returns nothing.
 You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
 and `None` is always false.
-Everything else is true, unless an object says otherwise.
+Everything else is true, unless an object's type says otherwise.
 This is *truthiness*,
 and it allows `if items:` instead of `if len(items) != 0:`.
+A type says otherwise by defining `__bool__()`; without one,
+Python falls back to `__len__()`, which is why an empty container is false.
 
 ```python
 # truthiness.py
@@ -310,6 +329,8 @@ which you can write out in full without escaping line breaks.
 
 The '`r`' right before a string means "raw."
 Python takes backslashes literally, so you don't need to double them.
+A raw string still cannot end with a backslash,
+because the backslash escapes the closing quote even here.
 
 ### f-Strings
 
@@ -334,6 +355,8 @@ print(f"{total = }")  # Useful for debugging
 ```
 
 The format spec after a colon controls width, precision, and alignment.
+A `!r` on the expression, as in `{name!r}`,
+formats the value with `repr()` instead of `str()`.
 
 You will also see two older styles in existing code: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,
@@ -436,7 +459,7 @@ For example: `ThisIsMyClass`.
 
 A class may instead use `snake_case` when it is documented and used primarily as a callable,
 the way a function is.
-The standard library does this for `contextlib.suppress` and `contextlib.contextmanager`,
+The standard library does this for `contextlib.suppress` and `functools.partial`,
 and for builtins like `property` and `staticmethod`.
 Reserve it for classes that behave like a function to their users.
 The default for a class is still `CapWords`.
@@ -455,8 +478,8 @@ Tools such as ruff can apply these to your code automatically
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
     Predict what `bool()` reports for each before running it,
     then check your prediction.
-3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero
-    (change `{score:.0f}%` to show `{score:.2f}`),
+3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
+    using `{score:.2f}` in place of `{score:.0f}%`,
     and a second line using the debug specifier, `f"{score = }"`.
 4.  `arithmetic.py` and `bitwise.py` each define one variable,
     `total` and `flags`.

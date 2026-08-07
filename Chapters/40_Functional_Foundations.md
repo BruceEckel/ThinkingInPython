@@ -4,7 +4,8 @@ This chapter begins the book's exploration of functional programming.
 The ideas pay off before the vocabulary arrives.
 A pure function cannot corrupt state you forgot about.
 It has fewer bugs to chase, and it needs no mock or fixture to test.
-A cache or a fold from `functools` or `itertools` is code you never write yourself,
+A cache from `functools`, or a sliding window from `itertools`,
+is code you never write yourself,
 already correct on the edge case you would otherwise miss.
 A function with no shared state needs no lock,
 so it parallelizes with no new code.
@@ -63,13 +64,15 @@ You cannot understand a single `withdraw()` call without tracking the history of
 The payoff is trust.
 A pure function is the most reliable code you can write,
 because its behavior is fully described by its inputs.
-You test it with a single assertion and no fixture,
-since there is nothing to set up or restore.
 You can call it from many threads at once,
 because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional_Assurance.md#automatic-parallelism)
 turns that safety into speed.
-A cache can store its results, knowing the answer will never go stale:
+A cache can store its results, knowing the answer will never go stale.
+That is what makes [`functools.cache`](41_Functional_Toolkits.md#cache)
+safe on a pure function, and wrong on an impure one.
+And you test it with a single assertion and no fixture,
+since there is nothing to set up or restore:
 
 ```python
 # why_pure.py
@@ -87,6 +90,9 @@ print("ok")
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
+Each is immutable in itself, and no deeper:
+the tuple `([1], 2)` will always hold that same list,
+which anyone can still append to.
 Removing shared mutable state is the practical core of the functional style.
 A value that never changes cannot develop a bug from some forgotten change elsewhere.
 
@@ -147,6 +153,11 @@ The annotation is a constraint the checker enforces,
 even when the value passed in is a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error caught before the program runs.
+The constraint runs one way only.
+`Sequence[int]` states that `total()` will not mutate its argument.
+It says nothing about the caller,
+who still holds the `list` and can append to it whenever it likes,
+including from another thread while `total()` is running.
 Mind what `Final` does and does not freeze.
 It locks the binding, not the object:
 if you declare `CONFIG: Final[list[int]] = [...]`,
@@ -156,13 +167,12 @@ in another costume.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`, and let `Final` guard only the name.
 
-Immutability also unlocks abilities a mutable value lacks.
-An immutable object can be *hashable*.
-It can guarantee a stable hash for its whole life,
-so it can serve as a dictionary key or a set member.
-You can also share it without a defensive copy,
-because no recipient can change it out from under you.
-A `list` can do neither:
+Immutability also makes two things possible that a mutable value cannot offer.
+The first is a *stable hash*, one that holds for the value's whole life,
+so the value can serve as a dictionary key or a set member.
+The second is sharing without a defensive copy,
+because no recipient can change the value out from under you.
+A `list` offers neither:
 
 ```python
 # hashable.py
@@ -184,8 +194,16 @@ with ignore(TypeError):
 #: TypeError("unhashable type: 'list'")
 ```
 
-These abilities are why the standard library uses tuples and frozen dataclasses whenever a value must be a key,
-cached, or shared across threads.
+Mutability alone is not what removes hashing.
+A plain class instance is mutable and still hashes, by identity,
+so it works as a dictionary key.
+What removes hashing is equality based on *contents*.
+A `list` and an unfrozen `@dataclass` both compare that way,
+so Python sets their `__hash__` to `None`:
+a key whose contents changed would no longer be found in the dictionary that stored it.
+`frozen=True` is what lets a dataclass keep contents-based equality and a hash at the same time.
+That combination is why a value that must be a dictionary key, a cache entry,
+or a shared read across threads is normally a tuple or a frozen dataclass.
 
 ## Functions as First-Class Objects
 
@@ -239,7 +257,8 @@ print(operations["+"](6, 4), operations["-"](6, 4))
 
 Supporting a new operator means adding a row to the table.
 The dispatch code never changes.
-This is the structure behind dispatch tables and the plugin registries that let a program grow without editing its core.
+The same structure is behind [the dictionary factory](27_Factory.md#the-pythonic-factory-a-dictionary)
+and the plugin registries that let a program grow without editing its core.
 
 ## Higher-Order Functions
 
@@ -270,6 +289,15 @@ Each call hands a function to another function and lets it do the looping.
 Returning a function is the other half of the definition,
 covered under [Closures](#closures), below.
 
+The `list()` calls are not decoration.
+`map()` and `filter()` return one-shot iterators,
+so `print(map(...))` shows `<map object at 0x...>` instead of values,
+and a second pass over the same object produces nothing at all,
+with no error to point at ([Generators](23_Iterators.md#generators)).
+`sorted()` is the exception:
+it has to see every element before it can order any of them,
+so it always returns a list.
+
 The lambdas above exist to show the machinery,
 and for these cases Python offers a lookalike you should usually prefer:
 the comprehension ([Comprehensions](16_Comprehensions.md)).
@@ -277,12 +305,15 @@ the comprehension ([Comprehensions](16_Comprehensions.md)).
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` earn their keep when the function already exists:
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
+The two are not quite the same object, either.
+The comprehension hands you a finished list;
+`map()` hands you an iterator you can feed into the next stage without building the list at all.
 The rule of thumb: existing function, use the higher-order form;
 expression you are writing on the spot, use the comprehension.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
-Higher-order functions provide separation of concerns.
+Higher-order functions separate the walking from the work.
 `map()`, `filter()`, and `sorted()` each contain the loop that walks the data,
 written once, and you supply only the part that differs from one use to the next.
 You stop rewriting the same iteration scaffold,
@@ -337,10 +368,15 @@ and each returned function remembers its own `factor`.
 `double` and `triple` are the same code with different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
+`multiply()` reads `factor` rather than receiving it, yet it stays pure:
+`factor` is fixed at capture and never changes,
+so the same argument always produces the same answer.
+That is the difference between a captured constant and the global `balance` that made `withdraw()` unpredictable.
+
 A closure fits when you want behavior configured once and then reused,
 with its configuration kept private.
-The captured variable is reachable only through the returned function,
-so no other code can read or overwrite it.
+The captured variable has no name in any enclosing scope,
+so ordinary code cannot read or rebind it.
 That gives you encapsulation without declaring a class:
 
 ```python
@@ -360,9 +396,21 @@ print(tally(), tally(), tally())
 #: 1 2 3
 ```
 
-Each call to `make_counter()` builds an independent counter with its own hidden `count`.
-Nothing outside `increment()` can reach that state,
-so no accident can corrupt it.
+Each call to `make_counter()` builds an independent counter with its own `count`.
+No other code can name that variable, so no accident can corrupt it.
+
+`increment()` is impure, and deliberately so.
+The contrast with `withdraw()` is the lesson.
+`withdraw()` mutated a module-level name that any code could touch;
+`increment()` mutates a name that only it can touch.
+When state has to exist,
+a closure is one way to give exactly one function the right to change it.
+
+The privacy is Python's usual kind, though, and not a lock.
+`inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
+and `tally.__closure__[0].cell_contents = 100` rewrites it.
+Like the single leading underscore,
+a closure states an intention that the language does not enforce.
 
 The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
@@ -371,8 +419,12 @@ so `count += 1` alone makes `count` a fresh local,
 one referenced before assignment, and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 Forgetting it is the standard stumble when a closure first needs to write,
-and the error message, complaining about a local variable,
+and the runtime message, complaining about a local variable
+("cannot access local variable 'count' where it is not associated with a value"),
 points nowhere near the missing declaration.
+The checker is the better guide here.
+Delete the `nonlocal` line and `ty` reports `Name 'count' used when not defined` on the `count += 1` line itself,
+before the program runs at all.
 
 ## Partial Application
 
@@ -395,6 +447,10 @@ print(square(5), cube(5))
 
 `square` and `cube` are specializations of `power`,
 each with one argument already supplied.
+The keyword is doing real work here.
+`partial(power, 2)` would bind `base` instead,
+because positional arguments fill from the left,
+and `square(5)` would then compute `2 ** 5`.
 Partial application turns a general function into the specific one a caller needs,
 which is handy when a higher-order function needs a single-argument callable.
 
@@ -434,8 +490,10 @@ which is the specialization a caller needs and the one `partial()` could not pre
 A `Placeholder` is not a default.
 The caller must supply it:
 calling `percent()` with no argument raises a `TypeError`.
-The library rejects trailing placeholders for the same reason:
-a gap at the end is an unbound parameter.
+The library also rejects a *trailing* placeholder, but for the opposite reason:
+it would add nothing.
+`partial()` already appends the call's arguments after the bound ones,
+so `partial(clamp, 0, Placeholder)` would mean exactly what `partial(clamp, 0)` already means.
 
 The `# type: ignore` comments mark a checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
@@ -476,7 +534,7 @@ then doubles.
 Each piece stays small and pure,
 and you combine them without touching their internals.
 
-Composition scales by addition.
+Composition grows by adding a stage rather than by enlarging one.
 Each stage is also testable on its own,
 and you build larger behavior by naming a new composition rather than writing new logic.
 When a requirement changes,

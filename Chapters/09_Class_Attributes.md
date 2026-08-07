@@ -40,7 +40,8 @@ Assigning through an instance always writes to the instance,
 creating the instance variable on first assignment.
 Assigning through the class name, as `Stars.rating = 9` did,
 changes the shared value.
-You can see this by inspecting the class with `vars(A)` and the instance with `vars(a)`:
+`vars(obj)` returns that dictionary,
+so you can see the split by inspecting the class with `vars(A)` and the instance with `vars(a)`:
 
 ```python
 # inside_objects.py
@@ -59,6 +60,13 @@ print(vars(a))  # Assignment created it on the instance
 print(vars(A)["x"])
 #: 100
 ```
+
+One kind of class attribute does not follow that lookup rule.
+A `@property` from [Classes](07_Classes.md#properties)
+owns its name on the class,
+so reading calls its getter and assigning calls its setter,
+and neither one touches the instance dictionary.
+The rest of this chapter is about ordinary values stored in a class body.
 
 A class attribute seems like a default until someone assigns to an instance variable of the same name.
 Changing the class attribute makes the "default" value seem different for every object that has not shadowed it.
@@ -93,7 +101,9 @@ an attribute read that ends in a method call can change shared state,
 and the shadowing rule offers no protection.
 A type checker cannot help here either,
 since `a.items.append("apple")` is a correct call on a `list[str]`.
-A mutable per-instance default belongs in a `@dataclass` field with a `default_factory`,
+[Real Per-Object Defaults](#real-per-object-defaults),
+at the end of this chapter, gives each object its own value instead.
+A mutable one belongs in a `@dataclass` field with a `default_factory`,
 covered in [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes).
 
 ## Declaring Shared State with ClassVar
@@ -180,11 +190,15 @@ shows the case where the annotation is not optional.
 There, an attribute is set from outside the class,
 and a bare annotation is the checker's only way to know its type.
 
-`ClassVar` is a hint for the checker, not the runtime.
+`ClassVar` is a hint for the checker.
 It records that `total` belongs to the class,
 and it catches the accidental shadowing from the earlier example before it happens.
+Python's own attribute lookup ignores it.
+One library does read it at runtime:
+`@dataclass` leaves a `ClassVar` field out of the constructor it generates,
+shown in [Data Classes as Types](12_Data_Classes_as_Types.md#d-a-real-classvar).
 
-It does not catch every form of it:
+`ClassVar` does not catch every form of shadowing:
 
 ```python
 # counter_near_miss.py
@@ -256,6 +270,10 @@ so it never sees changes made through `Base`.
 `ClassVar` doesn't change any of this.
 It only tells the checker that `shared` belongs to the class,
 not that subclasses share storage.
+This is the shadowing rule from the start of the chapter, one level up:
+`Left` reads through to `Base` until an assignment gives `Left` its own copy,
+the way `a` read through to `Stars` until `a.rating = 1`.
+A class body stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
 A subclass overriding a `ClassVar` inherits the declaration along with the name,
 so restating `ClassVar[int]` adds nothing.
@@ -292,11 +310,20 @@ print(vars(B)["x"], vars(B())["x"])
 Both listings define a class `A` whose `x` starts at `100`,
 and the two behave in opposite ways.
 In `inside_objects.py` the `100` lives on the class and every instance reads it;
-here it is a default argument, evaluated per call,
-and `self.x = x` gives each object its own storage before anything can read it.
+here it is a default argument, and `self.x = x` runs on every construction,
+giving each object its own storage before anything can read it.
 The difference is not the value but where it is written.
+The default value itself is still built once, at definition time
+(see [Default and Keyword Arguments](05_Functions.md#default-and-keyword-arguments)),
+so a *mutable* default argument brings the sharing straight back.
+`100` cannot be mutated, so it is safe.
 
-A `@dataclass` reads the class-attribute declarations as a template and generates a constructor from them.
+A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
+The annotation is what marks a field.
+Write `x = 100` with no `x: int` and `@dataclass` sees nothing:
+the name stays an ordinary shared class attribute,
+the generated `__init__()` takes no `x`,
+and neither the runtime nor the checker complains.
 The class attribute survives the decoration: `vars(B)` still holds `x = 100`.
 What changes is the generated `__init__()`,
 which assigns `self.x` on every instance,

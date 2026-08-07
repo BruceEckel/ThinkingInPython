@@ -100,8 +100,11 @@ You need something that says "success" or "failure" no matter what types they ca
 Make success and failure explicit by defining them as types.
 `Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
-Both are frozen data classes,
-parameterized over the answer type and the error type.
+The class is now the tag that tells the two cases apart,
+so the union stays unambiguous whatever the two sides carry.
+Other languages call this a *tagged* or *discriminated* union.
+`Ok` and `Err` are frozen data classes,
+`Ok` parameterized over the answer type and `Err` over the error type.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
@@ -168,6 +171,11 @@ success by returning an `Ok` object.
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
+`unwrap()` is what makes that literal: it is defined on `Ok` and not on `Err`,
+so `func_a(i).unwrap()` fails the checker,
+which reports that `unwrap` is not defined on `Err[str]` in the union.
+Using the `Result` as if it were a number fails the same way.
+Narrowing to one of the two classes is the only route to the answer.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 Python's humbler form of the same idea is `int | None`.
@@ -187,6 +195,9 @@ Python does not enforce totality.
 Nothing stops a `Result`-returning function from also raising an exception,
 so this is a discipline the author of the function maintains,
 not a guarantee the checker provides.
+The caller has a matching hole:
+a statement that calls the function and discards what comes back draws no complaint.
+The checker stops you from misreading a `Result`, not from ignoring one.
 
 Because failures are values, you can assert on them directly,
 with no `pytest.raises()`.
@@ -255,6 +266,12 @@ if __name__ == "__main__":
 ```
 
 Each step returns early when it encounters an `Err`.
+Notice that the check names `Err` and not `Result`.
+`Result` is a `type` alias rather than a class,
+so `isinstance(a, Result)` raises `TypeError` at runtime,
+and the checker rejects it before that.
+Ask about one of the two concrete classes.
+
 This works, and it keeps errors as values, but every step is the same dance:
 call, check for `Err`, return early, unwrap, go on.
 
@@ -264,6 +281,10 @@ call, check for `Err`, return early, unwrap, go on.
 Look again at the `bind()` method on `Result`.
 On an `Ok`, it feeds the answer to the next function.
 On an `Err`, it ignores the function and returns the failure unchanged.
+The two signatures differ because `Err` holds no answer:
+it cannot name the argument type the next step would receive,
+so it accepts any callable,
+and its return type states only that an `Err` comes back out.
 An `Err` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
@@ -298,8 +319,8 @@ You do not need to know that word to use functional error handling.
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, `.bind(str)` say,
-the chain now holds a bare `str` where a `Result` belongs,
-which the checker flags at the next `bind()`.
+the checker rejects that call on the spot,
+because `str` is not a callable that returns a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that cannot fail,
@@ -351,6 +372,11 @@ Nested binds carry each answer inward.
 An `Err` anywhere short-circuits to the end.
 Only the last input passes all three steps,
 so it's the only one that reaches `add()`.
+Three inputs already cost three levels of nesting,
+and the shape gets worse with each one you add.
+[The returns Library](#the-returns-library)
+at the end of this chapter has do-notation,
+which writes the same combination flat.
 
 Testing confirms combining returns the correct value,
 or the first failure in the chain:
@@ -364,6 +390,7 @@ from result import Err, Ok, Result
 @pytest.mark.parametrize("a, b, expected", [
     (7, 5, Ok("add(7 + 5 + 12): 24")),
     (1, 5, Err("func_a(1)")),
+    (7, 2, Err("func_b(2)")),
     (2, 1, Err("func_c(3): division by zero")),
 ])
 def test_combined(
@@ -426,6 +453,16 @@ so `parse("42")` type-checks and `parse(42)` does not:
 The [Decorators](14_Decorators.md)
 chapter explains how to write decorators like `@safe`,
 including `functools.wraps`.
+
+`@safe` catches `Exception`,
+which is every failure the wrapped function can produce,
+including the ones that are defects rather than expected outcomes.
+Misspell a name inside the wrapped function and the resulting `NameError` arrives as an ordinary `Err`,
+indistinguishable from bad input.
+The version here is deliberately small.
+A production one takes the exception types it should catch as an argument and lets the rest propagate,
+which preserves the distinction this chapter ends on,
+between a failure the caller can act on and a bug the caller cannot.
 
 To test `@safe`, a good input becomes an `Ok`,
 and a raised exception becomes an `Err` holding that exception:
@@ -535,6 +572,9 @@ so the type stays `ValueError` and the original traceback is undisturbed.
 Notes accumulate: each frame that knows something the raiser did not can add its own line as the exception passes through.
 They live in a list called `__notes__`,
 which is absent until the first `add_note()` call.
+The checker is no help there,
+because typeshed declares `__notes__` on `BaseException` unconditionally,
+so reading it on an exception that has no notes type-checks and then raises `AttributeError`.
 `traceback.format_exception_only()` renders the message and the notes without the file paths,
 which is why the listing uses it instead of letting the traceback print.
 
@@ -555,13 +595,13 @@ def parse_field(name: str, text: str) -> Result[int, Exception]:
         return Err(e)
 
 for field, value in (("age", "42"), ("size", "oops")):
-    result = parse_field(field, value)
-    if isinstance(result, Ok):
-        print(f"{field} = {result.answer}")
-    else:
-        print(f"{field}: {type(result.error).__name__}")
-        for note in result.error.__notes__:
-            print(f"  {note}")
+    match parse_field(field, value):
+        case Ok(answer):
+            print(f"{field} = {answer}")
+        case Err(error):
+            print(f"{field}: {type(error).__name__}")
+            for note in error.__notes__:
+                print(f"  {note}")
 #: age = 42
 #: size: ValueError
 #:   field 'size' received 'oops'
@@ -574,13 +614,15 @@ This is the same argument the chapter opened with, applied one level down:
 `Err` says a failure happened and the exception says what it was,
 and a note says which piece of work it belonged to.
 
-Notice that this listing narrows with `isinstance()` rather than `match`.
-`ty` loses the error's type through an `Err(...)` pattern and through `isinstance(result, Err)`,
-reporting `object` instead of `Exception`,
-so `result.error.__notes__` would not check.
-Asking about `Ok` and reading the error in the `else` branch gets the precise type.
-This is a checker limitation rather than a rule about which form to write:
-`match` is still the better fit whenever the branches do not need the captured value's type.
+The `Err` branch reads `error.__notes__`,
+which works only because `match` recovers the exception's type.
+Write `if isinstance(result, Err)` instead and `result.error` comes back as `object`,
+so the same line stops checking.
+`Ok` and `Err` are ordinary classes,
+and a positive `isinstance()` test cannot rule out a value that inherits from both,
+so the checker keeps that possibility alive and erases what it knows about the field.
+Asking about `Ok` and reading the error in the `else` branch works for the mirror-image reason:
+ruling `Ok` out leaves `Err` alone.
 
 ## The returns Library
 

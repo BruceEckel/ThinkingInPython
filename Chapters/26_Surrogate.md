@@ -173,10 +173,14 @@ p.h()
 #: Implementation.h()
 ```
 
-The beauty of using `__getattr__()` is that `Proxy2` is completely generic,
-and not tied to any particular implementation.
+The beauty of using `__getattr__()` is that the forwarding is completely generic:
+`Proxy2` names no method of `Implementation2`,
+so it keeps working when the implementation grows a method.
+The proxy is still tied to one implementation class, which it constructs itself;
+accepting an implementation as a constructor argument removes that tie too.
 The double underscore on `self.__implementation` earns its place here:
-the name mangles to `_Proxy2__implementation`,
+the name [mangles](11_Testing.md#white-box-and-black-box-tests)
+to `_Proxy2__implementation`,
 so it cannot collide with an attribute the implementation carries.
 
 One limit: special methods bypass `__getattr__()`.
@@ -264,8 +268,8 @@ A surrogate that must forward writes defines `__setattr__()` as well,
 and that method has to let the proxy's own attributes through or the assignment in `__init__()` recurses.
 
 Identity has the same gap.
-`isinstance(p, Words)` is `False`; delegation forwards the methods,
-not the type.
+A proxy is not an instance of the class it fronts for;
+delegation forwards the methods, not the type.
 A `@runtime_checkable` `Protocol` does not close that gap either.
 Since Python 3.12 that check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries directly and does not call `__getattr__()`,
@@ -463,12 +467,13 @@ The fallback hook has a related trap of its own:
 if `__getattr__()`'s body touches a proxy attribute that does not exist,
 a misspelled `self._imp`,
 or any attribute on an instance built without `__init__()`,
+which is what `copy.copy()` and `pickle` do when they rebuild one,
 that failed lookup calls `__getattr__()` again,
 and the error surfaces as `RecursionError`,
 not the `AttributeError` that would point at the typo.
 
-The test for the counting proxy uses a small stand-in to confirm that the proxy forwards a call with its result,
-and counts only callable accesses:
+The test for the counting proxy uses a small stand-in to confirm that the proxy forwards a call and returns its result,
+and that it counts calls without counting a plain attribute read:
 
 ```python
 # test_counting_proxy.py

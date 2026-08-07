@@ -27,7 +27,7 @@ In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 filled automatically by `__init_subclass__()`,
 and a `create()` method builds an instance from a material name
-(this is a [Factory](27_Factory.md)):
+(this is a [Factory](27_Factory.md#the-pythonic-factory-a-dictionary)):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 
@@ -73,25 +73,31 @@ def sum_value(items: list[Trash]) -> float:
     return total
 ```
 
-Python implicitly makes `__init_subclass__` a classmethod,
-so `cls` doesn't need an `@classmethod` decorator.
+`Bins` names the shape the sorting sections use,
+a dictionary from a material's class to the pieces made of that material.
+A `type` statement's right side is evaluated lazily,
+so the alias can name `Trash` several lines before the `class` statement that defines it
+(see [The `type` Statement](08_Static_Typing.md#the-type-statement)).
+
+Python implicitly makes `__init_subclass__()` a classmethod,
+so it needs no `@classmethod` decorator and its first parameter is the new subclass.
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 
 Each subclass's `value = ...` line creates its own class attribute,
 separate from `Trash.value`.
-The `ClassVar` annotation just tells type checkers it belongs to the class rather than an instance.
+The `ClassVar` annotation tells type checkers the attribute belongs to the class rather than an instance.
 It doesn't share storage across subclasses.
 
 None of the subclasses redeclare `value: ClassVar[float]`.
 They don't need to because the checker resolves `value` through the MRO and finds it declared `ClassVar[float]` on `Trash`.
-It treats each subclass's assignment as filling in that same classvar rather than introducing a new one.
+It reads each subclass's assignment as overriding that declared attribute rather than introducing a new one.
 
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` builds it.
 `sum_value()` is an ordinary function.
-It relies on polymorphism (`t.value`, `t.weight`)
-and never asks what type each piece is.
+It reads `t.value` and `t.weight` polymorphically,
+and uses the type only to label the printed line, never to decide what to do.
 
 The tests confirm that each subclass registers itself,
 `create()` builds one by name, the per-pound values are correct,
@@ -262,7 +268,7 @@ This is a `match` over an open set,
 which is what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 warned against.
 When the set is open, sorting must not enumerate it,
-which the next section arranges.
+which is what the next section does.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing polymorphism's job by hand.
 
@@ -325,15 +331,26 @@ and [Multiple Dispatching](32_Multiple_Dispatching.md).
 If you derive `CrushedAluminum` from `Aluminum`, it sorts into its own bin,
 not its parent's, which a sorter usually needs,
 but is worth knowing before you subclass a material.
+This is the one place where the two versions disagree:
+`case Aluminum()` matches any subclass,
+so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
+Swapping the `match` for the dictionary is a redesign, not a rename.
+
+The `defaultdict(list)` is what creates a bin the first time a material turns up.
+`Bins` is an alias for a plain `dict`,
+so a checker accepts `bins: Bins = {}` just as happily,
+and that version raises `KeyError` on the first piece of trash.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-This chapter has changed *types* cheaply so far.
-The other axis of change is adding new operations.
+So far the chapter has made new *types* cheap.
+The other axis of change is adding new *operations*,
+and the two ordinarily pull against each other:
+that trade is the expression problem from [Pattern Matching](13_Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
 Suppose the `Trash` hierarchy is fixed
 (maybe it comes from a third-party library)
-and you want to add new behaviors to it without editing it: price it, weigh it,
-print recycling instructions, and more later.
+and you want to add new behaviors to it without editing it:
+print recycling instructions, flag a disposal hazard, and more later.
 
 [Visitor](33_Visitor.md) solves this problem.
 Visitor is elaborate:
@@ -342,7 +359,8 @@ an `accept()` method added to every element,
 and *double dispatch* to route each piece to the correct `visit()`.
 It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation.
-The standard library provides `functools.singledispatch` which dispatches on the type of its first argument,
+The standard library provides `functools.singledispatch`,
+which dispatches on the type of its first argument,
 with new types registered from anywhere.
 
 In Python, a single-dispatch function implements *Visitor*:
@@ -381,23 +399,36 @@ for t in parse("trash.dat"):
 ```
 
 Each implementation above is named `_`,
-a throwaway name [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
-explains.
+the throwaway name explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function.
-Adding a `price()` or `weight()` operation means writing another single-dispatch function.
-Adding a `Plastic` material means defining the class and,
-if it needs a special note, registering one line.
+That fallback is also the risk:
+a material nobody registers gets the default answer,
+with no exception at runtime and no complaint from the checker.
+Adding another operation that varies by material means writing another single-dispatch function.
+Adding a `Plastic` material means defining the class,
+plus one registration for each operation that must answer differently for plastic.
+Python does not escape the expression problem.
+It makes both sides of it cost a line instead of an edit spread across classes.
 
 Compare this to a Visitor implementation.
 No `Visitor` class exists, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
+The chapter now holds two kinds of dispatch that disagree about subclasses.
+`bins[type(t)]` keys on the exact class,
+so a `CrushedAluminum` derived from `Aluminum` lands in a bin of its own.
+`singledispatch` resolves through the MRO,
+so that same piece answers with `Aluminum`'s note.
+Neither is wrong for its job,
+and the difference is the one [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+draws between a table keyed by class and dispatch that follows inheritance.
+
 When the operation is the same for every type, you do not need single dispatch.
 The earlier `sum_value()` is an ordinary function.
 Use `singledispatch` only when the behavior differs by type.
-For operations that belong on the objects and vary by type,
-`singledispatchmethod` does the same thing as a method.
+For an operation that belongs on an object and still varies by type,
+`functools.singledispatchmethod` provides the same dispatch in method form.
 
 ## Choosing the Lightest Construct
 

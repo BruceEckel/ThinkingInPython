@@ -1,8 +1,9 @@
 # optional_logger.py
+from dataclasses import dataclass, field
 
+@dataclass
 class ListLogger:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
+    lines: list[str] = field(default_factory=list)
 
     def log(self, message: str) -> None:
         self.lines.append(message)

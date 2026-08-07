@@ -32,8 +32,8 @@ fit naturally.
 *Smalltalk* took the other path: everything is an object,
 and the only thing you do is send messages to objects, always late-bound.
 It was an emphatically dynamic,
-run-time world where you built programs by finding the closest existing object and inheriting from it to add behavior.
-That style guarantees no substitutability.
+runtime world where you built programs by finding the closest existing object and inheriting from it to add behavior.
+That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
 Objects were optional,
@@ -60,7 +60,7 @@ The industry has been quietly walking back from "everything is an object" and fr
 The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
-It accepts the same arguments, returns the same kinds of results,
+An override accepts the same arguments, returns the same kinds of results,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
@@ -76,7 +76,7 @@ A type checker reads an override's signature and reports one that no longer fits
 especially when [`@override`](07_Classes.md#marking-overrides-with-override)
 marks the intent.
 What no tool reads is the behavior behind the signature.
-Nothing stops a subclass from breaking the base class contract while matching it perfectly.
+Nothing stops a subclass from breaking the base class contract while matching its signature perfectly.
 The interpreter runs code that violates the LSP without objection.
 That code may or may not fail at runtime:
 
@@ -283,6 +283,10 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
+The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"` before the program ever runs.
+`frozen=True` is the defense that holds at runtime,
+against code the checker never saw.
+
 Two quiet changes in the listing do as much work as `frozen=True`.
 `frozen=True` is shallow:
 it stops assignment to the fields of `Immutable` itself,
@@ -312,6 +316,9 @@ Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
 and attempting to rebind it raises an exception.
 But nothing stops that list from changing, the identical leak `Leaky` had.
+Hashing goes the same way.
+A frozen data class is hashable only when every field it holds is hashable,
+so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 That is why `numbers` became a `tuple` and `Bob` was also frozen.
 Immutability pays off only when it goes all the way down.
 
@@ -594,12 +601,13 @@ if __name__ == "__main__":
 #: Glider 65
 ```
 
-`show()` accepts anything: `Any`, which is not `object`.
+`show()` accepts anything because `t` is typed `Any`,
+which is not the same as `object`.
 If you pass it something without a `display()` method,
 you'll get an exception when the line runs.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
-`Any` switches the checker off for `t`, and this permits any type.
+`Any` switches the checker off for `t`, so any type passes.
 Each `Any` parameter moves you back into dynamic typing.
 
 ### Protocols
@@ -760,8 +768,7 @@ if __name__ == "__main__":
 
 Without the `# type: ignore`, `ty` rejects the second call.
 `UserId` and `int` are different types to the checker.
-The same distinction separates `Priced` and `Weighted` in `protocol_collision.py`,
-if `total()` returns a `Price` or a `Weight` instead of a bare `float`.
+The same distinction would separate `Priced` from `Weighted` in `protocol_collision.py` if `total()` returned a `Price` or a `Weight` instead of a bare `float`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
@@ -864,14 +871,14 @@ The questions are which types it accepts and what the function may do with them.
 Type theory defines three kinds of polymorphism.
 Christopher Strachey's 1967 lecture notes,
 [Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf),
-named the first two, parametric and ad hoc.
+named the first two, parametric and ad-hoc.
 Cardelli and Wegner added the third, subtyping,
 in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
 
 *Subtype polymorphism* was demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
 One function accepts any type that fits a shape,
 whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
-The caller writes one function.
+You write one function.
 The type varies underneath it.
 
 *Parametric polymorphism* is a single implementation for multiple types.
@@ -927,10 +934,11 @@ Here a logger is optional, so the function guards each logging call:
 
 ```python
 # optional_logger.py
+from dataclasses import dataclass, field
 
+@dataclass
 class ListLogger:
-    def __init__(self) -> None:
-        self.lines: list[str] = []
+    lines: list[str] = field(default_factory=list)
 
     def log(self, message: str) -> None:
         self.lines.append(message)
@@ -1024,12 +1032,13 @@ representation, and, when frozen, hashing.
 
 OOP also normalized the idea of types,
 as seen in [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
-If you simply avoid implementation inheritance,
+If you avoid implementation inheritance,
 the payoff for using types is tremendous.
 
 Start with functions and data.
 When a program truly needs an object, it tells you:
-passing the same data into every function, or bundling behavior with state.
+you are passing the same data into every function,
+or bundling behavior with state.
 OOP is useful, sometimes.
 But not everywhere, all the time.
 

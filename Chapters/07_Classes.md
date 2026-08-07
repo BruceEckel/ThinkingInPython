@@ -64,9 +64,9 @@ You do not declare them this way in Python.
 To create an object field, you name it, using `self`, inside a method
 (typically in the constructor, but not always).
 This creates space for that field when the method runs.
-If you declare fields using the C++/Java style,
-they implicitly become class-level fields
-(similar to static fields in C++/Java).
+If you assign to a name in the class body, C++/Java style,
+that name becomes a class-level field instead
+(similar to a static field in C++/Java).
 [Class Attributes](09_Class_Attributes.md)
 shows what that shared storage does when you assign to it.
 
@@ -104,7 +104,7 @@ Python is different.
 You inherit an implementation, to reuse the code from the base class.
 Python does have a way to name an interface without inheritance,
 the `Protocol` in [Static Typing](08_Static_Typing.md),
-which describes the shape `f()` requires instead of demanding a base class.
+which describes the shape a function needs instead of demanding a base class.
 
 First import the base class the same way you import any name from a module
 (see [Modules and Packages](06_Modules_and_Packages.md)).
@@ -224,8 +224,9 @@ It sets an `__override__` attribute on the method,
 for anything that wants to find overrides by introspection,
 and returns the same function object.
 
-Apply `@override` to any method that replaces an inherited method,
-except constructors, which are undecorated by convention.
+Apply `@override` to any method that replaces an inherited method.
+Two kinds stay undecorated by convention: constructors,
+and dunders such as `__repr__()` and `__str__()` that replace a default inherited from `object`.
 
 ## Properties
 
@@ -339,6 +340,9 @@ Cache only what cannot change.
 
 ## String Representation
 
+Printing an object that defines neither method shows its class and its address,
+as in `<__main__.Point object at 0x7f2dd669cd70>`,
+which says nothing about the value the object holds.
 Two special methods control the way an object displays.
 `__str__()` is the readable form for users,
 and `__repr__()` is the unambiguous form for developers:
@@ -389,6 +393,8 @@ The fallback runs one way only, so `repr()` never consults `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
 which is why the list prints `Point(3, 4)` rather than the shorter form.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
+By convention `__repr__()` returns the call that would rebuild the object,
+which is why it reads `Point(3, 4)`.
 
 Define `__repr__()` on classes you debug,
 and add `__str__()` only when users see the output.
@@ -425,6 +431,10 @@ print(Temperature.is_freezing(-4))
 Called on a subclass, `cls` is that subclass,
 so the alternative constructor produces the right kind of object without being rewritten.
 Naming the class directly would hard-code `Temperature` into every subclass.
+
+`is_freezing()` would also work as a module-level function.
+Defining it in the class keeps it where a reader looks for it,
+and lets a subclass replace it the way it replaces any other method.
 
 For classes that are primarily a bundle of typed data,
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
@@ -470,8 +480,9 @@ but composition or a module-level function is almost always a clearer choice.
 
 1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
     going through the existing setter.
-    Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5`,
-    then confirm `shrink(-2)`, which would divide the radius down to `-5`,
+    Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5.0`,
+    then confirm that calling `shrink(-2)` on that same circle,
+    which would divide the radius down to `-2.5`,
     still raises the setter's `ValueError` instead of silently storing a negative radius.
 2.  In `class_methods.py`, add a second alternative constructor,
     `from_kelvin(cls, k)`, using `celsius = k - 273.15`.

@@ -42,7 +42,7 @@ if __name__ == "__main__":
 ```
 
 `with trace("A") as t:` runs the body of `trace()` up to the `yield`,
-which prints `enter A`.
+printing `enter A`.
 The yielded value is what `as` binds, so `t` is `"A"`.
 The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
@@ -140,6 +140,11 @@ Comparing this to the generator form,
 `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
 
+`Trace` is also reusable: the same instance can appear in a second `with`,
+because `__enter__()` just runs again.
+The generator form cannot, which is the single-use caution above.
+A class manager that stores per-`with` state keeps that property only if `__enter__()` resets it.
+
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
@@ -192,9 +197,12 @@ except RuntimeError as error:
 `exit runs` never prints,
 because Python only registers the cleanup once `__enter__()` returns.
 An `__enter__()` that acquires several things must clean up its own partial work before it raises an exception.
+[`ExitStack`](#combining-context-managers), later in this chapter,
+is the standard tool for that:
+it unwinds whatever it already entered when a later entry fails.
 In a `with` naming several managers this is per-manager:
 the ones that entered successfully still exit,
-and only the failing one is left unwound.
+and only the failing one gets no `__exit__()` call.
 
 ## The `__exit__()` Arguments
 
@@ -295,6 +303,12 @@ The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Function
 This makes `ignore()` with no argument catch all exceptions.
 `ignore(ZeroDivisionError)` restricts that to one type.
 `ignore((ZeroDivisionError, TypeError))` restricts it to several.
+
+`suppress` reads the same call the opposite way:
+`suppress()` with no argument suppresses nothing,
+because no type is there for the raised exception to match.
+An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
+so name the types you expect unless you really want a block that nothing escapes.
 
 `__enter__()` returns `None` because `ignore` is not meant to be used with `as`.
 You can still write `as`, but it binds `None`.
@@ -589,6 +603,9 @@ print(path.read_text().strip())
 path.unlink()
 ```
 
+`AbstractContextManager[IO[str]]` is the type of any context manager whose `__enter__()` returns an `IO[str]`,
+so one variable can hold the open file in one branch and a `nullcontext` in the others.
+
 `emit()` closes only the file it opened.
 A stream the caller handed over stays open, which is what the caller expects;
 the `nullcontext` wrapper is what lets one `with` block serve both cases without an `if` around the whole body.
@@ -730,7 +747,7 @@ and everything hard about custody lives on the other side of the `yield`.
     using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
-6.  Write a context manager `retrying` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
+6.  Write a context manager `ignore_missing` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
     without using `contextlib.suppress`.
     Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
 7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,

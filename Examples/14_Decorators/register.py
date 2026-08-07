@@ -2,7 +2,7 @@
 
 registry: dict[str, type] = {}
 
-def register(cls: type) -> type:
+def register[T](cls: type[T]) -> type[T]:
     registry[cls.__name__] = cls
     return cls
 

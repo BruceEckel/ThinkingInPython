@@ -58,7 +58,7 @@ No base class needs inheriting,
 and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-The tests that follow check the `Account` class:
+The tests in this chapter check the following `Account` class:
 
 ```python
 # account.py
@@ -147,7 +147,7 @@ ______________ test_deposit_increases_balance ______________
 E       assert 100.0 == 10
 E        +  where 100.0 = <account.Account object>.balance
 
-test_account.py:6: AssertionError
+test_account.py:11: AssertionError
 ```
 
 The `where` line is the rewriting at work:
@@ -184,11 +184,15 @@ def test_overdraft_reports_the_shortfall() -> None:
 The assertion after the block belongs outside it:
 a failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
+Inside the block it would never run at all:
+the exception from `withdraw()` skips the rest of the block,
+and `pytest.raises()` then absorbs it.
 
 The second is comparing floating-point numbers,
 where testing for exact equality is unreliable.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
-which allows a small tolerance.
+which allows a small tolerance: a relative difference of 1e-6,
+unless you pass `rel=` or `abs=`.
 
 ## Parametrizing Tests
 
@@ -232,6 +236,8 @@ You declare fixtures as parameters to a test,
 which tells `pytest` to call the fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
+`pytest` is the only thing that calls it:
+a test that calls `funded()` itself fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
@@ -262,6 +268,9 @@ Everything before the `yield` is setup.
 Everything after it runs once the test finishes, even if the test failed.
 After the `yield` is the place to close files, release locks,
 or check a final invariant.
+A failing check there is reported as an error, not as a test failure:
+`pytest` prints `1 passed, 1 error`,
+so read the error to see which invariant broke.
 
 You can automatically invoke a fixture for every test
 (without specifying the fixture in each test) by adding the `autouse` flag:
@@ -277,7 +286,7 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 Place shared setup in `conftest.py`.
 
-You can parameterize fixtures too.
+You can parametrize fixtures too.
 Every test that requests the fixture runs once for each parameter value:
 
 ```python
@@ -372,6 +381,14 @@ def test_missing_file_raises(
         storage.load("absent.txt")
 ```
 
+`data_dir()` reads `APP_DATA` on every call,
+which is what lets `monkeypatch.setenv()` redirect it.
+A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` would read the variable once,
+at import time, which happens before any test body runs,
+so patching the environment afterward would move nothing.
+Reading a setting where you use it, rather than caching it at import,
+is most of what makes a module testable.
+
 ### Random Numbers
 
 Code that calls `random` produces a different value each run,
@@ -457,7 +474,7 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock is cleaner still.
-The `stamp()` function takes a `now` callable:
+Here a `stamp()` function takes a `now` callable:
 
 ```python
 # clock.py
@@ -483,7 +500,7 @@ so the injection approach is worth the small effort.
 
 If you cannot change the code,
 the library [`time-machine`](https://github.com/adamchainz/time-machine)
-freezes every clock at once, including `datetime.now()`,
+freezes every source of wall-clock time at once, including `datetime.now()`,
 with no monkeypatching on your part:
 
 ```python
@@ -506,6 +523,8 @@ def test_current_year_is_frozen() -> None:
 
 `travel` sets the clock to the given moment for the test,
 and `tick=False` holds it there so every reading is identical.
+`time.monotonic()` and `time.perf_counter()` keep running,
+because they measure elapsed intervals rather than dates.
 Unlike the prior tools it is a third-party dependency,
 but it is the standard answer for code built around `datetime`.
 
@@ -565,7 +584,7 @@ A *white-box* test reaches into the internals of the code it checks.
 A *black-box* test treats the code as an opaque box and exercises only its public interface,
 the way a client would.
 
-A language with access control enforces the two differently.
+In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.

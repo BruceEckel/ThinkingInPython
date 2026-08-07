@@ -26,7 +26,7 @@ print(vars(m))
 #: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
 ```
 
-The constructor replaces the object's `__dict__` with the `dict` the `**kwargs` argument automatically creates.
+The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
 `vars(m)` returns that same `__dict__`,
 and its output shows that the attributes and the keyword arguments are one dict:
 `m.more = 11` adds a key, just as passing `more=11` to the constructor would.
@@ -101,7 +101,7 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 `typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
-so a checker knows `Color.r` is an `int` while the functional form leaves it unknown.
+so a checker knows a `Color`'s `r` is an `int` while the functional form leaves it unknown.
 Because it is a tuple underneath, each field is readable by name or by position:
 
 ```python
@@ -130,10 +130,11 @@ Since the fields cannot be mutated, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
 
-The guarantee reaches the fields, not the objects they refer to.
+The immutability guarantee reaches the fields, not the objects they refer to.
 A `NamedTuple` holding a list still lets that list be changed,
-and the record is then unhashable,
 the same leak [`frozen=True` has](20_Rethinking_Objects.md#the-immutability-solution).
+Such a record cannot be hashed either, whether or not anyone mutates the list,
+because hashing a tuple hashes its contents.
 An immutable record needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
@@ -154,7 +155,7 @@ see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-value
 
 ## Returning Multiple Values
 
-Here, a function computes two results, returned in a `NamedTuple`:
+A function that computes two results can return them in a `NamedTuple`:
 
 ```python
 # fetch_stats.py
@@ -184,6 +185,8 @@ A data class cannot do that last part.
 `mean, count = summarize(data)` against a `@dataclass` version of `Stats` raises a `TypeError`,
 since a data class is not iterable.
 `dataclasses.astuple()` converts one when you need the positional form.
+It recurses, though: a nested data class comes back as a nested tuple,
+and every other field is deep-copied rather than shared.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -243,7 +246,7 @@ when a record should be a distinct type that equals only its own kind.
     (unlike a class attribute from [Class Attributes](09_Class_Attributes.md)).
 2.  In `point_dataclass.py`, add a third field, `z: float`,
     to the `Point` dataclass,
-    and update both `Point(...)` calls to pass three arguments.
+    and update the `Point(...)` call to pass three arguments.
 3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `color_namedtuple.py`,
     following `Color`'s shape,
     and confirm an instance still unpacks and indexes like a tuple.

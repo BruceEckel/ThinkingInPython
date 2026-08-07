@@ -18,7 +18,7 @@ The maze never decides anything.
 It only answers questions.
 
 A *blackboard* is the shared surface on which every rat writes.
-The blackboard is a classic coordination technique.
+Blackboard is a classic coordination pattern.
 Independent agents read from and write to one common data structure instead of talking to each other directly.
 Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and launches new rats.
@@ -36,7 +36,7 @@ When a rat finds more than one open neighbor,
 it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.
 When it can claim nothing, it has reached a dead end and its task ends.
-When the last rat dies, the maze is fully mapped.
+When the last rat dies, every cell reachable from the entry has been mapped.
 
 The rat does not import the blackboard.
 It only needs an object with matching methods,
@@ -153,10 +153,13 @@ The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-This is the read-modify-write hazard demonstrated in [Concurrency](19_Concurrency.md#a-single-thread-still-races),
-avoided by construction: a race needs a suspension point inside the update,
-and `claim()` contains none
-(exercise 3 inserts one and watches the guarantee fail).
+The hazard it sidesteps is the read-modify-write race from [Concurrency](19_Concurrency.md#a-single-thread-still-races).
+That race needs a suspension point inside the update,
+and `claim()` contains none,
+so the atomicity comes from the shape of the code rather than from a lock
+(exercise 3 inserts a suspension point and looks at what breaks).
+`next_number()` hands out rat numbers from `itertools.count()`,
+the endless counter from [Iterators](23_Iterators.md#reusable-algorithms).
 `explore()` claims the entry, releases the first rat, then awaits every task,
 including the ones spawned along the way:
 
@@ -216,7 +219,8 @@ class Blackboard:
 ```
 
 The maze layout lives in a text file.
-The loader skips blank lines and the path comment, so the file is the maze.
+The loader drops blank lines and any line beginning with `#`,
+so the first line naming the file's path is ignored and the rest is the maze.
 
 ```text
 # rats_and_mazes/amaze.txt
@@ -320,6 +324,11 @@ records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
+Each of this chapter's three views is a separate file holding all the display code,
+the model-view split of [Observer](30_Observer.md#a-visual-example-of-observers).
+What is missing here is the subscription:
+no model in this chapter notifies anybody,
+so each view drives or replays its model instead of waiting to be told.
 The harness skips it, like every windowed view in this book
 (`tools/data/norun.txt` lists all three of this chapter's views):
 
@@ -398,7 +407,7 @@ The occupants are `Item`s.
 and the return value is the room in which the robot ends up.
 A wall keeps the robot where it is, food gets eaten and lets the robot in,
 a teleport returns a distant room.
-No `if` or `elif` on the type of occupant appears anywhere:
+No `if` or `elif` on the type of occupant appears in the movement code:
 
 ```python
 # robot_explorer/items.py
@@ -521,11 +530,18 @@ so adding a new kind of item needs no change here.
 If you define the subclass with its symbol, the factory finds it.
 This is the registry idea from [Factory](27_Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
+`__subclasses__()` reports only direct subclasses
+(that chapter's [Simple Factory Method](27_Factory.md#simple-factory-method) shows the recursion for deeper hierarchies),
+so a new item must inherit from `Item` itself.
+Deriving from `Food` to borrow its behavior hides the class from the factory,
+which falls through to the last line and builds a `Teleport` instead.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.
 Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
-so the robot can try any direction without a special case:
+so the robot can try any direction without a special case.
+`EDGE` is a [Null Object](20_Rethinking_Objects.md#null-object):
+it answers like any other room and sends the robot back where it started:
 
 ![A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room](_images/maze_graph)
 
@@ -570,12 +586,19 @@ class Doors:
 EDGE: Final[Room] = Room(Edge())
 ```
 
+The `Coord` here counts `(row, col)`,
+the opposite order from the rats example's `(column, row)`,
+because `GameBuilder` walks the maze text line by line.
+
 ### Building the Maze in Stages
 
 `GameBuilder` assembles the maze in three stages: a room for every character,
 then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
 so splitting them into labeled passes keeps the construction readable instead of tangling it into one loop.
+[Factory](27_Factory.md#builder)
+counts this as one of the cases where Builder survives in Python,
+because construction here is genuinely a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
@@ -738,6 +761,12 @@ which walks two independent passes over the list and pairs every room with itsel
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
 
+Stage 1 does test types,
+with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
+That is not the type switch polymorphism removed.
+Construction is where the kinds of item must still be told apart, once,
+and the movement code that runs afterward never asks again.
+
 ### Testing the Walk
 
 The maze rendering, `show_maze()`, returns a string,
@@ -852,9 +881,14 @@ if __name__ == "__main__":
     show()
 ```
 
-Two patterns from earlier chapters carry the design.
-Polymorphism replaces a type switch, and a factory builds objects from data.
-Neither needs concurrency.
+Three ideas from earlier chapters carry the design.
+[Polymorphism](20_Rethinking_Objects.md#what-is-polymorphism)
+replaces a type switch,
+a [factory](27_Factory.md#the-pythonic-factory-a-dictionary)
+builds objects from data,
+and a [Null Object](20_Rethinking_Objects.md#null-object)
+removes the check for a missing door.
+None of them needs concurrency.
 
 ## Order from Noise
 
@@ -962,7 +996,8 @@ One number summarizes how settled the sand is.
 `render()` draws grain density as characters,
 in the same spirit as `Blackboard.render()`,
 so the model can show its state without a window.
-The demo shakes the plate 1200 times and displays the agitation as it happens:
+The demo shakes the plate 1200 times,
+printing agitation at four checkpoints along the way:
 
 ```python
 # chladni_plate/chladni_demo.py

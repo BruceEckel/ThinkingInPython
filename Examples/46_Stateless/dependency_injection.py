@@ -11,9 +11,10 @@ def register[T](t: type[T], instance: T) -> None:
     DI_CONTAINER[t] = instance
 
 def get[T](t: type[T]) -> T:
-    if t not in DI_CONTAINER:
-        raise NotRegistered(t.__name__)
-    return DI_CONTAINER[t]
+    try:
+        return DI_CONTAINER[t]
+    except KeyError as e:
+        raise NotRegistered(t.__name__) from e
 
 def greet(name: str) -> None:
     console: Console = get(Console)

@@ -34,6 +34,10 @@ print(low is low2, high is high2)
 
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
+The cache covers a fixed range of values chosen when CPython is built.
+The number usually quoted is `-5` through `256`, but that is not a guarantee:
+the build used here caches up to 1024,
+which is why the uncached example is `100000` and not `257`.
 Calling `int("...")` on a string, not a literal, matters here.
 If you write the literals directly, `low, low2 = 256, 256`,
 the demonstration silently breaks:
@@ -137,6 +141,11 @@ if __name__ == "__main__":
 ```
 
 Twenty-four cells, three objects.
+Counting `id(t)` rather than `len(set(cells))` is deliberate.
+`Tile` is a frozen data class,
+so its generated `__eq__()` compares field values,
+and a set of cells would collapse to three whether the tiles were shared or not.
+Only identity proves sharing.
 The grid can grow to any size and the object count stays at the number of tile kinds,
 because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
@@ -153,7 +162,8 @@ the one place raw text meets the checked type.
 It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
 The checker reads that guard.
 `SPECS` has key type `Symbol`,
-so `char not in SPECS` failing to raise an exception leaves `char` narrowed to `Symbol` on the line below,
+so reaching the line below means `char not in SPECS` was false,
+which narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 This is narrowing doing the work a `cast()` would otherwise do by assertion
 (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
@@ -187,6 +197,12 @@ because nothing they can do affects the tile.
 
 If you remove `frozen=True`, the pattern fails.
 Mutating the grass tile in one cell changes every grass cell in the map.
+
+`frozen=True` has to hold all the way down.
+It blocks assignment to a field, not mutation inside one,
+so a `Tile` holding a `list` would leak that list to every cell that shares the tile
+(the shallow-freezing trap in [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
+Every field here is immutable, which is what makes the sharing safe.
 
 ## Interning in the Constructor
 
@@ -236,24 +252,42 @@ When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore defines no `__init__()`.
-This rules out `@dataclass`,
-whose generated `__init__()` reintroduces that re-run.
+That rules out `@dataclass`,
+whose generated `__init__()` reintroduces the re-run.
+The damage is invisible at first,
+since re-assigning the same components changes nothing,
+and it appears the moment a field has a `default_factory` or `__post_init__()` has a side effect:
+both run again on an object that was already finished.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
 The missing `__eq__()` costs less than it appears:
 for a perfectly interned type, equal values are the same object,
 so the default identity comparison answers correctly.
-(`@dataclass(init=False)` could restore those two generated methods, at the price of still more care with the by-hand field assignment.)
+`@dataclass(init=False)` could restore those two generated methods, at a price:
+the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,
+and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
 A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
 not just the key that names them.
-Unless you need the constructor syntax,
+
+The two forms are not quite interchangeable.
+`tile()` interns only the calls that go through it,
+so `Tile("~", "water", False)` still builds a separate object,
+equal to the pooled water tile but not the same one.
+`Color(...)` has no such gap, because every construction goes through the pool.
+The difference matters when you want to trust `is` instead of `==`.
+Unless you need the constructor syntax or that guarantee,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
 One more property carries over from [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object,
 one wins the pool, and identity between their two results fails.
+`@cache` is not exempt.
+Being C code in the standard library invites the assumption that it is atomic,
+but the lookup, the call to your function,
+and the store are three separate steps.
+Threads that all miss on the same key each run the function and each keep their own result.
 When flyweights meet threads,
 populate the pool eagerly or guard the insert with a lock.
 
@@ -265,7 +299,9 @@ and `Color._pool` never shrinks.
 For tile kinds and colors that is fine, since the universe of values is small.
 When the universe is unbounded, such as symbols in a long-running parser,
 the pool becomes a memory leak.
-`weakref.WeakValueDictionary` fixes this.
+`weakref.WeakValueDictionary`,
+the live-instance registry from [Cleanup](10_Cleanup.md#reliable-alternatives),
+fixes this.
 It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
 
@@ -393,7 +429,7 @@ exploits the same property, using members as shared, comparable states.
 ## Flyweights in the Wild
 
 Compilers and interpreters intern identifiers so that scope lookups compare pointers instead of characters.
-Column stores such as Pandas and Polars offer categorical types.
+Dataframe libraries such as Pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.

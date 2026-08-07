@@ -4,19 +4,18 @@ from collections import Counter
 from collections.abc import Iterator
 from itertools import combinations, islice
 
-type Student = str
-type Group = tuple[Student, ...]
+type Group = tuple[str, ...]
 type Round = list[Group]
 
 def group_rounds(
-    students: list[Student], size: int, seed: int = 0
+    students: list[str], size: int, seed: int = 0
 ) -> Iterator[Round]:
-    history: Counter[frozenset[Student]] = Counter()
+    history: Counter[frozenset[str]] = Counter()
     rng = random.Random(seed)
     while True:
         pool = list(students)
         rng.shuffle(pool)
-        groups: list[list[Student]] = []
+        groups: list[list[str]] = []
         while len(pool) >= size:
             leader = pool.pop()
             group = [leader]

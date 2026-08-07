@@ -104,7 +104,7 @@ and a method can leave the object in an illegal state between steps:
 
 ```python
 # stars_class.py
-from validation import check
+from validation import TypeFailure, check
 
 class Stars:
     def __init__(self, number: int) -> None:
@@ -130,13 +130,25 @@ if __name__ == "__main__":
     rating = Stars(4)
     print(rating)
     print(rating.f1())
+    damaged = Stars(8)
+    try:
+        damaged.f1()
+    except TypeFailure as e:
+        print(f"TypeFailure: {e}")
+    print(damaged)
 #: Stars(4)
 #: 9
+#: TypeFailure: Stars(13)
+#: Stars(13)
 ```
 
 A read-only `@property` keeps users from assigning to `number`,
 but the class object still mutates `_number`,
 so `f1()` must re-check the result before returning it.
+That check runs after the mutation, not instead of it:
+`Stars(8).f1()` sets `_number` to 13, then raises,
+and the object goes on holding that illegal value.
+Catching the exception does not undo the damage.
 Checking arguments on the way in and results on the way out is the practice known as *Design by Contract*
 (DbC).
 `f1()` takes no argument, so only the postcondition appears here.
@@ -183,6 +195,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 
 The dunder methods have indeed been generated,
 and the constructor arguments cover all the fields in `Messenger`.
+The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
@@ -1047,6 +1060,49 @@ so it does not call it.
 Its field list covers its own fields plus any inherited from data class bases,
 and it builds the body by assigning those fields.
 
+Two data classes in one hierarchy must agree about `frozen`.
+Mixing the settings fails in either direction:
+
+```python
+# frozen_inheritance.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Frozen:
+    a: int
+
+@dataclass
+class Plain:
+    a: int
+
+try:
+    @dataclass
+    class Thawed(Frozen):  # type: ignore
+        b: int
+except TypeError as e:
+    print(e)
+#: cannot inherit non-frozen dataclass from a frozen one
+
+try:
+    @dataclass(frozen=True)
+    class Chilled(Plain):  # type: ignore
+        b: int
+except TypeError as e:
+    print(e)
+#: cannot inherit frozen dataclass from a non-frozen one
+```
+
+Both defenses fire again.
+The checker reports each class as an invalid frozen-dataclass subclass,
+which the `# type: ignore` silences so the listing can reach the runtime failure.
+
+`frozen=True` works by installing a `__setattr__()` that rejects every assignment,
+and a subclass inherits that method.
+Either mix would produce a class whose fields are half writable,
+so `@dataclass` refuses at class-definition time rather than at the first surprising assignment.
+Every validated type in this chapter is frozen,
+so anything you derive from one must be frozen too.
+
 ## More Data Class Tools
 
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,
@@ -1087,6 +1143,17 @@ class Config:
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
+
+`asdict()` and `astuple()` copy as they go,
+so every list and dict in the result is a new object rather than the one inside the instance.
+Changing the result never reaches back into the original.
+
+`KW_ONLY` also lifts the ordering rule.
+A field with no default normally cannot follow one that has a default,
+because the generated `__init__()` would then need a required parameter after an optional one,
+which Python refuses with `TypeError: non-default argument 'b' follows default argument 'a'`.
+Fields after `_: KW_ONLY` are keyword-only,
+so their order no longer matters and the rule stops applying.
 
 ## Defaults That Are Built, Not Shared {#defaults-built-not-shared}
 
@@ -1325,7 +1392,7 @@ print(from_json(text) == original)  # Round-trip
 JSON data typically arrives from outside the program, untrusted.
 Rebuilding the value through `Person`, `FullName`,
 and `EmailAddress` runs each constructor's validation,
-so the boundary rejects malformed JSON instead of leaking a bad object into the rest of the code.
+so the boundary rejects an illegal value instead of leaking it into the rest of the code.
 The type guards itself.
 
 A custom `JSONEncoder` serializes any data class it meets,
@@ -1375,6 +1442,9 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
 The encoder converts each data class to a dictionary and the base encoder handles it from there,
 recursing through lists and nested objects.
+`is_dataclass()` answers `True` for a data class itself as well as for an instance,
+and `asdict()` accepts only instances,
+so `not isinstance(o, type)` keeps a bare class object from reaching it.
 
 Encoding is mechanical, but decoding must know which type to rebuild,
 and that part the standard library leaves to you.

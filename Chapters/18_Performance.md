@@ -162,8 +162,11 @@ which the interpreter calls each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument:
 it attaches the event to one code object,
 which is why `square()` is absent from the count even though it ran.
-Global attachment is `set_events()`, and the two differ in cost,
-because everything reached from monitored code is monitored too.
+Attachment does not spread to whatever that code calls,
+so a helper invoked by `fib()` would go uncounted as well.
+The global form is `set_events()`,
+which fires for every Python function in the process,
+and that is where the two differ in cost.
 When one function is the question,
 monitoring the whole program to answer it pays for data you discard and slows the run you are measuring.
 
@@ -261,6 +264,9 @@ That first argument is a `lambda` here rather than a string of code,
 since a `lambda` can close over `target`, `as_list`, and `as_set` directly,
 with no separate `setup` argument needed to build them.
 `number` sets how many times `timeit` calls the lambda, 100 in this case.
+Leaving `number` out defaults to a million calls,
+which suits a microsecond snippet and is a long wait for anything slower,
+so always set it for a function you have not timed before.
 One machine measured the `set` at about 22,000 times faster than the list scan.
 
 A single measurement includes whatever else the machine was doing.
@@ -289,8 +295,7 @@ so pass `setup="gc.enable()"` when collection pauses are part of what you are co
 
 The interpreter is written in C.
 A built-in like `sum()` runs its loop in C,
-so the more of your loop you hand to the interpreter,
-the less bytecode runs per element.
+so the more of your loop you hand to C, the less bytecode runs per element.
 The idiomatic version of a loop is usually also the fast one:
 
 ```python
@@ -405,6 +410,13 @@ print([grade(s) for s in (55, 65, 85, 95)])
 
 Because `scores` stays sorted, `bisect` locates a position in O(log n)
 instead of the O(n) scan a `list` needs.
+`bisect()` is an alias for `bisect_right()`,
+which returns the position after any elements equal to the target,
+while `bisect_left()` returns the position before them
+(`insort()` is likewise an alias for `insort_right()`).
+Either one answers "where does this go,"
+but only `bisect_left()` lands on an existing value,
+so a membership test must use it, as `search_comparison.py` does below.
 Only the search is fast,
 because `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic consider the heap below instead.
@@ -645,6 +657,9 @@ print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 Both versions produce the same five numbers,
 but the eager one built two million-element lists to get them,
 while the lazy one computed only the handful of values that `islice()` extracted.
+`islice()` is what replaces the eager version's `evens[:5]`:
+a generator has no `__getitem__`,
+so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice.
 A generator is spent after one pass.
@@ -1151,14 +1166,18 @@ def collatz_lengths(values: list[int]) -> list[int]:
 limit = 200_000
 assert fastcount.count_primes(limit) == count_primes(limit)
 t_python = timeit.timeit(lambda: count_primes(limit), number=1)
-t_rust = timeit.timeit(lambda: fastcount.count_primes(limit), number=1)
+t_rust = timeit.timeit(
+    lambda: fastcount.count_primes(limit), number=1
+)
 print(f"count_primes Rust speedup: {t_python / t_rust:.1f}x")
 # Sample run: count_primes Rust speedup: 12.2x
 
 values = list(range(1, 50_000))
 assert fastcount.collatz_lengths(values) == collatz_lengths(values)
 t_python = timeit.timeit(lambda: collatz_lengths(values), number=1)
-t_rust = timeit.timeit(lambda: fastcount.collatz_lengths(values), number=1)
+t_rust = timeit.timeit(
+    lambda: fastcount.collatz_lengths(values), number=1
+)
 print(f"collatz_lengths Rust speedup: {t_python / t_rust:.1f}x")
 # Sample run: collatz_lengths Rust speedup: 34.3x
 ```

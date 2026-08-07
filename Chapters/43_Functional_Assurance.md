@@ -39,8 +39,12 @@ print(x, y, x == y)
 #: 10 10 True
 ```
 
-Because `add(2, 3)` and `5` are interchangeable, a compiler can cache the call,
-evaluate it in any order, or skip a repeat.
+Because `add(2, 3)` and `5` are interchangeable,
+an implementation is free to cache the call, evaluate it in any order,
+or skip a repeat.
+CPython does none of these on its own,
+because nothing in the language marks `add()` as pure,
+so you ask for the reuse yourself.
 You can also reason about the code by substitution,
 the same move you make in algebra.
 This property lets you check parts of a program,
@@ -88,6 +92,12 @@ where the alternative is a thicket of nested conditionals.
 [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
 put this to work, taking a `Result` apart with one branch per kind of failure.
 
+That is a runtime win rather than a checking win.
+`ty` narrows `case Ok(answer)` on a `Result[float, Exception]` to `object`,
+losing the `float`, which is why a later listing in that chapter tests with `isinstance()` instead.
+Destructuring makes the shape test and the extraction one step;
+it does not extend what a checker can prove.
+
 ## Automatic Parallelism
 
 A pure function is automatically parallelizable.
@@ -126,7 +136,7 @@ if __name__ == "__main__":
     print(parallel)
 ```
 
-`map()` runs the four calls one at a time, on one core.
+`list(map(...))` runs the four calls one at a time, on one core.
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
 Run as a script, this prints `[1229, 2262, 3245, 4203]`.
@@ -137,9 +147,21 @@ Notice there are no locks, no queues, no shared state,
 and no changes to `count_primes()`.
 The function needed no preparation for parallel execution.
 It was ready the day it was written, because it was pure.
-`ProcessPoolExecutor`,
-and the reasons Python parallelism uses processes rather than threads,
-are covered in [Concurrency](19_Concurrency.md#parallelism).
+
+Purity makes the calls safe to run together.
+It does not make them easy to move.
+Each argument and each result is pickled to cross the process boundary,
+and the function itself travels by name,
+so `count_primes()` must be defined at the top level of a module a worker can import.
+A `lambda` or a closure fails with a `PicklingError`,
+which rules out two shapes these chapters have been favoring.
+A `functools.partial` survives,
+because it pickles as its wrapped function plus its bound arguments.
+The `if __name__ == "__main__"` guard is there for the same reason:
+each worker imports this module to find `count_primes()`,
+and without the guard every worker would build a pool of its own.
+[Concurrency](19_Concurrency.md#parallelism) covers all of this,
+along with the reasons Python parallelism uses processes rather than threads.
 
 ## An Assurance Spectrum
 
@@ -156,16 +178,20 @@ You decide how far to take it.
 2. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
-   Running `ty` over the examples in this book demonstrates that proof for a useful class of mistakes.
+   Python's version of it is partial.
+   An `Any`, a `cast()`,
+   or data arriving from outside the program leaves a gap no checker can close,
+   so the theorem holds only as far as the annotations do.
+   Running `ty` over the examples in this book still rules out a useful class of mistakes,
+   which is most of what this rung is for.
 3. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
    It does not prove the law.
    It works to falsify it, which is the falsifiability the opening asked for.
 4. At the top is formal proof.
-   Dependently-typed languages such as Lean, Idris,
-   and Rocq prove a program correct for every possible input,
-   checked by machine.
+   Dependently-typed languages such as Lean, Idris, and Rocq (formerly Coq)
+   prove a program correct for every possible input, checked by machine.
    This is real, but rare outside specialized work.
 
 ### Property-Based Testing
@@ -207,8 +233,8 @@ Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
-including awkward ones a hand-written loop misses,
-such as the empty string and unusual Unicode:
+drawing on the whole of `str` rather than the five-letter alphabet chosen above,
+so it reaches inputs the loop can never produce, such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -226,6 +252,9 @@ def test_roundtrip(sample: str) -> None:
 ```
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
+By default there are a hundred of them,
+a tenth of the hand-written loop's thousand, and they still cover more ground,
+because Hypothesis aims at boundaries and oddities instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
@@ -282,5 +311,7 @@ is the "functionality" the introduction set out to find.
 4.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
     every student appears in exactly one group per round.
-    Use a strategy that generates rosters of distinct names,
-    and note how the seeded generator keeps failures reproducible.
+    Use a strategy that generates rosters of distinct names.
+    Then break `group_rounds()` on purpose, run the test twice,
+    and confirm the same counterexample arrives both times:
+    Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.

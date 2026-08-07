@@ -15,7 +15,7 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
         mid = (a + b) / 2
         if abs(f(mid)) < TOLERANCE:
             return mid
-        if f(a) * f(mid) < 0:
+        if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid

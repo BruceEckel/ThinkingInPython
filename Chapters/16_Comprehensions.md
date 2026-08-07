@@ -162,8 +162,8 @@ print(unique == same)
 ```
 
 `same` builds a list with a list comprehension, then passes it to `set()`.
-This produces the same result, but because it builds a throwaway list first,
-the set comprehension is more efficient.
+It produces the same result,
+but the throwaway list costs time and memory that the set comprehension never spends.
 
 ## Dictionary Comprehensions
 
@@ -225,19 +225,32 @@ for row in matrix:
 #: [0, 0, 0, 0, 0, 1]
 ```
 
-Read the `for` clauses left to right,
-in the order the equivalent nested loops would appear.
+Read a nested comprehension from the outside in, not left to right.
 The outer comprehension supplies `row`; for each `row`,
 the inner comprehension runs the full `col` loop and produces one sub-list.
+The inner `for col` is written to the left of the outer `for row` but runs inside it.
 The output expression sits first but runs last, once per innermost iteration.
+
+`1 if col == row else 0` is a conditional expression, not a filter.
+It sits in the output position, before the `for`,
+and decides what each element *is*; every `col` still produces one.
+An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
+decides *whether* an element is produced at all.
+The positions are not interchangeable:
+`[x for x in xs if a else b]` is a `SyntaxError`,
+and a comprehension needing both writes them in both places,
+`[x if a else b for x in xs if c]`.
 
 Nesting one comprehension inside another builds a list of lists.
 Writing two `for` clauses in one comprehension flattens instead,
-producing a single list.
+producing a single list:
+`[x for row in matrix for x in row]` turns the identity matrix into 36 numbers.
+Those clauses *do* read left to right,
+in the order the equivalent nested loops would appear.
 
 ## Feeding the Iterator Clause
 
-Everything to the right of `for` is an ordinary iterable expression,
+Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
 
 Use `zip()` to walk two sequences together, taking one element from each:
@@ -485,7 +498,7 @@ so `set(...)` or `dict(...)` consumes the whole generator immediately.
 Neither saves anything over the set comprehension `{len(w) for w in words}` or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are the better choice.
 
-Use a generator expression when the consumer takes values one at a time and never needs them all,
+Use a generator expression when the consumer takes values one at a time and never needs them all at once,
 such as `sum()`, `any()`, `all()`, `min()`, `max()`, or `str.join()`:
 
 ```python
@@ -542,7 +555,7 @@ The unpacking operators `*` and `**` may appear in the output expression of a co
 splicing each iterable or mapping into the result.
 This extends the [PEP 448](https://peps.python.org/pep-0448/)
 unpacking from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
-and replaces many uses of nested comprehensions, `itertools.chain()`,
+and replaces many uses of two-`for` comprehensions, `itertools.chain()`,
 and `itertools.chain.from_iterable()`:
 
 ```python
@@ -565,7 +578,7 @@ print(list(flat))
 ```
 
 `[*row for row in rows]` reads as "splice each `row` in,"
-and produces the same flat list as the nested `[x for row in rows for x in row]`,
+and produces the same flat list as the two-`for` `[x for row in rows for x in row]`,
 while saying what it does more directly.
 This is a shallow flatten: it splices only the outer iterable,
 so a nested list inside a row stays nested.
@@ -573,8 +586,12 @@ so a nested list inside a row stays nested.
 not `[1, 2, 3, 4]`.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
-The set form `{*s for s in sets}` and the asynchronous generator form
-(`(*a async for a in agen())`) work the same way.
+Braces plus `*` build a set instead:
+`{*s for s in sets}` produces `{1, 2, 3}` from `[{1, 2}, {3}]`.
+This is the one place where the colon does not decide between a set and a dict,
+because neither form has one; the unpacking operator decides instead.
+The asynchronous generator form (`(*a async for a in agen())`)
+works the same way.
 
 ## Choosing a Form
 
@@ -582,7 +599,7 @@ The four forms are one expression with different delimiters,
 which is why learning the list form teaches all four.
 Brackets when you want a list.
 Braces for a set, or for a dict when a colon separates a key from a value.
-Parentheses when the consumer takes values one at a time and never needs them all.
+Parentheses when the consumer takes values one at a time and never needs them all at once.
 A `for` loop when you want the side effect rather than the collection.
 
 The delimiters also decide when the work happens.

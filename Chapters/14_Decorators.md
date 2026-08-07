@@ -73,6 +73,14 @@ A decorator that forgets its `return wrapper` binds `cheese` to `None`,
 and the failure surfaces at the next call to `cheese()`,
 not at the decoration that caused it.
 
+`wrapper()` here declares no parameters,
+so `add_behavior` only works on functions that take none.
+Applied to a `def add(a, b)`,
+the call `add(2, 3)` raises `TypeError: wrapper() takes 0 positional arguments but 2 were given`.
+A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
+the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
+Every wrapper from here on is written that way.
+
 The decorator runs when Python executes the `def`,
 not when the decorated function is called:
 
@@ -351,8 +359,11 @@ so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 
-`functools.update_wrapper()` does for a class instance what `functools.wraps` does for a function.
-`wraps` is a thin convenience layer over `update_wrapper()` that copies the wrapped function's metadata.
+`functools.update_wrapper(self, func)` copies `func`'s metadata onto an object you already have.
+`wraps` is the decorator form of that same call:
+`@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
+The class form has no inner function to decorate, only `self`,
+so it calls `update_wrapper()` directly.
 
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
@@ -664,7 +675,7 @@ This one registers every class it decorates, in `registry`:
 
 registry: dict[str, type] = {}
 
-def register(cls: type) -> type:
+def register[T](cls: type[T]) -> type[T]:
     registry[cls.__name__] = cls
     return cls
 
@@ -683,6 +694,10 @@ if __name__ == "__main__":
 
 `register()` returns `cls` unchanged, so this decoration adds no wrapper;
 it exists only for the side effect of recording the class.
+The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
+Annotated `(cls: type) -> type` instead,
+`register` would hand back a bare `type`,
+and the checker would then see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
@@ -706,8 +721,8 @@ def test_registry_looks_up_by_name() -> None:
 
 `@decorator` above a `def` is shorthand for `name = decorator(name)`,
 as the `@hijack` example showed at the start of this chapter.
-Only a `def` or a `class` can follow `@`; `@decorator` above a bare assignment,
-or above a `type` alias,
+A decorator line must sit directly above a `def` or a `class`;
+`@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
 But the decorator is only a function,
 and nothing requires the callable it wraps to come from a `def`:
@@ -885,22 +900,23 @@ The two examples share a topic, not a type.
 
 ```python
 # test_pizza_decorator.py
+import pytest
 from pizza_decorator import Feta, Garlic, Hawaiian, Margherita, Olives
 
 def test_plain_pizza() -> None:
     pizza = Hawaiian()
-    assert pizza.cost == 9.50
+    assert pizza.cost == pytest.approx(9.50)
     assert pizza.description == "Hawaiian"
 
 def test_stacked_toppings() -> None:
     order = Feta(Olives(Margherita()))
-    assert order.cost == 10.00
+    assert order.cost == pytest.approx(10.00)
     assert order.description == (
         "Margherita + Olives + Feta")
 
 def test_single_topping() -> None:
     order = Garlic(Margherita())
-    assert order.cost == 8.50
+    assert order.cost == pytest.approx(8.50)
     assert order.description == "Margherita + Garlic"
 ```
 

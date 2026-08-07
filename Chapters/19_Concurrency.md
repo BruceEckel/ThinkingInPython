@@ -331,6 +331,11 @@ since more than one task can fail at once.
 The `except*` form catches members of a group by type,
 and iterating through `group.exceptions` reaches every member.
 
+The `except*` is not decoration.
+A `TaskGroup` always wraps what it re-raises, even when exactly one task failed,
+so a plain `except ValueError:` around the `async with` block catches nothing,
+and the `ExceptionGroup` travels past it uncaught.
+
 Keeping the task objects pays off even after a partial failure.
 `a` and `b` already succeeded, and their results are untouched:
 `task.result()` returns `'A'` and `'B'`, as if nothing else had gone wrong.
@@ -491,7 +496,7 @@ The event loop overlaps waiting, not computing.
 
 Notice that `asyncio.sleep()` in `io_price` is different from `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which let all five `io_price` tasks overlap.
+which is what let all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 
@@ -1383,14 +1388,15 @@ import threading
 import time
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from typing import Final
 
 LIMIT: Final[int] = 200
 
+@dataclass
 class Tickets:
-    def __init__(self, limit: int) -> None:
-        self.limit = limit
-        self.next_number = 0
+    limit: int
+    next_number: int = 0
 
     def __iter__(self) -> Iterator[int]:
         return self
@@ -1583,6 +1589,8 @@ if __name__ == "__main__":
 `run_on()` accepts the base type `Executor`, so it takes all three subtypes,
 whose workers could not be more different: an OS thread, an OS process,
 a subinterpreter.
+It prints `[10, 20, 30, 40, 50]` and `True`: three unrelated kinds of worker,
+one set of answers.
 
 `asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
@@ -1651,7 +1659,8 @@ Three different backends are running inside one `TaskGroup`.
 `to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
-All three start together, and the block does not exit until all three finish.
+All three start together, and the block does not exit until all three finish,
+so the printed `[10, 20, 30]` holds one result from each backend.
 The event loop is doing the job it has done all chapter.
 It schedules awaitables,
 and it no longer cares whether the work underneath is a coroutine, a thread,
@@ -1707,7 +1716,7 @@ The GIL [does not prevent races](#the-gil-does-not-prevent-races).
 It doesn't protect a read-modify-write spanning a function call.
 With free threading,
 two threads can execute at the same instant on separate cores.
-Race conditions become even easier.
+Race conditions become even easier to hit.
 
 `asyncio` only switches at an `await`,
 which makes it easier to [reason about interleaving](#a-single-thread-still-races).
@@ -1785,7 +1794,7 @@ The two `tracemalloc` snapshots capture the heap they add.
 so the measurement leaves the rest of the program untouched.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
-could instead hold roughly 777 suspended tasks.
+could instead hold hundreds of suspended tasks.
 The stack figure is address space set aside whether every byte is touched or not.
 The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one.
@@ -1931,7 +1940,8 @@ so the task keeps control through them and needs no lock.
 A semaphore initialized to one behaves like a lock,
 with one difference worth knowing.
 A `Lock` refuses a release it never granted,
-raising `RuntimeError: Lock is not acquired.` An over-released `Semaphore` quietly raises its own limit instead,
+raising `RuntimeError: Lock is not acquired`.
+An over-released `Semaphore` quietly raises its own limit instead,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 Raising the count deliberately turns it into a throttle on a limited resource,
 such as a fixed number of database connections.
@@ -2100,6 +2110,10 @@ for example letting only the task with the lower ID give.
 - **Pass request-scoped values in a `ContextVar`, not a global.**
   Each task starts from a copy of the context that created it,
   and `asyncio.to_thread()` carries that copy into the worker thread.
+- **A `TaskGroup` failure arrives as an `ExceptionGroup`.**
+  Catch it with `except*`.
+  A plain `except ValueError:` around the `async with` block misses it,
+  even when only one task failed.
 - **Cancellation is a `BaseException`, not an `Exception`.**
   `except Exception:` inside a task lets it through, which is what you want.
   Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.

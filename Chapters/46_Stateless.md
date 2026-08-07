@@ -144,7 +144,8 @@ def greet(name: str) -> Depend[Need[Console], None]:
 ```
 
 `greet()` needs a `Console`, cannot fail, and produces nothing.
-It lives in `utils/` because both this chapter and the next one import it.
+It lives in `utils/` because both this chapter and [Stateless in Practice](47_Stateless_in_Practice.md)
+import it.
 Compare that to the version that calls `print()` directly:
 
 ```python
@@ -193,7 +194,7 @@ Generator[Need[Console] | KeyError, Any, None]
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
 which [Generators](45_Generators.md#annotating-a-generator)
-taught you to read as "what comes back from a `yield` call."
+taught you to read as the type the `yield` expression produces inside the generator.
 That `Any` is deliberate, and it decides how `greet()` must write its request.
 
 ### Why `yield from`
@@ -296,7 +297,7 @@ run(bound("Alice"))
 #: Hello, Alice!
 ```
 
-The `bound` assignment does three things:
+Those two lines do three things:
 
 1. `supply(Console())` builds a *handler*,
    an object that knows how to answer `Need[Console]`.
@@ -406,6 +407,12 @@ or keeping one around to retry after a failure---these all fail quietly,
 returning `None` instead of raising an exception.
 Other Effect systems let you describe the work once and decide later how many times to perform it.
 In Stateless, that decision belongs to whoever still holds the function.
+
+`memoize()` is the one concession, and it caches rather than replays:
+it wraps the Effect in an object that records the result and hands that same result back on a second `run()`,
+without performing the work again.
+[`repeat()` and `memoize()`](47_Stateless_in_Practice.md#repeat-and-memoize)
+shows it, and it decorates the function like the others.
 
 ## Forgetting to Supply
 
@@ -528,6 +535,9 @@ if __name__ == "__main__":
 #: Hello, Alice!
 #: Hello, Bob!
 ```
+
+`Console` and `greet()` are repeated here rather than imported from `greeter.py`,
+so one listing holds the whole path a dependency travels.
 
 This has the same virality as `async`.
 An `async` function's callers must also be `async`,
@@ -885,7 +895,7 @@ The parameter annotation performs the upcast, so no call site needs `as_type()`.
 An annotated local variable does not do the same job:
 `screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
 so `supply(screen)` builds a `Need[Terminal]` handler again.
-Everything in between works the same under either form.
+Every function between that boundary and the Effect is written the same way under either form.
 
 ## When Two Implementations Match
 
@@ -961,9 +971,10 @@ def register[T](t: type[T], instance: T) -> None:
     DI_CONTAINER[t] = instance
 
 def get[T](t: type[T]) -> T:
-    if t not in DI_CONTAINER:
-        raise NotRegistered(t.__name__)
-    return DI_CONTAINER[t]
+    try:
+        return DI_CONTAINER[t]
+    except KeyError as e:
+        raise NotRegistered(t.__name__) from e
 
 def greet(name: str) -> None:
     console: Console = get(Console)
@@ -1066,6 +1077,8 @@ The trade is not about correctness, but churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint that was made against Java's checked exceptions,
+which [Effect Management](44_Effect_Management.md#catch-the-exception-you-expect)
+describes failing in exactly this way,
 and it is the reason [Effects Propagate, and the Checker Verifies It](#effects-propagate-and-the-checker-verifies-it)
 compares the spread to `async`.
 
@@ -1193,7 +1206,7 @@ and `Need[Console]` is the Ability that asks for it.
 The first type parameter accepts only `Ability` subclasses,
 so `Depend[Console, None]` is rejected at the annotation.
 [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
-writes an Ability from scratch and takes that bound apart.
+writes an Ability from scratch and takes that type bound apart.
 
 There is nothing to supply, because `Async` asks for no object
 (there's no `Need`).
@@ -1260,6 +1273,9 @@ def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
     yield from wait(time.sleep(seconds))
 ```
 
+The local `time` is the supplied `Time` instance,
+not the standard library's `time` module,
+so `time.sleep(seconds)` is the coroutine that `Time.sleep()` returns.
 `Time.sleep()` is the only `async def` here.
 `wait()` hands its coroutine to the driver, which awaits it,
 so `delayed_sum()` needs no `async` and no `await` of its own.
@@ -1432,7 +1448,21 @@ without forcing you to handle them.
 
 The channel carries only the failures `@throws` lifted into it.
 An exception raised where no `@throws` wraps the body bypasses the type,
-a hole the next chapter examines in [Nothing stops an undeclared Effect](47_Stateless_in_Practice.md#nothing-stops-an-undeclared-effect).
+a hole that [Nothing stops an undeclared Effect](47_Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
+examines.
+
+Because the driver throws the failure back in,
+an ordinary `try`/`except` around a `yield from` catches it,
+which is not the same as handling it.
+The exception leaves as a yielded value, travels out to `run()`,
+and comes back down into the innermost suspended frame,
+so the `except` clause runs.
+Nothing removed the `KeyError` from the channel, though,
+so the signature keeps declaring a failure that can no longer escape.
+A `catch()` further out changes the outcome again:
+it matches the yielded value before the driver ever sees it and returns that value as the result,
+so the inner `except` never runs at all.
+Only `catch()` moves an error in the type, which is the next section.
 
 ## Turning an Error Into a Value
 

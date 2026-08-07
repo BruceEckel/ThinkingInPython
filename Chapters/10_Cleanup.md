@@ -7,7 +7,7 @@ you must release it.
 ## Why `__del__()` Is Not Cleanup {#why-del-is-not-cleanup}
 
 Python calls an object's `__del__()` method when it destroys that object.
-This seems like a candidate for releasing resources:
+That looks like the place to release resources:
 
 ```python
 # cleanup.py
@@ -50,7 +50,7 @@ print("End of delete loop")
 ```
 
 `del c` inside the loop does not delete the object.
-It only unbinds the name `c`.
+It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so no `Counter`'s reference count reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
@@ -63,7 +63,7 @@ That list holds the only remaining references, so when it goes,
 the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints only afterward.
-Run `cleanup.py` directly and three more groups of lines follow the last one above:
+Run `cleanup.py` directly and three more pairs of lines follow the last one above:
 
     Third deleted
     2 Counter objects remaining
@@ -108,13 +108,17 @@ The Python documentation warns:
 >   that imported modules are still available at the time when the
 >   `__del__()` method is called.
 
-In this run the objects are destroyed during shutdown,
+In the direct run the objects are destroyed during shutdown,
 which is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
 `__del__()` should do as little as possible, and you should not depend on it.
 
 ## Reference Cycles Delay Destruction
+
+Unpredictable timing is not the only problem with `__del__()`.
+An object that refers to itself, directly or through another object,
+is not destroyed at the moment it becomes unreachable:
 
 ```python
 # cycle.py
@@ -150,8 +154,9 @@ A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
 Freeing it takes the cyclic garbage collector,
-a separate mechanism that runs periodically rather than at the moment the object becomes unreachable.
-`gc.collect()` above forces a run so the timing is visible;
+a separate mechanism triggered by allocation counts rather than by the object becoming unreachable.
+`gc.disable()` above keeps that collector from running on its own,
+and `gc.collect()` then forces a run, so the moment of destruction is visible;
 in a real program nothing tells you when it happens.
 This is a second reason not to put cleanup in `__del__()`:
 one back-reference between two objects is enough to postpone it,
@@ -200,11 +205,19 @@ print("End of program")
 `finalize()` registers `print(name, "closed")` to run when `a` is destroyed.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
+`finalize(self, self.close)` looks tidier but defeats this:
+the bound method holds a strong reference to the object,
+which then survives until the program ends.
 `close()` runs the callback immediately.
 The second `close()` does nothing: a finalizer runs at most once,
 and `alive` reports whether it still can.
-When `b` goes away without anyone calling `close()`, the callback still runs,
+`del b` destroys the object here, where the `del c` in `cleanup.py` did not,
+because `b` held the only reference to it.
+Nobody called `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
+For an object still alive when the program ends,
+`finalize()` runs the callback from `atexit`,
+ahead of the teardown that makes `__del__()` unreliable.
 
 3. A weak reference, which tracks an object without keeping it alive.
    Here, a `WeakValueDictionary` counts live instances,

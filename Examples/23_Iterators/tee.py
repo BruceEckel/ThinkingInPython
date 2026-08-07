@@ -2,6 +2,7 @@
 import tracemalloc
 from collections.abc import Iterator
 from itertools import tee
+from typing import Final
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
@@ -10,7 +11,7 @@ a, b = tee(squares(5))  # Two independent readers, one source
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
 
-N = 100_000
+N: Final[int] = 100_000
 first, second = tee(squares(N))
 tracemalloc.start()
 for _ in first:  # Drain one branch; second has not started

@@ -13,12 +13,13 @@ and closes with a case study that puts several of the pieces to work on one prob
 ## The `functools` Toolkit
 
 The standard library provides the building blocks of functional Python under `functools`,
-from a single fold to an alternate dispatch mechanism.
+from a single `reduce()` call to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table,
 each one hides an edge case that's easy to miss on the first attempt.
-These tools are already written, already correct,
-and implemented in C for speed.
+These tools are already written and already correct.
+The ones where speed matters, `reduce()`, `partial()` and the two caches,
+are implemented in C.
 What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `reduce`
@@ -38,6 +39,10 @@ For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` earns its keep for every other fold,
 where no dedicated built-in exists.
+On an empty sequence it raises `TypeError: reduce() of empty iterable with no initial value`,
+because there is nothing to return.
+A third argument supplies that starting value,
+so `reduce(add, [], 0)` returns `0` instead of raising.
 
 ### `cache`
 
@@ -56,13 +61,24 @@ def fib(n: int) -> int:
 
 print(fib(30))
 #: 832040
+print(fib.cache_info())
+#: CacheInfo(hits=28, misses=31, maxsize=None, currsize=31)
 ```
 
-Because `fib()` is recursive, the values up to and including 30 are now cached.
+Because `fib()` is recursive, the values up to and including 30 are now cached,
+and the counts show what that bought.
+The 31 misses are the 31 distinct arguments, `0` through `30`.
+The 28 hits are the calls that found a stored answer instead of recomputing it.
+Fifty-nine calls in all, against 2,692,537 for the undecorated version,
+where every branch recomputes the whole subtree beneath it.
+[Caching](18_Performance.md#caching) runs both versions side by side,
+and [Recursion](#recursion)
+comes back to why the recursive form is worth keeping.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
-the lapsed-listener leak of [Observer](30_Observer.md) in cache form.
+the lapsed-listener leak of [The Pythonic Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)
+in cache form.
 For the usual case, one expensive value per instance,
 use `@cached_property` below,
 which stores the result on the instance and dies with it.
@@ -82,9 +98,17 @@ def square(n: int) -> int:
 square(1)
 square(2)
 square(3)  # Evicts 1, the least recently used
+square(2)
+square(1)
 print(square.cache_info())
-#: CacheInfo(hits=0, misses=3, maxsize=2, currsize=2)
+#: CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)
 ```
+
+The single hit is the second `square(2)`, which was still in the cache.
+The second `square(1)` is a fourth miss even though `1` was the first value computed,
+and that miss is the proof that the eviction happened.
+`currsize` never passes `maxsize`:
+a new entry gets in only by pushing another one out.
 
 ### `partial`
 
@@ -112,11 +136,12 @@ The descriptor binds `self` automatically when accessed on an instance.
 
 ```python
 # functools_partialmethod.py
+from dataclasses import dataclass
 from functools import partialmethod
 
+@dataclass
 class Text:
-    def __init__(self, value: str) -> None:
-        self.value = value
+    value: str
 
     def pad(self, width: int, fill: str = " ") -> str:
         return self.value.rjust(width, fill)
@@ -127,6 +152,15 @@ print(Text("7").zero_pad(3))
 #: 007
 ```
 
+Since Python 3.14 a `partial` object is a descriptor too,
+so writing `zero_pad = partial(pad, fill="0")` here happens to work.
+The two stop agreeing the moment an argument is positional.
+`partialmethod` passes the instance first and the bound arguments after it,
+which is what a method expects.
+`partial` passes the bound arguments first and the instance after them,
+so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'int' object has no attribute 'value'`.
+Use `partialmethod` inside a class body and `partial` everywhere else.
+
 ### `cached_property`
 
 Runs a property's code once, on first access, then reuses the stored result.
@@ -134,11 +168,12 @@ Runs a property's code once, on first access, then reuses the stored result.
 
 ```python
 # functools_cached_property.py
+from dataclasses import dataclass
 from functools import cached_property
 
+@dataclass
 class Lazy:
-    def __init__(self, n: int) -> None:
-        self.n = n
+    n: int
 
     @cached_property
     def squared(self) -> int:
@@ -188,6 +223,13 @@ def greet(name: str) -> str:
 print(greet.__name__, "-", greet.__doc__)
 #: greet - Say hello.
 ```
+
+Delete the `@wraps(func)` line and that same `print()` reports `wrapper - None`,
+because `greet` is now bound to the inner function and nothing copied the original's identity onto it.
+Everything that reads those attributes reads the wrapper instead: `help()`,
+a traceback, a debugger, and a test framework that collects functions by name.
+`wraps()` also sets `greet.__wrapped__` to the original function,
+so a tool that needs the undecorated version can still find it.
 
 ### `cmp_to_key`
 
@@ -287,18 +329,25 @@ print(d.describe("hi"), "|", d.describe(5))
 #: a str | the number 5
 ```
 
-`itertools`, covered next, applies the same idea to lazy iteration.
+Dispatch is on the first argument after `self`, never on `self` itself,
+so this selects an implementation by the type of `value` exactly as the plain function above does.
+
+`itertools` does the same for iteration: ready-made pieces you compose,
+instead of loops you write and test again.
 
 ## The `itertools` Toolkit
 
 `itertools` builds lazy iterators from a small set of composable pieces.
-Each one produces values on demand instead of building a list up front.
+Each one produces values on demand instead of building a list up front,
+the property [Lazy Evaluation](#lazy-evaluation) returns to below.
 Each is also a loop you would otherwise write by hand,
 already tuned in C and already correct on the edge cases a hand-rolled version tends to miss,
 the empty iterable, the single element,
 the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
+[Reusable Algorithms](23_Iterators.md#reusable-algorithms)
+introduced several of these as iterator plumbing; this section is the catalog.
 
 ### `repeat`
 
@@ -324,6 +373,12 @@ from itertools import islice
 print(list(islice(range(10), 2, 8, 2)))
 #: [2, 4, 6]
 ```
+
+Two differences from a list slice.
+`islice()` rejects negative indices with a `ValueError`,
+since it cannot count back from an end it may never reach.
+And it consumes what it passes over: give it an iterator rather than a list,
+and that iterator resumes where the slice stopped instead of at the beginning.
 
 ### `count`
 
@@ -390,6 +445,10 @@ print(list(batched(range(7), 3)))
 #: [(0, 1, 2), (3, 4, 5), (6,)]
 ```
 
+A short final batch is normal for pagination and wrong for fixed-width records.
+`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` for the second case,
+which is the same choice `zip(strict=True)` offers below.
+
 ### `accumulate`
 
 Yields the running total of an iterable,
@@ -427,6 +486,14 @@ print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 #: [1, 2]
 ```
 
+The trailing `1` is in the input to separate `takewhile()` from `filter()`.
+`filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
+because filtering skips what fails and keeps looking.
+`takewhile()` stops at the first failure and never reaches the last element.
+On finite data that is a detail.
+On an infinite source it decides whether the program terminates,
+which [Reusable Algorithms](23_Iterators.md#reusable-algorithms) works through.
+
 ### `dropwhile`
 
 Skips elements while a predicate holds, then yields everything after.
@@ -438,6 +505,11 @@ from itertools import dropwhile
 print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 #: [3, 4, 1]
 ```
+
+The same trailing `1` marks the same distinction from the other direction.
+`dropwhile()` stops testing once the predicate fails,
+so the final `1` comes through,
+where `filterfalse()` would test every element and return `[3, 4]`.
 
 ### `filterfalse`
 
@@ -483,6 +555,15 @@ print(list(zip_longest([1, 2, 3], [4, 5], fillvalue=MISSING)))
 #: [(1, 4), (2, 5), (3, MISSING)]
 ```
 
+Three ways to zip inputs of different lengths,
+and the choice says what a mismatch means.
+Plain `zip()` stops at the shortest and says nothing,
+which is right when the extra elements are genuinely surplus.
+`zip(a, b, strict=True)` raises `ValueError: zip() argument 2 is shorter than argument 1`,
+which is right when equal lengths are an invariant you want checked.
+`zip_longest()` pads,
+which is right when the missing elements are data in their own right.
+
 ### `groupby`
 
 Groups consecutive elements that share a key.
@@ -495,7 +576,22 @@ from itertools import groupby
 data = ["a", "a", "b", "b", "b", "c"]
 print([(k, list(g)) for k, g in groupby(data)])
 #: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
+print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
+#: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
 ```
+
+The second line is what unsorted input costs you:
+`"b"` comes back as two separate groups, and no error says so.
+`sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
+with the same key function both times.
+
+The `list(g)` is also doing more work than it looks.
+Each group is a view onto the one underlying iterator,
+so advancing to the next group invalidates the previous group's view.
+`list(groupby(data))` therefore returns three keys paired with three empty iterators:
+the outer `list()` walked all the way to the end before anything read a group.
+Consume each group before asking for the next one,
+as the comprehension above does.
 
 ### `tee`
 
@@ -520,6 +616,10 @@ stores the whole sequence anyway.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
+[Generators](23_Iterators.md#generators)
+measures that buffering and adds a third caution:
+`tee()` shares one unlocked buffer between its branches,
+so handing them to separate threads corrupts it.
 
 ### `product`
 
@@ -600,12 +700,20 @@ Recursion is not a faster or shorter way to count down to zero.
 Its payoff shows up once the problem branches, not just repeats,
 as the next example shows.
 
+Branching brings a cost that counting down does not.
+The same subproblem can be reached along more than one branch,
+and a plain recursive function recomputes it every time.
+That is why the recursive `fib()` under [`cache`](#cache)
+is decorated rather than rewritten as a loop:
+the recursion states the definition, and the cache removes the repetition.
+
 Recursion suits problems that are naturally self-similar,
 such as walking a tree.
 Python does not optimize tail calls and limits the call stack,
 so deep recursion will raise `RecursionError`.
-For long flat sequences,
-a loop or one of the `itertools` tools is the better choice.
+`sys.setrecursionlimit()` raises that ceiling when the depth is genuine,
+but it is the wrong answer for a long flat sequence,
+where a loop or one of the `itertools` tools is the better choice.
 
 Code that walks a tree, nested data,
 or a directory reads most clearly when its shape matches the data's shape.
@@ -631,8 +739,9 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
 Writing this as a loop means building your own stack to track which sublists are still open,
 and getting the push and pop correct at every depth.
-The recursive version gets that bookkeeping from the call stack,
-which is why it stays three lines instead of growing with every level of nesting you support.
+The recursive version gets that bookkeeping from the call stack for free,
+so the body says only what to do with one element and where to descend,
+and says nothing at all about depth.
 
 ## Lazy Evaluation
 
@@ -670,8 +779,14 @@ one at a time, the same way any `for` loop consumes a generator.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
 because `islice()` stops asking when it has delivered five.
-The [Performance](18_Performance.md)
-chapter looks at laziness from the perspective of memory and speed.
+The obvious-looking `list(squares())[:5]` is not the same program.
+It slices after building the list,
+so it asks `squares()` for every value before taking five,
+and the program never gets past that line.
+Slice lazily and the source can be infinite;
+slice a list and the source has to end.
+[Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
+looks at the same idea from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
@@ -684,7 +799,11 @@ means no upstream work for the items it never reaches.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has had a turn.
-This is a good place to see these chapters' ideas working together on one small program instead of one at a time.
+This is a good place to see several of these ideas working on one small program instead of one at a time:
+an infinite generator for the rounds,
+`islice()` to take as many of them as you want,
+`combinations()` for the pairs inside a group,
+and a seeded random source that makes the whole schedule reproducible.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.
@@ -714,19 +833,18 @@ from collections import Counter
 from collections.abc import Iterator
 from itertools import combinations, islice
 
-type Student = str
-type Group = tuple[Student, ...]
+type Group = tuple[str, ...]
 type Round = list[Group]
 
 def group_rounds(
-    students: list[Student], size: int, seed: int = 0
+    students: list[str], size: int, seed: int = 0
 ) -> Iterator[Round]:
-    history: Counter[frozenset[Student]] = Counter()
+    history: Counter[frozenset[str]] = Counter()
     rng = random.Random(seed)
     while True:
         pool = list(students)
         rng.shuffle(pool)
-        groups: list[list[Student]] = []
+        groups: list[list[str]] = []
         while len(pool) >= size:
             leader = pool.pop()
             group = [leader]

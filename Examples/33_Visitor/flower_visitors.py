@@ -57,14 +57,15 @@ def flower_gen(n: int) -> Iterator[Flower]:
         yield random.choice(flowers)()
 
 # Now perform Bug operations on the flowers:
-bee = Bee()
-fly = Fly()
-worm = Worm()
-random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(4):
-    flower.accept(bee)
-    flower.accept(fly)
-    flower.accept(worm)
+if __name__ == "__main__":
+    bee = Bee()
+    fly = Fly()
+    worm = Worm()
+    random.seed(47)  # Reproducible flower sequence
+    for flower in flower_gen(4):
+        flower.accept(bee)
+        flower.accept(fly)
+        flower.accept(worm)
 #: Ranunculus pollinated by Bee
 #: Ranunculus pollinated by Fly
 #: Ranunculus eaten by Worm

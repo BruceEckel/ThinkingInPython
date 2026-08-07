@@ -2,7 +2,7 @@
 
 In languages like C++ and Java, containers are add-on libraries.
 Python builds them into the core of the language.
-Lists, dictionaries, and sets are fundamental data types.
+Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
 
@@ -143,6 +143,42 @@ print(low, high)
 #: 1 9
 ```
 
+The empty tuple `()` is the exception to the comma rule,
+because it has nothing to separate.
+
+Unpacking is not limited to one name per element.
+A starred name absorbs whatever is left over,
+and a target can nest to match the shape of the value:
+
+```python
+# unpacking.py
+
+first, *rest = [10, 20, 30, 40]
+print(first, rest)  # A starred name always collects a list
+#: 10 [20, 30, 40]
+head, *middle, tail = "abcde"  # Any iterable unpacks
+print(head, middle, tail)
+#: a ['b', 'c', 'd'] e
+(name, age), city = ("Alice", 30), "Rome"  # Nested targets
+print(name, age, city)
+#: Alice 30 Rome
+values = [1, 2, 3]
+try:
+    x, y = values  # Without a star the counts must match
+except ValueError as e:
+    print(type(e).__name__)
+#: ValueError
+```
+
+At most one target can be starred, and it always produces a `list`,
+even when the source is a tuple or a string.
+Without a star the number of names must equal the number of elements,
+or the assignment raises `ValueError`.
+A name whose value you never read is written `_` by convention,
+so `*_` discards a run of elements.
+[Pattern Matching](13_Pattern_Matching.md)
+matches `case` patterns against the same shapes.
+
 Tuples are often heterogeneous, with each position a different type:
 
 ```python
@@ -185,6 +221,10 @@ print("Bob" in ages)  # Membership tests the keys
 #: True
 print(ages.get("Dan", 0))  # A default when the key is missing
 #: 0
+print(list(ages))  # Iterating a dict yields its keys
+#: ['Alice', 'Bob', 'Carol']
+print(list(ages.values()))
+#: [30, 25, 41]
 for name, age in ages.items():
     print(name, age)
 #: Alice 30
@@ -193,6 +233,13 @@ for name, age in ages.items():
 ```
 
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
+
+A `dict` has three views: `keys()`, `values()`, and `items()`.
+Iterating the `dict` itself is the same as iterating `keys()`,
+which is why `for name in ages` walks the names.
+Only `items()` yields `(key, value)` pairs,
+so `for name, age in ages` is a common slip:
+it iterates the keys and tries to unpack each one.
 
 A `dict` iterates in insertion order, which the language guarantees.
 A `set` makes no such guarantee: the order it prints is an artifact of hashing,
@@ -275,7 +322,7 @@ and `symmetric_difference_update()` methods.
 Speed is the reason to convert a `list` to a `set` before repeated lookups.
 A `list` compares against every element in turn;
 a `set` computes one hash and looks in one place.
-`timeit()` runs a callable and returns the elapsed seconds:
+`timeit()` runs a callable `number` times and returns the total elapsed seconds:
 
 ```python
 # membership_cost.py
@@ -361,6 +408,13 @@ The factory runs on the *read*, and the new value is stored,
 so touching a missing key grows the dictionary.
 Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
+
+A plain `dict` has a second option worth knowing:
+`plain.setdefault(kind, []).append(name)` stores the default and returns it when the key is missing,
+and returns the existing value when it is not.
+It builds the empty list on every call, used or not,
+and you must repeat it everywhere you touch the dictionary.
+A `defaultdict` states the default once, where the dictionary is created.
 
 ### `deque`
 
@@ -460,8 +514,13 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
 but its fields are self-documenting.
-For records with defaults, methods, or type annotations, prefer a data class
+`typing.NamedTuple` is the class form of the same idea:
+it declares a type for each field instead of listing bare names,
+so a checker knows what each one holds.
+For a record that must be mutable, use a data class
 (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
+[Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions)
+compares all three.
 
 The standard library has more specialized containers.
 For compact homogeneous storage (`array`),
@@ -471,7 +530,7 @@ binary search in a sorted `list` (`bisect`), and a heap-backed priority queue
 
 ## Immutability
 
-Each mutable container has an immutable counterpart.
+Each of the three built-in mutable containers has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
 completes the set: a built-in,
@@ -516,7 +575,7 @@ except TypeError as e:
 ```
 
 Each `# type: ignore` sits on a line that deliberately misbehaves.
-Assigning into an immutable container is a type error as well as a runtime one,
+Modifying an immutable container is a type error as well as a runtime one,
 so the comment lets the example demonstrate the exception it expects.
 
 Where a `MappingProxyType` is only a read-only window onto a `dict` that still exists and can change,
@@ -541,8 +600,8 @@ except TypeError as e:
 
 Because a `frozendict` cannot change, it is hashable when its values are,
 so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
-A dictionary key must be hashable rather than immutable.
-Immutability is how a container produces a stable hash.
+The requirement on a dictionary key is hashability, not immutability.
+Immutability is how a container earns a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
 Neither you nor code you pass it to can add, remove,

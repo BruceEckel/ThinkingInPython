@@ -82,7 +82,7 @@ Programmers wrote the same scaffolding often enough that it acquired a name.
 It exists only because the language does not write it for them.
 
 The missing piece can arrive in two ways.
-Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, and [Singleton](24_Singleton.md)
+Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
 shows that a Python module already is one.].
 Iterator is the clear case.
 It was implicit in the `for` loop from the start,
@@ -155,7 +155,10 @@ The three purposes are:
     How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
     [Surrogate](26_Surrogate.md),
     [Changing the Interface](29_Changing_the_Interface.md),
-    and [Flyweight](35_Flyweight.md) cover the structural patterns in this book.
+    [Composite and Interpreter](34_Composite_and_Interpreter.md),
+    [Flyweight](35_Flyweight.md),
+    and [Decorators](14_Decorators.md#the-decorator-pattern)
+    cover the structural patterns in this book.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
@@ -209,7 +212,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
     This complements separating what varies from what stays the same,
-    and is part of the Low-Coupling-High-Cohesion message.
+    and is part of the Low-Coupling-High-Cohesion message:
+    few connections between parts, and one subject per part.
     [Rethinking Objects](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
     makes the composition case for it.
 -   *Managed Coupling*.
@@ -243,12 +247,13 @@ This is a small handful of fundamental ideas that you can hold in your head whil
 
 ## Reading the Chapters Ahead
 
-Each chapter in this part takes one pattern and asks three questions of it.
+Each chapter ahead takes a pattern,
+or a family of patterns that share a structure, and asks three questions of it.
 What varies and what stays the same?
 That names the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
 That decides how much is left for you to write.
-What remains after you subtract the rest?
+What remains after you subtract Python's share?
 That remainder is worth learning,
 and it is usually the intent rather than the structure.
 

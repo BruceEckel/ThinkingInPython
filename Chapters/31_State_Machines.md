@@ -49,8 +49,8 @@ which is enough for a design where every state is created once at module level.
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
-This method moves to the next state and calls `run()` for each state object.
-Thus you can see it's an expansion of the idea of the `State` pattern,
+For each one it moves to the next state, then calls that state's `run()`.
+Thus you can see it's an expansion of the idea of the *State* pattern,
 since `run()` does something different depending on the state that the system is in:
 
 ```python
@@ -131,7 +131,7 @@ mouse removed
 
 Here's the first version of the mousetrap program.
 Each `State` subclass defines its `run()` behavior,
-and also establishes its next state with an `if-else` clause:
+and also establishes its next state with a `match` statement:
 
 ```python
 # mouse_trap.py
@@ -370,8 +370,10 @@ The two versions also answer a question this input file never asks:
 what happens on an unexpected input?
 They answer it differently.
 Version 1's `case _` arms return the current state,
-so an input a state does not recognize is silently ignored,
-and the machine stays put.
+so an input a state does not recognize raises nothing and the machine stays put.
+Staying put is not the same as doing nothing:
+`run_all()` calls `run()` on whatever state `next()` returns,
+so a transition back to the current state performs that state's action a second time.
 Version 2's table holds only the explicit transitions,
 and its `next()` raises an exception on anything else.
 Neither is wrong, but the choice deserves to be deliberate.
@@ -457,6 +459,8 @@ Several candidate transitions can share one `(state, input)` key,
 told apart by their conditions.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
+A row whose condition is `None` matches every time,
+so it belongs last in its group, as the `else` the earlier rows fall through to.
 Note that the lookup keys on `type(event)` exactly: a dictionary probe,
 not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
@@ -468,6 +472,9 @@ Both callables receive the event, whether they need it or not,
 which is why `refund()` takes an argument it ignores.
 The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
 and no one signature covers them all.
+That `...` costs you a check.
+Nothing verifies that a row's condition and action accept the event class named in that row's key,
+so pairing a `SecondDigit` key with a method written for a `FirstDigit` type-checks clean and then quietly does the wrong thing at runtime.
 
 ### A Vending Machine
 
@@ -626,6 +633,10 @@ The two `Clearing selection` lines read alike and end in different states:
 too expensive returns to `COLLECTING` with the money still in,
 while sold out goes to `UNAVAILABLE`.
 The condition that fired is visible only in the state.
+
+The table is built inside `__init__()` rather than in the class body because its entries are bound methods.
+`self.add_money` carries this machine with it,
+so each `VendingMachine` gets a table wired to its own money and stock.
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.

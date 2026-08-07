@@ -9,13 +9,16 @@ from visitor_singledispatch import (
     nectar,
 )
 
-def test_nectar_registered_types() -> None:
-    assert nectar(Gladiolus()) == "Gladiolus: abundant nectar"
-    assert nectar(Chrysanthemum()) == "Chrysanthemum: a little nectar"
-
-def test_nectar_default_for_unregistered() -> None:
-    assert nectar(Ranunculus()) == "Ranunculus: no nectar"
-    assert nectar(Flower()) == "Flower: no nectar"
+@pytest.mark.parametrize("flower, expected", [
+    (Gladiolus(), "Gladiolus: abundant nectar"),
+    (Chrysanthemum(), "Chrysanthemum: a little nectar"),
+    (Ranunculus(), "Ranunculus: no nectar"),
+    (Flower(), "Flower: no nectar"),
+])
+def test_nectar_registered_and_default(
+    flower: Flower, expected: str
+) -> None:
+    assert nectar(flower) == expected
 
 @pytest.mark.parametrize("flower, expected", [
     (Ranunculus(), "strong"),

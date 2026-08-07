@@ -15,7 +15,7 @@ It calls `setUp()`, then your test method, then `tearDown()`,
 and you never call that sequence yourself.
 Constructing a `TestCase` runs nothing;
 the test runner calls `run()` on the finished object,
-a separation this chapter returns to below.
+a separation this chapter returns to in [Don't Start the Engine in the Constructor](#dont-start-the-engine-in-the-constructor).
 
 ## The Fixed Algorithm
 
@@ -92,6 +92,11 @@ applies to a method too: raise an exception when `"run" in cls.__dict__`.
 The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
+An optional step like this is a *hook*.
+The same silence hides a misspelling:
+`def customise1()` adds a new method and leaves the base's do-nothing version in place,
+which is why every step override in these listings carries `@override`.
+The checker then rejects a method that overrides nothing.
 When every subclass must supply a step,
 inherit from `ABC` and declare the step with `@abstractmethod`,
 as in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance);
@@ -224,13 +229,20 @@ If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
+The subclass form also gets optional steps for free,
+since the base already supplies the `...` default;
+the function form has to give each parameter a default of its own.
 
 The function version also closes the gap in `@final`.
 A caller supplies the steps and cannot replace the loop,
 because there is no subclass through which to replace it.
 The fixed algorithm is fixed by structure rather than by a decorator the runtime ignores.
 
-This is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+Passing functions in is not the *Strategy* pattern,
+although the two look alike at the call site.
+A Strategy swaps out a whole algorithm behind a single interface.
+Here the algorithm stays where it is and only its steps arrive from outside.
+The choice between a class and a function is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
 ## Exercises

@@ -80,14 +80,15 @@ def flower_gen(n: int) -> Iterator[Flower]:
         yield random.choice(flowers)()
 
 # Now perform Bug operations on the flowers:
-bee = Bee()
-fly = Fly()
-worm = Worm()
-random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(4):
-    flower.accept(bee)
-    flower.accept(fly)
-    flower.accept(worm)
+if __name__ == "__main__":
+    bee = Bee()
+    fly = Fly()
+    worm = Worm()
+    random.seed(47)  # Reproducible flower sequence
+    for flower in flower_gen(4):
+        flower.accept(bee)
+        flower.accept(fly)
+        flower.accept(worm)
 #: Ranunculus pollinated by Bee
 #: Ranunculus pollinated by Fly
 #: Ranunculus eaten by Worm
@@ -121,7 +122,8 @@ the flower-side dispatch goes back to having nothing to say.
 Notice where the behavior lives.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
 so the only addition to the primary hierarchy is `accept()`.
-Python has no overloading,
+Python has no method overloading,
+since a second `def visit()` replaces the first,
 so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
 Whichever way you write it,
@@ -132,7 +134,7 @@ One annotation in the listing looks like a shortcut and is not.
 because the `Visitor` base class declares no `visit()` method,
 so declaring that parameter as `Visitor` instead of `Any` fails the type checker.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base.
-A `Protocol` removes the `Any` in four lines:
+A `Protocol` removes the `Any` for two new lines and an import:
 
     class Visits(Protocol):
         def visit(self, flower: Flower) -> None: ...
@@ -143,6 +145,9 @@ A `Protocol` removes the `Any` in four lines:
 
 The listing keeps `Any` because the empty `Visitor` base is what the classic pattern looks like,
 and seeing the price is part of the point.
+The price is that nothing checks the visitor side:
+`Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
+That is the same gap the `Any` in `paper_scissors_rock.py` left in [Multiple Dispatching](32_Multiple_Dispatching.md).
 This `Any` is chosen,
 unlike the one in [Data Transfer Objects](22_Data_Transfer_Objects.md),
 where a bag of attributes named at runtime leaves no precise type to write.
@@ -154,7 +159,10 @@ using `functools.singledispatch`.
 It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
 That's how *Visitor* works,
-but without the `accept()` hook or the `Visitor` class hierarchy:
+but without the `accept()` hook or the `Visitor` class hierarchy.
+The flowers below are the same three.
+The operations are new, and there are two of them,
+added independently of each other:
 
 ```python
 # visitor_singledispatch.py
@@ -222,22 +230,31 @@ falling back to the `Flower` default only when no ancestor is registered
 The default is also the risk.
 A new `Flower` subclass that nobody registers gets the default answer with no exception and no static complaint,
 so a forgotten registration shows up as a wrong result rather than a failure.
+The default reaches further than `Flower`, too:
+`@singledispatch` registers the base implementation under `object`,
+not under the `Flower` in its annotation,
+so `nectar(42)` returns `42: no nectar`.
+The checker does not object either,
+because the dispatcher it builds declares its parameters as `Any`.
 When there is no sensible answer for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string,
 and the omission fails at the first call.
-A `match` over a closed union of types goes further and catches it before the program runs
+A `match` over a closed union of types, with `assert_never()` in the `case _`,
+goes further and catches it before the program runs
 ([Composite and Interpreter](34_Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 Adding a new operation is a new function.
-Adding a new flower is a class and, where needed, a one-line registration.
+Adding a new flower is a class,
+plus one registration for each operation that needs more than the default.
 When the operation should read like a method,
-use `functools.singledispatchmethod` instead.
+use [`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
+instead, which dispatches on the first argument after `self`.
 
 *Visitor* still has a place:
-when you truly cannot define functions over the hierarchy,
-or you need the `accept()` hook for some other reason.
+when the elements must drive the traversal themselves from inside `accept()`,
+or when a framework you do not own already calls that hook.
 But in Python that is rare.
 As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example,
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
@@ -260,13 +277,16 @@ from visitor_singledispatch import (
     nectar,
 )
 
-def test_nectar_registered_types() -> None:
-    assert nectar(Gladiolus()) == "Gladiolus: abundant nectar"
-    assert nectar(Chrysanthemum()) == "Chrysanthemum: a little nectar"
-
-def test_nectar_default_for_unregistered() -> None:
-    assert nectar(Ranunculus()) == "Ranunculus: no nectar"
-    assert nectar(Flower()) == "Flower: no nectar"
+@pytest.mark.parametrize("flower, expected", [
+    (Gladiolus(), "Gladiolus: abundant nectar"),
+    (Chrysanthemum(), "Chrysanthemum: a little nectar"),
+    (Ranunculus(), "Ranunculus: no nectar"),
+    (Flower(), "Flower: no nectar"),
+])
+def test_nectar_registered_and_default(
+    flower: Flower, expected: str
+) -> None:
+    assert nectar(flower) == expected
 
 @pytest.mark.parametrize("flower, expected", [
     (Ranunculus(), "strong"),

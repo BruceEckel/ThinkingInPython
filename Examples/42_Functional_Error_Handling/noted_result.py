@@ -9,13 +9,13 @@ def parse_field(name: str, text: str) -> Result[int, Exception]:
         return Err(e)
 
 for field, value in (("age", "42"), ("size", "oops")):
-    result = parse_field(field, value)
-    if isinstance(result, Ok):
-        print(f"{field} = {result.answer}")
-    else:
-        print(f"{field}: {type(result.error).__name__}")
-        for note in result.error.__notes__:
-            print(f"  {note}")
+    match parse_field(field, value):
+        case Ok(answer):
+            print(f"{field} = {answer}")
+        case Err(error):
+            print(f"{field}: {type(error).__name__}")
+            for note in error.__notes__:
+                print(f"  {note}")
 #: age = 42
 #: size: ValueError
 #:   field 'size' received 'oops'

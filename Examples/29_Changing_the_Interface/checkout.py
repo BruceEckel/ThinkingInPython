@@ -9,10 +9,10 @@ class _TaxRule:
 class _Discount:
     fraction: float
 
+@dataclass(frozen=True)
 class _PriceEngine:
-    def __init__(self, tax: _TaxRule, cut: _Discount) -> None:
-        self.tax = tax
-        self.cut = cut
+    tax: _TaxRule
+    cut: _Discount
 
     def compute(self, amount: float) -> float:
         net = amount * (1 - self.cut.fraction)

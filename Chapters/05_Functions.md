@@ -99,7 +99,8 @@ print(connect(port=80, host="web.example.com"))  # Any order by name
 A parameter with a default cannot come before one without.
 `def f(a=1, b):` is a `SyntaxError`:
 `parameter without a default follows parameter with a default`.
-Keyword-only parameters are exempt, because the caller names them.
+[Keyword-only parameters](#positional-only-and-keyword-only-parameters)
+are exempt, because the caller names them.
 
 Python evaluates a default value once, at function definition.
 This means a mutable default is shared across calls:
@@ -144,7 +145,10 @@ so each call mutates the object the next call will use.
 
 The `None` default in `good_append()` is a *sentinel*:
 a value chosen to mean "nothing was supplied" rather than to be used.
-You need one when the function modifies the argument.
+You need one when the function mutates that parameter,
+because the default must then be a fresh object on every call.
+Test it with `is None` rather than truthiness:
+`if not target:` also discards an empty list the caller passed on purpose.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
 Calls still share it, but sharing is harmless because it cannot change:
@@ -202,6 +206,10 @@ Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied."
 The `MISSING` sentinel keeps the two cases apart.
 A missing key with no default normally raises an exception.
 A stored `None` comes back untouched.
+
+Create a sentinel once and share that name.
+Each `sentinel()` call builds a new object, even for the same name,
+so `default is sentinel("MISSING")` compares against a second object and is always false.
 
 ## Variable Argument Lists
 
@@ -267,6 +275,10 @@ Because collecting and unpacking are inverses,
 a function can gather arguments it knows nothing about and pass them on unchanged.
 `trace()` accepts any call and forwards it,
 which is the standard shape of a wrapper.
+A function is an object like any other,
+so `report` can be passed to `trace()` as an argument,
+and `func.__name__` reads the name of whatever function arrived
+(see [Functions as First-Class Objects](40_Functional_Foundations.md#functions-as-first-class-objects)).
 [Decorators](14_Decorators.md) builds on this.
 
 ## Positional-Only and Keyword-Only Parameters
@@ -276,7 +288,7 @@ A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, never by name.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
-A `*args` parameter does the same thing.
+A `*args` parameter has the same effect as a bare `*`.
 It absorbs every remaining positional argument,
 so a parameter declared after it can only be passed by name.
 

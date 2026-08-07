@@ -1,5 +1,5 @@
 # stars_class.py
-from validation import check
+from validation import TypeFailure, check
 
 class Stars:
     def __init__(self, number: int) -> None:
@@ -25,5 +25,13 @@ if __name__ == "__main__":
     rating = Stars(4)
     print(rating)
     print(rating.f1())
+    damaged = Stars(8)
+    try:
+        damaged.f1()
+    except TypeFailure as e:
+        print(f"TypeFailure: {e}")
+    print(damaged)
 #: Stars(4)
 #: 9
+#: TypeFailure: Stars(13)
+#: Stars(13)

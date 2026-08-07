@@ -13,8 +13,8 @@ def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
+        print(f"{request = }, {answers[request] = }")
         try:
-            print(f"{request = }, {answers[request] = }")
             request = conversation.send(answers[request])
         except StopIteration as stop:
             return stop.value

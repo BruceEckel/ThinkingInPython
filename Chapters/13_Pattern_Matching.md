@@ -11,6 +11,7 @@ Pattern matching was briefly introduced in [Control Flow](04_Control_Flow.md#pat
 The simplest patterns are literal values.
 A `case _` at the end is the wildcard.
 It matches anything, like a default.
+Without one, a `match` that fits no pattern does nothing and raises no error.
 Patterns are tried top to bottom and the first match wins:
 
 ```python
@@ -35,8 +36,12 @@ print(describe(301))
 #: Status 301
 ```
 
+A literal pattern compares with `==`, not with `is`,
+so `case 200:` also matches `200.0` and `case 1:` matches `True`.
+`None`, `True`, and `False` are the exception: those three compare with `is`.
+
 For a value-to-value lookup like this, a dictionary is often shorter
-(see [the end of this chapter](#when-not-to-match)).
+(see [When Not to Match](#when-not-to-match)).
 `match` becomes valuable once the patterns do more than test equality.
 
 ## Alternatives and Capture
@@ -152,13 +157,15 @@ print(summarize([1, 2, 3, 4]))
 This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
-A sequence pattern deliberately excludes `str` and `bytes`.
+A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
 even though a string is a sequence in every other context.
 Iterating a string a character at a time is almost never what a pattern means,
 so the language rules it out.
 A tuple does match: `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
+The subject must be a sequence, though, not merely iterable:
+`case [a, b]` matches a `range` but not a generator and not a `set`.
 
 ```python
 # test_sequence_patterns.py
@@ -222,6 +229,7 @@ Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
 `@dataclass` generates it automatically from the field order,
 so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
+`NamedTuple` generates it too; an ordinary class must assign it by hand.
 Without a `__match_args__` long enough to cover the positions you supply,
 a positional pattern raises a `TypeError`.
 
@@ -365,6 +373,17 @@ print(quadrant(Point(-1, -1)))
 #: Somewhere else
 ```
 
+The guard runs only after the pattern matches,
+which is what lets it use the names the pattern bound.
+A false guard moves on to the next `case`, but the names stay bound:
+once `case Point(x, y) if x > 0 and y > 0` has failed,
+`x` and `y` still hold the values it captured.
+A pattern tests shape and equality and nothing else,
+so everything beyond that belongs in the guard: an ordering test like `x > 0`,
+a relation between two captures like `x == y`, or any call,
+such as `len(items) > 3`.
+A guard that only compares one capture to a constant is a literal pattern written the long way.
+
 ## Mapping Patterns
 
 A mapping pattern matches keys in a dictionary and binds their values.
@@ -373,6 +392,8 @@ which makes it a clean way to dispatch on JSON-shaped data.
 That also makes `case {}` a catch-all for any mapping rather than a test for an empty one,
 the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
+A `**rest` at the end binds whatever keys the pattern did not mention,
+the mapping counterpart of `*rest` in a sequence pattern.
 
 ```python
 # mapping_patterns.py
@@ -525,7 +546,7 @@ def test_exhaustive_area() -> None:
 
 ## When Not to Match
 
-For a value-to-value lookup, a dictionary is shorter and faster:
+For a value-to-value lookup, a dictionary is shorter:
 
 ```python
 # value_to_value_lookup.py
@@ -542,6 +563,12 @@ print(describe(200))
 print(describe(301))
 #: Status 301
 ```
+
+A literal `match` compiles to a chain of comparisons, one per `case`,
+so its cost grows with the number of cases while a dictionary lookup's does not.
+At three entries the difference does not matter;
+the dictionary wins as the table grows,
+and it is the only one of the two you can build or change at runtime.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.

@@ -6,6 +6,7 @@ from result import Err, Ok, Result
 @pytest.mark.parametrize("a, b, expected", [
     (7, 5, Ok("add(7 + 5 + 12): 24")),
     (1, 5, Err("func_a(1)")),
+    (7, 2, Err("func_b(2)")),
     (2, 1, Err("func_c(3): division by zero")),
 ])
 def test_combined(

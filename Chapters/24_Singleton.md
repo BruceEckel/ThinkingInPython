@@ -2,12 +2,15 @@
 
 A *singleton* is the simplest design pattern: a class with exactly one instance.
 Before using a classic implementation,
-ask whether the language already provides a solution.
+ask whether the language already provides a solution,
+the question [When a Pattern Dissolves](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+poses for every pattern.
 For the singleton, Python does.
 
 ## A Module Is Already a Singleton
 
-Python imports each module once and caches it in `sys.modules`.
+Python imports each module once and caches it in `sys.modules`,
+as [Modules and Packages](06_Modules_and_Packages.md) showed.
 Every `import` after the first produces the same module object.
 A module is a singleton, and anything defined at module level is shared,
 with one copy for the whole interpreter.
@@ -81,7 +84,7 @@ This applies `functools.cache` to a *constructor function*,
 which is an ordinary function whose only job is to build and return an instance of a class.
 It stands in for a direct call to the class constructor.
 
-`functools.cache` *memoizes* a function.
+`functools.cache` ([Caching](18_Performance.md#caching)) *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
 A constructor function with no arguments has only one possible call,
@@ -163,7 +166,6 @@ Three implementation notes:
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
-   This is not a narrow window.
    Eight threads calling `settings()` at once,
    with a constructor slow enough to widen it,
    ran that constructor eight times and handed back eight different objects.
@@ -172,7 +174,7 @@ Three implementation notes:
    or use the module form, which the import system builds exactly once.
 
 3. A [lock](19_Concurrency.md#locks) is the other fix for that race,
-   and not the obvious one.
+   but not in the obvious place.
    Wrapping the cached function's body in a `threading.Lock` changes nothing,
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
@@ -207,7 +209,9 @@ print(len({id(s) for s in built}) > 1)
 
 Eight threads, more than one object.
 Every thread checked the cache before any of them had filled it,
-so each ran the constructor and seven results were thrown away.
+so each ran the constructor and handed its caller a different object.
+Only the last one to finish stays in the cache;
+the other seven are already in the hands of their callers.
 
 `@cache` is gone below, because it no longer makes the object single:
 
@@ -434,8 +438,8 @@ y.val.append("eggs")
 z = OnlyOne()
 z.val.append("spam")
 # __new__ returns the one instance every time, so all three share val:
-print(x.val, x is y is z)
-#: ['sausage', 'eggs', 'spam'] True
+print(x.val, x is y is z, isinstance(x, OnlyOne))
+#: ['sausage', 'eggs', 'spam'] True False
 assert OnlyOne() is OnlyOne()
 ```
 
@@ -453,8 +457,8 @@ Here, where `__new__()` produces the inner object directly,
 
 Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
 Here it returns something else, the inner object, so no `__init__()` ever runs.
-That has a second consequence: `x` is not an `OnlyOne`,
-so `isinstance(x, OnlyOne)` is `False`.
+That has a second consequence, and the last printed value shows it:
+`x` is not an `OnlyOne`, so `isinstance(x, OnlyOne)` is `False`.
 The metaclass version at the end of this chapter returns the class's own instance,
 which puts it on the other side of the rule.
 
@@ -482,15 +486,15 @@ class SingletonClassVar:
 x = SingletonClassVar("sausage")
 y = SingletonClassVar("eggs")
 z = SingletonClassVar("spam")
-print(x.val, x is y is z)
-#: ['sausage', 'eggs', 'spam'] True
+print(x.val, x is y is z, isinstance(x, SingletonClassVar))
+#: ['sausage', 'eggs', 'spam'] True True
 ```
 
 `object.__new__(cls)` builds a `SingletonClassVar`, not a foreign object,
 which puts this version on the other side of the rule from `singleton_with_new.py`.
 There, `__new__()` handed back the inner class,
 so `__init__()` never ran and `isinstance(x, OnlyOne)` was `False`.
-Here `isinstance(x, SingletonClassVar)` is `True`,
+Here the same check prints `True`,
 and Python calls `__init__()` on the shared instance after every construction if the class defines one.
 `SingletonClassVar` defines none, so all the work happens in `__new__()`.
 
@@ -647,8 +651,8 @@ def test_subclassing_the_decorated_name_fails() -> None:
 
 The type checker complains that defining `Sub` raises a `TypeError` at runtime.
 `singleton.__init__()` takes two positional arguments and receives four,
-because a class statement passes the name, bases,
-and namespace to whatever it inherits from.
+because a class statement hands the name, bases, and namespace to its metaclass,
+and Python takes that metaclass from the type of the base, which is `singleton`.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
 That is the confusion a class decorator costs you.
@@ -705,9 +709,9 @@ It attaches an `instance` attribute that does not exist yet,
 and it replaces `__new__()`.
 `klass: Any = cls` is the escape hatch that lets those assignments past the type checker.
 Annotating `klass` as `type` fails.
-That resolves `klass.__new__` to `type.__new__`,
-the constructor that builds classes, when the line captures `Bar.__new__`,
-which is `object.__new__`.
+The checker then resolves `klass.__new__` to `type.__new__`,
+the constructor that builds classes,
+but the line actually captures `Bar.__new__`, which is `object.__new__`.
 
 This is the other side of the `__new__()` rule.
 `my_new()` returns an instance of `Bar`,

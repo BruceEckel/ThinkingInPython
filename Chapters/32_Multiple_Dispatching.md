@@ -155,11 +155,9 @@ If you misread that convention, every result in the class appears backward.
 
 Note what the `Any` annotations cost.
 `Item` declares neither `compete()` nor any `eval_*()` method,
-so nothing more precise would let `item.eval_scissors(self)` type-check.
-That also means a checker cannot tell you when a class is missing one of the nine methods;
+so `Any` is the only annotation available short of a `Protocol` naming all four methods.
+With `Any`, a checker cannot tell you when a class is missing one of the nine answers;
 the gap surfaces as an `AttributeError` during whichever duel first needs it.
-This is the maintenance problem the table version solves,
-where the same nine answers sit in one place and a missing one raises `KeyError`.
 
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
@@ -187,7 +185,7 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
+OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -257,7 +255,7 @@ Python makes the table cheap, so it is both shorter and easier to maintain.
 Use the double-dispatch version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
 
-Python's own operators already contain a two-step dispatch,
+Python's own operators already perform a two-step dispatch,
 and it answers the `Number + Number` question that opened this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
@@ -277,13 +275,12 @@ Here is the machinery, with each dispatch traced:
 ```python
 # radd_dispatch.py
 from dataclasses import dataclass
-from typing import Any
 
 @dataclass(frozen=True)
 class Meters:
     n: float
 
-    def __add__(self, other: object) -> Any:
+    def __add__(self, other: object) -> Meters:
         print(f"__add__({self!r}, {other!r})")
         if isinstance(other, Meters):
             return Meters(self.n + other.n)
@@ -291,7 +288,7 @@ class Meters:
             return Meters(self.n + other)
         return NotImplemented
 
-    def __radd__(self, other: object) -> Any:
+    def __radd__(self, other: object) -> Meters:
         print(f"__radd__({self!r}, {other!r})")
         if isinstance(other, int | float):
             return Meters(other + self.n)
@@ -336,12 +333,17 @@ when the right operand's type is a subclass of the left's and overrides the refl
 Python tries that reflected method first,
 so the more specific type can answer before its base does.
 
-The `Any` return annotations are the honest choice here.
-The precise type is `Meters | NotImplementedType`,
-and a checker then rejects `(Meters(1) + Meters(2)).n`,
+Both methods declare `-> Meters` even though each can return `NotImplemented`,
+and that is the standard convention rather than a shortcut.
+Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union,
+and it can do that because it gives `NotImplemented` a type that inherits `Any`,
+so returning the sentinel satisfies any declared return type.
+Spelling the union out, `Meters | NotImplementedType`,
+makes a checker reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
-The sentinel is a signal to the interpreter rather than a value a caller ever sees,
-so the annotation that describes it accurately describes the wrong thing.
+The sentinel signals the interpreter and never reaches a caller,
+so an annotation that names it describes the wrong thing.
+Widening the return to `Any` describes nothing at all and turns off checking for every caller.
 
 The win/lose/draw result is pure logic,
 which makes it easy to validate through testing.
@@ -419,9 +421,11 @@ not when a test imports it.
     while still yielding `(item1, item2)` pairs so existing calls need no change.
     Pass in your own `Counter` and print how many times `Lizard` appeared after iterating over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
     since the counter fills only as you consume the generator.
-5.  Give `Meters` a `__sub__()` and a `__rsub__()`,
-    each returning `NotImplemented` for anything but a `Meters`, an `int`,
-    or a `float`.
+5.  Give `Meters` a `__sub__()` and a `__rsub__()`.
+    `__sub__()` handles a `Meters`, an `int`, or a `float`,
+    and returns `NotImplemented` for anything else.
+    `__rsub__()` needs only the `int` and `float` cases,
+    since Python never calls the reflected form for two `Meters`.
     Subtraction does not commute, so the reflected form must undo the swap:
     check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
     Then confirm that `"ten" - Meters(3)` raises `TypeError` rather than building anything.

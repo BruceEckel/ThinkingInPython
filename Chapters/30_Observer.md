@@ -70,7 +70,7 @@ t.set_celsius(25)
 ```
 
 Python expresses this with far less machinery.
-This chapter shows the Pythonic version first,
+The rest of the chapter shows the Pythonic version first,
 then extends it to async for I/O-bound observers.
 It closes with a visual model-view example built on the same callable observers.
 
@@ -142,7 +142,7 @@ the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
 and a class per reaction.
 
 The type parameter carries the notification's type through to the observers,
-so subscribing a `list[str]`'s `append` to a `Thermometer` is a type error instead of a list of strings quietly collecting floats.
+so subscribing a `list[str]`'s `append` to a `Thermometer` fails the checker instead of quietly collecting floats in a list of strings.
 
 `Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
 not because the pattern demands a base class.
@@ -164,9 +164,12 @@ and that an unsubscribed observer stops hearing them.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
 A bound method is the exception.
-Writing `t.update` twice builds two objects that are not identical but do compare equal,
+Writing `obj.update` twice builds two objects that are not identical but do compare equal,
 since they share an instance and a function,
 so a bound-method observer detaches without being stashed.
+`unsubscribe()` delegates to `list.remove()`,
+so detaching an observer that never subscribed raises `ValueError`,
+and subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
 A list whose `append` is the observer records what arrived:
 
 ```python

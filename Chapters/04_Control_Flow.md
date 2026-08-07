@@ -146,7 +146,8 @@ find_factor(13)
 The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
 
-When iterating, `for` walks any sequence directly.
+When iterating, `for` walks any iterable directly.
+A list, a set, a dictionary, or a string needs no index.
 Use `range()` for counting and `enumerate()` when you also need the index:
 
 ```python
@@ -210,8 +211,8 @@ if length > 3:
 if (n := len(text)) > 3:
     print(f"{n} characters")
 #: 5 characters
-queue = ["a", "b", "c"]
-while queue and (item := queue.pop()) != "a":
+stack = ["a", "b", "c"]
+while stack and (item := stack.pop()) != "a":
     print("processing", item)
 #: processing c
 #: processing b
@@ -249,6 +250,8 @@ print(run("dance"))
 #: unknown command
 ```
 
+Only the first matching `case` runs.
+Unlike C, there is no fall-through, so a `case` needs no `break`.
 The first `case` destructures the split command:
 it matches a two-item list starting with `"go"`,
 and binds the second item to `direction`.
@@ -315,6 +318,9 @@ Catch the exceptions you can do something about.
 A bare `except:` with no type catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program,
 so a mistake in the `try` block looks like an expected failure.
+`except Exception:` is the broad catch you want instead:
+`KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
+so they travel past it and still stop the program.
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
 
@@ -369,6 +375,11 @@ for parse in (implicit, explicit, suppressed):
 #: explicit: direct cause: ValueError
 #: suppressed: nothing earlier shown
 ```
+
+`BadNumber` is a custom exception type,
+made by deriving a class from `Exception`.
+Its body is `pass` because it needs no behavior of its own;
+the class name is what the handler matches on.
 
 `earlier()` states the rule Python follows.
 It shows the cause when `from` set one.

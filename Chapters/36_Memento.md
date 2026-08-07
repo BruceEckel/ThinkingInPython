@@ -156,7 +156,7 @@ def test_drawing_after_restore_spares_memento() -> None:
 
 The third test checks for the subtle bug.
 If the memento shares a mutable list with the sketch,
-as in the variant exercise 4 explores,
+as in the variant that exercise 4 explores,
 drawing after a restore corrupts the snapshot.
 Both `save()` and `restore()` must copy.
 
@@ -201,6 +201,10 @@ No `Memento` class exists, no `save()`, no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
 This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution).
+That section is also why `strokes` is a tuple and not a list:
+`frozen=True` guards the binding, not the object,
+so a frozen data class holding a list still lets that list change underneath it,
+as `frozen_leaky.py` shows there.
 [Flyweight](35_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
@@ -410,7 +414,7 @@ The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If `Sketch` gains, loses, or renames a field before the load happens,
 `pickle.loads()` still succeeds.
-What breaks is everything that touches the missing piece.
+What breaks is whatever later touches a field the bytes never carried.
 Splitting the class into its own module keeps the simulation honest,
 since real drift happens between two separate runs of a program,
 not inside one script:
@@ -467,13 +471,18 @@ Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
 Drift in the other direction is quieter still.
-If you delete or rename a field, old bytes load with no error anywhere.
-The stale name arrives in the object's `__dict__` as a ghost attribute,
+Delete a field and the old bytes load with no error anywhere.
+The dropped name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
-while the renamed field is missing.
-The added-field drift above at least fails when something touches the gap.
-The removed-field drift never raises an exception.
+so `repr()` never shows it and `==` never compares it.
+The loaded object is equal to, and hashes the same as,
+one built fresh without that field.
+The added-field drift above at least fails when something touches the gap;
+this one never raises an exception at all.
 The data is just quietly wrong.
+Renaming a field is a delete and an add at once, and does both:
+the old name becomes a ghost and the new one is missing,
+so even `repr()` raises `AttributeError`.
 
 Databases hit the same problem and gave it a name.
 A *schema migration* is the disciplined version of this drift, a versioned,
@@ -493,7 +502,7 @@ so none carry pickle's security risk either.
 
 ## Snapshots in the Wild
 
-Version control is the memento pattern at industrial scale.
+Version control is the Memento pattern at industrial scale.
 A git commit is an immutable snapshot of your whole tree,
 checkout is `restore()`,
 and git shares unchanged content between commits just as `History` shares unchanged strokes between states.

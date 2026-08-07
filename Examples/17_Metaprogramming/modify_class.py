@@ -39,3 +39,6 @@ display_object(x)
 #:   • n = 42 [CV]
 #: [Methods]
 #:   • m(self)
+
+print(x.__dict__)
+#: {}

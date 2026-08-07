@@ -48,7 +48,8 @@ For example, it might:
 - Modify a non-local variable
 - Acquire a lock, or coordinate with another thread
 
-Side effects are relatively easy to spot because they change things in their environment.
+Side effects are relatively easy to spot in the function that performs them,
+because they change something outside it.
 
 But the meaning of "Effect" is broader than just side effects.
 It also includes the impact of the environment on the function.
@@ -92,7 +93,7 @@ Two schools of thought exist:
     Formal computer science theory backs this up.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
     A bottom value represents a computation that does not terminate normally or result in a standard value.
-    Because ⊥ is a valid theoretical value, raising an uncatchable error
+    Because ⊥ is a valid theoretical value, raising an error that nothing catches
     is technically referentially transparent.
     You could replace the function call with the crash itself, and the program's behavior wouldn't change.
 
@@ -109,6 +110,8 @@ If you write a function `a()` that calls a function `b()` that raises an excepti
 then `a()` also raises that exception unless it is caught within `a()`.
 To know the Effects that your function has,
 exceptions must be tracked as Effects on all functions.
+Effects therefore come in three kinds: side effects, side causes,
+and exceptions.
 
 ## A Program Can Never Be Pure
 
@@ -140,7 +143,7 @@ print(f"burned real CPU time for nothing: {busy > idle * 100}")
 Neither `compute_and_discard()` nor `do_nothing()` prints, writes,
 or returns anything a caller can act on.
 But `compute_and_discard()` still takes measurably longer to run,
-because Python cannot tell that the work is worthless, and skip it.
+because Python cannot recognize the work as worthless and skip it.
 A perfectly pure computation, followed to its logical end,
 is a space heater with extra steps.
 
@@ -157,7 +160,7 @@ The same guarantee makes testing trivial.
 A pure function needs no setup, no mocks, and no teardown.
 Call it with arguments and check the result.
 
-Consider the depth of Effect analysis as a series of phases.
+Think of Effect analysis as a series of phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
@@ -222,7 +225,7 @@ for args in [(10, 2), (10, 0)]:
 #: slope(10, 0): ZeroDivisionError
 ```
 
-`@safe` catches whatever it raises,
+`@safe` catches whatever `slope()` raises,
 so the fix lives outside the function being fixed.
 `slope()` is total again, and `match` forces the caller to handle both outcomes.
 Nothing escapes through a raised exception.
@@ -263,14 +266,17 @@ This works, and it needs no new type.
 But it only guards the exception that `slope()` was written to expect.
 `validate()` raises `ValueError` for a negative `run`,
 an exception `slope()` never anticipated.
-By calling it, `validate()`'s Effect becomes `slope()`'s Effect.
+Because `slope()` calls it, `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand is only as complete as your knowledge of every exception that a callee can raise,
 which is the tracking problem an Effect Management System exists to solve.
 
 Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,
 but did not make those first-class in the function type.
+Nothing computed a specification from the functions a body called,
+so an exception introduced three levels down had to be written by hand into every signature above it.
+The usual escape was to widen the specification until it said nothing.
 They leaked information and are generally considered a failure
-(C++ changed their specifications to a binary indication of whether or not any exceptions are thrown).
+(C++ changed its specifications to a binary indication of whether or not any exceptions are thrown).
 
 ### Make the Bad Value Impossible
 
@@ -316,13 +322,16 @@ Catching by hand hides the fix inside `slope()`,
 at the cost of a blind spot for an exception nobody thought to catch.
 A restrictive type pays once, at construction,
 and every function downstream is pure by inheritance rather than by discipline.
+None of the three makes the failure disappear.
+A `Result` turns it into a value, a `try` consumes it,
+and `NonZero` moves it to the one line that builds the value.
+What changes is how many functions have to know about it.
 
 ## Effect Management Systems
 
 Suppose a test starts failing intermittently.
 The test calls a function you wrote last week.
-By its name and parameters,
-that function calculates a total price for a list of items.
+Its name and parameters say it calculates a total price for a list of items.
 The logic looks correct.
 The math checks out.
 But sometimes the test is slow.
@@ -334,7 +343,8 @@ None of this appears in the function's signature.
 To discover what the function does, you had to read every line of it,
 and every line of everything it calls.
 
-Most functions in most programs have this hidden life which makes code hard to understand:
+Most functions in most programs have this hidden life,
+and it is what makes code hard to understand:
 
 - Can you call this function in a test without mocking half the world?
 - If you call it twice with the same arguments, do you get the same result?
@@ -359,11 +369,12 @@ You don't know enough to compose functions, which is how programs grow large.
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
-the EMS guarantees that your function also reports its Effects.
-Then if another function calls your function,
-the EMS guarantees that the new function also reports whatever Effects it produces.
+the EMS adds that Effect to your function's type.
+If another function then calls yours,
+the EMS carries the Effect into that function's type as well,
+and so on out to the edge of the program.
 An EMS allows you to look at the function signature and know whether it is pure.
-If it is not, the EMS will give details about the kinds of impurities that function involves.
+If it is not, the signature names the kinds of impurity involved.
 
 A full EMS does three things:
 
@@ -488,7 +499,7 @@ The compiler observes what you call and tracks the Effects,
 the same way it tracks whether a value is an integer or a string.
 
 The examples in this section and the next come from my research,
-which builds the same small programs in four Effect-managing languages.
+in which I build the same small programs in four Effect-managing languages.
 
 Here is the greeting program in [Koka](https://koka-lang.github.io/),
 a research language with native Effects:
@@ -671,16 +682,20 @@ not when the description is executed.
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-[Stateless](46_Stateless.md) builds all three of these listings again,
-in the language this book is about.
+Stateless is built on generators, so [Generators](45_Generators.md)
+covers that mechanism first.
+[Stateless](46_Stateless.md)
+then writes these programs again in the language this book is about,
+and [Stateless in Practice](47_Stateless_in_Practice.md#abilities-are-not-special)
+rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 ### Custom AI Languages with Effects
 
 At this writing there is an explosion of experimental languages designed for AI code generation.
 Their designs try to balance better code generation for the AI against human verifiability.
-These new languages have no human-constrained adoption curve.
-AI Effect Languages don't need the extra affordances that benefit humans.
-If a language works, an AI can start using it immediately.
+Adoption is not gated by how long humans take to learn them.
+A language written for an AI doesn't need the conveniences that help a person read code,
+and if it works, an AI can start using it immediately.
 
 Most of these only **track** Effects, rather than providing a full EMS,
 for reasons the end of this section explains:
@@ -712,7 +727,7 @@ for reasons the end of this section explains:
 By the definition above,
 most of these are Effect-tracking systems rather than full EMSs.
 For their purpose the other two parts are liabilities,
-since a host that fixes the implementations can guarantee what generated code is able to do.
+since a host that pins the implementations itself can guarantee what generated code is able to do.
 Pact and Lumen are exceptions.
 Each separates an effect's interface from its implementation and binds the implementation later,
 the second and third properties of a full EMS.
@@ -728,18 +743,22 @@ and enforces that tracking virally: `async`.
 # coroutines_are_descriptions.py
 import asyncio
 
+ran: list[str] = []
+
 async def greet() -> str:
+    ran.append("body")
     return "Hello"
 
 description = greet()  # Nothing runs
-print(type(description).__name__)
-#: coroutine
-print(asyncio.run(description))
-#: Hello
+print(type(description).__name__, ran)
+#: coroutine []
+print(asyncio.run(description), ran)
+#: Hello ['body']
 ```
 
 Calling `greet()` runs nothing.
-It builds a coroutine object, a description of work.
+It builds a coroutine object, a description of work,
+and the empty list is the evidence: the body never executed.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
 This is the same demonstration [Concurrency](19_Concurrency.md#asyncio-mechanics)
 opened with.
@@ -790,7 +809,7 @@ A library checks the Effects you wrote down.
 Only the language can check the ones you didn't.
 
 Could Effect tracking be added to Python itself,
-so that the declaring stops being manual?
+so that declaring Effects stops being manual?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
@@ -826,7 +845,7 @@ Nobody audits their imports for name collisions anymore.
 The language does the bookkeeping.
 
 The same pattern repeats across the field.
-Version control made program elements unique across time,
+Version control gave every state of the code a name you can return to,
 so experimentation stopped being risky.
 Automated testing moved "does it still work?" from a manual ritual into the build.
 Garbage collection took the tracking of memory ownership out of the programmer's head.

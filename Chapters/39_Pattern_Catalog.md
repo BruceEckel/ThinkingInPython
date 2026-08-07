@@ -11,7 +11,8 @@ Each entry has a one-line intent so you can recognize a pattern by name and find
 Listing a pattern here is not a recommendation.
 Many overlap, some compete,
 and several exist only to work around limits of a particular language.
-The body of this book argues that a number of them are unnecessary in Python.
+The body of this book argues that a number of them are unnecessary in Python
+([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the pattern appears only in this catalog.
 
@@ -21,7 +22,7 @@ An unlinked name means the pattern appears only in this catalog.
 |---------|--------|
 | [Abstract Factory](27_Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
 | [Builder](27_Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
-| [Factory Method](27_Factory.md) | Defer instantiation to a method so subclasses choose the concrete type. |
+| [Factory Method](27_Factory.md#polymorphic-factories) | Defer instantiation to a method so subclasses choose the concrete type. |
 | [Prototype](27_Factory.md#prototype) | Create new objects by cloning an existing instance. |
 | [Singleton](24_Singleton.md) | Ensure a class has one instance with a single point of access. |
 
@@ -31,7 +32,7 @@ An unlinked name means the pattern appears only in this catalog.
 |---------|--------|
 | [Adapter](29_Changing_the_Interface.md#adapter) | Convert one interface into another a client expects. |
 | Bridge | Separate an abstraction from its implementation so both vary independently. |
-| [Composite](34_Composite_and_Interpreter.md) | Treat individual objects and compositions of them uniformly through a tree. |
+| [Composite](34_Composite_and_Interpreter.md#the-classic-composite) | Treat individual objects and compositions of them uniformly through a tree. |
 | [Decorator](14_Decorators.md#the-decorator-pattern) | Attach responsibilities to an object dynamically by wrapping it. |
 | [Façade](29_Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
 | [Flyweight](35_Flyweight.md) | Share fine-grained objects to support large numbers of them efficiently. |
@@ -66,10 +67,10 @@ An unlinked name means the pattern appears only in this catalog.
 | Proactor | Dispatch the completion of asynchronous operations to handlers. |
 | [Producer-Consumer](19_Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | Read-Write Lock | Allow concurrent readers but exclusive writers. |
-| Double-Checked Locking | Cut locking cost when lazily initializing a shared resource. |
+| [Double-Checked Locking](24_Singleton.md#tests-threads-and-locks) | Cut locking cost when lazily initializing a shared resource. |
 | Guarded Suspension | Block a call until a precondition becomes true. |
 | Balking | Refuse an action when the object is not in a suitable state. |
-| [Future / Promise](19_Concurrency.md#parallelism) | Represent a result that will become available later. |
+| [Future/Promise](19_Concurrency.md#one-task-many-backends) | Represent a result that will become available later. |
 | Thread-Specific Storage | Give each thread its own copy of a value. |
 
 ## Architectural (POSA)
@@ -149,7 +150,7 @@ An unlinked name means the pattern appears only in this catalog.
 | [Object Pool](15_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a fixed set of named singletons. |
 | [Dependency Injection](11_Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [Inversion of Control](25_Template_Method.md) | Let a framework call your code rather than the reverse. |
+| [Inversion of Control](25_Template_Method.md#the-fixed-algorithm) | Let a framework call your code rather than the reverse. |
 | Service Locator | Look up dependencies through a central registry. |
 | [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |
@@ -157,7 +158,7 @@ An unlinked name means the pattern appears only in this catalog.
 | [Fluent Interface](27_Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](42_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
-| [Function Object](28_Function_Objects.md) | An object whose sole purpose is to wrap a single function. |
+| [Function Object](28_Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [Memoization](41_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |

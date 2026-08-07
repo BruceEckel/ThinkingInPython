@@ -3,14 +3,15 @@ import threading
 import time
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from typing import Final
 
 LIMIT: Final[int] = 200
 
+@dataclass
 class Tickets:
-    def __init__(self, limit: int) -> None:
-        self.limit = limit
-        self.next_number = 0
+    limit: int
+    next_number: int = 0
 
     def __iter__(self) -> Iterator[int]:
         return self

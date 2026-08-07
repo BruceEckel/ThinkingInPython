@@ -15,5 +15,5 @@ class SingletonClassVar:
 x = SingletonClassVar("sausage")
 y = SingletonClassVar("eggs")
 z = SingletonClassVar("spam")
-print(x.val, x is y is z)
-#: ['sausage', 'eggs', 'spam'] True
+print(x.val, x is y is z, isinstance(x, SingletonClassVar))
+#: ['sausage', 'eggs', 'spam'] True True

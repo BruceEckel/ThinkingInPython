@@ -23,7 +23,7 @@ This is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
 the tricky data, the code on which other people depend.
 An explicit `Any` indicates that a value is truly dynamic.
-`ty` calls this inferred form `Unknown` when it reports a type,
+`ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
 They behave the same: both are compatible with everything.
 
@@ -121,8 +121,7 @@ print(area("3", 4))  # type: ignore
 ```
 
 At runtime `area("3", 4)` does not cause an error.
-It returns `"3333"`,
-because `"3" * 4` is the correct syntax for string repetition.
+It returns `"3333"`, because `"3" * 4` repeats the string four times.
 The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
 
@@ -141,6 +140,10 @@ info: Function defined here
 
 A diagnostic names the rule in brackets, points at the offending line,
 and pairs what the annotation expected with what the call supplied.
+
+Listings in this book use a shorthand for a diagnostic.
+Where a line is commented out because it would fail the check,
+a neighboring `# ty:` comment summarizes what the checker reports for it.
 
 ## Narrowing {#narrowing}
 
@@ -166,7 +169,7 @@ Inside the `if`, the checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
 Outside the `if`, `text` is still the full `str | None`.
 The same narrowing follows an `isinstance()` check, an equality test,
-or a comparison against a specific value such as `is not SOME_SENTINEL`.
+or an identity test against a specific value such as `is not SOME_SENTINEL`.
 
 ## Constants with Final
 
@@ -189,6 +192,10 @@ GREETING: Final[str] = "hello"
 print(MAX_RETRIES, GREETING)
 #: 3 hello
 ```
+
+`Final` blocks rebinding the name, not mutation of the object the name holds.
+A `Final[list[str]]` can still be appended to;
+only an assignment to the name itself is refused.
 
 You can give the type explicitly, as in `GREETING`,
 or let the checker infer it from the value, as with `MAX_RETRIES`.
@@ -243,8 +250,10 @@ print(render(Square()))
 ```
 
 `Circle` and `Square` never mention `Drawable`.
-The checker accepts both because each has a `draw()`,
+The checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
 so they are of the correct shape.
+The signature is part of that shape: a `draw()` that returns an `int`,
+or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
@@ -333,7 +342,7 @@ whatever that type is.
 
 `Any` cannot express that connection.
 It accepts any list,
-but the returned value doesn't express the type held by the list.
+but the return type then says nothing about what the list held.
 
 A *type parameter* correctly specifies the returned type.
 Declare the parameter in square brackets after the function name:
@@ -354,8 +363,7 @@ print(s.upper())
 
 `T` is a placeholder, filled in separately at each call.
 The checker infers `T` from the argument and then knows the return type.
-Both `n + 1` and `s.upper()` are successful,
-while `n.upper()` fails the type check.
+Both `n + 1` and `s.upper()` pass the checker, while `n.upper()` fails.
 
 A class declares type parameters the same way:
 

@@ -1,9 +1,10 @@
 # functools_cached_property.py
+from dataclasses import dataclass
 from functools import cached_property
 
+@dataclass
 class Lazy:
-    def __init__(self, n: int) -> None:
-        self.n = n
+    n: int
 
     @cached_property
     def squared(self) -> int:

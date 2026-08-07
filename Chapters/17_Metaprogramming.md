@@ -1,7 +1,7 @@
 # Metaprogramming
 
 Objects are created by other (special) objects.
-These special objects are called *classes* and you configure them to produce desired objects.
+These special objects are called *classes* and you configure them to produce the objects you want.
 
 Classes are also objects, and you can modify objects.
 The listings here use `display_object()`,
@@ -49,18 +49,20 @@ display_object(x)
 #:   • n = 42 [CV]
 #: [Methods]
 #:   • m(self)
+
+print(x.__dict__)
+#: {}
 ```
 
-Note that `x` sees the changes made to the class *after* `x` was created.
-The instance never changed; its `__dict__` is as empty as before.
+`x` sees the changes made to the class *after* `x` was created.
+The instance never changed; the last line shows its `__dict__` still empty.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
 even ones already created.
 
 What creates these "class" objects?
 Other special objects, called *metaclasses*.
-The default metaclass is `type`,
-and in the vast majority of cases it does the right thing.
+The default metaclass is `type`, and almost always it does the right thing.
 You can customize how Python produces classes by running extra code or injecting members as it builds each class.
 That is metaclass programming.
 
@@ -257,6 +259,12 @@ ThermostatDay 6:00
 LightOn 8:00
 ```
 
+Each generated class is a real type, not a label.
+`LightOn` and `WaterOff` are distinct subclasses of `Event`,
+so `isinstance()` tells them apart and either one can later be given behavior of its own.
+Calling `Event(class_name, hour, minute)` directly would print the same schedule,
+but every entry would be the same type with its kind reduced to a string.
+
 `EventMakers` subclasses `dict` so the laziness is invisible at the call site.
 `Event._event_maker[class_name]` reads as an ordinary lookup,
 and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
@@ -294,7 +302,8 @@ The `type` approach in the previous section builds a class from a name,
 a tuple of bases, and a namespace dict.
 A second way is to write an ordinary `class` statement in an f-string,
 then `exec()` that string as code.
-The class definition (`klass`) is easier to read and modify:
+That class body, held in `klass` below,
+is easier to read and modify than a namespace dict:
 
 ```python
 # commander.py
@@ -589,7 +598,7 @@ In `x = Field()` below, `Field()` runs before the assignment,
 so the new instance cannot know it is about to be bound to the name `x`.
 Python delivers that name automatically.
 When a `class` body finishes executing,
-it calls `__set_name__(owner, name)` on every class attribute that defines it,
+Python calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
 passing the freshly created class and the name the attribute was assigned to.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
@@ -721,7 +730,7 @@ print(Simple().uses_metaclass())  # type: ignore
 
 `SimpleMeta.__init__()` runs once, as the `class Simple` statement finishes,
 and patches a new method onto the freshly built class.
-In the `display_object` listing,
+In the `display_object()` output,
 `uses_metaclass(self)` sits alongside `foo` and `bar`,
 indistinguishable from the methods written in the class body.
 The injected value is a lambda, but a function is a descriptor
@@ -889,6 +898,11 @@ The `[T]` on `__call__()` ties its return type to `cls`,
 so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
 Without it, every singleton loses its type and a type checker can no longer catch a misspelled attribute access on the result.
 
+That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
+Annotating the first parameter as `type[T]` hides the fact that `cls` is a `Singleton`,
+which is exactly what a checker must confirm before it will accept a zero-argument `super()`.
+Both forms do the same work at run time.
+
 You might expect to parameterize[^parametrize] the class,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That does not work.
@@ -1002,6 +1016,10 @@ and whatever mapping it returns is the namespace that body executes into.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
 so `NoDuplicates` sees the second `on_open` land on a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
+`__prepare__()` must carry `@classmethod`.
+Python calls it on the metaclass before any class object exists,
+so an ordinary method would receive the class name as its `self` and leave `bases` unfilled,
+producing a `TypeError` that says nothing about the real mistake.
 No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
 by which time the duplicate has already won.
@@ -1048,15 +1066,15 @@ This creates a metaclass conflict you must resolve.
 As with the layout conflict above, ty sees this without running the program,
 reporting `conflicting-metaclass` and naming both `MetaA` and `MetaB`,
 which is why the line carries a `# type: ignore`.
-It's one more reason to avoid metaclasses (and arguably, multiple inheritance)
+It's one more reason to avoid metaclasses (and, arguably, multiple inheritance)
 unless you truly need them.
 
 ## The `inspect` Module
 
 Up to now, you've been modifying classes.
 `type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
-The `inspect` module is the other half of metaprogramming.
-`inspect` reads the structure of live objects.
+The `inspect` module is the other half of metaprogramming:
+it reads the structure of live objects.
 It answers questions like which members an object has,
 what a function's signature is, and what its docstring says.
 
@@ -1068,6 +1086,7 @@ A few functions cover most needs:
   their annotations, and their defaults.
 - `inspect.getdoc(obj)` returns the cleaned-up docstring.
 - `inspect.getmembers(obj)` and `inspect.getmembers_static(obj)` return an object's `(name, value)` pairs.
+  The `_static` variant reads them without running properties or other descriptors.
 - Predicates such as `inspect.isclass()`, `inspect.isfunction()`,
   and `inspect.ismethod()` classify what you find.
 
@@ -1098,15 +1117,16 @@ the deferred evaluation of PEP 649,
 even though it [never checks them](08_Static_Typing.md#hints-are-not-enforced-at-run-time).
 `signature()` requests that stored data (not the original source text)
 to build the `Signature` object.
-The `ALL_DUNDERS` listing at the end of this chapter shows the machinery on a class:
+The `ALL_DUNDERS` listing in [The Tool in Use](#the-tool-in-use)
+shows that machinery on a class:
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
 ### Building `display_object()`
 
 Throughout the book you've been seeing `display_object()` to show the layout of an object.
-The `utils/` prefix makes it live in the shared `utils/` directory at the top of the `Examples` tree,
-and any chapter can import it:
+The `utils/` prefix on the file marker below puts it in the shared `utils/` directory at the top of the `Examples` tree,
+where any chapter can import it:
 
 ```python
 # utils/display.py
@@ -1404,6 +1424,7 @@ The third call passes `ALL_DUNDERS`.
 A `@dataclass` produces many of these:
 
 - `__dataclass_fields__`
+- `__dataclass_params__`
 - `__match_args__`
 - `__replace__`
 - `__hash__`, set to `None`
