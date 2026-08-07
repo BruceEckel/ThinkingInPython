@@ -47,11 +47,10 @@ The yielded value is what `as` binds, so `t` is `"A"`.
 The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
-The code before `yield` is the setup, and the code after it is the cleanup.
 The `finally` makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
 and `finally` still runs the cleanup before the exception propagates.
-It relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
+The `@contextmanager` form relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
 and [Iterators](23_Iterators.md#generators).
 
 Leaving the `try`/`finally` out is the common mistake:
@@ -458,8 +457,7 @@ Even if `report()` takes arguments or returns a value,
 neither version of `banner` sees them.
 What `banner` offers instead is one definition,
 usable both as a `with` block and as a `@` decorator.
-Use it when setup and cleanup should be identical on every call,
-with nothing that needs to vary per call.
+Use it when setup and cleanup should be identical on every call.
 
 ## Combining Context Managers
 
@@ -705,7 +703,6 @@ def test_objects_reused_not_recreated() -> None:
         assert second is first
 ```
 
-The second lease hands back the same object, not a new one.
 A production pool adds refinements to this skeleton,
 such as lazily creating items on first demand,
 validating an item before lending it out,
@@ -714,7 +711,7 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.
 That is what the protocol buys:
-the borrower's contract is two lines long and cannot be got wrong,
+the borrower's contract is two lines long and impossible to get wrong,
 and everything hard about custody lives on the other side of the `yield`.
 
 ## Exercises

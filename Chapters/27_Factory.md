@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
 The privacy has a price.
 The nested `class` statements run again on every call,
-so every `factory()` defines fresh `Circle` and `Square` classes.
+so every call to `factory()` defines fresh `Circle` and `Square` classes.
 Two shapes from different calls share behavior but not a class:
 `type(a) is type(b)` is `False`,
 and `isinstance()` comparisons across calls fail with it.
@@ -276,7 +276,6 @@ the pattern does not go away, it stops needing a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
 
-Know when the registration runs:
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 In one file that timing is invisible,
 but a subclass defined in another module joins the registry only when that module is imported.
@@ -396,7 +395,6 @@ if __name__ == "__main__":
 
 Now the factory methods are polymorphic:
 each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeFactory` is the dispatcher that finds and applies the correct one.
 `ShapeFactory.create_shape()` creates the shapes,
 a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
 The factory is immediately used to create the shape object,
@@ -509,7 +507,7 @@ g2.play()
 ```
 
 In this environment, `Character` objects interact with `Obstacle` objects,
-but there are different types of Characters and obstacles depending on what kind of game you're playing.
+but there are different types of characters and obstacles depending on what kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
 In this example, the setup and play is simple, but those activities
@@ -533,7 +531,6 @@ a concrete factory that forgets `make_obstacle()` constructs without complaint a
 An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
 which catches the omission as early as possible.
-The two forms look interchangeable in a listing and fail at different moments.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -600,7 +597,7 @@ The concrete classes inherit nothing,
 but the type checker still verifies that each one fits the appropriate `Protocol`.
 `BrokenFactory` is the near-miss.
 It supplies `make_character()` and forgets `make_obstacle()`,
-and uncommenting the line that passes one produces `protocol member make_obstacle is not defined on type BrokenFactory`.
+and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
 The Protocol catches the omission before the program runs,
 earlier than either `@abstractmethod` or `raise NotImplementedError` can.
 A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
@@ -652,7 +649,6 @@ print(goblin.powers)  # The original changed too
 #: ['bite', 'shared']
 ```
 
-The deep copy is the part that matters.
 `captain` gets its own `powers` list,
 so appending to it leaves `goblin.powers` unchanged.
 The `clone()` method wraps `copy.deepcopy()`.
@@ -701,8 +697,8 @@ There the table holds classes and calls a constructor.
 Here it holds instances and copies them.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
-These tests pin down the two properties a prototype registry has to have:
-each spawn is independent, and the stored prototype never changes:
+These tests pin down the two required properties for a prototype registry.
+Each spawn must be independent, and the stored prototype must never change:
 
 ```python
 # test_prototype.py

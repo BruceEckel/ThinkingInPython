@@ -83,7 +83,7 @@ print(sorted(words, reverse=True))
 #: ['pear', 'apple', 'Fig']
 ```
 
-`sorted(x)` returns the result,
+`sorted(x)` returns the result while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because the comparison is by code point;
 [Functions](05_Functions.md#lambdas) shows how `key=` changes that.
@@ -231,7 +231,7 @@ print(2 in a)
 ```
 
 The `{}` literal was taken by `dict` first, so an empty set is `set()`.
-The order these sets print is CPython's hashing rather than a guarantee.
+The order these sets print comes from CPython's hashing and is not a guarantee.
 
 Every operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
@@ -272,7 +272,7 @@ The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
 
-The speed is the reason to convert a `list` to a `set` before repeated lookups.
+Speed is the reason to convert a `list` to a `set` before repeated lookups.
 A `list` compares against every element in turn;
 a `set` computes one hash and looks in one place.
 `timeit()` runs a callable and returns the elapsed seconds:

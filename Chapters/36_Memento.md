@@ -114,10 +114,10 @@ Whoever holds `checkpoint` stores it and gives it back.
 It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means the honest mistakes (mutating the snapshot)
-fail loudly.
+though freezing the memento means an honest mistake (mutating the snapshot)
+fails loudly.
 
-A `type Memento = tuple[str, ...]` alias type-checks at every call site instead of the class.
+A `type Memento = tuple[str, ...]` alias would type-check at every call site instead of the class.
 But an alias is *structural*, not *nominal*.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
@@ -200,8 +200,8 @@ Now it is safe because no operation anywhere can change the object bound to `bef
 No `Memento` class exists, no `save()`, no `restore()`,
 and no copying to protect the past.
 `after` shares the two original stroke strings with `before`.
-This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution),
-as [Flyweight](35_Flyweight.md) shares immutable values across space,
+This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution).
+[Flyweight](35_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
 ```python
@@ -283,7 +283,7 @@ if __name__ == "__main__":
 `do()` pushes the present into the past and clears the future,
 because acting after an undo starts a new timeline.
 The states you undid are no longer reachable by redo,
-which is how every editor behaves.
+which is how editors behave.
 `undo()` and `redo()` just shuttle the present between the two stacks.
 Neither checks its own precondition:
 undoing with no past raises `IndexError` from `pop()`.
@@ -470,7 +470,7 @@ Drift in the other direction is quieter still.
 If you delete or rename a field, old bytes load with no error anywhere.
 The stale name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
-while the renamed field is simply missing.
+while the renamed field is missing.
 The added-field drift above at least fails when something touches the gap.
 The removed-field drift never raises an exception.
 The data is just quietly wrong.

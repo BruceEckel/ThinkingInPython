@@ -83,9 +83,6 @@ print("ok")
 #: ok
 ```
 
-Every later feature in these chapters is, in part,
-a way to keep more of your code pure.
-
 ## Immutability
 
 An *immutable* value cannot change after creation.
@@ -402,8 +399,6 @@ Partial application turns a general function into the specific one a caller need
 which is handy when a higher-order function needs a single-argument callable.
 
 Use partial application when an API expects a function of one argument and you have a function of several.
-Rather than write a throwaway wrapper,
-you preset the fixed arguments and pass the result straight in.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
@@ -484,7 +479,6 @@ and you combine them without touching their internals.
 Composition scales by addition.
 Each stage is also testable on its own,
 and you build larger behavior by naming a new composition rather than writing new logic.
-Stacking `compose()` calls forms a pipeline that reads as the list of steps it performs.
 When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 

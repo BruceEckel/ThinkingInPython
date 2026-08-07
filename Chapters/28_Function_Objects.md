@@ -236,7 +236,7 @@ def newton(f: Fn, a: float, b: float) -> float | None:
 
 Because each finder is a function with the same signature,
 passing one to `solve()` chooses the strategy,
-and the loop below simply tries each choice in turn:
+and the loop below tries each choice in turn:
 
 ```python
 # strategy.py
@@ -522,8 +522,6 @@ The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
 Its lists cannot name a single event class,
 so the element type erases the parameter to `Handler[Any]`.
-The generic guards the boundary.
-The `Any` covers the heterogeneous storage behind it.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
@@ -537,7 +535,7 @@ A subclass of `Deposit` published to this bus finds no handler and vanishes as q
 Walking `type(event).__mro__` and calling every handler along it gives subclass events their parent's handlers,
 at the cost of an event type no longer naming its audience by itself.
 
-For testing, publishing calls every handler registered for a type,
+The tests confirm that publishing calls every handler registered for a type,
 a handler hears only its own event type,
 and an event with no handler is a quiet no-op:
 
@@ -568,8 +566,6 @@ def test_no_handler_is_a_noop() -> None:
 This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)
 with one shared subject: instead of every observable holding its own list,
 one bus holds them all and the event type picks the audience.
-The subscribers are functions,
-and the bus routes each event to them by its type.
 Here a type may have many handlers.
 If you instead want a single handler per type,
 chosen by the argument's type and open to new types without editing a central function,

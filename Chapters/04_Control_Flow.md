@@ -226,7 +226,8 @@ which [Comprehensions](16_Comprehensions.md) covers.
 ## Pattern Matching
 
 The `match` statement compares a value against structural patterns.
-It is reminiscent of a C `switch`, but is much more powerful:
+It is reminiscent of a C `switch`,
+but a pattern can look inside a value and pull out its parts:
 
 ```python
 # pattern_matching.py
@@ -260,7 +261,7 @@ Write a constant as a literal (`case "quit":`) or as a dotted name
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.
-Like C++ and Java, an exception propagates up the call stack until it finds a handler.
+As in C++ and Java, an exception propagates up the call stack until it finds a handler.
 In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
@@ -437,9 +438,9 @@ with path.open() as f:
 path.unlink()  # Delete the file
 ```
 
-Closing the file is cleanup that runs whether or not the block succeeds,
-which [Cleanup](10_Cleanup.md)
-contrasts with letting Python's garbage collector do it.
+Closing the file is cleanup that runs whether or not the block succeeds.
+[Cleanup](10_Cleanup.md)
+contrasts this with letting Python's garbage collector do it.
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.

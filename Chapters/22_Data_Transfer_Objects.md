@@ -231,7 +231,6 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
-This refines the selection rule.
 Choose `NamedTuple` when tuple behavior is the goal: unpacking,
 multiple return values, compatibility with code that expects a tuple.
 Choose a [frozen dataclass](12_Data_Classes_as_Types.md#immutability)
@@ -251,8 +250,8 @@ when a record should be a distinct type that equals only its own kind.
 4.  In `display_namespace.py`,
     add a fourth attribute to `m` by passing it to the constructor,
     then add it by assignment after the existing `m.more = 11` instead.
-    Confirm `vars(m)` reports the same four attributes, in the same order,
-    either way.
+    Confirm `vars(m)` reports the same four attributes either way,
+    and note whether they come out in the same order.
 5.  In `fetch_stats.py`,
     change `summarize()` to return a bare `tuple[float, int]`.
     Every caller still runs.

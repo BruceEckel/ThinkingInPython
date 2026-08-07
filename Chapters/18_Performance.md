@@ -1,6 +1,6 @@
 # Performance
 
-Performance means at least two things when it comes to computing:
+Performance means at least two things in computing:
 
 1. Application development speed
 2. Execution speed
@@ -665,8 +665,7 @@ turning microseconds into milliseconds, a thousandfold slowdown,
 not a modest one.
 If you push further, the process fails outright,
 with `MemoryError` or an OS kill.
-The slowdown is a cliff, not a slope:
-nothing warns you as the data approaches the limit,
+Nothing warns you as the data approaches the limit,
 and everything changes the moment it crosses.
 
 That cliff is why it's worth building a lazy pipeline to handle a data set that could grow.
@@ -1061,7 +1060,6 @@ Hand the hot Python function to your AI for conversion,
 and it can walk you through the rest of the process.
 Once you're done, you import a module that looks from the outside like any other Python module,
 except that it runs faster.
-It also lets you do things that are difficult in Python.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
 and [maturin](https://www.maturin.rs)
@@ -1171,8 +1169,7 @@ and runs this same comparison, printing your machine's own numbers.
 The main book build never does this and never requires a Rust toolchain;
 building `rust/` is a separate, opt-in step.
 
-That closes the arc this chapter has been building:
-one baseline and three ways past it.
+That is one baseline and three ways past it.
 The plain Python loop, timed in the Numba example above, is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
@@ -1195,7 +1192,7 @@ so this compares Rust against that combination too, not just plain Python. -->
 
 Sometimes the fix is not a faster function but a different architecture.
 When the slowdown comes from waiting on the outside world, use `asyncio`.
-If the work can be done in parallel (pure functions can do this seamlessly),
+If the work can be done in parallel (pure functions make this easy),
 you can spread it across multiple cores or multiple processes.
 That is a design decision with its own chapter,
 [Concurrency](19_Concurrency.md).
@@ -1203,7 +1200,7 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
-A profiler is how you find them without guessing.
+A profiler is how you find the slow spots without guessing.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,

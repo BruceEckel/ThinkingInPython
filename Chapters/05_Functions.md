@@ -131,9 +131,9 @@ print(good_append(2))
 ```
 
 A mutable default persists because it lives on the function object rather than being recreated on each call.
-`__defaults__` holds the tuple of default values stored on the function object,
-and it is the same list both calls appended to.
-This behavior commonly confuses newcomers to the language.
+`__defaults__` holds the tuple of default values,
+and it is the same list both calls append to.
+This behavior commonly confuses newcomers.
 
 Underneath, a parameter is another name bound to the caller's object,
 the binding described in [Variables and References](02_Tour.md#variables-and-references).
@@ -331,8 +331,7 @@ In the standard library,
 many built-in functions and methods take positional-only parameters,
 such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
-That matters when a subclass overrides a method.
-Since the name is not part of the interface,
+That matters when a subclass overrides a method:
 the subclass can rename the parameter, and a type checker will not object.
 
 ## Lambdas

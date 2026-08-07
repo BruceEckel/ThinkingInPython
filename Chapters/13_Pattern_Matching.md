@@ -153,7 +153,7 @@ This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
 A sequence pattern deliberately excludes `str` and `bytes`.
-Matching `"abc"` against `case [a, b, c]` does not match,
+`case [a, b, c]` does not match `"abc"`,
 even though a string is a sequence in every other context.
 Iterating a string a character at a time is almost never what a pattern means,
 so the language rules it out.
@@ -456,7 +456,7 @@ fails with `SyntaxError: alternative patterns bind different names`.
 
 When a value is one of a fixed set of types,
 define that set as a union using the [`type` statement](08_Static_Typing.md#the-type-statement).
-Now you can perform a match on that union.
+Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker will ensure the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.

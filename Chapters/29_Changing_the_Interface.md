@@ -348,7 +348,7 @@ print(caught[0].message)
 `to_string()` keeps working, which is the point: existing callers are warned,
 not broken.
 The `# type: ignore` is there because `ty` reports the deprecated call as a diagnostic,
-which is the half that reaches a caller before they run anything.
+the half that reaches a caller before they run anything.
 The runtime half is a `DeprecationWarning`.
 Python hides those by default outside `__main__` and test runners,
 which is the trap: the caller who most needs the warning is the least likely to see it.
@@ -361,7 +361,7 @@ A message is optional but should say what to use instead.
 The decorator also applies to a class,
 where it warns on construction and on subclassing.
 
-`@overload` accepts it too, which is the finer instrument:
+`@overload` accepts it too, the finer instrument:
 you can deprecate one call signature while the rest stay current,
 so a function that used to take a string and now takes a `Path` can warn only the string callers.
 Checker support for the per-overload form lags the whole-function form,
@@ -370,7 +370,7 @@ so verify your checker reports it before relying on it.
 An Adapter and a Façade both add an interface without disturbing what is already there,
 which is why they are safe moves.
 Deprecation is the move that is not safe,
-and marking the old interface is how you make the risk visible on a schedule instead of discovering it at the moment you delete something.
+and marking the old interface is how you make the risk visible on a schedule instead of discovering it when you delete something.
 
 ## Exercises
 

@@ -44,8 +44,7 @@ evaluate it in any order, or skip a repeat.
 You can also reason about the code by substitution,
 the same move you make in algebra.
 This property lets you check parts of a program,
-and sometimes prove them correct,
-and it connects back to this chapter's opening question about what counts as "what works."
+and sometimes prove them correct.
 
 This property is also the quiet reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
 is safe.
@@ -68,7 +67,6 @@ which is "the squares of the even numbers."
 It leaves the looping to Python.
 This is the broader "functionality" you want.
 Describe the result, and let the machine arrange the steps.
-Declarative code says less and means more.
 By naming the result instead of the steps,
 you hand the reader your intent and give the runtime freedom to choose how to deliver it.
 That freedom is why a SQL query, a NumPy expression,
@@ -158,14 +156,12 @@ You decide how far to take it.
 2. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
-   Types are propositions and programs are their proofs.
    Running `ty` over the examples in this book demonstrates that proof for a useful class of mistakes.
 3. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
    It does not prove the law.
-   It works to falsify it,
-   which is the falsifiability the chapter's opening requests.
+   It works to falsify it, which is the falsifiability the opening asked for.
 4. At the top is formal proof.
    Dependently-typed languages such as Lean, Idris,
    and Rocq prove a program correct for every possible input,
@@ -211,7 +207,7 @@ Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
-including awkward ones a handwritten loop misses,
+including awkward ones a hand-written loop misses,
 such as the empty string and unusual Unicode:
 
 ```python
@@ -230,8 +226,7 @@ def test_roundtrip(sample: str) -> None:
 ```
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
-When a law fails, Hypothesis does not only report the failing input.
-It shrinks it to the smallest example that still fails,
+When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
 

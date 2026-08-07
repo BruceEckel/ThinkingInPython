@@ -831,7 +831,7 @@ The class is an instance of the metaclass.
 The class's own instances are not.
 
 One useful metamethod is `__call__()`.
-It is the same method that makes any object callable when it is called.
+It is the same method that makes any object callable.
 `obj()` invokes `type(obj).__call__(obj, ...)`.
 A class is an object, an instance of its metaclass,
 so `ClassName()` invokes `__call__()` on the metaclass the same way.
@@ -910,7 +910,6 @@ Choose the lightest tool that solves your problem.
 
 `Singleton` stores its cache in `_instances`, which is a `dict` attribute.
 It doesn't inherit from `dict` directly.
-That raises a natural question.
 Can a metaclass inherit from more than one class, the way an ordinary class can?
 
 Trying the obvious version fails.
@@ -1058,11 +1057,8 @@ Up to now, you've been modifying classes.
 `type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
 The `inspect` module is the other half of metaprogramming.
 `inspect` reads the structure of live objects.
-It answers questions like:
-
-- Which members an object has
-- What a function's signature is
-- What its docstring says
+It answers questions like which members an object has,
+what a function's signature is, and what its docstring says.
 
 `inspect` works on any live object: modules, classes, functions, methods,
 and instances.
@@ -1416,8 +1412,7 @@ A `@dataclass` produces many of these:
 The generated `__init__`, `__eq__`, and `__repr__` give `Fraggle` a constructor,
 equality, and a `repr()` for free.
 
-The rest, from `__class__` to `__static_attributes__`,
-is the bookkeeping every class carries.
+The rest is the bookkeeping every class carries.
 
 ## Which Hook for Which Job
 

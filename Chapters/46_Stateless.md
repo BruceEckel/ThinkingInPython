@@ -156,8 +156,8 @@ def greet(name: str) -> None:
 That signature is a lie by omission.
 `-> None` claims the function returns nothing and mentions nothing else.
 However, the body writes to standard output, which is a side effect.
-That omission matters: the caller cannot see the dependency,
-redirect the output, or test the function without capturing stdout.
+The caller cannot see the dependency, redirect the output,
+or test the function without capturing stdout.
 
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
@@ -409,7 +409,6 @@ In Stateless, that decision belongs to whoever still holds the function.
 
 ## Forgetting to Supply
 
-Let's see what happens when we don't supply a required `Need`.
 Give `run()` an Effect that still needs a `Console`:
 
 ```python
@@ -761,7 +760,7 @@ A double for the builtin `Console` must inherit from it,
 and that `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 [Supplying an Interface](#supplying-an-interface), next,
-is where that cost comes from and how an interface avoids it.
+explains where that cost comes from and how an interface avoids it.
 
 For illustration, this chapter builds a `Console` rather than using the one from Stateless.
 In your own code, check what the library already declares first.
@@ -1008,8 +1007,8 @@ apart from `console: Console = get(Console)` in place of `console = yield from n
 The first call to `greet("Alice")` fails at runtime because nothing has been registered.
 The second call succeeds because now the binding exists.
 The two `greet()` calls are identical.
-No type information indicates whether a `Console` has been registered.
-The type checker cannot report that something has gone wrong.
+No type information indicates whether a `Console` has been registered,
+so the type checker cannot report that something has gone wrong.
 
 Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.

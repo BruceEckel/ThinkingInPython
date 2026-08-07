@@ -216,7 +216,7 @@ if __name__ == "__main__":
 ```
 
 Notice the flexibility of dictionaries.
-A tuple serves as a key just as easily as a single object.
+A tuple works as a key just as easily as a single object.
 Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
 The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
@@ -226,7 +226,6 @@ as you will see while adding `Lizard` in exercise 1.
 
 ## One Type or Many
 
-Python dispatches on a single type at a time.
 For dispatch on one argument's type, `functools.singledispatch`
 (see [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch))
 gives you open, per-type functions.
@@ -238,7 +237,7 @@ with no methods to edit across the classes.
 The two match types differently.
 `singledispatch` resolves through the MRO,
 so registering a base class catches every subclass,
-while the table matches the class exactly, as the paragraph above notes.
+while the table matches the class exactly.
 Swapping one for the other changes which pairings are covered,
 not just how many types are considered.
 
@@ -255,7 +254,7 @@ The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
 belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
 Python makes the table cheap, so it is both shorter and easier to maintain.
-Use the spread-out method version only when a combination needs substantial,
+Use the double-dispatch version only when a combination needs substantial,
 type-specific code that will not fit in a table cell.
 
 Python's own operators already contain a two-step dispatch,
@@ -317,7 +316,6 @@ except TypeError as e:
 
 The first two additions resolve inside `__add__()`:
 the left operand recognized the type.
-The third is the interesting one.
 `4 + Meters(3)` asks `int.__add__` first, and `int` has never heard of `Meters`,
 so it returns `NotImplemented`.
 Python then, with no error anywhere, turns to `Meters.__radd__`,
@@ -325,7 +323,6 @@ whose trace line shows the operands arriving swapped.
 The last case shows what the sentinel is for.
 `Meters.__add__` runs, declines the string, `str` has no `__radd__` to consult,
 and only after both sides have declined does Python raise `TypeError`.
-Declining is not failing; the error appears only when nobody volunteers.
 
 Two details of the fallback are easy to get wrong.
 Raising `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.

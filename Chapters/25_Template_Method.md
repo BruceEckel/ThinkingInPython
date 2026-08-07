@@ -89,7 +89,7 @@ When you need the interpreter to refuse an override,
 the `__init_subclass__()` technique from [Making a Class Final](17_Metaprogramming.md#making-a-class-final)
 applies to a method too: raise an exception when `"run" in cls.__dict__`.
 
-The step methods default to `...`, doing nothing,
+The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
 When every subclass must supply a step,
@@ -157,8 +157,6 @@ or one that leaves a step empty when the flow depends on the work.
 That last case is the price of the `...` defaults above.
 They make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten."
-Where the algorithm cannot proceed without a step,
-`@abstractmethod` says so and Python enforces it.
 The Template Method works only when every subclass is a faithful substitute for its base.
 
 The test supplies a recording subclass and verifies the fixed flow:

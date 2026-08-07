@@ -152,15 +152,14 @@ The goal of Effect Management is not to eliminate Effects but to isolate them so
 ## A Taxonomy of Benefits
 
 The initial and most obvious reason to track Effects is parallelism.
-A function with no Effects touches nothing shared and effortlessly runs in parallel.
+A function with no Effects touches nothing shared and runs in parallel.
 The same guarantee makes testing trivial.
 A pure function needs no setup, no mocks, and no teardown.
 Call it with arguments and check the result.
 
-Isolating Effects produces a cascade of value beyond that first split.
 Consider the depth of Effect analysis as a series of phases.
-The first phase separates pure from impure.
-That phase produces parallelism, caching, and easy testing for the pure part.
+The first phase separates pure from impure, and produces parallelism, caching,
+and easy testing for the pure part.
 
 ### Subdividing the Impure Portion
 
@@ -679,8 +678,7 @@ in the language this book is about.
 
 At this writing there is an explosion of experimental languages designed for AI code generation.
 Their designs try to balance better code generation for the AI against human verifiability.
-One benefit these new languages have:
-there's no human-constrained adoption curve.
+These new languages have no human-constrained adoption curve.
 AI Effect Languages don't need the extra affordances that benefit humans.
 If a language works, an AI can start using it immediately.
 
@@ -744,7 +742,7 @@ Calling `greet()` runs nothing.
 It builds a coroutine object, a description of work.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
 This is the same demonstration [Concurrency](19_Concurrency.md#asyncio-mechanics)
-opened with, and it can now be read with new eyes.
+opened with.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
@@ -849,7 +847,7 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, it does not scale.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions from the beginning of this chapter:
+The function signature answers the questions raised earlier in this chapter:
 what does this function depend on, what does it change, what can go wrong.
 Composition stops being a guess,
 because the compiler balances the books at every boundary.

@@ -28,8 +28,7 @@ This material comes from my PyCon 2024 talk,
 ## Exceptions Discard Partial Calculations
 
 If a function raises an exception partway through a comprehension,
-you lose all partial calculations.
-Any successful results computed before the failure vanish:
+you lose all partial calculations:
 
 ```python
 # exceptions_lose_data.py
@@ -171,8 +170,7 @@ The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
-Python's humbler form of the same idea is `int | None`,
-and the comparison locates `Result`'s value.
+Python's humbler form of the same idea is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
 while an `Err` carries the reason for the failure.
 Use `| None` when absence is the whole story, a lookup that found nothing.
@@ -292,7 +290,6 @@ then `func_c()`.
 Bind removes the boilerplate by chaining the steps.
 The error checking has not gone away.
 It moved into `bind()`, where it appears once.
-An `Err` anywhere short-circuits the whole thing.
 
 Functional programmers have a name for a type that carries a value plus this chaining operation:
 a *monad*.
@@ -499,7 +496,7 @@ and the `match` tells them apart.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 
-An exception knows what went wrong and not where it came from.
+An exception knows what went wrong but not where it came from.
 `invalid literal for int() with base 10: 'soon'` is accurate and unhelpful:
 which setting, which field, which row of the file?
 The frame that has that answer is rarely the frame that raised the exception,

@@ -182,7 +182,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 ```
 
 The dunder methods have indeed been generated,
-and you can see that the constructor arguments cover all the fields in `Messenger`.
+and the constructor arguments cover all the fields in `Messenger`.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
@@ -613,7 +613,6 @@ Instead of checking a changeable value everywhere and hoping you never miss a sp
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
 No other code repeats the check, because it cannot fail.
-An illegal value never produces a `Stars`.
 Illegal values are unrepresentable.
 
 This is one aspect of functional programming
@@ -1191,7 +1190,6 @@ except Exception as e:
 #: TypeFailure: Stars(99)
 ```
 
-The last case matters more than the convenience.
 `copy.replace()` builds the new object through the constructor,
 so `Stars.__post_init__()` runs on the copy.
 A validated type stays validated across a replacement,

@@ -99,12 +99,11 @@ Eventually I even wrote a message confirming I was not going to complete it.
 
 In June of 2026, after having people mention the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
-The experience was amazing, and I began adding material from talks, writing,
-and presentations.
+The experience was amazing,
+and I began adding material from writing and presentations.
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
 
-This book never would have happened without the help of Claude,
-which gave me tremendous support throughout the process.
+This book never would have happened without the help of Claude.
 That said, it is still my work, derived from existing work, designed by me,
 checked and rewritten by me.
 It has my voice, and I've gone over every sentence multiple times, editing,

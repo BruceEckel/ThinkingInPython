@@ -17,7 +17,7 @@ It requires that the primary class hierarchy have a method,
 typically called `accept()`,
 which takes an object of a secondary class hierarchy called `Visitor`.
 The operations on the primary hierarchy become dynamically bound.
-The objects of the primary hierarchy simply `accept()` the `Visitor`,
+The objects of the primary hierarchy `accept()` the `Visitor`,
 then call the `Visitor`'s dynamically bound method:
 
 ```python
@@ -116,7 +116,7 @@ The last line of output shows both dispatches doing visible work.
 so that line depends on both unknown types at once:
 the worm's type chose `eat()`, and the flower's type chose which `eat()` runs.
 If you delete the override, the program still runs;
-the flower-side dispatch simply goes back to having nothing to say.
+the flower-side dispatch goes back to having nothing to say.
 
 Notice where the behavior lives.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,

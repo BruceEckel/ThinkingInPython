@@ -153,9 +153,9 @@ The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-This is the read-modify-write hazard [Concurrency](19_Concurrency.md#a-single-thread-still-races)
-demonstrated, avoided by construction:
-a race needs a suspension point inside the update, and `claim()` contains none
+This is the read-modify-write hazard demonstrated in [Concurrency](19_Concurrency.md#a-single-thread-still-races),
+avoided by construction: a race needs a suspension point inside the update,
+and `claim()` contains none
 (exercise 3 inserts one and watches the guarantee fail).
 `explore()` claims the entry, releases the first rat, then awaits every task,
 including the ones spawned along the way:
@@ -320,7 +320,7 @@ records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
-Like every windowed view in this book, the harness skips it
+The harness skips it, like every windowed view in this book
 (`tools/data/norun.txt` lists all three of this chapter's views):
 
 ```python
@@ -1110,7 +1110,7 @@ if __name__ == "__main__":
 ```
 
 `itertools.cycle()` constructs an infinite iterator from any finite iterable.
-It yields elements from the source item in sequence and cycles back to the beginning when it reaches the end.
+It yields elements from the source in sequence and cycles back to the beginning when it reaches the end.
 `itertools.count()` constructs an infinite iterator of evenly spaced numbers.
 The first argument is the starting point, the second is the step size
 (defaults to one).

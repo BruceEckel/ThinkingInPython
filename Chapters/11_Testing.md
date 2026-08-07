@@ -37,12 +37,10 @@ not a verification step you skip when the code looks right to you.
 That said, TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
 so that only implementation remains.
-You need that certainty to write tests first.
 Often, however, you are not sure what direction a program will take you.
 You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
-Writing tests for exploratory programming is not practical.
 Once you have found a good path,
 AI makes a thorough test suite far cheaper to produce.
 
@@ -234,7 +232,6 @@ You declare fixtures as parameters to a test,
 which tells `pytest` to call the fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
-A test that names `funded` as an argument receives the value the fixture returns.
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
@@ -604,8 +601,6 @@ The rewritten name is a real attribute like any other,
 so `v._Vault__pin` reads it successfully.
 Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
 not to hide the attribute.
-Anyone who knows the class name can still reach the attribute,
-because the rewrite changes only the name.
 In Python the distinction between white-box and black-box remains one of discipline,
 not of compiler enforcement.
 

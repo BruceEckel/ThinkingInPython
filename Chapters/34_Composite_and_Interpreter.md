@@ -263,7 +263,6 @@ which need the union to know when they are done.
 annotate `evaluate()` with `Operators` and `assert_never()` stops working,
 because a base class is an open set and any new subclass silently belongs to it.
 
-The `Operators` base class is the clever part.
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
 They build nodes.
@@ -271,7 +270,7 @@ Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)
 `Self` would mean "some subclass of `Operators`,"
 and the checker cannot know that every such subclass is in the `Expr` union.
 The annotation says so.
-Writing `x + 1` on two `Expr` values produces an `Add`,
+Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
 and `wrap()` promotes integers to `Num` nodes,

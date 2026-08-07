@@ -1,4 +1,4 @@
-Apply the "readability" skill to each chapter.
+Apply the "xxx" skill to each chapter.
 As this skill processes each chapter in isolation,
 you should be able to parallelize many tasks at once, one per chapter.
 If a chapter needs to modify another chapter,

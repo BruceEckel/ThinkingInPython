@@ -43,7 +43,7 @@ where no dedicated built-in exists.
 
 Remembers every result forever,
 so repeated calls with the same arguments cost nothing.
-Note that this only works correctly for pure functions.
+This only works correctly for pure functions.
 Caching a side-effecting function skips the effects.
 
 ```python
@@ -59,7 +59,6 @@ print(fib(30))
 ```
 
 Because `fib()` is recursive, the values up to and including 30 are now cached.
-This accelerates future calls to `fib()`.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
@@ -157,8 +156,8 @@ print(x.squared)
 #: 25
 ```
 
-Note that you must be careful with caching,
-because mutating a property doesn't cause the cached result to be recalculated.
+Be careful with caching:
+mutating a property doesn't cause the cached result to be recalculated.
 The escape hatch is `del x.squared`:
 deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
@@ -300,7 +299,6 @@ the empty iterable, the single element,
 the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
-What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `repeat`
 
@@ -609,7 +607,6 @@ so deep recursion will raise `RecursionError`.
 For long flat sequences,
 a loop or one of the `itertools` tools is the better choice.
 
-Recursion is beneficial when the data is recursive.
 Code that walks a tree, nested data,
 or a directory reads most clearly when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:
@@ -670,7 +667,6 @@ print(first_five)
 yet the program terminates because `islice()` requests five values.
 Each `computing square N` line appears only when `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
-Nothing here is a batch.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
 because `islice()` stops asking when it has delivered five.
@@ -688,8 +684,7 @@ means no upstream work for the items it never reaches.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has had a turn.
-This is a good place to see these chapters' ideas working together on one small,
-real program instead of one at a time.
+This is a good place to see these chapters' ideas working together on one small program instead of one at a time.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.

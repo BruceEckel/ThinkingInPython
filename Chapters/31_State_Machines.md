@@ -15,9 +15,6 @@ you can also pass it an "input" object so it can tell you what new state to move
 The key distinction between this design and the next is that here,
 each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
-Another way to put it is that here,
-each `State` object has its own little `State` table,
-and in the subsequent design there is a single master state transition table for the whole system.
 
 ## Each State Decides
 
@@ -78,7 +75,6 @@ class StateMachine:
 while the varying behavior lives in each `State`'s `run()` and `next()`.
 [Template Method](25_Template_Method.md) puts the varying steps in a subclass;
 here they come from the `State` objects the machine holds.
-The flow is fixed either way, and only where the steps live changes.
 The constructor also runs the initial state,
 the construction-starts-the-engine choice that drew a warning in that chapter.
 It is safe here because the state objects are stateless singletons,
@@ -481,7 +477,7 @@ reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are plain methods, stored directly in the table.
 
-![Five states, QUIESCENT, COLLECTING, SELECTING, UNAVAILABLE, and WANT_MORE; money loops COLLECTING back on itself, a first digit moves to SELECTING, and a second digit branches three ways on price and stock, while Quit refunds from any state back to QUIESCENT](_images/stateMachine)
+![Five states, QUIESCENT, COLLECTING, SELECTING, UNAVAILABLE, and WANT_MORE; money loops COLLECTING back on itself, a first digit moves to SELECTING, and a second digit branches three ways on price and stock, while Quit refunds from any of the other states back to QUIESCENT](_images/stateMachine)
 
 The states are an `Enum`,
 so the type checker catches a misspelled state name instead of letting it fail silently at runtime:

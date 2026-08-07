@@ -239,7 +239,7 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-The return type is worth unpacking:
+The return type is worth breaking down:
 `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
 (see the summary in [Static Typing](08_Static_Typing.md#containers)).
@@ -379,8 +379,7 @@ def test_trace_returns_original_result() -> None:
 ### A Class Decorator with State
 
 Because the instance can hold attributes, state between calls is natural.
-Here is a class-based decorator that counts calls.
-It keeps the count on the instance:
+This decorator counts calls and keeps the count on the instance:
 
 ```python
 # count_calls.py
@@ -505,7 +504,7 @@ def test_repeat_call_count(times: int, expected: int) -> None:
 
 ### A Limitation: Methods Need a Descriptor
 
-The class form has one real limitation:
+The class form has one limitation:
 an instance that replaces the function does not work on methods.
 Neither `trace` nor `count_calls` above was applied to a method,
 only to a bare function, and that was not an accident:

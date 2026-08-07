@@ -142,7 +142,6 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the coordinates supplied by the asker.
-That is the intrinsic/extrinsic split doing its work.
 
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and `SPECS` can only hold one of them.
@@ -191,8 +190,8 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 ## Interning in the Constructor
 
-A factory function like `tile()` is a visibly different name.
-Its different syntax warns callers that something unusual is happening.
+A factory function like `tile()` has a visibly different name and call syntax,
+which warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
@@ -395,7 +394,7 @@ exploits the same property, using members as shared, comparable states.
 
 Compilers and interpreters intern identifiers so that scope lookups compare pointers instead of characters.
 Column stores such as Pandas and Polars offer categorical types.
-A column of a million country names stores small integer codes into a pool of distinct strings.
+A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
 In every case the benefit is the same:

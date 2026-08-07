@@ -2,7 +2,7 @@
 
 This chapter and the several that follow give a programmer's tour of Python:
 syntax and the scalar types here, then containers, control flow, functions,
-modules, classes, and static typing in the chapters that follow this one.
+modules, classes, and static typing.
 It assumes you have programming experience.
 You can find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
@@ -261,7 +261,7 @@ so the empty string shows as `''` and not as blank.
 not a coerced boolean.
 `x or default` is a common way to supply a fallback.
 It has a sharp edge.
-`x or default` replaces every falsy `x`, not only a missing one,
+It replaces every falsy `x`, not only a missing one,
 so a legitimate `0` or `""` is thrown away.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
@@ -315,7 +315,7 @@ Python takes backslashes literally, so you don't need to double them.
 
 Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
-It is readable and fast, and it is what modern code uses:
+It is readable and fast:
 
 ```python
 # fstrings.py

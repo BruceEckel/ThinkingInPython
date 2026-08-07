@@ -136,8 +136,6 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
-No `Observer` base class needs inheriting,
-and no notification protocol needs implementing.
 Assigning to `celsius` notifies everyone.
 Four things from the classic version are gone: the interface,
 the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
@@ -160,9 +158,9 @@ Collecting a value from each observer is a different pattern,
 such as [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 for the first handler that answers.
 
-Testing confirms that every subscriber receives the new value,
-and a subscriber sees only the changes that happen after it subscribes.
-It also verifies that an unsubscribed observer stops hearing changes.
+The tests check that every subscriber receives the new value,
+that a subscriber sees only the changes that happen after it subscribes,
+and that an unsubscribed observer stops hearing them.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
 A bound method is the exception.
@@ -500,8 +498,6 @@ and this one is a pixel count.
 The model and the view share only the subscribe-and-notify contract,
 so the test can exercise the model without a display.
 You can also attach a second view to the same model and keep both in step.
-Showing that the model is correct, separately from how it is drawn,
-is the model-view split made concrete.
 
 ## What Stayed Constant
 

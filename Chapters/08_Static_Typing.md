@@ -86,7 +86,7 @@ print(draw_all(circles))
 The reason is that a `list` can be written to.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
 Refusing the call is what keeps that from happening.
-A read-only shape has no such problem,
+A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
 and it accepts more callers as a result.
@@ -261,8 +261,7 @@ store it in a variable, and call it to make an instance.
 This means an annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an instance of `SomeType`.
-The form `type[SomeType]` means the class object, or any subclass of it.
-`type[C]` annotates the class, not an instance:
+The form `type[SomeType]` means the class object, or any subclass of it:
 
 ```python
 # class_values.py
@@ -337,7 +336,6 @@ It accepts any list,
 but the returned value doesn't express the type held by the list.
 
 A *type parameter* correctly specifies the returned type.
-The type held by the list is the type the function returns.
 Declare the parameter in square brackets after the function name:
 
 ```python

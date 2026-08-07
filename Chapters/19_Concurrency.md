@@ -409,10 +409,7 @@ For a batch where partial failure is data to examine rather than a reason to sto
 A health check across ten services needs all the answers including the errors,
 not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
-Its contract is all-or-cancel.
 Keeping siblings alive past a failure means catching exceptions inside each task yourself.
-Use `TaskGroup` where a failure should stop the batch.
-`gather()` provides failure-as-data.
 
 ## Overlapping the Waits
 
@@ -1665,8 +1662,6 @@ not the whole.
 `Executor` unifies backends that share a blocking, submit-and-wait shape.
 `await` unifies backends that share only a result that arrives later.
 Everything else about the backends stays different.
-Most of what concurrency asks of you is knowing what a shared interface hides,
-and what it leaves different underneath.
 
 ![Asyncio and threads share a single GIL and take turns.
 Processes and subinterpreters genuinely run at once
@@ -1685,8 +1680,7 @@ divides concurrent work into two kinds, and neither kind needs threads.
 A process pool or [subinterpreter](#subinterpreters)
 overlaps CPU-bound computing.
 
-What role remains for threads?
-Creating bridges to code that doesn't cooperate with an event loop.
+The remaining role for threads is in creating bridges to code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.
 
@@ -1727,7 +1721,7 @@ It does not change what `asyncio` is for.
 
 ### Measuring the Difference
 
-You can support the claim that a thread costs real memory while a task costs much less.
+You can support the claim that a thread costs far more memory than a task.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint directly,

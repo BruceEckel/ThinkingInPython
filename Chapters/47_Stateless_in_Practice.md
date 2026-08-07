@@ -104,8 +104,7 @@ so the annotation is an assertion the checker takes on faith rather than a type 
 and writing it at the binding keeps the accessor's claim in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
-That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
-and the difference deserves a moment.
+That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`.
 `Ask` is an Ability, so it sits in the channel bare.
 `Console` never was one.
 It is an ordinary class, and `Need[Console]` is the Ability:
@@ -913,8 +912,7 @@ The fourth run prints no trace,
 since `DeadWire.latest()` raises before printing,
 while the third reaches the library and fails there.
 
-`report()` is where the two channels come apart,
-and its annotation is worth reading twice.
+`report()` is where the two channels come apart.
 `catch()` emptied the error channel, so `report()` cannot fail.
 It still declares both abilities,
 because catching an error does nothing about a dependency.
@@ -1332,7 +1330,8 @@ Five abilities need five distinct shapes.
 and then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
 the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
-Every pair of abilities with a wide cast raises the odds of a collision.
+A wide cast raises the odds of a collision,
+since every pair of abilities is a chance for one.
 
 The cast is a set of ordinary classes that inherit nothing:
 
@@ -1439,7 +1438,6 @@ print(len(script.lines), script.lines[1])
 ```
 
 One engine, four runs, and the only difference is what was supplied.
-The last two are the ones to study.
 
 The third mixes the casts, and nothing objects.
 A `Kitty` bats at a `NastyWeapon` across a `Wasteland`; it type-checks,
@@ -1568,7 +1566,7 @@ That judgment stays with you.
 
 ### Why `retry()` Decorates the Function
 
-Notice that `retry()` decorates the function, not the Effect.
+`retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 and the reason is the substrate.
 A Stateless Effect is a generator, so it runs once and is then spent:
@@ -1601,7 +1599,6 @@ Stateless attaches it one level up.
 
 ### What Retry Costs the Signature
 
-Now read what the decoration did to the type.
 `save_user()` was `(str) -> Effect[Need[Database], Crashed, str]`.
 Under `reveal_type()`, `retried` is:
 
@@ -1776,7 +1773,6 @@ so this gap is narrower than it first appears.
 
 Here is every tool from both chapters.
 Each one builds a description, rewrites a description's type, or executes one.
-The type column is the part worth memorizing.
 
 Four build a description:
 

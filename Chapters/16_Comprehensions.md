@@ -92,7 +92,7 @@ The nested form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression.
 
-The `# type: ignore` comments mark a cost the reading test does not show.
+The `# type: ignore` comments mark a cost that readability alone does not show.
 `filter()` with a `lambda` predicate does not narrow the element type,
 so the checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
@@ -101,7 +101,7 @@ which is why `list_comprehension.py` needs no such comment.
 but only when its predicate is a named function annotated to return `TypeIs[int]` rather than `bool`.
 
 List brackets (`[]`) enclose the list comprehension,
-so it is immediately evident that it produces a list.
+so you can see at a glance that it produces a list.
 The `if` clause names `isinstance()` directly and the output expression squares directly,
 with no `lambda` wrappers in the way.
 
@@ -128,7 +128,7 @@ its loop variable is left behind in the enclosing scope after the loop ends.
 The walrus operator is the exception.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
-That is deliberate, and it is the reason a comprehension can accumulate a value without a separate loop.
+That is deliberate, and it lets a comprehension accumulate a value without a separate loop.
 
 ## Set Comprehensions
 

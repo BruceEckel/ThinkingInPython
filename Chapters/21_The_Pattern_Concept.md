@@ -26,10 +26,8 @@ Once you know a catalog of patterns, it is tempting to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern earns its place only when the problem it solves is present.
 If nothing varies, you do not need machinery for isolating variation.
-A pattern without its problem is just overhead.
 
-Although they're called "design patterns,"
-they aren't tied to the realm of design.
+Although they're called "design patterns," they aren't tied to design.
 Patterns seem to stand apart from the traditional way of thinking about analysis,
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
@@ -57,14 +55,13 @@ you have the focal point around which to structure your design.
 
 A vector of change is discovered, not predicted.
 Guessing at it up front often builds complexity for flexibility in a direction that doesn't get used.
-Let real changes reveal it.
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
 You have seen some design patterns in this book.
 For example, inheritance can be thought of as a design pattern
-(albeit one built into the language, which is a case worth returning to).
+(albeit one built into the language).
 It allows you to express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
 Composition also qualifies as a pattern, since it allows you to change,

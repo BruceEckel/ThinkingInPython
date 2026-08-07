@@ -57,7 +57,7 @@ print(settings)
 ```
 
 No class, no ceremony.
-For the majority of singleton needs, the module approach solves the problem.
+For most singleton needs, a module solves the problem.
 
 Mutation makes the sharing work.
 Rebinding is the mistake that quietly ends it.
@@ -148,7 +148,7 @@ An underscore asks callers to stay out, and nothing makes them.
 [Rethinking Objects](20_Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data,
 where a getter hands back a reference to the internals it was meant to protect.
-It also turns out that the reachable class is useful when a test needs a fresh,
+The reachable class is also useful when a test needs a fresh,
 uncached `Settings`.
 
 ### Tests, Threads, and Locks
@@ -291,13 +291,13 @@ not because you need these forms.
 To address languages like C++ and Java,
 *GoF Design Patterns* builds the singleton with more apparatus.
 The variations shown here are worth understanding,
-but notice that each does more work than the module or the cached factory above.
+but each does more work than the module or the cached factory above.
 
 The classic approach takes control of creation by delegating to a single instance of a private nested class.
 
 ### Lazy Creation
 
-It is *lazy*: it builds the inner object on the first call,
+The classic approach is *lazy*: it builds the inner object on the first call,
 which is why it needs the `None` sentinel and the `if` guard.
 
 ```python

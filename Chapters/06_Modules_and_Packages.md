@@ -78,7 +78,6 @@ a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
 which is why `use_module` and `second` are one object.
-A module's top-level code is a one-time setup step rather than something that runs per import.
 
 To bring a name into the current namespace, use the `from` keyword:
 
@@ -121,7 +120,7 @@ print(y)  # type: ignore  # noqa: F821
 The two directives on the `print(y)` line silence the type checker and the linter,
 neither of which can see a name that appears only as a dict key.
 That is the cost of creating names this way, and a reason to keep it rare.
-It matters whenever code needs to define a module-level name that isn't known until runtime,
+Assigning into `globals()` matters whenever code needs to define a module-level name that isn't known until runtime,
 such as a class built dynamically and registered under a computed name.
 
 ## Packages

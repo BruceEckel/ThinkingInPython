@@ -383,7 +383,6 @@ Each of these consumes and produces iterators.
 Combined with [generator expressions](16_Comprehensions.md#generator-expressions)
 such as `(x * x for x in data if x > 0)`,
 you can build pipelines that stay lazy end to end.
-Such a pipeline draws from an infinite source but computes only what the consumer takes.
 Each stage pulls one item at a time,
 so an infinite source is fine as long as something downstream stops it:
 
@@ -631,7 +630,6 @@ print(stream.seen)
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
 rather than a base class.
-The second pass is the part to notice.
 The generator was spent by the end of the first one,
 yet `first()` rewinds and `traverse()` produces the same three values.
 

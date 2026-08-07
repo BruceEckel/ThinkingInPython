@@ -173,7 +173,7 @@ as an `AttributeError` from the first code that reads the missing `label`.
 The annotation on `label` is not required here.
 If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
 because the parameter's own type carries through to the attribute it initializes.
-It earns its place for symmetry with `total`,
+The annotation is there for symmetry with `total`,
 so both names read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
@@ -265,7 +265,7 @@ so restating `ClassVar[int]` adds nothing.
 For real per-object defaults, write a constructor with default arguments,
 or use a `@dataclass`,
 which turns the class-attribute syntax into instance variable defaults.
-Each object then gets its own storage for instance variables:
+Each object then gets its own storage:
 
 ```python
 # real_defaults.py
@@ -301,7 +301,7 @@ The class attribute survives the decoration: `vars(B)` still holds `x = 100`.
 What changes is the generated `__init__()`,
 which assigns `self.x` on every instance,
 so each object shadows the class attribute the moment it is built and never reads the shared one.
-That is why `b.x = -1` cannot leak into a later `B()`,
+That is why assigning `x` on one `B` cannot leak into a later `B()`,
 while `a.rating = 1` on `Stars` left `b` reading a value someone else could change.
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
 covers the details.

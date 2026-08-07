@@ -244,7 +244,6 @@ print(Counter.live_count())
 #: 0
 ```
 
-Storing each instance in a `WeakValueDictionary` tracks it without keeping it alive.
 The key is `id(self)` because the registry needs a key per object, not per name:
 two counters could share a name, and one would then displace the other.
 Reused `id()` values are not a hazard here,

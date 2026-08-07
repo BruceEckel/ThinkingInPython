@@ -56,7 +56,7 @@ since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
 Python calls the constructor automatically during object creation.
-In the demo you can see that the creation of an object looks like a function call,
+In the demo, creating an object looks like a function call,
 but using the class name.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.
@@ -173,7 +173,7 @@ When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
 The demo shows that the base-class constructor runs.
-You can also see that the inherited `show_twice()` method is available in the derived class.
+The inherited `show_twice()` method is also available in the derived class.
 
 The class `Different` also has a method named `show()`,
 but this class does not derive from `Simple`.
@@ -223,7 +223,6 @@ At run time `@override` adds no wrapper.
 It sets an `__override__` attribute on the method,
 for anything that wants to find overrides by introspection,
 and returns the same function object.
-The type checker performs all verification before the program runs.
 
 Apply `@override` to any method that replaces an inherited method,
 except constructors, which are undecorated by convention.
@@ -298,7 +297,7 @@ and again, until the interpreter raises a `RecursionError`.
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
 A write-only property is possible but rare.
-A plain method is a better expression of the intent.
+A plain method expresses the intent.
 
 A `@property` reruns its code on every access.
 When the computation is expensive and the answer cannot change,
@@ -466,7 +465,6 @@ the `Compose` instance.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
 but composition or a module-level function is almost always a clearer choice.
-You will rarely need this in your own code.
 
 ## Exercises
 

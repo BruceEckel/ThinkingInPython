@@ -171,7 +171,7 @@ def parse(filename: str) -> list[Trash]:
     return items
 ```
 
-Testing parses a small in-memory file, so it does not depend on `trash.dat`:
+The test parses a small in-memory file, so it does not depend on `trash.dat`:
 
 ```python
 # test_parse_trash.py
@@ -384,8 +384,7 @@ Each implementation above is named `_`,
 a throwaway name [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 explains.
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
-`Paper` has no registered note,
-so it falls through to the base function and performs the default behavior.
+`Paper` has no registered note, so it falls through to the base function.
 Adding a `price()` or `weight()` operation means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class and,
 if it needs a special note, registering one line.
@@ -395,8 +394,8 @@ No `Visitor` class exists, no `accept()` method bolted onto every material,
 and no decorator gymnastics to fake overloading.
 
 When the operation is the same for every type, you do not need single dispatch.
-`sum_value()` earlier was a function.
-Use `singledispatch` only when the behavior genuinely differs by type.
+The earlier `sum_value()` is an ordinary function.
+Use `singledispatch` only when the behavior differs by type.
 For operations that belong on the objects and vary by type,
 `singledispatchmethod` does the same thing as a method.
 
@@ -411,7 +410,7 @@ and choosing the lightest construct that isolates it.
 This chapter discovered its vectors one requirement at a time,
 rather than predicting them up front.
 In Python that construct is often a language feature, not a multi-class pattern.
-The true measure of a pattern is whether it is still useful once the language does part of the work.
+A pattern is worth keeping only when it is still useful once the language does part of the work.
 
 ## Exercises
 

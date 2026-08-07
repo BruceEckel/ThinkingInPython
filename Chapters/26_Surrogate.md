@@ -63,8 +63,6 @@ It isn't necessary that `Implementation` have the same interface as `Proxy`.
 As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea
 (this statement is at odds with the definition for *Proxy* in *GoF Design Patterns*).
-The loose reading is about what the pattern requires,
-not about how to name your wrapper.
 When you are choosing between *Proxy* and *Adapter*,
 the interface is still the question that separates them:
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
@@ -305,7 +303,6 @@ print(isinstance(p, Implementation3), isinstance(p, Service))
 
 The call works and `hasattr()` finds the method,
 yet neither check recognizes the proxy.
-A surrogate is verified by using it, not by asking what it is.
 
 ## State
 
@@ -470,7 +467,7 @@ that failed lookup calls `__getattr__()` again,
 and the error surfaces as `RecursionError`,
 not the `AttributeError` that would point at the typo.
 
-Testing hands the counting proxy a small stand-in and confirms the proxy forwards the call with its result,
+The test for the counting proxy uses a small stand-in to confirm that the proxy forwards a call with its result,
 and counts only callable accesses:
 
 ```python

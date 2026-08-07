@@ -170,7 +170,6 @@ the identical object the underscore was hiding.
 Python's `return` hands out references, never copies.
 The property blocked reassigning `numbers`,
 but it could not stop the caller from mutating the list it returned.
-Mutating the returned list manipulates the internal state.
 
 ## Plugging Leaks Is Tedious
 
@@ -780,8 +779,6 @@ def test_newtype_has_no_runtime_effect() -> None:
 Nothing in that test can fail.
 The `NewType` protection lives in the checker alone.
 A caller who passes a raw `int` where `UserId` is expected raises no exception.
-The value doesn't change.
-There is nothing at runtime for a test to catch.
 Only the checker sees it, and only at edit time.
 Here, that diagnostic is silenced by the same `# type: ignore` that passes the book build.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
@@ -800,7 +797,6 @@ finish rather than block, describe the object rather than change it.
 No checker sees that half.
 Substitution is safe only when both halves work,
 whether membership came from inheriting a base class or matching a protocol.
-The machine checks the signatures; you still own the behavior.
 
 ### Pattern Matching on a Union
 

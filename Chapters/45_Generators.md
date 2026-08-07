@@ -155,7 +155,6 @@ If you mistakenly annotate the generator as `Generator[Answer, Question, Result]
 All three `yield Question(...)` expressions offer a `Question` where the annotation declares an `Answer`.
 All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
 All three `question` variables receive an `Answer` where they are declared `Question`.
-Each channel has its own type, so the checker catches every transposition.
 `Generator[str, str, str]` accepts the reversal without complaint.
 
 ## A Generator Is a Description
@@ -223,7 +222,7 @@ The generator is imported unchanged; only the driver is new.
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map is keyed by `Question` and holds `Answer`s.
 
-Notice that `interview()` does not know where the answers originate.
+`interview()` does not know where the answers originate.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
 `drive()` decides how those needs are met,
@@ -288,7 +287,7 @@ A `yield from` expression evaluates to the inner generator's return value,
 not its yielded values.
 The yielded values pass through to whoever is driving.
 Here, `report()` captures the return value from `yield from emit(items)` into `size`.
-Note that `report()` returns nothing and only yields:
+`report()` returns nothing and only yields:
 
 ```python
 # yield_from_return.py
@@ -367,8 +366,7 @@ The numbers travel down to the `yield` that asked for them.
 `g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
 `both()` contains no code that forwards the value because `yield from` does that forwarding.
 
-`g.send(2)` is the interesting one.
-It supplies alpha's second value, which lets `collect("alpha")` finish,
+`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
 which completes the first `yield from`, which starts the second one.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` runs out of delegations.
