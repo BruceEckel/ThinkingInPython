@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -116,20 +117,6 @@ the `while True:` loop with a `break` at the bottom, is used later in the book
 (23, 38, 41, 45) without ever being introduced.
 
 Proposed change: after `while_loop.py`, add a short paragraph and listing:
-
-```python
-# while_true.py
-
-total = 0
-for value in [3, 0, 7]:  # Stands in for reading input
-    if value == 0:
-        break
-    total += value
-print(total)
-#: 3
-```
-
-Better, keep it a real `while True:`:
 
 ```python
 # while_true.py

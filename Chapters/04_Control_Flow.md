@@ -1,12 +1,14 @@
 # Control Flow
 
 Control-flow statements decide which code runs and how often.
-This chapter covers conditionals, loops, pattern matching, exceptions,
-the `with` statement, and comprehensions.
+This chapter covers conditionals, placeholders, loops, pattern matching,
+exceptions, the `with` statement, and comprehensions.
 
 ## Conditionals
 
-Python's comparison operators chain the way they do in mathematics:
+[Tour](02_Tour.md#indentation-and-blocks) showed the basic `if`, its colon,
+and its indented block.
+Python's comparison operators also chain the way they do in mathematics:
 
 ```python
 # chaining.py
@@ -44,31 +46,25 @@ print(classify(-3), classify(0), classify(7))
 The `pass` statement does nothing.
 Use it where Python's syntax requires a statement but you have none to run yet:
 
-```python
-# pass_statement.py
-
-def not_implemented():
-    pass  # Fill in later
-
-print(not_implemented())
-#: None
-```
-
 `...` (the *Ellipsis* literal) is a second placeholder.
 Using it alone as a statement does nothing, the same as `pass`:
 
 ```python
-# ellipsis_placeholder.py
+# placeholders.py
+
+def not_implemented():
+    pass  # Fill in later
 
 def not_implemented_yet():
     ...
 
-print(not_implemented_yet())
-#: None
+print(not_implemented(), not_implemented_yet())
+#: None None
 ```
 
 `pass` marks an indented block with nothing in it yet.
-`...` marks a one-line stub, usually a function signature with no real body,
+`...` is the conventional body for a stub that will be filled in elsewhere,
+and it is normally written on the same line as the signature it stubs,
 as in a `Protocol` method
 ([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
 
@@ -110,17 +106,36 @@ for n in range(10):
     print(n, end=" ")
 print()  # The newline that end=" " left off
 #: 0 1 2 4 5
-print("a", "b", sep="-")  # Sep goes between values
-#: a-b
 ```
 
 The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
+Both apply to the innermost enclosing loop.
+Python has no labeled `break`, so leaving two loops at once means either a flag,
+a `return` from a function that holds both loops,
+or a `for`/`else` on the outer one.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers land on one line,
 and a bare `print()` emits the missing newline afterward.
-`sep=` changes what goes between several values, a space by default.
+
+Python has no `do`/`while` statement.
+When the test belongs at the bottom of the body rather than the top,
+write `while True:` and `break` out:
+
+```python
+# while_true.py
+
+values = iter([3, 5, 0, 7])
+total = 0
+while True:
+    value = next(values)
+    if value == 0:
+        break
+    total += value
+print(total)
+#: 8
+```
 
 A loop may have an `else` clause.
 It runs only if the loop finished without hitting `break`,
@@ -168,6 +183,9 @@ for index, name in enumerate(names):
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
 which the loop here unpacks into `index` and `name`.
+A loop written as `for i in range(len(names)):` and then indexing `names[i]` does the same job,
+but it names the index and re-looks-up the item on every line that needs it.
+`enumerate()` hands you both.
 `zip()` walks several sequences at once:
 
 ```python
@@ -192,8 +210,10 @@ except ValueError as e:
 so the extra score never appears.
 That silence is convenient when the lengths differ on purpose and a bug when they were supposed to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
-When you need the index as well, wrap the whole thing:
-`enumerate(zip(names, scores))`.
+When you need the index as well, wrap the whole thing.
+The extra nesting shows up in the loop header,
+which needs parentheses around the inner pair:
+`for i, (name, score) in enumerate(zip(names, scores)):`.
 
 The *walrus operator* `:=` assigns a value as part of an expression,
 so you can compute, name, and test a value in one place:
@@ -223,6 +243,38 @@ It pops a value, names it, and tests it in one place,
 so nothing in the body has to pop again or keep a separate copy.
 A comprehension can use `:=` the same way,
 which [Comprehensions](16_Comprehensions.md) covers.
+
+Changing a container while a `for` loop walks it is the classic control-flow bug,
+and the two containers you are most likely to do it to behave differently:
+
+```python
+# mutating_while_looping.py
+
+scores = [1, 2, 2, 3]
+for s in scores:
+    if s == 2:
+        scores.remove(s)
+print(scores)
+#: [1, 2, 3]
+print([s for s in [1, 2, 2, 3] if s != 2])
+#: [1, 3]
+ages = {"a": 1, "b": 2}
+try:
+    for name in ages:
+        ages[name + "!"] = 0
+except RuntimeError as e:
+    print(e)
+#: dictionary changed size during iteration
+```
+
+The list loop walks by position.
+Removing an item shifts the next one down into the slot the loop already passed,
+so the loop skips it and one of the two `2`s survives,
+with no exception to tell you.
+The dictionary refuses outright instead of skipping silently.
+Neither behavior is something to work around:
+build a new container with a comprehension,
+or collect what to remove first and remove it after the loop.
 
 ## Pattern Matching
 
@@ -259,6 +311,11 @@ A bare name in a `case` captures rather than compares:
 `case direction:` binds anything to `direction` and matches every value.
 Write a constant as a literal (`case "quit":`) or as a dotted name
 (`case Command.QUIT:`).
+
+`match` and `case` are *soft keywords*:
+they are keywords only in this statement,
+so existing code that uses `match` as a variable name still runs.
+Avoid the name anyway, since a reader has to work out which one is meant.
 [Pattern Matching](13_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
@@ -288,7 +345,7 @@ def checked_divide(a, b):
         raise ValueError("Divide by zero")
     return a / b
 
-def exceptions(a, b):
+def divide_and_report(a, b):
     try:
         checked_divide(a, b)
     except ValueError as e:
@@ -298,10 +355,10 @@ def exceptions(a, b):
     finally:
         print("finally always runs")
 
-exceptions(1, 0)
+divide_and_report(1, 0)
 #: caught: Divide by zero
 #: finally always runs
-exceptions(1, 1)
+divide_and_report(1, 1)
 #: no exception
 #: finally always runs
 ```
@@ -323,6 +380,9 @@ so a mistake in the `try` block looks like an expected failure.
 so they travel past it and still stop the program.
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
+Python tries the `except` clauses in order and runs the first whose type matches,
+so a broad clause above a narrow one makes the narrow one unreachable.
+Order them most specific first.
 
 An exception raised while handling another one arrives with the first attached.
 Python reports both, and `from` decides how they are joined:
@@ -337,6 +397,8 @@ All three raise the same exception and differ only in that report:
 
 ```python
 # exception_chaining.py
+import textwrap
+import traceback
 
 class BadNumber(Exception):
     pass
@@ -359,21 +421,30 @@ def suppressed(text):
     except ValueError:
         raise BadNumber(text) from None
 
-def earlier(e):
-    if e.__cause__ is not None:
-        return f"direct cause: {type(e.__cause__).__name__}"
-    if e.__context__ is not None and not e.__suppress_context__:
-        return f"during handling: {type(e.__context__).__name__}"
-    return "nothing earlier shown"
+def joining_line(e):
+    for part in traceback.format_exception(e):
+        line = part.strip()
+        if line.endswith("exception occurred:") or line.endswith(
+            "following exception:"
+        ):
+            return line
+    return "nothing shown above it"
 
 for parse in (implicit, explicit, suppressed):
     try:
         parse("seven")
     except BadNumber as e:
-        print(f"{parse.__name__}: {earlier(e)}")
-#: implicit: during handling: ValueError
-#: explicit: direct cause: ValueError
-#: suppressed: nothing earlier shown
+        print(f"{parse.__name__}:")
+        for chunk in textwrap.wrap(joining_line(e), 60):
+            print(" ", chunk)
+#: implicit:
+#:   During handling of the above exception, another exception
+#:   occurred:
+#: explicit:
+#:   The above exception was the direct cause of the following
+#:   exception:
+#: suppressed:
+#:   nothing shown above it
 ```
 
 `BadNumber` is a custom exception type,
@@ -381,10 +452,12 @@ made by deriving a class from `Exception`.
 Its body is `pass` because it needs no behavior of its own;
 the class name is what the handler matches on.
 
-`earlier()` states the rule Python follows.
-It shows the cause when `from` set one.
-Otherwise it shows the context, which Python records without being asked,
-unless `from None` marked that context hidden.
+`joining_line()` digs the joining sentence out of the formatted traceback,
+so the output above is the text Python itself would print, not a summary of it.
+`from e` sets `__cause__` and produces the "direct cause" line.
+With no `from`, Python records the earlier exception in `__context__` anyway and produces the "During handling" line.
+`from None` sets `__suppress_context__`,
+and nothing appears above the new exception at all.
 Use `from e` when the earlier exception explains this one,
 and `from None` when it would only distract from your own message.
 
@@ -446,8 +519,21 @@ with path.open() as f:
         print(line.strip())
 #: one
 #: two
+try:
+    with path.open("w") as f:
+        f.write("partial")
+        raise RuntimeError("failed midway")
+except RuntimeError as e:
+    print(e)
+#: failed midway
+print("closed:", f.closed)
+#: closed: True
 path.unlink()  # Delete the file
 ```
+
+The exception propagates, but the file is closed before it does.
+`f` is still in scope afterward, which is how the listing can check it;
+the `with` statement does not create a scope, only a guarantee about the exit.
 
 Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Cleanup.md)
@@ -497,7 +583,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
     Predict whether the output changes before running it,
     and explain why the order of two independent conditions,
     testing different values of `n`, does not matter here.
-4.  In `demonstrate_exceptions.py`, add a call `exceptions(1, "x")`
+4.  In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
     (a `TypeError` that `except ValueError` does not catch).
     Run it and read the traceback that escapes.
 5.  In `pattern_matching.py`,
@@ -505,3 +591,9 @@ as well as generator expressions and the functional tools `map()` and `filter()`
     and check what `run("go north 3")` returns before and after you add it.
 6.  Rewrite the `evens` list comprehension in `comprehensions_intro.py` as a `for` loop that appends to a list,
     then say which version you would rather read six months from now.
+7.  In `exception_chaining.py`,
+    add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs itself.
+    Predict which line `joining_line()` prints before you run it.
+8.  Rewrite `context_manager.py`'s reading half using `path.read_text()`.
+    Say what the `with` form gives you that the one-liner does not,
+    and when that matters.

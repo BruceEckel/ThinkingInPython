@@ -11,4 +11,13 @@ with path.open() as f:
         print(line.strip())
 #: one
 #: two
+try:
+    with path.open("w") as f:
+        f.write("partial")
+        raise RuntimeError("failed midway")
+except RuntimeError as e:
+    print(e)
+#: failed midway
+print("closed:", f.closed)
+#: closed: True
 path.unlink()  # Delete the file

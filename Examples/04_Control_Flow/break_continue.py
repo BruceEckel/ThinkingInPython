@@ -8,5 +8,3 @@ for n in range(10):
     print(n, end=" ")
 print()  # The newline that end=" " left off
 #: 0 1 2 4 5
-print("a", "b", sep="-")  # Sep goes between values
-#: a-b

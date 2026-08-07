@@ -1,4 +1,6 @@
 # exception_chaining.py
+import textwrap
+import traceback
 
 class BadNumber(Exception):
     pass
@@ -21,18 +23,27 @@ def suppressed(text):
     except ValueError:
         raise BadNumber(text) from None
 
-def earlier(e):
-    if e.__cause__ is not None:
-        return f"direct cause: {type(e.__cause__).__name__}"
-    if e.__context__ is not None and not e.__suppress_context__:
-        return f"during handling: {type(e.__context__).__name__}"
-    return "nothing earlier shown"
+def joining_line(e):
+    for part in traceback.format_exception(e):
+        line = part.strip()
+        if line.endswith("exception occurred:") or line.endswith(
+            "following exception:"
+        ):
+            return line
+    return "nothing shown above it"
 
 for parse in (implicit, explicit, suppressed):
     try:
         parse("seven")
     except BadNumber as e:
-        print(f"{parse.__name__}: {earlier(e)}")
-#: implicit: during handling: ValueError
-#: explicit: direct cause: ValueError
-#: suppressed: nothing earlier shown
+        print(f"{parse.__name__}:")
+        for chunk in textwrap.wrap(joining_line(e), 60):
+            print(" ", chunk)
+#: implicit:
+#:   During handling of the above exception, another exception
+#:   occurred:
+#: explicit:
+#:   The above exception was the direct cause of the following
+#:   exception:
+#: suppressed:
+#:   nothing shown above it

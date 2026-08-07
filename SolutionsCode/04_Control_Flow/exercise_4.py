@@ -4,7 +4,7 @@ def checked_divide(a, b):
         raise ValueError("Divide by zero")
     return a / b
 
-def demo_exceptions(a, b):
+def divide_and_report(a, b):
     try:
         checked_divide(a, b)
     except ValueError as e:
@@ -15,7 +15,7 @@ def demo_exceptions(a, b):
         print("finally always runs")
 
 try:
-    demo_exceptions(1, "x")
+    divide_and_report(1, "x")
 except TypeError as e:
     print("escaped:", type(e).__name__)
 #: finally always runs

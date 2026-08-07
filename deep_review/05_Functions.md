@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -58,7 +59,6 @@ write `def f(x): x = something` and wonder why nothing happened outside.
 Proposed listing, inserted after the paragraph at 139-144 (verified: runs
 clean, markers correct, ruff clean at width 70):
 
-````
 ```python
 # mutating_arguments.py
 

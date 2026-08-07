@@ -16,7 +16,7 @@ def checked_divide(a, b):
         raise ValueError("Divide by zero")
     return a / b
 
-def exceptions(a, b):
+def divide_and_report(a, b):
     try:
         checked_divide(a, b)
     except ValueError as e:
@@ -26,9 +26,9 @@ def exceptions(a, b):
     finally:
         print("finally always runs")
 
-exceptions(1, 0)
+divide_and_report(1, 0)
 #: caught: Divide by zero
 #: finally always runs
-exceptions(1, 1)
+divide_and_report(1, 1)
 #: no exception
 #: finally always runs
