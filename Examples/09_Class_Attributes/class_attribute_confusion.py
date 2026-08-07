@@ -6,7 +6,7 @@ class Stars:
 a, b = Stars(), Stars()
 print(a.rating, b.rating)  # Both read the same storage
 #: 5 5
-a.rating = 1  # Assigning makes an instance variable on 'a'
+a.rating = 1  # Assigning makes an instance attribute on 'a'
 print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
 #: 1 5
 Stars.rating = 9  # Change the shared storage

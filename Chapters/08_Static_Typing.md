@@ -614,7 +614,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Final`, `Final[T]` | A name the checker will not let you reassign, see [Constants with Final](#constants-with-final) |
-| `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values) |
+| `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Generics</a>
 

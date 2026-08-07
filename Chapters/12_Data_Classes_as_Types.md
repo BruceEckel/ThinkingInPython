@@ -312,7 +312,7 @@ so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
 `x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
-As [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values)
+As [Class Attributes](09_Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 puts it, a bare annotation is a declaration rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,

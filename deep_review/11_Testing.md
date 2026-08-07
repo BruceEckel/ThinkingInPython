@@ -53,11 +53,9 @@ Price of making the change, which is why I did not apply it:
 - `Solutions/11_Testing.md` repeats the same hand-written `Account` three
   times (exercises 1, 2, 3) and would drift out of step.
 
-Recommendation: keep the plain class, but add one clause saying why, so the
-deviation reads as deliberate. For instance, after line 86: "`Account` is a
-plain class rather than a `@dataclass` so its `repr` stays out of the way in
-the failure reports below." Alternative: convert both the chapter and the
-solutions and re-capture the traceback.
+[[Do this:]]
+> Convert both the chapter and the
+> solutions and re-capture the traceback.
 
 ---
 

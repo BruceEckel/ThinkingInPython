@@ -69,14 +69,14 @@ class B:
     x: int = 100  # Constructor default, not class attribute
 
 b = B()
-b2 = B()
 b.x = -1
+b2 = B()
 print(b.x, b2.x)
 #: -1 100
 ```
 
 Each call to `B()` runs the generated `__init__()`, which assigns `100`
-to `self.x` as a fresh instance variable for that particular object.
+to `self.x` as a fresh instance attribute for that particular object.
 `b.x = -1` only touches `b`'s own attribute; `b2` was constructed
 independently and keeps its own `100`. This is the same guarantee
 `real_defaults.py` demonstrates with `A`: a constructor default
@@ -197,3 +197,119 @@ reading does, so it never reaches `vars(A)["x"]`, which still holds
 `100`. Deleting a class attribute takes `del A.x`, naming the class,
 the same asymmetry as assignment: reads fall back to the class,
 writes and deletes do not.
+
+## 7. Why `self.total += 1` leaves the class counter at zero
+
+```python
+# exercise_7.py
+from typing import ClassVar
+
+class Tally:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        self.total += 1
+
+a, b = Tally(), Tally()
+print(a.total, b.total, Tally.total)
+#: 1 1 0
+print(vars(a), vars(Tally)["total"])
+#: {'total': 1} 0
+
+class Counting:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        Counting.total += 1  # Name the class, not self
+
+c, d = Counting(), Counting()
+print(c.total, d.total, Counting.total)
+#: 2 2 2
+print(vars(c), vars(Counting)["total"])
+#: {} 2
+```
+
+`vars(a)` holds `{'total': 1}` and the class still holds `0`, which is
+the whole explanation. `self.total += 1` expands to
+`self.total = self.total + 1`. The read finds nothing on the instance,
+falls back to the class, and gets `0`. The write then goes where every
+write through an instance goes: onto the instance. Each object ends up
+with its own `total` of `1`, shadowing a class attribute that was never
+touched.
+
+The fix names the class on the left. `Counting.total += 1` reads and
+writes the same class dictionary, so both instances report `2` and
+`vars(c)` is empty: nothing was ever created on an instance, and
+`c.total` is the fallback finding the shared value.
+
+`ty` accepted the broken version because nothing about it is a type
+error. `self.total` is an `int`, `self.total + 1` is an `int`, and
+assigning an `int` to it type-checks. `ClassVar` catches
+`a.total = 99`, an assignment written through an instance in the
+source, and this assignment is written through `self` inside a method,
+which is the one form that looks identical to legitimate per-instance
+initialization. That is why the chapter calls this the mistake the
+checker misses.
+
+## 8. A mutable `ClassVar` shared down the hierarchy
+
+```python
+# exercise_8.py
+from typing import ClassVar
+
+class Base:
+    shared: ClassVar[list[int]] = []
+
+class Left(Base):
+    pass
+
+class Right(Base):
+    pass
+
+Left.shared.append(1)
+Right.shared.append(2)
+print(Base.shared, Left.shared, Right.shared)
+#: [1, 2] [1, 2] [1, 2]
+print(Left.shared is Base.shared)
+#: True
+
+class Base2:
+    shared: ClassVar[list[int]] = []
+
+class Left2(Base2):
+    pass
+
+class Right2(Base2):
+    shared = []  # Its own list, separate from Base2's
+
+Left2.shared.append(1)
+Right2.shared.append(2)
+print(Base2.shared, Left2.shared, Right2.shared)
+#: [1] [1] [2]
+```
+
+`Base.shared` holds `[1, 2]`, and so do both subclasses, because there
+is only one list. Neither `Left` nor `Right` declared its own, so both
+names resolve up to `Base`, and `.append()` mutates what it finds
+there. `Left.shared is Base.shared` proves they are one object rather
+than three that happen to be equal.
+
+This is section 1's mutable-value trap and section 3's inheritance rule
+meeting. Each is harmless on its own: an immutable `ClassVar` survives
+inheritance because nothing can change it in place, and a mutable one
+in a single class at least keeps the sharing visible. Together they
+produce a base-class list that every subclass writes to and none of
+them declared.
+
+Giving `Right2` its own `shared = []` splits it off, and only it. The
+assignment in the class body creates a new entry in `Right2`'s own
+dictionary, so `Right2.shared` stops resolving up, while `Left2` still
+shares `Base2`'s list. The result, `[1] [1] [2]`, is the same
+one-per-class-that-declares-it pattern the integer version showed.
+
+The real bug this models is a registry on a base class. Every subclass
+appends its own entry, and they all land in one list nobody meant to
+share. The fix is the one the chapter gives for instances: build the
+mutable value per owner rather than once in the class body, with
+`__init_subclass__()` giving each subclass its own, or a
+`default_factory` field giving each instance its own.

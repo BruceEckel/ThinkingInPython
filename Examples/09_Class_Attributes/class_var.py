@@ -25,4 +25,4 @@ display_object(a)
 b = Tally("b")
 print(Tally.total)
 #: 2
-# a.total = 99  # ty: cannot assign ClassVar "total" via instance
+# a.total = 99  # ty: Cannot assign to ClassVar `total`
