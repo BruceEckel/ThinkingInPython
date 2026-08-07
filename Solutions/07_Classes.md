@@ -35,9 +35,10 @@ except ValueError as e:
 `shrink()` never touches `self._radius` directly. It assigns to
 `self.radius`, which still goes through `@radius.setter`, so the
 existing validation applies automatically to every new way of changing
-the radius, present or future. `shrink(-2)` computes `10 / -2 == -5.0`
-and the setter rejects it, exactly as if you had written
-`c.radius = -5.0` by hand.
+the radius, present or future. `shrink(-2)` runs after `shrink(2)` has already
+brought the radius to `5.0`, so it computes `5.0 / -2 == -2.5` and the
+setter rejects that, exactly as if you had written `c.radius = -2.5` by
+hand.
 
 ## 2. A second alternative constructor, `from_kelvin()`
 
@@ -194,3 +195,50 @@ The two forms answer different questions. `Temperature(21.0)` says
 what would rebuild this object, which is what you want in a traceback
 or a debugger. `21.0C` says what the value means, which is what you
 want in output a user reads.
+
+## 6. A misspelled override, with and without the decorator
+
+```python
+# exercise_6.py
+
+class Base:
+    def show(self):
+        print("Base.show")
+
+class Derived(Base):
+    # @override  # Uncomment this and the import to see it complain
+    def shwo(self):
+        print("Derived.shwo")
+
+Derived().show()
+#: Base.show
+```
+
+The program prints `Base.show`. Nothing overrode anything: `shwo()` is
+a new method that happens to sit in a subclass, and `show()` resolves
+up the chain to `Base` as it always would. Python has no opinion about
+whether a subclass method was meant to replace one, so the misspelling
+is not an error, it is a third method nobody calls.
+
+Add `from typing import override`, uncomment the decorator,
+and the program still prints `Base.show`,
+because the decorator adds no wrapper and changes no behavior. The
+checker is where the difference shows:
+
+```text
+error[invalid-explicit-override]: Method `shwo` is decorated with
+`@override` but does not override anything
+info: No `shwo` definitions were found on any superclasses of `Derived`
+```
+
+Remove the decorator again and the checker goes quiet, while the
+program's behavior never changed at any point in the exercise. That is
+the whole shape of the feature: `@override` states an intention, the
+checker verifies it, and the runtime is indifferent.
+
+The value is in what it catches later. The typo is easy to spot in six
+lines; the same failure arrives silently when someone renames or
+deletes `Base.show` a year from now, and every `@override` in the
+codebase turns that rename into a list of exact locations to fix. A
+decorator that does nothing at runtime is worth writing when a tool
+reads it.

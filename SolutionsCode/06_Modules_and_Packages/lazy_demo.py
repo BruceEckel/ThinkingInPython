@@ -8,9 +8,9 @@ print("between")
 noisy.announce()
 print("after both")
 #: before any use
-#: noisy2 module body running
-#: noisy2 announces!
+#: noisy2 module loaded
+#: noisy2.announce() called
 #: between
-#: noisy module body running
-#: noisy announces!
+#: noisy module loaded
+#: noisy.announce() called
 #: after both

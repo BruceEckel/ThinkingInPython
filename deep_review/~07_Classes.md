@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -31,6 +32,11 @@ it.", add
 > it stores nothing anywhere and only records the type.
 > [Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar)
 > and [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) use it.
+
+[[OK, but this is awkward:
+> is a third thing again:
+> it stores nothing anywhere and only records the type.
+]]
 
 Alternative, if that is too much machinery for chapter 7 (annotations are not
 introduced until chapter 8): drop the added sentence and instead soften
@@ -170,21 +176,11 @@ and its selling point. `properties.py` then shows `radius` staying plain and
 in `property_setter.py`, on a *different* `Circle` that has quietly dropped
 `area`, and the prose never connects the two.
 
-Two ways to fix it, in order of preference:
-
-1. Add one sentence after `properties.py`, before "Because the change is
-   invisible at the call site":
-   > `radius` is still a plain attribute here.
-   > The next listing turns it into a property,
-   > and nothing at the call site changes.
-
-2. Restructure so one `Circle` runs through the section: plain `radius` and
+ Restructure so one `Circle` runs through the section: plain `radius` and
    computed `area` first, then the same class with `radius` promoted to a
    property, keeping `area`. This makes the point far better but costs a
    rewritten second listing and its output markers.
 
-I recommend (1) unless you want to spend the space; (2) is the version that
-actually earns the thesis sentence.
 
 ---
 

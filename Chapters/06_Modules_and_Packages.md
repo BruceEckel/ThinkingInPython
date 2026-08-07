@@ -1,6 +1,6 @@
 # Modules and Packages
 
-Each Python file is a namespaced *module* you can `import` into another Python file.
+Each Python file is a *module* you can `import` into another Python file.
 If the file is in the same directory,
 you can use an unqualified `import` statement:
 
@@ -23,7 +23,8 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
-Importing a module creates a *namespace* within the file that imports it.
+Importing a module makes its *namespace* reachable in the importing file,
+under the module's name.
 This automatically prevents name clashes between the imported module's names and the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
@@ -72,12 +73,17 @@ print(sys.modules["use_module"] is use_module)
 #: True
 ```
 
-The message prints once even though the module is imported twice.
+`use_module`'s body runs once even though two `import` statements name it.
 The first `import` stored the finished module object in `sys.modules`,
 a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
 which is why `use_module` and `second` are one object.
+A consequence: a running program never notices an edit to a module it already imported.
+Restart it, or call `importlib.reload(use_module)`,
+which re-runs the body into the existing module object.
+Reloading leaves every name already bound by a `from ... import` pointing at the old objects,
+which is why restarting is the reliable choice.
 
 To bring a name into the current namespace, use the `from` keyword:
 
@@ -90,6 +96,38 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
+`from` copies the name's current value into this file rather than linking to it.
+Rebinding the name in the module afterward does not reach the copy:
+
+```python
+# app_settings.py
+
+debug: bool = False
+
+def show() -> None:
+    print(f"app_settings.debug is {debug}")
+```
+
+```python
+# from_snapshot.py
+import app_settings
+from app_settings import debug
+
+app_settings.debug = True
+print(debug, app_settings.debug)
+#: False True
+app_settings.show()
+#: app_settings.debug is True
+```
+
+`app_settings.debug` is now `True`,
+and `show()` sees the new value because it looks the name up in its own module every time it runs.
+The local `debug` is a separate binding made once, at import,
+so it still holds `False`.
+Import the module and write `app_settings.debug` when the value can change;
+use `from ... import` for things that don't get rebound,
+such as functions and classes.
+
 You can rename a module's namespace during an import using the `as` keyword:
 
 ```python
@@ -101,9 +139,12 @@ if __name__ == "__main__":
 #: Use this elsewhere!
 ```
 
-A module's own namespace is concrete, not just a figure of speech.
+A module's namespace is an ordinary dict you can read and write.
 `globals()` returns it as a mutable `dict`,
 the same dict Python already searches when it looks up a top-level name.
+It is also the dict behind the dotted name:
+`use_module.__dict__` from outside is the same object `globals()` returns inside `use_module`,
+which is why `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
 Assigning into that dict has the same effect as writing the assignment directly:
 
 ```python
@@ -132,16 +173,21 @@ and it forms its own namespace with the name of that directory.
 
 To make something a package,
 you put a special file named `__init__.py` in that directory.
-Typically, there's no executable code in `__init__.py`.
-It is only there to flag the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to have named the file `__package__.py`.]
+`__init__.py` runs once, before any module inside the package loads.
+It is often empty, and then it only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to have named the file `__package__.py`.]
+When it isn't, it usually re-exports the package's public names,
+so that `from a_package import function1` works and callers never learn which submodule `function1` lives in.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
 
-To explore this, create a directory called `a_package` and give it an `__init__.py` containing only a comment:
+To explore this, create a directory called `a_package` whose `__init__.py` announces itself,
+so the markers below show when it runs:
 
 ```python
 # a_package/__init__.py
+
+print("initializing a_package")
 ```
 
 Now add two modules to the package:
@@ -171,6 +217,7 @@ To import a module from a package, you must qualify it with the package name:
 import a_package.module1
 import a_package.module2
 
+#: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
 print("a_package" in dir(), "module1" in dir())
@@ -187,12 +234,28 @@ which is why `a_package.module1.function1()` resolves,
 and why the shorter `module1.function1()` fails here but works in `from_packages.py` below,
 where `from` binds `module1` directly.
 
+Importing the package alone does not import what is inside it:
+
+```python
+# package_only.py
+import a_package
+
+print(hasattr(a_package, "module1"))
+#: initializing a_package
+#: False
+```
+
+No submodule loads, and no message prints beyond the package's own.
+`a_package.module1.function1()` here would raise `AttributeError: module 'a_package' has no attribute 'module1'`.
+The submodule becomes an attribute of the package only when something imports it by name.
+
 You can also name the package with `from`:
 
 ```python
 # from_packages.py
 from a_package import module1, module2
 
+#: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
 print(module1.function1())
@@ -210,6 +273,7 @@ You can bring specific functions into the namespace by naming both the package a
 from a_package.module1 import function1
 from a_package.module2 import function2
 
+#: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
 print(function1())
@@ -222,6 +286,8 @@ You can put a second package underneath the first one:
 
 ```python
 # a_package/b_package/__init__.py
+
+print("initializing b_package")
 ```
 
 ```python
@@ -239,6 +305,8 @@ To import `module3` you must specify both packages:
 # two_levels.py
 from a_package.b_package import module3
 
+#: initializing a_package
+#: initializing b_package
 #: importing module3 in b_package
 print(module3.function3())
 #: function3 in module3 in b_package
@@ -262,6 +330,7 @@ def function4():
 # use_module4.py
 from a_package.module4 import function4
 
+#: initializing a_package
 #: importing module1 in a_package
 print(function4())
 #: function4 calls function1 in module1 in a_package
@@ -280,11 +349,22 @@ which a file run as a script does not have.
 Running `python a_package/module4.py` raises `ImportError: attempted relative import with no known parent package`.
 Run it as `python -m a_package.module4` instead.
 
+Two modules in a package can end up importing each other.
+The first one to load is placed in `sys.modules` before its body finishes,
+so the second one imports a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
+A cycle is a design signal:
+move the shared piece into a third module both can import.
+When the cycle exists only in annotations,
+an `if TYPE_CHECKING:` import breaks it,
+because annotations are not evaluated at import time
+(see [Simulation](38_Simulation.md#a-robot-in-a-maze)).
+
 ## File Names
 
-To be importable, a module's file name must be a valid Python identifier:
-letters, digits, and underscores, not starting with a digit, and not a keyword.
-Any other name still runs as a script but can never be the target of an `import`.
+To be the target of an `import` statement,
+a module's file name must be a valid Python identifier and not a keyword.
+`import my-mod` cannot parse.
+(`importlib.import_module("my-mod")` still loads it, which is how plugin loaders reach oddly named files, but that is not a name you should choose.)
 
 **Modules** (`.py` files): short, all-lowercase,
 with underscores between words if that improves readability.
@@ -305,14 +385,21 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 
 Don't shadow standard-library modules.
 A file named `random.py`, `types.py`,
-or `weakref.py` can hide the stdlib one and break imports.
+or `weakref.py` can hide the stdlib one and break imports,
+because the directory of the script you ran is searched before the standard library
+(see [`PYTHONPATH`](#pythonpath) below).
+Give a shared module a distinctive name for the same reason:
+the first `config.py` imported anywhere in the process is the one every later `import config` gets.
 
 ## `PYTHONPATH`
 
 Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
-Its first entry is the directory of the script you ran,
+Its first entry is the directory of the script you ran
+(the current directory when you use `-m` or the REPL),
 which is why `use_module.py` could `import module` with no setup at all;
+running with `-P` drops that first entry,
+so a local `random.py` can no longer shadow the standard library;
 the entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 
@@ -355,10 +442,10 @@ print(Path("report/data.txt").suffix)
 #: .txt
 ```
 
-Nothing loads at the `lazy import` lines,
-and once loaded the names behave exactly like eagerly imported ones.
-`json` and `pathlib` load on first use,
-at the `json.dumps` and `Path(...)` calls.
+A `lazy import` is spelled like an ordinary one, with `lazy` in front,
+and once loaded the names behave like eagerly imported ones.
+`json` and `pathlib` load at the `json.dumps` and `Path(...)` calls,
+which this listing cannot show, since the output is the same either way.
 
 Before 3.15, the way to defer a costly import was to move it inside the function that needed it.
 That works, but it hides the dependency:
@@ -391,11 +478,13 @@ print("after first use")
 #: after first use
 ```
 
-The body of `noisy` does not run at the `lazy import` line.
-It runs at `noisy.announce()`, the first access,
+Nothing loads at the `lazy import` line.
+The body of `noisy` runs at `noisy.announce()`, the first access,
 which is why `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
+`sys.lazy_modules` holds the names that are currently deferred,
+so you can check what a run actually put off without instrumenting the modules.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
@@ -419,16 +508,16 @@ including the ones whose only purpose is to run the module.
 
 ## Exercises
 
-1.  Add a third module, `a_package/module3.py`,
-    with its own `function3()` that prints a message when the module loads.
-    Import it three different ways, one each using `import a_package.module3`,
-    `from a_package import module3`,
-    and `from a_package.module3 import function3`,
+1.  Add a third module, `a_package/module5.py`,
+    with its own `function5()` that prints a message when the module loads.
+    Import it three different ways, one each using `import a_package.module5`,
+    `from a_package import module5`,
+    and `from a_package.module5 import function5`,
     and confirm the loading message prints only once no matter how many of the three you use together.
-2.  Add `a_package/b_package/module4.py` with a `function4()` that calls `function3()` from `module3`.
-    Import and call `function4()` from a script outside `a_package`,
-    then rename `b_package` to `bPackage` and explain,
-    from the naming rules above,
+2.  Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
+    Import and call `function6()` from a script outside `a_package`,
+    then rename `b_package` to `bPackage` (and rename it back afterward)
+    and explain, from the naming rules above,
     why that name is a poor choice even though the import still works.
 3.  Write a small module `noisy2.py` whose top-level body prints a message,
     similar to `noisy.py` above.
@@ -440,4 +529,11 @@ including the ones whose only purpose is to run the module.
     Run it.
     Then change the import back to `import module`,
     leaving the file named `Module.py`, and run it again.
-    Explain the result, and say what would happen on a case-sensitive filesystem such as Linux's default.
+    Predict the result before you run it, then explain what you see,
+    given that Windows and macOS open `module.py` and `Module.py` as the same file.
+    Look up `PYTHONCASEOK` to confirm your explanation.
+5.  Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
+    Then run `python a_package/module4.py` directly,
+    both before and after the change.
+    Both fail, with different errors: explain each,
+    and say why `python -m a_package.module4` works either way.

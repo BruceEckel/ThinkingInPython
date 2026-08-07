@@ -37,13 +37,32 @@ x.show_twice()
 #: Constructor argument
 ```
 
-Python methods require a reference to the current object.
+Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
 but you can use any identifier
 (however, anything other than `self` will probably confuse people).
 To refer to the object's fields or its other methods,
 you must go through `self`.
+
+```python
+# forgot_self.py
+
+class Forgetful:
+    def show():  # Missing the self parameter
+        print("never runs")
+
+try:
+    Forgetful().show()  # type: ignore
+except TypeError as e:
+    print(e)
+#: Forgetful.show() takes 0 positional arguments but 1 was given
+```
+
+The "1" is the object reference Python passed automatically.
+A method that omits `self` cannot receive it.
+A type checker sees the mistake without running anything,
+which is why the call carries a `# type: ignore` saying it is deliberate.
 
 When you call a method for an object, as in `x.show()`,
 Python passes the object reference automatically.
@@ -69,9 +88,14 @@ that name becomes a class-level field instead
 (similar to a static field in C++/Java).
 [Class Attributes](09_Class_Attributes.md)
 shows what that shared storage does when you assign to it.
+A bare annotation with no value,
+the form that looks most like a C++ or Java field declaration, does neither:
+it stores nothing and only records the type.
+[Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar)
+and [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) use it.
 
 You can see the shape of an object with `display_object()`,
-a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#the-inspect-module).
+a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#building-display_object).
 It prints an object's attributes and methods:
 
 ```python
@@ -109,7 +133,7 @@ which describes the shape a function needs instead of demanding a base class.
 First import the base class the same way you import any name from a module
 (see [Modules and Packages](06_Modules_and_Packages.md)).
 Then inherit by listing the class
-(or classes, since Python supports multiple inheritance)
+(or classes, since Python supports multiple inheritance, which [Rethinking Objects](20_Rethinking_Objects.md) argues against in favor of protocols)
 in parentheses after the name of the inheriting class.
 This example imports and subclasses `Simple`, from the `simple_class` module.
 Ignore the `@override` decorator for now;
@@ -183,6 +207,47 @@ with no other type requirements.
 Thus, `f()` works equally on an object of a class derived from `Simple` and one that isn't,
 as long as the `obj` argument has a `show()`.
 
+## Composing Methods with `import`
+
+You can compose methods into a class using `import`.
+More than one class can reuse a method defined this way:
+
+```python
+# utility.py
+
+def f(self):
+    print(f"utility.f() called on {self.name}")
+```
+
+This example composes that method into two unrelated classes:
+
+```python
+# compose.py
+
+class Compose:
+    from utility import f
+
+    def __init__(self, name):
+        self.name = name
+
+class Other:
+    from utility import f
+
+    def __init__(self, name):
+        self.name = name
+
+Compose("example").f()
+#: utility.f() called on example
+Other("second").f()
+#: utility.f() called on second
+```
+
+Because `f` is now an ordinary method, its first parameter is `self`,
+whichever class it was imported into.
+This is a curiosity more than a technique.
+It works because `import` inside a class body binds like any other assignment,
+but composition or a module-level function is almost always a clearer choice.
+
 ## Marking Overrides with `@override`
 
 When you override a method,
@@ -207,20 +272,33 @@ class Derived(Base):
     def show(self):
         print("Derived.show")
 
+class Typo(Base):
+    # @override  # "shwo" does not override anything
+    def shwo(self):
+        print("Typo.shwo")
+
 Derived().show()
 #: Derived.show
 ```
 
 A type checker now verifies the claim.
-If `Derived.show` does not override a method in a base class,
+If a decorated method does not override anything in a base class,
 because the name is misspelled or the base method is gone,
 the checker reports an error.
+Uncomment the decorator on `Typo.shwo` and it says:
+
+```text
+error[invalid-explicit-override]: Method `shwo` is decorated with
+`@override` but does not override anything
+```
+
 Python runs the program either way.
 Verification comes from a separate tool,
 introduced in [Static Typing](08_Static_Typing.md).
 
 At run time `@override` adds no wrapper.
-It sets an `__override__` attribute on the method,
+It tries to set an `__override__` attribute on the method
+(some callables refuse it),
 for anything that wants to find overrides by introspection,
 and returns the same function object.
 
@@ -251,9 +329,8 @@ print(c.area)  # Properties don't use parentheses
 #: 314.159
 ```
 
-Because the change is invisible at the call site,
-do not preemptively add getters and setters.
-You can always add them later when you discover you need the logic.
+`radius` is a plain attribute here and `area` is computed,
+and the call site cannot tell them apart.
 
 The default `@property` is read-only.
 Assigning to it raises an `AttributeError`.
@@ -277,8 +354,14 @@ class Circle:
             raise ValueError("radius cannot be negative")
         self._radius = value
 
+    @property
+    def area(self):  # Unchanged from the version above
+        return 3.14159 * self.radius ** 2
+
 c = Circle(10)
-c.radius = 5  # The setter validates, then stores
+print(c.radius, c.area)  # The same two lines as before
+#: 10 314.159
+c.radius = 5  # Now the setter validates, then stores
 print(c.radius)
 #: 5
 try:
@@ -287,6 +370,13 @@ except ValueError as e:
     print(f"Failed: {e}")
 #: Failed: radius cannot be negative
 ```
+
+This is the conversion the section opened with, carried out.
+`radius` began as a plain attribute and is now a validated property,
+and the two lines that read `c.radius` and `c.area` are the ones from the first listing,
+unchanged.
+Nothing outside the class could tell which version it is holding,
+which is why you do not add getters and setters before you need them.
 
 The property owns the name `radius` on the class,
 so the value goes into a separate attribute.
@@ -324,17 +414,26 @@ print(n.total)
 #: 30
 print(n.total)  # Second access: stored value, no recomputation
 #: 30
+n.values.append(20)
+print(n.total)  # Still the old sum: the cache is stale
+#: 30
+del n.total  # Discard the cached value
+print(n.total)
+#: summing 4 values
+#: 50
 ```
 
 The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
 so there's no cost if the attribute is not accessed.
-The stored value lives on the instance.
-`del n.total` discards it, and the next access recomputes.
+The stored value lives in the instance's `__dict__`,
+so a class that suppresses that dictionary,
+as [Rethinking Objects](20_Rethinking_Objects.md) does with `slots=True`,
+cannot use `cached_property`.
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
-`total` becomes stale.
+`total` becomes stale, as appending `20` above shows.
 A plain `@property` recomputes every time, so its answer is always current.
 Cache only what cannot change.
 
@@ -399,6 +498,10 @@ which is why it reads `Point(3, 4)`.
 Define `__repr__()` on classes you debug,
 and add `__str__()` only when users see the output.
 
+For classes that are primarily a bundle of typed data,
+[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
+shows how `@dataclass` writes the constructor and `__repr__()`.
+
 ## Static and Class Methods
 
 A method that doesn't use `self` can be a `@staticmethod`.
@@ -436,46 +539,6 @@ Naming the class directly would hard-code `Temperature` into every subclass.
 Defining it in the class keeps it where a reader looks for it,
 and lets a subclass replace it the way it replaces any other method.
 
-For classes that are primarily a bundle of typed data,
-[Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
-shows how `@dataclass` writes the constructor and `__repr__()`.
-
-## Composing Methods with `import`
-
-You can compose methods into a class using `import`.
-Multiple classes can reuse a method defined this way:
-
-```python
-# utility.py
-
-def f(self):
-    print(f"utility.f() called on {self}")
-```
-
-This example composes that method into a class:
-
-```python
-# compose.py
-
-class Compose:
-    from utility import f
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return f"Compose({self.name!r})"
-
-Compose("example").f()
-#: utility.f() called on Compose('example')
-```
-
-Because `f` is now an ordinary method, its first parameter is `self`,
-the `Compose` instance.
-This is a curiosity more than a technique.
-It works because `import` inside a class body binds like any other assignment,
-but composition or a module-level function is almost always a clearer choice.
-
 ## Exercises
 
 1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
@@ -500,3 +563,9 @@ but composition or a module-level function is almost always a clearer choice.
     Print a single `Temperature` and a list of two of them,
     and confirm the list shows the same form for each element.
     Then add a `__str__()` returning `21.0C` and confirm which of the two `print()` uses for each case.
+6.  In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
+    keeping the `@override` decorator.
+    Run the program and confirm it still prints `Base.show`,
+    then run the type checker ([Static Typing](08_Static_Typing.md) sets one up)
+    and read what it says.
+    Remove `@override` and confirm the checker goes quiet while the program's behavior does not change.

@@ -176,7 +176,7 @@ class Messenger:
 ```
 
 You can see what `@dataclass` generates using `display_object()`,
-the inspection helper from [Metaprogramming](17_Metaprogramming.md#the-inspect-module):
+the inspection helper from [Metaprogramming](17_Metaprogramming.md#building-display_object):
 
 ```python
 # display_messenger_class.py

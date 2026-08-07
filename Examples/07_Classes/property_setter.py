@@ -14,8 +14,14 @@ class Circle:
             raise ValueError("radius cannot be negative")
         self._radius = value
 
+    @property
+    def area(self):  # Unchanged from the version above
+        return 3.14159 * self.radius ** 2
+
 c = Circle(10)
-c.radius = 5  # The setter validates, then stores
+print(c.radius, c.area)  # The same two lines as before
+#: 10 314.159
+c.radius = 5  # Now the setter validates, then stores
 print(c.radius)
 #: 5
 try:

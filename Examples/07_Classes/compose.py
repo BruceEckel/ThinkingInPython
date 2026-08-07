@@ -6,8 +6,13 @@ class Compose:
     def __init__(self, name):
         self.name = name
 
-    def __repr__(self):
-        return f"Compose({self.name!r})"
+class Other:
+    from utility import f
+
+    def __init__(self, name):
+        self.name = name
 
 Compose("example").f()
-#: utility.f() called on Compose('example')
+#: utility.f() called on example
+Other("second").f()
+#: utility.f() called on second

@@ -2,6 +2,7 @@
 import a_package.module1
 import a_package.module2
 
+#: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
 print("a_package" in dir(), "module1" in dir())

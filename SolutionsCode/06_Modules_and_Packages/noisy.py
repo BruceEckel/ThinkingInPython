@@ -1,5 +1,5 @@
 # noisy.py
-print("noisy module body running")
+print("noisy module loaded")
 
 def announce():
-    print("noisy announces!")
+    print("noisy.announce() called")

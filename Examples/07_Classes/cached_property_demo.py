@@ -16,3 +16,10 @@ print(n.total)
 #: 30
 print(n.total)  # Second access: stored value, no recomputation
 #: 30
+n.values.append(20)
+print(n.total)  # Still the old sum: the cache is stale
+#: 30
+del n.total  # Discard the cached value
+print(n.total)
+#: summing 4 values
+#: 50
