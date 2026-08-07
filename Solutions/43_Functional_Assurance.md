@@ -170,7 +170,7 @@ import random
 from collections import Counter
 from collections.abc import Iterator
 from itertools import combinations, islice
-from hypothesis import assume, given, strategies
+from hypothesis import given, strategies
 
 type Group = tuple[str, ...]
 type Round = list[Group]
@@ -193,6 +193,8 @@ def group_rounds(
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
+        if pool and not groups:  # Roster smaller than one group
+            groups.append([])
         for extra in pool:
             roomiest = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
@@ -210,7 +212,6 @@ rosters = strategies.lists(
 @given(rosters, strategies.integers(min_value=2, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
-    assume(len(names) >= size)  # A round needs one full group
     for grouping in islice(group_rounds(names, size), 3):
         placed = [n for group in grouping for n in group]
         assert sorted(placed) == sorted(names)
@@ -223,15 +224,26 @@ property would fail for a reason that says nothing about the code.
 Generating distinct names states that precondition where the test can
 see it.
 
-The `assume()` states a second precondition, and the property test is
-how it was found. Without it, Hypothesis reports
-`names=['a', 'aa'], size=3` and a `ValueError: min() iterable argument
-is empty`: with fewer students than the group size, the `while
-len(pool) >= size` loop never runs, `groups` is empty, and the leftover
-loop calls `min()` on it. `group_rounds()` requires at least one full
-group's worth of students, which nothing in its signature or its
-chapter says. Surfacing an unstated precondition on the second test run
-is exactly what this style of testing is for.
+The two lines guarding an empty `groups` are the interesting part,
+because the property test is what found the need for them. Run against
+the version without them, Hypothesis reports `names=['a', 'aa'],
+size=3` and a `ValueError: min() iterable argument is empty`: with
+fewer students than the group size, the `while len(pool) >= size` loop
+never runs, `groups` stays empty, and the leftover loop then asks
+`min()` for the smallest of nothing.
+
+That is a real defect rather than an unstated precondition, and the
+distinction is worth drawing. `group_rounds()` already declines to
+leave anyone out when a roster divides unevenly, folding the leftovers
+into existing groups, so the answer for a roster of two and a size of
+five is one group of two. Crashing is the one answer inconsistent with
+what the function does everywhere else. The fix is in the chapter now,
+which is why the test above needs no `assume()` to pass.
+
+Finding it took no cleverness and no thought about edge cases. The
+strategy generates small rosters because Hypothesis prefers small
+examples, a size of `3` against a roster of `2` came up on its own, and
+the property said what should have been true for every roster.
 
 Breaking the function on purpose is the other half of the exercise.
 Delete the three lines that place leftovers:

@@ -500,6 +500,22 @@ right number, which still needs a human reading the two side by side. It runs
 first in `solutions-gate`, being the cheapest step and the only one that
 notices a missing answer.
 
+It also checks how a solution cites its chapter, which is a trap the layout
+sets. `Solutions/` sits beside `Chapters/` with the same file names, so a link
+copied from a chapter, `](24_Singleton.md#state)`, resolves to
+`Solutions/24_Singleton.md`: a real file, wrong content, no warning from
+anything. Seventeen links were wrong this way before anything looked. The
+correct form is `](../Chapters/24_Singleton.md#state)`, and a leading `./`
+marks a deliberate link to a neighboring solution.
+
+`heading_links.py` covers the other half. The gate now runs its `anchors`
+check over `Solutions/` as well (see `GATE_DOCS` in the Makefile), which
+catches an anchor that names no heading in whatever file it does reach; three
+of those were dead in `Solutions/` for the same "nothing looked here" reason.
+Neither check sees an anchorless link to a file that exists, so the two
+together are the coverage: `check_solutions.py` for the missing prefix,
+`heading_links.py` for the anchor.
+
 ## reflow_prose.py
 
 Rewrites prose paragraphs in `Chapters/*.md` so each sentence sits on its own

@@ -25,6 +25,13 @@ than 1..N in order. What it cannot see is a solution that answers the
 wrong exercise under the right number; that still needs a human reading
 the two side by side.
 
+It also checks how a solution *cites* its chapter. `Solutions/` sits
+beside `Chapters/`, so a link written the way a chapter writes it,
+`](24_Singleton.md#...)`, resolves to `Solutions/24_Singleton.md`, a real
+file with the wrong content. The correct form is `../Chapters/24_Singleton.md`.
+Seventeen links were wrong this way before anything looked. Write `./` on
+the front for a deliberate link to a neighboring solution.
+
 Usage:
     python tools/check_solutions.py           # every chapter
     python tools/check_solutions.py 19 45     # only these chapters
@@ -58,6 +65,11 @@ ANSWER = re.compile(r"^([\d\s&,-]+?)\.\s+\S")
 
 # How the numbers in a combined heading are separated.
 JOINERS = re.compile(r"[&,]")
+
+# A Markdown link to a numbered book file with no directory in front of
+# it, so it resolves beside the linking file: "](24_Singleton.md#state)".
+# A leading "./" or "../" fails the match, which is the opt-out.
+BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_]+\.md)([^)]*)\)")
 
 
 def exercise_numbers(doc: Document) -> list[tuple[int, int]]:
@@ -122,10 +134,23 @@ def out_of_order(
             )
 
 
+def chapter_citations(solutions: Path) -> Iterator[Finding]:
+    """Findings for a chapter link that resolves inside Solutions/."""
+    for lineno, line in Document.parse(solutions).outside_fences():
+        for m in BARE_CHAPTER_LINK.finditer(line):
+            yield Finding(
+                solutions, lineno,
+                f"link to {m.group(1)} resolves to Solutions/, not the "
+                f"chapter; write ../Chapters/{m.group(1)}",
+            )
+
+
 def compare(chapter: Path) -> Iterator[Finding]:
     """Findings for one chapter against its Solutions file."""
     exercises = exercise_numbers(Document.parse(chapter))
     solutions = SOLUTIONS_DIR / chapter.name
+    if solutions.exists():
+        yield from chapter_citations(solutions)
     if not exercises:
         return
     if not solutions.exists():
@@ -179,9 +204,9 @@ def main(argv: list[str] | None = None) -> int:
     return report(
         findings,
         clean="Exercises and solutions line up.",
-        problem="{n} exercise/solution mismatch(es). Write the missing "
-                "solution, or renumber so each `## N.` heading in "
-                "Solutions/ matches its exercise.",
+        problem="{n} problem(s) in Solutions/. Write the missing "
+                "solution, renumber so each `## N.` heading matches its "
+                "exercise, or fix the chapter link.",
     )
 
 

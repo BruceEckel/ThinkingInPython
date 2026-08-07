@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -245,22 +246,6 @@ This needs a matching entry in `Solutions/02_Tour.md`, which is outside
 this review's scope; the solution is a four-line variation on `shout()`.
 Alternative, if a fifth exercise is too many: retarget exercise 3, which is
 the lightest of the four, at `tstrings.py` instead of `fstrings.py`.
-
----
-
-[] Reject
-
-**Spellcheck flags "uppercases" (line 402) — a `tools/` change, not a chapter change.**
-
-`uv run python tools/spellcheck.py Chapters/02_Tour.md` reports
-`unknown word: "uppercases"`. The word is correct English and the sentence
-is the right one; the dictionary is simply missing the inflection. This is
-the only spellcheck hit in the chapter. `make spell` is not part of
-`verify`/`gate`, so nothing is failing today, but the hit will recur on
-every run.
-
-Proposed change: add `uppercases` to `tools/data/wordlist.txt`. I did not
-make this edit because `tools/` is out of scope for a chapter review.
 
 ---
 

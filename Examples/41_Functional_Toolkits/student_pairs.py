@@ -25,6 +25,8 @@ def group_rounds(
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
+        if pool and not groups:  # Roster smaller than one group
+            groups.append([])
         for extra in pool:  # Too few left for a full group of `size`
             roomiest = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
@@ -57,3 +59,6 @@ for i, grouping in enumerate(trios):
 #: 0 [('Gia', 'Eve', 'Cy', 'Fi'), ('Di', 'Bo', 'Ana')]
 #: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
+
+print(next(group_rounds(["Ana", "Bo"], 5)))  # Fewer than `size`
+#: [('Ana', 'Bo')]

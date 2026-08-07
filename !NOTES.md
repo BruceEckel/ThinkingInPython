@@ -1,4 +1,9 @@
+Look in deep_review for files that start with [[Reviewed]] and do those.
+Do them sequentially to prevent edit collisions.
+
 New book cover & favicon
+
+60 character limit on code listings, for better ebook reading experience
 
 Add Epub link info on README and bottom of index page.
 
@@ -40,15 +45,6 @@ Review all exercises to make sure they refer to existing examples and that all  
 - Indexing using Leanpub format, before publishing to leanpub
 
 - Potential example: A task runner based on decorators and generators
-
-/loop through the chapters in the book and look for correctness, style and voice issues.
-Fix any obvious issues, and put all the rest in CORRECTNESS_STYLE_AND_VOICE.md, demarking each chapter in the file.
-Do not give overviews or summaries or anything other than issues.
-The issues you put in CORRECTNESS_STYLE_AND_VOICE.md should be suggested fixes you need me to review.
-I will review CORRECTNESS_STYLE_AND_VOICE.md and hand it back to you.
-If I haven't deleted a suggested fix, it means I want you to do it.
-I may also make further notes next to a suggested fix, inside [[]], giving instructions about the fix.
-If you run out of tokens during a chapter, resume when it resets.
 
 ******************
 

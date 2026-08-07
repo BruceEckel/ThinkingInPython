@@ -3,7 +3,7 @@ import random
 from collections import Counter
 from collections.abc import Iterator
 from itertools import combinations, islice
-from hypothesis import assume, given, strategies
+from hypothesis import given, strategies
 
 type Group = tuple[str, ...]
 type Round = list[Group]
@@ -26,6 +26,8 @@ def group_rounds(
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
+        if pool and not groups:  # Roster smaller than one group
+            groups.append([])
         for extra in pool:
             roomiest = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
@@ -43,7 +45,6 @@ rosters = strategies.lists(
 @given(rosters, strategies.integers(min_value=2, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
-    assume(len(names) >= size)  # A round needs one full group
     for grouping in islice(group_rounds(names, size), 3):
         placed = [n for group in grouping for n in group]
         assert sorted(placed) == sorted(names)

@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from check_solutions import (
+    BARE_CHAPTER_LINK,
     answer_numbers,
     exercise_numbers,
     out_of_order,
@@ -80,6 +81,26 @@ def test_a_gap_in_the_numbering_is_reported() -> None:
     findings = list(out_of_order([(1, 3), (3, 9)], Path("a.md"), "solution"))
     assert len(findings) == 1
     assert "numbered 3 where 2 was expected" in findings[0].message
+
+# ── chapter citations ─────────────────────────────────────────────────────────
+
+def test_a_bare_chapter_link_is_flagged() -> None:
+    m = BARE_CHAPTER_LINK.search("see [State](26_Surrogate.md#state) for")
+    assert m is not None
+    assert m.group(1) == "26_Surrogate.md"
+
+def test_a_bare_link_with_no_anchor_is_flagged_too() -> None:
+    assert BARE_CHAPTER_LINK.search("[Classes](07_Classes.md)") is not None
+
+def test_a_chapters_prefixed_link_is_clean() -> None:
+    text = "[State](../Chapters/26_Surrogate.md#state)"
+    assert BARE_CHAPTER_LINK.search(text) is None
+
+def test_an_explicit_sibling_link_is_the_opt_out() -> None:
+    assert BARE_CHAPTER_LINK.search("[that answer](./26_Surrogate.md)") is None
+
+def test_a_same_file_anchor_is_not_a_chapter_link() -> None:
+    assert BARE_CHAPTER_LINK.search("[above](#the-heading)") is None
 
 # ── chapter selection ─────────────────────────────────────────────────────────
 

@@ -128,10 +128,14 @@ GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing ancho
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
-# README's own worked example of a banned phrase, and the listing checks
-# have no ```python blocks to inspect there. Two of these links were dead
-# for a while precisely because nothing looked outside Chapters/.
-GATE_DOCS = tools/README.md
+# README's own worked example of a banned phrase (and on the `from
+# __future__ import annotations` lines still in a few Solutions listings),
+# and the listing checks have no ```python blocks to inspect in the README.
+# Two of these links were dead for a while precisely because nothing looked
+# outside Chapters/, and three anchors in Solutions/ were dead for the same
+# reason. check_solutions.py covers the other half of a Solutions link, the
+# `../Chapters/` prefix that `anchors` cannot see is missing.
+GATE_DOCS = tools/README.md Solutions
 
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest, plus the same checks for

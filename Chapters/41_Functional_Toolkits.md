@@ -854,6 +854,8 @@ def group_rounds(
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
+        if pool and not groups:  # Roster smaller than one group
+            groups.append([])
         for extra in pool:  # Too few left for a full group of `size`
             roomiest = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
@@ -886,6 +888,9 @@ for i, grouping in enumerate(trios):
 #: 0 [('Gia', 'Eve', 'Cy', 'Fi'), ('Di', 'Bo', 'Ana')]
 #: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
+
+print(next(group_rounds(["Ana", "Bo"], 5)))  # Fewer than `size`
+#: [('Ana', 'Bo')]
 ```
 
 Called with `size=2`,
@@ -900,6 +905,14 @@ Called with `size=3`, the same function schedules trios instead.
 Seven students do not split evenly into threes,
 so one group grows to four rather than leaving anyone out,
 the same join-instead-of-sit-out choice the pair rounds made above.
+
+A roster smaller than one full group takes that choice to its limit.
+The `while len(pool) >= size` loop never runs,
+so there is no group to fold the leftovers into,
+and the `if pool and not groups` line opens one.
+Without it, `min()` is asked for the smallest of no groups and raises a `ValueError`.
+Two students and a requested size of five produce one group of two,
+because the alternative is a round in which nobody meets anyone.
 
 Generality cost something.
 The circle method needed no memory.

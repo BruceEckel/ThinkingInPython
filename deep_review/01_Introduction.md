@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -302,36 +303,6 @@ The paragraph above it is about where the book lives and how it is licensed,
 then six unannounced bullets appear. Proposed: add one line before the list.
 
 > Places worth knowing about:
-
----
-
-## Cross-chapter
-
-[] Reject
-
-**`Solutions/`: four chapters have an `## Exercises` section with no solutions
-file, which the Introduction's line 203 does not allow for.**
-
-Line 203 says flatly "Solutions live in the `Solutions/` directory of the
-source repository." `Solutions/` holds 40 files; the chapters with exercises
-and no matching solutions file are:
-
-- `21_The_Pattern_Concept.md`
-- `44_Effect_Management.md`
-- `45_Generators.md`
-- `46_Stateless.md`
-
-Two ways to settle it, and the choice is yours because it decides whether four
-solution files get written:
-
-1. Write the four missing `Solutions/NN_*.md` files, leaving the Introduction
-   as it is. This is the better outcome if those exercises are meant to have
-   solutions.
-2. Soften line 203 to "Solutions for most exercises live in the `Solutions/`
-   directory of the source repository."
-
-I did not touch `Solutions/` or those four chapters, per the scope rules for
-this review pass.
 
 ---
 
